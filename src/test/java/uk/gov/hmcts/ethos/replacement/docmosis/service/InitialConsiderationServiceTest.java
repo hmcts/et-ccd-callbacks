@@ -9,6 +9,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
+import uk.gov.hmcts.et.common.model.ccd.EtICHearingListedAnswers;
 import uk.gov.hmcts.et.common.model.ccd.EtICListForFinalHearing;
 import uk.gov.hmcts.et.common.model.ccd.EtICListForFinalHearingUpdated;
 import uk.gov.hmcts.et.common.model.ccd.EtICListForPreliminaryHearing;
@@ -48,6 +49,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CVP;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CVP_HEARING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.HEARING_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.HEARING_MISSING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.HEARING_NOT_LISTED;
@@ -413,7 +415,7 @@ class InitialConsiderationServiceTest {
         caseData.setEtICConvertPreliminaryGiveDetails("Test");
         caseData.setEtICConvertF2fGiveDetails("Test");
 
-        initialConsiderationService.clearHiddenValue(caseData, SCOTLAND_CASE_TYPE_ID);
+        initialConsiderationService.clearHiddenValue(caseData);
 
         assertThat(caseData.getEtICHearingNotListedList()).isNull();
         assertThat(caseData.getEtICHearingNotListedSeekComments()).isNull();
@@ -447,8 +449,11 @@ class InitialConsiderationServiceTest {
         caseData.setEtICHearingNotListedListForFinalHearing(new EtICListForFinalHearing());
         caseData.setEtICHearingNotListedUDLHearing(new EtIcudlHearing());
         caseData.setEtICHearingNotListedAnyOtherDirections("Test");
+        caseData.setEtICHearingNotListedListUpdated(new ArrayList<>());
+        caseData.setEtICHearingNotListedListForPrelimHearingUpdated(new EtICListForPreliminaryHearingUpdated());
+        caseData.setEtICHearingNotListedListForFinalHearingUpdated(new EtICListForFinalHearingUpdated());
 
-        initialConsiderationService.clearHiddenValue(caseData, SCOTLAND_CASE_TYPE_ID);
+        initialConsiderationService.clearHiddenValue(caseData);
 
         assertThat(caseData.getEtICFurtherInformation()).isNull();
         assertThat(caseData.getEtICFurtherInformationHearingAnyOtherDirections()).isNull();
@@ -462,6 +467,9 @@ class InitialConsiderationServiceTest {
         assertThat(caseData.getEtICHearingNotListedListForFinalHearing()).isNull();
         assertThat(caseData.getEtICHearingNotListedUDLHearing()).isNull();
         assertThat(caseData.getEtICHearingNotListedAnyOtherDirections()).isNull();
+        assertThat(caseData.getEtICHearingNotListedListUpdated()).isNull();
+        assertThat(caseData.getEtICHearingNotListedListForPrelimHearingUpdated()).isNull();
+        assertThat(caseData.getEtICHearingNotListedListForFinalHearingUpdated()).isNull();
     }
 
     @Test
@@ -482,8 +490,9 @@ class InitialConsiderationServiceTest {
         caseData.setEtICPostponeGiveDetails("Test");
         caseData.setEtICConvertPreliminaryGiveDetails("Test");
         caseData.setEtICConvertF2fGiveDetails("Test");
+        caseData.setEtICHearingListedAnswers(new EtICHearingListedAnswers());
 
-        initialConsiderationService.clearHiddenValue(caseData, SCOTLAND_CASE_TYPE_ID);
+        initialConsiderationService.clearHiddenValue(caseData);
 
         assertThat(caseData.getEtICFurtherInformation()).isNull();
         assertThat(caseData.getEtICFurtherInformationHearingAnyOtherDirections()).isNull();
@@ -498,6 +507,7 @@ class InitialConsiderationServiceTest {
         assertThat(caseData.getEtICPostponeGiveDetails()).isNull();
         assertThat(caseData.getEtICConvertPreliminaryGiveDetails()).isNull();
         assertThat(caseData.getEtICConvertF2fGiveDetails()).isNull();
+        assertThat(caseData.getEtICHearingListedAnswers()).isNull();
     }
 
     @Test
@@ -635,7 +645,7 @@ class InitialConsiderationServiceTest {
         preliminaryHearing.setEtICLengthOfPrelimHearing("1");
         preliminaryHearing.setPrelimHearingLengthNumType("Hours");
         caseData1.setEtICHearingNotListedListForPrelimHearing(preliminaryHearing);
-        initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData1);
+        initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData1, ENGLANDWALES_CASE_TYPE_ID);
 
         assertThat(caseData1.getEtICHearingNotListedListForPrelimHearingUpdated()).isNotNull();
         EtICListForPreliminaryHearingUpdated preliminaryHearingUpdated =
@@ -663,7 +673,7 @@ class InitialConsiderationServiceTest {
         preliminaryHearing.setEtICLengthOfPrelimHearing("1");
         preliminaryHearing.setPrelimHearingLengthNumType("Hours");
         caseData1.setEtICHearingNotListedListForPrelimHearing(preliminaryHearing);
-        initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData1);
+        initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData1, SCOTLAND_CASE_TYPE_ID);
 
         assertThat(caseData1.getEtICHearingNotListedListForPrelimHearingUpdated()).isNotNull();
         EtICListForPreliminaryHearingUpdated preliminaryHearingUpdated =
@@ -689,7 +699,29 @@ class InitialConsiderationServiceTest {
         finalHearing.setEtICLengthOfFinalHearing("1");
         finalHearing.setFinalHearingLengthNumType("Hours");
         caseData1.setEtICHearingNotListedListForFinalHearing(finalHearing);
-        initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData1);
+        initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData1, ENGLANDWALES_CASE_TYPE_ID);
+
+        assertThat(caseData1.getEtICHearingNotListedListForFinalHearingUpdated()).isNotNull();
+        EtICListForFinalHearingUpdated finalHearingUpdated =
+                caseData1.getEtICHearingNotListedListForFinalHearingUpdated();
+        assertEquals(List.of(VIDEO),
+                finalHearingUpdated.getEtICTypeOfFinalHearing());
+        assertEquals(finalHearing.getEtICLengthOfFinalHearing(),
+                finalHearingUpdated.getEtICLengthOfFinalHearing());
+        assertEquals(finalHearing.getFinalHearingLengthNumType(),
+                finalHearingUpdated.getFinalHearingLengthNumType());
+    }
+
+    @Test
+    void mapOldIcHearingNotListedOptionsToNew_FinalHearing_SC() {
+        CaseData caseData1 = new CaseData();
+        caseData1.setEtICHearingNotListedList(List.of(LIST_FOR_FINAL_HEARING));
+        EtICListForFinalHearing finalHearing = new EtICListForFinalHearing();
+        finalHearing.setEtICTypeOfFinalHearing(List.of(CVP, TELEPHONE));
+        finalHearing.setEtICLengthOfFinalHearing("1");
+        finalHearing.setFinalHearingLengthNumType("Hours");
+        caseData1.setEtICHearingNotListedListForFinalHearing(finalHearing);
+        initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData1, SCOTLAND_CASE_TYPE_ID);
 
         assertThat(caseData1.getEtICHearingNotListedListForFinalHearingUpdated()).isNotNull();
         EtICListForFinalHearingUpdated finalHearingUpdated =
@@ -710,7 +742,7 @@ class InitialConsiderationServiceTest {
         udlHearing.setEtIcudlHearFormat("Video hearing");
         udlHearing.setEtIcejSitAlone(YES);
         caseData1.setEtICHearingNotListedUDLHearing(udlHearing);
-        initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData1);
+        initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData1, ENGLANDWALES_CASE_TYPE_ID);
 
         assertThat(caseData1.getEtICHearingNotListedListForFinalHearingUpdated()).isNotNull();
         EtICListForFinalHearingUpdated finalHearingUpdated =
@@ -725,24 +757,24 @@ class InitialConsiderationServiceTest {
         CaseData caseData1 = new CaseData();
         caseData1.setEtICHearingNotListedList(List.of(UDL_HEARING));
         EtIcudlHearing udlHearing = new EtIcudlHearing();
-        udlHearing.setEtIcudlHearFormat("CVP hearing");
+        udlHearing.setEtIcudlHearFormat(CVP_HEARING);
         udlHearing.setEtIcejSitAlone(YES);
         caseData1.setEtICHearingNotListedUDLHearing(udlHearing);
-        initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData1);
+        initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData1, SCOTLAND_CASE_TYPE_ID);
 
         assertThat(caseData1.getEtICHearingNotListedListForFinalHearingUpdated()).isNotNull();
         EtICListForFinalHearingUpdated finalHearingUpdated =
                 caseData1.getEtICHearingNotListedListForFinalHearingUpdated();
         assertEquals(List.of(VIDEO),
                 finalHearingUpdated.getEtICTypeOfFinalHearing());
-        assertEquals(JSA, finalHearingUpdated.getEtICFinalHearingIsEJSitAlone());
+        assertEquals(YES, finalHearingUpdated.getEtICFinalHearingIsEJSitAlone());
     }
 
     @Test
     void mapOldIcHearingNotListedOptionsToNew_seekComments_EW() {
         CaseData caseData1 = new CaseData();
         caseData1.setEtICHearingNotListedList(List.of(SEEK_COMMENTS));
-        initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData1);
+        initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData1, ENGLANDWALES_CASE_TYPE_ID);
 
         assertThat(caseData1.getEtICHearingNotListedListUpdated()).isEqualTo(List.of(HEARING_NOT_LISTED));
     }

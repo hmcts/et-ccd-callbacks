@@ -99,7 +99,7 @@ public class InitialConsiderationController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        initialConsiderationService.clearHiddenValue(caseData, ccdRequest.getCaseDetails().getCaseTypeId());
+        initialConsiderationService.clearHiddenValue(caseData);
         caseData.setIcCompletedBy(reportDataService.getUserFullName(userToken));
         caseData.setIcDateCompleted(LocalDate.now().format(DateTimeFormatter.ofPattern(MONTH_STRING_DATE_FORMAT)));
         DocumentInfo documentInfo = initialConsiderationService.generateDocument(caseData, userToken,
@@ -154,7 +154,7 @@ public class InitialConsiderationController {
         initialConsiderationService.setIsHearingAlreadyListed(caseData, caseTypeId);
 
         if (CollectionUtils.isNotEmpty(caseData.getEtICHearingNotListedList())) {
-            initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData);
+            initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData, caseTypeId);
         }
 
         return getCallbackRespEntityNoErrors(caseData);

@@ -353,8 +353,6 @@ public class InitialConsiderationService {
         caseData.setEtICFurtherInformationTimeToComply(null);
         caseData.setEtInitialConsiderationRule27(null);
         caseData.setEtInitialConsiderationRule28(null);
-
-
     }
 
     private void removeEtICHearingAlreadyListedYesValue(CaseData caseData) {

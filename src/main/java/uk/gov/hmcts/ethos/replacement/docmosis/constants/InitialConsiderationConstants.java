@@ -61,9 +61,10 @@ public class InitialConsiderationConstants {
     public static final String VIDEO = "Video";
     public static final String F2F = "F2F";
     public static final String CVP = "CVP";
+    public static final String CVP_HEARING = "CVP hearing";
     public static final Map<String, String> hearingTypeMappings = Map.of(
             "Video hearing", VIDEO,
-            "CVP hearing", VIDEO,
+            CVP_HEARING, VIDEO,
             "Final F2F hearings (not Aberdeen)", F2F
     );
     public static final String JSA = "JSA";

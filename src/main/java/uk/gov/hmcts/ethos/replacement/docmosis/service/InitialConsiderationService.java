@@ -237,17 +237,17 @@ public class InitialConsiderationService {
      * @param caseData gets the CaseData
      */
     public void clearHiddenValue(CaseData caseData) {
-            if (YES.equals(caseData.getEtICCanProceed())) {
-                removeEtIcCanProceedYesValue(caseData);
-                if (YES.equals(caseData.getEtICHearingAlreadyListed())) {
-                    removeEtICHearingAlreadyListedYesValue(caseData);
-                } else {
-                    removeEtICHearingAlreadyListedNoValue(caseData);
-                }
-            } else {
+        if (YES.equals(caseData.getEtICCanProceed())) {
+            removeEtIcCanProceedYesValue(caseData);
+            if (YES.equals(caseData.getEtICHearingAlreadyListed())) {
                 removeEtICHearingAlreadyListedYesValue(caseData);
+            } else {
                 removeEtICHearingAlreadyListedNoValue(caseData);
             }
+        } else {
+            removeEtICHearingAlreadyListedYesValue(caseData);
+            removeEtICHearingAlreadyListedNoValue(caseData);
+        }
     }
 
     /**

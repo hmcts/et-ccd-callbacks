@@ -55,6 +55,7 @@ public class InitialConsiderationConstants {
     public static final String LIST_FOR_FINAL_HEARING = "List for final hearing";
     public static final String UDL_HEARING = "UDL hearing";
     public static final String SEEK_COMMENTS = "Seek comments on the video hearing";
+    public static final String SEEK_COMMENTS_SC = "Seek comments on the video hearing";
     public static final String HEARING_NOT_LISTED = "Do not list at present (give other directions below)";
     public static final String TELEPHONE = "Telephone";
     public static final String VIDEO = "Video";

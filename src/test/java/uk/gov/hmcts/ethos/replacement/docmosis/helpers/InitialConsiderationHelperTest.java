@@ -235,8 +235,8 @@ class InitialConsiderationHelperTest {
 
     @Test
     void getDocumentRequestSC_withNullCaseData_returnsEmptyJson() throws JsonProcessingException {
-        CaseData caseData = new CaseData();
-        String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseData, "key",
+        CaseData caseDataSC = new CaseData();
+        String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseDataSC, "key",
                 "ET_Scotland");
         String formattedNow = LocalDate.now().format(DateTimeFormatter.ofPattern(MONTH_STRING_DATE_FORMAT));
         String expected = "{\"accessKey\":\"key\",\"templateName\":\"EM-TRB-SCO-ENG-02204.docx\","

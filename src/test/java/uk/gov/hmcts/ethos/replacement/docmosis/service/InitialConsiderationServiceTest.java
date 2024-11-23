@@ -108,14 +108,13 @@ class InitialConsiderationServiceTest {
             + "|Duration | 3.5 Hours|"
             + "\n\n";
 
-    private static final String S1 = """
-            |Hearing details | |
-            |-------------|:------------|
-            |Date | 26 Nov 2024|
-            |Type | Hearing|
-            |Duration | 3.5 Hours|
-            
-            """;
+    private static final String EXPECTED_HEARING_DETAILS_STRING = """
+        |Hearing details | |
+        |-------------|:------------|
+        |Date | 16 May 2022|
+        |Type | Hearing|
+        |Duration | 60 Days|
+        """;
 
     private static final String EXPECTED_HEARING_BLANK = String.format(HEARING_DETAILS, "-", "-", "-");
 
@@ -520,11 +519,7 @@ class InitialConsiderationServiceTest {
 
     @Test
     void setIsHearingAlreadyListed_shouldBeSetToYes_whenThereAreHearings() {
-        caseData.setEtInitialConsiderationHearing("|Hearing details | |\r\n"
-            + "|-------------|:------------|\r\n"
-            + "|Date | 16 May 2022|\r\n"
-            + "|Type | Hearing|\r\n"
-            + "|Duration | 60 Days|");
+        caseData.setEtInitialConsiderationHearing(EXPECTED_HEARING_DETAILS_STRING);
 
         initialConsiderationService.setIsHearingAlreadyListed(caseData, SCOTLAND_CASE_TYPE_ID);
         assertThat(caseData.getEtICHearingAlreadyListed()).isEqualTo(YES);
@@ -532,11 +527,7 @@ class InitialConsiderationServiceTest {
 
     @Test
     void setIsHearingAlreadyListed_shouldIgnoreEntirely_whenCaseTypeIsEnglandWales() {
-        caseData.setEtInitialConsiderationHearing("|Hearing details | |\r\n"
-            + "|-------------|:------------|\r\n"
-            + "|Date | 16 May 2022|\r\n"
-            + "|Type | Hearing|\r\n"
-            + "|Duration | 60 Days|");
+        caseData.setEtInitialConsiderationHearing(EXPECTED_HEARING_DETAILS_STRING);
 
         initialConsiderationService.setIsHearingAlreadyListed(caseData, ENGLANDWALES_CASE_TYPE_ID);
         assertThat(caseData.getEtICHearingAlreadyListed()).isNull();

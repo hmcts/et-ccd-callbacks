@@ -480,6 +480,75 @@ class Et1VettingServiceTest {
     }
 
     @Test
+    void validateJurisdictionCodes_noErrors() {
+        CaseData caseData = new CaseData();
+        addJurCodeToVettingCollection(caseData, "DAG");
+        addJurCodeToVettingCollection(caseData, "PID");
+
+        List<String> errors = et1VettingService.validateJurisdictionCodes(caseData);
+
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void validateJurisdictionCodes_existingCodeError() {
+        CaseData caseData = new CaseData();
+        addJurCodeToExistingCollection(caseData, "DAG");
+        addJurCodeToVettingCollection(caseData, "DAG");
+
+        List<String> errors = et1VettingService.validateJurisdictionCodes(caseData);
+
+        assertThat(errors).containsExactly(String.format(ERROR_EXISTING_JUR_CODE, "DAG"));
+    }
+
+    @Test
+    void validateJurisdictionCodes_duplicateCodeError() {
+        CaseData caseData = new CaseData();
+        addJurCodeToVettingCollection(caseData, "PID");
+        addJurCodeToVettingCollection(caseData, "PID");
+
+        List<String> errors = et1VettingService.validateJurisdictionCodes(caseData);
+
+        assertThat(errors).containsExactly(String.format(ERROR_SELECTED_JUR_CODE, "PID"));
+    }
+
+    @Test
+    void validateJurisdictionCodes_existingAndDuplicateCodeErrors() {
+        CaseData caseData = new CaseData();
+        addJurCodeToExistingCollection(caseData, "DAG");
+        addJurCodeToVettingCollection(caseData, "DAG");
+        addJurCodeToVettingCollection(caseData, "PID");
+        addJurCodeToVettingCollection(caseData, "PID");
+
+        List<String> errors = et1VettingService.validateJurisdictionCodes(caseData);
+
+        assertThat(errors).containsExactly(
+                String.format(ERROR_EXISTING_JUR_CODE, "DAG"),
+                String.format(ERROR_SELECTED_JUR_CODE, "PID")
+        );
+    }
+
+    @Test
+    void validateJurisdictionCodes_nullVettingCollection() {
+        CaseData caseData = new CaseData();
+        caseData.setVettingJurisdictionCodeCollection(null);
+
+        List<String> errors = et1VettingService.validateJurisdictionCodes(caseData);
+
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void validateJurisdictionCodes_emptyVettingCollection() {
+        CaseData caseData = new CaseData();
+        caseData.setVettingJurisdictionCodeCollection(new ArrayList<>());
+
+        List<String> errors = et1VettingService.validateJurisdictionCodes(caseData);
+
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
     void testGettingHearingVenueAddressesHtml() {
         caseDetails.getCaseData().setManagingOffice("Manchester");
         caseDetails.getCaseData().setClaimantWorkAddressQuestion("No");

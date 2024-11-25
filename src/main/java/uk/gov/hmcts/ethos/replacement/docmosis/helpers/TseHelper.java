@@ -352,7 +352,7 @@ public final class TseHelper {
         return DocumentUtil.generateUploadedDocumentListFromDocumentList(caseData.getTseResponseSupportingMaterial());
     }
 
-    private static String hasSupportingDocs(List<GenericTypeItem<DocumentType>> supportDocList) {
+    public static String hasSupportingDocs(List<GenericTypeItem<DocumentType>> supportDocList) {
         return supportDocList != null && !supportDocList.isEmpty() ? "Yes" : "No";
     }
 }

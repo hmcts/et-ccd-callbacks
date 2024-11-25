@@ -21,7 +21,8 @@ public final class DocumentUtil {
             GenericTypeItem<DocumentType> genTypeItems = new GenericTypeItem<>();
             DocumentType docType = new DocumentType();
             docType.setUploadedDocument(doc.getValue().getUploadedDocument());
-            docType.getUploadedDocument().setDocumentBinaryUrl(doc.getValue().getUploadedDocument().getDocumentUrl());
+            docType.getUploadedDocument().setDocumentBinaryUrl(
+                    doc.getValue().getUploadedDocument().getDocumentBinaryUrl());
 
             genTypeItems.setId(doc.getId() != null ? doc.getId() : UUID.randomUUID().toString());
             genTypeItems.setValue(docType);

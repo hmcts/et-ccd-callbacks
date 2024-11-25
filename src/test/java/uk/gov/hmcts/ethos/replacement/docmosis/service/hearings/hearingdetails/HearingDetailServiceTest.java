@@ -9,6 +9,7 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.Document;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingDetailTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
@@ -23,9 +24,11 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
 @SuppressWarnings({"PMD.NcssCount"})
@@ -104,6 +107,7 @@ class HearingDetailServiceTest {
         assertEquals(hearingTimeFinish, hearingDetailType.getHearingDetailsTimingFinish());
         assertEquals(duration, hearingDetailType.getHearingDetailsTimingDuration());
         assertEquals(notes, hearingDetailType.getHearingDetailsHearingNotes2());
+        assertEquals(YES, caseData.getDoesHearingNotesDocExist());
     }
 
     @Test
@@ -182,6 +186,10 @@ class HearingDetailServiceTest {
         HearingDetailTypeItem hearingDetailTypeItem = new HearingDetailTypeItem();
         hearingDetailTypeItem.setValue(hearingDetailType);
         CaseData caseData = createCaseData();
+        Document hearingNotesDocument = new Document();
+        hearingNotesDocument.setUrl("http://localhost:8080/documents/123");
+        caseData.setUploadHearingNotesDocument(hearingNotesDocument);
+
         caseData.setHearingDetailsCollection(List.of(hearingDetailTypeItem));
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
@@ -211,6 +219,9 @@ class HearingDetailServiceTest {
         assertEquals(hearingTimeFinish, selectedListing.getHearingTimingFinish());
         assertEquals(duration, selectedListing.getHearingTimingDuration());
         assertEquals(notes, selectedListing.getHearingNotes2());
+        assertEquals(hearingNotesDocument,
+                caseDetails.getCaseData().getHearingCollection().get(0).getValue().getHearingNotesDocument());
+        assertNull(caseData.getUploadHearingNotesDocument());
     }
 
     @Test
@@ -272,6 +283,9 @@ class HearingDetailServiceTest {
         dateListedTypeItem.setId(UUID.randomUUID().toString());
         dateListedTypeItem.setValue(selectedListing);
         HearingType hearingType = new HearingType();
+        Document hearingNotesDocument = new Document();
+        hearingNotesDocument.setUrl("http://localhost:8080/documents/123");
+        hearingType.setHearingNotesDocument(hearingNotesDocument);
         hearingType.setHearingDateCollection(List.of(dateListedTypeItem));
         when(hearingSelectionService.getSelectedHearing(isA(CaseData.class), isA(DynamicFixedListType.class)))
                 .thenReturn(hearingType);
@@ -294,6 +308,9 @@ class HearingDetailServiceTest {
         dateListedTypeItemList.add(dateListedTypeItem);
         HearingType hearingType = new HearingType();
         hearingType.setHearingDateCollection(dateListedTypeItemList);
+        Document hearingNotesDocument = new Document();
+        hearingNotesDocument.setUrl("http://localhost:8080/documents/123");
+        hearingType.setHearingNotesDocument(hearingNotesDocument);
         hearingTypeItem.setValue(hearingType);
 
         List<HearingTypeItem> hearingTypeItemList = new ArrayList<>();

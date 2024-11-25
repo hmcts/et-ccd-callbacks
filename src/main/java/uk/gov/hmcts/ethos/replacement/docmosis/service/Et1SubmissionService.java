@@ -26,6 +26,7 @@ import java.util.Objects;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_ATTACHMENT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.LegalRepDocumentConstants.SUBMIT_ET1;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.ENGLISH_LANGUAGE;
@@ -115,7 +116,12 @@ public class Et1SubmissionService {
 
     public DocumentInfo createEt1(CaseDetails caseDetails, String userToken, String pdfSource)
             throws PdfServiceException {
-        byte[] pdf = pdfService.convertCaseToPdf(caseDetails.getCaseData(), pdfSource, ET1, "representative");
+        byte[] pdf = pdfService.convertCaseToPdf(
+                caseDetails.getCaseData(),
+                pdfSource,
+                ET1,
+                "representative",
+                SUBMIT_ET1);
         if (ObjectUtils.isEmpty(pdf)) {
             throw new PdfServiceException("Failed to create ET1 PDF", new NullPointerException());
         }

@@ -76,7 +76,6 @@ public class InitialConsiderationData {
     private String preliminaryHearingWithMembers;
     @JsonProperty("preliminaryHearingWithMembersReason")
     private String preliminaryHearingWithMembersReason;
-
     @JsonProperty("hearingNotListedListAnyOtherDirections")
     private String hearingNotListedListAnyOtherDirections;
 

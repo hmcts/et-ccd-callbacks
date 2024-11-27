@@ -23,8 +23,12 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
@@ -446,6 +450,41 @@ class TseRespondentReplyServiceTest {
                 Arguments.of(true, true),
                 Arguments.of(false, false)
         );
+    }
+
+    @Test
+    void updateResponseDocsBinaryUrl() {
+        UploadedDocumentType uploadedDocumentType = UploadedDocumentType.builder()
+                .documentUrl("http://localhost:8080/documents/123")
+                .documentBinaryUrl("http://localhost:8080/documents/123")
+                .documentFilename("test.pdf")
+                .build();
+        DocumentType documentType = DocumentType.builder()
+                .uploadedDocument(uploadedDocumentType)
+                .build();
+
+        TseRespondTypeItem tseRespondTypeItem = TseRespondTypeItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(TseRespondType.builder()
+                        .supportingMaterial(Collections.singletonList(GenericTypeItem.<DocumentType>builder()
+                                .value(documentType)
+                                .build()))
+                        .build())
+                .build();
+
+        GenericTseApplicationTypeItem genericTseApplicationTypeItem = GenericTseApplicationTypeItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(GenericTseApplicationType.builder()
+                        .respondCollection(Collections.singletonList(tseRespondTypeItem))
+                        .build())
+                .build();
+
+        caseData.setGenericTseApplicationCollection(Collections.singletonList(genericTseApplicationTypeItem));
+        tseRespondentReplyService.updateResponseDocsBinaryUrl(caseData);
+        assertThat(caseData.getGenericTseApplicationCollection().get(0).getValue()
+                .getRespondCollection().get(0).getValue()
+                .getSupportingMaterial().get(0).getValue()
+                .getUploadedDocument().getDocumentBinaryUrl()).endsWith("/binary");
     }
 
     private GenericTseApplicationType getApplicationType(boolean respondentResponseRequired) {

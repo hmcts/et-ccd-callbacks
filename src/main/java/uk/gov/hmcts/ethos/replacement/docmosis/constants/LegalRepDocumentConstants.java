@@ -6,6 +6,7 @@ import java.util.List;
 
 public final class LegalRepDocumentConstants {
     public static final String DOCUMENT_HEADING = "Document (the documents below open in a new tab)";
+    public static final String SUBMIT_ET1 = "submitEt1";
     public static final List<String> LEGAL_REP_HIDDEN_DOCS = List.of(
             DocumentConstants.ET1_VETTING,
             DocumentConstants.ET3_PROCESSING,

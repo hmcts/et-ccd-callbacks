@@ -19,6 +19,7 @@ import uk.gov.hmcts.et.common.model.ccd.EtIcudlHearing;
 import uk.gov.hmcts.et.common.model.ccd.EtInitialConsiderationRule27;
 import uk.gov.hmcts.et.common.model.ccd.EtInitialConsiderationRule28;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
@@ -591,6 +592,47 @@ class InitialConsiderationServiceTest {
         dateListedType.setHearingStatus(status);
         hearingDate.setValue(dateListedType);
         return hearingDate;
+    }
+
+    @Test
+    void processIcDocumentCollections_AllCollectionsNull() {
+        caseData.setIcDocumentCollection1(null);
+        caseData.setIcDocumentCollection2(null);
+        caseData.setIcDocumentCollection3(null);
+
+        initialConsiderationService.processIcDocumentCollections(caseData);
+
+        assertEquals(0, caseData.getIcAllDocumentCollection().size());
+    }
+
+    @Test
+    void processIcDocumentCollections_SomeCollectionsNotNull() {
+        List<DocumentTypeItem> collection1 = new ArrayList<>();
+        collection1.add(new DocumentTypeItem());
+        caseData.setIcDocumentCollection1(collection1);
+        caseData.setIcDocumentCollection2(null);
+        caseData.setIcDocumentCollection3(null);
+
+        initialConsiderationService.processIcDocumentCollections(caseData);
+
+        assertEquals(1, caseData.getIcAllDocumentCollection().size());
+    }
+
+    @Test
+    void processIcDocumentCollections_AllCollectionsNotNull() {
+        List<DocumentTypeItem> collection1 = new ArrayList<>();
+        collection1.add(new DocumentTypeItem());
+        List<DocumentTypeItem> collection2 = new ArrayList<>();
+        collection2.add(new DocumentTypeItem());
+        List<DocumentTypeItem> collection3 = new ArrayList<>();
+        collection3.add(new DocumentTypeItem());
+        caseData.setIcDocumentCollection1(collection1);
+        caseData.setIcDocumentCollection2(collection2);
+        caseData.setIcDocumentCollection3(collection3);
+
+        initialConsiderationService.processIcDocumentCollections(caseData);
+
+        assertEquals(3, caseData.getIcAllDocumentCollection().size());
     }
 
     @Test

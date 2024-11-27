@@ -12,6 +12,7 @@ import uk.gov.hmcts.et.common.model.ccd.EtICListForPreliminaryHearing;
 import uk.gov.hmcts.et.common.model.ccd.EtICListForPreliminaryHearingUpdated;
 import uk.gov.hmcts.et.common.model.ccd.EtIcudlHearing;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
@@ -378,5 +379,19 @@ public class InitialConsiderationService {
         caseData.setEtICConvertPreliminaryGiveDetails(null);
         caseData.setEtICConvertF2fGiveDetails(null);
         caseData.setEtICHearingListedAnswers(null);
+    }
+    
+    public void processIcDocumentCollections(CaseData caseData) {
+        List<DocumentTypeItem> mergedCollection = new ArrayList<>();
+        if (caseData.getIcDocumentCollection1() != null) {
+            mergedCollection.addAll(caseData.getIcDocumentCollection1());
+        }
+        if (caseData.getIcDocumentCollection2() != null) {
+            mergedCollection.addAll(caseData.getIcDocumentCollection2());
+        }
+        if (caseData.getIcDocumentCollection3() != null) {
+            mergedCollection.addAll(caseData.getIcDocumentCollection3());
+        }
+        caseData.setIcAllDocumentCollection(mergedCollection);
     }
 }

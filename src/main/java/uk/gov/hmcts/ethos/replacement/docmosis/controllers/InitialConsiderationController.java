@@ -99,6 +99,7 @@ public class InitialConsiderationController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        initialConsiderationService.processIcDocumentCollections(caseData);
         initialConsiderationService.clearHiddenValue(caseData);
         caseData.setIcCompletedBy(reportDataService.getUserFullName(userToken));
         caseData.setIcDateCompleted(LocalDate.now().format(DateTimeFormatter.ofPattern(MONTH_STRING_DATE_FORMAT)));

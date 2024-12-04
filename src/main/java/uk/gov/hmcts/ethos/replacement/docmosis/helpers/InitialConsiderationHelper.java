@@ -129,9 +129,11 @@ public final class InitialConsiderationHelper {
                 //final
                 .etICFinalHearingType(Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
                         .map(EtICListForFinalHearingUpdated::getEtICTypeOfFinalHearing).orElse(null))
-                .etICTypeOfVideoHearingOrder(Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
+                .etICTypeOfVideoHearingOrder(
+                        Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
                         .map(EtICListForFinalHearingUpdated::getEtICTypeOfVideoHearingOrder).orElse(null))
-                .etICTypeOfF2fHearingOrder(Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
+                .etICTypeOfF2fHearingOrder(
+                        Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
                         .map(EtICListForFinalHearingUpdated::getEtICTypeOfF2fHearingOrder).orElse(null))
                 .etICFinalHearingLength(
                         Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())

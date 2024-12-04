@@ -81,6 +81,10 @@ public class InitialConsiderationData {
 
     @JsonProperty("etICFinalHearingType")
     private List<String> etICFinalHearingType;
+    @JsonProperty("etICTypeOfVideoHearingOrder")
+    private List<String> etICTypeOfVideoHearingOrder;
+    @JsonProperty("etICTypeOfF2fHearingOrder")
+    private List<String> etICTypeOfF2fHearingOrder;
     @JsonProperty("etICFinalHearingLength")
     private String etICFinalHearingLength;
     @JsonProperty("etICFinalHearingLengthType")

@@ -5603,9 +5603,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"codeceptjs@npm:3.6.9":
-  version: 3.6.9
-  resolution: "codeceptjs@npm:3.6.9"
+"codeceptjs@npm:3.6.10":
+  version: 3.6.10
+  resolution: "codeceptjs@npm:3.6.10"
   dependencies:
     "@codeceptjs/configure": 1.0.1
     "@codeceptjs/detox-helper": 1.1.2
@@ -5658,7 +5658,7 @@ __metadata:
       optional: true
   bin:
     codeceptjs: bin/codecept.js
-  checksum: e1f992e468ba6d5c655469aa96749d506f590a0008c437ddc0cbcb8f7985a035f9ce0330c356d38e14c24d47441c45c4a79e2b3a0312452de2b8df570b00e0e8
+  checksum: 9e35b6200a07d1c1880bac34932b0725ff554d0ded10fc51b8666dc57d19d76c59c511070707e747eacc1bfd6251cc78a612cc7afbc6f19c34dc299a841fb20b
   languageName: node
   linkType: hard
 
@@ -7954,7 +7954,7 @@ __metadata:
     chai: 4.5.0
     chai-as-promised: 8.0.1
     chai-http: 5.1.1
-    codeceptjs: 3.6.9
+    codeceptjs: 3.6.10
     codeceptjs-saucehelper: ^1.4.0
     cross-env: 7.0.3
     eslint: 9.12.0

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
+import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -75,7 +76,7 @@ public class BFActionsScheduledTasks {
                 .query(new BoolQueryBuilder()
                         .must(new TermQueryBuilder("data.respondentCollection.value.responseReceived", NO))
                         .must(QueryBuilders.rangeQuery("data.bfActions.value.bfDate").to(yesterday).includeUpper(true))
-                        .mustNot(new TermQueryBuilder("data.waRule21ReferralSent", YES))
+                        .mustNot(new MatchQueryBuilder("data.waRule21ReferralSent", YES))
                         .must(new TermQueryBuilder("data.bfActions.value.allActions.keyword", "Claim served")))
                 .toString();
     }

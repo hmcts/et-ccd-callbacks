@@ -87,6 +87,7 @@ class InvalidCharacterCheckTest {
         return Stream.of(
             Arguments.of("John Doe", "John Doe"),
             Arguments.of("John O'Doe", "John O Doe"),
+            Arguments.of("John!Doe", "John Doe"),
             Arguments.of("John Doe/Jr", "John Doe Jr"),
             Arguments.of("", ""),
             Arguments.of(null, "")

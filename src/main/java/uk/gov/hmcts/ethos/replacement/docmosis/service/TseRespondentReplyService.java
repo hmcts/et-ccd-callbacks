@@ -11,6 +11,8 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
@@ -24,11 +26,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
@@ -101,6 +105,29 @@ public class TseRespondentReplyService {
         }
 
         resetReplyToApplicationPage(caseData);
+
+        updateResponseDocsBinaryUrl(caseData);
+    }
+
+    /**
+     * Updates the binary url of the uploaded documents in the response supporting material.
+     *
+     * @param caseData case data
+     */
+    public void updateResponseDocsBinaryUrl(CaseData caseData) {
+        caseData.getGenericTseApplicationCollection().stream()
+                .map(GenericTseApplicationTypeItem::getValue)
+                .filter(applicationType -> isNotEmpty(applicationType.getRespondCollection()))
+                .flatMap(applicationType -> applicationType.getRespondCollection().stream())
+                .map(TseRespondTypeItem::getValue)
+                .map(TseRespondType::getSupportingMaterial)
+                .filter(Objects::nonNull)
+                .flatMap(Collection::stream)
+                .map(GenericTypeItem::getValue)
+                .filter(document -> document.getUploadedDocument() != null)
+                .filter(document -> !document.getUploadedDocument().getDocumentBinaryUrl().endsWith("/binary"))
+                .forEach(document -> document.getUploadedDocument()
+                        .setDocumentBinaryUrl(document.getUploadedDocument().getDocumentUrl() + "/binary"));
     }
 
     /**

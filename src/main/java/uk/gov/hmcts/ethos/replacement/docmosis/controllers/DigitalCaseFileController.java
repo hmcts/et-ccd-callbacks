@@ -48,7 +48,7 @@ public class DigitalCaseFileController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> selectDcf(@RequestBody CCDRequest ccdRequest,
-                                                            @RequestHeader(value = HttpHeaders.AUTHORIZATION)
+                                                            @RequestHeader(HttpHeaders.AUTHORIZATION)
                                                             String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
@@ -75,7 +75,7 @@ public class DigitalCaseFileController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> aboutToSubmit(@RequestBody CCDRequest ccdRequest,
-                                                            @RequestHeader(value = HttpHeaders.AUTHORIZATION)
+                                                            @RequestHeader(HttpHeaders.AUTHORIZATION)
                                                             String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {

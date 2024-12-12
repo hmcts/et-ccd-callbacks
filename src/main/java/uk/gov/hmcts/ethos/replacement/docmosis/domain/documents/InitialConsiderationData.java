@@ -40,6 +40,12 @@ public class InitialConsiderationData {
     private String hearingConvertF2f;
     @JsonProperty("hearingOther")
     private String hearingOther;
+    @JsonProperty("hearingWithJudgeOrMembers")
+    private String hearingWithJudgeOrMembers;
+    @JsonProperty("hearingWithJudgeOrMembersReason")
+    private List<String> hearingWithJudgeOrMembersReason;
+    @JsonProperty("hearingWithJudgeOrMembersFurtherDetails")
+    private String hearingWithJudgeOrMembersFurtherDetails;
     @JsonProperty("otherDirections")
     private String otherDirections;
 
@@ -66,13 +72,31 @@ public class InitialConsiderationData {
     private String preliminaryHearingLength;
     @JsonProperty("preliminaryHearingLengthType")
     private String preliminaryHearingLengthType;
+    @JsonProperty("preliminaryHearingWithMembers")
+    private String preliminaryHearingWithMembers;
+    @JsonProperty("preliminaryHearingWithMembersReason")
+    private String preliminaryHearingWithMembersReason;
+    @JsonProperty("hearingNotListedListAnyOtherDirections")
+    private String hearingNotListedListAnyOtherDirections;
 
-    @JsonProperty("finalHearingType")
-    private List<String> finalHearingType;
-    @JsonProperty("finalHearingLength")
-    private String finalHearingLength;
-    @JsonProperty("finalHearingLengthType")
-    private String finalHearingLengthType;
+    @JsonProperty("etICFinalHearingType")
+    private List<String> etICFinalHearingType;
+    @JsonProperty("etICTypeOfVideoHearingOrder")
+    private List<String> etICTypeOfVideoHearingOrder;
+    @JsonProperty("etICTypeOfF2fHearingOrder")
+    private List<String> etICTypeOfF2fHearingOrder;
+    @JsonProperty("etICHearingOrderBUCompliance")
+    private String etICHearingOrderBUCompliance;
+    @JsonProperty("etICFinalHearingLength")
+    private String etICFinalHearingLength;
+    @JsonProperty("etICFinalHearingLengthType")
+    private String etICFinalHearingLengthType;
+    @JsonProperty("etICFinalHearingIsEJSitAlone")
+    private String etICFinalHearingIsEJSitAlone;
+    @JsonProperty("etICFinalHearingIsEJSitAloneReason")
+    private String etICFinalHearingIsEJSitAloneReason;
+    @JsonProperty("etICFinalHearingIsEJSitAloneFurtherDetails")
+    private String etICFinalHearingIsEJSitAloneFurtherDetails;
 
     @JsonProperty("udlSitAlone")
     private String udlSitAlone;

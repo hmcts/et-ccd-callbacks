@@ -116,11 +116,13 @@ public class Et1SubmissionService {
 
     public DocumentInfo createEt1(CaseDetails caseDetails, String userToken, String pdfSource)
             throws PdfServiceException {
+        // last 2 parameters don't have any effect fot the creation of ET1 PDF form. Those parameters are used
+        // just for discrimination between representative and citizen client types.
         byte[] pdf = pdfService.convertCaseToPdf(
                 caseDetails.getCaseData(),
                 pdfSource,
                 ET1,
-                "representative",
+                "claimantparty",
                 SUBMIT_ET1);
         if (ObjectUtils.isEmpty(pdf)) {
             throw new PdfServiceException("Failed to create ET1 PDF", new NullPointerException());

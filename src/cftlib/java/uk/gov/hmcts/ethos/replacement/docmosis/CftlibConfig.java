@@ -79,8 +79,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.SPECIFIC_AC
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.STAFF_ADMIN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.SUPERUSER_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.TASK_SUPERVISOR;
-import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.TTL_PROFILE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.TRIBUNAL_CASEWORKER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.TTL_PROFILE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.WA_SYSTEM_USER_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.WA_TASK_CONFIGURATION;
 

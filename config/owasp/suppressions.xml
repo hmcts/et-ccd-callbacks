@@ -12,11 +12,11 @@
         <packageUrl regex="true">^pkg:maven/com\.microsoft\.azure/adal4j@.*$</packageUrl>
         <cve>CVE-2021-42306</cve>
     </suppress>
-    <suppress until="2024-12-16Z">
+    <suppress until="2025-01-07Z">
         <packageUrl regex="true">^pkg:maven/com\.microsoft.*$</packageUrl>
         <cve>CVE-2023-36052</cve>
     </suppress>
-    <suppress until="2024-12-16Z">
+    <suppress until="2025-01-07Z">
         <packageUrl regex="true">^pkg:maven/com\.azure.*$</packageUrl>
         <cve>CVE-2023-36052</cve>
     </suppress>

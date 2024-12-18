@@ -300,8 +300,8 @@ integration.shouldRunAfter(checkstyleIntegrationTest)
 integration.shouldRunAfter(test)
 
 ext {
-    junitJupiterVersion = '5.11.3'
-    log4JVersion = '2.24.2'
+    junitJupiterVersion = '5.11.4'
+    log4JVersion = '2.24.3'
     pact_version = '4.3.10'
     reformLoggingVersion = '6.0.1'
     serenity = '3.9.8'
@@ -315,7 +315,7 @@ dependencyManagement {
         dependencySet(group: 'com.google.guava', version: '33.3.1-jre') {
             entry 'guava'
         }
-        dependencySet(group: 'io.netty', version: '4.1.115.Final') {
+        dependencySet(group: 'io.netty', version: '4.1.116.Final') {
             entry 'netty-buffer'
             entry 'netty-codec'
             entry 'netty-codec-http'
@@ -363,7 +363,7 @@ dependencies {
     implementation group: 'org.apache.santuario', name: 'xmlsec', version: '4.0.3'
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: tomcatEmbedVersion
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: tomcatEmbedVersion
-    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.4.1'
+    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.4.2'
     //To Remove vulnerability CVE-2020-11988
     implementation group: 'org.apache.xmlgraphics', name: 'xmlgraphics-commons', version: '2.10'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.22.3'
@@ -375,7 +375,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '3.1.9'
-    implementation group: 'org.springframework.retry', name: 'spring-retry', version: '2.0.10'
+    implementation group: 'org.springframework.retry', name: 'spring-retry', version: '2.0.11'
     // CVE-2022-25857
     implementation group: 'org.yaml', name: 'snakeyaml', version: '2.3'
     implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '4.1.1-RELEASE'
@@ -383,8 +383,8 @@ dependencies {
     // 1084765
     implementation group: 'org.webjars.npm', name: 'minimatch', version: '9.0.5'
     implementation group: 'org.asynchttpclient', name: 'async-http-client-netty-utils', version: '2.12.4'
-    implementation group: 'io.netty', name: 'netty-transport-classes-epoll', version: '4.1.115.Final'
-    implementation group: 'io.netty', name: 'netty-transport-classes-kqueue', version: '4.1.115.Final'
+    implementation group: 'io.netty', name: 'netty-transport-classes-epoll', version: '4.1.116.Final'
+    implementation group: 'io.netty', name: 'netty-transport-classes-kqueue', version: '4.1.116.Final'
     implementation group: 'com.fasterxml.woodstox', name: 'woodstox-core', version: '7.1.0'
     implementation group: 'com.squareup.okio', name: 'okio', version: '3.9.1'
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.13'
@@ -397,7 +397,7 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
-    testImplementation 'com.github.hmcts:fortify-client:1.4.5:all', {
+    testImplementation 'com.github.hmcts:fortify-client:1.4.6:all', {
         exclude module: 'commons-io'
     }
 
@@ -413,7 +413,7 @@ dependencies {
     testImplementation (group: 'org.docx4j', name: 'docx4j', version: '6.1.2') {
         exclude module: 'slf4j-log4j12'
     }
-    testImplementation(platform('org.junit:junit-bom:5.11.3'))
+    testImplementation(platform('org.junit:junit-bom:5.11.4'))
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
     testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.20.4'
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.26.3'
@@ -427,7 +427,7 @@ dependencies {
 
     contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitJupiterVersion
     contractTestRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitJupiterVersion
-    contractTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-commons', version: '1.11.3'
+    contractTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-commons', version: '1.11.4'
     contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.2.0'
     contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-netflix-ribbon', version: '2.2.10.RELEASE'
     contractTestImplementation sourceSets.main.runtimeClasspath

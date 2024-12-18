@@ -301,7 +301,7 @@ integration.shouldRunAfter(test)
 
 ext {
     junitJupiterVersion = '5.11.4'
-    log4JVersion = '2.24.2'
+    log4JVersion = '2.24.3'
     pact_version = '4.3.10'
     reformLoggingVersion = '6.0.1'
     serenity = '3.9.8'

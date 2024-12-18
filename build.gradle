@@ -196,7 +196,7 @@ tasks.register('integration', Test) {
     classpath = sourceSets.integrationTest.runtimeClasspath
     failFast = true
     reports {
-        html.enabled(true)
+        html.setRequired(true)
         html.destination file("${buildDir}/integration/")
     }
 }

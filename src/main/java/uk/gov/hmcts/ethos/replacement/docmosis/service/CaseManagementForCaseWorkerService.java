@@ -346,6 +346,10 @@ public class CaseManagementForCaseWorkerService {
         return dates;
     }
 
+    public void setMigratedCaseTtlDetails(String userToken, CaseDetails caseDetails) {
+
+    }
+
     public void setMigratedCaseLinkDetails(String authToken, CaseDetails caseDetails) {
         // get a target case data using the source case data and elastic search query
         Pair<String, List<SubmitEvent>> caseRefAndCaseDataPair =

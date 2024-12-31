@@ -51,7 +51,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCasesSendin
 import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -1374,18 +1373,18 @@ class CaseManagementForCaseWorkerServiceTest {
 
     @Test
     void setMigratedCaseTtlDetails_setsTtlWhenNotPresent() throws Exception {
-        String userToken = "userToken";
-        CCDRequest ccdRequest = new CCDRequest();
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setJurisdiction("Jurisdiction");
         caseDetails.setCaseId("caseId");
         caseDetails.setCaseTypeId("caseTypeId");
+        CCDRequest ccdRequest = new CCDRequest();
         ccdRequest.setCaseDetails(caseDetails);
         CaseData caseData = new CaseData();
         caseData.setRetrospectiveTTL("2023-12-31");
         SubmitEvent submitEvent = new SubmitEvent();
         submitEvent.setCaseData(caseData);
         List<SubmitEvent> submitEvents = List.of(submitEvent);
+        String userToken = "userToken";
         when(caseRetrievalForCaseWorkerService.casesRetrievalRequest(ccdRequest, userToken)).thenReturn(submitEvents);
         caseManagementForCaseWorkerService.setMigratedCaseTtlDetails(userToken, ccdRequest);
 
@@ -1398,12 +1397,11 @@ class CaseManagementForCaseWorkerServiceTest {
 
     @Test
     void setMigratedCaseTtlDetails_doesNotOverrideExistingTtl() throws Exception {
-        String userToken = "userToken";
-        CCDRequest ccdRequest = new CCDRequest();
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setJurisdiction("Jurisdiction");
         caseDetails.setCaseId("caseId");
         caseDetails.setCaseTypeId("caseTypeId");
+        CCDRequest ccdRequest = new CCDRequest();
         ccdRequest.setCaseDetails(caseDetails);
 
         TTL existingTtl = new TTL();
@@ -1413,6 +1411,7 @@ class CaseManagementForCaseWorkerServiceTest {
         SubmitEvent submitEvent = new SubmitEvent();
         submitEvent.setCaseData(caseData);
         List<SubmitEvent> submitEvents = List.of(submitEvent);
+        String userToken = "userToken";
         when(caseRetrievalForCaseWorkerService.casesRetrievalRequest(ccdRequest, userToken)).thenReturn(submitEvents);
         caseManagementForCaseWorkerService.setMigratedCaseTtlDetails(userToken, ccdRequest);
         assertThat(caseData.getTtl()).isEqualTo(existingTtl);
@@ -1422,11 +1421,11 @@ class CaseManagementForCaseWorkerServiceTest {
 
     @Test
     void setMigratedCaseTtlDetails_handlesEmptySubmitEvents() throws Exception {
-        String userToken = "userToken";
         CCDRequest ccdRequest = new CCDRequest();
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseId("caseId");
         ccdRequest.setCaseDetails(caseDetails);
+        String userToken = "userToken";
         when(caseRetrievalForCaseWorkerService.casesRetrievalRequest(ccdRequest, userToken))
                 .thenReturn(Collections.emptyList());
         caseManagementForCaseWorkerService.setMigratedCaseTtlDetails(userToken, ccdRequest);

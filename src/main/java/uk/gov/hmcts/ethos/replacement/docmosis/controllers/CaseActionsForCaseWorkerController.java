@@ -416,12 +416,12 @@ public class CaseActionsForCaseWorkerController {
     @PostMapping(value = "/migrateCaseTTLDetails", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "amends the case TTL details of a single case with/in draft state.")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
-                    content = { @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = CCDCallbackResponse.class))
-                    }),
-            @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
-            @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
+        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
+                content = { @Content(mediaType = "application/json",
+                        schema = @Schema(implementation = CCDCallbackResponse.class))
+                }),
+        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
+        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
     public ResponseEntity<CCDCallbackResponse> migrateCaseTTLDetails(
             @RequestBody CCDRequest ccdRequest,

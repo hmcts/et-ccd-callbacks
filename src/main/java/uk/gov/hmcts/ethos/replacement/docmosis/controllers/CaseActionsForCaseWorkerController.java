@@ -428,7 +428,7 @@ public class CaseActionsForCaseWorkerController {
             @RequestHeader("Authorization") String userToken) {
         log.info("MIGRATE CASE TTL DETAILS ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
 
-        caseManagementForCaseWorkerService.setMigratedCaseTtlDetails(userToken, ccdRequest.getCaseDetails());
+        caseManagementForCaseWorkerService.setMigratedCaseTtlDetails(userToken, ccdRequest);
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }
 

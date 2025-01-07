@@ -21,4 +21,24 @@
         <cve>CVE-2023-36052</cve>
     </suppress>
     <!-- Above to be removed when migrated to DB instead of SB queue -->
+
+    <!--Below suppressed as suggested update to the latest version of jackson-databind, i.e. 2.18.2
+        does break build -->
+    <suppress until="2025-05-07Z">
+        <packageUrl regex="true">^pkg:maven/com\.microsoft\.azure.\/adal4j@*$</packageUrl>
+        <cve>CVE-2021-42306</cve>
+    </suppress>
+    <suppress until="2025-05-07Z">
+        <packageUrl regex="true">^pkg:maven/com\.microsoft\.azure.\/azure-client-authentication@*$</packageUrl>
+        <cve>CVE-2023-36052</cve>
+    </suppress>
+    <suppress until="2025-05-07Z">
+        <packageUrl regex="true">^pkg:maven/com\.microsoft\.azure.\/azure-client-runtime@*$</packageUrl>
+        <cve>CVE-2023-36052</cve>
+    </suppress>
+    <suppress until="2025-05-07Z">
+        <packageUrl regex="true">^pkg:maven/com\.fasterxml\.jackson\.core\/jackson-databind@*$</packageUrl>
+        <cve>CVE-2021-42306</cve>
+    </suppress>
+
 </suppressions>

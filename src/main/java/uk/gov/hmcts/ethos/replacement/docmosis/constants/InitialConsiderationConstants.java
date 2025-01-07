@@ -69,6 +69,12 @@ public class InitialConsiderationConstants {
     );
     public static final String JSA = "JSA";
     public static final String WITH_MEMBERS = "With members";
+    public static final String ISSUE_RULE_27_NOTICE_AND_ORDER = "Issue Rule 27 Notice and order";
+    public static final String ISSUE_RULE_28_NOTICE_AND_ORDER = "Issue Rule 28 Notice and order";
+    public static final String ISSUE_RULE_29_NOTICE_AND_ORDER = "Issue Rule 29 Notice and order";
+    public static final String ISSUE_RULE_27_NOTICE_AND_ORDER_SC = "issueRule27";
+    public static final String ISSUE_RULE_28_NOTICE_AND_ORDER_SC = "issueRule28";
+    public static final String RULE_29_NOTICE = "Rule 29 Notice";
 
     private InitialConsiderationConstants() {
         // Access through static methods

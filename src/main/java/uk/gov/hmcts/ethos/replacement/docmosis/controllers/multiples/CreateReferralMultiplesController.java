@@ -38,6 +38,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getLast;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.clearReferralDataFromCaseData;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.getNearestHearingToReferral;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.setReferralSubject;
 
 /**
  * REST controller for the Create Referral event pages, formats data appropriately for rendering on the front end.
@@ -152,10 +153,7 @@ public class CreateReferralMultiplesController {
 
         MultipleDetails details = ccdRequest.getCaseDetails();
         MultipleData caseData = details.getCaseData();
-        if ("Party not responded/compiled".equals(caseData.getReferralSubject())) {
-            caseData.setReferralSubject("Party not responded/complied");
-        }
-
+        caseData.setReferralSubject(setReferralSubject(caseData.getReferralSubject()));
         UserDetails userDetails = userIdamService.getUserDetails(userToken);
         CaseData leadCase = caseLookupService.getLeadCaseFromMultipleAsAdmin(details);
 

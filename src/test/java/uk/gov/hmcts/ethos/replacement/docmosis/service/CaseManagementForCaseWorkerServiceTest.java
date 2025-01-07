@@ -1435,14 +1435,13 @@ class CaseManagementForCaseWorkerServiceTest {
 
     @Test
     void testSetMigratedCaseTtlDetails_exceptionInCcdClient() throws Exception {
-        String userToken = "userToken";
         CCDRequest ccdRequest = new CCDRequest();
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseId("caseId");
         CaseData caseData = new CaseData();
         caseDetails.setCaseData(caseData);
         ccdRequest.setCaseDetails(caseDetails);
-
+        String userToken = "userToken";
         when(caseRetrievalForCaseWorkerService.casesRetrievalRequest(ccdRequest, userToken))
                 .thenReturn(List.of(submitEvent));
 
@@ -1457,7 +1456,6 @@ class CaseManagementForCaseWorkerServiceTest {
                 .submitEventForCase(eq(userToken), eq(submitEvent.getCaseData()),
                         any(), any(), eq(ccdRequest), any());
     }
-
 
     private List<RespondentSumTypeItem> createRespondentCollection(boolean single) {
         RespondentSumTypeItem respondentSumTypeItem1 = createRespondentSumType(

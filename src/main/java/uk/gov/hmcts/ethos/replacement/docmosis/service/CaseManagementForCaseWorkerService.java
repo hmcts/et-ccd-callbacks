@@ -347,25 +347,21 @@ public class CaseManagementForCaseWorkerService {
         return dates;
     }
 
-    public void setMigratedCaseTtlDetails(String userToken, CCDRequest ccdRequest) {
+    public void setMigratedCaseTtlDetails(String userToken, CCDRequest ccdRequest) throws IOException {
         List<SubmitEvent> submitEvents = caseRetrievalForCaseWorkerService.casesRetrievalRequest(ccdRequest, userToken);
         // Get the target casedata and set the TTL field
         if (submitEvents != null && !submitEvents.isEmpty()) {
-            try {
-                SubmitEvent submitEvent = submitEvents.get(0);
-                CaseData caseData = submitEvent.getCaseData();
-                if (caseData.getTtl() == null) {
-                    TTL ttl = new TTL();
-                    ttl.setOverrideTTL(caseData.getRetrospectiveTTL());
-                    ttl.setSuspended("No");
-                    caseData.setTtl(ttl);
-                }
-                ccdClient.submitEventForCase(userToken, caseData, ccdRequest.getCaseDetails().getCaseTypeId(),
-                        ccdRequest.getCaseDetails().getJurisdiction(),
-                        ccdRequest, ccdRequest.getCaseDetails().getCaseId());
-            } catch (Exception ex) {
-                log.error("Error setting migrated case ttl details: {}", ex.getMessage());
+            SubmitEvent submitEvent = submitEvents.get(0);
+            CaseData caseData = submitEvent.getCaseData();
+            if (caseData.getTtl() == null) {
+                TTL ttl = new TTL();
+                ttl.setOverrideTTL(caseData.getRetrospectiveTTL());
+                ttl.setSuspended("No");
+                caseData.setTtl(ttl);
             }
+            ccdClient.submitEventForCase(userToken, caseData, ccdRequest.getCaseDetails().getCaseTypeId(),
+                    ccdRequest.getCaseDetails().getJurisdiction(),
+                    ccdRequest, ccdRequest.getCaseDetails().getCaseId());
         }
     }
 

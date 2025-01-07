@@ -425,7 +425,7 @@ public class CaseActionsForCaseWorkerController {
     })
     public ResponseEntity<CCDCallbackResponse> migrateCaseTTLDetails(
             @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) throws IOException {
         log.info("MIGRATE CASE TTL DETAILS ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
 
         caseManagementForCaseWorkerService.setMigratedCaseTtlDetails(userToken, ccdRequest);

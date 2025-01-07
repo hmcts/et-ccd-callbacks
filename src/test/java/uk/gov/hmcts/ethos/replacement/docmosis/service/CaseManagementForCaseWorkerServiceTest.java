@@ -1381,9 +1381,9 @@ class CaseManagementForCaseWorkerServiceTest {
         ccdRequest.setCaseDetails(caseDetails);
         CaseData caseData = new CaseData();
         caseData.setRetrospectiveTTL("2023-12-31");
-        SubmitEvent submitEvent = new SubmitEvent();
-        submitEvent.setCaseData(caseData);
-        List<SubmitEvent> submitEvents = List.of(submitEvent);
+        SubmitEvent submitEventTest = new SubmitEvent();
+        submitEventTest.setCaseData(caseData);
+        List<SubmitEvent> submitEvents = List.of(submitEventTest);
         String userToken = "userToken";
         when(caseRetrievalForCaseWorkerService.casesRetrievalRequest(ccdRequest, userToken)).thenReturn(submitEvents);
         caseManagementForCaseWorkerService.setMigratedCaseTtlDetails(userToken, ccdRequest);
@@ -1391,8 +1391,8 @@ class CaseManagementForCaseWorkerServiceTest {
         assertThat(caseData.getTtl()).isNotNull();
         assertThat(caseData.getTtl().getOverrideTTL()).isEqualTo("2023-12-31");
         assertThat(caseData.getTtl().getSuspended()).isEqualTo("No");
-        verify(ccdClient).submitEventForCase(eq(userToken), eq(caseData), eq("caseTypeId"),
-                eq("Jurisdiction"), eq(ccdRequest), eq("caseId"));
+        verify(ccdClient).submitEventForCase(userToken, caseData, "caseTypeId",
+                "Jurisdiction", ccdRequest, "caseId");
     }
 
     @Test
@@ -1408,15 +1408,15 @@ class CaseManagementForCaseWorkerServiceTest {
         existingTtl.setOverrideTTL("2023-12-31");
         CaseData caseData = new CaseData();
         caseData.setTtl(existingTtl);
-        SubmitEvent submitEvent = new SubmitEvent();
-        submitEvent.setCaseData(caseData);
-        List<SubmitEvent> submitEvents = List.of(submitEvent);
+        SubmitEvent submitEventForTtl = new SubmitEvent();
+        submitEventForTtl.setCaseData(caseData);
+        List<SubmitEvent> submitEvents = List.of(submitEventForTtl);
         String userToken = "userToken";
         when(caseRetrievalForCaseWorkerService.casesRetrievalRequest(ccdRequest, userToken)).thenReturn(submitEvents);
         caseManagementForCaseWorkerService.setMigratedCaseTtlDetails(userToken, ccdRequest);
         assertThat(caseData.getTtl()).isEqualTo(existingTtl);
-        verify(ccdClient).submitEventForCase(eq(userToken), eq(caseData), eq("caseTypeId"),
-                eq("Jurisdiction"), eq(ccdRequest), eq("caseId"));
+        verify(ccdClient).submitEventForCase(userToken, caseData, "caseTypeId",
+                "Jurisdiction", ccdRequest, "caseId");
     }
 
     @Test
@@ -1432,6 +1432,32 @@ class CaseManagementForCaseWorkerServiceTest {
         verify(ccdClient, never()).submitEventForCase(anyString(), any(CaseData.class), anyString(),
                 anyString(), any(CCDRequest.class), anyString());
     }
+
+    @Test
+    void testSetMigratedCaseTtlDetails_exceptionInCcdClient() throws Exception {
+        String userToken = "userToken";
+        CCDRequest ccdRequest = new CCDRequest();
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseId("caseId");
+        CaseData caseData = new CaseData();
+        caseDetails.setCaseData(caseData);
+        ccdRequest.setCaseDetails(caseDetails);
+
+        when(caseRetrievalForCaseWorkerService.casesRetrievalRequest(ccdRequest, userToken))
+                .thenReturn(List.of(submitEvent));
+
+        when(ccdClient.submitEventForCase(eq(userToken), eq(ccdRequest.getCaseDetails().getCaseData()),
+                anyString(), anyString(), eq(ccdRequest), anyString()))
+                .thenThrow(new RuntimeException("Error mukera"));
+
+        caseManagementForCaseWorkerService.setMigratedCaseTtlDetails(userToken, ccdRequest);
+
+        // Ensure method does not propagate the exception
+        verify(ccdClient, times(1))
+                .submitEventForCase(eq(userToken), eq(submitEvent.getCaseData()),
+                        any(), any(), eq(ccdRequest), any());
+    }
+
 
     private List<RespondentSumTypeItem> createRespondentCollection(boolean single) {
         RespondentSumTypeItem respondentSumTypeItem1 = createRespondentSumType(

@@ -340,7 +340,7 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'et-data-model', version: '3.18.25'
 
     implementation group: 'uk.gov.dwp.regex', name: 'postcode-validation', version: '1.1.0'
-    implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.7.3'
+    implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.8.1'
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '6.1.7'
     implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '8.0'
@@ -390,10 +390,6 @@ dependencies {
     implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.13'
 
     implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.6.0'
-
-    //to remove cves CVE-2021-42306
-    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.15.2'
-
     runtimeOnly group: 'com.squareup.okio', name: 'okio-jvm', version: '3.9.1'
 
     compileOnly 'org.projectlombok:lombok'

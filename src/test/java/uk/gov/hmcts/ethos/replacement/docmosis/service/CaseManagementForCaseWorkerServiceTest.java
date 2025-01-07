@@ -43,6 +43,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.RestrictedReportingType;
+import uk.gov.hmcts.et.common.model.ccd.types.TTL;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
@@ -66,6 +67,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -1369,6 +1371,92 @@ class CaseManagementForCaseWorkerServiceTest {
                 EMPLOYMENT,
                 multipleData,
                 "1716474017962374");
+    }
+
+    @Test
+    void setMigratedCaseTtlDetails_setsTtlWhenNotPresent() throws Exception {
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setJurisdiction("Jurisdiction");
+        caseDetails.setCaseId("caseId");
+        caseDetails.setCaseTypeId("caseTypeId");
+        CCDRequest ccdRequest = new CCDRequest();
+        ccdRequest.setCaseDetails(caseDetails);
+        CaseData caseData = new CaseData();
+        caseData.setRetrospectiveTTL("2023-12-31");
+        SubmitEvent submitEventTest = new SubmitEvent();
+        submitEventTest.setCaseData(caseData);
+        List<SubmitEvent> submitEvents = List.of(submitEventTest);
+        String userToken = "userToken";
+        when(caseRetrievalForCaseWorkerService.casesRetrievalRequest(ccdRequest, userToken)).thenReturn(submitEvents);
+        caseManagementForCaseWorkerService.setMigratedCaseTtlDetails(userToken, ccdRequest);
+
+        assertThat(caseData.getTtl()).isNotNull();
+        assertThat(caseData.getTtl().getOverrideTTL()).isEqualTo("2023-12-31");
+        assertThat(caseData.getTtl().getSuspended()).isEqualTo("No");
+        verify(ccdClient).submitEventForCase(userToken, caseData, "caseTypeId",
+                "Jurisdiction", ccdRequest, "caseId");
+    }
+
+    @Test
+    void setMigratedCaseTtlDetails_doesNotOverrideExistingTtl() throws Exception {
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setJurisdiction("Jurisdiction");
+        caseDetails.setCaseId("caseId");
+        caseDetails.setCaseTypeId("caseTypeId");
+        CCDRequest ccdRequest = new CCDRequest();
+        ccdRequest.setCaseDetails(caseDetails);
+
+        TTL existingTtl = new TTL();
+        existingTtl.setOverrideTTL("2023-12-31");
+        CaseData caseData = new CaseData();
+        caseData.setTtl(existingTtl);
+        SubmitEvent submitEventForTtl = new SubmitEvent();
+        submitEventForTtl.setCaseData(caseData);
+        List<SubmitEvent> submitEvents = List.of(submitEventForTtl);
+        String userToken = "userToken";
+        when(caseRetrievalForCaseWorkerService.casesRetrievalRequest(ccdRequest, userToken)).thenReturn(submitEvents);
+        caseManagementForCaseWorkerService.setMigratedCaseTtlDetails(userToken, ccdRequest);
+        assertThat(caseData.getTtl()).isEqualTo(existingTtl);
+        verify(ccdClient).submitEventForCase(userToken, caseData, "caseTypeId",
+                "Jurisdiction", ccdRequest, "caseId");
+    }
+
+    @Test
+    void setMigratedCaseTtlDetails_handlesEmptySubmitEvents() throws Exception {
+        CCDRequest ccdRequest = new CCDRequest();
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseId("caseId");
+        ccdRequest.setCaseDetails(caseDetails);
+        String userToken = "userToken";
+        when(caseRetrievalForCaseWorkerService.casesRetrievalRequest(ccdRequest, userToken))
+                .thenReturn(Collections.emptyList());
+        caseManagementForCaseWorkerService.setMigratedCaseTtlDetails(userToken, ccdRequest);
+        verify(ccdClient, never()).submitEventForCase(anyString(), any(CaseData.class), anyString(),
+                anyString(), any(CCDRequest.class), anyString());
+    }
+
+    @Test
+    void testSetMigratedCaseTtlDetails_exceptionInCcdClient() throws Exception {
+        CCDRequest ccdRequest = new CCDRequest();
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseId("caseId");
+        CaseData caseData = new CaseData();
+        caseDetails.setCaseData(caseData);
+        ccdRequest.setCaseDetails(caseDetails);
+        String userToken = "userToken";
+        when(caseRetrievalForCaseWorkerService.casesRetrievalRequest(ccdRequest, userToken))
+                .thenReturn(List.of(submitEvent));
+
+        when(ccdClient.submitEventForCase(eq(userToken), eq(ccdRequest.getCaseDetails().getCaseData()),
+                anyString(), anyString(), eq(ccdRequest), anyString()))
+                .thenThrow(new RuntimeException("Error mukera"));
+
+        caseManagementForCaseWorkerService.setMigratedCaseTtlDetails(userToken, ccdRequest);
+
+        // Ensure method does not propagate the exception
+        verify(ccdClient, times(1))
+                .submitEventForCase(eq(userToken), eq(submitEvent.getCaseData()),
+                        any(), any(), eq(ccdRequest), any());
     }
 
     private List<RespondentSumTypeItem> createRespondentCollection(boolean single) {

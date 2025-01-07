@@ -28,6 +28,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.EccCounterClaimType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.et.common.model.ccd.types.TTL;
 import uk.gov.hmcts.et.common.model.generic.BaseCaseData;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ECCHelper;
@@ -344,6 +345,30 @@ public class CaseManagementForCaseWorkerService {
             }
         }
         return dates;
+    }
+
+    /**
+     * Update Case TTL details.
+     *
+     * @param userToken - authorization token
+     * @param ccdRequest - ccdRequest that has the case details to be used for update
+     */
+    public void setMigratedCaseTtlDetails(String userToken, CCDRequest ccdRequest) throws IOException {
+        List<SubmitEvent> submitEvents = caseRetrievalForCaseWorkerService.casesRetrievalRequest(ccdRequest, userToken);
+        // Get the target casedata and set the TTL field
+        if (submitEvents != null && !submitEvents.isEmpty()) {
+            SubmitEvent submitEvent = submitEvents.get(0);
+            CaseData caseData = submitEvent.getCaseData();
+            if (caseData.getTtl() == null) {
+                TTL ttl = new TTL();
+                ttl.setOverrideTTL(caseData.getRetrospectiveTTL());
+                ttl.setSuspended("No");
+                caseData.setTtl(ttl);
+            }
+            ccdClient.submitEventForCase(userToken, caseData, ccdRequest.getCaseDetails().getCaseTypeId(),
+                    ccdRequest.getCaseDetails().getJurisdiction(),
+                    ccdRequest, ccdRequest.getCaseDetails().getCaseId());
+        }
     }
 
     public void setMigratedCaseLinkDetails(String authToken, CaseDetails caseDetails) {

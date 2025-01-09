@@ -28,7 +28,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.EccCounterClaimType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.et.common.model.ccd.types.TTL;
 import uk.gov.hmcts.et.common.model.generic.BaseCaseData;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ECCHelper;
@@ -354,14 +353,11 @@ public class CaseManagementForCaseWorkerService {
             SubmitEvent submitEvent = submitEvents.get(0);
             CaseData caseData = submitEvent.getCaseData();
             if (caseData.getTtl() == null) {
-                TTL ttl = new TTL();
-                ttl.setOverrideTTL(caseData.getRetrospectiveTTL());
-                ttl.setSuspended("No");
-                caseData.setTtl(ttl);
+                caseData.setTtl(ccdRequest.getCaseDetails().getCaseData().getTtl());
+                ccdClient.submitEventForCase(userToken, caseData, ccdRequest.getCaseDetails().getCaseTypeId(),
+                        ccdRequest.getCaseDetails().getJurisdiction(),
+                        ccdRequest, ccdRequest.getCaseDetails().getCaseId());
             }
-            ccdClient.submitEventForCase(userToken, caseData, ccdRequest.getCaseDetails().getCaseTypeId(),
-                    ccdRequest.getCaseDetails().getJurisdiction(),
-                    ccdRequest, ccdRequest.getCaseDetails().getCaseId());
         }
     }
 

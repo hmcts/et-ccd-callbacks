@@ -346,21 +346,6 @@ public class CaseManagementForCaseWorkerService {
         return dates;
     }
 
-    public void setMigratedCaseTtlDetails(String userToken, CCDRequest ccdRequest) throws IOException {
-        List<SubmitEvent> submitEvents = caseRetrievalForCaseWorkerService.casesRetrievalRequest(ccdRequest, userToken);
-        // Get the target casedata and set the TTL field
-        if (submitEvents != null && !submitEvents.isEmpty()) {
-            SubmitEvent submitEvent = submitEvents.get(0);
-            CaseData caseData = submitEvent.getCaseData();
-            if (caseData.getTtl() == null) {
-                caseData.setTtl(ccdRequest.getCaseDetails().getCaseData().getTtl());
-                ccdClient.submitEventForCase(userToken, caseData, ccdRequest.getCaseDetails().getCaseTypeId(),
-                        ccdRequest.getCaseDetails().getJurisdiction(),
-                        ccdRequest, ccdRequest.getCaseDetails().getCaseId());
-            }
-        }
-    }
-
     public void setMigratedCaseLinkDetails(String authToken, CaseDetails caseDetails) {
         // get a target case data using the source case data and elastic search query
         Pair<String, List<SubmitEvent>> caseRefAndCaseDataPair =

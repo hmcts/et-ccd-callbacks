@@ -288,8 +288,10 @@ class BulkHelperTest {
                 "B", "Withdrawn or private settlement");
         JurCodesTypeItem jurCodesTypeItem3 = getJurCodesWithOutcome(
                 "C", "Input in error");
+        JurCodesTypeItem jurCodesTypeItem4 = getJurCodesWithOutcome(
+                "D", "Dismissed on withdrawal");
         List<JurCodesTypeItem> jurCodesTypeItems = new ArrayList<>(
-                Arrays.asList(jurCodesTypeItem1, jurCodesTypeItem2, jurCodesTypeItem3));
+                Arrays.asList(jurCodesTypeItem1, jurCodesTypeItem2, jurCodesTypeItem3, jurCodesTypeItem4));
         assertEquals(" ", BulkHelper.getJurCodesCollectionWithHide(jurCodesTypeItems));
     }
 
@@ -314,8 +316,10 @@ class BulkHelperTest {
                 "B", "Successful at hearing");
         JurCodesTypeItem jurCodesTypeItem3 = getJurCodesWithOutcome(
                 "C", "Withdrawn or private settlement");
+        JurCodesTypeItem jurCodesTypeItem4 = getJurCodesWithOutcome(
+                "D", "Dismissed on withdrawal");
         List<JurCodesTypeItem> jurCodesTypeItems = new ArrayList<>(
-                Arrays.asList(jurCodesTypeItem1, jurCodesTypeItem2, jurCodesTypeItem3));
+                Arrays.asList(jurCodesTypeItem1, jurCodesTypeItem2, jurCodesTypeItem3, jurCodesTypeItem4));
         assertEquals("B", BulkHelper.getJurCodesCollectionWithHide(jurCodesTypeItems));
     }
 

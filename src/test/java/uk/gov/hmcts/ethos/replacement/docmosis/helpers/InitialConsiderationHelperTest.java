@@ -14,6 +14,11 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.ISSUE_RULE_27_NOTICE_AND_ORDER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.ISSUE_RULE_27_NOTICE_AND_ORDER_SC;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.ISSUE_RULE_28_NOTICE_AND_ORDER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.ISSUE_RULE_28_NOTICE_AND_ORDER_SC;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
 
 class InitialConsiderationHelperTest {
@@ -273,7 +278,7 @@ class InitialConsiderationHelperTest {
                 + "\"udlViewsOfParties\":null,\"udlNoViewsExpressedByParties\":null,\"udlConcurrentProceedings\":null,"
                 + "\"udlOther\":null,\"udlHearingFormat\":null,\"udlCVPIssue\":null,\"udlFinalF2FIssue\":null,"
                 + "\"udlCheckComplianceOrders\":null,\"hearingNotListedOtherDirections\":null,"
-                + "\"furtherInformation\":null,\"furtherInfoGiveDetails\":null,\"furtherInfoTimeToComply\":null,"
+                + "\"furtherInformation\":[],\"furtherInfoGiveDetails\":null,\"furtherInfoTimeToComply\":null,"
                 + "\"r27ClaimToBe\":null,\"r27WhichPart\":null,\"r27Direction\":null,\"r27DirectionReason\":null,"
                 + "\"r27NoJurisdictionReason\":null,\"r27NumberOfDays\":null,\"r28ClaimToBe\":null,"
                 + "\"r28WhichPart\":null,\"r28DirectionReason\":null,\"r28NumberOfDays\":null,"
@@ -307,5 +312,104 @@ class InitialConsiderationHelperTest {
         finalHearingUpdated.setEtICFinalHearingIsEJSitAloneReason("Members experience is likely to add significant "
                 + "value to the process of adjudication");
         return finalHearingUpdated;
+    }
+
+    @Test
+    void getFurtherInformationRuleChange_EngWales() throws JsonProcessingException {
+        caseData = CaseDataBuilder.builder().build();
+        setCaseDataValues(caseData);
+        caseData.setEtICFurtherInformation(List.of(ISSUE_RULE_28_NOTICE_AND_ORDER, ISSUE_RULE_27_NOTICE_AND_ORDER));
+        String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseData,
+                "key", ENGLANDWALES_CASE_TYPE_ID);
+
+        String expected = "{\"accessKey\":\"key\",\"templateName\":\"EM-TRB-EGW-ENG-02203.docx\","
+                + "\"outputName\":\"Initial Consideration.pdf\",\"data\":{\"caseNumber\":\"6000001/2024\","
+                + "\"issuesJurisdiction\":\"No\",\"issuesJurCodesGiveDetails\":null,\"canProceed\":\"Yes\","
+                + "\"hearingAlreadyListed\":\"No\",\"hearingListed\":null,\"hearingPostpone\":null,"
+                + "\"hearingExtend\":null,\"hearingConvertFinal\":null,\"hearingConvertF2f\":null,"
+                + "\"hearingOther\":null,\"hearingWithJudgeOrMembers\":null,\"hearingWithJudgeOrMembersReason\":null,"
+                + "\"hearingWithJudgeOrMembersFurtherDetails\":null,\"otherDirections\":null,"
+                + "\"hearingNotListed\":null,\"cvpHearingType\":null,"
+                + "\"cvpFinalDetails\":null,\"cvpPreliminaryDetails\":null,\"cvpPreliminaryYesNo\":null,"
+                + "\"preliminaryHearingType\":null,\"preliminaryHearingPurpose\":null,"
+                + "\"preliminaryHearingNotice\":null,\"preliminaryHearingLength\":null,"
+                + "\"preliminaryHearingLengthType\":null,\"preliminaryHearingWithMembers\":null,"
+                + "\"preliminaryHearingWithMembersReason\":null,"
+                + "\"hearingNotListedListAnyOtherDirections\":null,"
+                + "\"etICFinalHearingType\":null,"
+                + "\"etICTypeOfVideoHearingOrder\":null,\"etICTypeOfF2fHearingOrder\":null,"
+                + "\"etICHearingOrderBUCompliance\":null,"
+                + "\"etICFinalHearingLength\":null,"
+                + "\"etICFinalHearingLengthType\":null,\"etICFinalHearingIsEJSitAlone\":null,"
+                + "\"etICFinalHearingIsEJSitAloneReason\":null,"
+                + "\"etICFinalHearingIsEJSitAloneFurtherDetails\":null,"
+                + "\"udlSitAlone\":null,\"udlReasons\":null,\"udlDisputeOnFacts\":null,"
+                + "\"udlLittleOrNoAgreement\":null,\"udlIssueOfLawArising\":null,\"udlViewsOfParties\":null,"
+                + "\"udlNoViewsExpressedByParties\":null,\"udlConcurrentProceedings\":null,\"udlOther\":null,"
+                + "\"udlHearingFormat\":null,\"udlCVPIssue\":null,\"udlFinalF2FIssue\":null,"
+                + "\"udlCheckComplianceOrders\":null,\"hearingNotListedOtherDirections\":null,"
+                + "\"furtherInformation\":[\"Issue Rule 29 Notice and order\",\"Issue Rule 28 Notice and order\"],"
+                + "\"furtherInfoGiveDetails\":null,\"furtherInfoTimeToComply\":null,"
+                + "\"r27ClaimToBe\":null,\"r27WhichPart\":null,\"r27Direction\":null,\"r27DirectionReason\":null,"
+                + "\"r27NoJurisdictionReason\":null,\"r27NumberOfDays\":null,\"r28ClaimToBe\":null,"
+                + "\"r28WhichPart\":null,\"r28DirectionReason\":null,\"r28NumberOfDays\":null,"
+                + "\"furtherInfoAnyOtherDirections\":null,\"icReceiptET3FormIssues\":null,"
+                + "\"icRespondentsNameIdentityIssues\":null,\"icJurisdictionCodeIssues\":null,"
+                + "\"icApplicationIssues\":null,\"icEmployersContractClaimIssues\":null,"
+                + "\"icClaimProspectIssues\":null,\"icListingIssues\":null,\"icDdaDisabilityIssues\":null,"
+                + "\"icOrderForFurtherInformation\":null,\"icOtherIssuesOrFinalOrders\":null,"
+                + "\"icCompletedBy\":\"A User\",\"icDateCompleted\":\"20 Nov 2024\"}}";
+
+        assertEquals(expected, documentRequest);
+    }
+
+    @Test
+    void getFurtherInformationRuleChange_Scotland() throws JsonProcessingException {
+        caseData = CaseDataBuilder.builder().build();
+        setCaseDataValues(caseData);
+        caseData.setEtICFurtherInformation(List.of(ISSUE_RULE_28_NOTICE_AND_ORDER_SC,
+                ISSUE_RULE_27_NOTICE_AND_ORDER_SC));
+        String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseData,
+                "key", SCOTLAND_CASE_TYPE_ID);
+
+        String expected = "{\"accessKey\":\"key\",\"templateName\":\"EM-TRB-SCO-ENG-02204.docx\","
+                + "\"outputName\":\"Initial Consideration.pdf\",\"data\":{\"caseNumber\":\"6000001/2024\","
+                + "\"issuesJurisdiction\":\"No\",\"issuesJurCodesGiveDetails\":null,\"canProceed\":\"Yes\","
+                + "\"hearingAlreadyListed\":\"No\",\"hearingListed\":null,\"hearingPostpone\":null,"
+                + "\"hearingExtend\":null,\"hearingConvertFinal\":null,\"hearingConvertF2f\":null,"
+                + "\"hearingOther\":null,\"hearingWithJudgeOrMembers\":null,\"hearingWithJudgeOrMembersReason\":null,"
+                + "\"hearingWithJudgeOrMembersFurtherDetails\":null,\"otherDirections\":null,"
+                + "\"hearingNotListed\":null,\"cvpHearingType\":null,"
+                + "\"cvpFinalDetails\":null,\"cvpPreliminaryDetails\":null,\"cvpPreliminaryYesNo\":null,"
+                + "\"preliminaryHearingType\":null,\"preliminaryHearingPurpose\":null,"
+                + "\"preliminaryHearingNotice\":null,\"preliminaryHearingLength\":null,"
+                + "\"preliminaryHearingLengthType\":null,\"preliminaryHearingWithMembers\":null,"
+                + "\"preliminaryHearingWithMembersReason\":null,"
+                + "\"hearingNotListedListAnyOtherDirections\":null,"
+                + "\"etICFinalHearingType\":null,"
+                + "\"etICTypeOfVideoHearingOrder\":null,\"etICTypeOfF2fHearingOrder\":null,"
+                + "\"etICHearingOrderBUCompliance\":null,"
+                + "\"etICFinalHearingLength\":null,"
+                + "\"etICFinalHearingLengthType\":null,\"etICFinalHearingIsEJSitAlone\":null,"
+                + "\"etICFinalHearingIsEJSitAloneReason\":null,"
+                + "\"etICFinalHearingIsEJSitAloneFurtherDetails\":null,"
+                + "\"udlSitAlone\":null,\"udlReasons\":null,\"udlDisputeOnFacts\":null,"
+                + "\"udlLittleOrNoAgreement\":null,\"udlIssueOfLawArising\":null,\"udlViewsOfParties\":null,"
+                + "\"udlNoViewsExpressedByParties\":null,\"udlConcurrentProceedings\":null,\"udlOther\":null,"
+                + "\"udlHearingFormat\":null,\"udlCVPIssue\":null,\"udlFinalF2FIssue\":null,"
+                + "\"udlCheckComplianceOrders\":null,\"hearingNotListedOtherDirections\":null,"
+                + "\"furtherInformation\":[\"Issue Rule 29 Notice and order\",\"Issue Rule 28 Notice and order\"],"
+                + "\"furtherInfoGiveDetails\":null,\"furtherInfoTimeToComply\":null,"
+                + "\"r27ClaimToBe\":null,\"r27WhichPart\":null,\"r27Direction\":null,\"r27DirectionReason\":null,"
+                + "\"r27NoJurisdictionReason\":null,\"r27NumberOfDays\":null,\"r28ClaimToBe\":null,"
+                + "\"r28WhichPart\":null,\"r28DirectionReason\":null,\"r28NumberOfDays\":null,"
+                + "\"furtherInfoAnyOtherDirections\":null,\"icReceiptET3FormIssues\":null,"
+                + "\"icRespondentsNameIdentityIssues\":null,\"icJurisdictionCodeIssues\":null,"
+                + "\"icApplicationIssues\":null,\"icEmployersContractClaimIssues\":null,"
+                + "\"icClaimProspectIssues\":null,\"icListingIssues\":null,\"icDdaDisabilityIssues\":null,"
+                + "\"icOrderForFurtherInformation\":null,\"icOtherIssuesOrFinalOrders\":null,"
+                + "\"icCompletedBy\":\"A User\",\"icDateCompleted\":\"20 Nov 2024\"}}";
+
+        assertEquals(expected, documentRequest);
     }
 }

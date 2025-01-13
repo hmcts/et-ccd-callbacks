@@ -770,4 +770,20 @@ class ReferralHelperTest {
         assertEquals(1, caseData.getDocumentCollection().size());
 
     }
+
+    @ParameterizedTest
+    @MethodSource("provideReferralSubject")
+    void updateReferralSubject(String initialSubject, String expectedSubject) {
+        assertEquals(expectedSubject, ReferralHelper.setReferralSubject(initialSubject));
+    }
+
+    private static Stream<Arguments> provideReferralSubject() {
+        return Stream.of(
+                Arguments.of(PARTY_NOT_RESPONDED_COMPILED, PARTY_NOT_RESPONDED_COMPLIED),
+                Arguments.of("Rule 50 application", "Rule 49 Application"),
+                Arguments.of("Rule 21", "Rule 22"),
+                Arguments.of("Other", "Other"),
+                Arguments.of("ET1", "ET1")
+        );
+    }
 }

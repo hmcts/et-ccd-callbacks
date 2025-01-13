@@ -825,4 +825,24 @@ public final class ReferralHelper {
         return isNullOrEmpty(text) ? "-" : text.replace("\n", "<br>");
     }
 
+    public static String setReferralSubject(String referralSubject) {
+        if (isNullOrEmpty(referralSubject)) {
+            return null;
+        }
+        switch (referralSubject) {
+            case PARTY_NOT_RESPONDED_COMPILED -> {
+                return PARTY_NOT_RESPONDED_COMPLIED;
+            }
+            case "Rule 21" -> {
+                return  "Rule 22";
+            }
+            case "Rule 50 application" -> {
+                return "Rule 49 Application";
+            }
+            default -> {
+                return referralSubject;
+            }
+        }
+    }
+
 }

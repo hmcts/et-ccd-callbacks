@@ -35,6 +35,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_ATTACHM
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET3;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET3_ATTACHMENT;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.HEARINGS;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.INITIAL_CONSIDERATION;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.LEGACY_DOCUMENT_NAMES;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.MISC;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.NOTICE_OF_A_CLAIM;
@@ -43,9 +44,12 @@ import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.NOTICE_OF_H
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.OTHER;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.REJECTION_OF_CLAIM;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.RESPONSE_TO_A_CLAIM;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.RULE_27_NOTICE;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.RULE_28_NOTICE;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.STARTING_A_CLAIM;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.TRIBUNAL_CASE_FILE;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.TRIBUNAL_CORRESPONDENCE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.RULE_29_NOTICE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 
 public class UploadDocumentHelperTest {
@@ -193,6 +197,22 @@ public class UploadDocumentHelperTest {
                 Arguments.of(OTHER, OTHER)
 
         );
+    }
+
+    @Test
+    void initialConsiderationRuleChangeDocType() {
+        caseData = new CaseDataBuilder()
+                .withDocumentCollection("Doc 1")
+                .withDocumentCollection("Doc 2")
+                .build();
+        caseData.getDocumentCollection().get(0).getValue().setTopLevelDocuments(INITIAL_CONSIDERATION);
+        caseData.getDocumentCollection().get(0).getValue().setInitialConsiderationDocuments(RULE_27_NOTICE);
+        caseData.getDocumentCollection().get(1).getValue().setTopLevelDocuments(INITIAL_CONSIDERATION);
+        caseData.getDocumentCollection().get(1).getValue().setInitialConsiderationDocuments(RULE_28_NOTICE);
+
+        UploadDocumentHelper.setDocumentTypeForDocumentCollection(caseData);
+        assertEquals(RULE_28_NOTICE, caseData.getDocumentCollection().get(0).getValue().getDocumentType());
+        assertEquals(RULE_29_NOTICE, caseData.getDocumentCollection().get(1).getValue().getDocumentType());
     }
 
     private Map<String, String> buildPersonalisation(String initialTitle) {

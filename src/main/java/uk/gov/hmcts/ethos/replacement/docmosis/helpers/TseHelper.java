@@ -43,6 +43,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.SHORT_TEXT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE_PARAM;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_REP_TITLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.TABLE_STRING;
 
 @Slf4j
@@ -93,9 +94,34 @@ public final class TseHelper {
                 .toList());
     }
 
+    /**
+     * Create fields for application dropdown selector claimant rep.
+     *
+     * @param caseData contains all the case data
+     */
+    public static DynamicFixedListType populateClaimantRepSelectApplication(CaseData caseData) {
+        if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
+            return null;
+        }
+
+        return DynamicFixedListType.from(caseData.getGenericTseApplicationCollection().stream()
+                .filter(o -> !CLOSED_STATE.equals(o.getValue().getStatus())
+                        && (isNoClaimantRepReply(o.getValue().getRespondCollection())
+                        && YES.equals(o.getValue().getCopyToOtherPartyYesOrNo())
+                        || hasTribunalResponse(o.getValue()))
+                )
+                .map(TseHelper::formatDropdownOption)
+                .toList());
+    }
+
     private static boolean isNoRespondentReply(List<TseRespondTypeItem> tseRespondTypeItems) {
         return CollectionUtils.isEmpty(tseRespondTypeItems)
                 || tseRespondTypeItems.stream().noneMatch(r -> RESPONDENT_TITLE.equals(r.getValue().getFrom()));
+    }
+
+    private static boolean isNoClaimantRepReply(List<TseRespondTypeItem> tseRespondTypeItems) {
+        return CollectionUtils.isEmpty(tseRespondTypeItems)
+                || tseRespondTypeItems.stream().noneMatch(r -> CLAIMANT_REP_TITLE.equals(r.getValue().getFrom()));
     }
 
     /**
@@ -115,12 +141,18 @@ public final class TseHelper {
      *
      * @param caseData contains all the case data
      */
-    public static void setDataForRespondingToApplication(CaseData caseData) {
+    public static void setDataForRespondingToApplication(CaseData caseData, boolean isClaimantRep) {
         if (CollectionUtils.isEmpty(caseData.getGenericTseApplicationCollection())) {
             return;
         }
 
-        GenericTseApplicationType genericTseApplicationType = getRespondentSelectedApplicationType(caseData);
+        GenericTseApplicationType genericTseApplicationType;
+
+        if (isClaimantRep) {
+            genericTseApplicationType = getClaimantRepSelectedApplicationType(caseData);
+        } else {
+            genericTseApplicationType = getRespondentSelectedApplicationType(caseData);
+        }
         assert genericTseApplicationType != null;
 
         LocalDate date = LocalDate.parse(genericTseApplicationType.getDate(), NEW_DATE_PATTERN);
@@ -185,6 +217,10 @@ public final class TseHelper {
         return getTseApplication(caseData, caseData.getTseRespondSelectApplication().getSelectedCode());
     }
 
+    public static GenericTseApplicationType getClaimantRepSelectedApplicationType(CaseData caseData) {
+        return getTseApplication(caseData, caseData.getClaimantRepRespondSelectApplication().getSelectedCode());
+    }
+
     @Nullable
     private static GenericTseApplicationType getTseApplication(CaseData caseData, String selectedAppId) {
 
@@ -204,6 +240,27 @@ public final class TseHelper {
      */
     public static String getReplyDocumentRequest(CaseData caseData, String accessKey) throws JsonProcessingException {
         GenericTseApplicationType selectedApplication = getRespondentSelectedApplicationType(caseData);
+        assert selectedApplication != null;
+
+        TseReplyData data = createDataForTseReply(caseData, selectedApplication);
+        TseReplyDocument document = TseReplyDocument.builder()
+                .accessKey(accessKey)
+                .outputName(String.format(REPLY_OUTPUT_NAME, selectedApplication.getType()))
+                .templateName(REPLY_TEMPLATE_NAME)
+                .data(data).build();
+        return new ObjectMapper().writeValueAsString(document);
+    }
+
+    /**
+     * Builds a document request for generating the pdf of the CYA page for responding to a claimant application.
+     *
+     * @param caseData  contains all the case data
+     * @param accessKey access key required for docmosis
+     * @return a string representing the api request to docmosis
+     */
+    public static String getClaimantReplyDocumentRequest(CaseData caseData, String accessKey)
+            throws JsonProcessingException {
+        GenericTseApplicationType selectedApplication = getClaimantRepSelectedApplicationType(caseData);
         assert selectedApplication != null;
 
         TseReplyData data = createDataForTseReply(caseData, selectedApplication);
@@ -252,9 +309,16 @@ public final class TseHelper {
         );
     }
 
-    public static Map<String, Object> getPersonalisationForAcknowledgement(CaseDetails caseDetails, String exuiUrl) {
+    public static Map<String, Object> getPersonalisationForAcknowledgement(CaseDetails caseDetails, String exuiUrl,
+                                                                           boolean isClaimantRep) {
         CaseData caseData = caseDetails.getCaseData();
-        GenericTseApplicationType selectedApplication = getRespondentSelectedApplicationType(caseData);
+        GenericTseApplicationType selectedApplication;
+
+        if (isClaimantRep) {
+            selectedApplication = getClaimantRepSelectedApplicationType(caseData);
+        } else {
+            selectedApplication = getRespondentSelectedApplicationType(caseData);
+        }
         assert selectedApplication != null;
 
         return Map.of(
@@ -288,7 +352,7 @@ public final class TseHelper {
         return DocumentUtil.generateUploadedDocumentListFromDocumentList(caseData.getTseResponseSupportingMaterial());
     }
 
-    private static String hasSupportingDocs(List<GenericTypeItem<DocumentType>> supportDocList) {
+    public static String hasSupportingDocs(List<GenericTypeItem<DocumentType>> supportDocList) {
         return supportDocList != null && !supportDocList.isEmpty() ? "Yes" : "No";
     }
 }

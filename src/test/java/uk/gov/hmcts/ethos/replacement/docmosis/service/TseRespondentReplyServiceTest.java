@@ -23,8 +23,12 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
@@ -71,6 +75,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.ENGLISH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeItemUtil.createSupportingMaterial;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.TseApplicationUtil.getGenericTseApplicationTypeItem;
 
@@ -122,7 +127,7 @@ class TseRespondentReplyServiceTest {
         mockStatic = mockStatic(TseHelper.class, Mockito.CALLS_REAL_METHODS);
         mockStatic.when(() -> TseHelper.getPersonalisationForResponse(any(), any(), any(), anyBoolean()))
                 .thenReturn(Collections.emptyMap());
-        mockStatic.when(() -> TseHelper.getPersonalisationForAcknowledgement(any(), any()))
+        mockStatic.when(() -> TseHelper.getPersonalisationForAcknowledgement(any(), any(), anyBoolean()))
                 .thenReturn(Collections.emptyMap());
 
         caseData = CaseDataBuilder.builder()
@@ -242,6 +247,7 @@ class TseRespondentReplyServiceTest {
         caseData.setTseResponseCopyToOtherParty(rule92);
         caseData.setClaimantHearingPreference(new ClaimantHearingPreference());
         caseData.getClaimantHearingPreference().setContactLanguage(ENGLISH_LANGUAGE);
+        when(featureToggleService.isWelshEnabled()).thenReturn(false);
 
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseId("caseId");
@@ -268,6 +274,35 @@ class TseRespondentReplyServiceTest {
                 Arguments.of(YES, atLeastOnce(), REPLY_TO_APP_ACK_TEMPLATE_YES),
                 Arguments.of(NO, never(), REPLY_TO_APP_ACK_TEMPLATE_NO)
         );
+    }
+
+    @ParameterizedTest
+    @MethodSource("sendRespondingToApplicationEmails")
+    void sendRespondingToApplicationEmails_welshEnabled(String rule92, VerificationMode isEmailSentToClaimant,
+                                           String ackEmailTemplate) {
+        caseData.setTseResponseCopyToOtherParty(rule92);
+        caseData.setClaimantHearingPreference(new ClaimantHearingPreference());
+        caseData.getClaimantHearingPreference().setContactLanguage(WELSH_LANGUAGE);
+        when(featureToggleService.isWelshEnabled()).thenReturn(true);
+
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseId("caseId");
+        caseDetails.setCaseData(caseData);
+
+        ReflectionTestUtils.setField(tseRespondentReplyService,
+                "acknowledgementRule92YesEmailTemplateId", REPLY_TO_APP_ACK_TEMPLATE_YES);
+        ReflectionTestUtils.setField(tseRespondentReplyService,
+                "acknowledgementRule92NoEmailTemplateId", REPLY_TO_APP_ACK_TEMPLATE_NO);
+
+        tseRespondentReplyService.sendRespondingToApplicationEmails(caseDetails, "userToken");
+
+        verify(emailService).sendEmail(any(), eq(userDetails.getEmail()), any());
+        verify(emailService, isEmailSentToClaimant)
+                .sendEmail(any(), eq(caseData.getClaimantType().getClaimantEmailAddress()), any());
+        verify(respondentTellSomethingElseService).sendAdminEmail(any());
+
+        verify(emailService)
+                .sendEmail(eq(ackEmailTemplate), eq(userDetails.getEmail()), any());
     }
 
     @Test
@@ -415,6 +450,41 @@ class TseRespondentReplyServiceTest {
                 Arguments.of(true, true),
                 Arguments.of(false, false)
         );
+    }
+
+    @Test
+    void updateResponseDocsBinaryUrl() {
+        UploadedDocumentType uploadedDocumentType = UploadedDocumentType.builder()
+                .documentUrl("http://localhost:8080/documents/123")
+                .documentBinaryUrl("http://localhost:8080/documents/123")
+                .documentFilename("test.pdf")
+                .build();
+        DocumentType documentType = DocumentType.builder()
+                .uploadedDocument(uploadedDocumentType)
+                .build();
+
+        TseRespondTypeItem tseRespondTypeItem = TseRespondTypeItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(TseRespondType.builder()
+                        .supportingMaterial(Collections.singletonList(GenericTypeItem.<DocumentType>builder()
+                                .value(documentType)
+                                .build()))
+                        .build())
+                .build();
+
+        GenericTseApplicationTypeItem genericTseApplicationTypeItem = GenericTseApplicationTypeItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(GenericTseApplicationType.builder()
+                        .respondCollection(Collections.singletonList(tseRespondTypeItem))
+                        .build())
+                .build();
+
+        caseData.setGenericTseApplicationCollection(Collections.singletonList(genericTseApplicationTypeItem));
+        tseRespondentReplyService.updateResponseDocsBinaryUrl(caseData);
+        assertThat(caseData.getGenericTseApplicationCollection().get(0).getValue()
+                .getRespondCollection().get(0).getValue()
+                .getSupportingMaterial().get(0).getValue()
+                .getUploadedDocument().getDocumentBinaryUrl()).endsWith("/binary");
     }
 
     private GenericTseApplicationType getApplicationType(boolean respondentResponseRequired) {

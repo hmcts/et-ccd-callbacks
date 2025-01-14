@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -32,6 +33,7 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.setDocumentNumbers;
 
 
 /**
@@ -98,7 +100,8 @@ public class InitialConsiderationController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        initialConsiderationService.clearHiddenValue(caseData, ccdRequest.getCaseDetails().getCaseTypeId());
+        initialConsiderationService.processIcDocumentCollections(caseData);
+        initialConsiderationService.clearHiddenValue(caseData);
         caseData.setIcCompletedBy(reportDataService.getUserFullName(userToken));
         caseData.setIcDateCompleted(LocalDate.now().format(DateTimeFormatter.ofPattern(MONTH_STRING_DATE_FORMAT)));
         DocumentInfo documentInfo = initialConsiderationService.generateDocument(caseData, userToken,
@@ -109,6 +112,12 @@ public class InitialConsiderationController {
         if (featureToggleService.isHmcEnabled()) {
             caseFlagsService.setPrivateHearingFlag(caseData);
         }
+
+        if (CollectionUtils.isNotEmpty(caseData.getEtICHearingNotListedList())) {
+            initialConsiderationService.clearIcHearingNotListedOldValues(caseData);
+        }
+
+        setDocumentNumbers(caseData);
         caseManagementForCaseWorkerService.setNextListedDate(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
@@ -132,15 +141,24 @@ public class InitialConsiderationController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 
         caseData.setEtInitialConsiderationRespondent(
-            initialConsiderationService.getRespondentName(caseData.getRespondentCollection()));
+                initialConsiderationService.getRespondentName(caseData.getRespondentCollection()));
         caseData.setEtInitialConsiderationHearing(
             initialConsiderationService.getHearingDetails(caseData.getHearingCollection()));
+        caseData.setEtIcHearingPanelPreference(
+                initialConsiderationService.getClaimantHearingPanelPreference(caseData.getClaimantHearingPreference()));
+        String icRespondentHearingPanelPreference = initialConsiderationService.getIcRespondentHearingPanelPreference(
+                caseData.getRespondentCollection());
+        caseData.setIcRespondentHearingPanelPreference(icRespondentHearingPanelPreference);
 
         String caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();
-
         caseData.setEtInitialConsiderationJurisdictionCodes(
-            initialConsiderationService.generateJurisdictionCodesHtml(caseData.getJurCodesCollection(), caseTypeId));
+                initialConsiderationService.generateJurisdictionCodesHtml(
+                        caseData.getJurCodesCollection(), caseTypeId));
         initialConsiderationService.setIsHearingAlreadyListed(caseData, caseTypeId);
+
+        if (CollectionUtils.isNotEmpty(caseData.getEtICHearingNotListedList())) {
+            initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData, caseTypeId);
+        }
 
         return getCallbackRespEntityNoErrors(caseData);
     }

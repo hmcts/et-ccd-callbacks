@@ -11,7 +11,10 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse;
@@ -23,10 +26,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
@@ -39,6 +45,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_REP_TITLE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClaimantTellSomethingElseHelper.claimantSelectApplicationToType;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClaimantTellSomethingElseHelper.getApplicantType;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItemFromTopLevel;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper.createTwoColumnTable;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getRespondentSelectedApplicationType;
@@ -96,6 +105,29 @@ public class TseRespondentReplyService {
         }
 
         resetReplyToApplicationPage(caseData);
+
+        updateResponseDocsBinaryUrl(caseData);
+    }
+
+    /**
+     * Updates the binary url of the uploaded documents in the response supporting material.
+     *
+     * @param caseData case data
+     */
+    public void updateResponseDocsBinaryUrl(CaseData caseData) {
+        caseData.getGenericTseApplicationCollection().stream()
+                .map(GenericTseApplicationTypeItem::getValue)
+                .filter(applicationType -> isNotEmpty(applicationType.getRespondCollection()))
+                .flatMap(applicationType -> applicationType.getRespondCollection().stream())
+                .map(TseRespondTypeItem::getValue)
+                .map(TseRespondType::getSupportingMaterial)
+                .filter(Objects::nonNull)
+                .flatMap(Collection::stream)
+                .map(GenericTypeItem::getValue)
+                .filter(document -> document.getUploadedDocument() != null)
+                .filter(document -> !document.getUploadedDocument().getDocumentBinaryUrl().endsWith("/binary"))
+                .forEach(document -> document.getUploadedDocument()
+                        .setDocumentBinaryUrl(document.getUploadedDocument().getDocumentUrl() + "/binary"));
     }
 
     /**
@@ -264,17 +296,33 @@ public class TseRespondentReplyService {
             return;
         }
         boolean isWelsh = featureToggleService.isWelshEnabled()
-                && WELSH_LANGUAGE.equals(caseData.getClaimantHearingPreference().getContactLanguage());
+                && Optional.ofNullable(caseData.getClaimantHearingPreference())
+                .map(preference -> WELSH_LANGUAGE.equals(preference.getContactLanguage()))
+                .orElse(false);
+
         String emailTemplate = isWelsh
                 ? cyTseRespondentResponseTemplateId
                 : tseRespondentResponseTemplateId;
 
         try {
+            String claimantEmail = Optional.ofNullable(caseData.getClaimantType().getClaimantEmailAddress())
+                    .orElseGet(() -> Optional.ofNullable(caseData.getRepresentativeClaimantType())
+                            .map(RepresentedTypeC::getRepresentativeEmailAddress)
+                            .orElse(null));
+
+            if (isNullOrEmpty(claimantEmail)) {
+                return;
+            }
+
             byte[] bytes = tornadoService.generateEventDocumentBytes(caseData, "",
                     "TSE Reply.pdf");
-            String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();
+
+            String linkToCase = CLAIMANT_REP_TITLE.equals(getApplicantType(caseData))
+                    ? emailService.getExuiCaseLink(caseDetails.getCaseId())
+                    : emailService.getCitizenCaseLink(caseDetails.getCaseId());
+
             Map<String, Object> personalisation = TseHelper.getPersonalisationForResponse(caseDetails,
-                    bytes, emailService.getCitizenCaseLink(caseDetails.getCaseId()), isWelsh);
+                    bytes, linkToCase, isWelsh);
             emailService.sendEmail(emailTemplate,
                     claimantEmail, personalisation);
         } catch (Exception e) {
@@ -289,7 +337,7 @@ public class TseRespondentReplyService {
             getAckEmailTemplateId(caseDetails, isRespondingToTribunal),
             userIdamService.getUserDetails(userToken).getEmail(),
             TseHelper.getPersonalisationForAcknowledgement(
-                caseDetails, emailService.getExuiCaseLink(caseDetails.getCaseId())));
+                caseDetails, emailService.getExuiCaseLink(caseDetails.getCaseId()), false));
     }
 
     private String getAckEmailTemplateId(CaseDetails caseDetails, boolean isRespondingToTribunal) {
@@ -344,9 +392,13 @@ public class TseRespondentReplyService {
             return;
         }
 
+        String linkToCase = CLAIMANT_REP_TITLE.equals(getApplicantType(caseData))
+                ? emailService.getExuiCaseLink(caseDetails.getCaseId())
+                : emailService.getCitizenCaseLink(caseDetails.getCaseId());
+
         Map<String, String> personalisation = Map.of(
                 CASE_NUMBER, caseData.getEthosCaseReference(),
-                LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseDetails.getCaseId()));
+                LINK_TO_CITIZEN_HUB, linkToCase);
         emailService.sendEmail(replyToTribunalEmailToClaimantTemplateId, claimantEmail, personalisation);
     }
 
@@ -358,6 +410,10 @@ public class TseRespondentReplyService {
         if (CLAIMANT_TITLE.equals(applicationType.getApplicant())) {
             return uk.gov.hmcts.ecm.common.helpers.DocumentHelper.claimantApplicationTypeToDocType(
                     getClaimantApplicationType(applicationType));
+        } else if (CLAIMANT_REP_TITLE.equals(applicationType.getApplicant())) {
+            String claimantApplicationType = claimantSelectApplicationToType(applicationType.getType());
+            return uk.gov.hmcts.ecm.common.helpers.DocumentHelper.claimantApplicationTypeToDocType(
+                    claimantApplicationType);
         } else {
             return uk.gov.hmcts.ecm.common.helpers.DocumentHelper.respondentApplicationToDocType(
                     applicationType.getType());

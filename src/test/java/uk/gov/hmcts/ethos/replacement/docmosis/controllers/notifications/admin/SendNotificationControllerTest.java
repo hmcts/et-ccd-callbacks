@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
+package uk.gov.hmcts.ethos.replacement.docmosis.controllers.notifications.admin;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,6 +11,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.ethos.replacement.docmosis.controllers.BaseControllerTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SendNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;

@@ -26,14 +26,14 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
-class PseRespondentViewServiceTest {
+class ProvideSomethingElseViewServiceTest {
 
-    private PseRespondentViewService pseRespondentViewService;
+    private ProvideSomethingElseViewService provideSomethingElseViewService;
     private CaseData caseData;
 
     @BeforeEach
     void setUp() {
-        pseRespondentViewService = new PseRespondentViewService();
+        provideSomethingElseViewService = new ProvideSomethingElseViewService();
         caseData = CaseDataBuilder.builder().build();
 
         caseData.setSendNotificationCollection(List.of(
@@ -80,7 +80,7 @@ class PseRespondentViewServiceTest {
             DynamicValueType.create("3", "3 Send Notification Title")
         ));
 
-        assertThat(pseRespondentViewService.populateSelectDropdownView(caseData),
+        assertThat(provideSomethingElseViewService.populateSelectDropdownView(caseData, RESPONDENT_TITLE),
             is(expected));
     }
 
@@ -132,7 +132,7 @@ class PseRespondentViewServiceTest {
                 "1 View notice of hearing")));
 
         String expected = """
-            |View Application||\r
+            |View Notification||\r
             |--|--|\r
             |Notification|View notice of hearing|\r
             |Hearing|3: Hearing - Leeds - 14 Aug 2022|\r
@@ -147,16 +147,24 @@ class PseRespondentViewServiceTest {
             |Request made by|Legal Officer|\r
             |Name|Mr Lee Gal Officer|\r
             |Sent to|Both parties|\r
-            \r\n|Response 1| |\r
+            <details class="govuk-details"> <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">Responses</span></summary>
+            <div class="govuk-details__text">
+            
+            \r
+            |Response 1| |\r
             |--|--|\r
             |Response from|Claimant|\r
             |Response date|10 Aug 2022|\r
             |What's your response to the tribunal?|Response text entered|\r
             |Supporting material|<a href="/documents/ca35bccd-f507-4243-9133-f6081fb0fe5e/binary" target="_blank">My claimant hearing agenda.pdf</a>|\r
-            |Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?|Yes|\r
+            |Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?|Yes|\r\n
+          
+            </div> </details>
+            
             """;
 
-        assertThat(pseRespondentViewService.initialOrdReqDetailsTableMarkUp(caseData),
+        assertThat(provideSomethingElseViewService.initialOrdReqDetailsTableMarkUp(caseData, RESPONDENT_TITLE),
             is(expected));
     }
 
@@ -221,7 +229,7 @@ class PseRespondentViewServiceTest {
                         "1 View notice of hearing")));
 
         String expected = """
-            |View Application||\r
+            |View Notification||\r
             |--|--|\r
             |Notification|View notice of hearing|\r
             |Hearing|3: Hearing - Leeds - 14 Aug 2022|\r
@@ -236,16 +244,24 @@ class PseRespondentViewServiceTest {
             |Request made by|Legal Officer|\r
             |Name|Mr Lee Gal Officer|\r
             |Sent to|Both parties|\r
-            \r\n|Response 1| |\r
+            <details class="govuk-details"> <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">Responses</span></summary>
+            <div class="govuk-details__text">
+            
+            \r
+            |Response 1| |\r
             |--|--|\r
             |Response from|Respondent|\r
             |Response date|10 Aug 2022|\r
             |What's your response to the tribunal?|Response text entered|\r
             |Supporting material|<a href="/documents/ca35bccd-f507-4243-9133-f6081fb0fe5e/binary" target="_blank">My respondent hearing agenda.pdf</a>|\r
-            |Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?|Yes|\r
+            |Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?|Yes|\r\n
+            
+            </div> </details>
+            
             """;
 
-        assertThat(pseRespondentViewService.initialOrdReqDetailsTableMarkUp(caseData),
+        assertThat(provideSomethingElseViewService.initialOrdReqDetailsTableMarkUp(caseData, RESPONDENT_TITLE),
                 is(expected));
     }
 
@@ -284,7 +300,7 @@ class PseRespondentViewServiceTest {
                 "1 View notice of hearing")));
 
         String expected = """
-            |View Application||\r
+            |View Notification||\r
             |--|--|\r
             |Notification|View notice of hearing|\r
             |Date sent|5 Aug 2022|\r
@@ -296,7 +312,8 @@ class PseRespondentViewServiceTest {
             |Sent to|Both parties|\r
             """;
 
-        assertThat(pseRespondentViewService.initialOrdReqDetailsTableMarkUp(caseData), is(expected));
+        assertThat(provideSomethingElseViewService.initialOrdReqDetailsTableMarkUp(caseData, RESPONDENT_TITLE),
+                is(expected));
     }
 
     @Test
@@ -305,10 +322,10 @@ class PseRespondentViewServiceTest {
             | No | Subject | To party | Date sent | Notification | Response due | Number of responses |\r
             |:---------|:---------|:---------|:---------|:---------|:---------|:---------|\r
             |1|Other (General correspondence)|Both parties|23 February 2023|View notice of hearing|No|0|\r
-            |3|Other (General correspondence)|Respondent only|23 February 2023|Send Notification Title|No|0|\r
+            |2|Other (General correspondence)|Respondent only|23 February 2023|Send Notification Title|No|0|\r
             \r
             """;
-        String actual = pseRespondentViewService.generateViewNotificationsMarkdown(caseData);
+        String actual = provideSomethingElseViewService.generateViewNotificationsMarkdown(caseData, RESPONDENT_TITLE);
 
         assertThat(actual, is(expected));
     }

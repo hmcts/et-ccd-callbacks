@@ -36,6 +36,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRIBUNAL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.createLinkForUploadedDocument;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isRepresentedClaimantWithMyHmctsCase;
 
 @Service
 @RequiredArgsConstructor
@@ -232,7 +233,12 @@ public class RespondNotificationService {
             templateId = responseTemplateId;
         }
 
-        String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();
+        String claimantEmail = isRepresentedClaimantWithMyHmctsCase(caseData)
+                ? caseData.getRepresentativeClaimantType().getRepresentativeEmailAddress()
+                : caseData.getClaimantType().getClaimantEmailAddress();
+        String claimantUrl = isRepresentedClaimantWithMyHmctsCase(caseData)
+                ? emailService.getExuiCaseLink(caseDetails.getCaseId())
+                : emailService.getCitizenCaseLink(caseDetails.getCaseId());
 
         String sendNotificationTitle = sendNotificationType.getSendNotificationTitle();
         String caseId = caseDetails.getCaseId();
@@ -240,7 +246,7 @@ public class RespondNotificationService {
             emailService.sendEmail(
                 templateId,
                 claimantEmail,
-                buildPersonalisation(caseDetails, emailService.getCitizenCaseLink(caseId), sendNotificationTitle)
+                buildPersonalisation(caseDetails, claimantUrl, sendNotificationTitle)
             );
         }
 

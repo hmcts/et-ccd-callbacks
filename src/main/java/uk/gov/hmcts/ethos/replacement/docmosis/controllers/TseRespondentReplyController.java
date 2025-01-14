@@ -84,7 +84,8 @@ public class TseRespondentReplyController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
 
-        if (Helper.isClaimantNonSystemUser(caseData)) {
+        if (Helper.isClaimantNonSystemUser(caseData)
+                && Boolean.FALSE.equals(Helper.isRepresentedClaimantWithMyHmctsCase(caseData))) {
             caseData.setTseRespondNotAvailableWarning(YES);
         }
 
@@ -96,7 +97,6 @@ public class TseRespondentReplyController {
      * the other party (Claimant) is a non-system user.
      *
      * @param ccdRequest holds the request and case data
-     * @param userToken  used for authorization
      * @return Callback response entity with confirmation header and body
      */
     @PostMapping(value = "/showError", consumes = APPLICATION_JSON_VALUE)
@@ -110,15 +110,12 @@ public class TseRespondentReplyController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> showError(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
+            @RequestBody CCDRequest ccdRequest) {
+
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>();
-        if (Helper.isClaimantNonSystemUser(caseData)) {
+        if (Helper.isClaimantNonSystemUser(caseData)
+                && Boolean.FALSE.equals(Helper.isRepresentedClaimantWithMyHmctsCase(caseData))) {
             errors.add(FUNCTION_NOT_AVAILABLE_ERROR);
         }
 
@@ -157,7 +154,7 @@ public class TseRespondentReplyController {
         if (tseRespondentReplyService.isRespondingToTribunal(caseData)) {
             tseRespondentReplyService.initialResReplyToTribunalTableMarkUp(caseData, userToken);
         } else {
-            TseHelper.setDataForRespondingToApplication(caseData);
+            TseHelper.setDataForRespondingToApplication(caseData, false);
         }
 
         return getCallbackRespEntityNoErrors(caseData);

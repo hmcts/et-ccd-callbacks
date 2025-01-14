@@ -83,6 +83,29 @@ template:
           rule-92-yes: f75316e7-29b4-49e1-b04e-02241f69b649
           rule-92-no: 376fb37d-d563-42f2-89f0-3165a4777447
         tribunal: c2f72be8-541c-4bcc-b213-42557976dc39
+    claimant-rep:
+      application:
+        claimant-rep-a: 7232eb51-89fc-4fdf-b0a1-2d6c3e28955e
+        claimant-rep-b: 19812581-df03-4bd6-ad0f-907ba90c6603
+        claimant-rep-c: 82744586-f034-4e4d-b5f6-b0aeb23bd582
+        claimant-no: a3621d2d-3cd8-4811-87e7-fcffa676dd3b
+        respondent-type-a: 410270f3-4136-4f3c-99d7-0a564955803f
+        respondent-type-b: 36161401-e4a2-4a98-925c-a65529d23fad
+        cyRespondent-type-a: d340c60b-111b-41f7-ab9c-6cd34cdebee5
+        cyRespondent-type-b: 99ec3a75-7371-4b6d-aa5a-9050c1537cf1
+        tribunal: bd7addc3-d1ea-47cf-9249-208a7033d454
+      respond:
+        respondent: 88a60473-278f-4e03-8ba2-7e0da7f807dd}
+        cyRespondent: 5d00ecf1-790c-4942-8c39-06f20ac81847}
+        claimant-rep:
+          rule-92-yes: dd2c25c5-cb5b-4ddb-984c-a4e7c3a3ddeb}
+          rule-92-no: 83e076fc-1819-4222-9c18-a4c0f8ad06b4}
+      reply-to-tribunal:
+        respondent: 9366acdd-8fb1-4425-9a16-04fbbdaa5f64}
+        claimant-rep:
+          rule-92-yes: cb40366e-bc50-42ed-ae7b-74edfe344bba}
+          rule-92-no: 078dfb3b-21f3-4386-901d-ce50769a32d1}
+        tribunal: c2f72be8-541c-4bcc-b213-42557976dc39}
 
     admin:
       reply:
@@ -93,11 +116,16 @@ template:
         respondent: ca1a1dd2-13c9-435d-b63e-0ca07abe937d
 
   pse:
+    claimant-rep:
+      acknowledgement-of-response: ${PSE_CLAIMANT_REP_ACKNOWLEDGEMENT_OF_RESPONSE_TEMPLATE_ID:000070c4-5968-4f6b-aca1-095e37988be9}
+      new-notification: ${PSE_CLAIMANT_REP_NEW_NOTIFICATION:9352bba3-cdb4-4150-9840-599696147489}
     claimant: bdf1a2b7-5bb4-45d0-9b71-9d6c024aafff
     cyClaimant: fcd14cac-5e8e-478e-ab3c-89e394a3c663
-    respondent:
+    myhmcts:
       rule-92-yes: aa114479-e72b-4893-9024-c25aee1be6fc
       rule-92-no: 3a7ff23d-d49f-4c28-b00b-08ca3f0b38ee
+    respondent-rep:
+      response-received: ${PSE_RESPONDENT_REP_RESPONSE_RECEIVED_TEMPLATE_ID:9ea43b1d-7029-48ea-a0bd-b9fc4c3c8b66}
     admin: 296d3c6e-00d7-4f43-a8bd-260d52b171a7
 
   nocNotification:
@@ -120,7 +148,6 @@ template:
       ${BUNDLES_SUBMITTED_NOTIFICATION_FOR_TRIBUNAL_TEMPLATE_ID:12d604ce-df82-4c64-8544-ebbef66eb8c4}
 
   claimantSendNotification: ${CLAIMANT_SEND_NOTIFICATION_TEMPLATE_ID:a71ee3fd-a577-4a11-9bdb-de7fecd81336}
-
   respondentSendNotification: ${RESPONDENT_SEND_NOTIFICATION_TEMPLATE_ID:6e79a4db-873d-4ea3-85cd-3fdfbdaed38e}
   et1:
     et1ProfessionalSubmission: ${ET1_PROFESSIONAL_SUBMISSION_TEMPLATE_ID:ec815e00-39b0-4711-8b24-614ea1f2de89}

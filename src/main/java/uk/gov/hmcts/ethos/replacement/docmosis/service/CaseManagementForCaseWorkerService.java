@@ -2,7 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
-import net.logstash.logback.util.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.util.Pair;
@@ -203,19 +203,11 @@ public class CaseManagementForCaseWorkerService {
             for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
                 checkExtensionRequired(respondentSumTypeItem);
                 checkResponseReceived(respondentSumTypeItem);
-                checkResponseAddress(respondentSumTypeItem);
                 checkResponseContinue(respondentSumTypeItem);
                 clearRespondentTypeFields(respondentSumTypeItem);
             }
         } else {
             caseData.setRespondent(MISSING_RESPONDENT);
-        }
-    }
-
-    private void checkResponseAddress(RespondentSumTypeItem respondentSumTypeItem) {
-        if (respondentSumTypeItem.getValue().getResponseReceived().equals(NO)
-                && respondentSumTypeItem.getValue().getResponseRespondentAddress() != null) {
-            resetResponseRespondentAddress(respondentSumTypeItem);
         }
     }
 
@@ -234,30 +226,6 @@ public class CaseManagementForCaseWorkerService {
     private void checkExtensionRequired(RespondentSumTypeItem respondentSumTypeItem) {
         if (isNullOrEmpty(respondentSumTypeItem.getValue().getExtensionRequested())) {
             respondentSumTypeItem.getValue().setExtensionRequested(NO);
-        }
-    }
-
-    private void resetResponseRespondentAddress(RespondentSumTypeItem respondentSumTypeItem) {
-        if (!isNullOrEmpty(respondentSumTypeItem.getValue().getResponseRespondentAddress().getAddressLine1())) {
-            respondentSumTypeItem.getValue().getResponseRespondentAddress().setAddressLine1("");
-        }
-        if (!isNullOrEmpty(respondentSumTypeItem.getValue().getResponseRespondentAddress().getAddressLine2())) {
-            respondentSumTypeItem.getValue().getResponseRespondentAddress().setAddressLine2("");
-        }
-        if (!isNullOrEmpty(respondentSumTypeItem.getValue().getResponseRespondentAddress().getAddressLine3())) {
-            respondentSumTypeItem.getValue().getResponseRespondentAddress().setAddressLine3("");
-        }
-        if (!isNullOrEmpty(respondentSumTypeItem.getValue().getResponseRespondentAddress().getCountry())) {
-            respondentSumTypeItem.getValue().getResponseRespondentAddress().setCountry("");
-        }
-        if (!isNullOrEmpty(respondentSumTypeItem.getValue().getResponseRespondentAddress().getCounty())) {
-            respondentSumTypeItem.getValue().getResponseRespondentAddress().setCounty("");
-        }
-        if (!isNullOrEmpty(respondentSumTypeItem.getValue().getResponseRespondentAddress().getPostCode())) {
-            respondentSumTypeItem.getValue().getResponseRespondentAddress().setPostCode("");
-        }
-        if (!isNullOrEmpty(respondentSumTypeItem.getValue().getResponseRespondentAddress().getPostTown())) {
-            respondentSumTypeItem.getValue().getResponseRespondentAddress().setPostTown("");
         }
     }
 
@@ -458,39 +426,40 @@ public class CaseManagementForCaseWorkerService {
     }
 
     public void amendHearing(CaseData caseData, String caseTypeId) {
-        if (!isEmpty(caseData.getHearingCollection())) {
-            for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
-                HearingType hearingType = hearingTypeItem.getValue();
-                if (!isEmpty(hearingTypeItem.getValue().getHearingDateCollection())) {
-                    for (DateListedTypeItem dateListedTypeItem
-                            : hearingTypeItem.getValue().getHearingDateCollection()) {
-                        DateListedType dateListedType = dateListedTypeItem.getValue();
-                        if (dateListedType.getHearingStatus() == null) {
-                            dateListedType.setHearingStatus(HEARING_STATUS_LISTED);
-                            dateListedType.setHearingTimingStart(dateListedType.getListedDate());
-                            dateListedType.setHearingTimingFinish(dateListedType.getListedDate());
-                        }
-                        populateHearingVenueFromHearingLevelToDayLevel(dateListedType, hearingType, caseTypeId);
-                    }
-                }
-            }
+        if (isEmpty(caseData.getHearingCollection())) {
+            return;
         }
+        caseData.getHearingCollection().forEach(hearingTypeItem -> {
+            HearingType hearingType = hearingTypeItem.getValue();
+            if (isNotEmpty(hearingTypeItem.getValue().getHearingDateCollection())) {
+                hearingTypeItem.getValue().getHearingDateCollection().stream()
+                        .map(DateListedTypeItem::getValue)
+                        .forEach(dateListedType -> {
+                            if (dateListedType.getHearingStatus() == null) {
+                                dateListedType.setHearingStatus(HEARING_STATUS_LISTED);
+                                dateListedType.setHearingTimingStart(dateListedType.getListedDate());
+                                dateListedType.setHearingTimingFinish(dateListedType.getListedDate());
+                            }
+                            populateHearingVenueFromHearingLevelToDayLevel(dateListedType, hearingType, caseTypeId);
+                        });
+            }
+        });
     }
 
     public void midEventAmendHearing(CaseData caseData, List<String> errors) {
         caseData.setListedDateInPastWarning(NO);
-        if (!isEmpty(caseData.getHearingCollection())) {
-            for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
-                if (!isEmpty(hearingTypeItem.getValue().getHearingDateCollection())) {
-                    for (DateListedTypeItem dateListedTypeItem
-                            : hearingTypeItem.getValue().getHearingDateCollection()) {
+        if (isEmpty(caseData.getHearingCollection())) {
+            return;
+        }
+        caseData.getHearingCollection().stream()
+                .filter(hearingTypeItem -> isNotEmpty(hearingTypeItem.getValue().getHearingDateCollection()))
+                .forEach(hearingTypeItem -> {
+                    hearingTypeItem.getValue().getHearingDateCollection().forEach(dateListedTypeItem -> {
                         addHearingsOnWeekendError(dateListedTypeItem, errors,
                                 hearingTypeItem.getValue().getHearingNumber());
                         addHearingsInPastWarning(dateListedTypeItem, caseData);
-                    }
-                }
-            }
-        }
+                    });
+                });
     }
 
     public void setScotlandAllocatedOffice(String caseTypeId, CaseData caseData) {

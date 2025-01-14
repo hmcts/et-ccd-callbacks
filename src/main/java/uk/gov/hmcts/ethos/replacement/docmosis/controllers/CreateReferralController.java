@@ -37,6 +37,7 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.clearReferralDataFromCaseData;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.setReferralSubject;
 
 /**
  * REST controller for the Create Referral event pages, formats data appropriately for rendering on the front end.
@@ -55,7 +56,6 @@ public class CreateReferralController {
     @Value("${template.referral}")
     private String referralTemplateId;
 
-    private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String LOG_MESSAGE = "received notification request for case reference :    ";
 
     private static final String CREATE_REFERRAL_BODY = "<hr>"
@@ -153,9 +153,7 @@ public class CreateReferralController {
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
-        if ("Party not responded/compiled".equals(caseData.getReferralSubject())) {
-            caseData.setReferralSubject("Party not responded/complied");
-        }
+        caseData.setReferralSubject(setReferralSubject(caseData.getReferralSubject()));
         UserDetails userDetails = userIdamService.getUserDetails(userToken);
         String referralNumber = String.valueOf(ReferralHelper.getNextReferralNumber(caseData.getReferralCollection()));
 

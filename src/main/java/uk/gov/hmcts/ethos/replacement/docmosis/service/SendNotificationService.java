@@ -41,12 +41,16 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRIBUNAL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CCD_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EXUI_HEARING_DOCUMENTS_LINK;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.HEARING_DATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENT_NAMES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.createLinkForUploadedDocument;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantNonSystemUser;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isRepresentedClaimantWithMyHmctsCase;
 
 @Service("sendNotificationService")
 @RequiredArgsConstructor
@@ -58,8 +62,11 @@ public class SendNotificationService {
     private final HearingSelectionService hearingSelectionService;
     private final EmailService emailService;
     private final FeatureToggleService featureToggleService;
+    private static final String EMAIL_ADDRESS = "emailAddress";
     @Value("${template.claimantSendNotification}")
     private String claimantSendNotificationTemplateId;
+    @Value("${template.pse.claimant-rep.new-notification}")
+    private String claimantRepSendNotificationTemplateId;
     @Value("${template.respondentSendNotification}")
     private String respondentSendNotificationTemplateId;
     @Value("${template.bundles.respondentSubmittedNotificationForClaimant}")
@@ -216,13 +223,32 @@ public class SendNotificationService {
             return;
         }
 
-        String claimantEmailAddress = caseData.getClaimantType().getClaimantEmailAddress();
+        // Send notification to the claimant
         String caseId = caseDetails.getCaseId();
         if (!RESPONDENT_ONLY.equals(caseData.getSendNotificationNotify())) {
-            emailService.sendEmail(claimantSendNotificationTemplateId, claimantEmailAddress,
-                    buildPersonalisation(caseDetails, emailService.getCitizenCaseLink(caseId)));
+            // If represented, send notification to claimant representative Only
+            Map<String, String> personalisation;
+            if (isRepresentedClaimantWithMyHmctsCase(caseDetails.getCaseData())) {
+                personalisation = NotificationHelper.buildMapForClaimantRepresentative(caseDetails.getCaseData());
+                personalisation.put(CCD_ID, caseDetails.getCaseId());
+                personalisation.put(LINK_TO_EXUI, emailService.getClaimantRepExuiCaseNotificationsLink(
+                        caseDetails.getCaseId()));
+                if (!isNullOrEmpty(personalisation.get(EMAIL_ADDRESS))) {
+                    emailService.sendEmail(claimantRepSendNotificationTemplateId, personalisation.get(EMAIL_ADDRESS),
+                            personalisation);
+                }
+            } else {
+                // If not represented, send notification to the claimant
+                String claimantEmailAddress = caseData.getClaimantType().getClaimantEmailAddress();
+                // Send notification to the claimant only if the claimant is a system user
+                if (!isClaimantNonSystemUser(caseData) && !isNullOrEmpty(claimantEmailAddress)) {
+                    emailService.sendEmail(claimantSendNotificationTemplateId, claimantEmailAddress,
+                            buildPersonalisation(caseDetails, emailService.getCitizenCaseLink(caseId)));
+                }
+            }
         }
 
+        // Send notification to the respondent(s)
         if (!CLAIMANT_ONLY.equals(caseData.getSendNotificationNotify())) {
             Map<String, String> personalisation = buildPersonalisation(caseDetails,
                     emailService.getExuiCaseLink(caseId));
@@ -321,5 +347,4 @@ public class SendNotificationService {
         emailData.put(LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseId));
         return emailData;
     }
-
 }

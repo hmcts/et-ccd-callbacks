@@ -43,7 +43,6 @@ class CaseLinksEmailServiceTest {
     private SubmitEvent submitEvent;
     private CaseDetails caseDetails;
     private Map<String, Object> claimantPersonalisation;
-    private Map<String, Object> respondentPersonalisation;
     private Map<String, Object> repPersonalisation;
 
     @BeforeEach
@@ -61,10 +60,6 @@ class CaseLinksEmailServiceTest {
         claimantPersonalisation = Map.of(
                 "caseNumber", "12345/6789",
                 "linkToManageCase", "To manage your case, go to citizenUrl/1234");
-
-        respondentPersonalisation = Map.of(
-                "caseNumber", "12345/6789",
-                "linkToManageCase", "");
 
         repPersonalisation = Map.of(
                 "caseTitle", "Claimant LastName vs Respondent, Respondent Unrepresented, Respondent Represented",
@@ -118,11 +113,9 @@ class CaseLinksEmailServiceTest {
                 AUTH_TOKEN,
                 true);
 
-        verify(emailService, times(4)).sendEmail(any(), any(), any());
+        verify(emailService, times(2)).sendEmail(any(), any(), any());
         verify(emailService).sendEmail("1", "claimant@unrepresented.com", claimantPersonalisation);
-        verify(emailService).sendEmail("1", "respondent@unrepresented.com", respondentPersonalisation);
-        verify(emailService).sendEmail("1", "res@rep.com", respondentPersonalisation);
-        verify(emailService).sendEmail("3", "rep1@test.com", repPersonalisation);
+        verify(emailService).sendEmail("3", REP_EMAIL, repPersonalisation);
     }
 
     @Test
@@ -132,9 +125,8 @@ class CaseLinksEmailServiceTest {
                 AUTH_TOKEN,
                 true);
 
-        verify(emailService, times(3)).sendEmail(any(), any(), any());
+        verify(emailService, times(2)).sendEmail(any(), any(), any());
         verify(emailService).sendEmail("1", "claimant@unrepresented.com", claimantPersonalisation);
-        verify(emailService).sendEmail("1", "respondent@unrepresented.com", respondentPersonalisation);
         verify(emailService).sendEmail("3", "rep1@test.com", repPersonalisation);
     }
 
@@ -145,9 +137,8 @@ class CaseLinksEmailServiceTest {
                 AUTH_TOKEN,
                 true);
 
-        verify(emailService, times(3)).sendEmail(any(), any(), any());
+        verify(emailService, times(2)).sendEmail(any(), any(), any());
         verify(emailService).sendEmail("1", "claimant@unrepresented.com", claimantPersonalisation);
-        verify(emailService).sendEmail("1", "respondent@unrepresented.com", respondentPersonalisation);
         verify(emailService).sendEmail("3", "rep1@test.com", repPersonalisation);
     }
 
@@ -177,11 +168,9 @@ class CaseLinksEmailServiceTest {
                 AUTH_TOKEN,
                 true);
 
-        verify(emailService, times(4)).sendEmail(any(), any(), any());
+        verify(emailService, times(2)).sendEmail(any(), any(), any());
         verify(emailService).sendEmail("1", "claimant@unrepresented.com", claimantPersonalisation);
-        verify(emailService).sendEmail("1", "respondent@unrepresented.com", respondentPersonalisation);
-        verify(emailService).sendEmail("1", "res@rep.com", respondentPersonalisation);
-        verify(emailService).sendEmail("3", "rep1@test.com", repPersonalisation);
+        verify(emailService).sendEmail("3", REP_EMAIL, repPersonalisation);
     }
 
     @Test
@@ -197,11 +186,9 @@ class CaseLinksEmailServiceTest {
                 AUTH_TOKEN,
                 false);
 
-        verify(emailService, times(4)).sendEmail(any(), any(), any());
+        verify(emailService, times(2)).sendEmail(any(), any(), any());
         verify(emailService).sendEmail("2", "claimant@unrepresented.com", claimantPersonalisation);
-        verify(emailService).sendEmail("2", "respondent@unrepresented.com", respondentPersonalisation);
-        verify(emailService).sendEmail("2", "res@rep.com", respondentPersonalisation);
-        verify(emailService).sendEmail("4", "rep1@test.com", repPersonalisation);
+        verify(emailService).sendEmail("4", REP_EMAIL, repPersonalisation);
     }
 
     @Test
@@ -216,11 +203,9 @@ class CaseLinksEmailServiceTest {
                 AUTH_TOKEN,
                 false);
 
-        verify(emailService, times(4)).sendEmail(any(), any(), any());
+        verify(emailService, times(2)).sendEmail(any(), any(), any());
         verify(emailService).sendEmail("2", "claimant@unrepresented.com", claimantPersonalisation);
-        verify(emailService).sendEmail("2", "respondent@unrepresented.com", respondentPersonalisation);
-        verify(emailService).sendEmail("2", "res@rep.com", respondentPersonalisation);
-        verify(emailService).sendEmail("4", "rep1@test.com", repPersonalisation);
+        verify(emailService).sendEmail("4", REP_EMAIL, repPersonalisation);
     }
 
     @Test
@@ -235,11 +220,9 @@ class CaseLinksEmailServiceTest {
                 AUTH_TOKEN,
                 false);
 
-        verify(emailService, times(4)).sendEmail(any(), any(), any());
+        verify(emailService, times(2)).sendEmail(any(), any(), any());
         verify(emailService).sendEmail("2", "claimant@unrepresented.com", claimantPersonalisation);
-        verify(emailService).sendEmail("2", "respondent@unrepresented.com", respondentPersonalisation);
-        verify(emailService).sendEmail("2", "res@rep.com", respondentPersonalisation);
-        verify(emailService).sendEmail("4", "rep1@test.com", repPersonalisation);
+        verify(emailService).sendEmail("4", REP_EMAIL, repPersonalisation);
     }
 
     @Test

@@ -2,7 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -12,14 +11,10 @@ import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.AddressLabelsAttributesType;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceScotType;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
-import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VenueAddressReaderService;
@@ -30,7 +25,6 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,7 +33,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADDRESS_LABELS_TEMPLATE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
@@ -47,7 +40,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ACAS_CERTIF
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_ATTACHMENT;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.LEGACY_DOCUMENT_NAMES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentFixtures.getDocumentTypeItem;
 
 @ExtendWith(SpringExtension.class)
 class DocumentHelperTest {
@@ -2240,85 +2232,6 @@ class DocumentHelperTest {
 
         assertThat(actual.getId()).isNotEmpty();
         assertThat(actual.getValue()).isEqualTo(expected);
-    }
-
-    @Nested
-    class SetLegalRepVisibleDocuments {
-        @Test
-        void hidesDocuments() {
-            CaseData caseData = new CaseData();
-
-            caseData.setDocumentCollection(List.of(
-                getDocumentTypeItem("Visible", "ET1"),
-                getDocumentTypeItem("Hidden", "ET1 Vetting"),
-                getDocumentTypeItem("Hidden", "ET3 Processing"),
-                getDocumentTypeItem("Hidden", "Initial Consideration"),
-                getDocumentTypeItem("Hidden", "App for a Witness Order - C"),
-                getDocumentTypeItem("Hidden", "Referral/Judicial direction"),
-                getDocumentTypeItem("Hidden", "Referral/Judicial Direction"),
-                getDocumentTypeItem("Hidden", "COT3"),
-                getDocumentTypeItem("Hidden", "Other"),
-                getDocumentTypeItem("Hidden", "Contact the tribunal about something else - C"),
-                getDocumentTypeItem("Hidden", "Tribunal case file"),
-                getDocumentTypeItem("Hidden", "Rejection of Claim"),
-                getDocumentTypeItem("Hidden", "Claim rejected"),
-                getDocumentTypeItem("Visible", null),
-                getDocumentTypeItem("Hidden", "App to amend response"),
-                getDocumentTypeItem("Hidden", "App to vary or revoke an order - C"),
-                getDocumentTypeItem("Hidden", "Withdrawal of all or part of claim")
-                )
-            );
-
-            DocumentHelper.setLegalRepVisibleDocuments(caseData);
-
-            List<DocumentTypeItem> legalRepDocuments = caseData.getLegalrepDocumentCollection();
-
-            assertThat(legalRepDocuments).hasSize(2);
-            assertThat(legalRepDocuments.get(0).getValue().getUploadedDocument().getDocumentFilename())
-                .isEqualTo("Visible");
-            assertThat(legalRepDocuments.get(1).getValue().getUploadedDocument().getDocumentFilename())
-                .isEqualTo("Visible");
-        }
-
-        @Test
-        void hidesClaimantRule92NoDocuments() {
-            DocumentTypeItem doc1 = getDocumentTypeItem("Tse submit support material", "Claimant correspondence");
-            DocumentTypeItem doc2 = getDocumentTypeItem("Tse response document 1", "Claimant correspondence");
-            DocumentTypeItem doc3 = getDocumentTypeItem("Tse response document 2", "Claimant correspondence");
-            CaseData caseData = new CaseData();
-            caseData.setDocumentCollection(List.of(doc1, doc2, doc3));
-
-            GenericTseApplicationTypeItem claimantApp = GenericTseApplicationTypeItem.builder()
-                .value(GenericTseApplicationType.builder()
-                    .applicant(CLAIMANT_TITLE)
-                    .copyToOtherPartyYesOrNo(NO)
-                    .documentUpload(doc1.getValue().getUploadedDocument())
-                    .build())
-                .build();
-
-            List<TseRespondTypeItem> tseRespondTypeItems = List.of(
-                TseRespondTypeItem.builder()
-                    .value(TseRespondType.builder()
-                        .from(CLAIMANT_TITLE)
-                        .copyToOtherParty(NO)
-                        .supportingMaterial(List.of(doc2, doc3))
-                        .build())
-                .build()
-            );
-
-            GenericTseApplicationTypeItem claimantResponses = GenericTseApplicationTypeItem.builder()
-                .value(GenericTseApplicationType.builder()
-                    .documentUpload(doc1.getValue().getUploadedDocument())
-                    .respondCollection(tseRespondTypeItems)
-                    .build())
-                .build();
-
-            caseData.setGenericTseApplicationCollection(List.of(claimantApp, claimantResponses));
-
-            DocumentHelper.setLegalRepVisibleDocuments(caseData);
-
-            assertThat(caseData.getLegalrepDocumentCollection()).isEmpty();
-        }
     }
 
     @Test

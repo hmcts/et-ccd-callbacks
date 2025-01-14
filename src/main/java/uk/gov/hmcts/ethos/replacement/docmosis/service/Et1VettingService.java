@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
@@ -313,27 +314,39 @@ public class Et1VettingService {
     }
 
     /**
-     * Validates jurisdiction codes that the caseworker has added in the vettingJurisdictionCodeCollection
-     * to ensure that existing code can't be added and the codes that's been added can't have duplicate entries.
+     * Validates the jurisdiction codes added by the caseworker in the vettingJurisdictionCodeCollection
+     * to ensure that existing codes cannot be re-added and that each code is unique, with no duplicate entries.
      *
-     * @return a list of errors
+     * @return a list of validation errors
      */
     public List<String> validateJurisdictionCodes(CaseData caseData) {
         List<String> errors = new ArrayList<>();
-        List<VettingJurCodesTypeItem> codeList = caseData.getVettingJurisdictionCodeCollection();
-        if (!codeList.isEmpty()) {
+        List<VettingJurCodesTypeItem> jurisdictionCodesList = caseData.getVettingJurisdictionCodeCollection();
+
+        if (jurisdictionCodesList != null && !jurisdictionCodesList.isEmpty()) {
+            // Check if the jurisdiction codes already exist in the jurisdictionCodesCollection
             if (CollectionUtils.isNotEmpty(caseData.getJurCodesCollection())) {
-                codeList.stream().filter(codesTypeItem -> caseData.getJurCodesCollection().stream()
+                List<String> existingCodes = caseData.getJurCodesCollection().stream()
                         .map(existingCode -> existingCode.getValue().getJuridictionCodesList())
-                        .toList().stream()
-                        .anyMatch(code -> code.equals(codesTypeItem.getValue().getEt1VettingJurCodeList())))
-                    .forEach(c -> errors
-                        .add(String.format(ERROR_EXISTING_JUR_CODE, c.getValue().getEt1VettingJurCodeList())));
+                        .toList();
+
+                jurisdictionCodesList.stream()
+                        .filter(codesTypeItem -> existingCodes.contains(
+                                codesTypeItem.getValue().getEt1VettingJurCodeList()))
+                        .forEach(c -> errors.add(String.format(ERROR_EXISTING_JUR_CODE,
+                                c.getValue().getEt1VettingJurCodeList())));
             }
-            codeList.stream()
-                .filter(code -> Collections.frequency(codeList, code) > 1).collect(Collectors.toSet())
-                .forEach(c -> errors
-                    .add(String.format(ERROR_SELECTED_JUR_CODE, c.getValue().getEt1VettingJurCodeList())));
+
+            // Check if a jurisdiction code has been added more than once
+            // First, get a list of all the Et1 Vetting Jurisdiction codes
+            List<String> et1VettingCodeList = jurisdictionCodesList.stream()
+                    .map(c -> c.getValue().getEt1VettingJurCodeList())
+                    .toList();
+            // Then, check if any code has been added more than once
+            et1VettingCodeList.stream()
+                    .filter(code -> Collections.frequency(et1VettingCodeList, code) > 1)
+                    .collect(Collectors.toSet())
+                    .forEach(code -> errors.add(String.format(ERROR_SELECTED_JUR_CODE, code)));
         }
 
         return errors;
@@ -452,10 +465,13 @@ public class Et1VettingService {
 
     public String getAddressesHtml(CaseData caseData) {
         if (caseData.getClaimantWorkAddressQuestion() != null
+                && caseData.getClaimantWorkAddress() != null
                 && NO.equals(caseData.getClaimantWorkAddressQuestion())) {
             return String.format(CLAIMANT_AND_RESPONDENT_ADDRESSES,
                     toAddressWithTab(caseData.getClaimantType().getClaimantAddressUK()),
-                    toAddressWithTab(caseData.getClaimantWorkAddress().getClaimantWorkAddress()),
+                    toAddressWithTab(ObjectUtils.isEmpty(caseData.getClaimantWorkAddress().getClaimantWorkAddress())
+                            ? new Address()
+                            : caseData.getClaimantWorkAddress().getClaimantWorkAddress()),
                     toAddressWithTab(caseData.getRespondentCollection().get(0).getValue().getRespondentAddress()));
         } else {
             return String.format(CLAIMANT_AND_RESPONDENT_ADDRESSES_WITHOUT_WORK_ADDRESS,
@@ -463,7 +479,6 @@ public class Et1VettingService {
                     toAddressWithTab(caseData.getRespondentCollection().get(0).getValue().getRespondentAddress())
             );
         }
-
     }
 
     /**

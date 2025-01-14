@@ -75,6 +75,7 @@ public enum JurisdictionCode {
     RTRST("Suffer a detriment or dismissal as a result of doing work under another contract or arrangement  "
         + "(zero hours contract exclusivity clause)"),
     SUN("Suffer a detriment and/or dismissal for refusing to work on a Sunday"),
+    TIP("Suffer a failure by an employer to comply with provisions about distribution of or information about tips"),
     TPE("Suffer less favourable treatment and/or dismissal as a temp. employee than a full time employee"),
     TT("Suffer a detriment and/or dismissal for requesting time to train. Failure of employer to follow "
         + "correct procedures/reject request based on incorrect facts"),

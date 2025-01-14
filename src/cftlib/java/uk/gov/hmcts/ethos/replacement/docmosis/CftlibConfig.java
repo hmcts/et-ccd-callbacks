@@ -12,6 +12,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Objects;
 
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.ACAS_API;
@@ -38,6 +39,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CITIZEN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CITIZEN_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CWD_ADMIN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.CWD_USER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.ECM_CASEWORKER_ROLES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.ECM_JUDGE_ROLES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.EMPLOYMENT_HEARING_CENTRE_ADMIN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.EMPLOYMENT_HEARING_CENTRE_TEAM_LEADER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.RolesConstants.EMPLOYMENT_SENIOR_TRIBUNAL_CASEWORKER;
@@ -190,6 +193,8 @@ public class CftlibConfig implements CFTLibConfigurer {
 
     private void createRoles(CFTLib lib) {
         lib.createRoles(CASEWORKER_ROLES);
+        lib.createRoles(ECM_CASEWORKER_ROLES);
+        lib.createRoles(ECM_JUDGE_ROLES);
     }
 
     private void createUsers(CFTLib lib) throws IOException, URISyntaxException {
@@ -208,7 +213,8 @@ public class CftlibConfig implements CFTLibConfigurer {
                 CASEWORKER,
                 CASEWORKER_EMPLOYMENT,
                 CASEWORKER_EMPLOYMENT_ETJUDGE,
-                CASEWORKER_EMPLOYMENT_ETJUDGE_ENGLANDWALES);
+                CASEWORKER_EMPLOYMENT_ETJUDGE_ENGLANDWALES,
+                Arrays.stream(ECM_JUDGE_ROLES).reduce((a, b) -> a + "," + b).orElse(""));
 
         lib.createIdamUser(JUDGE_SC_EMAIL,
                 CASEWORKER,
@@ -224,7 +230,8 @@ public class CftlibConfig implements CFTLibConfigurer {
         lib.createIdamUser(ENGLANDWALES_EMAIL,
             CASEWORKER,
             CASEWORKER_EMPLOYMENT,
-            CASEWORKER_EMPLOYMENT_ENGLANDWALES);
+            CASEWORKER_EMPLOYMENT_ENGLANDWALES,
+            Arrays.stream(ECM_CASEWORKER_ROLES).reduce((a, b) -> a + "," + b).orElse(""));
 
         lib.createIdamUser(SCOTLAND_EMAIL,
             CASEWORKER,
@@ -236,7 +243,8 @@ public class CftlibConfig implements CFTLibConfigurer {
             CASEWORKER_EMPLOYMENT,
             CASEWORKER_EMPLOYMENT_API,
             CASEWORKER_WA,
-            WA_TASK_CONFIGURATION, STAFF_ADMIN, CWD_ADMIN);
+            WA_TASK_CONFIGURATION, STAFF_ADMIN, CWD_ADMIN, CASEWORKER_CAA, CASEWORKER_APPROVER,
+            Arrays.stream(ECM_CASEWORKER_ROLES).reduce((a, b) -> a + "," + b).orElse(""));
 
         lib.createIdamUser(SUPERUSER_EMAIL,
             CASEWORKER_CAA,

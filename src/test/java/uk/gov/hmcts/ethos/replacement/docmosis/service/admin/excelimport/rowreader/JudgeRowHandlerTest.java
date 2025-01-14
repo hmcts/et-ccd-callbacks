@@ -2,11 +2,13 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.rowrea
 
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.ArgumentCaptor;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.Judge;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.JudgeEmploymentStatus;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.JudgeRepository;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -54,6 +56,48 @@ class JudgeRowHandlerTest {
         assertEquals(name, actual.getName());
         assertEquals(expectedEmploymentStatus, actual.getEmploymentStatus().name());
         assertEquals(tribunalOffice, actual.getTribunalOffice());
+    }
+
+    @Test
+    void testEmptyValue() {
+        Row row = mock(Row.class);
+        mockCell(row, 0, JUDGE_ROW_ID);
+        mockCell(row, 1, "01_JudgeCode");
+        mockCell(row, 2, "Judge Fudge");
+        mockCell(row, 3, "1");
+        mockCell(row, 4, null);
+
+        JudgeRepository judgeRepository = mock(JudgeRepository.class);
+        JudgeRowHandler judgeRowHandler = new JudgeRowHandler(judgeRepository);
+        TribunalOffice tribunalOffice = TribunalOffice.NEWCASTLE;
+        judgeRowHandler.handle(tribunalOffice, row);
+
+        ArgumentCaptor<Judge> captor = ArgumentCaptor.forClass(Judge.class);
+        verify(judgeRepository, times(1)).save(captor.capture());
+
+        Judge actual = captor.getValue();
+        assertEquals(JudgeEmploymentStatus.UNKNOWN, actual.getEmploymentStatus());
+    }
+
+    @Test
+    void testNoJudgeStatus() {
+        // Not creating row 4 which contains the judge status
+        Row row = mock(Row.class);
+        mockCell(row, 0, JUDGE_ROW_ID);
+        mockCell(row, 1, "01_JudgeCode");
+        mockCell(row, 2, "Judge Fudge");
+        mockCell(row, 3, "1");
+
+        JudgeRepository judgeRepository = mock(JudgeRepository.class);
+        JudgeRowHandler judgeRowHandler = new JudgeRowHandler(judgeRepository);
+        TribunalOffice tribunalOffice = TribunalOffice.NEWCASTLE;
+        judgeRowHandler.handle(tribunalOffice, row);
+
+        ArgumentCaptor<Judge> captor = ArgumentCaptor.forClass(Judge.class);
+        verify(judgeRepository, times(1)).save(captor.capture());
+
+        Judge actual = captor.getValue();
+        assertEquals(JudgeEmploymentStatus.UNKNOWN, actual.getEmploymentStatus());
     }
 
     private void mockCell(Row row, int cellNum, String value) {

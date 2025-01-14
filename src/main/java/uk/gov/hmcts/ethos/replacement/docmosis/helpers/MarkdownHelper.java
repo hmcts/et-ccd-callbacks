@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
@@ -10,6 +11,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.DOCUMENT_LINK_MARKDOWN;
 
 /**
@@ -27,6 +29,11 @@ public final class MarkdownHelper {
       </div> </details>
       
         """;
+    private static final String FOUR_COLUMN_HEADER = "|%s|%s|%s|%s|\r\n|--|--|--|--|\r\n%s";
+    private static final String FOUR_COLUMN_ROW = "|%s|%s|%s|%s|\r\n";
+    private static final String DOCUMENT_LINK = "<a href=\"%s\" target=\"_blank\">%s</a>";
+    private static final int TWO = 2;
+    private static final int FOUR = 4;
 
     private MarkdownHelper() {
         // Access through static methods
@@ -39,7 +46,7 @@ public final class MarkdownHelper {
      * @return formatted string representing data in a two column Markdown table
      */
     public static String createTwoColumnTable(String[] header, List<String[]> rows) {
-        if (header.length != 2) {
+        if (header.length != TWO) {
             throw new IllegalArgumentException("header array should contain only two items");
         }
 
@@ -92,15 +99,27 @@ public final class MarkdownHelper {
         return addRowsForDocument(document, documentLink, title);
     }
 
-    public static List<String[]> addDocumentRows(List<GenericTypeItem<DocumentType>> documents, String title) {
+    public static List<String[]> addGenericTypeDocumentRows(List<GenericTypeItem<DocumentType>> documents,
+                                                            String title) {
         if (documents == null) {
             return List.of();
-        } 
+        }
 
         return documents.stream()
             .filter(Objects::nonNull)
             .flatMap(o -> addDocumentRow(o.getValue(), title).stream())
             .toList();
+    }
+
+    public static List<String[]> addDocumentTypeRows(List<DocumentTypeItem> documents, String title) {
+        if (documents == null) {
+            return List.of();
+        }
+
+        return documents.stream()
+                .filter(Objects::nonNull)
+                .flatMap(o -> addDocumentRow(o.getValue(), title).stream())
+                .toList();
     }
 
     /**
@@ -137,5 +156,48 @@ public final class MarkdownHelper {
 
     public static String detailsWrapper(String heading, String body) {
         return DETAILS_SUMMARY.formatted(heading, body);
+    }
+
+    public static String getDocumentLink(DocumentTypeItem documentTypeItem) {
+        String docFileName = "";
+        if (documentExists(documentTypeItem)) {
+            docFileName = documentTypeItem.getValue().getUploadedDocument().getDocumentFilename();
+            return String.format(DOCUMENT_LINK, createDocLinkBinary(documentTypeItem),
+                    docFileName);
+        } else {
+            return docFileName;
+        }
+    }
+
+    private static boolean documentExists(DocumentTypeItem documentTypeItem) {
+        return documentTypeItem != null && documentTypeItem.getValue() != null
+               && documentTypeItem.getValue().getUploadedDocument() != null
+               && !isNullOrEmpty(documentTypeItem.getValue()
+                .getUploadedDocument().getDocumentBinaryUrl());
+    }
+
+    private static String createDocLinkBinary(DocumentTypeItem documentTypeItem) {
+        String documentBinaryUrl = documentTypeItem.getValue().getUploadedDocument().getDocumentBinaryUrl();
+        if (!isNullOrEmpty(documentBinaryUrl) && documentBinaryUrl.contains("/documents/")) {
+            return documentBinaryUrl.substring(documentBinaryUrl.indexOf("/documents/"));
+        } else {
+            return "";
+        }
+    }
+
+    public static String createFourColumnTable(String[] header, List<String[]> rows) {
+        if (header.length != FOUR) {
+            throw new IllegalArgumentException("header array should contain only four items");
+        }
+
+        return String.format(FOUR_COLUMN_HEADER, header[0], header[1], header[2], header[3],
+                createFourColumnRows(rows));
+    }
+
+    private static String createFourColumnRows(List<String[]> rows) {
+        return rows.stream()
+                .filter(columns -> columns[1] != null)
+                .map(columns -> String.format(FOUR_COLUMN_ROW, columns[0], columns[1], columns[2], columns[3]))
+                .collect(Collectors.joining());
     }
 }

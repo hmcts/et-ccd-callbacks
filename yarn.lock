@@ -7990,7 +7990,7 @@ __metadata:
     playwright-core: ^1.35.1
     proxyquire: 2.1.3
     puppeteer: 23.11.1
-    randomstring: 1.3.0
+    randomstring: 1.3.1
     request: 2.88.2
     request-promise-native: 1.0.9
     require-directory: 2.1.1
@@ -14712,14 +14712,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"randombytes@npm:2.0.3":
-  version: 2.0.3
-  resolution: "randombytes@npm:2.0.3"
-  checksum: 13e1abd143404dd87024bf345fb1a446b2e2ee46d8e1a5a073e8370c9b1e58000d81a97d4327ba7089087213eb6d8c77fa67ab4e91aa00605126d634fcccb9d4
-  languageName: node
-  linkType: hard
-
-"randombytes@npm:^2.1.0":
+"randombytes@npm:2.1.0, randombytes@npm:^2.1.0":
   version: 2.1.0
   resolution: "randombytes@npm:2.1.0"
   dependencies:
@@ -14728,14 +14721,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"randomstring@npm:1.3.0":
-  version: 1.3.0
-  resolution: "randomstring@npm:1.3.0"
+"randomstring@npm:1.3.1":
+  version: 1.3.1
+  resolution: "randomstring@npm:1.3.1"
   dependencies:
-    randombytes: 2.0.3
+    randombytes: 2.1.0
   bin:
     randomstring: bin/randomstring
-  checksum: ec89fd1337b197edea5a7f60686cc674170f6f0424cb8ac025f7acb043d906fdd30b4a3b21073d0c566efec4921be9e87749b41609954f6656c9d5f3278e2284
+  checksum: 06e78195fa8e0ce8b59e17659a9dbf63c7b3ccbb2d056fe8fc7892e1132a60905175443c5a88acdc7b12fd628027a7b1659e485c917e9e01b7f2ab08aad6d646
   languageName: node
   linkType: hard
 

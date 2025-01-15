@@ -367,7 +367,7 @@ dependencies {
     //To Remove vulnerability CVE-2020-11988
     implementation group: 'org.apache.xmlgraphics', name: 'xmlgraphics-commons', version: '2.10'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.22.3'
-    implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.4'
+    implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.5'
     implementation group: 'org.slf4j', name: 'slf4j-ext', version: '2.0.16'
     implementation group: 'org.springdoc', name: 'springdoc-openapi-ui', version: '1.6.15'
     implementation 'org.springframework.boot:spring-boot-configuration-processor'

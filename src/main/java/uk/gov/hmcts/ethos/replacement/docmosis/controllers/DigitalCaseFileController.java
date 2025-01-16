@@ -43,7 +43,7 @@ public class DigitalCaseFileController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> aboutToSubmitAsync(@RequestBody CCDRequest ccdRequest,
-                                                                  @RequestHeader(value = HttpHeaders.AUTHORIZATION)
+                                                                  @RequestHeader(HttpHeaders.AUTHORIZATION)
                                                                   String userToken) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setCaseBundles(digitalCaseFileService.createBundleData(caseData));
@@ -64,7 +64,7 @@ public class DigitalCaseFileController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> asyncCompleteAboutToSubmit(
-            @RequestBody CCDRequest ccdRequest, @RequestHeader(value = HttpHeaders.AUTHORIZATION) String userToken) {
+            @RequestBody CCDRequest ccdRequest, @RequestHeader(HttpHeaders.AUTHORIZATION) String userToken) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         DigitalCaseFileHelper.addDcfToDocumentCollection(caseData);
         return getCallbackRespEntityNoErrors(caseData);
@@ -82,7 +82,7 @@ public class DigitalCaseFileController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> uploadOrRemoveDcf(@RequestBody CCDRequest ccdRequest,
-                                                                 @RequestHeader(value = HttpHeaders.AUTHORIZATION)
+                                                                 @RequestHeader(HttpHeaders.AUTHORIZATION)
                                                                  String userToken) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         DigitalCaseFileHelper.uploadOrRemoveDcf(caseData);

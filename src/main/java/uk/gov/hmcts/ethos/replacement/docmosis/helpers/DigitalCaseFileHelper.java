@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.ecm.common.model.helper.DocumentCategory;
 import uk.gov.hmcts.et.common.model.bundle.Bundle;
 import uk.gov.hmcts.et.common.model.bundle.BundleDetails;
@@ -49,22 +50,18 @@ public final class DigitalCaseFileHelper {
                 .filter(bundle -> List.of(DONE, FAILED).contains(bundle.value().getStitchStatus()))
                 .findFirst();
         stitchedFile.ifPresent(bundle -> caseData.setDigitalCaseFile(
-                createTribunalCaseFile(caseData.getDigitalCaseFile(), bundle.value())));
+                createTribunalCaseFile(caseData, bundle.value())));
     }
 
-    private static DigitalCaseFileType createTribunalCaseFile(DigitalCaseFileType digitalCaseFile,
+    private static DigitalCaseFileType createTribunalCaseFile(BaseCaseData caseData,
                                                               BundleDetails bundleDetails) {
+        DigitalCaseFileType digitalCaseFile = caseData.getDigitalCaseFile();
         if (isEmpty(digitalCaseFile)) {
             digitalCaseFile = new DigitalCaseFileType();
         }
         switch (bundleDetails.getStitchStatus()) {
             case DONE -> {
-                DocumentLink documentLink = bundleDetails.getStitchedDocument();
-                UploadedDocumentType uploadedDocumentType = new UploadedDocumentType();
-                uploadedDocumentType.setDocumentFilename(documentLink.documentFilename);
-                uploadedDocumentType.setDocumentUrl(documentLink.documentUrl);
-                uploadedDocumentType.setDocumentBinaryUrl(documentLink.documentBinaryUrl);
-                uploadedDocumentType.setCategoryId(DocumentCategory.TRIBUNAL_CASE_FILE.getId());
+                UploadedDocumentType uploadedDocumentType = getUploadedDocumentType(bundleDetails);
                 digitalCaseFile.setUploadedDocument(uploadedDocumentType);
                 digitalCaseFile.setStatus("DCF Updated: " + LocalDateTime.now().format(NEW_DATE_TIME_PATTERN));
                 digitalCaseFile.setError(null);
@@ -81,6 +78,17 @@ public final class DigitalCaseFileHelper {
         digitalCaseFile.setDateGenerated(null);
 
         return digitalCaseFile;
+    }
+
+    @NotNull
+    private static UploadedDocumentType getUploadedDocumentType(BundleDetails bundleDetails) {
+        DocumentLink documentLink = bundleDetails.getStitchedDocument();
+        UploadedDocumentType uploadedDocumentType = new UploadedDocumentType();
+        uploadedDocumentType.setDocumentFilename(documentLink.documentFilename);
+        uploadedDocumentType.setDocumentUrl(documentLink.documentUrl);
+        uploadedDocumentType.setDocumentBinaryUrl(documentLink.documentBinaryUrl);
+        uploadedDocumentType.setCategoryId(DocumentCategory.TRIBUNAL_CASE_FILE.getId());
+        return uploadedDocumentType;
     }
 
     public static String getDocumentName(DocumentType doc) {

@@ -87,7 +87,7 @@ public class MultiplesDigitalCaseFileService {
 
     private void setBundleConfig(MultipleData caseData) {
         if (isNullOrEmpty(caseData.getBundleConfiguration())) {
-            caseData.setBundleConfiguration(defaultBundle);
+            caseData.setBundleConfiguration("et-dcf-2.yaml");
         }
     }
 

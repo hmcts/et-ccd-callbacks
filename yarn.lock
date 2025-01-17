@@ -7995,7 +7995,7 @@ __metadata:
     request-promise-native: 1.0.9
     require-directory: 2.1.1
     rewire: 7.0.0
-    selenium-standalone: 10.0.0
+    selenium-standalone: 10.0.1
     sinon: 19.0.2
     sinon-chai: 4.0.0
     sonar-scanner: 3.1.0
@@ -8594,7 +8594,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"find-process@npm:^1.4.7":
+"find-process@npm:1.4.7":
   version: 1.4.7
   resolution: "find-process@npm:1.4.7"
   dependencies:
@@ -15615,15 +15615,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"selenium-standalone@npm:10.0.0":
-  version: 10.0.0
-  resolution: "selenium-standalone@npm:10.0.0"
+"selenium-standalone@npm:10.0.1":
+  version: 10.0.1
+  resolution: "selenium-standalone@npm:10.0.1"
   dependencies:
     commander: ^8.3.0
     cross-spawn: ^7.0.3
     debug: ^4.3.1
     execa: ^5.1.1
-    find-process: ^1.4.7
+    find-process: 1.4.7
     fkill: ^7.2.1
     got: ^11.8.6
     http-proxy-agent: ^7.0.2
@@ -15640,7 +15640,7 @@ __metadata:
     yauzl: ^3.1.2
   bin:
     selenium-standalone: bin/selenium-standalone
-  checksum: e503fdfafcbdd01f16dd8d8d73fe50df8a9830f35dbd901d5acccff43dd58bda79cf67bcf7872ccbc1f3f42fd6d55f819421f6e4cb8c6d86c827c31de4170253
+  checksum: f86e58dc2a284c626ac764961a476e649460887f4275e795b5b933ad5ac5ef2c38e56ec49323e0d2434d266815bc2f8c82f845103f47f9e505ac3e9f820af123
   languageName: node
   linkType: hard
 

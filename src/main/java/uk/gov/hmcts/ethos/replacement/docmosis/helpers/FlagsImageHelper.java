@@ -17,7 +17,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_ECC;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_LIVE_APPEAL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_REPORTING;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_RESERVED;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_RULE_503B;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_SENSITIVE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_WITH_OUTSTATION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.IMAGE_FILE_EXTENSION;
@@ -44,6 +43,7 @@ public final class FlagsImageHelper {
     private static final String FLAG_REASONABLE_ADJUSTMENT = "REASONABLE ADJUSTMENT";
     private static final String FLAG_WELSH_LANGUAGE = "Cymraeg";
     private static final String WELSH = "Welsh";
+    private static final String FLAG_RULE_493B = "RULE 49(3)b";
 
     private FlagsImageHelper() {
     }
@@ -60,7 +60,7 @@ public final class FlagsImageHelper {
         setFlagImageFor(FLAG_WITH_OUTSTATION, flagsImageFileName, flagsImageAltText, caseData, caseTypeId);
         setFlagImageFor(FLAG_DO_NOT_POSTPONE, flagsImageFileName, flagsImageAltText, caseData, caseTypeId);
         setFlagImageFor(FLAG_LIVE_APPEAL, flagsImageFileName, flagsImageAltText, caseData, caseTypeId);
-        setFlagImageFor(FLAG_RULE_503B, flagsImageFileName, flagsImageAltText, caseData, caseTypeId);
+        setFlagImageFor(FLAG_RULE_493B, flagsImageFileName, flagsImageAltText, caseData, caseTypeId);
         setFlagImageFor(FLAG_REPORTING, flagsImageFileName, flagsImageAltText, caseData, caseTypeId);
         setFlagImageFor(FLAG_SENSITIVE, flagsImageFileName, flagsImageAltText, caseData, caseTypeId);
         setFlagImageFor(FLAG_RESERVED, flagsImageFileName, flagsImageAltText, caseData, caseTypeId);
@@ -92,8 +92,8 @@ public final class FlagsImageHelper {
                 flagRequired = liveAppeal(caseData);
                 flagColor = COLOR_GREEN;
                 break;
-            case FLAG_RULE_503B:
-                flagRequired = rule503bApplies(caseData);
+            case FLAG_RULE_493B:
+                flagRequired = rule493bApplies(caseData);
                 flagColor = COLOR_RED;
                 break;
             case FLAG_REPORTING:
@@ -158,7 +158,8 @@ public final class FlagsImageHelper {
         }
     }
 
-    private static boolean rule503bApplies(CaseData caseData) {
+    private static boolean rule493bApplies(CaseData caseData) {
+        // Note: rule494b was previously rule503b which is why the field is named as such
         if (caseData.getRestrictedReporting() != null) {
             if (isNullOrEmpty(caseData.getRestrictedReporting().getRule503b())) {
                 return false;

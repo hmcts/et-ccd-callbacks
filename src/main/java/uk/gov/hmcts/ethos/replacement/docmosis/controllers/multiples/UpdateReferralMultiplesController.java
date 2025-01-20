@@ -34,6 +34,7 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.multipleResponse;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.clearReferralDataFromCaseData;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.getNearestHearingToReferral;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.setReferralSubject;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.updateReferral;
 
 /**
@@ -144,9 +145,7 @@ public class UpdateReferralMultiplesController {
         log.info("ABOUT TO SUBMIT UPDATE REFERRAL ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
 
         MultipleData caseData = ccdRequest.getCaseDetails().getCaseData();
-        if ("Party not responded/compiled".equals(caseData.getReferralSubject())) {
-            caseData.setUpdateReferralSubject("Party not responded/complied");
-        }
+        caseData.setReferralSubject(setReferralSubject(caseData.getReferralSubject()));
         UserDetails userDetails = userIdamService.getUserDetails(userToken);
         CaseData leadCase = caseLookupService.getLeadCaseFromMultipleAsAdmin(ccdRequest.getCaseDetails());
         String nextHearingDate = getNearestHearingToReferral(leadCase, "None");

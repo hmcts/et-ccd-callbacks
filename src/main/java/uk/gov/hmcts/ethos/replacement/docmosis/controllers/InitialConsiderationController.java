@@ -33,6 +33,7 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.setDocumentNumbers;
 
 
 /**
@@ -116,6 +117,7 @@ public class InitialConsiderationController {
             initialConsiderationService.clearIcHearingNotListedOldValues(caseData);
         }
 
+        setDocumentNumbers(caseData);
         caseManagementForCaseWorkerService.setNextListedDate(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }

@@ -20,6 +20,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -27,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_ATTACHMENT;
@@ -42,6 +44,7 @@ class DigitalCaseFileServiceTest {
     @MockBean
     private DigitalCaseFileService digitalCaseFileService;
     private CaseData caseData;
+    private CaseDetails caseDetails;
 
     @BeforeEach
     void setUp() throws URISyntaxException, IOException {
@@ -53,7 +56,7 @@ class DigitalCaseFileServiceTest {
                 .build();
         caseData.getDocumentCollection().get(0).getValue().setDateOfCorrespondence("2000-01-01");
         caseData.getDocumentCollection().get(1).getValue().setExcludeFromDcf(List.of(YES));
-        CaseDetails caseDetails = new CaseDetails();
+        caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
         caseDetails.setCaseId("1234123412341234");
         when(bundleApiClient.asyncStitchBundle(any(), any(), any())).thenReturn(ResourceLoader.stitchBundleRequest());
@@ -117,6 +120,14 @@ class DigitalCaseFileServiceTest {
         caseData.setDigitalCaseFile(null);
         caseData.setDocumentCollection(null);
         assertDoesNotThrow(() -> digitalCaseFileService.getReplyToReferralDCFLink(caseData));
+    }
+
+    @Test
+    void createDcf() {
+        caseData.setUploadOrRemoveDcf("Create");
+        assertDoesNotThrow(() -> digitalCaseFileService.createUploadRemoveDcf("authToken", caseDetails));
+        assertEquals("DCF Updating: " + LocalDateTime.now().format(NEW_DATE_TIME_PATTERN),
+                caseData.getDigitalCaseFile().getStatus());
     }
 
 }

@@ -126,13 +126,6 @@ class DigitalCaseFileHelperTest {
     }
 
     @Test
-    void uploadOrRemoveDcf_InvalidValue() {
-        caseData.setUploadOrRemoveDcf("Invalid value");
-        assertDoesNotThrow(() -> DigitalCaseFileHelper.uploadOrRemoveDcf(caseData));
-        assertNull(caseData.getUploadOrRemoveDcf());
-    }
-
-    @Test
     void dcf_failedToGenerate() {
         BundleDetails bundleDetails = BundleDetails.builder()
                 .stitchStatus("FAILED")

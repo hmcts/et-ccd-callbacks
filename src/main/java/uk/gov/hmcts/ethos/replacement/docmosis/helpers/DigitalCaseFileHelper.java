@@ -33,8 +33,6 @@ public final class DigitalCaseFileHelper {
 
     private static final String DONE = "DONE";
     private static final String FAILED = "FAILED";
-    private static final String UPLOAD = "Upload";
-    private static final String REMOVE = "Remove";
 
     private DigitalCaseFileHelper() {
         // access through static methods
@@ -63,7 +61,7 @@ public final class DigitalCaseFileHelper {
             case DONE -> {
                 UploadedDocumentType uploadedDocumentType = getUploadedDocumentType(bundleDetails);
                 digitalCaseFile.setUploadedDocument(uploadedDocumentType);
-                digitalCaseFile.setStatus("DCF Updated: " + LocalDateTime.now().format(NEW_DATE_TIME_PATTERN));
+                digitalCaseFile.setStatus("DCF Generated: " + LocalDateTime.now().format(NEW_DATE_TIME_PATTERN));
                 digitalCaseFile.setError(null);
             }
             case FAILED -> {
@@ -129,23 +127,7 @@ public final class DigitalCaseFileHelper {
             caseData.setDigitalCaseFile(new DigitalCaseFileType());
         }
         caseData.getDigitalCaseFile().setStatus("DCF Updating: " + LocalDateTime.now().format(NEW_DATE_TIME_PATTERN));
+        caseData.getDigitalCaseFile().setError(null);
     }
 
-    public static void uploadOrRemoveDcf(CaseData caseData) {
-        switch (caseData.getUploadOrRemoveDcf()) {
-            case UPLOAD -> {
-                DigitalCaseFileType digitalCaseFile = caseData.getDigitalCaseFile();
-                if (isNotEmpty(digitalCaseFile)) {
-                    digitalCaseFile.setStatus("DCF Uploaded: " + LocalDateTime.now().format(NEW_DATE_TIME_PATTERN));
-                    digitalCaseFile.setError(null);
-
-                    // Deprecating old field
-                    digitalCaseFile.setDateGenerated(null);
-                }
-            }
-            case REMOVE -> caseData.setDigitalCaseFile(null);
-            default -> log.error("Invalid uploadOrRemoveDcf value: {}", caseData.getUploadOrRemoveDcf());
-        }
-        caseData.setUploadOrRemoveDcf(null);
-    }
 }

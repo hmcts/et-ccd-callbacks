@@ -46,9 +46,7 @@ public class DigitalCaseFileController {
                                                                   @RequestHeader(HttpHeaders.AUTHORIZATION)
                                                                   String userToken) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setCaseBundles(digitalCaseFileService.createBundleData(caseData));
-        digitalCaseFileService.stitchCaseFileAsync(userToken, ccdRequest.getCaseDetails());
-        DigitalCaseFileHelper.setUpdatingStatus(caseData);
+        digitalCaseFileService.createUploadRemoveDcf(userToken, ccdRequest.getCaseDetails());
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -70,22 +68,4 @@ public class DigitalCaseFileController {
         return getCallbackRespEntityNoErrors(caseData);
     }
 
-    @PostMapping(path = "/uploadOrRemoveDcf", consumes = APPLICATION_JSON_VALUE)
-    @Operation(description = "Manually upload or remove the DCF")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully",
-            content = {
-                @Content(mediaType = APPLICATION_JSON_VALUE,
-                        schema = @Schema(implementation = CCDCallbackResponse.class))
-            }),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
-    public ResponseEntity<CCDCallbackResponse> uploadOrRemoveDcf(@RequestBody CCDRequest ccdRequest,
-                                                                 @RequestHeader(HttpHeaders.AUTHORIZATION)
-                                                                 String userToken) {
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        DigitalCaseFileHelper.uploadOrRemoveDcf(caseData);
-        return getCallbackRespEntityNoErrors(caseData);
-    }
 }

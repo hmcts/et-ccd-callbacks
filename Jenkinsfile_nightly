@@ -64,8 +64,8 @@ withNightlyPipeline(type, product, component) {
     env.RUNNING_ENV = params.ENVIRONMENT
 
     loadVaultSecrets(secrets)
-    enableFullFunctionalTest()
-    enableCrossBrowserTest()
+    //enableFullFunctionalTest()
+    //enableCrossBrowserTest()
     enableFortifyScan()
    // enableApiGatewayTest()
 

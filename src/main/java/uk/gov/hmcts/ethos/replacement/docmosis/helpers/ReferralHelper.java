@@ -167,15 +167,22 @@ public final class ReferralHelper {
     public static void populateUpdateReferralDetails(BaseCaseData caseData) {
         ReferralType referral = getSelectedReferral(caseData);
         caseData.setUpdateReferCaseTo(referral.getReferCaseTo());
-        caseData.setUpdateReferralSubject(PARTY_NOT_RESPONDED_COMPLIED.equals(referral.getReferralSubject())
-                ? PARTY_NOT_RESPONDED_COMPILED
-                : referral.getReferralSubject());
+        caseData.setUpdateReferralSubject(getUpdateReferralSubject(referral));
         caseData.setUpdateReferralDetails(referral.getReferralDetails());
         caseData.setUpdateReferentEmail(referral.getReferentEmail());
         caseData.setUpdateIsUrgent(referral.getIsUrgent());
         caseData.setUpdateReferralInstruction(referral.getReferralInstruction());
         caseData.setUpdateReferralSubjectSpecify(referral.getReferralSubjectSpecify());
         caseData.setUpdateReferralDocument(referral.getReferralDocument());
+    }
+
+    private static String getUpdateReferralSubject(ReferralType referral) {
+        return switch (referral.getReferralSubject()) {
+            case PARTY_NOT_RESPONDED_COMPLIED -> PARTY_NOT_RESPONDED_COMPILED;
+            case "Rule 22" -> "Rule 21";
+            case "Rule 49 Application" -> "Rule 50 Application";
+            default -> referral.getReferralSubject();
+        };
     }
 
     /**

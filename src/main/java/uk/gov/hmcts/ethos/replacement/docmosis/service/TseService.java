@@ -91,10 +91,10 @@ public class TseService {
                 addClaimantData(caseData, application);
                 break;
             case RESPONDENT_TITLE:
-                addRespondentRepData(caseData, application);
+                addRespondentData(caseData, application);
                 break;
             case RESPONDENT_REP_TITLE:
-                addRespondentData(caseData, application);
+                addRespondentRepData(caseData, application);
                 break;
             case CLAIMANT_REP_TITLE:
                 addClaimantRepresentativeData(caseData, application);

@@ -414,24 +414,6 @@ public class CaseActionsForCaseWorkerController {
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }
 
-    @PostMapping(value = "/migrateCaseTTLDetails", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "amends the case TTL details of a single case with/in draft state.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
-                content = { @Content(mediaType = "application/json",
-                        schema = @Schema(implementation = CCDCallbackResponse.class))
-                }),
-        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
-        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
-    })
-    public ResponseEntity<CCDCallbackResponse> migrateCaseTTLDetails(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) throws IOException {
-        log.info("MIGRATE CASE TTL DETAILS ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
-
-        return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
-    }
-
     @PostMapping(value = "/amendClaimantDetails", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "amend the case claimant details for a single case.")
     @ApiResponses(value = {

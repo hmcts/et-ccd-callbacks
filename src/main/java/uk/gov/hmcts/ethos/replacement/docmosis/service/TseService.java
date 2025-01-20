@@ -12,6 +12,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentTse;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
@@ -43,6 +44,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRIBUNAL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_REP_TITLE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.RESPONDENT_REP_TITLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClaimantTellSomethingElseHelper.claimantSelectApplicationToType;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper.createTwoColumnTable;
 
@@ -89,6 +91,9 @@ public class TseService {
                 addClaimantData(caseData, application);
                 break;
             case RESPONDENT_TITLE:
+                addRespondentRepData(caseData, application);
+                break;
+            case RESPONDENT_REP_TITLE:
                 addRespondentData(caseData, application);
                 break;
             case CLAIMANT_REP_TITLE:
@@ -144,6 +149,18 @@ public class TseService {
         application.setApplicationState(IN_PROGRESS);
     }
 
+    private void addRespondentData(CaseData caseData, GenericTseApplicationType application) {
+        application.setApplicant(RESPONDENT_TITLE);
+
+        RespondentTse respondentTse = caseData.getRespondentTse();
+        application.setType(respondentTse.getContactApplicationType());
+        application.setDetails(respondentTse.getContactApplicationText());
+        application.setDocumentUpload(respondentTse.getContactApplicationFile());
+        application.setCopyToOtherPartyYesOrNo(respondentTse.getCopyToOtherPartyYesOrNo());
+        application.setCopyToOtherPartyText(respondentTse.getCopyToOtherPartyText());
+        application.setApplicationState(IN_PROGRESS);
+    }
+
     private void addClaimantRepresentativeData(CaseData caseData, GenericTseApplicationType application) {
         addClaimantData(caseData, application);
         application.setApplicant(CLAIMANT_REP_TITLE);
@@ -151,8 +168,8 @@ public class TseService {
         addSupportingMaterialToDocumentCollection(caseData, application, true);
     }
 
-    private void addRespondentData(CaseData caseData, GenericTseApplicationType application) {
-        application.setApplicant(RESPONDENT_TITLE);
+    private void addRespondentRepData(CaseData caseData, GenericTseApplicationType application) {
+        application.setApplicant(RESPONDENT_REP_TITLE);
         assignDataToFieldsFromApplicationType(application, caseData);
         application.setType(caseData.getResTseSelectApplication());
         application.setCopyToOtherPartyYesOrNo(caseData.getResTseCopyToOtherPartyYesOrNo());
@@ -201,6 +218,7 @@ public class TseService {
     }
 
     private void clearRespondentTseDataFromCaseData(CaseData caseData) {
+        caseData.setRespondentTse(null);
         caseData.setResTseSelectApplication(null);
         caseData.setResTseCopyToOtherPartyYesOrNo(null);
         caseData.setResTseCopyToOtherPartyTextArea(null);

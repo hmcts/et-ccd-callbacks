@@ -505,6 +505,10 @@ public class Et1ReppedController {
         et1ReppedService.addDefaultData(caseDetails.getCaseTypeId(), caseData);
         et1ReppedService.addClaimantRepresentativeDetails(caseData, userToken);
         caseActionsForCaseWorkerController.postDefaultValues(ccdRequest, userToken);
+
+        //Remove case time to live to avoid case being deleted
+        caseData.setTtl(null);
+
         if (featureToggleService.isEt1DocGenEnabled()) {
             caseData.setRequiresSubmissionDocuments(YES);
         } else {
@@ -554,6 +558,7 @@ public class Et1ReppedController {
             @RequestHeader("Authorization") String userToken) throws IOException {
 
         caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(ccdRequest.getCaseDetails());
+
         return ResponseEntity.ok(CCDCallbackResponse.builder()
                 .data(ccdRequest.getCaseDetails().getCaseData())
                 .confirmation_header("<h1>You have submitted the ET1 claim</h1>")

@@ -283,6 +283,7 @@ public class CaseActionsForCaseWorkerController {
 
             if (featureToggleService.citizenEt1Generation() && SUBMIT_CASE_DRAFT.equals(ccdRequest.getEventId())) {
                 caseDetails.setCaseData(caseData);
+                caseDetails.getCaseData().setTtl(null);
                 et1SubmissionService.createAndUploadEt1Docs(caseDetails, userToken);
                 et1SubmissionService.sendEt1ConfirmationClaimant(caseDetails, userToken);
             }

@@ -64,39 +64,8 @@ withNightlyPipeline(type, product, component) {
     env.RUNNING_ENV = params.ENVIRONMENT
 
     loadVaultSecrets(secrets)
-    //enableFullFunctionalTest()
-    //enableCrossBrowserTest()
     enableFortifyScan()
-   // enableApiGatewayTest()
 
-    before('crossBrowserTest') {
-        sh """
-           yarn install
-           yarn playwright install
-        """
-    }
-
-    before('fullFunctionalTest') {
-        env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
-        env.ET_COS_URL = "http://et-cos-aat.service.core-compute-aat.internal"
-        env.FT_SYA_URL = "http://et-sya-api-aat.service.core-compute-aat.internal"
-        env.SERVICE_AUTH_PROVIDER_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
-        env.CCD_DATA_STORE_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
-    }
-
-    afterAlways('fullFunctionalTest') {
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
-        steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'
-
-        publishHTML target: [
-                allowMissing : true,
-                alwaysLinkToLastBuild: true,
-                keepAll : true,
-                reportDir : "functional-output",
-                reportFiles : "ET-CCD-Callbacks-tests.html",
-                reportName : "ET E2E functional tests result"
-        ]
-    }
 
     afterAlways('fortify-scan') {
         steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/Fortify Scan/**/*'

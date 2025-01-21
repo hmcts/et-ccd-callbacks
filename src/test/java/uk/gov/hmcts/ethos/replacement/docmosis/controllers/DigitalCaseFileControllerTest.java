@@ -21,7 +21,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
-import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.time.LocalDateTime;
 

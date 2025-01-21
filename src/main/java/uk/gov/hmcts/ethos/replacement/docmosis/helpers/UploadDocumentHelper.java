@@ -47,7 +47,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.TRIBUNAL_CO
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.RULE_29_NOTICE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.*;
 
 /**
  * Helper methods for the Upload Documents event.

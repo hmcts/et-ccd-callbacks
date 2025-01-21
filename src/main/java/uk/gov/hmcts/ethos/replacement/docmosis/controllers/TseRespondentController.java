@@ -44,7 +44,7 @@ public class TseRespondentController {
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
 
-        if (caseDetails.getCaseData().getClaimantTse() != null) {
+        if (caseDetails.getCaseData().getRespondentTse() != null) {
             tseService.createApplication(caseDetails.getCaseData(), RESPONDENT_TITLE);
             tseService.clearApplicationData(caseDetails.getCaseData());
         }

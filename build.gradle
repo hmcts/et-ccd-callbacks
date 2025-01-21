@@ -384,13 +384,13 @@ dependencies {
     implementation group: 'io.netty', name: 'netty-transport-classes-epoll', version: '4.1.117.Final'
     implementation group: 'io.netty', name: 'netty-transport-classes-kqueue', version: '4.1.117.Final'
     implementation group: 'com.fasterxml.woodstox', name: 'woodstox-core', version: '7.1.0'
-    implementation group: 'com.squareup.okio', name: 'okio', version: '3.9.1'
+    implementation group: 'com.squareup.okio', name: 'okio', version: '3.10.2'
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.2.13'
     implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.2.13'
 
     implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.6.0'
 
-    runtimeOnly group: 'com.squareup.okio', name: 'okio-jvm', version: '3.9.1'
+    runtimeOnly group: 'com.squareup.okio', name: 'okio-jvm', version: '3.10.2'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'

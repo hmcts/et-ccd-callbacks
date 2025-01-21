@@ -283,7 +283,6 @@ public class CaseActionsForCaseWorkerController {
 
             if (featureToggleService.citizenEt1Generation() && SUBMIT_CASE_DRAFT.equals(ccdRequest.getEventId())) {
                 caseDetails.setCaseData(caseData);
-                caseDetails.getCaseData().setTtl(null);
                 et1SubmissionService.createAndUploadEt1Docs(caseDetails, userToken);
                 et1SubmissionService.sendEt1ConfirmationClaimant(caseDetails, userToken);
             }
@@ -291,7 +290,7 @@ public class CaseActionsForCaseWorkerController {
 
         log.info("PostDefaultValues for case: {} {}", ccdRequest.getCaseDetails().getCaseTypeId(),
                 caseData.getEthosCaseReference());
-
+        caseData.setTtl(null);
         return getCallbackRespEntityErrors(errors, caseData);
     }
 

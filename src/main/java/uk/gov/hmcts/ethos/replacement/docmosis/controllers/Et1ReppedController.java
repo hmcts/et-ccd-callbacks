@@ -505,10 +505,6 @@ public class Et1ReppedController {
         et1ReppedService.addDefaultData(caseDetails.getCaseTypeId(), caseData);
         et1ReppedService.addClaimantRepresentativeDetails(caseData, userToken);
         caseActionsForCaseWorkerController.postDefaultValues(ccdRequest, userToken);
-
-        //Remove case time to live to avoid case being deleted
-        caseData.setTtl(null);
-
         if (featureToggleService.isEt1DocGenEnabled()) {
             caseData.setRequiresSubmissionDocuments(YES);
         } else {
@@ -517,6 +513,8 @@ public class Et1ReppedController {
         et1SubmissionService.sendEt1ConfirmationMyHmcts(caseDetails, userToken);
         Et1ReppedHelper.clearEt1ReppedCreationFields(caseData);
         caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
+        //Remove case time to live to avoid case being deleted
+        caseData.setTtl(null);
         return getCallbackRespEntityNoErrors(caseData);
     }
 

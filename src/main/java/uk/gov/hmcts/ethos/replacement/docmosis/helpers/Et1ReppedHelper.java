@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.jetbrains.annotations.NotNull;
@@ -16,6 +17,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.ClaimantWorkAddressType;
 import uk.gov.hmcts.et.common.model.ccd.types.CreateRespondentType;
 import uk.gov.hmcts.et.common.model.ccd.types.NewEmploymentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.et.common.model.ccd.types.TTL;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants;
 
 import java.time.LocalDate;
@@ -52,6 +54,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EMPTY_ST
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.UNEXPECTED_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getFirstListItem;
 
+@Slf4j
 public final class Et1ReppedHelper {
 
     private Et1ReppedHelper() {
@@ -220,6 +223,9 @@ public final class Et1ReppedHelper {
      * @param caseData the case data
      */
     public static void setEt1SubmitData(CaseData caseData) {
+        //Remove case time to live to avoid case being deleted
+        caseData.setTtl(new TTL());
+        log.info("TTL set to: {}", caseData.getTtl());
         addClaimantInformation(caseData);
         addRespondentInformation(caseData);
         addClaimDetails(caseData);

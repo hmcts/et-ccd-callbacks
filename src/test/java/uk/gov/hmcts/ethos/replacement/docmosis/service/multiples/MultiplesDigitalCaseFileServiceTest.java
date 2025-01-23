@@ -5,7 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.et.common.model.bundle.Bundle;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
@@ -54,8 +53,6 @@ class MultiplesDigitalCaseFileServiceTest {
         when(authTokenGenerator.generate()).thenReturn("authToken");
         when(bundleApiClient.stitchMultipleBundle(eq(userToken), eq("authToken"), any()))
                 .thenReturn(ResourceLoader.stitchBundleRequest());
-
-        ReflectionTestUtils.setField(multiplesDigitalCaseFileService, "defaultBundle", ET_DCF_2_YAML);
     }
 
     @Test

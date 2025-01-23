@@ -4,13 +4,9 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
@@ -24,15 +20,15 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_ATTACHMENT;
@@ -63,44 +59,8 @@ class DigitalCaseFileServiceTest {
         caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
         caseDetails.setCaseId("1234123412341234");
-        when(bundleApiClient.stitchBundle(any(), any(), any()))
-                .thenReturn(ResourceLoader.stitchBundleRequest());
+        when(bundleApiClient.asyncStitchBundle(any(), any(), any())).thenReturn(ResourceLoader.stitchBundleRequest());
         when(authTokenGenerator.generate()).thenReturn("authToken");
-        ReflectionTestUtils.setField(digitalCaseFileService, "defaultBundle", "et-dcf-2.yaml");
-
-    }
-
-    @Test
-    void createBundleRequest() {
-        caseData.setCaseBundles(digitalCaseFileService.createCaseFileRequest(caseData));
-        assertNotNull(caseData.getCaseBundles());
-        assertEquals(1, caseData.getCaseBundles().get(0).value().getDocuments().size());
-        assertEquals(YES, caseDetails.getCaseData().getCaseBundles().get(0).value().getEligibleForStitching());
-    }
-
-    @Test
-    void stitchBundleRequest() {
-        String authToken = "Bearer token";
-        caseDetails.getCaseData().setCaseBundles(digitalCaseFileService.stitchCaseFile(caseDetails, authToken));
-        assertNotNull(caseDetails.getCaseData().getCaseBundles());
-        assertNotNull(caseDetails.getCaseData().getCaseBundles().get(0).value().getStitchedDocument());
-    }
-
-    @ParameterizedTest
-    @MethodSource("shouldSetBundleConfiguration")
-    void shouldSetBundleConfiguration(String bundleConfig, String expectedConfig) {
-        caseData.setBundleConfiguration(bundleConfig);
-        digitalCaseFileService.setBundleConfig(caseData);
-        assertEquals(caseData.getBundleConfiguration(), expectedConfig);
-    }
-
-    private static Stream<Arguments> shouldSetBundleConfiguration() {
-        return Stream.of(
-                Arguments.of("et-dcf-ordered.yaml", "et-dcf-ordered.yaml"),
-                Arguments.of("", "et-dcf-2.yaml"),
-                Arguments.of(null, "et-dcf-2.yaml")
-
-        );
     }
 
     @Test
@@ -160,6 +120,14 @@ class DigitalCaseFileServiceTest {
         caseData.setDigitalCaseFile(null);
         caseData.setDocumentCollection(null);
         assertDoesNotThrow(() -> digitalCaseFileService.getReplyToReferralDCFLink(caseData));
+    }
+
+    @Test
+    void createDcf() {
+        caseData.setUploadOrRemoveDcf("Create");
+        assertDoesNotThrow(() -> digitalCaseFileService.createUploadRemoveDcf("authToken", caseDetails));
+        assertEquals("DCF Updating: " + LocalDateTime.now().format(NEW_DATE_TIME_PATTERN),
+                caseData.getDigitalCaseFile().getStatus());
     }
 
 }

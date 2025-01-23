@@ -18,12 +18,9 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DigitalCaseFileHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.UploadDocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DigitalCaseFileService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
-import static io.netty.handler.codec.http.HttpHeaders.Values.APPLICATION_JSON;
-import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @Slf4j
@@ -33,60 +30,42 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 public class DigitalCaseFileController {
 
     private final DigitalCaseFileService digitalCaseFileService;
-    private final VerifyTokenService verifyTokenService;
 
-    private static final String INVALID_TOKEN = "Invalid Token {}";
-
-    @PostMapping(path = "/selectDcf", consumes = APPLICATION_JSON, produces = APPLICATION_JSON)
-    @Operation(description = "Select DCF configuration and documents")
+    @PostMapping(path = "/asyncAboutToSubmit", consumes = APPLICATION_JSON_VALUE)
+    @Operation(description = "Submit DCF asynchronously")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
-                @Content(mediaType = APPLICATION_JSON, schema = @Schema(implementation = CCDCallbackResponse.class))
+                @Content(mediaType = APPLICATION_JSON_VALUE, 
+                        schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<CCDCallbackResponse> selectDcf(@RequestBody CCDRequest ccdRequest,
-                                                            @RequestHeader(HttpHeaders.AUTHORIZATION)
-                                                            String userToken) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
+    public ResponseEntity<CCDCallbackResponse> aboutToSubmitAsync(@RequestBody CCDRequest ccdRequest,
+                                                                  @RequestHeader(HttpHeaders.AUTHORIZATION)
+                                                                  String userToken) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        // Convert doc type from legacy to new before dcf
-        UploadDocumentHelper.convertLegacyDocsToNewDocNaming(caseData);
-        UploadDocumentHelper.setDocumentTypeForDocumentCollection(caseData);
-        caseData.setCaseBundles(digitalCaseFileService.createCaseFileRequest(caseData));
+        digitalCaseFileService.createUploadRemoveDcf(userToken, ccdRequest.getCaseDetails());
         return getCallbackRespEntityNoErrors(caseData);
     }
 
-    @PostMapping(path = "/aboutToSubmit", consumes = APPLICATION_JSON, produces = APPLICATION_JSON)
-    @Operation(description = "Stitch DCF")
+    @PostMapping(path = "/asyncCompleteAboutToSubmit", consumes = APPLICATION_JSON_VALUE)
+    @Operation(description = "Submit DCF asynchronously")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                content = {
-                    @Content(mediaType = APPLICATION_JSON, schema = @Schema(implementation = CCDCallbackResponse.class))
-                }),
+            content = {
+                @Content(mediaType = APPLICATION_JSON_VALUE,
+                        schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<CCDCallbackResponse> aboutToSubmit(@RequestBody CCDRequest ccdRequest,
-                                                            @RequestHeader(HttpHeaders.AUTHORIZATION)
-                                                            String userToken) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
+    public ResponseEntity<CCDCallbackResponse> asyncCompleteAboutToSubmit(
+            @RequestBody CCDRequest ccdRequest, @RequestHeader(HttpHeaders.AUTHORIZATION) String userToken) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setCaseBundles(digitalCaseFileService.stitchCaseFile(ccdRequest.getCaseDetails(), userToken));
         DigitalCaseFileHelper.addDcfToDocumentCollection(caseData);
-        caseData.setCaseBundles(null);
         return getCallbackRespEntityNoErrors(caseData);
     }
+
 }

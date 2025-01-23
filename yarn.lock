@@ -1112,6 +1112,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@codeceptjs/configure@npm:1.0.2":
+  version: 1.0.2
+  resolution: "@codeceptjs/configure@npm:1.0.2"
+  dependencies:
+    lodash.merge: ^4.6.2
+    lodash.mergewith: ^4.6.2
+  peerDependencies:
+    codeceptjs: ">=2.3.3 <100.0.0"
+  checksum: bb1a5cbd3cde5a4a48ec051997b9e06aa3dcb440ff928b24422d2caa6c4f52d1fc2d8760f161960690954e6c2f4c871a34e65e929fc115ff42932b97abbaaaa2
+  languageName: node
+  linkType: hard
+
 "@codeceptjs/configure@npm:^0.8.0":
   version: 0.8.0
   resolution: "@codeceptjs/configure@npm:0.8.0"
@@ -7936,7 +7948,7 @@ __metadata:
   resolution: "et-ccd-callbacks@workspace:."
   dependencies:
     "@babel/eslint-parser": ^7.17.0
-    "@codeceptjs/configure": 1.0.1
+    "@codeceptjs/configure": 1.0.2
     "@codeceptjs/examples": 1.2.4
     "@codeceptjs/ui": 1.2.0
     "@hmcts/nodejs-logging": 4.0.4

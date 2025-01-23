@@ -223,9 +223,6 @@ public final class Et1ReppedHelper {
      * @param caseData the case data
      */
     public static void setEt1SubmitData(CaseData caseData) {
-        //Remove case time to live to avoid case being deleted
-        caseData.setTtl(new TTL());
-        log.info("TTL set to: {}", caseData.getTtl());
         addClaimantInformation(caseData);
         addRespondentInformation(caseData);
         addClaimDetails(caseData);

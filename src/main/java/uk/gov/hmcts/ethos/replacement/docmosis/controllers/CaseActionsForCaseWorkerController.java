@@ -291,7 +291,6 @@ public class CaseActionsForCaseWorkerController {
 
         log.info("PostDefaultValues for case: {} {}", ccdRequest.getCaseDetails().getCaseTypeId(),
                 caseData.getEthosCaseReference());
-        caseData.setTtl(new TTL());
         return getCallbackRespEntityErrors(errors, caseData);
     }
 

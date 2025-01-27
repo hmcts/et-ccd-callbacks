@@ -188,7 +188,8 @@ public class DocumentGenerationService {
 
     public boolean areBfActionsForEnglandOrWalesToBeUpdated(CaseData caseData, String sectionName) {
         if (caseData.getCorrespondenceType() != null) {
-            String[] values = {"2.6", "2.6 Reform", "2.7", "2.8", "2.7 Reform", "2.8 Reform"};
+            String[] values = {"2.6", "2.6 Reform", "2.7", "2.8", "2.7 Reform", "2.8 Reform",
+                    "2.7A", "2.8A", "2.7A Reform", "2.8A Reform"};
             return Arrays.asList(values).contains(sectionName);
         }
         return false;

@@ -513,6 +513,7 @@ public class Et1ReppedController {
         et1SubmissionService.sendEt1ConfirmationMyHmcts(caseDetails, userToken);
         Et1ReppedHelper.clearEt1ReppedCreationFields(caseData);
         caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
+
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -554,6 +555,7 @@ public class Et1ReppedController {
             @RequestHeader("Authorization") String userToken) throws IOException {
 
         caseManagementForCaseWorkerService.setHmctsServiceIdSupplementary(ccdRequest.getCaseDetails());
+
         return ResponseEntity.ok(CCDCallbackResponse.builder()
                 .data(ccdRequest.getCaseDetails().getCaseData())
                 .confirmation_header("<h1>You have submitted the ET1 claim</h1>")

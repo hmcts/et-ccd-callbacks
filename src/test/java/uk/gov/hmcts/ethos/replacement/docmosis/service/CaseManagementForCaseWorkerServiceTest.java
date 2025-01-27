@@ -1354,11 +1354,9 @@ class CaseManagementForCaseWorkerServiceTest {
         SubmitMultipleEvent event = new SubmitMultipleEvent();
         event.setCaseId(1_716_474_017_962_374L);
         event.setCaseData(multipleData);
-
         String adminToken = "adminToken";
         when(adminUserService.getAdminUserToken()).thenReturn(adminToken);
         when(multipleReferenceService.getMultipleByReference(anyString(), anyString(), anyString())).thenReturn(event);
-
         caseManagementForCaseWorkerService.setNextListedDateOnMultiple(details);
 
         assertThat(multipleData.getNextListedDate()).isEqualTo(nextListedDate);

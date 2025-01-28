@@ -290,7 +290,6 @@ public class CaseActionsForCaseWorkerController {
 
         log.info("PostDefaultValues for case: {} {}", ccdRequest.getCaseDetails().getCaseTypeId(),
                 caseData.getEthosCaseReference());
-
         return getCallbackRespEntityErrors(errors, caseData);
     }
 

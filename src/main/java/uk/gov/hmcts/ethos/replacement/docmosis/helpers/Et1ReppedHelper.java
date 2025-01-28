@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.jetbrains.annotations.NotNull;
@@ -52,6 +53,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EMPTY_ST
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.UNEXPECTED_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getFirstListItem;
 
+@Slf4j
 public final class Et1ReppedHelper {
 
     private Et1ReppedHelper() {

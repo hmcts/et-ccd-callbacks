@@ -3,7 +3,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.multiples;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.bundle.Bundle;
 import uk.gov.hmcts.et.common.model.bundle.BundleCreateResponse;
@@ -30,9 +29,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 public class MultiplesDigitalCaseFileService {
     private final AuthTokenGenerator authTokenGenerator;
     private final BundleApiClient bundleApiClient;
-
-    @Value("${em-ccd-orchestrator.config.default}")
-    private String defaultBundle;
 
     /**
      * Creates a request to create a case file.
@@ -87,7 +83,7 @@ public class MultiplesDigitalCaseFileService {
 
     private void setBundleConfig(MultipleData caseData) {
         if (isNullOrEmpty(caseData.getBundleConfiguration())) {
-            caseData.setBundleConfiguration(defaultBundle);
+            caseData.setBundleConfiguration("et-dcf-2.yaml");
         }
     }
 

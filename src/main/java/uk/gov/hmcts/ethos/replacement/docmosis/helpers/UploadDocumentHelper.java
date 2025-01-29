@@ -196,7 +196,6 @@ public final class UploadDocumentHelper {
             documentType.setDocNumber(
                     String.valueOf(caseData.getDocumentCollection().indexOf(documentTypeItem) + 1));
         });
-
     }
 
     private static void setDocumentTypeForInitialConsiderationRuleChanges(DocumentType documentType) {

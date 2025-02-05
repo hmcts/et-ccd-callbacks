@@ -13,6 +13,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_REP_TITLE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.RESPONDENT_REP_TITLE;
 
 @Slf4j
 public final class TseViewApplicationHelper {
@@ -50,11 +51,13 @@ public final class TseViewApplicationHelper {
      */
     public static boolean applicationsSharedWithRespondent(GenericTseApplicationTypeItem applicationTypeItem) {
         String applicant = applicationTypeItem.getValue().getApplicant();
+        boolean isRespondentOrRespondentRep =
+                RESPONDENT_TITLE.equals(applicant) || RESPONDENT_REP_TITLE.equals(applicant);
         String copyToRespondent = applicationTypeItem.getValue().getCopyToOtherPartyYesOrNo();
         boolean isClaimantAndRule92Shared = (CLAIMANT_TITLE.equals(applicant) || CLAIMANT_REP_TITLE.equals(applicant))
                 && YES.equals(copyToRespondent);
 
-        return RESPONDENT_TITLE.equals(applicant) || isClaimantAndRule92Shared;
+        return isRespondentOrRespondentRep || isClaimantAndRule92Shared;
     }
 
     /**

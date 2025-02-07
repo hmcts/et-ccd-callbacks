@@ -396,7 +396,7 @@ dependencies {
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
-    testImplementation 'com.github.hmcts:fortify-client:1.4.6:all', {
+    testImplementation 'com.github.hmcts:fortify-client:1.4.7:all', {
         exclude module: 'commons-io'
     }
 

@@ -351,7 +351,7 @@ dependencies {
 
     implementation group: 'commons-io', name: 'commons-io', version: '2.18.0'
     implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.5'
-    implementation group: 'io.netty', name: 'netty-tcnative-classes', version: '2.0.69.Final'
+    implementation group: 'io.netty', name: 'netty-tcnative-classes', version: '2.0.70.Final'
     implementation group: 'org.json', name: 'json', version: '20240303'
     implementation group: 'org.apache.commons', name: 'commons-compress', version: '1.27.1'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.17.0'

@@ -66,6 +66,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.TRIBUNAL
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.TRIBUNAL_LOCATION_LABEL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.TRIBUNAL_OFFICE_LOCATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.TRIBUNAL_SCOTLAND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.addressIsEmpty;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.JUR_CODE_CONCILIATION_TRACK_OP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.JUR_CODE_CONCILIATION_TRACK_SH;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.JUR_CODE_CONCILIATION_TRACK_ST;
@@ -424,17 +425,6 @@ public class Et1VettingService {
             claimantAddressStr.append(BR_WITH_TAB).append(address.getPostCode());
         }
         return claimantAddressStr.toString();
-    }
-
-    private boolean addressIsEmpty(Address address) {
-        return address == null
-                || isNullOrEmpty(address.getAddressLine1())
-                && isNullOrEmpty(address.getAddressLine2())
-                && isNullOrEmpty(address.getAddressLine3())
-                && isNullOrEmpty(address.getPostTown())
-                && isNullOrEmpty(address.getPostCode())
-                && isNullOrEmpty(address.getCountry())
-                && isNullOrEmpty(address.getCounty());
     }
 
     private void populateCodeNameAndDescriptionHtml(StringBuilder sb, String codeName) {

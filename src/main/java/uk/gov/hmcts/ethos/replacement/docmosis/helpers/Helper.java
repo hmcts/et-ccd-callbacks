@@ -9,6 +9,7 @@ import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.model.labels.LabelPayloadES;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
+import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.SignificantItem;
@@ -448,5 +449,16 @@ public final class Helper {
             caseData.getClaimantIndType().setClaimantLastName(
                     caseData.getClaimantIndType().getClaimantLastName().trim());
         }
+    }
+
+    public static boolean addressIsEmpty(Address address) {
+        return address == null
+                || isNullOrEmpty(address.getAddressLine1())
+                && isNullOrEmpty(address.getAddressLine2())
+                && isNullOrEmpty(address.getAddressLine3())
+                && isNullOrEmpty(address.getPostTown())
+                && isNullOrEmpty(address.getPostCode())
+                && isNullOrEmpty(address.getCountry())
+                && isNullOrEmpty(address.getCounty());
     }
 }

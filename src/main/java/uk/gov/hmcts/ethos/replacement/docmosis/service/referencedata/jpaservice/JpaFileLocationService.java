@@ -6,6 +6,7 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.FileLocationRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.FileLocationService;
 
+import java.util.Comparator;
 import java.util.List;
 
 @Service
@@ -22,6 +23,7 @@ public class JpaFileLocationService implements FileLocationService {
         return fileLocationRepository.findByTribunalOffice(tribunalOffice)
                 .stream()
                 .map(fl -> DynamicValueType.create(fl.getCode(), fl.getName()))
+                .sorted(Comparator.comparing(DynamicValueType::getLabel))
                 .toList();
     }
 }

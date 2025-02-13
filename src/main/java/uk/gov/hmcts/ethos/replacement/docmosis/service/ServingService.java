@@ -10,6 +10,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 
@@ -22,8 +23,10 @@ import java.util.stream.Collectors;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.addressIsEmpty;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantNonSystemUser;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isRepresentedClaimantWithMyHmctsCase;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.ADDRESS_NOT_ENTERED;
 
 @Service
 @Slf4j
@@ -91,13 +94,18 @@ public class ServingService {
         ClaimantIndType claimant = caseData.getClaimantIndType();
         addressStr.append(String.format(CLAIMANT_ADDRESS, claimant.getClaimantFirstNames(),
             claimant.getClaimantLastName(),
-            caseData.getClaimantType().getClaimantAddressUK().toAddressHtml()));
+            addressIsEmpty(caseData.getClaimantType().getClaimantAddressUK())
+                    ? "<br>" + ADDRESS_NOT_ENTERED + "<br>"
+                    : caseData.getClaimantType().getClaimantAddressUK().toAddressHtml()));
 
         int index = 1;
         for (RespondentSumTypeItem respondentItem : caseData.getRespondentCollection()) {
+            RespondentSumType respondentSumType = respondentItem.getValue();
             addressStr.append(String.format(RESPONDENT_ADDRESS, index,
-                respondentItem.getValue().getRespondentName(),
-                respondentItem.getValue().getRespondentAddress().toAddressHtml()));
+                respondentSumType.getRespondentName(),
+                addressIsEmpty(respondentSumType.getRespondentAddress())
+                        ? "<br>" + ADDRESS_NOT_ENTERED + "<br>"
+                        : respondentSumType.getRespondentAddress().toAddressHtml()));
             index++;
         }
 

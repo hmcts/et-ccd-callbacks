@@ -22,9 +22,12 @@ class JpaCourtWorkerServiceTest {
         TribunalOffice tribunalOffice = TribunalOffice.BRISTOL;
         CourtWorkerType courtWorkerType = CourtWorkerType.CLERK;
         List<CourtWorker> courtWorkers = List.of(
+                createCourtWorker("inactive Worker", "z Worker"),
                 createCourtWorker("worker1", "Worker 1"),
                 createCourtWorker("worker2", "Worker 2"),
-                createCourtWorker("worker3", "Worker 3"));
+                createCourtWorker("worker3", "Worker 3"),
+                createCourtWorker("Clerk1", "Clerk1"),
+                createCourtWorker("Clerk2", "Clerk2"));
         CourtWorkerRepository courtWorkerRepository = mock(CourtWorkerRepository.class);
         when(courtWorkerRepository.findByTribunalOfficeAndType(
                 tribunalOffice, courtWorkerType)).thenReturn(courtWorkers);
@@ -33,10 +36,14 @@ class JpaCourtWorkerServiceTest {
         List<DynamicValueType> values = courtWorkerService.getCourtWorkerByTribunalOffice(
                 tribunalOffice, courtWorkerType);
 
-        assertEquals(3, values.size());
-        verifyValue(values.get(0), "worker1", "Worker 1");
-        verifyValue(values.get(1), "worker2", "Worker 2");
-        verifyValue(values.get(2), "worker3", "Worker 3");
+        assertEquals(6, values.size());
+        // Results should be sorted in alphabetical order by label
+        verifyValue(values.get(0), "Clerk1", "Clerk1");
+        verifyValue(values.get(1), "Clerk2", "Clerk2");
+        verifyValue(values.get(2), "worker1", "Worker 1");
+        verifyValue(values.get(3), "worker2", "Worker 2");
+        verifyValue(values.get(4), "worker3", "Worker 3");
+        verifyValue(values.get(5), "inactive Worker", "z Worker");
     }
 
     private CourtWorker createCourtWorker(String code, String name) {

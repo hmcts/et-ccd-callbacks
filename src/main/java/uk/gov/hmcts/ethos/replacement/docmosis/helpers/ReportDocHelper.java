@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
@@ -220,7 +221,7 @@ public final class ReportDocHelper {
     public static void addJsonCollection(String name, Iterator<?> iterator, StringBuilder sb)
             throws JsonProcessingException {
         sb.append('"').append(name).append("\":[\n");
-        ObjectMapper objectMapper = new ObjectMapper();
+        ObjectMapper objectMapper = new ObjectMapper().registerModule(new JavaTimeModule());
         while (iterator.hasNext()) {
             sb.append(objectMapper.writeValueAsString(iterator.next()));
             if (iterator.hasNext()) {

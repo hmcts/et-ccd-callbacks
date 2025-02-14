@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -9,6 +10,7 @@ import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.model.labels.LabelPayloadES;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
+import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.SignificantItem;
@@ -68,7 +70,7 @@ public final class Helper {
     public static final String HEARING_CREATION_DAY_ERROR = "A new day for a hearing can "
             + "only be added from the List Hearing menu item";
     private static final String MY_HMCTS = "MyHMCTS";
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().registerModule(new JavaTimeModule());
 
     private Helper() {
         OBJECT_MAPPER.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
@@ -448,5 +450,16 @@ public final class Helper {
             caseData.getClaimantIndType().setClaimantLastName(
                     caseData.getClaimantIndType().getClaimantLastName().trim());
         }
+    }
+
+    public static boolean addressIsEmpty(Address address) {
+        return address == null
+                || isNullOrEmpty(address.getAddressLine1())
+                && isNullOrEmpty(address.getAddressLine2())
+                && isNullOrEmpty(address.getAddressLine3())
+                && isNullOrEmpty(address.getPostTown())
+                && isNullOrEmpty(address.getPostCode())
+                && isNullOrEmpty(address.getCountry())
+                && isNullOrEmpty(address.getCounty());
     }
 }

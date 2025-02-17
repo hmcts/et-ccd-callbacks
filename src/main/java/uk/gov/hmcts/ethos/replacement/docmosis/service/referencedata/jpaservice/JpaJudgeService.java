@@ -9,8 +9,10 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.Judge;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.JudgeRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.JudgeService;
 
-import java.util.Comparator;
 import java.util.List;
+
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.partitioningBy;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -28,7 +30,11 @@ public class JpaJudgeService implements JudgeService {
     public List<DynamicValueType> getJudgesDynamicList(TribunalOffice tribunalOffice) {
         return judgeRepository.findByTribunalOffice(tribunalOffice).stream()
                 .map(j -> DynamicValueType.create(j.getCode(), j.getName()))
-                .sorted(Comparator.comparing(DynamicValueType::getLabel))
+                .sorted(comparing(dv -> dv.getLabel().toLowerCase()))
+                .collect(partitioningBy(dv -> dv.getLabel().startsWith("z ")))
+                .values()
+                .stream()
+                .flatMap(List::stream)
                 .toList();
     }
 }

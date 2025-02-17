@@ -6,8 +6,10 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.FileLocationRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.FileLocationService;
 
-import java.util.Comparator;
 import java.util.List;
+
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.partitioningBy;
 
 @Service
 public class JpaFileLocationService implements FileLocationService {
@@ -20,10 +22,13 @@ public class JpaFileLocationService implements FileLocationService {
 
     @Override
     public List<DynamicValueType> getFileLocations(TribunalOffice tribunalOffice) {
-        return fileLocationRepository.findByTribunalOffice(tribunalOffice)
-                .stream()
+        return fileLocationRepository.findByTribunalOffice(tribunalOffice).stream()
                 .map(fl -> DynamicValueType.create(fl.getCode(), fl.getName()))
-                .sorted(Comparator.comparing(DynamicValueType::getLabel))
+                .sorted(comparing(dv -> dv.getLabel().toLowerCase()))
+                .collect(partitioningBy(dv -> dv.getLabel().startsWith("z ")))
+                .values()
+                .stream()
+                .flatMap(List::stream)
                 .toList();
     }
 }

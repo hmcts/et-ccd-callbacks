@@ -8,8 +8,10 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.CourtWorkerT
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.CourtWorkerRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.CourtWorkerService;
 
-import java.util.Comparator;
 import java.util.List;
+
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.partitioningBy;
 
 @RequiredArgsConstructor
 @Service
@@ -19,10 +21,13 @@ public class JpaCourtWorkerService implements CourtWorkerService {
 
     public List<DynamicValueType> getCourtWorkerByTribunalOffice(TribunalOffice tribunalOffice,
                                                                  CourtWorkerType courtWorkerType) {
-        return courtWorkerRepository.findByTribunalOfficeAndType(tribunalOffice, courtWorkerType)
-                .stream()
+        return courtWorkerRepository.findByTribunalOfficeAndType(tribunalOffice, courtWorkerType).stream()
                 .map(cw -> DynamicValueType.create(cw.getCode(), cw.getName()))
-                .sorted(Comparator.comparing(DynamicValueType::getLabel))
+                .sorted(comparing(dv -> dv.getLabel().toLowerCase()))
+                .collect(partitioningBy(dv -> dv.getLabel().startsWith("z ")))
+                .values()
+                .stream()
+                .flatMap(List::stream)
                 .toList();
     }
 }

@@ -36,7 +36,6 @@ class JpaCourtWorkerServiceTest {
         JpaCourtWorkerService courtWorkerService = new JpaCourtWorkerService(courtWorkerRepository);
         List<DynamicValueType> values = courtWorkerService.getCourtWorkerByTribunalOffice(
                 tribunalOffice, courtWorkerType);
-        System.out.println(values);
         assertEquals(7, values.size());
         // Results should be sorted in alphabetical order by label with 'z' values at the end
         verifyValue(values.get(0), "Clerk1", "Clerk1");

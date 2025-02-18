@@ -74,6 +74,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EMPTY_ST
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET1_ATTACHMENT_DOC_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET1_DOC_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.removeSpacesFromPartyNames;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.TribunalOfficesService.UNASSIGNED_OFFICE;
 
 @Slf4j
@@ -133,6 +134,7 @@ public class CaseManagementForCaseWorkerService {
     }
 
     public void caseDataDefaults(CaseData caseData) {
+        removeSpacesFromPartyNames(caseData);
         claimantDefaults(caseData);
         respondentDefaults(caseData);
         struckOutDefaults(caseData);

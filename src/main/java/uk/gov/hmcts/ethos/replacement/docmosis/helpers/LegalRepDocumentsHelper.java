@@ -19,6 +19,7 @@ import java.util.Optional;
 import java.util.stream.IntStream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static org.apache.commons.lang3.StringUtils.EMPTY;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
@@ -102,7 +103,7 @@ public final class LegalRepDocumentsHelper {
                 TseRespondType respondType = response.getValue();
                 if (CLAIMANT_TITLE.equals(respondType.getFrom()) && NO.equals(respondType.getCopyToOtherParty())) {
                     claimantRule92NoDocuments.addAll(
-                            respondType.getSupportingMaterial().stream()
+                            emptyIfNull(respondType.getSupportingMaterial()).stream()
                                 .map(documentType -> Optional.ofNullable(documentType.getValue().getUploadedDocument()))
                                 .toList()
                     );

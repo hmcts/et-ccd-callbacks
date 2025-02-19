@@ -9,6 +9,10 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.CourtWorkerRepo
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.CourtWorkerService;
 
 import java.util.List;
+import java.util.Locale;
+
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.partitioningBy;
 
 @RequiredArgsConstructor
 @Service
@@ -18,9 +22,13 @@ public class JpaCourtWorkerService implements CourtWorkerService {
 
     public List<DynamicValueType> getCourtWorkerByTribunalOffice(TribunalOffice tribunalOffice,
                                                                  CourtWorkerType courtWorkerType) {
-        return courtWorkerRepository.findByTribunalOfficeAndType(tribunalOffice, courtWorkerType)
-                .stream()
+        return courtWorkerRepository.findByTribunalOfficeAndType(tribunalOffice, courtWorkerType).stream()
                 .map(cw -> DynamicValueType.create(cw.getCode(), cw.getName()))
+                .sorted(comparing(dv -> dv.getLabel().toLowerCase(Locale.ROOT)))
+                .collect(partitioningBy(dv -> dv.getLabel().startsWith("z ")))
+                .values()
+                .stream()
+                .flatMap(List::stream)
                 .toList();
     }
 }

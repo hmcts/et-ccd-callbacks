@@ -20,19 +20,24 @@ class JpaJudgeServiceTest {
     void testGetJudges() {
         TribunalOffice tribunalOffice = TribunalOffice.BRISTOL;
         List<Judge> judges = List.of(
+                createJudge("inactive Judge", "z Judge"),
                 createJudge("judge1", "Judge 1"),
                 createJudge("judge2", "Judge 2"),
-                createJudge("judge3", "Judge 3"));
+                createJudge("judge3", "Judge 3"),
+                createJudge("A Judge", "A Judge"));
         JudgeRepository judgeRepository = mock(JudgeRepository.class);
         when(judgeRepository.findByTribunalOffice(tribunalOffice)).thenReturn(judges);
 
         JpaJudgeService judgeService = new JpaJudgeService(judgeRepository);
         List<DynamicValueType> values = judgeService.getJudgesDynamicList(tribunalOffice);
 
-        assertEquals(3, values.size());
-        verifyValue(values.get(0), "judge1", "Judge 1");
-        verifyValue(values.get(1), "judge2", "Judge 2");
-        verifyValue(values.get(2), "judge3", "Judge 3");
+        assertEquals(5, values.size());
+        // Results should be sorted in alphabetical order by label
+        verifyValue(values.get(0), "A Judge", "A Judge");
+        verifyValue(values.get(1), "judge1", "Judge 1");
+        verifyValue(values.get(2), "judge2", "Judge 2");
+        verifyValue(values.get(3), "judge3", "Judge 3");
+        verifyValue(values.get(4), "inactive Judge", "z Judge");
     }
 
     private Judge createJudge(String code, String name) {

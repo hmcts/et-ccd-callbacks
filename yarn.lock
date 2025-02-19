@@ -8286,7 +8286,7 @@ __metadata:
     sinon: 19.0.2
     sinon-chai: 4.0.0
     sonar-scanner: 3.1.0
-    sonarqube-scanner: 4.2.6
+    sonarqube-scanner: 4.2.7
     superagent-proxy: 3.0.0
     supertest: 7.0.0
     totp-generator: 1.0.0
@@ -11513,15 +11513,6 @@ __metadata:
   version: 29.6.3
   resolution: "jest-regex-util@npm:29.6.3"
   checksum: 0518beeb9bf1228261695e54f0feaad3606df26a19764bc19541e0fc6e2a3737191904607fb72f3f2ce85d9c16b28df79b7b1ec9443aa08c3ef0e9efda6f8f2a
-  languageName: node
-  linkType: hard
-
-"jest-sonar-reporter@npm:2.0.0":
-  version: 2.0.0
-  resolution: "jest-sonar-reporter@npm:2.0.0"
-  dependencies:
-    xml: ^1.0.1
-  checksum: a79d87f0db6d83c9306b90b1fe44fa8ea19f1598c3bd11d3198b17617c54b9bd8e982ea3b5a857865acf2f6f96b830321e684e320f7961bcb7444935029be724
   languageName: node
   linkType: hard
 
@@ -16516,16 +16507,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sonarqube-scanner@npm:4.2.6":
-  version: 4.2.6
-  resolution: "sonarqube-scanner@npm:4.2.6"
+"sonarqube-scanner@npm:4.2.7":
+  version: 4.2.7
+  resolution: "sonarqube-scanner@npm:4.2.7"
   dependencies:
     adm-zip: 0.5.12
     axios: 1.7.7
     commander: 12.0.0
     fs-extra: 11.2.0
     hpagent: 1.2.0
-    jest-sonar-reporter: 2.0.0
     node-forge: ^1.3.1
     properties-file: 3.5.4
     proxy-from-env: ^1.1.0
@@ -16533,8 +16523,9 @@ __metadata:
     slugify: 1.6.6
     tar-stream: 3.1.7
   bin:
-    sonar-scanner: bin/sonar-scanner
-  checksum: cb064b57aea00c0d4409d258ad0b66a7150ffe7bd27a74e16148865845e7988dcffb169f7dfdfdd6c04693b56eab80f97c8d4543883ffb534d84560dfddc782e
+    sonar: bin/sonar-scanner.js
+    sonar-scanner: bin/sonar-scanner.js
+  checksum: e00297906510f817b33cf9c142e86bfd42754c8a8b8ab2b7ff8d56fe3e7ac5997deee23e77dcaa780f8c6836fe98085babf750179675cfb21e9b486cabfa5bf5
   languageName: node
   linkType: hard
 

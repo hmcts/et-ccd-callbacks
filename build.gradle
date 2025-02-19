@@ -363,7 +363,7 @@ dependencies {
     implementation group: 'org.apache.santuario', name: 'xmlsec', version: '4.0.3'
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: tomcatEmbedVersion
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: tomcatEmbedVersion
-    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.4.2'
+    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.4.3'
     //To Remove vulnerability CVE-2020-11988
     implementation group: 'org.apache.xmlgraphics', name: 'xmlgraphics-commons', version: '2.10'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.22.3'

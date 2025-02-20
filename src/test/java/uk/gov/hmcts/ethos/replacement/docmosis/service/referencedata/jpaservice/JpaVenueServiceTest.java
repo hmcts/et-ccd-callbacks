@@ -20,7 +20,9 @@ class JpaVenueServiceTest {
     void testGetVenues() {
         TribunalOffice tribunalOffice = TribunalOffice.BRISTOL;
         List<Venue> venues = List.of(
+                createVenue("Venue0", "z Venue 0"),
                 createVenue("venue1", "Venue 1"),
+                createVenue("Zouch", "Zouch"),
                 createVenue("venue2", "Venue 2"),
                 createVenue("venue3", "Venue 3"));
         VenueRepository venueRepository = mock(VenueRepository.class);
@@ -29,10 +31,12 @@ class JpaVenueServiceTest {
         JpaVenueService venueService = new JpaVenueService(venueRepository);
         List<DynamicValueType> values = venueService.getVenues(tribunalOffice);
 
-        assertEquals(3, values.size());
+        assertEquals(5, values.size());
         verifyValue(values.get(0), "venue1", "Venue 1");
         verifyValue(values.get(1), "venue2", "Venue 2");
         verifyValue(values.get(2), "venue3", "Venue 3");
+        verifyValue(values.get(3), "Zouch", "Zouch");
+        verifyValue(values.get(4), "Venue0", "z Venue 0");
     }
 
     private Venue createVenue(String code, String name) {

@@ -3697,13 +3697,13 @@ __metadata:
   linkType: hard
 
 "@wdio/cli@npm:^9.0.0":
-  version: 9.9.1
-  resolution: "@wdio/cli@npm:9.9.1"
+  version: 9.9.3
+  resolution: "@wdio/cli@npm:9.9.3"
   dependencies:
     "@types/node": ^20.1.1
     "@vitest/snapshot": ^2.1.1
     "@wdio/config": 9.9.0
-    "@wdio/globals": 9.9.1
+    "@wdio/globals": 9.9.3
     "@wdio/logger": 9.4.4
     "@wdio/protocols": 9.7.0
     "@wdio/types": 9.9.0
@@ -3722,11 +3722,11 @@ __metadata:
     read-pkg-up: ^10.0.0
     recursive-readdir: ^2.2.3
     tsx: ^4.7.2
-    webdriverio: 9.9.1
+    webdriverio: 9.9.3
     yargs: ^17.7.2
   bin:
     wdio: ./bin/wdio.js
-  checksum: 5a1f208bbbeb784500356cfebbd41417969bee35f3188f857ff3efac2e615b85364f73c3f62c8db088295743b34af427bdca1c8f24cc7306cbc73c882a1537d9
+  checksum: c0617d551ebab557019717978f1b345dbb1c42282583eaa7c5d701efe8e08f22b5cdaa2ab5b74ea9a4c2889ea660c9dae00f0fc3daeed5bcf5a7cf35bde43f14
   languageName: node
   linkType: hard
 
@@ -3760,18 +3760,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@wdio/globals@npm:9.9.1":
-  version: 9.9.1
-  resolution: "@wdio/globals@npm:9.9.1"
+"@wdio/globals@npm:9.9.3":
+  version: 9.9.3
+  resolution: "@wdio/globals@npm:9.9.3"
   dependencies:
     expect-webdriverio: ^5.1.0
-    webdriverio: 9.9.1
+    webdriverio: 9.9.3
   dependenciesMeta:
     expect-webdriverio:
       optional: true
     webdriverio:
       optional: true
-  checksum: 494e6100addacf961cca0a2646f34e82e49374d6e36f23703cac1b0d6a1b19ba1fd7bcb72caaff2f4830f6767a21d9076558bf18c6b94916c3e13c0cd93c7a4b
+  checksum: f4cf9b3f59c14d56ee648d294fc05c67289e3ca911293a3cb0f351dc0095e1e9a75c5129e031286490c24d1e6515d8eb8d1ed98311ba21fdfe006353b9a20077
   languageName: node
   linkType: hard
 
@@ -3816,15 +3816,15 @@ __metadata:
   linkType: hard
 
 "@wdio/sauce-service@npm:^9.0.0":
-  version: 9.9.1
-  resolution: "@wdio/sauce-service@npm:9.9.1"
+  version: 9.9.3
+  resolution: "@wdio/sauce-service@npm:9.9.3"
   dependencies:
     "@wdio/logger": 9.4.4
     "@wdio/types": 9.9.0
     "@wdio/utils": 9.9.0
     saucelabs: ^9.0.1
-    webdriverio: 9.9.1
-  checksum: 7823a269d07772e7904676a033c48fb1ee3851c32dcf76ea24e012e1802d39d21a68963ee44e3d8c178a4def3d5c755d329db3878ad84a815b6052dcd14e72d2
+    webdriverio: 9.9.3
+  checksum: a1c67005dfb6d7c89a4cebf34fd7bdfe4479b99c32de91f15911d20922fec5620748395d47d04d6d6d207306f66e803b7ba72ff1b920bd16b9b66951aab16ef3
   languageName: node
   linkType: hard
 
@@ -8286,14 +8286,14 @@ __metadata:
     sinon: 19.0.2
     sinon-chai: 4.0.0
     sonar-scanner: 3.1.0
-    sonarqube-scanner: 4.2.6
+    sonarqube-scanner: 4.2.7
     superagent-proxy: 3.0.0
     supertest: 7.0.0
     totp-generator: 1.0.0
     unirest: 0.6.0
     uuid: 10.0.0
     watch: 1.0.2
-    webdriverio: 9.9.1
+    webdriverio: 9.9.3
     when: 3.7.8
   languageName: unknown
   linkType: soft
@@ -11513,15 +11513,6 @@ __metadata:
   version: 29.6.3
   resolution: "jest-regex-util@npm:29.6.3"
   checksum: 0518beeb9bf1228261695e54f0feaad3606df26a19764bc19541e0fc6e2a3737191904607fb72f3f2ce85d9c16b28df79b7b1ec9443aa08c3ef0e9efda6f8f2a
-  languageName: node
-  linkType: hard
-
-"jest-sonar-reporter@npm:2.0.0":
-  version: 2.0.0
-  resolution: "jest-sonar-reporter@npm:2.0.0"
-  dependencies:
-    xml: ^1.0.1
-  checksum: a79d87f0db6d83c9306b90b1fe44fa8ea19f1598c3bd11d3198b17617c54b9bd8e982ea3b5a857865acf2f6f96b830321e684e320f7961bcb7444935029be724
   languageName: node
   linkType: hard
 
@@ -16516,16 +16507,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sonarqube-scanner@npm:4.2.6":
-  version: 4.2.6
-  resolution: "sonarqube-scanner@npm:4.2.6"
+"sonarqube-scanner@npm:4.2.7":
+  version: 4.2.7
+  resolution: "sonarqube-scanner@npm:4.2.7"
   dependencies:
     adm-zip: 0.5.12
     axios: 1.7.7
     commander: 12.0.0
     fs-extra: 11.2.0
     hpagent: 1.2.0
-    jest-sonar-reporter: 2.0.0
     node-forge: ^1.3.1
     properties-file: 3.5.4
     proxy-from-env: ^1.1.0
@@ -16533,8 +16523,9 @@ __metadata:
     slugify: 1.6.6
     tar-stream: 3.1.7
   bin:
-    sonar-scanner: bin/sonar-scanner
-  checksum: cb064b57aea00c0d4409d258ad0b66a7150ffe7bd27a74e16148865845e7988dcffb169f7dfdfdd6c04693b56eab80f97c8d4543883ffb534d84560dfddc782e
+    sonar: bin/sonar-scanner.js
+    sonar-scanner: bin/sonar-scanner.js
+  checksum: e00297906510f817b33cf9c142e86bfd42754c8a8b8ab2b7ff8d56fe3e7ac5997deee23e77dcaa780f8c6836fe98085babf750179675cfb21e9b486cabfa5bf5
   languageName: node
   linkType: hard
 
@@ -18227,9 +18218,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"webdriverio@npm:9.9.1":
-  version: 9.9.1
-  resolution: "webdriverio@npm:9.9.1"
+"webdriverio@npm:9.9.3":
+  version: 9.9.3
+  resolution: "webdriverio@npm:9.9.3"
   dependencies:
     "@types/node": ^20.11.30
     "@types/sinonjs__fake-timers": ^8.1.5
@@ -18261,7 +18252,7 @@ __metadata:
   peerDependenciesMeta:
     puppeteer-core:
       optional: true
-  checksum: 37f1f587f913b3d77a9db95d9c049f27fc47a1d1eacfec5d1667ab8586fb172e7e8a92602b6abf4dbe7f1c7656ea9228710c1ffc815310ed6cad652a81f5f1b0
+  checksum: 9dc7a24af505d8b206f9311c3ad085026ae4d3ca0ceda58c841e39e19e3021ffab62bfa9f2581d8a34c0347221f13f6e08195c79956eb9cf7e1c6e889f9baa13
   languageName: node
   linkType: hard
 

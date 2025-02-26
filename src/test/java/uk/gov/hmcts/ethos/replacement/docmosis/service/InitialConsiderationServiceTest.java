@@ -120,8 +120,10 @@ class InitialConsiderationServiceTest {
     private static final String EXPECTED_HEARING_BLANK = String.format(HEARING_DETAILS, "-", "-", "-");
 
     private static final String EXPECTED_JURISDICTION_HTML = "<h2>Jurisdiction codes</h2><a "
-        + "target=\"_blank\" href=\"https://judiciary.sharepoint"
-        + ".com/:b:/s/empjudgesew/EZowDqUAYpBEl9NkTirLUdYBjXdpi3-7b18HlsDqZNV3xA?e=tR7Wof\">View all jurisdiction "
+        + "target=\"_blank\" href=\"https://judiciary.sharepoint.com/sites/empjudgesew/Shared%20Documents/Forms/"
+        + "AllItems.aspx?id=%2Fsites%2Fempjudgesew%2FShared%20Documents%2FET%20Jurisdiction%20List%2F"
+        + "Jurisdiction%20list%20October%202024.pdf&viewid=9cee6d50-61e5-4d87-92d2-8c9444f00c95&parent=%2F"
+        + "sites%2Fempjudgesew%2FShared%20Documents%2FET%20Jurisdiction%20List\">View all jurisdiction "
         + "codes and descriptors (opens in new tab)"
         + "</a><br><br><strong>DAG</strong> - Discrimination, including harassment or discrimination based on "
         + "association or perception on grounds of age<br><br><strong>SXD</strong> - Discrimination, including "

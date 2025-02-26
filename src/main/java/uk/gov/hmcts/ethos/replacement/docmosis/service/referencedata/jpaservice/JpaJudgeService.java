@@ -11,9 +11,11 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.JudgeServic
 
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import static java.util.Comparator.comparing;
 import static java.util.stream.Collectors.partitioningBy;
+import static org.apache.commons.lang3.StringUtils.SPACE;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -27,15 +29,25 @@ public class JpaJudgeService implements JudgeService {
         return judgeRepository.findByTribunalOffice(tribunalOffice);
     }
 
+
+    /**
+     * This method order the judges by their surname and by the z value. Judges are to be ordered by their surname and
+     * if they are inactive and begin with a z, they are to be ordered at the end of the list.
+     * @param tribunalOffice the tribunal office to get the judges from
+     * @return a list of judges ordered by their surname and by the z value
+     */
     @Override
     public List<DynamicValueType> getJudgesDynamicList(TribunalOffice tribunalOffice) {
-        return judgeRepository.findByTribunalOffice(tribunalOffice).stream()
+        List<DynamicValueType> toSort = judgeRepository.findByTribunalOffice(tribunalOffice).stream()
                 .map(j -> DynamicValueType.create(j.getCode(), j.getName()))
                 .sorted(comparing(dv -> dv.getLabel().toLowerCase(Locale.ROOT)))
-                .collect(partitioningBy(dv -> dv.getLabel().startsWith("z ")))
-                .values()
-                .stream()
-                .flatMap(List::stream)
                 .toList();
+        Map<Boolean, List<DynamicValueType>> map = toSort.stream()
+                .collect(partitioningBy(dv -> dv.getLabel().startsWith("z ")));
+
+        map.values().forEach(list -> list.sort(
+                comparing(dv -> dv.getLabel().split(SPACE)[dv.getLabel().split(SPACE).length - 1])));
+
+        return map.values().stream().flatMap(List::stream).toList();
     }
 }

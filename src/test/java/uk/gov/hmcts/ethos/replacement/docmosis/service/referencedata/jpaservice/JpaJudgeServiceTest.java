@@ -20,24 +20,30 @@ class JpaJudgeServiceTest {
     void testGetJudges() {
         TribunalOffice tribunalOffice = TribunalOffice.BRISTOL;
         List<Judge> judges = List.of(
-                createJudge("inactive Judge", "z Judge"),
-                createJudge("judge1", "Judge 1"),
-                createJudge("judge2", "Judge 2"),
-                createJudge("judge3", "Judge 3"),
-                createJudge("A Judge", "A Judge"));
+                createJudge("judge1", "z A Test"),
+                createJudge("judge2", "A Judge"),
+                createJudge("judge3", "A John"),
+                createJudge("judge4", "B John"),
+                createJudge("judge4", "z A John"),
+                createJudge("judge5", "z B John"),
+                createJudge("judge6", "z C Judge"),
+                createJudge("judge7", "C Judge"));
         JudgeRepository judgeRepository = mock(JudgeRepository.class);
         when(judgeRepository.findByTribunalOffice(tribunalOffice)).thenReturn(judges);
 
         JpaJudgeService judgeService = new JpaJudgeService(judgeRepository);
         List<DynamicValueType> values = judgeService.getJudgesDynamicList(tribunalOffice);
 
-        assertEquals(5, values.size());
-        // Results should be sorted in alphabetical order by label
-        verifyValue(values.get(0), "A Judge", "A Judge");
-        verifyValue(values.get(1), "judge1", "Judge 1");
-        verifyValue(values.get(2), "judge2", "Judge 2");
-        verifyValue(values.get(3), "judge3", "Judge 3");
-        verifyValue(values.get(4), "inactive Judge", "z Judge");
+        assertEquals(8, values.size());
+        // Results should be sorted in alphabetical order by z values and surname
+        verifyValue(values.get(0), "judge3", "A John");
+        verifyValue(values.get(1), "judge4", "B John");
+        verifyValue(values.get(2), "judge2", "A Judge");
+        verifyValue(values.get(3), "judge7", "C Judge");
+        verifyValue(values.get(4), "judge4", "z A John");
+        verifyValue(values.get(5), "judge5", "z B John");
+        verifyValue(values.get(6), "judge6", "z C Judge");
+        verifyValue(values.get(7), "judge1", "z A Test");
     }
 
     private Judge createJudge(String code, String name) {

@@ -6,10 +6,8 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.types.TTL;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -51,9 +49,6 @@ public class EcmMigrationService {
         caseData.setEcmFeeGroupReference(null);
         caseData.setEcmCaseLink(null);
         caseData.setMigratedFromEcm(null);
-        TTL ttl = new TTL();
-        ttl.setSystemTTL(LocalDate.now().minusDays(1));
-        caseData.setTtl(ttl);
     }
 
     private String getEcmCaseType(String managingOffice) {

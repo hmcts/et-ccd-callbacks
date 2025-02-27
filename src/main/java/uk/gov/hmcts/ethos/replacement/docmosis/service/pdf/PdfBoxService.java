@@ -12,7 +12,10 @@ import org.apache.pdfbox.pdmodel.PDResources;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
 import org.apache.pdfbox.pdmodel.interactive.form.PDField;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ecm.common.exceptions.PdfServiceException;
+import uk.gov.hmcts.ecm.common.service.pdf.PdfService;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
@@ -25,6 +28,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import static uk.gov.hmcts.ecm.common.constants.PdfMapperConstants.PDF_TYPE_ET3;
+import static uk.gov.hmcts.ecm.common.service.pdf.et3.ET3FormConstants.ET3_FORM_CLIENT_TYPE_REPRESENTATIVE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.EMPTY_BYTE_ARRAY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.ET3_FORM_BYTE_ARRAY_CREATION_METHOD_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.GENERATE_PDF_DOCUMENT_INFO_SERVICE_NAME;
@@ -47,6 +52,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceC
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.UNABLE_TO_PROCESS_PDF_SOURCE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CASE_DATA_NOT_FOUND_EXCEPTION_MESSAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.STRING_EMPTY;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.SUBMIT_ET3;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormMapper.mapEt3Form;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.LoggingUtil.logException;
 
@@ -59,22 +65,26 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.LoggingUtil.logExcep
 public class PdfBoxService {
 
     private final TornadoService tornadoService;
+    private final PdfService pdfService;
+
+    @Value("${pdf.et3form}")
+    public String et3EnglishPdfTemplateSource;
 
     /**
      * This method calls the ET3Mapper method to create the data to be passed through to dm store method
      * and then checks whether  it can reach the service.
      * @param caseData contains the data needed to generate the PDF
      * @param userToken contains the user authentication token
-     * @param caseTypeId reference for which casetype the document is being uploaded to
+     * @param caseTypeId reference for which case type the document is being uploaded to
      * @param documentName name of the document
      * @param pdfTemplate location of the pdf template to be mapped with case data
      * @return DocumentInfo which contains the URL and markup of the uploaded document
-     * @throws IOException if the call to Tornado has failed, an exception will be thrown. This could be due to
+     * @throws PdfServiceException if the call to Tornado has failed, an exception will be thrown. This could be due to
     timeout or maybe a bad gateway.
      */
     public DocumentInfo generatePdfDocumentInfo(CaseData caseData, String userToken, String caseTypeId,
                                                 String documentName, String pdfTemplate, String event)
-            throws IOException, GenericServiceException {
+            throws GenericServiceException, PdfServiceException {
         if (ObjectUtils.isEmpty(caseData)) {
             Throwable exception = new Throwable(PDF_SERVICE_EXCEPTION_FIRST_WORD_WHEN_CASE_DATA_EMPTY);
             throw new GenericServiceException(PDF_SERVICE_EXCEPTION_FIRST_WORD_WHEN_CASE_DATA_EMPTY, exception,
@@ -90,14 +100,15 @@ public class PdfBoxService {
         throwPdfServiceExceptionWhenStringValueIsEmpty(pdfTemplate,
                 PDF_SERVICE_EXCEPTION_WHEN_PDF_TEMPLATE_EMPTY, caseData.getEthosCaseReference());
         try {
-            byte[] bytes = convertCaseToPdfAsByteArray(caseData, pdfTemplate, event);
+            byte[] bytes = pdfService.convertCaseToPdf(caseData,
+                    et3EnglishPdfTemplateSource, PDF_TYPE_ET3, ET3_FORM_CLIENT_TYPE_REPRESENTATIVE, SUBMIT_ET3);
             String dmStoreDocumentName = generatePdfFileName(caseData, documentName);
             return tornadoService.createDocumentInfoFromBytes(userToken, bytes, dmStoreDocumentName, caseTypeId);
-        } catch (IOException ioe) {
+        } catch (PdfServiceException pse) {
             logException(String.format(UNABLE_TO_PROCESS_PDF_SOURCE, pdfTemplate),
-                    caseData.getEthosCaseReference(), ioe.getMessage(), PDF_SERVICE_CLASS_NAME,
+                    caseData.getEthosCaseReference(), pse.getMessage(), PDF_SERVICE_CLASS_NAME,
                     GENERATE_PDF_DOCUMENT_INFO_SERVICE_NAME);
-            throw ioe;
+            throw pse;
         }
     }
 

@@ -65,6 +65,7 @@ public class DigitalCaseFileController {
             @RequestBody CCDRequest ccdRequest, @RequestHeader(HttpHeaders.AUTHORIZATION) String userToken) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         DigitalCaseFileHelper.addDcfToDocumentCollection(caseData);
+        caseData.setCaseBundles(null);
         return getCallbackRespEntityNoErrors(caseData);
     }
 

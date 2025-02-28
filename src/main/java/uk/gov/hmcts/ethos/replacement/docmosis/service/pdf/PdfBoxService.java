@@ -103,6 +103,7 @@ public class PdfBoxService {
             byte[] bytes = pdfService.convertCaseToPdf(caseData,
                     et3EnglishPdfTemplateSource, PDF_TYPE_ET3, ET3_FORM_CLIENT_TYPE_REPRESENTATIVE, SUBMIT_ET3);
             String dmStoreDocumentName = generatePdfFileName(caseData, documentName);
+            log.info("Created PDF document binary data");
             return tornadoService.createDocumentInfoFromBytes(userToken, bytes, dmStoreDocumentName, caseTypeId);
         } catch (PdfServiceException pse) {
             logException(String.format(UNABLE_TO_PROCESS_PDF_SOURCE, pdfTemplate),

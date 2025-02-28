@@ -262,13 +262,16 @@ public class TornadoService {
 
         URI documentSelfPath = uploadDocument(documentName, authToken, bytes, caseTypeId);
         String downloadUrl = documentManagementService.generateDownloadableURL(documentSelfPath);
+        log.info("**** PDF file downloadable URL = " + downloadUrl);
         String markup = documentManagementService.generateMarkupDocument(downloadUrl);
+        log.info("**** PDF file markup = " + markup);
         return generateDocumentInfo(documentName, documentSelfPath, markup);
     }
 
     private URI uploadDocument(String documentName, String authToken, byte[] bytes, String caseTypeId) {
         if (documentName.endsWith(".pdf")) {
             String pdfFileName = isCustomDocName(documentName) ? documentName : OUTPUT_FILE_NAME_PDF;
+            log.info("********PDF File Document Name: " + pdfFileName);
             return documentManagementService.uploadDocument(authToken, bytes, pdfFileName,
                     APPLICATION_PDF_VALUE, caseTypeId);
         } else {

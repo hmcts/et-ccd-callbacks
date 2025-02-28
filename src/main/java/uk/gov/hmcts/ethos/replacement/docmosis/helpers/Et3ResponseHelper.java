@@ -263,6 +263,8 @@ public final class Et3ResponseHelper {
         respondent.setEt3ResponseRespondentSupportNeeded(caseData.getEt3ResponseRespondentSupportNeeded());
         respondent.setEt3ResponseRespondentSupportDetails(caseData.getEt3ResponseRespondentSupportDetails());
         respondent.setEt3ResponseRespondentSupportDocument(caseData.getEt3ResponseRespondentSupportDocument());
+        respondent.setRespondentHearingPanelPreference(caseData.getEt3ResponseHearingPanelPreference());
+        respondent.setRespondentHearingPanelPreferenceReason(caseData.getEt3ResponseHearingPanelPreferenceReason());
         respondent.setPersonalDetailsSection(YES);
         return respondent;
     }
@@ -367,6 +369,8 @@ public final class Et3ResponseHelper {
         caseData.setEt3ResponseRespondentSupportNeeded(value.getEt3ResponseRespondentSupportNeeded());
         caseData.setEt3ResponseRespondentSupportDetails(value.getEt3ResponseRespondentSupportDetails());
         caseData.setEt3ResponseRespondentSupportDocument(value.getEt3ResponseRespondentSupportDocument());
+        caseData.setEt3ResponseHearingPanelPreference(value.getRespondentHearingPanelPreference());
+        caseData.setEt3ResponseHearingPanelPreferenceReason(value.getRespondentHearingPanelPreferenceReason());
     }
 
     /**

@@ -8,7 +8,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -59,6 +61,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -1442,5 +1445,22 @@ class CaseManagementForCaseWorkerServiceTest {
         dynamicValueType.setLabel("RespondentName1");
         respondentECC.setValue(dynamicValueType);
         return respondentECC;
+    }
+
+    @ParameterizedTest
+    @MethodSource("individualClaimantNames")
+    void testIndividualClaimantNames(String firstName, String lastName,  String expected) {
+        CaseData caseData = ccdRequest22.getCaseDetails().getCaseData();
+        caseData.getClaimantIndType().setClaimantFirstNames(firstName);
+        caseData.getClaimantIndType().setClaimantLastName(lastName);
+        caseManagementForCaseWorkerService.caseDataDefaults(caseData);
+        assertThat(caseData.getClaimant()).isEqualTo(expected);
+    }
+
+    private static Stream<Arguments> individualClaimantNames() {
+        return Stream.of(Arguments.of("John", "Doe", "John Doe"),
+                Arguments.of("John ", " Doe", "John Doe"),
+                Arguments.of(" John", " Doe", "John Doe"),
+                Arguments.of(" John ", " Doe ", "John Doe"));
     }
 }

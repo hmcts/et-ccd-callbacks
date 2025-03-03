@@ -13,13 +13,16 @@ import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_DATE_TIME_PATTERN;
 
 class DigitalCaseFileHelperTest {
 
@@ -118,6 +121,27 @@ class DigitalCaseFileHelperTest {
         return BundleDetails.builder()
                 .id(UUID.randomUUID().toString())
                 .stitchedDocument(documentLink)
+                .stitchStatus("DONE")
                 .build();
+    }
+
+    @Test
+    void dcf_failedToGenerate() {
+        BundleDetails bundleDetails = BundleDetails.builder()
+                .stitchStatus("FAILED")
+                .stitchingFailureMessage("Failed to generate")
+                .build();
+        caseData.setCaseBundles(List.of(Bundle.builder().value(bundleDetails).build()));
+        assertDoesNotThrow(() -> DigitalCaseFileHelper.addDcfToDocumentCollection(caseData));
+        assertEquals("DCF Failed to generate: " + LocalDateTime.now().format(NEW_DATE_TIME_PATTERN),
+                caseData.getDigitalCaseFile().getStatus());
+        assertEquals("Failed to generate", caseData.getDigitalCaseFile().getError());
+    }
+
+    @Test
+    void setDcfUpdatingStatus() {
+        DigitalCaseFileHelper.setUpdatingStatus(caseData);
+        assertEquals("DCF Updating: " + LocalDateTime.now().format(NEW_DATE_TIME_PATTERN),
+                caseData.getDigitalCaseFile().getStatus());
     }
 }

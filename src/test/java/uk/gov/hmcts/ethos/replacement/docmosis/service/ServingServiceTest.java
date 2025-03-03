@@ -105,6 +105,22 @@ class ServingServiceTest {
     }
 
     @Test
+    void generateClaimantAndRespondentAddressNoAddress() {
+        String expectedClaimantAndRespondentAddress = "**<big>Claimant</big>**<br/>Doris Johnson"
+                + "<br>Address not entered<br>"
+                + "**<big>Respondent 1</big>**<br/>Antonio Vazquez"
+                + "<br>Address not entered<br>"
+                + "**<big>Respondent 2</big>**<br/>Juan Garcia<br/>12 Small Street<br/>"
+                + "24 House<br/>Manchester<br/>M12 4ED<br/><br/>";
+
+        CaseData caseData = caseDetails.getCaseData();
+        caseData.getClaimantType().setClaimantAddressUK(null);
+        caseData.getRespondentCollection().get(0).getValue().setRespondentAddress(null);
+        assertThat(servingService.generateClaimantAndRespondentAddress(caseData))
+                .isEqualTo(expectedClaimantAndRespondentAddress);
+    }
+
+    @Test
     void generateEmailLinkToAcas() {
         String expectedEt1EmailLinkToAcas = "mailto:et3@acas.org.uk?subject=2120001/2019"
             + "&body=Parties%20in%20claim%3A%20Doris%20Johnson%20vs%20Antonio%20Vazquez%2C%20Juan%20Garcia%0D%0A"

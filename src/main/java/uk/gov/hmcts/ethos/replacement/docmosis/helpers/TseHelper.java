@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -248,7 +249,7 @@ public final class TseHelper {
                 .outputName(String.format(REPLY_OUTPUT_NAME, selectedApplication.getType()))
                 .templateName(REPLY_TEMPLATE_NAME)
                 .data(data).build();
-        return new ObjectMapper().writeValueAsString(document);
+        return new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(document);
     }
 
     /**
@@ -269,7 +270,7 @@ public final class TseHelper {
                 .outputName(String.format(REPLY_OUTPUT_NAME, selectedApplication.getType()))
                 .templateName(REPLY_TEMPLATE_NAME)
                 .data(data).build();
-        return new ObjectMapper().writeValueAsString(document);
+        return new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(document);
     }
 
     /**

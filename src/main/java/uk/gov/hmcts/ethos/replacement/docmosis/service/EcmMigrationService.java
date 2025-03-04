@@ -12,6 +12,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.apache.commons.lang3.StringUtils.deleteWhitespace;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPLOYMENT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
@@ -55,14 +56,7 @@ public class EcmMigrationService {
         if (isNullOrEmpty(managingOffice)) {
             throw new IllegalArgumentException("Managing office is null or empty");
         }
-        return switch (managingOffice) {
-            case "London Central" -> "LondonCentral";
-            case "London East" -> "LondonEast";
-            case "London South" -> "LondonSouth";
-            case "Midlands East" -> "MidlandsEast";
-            case "Midlands West" -> "MidlandsWest";
-            default -> managingOffice;
-        };
+        return deleteWhitespace(managingOffice);
     }
 
     private String getEcmCaseId(String ecmCaseLink) {
@@ -72,10 +66,10 @@ public class EcmMigrationService {
 
         Pattern pattern = Pattern.compile("(\\d{16})");
         Matcher matcher = pattern.matcher(ecmCaseLink);
-        if (!matcher.find()) {
-            throw new IllegalArgumentException("Could not find 16 digit case id for ECM case");
-        } else {
+        if (matcher.find()) {
             return matcher.group(1);
+        } else {
+            throw new IllegalArgumentException("Could not find 16 digit case id for ECM case");
         }
     }
 }

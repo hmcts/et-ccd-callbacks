@@ -597,6 +597,8 @@ public final class Et1ReppedHelper {
         caseData.setLinkedCasesYesNo(null);
         caseData.setLinkedCasesDetails(null);
         caseData.setAddAdditionalRespondent(null);
+        caseData.setEt3ResponseHearingPanelPreference(null);
+        caseData.setEt3ResponseHearingPanelPreferenceReason(null);
     }
 
     /**

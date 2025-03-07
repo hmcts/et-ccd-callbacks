@@ -30,9 +30,11 @@ import java.util.Map;
 import java.util.regex.Matcher;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_DATE_PATTERN;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_RESPONDING_TO_APP_TYPE_MAP;
@@ -338,10 +340,10 @@ public final class TseHelper {
             .respondentParty(RESPONDENT_TITLE)
             .type(defaultIfEmpty(application.getType(), null))
             .responseDate(UtilHelper.formatCurrentDate(LocalDate.now()))
-            .response(defaultIfEmpty(application.getDetails(), null))
+            .response(defaultIfEmpty(caseData.getTseResponseText(), null))
             .supportingYesNo(hasSupportingDocs(caseData.getTseResponseSupportingMaterial()))
             .documentCollection(getUploadedDocList(caseData))
-            .copy(defaultIfEmpty(application.getCopyToOtherPartyYesOrNo(), null))
+            .copy(defaultIfEmpty(caseData.getTseResponseCopyToOtherParty(), null))
             .build();
     }
 
@@ -354,6 +356,6 @@ public final class TseHelper {
     }
 
     public static String hasSupportingDocs(List<GenericTypeItem<DocumentType>> supportDocList) {
-        return supportDocList != null && !supportDocList.isEmpty() ? "Yes" : "No";
+        return isNotEmpty(supportDocList) ? YES : NO;
     }
 }

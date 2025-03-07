@@ -64,7 +64,7 @@ class TseHelperTest {
     private FeatureToggleService featureToggleService;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         caseData = CaseDataBuilder.builder()
             .withClaimantIndType("First", "Last")
             .withEthosCaseReference("1234")
@@ -72,10 +72,17 @@ class TseHelperTest {
             .withRespondent("Respondent Name", YES, "13 December 2022", false)
             .build();
 
-        GenericTseApplicationType build = TseApplicationBuilder.builder().withApplicant(RESPONDENT_TITLE)
-                .withDate("13 December 2022").withDue("20 December 2022").withType("Withdraw my claim")
-                .withCopyToOtherPartyYesOrNo(YES).withDetails("Text").withNumber("1")
-                .withResponsesCount("0").withStatus(OPEN_STATE).build();
+        GenericTseApplicationType build = TseApplicationBuilder.builder()
+                .withApplicant(RESPONDENT_TITLE)
+                .withDate("13 December 2022")
+                .withDue("20 December 2022")
+                .withType("Withdraw my claim")
+                .withCopyToOtherPartyYesOrNo(YES)
+                .withDetails("Text")
+                .withNumber("1")
+                .withResponsesCount("0")
+                .withStatus(OPEN_STATE)
+                .build();
 
         genericTseApplicationTypeItem = new GenericTseApplicationTypeItem();
         genericTseApplicationTypeItem.setId(UUID.randomUUID().toString());
@@ -249,6 +256,8 @@ class TseHelperTest {
         item.setId("78910");
 
         caseData.setTseResponseSupportingMaterial(List.of(item));
+        caseData.setTseResponseText("This is my response");
+        caseData.setTseResponseCopyToOtherParty(YES);
         String expectedDate = UtilHelper.formatCurrentDate(LocalDate.now());
         String replyDocumentRequest = TseHelper.getReplyDocumentRequest(caseData, "");
         String expected = "{\"accessKey\":\"\",\"templateName\":\"EM-TRB-EGW-ENG-01212.docx\","
@@ -267,7 +276,7 @@ class TseHelperTest {
             + "dateOfCorrespondence\":null,\"docNumber\":null,\"tornadoEmbeddedPdfUrl\":null,"
             + "\"excludeFromDcf\":null,\"documentIndex\":null}}],"
             + "\"copy\":\"Yes\","
-            + "\"response\":\"Text\",\"respondentParty\":\"Respondent\"}}";
+            + "\"response\":\"This is my response\",\"respondentParty\":\"Respondent\"}}";
 
         assertThat(replyDocumentRequest, is(expected));
     }
@@ -290,6 +299,9 @@ class TseHelperTest {
         item.setId("78910");
 
         caseData.setTseResponseSupportingMaterial(List.of(item));
+        caseData.setTseResponseText("This is my response");
+        caseData.setTseResponseCopyToOtherParty(YES);
+
         String expectedDate = UtilHelper.formatCurrentDate(LocalDate.now());
         String replyDocumentRequest = TseHelper.getClaimantReplyDocumentRequest(caseData, "");
         String expected = "{\"accessKey\":\"\",\"templateName\":\"EM-TRB-EGW-ENG-01212.docx\","
@@ -312,7 +324,7 @@ class TseHelperTest {
                 + "dateOfCorrespondence\":null,\"docNumber\":null,\"tornadoEmbeddedPdfUrl\":null,"
                 + "\"excludeFromDcf\":null,\"documentIndex\":null}}],"
                 + "\"copy\":\"Yes\","
-                + "\"response\":\"Text\",\"respondentParty\":\"Respondent\"}}";
+                + "\"response\":\"This is my response\",\"respondentParty\":\"Respondent\"}}";
 
         assertThat(replyDocumentRequest, is(expected));
     }

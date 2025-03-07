@@ -15,6 +15,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentTse;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse;
@@ -584,5 +585,44 @@ class TseServiceTest {
             .copyNoGiveDetails("Details")
             .supportingMaterial(createDocumentList())
             .build();
+    }
+
+    @Test
+    void createApplication_withRespondentData() {
+        RespondentTse respondentTse = new RespondentTse();
+        respondentTse.setContactApplicationType("Amend response");
+        respondentTse.setContactApplicationText("Details");
+        respondentTse.setContactApplicationFile(DocumentFixtures.getUploadedDocumentType("application.docx"));
+
+        CaseData caseData = new CaseData();
+        caseData.setRespondentTse(respondentTse);
+
+        tseService.createApplication(caseData, RESPONDENT_TITLE);
+
+        List<GenericTseApplicationTypeItem> applications = caseData.getGenericTseApplicationCollection();
+        assertThat(applications).hasSize(1);
+        GenericTseApplicationType application = applications.get(0).getValue();
+        assertThat(application.getApplicant()).isEqualTo(RESPONDENT_TITLE);
+        assertThat(application.getType()).isEqualTo("Amend response");
+        assertThat(application.getDetails()).isEqualTo("Details");
+    }
+
+    @Test
+    void createApplication_withRespondentData_noDocument() {
+        CaseData caseData = new CaseData();
+        RespondentTse respondentTse = new RespondentTse();
+        respondentTse.setContactApplicationType("Amend response");
+        respondentTse.setContactApplicationText("Details");
+        caseData.setRespondentTse(respondentTse);
+
+        tseService.createApplication(caseData, RESPONDENT_TITLE);
+
+        List<GenericTseApplicationTypeItem> applications = caseData.getGenericTseApplicationCollection();
+        assertThat(applications).hasSize(1);
+        GenericTseApplicationType application = applications.get(0).getValue();
+        assertThat(application.getApplicant()).isEqualTo(RESPONDENT_TITLE);
+        assertThat(application.getType()).isEqualTo("Amend response");
+        assertThat(application.getDetails()).isEqualTo("Details");
+        assertThat(application.getDocumentUpload()).isNull();
     }
 }

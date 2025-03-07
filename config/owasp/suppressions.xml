@@ -49,4 +49,16 @@
         <cve>CVE-2024-43591</cve>
     </suppress>
     <!-- Above to be removed when migrated to DB instead of SB queue -->
+    <suppress until="2025-04-07Z">
+        <packageUrl regex="true">^pkg:maven/com\.microsoft\.azure/azure-client-authentication.*$</packageUrl>
+        <cve>CVE-2024-43591</cve>
+    </suppress>
+    <suppress until="2025-04-07Z">
+        <packageUrl regex="true">^pkg:maven/com\.microsoft\.azure/azure-client-runtime.*$</packageUrl>
+        <cve>CVE-2024-43591</cve>
+    </suppress>
+    <suppress until="2025-04-07Z">
+        <packageUrl regex="true">^pkg:maven/com\.microsoft\.rest/client-runtime.*$</packageUrl>
+        <cve>CVE-2024-43591</cve>
+    </suppress>
 </suppressions>

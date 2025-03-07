@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
-import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -23,6 +23,7 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.setDocumentNumbers;
 
 @Slf4j
 @RestController
@@ -53,14 +54,15 @@ public class TseClaimantController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        CaseDetails caseDetails = ccdRequest.getCaseDetails();
-
-        if (caseDetails.getCaseData().getClaimantTse() != null) {
-            tseService.createApplication(caseDetails.getCaseData(), CLAIMANT_TITLE);
-            tseService.removeStoredApplication(caseDetails.getCaseData());
-            tseService.clearApplicationData(caseDetails.getCaseData());
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        if (caseData.getClaimantTse() != null) {
+            tseService.createApplication(caseData, CLAIMANT_TITLE);
+            tseService.removeStoredApplication(caseData);
+            tseService.clearApplicationData(caseData);
         }
-        caseManagementForCaseWorkerService.setNextListedDate(caseDetails.getCaseData());
-        return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
+        caseManagementForCaseWorkerService.setNextListedDate(caseData);
+        setDocumentNumbers(caseData);
+
+        return getCallbackRespEntityNoErrors(caseData);
     }
 }

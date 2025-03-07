@@ -18,13 +18,14 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseReplyData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseReplyDocument;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentUtil;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -32,6 +33,7 @@ import java.util.regex.Matcher;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_DATE_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
@@ -47,7 +49,10 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.SHORT_TEXT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE_PARAM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_REP_TITLE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.RESPONDENT_REP_TITLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.TABLE_STRING;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClaimantTellSomethingElseHelper.claimantSelectApplicationToType;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentUtil.generateUploadedDocumentListFromDocumentList;
 
 @Slf4j
 public final class TseHelper {
@@ -71,7 +76,7 @@ public final class TseHelper {
             + "afresh", "Reconsider a judgment", "Withdraw my claim");
 
     private static final String REPLY_OUTPUT_NAME = "%s Reply.pdf";
-    private static final String REPLY_TEMPLATE_NAME = "EM-TRB-EGW-ENG-01212.docx";
+    private static final String REPLY_TEMPLATE_NAME = "EM-TRB-EGW-ENG-01213.docx";
 
     private TseHelper() {
         // Access through static methods
@@ -245,7 +250,18 @@ public final class TseHelper {
         GenericTseApplicationType selectedApplication = getRespondentSelectedApplicationType(caseData);
         assert selectedApplication != null;
 
-        TseReplyData data = createDataForTseReply(caseData, selectedApplication);
+        TseReplyData data = TseReplyData.builder()
+                .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
+                .applicationNumber(defaultIfEmpty(selectedApplication.getNumber(), null))
+                .responseFrom(RESPONDENT_REP_TITLE)
+                .type(defaultIfEmpty(selectedApplication.getType(), null))
+                .responseDate(UtilHelper.formatCurrentDate(LocalDate.now()))
+                .response(defaultIfEmpty(caseData.getTseResponseText(), null))
+                .supportingYesNo(hasSupportingDocs(caseData.getTseResponseSupportingMaterial()))
+                .documentCollection(getRespondentUploadedDocList(caseData))
+                .copy(defaultIfEmpty(caseData.getTseResponseCopyToOtherParty(), null))
+                .build();
+
         TseReplyDocument document = TseReplyDocument.builder()
                 .accessKey(accessKey)
                 .outputName(String.format(REPLY_OUTPUT_NAME, selectedApplication.getType()))
@@ -255,7 +271,7 @@ public final class TseHelper {
     }
 
     /**
-     * Builds a document request for generating the pdf of the CYA page for responding to a claimant application.
+     * Builds a document request for generating the pdf of the CYA page for responding to a respondent application.
      *
      * @param caseData  contains all the case data
      * @param accessKey access key required for docmosis
@@ -266,12 +282,27 @@ public final class TseHelper {
         GenericTseApplicationType selectedApplication = getClaimantRepSelectedApplicationType(caseData);
         assert selectedApplication != null;
 
-        TseReplyData data = createDataForTseReply(caseData, selectedApplication);
+        boolean isRespondingToTribunal =
+                YES.equals(getClaimantRepSelectedApplicationType(caseData).getRespondentResponseRequired());
+
+        TseReplyData data = TseReplyData.builder()
+                .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
+                .applicationNumber(defaultIfEmpty(selectedApplication.getNumber(), null))
+                .responseFrom(CLAIMANT_REP_TITLE)
+                .type(defaultIfEmpty(selectedApplication.getType(), null))
+                .responseDate(UtilHelper.formatCurrentDate(LocalDate.now()))
+                .response(isRespondingToTribunal ? caseData.getClaimantRepRespondingToTribunalText()
+                        : caseData.getClaimantRepResponseText())
+                .supportingYesNo(hasSupportingDocs(caseData.getClaimantRepResSupportingMaterial()))
+                .documentCollection(getClaimantUploadedDocList(caseData))
+                .copy(defaultIfEmpty(caseData.getClaimantRepResponseCopyToOtherParty(), null))
+                .build();
         TseReplyDocument document = TseReplyDocument.builder()
                 .accessKey(accessKey)
                 .outputName(String.format(REPLY_OUTPUT_NAME, selectedApplication.getType()))
                 .templateName(REPLY_TEMPLATE_NAME)
-                .data(data).build();
+                .data(data)
+                .build();
         return new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(document);
     }
 
@@ -333,29 +364,47 @@ public final class TseHelper {
         );
     }
 
-    private static TseReplyData createDataForTseReply(CaseData caseData, GenericTseApplicationType application) {
-
-        return TseReplyData.builder()
-            .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
-            .respondentParty(RESPONDENT_TITLE)
-            .type(defaultIfEmpty(application.getType(), null))
-            .responseDate(UtilHelper.formatCurrentDate(LocalDate.now()))
-            .response(defaultIfEmpty(caseData.getTseResponseText(), null))
-            .supportingYesNo(hasSupportingDocs(caseData.getTseResponseSupportingMaterial()))
-            .documentCollection(getUploadedDocList(caseData))
-            .copy(defaultIfEmpty(caseData.getTseResponseCopyToOtherParty(), null))
-            .build();
-    }
-
-    private static List<GenericTypeItem<DocumentType>> getUploadedDocList(CaseData caseData) {
+    private static List<GenericTypeItem<DocumentType>> getRespondentUploadedDocList(CaseData caseData) {
         if (caseData.getTseResponseSupportingMaterial() == null) {
-            return null;
+            return Collections.emptyList();
         }
 
-        return DocumentUtil.generateUploadedDocumentListFromDocumentList(caseData.getTseResponseSupportingMaterial());
+        return generateUploadedDocumentListFromDocumentList(caseData.getTseResponseSupportingMaterial());
+    }
+
+    private static List<GenericTypeItem<DocumentType>> getClaimantUploadedDocList(CaseData caseData) {
+        if (caseData.getClaimantRepResSupportingMaterial() == null) {
+            return Collections.emptyList();
+        }
+
+        return generateUploadedDocumentListFromDocumentList(caseData.getClaimantRepResSupportingMaterial());
     }
 
     public static String hasSupportingDocs(List<GenericTypeItem<DocumentType>> supportDocList) {
         return isNotEmpty(supportDocList) ? YES : NO;
+    }
+
+    public static String getApplicationDoc(GenericTseApplicationType applicationType) {
+        if (CLAIMANT_TITLE.equals(applicationType.getApplicant())) {
+            return uk.gov.hmcts.ecm.common.helpers.DocumentHelper.claimantApplicationTypeToDocType(
+                    getClaimantApplicationType(applicationType));
+        } else if (CLAIMANT_REP_TITLE.equals(applicationType.getApplicant())) {
+            String claimantApplicationType = claimantSelectApplicationToType(applicationType.getType());
+            return uk.gov.hmcts.ecm.common.helpers.DocumentHelper.claimantApplicationTypeToDocType(
+                    claimantApplicationType);
+        } else {
+            return uk.gov.hmcts.ecm.common.helpers.DocumentHelper.respondentApplicationToDocType(
+                    applicationType.getType());
+        }
+    }
+
+    private static String getClaimantApplicationType(GenericTseApplicationType applicationType) {
+        return ClaimantTse.APP_TYPE_MAP.entrySet()
+                .stream()
+                .filter(entry -> entry.getValue().equals(applicationType.getType()))
+                .map(Map.Entry::getKey)
+                .findFirst()
+                .orElse("");
+
     }
 }

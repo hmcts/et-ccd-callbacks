@@ -30,6 +30,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_REP_TITLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.setDocumentNumbers;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -127,6 +128,7 @@ public class ClaimantTellSomethingElseController {
 
         // clear application data
         tseService.clearApplicationData(caseData);
+        setDocumentNumbers(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
     }

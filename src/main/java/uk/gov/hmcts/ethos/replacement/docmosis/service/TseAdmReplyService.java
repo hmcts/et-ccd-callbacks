@@ -52,8 +52,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.TSE_ADMIN_CORRESPONDENCE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getAdminSelectedApplicationType;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getApplicationDoc;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.TSE_ADMIN_REPLY;
 import static uk.gov.service.notify.NotificationClient.prepareUpload;
 
@@ -342,8 +342,15 @@ public class TseAdmReplyService {
         if (isEmpty(caseData.getDocumentCollection())) {
             caseData.setDocumentCollection(new ArrayList<>());
         }
+        GenericTseApplicationType application = getAdminSelectedApplicationType(caseData);
+        String applicationDoc = getApplicationDoc(application);
         DocumentTypeItem docItem = TseAdmReplyHelper.getDocumentTypeItem(documentManagementService, tornadoService,
-                caseDetails, userToken, TSE_ADMIN_REPLY, TSE_ADMIN_CORRESPONDENCE);
+                caseDetails, userToken, TSE_ADMIN_REPLY, applicationDoc);
+        String documentName = "Application %s - %s - Tribunal Response.pdf".formatted(
+                application.getNumber(),
+                application.getType());
+        docItem.getValue().getUploadedDocument().setDocumentFilename(documentName);
+
         caseData.getDocumentCollection().add(docItem);
     }
 

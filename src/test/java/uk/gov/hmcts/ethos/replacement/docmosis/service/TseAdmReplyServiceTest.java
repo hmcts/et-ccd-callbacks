@@ -643,6 +643,7 @@ class TseAdmReplyServiceTest {
         caseData.setTseAdmReplyIsCmoOrRequest("Case management order");
         caseData.setTseAdmReplyCmoIsResponseRequired("Yes");
         caseData.setTseAdmReplyCmoSelectPartyRespond("Both");
+        caseData.setTseAdminSelectApplication(DynamicFixedListType.from("1", "1", true));
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
         caseDetails.setCaseId(CASE_ID);

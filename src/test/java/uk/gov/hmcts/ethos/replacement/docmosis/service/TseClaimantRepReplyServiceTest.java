@@ -178,15 +178,15 @@ class TseClaimantRepReplyServiceTest {
     class SaveReplyToApplication {
         @Test
         void savesReplyCorrectly() {
-            caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
+            caseData.setClaimantRepRespondSelectApplication(TseHelper.populateClaimantRepSelectApplication(caseData));
             caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("1", ""));
 
-            caseData.setTseResponseText("ResponseText");
-            caseData.setTseResponseSupportingMaterial(createSupportingMaterial());
+            caseData.setClaimantRepResponseText("ResponseText");
+            caseData.setClaimantRepResSupportingMaterial(createSupportingMaterial());
 
-            caseData.setTseResponseHasSupportingMaterial(YES);
-            caseData.setTseResponseCopyToOtherParty(NO);
-            caseData.setTseResponseCopyNoGiveDetails("It's a secret");
+            caseData.setClaimantRepResponseHasSupportingMaterial(YES);
+            caseData.setClaimantRepResponseCopyToOtherParty(NO);
+            caseData.setClaimantRepResponseCopyNoGiveDetails("It's a secret");
 
             tseClaimantRepReplyService.saveReplyToApplication(caseData, false);
 

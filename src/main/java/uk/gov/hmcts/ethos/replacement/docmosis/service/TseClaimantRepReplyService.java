@@ -205,13 +205,14 @@ public class TseClaimantRepReplyService {
         List<TseRespondTypeItem> respondCollection = genericTseApplicationType.getRespondCollection();
 
         TseRespondType response = TseRespondType.builder()
-                .response(caseData.getTseResponseText())
-                .supportingMaterial(caseData.getTseResponseSupportingMaterial())
-                .hasSupportingMaterial(caseData.getTseResponseHasSupportingMaterial())
+                .response(isRespondingToTribunal ? caseData.getClaimantRepRespondingToTribunalText()
+                        : caseData.getClaimantRepResponseText())
+                .supportingMaterial(caseData.getClaimantRepResSupportingMaterial())
+                .hasSupportingMaterial(caseData.getClaimantRepResponseHasSupportingMaterial())
                 .from(CLAIMANT_REP_TITLE)
                 .date(UtilHelper.formatCurrentDate(LocalDate.now()))
-                .copyToOtherParty(caseData.getTseResponseCopyToOtherParty())
-                .copyNoGiveDetails(caseData.getTseResponseCopyNoGiveDetails())
+                .copyToOtherParty(caseData.getClaimantRepResponseCopyToOtherParty())
+                .copyNoGiveDetails(caseData.getClaimantRepResponseCopyNoGiveDetails())
                 .build();
 
         respondCollection.add(TseRespondTypeItem.builder().id(UUID.randomUUID().toString()).value(response).build());

@@ -1,9 +1,9 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.STRING_EMPTY;
 
 @Slf4j
 public final class LoggingUtil {
@@ -26,11 +26,11 @@ public final class LoggingUtil {
                                     String className,
                                     String methodName) {
         log.error("*************EXCEPTION OCCURED*************"
-                + "\nERROR DESCRIPTION: " + (isNotBlank(firstWord) ? firstWord : STRING_EMPTY)
-                + "\nCASE REFERENCE: " + (isNotBlank(caseReferenceNumber) ? caseReferenceNumber : STRING_EMPTY)
-                + "\nERROR MESSAGE: " + (isNotBlank(message) ? message : STRING_EMPTY)
-                + "\nCLASS NAME: " + (isNotBlank(className) ? className : STRING_EMPTY)
-                + "\nMETHOD NAME: " + (isNotBlank(methodName) ? methodName : STRING_EMPTY)
+                + "\nERROR DESCRIPTION: " + (isNotBlank(firstWord) ? firstWord : StringUtils.EMPTY)
+                + "\nCASE REFERENCE: " + (isNotBlank(caseReferenceNumber) ? caseReferenceNumber : StringUtils.EMPTY)
+                + "\nERROR MESSAGE: " + (isNotBlank(message) ? message : StringUtils.EMPTY)
+                + "\nCLASS NAME: " + (isNotBlank(className) ? className : StringUtils.EMPTY)
+                + "\nMETHOD NAME: " + (isNotBlank(methodName) ? methodName : StringUtils.EMPTY)
                 + "\n*****************END OF EXCEPTION MESSAGE***********************");
     }
 }

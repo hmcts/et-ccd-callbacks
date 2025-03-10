@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.util;
 
+import org.apache.commons.lang3.StringUtils;
+
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.CHARACTER_DOT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.CURRENCY_DECIMAL_ZERO_WITH_DOT;
@@ -7,7 +9,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceC
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.STRING_ZERO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.TWO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.ZERO;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.STRING_EMPTY;
 
 public final class PdfBoxServiceUtil {
 
@@ -25,7 +26,7 @@ public final class PdfBoxServiceUtil {
      */
     public static String correctCurrency(String value) {
         if (isBlank(value)) {
-            return STRING_EMPTY;
+            return StringUtils.EMPTY;
         }
         if (value.indexOf(CHARACTER_DOT) == ZERO) {
             return STRING_ZERO + value;

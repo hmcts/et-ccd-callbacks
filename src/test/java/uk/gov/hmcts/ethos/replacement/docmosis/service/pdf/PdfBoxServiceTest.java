@@ -25,6 +25,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.http.MediaType.APPLICATION_PDF_VALUE;
 import static uk.gov.hmcts.ecm.common.constants.PdfMapperConstants.PDF_TYPE_ET3;
 import static uk.gov.hmcts.ecm.common.service.pdf.et3.ET3FormConstants.ET3_FORM_CLIENT_TYPE_REPRESENTATIVE;
+import static uk.gov.hmcts.ecm.common.service.pdf.et3.ET3FormConstants.SUBMIT_ET3;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.PDF_SERVICE_EXCEPTION_FIRST_WORD_WHEN_CASE_DATA_EMPTY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.PDF_SERVICE_EXCEPTION_WHEN_CASE_TYPE_ID_EMPTY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.PDF_SERVICE_EXCEPTION_WHEN_DOCUMENT_NAME_EMPTY;
@@ -35,10 +36,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceT
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceTestConstants.TEST_DOCUMENT_MARKUP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceTestConstants.TEST_DOCUMENT_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceTestConstants.TEST_DOCUMENT_URL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceTestConstants.TEST_ET3_FORM_CASE_DATA_FILE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceTestConstants.TEST_PDF_TEMPLATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceTestConstants.TEST_USER_TOKEN;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.SUBMIT_ET3;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_ET3_FORM_CASE_DATA_FILE;
 
 class PdfBoxServiceTest {
 
@@ -79,7 +79,7 @@ class PdfBoxServiceTest {
             CaseData caseData, String userToken, String caseTypeId, String documentName, String pdfTemplate) {
         if (ObjectUtils.isEmpty(caseData)) {
             assertThatThrownBy(() -> pdfBoxService.generatePdfDocumentInfo(caseData, userToken, caseTypeId,
-                    documentName, pdfTemplate, SUBMIT_ET3))
+                    documentName, pdfTemplate))
                     .hasMessage(PDF_SERVICE_EXCEPTION_FIRST_WORD_WHEN_CASE_DATA_EMPTY);
             return;
         }
@@ -102,7 +102,7 @@ class PdfBoxServiceTest {
             return;
         }
         DocumentInfo documentInfo = pdfBoxService.generatePdfDocumentInfo(
-                caseData, userToken, caseTypeId, documentName, pdfTemplate, SUBMIT_ET3);
+                caseData, userToken, caseTypeId, documentName, pdfTemplate);
 
         assertThat(documentInfo.getType()).isEqualTo(APPLICATION_PDF_VALUE);
         assertThat(documentInfo.getUrl()).contains(TEST_DOCUMENT_URL);
@@ -116,7 +116,7 @@ class PdfBoxServiceTest {
                                                                       String pdfTemplate) {
         if (StringUtils.isBlank(emptyValue)) {
             assertThatThrownBy(() -> pdfBoxService
-                    .generatePdfDocumentInfo(caseData, userToken, caseTypeId, documentName, pdfTemplate, SUBMIT_ET3))
+                    .generatePdfDocumentInfo(caseData, userToken, caseTypeId, documentName, pdfTemplate))
                     .hasMessage(expectedMessage);
             return true;
         }

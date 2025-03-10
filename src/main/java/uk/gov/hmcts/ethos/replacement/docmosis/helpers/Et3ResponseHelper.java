@@ -251,6 +251,11 @@ public final class Et3ResponseHelper {
             // mentioned in the ticket https://tools.hmcts.net/jira/browse/RET-5054
             // added this field to representative
             representative.setRepresentativeReference(caseData.getEt3ResponseReference());
+            representative.setRepresentativeDXAddress(caseData.getEt3ResponseDXAddress());
+        } else {
+            respondent.setRespondentPhone1(caseData.getEt3ResponsePhone());
+            respondent.setEt3ResponseContactReason(caseData.getEt3ResponseContactReason());
+            respondent.setEt3ResponseDXAddress(caseData.getEt3ResponseDXAddress());
         }
         respondent.setResponseReference(caseData.getEt3ResponseReference());
         respondent.setEt3ResponseRespondentCompanyNumber(caseData.getEt3ResponseRespondentCompanyNumber());
@@ -258,7 +263,6 @@ public final class Et3ResponseHelper {
         respondent.setEt3ResponseRespondentEmployerType(caseData.getEt3ResponseRespondentEmployerType());
         respondent.setEt3ResponseRespondentPreferredTitle(caseData.getEt3ResponseRespondentPreferredTitle());
         respondent.setEt3ResponseRespondentContactName(caseData.getEt3ResponseRespondentContactName());
-        respondent.setEt3ResponseDXAddress(caseData.getEt3ResponseDXAddress());
         respondent.setEt3ResponseHearingRepresentative(caseData.getEt3ResponseHearingRepresentative());
         respondent.setEt3ResponseHearingRespondent(caseData.getEt3ResponseHearingRespondent());
         respondent.setEt3ResponseRespondentSupportNeeded(caseData.getEt3ResponseRespondentSupportNeeded());
@@ -334,9 +338,11 @@ public final class Et3ResponseHelper {
             caseData.setEt3ResponseReference(representative.getRepresentativeReference());
             caseData.setEt3ResponseContactPreference(representative.getRepresentativePreference());
             caseData.setEt3ResponseContactReason(representative.getRepresentativeContactPreferencePostReason());
+            caseData.setEt3ResponseDXAddress(representative.getRepresentativeDXAddress());
         } else {
             caseData.setEt3ResponsePhone(value.getResponseRespondentPhone1());
             caseData.setEt3ResponseContactReason(value.getEt3ResponseContactReason());
+            caseData.setEt3ResponseDXAddress(value.getEt3ResponseDXAddress());
         }
         caseData.setEt3ResponseClaimantNameCorrection(value.getEt3ResponseClaimantNameCorrection());
         caseData.setEt3ResponseIsClaimantNameCorrect(value.getEt3ResponseIsClaimantNameCorrect());
@@ -344,7 +350,6 @@ public final class Et3ResponseHelper {
         caseData.setEt3ResponseRespondentEmployerType(value.getEt3ResponseRespondentEmployerType());
         caseData.setEt3ResponseRespondentPreferredTitle(value.getEt3ResponseRespondentPreferredTitle());
         caseData.setEt3ResponseRespondentContactName(value.getEt3ResponseRespondentContactName());
-        caseData.setEt3ResponseDXAddress(value.getEt3ResponseDXAddress());
         caseData.setEt3ResponseHearingRepresentative(value.getEt3ResponseHearingRepresentative());
         caseData.setEt3ResponseHearingRespondent(value.getEt3ResponseHearingRespondent());
         caseData.setEt3ResponseEmploymentCount(value.getEt3ResponseEmploymentCount());

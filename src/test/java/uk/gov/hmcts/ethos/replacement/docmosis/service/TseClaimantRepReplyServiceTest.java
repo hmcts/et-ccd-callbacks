@@ -179,7 +179,7 @@ class TseClaimantRepReplyServiceTest {
         @Test
         void savesReplyCorrectly() {
             caseData.setClaimantRepRespondSelectApplication(TseHelper.populateClaimantRepSelectApplication(caseData));
-            caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("1", ""));
+            caseData.getClaimantRepRespondSelectApplication().setValue(DynamicValueType.create("1", "1"));
 
             caseData.setClaimantRepResponseText("ResponseText");
             caseData.setClaimantRepResSupportingMaterial(createSupportingMaterial());

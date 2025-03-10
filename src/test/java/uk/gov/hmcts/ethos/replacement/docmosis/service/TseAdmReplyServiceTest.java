@@ -33,6 +33,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseAdminHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.UploadedDocumentBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.utils.TseApplicationBuilder;
 
@@ -639,11 +640,27 @@ class TseAdmReplyServiceTest {
 
     @Test
     void addTseAdmReplyPdfToDocCollection_addsPdfFile() {
+        when(documentManagementService.addDocumentToDocumentField(any()))
+                .thenReturn(UploadedDocumentBuilder.builder()
+                        .withUrl("http://dm-store:8080/documents/1234")
+                        .withFilename("Dummy file name.pdf")
+                        .build());
+
         caseData.setEthosCaseReference(CASE_NUMBER);
         caseData.setTseAdmReplyIsCmoOrRequest("Case management order");
         caseData.setTseAdmReplyCmoIsResponseRequired("Yes");
         caseData.setTseAdmReplyCmoSelectPartyRespond("Both");
         caseData.setTseAdminSelectApplication(DynamicFixedListType.from("1", "1", true));
+        caseData.setGenericTseApplicationCollection(
+                List.of(GenericTseApplicationTypeItem.builder()
+                        .id(UUID.randomUUID().toString())
+                        .value(TseApplicationBuilder.builder()
+                                .withNumber("1")
+                                .withType(TSE_APP_CHANGE_PERSONAL_DETAILS)
+                                .build())
+                        .build()
+                )
+        );
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
         caseDetails.setCaseId(CASE_ID);
@@ -651,6 +668,8 @@ class TseAdmReplyServiceTest {
         tseAdmReplyService.addTseAdmReplyPdfToDocCollection(caseDetails, "test token");
 
         assertThat(caseData.getDocumentCollection()).isNotNull();
+        assertThat(caseData.getDocumentCollection().get(0).getValue().getUploadedDocument().getDocumentFilename())
+                .isEqualTo("Application 1 - Change personal details - Tribunal Response.pdf");
     }
 
     private static Stream<Arguments> sendEmailsToRespondents() {

@@ -26,6 +26,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentTse;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
@@ -495,6 +496,9 @@ class RespondentTellSomethingElseServiceTest {
                                                                                  String documentUrl) {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setResTseSelectApplication(selectedApplication);
+        RespondentTse respondentTse = new RespondentTse();
+        respondentTse.setRespondentIdamId("12312312");
+        caseData.setRespondentTse(respondentTse);
         setDocAndTextForSelectedApplication(caseData, textBoxData, documentUrl);
         caseData.setResTseCopyToOtherPartyYesOrNo("copyToOtherPartyYesOrNo");
         caseData.setResTseCopyToOtherPartyTextArea("copyToOtherPartyTextArea");

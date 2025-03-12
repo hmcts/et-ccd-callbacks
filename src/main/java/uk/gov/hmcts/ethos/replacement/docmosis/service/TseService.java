@@ -84,7 +84,10 @@ public class TseService {
         application.setDueDate(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7));
         application.setResponsesCount("0");
         application.setNumber(String.valueOf(getNextApplicationNumber(caseData)));
-        application.setApplicantIdamId(caseData.getRespondentTse().getRespondentIdamId());
+        if (caseData.getRespondentTse() != null) {
+            application.setApplicantIdamId(caseData.getRespondentTse().getRespondentIdamId());
+        }
+
         application.setStatus(OPEN_STATE);
 
         switch (userType) {

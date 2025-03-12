@@ -21,6 +21,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseAdmReplyHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEAdminEmailRecipientsData;
 import uk.gov.service.notify.NotificationClientException;
 
@@ -66,7 +67,7 @@ public class TseAdmReplyService {
     private final TornadoService tornadoService;
     private final TseService tseService;
     private final FeatureToggleService featureToggleService;
-    
+
     @Value("${template.tse.admin.reply.claimant}")
     private String tseAdminReplyClaimantTemplateId;
     @Value("${template.tse.admin.reply.respondent}")
@@ -127,10 +128,18 @@ public class TseAdmReplyService {
             return;
         }
 
+        // Update ApplicationState for Claimant Citizen UI
         if (isResponseRequired(caseData, CLAIMANT_TITLE)) {
             applicationType.setApplicationState(NOT_STARTED_YET);
         } else if (isResponseRequired(caseData, RESPONDENT_TITLE)) {
             applicationType.setApplicationState(UPDATED);
+        }
+
+        // Update ApplicationState for Respondent Citizen UI
+        if (isResponseRequired(caseData, RESPONDENT_TITLE)) {
+            TseHelper.setRespondentApplicationState(applicationType, NOT_STARTED_YET);
+        } else if (isResponseRequired(caseData, CLAIMANT_TITLE)) {
+            TseHelper.setRespondentApplicationState(applicationType, UPDATED);
         }
     }
 

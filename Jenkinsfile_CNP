@@ -93,38 +93,20 @@ withPipeline(type, product, component) {
 
   afterAlways('smoketest:preview') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
-
-    // publishHTML target: [
-    //         allowMissing : true,
-    //         alwaysLinkToLastBuild: true,
-    //         keepAll : true,
-    //         reportDir : "functional-output",
-    //         reportFiles : "et-e2e-result.html",
-    //         reportName : "ET E2E Smoke test report"
-    // ]
-
+    
     publishHTML target: [
             allowMissing : true,
             alwaysLinkToLastBuild: true,
             keepAll : true,
             reportDir : "functional-output",
             reportFiles : "ET-CCD-Callbacks-tests.html",
-            reportName : "ET E2E Smoke test report"
+            reportName : "ET Smoke test report"
     ]
   }
 
   afterAlways('functionalTest:preview') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'
-
-    // publishHTML target: [
-    //         allowMissing : true,
-    //         alwaysLinkToLastBuild: true,
-    //         keepAll : true,
-    //         reportDir : "functional-output",
-    //         reportFiles : "ET-CCD-Callbacks-tests.html",
-    //         reportName : "ET E2E test report"
-    // ]
   }
 
   before('smoketest:aat') {
@@ -142,35 +124,18 @@ withPipeline(type, product, component) {
   afterAlways('smoketest:aat') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
 
-    // publishHTML target: [
-    //         allowMissing : true,
-    //         alwaysLinkToLastBuild: true,
-    //         keepAll : true,
-    //         reportDir : "functional-output",
-    //         reportFiles : "et-e2e-result.html",
-    //         reportName : "ET E2E Smoke test report"
-    // ]
     publishHTML target: [
             allowMissing : true,
             alwaysLinkToLastBuild: true,
             keepAll : true,
             reportDir : "functional-output",
             reportFiles : "ET-CCD-Callbacks-tests.html",
-            reportName : "ET E2E Smoke test report"
+            reportName : "ET Smoke test report"
     ]
   }
 
   afterAlways('functionalTest:aat') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'
-
-    // publishHTML target: [
-    //         allowMissing : true,
-    //         alwaysLinkToLastBuild: true,
-    //         keepAll : true,
-    //         reportDir : "functional-output",
-    //         reportFiles : "ET-CCD-Callbacks-tests.html",
-    //         reportName : "ET E2E test report"
-    // ]
   }
 }

@@ -49,7 +49,7 @@ public final class FlagsImageHelper {
     private static final String FLAG_RULE_493B = "RULE 49(3)b";
     private static final String FLAG_MIGRATED_FROM_ECM = "MIGRATED FROM ECM";
 
-    private static final List<String> flags = List.of(FLAG_MIGRATED_FROM_ECM, FLAG_WITH_OUTSTATION,
+    private static final List<String> FLAGS = List.of(FLAG_MIGRATED_FROM_ECM, FLAG_WITH_OUTSTATION,
             FLAG_DO_NOT_POSTPONE, FLAG_LIVE_APPEAL, FLAG_RULE_493B, FLAG_REPORTING, FLAG_SENSITIVE, FLAG_RESERVED,
             FLAG_ECC, FLAG_DIGITAL_FILE, FLAG_REASONABLE_ADJUSTMENT, FLAG_WELSH_LANGUAGE);
 
@@ -65,7 +65,7 @@ public final class FlagsImageHelper {
         StringBuilder flagsImageAltText = new StringBuilder();
 
         flagsImageFileName.append(IMAGE_FILE_PRECEDING);
-        flags.forEach(flag -> setFlagImageFor(flag, flagsImageFileName, flagsImageAltText, caseData, caseTypeId));
+        FLAGS.forEach(flag -> setFlagImageFor(flag, flagsImageFileName, flagsImageAltText, caseData, caseTypeId));
         flagsImageFileName.append(IMAGE_FILE_EXTENSION);
 
         caseData.setFlagsImageAltText(flagsImageAltText.toString());
@@ -75,60 +75,61 @@ public final class FlagsImageHelper {
     private static void setFlagImageFor(String flagName, StringBuilder flagsImageFileName,
                                         StringBuilder flagsImageAltText, CaseData caseData, String caseTypeId) {
         boolean flagRequired;
-        String flagColor = switch (flagName) {
+        String flagColor; 
+        switch (flagName) {
             case FLAG_WITH_OUTSTATION -> {
                 flagRequired = withOutstation(caseData, caseTypeId);
-                yield COLOR_DEEP_PINK;
+                flagColor = COLOR_DEEP_PINK;
             }
             case FLAG_DO_NOT_POSTPONE -> {
                 flagRequired = doNotPostpone(caseData);
-                yield COLOR_DARK_RED;
+                flagColor = COLOR_DARK_RED;
             }
             case FLAG_LIVE_APPEAL -> {
                 flagRequired = liveAppeal(caseData);
-                yield COLOR_GREEN;
+                flagColor = COLOR_GREEN;
             }
             case FLAG_RULE_493B -> {
                 flagRequired = rule493bApplies(caseData);
-                yield COLOR_RED;
+                flagColor = COLOR_RED;
             }
             case FLAG_REPORTING -> {
                 flagRequired = rule503dApplies(caseData);
-                yield COLOR_LIGHT_BLACK;
+                flagColor = COLOR_LIGHT_BLACK;
             }
             case FLAG_SENSITIVE -> {
                 flagRequired = sensitiveCase(caseData);
-                yield COLOR_ORANGE;
+                flagColor = COLOR_ORANGE;
             }
             case FLAG_RESERVED -> {
                 flagRequired = reservedJudgement(caseData);
-                yield COLOR_PURPLE;
+                flagColor = COLOR_PURPLE;
             }
             case FLAG_ECC -> {
                 flagRequired = counterClaimMade(caseData);
-                yield COLOR_OLIVE;
+                flagColor = COLOR_OLIVE;
             }
             case FLAG_DIGITAL_FILE -> {
                 flagRequired = digitalFile(caseData);
-                yield COLOR_SLATE_GRAY;
+                flagColor = COLOR_SLATE_GRAY;
             }
             case FLAG_REASONABLE_ADJUSTMENT -> {
                 flagRequired = reasonableAdjustment(caseData);
-                yield COLOR_DARK_SLATE_BLUE;
+                flagColor = COLOR_DARK_SLATE_BLUE;
             }
             case FLAG_WELSH_LANGUAGE -> {
                 flagRequired = welshColor(caseData);
-                yield COLOR_RED;
+                flagColor = COLOR_RED;
             }
             case FLAG_MIGRATED_FROM_ECM -> {
                 flagRequired = YES.equals(defaultIfEmpty(caseData.getMigratedFromEcm(), ""));
-                yield "#D6292D";
+                flagColor = "#D6292D";
             }
             default -> {
                 flagRequired = false;
-                yield COLOR_WHITE;
+                flagColor = COLOR_WHITE;
             }
-        };
+        }
 
         flagsImageFileName.append(flagRequired ? ONE : ZERO);
         flagsImageAltText.append(flagRequired && !flagsImageAltText.isEmpty() ? "<font size='5'> - </font>" : "")

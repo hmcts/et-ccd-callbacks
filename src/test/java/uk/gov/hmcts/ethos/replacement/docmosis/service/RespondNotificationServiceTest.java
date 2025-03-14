@@ -417,6 +417,7 @@ class RespondNotificationServiceTest {
 
         caseData.setRespondNotificationPartyToNotify(BOTH_PARTIES);
         caseData.setRespondNotificationResponseRequired(NO);
+        caseData.setEt1OnlineSubmission(YES);
         caseDetails.setCaseData(caseData);
         SendNotificationType sendNotification = SendNotificationType.builder().sendNotificationTitle("TEST").build();
         respondNotificationService.sendNotifyEmails(caseDetails, sendNotification);
@@ -433,6 +434,7 @@ class RespondNotificationServiceTest {
 
         caseData.setRespondNotificationPartyToNotify(CLAIMANT_ONLY);
         caseData.setRespondNotificationResponseRequired(NO);
+        caseData.setEt1OnlineSubmission(YES);
         caseDetails.setCaseData(caseData);
         SendNotificationType sendNotification = SendNotificationType.builder().sendNotificationTitle("TEST").build();
         respondNotificationService.sendNotifyEmails(caseDetails, sendNotification);

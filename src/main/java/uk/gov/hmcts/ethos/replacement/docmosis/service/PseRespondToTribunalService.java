@@ -46,6 +46,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE_PARAM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantNonSystemUser;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.canPartyViewNotification;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.formatOrdReqDetails;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.formatResponseDetails;
@@ -252,7 +253,7 @@ public class PseRespondToTribunalService {
         String emailTemplate = isWelsh
                 ? cyNotificationToClaimantTemplateId
                 : notificationToClaimantTemplateId;
-        if (YES.equals(caseData.getPseRespondentOrdReqCopyToOtherParty())) {
+        if (YES.equals(caseData.getPseRespondentOrdReqCopyToOtherParty()) && !isClaimantNonSystemUser(caseData)) {
             emailService.sendEmail(emailTemplate,
                 caseData.getClaimantType().getClaimantEmailAddress(),
                 buildPersonalisationNotify(caseDetails, isWelsh));

@@ -612,6 +612,7 @@ class PseRespondToTribunalServiceTest {
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
         caseDetails.setCaseId("1677174791076683");
         caseDetails.getCaseData().setPseRespondentOrdReqCopyToOtherParty(YES);
+        caseDetails.getCaseData().setEt1OnlineSubmission(YES);
 
         Map<String, String> expectedMap = Map.of(
             "caseNumber", "6000001/2023",
@@ -636,6 +637,8 @@ class PseRespondToTribunalServiceTest {
                 .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
         caseDetails.setCaseId(TEST_CASE_ID);
         caseDetails.getCaseData().setPseRespondentOrdReqCopyToOtherParty(YES);
+        caseDetails.getCaseData().setEt1OnlineSubmission(YES);
+
         when(featureToggleService.isWelshEnabled()).thenReturn(true);
 
         Map<String, String> expectedMap = Map.of(

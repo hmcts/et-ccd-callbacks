@@ -56,6 +56,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE_PARAM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItemFromTopLevel;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantNonSystemUser;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.getNearestHearingToReferral;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.TSE_FILE_NAME;
 
@@ -185,7 +186,8 @@ public class RespondentTellSomethingElseService {
 
         if (TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE.equals(caseData.getResTseSelectApplication())
                 || NO.equals(caseData.getResTseCopyToOtherPartyYesOrNo())
-                || caseData.getClaimantType().getClaimantEmailAddress() == null) {
+                || caseData.getClaimantType().getClaimantEmailAddress() == null
+                || isClaimantNonSystemUser(caseDetails.getCaseData())) {
             return;
         }
 

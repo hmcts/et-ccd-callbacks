@@ -26,6 +26,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.setDocumentNumbers;
 
 /**
  * REST controller for the Response to an Application event.
@@ -109,6 +110,7 @@ public class TseAdminController {
         if (featureToggleService.isHmcEnabled()) {
             caseFlagsService.setPrivateHearingFlag(caseData);
         }
+        setDocumentNumbers(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
     }
@@ -244,6 +246,8 @@ public class TseAdminController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         tseAdmCloseService.aboutToSubmitCloseApplication(caseData);
+        setDocumentNumbers(caseData);
+
         return getCallbackRespEntityNoErrors(caseData);
     }
 

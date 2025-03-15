@@ -17,6 +17,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TseStatusTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseReplyData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseReplyDocument;
@@ -355,5 +356,22 @@ public final class TseHelper {
 
     public static String hasSupportingDocs(List<GenericTypeItem<DocumentType>> supportDocList) {
         return supportDocList != null && !supportDocList.isEmpty() ? "Yes" : "No";
+    }
+
+    /**
+     * Update Respondent Application State list.
+     * @param applicationType application in GenericTseApplicationType
+     * @param newState new state
+     */
+    public static void setRespondentApplicationState(GenericTseApplicationType applicationType, String newState) {
+        List<TseStatusTypeItem> respondentStateList = applicationType.getRespondentState();
+        if (CollectionUtils.isEmpty(respondentStateList)) {
+            return;
+        }
+        for (TseStatusTypeItem statusItem : respondentStateList) {
+            if (statusItem != null && statusItem.getValue() != null) {
+                statusItem.getValue().setApplicationState(newState);
+            }
+        }
     }
 }

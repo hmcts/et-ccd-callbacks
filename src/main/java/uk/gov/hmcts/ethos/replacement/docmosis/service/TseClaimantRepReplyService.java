@@ -188,6 +188,7 @@ public class TseClaimantRepReplyService {
         } else if (isRespondingToTribunal(caseData)) {
             selectedApplicationType.setApplicationState(UPDATED);
         }
+        TseHelper.setRespondentApplicationState(selectedApplicationType, UPDATED);
     }
 
     /**

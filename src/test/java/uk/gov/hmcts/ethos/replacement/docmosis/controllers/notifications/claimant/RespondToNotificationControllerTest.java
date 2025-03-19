@@ -80,8 +80,8 @@ class RespondToNotificationControllerTest {
 
     @Test
     void aboutToStart() throws Exception {
+        caseData.getRespondentCollection().get(0).getValue().setIdamId("789");
         doCallRealMethod().when(pseRespondToTribunalService).populateSelectDropdown(any(), anyString());
-
         mockMvc.perform(post(ABOUT_TO_START_URL)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)

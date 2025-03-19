@@ -171,10 +171,18 @@ public class HelperTest {
         boolean actual = Helper.isRespondentSystemUser(caseData);
         assertFalse(actual);
 
+        RespondentSumType typeRespondent = new RespondentSumType();
+        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+        respondentSumTypeItem.setId("123");
+        respondentSumTypeItem.setValue(typeRespondent);
+        caseData.setRespondentCollection(Collections.singletonList(respondentSumTypeItem));
+
         RepresentedTypeR typeR = new RepresentedTypeR();
+        typeR.setRespondentId("123");
         RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
         representedTypeRItem.setValue(typeR);
         caseData.setRepCollection(Collections.singletonList(representedTypeRItem));
+
         boolean actual2 = Helper.isRespondentSystemUser(caseData);
         assertFalse(actual2);
 
@@ -185,6 +193,15 @@ public class HelperTest {
         typeR.setMyHmctsYesNo(NO);
         boolean actual4 = Helper.isRespondentSystemUser(caseData);
         assertFalse(actual4);
+
+        typeR.setMyHmctsYesNo(NO);
+        typeRespondent.setIdamId("456");
+        boolean actual5 = Helper.isRespondentSystemUser(caseData);
+        assertTrue(actual5);
+
+        caseData.setRepCollection(null);
+        boolean actual6 = Helper.isRespondentSystemUser(caseData);
+        assertTrue(actual6);
     }
 
     @Test

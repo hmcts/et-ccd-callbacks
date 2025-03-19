@@ -470,6 +470,7 @@ public class CaseDataBuilder {
      */
     public CaseDataBuilder withRespondentRepresentative(String respondentName, String repName, String email) {
         RepresentedTypeR item = RepresentedTypeR.builder()
+                .respondentId("1234")
                 .respRepName(respondentName)
                 .nameOfRepresentative(repName)
                 .representativeEmailAddress(email)

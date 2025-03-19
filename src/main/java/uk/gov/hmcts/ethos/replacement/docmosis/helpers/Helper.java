@@ -366,15 +366,14 @@ public final class Helper {
      */
     public static boolean isRespondentSystemUser(CaseData caseData) {
         if (caseData != null) {
-            List<RepresentedTypeRItem> repCollection = caseData.getRepCollection();
             List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
-
             if (respondentCollection == null) {
                 return false;
             }
 
             return respondentCollection.stream().allMatch(res -> {
-                if (repCollection!= null) {
+                List<RepresentedTypeRItem> repCollection = caseData.getRepCollection();
+                if (repCollection != null) {
                     return repCollection.stream()
                             .filter(rep -> rep.getValue().getRespondentId().equals(res.getId()))
                             .anyMatch(rep -> YES.equals(rep.getValue().getMyHmctsYesNo()))

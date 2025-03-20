@@ -486,6 +486,7 @@ class RespondentTellSomethingElseServiceTest {
             .build();
         caseData.setResTseSelectApplication(selectedApplication);
         caseData.setResTseCopyToOtherPartyYesOrNo(YES);
+        caseData.setEt1OnlineSubmission(YES);
         return caseData;
     }
 

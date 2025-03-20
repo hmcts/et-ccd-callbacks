@@ -26,6 +26,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentTse;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
@@ -75,6 +76,7 @@ import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_R
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.ENGLISH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE_PARAM;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.RESPONDENT_REP_TITLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
 
 @ExtendWith({SpringExtension.class, MockitoExtension.class})
@@ -494,18 +496,21 @@ class RespondentTellSomethingElseServiceTest {
                                                                                  String documentUrl) {
         CaseData caseData = CaseDataBuilder.builder().build();
         caseData.setResTseSelectApplication(selectedApplication);
+        RespondentTse respondentTse = new RespondentTse();
+        respondentTse.setRespondentIdamId("12312312");
+        caseData.setRespondentTse(respondentTse);
         setDocAndTextForSelectedApplication(caseData, textBoxData, documentUrl);
         caseData.setResTseCopyToOtherPartyYesOrNo("copyToOtherPartyYesOrNo");
         caseData.setResTseCopyToOtherPartyTextArea("copyToOtherPartyTextArea");
 
-        tseService.createApplication(caseData, RESPONDENT_TITLE);
+        tseService.createApplication(caseData, RESPONDENT_REP_TITLE);
 
         var genericTseApplicationType = caseData.getGenericTseApplicationCollection().get(0).getValue();
         assertThat(genericTseApplicationType.getDetails(), is(textBoxData));
         assertThat(genericTseApplicationType.getCopyToOtherPartyText(), is("copyToOtherPartyTextArea"));
         assertThat(genericTseApplicationType.getCopyToOtherPartyYesOrNo(), is("copyToOtherPartyYesOrNo"));
         assertThat(genericTseApplicationType.getDocumentUpload().getDocumentUrl(), is(documentUrl));
-        assertThat(genericTseApplicationType.getApplicant(), is(RESPONDENT_TITLE));
+        assertThat(genericTseApplicationType.getApplicant(), is(RESPONDENT_REP_TITLE));
         assertThat(genericTseApplicationType.getType(), is(selectedApplication));
 
         List<DocumentTypeItem> documentCollection = caseData.getDocumentCollection();

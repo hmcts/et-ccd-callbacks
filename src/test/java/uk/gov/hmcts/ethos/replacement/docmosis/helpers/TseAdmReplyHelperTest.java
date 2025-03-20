@@ -31,6 +31,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.WITHDRAWAL_OF_ALL_OR_PART_CLAIM;
 
 @ExtendWith(SpringExtension.class)
 class TseAdmReplyHelperTest {
@@ -83,7 +84,7 @@ class TseAdmReplyHelperTest {
         caseDetails.setCaseData(caseData);
         DocumentInfo expectedDocumentInfo = new DocumentInfo();
         expectedDocumentInfo.setDescription(documentType);
-        String correspondenceType = "correspondenceType";
+        String correspondenceType = WITHDRAWAL_OF_ALL_OR_PART_CLAIM;
 
         when(tornadoService.generateEventDocument(any(CaseData.class), any(), any(), any()))
             .thenReturn(expectedDocumentInfo);
@@ -91,8 +92,7 @@ class TseAdmReplyHelperTest {
                 caseDetails, "testToken", documentType, correspondenceType);
 
         assertNotNull(actual);
-        assertThat(actual.getValue().getTypeOfDocument(), is(correspondenceType));
-        assertThat(actual.getValue().getShortDescription(), is(selectedTseApp));
+        assertThat(actual.getValue().getDocumentType(), is(correspondenceType));
     }
 
     @Test

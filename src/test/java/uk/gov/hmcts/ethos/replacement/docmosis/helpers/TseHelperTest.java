@@ -67,7 +67,7 @@ class TseHelperTest {
     private FeatureToggleService featureToggleService;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         caseData = CaseDataBuilder.builder()
             .withClaimantIndType("First", "Last")
             .withEthosCaseReference("1234")
@@ -75,10 +75,17 @@ class TseHelperTest {
             .withRespondent("Respondent Name", YES, "13 December 2022", false)
             .build();
 
-        GenericTseApplicationType build = TseApplicationBuilder.builder().withApplicant(RESPONDENT_TITLE)
-                .withDate("13 December 2022").withDue("20 December 2022").withType("Withdraw my claim")
-                .withCopyToOtherPartyYesOrNo(YES).withDetails("Text").withNumber("1")
-                .withResponsesCount("0").withStatus(OPEN_STATE).build();
+        GenericTseApplicationType build = TseApplicationBuilder.builder()
+                .withApplicant(RESPONDENT_TITLE)
+                .withDate("13 December 2022")
+                .withDue("20 December 2022")
+                .withType("Withdraw my claim")
+                .withCopyToOtherPartyYesOrNo(YES)
+                .withDetails("Text")
+                .withNumber("1")
+                .withResponsesCount("0")
+                .withStatus(OPEN_STATE)
+                .build();
 
         genericTseApplicationTypeItem = new GenericTseApplicationTypeItem();
         genericTseApplicationTypeItem.setId(UUID.randomUUID().toString());
@@ -252,25 +259,27 @@ class TseHelperTest {
         item.setId("78910");
 
         caseData.setTseResponseSupportingMaterial(List.of(item));
+        caseData.setTseResponseText("This is my response");
+        caseData.setTseResponseCopyToOtherParty(YES);
         String expectedDate = UtilHelper.formatCurrentDate(LocalDate.now());
         String replyDocumentRequest = TseHelper.getReplyDocumentRequest(caseData, "");
-        String expected = "{\"accessKey\":\"\",\"templateName\":\"EM-TRB-EGW-ENG-01212.docx\","
-            + "\"outputName\":\"Withdraw my claim Reply.pdf\",\"data\":{\"caseNumber\":\"1234\","
-            + "\"type\":\"Withdraw my claim\",\"responseDate\":\"" + expectedDate + "\",\"supportingYesNo\":\"Yes\","
-            + "\"documentCollection\":[{\"id\":\"78910\","
-            + "\"value\":{\"typeOfDocument\":null,"
-            + "\"uploadedDocument\":{\"document_binary_url\":\"http://dm-store:8080/documents/1234/binary"
-            + "\",\"document_filename\":\"image.png\","
-            + "\"document_url\":\"http://dm-store:8080/documents/1234\",\"category_id\":null,\"upload_timestamp\""
-            + ":null},\"ownerDocument\":null,"
-            + "\"creationDate\":null,\"shortDescription\":null,\"topLevelDocuments\":null,\"startingClaimDocuments\":"
-            + "null,\"responseClaimDocuments\":null,\"initialConsiderationDocuments\":null,\"caseManagementDocuments\""
-            + ":null,\"withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\"judgmentAndReasonsDocuments\":"
-            + "null,\"reconsiderationDocuments\":null,\"miscDocuments\":null,\"documentType\":null,\""
-            + "dateOfCorrespondence\":null,\"docNumber\":null,\"tornadoEmbeddedPdfUrl\":null,"
-            + "\"excludeFromDcf\":null,\"documentIndex\":null}}],"
-            + "\"copy\":\"Yes\","
-            + "\"response\":\"Text\",\"respondentParty\":\"Respondent\"}}";
+        String expected = ("{\"accessKey\":\"\",\"templateName\":\"EM-TRB-EGW-ENG-01213.docx\","
+               + "\"outputName\":\"Withdraw my claim Reply.pdf\",\"data\":{\"caseNumber\":\"1234\","
+               + "\"applicationNumber\":\"1\",\"type\":\"Withdraw my claim\",\"responseFrom\":\"Respondent "
+               + "Representative\",\"responseDate\":\"%s\",\"response\":\"This is my response\",\""
+               + "supportingYesNo\":\"Yes\",\"documentCollection\":[{\"id\":\"78910\",\"value\":"
+               + "{\"typeOfDocument\":null,\"uploadedDocument\":{\"document_binary_url\":\""
+               + "http://dm-store:8080/documents/1234/binary\",\"document_filename\":\"image.png\",\""
+               + "document_url\":\"http://dm-store:8080/documents/1234\",\"category_id\":null,\""
+               + "upload_timestamp\":null},\"ownerDocument\":null,\"creationDate\":null,\""
+               + "shortDescription\":null,\"topLevelDocuments\":null,\"startingClaimDocuments\":null,\""
+               + "responseClaimDocuments\":null,\"initialConsiderationDocuments\":null,\""
+               + "caseManagementDocuments\":null,\"withdrawalSettledDocuments\":null,\"hearingsDocuments\""
+               + ":null,\"judgmentAndReasonsDocuments\":null,\"reconsiderationDocuments\":null,\""
+               + "miscDocuments\":null,\"documentType\":null,\"dateOfCorrespondence\":null,\""
+               + "docNumber\":null,\"tornadoEmbeddedPdfUrl\":null,\"excludeFromDcf\":null,\""
+               + "documentIndex\":null}}],\"copy\":\"Yes\",\"respondentParty\":null}}")
+                .formatted(expectedDate);
 
         assertThat(replyDocumentRequest, is(expected));
     }
@@ -293,29 +302,17 @@ class TseHelperTest {
         item.setId("78910");
 
         caseData.setTseResponseSupportingMaterial(List.of(item));
+        caseData.setTseResponseText("This is my response");
+        caseData.setTseResponseCopyToOtherParty(YES);
+
         String expectedDate = UtilHelper.formatCurrentDate(LocalDate.now());
         String replyDocumentRequest = TseHelper.getClaimantReplyDocumentRequest(caseData, "");
-        String expected = "{\"accessKey\":\"\",\"templateName\":\"EM-TRB-EGW-ENG-01212.docx\","
-                + "\"outputName\":\"Withdraw my claim Reply.pdf\",\"data\":{\"caseNumber\":\"1234\","
-                + "\"type\":\"Withdraw my claim\",\"responseDate\":\""
-                + expectedDate + "\",\"supportingYesNo\":\"Yes\","
-                + "\"documentCollection\":[{\"id\":\"78910\","
-                + "\"value\":{\"typeOfDocument\":null,"
-                + "\"uploadedDocument\":{\"document_binary_url\":\"http://dm-store:8080/documents/1234/binary"
-                + "\",\"document_filename\":\"image.png\","
-                + "\"document_url\":\"http://dm-store:8080/documents/1234\",\"category_id\":null,\"upload_timestamp\""
-                + ":null},\"ownerDocument\":null,"
-                + "\"creationDate\":null,"
-                + "\"shortDescription\":null,\"topLevelDocuments\":null,\"startingClaimDocuments\":"
-                + "null,\"responseClaimDocuments\":null,"
-                + "\"initialConsiderationDocuments\":null,\"caseManagementDocuments\""
-                + ":null,\"withdrawalSettledDocuments\":null,"
-                + "\"hearingsDocuments\":null,\"judgmentAndReasonsDocuments\":"
-                + "null,\"reconsiderationDocuments\":null,\"miscDocuments\":null,\"documentType\":null,\""
-                + "dateOfCorrespondence\":null,\"docNumber\":null,\"tornadoEmbeddedPdfUrl\":null,"
-                + "\"excludeFromDcf\":null,\"documentIndex\":null}}],"
-                + "\"copy\":\"Yes\","
-                + "\"response\":\"Text\",\"respondentParty\":\"Respondent\"}}";
+        String expected = ("{\"accessKey\":\"\",\"templateName\":\"EM-TRB-EGW-ENG-01213.docx\",\"outputName\":\""
+                + "Withdraw my claim Reply.pdf\",\"data\":{\"caseNumber\":\"1234\",\"applicationNumber\":\"1\",\""
+                + "type\":\"Withdraw my claim\",\"responseFrom\":\"Claimant Representative\",\"responseDate\":\"%s\","
+                + "\"response\":null,\"supportingYesNo\":\"No\",\"documentCollection\":[],\"copy\":null,\""
+                + "respondentParty\":null}}")
+                .formatted(expectedDate);
 
         assertThat(replyDocumentRequest, is(expected));
     }

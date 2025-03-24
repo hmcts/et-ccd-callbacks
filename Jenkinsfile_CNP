@@ -102,11 +102,22 @@ withPipeline(type, product, component) {
             reportFiles : "ET-CCD-Callbacks-tests.html",
             reportName : "ET Smoke test report"
     ]
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-report/**'
   }
 
   afterAlways('functionalTest:preview') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'
+
+    publishHTML([
+                    allowMissing         : true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll              : true,
+                    reportDir            : 'playwright-report',
+                    reportFiles          : 'index.html',
+                    reportName           : 'ET Functional UI Test Report'
+            ])
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-report/**'
   }
 
   before('smoketest:aat') {
@@ -132,10 +143,21 @@ withPipeline(type, product, component) {
             reportFiles : "ET-CCD-Callbacks-tests.html",
             reportName : "ET Smoke test report"
     ]
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-report/**'
   }
 
   afterAlways('functionalTest:aat') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'
+
+     publishHTML([
+                    allowMissing         : true,
+                    alwaysLinkToLastBuild: true,
+                    keepAll              : true,
+                    reportDir            : 'playwright-report',
+                    reportFiles          : 'index.html',
+                    reportName           : 'ET Functional UI Test Report'
+            ])
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-report/**'
   }
 }

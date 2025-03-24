@@ -85,6 +85,14 @@ withPipeline(type, product, component) {
     env.FT_SYA_URL = "http://et-sya-api-aat.service.core-compute-aat.internal"
     env.SERVICE_AUTH_PROVIDER_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
     env.CCD_DATA_STORE_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
+    env.ET_SYA_URL_TO_TEST = "https://et-sya.aat.platform.hmcts.net/"
+    env.ET_SYR_URL_TO_TEST = "https://et-syr.aat.platform.hmcts.net/"
+    env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net/testing-support/accounts"
+    env.MANAGE_ORG_URL = "https://manage-org.aat.platform.hmcts.net"
+    env.CCD_CALLBACKS_URL = "https://manage-case.aat.platform.hmcts.net/cases"
+    env.ET_CASE_API_URL = "http://et-sya-api-aat.service.core-compute-aat.internal/cases/initiate-case/"
+    env.ET_SUBMIT_DRAFT_CASE_URL = "http://et-sya-api-aat.service.core-compute-aat.internal/cases/submit-case/"
+
     sh """
       ./bin/pull-latest-e2e-tests.sh
     """
@@ -125,6 +133,14 @@ withPipeline(type, product, component) {
     env.FT_SYA_URL = "http://et-sya-api-aat.service.core-compute-aat.internal"
     env.SERVICE_AUTH_PROVIDER_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
     env.CCD_DATA_STORE_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
+    env.ET_SYA_URL_TO_TEST = "https://et-sya.aat.platform.hmcts.net/"
+    env.ET_SYR_URL_TO_TEST = "https://et-syr.aat.platform.hmcts.net/"
+    env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net/testing-support/accounts"
+    env.MANAGE_ORG_URL = "https://manage-org.aat.platform.hmcts.net"
+    env.CCD_CALLBACKS_URL = "https://manage-case.aat.platform.hmcts.net/cases"
+    env.ET_CASE_API_URL = "http://et-sya-api-aat.service.core-compute-aat.internal/cases/initiate-case/"
+    env.ET_SUBMIT_DRAFT_CASE_URL = "http://et-sya-api-aat.service.core-compute-aat.internal/cases/submit-case/"
+
     sh """
       ./bin/pull-latest-e2e-tests.sh
     """

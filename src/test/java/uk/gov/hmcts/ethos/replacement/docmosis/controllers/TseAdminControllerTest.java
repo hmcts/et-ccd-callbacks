@@ -37,6 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CHANGE_PERSONAL_DETAILS;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({TseAdminController.class, JsonMapper.class})
@@ -77,6 +78,7 @@ class TseAdminControllerTest extends BaseControllerTest {
 
         caseDetails.setCaseId("4321");
         CaseData caseData = caseDetails.getCaseData();
+        caseData.setEt1OnlineSubmission(YES);
         caseData.setGenericTseApplicationCollection(
             List.of(GenericTseApplicationTypeItem.builder()
             .id(UUID.randomUUID().toString())

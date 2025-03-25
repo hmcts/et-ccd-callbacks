@@ -13,9 +13,7 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.PseRespondToTribunalService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
@@ -52,10 +50,6 @@ class RespondToNotificationControllerTest {
     private VerifyTokenService verifyTokenService;
     @MockBean
     private PseRespondToTribunalService pseRespondToTribunalService;
-    @MockBean
-    private EmailService emailService;
-    @MockBean
-    private UserIdamService userIdamService;
     @Autowired
     private JsonMapper jsonMapper;
     private CCDRequest ccdRequest;
@@ -86,6 +80,7 @@ class RespondToNotificationControllerTest {
 
     @Test
     void aboutToStart() throws Exception {
+        caseData.getRespondentCollection().get(0).getValue().setIdamId("789");
         doCallRealMethod().when(pseRespondToTribunalService).populateSelectDropdown(any(), anyString());
         mockMvc.perform(post(ABOUT_TO_START_URL)
                         .contentType(APPLICATION_JSON)

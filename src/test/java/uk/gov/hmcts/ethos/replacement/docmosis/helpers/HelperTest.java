@@ -39,6 +39,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.COMPANY_TYPE_CLAIMA
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.INDIVIDUAL_TYPE_CLAIMANT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantNonSystemUser;
 
 public class HelperTest {
 
@@ -48,7 +49,7 @@ public class HelperTest {
     private CaseDetails caseDetailsScot2;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         caseDetails1 = generateCaseDetails("caseDetailsTest1.json");
         caseDetails4 = generateCaseDetails("caseDetailsTest4.json");
         caseDetailsScot1 = generateCaseDetails("caseDetailsScotTest1.json");
@@ -145,22 +146,25 @@ public class HelperTest {
     }
 
     @Test
-    void isClaimantNonSystemUser() {
+    void isClaimantNonSystemUserTest() {
         CaseData caseData = new CaseData();
         caseData.setEt1OnlineSubmission(null);
         caseData.setHubLinksStatuses(null);
-        boolean actual = Helper.isClaimantNonSystemUser(caseData);
-        assertTrue(actual);
+        assertTrue(isClaimantNonSystemUser(caseData));
 
         caseData.setEt1OnlineSubmission("Yes");
         caseData.setHubLinksStatuses(null);
-        boolean actual2 = Helper.isClaimantNonSystemUser(caseData);
-        assertFalse(actual2);
+        assertFalse(isClaimantNonSystemUser(caseData));
 
         caseData.setEt1OnlineSubmission(null);
         caseData.setHubLinksStatuses(new HubLinksStatuses());
-        boolean actual3 = Helper.isClaimantNonSystemUser(caseData);
-        assertFalse(actual3);
+        assertFalse(isClaimantNonSystemUser(caseData));
+
+        // System user but migrated from ECM so not a system user
+        caseData.setEt1OnlineSubmission(YES);
+        caseData.setHubLinksStatuses(new HubLinksStatuses());
+        caseData.setMigratedFromEcm(YES);
+        assertTrue(isClaimantNonSystemUser(caseData));
     }
 
     @Test
@@ -171,10 +175,18 @@ public class HelperTest {
         boolean actual = Helper.isRespondentSystemUser(caseData);
         assertFalse(actual);
 
+        RespondentSumType typeRespondent = new RespondentSumType();
+        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+        respondentSumTypeItem.setId("123");
+        respondentSumTypeItem.setValue(typeRespondent);
+        caseData.setRespondentCollection(Collections.singletonList(respondentSumTypeItem));
+
         RepresentedTypeR typeR = new RepresentedTypeR();
+        typeR.setRespondentId("123");
         RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
         representedTypeRItem.setValue(typeR);
         caseData.setRepCollection(Collections.singletonList(representedTypeRItem));
+
         boolean actual2 = Helper.isRespondentSystemUser(caseData);
         assertFalse(actual2);
 
@@ -185,6 +197,15 @@ public class HelperTest {
         typeR.setMyHmctsYesNo(NO);
         boolean actual4 = Helper.isRespondentSystemUser(caseData);
         assertFalse(actual4);
+
+        typeR.setMyHmctsYesNo(NO);
+        typeRespondent.setIdamId("456");
+        boolean actual5 = Helper.isRespondentSystemUser(caseData);
+        assertTrue(actual5);
+
+        caseData.setRepCollection(null);
+        boolean actual6 = Helper.isRespondentSystemUser(caseData);
+        assertTrue(actual6);
     }
 
     @Test

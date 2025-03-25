@@ -16,6 +16,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEAdminEmailRecipientsData;
 
 import java.time.LocalDate;
@@ -81,6 +82,7 @@ public class TseAdminService {
         }
 
         applicationType.setApplicationState(NOT_VIEWED_YET);
+        TseHelper.setRespondentApplicationState(applicationType, NOT_VIEWED_YET);
 
         if (CollectionUtils.isEmpty(applicationType.getAdminDecision())) {
             applicationType.setAdminDecision(new ArrayList<>());

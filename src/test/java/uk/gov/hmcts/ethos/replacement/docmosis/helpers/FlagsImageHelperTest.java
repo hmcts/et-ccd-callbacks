@@ -18,6 +18,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper.buildFlagsImageFileName;
 
 @ExtendWith(SpringExtension.class)
 class FlagsImageHelperTest {
@@ -31,11 +32,10 @@ class FlagsImageHelperTest {
             caseData.setManagingOffice(tribunalOffice.getOfficeName());
             CaseDetails caseDetails = createCaseDetails(SCOTLAND_CASE_TYPE_ID, caseData);
 
-            FlagsImageHelper.buildFlagsImageFileName(caseDetails);
+            buildFlagsImageFileName(caseDetails);
 
             assertEquals("<font color='DeepPink' size='5'> WITH OUTSTATION </font>", caseData.getFlagsImageAltText());
-            assertEquals("EMP-TRIB-10000000000.jpg", caseData.getFlagsImageFileName());
-            //assertEquals("EMP-TRIB-10000000000.jpg", caseData.getFlagsImageFileName());
+            assertEquals("EMP-TRIB-010000000000.jpg", caseData.getFlagsImageFileName());
         }
     }
 
@@ -49,7 +49,7 @@ class FlagsImageHelperTest {
             hearingPreference.setContactLanguage("Welsh");
             caseData.setClaimantHearingPreference(hearingPreference);
             CaseDetails caseDetails = createCaseDetails(ENGLANDWALES_CASE_TYPE_ID, caseData);
-            FlagsImageHelper.buildFlagsImageFileName(caseDetails);
+            buildFlagsImageFileName(caseDetails);
             assertEquals("<font color='Red' size='5'> Cymraeg </font>", caseData.getFlagsImageAltText());
         }
     }
@@ -64,7 +64,7 @@ class FlagsImageHelperTest {
             hearingPreference.setHearingLanguage("Welsh");
             caseData.setClaimantHearingPreference(hearingPreference);
             CaseDetails caseDetails = createCaseDetails(ENGLANDWALES_CASE_TYPE_ID, caseData);
-            FlagsImageHelper.buildFlagsImageFileName(caseDetails);
+            buildFlagsImageFileName(caseDetails);
             assertEquals("<font color='Red' size='5'> Cymraeg </font>", caseData.getFlagsImageAltText());
         }
     }
@@ -80,7 +80,7 @@ class FlagsImageHelperTest {
             hearingPreference.setContactLanguage("Welsh");
             caseData.setClaimantHearingPreference(hearingPreference);
             CaseDetails caseDetails = createCaseDetails(ENGLANDWALES_CASE_TYPE_ID, caseData);
-            FlagsImageHelper.buildFlagsImageFileName(caseDetails);
+            buildFlagsImageFileName(caseDetails);
             assertEquals("<font color='Red' size='5'> Cymraeg </font>", caseData.getFlagsImageAltText());
         }
     }
@@ -92,7 +92,7 @@ class FlagsImageHelperTest {
             CaseData caseData = new CaseData();
             caseData.setManagingOffice(tribunalOffice.getOfficeName());
             CaseDetails caseDetails = createCaseDetails(ENGLANDWALES_CASE_TYPE_ID, caseData);
-            FlagsImageHelper.buildFlagsImageFileName(caseDetails);
+            buildFlagsImageFileName(caseDetails);
             assertEquals("", caseData.getFlagsImageAltText());
         }
     }
@@ -103,11 +103,10 @@ class FlagsImageHelperTest {
         caseData.setManagingOffice(TribunalOffice.GLASGOW.getOfficeName());
         CaseDetails caseDetails = createCaseDetails(SCOTLAND_CASE_TYPE_ID, caseData);
 
-        FlagsImageHelper.buildFlagsImageFileName(caseDetails);
+        buildFlagsImageFileName(caseDetails);
 
         assertEquals("", caseData.getFlagsImageAltText());
-        //assertEquals("EMP-TRIB-00000000000.jpg", caseData.getFlagsImageFileName());
-        assertEquals("EMP-TRIB-00000000000.jpg", caseData.getFlagsImageFileName());
+        assertEquals("EMP-TRIB-000000000000.jpg", caseData.getFlagsImageFileName());
     }
 
     @Test
@@ -117,12 +116,11 @@ class FlagsImageHelperTest {
             caseData.setManagingOffice(tribunalOffice.getOfficeName());
             CaseDetails caseDetails = createCaseDetails(ENGLANDWALES_CASE_TYPE_ID, caseData);
 
-            FlagsImageHelper.buildFlagsImageFileName(caseDetails);
+            buildFlagsImageFileName(caseDetails);
 
             assertEquals("", caseData.getFlagsImageAltText());
 
-            //assertEquals("EMP-TRIB-00000000000.jpg", caseData.getFlagsImageFileName());
-            assertEquals("EMP-TRIB-00000000000.jpg", caseData.getFlagsImageFileName());
+            assertEquals("EMP-TRIB-000000000000.jpg", caseData.getFlagsImageFileName());
         }
     }
 
@@ -132,11 +130,25 @@ class FlagsImageHelperTest {
                 .withRespondent("Test", NO, null, false)
                 .build();
         caseData.getRespondentCollection().get(0).getValue().setEt3ResponseRespondentSupportNeeded(YES);
-        FlagsImageHelper.buildFlagsImageFileName(ENGLANDWALES_CASE_TYPE_ID, caseData);
-        assertEquals("EMP-TRIB-00000000010.jpg", caseData.getFlagsImageFileName());
+        buildFlagsImageFileName(ENGLANDWALES_CASE_TYPE_ID, caseData);
+        assertEquals("EMP-TRIB-000000000010.jpg", caseData.getFlagsImageFileName());
         assertEquals("<font color='DarkSlateBlue' size='5'> REASONABLE ADJUSTMENT </font>",
                 caseData.getFlagsImageAltText());
 
+    }
+
+    @Test
+    void ecmMigrationFlag() {
+        CaseData caseData = new CaseData();
+        caseData.setMigratedFromEcm(YES);
+        buildFlagsImageFileName(ENGLANDWALES_CASE_TYPE_ID, caseData);
+        assertEquals("EMP-TRIB-100000000000.jpg", caseData.getFlagsImageFileName());
+        assertEquals("<font color='#D6292D' size='5'> MIGRATED FROM ECM </font>",
+                caseData.getFlagsImageAltText());
+
+        caseData.setMigratedFromEcm(null);
+        buildFlagsImageFileName(ENGLANDWALES_CASE_TYPE_ID, caseData);
+        assertEquals("EMP-TRIB-000000000000.jpg", caseData.getFlagsImageFileName());
     }
 
     private CaseDetails createCaseDetails(String caseTypeId, CaseData caseData) {

@@ -25,8 +25,10 @@ import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
@@ -238,7 +240,7 @@ class TseClaimantRepReplyServiceTest {
 
     @ParameterizedTest
     @MethodSource("sendRespondingToApplicationEmails")
-    void sendRespondingToApplicationEmails(String rule92, VerificationMode isEmailSentToClaimant,
+    void sendRespondingToApplicationEmails(String rule92, VerificationMode isEmailSentToRespondent,
                                            String ackEmailTemplate) {
         caseData.setTseResponseCopyToOtherParty(rule92);
         caseData.setClaimantHearingPreference(new ClaimantHearingPreference());
@@ -265,11 +267,19 @@ class TseClaimantRepReplyServiceTest {
         representedTypeRItem.setValue(representedType);
         caseData.setRepCollection(new ArrayList<>());
         caseData.getRepCollection().add(representedTypeRItem);
+        caseData.setRespondentCollection(new ArrayList<>());
+        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+        respondentSumTypeItem.setId("1111-2222-3333-1111");
+        RespondentSumType respondentSumType = RespondentSumType.builder()
+                .respondentEmail("respondent@gmail.com")
+                .build();
+        respondentSumTypeItem.setValue(respondentSumType);
+        caseData.getRespondentCollection().add(respondentSumTypeItem);
         tseClaimantRepReplyService.sendRespondingToApplicationEmails(caseDetails, "userToken");
 
         verify(emailService).sendEmail(any(), eq(userDetails.getEmail()), any());
-        verify(emailService, isEmailSentToClaimant)
-                .sendEmail(any(), eq(caseData.getClaimantType().getClaimantEmailAddress()), any());
+        verify(emailService, isEmailSentToRespondent)
+                .sendEmail(any(), eq(respondentSumType.getRespondentEmail()), any());
         verify(claimantTellSomethingElseService).sendAdminEmail(any());
 
         verify(emailService)

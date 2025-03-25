@@ -60,7 +60,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLA
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_RECONSIDER_JUDGMENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_WITHDRAW_CLAIM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClaimantTellSomethingElseHelper.claimantSelectApplicationToType;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClaimantTellSomethingElseHelper.getRespondentEmailAddressList;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClaimantTellSomethingElseHelper.getRespondentsAndRepsEmailAddresses;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.DOCGEN_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItemFromTopLevel;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
@@ -236,7 +236,7 @@ public class ClaimantTellSomethingElseService {
             return;
         }
 
-        List<String> respondentEmailAddressList = getRespondentEmailAddressList(caseData);
+        List<String> respondentEmailAddressList = getRespondentsAndRepsEmailAddresses(caseData);
         if (respondentEmailAddressList.isEmpty()) {
             return;
         }

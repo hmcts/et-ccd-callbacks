@@ -27,6 +27,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
+import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
@@ -255,23 +256,66 @@ class TseClaimantRepReplyServiceTest {
         ReflectionTestUtils.setField(tseClaimantRepReplyService,
                 "acknowledgementRule92NoEmailTemplateId", REPLY_TO_APP_ACK_TEMPLATE_NO);
 
+        Organisation respondentOrg = Organisation.builder()
+                .organisationID("org_id")
+                .organisationName("New Organisation").build();
         RepresentedTypeR representedType =
                 RepresentedTypeR.builder()
                         .nameOfRepresentative("Respondent")
                         .respRepName("Respondent")
                         .representativeEmailAddress("person@email.com")
                         .myHmctsYesNo("Yes")
+                        .respondentOrganisation(respondentOrg)
                         .build();
         RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
         representedTypeRItem.setId("1111-2222-3333-1111");
         representedTypeRItem.setValue(representedType);
         caseData.setRepCollection(new ArrayList<>());
         caseData.getRepCollection().add(representedTypeRItem);
+
         caseData.setRespondentCollection(new ArrayList<>());
         RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
         respondentSumTypeItem.setId("1111-2222-3333-1111");
         RespondentSumType respondentSumType = RespondentSumType.builder()
                 .respondentEmail("respondent@gmail.com")
+                .respondentName("Respondent")
+                .build();
+        respondentSumTypeItem.setValue(respondentSumType);
+        caseData.getRespondentCollection().add(respondentSumTypeItem);
+        tseClaimantRepReplyService.sendRespondingToApplicationEmails(caseDetails, "userToken");
+
+        verify(emailService).sendEmail(any(), eq(userDetails.getEmail()), any());
+        verify(emailService, isEmailSentToRespondent)
+                .sendEmail(any(), eq(respondentSumType.getRespondentEmail()), any());
+        verify(claimantTellSomethingElseService).sendAdminEmail(any());
+
+        verify(emailService)
+                .sendEmail(eq(ackEmailTemplate), eq(userDetails.getEmail()), any());
+    }
+
+    @ParameterizedTest
+    @MethodSource("sendRespondingToApplicationEmails")
+    void sendRespondingToApplicationEmailsNoRep(String rule92, VerificationMode isEmailSentToRespondent,
+                                           String ackEmailTemplate) {
+        caseData.setTseResponseCopyToOtherParty(rule92);
+        caseData.setClaimantHearingPreference(new ClaimantHearingPreference());
+        caseData.getClaimantHearingPreference().setContactLanguage(ENGLISH_LANGUAGE);
+
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseId("caseId");
+        caseDetails.setCaseData(caseData);
+
+        ReflectionTestUtils.setField(tseClaimantRepReplyService,
+                "acknowledgementRule92YesEmailTemplateId", REPLY_TO_APP_ACK_TEMPLATE_YES);
+        ReflectionTestUtils.setField(tseClaimantRepReplyService,
+                "acknowledgementRule92NoEmailTemplateId", REPLY_TO_APP_ACK_TEMPLATE_NO);
+
+        caseData.setRespondentCollection(new ArrayList<>());
+        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+        respondentSumTypeItem.setId("1111-2222-3333-1111");
+        RespondentSumType respondentSumType = RespondentSumType.builder()
+                .respondentEmail("respondent@gmail.com")
+                .respondentName("Respondent")
                 .build();
         respondentSumTypeItem.setValue(respondentSumType);
         caseData.getRespondentCollection().add(respondentSumTypeItem);

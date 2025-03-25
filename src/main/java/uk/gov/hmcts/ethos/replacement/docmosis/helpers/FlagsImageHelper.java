@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -9,7 +8,11 @@ import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 
+import java.util.List;
+
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_DIGITAL_FILE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_DO_NOT_POSTPONE;
@@ -44,6 +47,11 @@ public final class FlagsImageHelper {
     private static final String FLAG_WELSH_LANGUAGE = "Cymraeg";
     private static final String WELSH = "Welsh";
     private static final String FLAG_RULE_493B = "RULE 49(3)b";
+    private static final String FLAG_MIGRATED_FROM_ECM = "MIGRATED FROM ECM";
+
+    private static final List<String> FLAGS = List.of(FLAG_MIGRATED_FROM_ECM, FLAG_WITH_OUTSTATION,
+            FLAG_DO_NOT_POSTPONE, FLAG_LIVE_APPEAL, FLAG_RULE_493B, FLAG_REPORTING, FLAG_SENSITIVE, FLAG_RESERVED,
+            FLAG_ECC, FLAG_DIGITAL_FILE, FLAG_REASONABLE_ADJUSTMENT, FLAG_WELSH_LANGUAGE);
 
     private FlagsImageHelper() {
     }
@@ -57,17 +65,7 @@ public final class FlagsImageHelper {
         StringBuilder flagsImageAltText = new StringBuilder();
 
         flagsImageFileName.append(IMAGE_FILE_PRECEDING);
-        setFlagImageFor(FLAG_WITH_OUTSTATION, flagsImageFileName, flagsImageAltText, caseData, caseTypeId);
-        setFlagImageFor(FLAG_DO_NOT_POSTPONE, flagsImageFileName, flagsImageAltText, caseData, caseTypeId);
-        setFlagImageFor(FLAG_LIVE_APPEAL, flagsImageFileName, flagsImageAltText, caseData, caseTypeId);
-        setFlagImageFor(FLAG_RULE_493B, flagsImageFileName, flagsImageAltText, caseData, caseTypeId);
-        setFlagImageFor(FLAG_REPORTING, flagsImageFileName, flagsImageAltText, caseData, caseTypeId);
-        setFlagImageFor(FLAG_SENSITIVE, flagsImageFileName, flagsImageAltText, caseData, caseTypeId);
-        setFlagImageFor(FLAG_RESERVED, flagsImageFileName, flagsImageAltText, caseData, caseTypeId);
-        setFlagImageFor(FLAG_ECC, flagsImageFileName, flagsImageAltText, caseData, caseTypeId);
-        setFlagImageFor(FLAG_DIGITAL_FILE, flagsImageFileName, flagsImageAltText, caseData, caseTypeId);
-        setFlagImageFor(FLAG_REASONABLE_ADJUSTMENT, flagsImageFileName, flagsImageAltText, caseData, caseTypeId);
-        setFlagImageFor(FLAG_WELSH_LANGUAGE, flagsImageFileName, flagsImageAltText, caseData, caseTypeId);
+        FLAGS.forEach(flag -> setFlagImageFor(flag, flagsImageFileName, flagsImageAltText, caseData, caseTypeId));
         flagsImageFileName.append(IMAGE_FILE_EXTENSION);
 
         caseData.setFlagsImageAltText(flagsImageAltText.toString());
@@ -77,58 +75,62 @@ public final class FlagsImageHelper {
     private static void setFlagImageFor(String flagName, StringBuilder flagsImageFileName,
                                         StringBuilder flagsImageAltText, CaseData caseData, String caseTypeId) {
         boolean flagRequired;
-        String flagColor;
-
+        String flagColor; 
         switch (flagName) {
-            case FLAG_WITH_OUTSTATION:
+            case FLAG_WITH_OUTSTATION -> {
                 flagRequired = withOutstation(caseData, caseTypeId);
                 flagColor = COLOR_DEEP_PINK;
-                break;
-            case FLAG_DO_NOT_POSTPONE:
+            }
+            case FLAG_DO_NOT_POSTPONE -> {
                 flagRequired = doNotPostpone(caseData);
                 flagColor = COLOR_DARK_RED;
-                break;
-            case FLAG_LIVE_APPEAL:
+            }
+            case FLAG_LIVE_APPEAL -> {
                 flagRequired = liveAppeal(caseData);
                 flagColor = COLOR_GREEN;
-                break;
-            case FLAG_RULE_493B:
+            }
+            case FLAG_RULE_493B -> {
                 flagRequired = rule493bApplies(caseData);
                 flagColor = COLOR_RED;
-                break;
-            case FLAG_REPORTING:
+            }
+            case FLAG_REPORTING -> {
                 flagRequired = rule503dApplies(caseData);
                 flagColor = COLOR_LIGHT_BLACK;
-                break;
-            case FLAG_SENSITIVE:
+            }
+            case FLAG_SENSITIVE -> {
                 flagRequired = sensitiveCase(caseData);
                 flagColor = COLOR_ORANGE;
-                break;
-            case FLAG_RESERVED:
+            }
+            case FLAG_RESERVED -> {
                 flagRequired = reservedJudgement(caseData);
                 flagColor = COLOR_PURPLE;
-                break;
-            case FLAG_ECC:
+            }
+            case FLAG_ECC -> {
                 flagRequired = counterClaimMade(caseData);
                 flagColor = COLOR_OLIVE;
-                break;
-            case FLAG_DIGITAL_FILE:
+            }
+            case FLAG_DIGITAL_FILE -> {
                 flagRequired = digitalFile(caseData);
                 flagColor = COLOR_SLATE_GRAY;
-                break;
-            case FLAG_REASONABLE_ADJUSTMENT:
+            }
+            case FLAG_REASONABLE_ADJUSTMENT -> {
                 flagRequired = reasonableAdjustment(caseData);
                 flagColor = COLOR_DARK_SLATE_BLUE;
-                break;
-            case FLAG_WELSH_LANGUAGE:
+            }
+            case FLAG_WELSH_LANGUAGE -> {
                 flagRequired = welshColor(caseData);
                 flagColor = COLOR_RED;
-                break;
-            default:
+            }
+            case FLAG_MIGRATED_FROM_ECM -> {
+                flagRequired = YES.equals(defaultIfEmpty(caseData.getMigratedFromEcm(), ""));
+                flagColor = "#D6292D";
+            }
+            default -> {
                 flagRequired = false;
                 flagColor = COLOR_WHITE;
-                break;
+            }
         }
+
         flagsImageFileName.append(flagRequired ? ONE : ZERO);
         flagsImageAltText.append(flagRequired && !flagsImageAltText.isEmpty() ? "<font size='5'> - </font>" : "")
                 .append(flagRequired ? "<font color='" + flagColor + "' size='5'> " + flagName + " </font>" : "");
@@ -172,25 +174,17 @@ public final class FlagsImageHelper {
     }
 
     private static boolean reservedJudgement(CaseData caseData) {
-        if (CollectionUtils.isEmpty(caseData.getHearingCollection())) {
+        if (isEmpty(caseData.getHearingCollection())) {
             return false;
         }
 
-        for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
-            HearingType hearingType = hearingTypeItem.getValue();
-            if (hearingNotNullOrEmpty(hearingType)) {
-                for (DateListedTypeItem dateListedTypeItem : hearingType.getHearingDateCollection()) {
-                    if (dateNotNull(dateListedTypeItem)) {
-                        String hearingReservedJudgement = dateListedTypeItem.getValue().getHearingReservedJudgement();
-                        if (YES.equals(hearingReservedJudgement)) {
-                            return true;
-                        }
-                    }
-                }
-            }
-        }
-
-        return false;
+        return caseData.getHearingCollection().stream()
+                .map(HearingTypeItem::getValue)
+                .filter(FlagsImageHelper::hearingNotNullOrEmpty)
+                .flatMap(hearingType -> hearingType.getHearingDateCollection().stream())
+                .filter(FlagsImageHelper::dateNotNull)
+                .map(dateListedTypeItem -> dateListedTypeItem.getValue().getHearingReservedJudgement())
+                .anyMatch(YES::equals);
     }
 
     private static boolean dateNotNull(DateListedTypeItem dateListedTypeItem) {
@@ -198,7 +192,7 @@ public final class FlagsImageHelper {
     }
 
     private static boolean hearingNotNullOrEmpty(HearingType hearingType) {
-        return hearingType != null && CollectionUtils.isNotEmpty(hearingType.getHearingDateCollection());
+        return hearingType != null && isNotEmpty(hearingType.getHearingDateCollection());
     }
 
     private static boolean counterClaimMade(CaseData caseData) {
@@ -239,7 +233,7 @@ public final class FlagsImageHelper {
         if (!flag && caseData.getClaimantHearingPreference() != null) {
             flag = YES.equals(caseData.getClaimantHearingPreference().getReasonableAdjustments());
         }
-        if (!flag && CollectionUtils.isNotEmpty(caseData.getRespondentCollection())) {
+        if (!flag && isNotEmpty(caseData.getRespondentCollection())) {
             flag = caseData.getRespondentCollection()
                     .stream()
                     .anyMatch(r -> YES.equals(

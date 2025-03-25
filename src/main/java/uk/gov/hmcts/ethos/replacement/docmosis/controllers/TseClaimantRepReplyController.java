@@ -31,6 +31,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.setDocumentNumbers;
 
 /**
  * REST controller for the "Respond to an Application" event.
@@ -197,6 +198,8 @@ public class TseClaimantRepReplyController {
                 caseDetails.getCaseTypeId());
         tseClaimantRepReplyService.claimantReplyToTse(userToken, caseDetails, caseData);
         caseManagementForCaseWorkerService.setNextListedDate(caseData);
+        setDocumentNumbers(caseData);
+
         return getCallbackRespEntityNoErrors(caseData);
     }
 

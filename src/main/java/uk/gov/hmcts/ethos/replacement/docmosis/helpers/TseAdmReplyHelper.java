@@ -26,7 +26,7 @@ import java.util.List;
 
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.DOCGEN_ERROR;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItem;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItemFromTopLevel;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.hasSupportingDocs;
 
 public final class TseAdmReplyHelper {
@@ -45,9 +45,9 @@ public final class TseAdmReplyHelper {
             return null;
         }
         DocumentInfo eventDocInfo = getDocumentInfo(tornadoService, userToken, caseDetails, typeOfDocument);
-        String resTseSelectApp = caseDetails.getCaseData().getResTseSelectApplication();
-        return createDocumentTypeItem(docService.addDocumentToDocumentField(eventDocInfo),
-                typeOfCorrespondence, resTseSelectApp);
+        String topLevel = uk.gov.hmcts.ecm.common.helpers.DocumentHelper.getTopLevelDocument(typeOfCorrespondence);
+        return createDocumentTypeItemFromTopLevel(docService.addDocumentToDocumentField(eventDocInfo),
+                topLevel, typeOfCorrespondence);
     }
 
     private static DocumentInfo getDocumentInfo(TornadoService tornadoService, String userToken,

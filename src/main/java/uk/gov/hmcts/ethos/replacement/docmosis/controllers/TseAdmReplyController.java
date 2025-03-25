@@ -26,6 +26,7 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.setDocumentNumbers;
 
 @Slf4j
 @RequestMapping("/tseAdmReply")
@@ -133,6 +134,7 @@ public class TseAdmReplyController {
         tseAdmReplyService.sendNotifyEmailsToClaimant(ccdRequest.getCaseDetails().getCaseId(), caseData, userToken);
         tseAdmReplyService.sendNotifyEmailsToRespondents(ccdRequest.getCaseDetails(), userToken);
         tseAdmReplyService.clearTseAdmReplyDataFromCaseData(caseData);
+        setDocumentNumbers(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
     }

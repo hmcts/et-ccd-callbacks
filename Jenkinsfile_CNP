@@ -141,7 +141,7 @@ withPipeline(type, product, component) {
 
   before('smoketest:aat') {
     env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
-    eenv.ET_COS_URL = "https://et-cos-staging.aat.platform.hmcts.net/"
+    env.ET_COS_URL = "https://et-cos-staging.aat.platform.hmcts.net/"
     env.FT_SYA_URL = "http://et-sya-api-aat.service.core-compute-aat.internal"
     env.SERVICE_AUTH_PROVIDER_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
     env.CCD_DATA_STORE_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
@@ -170,7 +170,7 @@ withPipeline(type, product, component) {
             reportFiles : "ET-CCD-Callbacks-tests.html",
             reportName : "ET Smoke test report"
     ]
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'playwright-report/**'
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'et-xui-e2e-tests/playwright-report/**'
   }
 
   afterAlways('functionalTest:aat') {

@@ -46,6 +46,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -243,6 +244,9 @@ class TseClaimantRepReplyServiceTest {
     @MethodSource("sendRespondingToApplicationEmails")
     void sendRespondingToApplicationEmails(String rule92, VerificationMode isEmailSentToRespondent,
                                            String ackEmailTemplate) {
+        mockStatic.when(() -> TseHelper.getPersonalisationForResponse(any(), any(), any(), anyBoolean()))
+                .thenReturn(new ConcurrentHashMap<>());
+
         caseData.setTseResponseCopyToOtherParty(rule92);
         caseData.setClaimantHearingPreference(new ClaimantHearingPreference());
         caseData.getClaimantHearingPreference().setContactLanguage(ENGLISH_LANGUAGE);
@@ -304,6 +308,8 @@ class TseClaimantRepReplyServiceTest {
     @MethodSource("sendRespondingToApplicationEmails")
     void sendRespondingToApplicationEmailsNoRep(String rule92, VerificationMode isEmailSentToRespondent,
                                            String ackEmailTemplate) {
+        mockStatic.when(() -> TseHelper.getPersonalisationForResponse(any(), any(), any(), anyBoolean()))
+                .thenReturn(new ConcurrentHashMap<>());
         caseData.setTseResponseCopyToOtherParty(rule92);
         caseData.setClaimantHearingPreference(new ClaimantHearingPreference());
         caseData.getClaimantHearingPreference().setContactLanguage(ENGLISH_LANGUAGE);

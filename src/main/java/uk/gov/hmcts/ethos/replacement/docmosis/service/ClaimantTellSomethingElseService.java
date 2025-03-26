@@ -290,7 +290,8 @@ public class ClaimantTellSomethingElseService {
     }
 
     private Map<String, Object> prepareRespondentEmailContent(CaseDetails caseDetails, byte[] document,
-                                                              boolean isWelsh, boolean isRespondent) throws NotificationClientException {
+                                                              boolean isWelsh, boolean isRespondent)
+            throws NotificationClientException {
         log.info("Preparing email content for respondent");
         CaseData caseData = caseDetails.getCaseData();
         JSONObject documentJson =

@@ -16,7 +16,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseApplicationDo
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEApplicationTypeData;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;

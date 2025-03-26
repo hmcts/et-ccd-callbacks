@@ -341,7 +341,7 @@ public class TseClaimantRepReplyService {
 
             respondentEmailAddressMap.forEach(
                     (respondentEmail, isRespondent) -> {
-                        if (isRespondent) {
+                        if (Boolean.TRUE.equals(isRespondent)) {
                             personalisation.put(LINK_TO_CITIZEN_HUB,
                                     emailService.getSyrCaseLink(caseDetails.getCaseId()));
                         }

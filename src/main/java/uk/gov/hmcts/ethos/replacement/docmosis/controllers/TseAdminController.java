@@ -26,6 +26,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantNonSystemUser;
 
 /**
  * REST controller for the Response to an Application event.
@@ -102,7 +103,9 @@ public class TseAdminController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         tseAdminService.saveTseAdminDataFromCaseData(caseData);
-        tseAdminService.sendEmailToClaimant(ccdRequest.getCaseDetails().getCaseId(), caseData);
+        if (!isClaimantNonSystemUser(caseData)) {
+            tseAdminService.sendEmailToClaimant(ccdRequest.getCaseDetails().getCaseId(), caseData);
+        }
         tseAdminService.sendNotifyEmailsToRespondents(ccdRequest.getCaseDetails());
         tseAdminService.clearTseAdminDataFromCaseData(caseData);
 

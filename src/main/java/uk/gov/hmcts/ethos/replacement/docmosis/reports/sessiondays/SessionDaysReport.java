@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.reports.sessiondays;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
@@ -28,8 +29,10 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.lang.Math.round;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.TWO_JUDGES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportCommonMethods.getHearingDurationInMinutes;
 
+@Slf4j
 public final class SessionDaysReport {
 
     public static final String ONE_HOUR = "One Hour";
@@ -163,22 +166,37 @@ public final class SessionDaysReport {
                                         SessionDaysReportSummary reportSummary,
                                         List<SessionDaysReportSummary2> sessionDaysReportSummary2List,
                                         List<List<String>> sessionsList) {
-        for (HearingTypeItem hearingTypeItem : getHearings(caseData)) {
+        List<HearingTypeItem> hearings = getHearings(caseData);
+        for (HearingTypeItem hearingTypeItem : hearings) {
             List<DateListedTypeItem> dates = hearingTypeItem.getValue().getHearingDateCollection();
             dates = filterValidHearingDates(dates);
-            if (CollectionUtils.isNotEmpty(dates)) {
-                for (DateListedTypeItem dateListedTypeItem : dates) {
-                    if (isHearingStatusValid(dateListedTypeItem)) {
-                        String judgeName = getJudgeName(hearingTypeItem.getValue().getJudge());
-                        JudgeEmploymentStatus judgeStatus = getJudgeStatus(judgeName);
-                        SessionDaysReportSummary2 reportSummary2 = getReportSummary2Item(
-                                dateListedTypeItem.getValue(), sessionDaysReportSummary2List);
-                        if (!sessionExists(judgeName, dateListedTypeItem.getValue().getListedDate(), sessionsList)) {
-                            setReportSummariesFields(judgeStatus, reportSummary, reportSummary2);
-                        }
-                    }
-                }
+            if (CollectionUtils.isEmpty(dates)) {
+                continue;
             }
+            dates.stream().filter(this::isHearingStatusValid)
+                .forEach(dateListedTypeItem -> {
+                    String judgeName = getJudgeName(hearingTypeItem.getValue().getJudge());
+                    getJudgeAndSession(reportSummary, sessionDaysReportSummary2List, sessionsList,
+                            dateListedTypeItem, judgeName);
+                    if (TWO_JUDGES.equals(hearingTypeItem.getValue().getHearingSitAlone())
+                        && hearingTypeItem.getValue().hasAdditionalHearingJudge()) {
+                        judgeName = getJudgeName(hearingTypeItem.getValue().getAdditionalJudge());
+                        getJudgeAndSession(reportSummary, sessionDaysReportSummary2List, sessionsList,
+                                dateListedTypeItem, judgeName);
+                    }
+                });
+        }
+    }
+
+    private void getJudgeAndSession(SessionDaysReportSummary reportSummary,
+                                    List<SessionDaysReportSummary2> sessionDaysReportSummary2List,
+                                    List<List<String>> sessionsList, DateListedTypeItem dateListedTypeItem,
+                                    String judgeName) {
+        JudgeEmploymentStatus judgeStatus = getJudgeStatus(judgeName);
+        SessionDaysReportSummary2 reportSummary2 = getReportSummary2Item(
+                dateListedTypeItem.getValue(), sessionDaysReportSummary2List);
+        if (!sessionExists(judgeName, dateListedTypeItem.getValue().getListedDate(), sessionsList)) {
+            setReportSummariesFields(judgeStatus, reportSummary, reportSummary2);
         }
     }
 
@@ -266,34 +284,48 @@ public final class SessionDaysReport {
             List<DateListedTypeItem> dates = hearingTypeItem.getValue().getHearingDateCollection();
             dates = filterValidHearingDates(dates);
             if (CollectionUtils.isNotEmpty(dates)) {
-                for (DateListedTypeItem dateListedTypeItem : dates) {
-                    if (isHearingStatusValid(dateListedTypeItem)) {
-                        SessionDaysReportDetail reportDetail =
-                                getSessionDaysReportDetail(caseData, hearingTypeItem, dateListedTypeItem);
-                        if (dateListedTypeItem.getValue().hasHearingClerk()) {
-                            reportDetail.setHearingClerk(dateListedTypeItem.getValue().getHearingClerk()
-                                    .getSelectedLabel());
-                        }
-                        reportDetailList.add(reportDetail);
+                dates.stream().filter(this::isHearingStatusValid).forEach(dateListedTypeItem -> {
+                    SessionDaysReportDetail reportDetail =
+                            getSessionDaysReportDetail(caseData, hearingTypeItem, dateListedTypeItem, false);
+                    if (dateListedTypeItem.getValue().hasHearingClerk()) {
+                        reportDetail.setHearingClerk(dateListedTypeItem.getValue().getHearingClerk()
+                                .getSelectedLabel());
                     }
-                }
+                    reportDetailList.add(reportDetail);
+                    twoJudgesDetailLogic(caseData, reportDetailList, hearingTypeItem, dateListedTypeItem);
+                });
             }
+        }
+    }
+
+    private void twoJudgesDetailLogic(SessionDaysCaseData caseData, List<SessionDaysReportDetail> reportDetailList,
+                                      HearingTypeItem hearingTypeItem, DateListedTypeItem dateListedTypeItem) {
+        SessionDaysReportDetail reportDetail;
+        if (TWO_JUDGES.equals(hearingTypeItem.getValue().getHearingSitAlone())
+            && hearingTypeItem.getValue().hasAdditionalHearingJudge()) {
+            reportDetail = getSessionDaysReportDetail(caseData, hearingTypeItem, dateListedTypeItem, true);
+            if (dateListedTypeItem.getValue().hasHearingClerk()) {
+                reportDetail.setHearingClerk(dateListedTypeItem.getValue().getHearingClerk()
+                        .getSelectedLabel());
+            }
+            reportDetailList.add(reportDetail);
         }
     }
 
     @NotNull
     private SessionDaysReportDetail getSessionDaysReportDetail(SessionDaysCaseData caseData,
                                                                HearingTypeItem hearingTypeItem,
-                                                               DateListedTypeItem dateListedTypeItem) {
+                                                               DateListedTypeItem dateListedTypeItem,
+                                                               boolean additionalJudge) {
         SessionDaysReportDetail reportDetail = new SessionDaysReportDetail();
         reportDetail.setHearingDate(LocalDateTime.parse(
                         dateListedTypeItem.getValue().getListedDate(), OLD_DATE_TIME_PATTERN)
                 .toLocalDate().toString());
-        String judgeName = getJudgeName(hearingTypeItem.getValue().getJudge());
+        DynamicFixedListType judge = additionalJudge ? hearingTypeItem.getValue().getAdditionalJudge()
+                : hearingTypeItem.getValue().getJudge();
+        String judgeName = getJudgeName(judge);
 
-        reportDetail.setHearingJudge(
-                isNullOrEmpty(judgeName)
-                        ? "* Not Allocated" : judgeName);
+        reportDetail.setHearingJudge(isNullOrEmpty(judgeName) ? "* Not Allocated" : judgeName);
         JudgeEmploymentStatus judgeStatus = getJudgeStatus(judgeName);
         setJudgeType(judgeStatus, reportDetail);
         reportDetail.setCaseReference(caseData.getEthosCaseReference());

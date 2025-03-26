@@ -104,8 +104,8 @@ public class CasesCompletedReport {
     }
 
     private void executeReport(ListingDetails listingDetails, List<SubmitEvent> submitEvents) {
-        log.info(String.format("Cases Completed report case type id %s search results: %d",
-                listingDetails.getCaseTypeId(), submitEvents.size()));
+        log.info("Cases Completed report case type id {} search results: {}",
+                listingDetails.getCaseTypeId(), submitEvents.size());
 
         AdhocReportType localReportsDetailHdr = listingDetails.getCaseData().getLocalReportsDetailHdr();
         List<AdhocReportTypeItem> localReportsDetailList = listingDetails.getCaseData().getLocalReportsDetail();
@@ -186,7 +186,12 @@ public class CasesCompletedReport {
         adhocReportType.setHearingDate(latestSession.getListedDate());
         adhocReportType.setHearingType(hearingType.getHearingType());
         if (hearingType.hasHearingJudge()) {
-            adhocReportType.setHearingJudge(hearingType.getJudge().getSelectedLabel());
+            if (hearingType.hasAdditionalHearingJudge()) {
+                adhocReportType.setHearingJudge(String.join(", ", hearingType.getJudge().getSelectedLabel(),
+                        hearingType.getAdditionalJudge().getSelectedLabel()));
+            } else {
+                adhocReportType.setHearingJudge(hearingType.getJudge().getSelectedLabel());
+            }
         }
         if (latestSession.hasHearingClerk()) {
             adhocReportType.setHearingClerk(latestSession.getHearingClerk().getSelectedLabel());

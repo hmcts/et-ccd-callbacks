@@ -223,7 +223,7 @@ public final class ClaimantTellSomethingElseHelper {
 
             RepresentedTypeR representative = getRespondentRepresentative(caseData, respondent);
             if (representative != null && StringUtils.isNotBlank(representative.getRepresentativeEmailAddress())) {
-                emailAddressesMap.put(representative.getRepresentativeEmailAddress(), null);
+                emailAddressesMap.put(representative.getRepresentativeEmailAddress(), "");
             }
         });
 

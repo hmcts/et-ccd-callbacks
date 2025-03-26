@@ -207,9 +207,9 @@ public final class ClaimantTellSomethingElseHelper {
      * @param caseData the case data containing respondent and representative information
      * @return a list of email addresses for respondents and their representatives
      */
-    public static List<String> getRespondentsAndRepsEmailAddresses(CaseData caseData) {
+    public static Map<String, Boolean> getRespondentsAndRepsEmailAddresses(CaseData caseData) {
         List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
-        List<String> emailAddresses = new ArrayList<>();
+        Map<String, Boolean> emailAddressesMap = new ConcurrentHashMap<>();
 
         respondentCollection.forEach(respondentSumTypeItem -> {
             RespondentSumType respondent = respondentSumTypeItem.getValue();
@@ -217,18 +217,18 @@ public final class ClaimantTellSomethingElseHelper {
             String respondentEmail = respondent.getRespondentEmail();
 
             if (StringUtils.isNotBlank(responseEmail)) {
-                emailAddresses.add(responseEmail);
+                emailAddressesMap.put(responseEmail, true);
             } else if (StringUtils.isNotBlank(respondentEmail)) {
-                emailAddresses.add(respondentEmail);
+                emailAddressesMap.put(respondentEmail, true);
             }
 
             RepresentedTypeR representative = getRespondentRepresentative(caseData, respondent);
             if (representative != null && StringUtils.isNotBlank(representative.getRepresentativeEmailAddress())) {
-                emailAddresses.add(representative.getRepresentativeEmailAddress());
+                emailAddressesMap.put(representative.getRepresentativeEmailAddress(), false);
             }
         });
 
-        return emailAddresses;
+        return emailAddressesMap;
     }
 
     public static String getApplicantType(CaseData caseData) {

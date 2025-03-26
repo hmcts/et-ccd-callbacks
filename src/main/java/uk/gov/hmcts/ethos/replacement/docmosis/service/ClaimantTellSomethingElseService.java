@@ -236,7 +236,7 @@ public class ClaimantTellSomethingElseService {
             return;
         }
 
-        List<String> respondentEmailAddressList = getRespondentsAndRepsEmailAddresses(caseData);
+        Map<String, Boolean> respondentEmailAddressList = getRespondentsAndRepsEmailAddresses(caseData);
         if (respondentEmailAddressList.isEmpty()) {
             return;
         }
@@ -249,26 +249,27 @@ public class ClaimantTellSomethingElseService {
         try {
             byte[] bytes = tornadoService.generateEventDocumentBytes(caseData, "", CLAIMANT_TSE_FILE_NAME);
             String emailTemplate = getRespondentEmailTemplate(isWelsh, applicationType);
-            respondentEmailAddressList.forEach(respondentEmail ->
+            respondentEmailAddressList.forEach((respondentEmail, isRespondent) ->
                     sendEmailToRespondent(
                             emailTemplate,
                             respondentEmail,
                             caseDetails,
                             bytes,
-                            isWelsh));
+                            isWelsh,
+                            isRespondent));
         } catch (Exception e) {
             throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
         }
     }
 
     private void sendEmailToRespondent(String emailTemplate, String respondentEmail, CaseDetails caseDetails,
-                                       byte[] bytes, boolean isWelsh) {
+                                       byte[] bytes, boolean isWelsh, boolean isRespondent) {
         CaseData caseData = caseDetails.getCaseData();
         try {
             emailService.sendEmail(
                     emailTemplate,
                     respondentEmail,
-                    prepareRespondentEmailContent(caseDetails, bytes, isWelsh)
+                    prepareRespondentEmailContent(caseDetails, bytes, isWelsh, isRespondent)
             );
         } catch (NotificationClientException e) {
             log.warn("Failed to send email. Reference ID: {}. Reason:", caseData.getEthosCaseReference(), e);
@@ -289,7 +290,7 @@ public class ClaimantTellSomethingElseService {
     }
 
     private Map<String, Object> prepareRespondentEmailContent(CaseDetails caseDetails, byte[] document,
-                                                              boolean isWelsh) throws NotificationClientException {
+                                                              boolean isWelsh, boolean isRespondent) throws NotificationClientException {
         log.info("Preparing email content for respondent");
         CaseData caseData = caseDetails.getCaseData();
         JSONObject documentJson =
@@ -300,8 +301,13 @@ public class ClaimantTellSomethingElseService {
         String datePlus7 = isWelsh
                 ? translateDateToWelsh(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7))
                 : UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7);
-        String exuiCaseDetailsLink = emailService.getExuiCaseLink(
-                caseDetails.getCaseId()) + (isWelsh ? WELSH_LANGUAGE_PARAM : "");
+        String caseLink = isRespondent
+                ? emailService.getSyrCaseLink(caseDetails.getCaseId())
+                : emailService.getExuiCaseLink(caseDetails.getCaseId());
+
+        if (isWelsh) {
+            caseLink += WELSH_LANGUAGE_PARAM;
+        }
 
         log.info("Email content prepared successfully");
         return Map.of(
@@ -312,7 +318,7 @@ public class ClaimantTellSomethingElseService {
                 SHORT_TEXT, shortText,
                 DATE_PLUS_7, datePlus7,
                 LINK_TO_DOCUMENT, documentJson,
-                LINK_TO_CITIZEN_HUB, exuiCaseDetailsLink
+                LINK_TO_CITIZEN_HUB, caseLink
         );
     }
 

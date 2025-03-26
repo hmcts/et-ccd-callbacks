@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -261,16 +262,19 @@ public class TseClaimantRepReplyService {
             return;
         }
 
-        List<String> respondentEmailAddressList = getRespondentsAndRepsEmailAddresses(caseData);
-        if (respondentEmailAddressList.isEmpty()) {
+        Map<String, Boolean> respondentEmailAddressMap = getRespondentsAndRepsEmailAddresses(caseData);
+        if (respondentEmailAddressMap.isEmpty()) {
             return;
         }
 
-        Map<String, String> personalisation = Map.of(
-                CASE_NUMBER, caseData.getEthosCaseReference(),
-                LINK_TO_CITIZEN_HUB, emailService.getExuiCaseLink(caseDetails.getCaseId()));
-        respondentEmailAddressList.forEach(respondentEmail ->
-            emailService.sendEmail(replyToTribunalEmailToClaimantTemplateId, respondentEmail, personalisation));
+        Map<String, String> personalisation = new ConcurrentHashMap<>();
+        personalisation.put(CASE_NUMBER, caseData.getEthosCaseReference());
+        respondentEmailAddressMap.forEach((respondentEmail, isRespondent) -> {
+            personalisation.put(LINK_TO_CITIZEN_HUB,
+                    isRespondent ? emailService.getSyrCaseLink(caseDetails.getCaseId())
+                            : emailService.getCitizenCaseLink(caseDetails.getCaseId()));
+            emailService.sendEmail(replyToTribunalEmailToClaimantTemplateId, respondentEmail, personalisation);
+        });
     }
 
     private void sendAcknowledgementEmailToLR(CaseDetails caseDetails, String userToken,
@@ -314,8 +318,8 @@ public class TseClaimantRepReplyService {
             return;
         }
 
-        List<String> respondentEmailAddressList = getRespondentsAndRepsEmailAddresses(caseData);
-        if (respondentEmailAddressList.isEmpty()) {
+        Map<String, Boolean> respondentEmailAddressMap = getRespondentsAndRepsEmailAddresses(caseData);
+        if (respondentEmailAddressMap.isEmpty()) {
             return;
         }
 
@@ -335,12 +339,17 @@ public class TseClaimantRepReplyService {
                     ? cyTseClaimantRepResponseTemplateId
                     : tseClaimantRepResponseTemplateId;
 
-            respondentEmailAddressList.forEach(
-                    respondentEmail ->
-                            emailService.sendEmail(
-                            emailTemplate,
-                            respondentEmail,
-                            personalisation));
+            respondentEmailAddressMap.forEach(
+                    (respondentEmail, isRespondent) -> {
+                        if (isRespondent) {
+                            personalisation.put(LINK_TO_CITIZEN_HUB,
+                                    emailService.getSyrCaseLink(caseDetails.getCaseId()));
+                        }
+                        emailService.sendEmail(
+                                emailTemplate,
+                                respondentEmail,
+                                personalisation);
+                    });
         } catch (Exception e) {
             throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
         }

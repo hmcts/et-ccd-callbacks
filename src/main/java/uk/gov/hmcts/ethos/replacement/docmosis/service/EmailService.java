@@ -62,8 +62,8 @@ public class EmailService {
         return exuiUrl + caseId;
     }
 
-    public String getSyrCaseLink(String caseId) {
-        return syrUrl + caseId;
+    public String getSyrCaseLink(String caseId, String respondentId) {
+        return syrUrl + caseId + "/" + respondentId;
     }
 
     public String getClaimantRepExuiCaseNotificationsLink(String caseId) {

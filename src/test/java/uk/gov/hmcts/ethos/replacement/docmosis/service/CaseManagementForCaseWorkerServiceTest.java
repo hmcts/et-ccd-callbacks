@@ -8,7 +8,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -59,6 +61,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -350,33 +353,6 @@ class CaseManagementForCaseWorkerServiceTest {
     }
 
     @Test
-    void caseDataDefaultsResetResponseRespondentAddress() {
-        CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
-        Address responseRespondentAddress = new Address();
-        for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
-            respondentSumTypeItem.getValue().setResponseReceived(null);
-            respondentSumTypeItem.getValue().setResponseRespondentAddress(responseRespondentAddress);
-            respondentSumTypeItem.getValue().getResponseRespondentAddress().setAddressLine1("Address1");
-            respondentSumTypeItem.getValue().getResponseRespondentAddress().setAddressLine2("Address2");
-            respondentSumTypeItem.getValue().getResponseRespondentAddress().setAddressLine3("Address3");
-            respondentSumTypeItem.getValue().getResponseRespondentAddress().setCounty("County");
-            respondentSumTypeItem.getValue().getResponseRespondentAddress().setPostTown("PostTown");
-            respondentSumTypeItem.getValue().getResponseRespondentAddress().setCountry("Country");
-            respondentSumTypeItem.getValue().getResponseRespondentAddress().setPostCode("PostCode");
-        }
-        caseManagementForCaseWorkerService.caseDataDefaults(caseData);
-        for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
-            assertThat(respondentSumTypeItem.getValue().getResponseRespondentAddress().getAddressLine1()).isEmpty();
-            assertThat(respondentSumTypeItem.getValue().getResponseRespondentAddress().getAddressLine2()).isEmpty();
-            assertThat(respondentSumTypeItem.getValue().getResponseRespondentAddress().getAddressLine3()).isEmpty();
-            assertThat(respondentSumTypeItem.getValue().getResponseRespondentAddress().getCountry()).isEmpty();
-            assertThat(respondentSumTypeItem.getValue().getResponseRespondentAddress().getCounty()).isEmpty();
-            assertThat(respondentSumTypeItem.getValue().getResponseRespondentAddress().getPostCode()).isEmpty();
-            assertThat(respondentSumTypeItem.getValue().getResponseRespondentAddress().getPostTown()).isEmpty();
-        }
-    }
-
-    @Test
     void caseDataDefaultsResponseReceivedDoesNotChange() {
         CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
         caseData.getRespondentCollection().get(0).getValue().setResponseReceived(YES);
@@ -624,7 +600,7 @@ class CaseManagementForCaseWorkerServiceTest {
                 + "<font size='5'> - </font>"
                 + "<font color='Green' size='5'> LIVE APPEAL </font>"
                 + "<font size='5'> - </font>"
-                + "<font color='Red' size='5'> RULE 50(3)b </font>"
+                + "<font color='Red' size='5'> RULE 49(3)b </font>"
                 + "<font size='5'> - </font>"
                 + "<font color='LightBlack' size='5'> REPORTING </font>"
                 + "<font size='5'> - </font>"
@@ -1381,11 +1357,9 @@ class CaseManagementForCaseWorkerServiceTest {
         SubmitMultipleEvent event = new SubmitMultipleEvent();
         event.setCaseId(1_716_474_017_962_374L);
         event.setCaseData(multipleData);
-
         String adminToken = "adminToken";
         when(adminUserService.getAdminUserToken()).thenReturn(adminToken);
         when(multipleReferenceService.getMultipleByReference(anyString(), anyString(), anyString())).thenReturn(event);
-
         caseManagementForCaseWorkerService.setNextListedDateOnMultiple(details);
 
         assertThat(multipleData.getNextListedDate()).isEqualTo(nextListedDate);
@@ -1471,5 +1445,22 @@ class CaseManagementForCaseWorkerServiceTest {
         dynamicValueType.setLabel("RespondentName1");
         respondentECC.setValue(dynamicValueType);
         return respondentECC;
+    }
+
+    @ParameterizedTest
+    @MethodSource("individualClaimantNames")
+    void testIndividualClaimantNames(String firstName, String lastName,  String expected) {
+        CaseData caseData = ccdRequest22.getCaseDetails().getCaseData();
+        caseData.getClaimantIndType().setClaimantFirstNames(firstName);
+        caseData.getClaimantIndType().setClaimantLastName(lastName);
+        caseManagementForCaseWorkerService.caseDataDefaults(caseData);
+        assertThat(caseData.getClaimant()).isEqualTo(expected);
+    }
+
+    private static Stream<Arguments> individualClaimantNames() {
+        return Stream.of(Arguments.of("John", "Doe", "John Doe"),
+                Arguments.of("John ", " Doe", "John Doe"),
+                Arguments.of(" John", " Doe", "John Doe"),
+                Arguments.of(" John ", " Doe ", "John Doe"));
     }
 }

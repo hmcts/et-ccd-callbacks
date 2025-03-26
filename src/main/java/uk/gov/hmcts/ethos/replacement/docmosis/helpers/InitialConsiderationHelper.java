@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -21,17 +22,24 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.InitialConsidera
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
 
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.INITIAL_CONSIDERATION;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.ISSUE_RULE_27_NOTICE_AND_ORDER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.ISSUE_RULE_27_NOTICE_AND_ORDER_SC;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.ISSUE_RULE_28_NOTICE_AND_ORDER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.ISSUE_RULE_28_NOTICE_AND_ORDER_SC;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.ISSUE_RULE_29_NOTICE_AND_ORDER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
 
 @Slf4j
 public final class InitialConsiderationHelper {
 
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().registerModule(new JavaTimeModule());
     private static final String IC_OUTPUT_NAME = "Initial Consideration.pdf";
     private static final String IC_SUMMARY_EW_TEMPLATE_NAME = "EM-TRB-EGW-ENG-02203.docx";
     private static final String IC_SUMMARY_SC_TEMPLATE_NAME = "EM-TRB-SCO-ENG-02204.docx";
@@ -192,7 +200,7 @@ public final class InitialConsiderationHelper {
                 .hearingNotListedOtherDirections(
                         defaultIfEmpty(caseData.getEtICHearingNotListedAnyOtherDirections(), null))
                 //further information
-                .furtherInformation(Optional.ofNullable(caseData.getEtICFurtherInformation()).orElse(null))
+                .furtherInformation(getFurtherInformation(caseData.getEtICFurtherInformation()))
 
                 .furtherInfoGiveDetails(defaultIfEmpty(caseData.getEtICFurtherInformationGiveDetails(), null))
                 .furtherInfoTimeToComply(defaultIfEmpty(caseData.getEtICFurtherInformationTimeToComply(), null))
@@ -356,7 +364,7 @@ public final class InitialConsiderationHelper {
                         defaultIfEmpty(caseData.getEtICHearingNotListedAnyOtherDirections(), null))
 
                 // Further Information
-                .furtherInformation(Optional.ofNullable(caseData.getEtICFurtherInformation()).orElse(null))
+                .furtherInformation(getFurtherInformation(caseData.getEtICFurtherInformation()))
 
                 .furtherInfoGiveDetails(Optional.ofNullable(caseData.getEtICFurtherInfoAnswers())
                         .map(EtICFurtherInfoAnswers::getEtICFurtherInformationGiveDetails).orElse(null))
@@ -424,5 +432,24 @@ public final class InitialConsiderationHelper {
                 DocumentHelper.createDocumentTypeItemFromTopLevel(caseData.getEtInitialConsiderationDocument(),
                         INITIAL_CONSIDERATION, INITIAL_CONSIDERATION, null);
         caseData.getDocumentCollection().add(documentTypeItem);
+    }
+
+    private static List<String> getFurtherInformation(List<String> icInformation) {
+        List<String> furtherInformation = new ArrayList<>(Optional.ofNullable(icInformation)
+                .orElse(Collections.emptyList()));
+        if (furtherInformation.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        if (furtherInformation.remove(ISSUE_RULE_28_NOTICE_AND_ORDER)
+                || furtherInformation.remove(ISSUE_RULE_28_NOTICE_AND_ORDER_SC)) {
+            furtherInformation.add(ISSUE_RULE_29_NOTICE_AND_ORDER);
+        }
+        if (furtherInformation.remove(ISSUE_RULE_27_NOTICE_AND_ORDER)
+                || furtherInformation.remove(ISSUE_RULE_27_NOTICE_AND_ORDER_SC)) {
+            furtherInformation.add(ISSUE_RULE_28_NOTICE_AND_ORDER);
+        }
+
+        return furtherInformation;
     }
 }

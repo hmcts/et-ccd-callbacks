@@ -309,7 +309,7 @@ class ReferralHelperTest {
     }
 
     @ParameterizedTest
-    @MethodSource("partyNotCompliedCorrectly")
+    @MethodSource("handleIncorrectAndRuleChangeSubjects")
     void handlePartyNotCompliedCorrectly(String subject, String expected) {
         caseData.setSelectReferral(new DynamicFixedListType("1"));
         caseData.setReferralCollection(List.of(createReferralTypeItem()));
@@ -319,10 +319,14 @@ class ReferralHelperTest {
         assertEquals(expected, caseData.getUpdateReferralSubject());
     }
 
-    public static Stream<Arguments> partyNotCompliedCorrectly() {
+    public static Stream<Arguments> handleIncorrectAndRuleChangeSubjects() {
         return Stream.of(
                 Arguments.of(PARTY_NOT_RESPONDED_COMPLIED, PARTY_NOT_RESPONDED_COMPILED),
                 Arguments.of(PARTY_NOT_RESPONDED_COMPILED, PARTY_NOT_RESPONDED_COMPILED),
+                Arguments.of("Rule 49 Application", "Rule 50 Application"),
+                Arguments.of("Rule 50 Application", "Rule 50 Application"),
+                Arguments.of("Rule 22", "Rule 21"),
+                Arguments.of("Rule 21", "Rule 21"),
                 Arguments.of("Other", "Other"),
                 Arguments.of("ET1", "ET1")
         );
@@ -769,5 +773,21 @@ class ReferralHelperTest {
         ReferralHelper.addReferralDocumentToDocumentCollection(caseData);
         assertEquals(1, caseData.getDocumentCollection().size());
 
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideReferralSubject")
+    void updateReferralSubject(String initialSubject, String expectedSubject) {
+        assertEquals(expectedSubject, ReferralHelper.setReferralSubject(initialSubject));
+    }
+
+    private static Stream<Arguments> provideReferralSubject() {
+        return Stream.of(
+                Arguments.of(PARTY_NOT_RESPONDED_COMPILED, PARTY_NOT_RESPONDED_COMPLIED),
+                Arguments.of("Rule 50 application", "Rule 49 Application"),
+                Arguments.of("Rule 21", "Rule 22"),
+                Arguments.of("Other", "Other"),
+                Arguments.of("ET1", "ET1")
+        );
     }
 }

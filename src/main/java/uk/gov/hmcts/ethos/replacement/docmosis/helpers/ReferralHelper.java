@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -66,7 +67,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper.det
 
 @Slf4j
 public final class ReferralHelper {
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().registerModule(new JavaTimeModule());
     private static final String TRUE = "True";
     private static final String FALSE = "False";
     private static final String JUDGE_ROLE_ENG = "caseworker-employment-etjudge-englandwales";
@@ -167,15 +168,22 @@ public final class ReferralHelper {
     public static void populateUpdateReferralDetails(BaseCaseData caseData) {
         ReferralType referral = getSelectedReferral(caseData);
         caseData.setUpdateReferCaseTo(referral.getReferCaseTo());
-        caseData.setUpdateReferralSubject(PARTY_NOT_RESPONDED_COMPLIED.equals(referral.getReferralSubject())
-                ? PARTY_NOT_RESPONDED_COMPILED
-                : referral.getReferralSubject());
+        caseData.setUpdateReferralSubject(getUpdateReferralSubject(referral));
         caseData.setUpdateReferralDetails(referral.getReferralDetails());
         caseData.setUpdateReferentEmail(referral.getReferentEmail());
         caseData.setUpdateIsUrgent(referral.getIsUrgent());
         caseData.setUpdateReferralInstruction(referral.getReferralInstruction());
         caseData.setUpdateReferralSubjectSpecify(referral.getReferralSubjectSpecify());
         caseData.setUpdateReferralDocument(referral.getReferralDocument());
+    }
+
+    private static String getUpdateReferralSubject(ReferralType referral) {
+        return switch (referral.getReferralSubject()) {
+            case PARTY_NOT_RESPONDED_COMPLIED -> PARTY_NOT_RESPONDED_COMPILED;
+            case "Rule 22" -> "Rule 21";
+            case "Rule 49 Application" -> "Rule 50 Application";
+            default -> referral.getReferralSubject();
+        };
     }
 
     /**
@@ -823,6 +831,26 @@ public final class ReferralHelper {
 
     private static String formatReferralDetails(String text) {
         return isNullOrEmpty(text) ? "-" : text.replace("\n", "<br>");
+    }
+
+    public static String setReferralSubject(String referralSubject) {
+        if (isNullOrEmpty(referralSubject)) {
+            return null;
+        }
+        switch (referralSubject) {
+            case PARTY_NOT_RESPONDED_COMPILED -> {
+                return PARTY_NOT_RESPONDED_COMPLIED;
+            }
+            case "Rule 21" -> {
+                return  "Rule 22";
+            }
+            case "Rule 50 application" -> {
+                return "Rule 49 Application";
+            }
+            default -> {
+                return referralSubject;
+            }
+        }
     }
 
 }

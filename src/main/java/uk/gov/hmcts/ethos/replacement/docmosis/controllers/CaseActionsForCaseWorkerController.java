@@ -79,6 +79,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EMPTY_STRING;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.removeSpacesFromPartyNames;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.updatePositionTypeToClosed;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.updatePostponedDate;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -261,7 +264,6 @@ public class CaseActionsForCaseWorkerController {
             UploadDocumentHelper.convertLegacyDocsToNewDocNaming(caseData);
             UploadDocumentHelper.setDocumentTypeForDocumentCollection(caseData);
             DocumentHelper.setDocumentNumbers(caseData);
-            Helper.removeSpacesFromPartyNames(caseData);
             //create NOC answers section only on case submission events
             if (SUBMISSION_EVENTS.contains(defaultIfEmpty(ccdRequest.getEventId(), EMPTY_STRING))) {
                 caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
@@ -290,7 +292,6 @@ public class CaseActionsForCaseWorkerController {
 
         log.info("PostDefaultValues for case: {} {}", ccdRequest.getCaseDetails().getCaseTypeId(),
                 caseData.getEthosCaseReference());
-
         return getCallbackRespEntityErrors(errors, caseData);
     }
 
@@ -387,7 +388,7 @@ public class CaseActionsForCaseWorkerController {
             if (featureToggleService.isWorkAllocationEnabled() && caseTypeId.equals(SCOTLAND_CASE_TYPE_ID)) {
                 caseManagementLocationService.setCaseManagementLocation(caseData);
             }
-            Helper.removeSpacesFromPartyNames(caseData);
+            removeSpacesFromPartyNames(caseData);
         }
 
         return getCallbackRespEntityErrors(errors, caseData);
@@ -441,7 +442,7 @@ public class CaseActionsForCaseWorkerController {
 
         caseFlagsService.setupCaseFlags(caseData);
         caseManagementForCaseWorkerService.setNextListedDate(caseData);
-        Helper.removeSpacesFromPartyNames(caseData);
+        removeSpacesFromPartyNames(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -491,7 +492,7 @@ public class CaseActionsForCaseWorkerController {
         caseFlagsService.setupCaseFlags(caseData);
 
         caseManagementForCaseWorkerService.updateWorkAllocationField(errors, caseData);
-        Helper.removeSpacesFromPartyNames(caseData);
+        removeSpacesFromPartyNames(caseData);
 
         log.info(EVENT_FIELDS_VALIDATION + errors);
 
@@ -608,7 +609,7 @@ public class CaseActionsForCaseWorkerController {
         log.info("ALLOCATE HEARING ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        Helper.updatePostponedDate(caseData);
+        updatePostponedDate(caseData);
         caseManagementForCaseWorkerService.setNextListedDate(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
@@ -1087,7 +1088,7 @@ public class CaseActionsForCaseWorkerController {
             }
 
             clerkService.initialiseClerkResponsible(caseData);
-            Helper.updatePositionTypeToClosed(caseData);
+            updatePositionTypeToClosed(caseData);
             return getCallbackRespEntityNoErrors(caseData);
         }
 

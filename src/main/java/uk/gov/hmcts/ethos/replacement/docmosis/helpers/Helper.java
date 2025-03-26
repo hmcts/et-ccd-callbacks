@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
@@ -9,6 +10,7 @@ import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.model.labels.LabelPayloadES;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
+import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.SignificantItem;
@@ -36,6 +38,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_ACAS;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_CASE_LISTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_CASE_PAPERS;
@@ -68,7 +71,7 @@ public final class Helper {
     public static final String HEARING_CREATION_DAY_ERROR = "A new day for a hearing can "
             + "only be added from the List Hearing menu item";
     private static final String MY_HMCTS = "MyHMCTS";
-    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().registerModule(new JavaTimeModule());
 
     private Helper() {
         OBJECT_MAPPER.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
@@ -348,7 +351,9 @@ public final class Helper {
      */
     public static boolean isClaimantNonSystemUser(CaseData caseData) {
         if (caseData != null) {
-            return caseData.getEt1OnlineSubmission() == null && caseData.getHubLinksStatuses() == null;
+            // TODO rework this logic when working on Claimant Gaps
+            return (caseData.getEt1OnlineSubmission() == null && caseData.getHubLinksStatuses() == null)
+                    || YES.equals(defaultIfNull(caseData.getMigratedFromEcm(), NO));
         }
         return true;
     }
@@ -364,9 +369,22 @@ public final class Helper {
      */
     public static boolean isRespondentSystemUser(CaseData caseData) {
         if (caseData != null) {
-            List<RepresentedTypeRItem> repCollection = caseData.getRepCollection();
-            return !CollectionUtils.isEmpty(repCollection)
-                    && repCollection.stream().anyMatch(rep -> YES.equals(rep.getValue().getMyHmctsYesNo()));
+            List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
+            if (respondentCollection == null) {
+                return false;
+            }
+
+            return respondentCollection.stream().allMatch(res -> {
+                List<RepresentedTypeRItem> repCollection = caseData.getRepCollection();
+                if (repCollection != null) {
+                    return repCollection.stream()
+                            .filter(rep -> rep.getValue().getRespondentId().equals(res.getId()))
+                            .anyMatch(rep -> YES.equals(rep.getValue().getMyHmctsYesNo()))
+                            || res.getValue().getIdamId() != null;
+                } else {
+                    return res.getValue().getIdamId() != null;
+                }
+            });
         }
         return true;
     }
@@ -448,5 +466,16 @@ public final class Helper {
             caseData.getClaimantIndType().setClaimantLastName(
                     caseData.getClaimantIndType().getClaimantLastName().trim());
         }
+    }
+
+    public static boolean addressIsEmpty(Address address) {
+        return address == null
+                || isNullOrEmpty(address.getAddressLine1())
+                && isNullOrEmpty(address.getAddressLine2())
+                && isNullOrEmpty(address.getAddressLine3())
+                && isNullOrEmpty(address.getPostTown())
+                && isNullOrEmpty(address.getPostCode())
+                && isNullOrEmpty(address.getCountry())
+                && isNullOrEmpty(address.getCounty());
     }
 }

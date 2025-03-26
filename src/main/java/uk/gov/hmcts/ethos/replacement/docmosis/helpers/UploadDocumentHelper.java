@@ -21,6 +21,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.REJECTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ACAS_CERTIFICATE;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.CLAIM_ACCEPTED;
@@ -30,6 +31,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_ATTACHM
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET3;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET3_ATTACHMENT;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.HEARINGS;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.INITIAL_CONSIDERATION;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.LEGACY_DOCUMENT_NAMES;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.MISC;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.NOTICE_OF_A_CLAIM;
@@ -37,9 +39,12 @@ import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.NOTICE_OF_C
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.NOTICE_OF_HEARING;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.REJECTION_OF_CLAIM;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.RESPONSE_TO_A_CLAIM;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.RULE_27_NOTICE;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.RULE_28_NOTICE;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.STARTING_A_CLAIM;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.TRIBUNAL_CASE_FILE;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.TRIBUNAL_CORRESPONDENCE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.RULE_29_NOTICE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 
@@ -177,18 +182,30 @@ public final class UploadDocumentHelper {
             return;
         }
         caseData.getDocumentCollection().forEach(documentTypeItem -> {
-            DocumentHelper.setDocumentTypeForDocument(documentTypeItem.getValue());
+            DocumentType documentType = documentTypeItem.getValue();
+            DocumentHelper.setDocumentTypeForDocument(documentType);
+            setDocumentTypeForInitialConsiderationRuleChanges(documentType);
 
-            if (!ObjectUtils.isEmpty(documentTypeItem.getValue().getUploadedDocument())) {
-                UploadedDocumentType documentType = documentTypeItem.getValue().getUploadedDocument();
-                documentType.setCategoryId(
-                        DocumentCategory.getIdFromCategory(documentTypeItem.getValue().getDocumentType()));
-                documentTypeItem.getValue().setUploadedDocument(documentType);
+            if (!ObjectUtils.isEmpty(documentType.getUploadedDocument())) {
+                UploadedDocumentType uploadedDocumentType = documentType.getUploadedDocument();
+                uploadedDocumentType.setCategoryId(
+                        DocumentCategory.getIdFromCategory(documentType.getDocumentType()));
+                documentType.setUploadedDocument(uploadedDocumentType);
             }
 
-            documentTypeItem.getValue().setDocNumber(
+            documentType.setDocNumber(
                     String.valueOf(caseData.getDocumentCollection().indexOf(documentTypeItem) + 1));
         });
+    }
+
+    private static void setDocumentTypeForInitialConsiderationRuleChanges(DocumentType documentType) {
+        if (INITIAL_CONSIDERATION.equals(defaultIfEmpty(documentType.getTopLevelDocuments(), ""))) {
+            if (RULE_27_NOTICE.equals(defaultIfEmpty(documentType.getInitialConsiderationDocuments(), ""))) {
+                documentType.setDocumentType(RULE_28_NOTICE);
+            } else if (RULE_28_NOTICE.equals(defaultIfEmpty(documentType.getInitialConsiderationDocuments(), ""))) {
+                documentType.setDocumentType(RULE_29_NOTICE);
+            }
+        }
 
     }
 }

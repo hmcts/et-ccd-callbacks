@@ -74,6 +74,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EMPTY_ST
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET1_ATTACHMENT_DOC_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET1_DOC_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.removeSpacesFromPartyNames;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.TribunalOfficesService.UNASSIGNED_OFFICE;
 
 @Slf4j
@@ -133,6 +134,7 @@ public class CaseManagementForCaseWorkerService {
     }
 
     public void caseDataDefaults(CaseData caseData) {
+        removeSpacesFromPartyNames(caseData);
         claimantDefaults(caseData);
         respondentDefaults(caseData);
         struckOutDefaults(caseData);
@@ -203,19 +205,11 @@ public class CaseManagementForCaseWorkerService {
             for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
                 checkExtensionRequired(respondentSumTypeItem);
                 checkResponseReceived(respondentSumTypeItem);
-                checkResponseAddress(respondentSumTypeItem);
                 checkResponseContinue(respondentSumTypeItem);
                 clearRespondentTypeFields(respondentSumTypeItem);
             }
         } else {
             caseData.setRespondent(MISSING_RESPONDENT);
-        }
-    }
-
-    private void checkResponseAddress(RespondentSumTypeItem respondentSumTypeItem) {
-        if (respondentSumTypeItem.getValue().getResponseReceived().equals(NO)
-                && respondentSumTypeItem.getValue().getResponseRespondentAddress() != null) {
-            resetResponseRespondentAddress(respondentSumTypeItem);
         }
     }
 
@@ -234,30 +228,6 @@ public class CaseManagementForCaseWorkerService {
     private void checkExtensionRequired(RespondentSumTypeItem respondentSumTypeItem) {
         if (isNullOrEmpty(respondentSumTypeItem.getValue().getExtensionRequested())) {
             respondentSumTypeItem.getValue().setExtensionRequested(NO);
-        }
-    }
-
-    private void resetResponseRespondentAddress(RespondentSumTypeItem respondentSumTypeItem) {
-        if (!isNullOrEmpty(respondentSumTypeItem.getValue().getResponseRespondentAddress().getAddressLine1())) {
-            respondentSumTypeItem.getValue().getResponseRespondentAddress().setAddressLine1("");
-        }
-        if (!isNullOrEmpty(respondentSumTypeItem.getValue().getResponseRespondentAddress().getAddressLine2())) {
-            respondentSumTypeItem.getValue().getResponseRespondentAddress().setAddressLine2("");
-        }
-        if (!isNullOrEmpty(respondentSumTypeItem.getValue().getResponseRespondentAddress().getAddressLine3())) {
-            respondentSumTypeItem.getValue().getResponseRespondentAddress().setAddressLine3("");
-        }
-        if (!isNullOrEmpty(respondentSumTypeItem.getValue().getResponseRespondentAddress().getCountry())) {
-            respondentSumTypeItem.getValue().getResponseRespondentAddress().setCountry("");
-        }
-        if (!isNullOrEmpty(respondentSumTypeItem.getValue().getResponseRespondentAddress().getCounty())) {
-            respondentSumTypeItem.getValue().getResponseRespondentAddress().setCounty("");
-        }
-        if (!isNullOrEmpty(respondentSumTypeItem.getValue().getResponseRespondentAddress().getPostCode())) {
-            respondentSumTypeItem.getValue().getResponseRespondentAddress().setPostCode("");
-        }
-        if (!isNullOrEmpty(respondentSumTypeItem.getValue().getResponseRespondentAddress().getPostTown())) {
-            respondentSumTypeItem.getValue().getResponseRespondentAddress().setPostTown("");
         }
     }
 

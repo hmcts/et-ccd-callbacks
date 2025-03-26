@@ -42,8 +42,10 @@ public class InitialConsiderationConstants {
 
     public static final String JURISDICTION_HEADER = "<h2>Jurisdiction codes</h2><a target=\"_blank\" "
             + "href=\"%s\">View all jurisdiction codes and descriptors (opens in new tab)</a><br><br>";
-    public static final String CODES_URL_ENGLAND = "https://judiciary.sharepoint"
-            + ".com/:b:/s/empjudgesew/EZowDqUAYpBEl9NkTirLUdYBjXdpi3-7b18HlsDqZNV3xA?e=tR7Wof";
+    public static final String CODES_URL_ENGLAND = "https://judiciary.sharepoint.com/sites/empjudgesew/"
+            + "Shared%20Documents/Forms/AllItems.aspx?id=%2Fsites%2Fempjudgesew%2FShared%20Documents%2FET%20"
+            + "Jurisdiction%20List%2FJurisdiction%20list%20October%202024.pdf&viewid=9cee6d50-61e5-4d87-92d2-"
+            + "8c9444f00c95&parent=%2Fsites%2Fempjudgesew%2FShared%20Documents%2FET%20Jurisdiction%20List";
     public static final String CODES_URL_SCOTLAND = "https://judiciary.sharepoint"
             + ".com/:b:/r/sites/ScotlandEJs/Shared%20Documents/Jurisdictional%20Codes%20List"
             + "/ET%20jurisdiction%20list%20(2019).pdf?csf=1&web=1&e=9bCQ8P";
@@ -69,6 +71,12 @@ public class InitialConsiderationConstants {
     );
     public static final String JSA = "JSA";
     public static final String WITH_MEMBERS = "With members";
+    public static final String ISSUE_RULE_27_NOTICE_AND_ORDER = "Issue Rule 27 Notice and order";
+    public static final String ISSUE_RULE_28_NOTICE_AND_ORDER = "Issue Rule 28 Notice and order";
+    public static final String ISSUE_RULE_29_NOTICE_AND_ORDER = "Issue Rule 29 Notice and order";
+    public static final String ISSUE_RULE_27_NOTICE_AND_ORDER_SC = "issueRule27";
+    public static final String ISSUE_RULE_28_NOTICE_AND_ORDER_SC = "issueRule28";
+    public static final String RULE_29_NOTICE = "Rule 29 Notice";
 
     private InitialConsiderationConstants() {
         // Access through static methods

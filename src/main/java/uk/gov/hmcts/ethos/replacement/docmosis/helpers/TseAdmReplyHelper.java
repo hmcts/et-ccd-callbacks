@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -70,7 +71,7 @@ public final class TseAdmReplyHelper {
                 .outputName(String.format(TSE_ADMIN_REPLY_OUTPUT_NAME, selectedApplication.getType()))
                 .templateName(TSE_ADMIN_REPLY_TEMPLATE_NAME)
                 .data(data).build();
-        return new ObjectMapper().writeValueAsString(document);
+        return new ObjectMapper().registerModule(new JavaTimeModule()).writeValueAsString(document);
     }
 
     public static GenericTseApplicationType getTseAdminSelectedApplicationType(CaseData caseData) {

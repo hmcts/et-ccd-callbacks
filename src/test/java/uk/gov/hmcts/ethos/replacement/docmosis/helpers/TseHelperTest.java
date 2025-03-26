@@ -51,6 +51,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.UPDATED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_RESPONDING_TO_APP_TYPE_MAP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.ENGLISH_LANGUAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_DOCUMENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE_PARAM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getClaimantRepSelectedApplicationType;
@@ -374,10 +375,10 @@ class TseHelperTest {
                 "response", "TseResponseText",
                 "claimant", "First Last",
                 "respondents", "Respondent Name",
-                "linkToDocument", NotificationClient.prepareUpload(document, false, true, "52 weeks")
+                LINK_TO_DOCUMENT, NotificationClient.prepareUpload(document, false, true, "52 weeks")
         );
         for (Map.Entry<String, Object> entry : expected.entrySet()) {
-            if (entry.getKey().equals("linkToDocument")) {
+            if (LINK_TO_DOCUMENT.equals(entry.getKey())) {
                 continue;
             }
             assertEquals(entry.getValue(), actual.get(entry.getKey()));
@@ -409,11 +410,11 @@ class TseHelperTest {
             "response", "",
             "claimant", "First Last",
             "respondents", "Respondent Name",
-            "linkToDocument", NotificationClient.prepareUpload(document, false, true, "52 weeks")
+                LINK_TO_DOCUMENT, NotificationClient.prepareUpload(document, false, true, "52 weeks")
         );
 
         for (Map.Entry<String, Object> entry : expected.entrySet()) {
-            if (entry.getKey().equals("linkToDocument")) {
+            if (LINK_TO_DOCUMENT.equals(entry.getKey())) {
                 continue;
             }
             assertEquals(entry.getValue(), actual.get(entry.getKey()));

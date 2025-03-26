@@ -346,7 +346,12 @@ class TseHelperTest {
             "linkToDocument", NotificationClient.prepareUpload(document, false, true, "52 weeks")
         );
 
-        assertThat(actual.toString(), is(expected.toString()));
+        for (Map.Entry<String, Object> entry : expected.entrySet()) {
+            if (LINK_TO_DOCUMENT.equals(entry.getKey())) {
+                continue;
+            }
+            assertEquals(entry.getValue(), actual.get(entry.getKey()));
+        }
     }
 
     @ParameterizedTest

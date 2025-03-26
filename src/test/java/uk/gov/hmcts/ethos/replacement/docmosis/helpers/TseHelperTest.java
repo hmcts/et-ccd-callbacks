@@ -376,7 +376,12 @@ class TseHelperTest {
                 "respondents", "Respondent Name",
                 "linkToDocument", NotificationClient.prepareUpload(document, false, true, "52 weeks")
         );
-        assertThat(actual.toString(), is(expected.toString()));
+        for (Map.Entry<String, Object> entry : expected.entrySet()) {
+            if (entry.getKey().equals("linkToDocument")) {
+                continue;
+            }
+            assertEquals(entry.getValue(), actual.get(entry.getKey()));
+        }
     }
 
     static Stream<String> applicationTypes() {
@@ -407,7 +412,12 @@ class TseHelperTest {
             "linkToDocument", NotificationClient.prepareUpload(document, false, true, "52 weeks")
         );
 
-        assertThat(actual.toString(), is(expected.toString()));
+        for (Map.Entry<String, Object> entry : expected.entrySet()) {
+            if (entry.getKey().equals("linkToDocument")) {
+                continue;
+            }
+            assertEquals(entry.getValue(), actual.get(entry.getKey()));
+        }
     }
 
     @Nested

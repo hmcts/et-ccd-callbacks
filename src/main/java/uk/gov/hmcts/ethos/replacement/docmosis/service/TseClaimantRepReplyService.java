@@ -271,7 +271,7 @@ public class TseClaimantRepReplyService {
         personalisation.put(CASE_NUMBER, caseData.getEthosCaseReference());
         respondentEmailAddressMap.forEach((respondentEmail, isRespondent) -> {
             personalisation.put(LINK_TO_CITIZEN_HUB,
-                    isRespondent ? emailService.getSyrCaseLink(caseDetails.getCaseId())
+                    Boolean.TRUE.equals(isRespondent) ? emailService.getSyrCaseLink(caseDetails.getCaseId())
                             : emailService.getCitizenCaseLink(caseDetails.getCaseId()));
             emailService.sendEmail(replyToTribunalEmailToClaimantTemplateId, respondentEmail, personalisation);
         });

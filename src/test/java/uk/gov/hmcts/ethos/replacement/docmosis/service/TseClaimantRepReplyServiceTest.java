@@ -371,12 +371,31 @@ class TseClaimantRepReplyServiceTest {
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseId("caseId");
         caseDetails.setCaseData(caseData);
-        RepresentedTypeR typeR = new RepresentedTypeR();
-        typeR.setMyHmctsYesNo(YES);
-        typeR.setRepresentativeEmailAddress("rep@email.com");
+
+        Organisation respondentOrg = Organisation.builder()
+                .organisationID("org_id")
+                .organisationName("New Organisation").build();
+        RepresentedTypeR representedType =
+                RepresentedTypeR.builder()
+                        .nameOfRepresentative("Respondent")
+                        .respRepName("Respondent")
+                        .representativeEmailAddress("person@email.com")
+                        .myHmctsYesNo("Yes")
+                        .respondentOrganisation(respondentOrg)
+                        .build();
         RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
-        representedTypeRItem.setValue(typeR);
+        representedTypeRItem.setValue(representedType);
         caseData.setRepCollection(Collections.singletonList(representedTypeRItem));
+
+        caseData.setRespondentCollection(new ArrayList<>());
+        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+        respondentSumTypeItem.setId("1111-2222-3333-1111");
+        RespondentSumType respondentSumType = RespondentSumType.builder()
+                .respondentEmail("respondent@gmail.com")
+                .respondentName("Respondent")
+                .build();
+        respondentSumTypeItem.setValue(respondentSumType);
+        caseData.getRespondentCollection().add(respondentSumTypeItem);
 
         when(claimantTellSomethingElseService.getTribunalEmail(any())).thenReturn(TRIBUNAL_EMAIL);
 
@@ -399,6 +418,32 @@ class TseClaimantRepReplyServiceTest {
                 Arguments.of(YES, atLeastOnce(), REPLY_TO_TRIB_ACK_TEMPLATE_YES),
                 Arguments.of(NO, never(), REPLY_TO_TRIB_ACK_TEMPLATE_NO)
         );
+    }
+
+    @ParameterizedTest
+    @MethodSource("sendRespondingToTribunalEmails")
+    void sendRespondingToTribunalEmailsNoSystemRespondent(String rule92, VerificationMode isEmailSentToClaimant,
+                                        String ackEmailTemplate) {
+        caseData.setTseResponseCopyToOtherParty(rule92);
+
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseId("caseId");
+        caseDetails.setCaseData(caseData);
+
+        when(claimantTellSomethingElseService.getTribunalEmail(any())).thenReturn(TRIBUNAL_EMAIL);
+
+        ReflectionTestUtils.setField(tseClaimantRepReplyService,
+                "replyToTribunalAckEmailToLRRule92YesTemplateId", REPLY_TO_TRIB_ACK_TEMPLATE_YES);
+        ReflectionTestUtils.setField(tseClaimantRepReplyService,
+                "replyToTribunalAckEmailToLRRule92NoTemplateId", REPLY_TO_TRIB_ACK_TEMPLATE_NO);
+
+        Map<String, String> tribunalPersonalisation = Map.of(
+                NotificationServiceConstants.CASE_NUMBER, CASE_NUMBER,
+                APPLICATION_TYPE, TSE_APP_CHANGE_PERSONAL_DETAILS,
+                LINK_TO_EXUI, TEST_XUI_URL + "caseId");
+
+        tseClaimantRepReplyService.sendRespondingToTribunalEmails(caseDetails, "token");
+        verify(emailService).sendEmail(any(), eq(TRIBUNAL_EMAIL), eq(tribunalPersonalisation));
     }
 
     @Test

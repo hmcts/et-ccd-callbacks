@@ -145,7 +145,7 @@ withPipeline(type, product, component) {
     env.FT_SYA_URL = "http://et-sya-api-aat.service.core-compute-aat.internal"
     env.SERVICE_AUTH_PROVIDER_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
     env.CCD_DATA_STORE_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
-    env.TEST_URL = "https://et-sya.aat.platform.hmcts.net/"
+    env.TEST_URL_CITIZEN_UI = "https://et-sya.aat.platform.hmcts.net/"
     env.TEST_RESP_URL = "https://et-syr.aat.platform.hmcts.net/"
     env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net/testing-support/accounts"
     env.MANAGE_ORG_URL = "https://manage-org.aat.platform.hmcts.net"

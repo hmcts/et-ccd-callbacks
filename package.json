@@ -33,11 +33,12 @@
         "totp-generator": "1.0.0"
     },
     "scripts": {
+        "setup": "sh ./bin/pull-latest-e2e-tests.sh",
         "test:local": "NODE_TLS_REJECT_UNAUTHORIZED=0 codeceptjs run --steps -c src/test/end-to-end/codecept.conf.js --steps --reporter mocha-multi --verbose",
-        "test:smoke": "NODE_TLS_REJECT_UNAUTHORIZED=0 codeceptjs run --steps -c src/test/end-to-end/codecept.conf.js --grep @smoke --steps --reporter mocha-multi --verbose",
-        "test:fullfunctional": "NODE_TLS_REJECT_UNAUTHORIZED=0 codeceptjs run --steps -c src/test/end-to-end/codecept.conf.js --grep @nightly --steps --reporter mocha-multi --verbose",
+        "test:smoke": "cd et-xui-e2e-tests && yarn install && yarn test:smoke",
+        "test:fullfunctional": "cd et-xui-e2e-tests && yarn install && yarn test:functional-ccd-callback",
         "test:crossbrowser": "NODE_TLS_REJECT_UNAUTHORIZED=0 codeceptjs run-multiple ${BROWSER_GROUP:-'--all'} --steps -c src/test/end-to-end/saucelabs.conf.js  --grep @crossbrowser --steps --reporter mocha-multi --verbose",
-        "test:functional": "NODE_TLS_REJECT_UNAUTHORIZED=0 codeceptjs run --steps -c src/test/end-to-end/codecept.conf.js --grep @dummy --steps --reporter mocha-multi --verbose",
+        "test:functional-chromium": "cd et-xui-e2e-tests && yarn install && yarn test:functional-ccd-callback",
         "codeceptjs": "codeceptjs run --steps",
         "codeceptjs:headless": "HEADLESS=true codeceptjs run --steps",
         "tests:a11y": "NODE_TLS_REJECT_UNAUTHORIZED=0 NODE_ENV=test LOG_LEVEL=ERROR mocha --exit --reporter mochawesome --require ts-node/register --require tsconfig-paths/register src/test/a11y/a11y.ts --timeout 60000 --reporter-options reportDir=functional-output/accessibility-report,reportFilename=a11y,inlineAssets=true,reportTitle=et-sya-frontend"

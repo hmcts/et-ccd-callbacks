@@ -43,9 +43,10 @@ public class AllocateHearingService {
     public void handleListingSelected(CaseData caseData) {
         HearingType selectedHearing = getSelectedHearing(caseData);
         TribunalOffice managingOffice = TribunalOffice.valueOfOfficeName(caseData.getManagingOffice());
-        caseData.setAllocateHearingJudge(judgeSelectionService.createJudgeSelection(managingOffice, selectedHearing));
+        caseData.setAllocateHearingJudge(judgeSelectionService.createJudgeSelection(managingOffice, selectedHearing,
+                false));
         caseData.setAllocateHearingAdditionalJudge(judgeSelectionService.createJudgeSelection(managingOffice,
-                selectedHearing));
+                selectedHearing, true));
         DateListedType selectedListing = getSelectedListing(caseData);
         caseData.setAllocateHearingVenue(venueSelectionService.createVenueSelection(managingOffice, selectedListing));
         caseData.setAllocateHearingSitAlone(selectedHearing.getHearingSitAlone());

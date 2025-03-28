@@ -43,9 +43,10 @@ public class ScotlandAllocateHearingService {
         DateListedType selectedListing = getSelectedListing(caseData);
         TribunalOffice managingOffice = TribunalOffice.valueOfOfficeName(caseData.getAllocateHearingManagingOffice());
 
-        caseData.setAllocateHearingJudge(judgeSelectionService.createJudgeSelection(managingOffice, selectedHearing));
+        caseData.setAllocateHearingJudge(judgeSelectionService.createJudgeSelection(managingOffice, selectedHearing,
+                false));
         caseData.setAllocateHearingAdditionalJudge(judgeSelectionService.createJudgeSelection(managingOffice,
-                selectedHearing));
+                selectedHearing, true));
         caseData.setAllocateHearingVenue(scotlandVenueSelectionService.createVenueSelection(managingOffice,
                 selectedListing));
         caseData.setAllocateHearingSitAlone(selectedHearing.getHearingSitAlone());

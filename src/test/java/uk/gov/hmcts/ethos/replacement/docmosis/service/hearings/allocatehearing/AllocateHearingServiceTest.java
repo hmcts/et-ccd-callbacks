@@ -250,7 +250,7 @@ class AllocateHearingServiceTest {
         DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
         dynamicFixedListType.setListItems(judges);
         when(judgeSelectionService.createJudgeSelection(isA(TribunalOffice.class),
-                isA(HearingType.class))).thenReturn(dynamicFixedListType);
+                isA(HearingType.class), isA(Boolean.class))).thenReturn(dynamicFixedListType);
 
         return judgeSelectionService;
     }

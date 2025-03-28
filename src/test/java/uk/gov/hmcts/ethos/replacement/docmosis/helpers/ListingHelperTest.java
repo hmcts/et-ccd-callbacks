@@ -92,7 +92,7 @@ class ListingHelperTest {
     private UserDetails userDetails;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         listingDetails = generateListingDetails("listingDetailsTest1.json");
         listingDetails2 = generateListingDetails("listingDetailsTest2.json");
         listingDetails3 = generateListingDetails("listingDetailsTest3.json");
@@ -181,7 +181,7 @@ class ListingHelperTest {
                 + "\"location\":[\n"
                 + "{\"Hearing_room\":\"* Not Allocated\",\n"
                 + "\"listing\":[\n"
-                + "{\"Judge\":\"Ms AM Aspden\",\n"
+                + "{\"Judge\":\"Ms AM Aspden & Judge For Tribunal\",\n"
                 + "\"Court_addressLine1\":\"Manchester Employment Tribunal\",\n"
                 + "\"Court_addressLine2\":\"Alexandra House\",\n"
                 + "\"Court_addressLine3\":\"14-22 The Parsonage\",\n"
@@ -454,7 +454,7 @@ class ListingHelperTest {
                 + "{\"date\":\"12 October 2020\",\n"
                 + "\"case_total\":\"1\",\n"
                 + "\"listing\":[\n"
-                + "{\"Judge\":\"Ms AM Aspden\",\n"
+                + "{\"Judge\":\"Ms AM Aspden & Judge For Tribunal\",\n"
                 + "\"Court_addressLine1\":\"Manchester Employment Tribunal\",\n"
                 + "\"Court_addressLine2\":\"Alexandra House\",\n"
                 + "\"Court_addressLine3\":\"14-22 The Parsonage\",\n"
@@ -1467,7 +1467,7 @@ class ListingHelperTest {
         hearingType.setHearingEstLengthNum("2");
         hearingType.setHearingEstLengthNumType("hours");
         hearingType.setHearingFormat(List.of("Telephone"));
-        hearingType.setHearingSitAlone("Sit Alone");
+        hearingType.setHearingSitAlone("Two Judges");
         hearingType.setJudicialMediation(YES);
 
         listingDetails = generateListingDetails("listingDetailsTest1.json");

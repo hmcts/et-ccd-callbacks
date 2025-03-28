@@ -24,6 +24,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -39,7 +40,7 @@ class ScotlandAllocatedHearingServiceTest {
     private DateListedType selectedListing;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         caseData = createCaseData();
 
         HearingSelectionService hearingSelectionService = mockHearingSelectionService();
@@ -104,6 +105,13 @@ class ScotlandAllocatedHearingServiceTest {
 
         SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(caseData.getAllocateHearingRoom(),
                 "room", "Room ");
+    }
+
+    @Test
+    void testPopulateRoomsInvalidOffice() {
+        caseData.getHearingCollection().get(0).getValue().getHearingDateCollection().get(0).getValue()
+                .setHearingVenueDayScotland(TribunalOffice.LEEDS.getOfficeName());
+        assertThrows(IllegalArgumentException.class, () -> scotlandAllocateHearingService.populateRooms(caseData));
     }
 
     @Test
@@ -184,13 +192,15 @@ class ScotlandAllocatedHearingServiceTest {
     }
 
     private CaseData createCaseData() {
-        CaseData caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice);
+        caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice);
         caseData.setAllocateHearingHearing(
                 SelectionServiceTestUtils.createSelectedDynamicList("hearing ", "Hearing ",
                     1));
 
         selectedHearing = new HearingType();
         selectedListing = new DateListedType();
+        selectedListing.setHearingVenueDayScotland(TribunalOffice.GLASGOW.getOfficeName());
+        selectedListing.setHearingGlasgow(new DynamicFixedListType(TribunalOffice.GLASGOW.getOfficeName()));
         DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
         dateListedTypeItem.setValue(selectedListing);
         selectedHearing.setHearingDateCollection(List.of(dateListedTypeItem));

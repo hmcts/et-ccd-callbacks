@@ -170,6 +170,7 @@ apply_noc_access_api_assignments_path: /noc/apply-decision
 case-details-url:
   citizen: ${CITIZEN_CASE_DETAILS_URL:http://localhost:3001/citizen-hub/}
   exui: ${EXUI_CASE_DETAILS_URL:http://localhost:3000/cases/case-details/}
+  syr: ${RESPONDENT_PORTAL_LINK:http://localhost:3003/case-details/}
 
 hmcts_service_id: BHA1
 

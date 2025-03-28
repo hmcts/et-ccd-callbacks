@@ -165,6 +165,7 @@ apply_noc_access_api_assignments_path: /noc/apply-decision
 case-details-url:
   citizen: dummyUrl
   exui: dummyUrl
+  syr: dummyUrl
 
 acas:
   api:

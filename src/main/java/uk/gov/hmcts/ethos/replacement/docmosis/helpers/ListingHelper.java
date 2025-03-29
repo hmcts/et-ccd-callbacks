@@ -100,6 +100,7 @@ public final class ListingHelper {
     public static final String NEWCASTLE_CFCTC = "Newcastle CFCTC";
     public static final String TEESSIDE_MAGS = "Teesside Mags";
     public static final String TEESSIDE_JUSTICE_CENTRE = "Teesside Justice Centre";
+    public static final String ITCO_REGEX = "\\d+_";
 
     private ListingHelper() {
     }
@@ -121,12 +122,7 @@ public final class ListingHelper {
             listingType.setHearingType(getHearingType(hearingType));
             listingType.setPositionType(getPositionType(caseData));
 
-            listingType.setHearingJudgeName(hearingType.hasHearingJudge()
-                    ? hearingType.getJudge().getSelectedLabel()
-                    : SPACE);
-            listingType.setAdditionalJudge(hearingType.hasAdditionalHearingJudge()
-                    ? hearingType.getAdditionalJudge().getSelectedLabel()
-                    : SPACE);
+            listingType.setHearingJudgeName(getHearingJudgeName(hearingType));
             listingType.setHearingEEMember(hearingType.hasHearingEmployeeMember()
                     ? hearingType.getHearingEEMember().getSelectedLabel()
                     : SPACE);
@@ -166,14 +162,22 @@ public final class ListingHelper {
             return getClaimantRespondentDetails(listingType, listingData, caseData);
 
         } catch (Exception ex) {
-            log.error("ListingData: " + listingData);
-            log.error("CaseData: " + caseData);
-            log.error("HearingType: " + hearingType);
-            log.error("DateListedType: " + dateListedType);
-            log.error("index: " + index);
-            log.error("hearingCollectionSize: " + hearingCollectionSize);
+            log.error("Error generating listing type for case {}", caseData.getEthosCaseReference(), ex);
             return listingType;
         }
+    }
+
+    private static String getHearingJudgeName(HearingType hearingType) {
+        String judgeName = SPACE;
+        if (hearingType.hasHearingJudge()) {
+            judgeName = hearingType.getJudge().getSelectedLabel();
+            if (hearingType.hasAdditionalHearingJudge()) {
+                judgeName = hearingType.getJudge().getSelectedLabel()
+                            + " & "
+                            + hearingType.getAdditionalJudge().getSelectedLabel();
+            }
+        }
+        return judgeName.replaceAll(ITCO_REGEX, "");
     }
 
     private static String getPositionType(CaseData caseData) {
@@ -583,16 +587,8 @@ public final class ListingHelper {
     }
 
     private static String extractHearingJudgeName(ListingType listingType) {
-        String judge = "";
-        if (listingType.getHearingJudgeName() != null) {
-            judge = listingType.getHearingJudgeName().substring(listingType.getHearingJudgeName().indexOf('_') + 1);
-            if (listingType.getAdditionalJudge() != null) {
-                return String.join(" & ", judge,
-                        listingType.getAdditionalJudge().substring(listingType.getAdditionalJudge().indexOf('_') + 1));
-            }
-            return judge;
-        }
-        return judge;
+        return listingType.getHearingJudgeName() != null
+                ? listingType.getHearingJudgeName().replaceAll(ITCO_REGEX, "") : "";
     }
 
     public static String getRespondentOthersWithLineBreaks(ListingType listingType) {

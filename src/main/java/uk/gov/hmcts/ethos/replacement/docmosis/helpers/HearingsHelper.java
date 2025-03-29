@@ -243,7 +243,8 @@ public final class HearingsHelper {
             && !isNullOrEmpty(caseData.getAllocateHearingAdditionalJudge().getSelectedCode())
             && caseData.getAllocateHearingAdditionalJudge().getSelectedCode()
                     .equals(caseData.getAllocateHearingJudge().getSelectedCode())) {
-            return List.of("Please select 2 different judges");
+            return List.of("Please choose a different judge for the second judge as the same judge has been selected "
+                           + "for both judges");
         }
 
         return new ArrayList<>();

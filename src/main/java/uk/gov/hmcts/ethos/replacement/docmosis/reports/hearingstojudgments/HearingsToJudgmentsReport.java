@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
@@ -31,6 +32,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_ALLOCATED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN2;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportCommonMethods.getHearingJudgeName;
 
 @Slf4j
 public final class HearingsToJudgmentsReport {
@@ -181,16 +183,7 @@ public final class HearingsToJudgmentsReport {
                 hearingJudgmentItem.judgmentDateSent = dateJudgmentSent.format(OLD_DATE_TIME_PATTERN2);
                 hearingJudgmentItem.total = hearingListedDate.datesUntil(dateJudgmentSent.plusDays(1)).count();
                 hearingJudgmentItem.reservedHearing = dateListedType.getHearingReservedJudgement();
-                if (hearingType.hasHearingJudge()) {
-                    if (hearingType.hasAdditionalHearingJudge()) {
-                        hearingJudgmentItem.judge = String.join(", ", hearingType.getJudge().getSelectedLabel(),
-                                hearingType.getAdditionalJudge().getSelectedLabel());
-                    } else {
-                        hearingJudgmentItem.judge = hearingType.getJudge().getSelectedLabel();
-                    }
-                } else {
-                    hearingJudgmentItem.judge = NOT_ALLOCATED;
-                }
+                hearingJudgmentItem.judge = defaultIfEmpty(getHearingJudgeName(hearingType), NOT_ALLOCATED);
                 hearingJudgmentsList.add(hearingJudgmentItem);
             }
         });

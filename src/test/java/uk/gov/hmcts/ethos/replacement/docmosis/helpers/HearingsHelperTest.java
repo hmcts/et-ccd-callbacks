@@ -337,7 +337,8 @@ class HearingsHelperTest {
         caseData.setAllocateHearingAdditionalJudge(DynamicFixedListType.of(create("judge1", "Judge 1")));
         List<String> errors = HearingsHelper.validateTwoJudges(caseData);
         assertEquals(1, errors.size());
-        assertEquals("Please select 2 different judges", errors.get(0));
+        assertEquals("Please choose a different judge for the second judge as the same judge has been selected for "
+                     + "both judges", errors.get(0));
     }
 
     @Test

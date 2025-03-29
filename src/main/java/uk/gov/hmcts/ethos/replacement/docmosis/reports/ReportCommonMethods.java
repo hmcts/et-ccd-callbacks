@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.reports;
 import com.google.common.base.Strings;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
+import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -47,5 +48,18 @@ public final class ReportCommonMethods {
         return dateToConvert.endsWith(".000")
                 ? LocalDateTime.parse(dateToConvert, OLD_DATE_TIME_PATTERN)
                 : LocalDateTime.parse(dateToConvert, OLD_DATE_TIME_PATTERN3);
+    }
+
+    public static String getHearingJudgeName(HearingType hearingType) {
+        String judgeName = "";
+        if (hearingType.hasHearingJudge()) {
+            if (hearingType.hasAdditionalHearingJudge()) {
+                judgeName = String.join(", ", hearingType.getJudge().getSelectedLabel(),
+                        hearingType.getAdditionalJudge().getSelectedLabel());
+            } else {
+                judgeName = hearingType.getJudge().getSelectedLabel();
+            }
+        }
+        return judgeName;
     }
 }

@@ -486,6 +486,9 @@ public final class Et1ReppedHelper {
         claimantHearingPreference.setHearingPreferences(hearingPreferenceMapping(caseData.getClaimantAttendHearing()));
         claimantHearingPreference.setReasonableAdjustments(
                 reasonableAdjustmentsMapping(caseData.getClaimantSupportQuestion()));
+        claimantHearingPreference.setClaimantHearingPanelPreference(caseData.getTmpClaimantHearingPanelPreference());
+        claimantHearingPreference.setClaimantHearingPanelPreferenceWhy(
+                caseData.getTmpClaimantHearingPanelPreferenceReason());
         claimantHearingPreference.setReasonableAdjustmentsDetail(caseData.getClaimantSupportQuestionReason());
         claimantHearingPreference.setHearingLanguage(getFirstListItem(caseData.getClaimantHearingContactLanguage()));
         return claimantHearingPreference;

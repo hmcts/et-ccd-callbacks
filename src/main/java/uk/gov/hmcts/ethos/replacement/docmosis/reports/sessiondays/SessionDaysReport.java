@@ -287,10 +287,6 @@ public final class SessionDaysReport {
                 dates.stream().filter(this::isHearingStatusValid).forEach(dateListedTypeItem -> {
                     SessionDaysReportDetail reportDetail =
                             getSessionDaysReportDetail(caseData, hearingTypeItem, dateListedTypeItem, false);
-                    if (dateListedTypeItem.getValue().hasHearingClerk()) {
-                        reportDetail.setHearingClerk(dateListedTypeItem.getValue().getHearingClerk()
-                                .getSelectedLabel());
-                    }
                     reportDetailList.add(reportDetail);
                     twoJudgesDetailLogic(caseData, reportDetailList, hearingTypeItem, dateListedTypeItem);
                 });
@@ -304,10 +300,6 @@ public final class SessionDaysReport {
         if (TWO_JUDGES.equals(hearingTypeItem.getValue().getHearingSitAlone())
             && hearingTypeItem.getValue().hasAdditionalHearingJudge()) {
             reportDetail = getSessionDaysReportDetail(caseData, hearingTypeItem, dateListedTypeItem, true);
-            if (dateListedTypeItem.getValue().hasHearingClerk()) {
-                reportDetail.setHearingClerk(dateListedTypeItem.getValue().getHearingClerk()
-                        .getSelectedLabel());
-            }
             reportDetailList.add(reportDetail);
         }
     }
@@ -337,6 +329,10 @@ public final class SessionDaysReport {
         String duration = getHearingDurationInMinutes(dateListedTypeItem);
         reportDetail.setHearingDuration(duration);
         reportDetail.setSessionType(getSessionType(Long.parseLong(duration)));
+        if (dateListedTypeItem.getValue().hasHearingClerk()) {
+            reportDetail.setHearingClerk(dateListedTypeItem.getValue().getHearingClerk()
+                    .getSelectedLabel());
+        }
         return reportDetail;
     }
 

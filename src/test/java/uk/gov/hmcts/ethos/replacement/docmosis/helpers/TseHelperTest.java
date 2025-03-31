@@ -19,9 +19,11 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.TseStatusTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
+import uk.gov.hmcts.et.common.model.ccd.types.TseStatusType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.UploadedDocumentBuilder;
@@ -45,6 +47,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_POSTPONE_A_HEARING;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.UPDATED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_RESPONDING_TO_APP_TYPE_MAP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.ENGLISH_LANGUAGE;
@@ -446,6 +449,38 @@ class TseHelperTest {
             caseData.getClaimantRepRespondSelectApplication().setValue(DynamicValueType.create("3", ""));
 
             assertNull(getClaimantRepSelectedApplicationType(caseData));
+        }
+    }
+
+    @Nested
+    class SetRespondentApplicationState {
+        @Test
+        void shouldUpdateApplicationStateForValidRespondentStates() {
+            TseStatusTypeItem item1 = new TseStatusTypeItem();
+            TseStatusTypeItem item2 = new TseStatusTypeItem();
+
+            TseStatusType status1 = new TseStatusType();
+            TseStatusType status2 = new TseStatusType();
+
+            item1.setValue(status1);
+            item2.setValue(status2);
+
+            List<TseStatusTypeItem> respondentStateList = List.of(item1, item2);
+
+            GenericTseApplicationType applicationType = new GenericTseApplicationType();
+            applicationType.setRespondentState(respondentStateList);
+
+            TseHelper.setRespondentApplicationState(applicationType, UPDATED);
+
+            assertEquals(UPDATED, status1.getApplicationState());
+            assertEquals(UPDATED, status2.getApplicationState());
+        }
+
+        @Test
+        void shouldDoNothingWhenRespondentStateListIsNull() {
+            GenericTseApplicationType applicationType = new GenericTseApplicationType();
+            TseHelper.setRespondentApplicationState(applicationType, UPDATED);
+            assertNull(applicationType.getRespondentState());
         }
     }
 }

@@ -124,6 +124,9 @@ public final class ListingHelper {
             listingType.setHearingJudgeName(hearingType.hasHearingJudge()
                     ? hearingType.getJudge().getSelectedLabel()
                     : SPACE);
+            listingType.setAdditionalJudge(hearingType.hasAdditionalHearingJudge()
+                    ? hearingType.getAdditionalJudge().getSelectedLabel()
+                    : SPACE);
             listingType.setHearingEEMember(hearingType.hasHearingEmployeeMember()
                     ? hearingType.getHearingEEMember().getSelectedLabel()
                     : SPACE);
@@ -580,10 +583,16 @@ public final class ListingHelper {
     }
 
     private static String extractHearingJudgeName(ListingType listingType) {
+        String judge = "";
         if (listingType.getHearingJudgeName() != null) {
-            return listingType.getHearingJudgeName().substring(listingType.getHearingJudgeName().indexOf('_') + 1);
+            judge = listingType.getHearingJudgeName().substring(listingType.getHearingJudgeName().indexOf('_') + 1);
+            if (listingType.getAdditionalJudge() != null) {
+                return String.join(" & ", judge,
+                        listingType.getAdditionalJudge().substring(listingType.getAdditionalJudge().indexOf('_') + 1));
+            }
+            return judge;
         }
-        return "";
+        return judge;
     }
 
     public static String getRespondentOthersWithLineBreaks(ListingType listingType) {

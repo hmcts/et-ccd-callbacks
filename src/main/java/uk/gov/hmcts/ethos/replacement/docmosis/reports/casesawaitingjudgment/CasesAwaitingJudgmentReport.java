@@ -9,7 +9,6 @@ import uk.gov.hmcts.ecm.common.model.reports.casesawaitingjudgment.CaseData;
 import uk.gov.hmcts.ecm.common.model.reports.casesawaitingjudgment.CasesAwaitingJudgmentSubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.listing.ListingDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper;
@@ -207,23 +206,26 @@ public final class CasesAwaitingJudgmentReport {
 
     private HeardHearing getLatestHeardHearing(List<HearingTypeItem> hearings) {
         ArrayList<HeardHearing> heardHearings = new ArrayList<>();
-        for (HearingTypeItem hearingTypeItem : hearings) {
-            HearingType hearingType = hearingTypeItem.getValue();
-            for (DateListedTypeItem dateListedTypeItem : hearingType.getHearingDateCollection()) {
-                DateListedType dateListedType = dateListedTypeItem.getValue();
-                if (HEARING_STATUS_HEARD.equals(dateListedType.getHearingStatus())) {
+        hearings.stream()
+            .map(HearingTypeItem::getValue)
+            .forEach(hearingType -> hearingType.getHearingDateCollection().stream()
+                .map(DateListedTypeItem::getValue)
+                .filter(dateListedType -> HEARING_STATUS_HEARD.equals(dateListedType.getHearingStatus()))
+                .forEach(dateListedType -> {
                     HeardHearing heardHearing = new HeardHearing();
                     heardHearing.listedDate = dateListedType.getListedDate();
                     heardHearing.hearingNumber = hearingType.getHearingNumber();
                     heardHearing.hearingType = hearingType.getHearingType();
                     if (hearingType.hasHearingJudge()) {
-                        heardHearing.judge = hearingType.getJudge().getSelectedLabel();
+                        if (hearingType.hasAdditionalHearingJudge()) {
+                            heardHearing.judge = String.join(", ", hearingType.getJudge().getSelectedLabel(),
+                                hearingType.getAdditionalJudge().getSelectedLabel());
+                        } else {
+                            heardHearing.judge = hearingType.getJudge().getSelectedLabel();
+                        }
                     }
-
                     heardHearings.add(heardHearing);
-                }
-            }
-        }
+                }));
 
         return Collections.max(heardHearings, Comparator.comparing(h -> h.listedDate));
     }

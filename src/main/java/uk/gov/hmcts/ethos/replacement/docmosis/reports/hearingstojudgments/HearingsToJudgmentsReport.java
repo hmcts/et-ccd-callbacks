@@ -158,19 +158,17 @@ public final class HearingsToJudgmentsReport {
             return hearingJudgmentsList;
         }
 
-        for (DateListedTypeItem dateListedTypeItem : hearingType.getHearingDateCollection()) {
+        hearingType.getHearingDateCollection().forEach(dateListedTypeItem -> {
             DateListedType dateListedType = dateListedTypeItem.getValue();
             LocalDate hearingListedDate = LocalDate.parse(dateListedType.getListedDate(), OLD_DATE_TIME_PATTERN);
             List<JudgementTypeItem> judgements = judgmentsCollection.stream()
-                                .filter(j -> judgmentHearingDateMatchHearingListedDate(j, hearingListedDate))
-                                .toList();
-
+                    .filter(j -> judgmentHearingDateMatchHearingListedDate(j, hearingListedDate))
+                    .toList();
             if (judgements.isEmpty()
-                    || !isWithinDateRange(hearingListedDate)
-                    || !isValidHearingDate(dateListedTypeItem)) {
-                continue;
+                || !isWithinDateRange(hearingListedDate)
+                || !isValidHearingDate(dateListedTypeItem)) {
+                return;
             }
-
             for (JudgementTypeItem judgmentItem : judgements) {
                 JudgementType judgment = judgmentItem.getValue();
                 LocalDate dateJudgmentMade = LocalDate.parse(judgment.getDateJudgmentMade(), OLD_DATE_TIME_PATTERN2);
@@ -184,13 +182,18 @@ public final class HearingsToJudgmentsReport {
                 hearingJudgmentItem.total = hearingListedDate.datesUntil(dateJudgmentSent.plusDays(1)).count();
                 hearingJudgmentItem.reservedHearing = dateListedType.getHearingReservedJudgement();
                 if (hearingType.hasHearingJudge()) {
-                    hearingJudgmentItem.judge = hearingType.getJudge().getSelectedLabel();
+                    if (hearingType.hasAdditionalHearingJudge()) {
+                        hearingJudgmentItem.judge = String.join(", ", hearingType.getJudge().getSelectedLabel(),
+                                hearingType.getAdditionalJudge().getSelectedLabel());
+                    } else {
+                        hearingJudgmentItem.judge = hearingType.getJudge().getSelectedLabel();
+                    }
                 } else {
                     hearingJudgmentItem.judge = NOT_ALLOCATED;
                 }
                 hearingJudgmentsList.add(hearingJudgmentItem);
             }
-        }
+        });
 
         return hearingJudgmentsList;
     }

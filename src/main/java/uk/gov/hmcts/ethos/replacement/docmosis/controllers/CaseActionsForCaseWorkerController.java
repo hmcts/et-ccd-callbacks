@@ -249,8 +249,10 @@ public class CaseActionsForCaseWorkerController {
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
-
-        List<String> errors = eventValidationService.validateReceiptDate(caseDetails);
+        List<String> errors = new ArrayList<>();
+        if (!"createEcmCase".equals(ccdRequest.getEventId())) {
+            errors = eventValidationService.validateReceiptDate(caseDetails);
+        }
 
         if (errors.isEmpty()) {
             defaultValuesReaderService.setSubmissionReference(caseDetails);

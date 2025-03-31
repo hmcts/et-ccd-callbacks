@@ -27,6 +27,8 @@ public class EmailService {
     private String exuiUrl;
     @Value("${case-details-url.citizen}")
     private String citizenUrl;
+    @Value("${case-details-url.syr}")
+    private String syrUrl;
 
     /**
      * Sends email to an email address using a specified email template.
@@ -58,6 +60,10 @@ public class EmailService {
 
     public String getExuiCaseLink(String caseId) {
         return exuiUrl + caseId;
+    }
+
+    public String getSyrCaseLink(String caseId, String respondentId) {
+        return syrUrl + caseId + "/" + respondentId;
     }
 
     public String getClaimantRepExuiCaseNotificationsLink(String caseId) {

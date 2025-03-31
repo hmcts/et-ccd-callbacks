@@ -28,6 +28,7 @@ import uk.gov.service.notify.NotificationClientException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -300,15 +301,17 @@ public final class TseHelper {
 
         JSONObject documentJson = NotificationClient.prepareUpload(document, false, true, "52 weeks");
 
-        return Map.of(
-                LINK_TO_CITIZEN_HUB, linkToCitizenHub,
-                CASE_NUMBER, caseData.getEthosCaseReference(),
-                APPLICATION_TYPE, applicationType,
-                "response", isNullOrEmpty(caseData.getTseResponseText()) ? "" : caseData.getTseResponseText(),
-                CLAIMANT, caseData.getClaimant(),
-                RESPONDENTS, Helper.getRespondentNames(caseData),
-                "linkToDocument", documentJson
-        );
+        Map<String, Object> personalisation = new ConcurrentHashMap<>();
+        personalisation.put(LINK_TO_CITIZEN_HUB, linkToCitizenHub);
+        personalisation.put(CASE_NUMBER, caseData.getEthosCaseReference());
+        personalisation.put(APPLICATION_TYPE, applicationType);
+        personalisation.put(
+                "response", isNullOrEmpty(caseData.getTseResponseText()) ? "" : caseData.getTseResponseText());
+        personalisation.put(CLAIMANT, caseData.getClaimant());
+        personalisation.put(RESPONDENTS, Helper.getRespondentNames(caseData));
+        personalisation.put("linkToDocument", documentJson.toString());
+
+        return personalisation;
     }
 
     public static Map<String, Object> getPersonalisationForAcknowledgement(CaseDetails caseDetails, String exuiUrl,

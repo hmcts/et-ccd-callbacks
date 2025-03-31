@@ -25,8 +25,11 @@ import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
+import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
@@ -43,6 +46,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -238,8 +242,11 @@ class TseClaimantRepReplyServiceTest {
 
     @ParameterizedTest
     @MethodSource("sendRespondingToApplicationEmails")
-    void sendRespondingToApplicationEmails(String rule92, VerificationMode isEmailSentToClaimant,
+    void sendRespondingToApplicationEmails(String rule92, VerificationMode isEmailSentToRespondent,
                                            String ackEmailTemplate) {
+        mockStatic.when(() -> TseHelper.getPersonalisationForResponse(any(), any(), any(), anyBoolean()))
+                .thenReturn(new ConcurrentHashMap<>());
+
         caseData.setTseResponseCopyToOtherParty(rule92);
         caseData.setClaimantHearingPreference(new ClaimantHearingPreference());
         caseData.getClaimantHearingPreference().setContactLanguage(ENGLISH_LANGUAGE);
@@ -253,23 +260,37 @@ class TseClaimantRepReplyServiceTest {
         ReflectionTestUtils.setField(tseClaimantRepReplyService,
                 "acknowledgementRule92NoEmailTemplateId", REPLY_TO_APP_ACK_TEMPLATE_NO);
 
+        Organisation respondentOrg = Organisation.builder()
+                .organisationID("org_id")
+                .organisationName("New Organisation").build();
         RepresentedTypeR representedType =
                 RepresentedTypeR.builder()
                         .nameOfRepresentative("Respondent")
                         .respRepName("Respondent")
                         .representativeEmailAddress("person@email.com")
                         .myHmctsYesNo("Yes")
+                        .respondentOrganisation(respondentOrg)
                         .build();
         RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
         representedTypeRItem.setId("1111-2222-3333-1111");
         representedTypeRItem.setValue(representedType);
         caseData.setRepCollection(new ArrayList<>());
         caseData.getRepCollection().add(representedTypeRItem);
+
+        caseData.setRespondentCollection(new ArrayList<>());
+        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+        respondentSumTypeItem.setId("1111-2222-3333-1111");
+        RespondentSumType respondentSumType = RespondentSumType.builder()
+                .respondentEmail("respondent@gmail.com")
+                .respondentName("Respondent")
+                .build();
+        respondentSumTypeItem.setValue(respondentSumType);
+        caseData.getRespondentCollection().add(respondentSumTypeItem);
         tseClaimantRepReplyService.sendRespondingToApplicationEmails(caseDetails, "userToken");
 
         verify(emailService).sendEmail(any(), eq(userDetails.getEmail()), any());
-        verify(emailService, isEmailSentToClaimant)
-                .sendEmail(any(), eq(caseData.getClaimantType().getClaimantEmailAddress()), any());
+        verify(emailService, isEmailSentToRespondent)
+                .sendEmail(any(), eq(respondentSumType.getRespondentEmail()), any());
         verify(claimantTellSomethingElseService).sendAdminEmail(any());
 
         verify(emailService)
@@ -281,6 +302,45 @@ class TseClaimantRepReplyServiceTest {
                 Arguments.of(YES, atLeastOnce(), REPLY_TO_APP_ACK_TEMPLATE_YES),
                 Arguments.of(NO, never(), REPLY_TO_APP_ACK_TEMPLATE_NO)
         );
+    }
+
+    @ParameterizedTest
+    @MethodSource("sendRespondingToApplicationEmails")
+    void sendRespondingToApplicationEmailsNoRep(String rule92, VerificationMode isEmailSentToRespondent,
+                                           String ackEmailTemplate) {
+        mockStatic.when(() -> TseHelper.getPersonalisationForResponse(any(), any(), any(), anyBoolean()))
+                .thenReturn(new ConcurrentHashMap<>());
+        caseData.setTseResponseCopyToOtherParty(rule92);
+        caseData.setClaimantHearingPreference(new ClaimantHearingPreference());
+        caseData.getClaimantHearingPreference().setContactLanguage(ENGLISH_LANGUAGE);
+
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseId("caseId");
+        caseDetails.setCaseData(caseData);
+
+        ReflectionTestUtils.setField(tseClaimantRepReplyService,
+                "acknowledgementRule92YesEmailTemplateId", REPLY_TO_APP_ACK_TEMPLATE_YES);
+        ReflectionTestUtils.setField(tseClaimantRepReplyService,
+                "acknowledgementRule92NoEmailTemplateId", REPLY_TO_APP_ACK_TEMPLATE_NO);
+
+        caseData.setRespondentCollection(new ArrayList<>());
+        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+        respondentSumTypeItem.setId("1111-2222-3333-1111");
+        RespondentSumType respondentSumType = RespondentSumType.builder()
+                .respondentEmail("respondent@gmail.com")
+                .respondentName("Respondent")
+                .build();
+        respondentSumTypeItem.setValue(respondentSumType);
+        caseData.getRespondentCollection().add(respondentSumTypeItem);
+        tseClaimantRepReplyService.sendRespondingToApplicationEmails(caseDetails, "userToken");
+
+        verify(emailService).sendEmail(any(), eq(userDetails.getEmail()), any());
+        verify(emailService, isEmailSentToRespondent)
+                .sendEmail(any(), eq(respondentSumType.getRespondentEmail()), any());
+        verify(claimantTellSomethingElseService).sendAdminEmail(any());
+
+        verify(emailService)
+                .sendEmail(eq(ackEmailTemplate), eq(userDetails.getEmail()), any());
     }
 
     @Test
@@ -311,12 +371,31 @@ class TseClaimantRepReplyServiceTest {
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseId("caseId");
         caseDetails.setCaseData(caseData);
-        RepresentedTypeR typeR = new RepresentedTypeR();
-        typeR.setMyHmctsYesNo(YES);
-        typeR.setRepresentativeEmailAddress("rep@email.com");
+
+        Organisation respondentOrg = Organisation.builder()
+                .organisationID("org_id")
+                .organisationName("New Organisation").build();
+        RepresentedTypeR representedType =
+                RepresentedTypeR.builder()
+                        .nameOfRepresentative("Respondent")
+                        .respRepName("Respondent")
+                        .representativeEmailAddress("person@email.com")
+                        .myHmctsYesNo("Yes")
+                        .respondentOrganisation(respondentOrg)
+                        .build();
         RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
-        representedTypeRItem.setValue(typeR);
+        representedTypeRItem.setValue(representedType);
         caseData.setRepCollection(Collections.singletonList(representedTypeRItem));
+
+        caseData.setRespondentCollection(new ArrayList<>());
+        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+        respondentSumTypeItem.setId("1111-2222-3333-1111");
+        RespondentSumType respondentSumType = RespondentSumType.builder()
+                .respondentEmail("respondent@gmail.com")
+                .respondentName("Respondent")
+                .build();
+        respondentSumTypeItem.setValue(respondentSumType);
+        caseData.getRespondentCollection().add(respondentSumTypeItem);
 
         when(claimantTellSomethingElseService.getTribunalEmail(any())).thenReturn(TRIBUNAL_EMAIL);
 
@@ -339,6 +418,32 @@ class TseClaimantRepReplyServiceTest {
                 Arguments.of(YES, atLeastOnce(), REPLY_TO_TRIB_ACK_TEMPLATE_YES),
                 Arguments.of(NO, never(), REPLY_TO_TRIB_ACK_TEMPLATE_NO)
         );
+    }
+
+    @ParameterizedTest
+    @MethodSource("sendRespondingToTribunalEmails")
+    void sendRespondingToTribunalEmailsNoSystemRespondent(String rule92, VerificationMode isEmailSentToClaimant,
+                                        String ackEmailTemplate) {
+        caseData.setTseResponseCopyToOtherParty(rule92);
+
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseId("caseId");
+        caseDetails.setCaseData(caseData);
+
+        when(claimantTellSomethingElseService.getTribunalEmail(any())).thenReturn(TRIBUNAL_EMAIL);
+
+        ReflectionTestUtils.setField(tseClaimantRepReplyService,
+                "replyToTribunalAckEmailToLRRule92YesTemplateId", REPLY_TO_TRIB_ACK_TEMPLATE_YES);
+        ReflectionTestUtils.setField(tseClaimantRepReplyService,
+                "replyToTribunalAckEmailToLRRule92NoTemplateId", REPLY_TO_TRIB_ACK_TEMPLATE_NO);
+
+        Map<String, String> tribunalPersonalisation = Map.of(
+                NotificationServiceConstants.CASE_NUMBER, CASE_NUMBER,
+                APPLICATION_TYPE, TSE_APP_CHANGE_PERSONAL_DETAILS,
+                LINK_TO_EXUI, TEST_XUI_URL + "caseId");
+
+        tseClaimantRepReplyService.sendRespondingToTribunalEmails(caseDetails, "token");
+        verify(emailService).sendEmail(any(), eq(TRIBUNAL_EMAIL), eq(tribunalPersonalisation));
     }
 
     @Test

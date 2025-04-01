@@ -255,7 +255,6 @@ public class TseAdmReplyService {
      */
     public Map<String, Object> sendNotifyEmailsToRespondents(CaseDetails caseDetails, String userToken) {
         CaseData caseData = caseDetails.getCaseData();
-        String caseId = caseDetails.getCaseId();
         if (CLAIMANT_ONLY.equals(caseData.getTseAdmReplySelectPartyNotify())) {
             return Collections.emptyMap();
         }
@@ -267,6 +266,7 @@ public class TseAdmReplyService {
         personalisationHashMap = buildPersonalisation(caseData.getEthosCaseReference(),
                 caseDetails.getCaseId(), customisedText, getUploadedDocumentContent(caseData, userToken));
 
+        String caseId = caseDetails.getCaseId();
         getRespondentsAndRepsEmailAddresses(caseData)
                 .forEach((emailAddress, respondentId) ->
                         sendRespondentEmail(personalisationHashMap, caseId, emailAddress, respondentId));

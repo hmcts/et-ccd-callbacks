@@ -78,7 +78,8 @@ public final class LegalRepDocumentsHelper {
         if (ObjectUtils.isEmpty(typeOfDocument)) {
             return false;
         }
-        return LEGAL_REP_HIDDEN_DOCS.contains(typeOfDocument);
+        return LEGAL_REP_HIDDEN_DOCS.stream()
+                .anyMatch(doc -> doc.equalsIgnoreCase(typeOfDocument));
     }
 
     private static String getTypeOfDocument(DocumentType documentType) {

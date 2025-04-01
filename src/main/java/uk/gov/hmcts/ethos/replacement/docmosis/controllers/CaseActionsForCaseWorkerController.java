@@ -97,6 +97,7 @@ public class CaseActionsForCaseWorkerController {
     public static final String BAD_REQUEST = "Bad Request";
     public static final String INTERNAL_SERVER_ERROR = "Internal Server Error";
     private static final List<String> SUBMISSION_EVENTS = List.of(SUBMIT_CASE_DRAFT, "initiateCase", "submitEt1Draft");
+    public static final String CREATE_ECM_CASE = "createEcmCase";
 
     private final CaseCloseValidator caseCloseValidator;
     private final CaseCreationForCaseWorkerService caseCreationForCaseWorkerService;
@@ -249,8 +250,7 @@ public class CaseActionsForCaseWorkerController {
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
-
-        List<String> errors = eventValidationService.validateReceiptDate(caseDetails);
+        List<String> errors = getValidationDate(ccdRequest.getEventId(), caseDetails);
 
         if (errors.isEmpty()) {
             defaultValuesReaderService.setSubmissionReference(caseDetails);
@@ -293,6 +293,13 @@ public class CaseActionsForCaseWorkerController {
         log.info("PostDefaultValues for case: {} {}", ccdRequest.getCaseDetails().getCaseTypeId(),
                 caseData.getEthosCaseReference());
         return getCallbackRespEntityErrors(errors, caseData);
+    }
+
+    private List<String> getValidationDate(String eventId, CaseDetails caseDetails) {
+        if (!CREATE_ECM_CASE.equals(eventId)) {
+            return eventValidationService.validateReceiptDate(caseDetails);
+        }
+        return new ArrayList<>();
     }
 
     @PostMapping(value = "/addServiceId", consumes = APPLICATION_JSON_VALUE)

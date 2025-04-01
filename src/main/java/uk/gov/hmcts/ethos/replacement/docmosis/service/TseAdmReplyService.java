@@ -271,7 +271,6 @@ public class TseAdmReplyService {
                 caseDetails.getCaseId(), customisedText, getUploadedDocumentContent(caseData, userToken));
 
         String caseId = caseDetails.getCaseId();
-        log.info("get respondents and reps email addresses");
         getRespondentsAndRepsEmailAddresses(caseData)
                 .forEach((emailAddress, respondentId) ->
                         sendRespondentEmail(personalisationHashMap, caseId, emailAddress, respondentId));
@@ -281,7 +280,6 @@ public class TseAdmReplyService {
 
     private void sendRespondentEmail(Map<String, Object> emailData, String caseId,
                                      String emailAddress, String respondentId) {
-        log.info("send respondent email {}", emailAddress);
         if (StringUtils.isNotBlank(respondentId)) {
             emailData.put(LINK_TO_EXUI, emailService.getSyrCaseLink(caseId, respondentId));
         }

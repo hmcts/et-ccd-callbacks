@@ -129,11 +129,8 @@ public class TseAdmReplyController {
         tseAdmReplyService.saveTseAdmReplyDataFromCaseData(caseData);
 
         // Generate a pdf copy of the CYA page of the Tse Admin reply application
-        log.info("add admin reply pdf to doc collection");
         tseAdmReplyService.addTseAdmReplyPdfToDocCollection(caseDetails, userToken);
-        log.info("send claimant email");
         tseAdmReplyService.sendNotifyEmailsToClaimant(ccdRequest.getCaseDetails().getCaseId(), caseData, userToken);
-        log.info("send respondent email");
         tseAdmReplyService.sendNotifyEmailsToRespondents(ccdRequest.getCaseDetails(), userToken);
         tseAdmReplyService.clearTseAdmReplyDataFromCaseData(caseData);
 

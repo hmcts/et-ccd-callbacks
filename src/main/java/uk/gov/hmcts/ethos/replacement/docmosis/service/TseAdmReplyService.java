@@ -52,6 +52,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClaimantTellSomethingElseHelper.getRespondentsAndRepsEmailAddresses;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.TSE_ADMIN_CORRESPONDENCE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isRepresentedClaimantWithMyHmctsCase;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getAdminSelectedApplicationType;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.TSE_ADMIN_REPLY;
 import static uk.gov.service.notify.NotificationClient.prepareUpload;
@@ -225,6 +226,9 @@ public class TseAdmReplyService {
         for (final TSEAdminEmailRecipientsData emailRecipient : emailsToSend) {
             personalisationHashMap = buildPersonalisation(caseNumber, caseId,
                     emailRecipient.getCustomisedText(), uploadedDocContent);
+            if (isRepresentedClaimantWithMyHmctsCase(caseData)) {
+                personalisationHashMap.put(LINK_TO_CITIZEN_HUB, emailService.getExuiCaseLink(caseId));
+            }
             emailService.sendEmail(emailRecipient.getRecipientTemplate(), emailRecipient.getRecipientEmail(),
                     personalisationHashMap);
         }

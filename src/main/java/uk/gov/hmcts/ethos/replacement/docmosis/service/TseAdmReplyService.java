@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.webjars.NotFoundException;
@@ -12,14 +13,11 @@ import uk.gov.hmcts.et.common.model.ccd.UploadedDocument;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
-import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseAdmReplyHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEAdminEmailRecipientsData;
@@ -35,7 +33,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -53,6 +50,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClaimantTellSomethingElseHelper.getRespondentsAndRepsEmailAddresses;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.TSE_ADMIN_CORRESPONDENCE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper.getAdminSelectedApplicationType;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.TSE_ADMIN_REPLY;
@@ -257,6 +255,7 @@ public class TseAdmReplyService {
      */
     public Map<String, Object> sendNotifyEmailsToRespondents(CaseDetails caseDetails, String userToken) {
         CaseData caseData = caseDetails.getCaseData();
+        String caseId = caseDetails.getCaseId();
         if (CLAIMANT_ONLY.equals(caseData.getTseAdmReplySelectPartyNotify())) {
             return Collections.emptyMap();
         }
@@ -268,17 +267,19 @@ public class TseAdmReplyService {
         personalisationHashMap = buildPersonalisation(caseData.getEthosCaseReference(),
                 caseDetails.getCaseId(), customisedText, getUploadedDocumentContent(caseData, userToken));
 
-        List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
-        respondents.forEach(obj -> sendRespondentEmail(caseData, personalisationHashMap, obj.getValue()));
+        getRespondentsAndRepsEmailAddresses(caseData)
+                .forEach((emailAddress, respondentId) ->
+                        sendRespondentEmail(personalisationHashMap, caseId, emailAddress, respondentId));
+
         return personalisationHashMap;
     }
 
-    private void sendRespondentEmail(CaseData caseData, Map<String, Object> emailData, RespondentSumType respondent) {
-        String respondentEmail = NotificationHelper.getEmailAddressForRespondent(caseData, respondent);
-        if (isNullOrEmpty(respondentEmail)) {
-            return;
+    private void sendRespondentEmail(Map<String, Object> emailData, String caseId,
+                                     String emailAddress, String respondentId) {
+        if (StringUtils.isNotBlank(respondentId)) {
+            emailData.put(LINK_TO_EXUI, emailService.getSyrCaseLink(caseId, respondentId));
         }
-        emailService.sendEmail(tseAdminReplyRespondentTemplateId, respondentEmail, emailData);
+        emailService.sendEmail(tseAdminReplyRespondentTemplateId, emailAddress, emailData);
     }
 
     private void collectClaimants(CaseData caseData, List<TSEAdminEmailRecipientsData> emailsToSend) {

@@ -94,7 +94,8 @@ class TseAdmReplyServiceTest {
     private static final String CASE_ID = "someCaseId";
 
     private static final String CLAIMANT_EMAIL = "Claimant@mail.com";
-    private static final String RESPONDENT_EMAIL = "Respondent@mail.com";
+    private static final String RESPONDENT_EMAIL_1 = "Respondent@mail.com";
+    private static final String RESPONDENT_EMAIL_2 = "Respondent2@mail.com";
     private static final String RESPONSE_REQUIRED =
         "The tribunal requires some information from you about an application.";
     private static final String RESPONSE_NOT_REQUIRED =
@@ -631,10 +632,10 @@ class TseAdmReplyServiceTest {
         caseDetails.setCaseId(CASE_ID);
         Map<String, Object> resultMap = tseAdmReplyService.sendNotifyEmailsToRespondents(caseDetails, AUTH_TOKEN);
 
-        // Email will be sent to the Representative if it exists,
-        // if not then email will be sent to the Respondent instead.
+        // Email is sent to respondent. if representative is present, email is sent to both
+        // representative and respondent.
         verify(emailService).sendEmail(TEMPLATE_ID, "rep@test.com", resultMap);
-        verify(emailService, times(0)).sendEmail(TEMPLATE_ID, RESPONDENT_EMAIL, resultMap);
+        verify(emailService, times(1)).sendEmail(TEMPLATE_ID, RESPONDENT_EMAIL_1, resultMap);
     }
 
     @Test
@@ -679,17 +680,19 @@ class TseAdmReplyServiceTest {
 
     private void setRespondents() {
         RespondentSumType respondentSumType = new RespondentSumType();
-        respondentSumType.setRespondentEmail(RESPONDENT_EMAIL);
+        respondentSumType.setRespondentEmail(RESPONDENT_EMAIL_1);
         respondentSumType.setRespondentName(RESPONDENT_1);
 
         RespondentSumType respondentSumType2 = new RespondentSumType();
-        respondentSumType2.setRespondentEmail(RESPONDENT_EMAIL);
+        respondentSumType2.setRespondentEmail(RESPONDENT_EMAIL_2);
         respondentSumType2.setRespondentName(RESPONDENT_2);
 
         RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+        respondentSumTypeItem.setId("1");
         respondentSumTypeItem.setValue(respondentSumType);
 
         RespondentSumTypeItem respondentSumTypeItem2 = new RespondentSumTypeItem();
+        respondentSumTypeItem2.setId("2");
         respondentSumTypeItem2.setValue(respondentSumType2);
 
         caseData.setRespondentCollection(List.of(respondentSumTypeItem, respondentSumTypeItem2));

@@ -4409,14 +4409,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"axios@npm:1.7.7":
-  version: 1.7.7
-  resolution: "axios@npm:1.7.7"
+"axios@npm:1.8.2":
+  version: 1.8.2
+  resolution: "axios@npm:1.8.2"
   dependencies:
     follow-redirects: ^1.15.6
     form-data: ^4.0.0
     proxy-from-env: ^1.1.0
-  checksum: 882d4fe0ec694a07c7f5c1f68205eb6dc5a62aecdb632cc7a4a3d0985188ce3030e0b277e1a8260ac3f194d314ae342117660a151fabffdc5081ca0b5a8b47fe
+  checksum: c47a43b79a058aa9e53a65bec9ade35c9f6e76a3999c795a79a2d205fb5f803fd4245497a0209a9727cbbe4f558791dd852ad2c168c5fc030259c11598ed8fd7
   languageName: node
   linkType: hard
 
@@ -8129,7 +8129,7 @@ __metadata:
     sinon: 19.0.5
     sinon-chai: 4.0.0
     sonar-scanner: 3.1.0
-    sonarqube-scanner: 4.2.8
+    sonarqube-scanner: 4.3.0
     superagent-proxy: 3.0.0
     supertest: 7.0.0
     totp-generator: 1.0.0
@@ -16299,12 +16299,12 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sonarqube-scanner@npm:4.2.8":
-  version: 4.2.8
-  resolution: "sonarqube-scanner@npm:4.2.8"
+"sonarqube-scanner@npm:4.3.0":
+  version: 4.3.0
+  resolution: "sonarqube-scanner@npm:4.3.0"
   dependencies:
     adm-zip: 0.5.12
-    axios: 1.7.7
+    axios: 1.8.2
     commander: 12.0.0
     fs-extra: 11.2.0
     hpagent: 1.2.0
@@ -16317,7 +16317,7 @@ __metadata:
   bin:
     sonar: bin/sonar-scanner.js
     sonar-scanner: bin/sonar-scanner.js
-  checksum: c63492b078dd4f20e421cf1343d906824e380dd1ad3f60102ac3e71ae91b63bcbcdc4033228df96d14550a91a7d799ab05567c0816bc805be335584a5ee1b2d0
+  checksum: 37845347a83c3c9aaccc1b842c26a1696d2e71522ce7cf3b8c7fcaf375d70e9d05c2fe6798d49b0ef08937b3ff2d36213abeb5e23128fe0704a13947876f66f3
   languageName: node
   linkType: hard
 

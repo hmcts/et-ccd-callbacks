@@ -55,7 +55,7 @@ public class Et1ReppedService {
     private final AdminUserService adminUserService;
     private final Et1SubmissionService et1SubmissionService;
 
-    private static final String ET1_EN_PDF = "ET1_0224.pdf";
+    private static final String ET1_EN_PDF = "ET1_0125.pdf";
     private final List<TribunalOffice> liveTribunalOffices = List.of(TribunalOffice.LEEDS,
             TribunalOffice.MIDLANDS_EAST, TribunalOffice.BRISTOL, TribunalOffice.LONDON_CENTRAL,
             TribunalOffice.LONDON_SOUTH, TribunalOffice.LONDON_EAST, TribunalOffice.MANCHESTER,

@@ -12,7 +12,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_ET3_FORM_CASE_DATA_FILE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceTestConstants.TEST_ET3_FORM_CASE_DATA_FILE;
 
 public class Et3ResponseControllerFunctionalTest extends BaseFunctionalTest {
     private static final String AUTHORIZATION = "Authorization";

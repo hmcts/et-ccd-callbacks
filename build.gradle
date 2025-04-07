@@ -114,6 +114,14 @@ configurations {
     integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
     apiTestImplementation.extendsFrom testImplementation
     apiTestRuntimeOnly.extendsFrom testRuntimeOnly
+
+    configureEach {
+        resolutionStrategy.eachDependency { details ->
+            if (details.requested.group.startsWith("com.fasterxml.jackson")) {
+                details.useVersion("$jacksonVersion")
+            }
+        }
+    }
 }
 
 test {
@@ -306,6 +314,7 @@ ext {
     reformLoggingVersion = '6.0.1'
     serenity = '3.9.8'
     tomcatEmbedVersion = '9.0.102'
+    jacksonVersion = '2.18.3'
 }
 
 ext["rest-assured.version"] = '5.1.0'

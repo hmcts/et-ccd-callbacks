@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRole;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesRequest;
@@ -39,7 +40,6 @@ public class CaseAccessService {
             log.error(e.getMessage());
             return List.of("Error getting original case id");
         }
-
         try {
             List<CaseUserAssignment> caseAssignedUserRolesList =
                     caseAssignment.getCaseUserRoles(caseId).getCaseUserAssignments();
@@ -47,12 +47,12 @@ public class CaseAccessService {
             if (caseAssignedUserRolesList.isEmpty()) {
                 return List.of("Case assigned user roles list is empty");
             }
-
+            List<String> errorList = new ArrayList<>();
             for (CaseUserAssignment caseUserAssignment : caseAssignedUserRolesList) {
                 if (isNullOrEmpty(caseUserAssignment.getUserId()) || isNullOrEmpty(caseUserAssignment.getCaseRole())) {
-                    return List.of("User ID is null or empty");
+                    errorList.add("User ID is null or empty");
+                    continue;
                 }
-
                 CaseAssignmentUserRole caseAssignmentUserRole = CaseAssignmentUserRole.builder()
                         .userId(caseUserAssignment.getUserId())
                         .caseDataId(caseDetails.getCaseId())
@@ -62,13 +62,15 @@ public class CaseAccessService {
                         .caseAssignmentUserRoles(List.of(caseAssignmentUserRole))
                         .build());
             }
+            if (CollectionUtils.isNotEmpty(errorList)) {
+                return errorList;
+            }
         } catch (Exception e) {
             log.error(e.getMessage());
             return List.of(String.format("Error assigning case access for case %s on behalf of %s",
                     caseId, caseDetails.getCaseId()));
         }
         return new ArrayList<>();
-
     }
 
     private String getOriginalCaseId(CaseData caseData) {

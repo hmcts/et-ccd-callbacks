@@ -25,11 +25,11 @@ public class CaseAccessService {
     private final CcdCaseAssignment caseAssignment;
 
     /**
-     * Give a claimant access to a case when the case has been transferred to another jurisdiction.
+     * Assigns all existing case roles after the case transferred to another jurisdiction.
      * @param caseDetails the case details
      * @return a list of errors
      */
-    public List<String> assignClaimantCaseAccess(CaseDetails caseDetails) {
+    public List<String> assignExistingCaseRoles(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
 
         String caseId;
@@ -48,25 +48,20 @@ public class CaseAccessService {
                 return List.of("Case assigned user roles list is empty");
             }
 
-            String userId = caseAssignedUserRolesList.stream()
-                    .filter(caseAssignedUserRole -> CREATOR_ROLE.equals(caseAssignedUserRole.getCaseRole()))
-                    .findFirst()
-                    .map(CaseUserAssignment::getUserId)
-                    .orElse("");
+            for (CaseUserAssignment caseUserAssignment : caseAssignedUserRolesList) {
+                if (isNullOrEmpty(caseUserAssignment.getUserId()) || isNullOrEmpty(caseUserAssignment.getCaseRole())) {
+                    return List.of("User ID is null or empty");
+                }
 
-            if (isNullOrEmpty(userId)) {
-                return List.of("User ID is null or empty");
+                CaseAssignmentUserRole caseAssignmentUserRole = CaseAssignmentUserRole.builder()
+                        .userId(caseUserAssignment.getUserId())
+                        .caseDataId(caseDetails.getCaseId())
+                        .caseRole(caseUserAssignment.getCaseRole())
+                        .build();
+                caseAssignment.addCaseUserRole(CaseAssignmentUserRolesRequest.builder()
+                        .caseAssignmentUserRoles(List.of(caseAssignmentUserRole))
+                        .build());
             }
-
-            CaseAssignmentUserRole caseAssignmentUserRole = CaseAssignmentUserRole.builder()
-                    .userId(userId)
-                    .caseDataId(caseDetails.getCaseId())
-                    .caseRole(CREATOR_ROLE)
-                    .build();
-            caseAssignment.addCaseUserRole(CaseAssignmentUserRolesRequest.builder()
-                    .caseAssignmentUserRoles(List.of(caseAssignmentUserRole))
-                    .build());
-
         } catch (Exception e) {
             log.error(e.getMessage());
             return List.of(String.format("Error assigning case access for case %s on behalf of %s",

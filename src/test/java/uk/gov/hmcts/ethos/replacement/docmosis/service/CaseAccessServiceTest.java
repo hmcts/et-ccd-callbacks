@@ -68,7 +68,7 @@ class CaseAccessServiceTest {
     }
 
     @Test
-    void assignClaimantCaseAccess() throws IOException {
+    void assignExistingCaseRoles() throws IOException {
         CaseUserAssignment caseUserAssignment = CaseUserAssignment.builder()
                 .userId(UUID.randomUUID().toString())
                 .caseId("1234567890123456")
@@ -89,7 +89,7 @@ class CaseAccessServiceTest {
                 eq(CaseAssignmentUserRolesResponse.class)
         )).thenReturn(ResponseEntity.ok(expected));
 
-        errors = caseAccessService.assignClaimantCaseAccess(caseDetails);
+        errors = caseAccessService.assignExistingCaseRoles(caseDetails);
 
         assertEquals(0, errors.size());
         verify(caseAssignment).addCaseUserRole(any(CaseAssignmentUserRolesRequest.class));
@@ -101,7 +101,7 @@ class CaseAccessServiceTest {
     void invalidCaseId(String linkedCaseCT) {
         caseData.setLinkedCaseCT(linkedCaseCT);
         caseDetails.setCaseData(caseData);
-        errors = caseAccessService.assignClaimantCaseAccess(caseDetails);
+        errors = caseAccessService.assignExistingCaseRoles(caseDetails);
         assertEquals("Error getting original case id", errors.get(0));
 
     }
@@ -119,7 +119,7 @@ class CaseAccessServiceTest {
                 .caseUserAssignments(Collections.emptyList())
                 .build();
         when(caseAssignment.getCaseUserRoles("1234567890123456")).thenReturn(caseUserAssignmentData);
-        errors = caseAccessService.assignClaimantCaseAccess(caseDetails);
+        errors = caseAccessService.assignExistingCaseRoles(caseDetails);
         assertEquals("Case assigned user roles list is empty", errors.get(0));
     }
 
@@ -133,7 +133,7 @@ class CaseAccessServiceTest {
                                 .build()))
                 .build();
         when(caseAssignment.getCaseUserRoles("1234567890123456")).thenReturn(caseUserAssignmentData);
-        errors = caseAccessService.assignClaimantCaseAccess(caseDetails);
+        errors = caseAccessService.assignExistingCaseRoles(caseDetails);
         assertEquals("User ID is null or empty", errors.get(0));
     }
 
@@ -156,7 +156,7 @@ class CaseAccessServiceTest {
                 )).thenThrow(new RestClientResponseException("Error", 500, "Internal Server Error", null, null, null));
         doCallRealMethod().when(caseAssignment).addCaseUserRole(any(CaseAssignmentUserRolesRequest.class));
 
-        errors = caseAccessService.assignClaimantCaseAccess(caseDetails);
+        errors = caseAccessService.assignExistingCaseRoles(caseDetails);
         assertEquals("Error assigning case access for case 1234567890123456 on behalf of 1111111111111111",
                 errors.get(0));
     }

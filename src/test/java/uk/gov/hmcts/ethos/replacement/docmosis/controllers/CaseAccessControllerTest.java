@@ -71,7 +71,7 @@ class CaseAccessControllerTest {
 
     @Test
     void assignClaimantTransferredCaseAccess_success() throws Exception {
-        when(caseAccessService.assignClaimantCaseAccess(any())).thenReturn(new ArrayList<>());
+        when(caseAccessService.assignExistingCaseRoles(any())).thenReturn(new ArrayList<>());
 
         mockMvc.perform(post(CLAIMANT_TRANSFERRED_CASE_URL)
                         .contentType(APPLICATION_JSON)
@@ -82,13 +82,13 @@ class CaseAccessControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
-        verify(caseAccessService, times(1)).assignClaimantCaseAccess(any());
+        verify(caseAccessService, times(1)).assignExistingCaseRoles(any());
     }
 
     @Test
     void assignClaimantTransferredCaseAccess_error() throws Exception {
         ccdRequest.getCaseDetails().getCaseData().setLinkedCaseCT(null);
-        doCallRealMethod().when(caseAccessService).assignClaimantCaseAccess(ccdRequest.getCaseDetails());
+        doCallRealMethod().when(caseAccessService).assignExistingCaseRoles(ccdRequest.getCaseDetails());
 
         mockMvc.perform(post(CLAIMANT_TRANSFERRED_CASE_URL)
                         .contentType(APPLICATION_JSON)
@@ -98,6 +98,6 @@ class CaseAccessControllerTest {
                 .andExpect(jsonPath("$.errors[0]", is("Error getting original case id")))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
-        verify(caseAccessService, times(1)).assignClaimantCaseAccess(any());
+        verify(caseAccessService, times(1)).assignExistingCaseRoles(any());
     }
 }

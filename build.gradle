@@ -336,8 +336,8 @@ dependencyManagement {
 
 dependencies {
 
-    implementation group: 'com.github.hmcts', name: 'et-common', version: '3e3d119356'
-    implementation group: 'com.github.hmcts', name: 'et-data-model', version: '0ba15b8679'
+    implementation group: 'com.github.hmcts', name: 'et-common', version: 'bd187010ff'
+    implementation group: 'com.github.hmcts', name: 'et-data-model', version: '33e2b7b8b3'
     implementation group: 'com.github.hmcts', name: 'ecm-common', version: '2.1.4'
     implementation group: 'com.github.hmcts', name: 'ecm-data-model', version: '1.3.14'
 

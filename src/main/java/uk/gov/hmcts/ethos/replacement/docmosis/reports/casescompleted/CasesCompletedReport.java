@@ -40,6 +40,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.JURISDICTION_OUTCOM
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.POSITION_TYPE_CASE_INPUT_IN_ERROR;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.POSITION_TYPE_CASE_TRANSFERRED_OTHER_COUNTRY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.POSITION_TYPE_CASE_TRANSFERRED_SAME_COUNTRY;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportCommonMethods.getHearingJudgeName;
 
 @Service
 @Slf4j
@@ -104,8 +105,8 @@ public class CasesCompletedReport {
     }
 
     private void executeReport(ListingDetails listingDetails, List<SubmitEvent> submitEvents) {
-        log.info(String.format("Cases Completed report case type id %s search results: %d",
-                listingDetails.getCaseTypeId(), submitEvents.size()));
+        log.info("Cases Completed report case type id {} search results: {}",
+                listingDetails.getCaseTypeId(), submitEvents.size());
 
         AdhocReportType localReportsDetailHdr = listingDetails.getCaseData().getLocalReportsDetailHdr();
         List<AdhocReportTypeItem> localReportsDetailList = listingDetails.getCaseData().getLocalReportsDetail();
@@ -185,9 +186,7 @@ public class CasesCompletedReport {
         adhocReportType.setHearingNumber(hearingType.getHearingNumber());
         adhocReportType.setHearingDate(latestSession.getListedDate());
         adhocReportType.setHearingType(hearingType.getHearingType());
-        if (hearingType.hasHearingJudge()) {
-            adhocReportType.setHearingJudge(hearingType.getJudge().getSelectedLabel());
-        }
+        adhocReportType.setHearingJudge(getHearingJudgeName(hearingType));
         if (latestSession.hasHearingClerk()) {
             adhocReportType.setHearingClerk(latestSession.getHearingClerk().getSelectedLabel());
         }

@@ -132,8 +132,9 @@ class InitialConsiderationServiceTest {
 
     private static final String EXPECTED_JURISDICTION_SCOTLAND_HTML = "<h2>Jurisdiction codes</h2><a "
         + "target=\"_blank\" href=\"https://judiciary.sharepoint"
-        + ".com/:b:/r/sites/ScotlandEJs/Shared%20Documents/Jurisdictional%20Codes%20List/ET%20jurisdiction%20list%20"
-        + "(2019).pdf?csf=1&web=1&e=9bCQ8P\">View all jurisdiction codes and descriptors (opens in new tab)"
+        + ".com/:w:/r/sites/ScotlandEJs/Shared%20Documents/Jurisdictional%20Codes%20List"
+        + "/Jurisdiction%20list%20July%202024%20.doc?d=wfa6ba431b0b941ffa0b82504fd093af0&csf=1&web=1&e=Dm6Hda\">"
+        + "View all jurisdiction codes and descriptors (opens in new tab)"
         + "</a><br><br><strong>DAG</strong> - Discrimination, including harassment or discrimination "
         + "based on association or perception on grounds of age<br><br><strong>SXD</strong> - "
         + "Discrimination, including indirect discrimination, discrimination based on association or perception, "

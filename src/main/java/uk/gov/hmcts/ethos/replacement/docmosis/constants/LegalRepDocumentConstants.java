@@ -45,7 +45,8 @@ public final class LegalRepDocumentConstants {
             DocumentConstants.APP_TO_RESTRICT_PUBLICITY_C,
             DocumentConstants.APP_TO_STRIKE_OUT_ALL_OR_PART_OF_THE_RESPONSE,
             DocumentConstants.APP_FOR_A_JUDGMENT_TO_BE_RECONSIDERED_C,
-            DocumentConstants.CONTACT_THE_TRIBUNAL_C
+            DocumentConstants.CONTACT_THE_TRIBUNAL_C,
+            DocumentConstants.NEEDS_UPDATING
     );
 
     private LegalRepDocumentConstants() {

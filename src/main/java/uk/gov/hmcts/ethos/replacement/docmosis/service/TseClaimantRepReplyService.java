@@ -24,9 +24,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
@@ -40,7 +42,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_REP_TITLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClaimantTellSomethingElseHelper.claimantSelectApplicationToType;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClaimantTellSomethingElseHelper.getRespondentEmailAddressList;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClaimantTellSomethingElseHelper.getRespondentsAndRepsEmailAddresses;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.DOCGEN_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItemFromTopLevel;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper.createTwoColumnTable;
@@ -261,16 +263,20 @@ public class TseClaimantRepReplyService {
             return;
         }
 
-        List<String> respondentEmailAddressList = getRespondentEmailAddressList(caseData);
-        if (respondentEmailAddressList.isEmpty()) {
+        Map<String, String> respondentEmailAddressMap = getRespondentsAndRepsEmailAddresses(caseData);
+        if (respondentEmailAddressMap.isEmpty()) {
             return;
         }
 
-        Map<String, String> personalisation = Map.of(
-                CASE_NUMBER, caseData.getEthosCaseReference(),
-                LINK_TO_CITIZEN_HUB, emailService.getExuiCaseLink(caseDetails.getCaseId()));
-        respondentEmailAddressList.forEach(respondentEmail ->
-            emailService.sendEmail(replyToTribunalEmailToClaimantTemplateId, respondentEmail, personalisation));
+        Map<String, String> personalisation = new ConcurrentHashMap<>();
+        personalisation.put(CASE_NUMBER, caseData.getEthosCaseReference());
+
+        respondentEmailAddressMap.forEach((respondentEmail, respondentId) -> {
+            personalisation.put(LINK_TO_CITIZEN_HUB, isNotBlank(respondentId)
+                    ? emailService.getSyrCaseLink(caseDetails.getCaseId(), respondentId)
+                    : emailService.getCitizenCaseLink(caseDetails.getCaseId()));
+            emailService.sendEmail(replyToTribunalEmailToClaimantTemplateId, respondentEmail, personalisation);
+        });
     }
 
     private void sendAcknowledgementEmailToLR(CaseDetails caseDetails, String userToken,
@@ -314,8 +320,8 @@ public class TseClaimantRepReplyService {
             return;
         }
 
-        List<String> respondentEmailAddressList = getRespondentEmailAddressList(caseData);
-        if (respondentEmailAddressList.isEmpty()) {
+        Map<String, String> respondentEmailAddressMap = getRespondentsAndRepsEmailAddresses(caseData);
+        if (respondentEmailAddressMap.isEmpty()) {
             return;
         }
 
@@ -335,12 +341,17 @@ public class TseClaimantRepReplyService {
                     ? cyTseClaimantRepResponseTemplateId
                     : tseClaimantRepResponseTemplateId;
 
-            respondentEmailAddressList.forEach(
-                    respondentEmail ->
-                            emailService.sendEmail(
-                            emailTemplate,
-                            respondentEmail,
-                            personalisation));
+            respondentEmailAddressMap.forEach(
+                    (respondentEmail, respondentId) -> {
+                        if (isNotBlank(respondentId)) {
+                            personalisation.put(LINK_TO_CITIZEN_HUB,
+                                    emailService.getSyrCaseLink(caseDetails.getCaseId(), respondentId));
+                        }
+                        emailService.sendEmail(
+                                emailTemplate,
+                                respondentEmail,
+                                personalisation);
+                    });
         } catch (Exception e) {
             throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
         }

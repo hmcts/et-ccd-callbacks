@@ -572,6 +572,7 @@ class ClaimantTellSomethingElseServiceTest {
     })
     void sendRespondentEmail_groupA_sendsEmail(String applicationType) throws IOException {
         CaseData caseData = createCaseDataWithHearing(applicationType);
+        caseData.getRespondentCollection().get(0).setId("123-456-789");
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
         caseDetails.setCaseId(CASE_ID);
@@ -616,6 +617,7 @@ class ClaimantTellSomethingElseServiceTest {
     })
     void sendRespondentEmail_groupA_sendsEmail_Welsh(String applicationType) throws IOException {
         CaseData caseData = createCaseDataWithHearing(applicationType);
+        caseData.getRespondentCollection().get(0).setId("123-456-789");
         caseData.getClaimantHearingPreference().setContactLanguage(WELSH_LANGUAGE);
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
@@ -656,6 +658,7 @@ class ClaimantTellSomethingElseServiceTest {
     })
     void sendRespondentEmail_groupB_sendsEmail(String applicationType) throws IOException {
         CaseData caseData = createCaseDataWithHearing(applicationType);
+        caseData.getRespondentCollection().get(0).setId("123-456-789");
         caseData.setHearingCollection(null);
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
@@ -686,6 +689,7 @@ class ClaimantTellSomethingElseServiceTest {
     })
     void sendRespondentEmail_groupB_sendsEmail_Welsh(String applicationType) throws IOException {
         CaseData caseData = createCaseDataWithHearing(applicationType);
+        caseData.getRespondentCollection().get(0).setId("123-456-789");
         caseData.getClaimantHearingPreference().setContactLanguage(WELSH_LANGUAGE);
         caseData.setHearingCollection(null);
         CaseDetails caseDetails = new CaseDetails();

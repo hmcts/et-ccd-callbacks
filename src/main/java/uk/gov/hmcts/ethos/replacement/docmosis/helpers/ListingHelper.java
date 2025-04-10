@@ -100,7 +100,6 @@ public final class ListingHelper {
     public static final String NEWCASTLE_CFCTC = "Newcastle CFCTC";
     public static final String TEESSIDE_MAGS = "Teesside Mags";
     public static final String TEESSIDE_JUSTICE_CENTRE = "Teesside Justice Centre";
-    public static final String ITCO_REGEX = "\\d+_";
 
     private ListingHelper() {
     }
@@ -177,7 +176,7 @@ public final class ListingHelper {
                             + hearingType.getAdditionalJudge().getSelectedLabel();
             }
         }
-        return judgeName.replaceAll(ITCO_REGEX, "");
+        return judgeName.replaceAll("\\d+_", "");
     }
 
     private static String getPositionType(CaseData caseData) {
@@ -588,7 +587,7 @@ public final class ListingHelper {
 
     private static String extractHearingJudgeName(ListingType listingType) {
         return listingType.getHearingJudgeName() != null
-                ? listingType.getHearingJudgeName().replaceAll(ITCO_REGEX, "") : "";
+                ? listingType.getHearingJudgeName().replaceAll("\\d+_", "") : "";
     }
 
     public static String getRespondentOthersWithLineBreaks(ListingType listingType) {

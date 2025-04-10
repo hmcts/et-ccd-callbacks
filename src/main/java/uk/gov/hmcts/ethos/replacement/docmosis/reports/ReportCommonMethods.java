@@ -8,6 +8,8 @@ import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_ALLOCATED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingHelper.ITCO_REGEX;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.memberdays.MemberDaysReport.OLD_DATE_TIME_PATTERN3;
@@ -61,6 +63,6 @@ public final class ReportCommonMethods {
                 judgeName = hearingType.getJudge().getSelectedLabel();
             }
         }
-        return judgeName.replaceAll(ITCO_REGEX, "");
+        return defaultIfEmpty(judgeName, NOT_ALLOCATED).replaceAll(ITCO_REGEX, "");
     }
 }

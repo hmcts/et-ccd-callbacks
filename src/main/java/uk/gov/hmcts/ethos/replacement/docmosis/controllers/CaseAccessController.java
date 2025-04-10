@@ -34,7 +34,7 @@ public class CaseAccessController {
             @RequestHeader("Authorization") String userToken) {
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
-        List<String> errors = caseAccessService.assignClaimantCaseAccess(caseDetails);
+        List<String> errors = caseAccessService.assignExistingCaseRoles(caseDetails);
 
         return getCallbackRespEntityErrors(errors, caseDetails.getCaseData());
     }

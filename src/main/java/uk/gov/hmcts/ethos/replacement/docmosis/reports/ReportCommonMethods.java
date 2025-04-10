@@ -62,6 +62,6 @@ public final class ReportCommonMethods {
                 judgeName = hearingType.getJudge().getSelectedLabel();
             }
         }
-        return defaultIfEmpty(judgeName, NOT_ALLOCATED).replace("\\d+_", "");
+        return defaultIfEmpty(judgeName, NOT_ALLOCATED).replaceAll("\\d+_", "");
     }
 }

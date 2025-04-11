@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -89,7 +88,7 @@ class AcasServiceTest {
     }
 
     @Test
-    void getAcasCertificate() throws JsonProcessingException {
+    void getAcasCertificate() {
         errors = acasService.getAcasCertificate(caseData, AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID);
         assertEquals(0, errors.size());
     }
@@ -97,14 +96,14 @@ class AcasServiceTest {
     @ParameterizedTest
     @NullSource
     @ValueSource(strings = "")
-    void nullOrEmptyAcasCert(String certifcateNumber) throws JsonProcessingException {
-        caseData.setAcasCertificate(certifcateNumber);
+    void nullOrEmptyAcasCert(String certificateNumber) {
+        caseData.setAcasCertificate(certificateNumber);
         errors = acasService.getAcasCertificate(caseData, AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID);
         assertEquals(1, errors.size());
     }
 
     @Test
-    void unauthorisedResponseFromAcas() throws JsonProcessingException {
+    void unauthorisedResponseFromAcas() {
         getMockServer().expect(ExpectedCount.once(), requestTo(ACAS_BASE_URL))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withStatus(HttpStatus.UNAUTHORIZED));
@@ -113,7 +112,7 @@ class AcasServiceTest {
     }
 
     @Test
-    void certificateNotFound() throws JsonProcessingException {
+    void certificateNotFound() {
         getMockServer().expect(ExpectedCount.once(), requestTo(ACAS_BASE_URL))
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withStatus(HttpStatus.OK)
@@ -125,10 +124,11 @@ class AcasServiceTest {
     }
 
     @Test
-    void getAcasCertificates() throws JsonProcessingException {
-        DocumentInfo actual = acasService.getAcasCertificates(caseData, "R111111/11/11", AUTH_TOKEN,
+    void getAcasCertificates() {
+        List<DocumentInfo> actual = acasService.getAcasCertificates(caseData, List.of("R111111/11/11"), AUTH_TOKEN,
                 ENGLANDWALES_CASE_TYPE_ID);
-        assertEquals(documentInfo.getDescription(), actual.getDescription());
+        assertEquals(1, actual.size());
+        assertEquals(documentInfo.getDescription(), actual.get(0).getDescription());
     }
 
     @Test
@@ -137,7 +137,7 @@ class AcasServiceTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withStatus(HttpStatus.UNAUTHORIZED));
         assertThrows(HttpClientErrorException.class,
-                () -> acasService.getAcasCertificates(caseData, "R111111/11/11", AUTH_TOKEN,
+                () -> acasService.getAcasCertificates(caseData, List.of("R111111/11/11"), AUTH_TOKEN,
                         ENGLANDWALES_CASE_TYPE_ID));
     }
 

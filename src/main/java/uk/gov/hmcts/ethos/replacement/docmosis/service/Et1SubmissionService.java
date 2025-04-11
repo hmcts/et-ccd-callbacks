@@ -21,7 +21,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1;
@@ -152,17 +151,8 @@ public class Et1SubmissionService {
             return new ArrayList<>();
         }
 
-        List<DocumentInfo> documentInfoList = acasNumbers.stream()
-                .map(acasNumber -> {
-                    try {
-                        return acasService.getAcasCertificates(caseData, acasNumber, userToken, caseTypeId);
-                    } catch (Exception e) {
-                        log.error("Failed to process ACAS Certificate {}", acasNumber, e);
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .toList();
+        List<DocumentInfo> documentInfoList = acasService.getAcasCertificates(caseData, acasNumbers, userToken,
+                caseTypeId);
 
         if (CollectionUtils.isEmpty(documentInfoList)) {
             return new ArrayList<>();

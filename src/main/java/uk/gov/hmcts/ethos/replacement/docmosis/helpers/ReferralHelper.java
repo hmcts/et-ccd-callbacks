@@ -72,7 +72,7 @@ public final class ReferralHelper {
     private static final String FALSE = "False";
     private static final String JUDGE_ROLE_ENG = "caseworker-employment-etjudge-englandwales";
     private static final String JUDGE_ROLE_SCOT = "caseworker-employment-etjudge-scotland";
-    private static final String DOCUMENT_LINK = "<a href=\"%s\" download>%s</a><br>";
+    private static final String DOCUMENT_LINK = "<a href=\"%s\" target=\"_blank\">%s</a><br>";
     private static final String REF_OUTPUT_NAME = "Referral Summary.pdf";
     private static final String REF_SUMMARY_TEMPLATE_NAME = "EM-TRB-EGW-ENG-00067.docx";
     private static final String INVALID_EMAIL_ERROR_MESSAGE = "The email address entered is invalid.";

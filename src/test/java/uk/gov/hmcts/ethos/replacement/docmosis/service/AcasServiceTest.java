@@ -141,6 +141,18 @@ class AcasServiceTest {
                         ENGLANDWALES_CASE_TYPE_ID));
     }
 
+    @Test
+    void getAcasCertificatesNoCertFound() {
+        getMockServer().expect(ExpectedCount.once(), requestTo(ACAS_BASE_URL))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withStatus(HttpStatus.OK)
+                                .contentType(MediaType.APPLICATION_JSON))
+        ;
+        List<DocumentInfo> actual = acasService.getAcasCertificates(caseData, List.of("R111111/11/11"), AUTH_TOKEN,
+                ENGLANDWALES_CASE_TYPE_ID);
+        assertEquals(0, actual.size());
+    }
+
     private MockRestServiceServer getMockServer() {
         return MockRestServiceServer.createServer(restTemplate);
     }

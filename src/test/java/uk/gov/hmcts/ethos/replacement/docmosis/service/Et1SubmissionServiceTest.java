@@ -164,7 +164,6 @@ class Et1SubmissionServiceTest {
         when(documentManagementService.addDocumentToDocumentField(any())).thenReturn(uploadedDocument);
 
         assertDoesNotThrow(() -> et1SubmissionService.createAndUploadEt1Docs(caseDetails, "authToken"));
-        System.out.println(caseDetails.getCaseData().getDocumentCollection());
         assertEquals(1, caseDetails.getCaseData().getDocumentCollection().size());
     }
 

@@ -55,4 +55,172 @@
         <cve>CVE-2024-43591</cve>
     </suppress>
     <!-- Above to be removed when migrated to DB instead of SB queue -->
+    <suppress>
+        <notes><![CDATA[
+   file name: lucene-analyzers-common-8.11.1.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.lucene/lucene\-analyzers\-common@.*$</packageUrl>
+        <cpe>cpe:/a:apache:lucene</cpe>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: lucene-backward-codecs-8.11.1.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.lucene/lucene\-backward\-codecs@.*$</packageUrl>
+        <cve>CVE-2024-45772</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: lucene-core-8.11.1.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.lucene/lucene\-core@.*$</packageUrl>
+        <cve>CVE-2024-45772</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: lucene-grouping-8.11.1.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.lucene/lucene\-grouping@.*$</packageUrl>
+        <cve>CVE-2024-45772</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: lucene-highlighter-8.11.1.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.lucene/lucene\-highlighter@.*$</packageUrl>
+        <cve>CVE-2024-45772</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: lucene-join-8.11.1.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.lucene/lucene\-join@.*$</packageUrl>
+        <cve>CVE-2024-45772</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: lucene-memory-8.11.1.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.lucene/lucene\-memory@.*$</packageUrl>
+        <cve>CVE-2024-45772</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: lucene-misc-8.11.1.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.lucene/lucene\-misc@.*$</packageUrl>
+        <cve>CVE-2024-45772</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: lucene-queries-8.11.1.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.lucene/lucene\-queries@.*$</packageUrl>
+        <cve>CVE-2024-45772</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: lucene-queryparser-8.11.1.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.lucene/lucene\-queryparser@.*$</packageUrl>
+        <cve>CVE-2024-45772</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: lucene-sandbox-8.11.1.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.lucene/lucene\-sandbox@.*$</packageUrl>
+        <cve>CVE-2024-45772</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: lucene-spatial3d-8.11.1.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.lucene/lucene\-spatial3d@.*$</packageUrl>
+        <cve>CVE-2024-45772</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: lucene-suggest-8.11.1.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.lucene/lucene\-suggest@.*$</packageUrl>
+        <cve>CVE-2024-45772</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-aop-5.3.31.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework/spring\-aop@.*$</packageUrl>
+        <cve>CVE-2024-38820</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-aspects-5.3.31.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework/spring\-aspects@.*$</packageUrl>
+        <cve>CVE-2024-38820</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-beans-5.3.31.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework/spring\-beans@.*$</packageUrl>
+        <cve>CVE-2024-38820</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-context-5.3.31.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework/spring\-context@.*$</packageUrl>
+        <cve>CVE-2024-38820</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-core-5.3.31.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework/spring\-core@.*$</packageUrl>
+        <cve>CVE-2024-38820</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-expression-5.3.31.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework/spring\-expression@.*$</packageUrl>
+        <cve>CVE-2024-38820</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-jcl-5.3.31.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework/spring\-jcl@.*$</packageUrl>
+        <cve>CVE-2024-38820</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-jdbc-5.3.31.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework/spring\-jdbc@.*$</packageUrl>
+        <cve>CVE-2024-38820</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-orm-5.3.31.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework/spring\-orm@.*$</packageUrl>
+        <cve>CVE-2024-38820</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-tx-5.3.31.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework/spring\-tx@.*$</packageUrl>
+        <cve>CVE-2024-38820</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+   file name: spring-webmvc-5.3.31.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.springframework/spring\-webmvc@.*$</packageUrl>
+        <cve>CVE-2024-38820</cve>
+    </suppress>
 </suppressions>

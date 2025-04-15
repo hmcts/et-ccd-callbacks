@@ -91,20 +91,11 @@ public class TseService {
         application.setStatus(OPEN_STATE);
 
         switch (userType) {
-            case CLAIMANT_TITLE:
-                addClaimantData(caseData, application);
-                break;
-            case RESPONDENT_TITLE:
-                addRespondentData(caseData, application);
-                break;
-            case RESPONDENT_REP_TITLE:
-                addRespondentRepData(caseData, application);
-                break;
-            case CLAIMANT_REP_TITLE:
-                addClaimantRepresentativeData(caseData, application);
-                break;
-            default:
-                throw new IllegalArgumentException("Unexpected user type: " + userType);
+            case CLAIMANT_TITLE -> addClaimantData(caseData, application);
+            case RESPONDENT_TITLE -> addRespondentData(caseData, application);
+            case RESPONDENT_REP_TITLE -> addRespondentRepData(caseData, application);
+            case CLAIMANT_REP_TITLE -> addClaimantRepresentativeData(caseData, application);
+            default -> throw new IllegalArgumentException("Unexpected user type: " + userType);
         }
 
         GenericTseApplicationTypeItem tseApplicationTypeItem = new GenericTseApplicationTypeItem();
@@ -162,7 +153,7 @@ public class TseService {
         application.setDocumentUpload(respondentTse.getContactApplicationFile());
         application.setCopyToOtherPartyYesOrNo(respondentTse.getCopyToOtherPartyYesOrNo());
         application.setCopyToOtherPartyText(respondentTse.getCopyToOtherPartyText());
-        application.setApplicationState(IN_PROGRESS);
+        application.setApplicationState(NOT_STARTED_YET);
     }
 
     private void addClaimantRepresentativeData(CaseData caseData, GenericTseApplicationType application) {

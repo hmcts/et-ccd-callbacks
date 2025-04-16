@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -53,7 +52,7 @@ public class AcasCertificateController {
     })
     public ResponseEntity<CCDCallbackResponse> retrieveCertificate(
             @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) throws JsonProcessingException {
+            @RequestHeader("Authorization") String userToken) {
         log.info(LOG_MESSAGE, "RETRIEVE ACAS CERTIFICATES FROM ACAS ---> ", ccdRequest.getCaseDetails().getCaseId());
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);

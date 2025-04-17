@@ -43,8 +43,10 @@ public class AllocateHearingService {
     public void handleListingSelected(CaseData caseData) {
         HearingType selectedHearing = getSelectedHearing(caseData);
         TribunalOffice managingOffice = TribunalOffice.valueOfOfficeName(caseData.getManagingOffice());
-        caseData.setAllocateHearingJudge(judgeSelectionService.createJudgeSelection(managingOffice, selectedHearing));
-
+        caseData.setAllocateHearingJudge(judgeSelectionService.createJudgeSelection(managingOffice, selectedHearing,
+                false));
+        caseData.setAllocateHearingAdditionalJudge(judgeSelectionService.createJudgeSelection(managingOffice,
+                selectedHearing, true));
         DateListedType selectedListing = getSelectedListing(caseData);
         caseData.setAllocateHearingVenue(venueSelectionService.createVenueSelection(managingOffice, selectedListing));
         caseData.setAllocateHearingSitAlone(selectedHearing.getHearingSitAlone());
@@ -68,6 +70,7 @@ public class AllocateHearingService {
         HearingType selectedHearing = getSelectedHearing(caseData);
         selectedHearing.setHearingSitAlone(caseData.getAllocateHearingSitAlone());
         selectedHearing.setJudge(caseData.getAllocateHearingJudge());
+        selectedHearing.setAdditionalJudge(caseData.getAllocateHearingAdditionalJudge());
         selectedHearing.setHearingERMember(caseData.getAllocateHearingEmployerMember());
         selectedHearing.setHearingEEMember(caseData.getAllocateHearingEmployeeMember());
 

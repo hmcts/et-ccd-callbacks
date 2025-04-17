@@ -121,9 +121,7 @@ public final class ListingHelper {
             listingType.setHearingType(getHearingType(hearingType));
             listingType.setPositionType(getPositionType(caseData));
 
-            listingType.setHearingJudgeName(hearingType.hasHearingJudge()
-                    ? hearingType.getJudge().getSelectedLabel()
-                    : SPACE);
+            listingType.setHearingJudgeName(getHearingJudgeName(hearingType));
             listingType.setHearingEEMember(hearingType.hasHearingEmployeeMember()
                     ? hearingType.getHearingEEMember().getSelectedLabel()
                     : SPACE);
@@ -163,14 +161,22 @@ public final class ListingHelper {
             return getClaimantRespondentDetails(listingType, listingData, caseData);
 
         } catch (Exception ex) {
-            log.error("ListingData: " + listingData);
-            log.error("CaseData: " + caseData);
-            log.error("HearingType: " + hearingType);
-            log.error("DateListedType: " + dateListedType);
-            log.error("index: " + index);
-            log.error("hearingCollectionSize: " + hearingCollectionSize);
+            log.error("Error generating listing type for case {}", caseData.getEthosCaseReference(), ex);
             return listingType;
         }
+    }
+
+    private static String getHearingJudgeName(HearingType hearingType) {
+        String judgeName = SPACE;
+        if (hearingType.hasHearingJudge()) {
+            judgeName = hearingType.getJudge().getSelectedLabel();
+            if (hearingType.hasAdditionalHearingJudge()) {
+                judgeName = hearingType.getJudge().getSelectedLabel()
+                            + " & "
+                            + hearingType.getAdditionalJudge().getSelectedLabel();
+            }
+        }
+        return judgeName.replaceAll("\\d+_", "");
     }
 
     private static String getPositionType(CaseData caseData) {
@@ -580,10 +586,8 @@ public final class ListingHelper {
     }
 
     private static String extractHearingJudgeName(ListingType listingType) {
-        if (listingType.getHearingJudgeName() != null) {
-            return listingType.getHearingJudgeName().substring(listingType.getHearingJudgeName().indexOf('_') + 1);
-        }
-        return "";
+        return listingType.getHearingJudgeName() != null
+                ? listingType.getHearingJudgeName().replaceAll("\\d+_", "") : "";
     }
 
     public static String getRespondentOthersWithLineBreaks(ListingType listingType) {

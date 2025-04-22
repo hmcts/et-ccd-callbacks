@@ -79,7 +79,7 @@ public final class Et3VettingHelper {
     private static final String RESPONDENT_DETAILS = "<h2>Respondent</h2>"
         + "<pre>Name &#09&#09&#09&#09&#09&#09&nbsp; %s"
         + "<br><br>Contact address &#09&#09 %s</pre><hr>";
-    private static final String BR_WITH_TAB = "<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09";
+    private static final String BR_WITH_TAB = "<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 ";
     private static final int ET3_RESPONSE_WINDOW = 28;
     private static final String NONE = "None";
     private static final String NONE_GIVEN = "None Given";

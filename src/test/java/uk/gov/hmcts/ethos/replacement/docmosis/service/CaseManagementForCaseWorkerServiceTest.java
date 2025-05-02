@@ -771,43 +771,27 @@ class CaseManagementForCaseWorkerServiceTest {
         assertThat(errors).isEmpty();
     }
 
-    @Test
-    void amendMidEventHearingEstLengthNumPositive() {
-        CaseData caseData = ccdRequest13.getCaseDetails().getCaseData();
-        caseData.getHearingCollection().get(0).getValue().setHearingEstLengthNum(" 1 ");
+    @ParameterizedTest
+    @CsvSource({
+        "' 1 ', false",
+        "'-1', true",
+        "'0', true",
+        "'Test', true"
+    })
+    void amendMidEventHearingEstLengthNum(String input, boolean expectError) {
+        CaseData caseData = createCaseWithHearingDate("2022-03-21T00:00:00.000");
+        caseData.getHearingCollection().get(0).getValue().setHearingEstLengthNum(input);
         List<String> errors = new ArrayList<>();
-        caseManagementForCaseWorkerService.midEventAmendHearing(caseData, errors);
-        assertThat(errors).isEmpty();
-    }
 
-    @Test
-    void amendMidEventHearingEstLengthNumNegative() {
-        CaseData caseData = ccdRequest13.getCaseDetails().getCaseData();
-        caseData.getHearingCollection().get(0).getValue().setHearingEstLengthNum("-1");
-        List<String> errors = new ArrayList<>();
         caseManagementForCaseWorkerService.midEventAmendHearing(caseData, errors);
-        assertThat(errors).isNotEmpty();
-        assertThat(errors.get(0)).isEqualTo(NEGATIVE_HEARING_LENGTH_MESSAGE + "1");
-    }
 
-    @Test
-    void amendMidEventHearingEstLengthNumZero() {
-        CaseData caseData = ccdRequest13.getCaseDetails().getCaseData();
-        caseData.getHearingCollection().get(0).getValue().setHearingEstLengthNum("0");
-        List<String> errors = new ArrayList<>();
-        caseManagementForCaseWorkerService.midEventAmendHearing(caseData, errors);
-        assertThat(errors).isNotEmpty();
-        assertThat(errors.get(0)).isEqualTo(NEGATIVE_HEARING_LENGTH_MESSAGE + "1");
-    }
-
-    @Test
-    void amendMidEventHearingEstLengthNumInvalid() {
-        CaseData caseData = ccdRequest13.getCaseDetails().getCaseData();
-        caseData.getHearingCollection().get(0).getValue().setHearingEstLengthNum("Test");
-        List<String> errors = new ArrayList<>();
-        caseManagementForCaseWorkerService.midEventAmendHearing(caseData, errors);
-        assertThat(errors).isNotEmpty();
-        assertThat(errors.get(0)).isEqualTo(NEGATIVE_HEARING_LENGTH_MESSAGE + "1");
+        if (expectError) {
+            assertThat(errors).hasSize(1);
+            String hearingNumber = caseData.getHearingCollection().get(0).getValue().getHearingNumber();
+            assertThat(errors.get(0)).isEqualTo(NEGATIVE_HEARING_LENGTH_MESSAGE + hearingNumber);
+        } else {
+            assertThat(errors).isEmpty();
+        }
     }
 
     private CaseData createCaseWithHearingDate(String date) {

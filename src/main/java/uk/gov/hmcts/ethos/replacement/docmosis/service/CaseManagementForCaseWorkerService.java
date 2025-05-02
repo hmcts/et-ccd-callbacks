@@ -97,7 +97,7 @@ public class CaseManagementForCaseWorkerService {
     public static final String LISTED_DATE_ON_WEEKEND_MESSAGE = "A hearing date you have entered "
             + "falls on a weekend. You cannot list this case on a weekend. Please amend the date of Hearing ";
     public static final String NEGATIVE_HEARING_LENGTH_MESSAGE = "Estimated hearing length you have entered "
-        + "is a negative number. Please amend the date of Hearing ";
+        + "is a negative number. Please amend Hearing ";
     public static final String HMCTS_SERVICE_ID = "HMCTSServiceId";
     public static final String ORGANISATION = "Organisation";
 
@@ -502,7 +502,12 @@ public class CaseManagementForCaseWorkerService {
     private void addNegativeHearingLengthsError(HearingTypeItem hearingTypeItem, List<String> errors,
                                                 String hearingNumber) {
         String number = hearingTypeItem.getValue().getHearingEstLengthNum();
-        if (number == null || number.isBlank() || Integer.parseInt(number) <= 0) {
+        try {
+            int parsed = Integer.parseInt(number.trim());
+            if (parsed <= 0) {
+                errors.add(NEGATIVE_HEARING_LENGTH_MESSAGE + hearingNumber);
+            }
+        } catch (NumberFormatException e) {
             errors.add(NEGATIVE_HEARING_LENGTH_MESSAGE + hearingNumber);
         }
     }

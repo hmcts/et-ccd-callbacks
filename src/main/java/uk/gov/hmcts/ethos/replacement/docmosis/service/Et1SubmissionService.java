@@ -24,6 +24,7 @@ import java.util.concurrent.ForkJoinPool;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Collections.synchronizedList;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ACAS_CERTIFICATE;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_ATTACHMENT;
@@ -48,6 +49,7 @@ public class Et1SubmissionService {
     private final TornadoService tornadoService;
     private final UserIdamService userIdamService;
     private final EmailService emailService;
+    private final FeatureToggleService featureToggleService;
 
     @Value("${template.et1.et1ProfessionalSubmission}")
     private String et1ProfessionalSubmissionTemplateId;
@@ -72,7 +74,13 @@ public class Et1SubmissionService {
                 welshEt1 = createEt1DocumentType(caseDetails, userToken, ET1_CY_PDF);
             }
 
-            List<DocumentTypeItem> acasCertificates = getAcasCertificates(caseDetails, userToken);
+            List<DocumentTypeItem> acasCertificates = new ArrayList<>();
+            if (featureToggleService.isAcasCertificatePostSubmissionEnabled()) {
+                caseDetails.getCaseData().setAcasCertificateRequired(YES);
+            } else {
+                acasCertificates = getAcasCertificates(caseDetails, userToken);
+            }
+
             addDocsToClaim(caseDetails.getCaseData(), englishEt1, welshEt1, acasCertificates);
         } catch (Exception e) {
             log.error("Failed to create and upload ET1 documents", e);
@@ -152,7 +160,7 @@ public class Et1SubmissionService {
     }
 
     @SuppressWarnings("PMD.SignatureDeclareThrowsException")
-    private List<DocumentTypeItem> retrieveAndAddAcasCertificates(
+    public List<DocumentTypeItem> retrieveAndAddAcasCertificates(
             CaseData caseData, String userToken, String caseTypeId) throws Exception {
         if (CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
             return new ArrayList<>();

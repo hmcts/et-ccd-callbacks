@@ -43,6 +43,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.ENGLISH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
 import static uk.gov.hmcts.ethos.utils.ResourceUtils.generateCaseDetails;
@@ -79,6 +80,8 @@ class Et1SubmissionServiceTest {
     private EmailService emailService;
     @MockBean
     private ET1PdfMapperService et1PdfMapperService;
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     private Et1SubmissionService et1SubmissionService;
     private CaseDetails caseDetails;
@@ -96,7 +99,7 @@ class Et1SubmissionServiceTest {
         TribunalOfficesService tribunalOfficesService = new TribunalOfficesService(new TribunalOfficesConfiguration(),
                 postcodeToOfficeService);
         et1SubmissionService = new Et1SubmissionService(acasService, documentManagementService,
-                pdfService, tornadoService, userIdamService, emailService);
+                pdfService, tornadoService, userIdamService, emailService, featureToggleService);
         et1ReppedService = new Et1ReppedService(authTokenGenerator, ccdCaseAssignment,
                 jurisdictionCodesMapperService, organisationClient, postcodeToOfficeService, tribunalOfficesService,
                 userIdamService, adminUserService, et1SubmissionService);
@@ -219,5 +222,28 @@ class Et1SubmissionServiceTest {
             Arguments.of(ENGLISH_LANGUAGE),
             Arguments.of(WELSH_LANGUAGE)
         );
+    }
+
+    @Test
+    void shouldNotAddAcasDocsIfNewLogicIsEnabled() throws Exception {
+        when(featureToggleService.isAcasCertificatePostSubmissionEnabled()).thenReturn(true);
+        caseDetails =  generateCaseDetails("citizenCaseData.json");
+        DocumentInfo documentInfo = DocumentInfo.builder()
+                .description("ET1 - John Doe")
+                .url("http://test.com/documents/random-uuid")
+                .markUp("<a target=\"_blank\" href=\"https://test.com/documents/random-uuid\">Document</a>")
+                .build();
+        when(tornadoService.createDocumentInfoFromBytes(anyString(), any(), anyString(), anyString()))
+                .thenReturn(documentInfo);
+        UploadedDocumentType uploadedDocument = UploadedDocumentBuilder.builder()
+                .withUrl("http://test.com/documents/random-uuid")
+                .withFilename("ET1 - John Doe.pdf")
+                .build();
+        when(documentManagementService.addDocumentToDocumentField(any())).thenReturn(uploadedDocument);
+
+        assertDoesNotThrow(() -> et1SubmissionService.createAndUploadEt1Docs(caseDetails, "authToken"));
+        assertEquals(2, caseDetails.getCaseData().getDocumentCollection().size());
+        assertEquals(YES, caseDetails.getCaseData().getAcasCertificateRequired());
+        verify(acasService, times(0)).getAcasCertificates(any(), anyList(), anyString(), anyString());
     }
 }

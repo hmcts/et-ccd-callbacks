@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.exceptions.PdfServiceException;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.DocumentCategory;
-import uk.gov.hmcts.ecm.common.model.helper.DocumentConstants;
 import uk.gov.hmcts.ecm.common.service.pdf.PdfService;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -21,8 +20,11 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ForkJoinPool;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static java.util.Collections.synchronizedList;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ACAS_CERTIFICATE;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_ATTACHMENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.LegalRepDocumentConstants.SUBMIT_ET1;
@@ -57,8 +59,9 @@ public class Et1SubmissionService {
 
     /**
      * Creates the ET1 PDF and calls of to ACAS to retrieve the certificates.
+     *
      * @param caseDetails the case details
-     * @param userToken the user token
+     * @param userToken   the user token
      */
     public void createAndUploadEt1Docs(CaseDetails caseDetails, String userToken) {
         try {
@@ -158,14 +161,21 @@ public class Et1SubmissionService {
             return new ArrayList<>();
         }
 
-        List<DocumentTypeItem> documentTypeItems = new ArrayList<>();
-        documentInfoList.stream()
-                .map(documentManagementService::addDocumentToDocumentField)
-                .forEach(uploadedDocumentType -> {
-                    uploadedDocumentType.setCategoryId(DocumentCategory.ACAS_CERTIFICATE.getCategory());
-                    documentTypeItems.add(createDocumentTypeItem(uploadedDocumentType,
-                            DocumentConstants.ACAS_CERTIFICATE));
-                });
+        List<DocumentTypeItem> documentTypeItems = synchronizedList(new ArrayList<>());
+        ForkJoinPool customThreadPool = new ForkJoinPool(documentInfoList.size());
+        try {
+            customThreadPool.submit(() ->
+                documentInfoList.parallelStream()
+                    .map(documentManagementService::addDocumentToDocumentField)
+                    .forEach(documentType -> {documentType.setCategoryId(DocumentCategory.ACAS_CERTIFICATE.getCategory());
+                        documentTypeItems.add(createDocumentTypeItem(documentType, ACAS_CERTIFICATE));
+                    })
+            ).get();
+        } catch (Exception e) {
+            log.error("Error occurred during parallel processing", e);
+        } finally {
+            customThreadPool.shutdown();
+        }
 
         return documentTypeItems;
     }

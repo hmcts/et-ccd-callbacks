@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRole;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesRequest;
@@ -25,11 +26,11 @@ public class CaseAccessService {
     private final CcdCaseAssignment caseAssignment;
 
     /**
-     * Give a claimant access to a case when the case has been transferred to another jurisdiction.
+     * Assigns all existing case roles after the case transferred to another jurisdiction.
      * @param caseDetails the case details
      * @return a list of errors
      */
-    public List<String> assignClaimantCaseAccess(CaseDetails caseDetails) {
+    public List<String> assignExistingCaseRoles(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
 
         String caseId;
@@ -39,7 +40,6 @@ public class CaseAccessService {
             log.error(e.getMessage());
             return List.of("Error getting original case id");
         }
-
         try {
             List<CaseUserAssignment> caseAssignedUserRolesList =
                     caseAssignment.getCaseUserRoles(caseId).getCaseUserAssignments();
@@ -47,33 +47,30 @@ public class CaseAccessService {
             if (caseAssignedUserRolesList.isEmpty()) {
                 return List.of("Case assigned user roles list is empty");
             }
-
-            String userId = caseAssignedUserRolesList.stream()
-                    .filter(caseAssignedUserRole -> CREATOR_ROLE.equals(caseAssignedUserRole.getCaseRole()))
-                    .findFirst()
-                    .map(CaseUserAssignment::getUserId)
-                    .orElse("");
-
-            if (isNullOrEmpty(userId)) {
-                return List.of("User ID is null or empty");
+            List<String> errorList = new ArrayList<>();
+            for (CaseUserAssignment caseUserAssignment : caseAssignedUserRolesList) {
+                if (isNullOrEmpty(caseUserAssignment.getUserId()) || isNullOrEmpty(caseUserAssignment.getCaseRole())) {
+                    errorList.add("User ID is null or empty");
+                    continue;
+                }
+                CaseAssignmentUserRole caseAssignmentUserRole = CaseAssignmentUserRole.builder()
+                        .userId(caseUserAssignment.getUserId())
+                        .caseDataId(caseDetails.getCaseId())
+                        .caseRole(caseUserAssignment.getCaseRole())
+                        .build();
+                caseAssignment.addCaseUserRole(CaseAssignmentUserRolesRequest.builder()
+                        .caseAssignmentUserRoles(List.of(caseAssignmentUserRole))
+                        .build());
             }
-
-            CaseAssignmentUserRole caseAssignmentUserRole = CaseAssignmentUserRole.builder()
-                    .userId(userId)
-                    .caseDataId(caseDetails.getCaseId())
-                    .caseRole(CREATOR_ROLE)
-                    .build();
-            caseAssignment.addCaseUserRole(CaseAssignmentUserRolesRequest.builder()
-                    .caseAssignmentUserRoles(List.of(caseAssignmentUserRole))
-                    .build());
-
+            if (CollectionUtils.isNotEmpty(errorList)) {
+                return errorList;
+            }
         } catch (Exception e) {
             log.error(e.getMessage());
             return List.of(String.format("Error assigning case access for case %s on behalf of %s",
                     caseId, caseDetails.getCaseId()));
         }
         return new ArrayList<>();
-
     }
 
     private String getOriginalCaseId(CaseData caseData) {

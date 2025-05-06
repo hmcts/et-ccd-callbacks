@@ -97,7 +97,7 @@ public class CaseManagementForCaseWorkerService {
     public static final String LISTED_DATE_ON_WEEKEND_MESSAGE = "A hearing date you have entered "
             + "falls on a weekend. You cannot list this case on a weekend. Please amend the date of Hearing ";
     public static final String NEGATIVE_HEARING_LENGTH_MESSAGE = "The estimated hearing length for hearing %s must be "
-        + "greater than 0";
+        + "greater than 0.";
     public static final String HMCTS_SERVICE_ID = "HMCTSServiceId";
     public static final String ORGANISATION = "Organisation";
 

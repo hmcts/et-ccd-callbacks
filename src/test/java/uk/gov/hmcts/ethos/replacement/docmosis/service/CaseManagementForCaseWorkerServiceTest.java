@@ -788,7 +788,7 @@ class CaseManagementForCaseWorkerServiceTest {
             assertThat(errors).hasSize(1);
             String hearingNumber = caseData.getHearingCollection().get(0).getValue().getHearingNumber();
             assertThat(errors.get(0)).isEqualTo(
-                "The estimated hearing length for hearing " + hearingNumber + " must be greater than 0");
+                "The estimated hearing length for hearing " + hearingNumber + " must be greater than 0.");
         } else {
             assertThat(errors).isEmpty();
         }

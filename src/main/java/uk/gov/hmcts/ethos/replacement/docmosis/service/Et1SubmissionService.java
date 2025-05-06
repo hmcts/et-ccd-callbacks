@@ -151,6 +151,7 @@ public class Et1SubmissionService {
                 : "ET1 - " + sanitizePartyName(caseData.getClaimant()) + ".pdf";
     }
 
+    @SuppressWarnings("PMD.SignatureDeclareThrowsException")
     private List<DocumentTypeItem> retrieveAndAddAcasCertificates(
             CaseData caseData, String userToken, String caseTypeId) throws Exception {
         if (CollectionUtils.isEmpty(caseData.getRespondentCollection())) {

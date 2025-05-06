@@ -167,8 +167,9 @@ public class Et1SubmissionService {
             customThreadPool.submit(() ->
                 documentInfoList.parallelStream()
                     .map(documentManagementService::addDocumentToDocumentField)
-                    .forEach(documentType -> {documentType.setCategoryId(DocumentCategory.ACAS_CERTIFICATE.getCategory());
-                        documentTypeItems.add(createDocumentTypeItem(documentType, ACAS_CERTIFICATE));
+                    .forEach(doc -> {
+                        doc.setCategoryId(DocumentCategory.ACAS_CERTIFICATE.getCategory());
+                        documentTypeItems.add(createDocumentTypeItem(doc, ACAS_CERTIFICATE));
                     })
             ).get();
         } catch (Exception e) {

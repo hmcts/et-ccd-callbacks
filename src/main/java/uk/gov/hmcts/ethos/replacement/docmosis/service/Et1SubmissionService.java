@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.exceptions.PdfServiceException;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.DocumentCategory;
-import uk.gov.hmcts.ecm.common.model.helper.DocumentConstants;
 import uk.gov.hmcts.ecm.common.service.pdf.PdfService;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -21,9 +20,12 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
+import java.util.concurrent.ForkJoinPool;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static java.util.Collections.synchronizedList;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ACAS_CERTIFICATE;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_ATTACHMENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.LegalRepDocumentConstants.SUBMIT_ET1;
@@ -39,6 +41,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters.InvalidCha
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@SuppressWarnings("PMD.DoNotUseThreads")
 public class Et1SubmissionService {
     private final AcasService acasService;
     private final DocumentManagementService documentManagementService;
@@ -46,6 +49,7 @@ public class Et1SubmissionService {
     private final TornadoService tornadoService;
     private final UserIdamService userIdamService;
     private final EmailService emailService;
+    private final FeatureToggleService featureToggleService;
 
     @Value("${template.et1.et1ProfessionalSubmission}")
     private String et1ProfessionalSubmissionTemplateId;
@@ -57,9 +61,10 @@ public class Et1SubmissionService {
     private static final String ET1_CY_PDF = "CY_ET1_2222.pdf";
 
     /**
-     * Creates the ET1 PDF and calls of to ACAS to retrieve the certificates.
+     * Creates the ET1 PDF and calls off to ACAS to retrieve the certificates.
+     *
      * @param caseDetails the case details
-     * @param userToken the user token
+     * @param userToken   the user token
      */
     public void createAndUploadEt1Docs(CaseDetails caseDetails, String userToken) {
         try {
@@ -69,12 +74,28 @@ public class Et1SubmissionService {
                 welshEt1 = createEt1DocumentType(caseDetails, userToken, ET1_CY_PDF);
             }
 
-            List<DocumentTypeItem> acasCertificates = retrieveAndAddAcasCertificates(caseDetails.getCaseData(),
-                    userToken, caseDetails.getCaseTypeId());
+            List<DocumentTypeItem> acasCertificates = new ArrayList<>();
+            if (featureToggleService.isAcasCertificatePostSubmissionEnabled()) {
+                caseDetails.getCaseData().setAcasCertificateRequired(YES);
+            } else {
+                acasCertificates = getAcasCertificates(caseDetails, userToken);
+            }
+
             addDocsToClaim(caseDetails.getCaseData(), englishEt1, welshEt1, acasCertificates);
         } catch (Exception e) {
             log.error("Failed to create and upload ET1 documents", e);
         }
+    }
+
+    private List<DocumentTypeItem> getAcasCertificates(CaseDetails caseDetails, String userToken) {
+        List<DocumentTypeItem> acasCertificates = new ArrayList<>();
+        try {
+            acasCertificates = retrieveAndAddAcasCertificates(caseDetails.getCaseData(),
+                    userToken, caseDetails.getCaseTypeId());
+        } catch (Exception e) {
+            log.error("Failed to retrieve ACAS certificates", e);
+        }
+        return acasCertificates;
     }
 
     private void addDocsToClaim(CaseData caseData, DocumentTypeItem englishEt1, DocumentTypeItem welshEt1,
@@ -138,8 +159,9 @@ public class Et1SubmissionService {
                 : "ET1 - " + sanitizePartyName(caseData.getClaimant()) + ".pdf";
     }
 
-    private List<DocumentTypeItem> retrieveAndAddAcasCertificates(CaseData caseData, String userToken,
-                                                                  String caseTypeId) {
+    @SuppressWarnings("PMD.SignatureDeclareThrowsException")
+    public List<DocumentTypeItem> retrieveAndAddAcasCertificates(
+            CaseData caseData, String userToken, String caseTypeId) throws Exception {
         if (CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
             return new ArrayList<>();
         }
@@ -152,30 +174,27 @@ public class Et1SubmissionService {
             return new ArrayList<>();
         }
 
-        List<DocumentInfo> documentInfoList = acasNumbers.stream()
-                .map(acasNumber -> {
-                    try {
-                        return acasService.getAcasCertificates(caseData, acasNumber, userToken, caseTypeId);
-                    } catch (Exception e) {
-                        log.error("Failed to process ACAS Certificate {}", acasNumber, e);
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .toList();
+        List<DocumentInfo> documentInfoList = acasService.getAcasCertificates(caseData, acasNumbers, userToken,
+                caseTypeId);
 
         if (CollectionUtils.isEmpty(documentInfoList)) {
             return new ArrayList<>();
         }
 
-        List<DocumentTypeItem> documentTypeItems = new ArrayList<>();
-        documentInfoList.stream()
-                .map(documentManagementService::addDocumentToDocumentField)
-                .forEach(uploadedDocumentType -> {
-                    uploadedDocumentType.setCategoryId(DocumentCategory.ACAS_CERTIFICATE.getCategory());
-                    documentTypeItems.add(createDocumentTypeItem(uploadedDocumentType,
-                            DocumentConstants.ACAS_CERTIFICATE));
-                });
+        List<DocumentTypeItem> documentTypeItems = synchronizedList(new ArrayList<>());
+        ForkJoinPool customThreadPool = new ForkJoinPool(documentInfoList.size());
+        try {
+            customThreadPool.submit(() ->
+                documentInfoList.parallelStream()
+                    .map(documentManagementService::addDocumentToDocumentField)
+                    .forEach(doc -> {
+                        doc.setCategoryId(DocumentCategory.ACAS_CERTIFICATE.getCategory());
+                        documentTypeItems.add(createDocumentTypeItem(doc, ACAS_CERTIFICATE));
+                    })
+            ).get();
+        } finally {
+            customThreadPool.shutdown();
+        }
 
         return documentTypeItems;
     }

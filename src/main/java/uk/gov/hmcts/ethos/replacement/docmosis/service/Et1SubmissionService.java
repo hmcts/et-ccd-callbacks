@@ -73,13 +73,22 @@ public class Et1SubmissionService {
                 welshEt1 = createEt1DocumentType(caseDetails, userToken, ET1_CY_PDF);
             }
 
-            List<DocumentTypeItem> acasCertificates = retrieveAndAddAcasCertificates(caseDetails.getCaseData(),
-                    userToken, caseDetails.getCaseTypeId());
+            List<DocumentTypeItem> acasCertificates = getAcasCertificates(caseDetails, userToken);
             addDocsToClaim(caseDetails.getCaseData(), englishEt1, welshEt1, acasCertificates);
-        } catch (InterruptedException | ExecutionException | PdfServiceException e) {
-            Thread.currentThread().interrupt();
+        } catch (Exception e) {
             log.error("Failed to create and upload ET1 documents", e);
         }
+    }
+
+    private List<DocumentTypeItem> getAcasCertificates(CaseDetails caseDetails, String userToken) {
+        List<DocumentTypeItem> acasCertificates = new ArrayList<>();
+        try {
+            acasCertificates = retrieveAndAddAcasCertificates(caseDetails.getCaseData(),
+                    userToken, caseDetails.getCaseTypeId());
+        } catch (Exception e) {
+            log.error("Failed to retrieve ACAS certificates", e);
+        }
+        return acasCertificates;
     }
 
     private void addDocsToClaim(CaseData caseData, DocumentTypeItem englishEt1, DocumentTypeItem welshEt1,
@@ -144,7 +153,7 @@ public class Et1SubmissionService {
     }
 
     private List<DocumentTypeItem> retrieveAndAddAcasCertificates(
-            CaseData caseData, String userToken, String caseTypeId) throws ExecutionException, InterruptedException {
+            CaseData caseData, String userToken, String caseTypeId) throws Exception {
         if (CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
             return new ArrayList<>();
         }
@@ -175,9 +184,6 @@ public class Et1SubmissionService {
                         documentTypeItems.add(createDocumentTypeItem(doc, ACAS_CERTIFICATE));
                     })
             ).get();
-        } catch (Exception e) {
-            log.error("Error occurred during parallel processing", e);
-            throw e;
         } finally {
             customThreadPool.shutdown();
         }

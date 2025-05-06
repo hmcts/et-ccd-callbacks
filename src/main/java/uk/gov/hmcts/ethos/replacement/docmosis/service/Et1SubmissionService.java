@@ -20,7 +20,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 
 import static com.google.common.base.Strings.isNullOrEmpty;

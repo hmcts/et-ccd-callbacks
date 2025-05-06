@@ -42,6 +42,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 @ExtendWith(SpringExtension.class)
 class AcasServiceTest {
 
+    private static final List<String> ACAS_CERT_LIST = List.of("R111111/11/11");
     @MockBean
     private DocumentManagementService documentManagementService;
     @MockBean
@@ -125,7 +126,7 @@ class AcasServiceTest {
 
     @Test
     void getAcasCertificates() {
-        List<DocumentInfo> actual = acasService.getAcasCertificates(caseData, List.of("R111111/11/11"), AUTH_TOKEN,
+        List<DocumentInfo> actual = acasService.getAcasCertificates(caseData, ACAS_CERT_LIST, AUTH_TOKEN,
                 ENGLANDWALES_CASE_TYPE_ID);
         assertEquals(1, actual.size());
         assertEquals(documentInfo.getDescription(), actual.get(0).getDescription());
@@ -137,7 +138,7 @@ class AcasServiceTest {
                 .andExpect(method(HttpMethod.POST))
                 .andRespond(withStatus(HttpStatus.UNAUTHORIZED));
         assertThrows(HttpClientErrorException.class,
-                () -> acasService.getAcasCertificates(caseData, List.of("R111111/11/11"), AUTH_TOKEN,
+                () -> acasService.getAcasCertificates(caseData, ACAS_CERT_LIST, AUTH_TOKEN,
                         ENGLANDWALES_CASE_TYPE_ID));
     }
 
@@ -148,7 +149,7 @@ class AcasServiceTest {
                 .andRespond(withStatus(HttpStatus.OK)
                                 .contentType(MediaType.APPLICATION_JSON))
         ;
-        List<DocumentInfo> actual = acasService.getAcasCertificates(caseData, List.of("R111111/11/11"), AUTH_TOKEN,
+        List<DocumentInfo> actual = acasService.getAcasCertificates(caseData, ACAS_CERT_LIST, AUTH_TOKEN,
                 ENGLANDWALES_CASE_TYPE_ID);
         assertEquals(0, actual.size());
     }

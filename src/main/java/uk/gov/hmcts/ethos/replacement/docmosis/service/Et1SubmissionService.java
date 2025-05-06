@@ -20,6 +20,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ForkJoinPool;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -59,7 +60,7 @@ public class Et1SubmissionService {
     private static final String ET1_CY_PDF = "CY_ET1_2222.pdf";
 
     /**
-     * Creates the ET1 PDF and calls of to ACAS to retrieve the certificates.
+     * Creates the ET1 PDF and calls off to ACAS to retrieve the certificates.
      *
      * @param caseDetails the case details
      * @param userToken   the user token
@@ -75,7 +76,8 @@ public class Et1SubmissionService {
             List<DocumentTypeItem> acasCertificates = retrieveAndAddAcasCertificates(caseDetails.getCaseData(),
                     userToken, caseDetails.getCaseTypeId());
             addDocsToClaim(caseDetails.getCaseData(), englishEt1, welshEt1, acasCertificates);
-        } catch (Exception e) {
+        } catch (InterruptedException | ExecutionException | PdfServiceException e) {
+            Thread.currentThread().interrupt();
             log.error("Failed to create and upload ET1 documents", e);
         }
     }
@@ -141,8 +143,8 @@ public class Et1SubmissionService {
                 : "ET1 - " + sanitizePartyName(caseData.getClaimant()) + ".pdf";
     }
 
-    private List<DocumentTypeItem> retrieveAndAddAcasCertificates(CaseData caseData, String userToken,
-                                                                  String caseTypeId) {
+    private List<DocumentTypeItem> retrieveAndAddAcasCertificates(
+            CaseData caseData, String userToken, String caseTypeId) throws ExecutionException, InterruptedException {
         if (CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
             return new ArrayList<>();
         }
@@ -175,6 +177,7 @@ public class Et1SubmissionService {
             ).get();
         } catch (Exception e) {
             log.error("Error occurred during parallel processing", e);
+            throw e;
         } finally {
             customThreadPool.shutdown();
         }

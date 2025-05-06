@@ -40,6 +40,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters.InvalidCha
 @Service
 @Slf4j
 @RequiredArgsConstructor
+@SuppressWarnings("PMD.DoNotUseThreads")
 public class Et1SubmissionService {
     private final AcasService acasService;
     private final DocumentManagementService documentManagementService;

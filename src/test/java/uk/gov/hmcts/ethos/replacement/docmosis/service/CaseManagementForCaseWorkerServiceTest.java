@@ -92,7 +92,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EMPTY_ST
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET1_ATTACHMENT_DOC_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET1_DOC_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService.LISTED_DATE_ON_WEEKEND_MESSAGE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService.NEGATIVE_HEARING_LENGTH_MESSAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService.ORGANISATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
@@ -788,7 +787,8 @@ class CaseManagementForCaseWorkerServiceTest {
         if (expectError) {
             assertThat(errors).hasSize(1);
             String hearingNumber = caseData.getHearingCollection().get(0).getValue().getHearingNumber();
-            assertThat(errors.get(0)).isEqualTo(NEGATIVE_HEARING_LENGTH_MESSAGE + hearingNumber);
+            assertThat(errors.get(0)).isEqualTo(
+                "The estimated hearing length for hearing " + hearingNumber + " must be greater than 0");
         } else {
             assertThat(errors).isEmpty();
         }

@@ -39,6 +39,7 @@ public final class HearingsByHearingTypeReport {
     private static final String STAGE_3 = "Stage 3";
     private static final String SIT_ALONE = "Sit Alone";
     private static final String FULL_PANEL = "Full Panel";
+    private static final String TWO_JUDGES = "Two Judges";
 
     private static final String COSTS_HEARING_TYPE_SCOTLAND = "Expenses/Wasted Costs Hearing";
     private String dateFrom;
@@ -101,6 +102,7 @@ public final class HearingsByHearingTypeReport {
     private void initReportSummary2HdrList(List<HearingsByHearingTypeReportSummary2Hdr> reportSummary2HdrList) {
         reportSummary2HdrList.add(new HearingsByHearingTypeReportSummary2Hdr(FULL_PANEL));
         reportSummary2HdrList.add(new HearingsByHearingTypeReportSummary2Hdr(SIT_ALONE));
+        reportSummary2HdrList.add(new HearingsByHearingTypeReportSummary2Hdr(TWO_JUDGES));
         reportSummary2HdrList.add(new HearingsByHearingTypeReportSummary2Hdr("JM"));
         reportSummary2HdrList.add(new HearingsByHearingTypeReportSummary2Hdr("Tel Con"));
         reportSummary2HdrList.add(new HearingsByHearingTypeReportSummary2Hdr(VIDEO));
@@ -117,6 +119,8 @@ public final class HearingsByHearingTypeReport {
                 return FULL_PANEL;
             } else if (List.of(SIT_ALONE, YES).contains(hearingTypeItem.getValue().getHearingSitAlone())) {
                 return SIT_ALONE;
+            } else if (TWO_JUDGES.equals(hearingTypeItem.getValue().getHearingSitAlone())) {
+                return TWO_JUDGES;
             }
         }
         return "";

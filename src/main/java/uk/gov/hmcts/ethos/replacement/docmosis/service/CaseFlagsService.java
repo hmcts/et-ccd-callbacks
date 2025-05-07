@@ -13,10 +13,10 @@ import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.CaseFlagsType;
 import uk.gov.hmcts.et.common.model.ccd.types.RestrictedReportingType;
 
+import javax.annotation.Nullable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-import javax.annotation.Nullable;
 
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.ACTIVE;
 import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.DISRUPTIVE_CUSTOMER;
@@ -45,6 +45,9 @@ public class CaseFlagsService {
      * @param caseData Data about the current case
      */
     public void setupCaseFlags(CaseData caseData) {
+        log.info("case flag {}", caseData.getCaseFlags());
+        log.info("claimant flag {}", caseData.getClaimantFlags());
+        log.info("respondent flag {}", caseData.getRespondentFlags());
         caseData.setCaseFlags(CaseFlagsType.builder().build());
 
         caseData.setClaimantFlags(CaseFlagsType.builder()

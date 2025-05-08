@@ -48,19 +48,29 @@ public class CaseFlagsService {
         log.info("case flag {}", caseData.getCaseFlags());
         log.info("claimant flag {}", caseData.getClaimantFlags());
         log.info("respondent flag {}", caseData.getRespondentFlags());
-        caseData.setCaseFlags(CaseFlagsType.builder().build());
 
-        caseData.setClaimantFlags(CaseFlagsType.builder()
-                .partyName(caseData.getClaimant())
-                .roleOnCase("claimant")
-                .build()
-        );
+        if (caseData.getCaseFlags() == null) {
+            caseData.setCaseFlags(CaseFlagsType.builder().build());
+        }
 
-        caseData.setRespondentFlags(CaseFlagsType.builder()
-                .partyName(caseData.getRespondent())
-                .roleOnCase("respondent")
-                .build()
-        );
+        if (caseData.getClaimantFlags() == null) {
+            caseData.setClaimantFlags(CaseFlagsType.builder()
+                    .partyName(caseData.getClaimant())
+                    .roleOnCase("claimant")
+                    .build()
+            );
+        }
+
+        if (caseData.getRespondentFlags() == null) {
+            caseData.setRespondentFlags(CaseFlagsType.builder()
+                    .partyName(caseData.getRespondent())
+                    .roleOnCase("respondent")
+                    .build()
+            );
+        }
+        log.info("post case flag {}", caseData.getCaseFlags());
+        log.info("post claimant flag {}", caseData.getClaimantFlags());
+        log.info("post respondent flag {}", caseData.getRespondentFlags());
     }
 
     /**

@@ -45,10 +45,6 @@ public class CaseFlagsService {
      * @param caseData Data about the current case
      */
     public void setupCaseFlags(CaseData caseData) {
-        log.info("case flag {}", caseData.getCaseFlags());
-        log.info("claimant flag {}", caseData.getClaimantFlags());
-        log.info("respondent flag {}", caseData.getRespondentFlags());
-
         if (caseData.getCaseFlags() == null) {
             caseData.setCaseFlags(CaseFlagsType.builder().build());
         }
@@ -59,6 +55,8 @@ public class CaseFlagsService {
                     .roleOnCase("claimant")
                     .build()
             );
+        } else if (!caseData.getClaimant().equals(caseData.getClaimantFlags().getPartyName())) {
+            caseData.getClaimantFlags().setPartyName(caseData.getClaimant());
         }
 
         if (caseData.getRespondentFlags() == null) {
@@ -67,10 +65,9 @@ public class CaseFlagsService {
                     .roleOnCase("respondent")
                     .build()
             );
+        } else if (!caseData.getRespondent().equals(caseData.getRespondentFlags().getPartyName())) {
+            caseData.getRespondentFlags().setPartyName(caseData.getRespondent());
         }
-        log.info("post case flag {}", caseData.getCaseFlags());
-        log.info("post claimant flag {}", caseData.getClaimantFlags());
-        log.info("post respondent flag {}", caseData.getRespondentFlags());
     }
 
     /**

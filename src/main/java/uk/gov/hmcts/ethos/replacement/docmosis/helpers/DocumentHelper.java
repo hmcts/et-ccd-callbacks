@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
@@ -1038,5 +1039,80 @@ public final class DocumentHelper {
         } else {
             documentCollection.add(docTypeItem);
         }
+    }
+
+    /**
+     * Adds new document to the given document type items. Checks if document type items list is empty or not. If it is
+     * empty creates new document type items list and checks if document type item is empty or not. If not empty and
+     * not exists in the existing document type items it adds new item to the document type item list. It is assumed
+     * that the list of document type items is never null but can be empty array list.
+     * @param documentTypeItems List of existing documents. Should never be null, but can be empty array list
+     * @param uploadedDocumentType new document to be added.
+     */
+    public static void addUploadedDocumentTypeToDocumentCollection(List<DocumentTypeItem> documentTypeItems,
+                                                                   UploadedDocumentType uploadedDocumentType,
+                                                                   String uploadedDocumentTypeTopLevel,
+                                                                   String uploadedDocumentTypeDescription,
+                                                                   String uploadedDocumentTypeValue,
+                                                                   List<String> excludeFromDcf) {
+        if (ObjectUtils.isEmpty(uploadedDocumentType)
+                || uploadedDocumentTypeExistsInDocumentCollection(documentTypeItems, uploadedDocumentType)) {
+            return;
+        }
+        DocumentTypeItem documentTypeItem = convertUploadedDocumentTypeToDocumentTypeItem(uploadedDocumentType,
+                uploadedDocumentTypeTopLevel,
+                uploadedDocumentTypeDescription,
+                uploadedDocumentTypeValue,
+                excludeFromDcf);
+        documentTypeItems.add(documentTypeItem);
+    }
+
+    /**
+     * Assumed that uploaded document type is never null or empty. Searched document in the document list if uploaded
+     * document exists or not by its name.
+     * @param documentTypeItems List of documents that will be searched for uploaded document type existence.
+     * @param uploadedDocumentType Document that will be searched in the list of documents by its name.
+     * @return if file exists in the document list will return true else will return false
+     */
+    private static boolean uploadedDocumentTypeExistsInDocumentCollection(List<DocumentTypeItem> documentTypeItems,
+                                                     UploadedDocumentType uploadedDocumentType) {
+        for (DocumentTypeItem documentTypeItem : documentTypeItems) {
+            if (ObjectUtils.isNotEmpty(documentTypeItem.getValue())
+                    && ObjectUtils.isNotEmpty(documentTypeItem.getValue().getUploadedDocument())
+                    && StringUtils.isNotEmpty(documentTypeItem.getValue().getUploadedDocument().getDocumentFilename())
+                    && documentTypeItem.getValue().getUploadedDocument().getDocumentFilename()
+                    .equals(uploadedDocumentType.getDocumentFilename())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static DocumentTypeItem convertUploadedDocumentTypeToDocumentTypeItem(
+            UploadedDocumentType uploadedDocumentType,
+            String uploadedDocumentTypeTopLevel,
+            String uploadedDocumentTypeDescription,
+            String uploadedDocumentTypeValue,
+            List<String> excludeFromDcf) {
+        DocumentTypeItem documentTypeItem = createDocumentTypeItemFromTopLevel(
+                uploadedDocumentType, uploadedDocumentTypeTopLevel,
+                uploadedDocumentTypeValue, uploadedDocumentTypeDescription);
+        documentTypeItem.getValue().setDateOfCorrespondence(uploadedDocumentType.getUploadTimestamp());
+        documentTypeItem.getValue().setExcludeFromDcf(excludeFromDcf);
+        return documentTypeItem;
+    }
+
+    /**
+     * Removes existing document from document collection by its name.
+     * @param documentTypeItems list of documents that will be searched by document name
+     * @param documentName Name of the document that will be removed.
+     */
+    public static void removeDocumentFromDocumentCollectionByDocumentName(List<DocumentTypeItem> documentTypeItems,
+                                                            String documentName) {
+        documentTypeItems.removeIf(documentTypeItem -> ObjectUtils.isNotEmpty(documentTypeItem.getValue())
+                && ObjectUtils.isNotEmpty(documentTypeItem.getValue().getUploadedDocument())
+                && StringUtils.isNotEmpty(documentTypeItem.getValue().getUploadedDocument().getDocumentFilename())
+                && documentTypeItem.getValue().getUploadedDocument().getDocumentFilename()
+                .equals(documentName));
     }
 }

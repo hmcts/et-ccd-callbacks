@@ -498,6 +498,7 @@ public class CaseActionsForCaseWorkerController {
 
         caseFlagsService.setupCaseFlags(caseData);
 
+        caseManagementForCaseWorkerService.modifyDocumentCollectionForET3Forms(caseData);
         caseManagementForCaseWorkerService.updateWorkAllocationField(errors, caseData);
         removeSpacesFromPartyNames(caseData);
 

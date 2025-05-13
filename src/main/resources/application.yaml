@@ -21,7 +21,7 @@ spring:
   application:
     name: et-cos
   datasource:
-    password: ${ET_COS_DB_PASSWORD:et_cos}
+    password: ${ET_COS_DB_PASSWORD:}
     url: jdbc:postgresql://${ET_COS_DB_HOST:localhost}:${ET_COS_DB_PORT:5432}/${ET_COS_DB_NAME:et_cos}${ET_COS_DB_CONN_OPTIONS:}
     username: ${ET_COS_DB_USER_NAME:et_cos}
   config:
@@ -35,11 +35,9 @@ feign:
     enabled: 'true'
 
 tornado:
-  accessKey: ${TORNADO_ACCESS_KEY:ZTY0NjBlNGEtYWIyYy00ZTA4LTg0NWItNTU1NDM4OWZjMTM4OjY4MTM4ODM}
-  # For localhost http://localhost:8080/api/render
-  # accessKey: ${TORNADO_ACCESS_KEY:3MAD-KMTP-JALP-GKIA-EBBH-2ELH-SBKQ-MS07-E7E1-B-3018}
+  accessKey: ${TORNADO_ACCESS_KEY}
   url: ${TORNADO_URL:https://eu.dws3.docmosis.com/api/render}
-  # url: ${TORNADO_URL:http://localhost:8080/api/render}
+
 ccd:
   client:
     timeout: '60000'
@@ -47,8 +45,8 @@ ccd:
 
 document_management:
   ccdCaseDocument:
-    url: ${DOCUMENT_MANAGEMENT_URL:http://localhost:5005}
-  url: ${DOCUMENT_MANAGEMENT_URL:http://localhost:5005}
+    url: ${DOCUMENT_MANAGEMENT_URL:http://dm-store:8080}
+  url: ${DOCUMENT_MANAGEMENT_URL:http://dm-store:8080}
 
 idam:
   s2s-auth:
@@ -64,7 +62,7 @@ idam:
     secret: ${IDAM_CLIENT_SECRET:AAAAAAAAAAAAAAAA}
     id: ${REFORM_SERVICE_NAME:et-cos}
 
-ccd_gateway_base_url: ${CCD_GATEWAY_BASE_URL:http://127.0.0.1:3000}
+ccd_gateway_base_url: ${CCD_GATEWAY_BASE_URL:http://127.0.0.1:3453}
 
 case_document_am:
   url: ${CASE_DOCUMENT_AM_URL:http://ccd-case-document-am-api:4455}
@@ -77,16 +75,15 @@ feature:
 
 queue:
   create-updates:
-    queue-name: ${CREATE_UPDATES_QUEUE_NAME:create-updates-md}
+    queue-name: ${CREATE_UPDATES_QUEUE_NAME:create-updates}
     send:
-      connection-string: ${CREATE_UPDATES_QUEUE_SEND_CONNECTION_STRING:Endpoint=sb://ethos-servicebus-devs.servicebus.windows.net/;SharedAccessKeyName=SendSharedAccessKey;SharedAccessKey=57oysgNkP+n3p5LJ3jTgZyop8F0gn4a377d7oOj8mPA=;EntityPath=create-updates-md}
+      connection-string: ${CREATE_UPDATES_QUEUE_SEND_CONNECTION_STRING}
 
 springdoc:
-  pre-loading-enabled: 'false'
   packagesToScan: uk.gov.hmcts.ethos.replacement.docmosis.controllers
   pathsToMatch: /**
 
-gov-notify-api-key: ${GOV_NOTIFY_API_KEY:mehmet_test-002d2170-e381-4545-8251-5e87dab724e7-db399a12-92a5-4314-855c-48b60bc6bcf7}
+gov-notify-api-key: ${GOV_NOTIFY_API_KEY}
 
 template:
   referral: ${REFERRAL_TEMPLATE_ID:f975c1cc-e102-472a-a6cb-84dffa0a6d42}
@@ -208,8 +205,8 @@ template:
     cySubmitCaseEmailTemplateId: ${CY_SUBMIT_CASE_EMAIL_TEMPLATE_ID:7b1f33eb-31c5-4a00-b1a4-c1bca84bc441}
 etcos:
   system:
-    username: ${ET_COS_SYSTEM_USER:admin@hmcts.net}
-    password: ${ET_COS_SYSTEM_USER_PASSWORD:Pa55word11}
+    username: ${ET_COS_SYSTEM_USER}
+    password: ${ET_COS_SYSTEM_USER_PASSWORD}
 
 assign_case_access_api_url: ${AAC_URL:http://localhost:4454}
 apply_noc_access_api_assignments_path: /noc/apply-decision
@@ -226,8 +223,6 @@ feature-flags:
 em-ccd-orchestrator:
   api:
     url: ${EM_CCD_ORCHESTRATOR_URL:http://localhost:8082}
-  config:
-    default: et-dcf-2.yaml
 
 acas:
   api:
@@ -238,9 +233,9 @@ acas:
 hmcts_service_id: BHA1
 
 launchdarkly:
-  sdk-key: ${LAUNCH_DARKLY_SDK_KEY:sdk-0356f703-08eb-4f8d-bdc0-c21301f8b446}
-  offline-mode: true
-  env: ${LAUNCH_DARKLY_ENV:demo}
+  sdk-key: ${LAUNCH_DARKLY_SDK_KEY:sdk-key}
+  offline-mode: false
+  env: ${LAUNCH_DARKLY_ENV:default}
 
 es:
   partition:
@@ -255,4 +250,4 @@ cron:
   partySpacing: ${CRON_PARTY_SPACING:0 */15 * * * ?}
 
 pdf:
-  et3form: "ET3_0125.pdf"
+  et3form: "ET3_0224.pdf"

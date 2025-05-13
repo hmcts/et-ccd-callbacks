@@ -12,6 +12,12 @@
           "document_filename": "Test Company - ET3 Response.pdf",
           "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/1824d0e5-aecc-4dff-8e7c-03fbae8cfb39/binary"
         },
+        "et3FormWelsh": {
+          "category_id": "C18",
+          "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/1824d0e5-aecc-4dff-8e7c-03fbae8cfb39",
+          "document_filename": "Test Company - ET3 Response - Welsh.pdf",
+          "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/1824d0e5-aecc-4dff-8e7c-03fbae8cfb39/binary"
+        },
         "respondent_phone1": "07444518903",
         "respondent_phone2": "07444518904",
         "respondent_contact_preference": "post",
@@ -448,6 +454,23 @@
           "category_id": "C18",
           "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/1824d0e5-aecc-4dff-8e7c-03fbae8cfb39",
           "document_filename": "Test Company - ET3 Response.pdf",
+          "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/1824d0e5-aecc-4dff-8e7c-03fbae8cfb39/binary"
+        },
+        "topLevelDocuments": "Response to a Claim",
+        "dateOfCorrespondence": "2024-05-13",
+        "responseClaimDocuments": "ET3"
+      }
+    },
+    {
+      "id": "8023c301-22da-461e-8ad3-d63cefc3a93c",
+      "value": {
+        "documentType": "ET3",
+        "typeOfDocument": "ET3",
+        "shortDescription": "Attached document submitted with a Response : ET3 Form Submission.",
+        "uploadedDocument": {
+          "category_id": "C18",
+          "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/1824d0e5-aecc-4dff-8e7c-03fbae8cfb39",
+          "document_filename": "Test Company - ET3 Response - Welsh.pdf",
           "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/1824d0e5-aecc-4dff-8e7c-03fbae8cfb39/binary"
         },
         "topLevelDocuments": "Response to a Claim",

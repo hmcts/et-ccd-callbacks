@@ -281,6 +281,9 @@ public class CaseManagementForCaseWorkerService {
     }
 
     public void modifyDocumentCollectionForET3Forms(CaseData caseData) {
+        if (isEmpty(caseData.getRespondentCollection())) {
+            return;
+        }
         if (caseData.getDocumentCollection() == null) {
             caseData.setDocumentCollection(new ArrayList<>());
         }
@@ -301,10 +304,16 @@ public class CaseManagementForCaseWorkerService {
                             ET3,
                             null);
                     DocumentHelper.setDocumentNumbers(caseData);
-                } else {
-                    DocumentHelper.removeDocumentFromDocumentCollectionByDocumentName(caseData.getDocumentCollection(),
+                    continue;
+                }
+                if (ObjectUtils.isNotEmpty(respondentSumTypeItem.getValue().getEt3Form())) {
+                    DocumentHelper.removeDocumentFromDocumentCollectionByDocumentName(
+                            caseData.getDocumentCollection(),
                             respondentSumTypeItem.getValue().getEt3Form().getDocumentFilename());
-                    DocumentHelper.removeDocumentFromDocumentCollectionByDocumentName(caseData.getDocumentCollection(),
+                }
+                if (ObjectUtils.isNotEmpty(respondentSumTypeItem.getValue().getEt3FormWelsh())) {
+                    DocumentHelper.removeDocumentFromDocumentCollectionByDocumentName(
+                            caseData.getDocumentCollection(),
                             respondentSumTypeItem.getValue().getEt3FormWelsh().getDocumentFilename());
                 }
             }

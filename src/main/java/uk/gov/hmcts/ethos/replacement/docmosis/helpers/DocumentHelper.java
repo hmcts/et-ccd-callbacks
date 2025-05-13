@@ -89,10 +89,9 @@ public final class DocumentHelper {
         // Start building the instruction
         sb.append("{\n\"accessKey\":\"").append(accessKey).append(NEW_LINE).append("\"templateName\":\"")
                 .append(templateName).append(FILE_EXTENSION).append(NEW_LINE).append("\"outputName\":\"")
-                .append(OUTPUT_FILE_NAME).append(NEW_LINE);
-
-        // Building the document data
-        sb.append("\"data\":{\n");
+                .append(OUTPUT_FILE_NAME).append(NEW_LINE)
+                // Building the document data
+                .append("\"data\":{\n");
 
         if (templateName.equals(ADDRESS_LABELS_TEMPLATE) && multipleData == null) {
             sb.append(getAddressLabelsDataSingleCase(caseData));

@@ -2,13 +2,13 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import com.google.common.collect.Maps;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.util.Pair;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.client.RestClientResponseException;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
@@ -30,6 +30,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.generic.BaseCaseData;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ECCHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
@@ -55,6 +56,7 @@ import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABOUT_TO_SUBMIT_EVENT_CALLBACK;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.DEFAULT_FLAGS_IMAGE_FILE_NAME;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPLOYMENT;
@@ -69,6 +71,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTE
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET3;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ACAS_DOC_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EMPTY_STRING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET1_ATTACHMENT_DOC_TYPE;
@@ -105,6 +108,8 @@ public class CaseManagementForCaseWorkerService {
     public static final String CASE_MANAGEMENT_CODE = "Employment";
     private static final String EMPLOYMENT_JURISDICTION = "EMPLOYMENT";
     public static final String ET3_RESPONSE_RECEIVED_INITIAL_VALUE = "1";
+    public static final String ET3_FORM_ENGLISH_DESCRIPTION = "ET3 Form English Version";
+    public static final String ET3_FORM_WELSH_DESCRIPTION = "ET3 Form Welsh Version";
     private final String ccdGatewayBaseUrl;
     private final List<String> caseTypeIdsToCheck = List.of("ET_EnglandWales", "ET_Scotland", "Bristol",
             "Leeds", "LondonCentral", "LondonEast", "LondonSouth", "Manchester", "MidlandsEast", "MidlandsWest",
@@ -272,6 +277,37 @@ public class CaseManagementForCaseWorkerService {
                 && featureToggleService.isWorkAllocationEnabled()
                 && !isEmpty(caseData.getRespondentCollection())) {
             updateResponseReceivedCounter(caseData.getRespondentCollection());
+        }
+    }
+
+    public void modifyDocumentCollectionForET3Forms(CaseData caseData) {
+        if (caseData.getDocumentCollection() == null) {
+            caseData.setDocumentCollection(new ArrayList<>());
+        }
+        List<RespondentSumTypeItem> respondentSumTypeItems = caseData.getRespondentCollection();
+        for (RespondentSumTypeItem respondentSumTypeItem : respondentSumTypeItems) {
+            if (ObjectUtils.isNotEmpty(respondentSumTypeItem.getValue())) {
+                if (ACCEPTED_STATE.equals(respondentSumTypeItem.getValue().getResponseStatus())) {
+                    DocumentHelper.addUploadedDocumentTypeToDocumentCollection(caseData.getDocumentCollection(),
+                            respondentSumTypeItem.getValue().getEt3Form(),
+                            ET3,
+                            ET3_FORM_ENGLISH_DESCRIPTION,
+                            ET3,
+                            null);
+                    DocumentHelper.addUploadedDocumentTypeToDocumentCollection(caseData.getDocumentCollection(),
+                            respondentSumTypeItem.getValue().getEt3FormWelsh(),
+                            ET3,
+                            ET3_FORM_WELSH_DESCRIPTION,
+                            ET3,
+                            null);
+                    DocumentHelper.setDocumentNumbers(caseData);
+                } else {
+                    DocumentHelper.removeDocumentFromDocumentCollectionByDocumentName(caseData.getDocumentCollection(),
+                            respondentSumTypeItem.getValue().getEt3Form().getDocumentFilename());
+                    DocumentHelper.removeDocumentFromDocumentCollectionByDocumentName(caseData.getDocumentCollection(),
+                            respondentSumTypeItem.getValue().getEt3FormWelsh().getDocumentFilename());
+                }
+            }
         }
     }
 

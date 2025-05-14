@@ -18,8 +18,10 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseViewApplicationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEApplicationTypeData;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
+import uk.gov.service.notify.RetentionPeriodDuration;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -234,7 +236,7 @@ public class RespondentTellSomethingElseService {
             throws NotificationClientException {
 
         CaseData caseData = caseDetails.getCaseData();
-        JSONObject documentJson = NotificationClient.prepareUpload(document, false, true, "52 weeks");
+        JSONObject documentJson = NotificationClient.prepareUpload(document, true, new RetentionPeriodDuration(52, ChronoUnit.WEEKS));
         String shortText = isWelsh
                 ? CY_RESPONDENT_APP_TYPE_MAP.get(caseData.getResTseSelectApplication())
                 : caseData.getResTseSelectApplication();

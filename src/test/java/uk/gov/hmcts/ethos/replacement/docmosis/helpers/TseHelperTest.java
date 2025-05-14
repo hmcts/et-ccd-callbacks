@@ -31,8 +31,10 @@ import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.utils.TseApplicationBuilder;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
+import uk.gov.service.notify.RetentionPeriodDuration;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -343,7 +345,7 @@ class TseHelperTest {
             "response", "TseResponseText",
             "claimant", "First Last",
             "respondents", "Respondent Name",
-            "linkToDocument", NotificationClient.prepareUpload(document, false, true, "52 weeks")
+            "linkToDocument", NotificationClient.prepareUpload(document, true, new RetentionPeriodDuration(52, ChronoUnit.WEEKS))
         );
 
         for (Map.Entry<String, Object> entry : expected.entrySet()) {
@@ -380,7 +382,7 @@ class TseHelperTest {
                 "response", "TseResponseText",
                 "claimant", "First Last",
                 "respondents", "Respondent Name",
-                LINK_TO_DOCUMENT, NotificationClient.prepareUpload(document, false, true, "52 weeks")
+                LINK_TO_DOCUMENT, NotificationClient.prepareUpload(document, true, new RetentionPeriodDuration(52, ChronoUnit.WEEKS))
         );
         for (Map.Entry<String, Object> entry : expected.entrySet()) {
             if (LINK_TO_DOCUMENT.equals(entry.getKey())) {
@@ -415,7 +417,7 @@ class TseHelperTest {
             "response", "",
             "claimant", "First Last",
             "respondents", "Respondent Name",
-                LINK_TO_DOCUMENT, NotificationClient.prepareUpload(document, false, true, "52 weeks")
+                LINK_TO_DOCUMENT, NotificationClient.prepareUpload(document, true, new RetentionPeriodDuration(52, ChronoUnit.WEEKS))
         );
 
         for (Map.Entry<String, Object> entry : expected.entrySet()) {

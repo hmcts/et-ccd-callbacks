@@ -43,6 +43,7 @@ public class Et3NotificationService {
                     return;
                 }
                 emailService.sendEmail(et3MyHmctsTemplateId, respondentEmail, respondent);
+
             });
 
         Map<String, String> personalisation;

@@ -23,6 +23,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
@@ -506,5 +507,16 @@ public final class Et3ResponseHelper {
         return isEmpty(caseData) || CollectionUtils.isEmpty(caseData.getRepCollection())
                 || isEmpty(caseData.getSubmitEt3Respondent())
                 || isBlank(caseData.getSubmitEt3Respondent().getSelectedLabel());
+    }
+
+    public static void setEt3NotificationAcceptedDate(RespondentSumType respondentSumType) {
+        if (isEmpty(respondentSumType)) {
+            return;
+        }
+        if (ACCEPTED_STATE.equals(respondentSumType.getResponseStatus())) {
+            respondentSumType.setEt3NotificationAcceptedDate(LocalDate.now().toString());
+        } else {
+            respondentSumType.setEt3NotificationAcceptedDate(null);
+        }
     }
 }

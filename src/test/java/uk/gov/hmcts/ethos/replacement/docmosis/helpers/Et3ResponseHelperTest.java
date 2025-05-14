@@ -22,7 +22,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -230,6 +232,22 @@ class Et3ResponseHelperTest {
             Arguments.of(YES, YES, YES, "2999-12-31", null, 1, 0),
             Arguments.of(YES, YES, YES, "2999-12-31", YES, 1, 1)
         );
+    }
+
+    @Test
+    void setEt3NotificationAcceptedDate() {
+        assertDoesNotThrow(() -> Et3ResponseHelper.setEt3NotificationAcceptedDate(null));
+
+        RespondentSumType respondentSumTypeResponseNotAccepted = caseData.getRespondentCollection().get(0).getValue();
+        respondentSumTypeResponseNotAccepted.setResponseStatus("Not Accepted");
+        Et3ResponseHelper.setEt3NotificationAcceptedDate(respondentSumTypeResponseNotAccepted);
+        assertThat(respondentSumTypeResponseNotAccepted.getEt3NotificationAcceptedDate()).isNull();
+
+        RespondentSumType respondentSumTypeResponseAccepted = caseData.getRespondentCollection().get(0).getValue();
+        respondentSumTypeResponseNotAccepted.setResponseStatus(ACCEPTED_STATE);
+        Et3ResponseHelper.setEt3NotificationAcceptedDate(respondentSumTypeResponseAccepted);
+        assertThat(respondentSumTypeResponseAccepted.getEt3NotificationAcceptedDate()).isNotNull();
+
     }
 
 }

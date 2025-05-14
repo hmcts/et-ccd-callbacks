@@ -2,10 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.index.query.BoolQueryBuilder;
-import org.elasticsearch.index.query.MatchQueryBuilder;
-import org.elasticsearch.index.query.RangeQueryBuilder;
-import org.elasticsearch.index.query.TermsQueryBuilder;
+import org.elasticsearch.index.query.*;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
@@ -82,8 +79,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.TIME_TO_FIRST_HEARI
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingHelper.CAUSE_LIST_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper.CASES_SEARCHED;
-import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ELASTICSEARCH_FIELD_HEARING_LISTED_DATE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ELASTICSEARCH_FIELD_MANAGING_OFFICE_KEYWORD;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.*;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService.ALL_OFFICES;
 
 @RequiredArgsConstructor
@@ -102,10 +98,7 @@ public class ListingService {
     private final BfActionReport bfActionReport;
     private static final String MISSING_DOCUMENT_NAME = "Missing document name";
     private static final String MESSAGE = "Failed to generate document for case id : ";
-    public static final String ELASTICSEARCH_FIELD_HEARING_VENUE_SCOTLAND =
-            "data.hearingCollection.value.Hearing_venue_Scotland";
     public static final String HEARING_STATUS_VACATED = "Vacated";
-    public static final String ELASTICSEARCH_FIELD_MANAGING_OFFICE = "data.managingOffice";
 
     public ListingData listingCaseCreation(ListingDetails listingDetails) {
 
@@ -209,7 +202,6 @@ public class ListingService {
         ListingData listingData = listingDetails.getCaseData();
         Map.Entry<String, String> entry =
                 ListingVenueHelper.getListingVenueToSearch(listingData).entrySet().iterator().next();
-        String venueToSearchMapping = entry.getKey();
         String venueToSearch = entry.getValue();
         String dateFrom;
         String dateTo;
@@ -224,32 +216,25 @@ public class ListingService {
 
         if (ALL_VENUES.equals(venueToSearch)) {
             venueToSearch = listingData.getManagingOffice();
-            venueToSearchMapping = getFieldNameForVenueToSearch(listingDetails.getCaseTypeId());
         }
 
         return ccdClient.buildAndGetElasticSearchRequest(authToken,
                 UtilHelper.getListingCaseTypeId(listingDetails.getCaseTypeId()),
-                getESQuery(dateFrom, dateTo, venueToSearchMapping, venueToSearch, listingData.getManagingOffice()));
+                getESQuery(dateFrom, dateTo, venueToSearch, listingData.getManagingOffice()));
     }
 
-    private String getFieldNameForVenueToSearch(String caseTypeId) {
-        if (SCOTLAND_CASE_TYPE_ID.equals(UtilHelper.getListingCaseTypeId(caseTypeId))) {
-            return ELASTICSEARCH_FIELD_HEARING_VENUE_SCOTLAND;
-        } else {
-            return ELASTICSEARCH_FIELD_MANAGING_OFFICE;
-        }
-    }
-
-    private String getESQuery(String dateFrom, String dateTo, String key, String venue, String managingOffice) {
+    private String getESQuery(String dateFrom, String dateTo, String venue, String managingOffice) {
         BoolQueryBuilder boolQueryBuilder = boolQuery()
                 .filter(new RangeQueryBuilder(ELASTICSEARCH_FIELD_HEARING_LISTED_DATE).gte(dateFrom).lte(dateTo));
+
         if (!ALL_OFFICES.equals(managingOffice)) {
-            boolQueryBuilder.filter(new TermsQueryBuilder(ELASTICSEARCH_FIELD_MANAGING_OFFICE_KEYWORD, managingOffice));
+            boolQueryBuilder.must(new MatchQueryBuilder(ELASTICSEARCH_FIELD_HEARING_VENUE_DAY_SCOTLAND, managingOffice));
         }
 
-        if (!ALL_VENUES.equals(venue)) {
-            boolQueryBuilder.must(new MatchQueryBuilder(key, venue));
+        if (!managingOffice.equals(venue)) {
+            boolQueryBuilder.must(new MatchQueryBuilder(ELASTICSEARCH_FIELD_HEARING_LOCATION + managingOffice + ".value.code", venue));
         }
+
         return new SearchSourceBuilder()
                 .size(MAX_ES_SIZE)
                 .query(boolQueryBuilder).toString();

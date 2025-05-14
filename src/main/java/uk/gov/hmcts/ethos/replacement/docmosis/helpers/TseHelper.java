@@ -301,7 +301,8 @@ public final class TseHelper {
                 ? CY_RESPONDING_TO_APP_TYPE_MAP.get(selectedApplication.getType())
                 : selectedApplication.getType();
 
-        JSONObject documentJson = NotificationClient.prepareUpload(document, true, new RetentionPeriodDuration(52, ChronoUnit.WEEKS));
+        JSONObject documentJson = NotificationClient.prepareUpload(document, true,
+                new RetentionPeriodDuration(52, ChronoUnit.WEEKS));
 
         Map<String, Object> personalisation = new ConcurrentHashMap<>();
         personalisation.put(LINK_TO_CITIZEN_HUB, linkToCitizenHub);

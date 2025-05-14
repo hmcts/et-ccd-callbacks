@@ -345,7 +345,8 @@ class TseHelperTest {
             "response", "TseResponseText",
             "claimant", "First Last",
             "respondents", "Respondent Name",
-            "linkToDocument", NotificationClient.prepareUpload(document, true, new RetentionPeriodDuration(52, ChronoUnit.WEEKS))
+            "linkToDocument", NotificationClient.prepareUpload(document, true,
+                        new RetentionPeriodDuration(52, ChronoUnit.WEEKS))
         );
 
         for (Map.Entry<String, Object> entry : expected.entrySet()) {
@@ -382,7 +383,8 @@ class TseHelperTest {
                 "response", "TseResponseText",
                 "claimant", "First Last",
                 "respondents", "Respondent Name",
-                LINK_TO_DOCUMENT, NotificationClient.prepareUpload(document, true, new RetentionPeriodDuration(52, ChronoUnit.WEEKS))
+                LINK_TO_DOCUMENT, NotificationClient.prepareUpload(document, true,
+                        new RetentionPeriodDuration(52, ChronoUnit.WEEKS))
         );
         for (Map.Entry<String, Object> entry : expected.entrySet()) {
             if (LINK_TO_DOCUMENT.equals(entry.getKey())) {
@@ -417,7 +419,8 @@ class TseHelperTest {
             "response", "",
             "claimant", "First Last",
             "respondents", "Respondent Name",
-                LINK_TO_DOCUMENT, NotificationClient.prepareUpload(document, true, new RetentionPeriodDuration(52, ChronoUnit.WEEKS))
+                LINK_TO_DOCUMENT, NotificationClient.prepareUpload(document, true,
+                        new RetentionPeriodDuration(52, ChronoUnit.WEEKS))
         );
 
         for (Map.Entry<String, Object> entry : expected.entrySet()) {

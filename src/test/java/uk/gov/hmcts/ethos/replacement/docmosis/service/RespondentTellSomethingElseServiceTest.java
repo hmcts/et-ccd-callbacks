@@ -362,8 +362,8 @@ class RespondentTellSomethingElseServiceTest {
         assertThat(personalisation.get("hearingDate"), is("16 May 2069"));
         assertThat(personalisation.get("shortText"), is(applicationType));
         assertThat(personalisation.get("datePlus7"), is(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7)));
-        assertThat(personalisation.get("linkToDocument").toString(), is("{\"file\":\"\",\"filename\":null," +
-                "\"confirm_email_before_download\":true,\"retention_period\":\"52 weeks\"}"));
+        assertThat(personalisation.get("linkToDocument").toString(), is("{\"file\":\"\",\"filename\":null,"
+                + "\"confirm_email_before_download\":true,\"retention_period\":\"52 weeks\"}"));
     }
 
     @ParameterizedTest
@@ -404,8 +404,8 @@ class RespondentTellSomethingElseServiceTest {
         assertThat(personalisation.get("hearingDate"), is("16 Mai 2069"));
         assertThat(personalisation.get("shortText"), is(CY_RESPONDENT_APP_TYPE_MAP.get(applicationType)));
         assertThat(personalisation.get("datePlus7"), is(expectedDueDate));
-        assertThat(personalisation.get("linkToDocument").toString(), is("{\"file\":\"\",\"filename\":null," +
-                "\"confirm_email_before_download\":true,\"retention_period\":\"52 weeks\"}"));
+        assertThat(personalisation.get("linkToDocument").toString(), is("{\"file\":\"\",\"filename\":null,"
+                + "\"confirm_email_before_download\":true,\"retention_period\":\"52 weeks\"}"));
         assertTrue(((String) personalisation.get("linkToCitizenHub")).endsWith(WELSH_LANGUAGE_PARAM));
     }
 
@@ -433,8 +433,8 @@ class RespondentTellSomethingElseServiceTest {
         assertThat(personalisation.get("hearingDate"), is("Not set"));
         assertThat(personalisation.get("shortText"), is(applicationType));
         assertThat(personalisation.get("datePlus7"), is(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7)));
-        assertThat(personalisation.get("linkToDocument").toString(), is("{\"file\":\"\",\"filename\":null," +
-                "\"confirm_email_before_download\":true,\"retention_period\":\"52 weeks\"}"));
+        assertThat(personalisation.get("linkToDocument").toString(), is("{\"file\":\"\",\"filename\":null,"
+                + "\"confirm_email_before_download\":true,\"retention_period\":\"52 weeks\"}"));
     }
 
     @ParameterizedTest
@@ -471,8 +471,8 @@ class RespondentTellSomethingElseServiceTest {
         assertThat(personalisation.get("hearingDate"), is("Heb ei anfon"));
         assertThat(personalisation.get("shortText"), is(CY_RESPONDENT_APP_TYPE_MAP.get(applicationType)));
         assertThat(personalisation.get("datePlus7"), is(expectedDueDate));
-        assertThat(personalisation.get("linkToDocument").toString(), is("{\"file\":\"\",\"filename\":null," +
-                "\"confirm_email_before_download\":true,\"retention_period\":\"52 weeks\"}"));
+        assertThat(personalisation.get("linkToDocument").toString(), is("{\"file\":\"\",\"filename\":null,"
+                + "\"confirm_email_before_download\":true,\"retention_period\":\"52 weeks\"}"));
         assertTrue(((String) personalisation.get("linkToCitizenHub")).endsWith(WELSH_LANGUAGE_PARAM));
     }
 

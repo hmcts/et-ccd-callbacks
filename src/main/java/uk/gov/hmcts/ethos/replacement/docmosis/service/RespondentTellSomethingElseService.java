@@ -236,7 +236,8 @@ public class RespondentTellSomethingElseService {
             throws NotificationClientException {
 
         CaseData caseData = caseDetails.getCaseData();
-        JSONObject documentJson = NotificationClient.prepareUpload(document, true, new RetentionPeriodDuration(52, ChronoUnit.WEEKS));
+        JSONObject documentJson = NotificationClient.prepareUpload(document, true,
+                new RetentionPeriodDuration(52, ChronoUnit.WEEKS));
         String shortText = isWelsh
                 ? CY_RESPONDENT_APP_TYPE_MAP.get(caseData.getResTseSelectApplication())
                 : caseData.getResTseSelectApplication();

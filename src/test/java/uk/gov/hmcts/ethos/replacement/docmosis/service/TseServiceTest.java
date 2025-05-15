@@ -14,7 +14,11 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.*;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentTse;
+import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
+import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentFixtures;
 
@@ -629,14 +633,16 @@ class TseServiceTest {
         RespondentTse respondentTse = new RespondentTse();
         respondentTse.setContactApplicationType("Amend response");
         respondentTse.setContactApplicationText("Details");
-        respondentTse.setContactApplicationFile(DocumentFixtures.getUploadedDocumentType("application.docx"));
+        respondentTse.setContactApplicationFile(
+                DocumentFixtures.getUploadedDocumentType("application.docx"));
 
         CaseData caseData = new CaseData();
         caseData.setRespondentTse(respondentTse);
         ClaimantTse claimantTse = new ClaimantTse();
         claimantTse.setContactApplicationType("amend");
         claimantTse.setContactApplicationText("Details");
-        claimantTse.setContactApplicationFile(UploadedDocumentType.builder().documentFilename("Test_Document.pdf").build());
+        claimantTse.setContactApplicationFile(
+                UploadedDocumentType.builder().documentFilename("Test_Document.pdf").build());
         claimantTse.setCopyToOtherPartyYesOrNo("Yes");
         claimantTse.setCopyToOtherPartyText("Copy to other party");
         caseData.setClaimantTse(claimantTse);
@@ -654,7 +660,7 @@ class TseServiceTest {
     @Test
     void createApplication_withRepresentativeData() {
         RespondentTse respondentTse = new RespondentTse();
-        respondentTse.setContactApplicationType("Amend response");
+        respondentTse.setContactApplicationType("Amend claim");
         respondentTse.setContactApplicationText("Details");
         respondentTse.setContactApplicationFile(DocumentFixtures
                 .getUploadedDocumentType("application.docx"));
@@ -669,6 +675,7 @@ class TseServiceTest {
         claimantTse.setCopyToOtherPartyYesOrNo("Yes");
         claimantTse.setCopyToOtherPartyText("Copy to other party");
         caseData.setClaimantTse(claimantTse);
+        caseData.setClaimantTseSelectApplication("Amend claim");
         tseService.createApplication(caseData, CLAIMANT_REP_TITLE);
 
         List<GenericTseApplicationTypeItem> applications = caseData.getGenericTseApplicationCollection();

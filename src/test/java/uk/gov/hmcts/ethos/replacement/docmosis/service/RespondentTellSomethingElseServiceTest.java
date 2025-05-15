@@ -354,8 +354,6 @@ class RespondentTellSomethingElseServiceTest {
         verify(emailService).sendEmail(eq(TEMPLATE_ID_A), any(), personalisationCaptor.capture());
         Map<String, Object> personalisation = personalisationCaptor.getValue();
 
-        System.out.println(personalisation.get("linkToDocument").toString());
-
         assertThat(personalisation.get("claimant"), is("claimant"));
         assertThat(personalisation.get("respondentNames"), is("Father Ted"));
         assertThat(personalisation.get("caseNumber"), is(caseData.getEthosCaseReference()));

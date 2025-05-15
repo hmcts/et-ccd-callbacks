@@ -14,10 +14,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
-import uk.gov.hmcts.et.common.model.ccd.types.RespondentTse;
-import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
-import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
+import uk.gov.hmcts.et.common.model.ccd.types.*;
 import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentFixtures;
 
@@ -37,6 +34,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_AMEND_RESPONSE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_REP_TITLE;
 
 @ExtendWith(SpringExtension.class)
 class TseServiceTest {
@@ -624,5 +622,61 @@ class TseServiceTest {
         assertThat(application.getType()).isEqualTo("Amend response");
         assertThat(application.getDetails()).isEqualTo("Details");
         assertThat(application.getDocumentUpload()).isNull();
+    }
+
+    @Test
+    void createApplication_withClaimantData() {
+        RespondentTse respondentTse = new RespondentTse();
+        respondentTse.setContactApplicationType("Amend response");
+        respondentTse.setContactApplicationText("Details");
+        respondentTse.setContactApplicationFile(DocumentFixtures.getUploadedDocumentType("application.docx"));
+
+        CaseData caseData = new CaseData();
+        caseData.setRespondentTse(respondentTse);
+        ClaimantTse claimantTse = new ClaimantTse();
+        claimantTse.setContactApplicationType("amend");
+        claimantTse.setContactApplicationText("Details");
+        claimantTse.setContactApplicationFile(UploadedDocumentType.builder().documentFilename("Test_Document.pdf").build());
+        claimantTse.setCopyToOtherPartyYesOrNo("Yes");
+        claimantTse.setCopyToOtherPartyText("Copy to other party");
+        caseData.setClaimantTse(claimantTse);
+        tseService.createApplication(caseData, CLAIMANT_TITLE);
+
+        List<GenericTseApplicationTypeItem> applications = caseData.getGenericTseApplicationCollection();
+        assertThat(applications).hasSize(1);
+        GenericTseApplicationType application = applications.get(0).getValue();
+        assertThat(application.getApplicant()).isEqualTo(CLAIMANT_TITLE);
+        assertThat(application.getDetails()).isEqualTo("Details");
+        assertThat(application.getCopyToOtherPartyText()).isEqualTo("Copy to other party");
+        assertThat(application.getCopyToOtherPartyYesOrNo()).isEqualTo("Yes");
+    }
+
+    @Test
+    void createApplication_withRepresentativeData() {
+        RespondentTse respondentTse = new RespondentTse();
+        respondentTse.setContactApplicationType("Amend response");
+        respondentTse.setContactApplicationText("Details");
+        respondentTse.setContactApplicationFile(DocumentFixtures
+                .getUploadedDocumentType("application.docx"));
+
+        CaseData caseData = new CaseData();
+        caseData.setRespondentTse(respondentTse);
+        ClaimantTse claimantTse = new ClaimantTse();
+        claimantTse.setContactApplicationType("Amend claim");
+        claimantTse.setContactApplicationText("Details");
+        claimantTse.setContactApplicationFile(UploadedDocumentType.builder()
+                .documentFilename("Test_Document.pdf").build());
+        claimantTse.setCopyToOtherPartyYesOrNo("Yes");
+        claimantTse.setCopyToOtherPartyText("Copy to other party");
+        caseData.setClaimantTse(claimantTse);
+        tseService.createApplication(caseData, CLAIMANT_REP_TITLE);
+
+        List<GenericTseApplicationTypeItem> applications = caseData.getGenericTseApplicationCollection();
+        assertThat(applications).hasSize(1);
+        GenericTseApplicationType application = applications.get(0).getValue();
+        assertThat(application.getApplicant()).isEqualTo(CLAIMANT_REP_TITLE);
+        assertThat(application.getDetails()).isEqualTo("Details");
+        assertThat(application.getCopyToOtherPartyText()).isEqualTo("Copy to other party");
+        assertThat(application.getCopyToOtherPartyYesOrNo()).isEqualTo("Yes");
     }
 }

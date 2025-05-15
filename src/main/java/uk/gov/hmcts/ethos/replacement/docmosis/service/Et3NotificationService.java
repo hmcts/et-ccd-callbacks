@@ -44,7 +44,6 @@ public class Et3NotificationService {
                     return;
                 }
                 emailService.sendEmail(et3MyHmctsTemplateId, respondentEmail, respondent);
-                Et3ResponseHelper.setEt3NotificationAcceptedDate(obj.getValue());
             });
 
         Map<String, String> personalisation;
@@ -63,6 +62,6 @@ public class Et3NotificationService {
             }
             emailService.sendEmail(et3CitizenTemplateId, personalisation.get(EMAIL_ADDRESS), personalisation);
         }
-
+        Et3ResponseHelper.setEt3NotificationAcceptedDates(caseDetails.getCaseData().getRespondentCollection());
     }
 }

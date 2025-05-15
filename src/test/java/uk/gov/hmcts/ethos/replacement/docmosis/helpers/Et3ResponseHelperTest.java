@@ -10,6 +10,7 @@ import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -235,19 +236,23 @@ class Et3ResponseHelperTest {
     }
 
     @Test
-    void setEt3NotificationAcceptedDate() {
-        assertDoesNotThrow(() -> Et3ResponseHelper.setEt3NotificationAcceptedDate(null));
+    void setEt3NotificationAcceptedDates() {
+        assertDoesNotThrow(() -> Et3ResponseHelper.setEt3NotificationAcceptedDates(null));
 
-        RespondentSumType respondentSumTypeResponseNotAccepted = caseData.getRespondentCollection().get(0).getValue();
-        respondentSumTypeResponseNotAccepted.setResponseStatus("Not Accepted");
-        Et3ResponseHelper.setEt3NotificationAcceptedDate(respondentSumTypeResponseNotAccepted);
-        assertThat(respondentSumTypeResponseNotAccepted.getEt3NotificationAcceptedDate()).isNull();
+        RespondentSumTypeItem respondentSumTypeItemResponseNotAccepted = caseData.getRespondentCollection().get(0);
+        respondentSumTypeItemResponseNotAccepted.getValue().setResponseStatus("Not Accepted");
+        Et3ResponseHelper.setEt3NotificationAcceptedDates(List.of(respondentSumTypeItemResponseNotAccepted));
+        assertThat(respondentSumTypeItemResponseNotAccepted.getValue().getEt3NotificationAcceptedDate()).isNull();
 
-        RespondentSumType respondentSumTypeResponseAccepted = caseData.getRespondentCollection().get(0).getValue();
-        respondentSumTypeResponseNotAccepted.setResponseStatus(ACCEPTED_STATE);
-        Et3ResponseHelper.setEt3NotificationAcceptedDate(respondentSumTypeResponseAccepted);
-        assertThat(respondentSumTypeResponseAccepted.getEt3NotificationAcceptedDate()).isNotNull();
+        RespondentSumTypeItem respondentSumTypeItemResponseAccepted = caseData.getRespondentCollection().get(0);
+        respondentSumTypeItemResponseAccepted.getValue().setResponseStatus(ACCEPTED_STATE);
+        Et3ResponseHelper.setEt3NotificationAcceptedDates(List.of(respondentSumTypeItemResponseAccepted));
+        assertThat(respondentSumTypeItemResponseAccepted.getValue().getEt3NotificationAcceptedDate()).isNotNull();
 
+        RespondentSumTypeItem respondentSumTypeItemValueNull = caseData.getRespondentCollection().get(0);
+        respondentSumTypeItemValueNull.setValue(null);
+        assertDoesNotThrow(() -> Et3ResponseHelper.setEt3NotificationAcceptedDates(
+                List.of(respondentSumTypeItemValueNull)));
     }
 
 }

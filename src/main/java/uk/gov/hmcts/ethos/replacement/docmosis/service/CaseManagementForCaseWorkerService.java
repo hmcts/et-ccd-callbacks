@@ -72,6 +72,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET3;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.RESPONSE_TO_A_CLAIM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ACAS_DOC_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EMPTY_STRING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET1_ATTACHMENT_DOC_TYPE;
@@ -293,13 +294,13 @@ public class CaseManagementForCaseWorkerService {
                 if (ACCEPTED_STATE.equals(respondentSumTypeItem.getValue().getResponseStatus())) {
                     DocumentHelper.addUploadedDocumentTypeToDocumentCollection(caseData.getDocumentCollection(),
                             respondentSumTypeItem.getValue().getEt3Form(),
-                            ET3,
+                            RESPONSE_TO_A_CLAIM,
                             ET3_FORM_ENGLISH_DESCRIPTION,
                             ET3,
                             null);
                     DocumentHelper.addUploadedDocumentTypeToDocumentCollection(caseData.getDocumentCollection(),
                             respondentSumTypeItem.getValue().getEt3FormWelsh(),
-                            ET3,
+                            RESPONSE_TO_A_CLAIM,
                             ET3_FORM_WELSH_DESCRIPTION,
                             ET3,
                             null);

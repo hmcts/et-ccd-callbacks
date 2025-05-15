@@ -509,14 +509,18 @@ public final class Et3ResponseHelper {
                 || isBlank(caseData.getSubmitEt3Respondent().getSelectedLabel());
     }
 
-    public static void setEt3NotificationAcceptedDate(RespondentSumType respondentSumType) {
-        if (isEmpty(respondentSumType)) {
+    public static void setEt3NotificationAcceptedDates(List<RespondentSumTypeItem> respondentSumTypeItems) {
+        if (CollectionUtils.isEmpty(respondentSumTypeItems)) {
             return;
         }
-        if (ACCEPTED_STATE.equals(respondentSumType.getResponseStatus())) {
-            respondentSumType.setEt3NotificationAcceptedDate(LocalDate.now().toString());
-        } else {
-            respondentSumType.setEt3NotificationAcceptedDate(null);
+        for (RespondentSumTypeItem respondentSumTypeItem : respondentSumTypeItems) {
+            if (isNotEmpty(respondentSumTypeItem.getValue())) {
+                if (ACCEPTED_STATE.equals(respondentSumTypeItem.getValue().getResponseStatus())) {
+                    respondentSumTypeItem.getValue().setEt3NotificationAcceptedDate(LocalDate.now().toString());
+                } else {
+                    respondentSumTypeItem.getValue().setEt3NotificationAcceptedDate(null);
+                }
+            }
         }
     }
 }

@@ -80,6 +80,30 @@ class CaseFlagsServiceTest {
     }
 
     @Test
+    void setupCaseFlags_shouldUpdateClaimantFlagsWhenNameChanges() {
+        caseFlagsService.setupCaseFlags(caseData);
+        String updatedClaimantName = "Updated Claimant Name";
+        caseData.setClaimant(updatedClaimantName);
+
+        caseFlagsService.setupCaseFlags(caseData);
+
+        assertEquals(updatedClaimantName, caseData.getClaimantFlags().getPartyName());
+        assertEquals("claimant", caseData.getClaimantFlags().getRoleOnCase());
+    }
+
+    @Test
+    void setupCaseFlags_shouldUpdateRespondentFlagsWhenNameChanges() {
+        caseFlagsService.setupCaseFlags(caseData);
+        String updatedRespondentName = "Updated Respondent Name";
+        caseData.setRespondent(updatedRespondentName);
+
+        caseFlagsService.setupCaseFlags(caseData);
+
+        assertEquals(updatedRespondentName, caseData.getRespondentFlags().getPartyName());
+        assertEquals("respondent", caseData.getRespondentFlags().getRoleOnCase());
+    }
+
+    @Test
     void processNewlySetCaseFlags_shouldSetInterpreterRequiredTrue() {
         caseData.setRespondentFlags(CaseFlagsType.builder().build());
         caseData.setClaimantFlags(CaseFlagsType.builder()

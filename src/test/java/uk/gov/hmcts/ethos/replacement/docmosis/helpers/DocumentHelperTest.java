@@ -1,9 +1,15 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -25,9 +31,13 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.InstanceOfAssertFactories.DATE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -39,6 +49,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ACAS_CERTIFICATE;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_ATTACHMENT;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET3;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.LEGACY_DOCUMENT_NAMES;
 
 @ExtendWith(SpringExtension.class)
@@ -50,6 +61,11 @@ class DocumentHelperTest {
     private static final String GLASGOW_VENUE_ADDRESS =
             "Glasgow Tribunal Centre, Atlantic Quay, 20 York Street, Glasgow, G2 8GT";
     private static final String ABERDEEN_VENUE_ADDRESS = "Ground Floor, AB1, 48 Huntly Street, Aberdeen, AB10 1SH";
+    private static final String ET3_FORM_ENGLISH_DESCRIPTION = "ET3 Form English Version";
+    private static final String ET3_FORM_NAME = "Test_ET3_Form.pdf";
+    private static final String ET3_FORM_URL = "Test_ET3_Form_URL";
+    private static final String ET3_FORM_BINARY_URL = "Test_ET3_Form_Binary_URL";
+
     private CaseDetails caseDetails1;
     private CaseDetails caseDetails2;
     private CaseDetails caseDetails3;
@@ -2243,5 +2259,123 @@ class DocumentHelperTest {
                 .build();
         DocumentHelper.setDocumentNumbers(caseData);
         caseData.getDocumentCollection().forEach(d -> assertThat(d.getValue().getDocNumber()).isNotNull());
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideTestDataForAddUploadedDocumentTypeToDocumentCollection")
+    void addUploadedDocumentTypeToDocumentCollection(List<DocumentTypeItem> documentTypeItems,
+                                                     UploadedDocumentType uploadedDocumentType,
+                                                     String uploadedDocumentTypeTopLevel,
+                                                     String uploadedDocumentTypeDescription,
+                                                     String uploadedDocumentTypeValue,
+                                                     List<String> excludeFromDcf) {
+        DocumentHelper.addUploadedDocumentTypeToDocumentCollection(documentTypeItems,
+                uploadedDocumentType,
+                uploadedDocumentTypeTopLevel,
+                uploadedDocumentTypeDescription,
+                uploadedDocumentTypeValue,
+                excludeFromDcf);
+        if (ObjectUtils.isEmpty(uploadedDocumentType)) {
+            assertThat(documentTypeItems).isNullOrEmpty();
+        } else {
+            assertThat(uploadedDocumentType.getDocumentFilename())
+                    .isEqualTo(documentTypeItems.get(documentTypeItems.size() - 1)
+                            .getValue().getUploadedDocument().getDocumentFilename());
+        }
+    }
+
+    private static List<List<DocumentTypeItem>> generateDocumentTypeItems() {
+        List<DocumentTypeItem> documentTypeItemsWithExistingUploadedDocument = new ArrayList<>();
+        DocumentTypeItem documentTypeItem = DocumentTypeItem.builder().value(DocumentType.builder()
+                .uploadedDocument(UploadedDocumentType.builder().documentFilename("Test_ET3_Form.pdf")
+                        .build()).build()).build();
+        documentTypeItemsWithExistingUploadedDocument.add(documentTypeItem);
+
+        List<DocumentTypeItem> documentTypeItemsWithExistingUploadedDocumentInvalidValue = new ArrayList<>();
+        DocumentTypeItem documentTypeItem2 = DocumentTypeItem.builder().value(null).build();
+        documentTypeItemsWithExistingUploadedDocumentInvalidValue.add(documentTypeItem2);
+
+        List<DocumentTypeItem> documentTypeItemsWithExistingUploadedDocumentInvalidUploadedDocument = new ArrayList<>();
+        DocumentTypeItem documentTypeItem3 = DocumentTypeItem.builder().value(
+                DocumentType.builder().uploadedDocument(null).build()).build();
+        documentTypeItemsWithExistingUploadedDocumentInvalidUploadedDocument.add(documentTypeItem3);
+
+        List<DocumentTypeItem> documentTypeItemsWithExistingUploadedDocumentNullUploadedDocumentName =
+                new ArrayList<>();
+        DocumentTypeItem documentTypeItem4 = DocumentTypeItem.builder().value(
+                DocumentType.builder().uploadedDocument(
+                        UploadedDocumentType.builder().documentFilename(null).build()).build()).build();
+        documentTypeItemsWithExistingUploadedDocumentNullUploadedDocumentName.add(documentTypeItem4);
+
+        List<DocumentTypeItem> documentTypeItemsWithExistingUploadedDocumentInvalidUploadedDocumentName =
+                new ArrayList<>();
+        DocumentTypeItem documentTypeItem5 = DocumentTypeItem.builder().value(
+                DocumentType.builder().uploadedDocument(
+                        UploadedDocumentType.builder().documentFilename("Invalid_Name.pdf").build()).build()).build();
+        documentTypeItemsWithExistingUploadedDocumentInvalidUploadedDocumentName.add(documentTypeItem5);
+        return List.of(new ArrayList<>(),
+                documentTypeItemsWithExistingUploadedDocument,
+                documentTypeItemsWithExistingUploadedDocumentInvalidValue,
+                documentTypeItemsWithExistingUploadedDocumentInvalidUploadedDocument,
+                documentTypeItemsWithExistingUploadedDocumentNullUploadedDocumentName,
+                documentTypeItemsWithExistingUploadedDocumentInvalidUploadedDocumentName);
+    }
+
+    private static Stream<Arguments> provideTestDataForAddUploadedDocumentTypeToDocumentCollection() {
+        UploadedDocumentType uploadedDocumentType = UploadedDocumentType.builder()
+                .documentFilename(ET3_FORM_NAME)
+                .documentUrl(ET3_FORM_URL)
+                .documentBinaryUrl(ET3_FORM_BINARY_URL)
+                .uploadTimestamp(DATE.toString()).build();
+        List<List<DocumentTypeItem>> documentTypeItemsList = generateDocumentTypeItems();
+
+        return Stream.of(
+                Arguments.of(documentTypeItemsList.get(0),
+                        null, StringUtils.EMPTY, StringUtils.EMPTY, StringUtils.EMPTY, List.of(StringUtils.EMPTY)),
+                Arguments.of(documentTypeItemsList.get(0),
+                        uploadedDocumentType, ET3, ET3_FORM_ENGLISH_DESCRIPTION, ET3, null),
+                Arguments.of(documentTypeItemsList.get(1),
+                        uploadedDocumentType, ET3, ET3_FORM_ENGLISH_DESCRIPTION, ET3, null),
+                Arguments.of(documentTypeItemsList.get(2),
+                        uploadedDocumentType, ET3, ET3_FORM_ENGLISH_DESCRIPTION, ET3, null),
+                Arguments.of(documentTypeItemsList.get(3),
+                        uploadedDocumentType, ET3, ET3_FORM_ENGLISH_DESCRIPTION, ET3, null),
+                Arguments.of(documentTypeItemsList.get(4),
+                        uploadedDocumentType, ET3, ET3_FORM_ENGLISH_DESCRIPTION, ET3, null),
+                Arguments.of(documentTypeItemsList.get(5),
+                        uploadedDocumentType, ET3, ET3_FORM_ENGLISH_DESCRIPTION, ET3, null)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideTestDataForRemoveDocumentFromDocumentCollectionByDocumentName")
+    void removeDocumentFromDocumentCollectionByDocumentName(List<DocumentTypeItem> documentTypeItems,
+                                                            String documentName) {
+        DocumentHelper.removeDocumentFromDocumentCollectionByDocumentName(documentTypeItems, documentName);
+        if (CollectionUtils.isNotEmpty(documentTypeItems)
+                && (ObjectUtils.isEmpty(documentTypeItems.get(0).getValue())
+                || ObjectUtils.isEmpty(documentTypeItems.get(0).getValue().getUploadedDocument())
+                || StringUtils.isEmpty(
+                        documentTypeItems.get(0).getValue().getUploadedDocument().getDocumentFilename())
+                || !documentTypeItems.get(0).getValue().getUploadedDocument().getDocumentFilename()
+                .equals(documentName))) {
+            assertThat(documentTypeItems).hasSize(1);
+        } else {
+            assertThat(documentTypeItems).isNullOrEmpty();
+        }
+    }
+
+    private static Stream<Arguments> provideTestDataForRemoveDocumentFromDocumentCollectionByDocumentName() {
+        List<List<DocumentTypeItem>> documentTypeItemsList = generateDocumentTypeItems();
+        return Stream.of(
+                Arguments.of(documentTypeItemsList.get(0), null),
+                Arguments.of(documentTypeItemsList.get(0), ET3_FORM_NAME),
+                Arguments.of(documentTypeItemsList.get(1), ET3_FORM_NAME),
+                Arguments.of(documentTypeItemsList.get(1), "DUMMY_FILE_NAME.pdf"),
+                Arguments.of(documentTypeItemsList.get(2), ET3_FORM_NAME),
+                Arguments.of(documentTypeItemsList.get(3), ET3_FORM_NAME),
+                Arguments.of(documentTypeItemsList.get(4), ET3_FORM_NAME),
+                Arguments.of(documentTypeItemsList.get(5), ET3_FORM_NAME)
+        );
     }
 }

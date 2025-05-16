@@ -13,13 +13,13 @@ import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
+import uk.gov.hmcts.ecm.common.service.pdf.et3.ET3FormMapper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormMapper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentFixtures;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader;
@@ -48,8 +48,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_HEARING;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.SUBMIT_ET3;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_ET3_FORM_CASE_DATA_FILE;
+import static uk.gov.hmcts.ecm.common.service.pdf.et3.ET3FormConstants.SUBMIT_ET3;
 
 @ExtendWith(SpringExtension.class)
 @SuppressWarnings({"PMD.ExcessiveImports"})
@@ -62,6 +61,8 @@ class Et3ResponseServiceTest {
     private EmailService emailService;
     private CaseData caseData;
     private DocumentInfo documentInfo;
+
+    private static final String TEST_ET3_FORM_CASE_DATA_FILE = "et3FormCaseData.json";
 
     @BeforeEach
     void setUp() {
@@ -91,12 +92,12 @@ class Et3ResponseServiceTest {
     @SneakyThrows
     void generateEt3ProcessingDocumentNullWithoutException() {
         try (MockedStatic<ET3FormMapper> et3FormMapperMockedStatic = Mockito.mockStatic(ET3FormMapper.class)) {
-            et3FormMapperMockedStatic.when(() -> ET3FormMapper.mapEt3Form(any(), anyString())).thenReturn(
+            et3FormMapperMockedStatic.when(() -> ET3FormMapper.mapEt3Form(any(), anyString(), anyString())).thenReturn(
                     new ConcurrentHashMap<String, Optional<String>>());
             when(documentManagementService.uploadDocument(anyString(), any(), anyString(), anyString(), anyString()))
                     .thenReturn(new URI("testUri"));
             when(pdfBoxService.generatePdfDocumentInfo(any(), anyString(),
-                    anyString(), anyString(), anyString(), anyString())).thenReturn(null);
+                    anyString(), anyString(), anyString())).thenReturn(null);
             CaseData testGeneratePdfCaseData = ResourceLoader.fromString(TEST_ET3_FORM_CASE_DATA_FILE, CaseData.class);
             DocumentInfo documentInfo1 = et3ResponseService.generateEt3ResponseDocument(testGeneratePdfCaseData,
                     "userToken", ENGLANDWALES_CASE_TYPE_ID, SUBMIT_ET3);
@@ -108,12 +109,12 @@ class Et3ResponseServiceTest {
     @SneakyThrows
     void generateEt3ProcessingDocumentNoExceptions() {
         try (MockedStatic<ET3FormMapper> et3FormMapperMockedStatic = Mockito.mockStatic(ET3FormMapper.class)) {
-            et3FormMapperMockedStatic.when(() -> ET3FormMapper.mapEt3Form(any(), anyString())).thenReturn(
+            et3FormMapperMockedStatic.when(() -> ET3FormMapper.mapEt3Form(any(), anyString(), anyString())).thenReturn(
                     new ConcurrentHashMap<String, Optional<String>>());
             when(documentManagementService.uploadDocument(anyString(), any(), anyString(), anyString(), anyString()))
                     .thenReturn(new URI("testUri"));
-            when(pdfBoxService.generatePdfDocumentInfo(any(), anyString(),
-                    anyString(), anyString(), anyString(), anyString())).thenReturn(documentInfo);
+            when(pdfBoxService.generatePdfDocumentInfo(any(), anyString(), anyString(), anyString(), anyString()))
+                    .thenReturn(documentInfo);
             assertDoesNotThrow(() -> et3ResponseService.generateEt3ResponseDocument(new CaseData(), "userToken",
                     ENGLANDWALES_CASE_TYPE_ID, SUBMIT_ET3));
         }

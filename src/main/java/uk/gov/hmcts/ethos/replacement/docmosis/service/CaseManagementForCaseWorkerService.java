@@ -96,6 +96,8 @@ public class CaseManagementForCaseWorkerService {
     private static final String CASE_NOT_FOUND_MESSAGE = "Case Reference Number not found.";
     public static final String LISTED_DATE_ON_WEEKEND_MESSAGE = "A hearing date you have entered "
             + "falls on a weekend. You cannot list this case on a weekend. Please amend the date of Hearing ";
+    public static final String NEGATIVE_HEARING_LENGTH_MESSAGE = "The estimated hearing length for hearing %s must be "
+        + "greater than 0.";
     public static final String HMCTS_SERVICE_ID = "HMCTSServiceId";
     public static final String ORGANISATION = "Organisation";
 
@@ -325,10 +327,10 @@ public class CaseManagementForCaseWorkerService {
         multipleData.setNextListedDate(caseData.getNextListedDate());
 
         multipleCasesSendingService.sendUpdateToMultiple(
-            adminToken, 
-            multipleCaseTypeId, 
-            EMPLOYMENT, 
-            multipleData, 
+            adminToken,
+            multipleCaseTypeId,
+            EMPLOYMENT,
+            multipleData,
             String.valueOf(multiple.getCaseId())
         );
     }
@@ -461,6 +463,8 @@ public class CaseManagementForCaseWorkerService {
                                 hearingTypeItem.getValue().getHearingNumber());
                         addHearingsInPastWarning(dateListedTypeItem, caseData);
                     });
+                    addNegativeHearingLengthsError(hearingTypeItem, errors,
+                        hearingTypeItem.getValue().getHearingNumber());
                 });
     }
 
@@ -495,18 +499,25 @@ public class CaseManagementForCaseWorkerService {
         }
     }
 
+    private void addNegativeHearingLengthsError(HearingTypeItem hearingTypeItem, List<String> errors,
+                                                String hearingNumber) {
+        try {
+            int parsed = Integer.parseInt(hearingTypeItem.getValue().getHearingEstLengthNum().trim());
+            if (parsed <= 0) {
+                errors.add(String.format(NEGATIVE_HEARING_LENGTH_MESSAGE, hearingNumber));
+            }
+        } catch (NumberFormatException e) {
+            errors.add(String.format(NEGATIVE_HEARING_LENGTH_MESSAGE, hearingNumber));
+        }
+    }
+
     private void populateHearingVenueFromHearingLevelToDayLevel(DateListedType dateListedType,
                                                                 HearingType hearingType,
                                                                 String caseTypeId) {
         switch (caseTypeId) {
-            case ENGLANDWALES_CASE_TYPE_ID:
-                populateHearingVenueEnglandWales(dateListedType, hearingType);
-                break;
-            case SCOTLAND_CASE_TYPE_ID:
-                populateHearingVenueScotland(dateListedType, hearingType);
-                break;
-            default:
-                throw new IllegalArgumentException("Unexpected case type id " + caseTypeId);
+            case ENGLANDWALES_CASE_TYPE_ID -> populateHearingVenueEnglandWales(dateListedType, hearingType);
+            case SCOTLAND_CASE_TYPE_ID -> populateHearingVenueScotland(dateListedType, hearingType);
+            default -> throw new IllegalArgumentException("Unexpected case type id " + caseTypeId);
         }
     }
 
@@ -554,20 +565,18 @@ public class CaseManagementForCaseWorkerService {
             SubmitEvent submitEvent = submitEvents.get(0);
             if (ECCHelper.validCaseForECC(submitEvent, errors)) {
                 switch (callback) {
-                    case MID_EVENT_CALLBACK:
+                    case MID_EVENT_CALLBACK -> {
                         Helper.midRespondentECC(currentCaseData, submitEvent.getCaseData());
                         currentCaseData.setManagingOffice(submitEvent.getCaseData().getManagingOffice());
                         clerkService.initialiseClerkResponsible(currentCaseData);
-                        break;
-                    case ABOUT_TO_SUBMIT_EVENT_CALLBACK:
+                    }
+                    case ABOUT_TO_SUBMIT_EVENT_CALLBACK -> {
                         ECCHelper.createECCLogic(caseDetails, submitEvent.getCaseData());
                         currentCaseData.setRespondentECC(null);
                         currentCaseData.setCaseSource(FLAG_ECC);
-                        break;
-                    default:
-                        sendUpdateSingleCaseECC(authToken, caseDetails, submitEvent.getCaseData(),
-                                String.valueOf(submitEvent.getCaseId()));
-                        break;
+                    }
+                    default -> sendUpdateSingleCaseECC(authToken, caseDetails, submitEvent.getCaseData(),
+                        String.valueOf(submitEvent.getCaseId()));
                 }
             }
         } else {

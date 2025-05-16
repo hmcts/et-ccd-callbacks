@@ -123,9 +123,16 @@ class FeatureToggleServiceTest {
 
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
-    void shouldReturnCorrectValue_whenNPartySpacingCronIsEnabled(Boolean toggleStat) {
+    void shouldReturnCorrectValue_whenPartySpacingCronIsEnabled(Boolean toggleStat) {
         givenToggle("party-spacing-cron", toggleStat);
         assertThat(featureToggleService.isPartySpacingCronEnabled()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void shouldReturnCorrectValue_whenAcasCertificateCronIsEnabled(Boolean toggleStat) {
+        givenToggle("acasCertificatePostSubmission", toggleStat);
+        assertThat(featureToggleService.isAcasCertificatePostSubmissionEnabled()).isEqualTo(toggleStat);
     }
 
     private void givenToggle(String feature, boolean state) {

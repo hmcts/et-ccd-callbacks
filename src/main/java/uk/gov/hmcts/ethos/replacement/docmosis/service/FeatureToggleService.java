@@ -62,6 +62,10 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("citizen-et1-generation");
     }
 
+    public boolean isAcasCertificatePostSubmissionEnabled() {
+        return this.featureToggleApi.isFeatureEnabled("acasCertificatePostSubmission");
+    }
+
     public boolean isNoticeOfChangeFieldsEnabled() {
         return this.featureToggleApi.isFeatureEnabled("noticeOfChangeFields");
     }

@@ -136,7 +136,8 @@
     "respondentNoAcasCertificateReason": "No Power",
     "claimantStillWorkingNoticePeriodMonths": "10",
     "claimantPreferredTitle": "Dr",
-    "requiresSubmissionDocuments": "Yes"
+    "requiresSubmissionDocuments": "Yes",
+    "acasCertificateRequired": "Yes"
   },
   "id": "1712760487710259",
   "jurisdiction": "EMPLOYMENT",

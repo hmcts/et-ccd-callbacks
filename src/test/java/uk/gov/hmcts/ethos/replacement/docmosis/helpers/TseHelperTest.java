@@ -31,11 +31,14 @@ import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.utils.TseApplicationBuilder;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
+import uk.gov.service.notify.RetentionPeriodDuration;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -336,15 +339,18 @@ class TseHelperTest {
         Map<String, Object> actual = TseHelper.getPersonalisationForResponse(
                 caseDetails, document, "citizenUrlCaseId", false);
 
-        Map<String, Object> expected = Map.of(
-            "linkToCitizenHub", "citizenUrlCaseId",
-            "caseNumber", "1234",
-            "applicationType", "Withdraw my claim",
-            "response", "TseResponseText",
-            "claimant", "First Last",
-            "respondents", "Respondent Name",
-            "linkToDocument", NotificationClient.prepareUpload(document, false, true, "52 weeks")
-        );
+        Map<String, Object> expected = new ConcurrentHashMap<>();
+        expected.put("linkToCitizenHub", "citizenUrlCaseId");
+        expected.put("caseNumber", "1234");
+        expected.put("applicationType", "Withdraw my claim");
+        expected.put("response", "TseResponseText");
+        expected.put("claimant", "First Last");
+        expected.put("respondents", "Respondent Name");
+        expected.put("linkToDocument", NotificationClient.prepareUpload(
+                document,
+                true,
+                new RetentionPeriodDuration(52, ChronoUnit.WEEKS)
+        ));
 
         for (Map.Entry<String, Object> entry : expected.entrySet()) {
             if (LINK_TO_DOCUMENT.equals(entry.getKey())) {
@@ -373,15 +379,18 @@ class TseHelperTest {
         Map<String, Object> actual = TseHelper.getPersonalisationForResponse(
                 caseDetails, document, "citizenUrlCaseId", true);
 
-        Map<String, Object> expected = Map.of(
-                "linkToCitizenHub", "citizenUrlCaseId" + WELSH_LANGUAGE_PARAM,
-                "caseNumber", "1234",
-                "applicationType", CY_RESPONDING_TO_APP_TYPE_MAP.get(applicationTypeKey),
-                "response", "TseResponseText",
-                "claimant", "First Last",
-                "respondents", "Respondent Name",
-                LINK_TO_DOCUMENT, NotificationClient.prepareUpload(document, false, true, "52 weeks")
-        );
+        Map<String, Object> expected = new ConcurrentHashMap<>();
+        expected.put("linkToCitizenHub", "citizenUrlCaseId" + WELSH_LANGUAGE_PARAM);
+        expected.put("caseNumber", "1234");
+        expected.put("applicationType", CY_RESPONDING_TO_APP_TYPE_MAP.get(applicationTypeKey));
+        expected.put("response", "TseResponseText");
+        expected.put("claimant", "First Last");
+        expected.put("respondents", "Respondent Name");
+        expected.put(LINK_TO_DOCUMENT, NotificationClient.prepareUpload(
+                document,
+                true,
+                new RetentionPeriodDuration(52, ChronoUnit.WEEKS)
+        ));
         for (Map.Entry<String, Object> entry : expected.entrySet()) {
             if (LINK_TO_DOCUMENT.equals(entry.getKey())) {
                 continue;
@@ -408,15 +417,18 @@ class TseHelperTest {
         Map<String, Object> actual = TseHelper.getPersonalisationForResponse(
                 caseDetails, document, "citizenUrlCaseId", false);
 
-        Map<String, Object> expected = Map.of(
-            "linkToCitizenHub", "citizenUrlCaseId",
-            "caseNumber", "1234",
-            "applicationType", "Withdraw my claim",
-            "response", "",
-            "claimant", "First Last",
-            "respondents", "Respondent Name",
-                LINK_TO_DOCUMENT, NotificationClient.prepareUpload(document, false, true, "52 weeks")
-        );
+        Map<String, Object> expected = new ConcurrentHashMap<>();
+        expected.put("linkToCitizenHub", "citizenUrlCaseId");
+        expected.put("caseNumber", "1234");
+        expected.put("applicationType", "Withdraw my claim");
+        expected.put("response", "");
+        expected.put("claimant", "First Last");
+        expected.put("respondents", "Respondent Name");
+        expected.put(LINK_TO_DOCUMENT, NotificationClient.prepareUpload(
+                document,
+                true,
+                new RetentionPeriodDuration(52, ChronoUnit.WEEKS)
+        ));
 
         for (Map.Entry<String, Object> entry : expected.entrySet()) {
             if (LINK_TO_DOCUMENT.equals(entry.getKey())) {

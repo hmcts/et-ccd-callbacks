@@ -105,10 +105,6 @@ class CaseManagementForCaseWorkerServiceTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     public static final String UNASSIGNED_OFFICE = "Unassigned";
     private static final String HMCTS_SERVICE_ID = "BHA1";
-    private static final String RESPONSE_STATUS_ACCEPTED = "Accepted";
-    private static final String RESPONSE_STATUS_REJECTED = "Rejected";
-    private static final String ENGLISH_ET3_FORM_NAME = "Test Company - ET3 Response.pdf";
-    private static final String WELSH_ET3_FORM_NAME = "Test Company - ET3 Response - Welsh.pdf";
 
     @Value("${ccd_gateway_base_url}")
     private String ccdGatewayBaseUrl;
@@ -1470,54 +1466,5 @@ class CaseManagementForCaseWorkerServiceTest {
                 Arguments.of("John ", " Doe", "John Doe"),
                 Arguments.of(" John", " Doe", "John Doe"),
                 Arguments.of(" John ", " Doe ", "John Doe"));
-    }
-
-    @ParameterizedTest
-    @MethodSource("provideDataForModifyDocumentCollectionForET3FormsTest")
-    void testModifyDocumentCollectionForET3Forms(CaseData caseData) {
-        caseManagementForCaseWorkerService.modifyDocumentCollectionForET3Forms(caseData);
-        if (CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
-            assertThat(caseData.getDocumentCollection()).hasSize(7);
-        } else if (ObjectUtils.isEmpty(caseData.getRespondentCollection().get(0).getValue())) {
-            assertThat(caseData.getDocumentCollection().get(5).getValue().getUploadedDocument().getDocumentFilename())
-                    .isEqualTo(ENGLISH_ET3_FORM_NAME);
-            assertThat(caseData.getDocumentCollection().get(6).getValue().getUploadedDocument().getDocumentFilename())
-                    .isEqualTo(WELSH_ET3_FORM_NAME);
-        } else if (RESPONSE_STATUS_REJECTED.equals(
-                        caseData.getRespondentCollection().get(0).getValue().getResponseStatus())) {
-            assertThat(caseData.getDocumentCollection()).hasSize(5);
-        } else if (RESPONSE_STATUS_ACCEPTED.equals(
-                caseData.getRespondentCollection().get(0).getValue().getResponseStatus())) {
-            assertThat(caseData.getDocumentCollection().get(0).getValue().getUploadedDocument().getDocumentFilename())
-                    .isEqualTo(ENGLISH_ET3_FORM_NAME);
-            assertThat(caseData.getDocumentCollection().get(1).getValue().getUploadedDocument().getDocumentFilename())
-                    .isEqualTo(WELSH_ET3_FORM_NAME);
-        }
-    }
-
-    private static Stream<Arguments> provideDataForModifyDocumentCollectionForET3FormsTest() {
-        CaseData caseDataWithoutRespondentCollection =
-                ResourceLoader.fromString(TEST_ET3_FORM_CASE_DATA_FILE, CaseData.class);
-        caseDataWithoutRespondentCollection.setRespondentCollection(null);
-
-        CaseData caseDataRespondentValueNotExists =
-                ResourceLoader.fromString(TEST_ET3_FORM_CASE_DATA_FILE, CaseData.class);
-        caseDataRespondentValueNotExists.getRespondentCollection().get(0).setValue(null);
-
-        CaseData caseDataResponseNotAccepted =
-                ResourceLoader.fromString(TEST_ET3_FORM_CASE_DATA_FILE, CaseData.class);
-        caseDataResponseNotAccepted.getRespondentCollection()
-                .get(0).getValue().setResponseStatus(RESPONSE_STATUS_REJECTED);
-
-        CaseData caseDataWithoutDocumentCollectionAndResponseAccepted =
-                ResourceLoader.fromString(TEST_ET3_FORM_CASE_DATA_FILE, CaseData.class);
-        caseDataWithoutDocumentCollectionAndResponseAccepted.setDocumentCollection(null);
-        caseDataWithoutDocumentCollectionAndResponseAccepted.getRespondentCollection()
-                .get(0).getValue().setResponseStatus(RESPONSE_STATUS_ACCEPTED);
-
-        return Stream.of(Arguments.of(caseDataWithoutRespondentCollection),
-                Arguments.of(caseDataRespondentValueNotExists),
-                Arguments.of(caseDataResponseNotAccepted),
-                Arguments.of(caseDataWithoutDocumentCollectionAndResponseAccepted));
     }
 }

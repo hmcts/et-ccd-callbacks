@@ -59,7 +59,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsidera
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.UDL_HEARING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.VIDEO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.WITH_MEMBERS;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.hearingTypeMappings;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.HEARING_TYPE_MAPPINGS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.getHearingDuration;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
@@ -324,7 +324,7 @@ public class InitialConsiderationService {
         if (udlHearing != null) {
             EtICListForFinalHearingUpdated updatedFinalHearing = new EtICListForFinalHearingUpdated();
             List<String> mappedTypes = Stream.of(udlHearing.getEtIcudlHearFormat())
-                    .map(type -> hearingTypeMappings.getOrDefault(type, type))
+                    .map(type -> HEARING_TYPE_MAPPINGS.getOrDefault(type, type))
                     .toList();
 
             updatedFinalHearing.setEtICTypeOfFinalHearing(mappedTypes);

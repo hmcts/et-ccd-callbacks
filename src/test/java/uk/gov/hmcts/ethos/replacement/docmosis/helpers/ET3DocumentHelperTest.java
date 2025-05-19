@@ -105,10 +105,10 @@ public class ET3DocumentHelperTest {
 
         RespondentSumTypeItem respondentSumTypeItem = ResourceLoader.fromString(
                 TEST_ET3_FORM_CASE_DATA_FILE, CaseData.class).getRespondentCollection().get(0);
-        assertThat(ET3DocumentHelper.findAllET3DocumentsOfRespondent(respondentSumTypeItem)).hasSize(4);
+        assertThat(ET3DocumentHelper.findAllET3DocumentsOfRespondent(respondentSumTypeItem)).hasSize(5);
 
         respondentSumTypeItem.getValue().setEt3ResponseContestClaimDocument(null);
-        assertThat(ET3DocumentHelper.findAllET3DocumentsOfRespondent(respondentSumTypeItem)).hasSize(3);
+        assertThat(ET3DocumentHelper.findAllET3DocumentsOfRespondent(respondentSumTypeItem)).hasSize(4);
     }
 
     @ParameterizedTest

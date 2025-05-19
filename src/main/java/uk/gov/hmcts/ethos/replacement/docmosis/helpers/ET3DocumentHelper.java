@@ -26,6 +26,7 @@ public final class ET3DocumentHelper {
     private static final String ET3_FORM_WELSH_DESCRIPTION = "ET3 form Welsh version";
     private static final String ET3_EMPLOYER_CONTEST_CLAIM_DOCUMENT = "ET3 employer contest claim document";
     private static final String ET3_RESPONDENT_SUPPORT_DOCUMENT = "ET3 respondent support document";
+    private static final String ET3_RESPONDENT_CLAIM_DOCUMENT = "ET3 respondent claim document";
 
     private ET3DocumentHelper() {
         // Helper classes should not have a public or default constructor.
@@ -104,6 +105,11 @@ public final class ET3DocumentHelper {
                     RESPONSE_TO_A_CLAIM,
                     ET3,
                     ET3_FORM_WELSH_DESCRIPTION);
+            addUploadedDocumentTypeToDocumentTypeItems(documentTypeItems,
+                    respondentSumType.getEt3ResponseEmployerClaimDocument(),
+                    RESPONSE_TO_A_CLAIM,
+                    ET3_ATTACHMENT,
+                    ET3_RESPONDENT_CLAIM_DOCUMENT);
             if (CollectionUtils.isNotEmpty(respondentSumType.getEt3ResponseContestClaimDocument())) {
                 for (DocumentTypeItem documentTypeItem : respondentSumType.getEt3ResponseContestClaimDocument()) {
                     setDocumentTypeItemLevels(documentTypeItem, RESPONSE_TO_A_CLAIM, ET3_ATTACHMENT);

@@ -114,6 +114,13 @@ configurations {
     integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
     apiTestImplementation.extendsFrom testImplementation
     apiTestRuntimeOnly.extendsFrom testRuntimeOnly
+    configureEach {
+        resolutionStrategy.eachDependency { details ->
+            if (details.requested.group.startsWith("com.fasterxml.jackson")) {
+                details.useVersion("$jacksonVersion")
+            }
+        }
+    }
 }
 
 test {
@@ -305,7 +312,8 @@ ext {
     pact_version = '4.3.10'
     reformLoggingVersion = '6.0.1'
     serenity = '3.9.8'
-    tomcatEmbedVersion = '9.0.102'
+    tomcatEmbedVersion = '9.0.104'
+    jacksonVersion = '2.18.3'
 }
 
 ext["rest-assured.version"] = '5.1.0'
@@ -380,7 +388,7 @@ dependencies {
     implementation group: 'org.springframework.retry', name: 'spring-retry', version: '2.0.11'
     // CVE-2022-25857
     implementation group: 'org.yaml', name: 'snakeyaml', version: '2.4'
-    implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '4.1.1-RELEASE'
+    implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '5.2.1-RELEASE'
     implementation group: 'commons-validator', name: 'commons-validator', version: '1.9.0'
     // 1084765
     implementation group: 'org.webjars.npm', name: 'minimatch', version: '9.0.5'

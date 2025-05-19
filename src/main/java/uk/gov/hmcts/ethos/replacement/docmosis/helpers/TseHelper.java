@@ -24,8 +24,10 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseReplyDocument
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentUtil;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
+import uk.gov.service.notify.RetentionPeriodDuration;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -299,7 +301,8 @@ public final class TseHelper {
                 ? CY_RESPONDING_TO_APP_TYPE_MAP.get(selectedApplication.getType())
                 : selectedApplication.getType();
 
-        JSONObject documentJson = NotificationClient.prepareUpload(document, false, true, "52 weeks");
+        JSONObject documentJson = NotificationClient.prepareUpload(document, true,
+                new RetentionPeriodDuration(52, ChronoUnit.WEEKS));
 
         Map<String, Object> personalisation = new ConcurrentHashMap<>();
         personalisation.put(LINK_TO_CITIZEN_HUB, linkToCitizenHub);

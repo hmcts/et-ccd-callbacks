@@ -192,3 +192,7 @@ cron:
 
 pdf:
   et3form: "ET3_0224.pdf"
+
+feature:
+  secure-doc-store:
+    enabled: false

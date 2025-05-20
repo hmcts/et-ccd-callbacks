@@ -1,12 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.exceptions;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxService;
 
 import java.io.Serial;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.STRING_EMPTY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.LoggingUtil.logException;
 
 /**
@@ -31,11 +31,11 @@ public class GenericServiceException extends Exception {
     public GenericServiceException(String message, Throwable cause, String firstWord, String caseReferenceNumber,
                                    String className, String methodName) {
         super(message, cause);
-        logException(isNotBlank(firstWord) ? firstWord : STRING_EMPTY,
-                isNotBlank(caseReferenceNumber) ? caseReferenceNumber : STRING_EMPTY,
-                isNotBlank(message) ? message : STRING_EMPTY,
-                isNotBlank(className) ? className : STRING_EMPTY,
-                isNotBlank(methodName) ? methodName : STRING_EMPTY);
+        logException(isNotBlank(firstWord) ? firstWord : StringUtils.EMPTY,
+                isNotBlank(caseReferenceNumber) ? caseReferenceNumber : StringUtils.EMPTY,
+                isNotBlank(message) ? message : StringUtils.EMPTY,
+                isNotBlank(className) ? className : StringUtils.EMPTY,
+                isNotBlank(methodName) ? methodName : StringUtils.EMPTY);
     }
 
 }

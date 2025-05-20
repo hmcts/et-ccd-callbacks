@@ -486,6 +486,9 @@ public final class Et1ReppedHelper {
         claimantHearingPreference.setHearingPreferences(hearingPreferenceMapping(caseData.getClaimantAttendHearing()));
         claimantHearingPreference.setReasonableAdjustments(
                 reasonableAdjustmentsMapping(caseData.getClaimantSupportQuestion()));
+        claimantHearingPreference.setClaimantHearingPanelPreference(caseData.getTmpClaimantHearingPanelPreference());
+        claimantHearingPreference.setClaimantHearingPanelPreferenceWhy(
+                caseData.getTmpClaimantHearingPanelPrefReason());
         claimantHearingPreference.setReasonableAdjustmentsDetail(caseData.getClaimantSupportQuestionReason());
         claimantHearingPreference.setHearingLanguage(getFirstListItem(caseData.getClaimantHearingContactLanguage()));
         return claimantHearingPreference;
@@ -597,6 +600,8 @@ public final class Et1ReppedHelper {
         caseData.setLinkedCasesYesNo(null);
         caseData.setLinkedCasesDetails(null);
         caseData.setAddAdditionalRespondent(null);
+        caseData.setEt3ResponseHearingPanelPreference(null);
+        caseData.setEt3ResponseHearingPanelPreferenceReason(null);
     }
 
     /**

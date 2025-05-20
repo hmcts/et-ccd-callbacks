@@ -1,16 +1,14 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ecm.common.model.acas.AcasCertificate;
 import uk.gov.hmcts.ecm.common.model.acas.AcasCertificateRequest;
@@ -24,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 
 @Service
@@ -47,24 +46,23 @@ public class AcasService {
         this.acasApiKey = acasApiKey;
     }
 
-    public List<String> getAcasCertificate(CaseData caseData, String authToken, String caseTypeId)
-            throws JsonProcessingException {
+    public List<String> getAcasCertificate(CaseData caseData, String authToken, String caseTypeId) {
         if (isNullOrEmpty(caseData.getAcasCertificate())) {
             return List.of("ACAS Certificate cannot be null or empty");
         }
 
-        Object acasCertificateObject;
+        List<AcasCertificate> acasCertificateObject;
         try {
             acasCertificateObject = fetchAcasCertificates(caseData.getAcasCertificate()).getBody();
             if (ObjectUtils.isEmpty(acasCertificateObject)) {
                 return List.of("Error reading ACAS Certificate");
             }
         } catch (Exception errorException) {
-            log.error("Error retrieving ACAS Certificate with exception : " + errorException.getMessage());
+            log.error("Error retrieving ACAS Certificate with exception : {}", errorException.getMessage());
             return List.of("Error retrieving ACAS Certificate");
         }
 
-        AcasCertificate acasCertificate = convertAcasResponse((ArrayList) acasCertificateObject);
+        AcasCertificate acasCertificate = acasCertificateObject.get(0);
         if (NOT_FOUND.equals(acasCertificate.getCertificateDocument())) {
             return List.of("No ACAS Certificate found");
         }
@@ -73,7 +71,7 @@ public class AcasService {
         try {
             documentInfo = convertCertificateToPdf(caseData, acasCertificate, authToken, caseTypeId);
         } catch (Exception exception) {
-            log.error("Error converting ACAS Certificate with exception : " + exception.getMessage());
+            log.error("Error converting ACAS Certificate with exception : {}", exception.getMessage());
             return List.of("Error uploading ACAS Certificate");
         }
 
@@ -81,13 +79,6 @@ public class AcasService {
         caseData.setDocMarkUp(documentInfo.getMarkUp());
         caseData.setAcasCertificate(null);
         return new ArrayList<>();
-    }
-
-    private static AcasCertificate convertAcasResponse(List acasCertificate) throws JsonProcessingException {
-        Object cert = acasCertificate.get(0);
-        ObjectMapper objectMapper = new ObjectMapper();
-        String certificate = objectMapper.writeValueAsString(cert);
-        return objectMapper.readValue(certificate, AcasCertificate.class);
     }
 
     private DocumentInfo convertCertificateToPdf(CaseData caseData, AcasCertificate acasCertificate, String authToken,
@@ -106,7 +97,7 @@ public class AcasService {
                 caseTypeId);
     }
 
-    private ResponseEntity<Object> fetchAcasCertificates(String... acasCertificate) {
+    private ResponseEntity<List<AcasCertificate>> fetchAcasCertificates(String... acasCertificate) {
         HttpHeaders headers = new HttpHeaders();
         headers.set(OCP_APIM_SUBSCRIPTION_KEY, acasApiKey);
         AcasCertificateRequest acasCertificateRequest = new AcasCertificateRequest();
@@ -116,27 +107,39 @@ public class AcasService {
                 acasApiUrl,
                 HttpMethod.POST,
                 request,
-                Object.class
+                new ParameterizedTypeReference<>() {
+                }
         );
     }
 
-    public DocumentInfo getAcasCertificates(CaseData caseData, String acasNumber, String authToken,
-                                            String caseTypeId)
-            throws JsonProcessingException {
-        Object acasCertificateObject;
+    public List<DocumentInfo> getAcasCertificates(CaseData caseData, List<String> acasNumber, String authToken,
+                                            String caseTypeId) {
+        List<AcasCertificate> acasCertificateList;
         try {
-            acasCertificateObject = fetchAcasCertificates(acasNumber).getBody();
-            AcasCertificate acasCertificate = convertAcasResponse((ArrayList) acasCertificateObject);
-            DocumentInfo documentInfo = convertCertificateToPdf(caseData, acasCertificate, authToken, caseTypeId);
-            documentInfo.setMarkUp(documentInfo.getMarkUp().replace("Document", documentInfo.getDescription()));
-            return documentInfo;
-        } catch (HttpClientErrorException errorException) {
-            log.error("Error retrieving ACAS Certificate with exception : " + errorException.getMessage());
+            ResponseEntity<List<AcasCertificate>> response = fetchAcasCertificates(acasNumber.toArray(new String[0]));
+            if (response.getStatusCode().is2xxSuccessful()) {
+                acasCertificateList = response.getBody();
+            } else {
+                log.error("Error retrieving ACAS Certificate with status code : {}", response.getStatusCode());
+                return new ArrayList<>();
+            }
+            if (isEmpty(acasCertificateList)) {
+                return new ArrayList<>();
+            }
+            return acasCertificateList.stream()
+                    .map(ac -> createAcasCertificate(caseData, authToken, caseTypeId, ac))
+                    .toList();
+        } catch (Exception errorException) {
+            log.error("Error retrieving ACAS Certificate with exception : {}", errorException.getMessage());
             throw errorException;
-        } catch (JsonProcessingException e) {
-            log.error("Error converting ACAS Certificate with exception : " + e.getMessage());
-            throw e;
         }
+    }
+
+    private DocumentInfo createAcasCertificate(CaseData caseData, String authToken, String caseTypeId,
+                                               AcasCertificate acasCertificate) {
+        DocumentInfo documentInfo = convertCertificateToPdf(caseData, acasCertificate, authToken, caseTypeId);
+        documentInfo.setMarkUp(documentInfo.getMarkUp().replace("Document", documentInfo.getDescription()));
+        return documentInfo;
     }
 
 }

@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
@@ -11,14 +12,14 @@ import uk.gov.hmcts.et.common.model.generic.BaseCaseData;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET3;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET3_ATTACHMENT;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.RESPONSE_TO_A_CLAIM;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentUtil.addDocumentIfNotExists;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentUtil.addUploadedDocumentTypeToDocumentTypeItems;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentUtil.setDocumentTypeItemLevels;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentUtils.addIfBinaryUrlNotExists;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentUtils.addUploadedDocumentTypeToDocumentTypeItems;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentUtils.removeDocumentsWithMatchingBinaryUrls;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentUtils.setDocumentTypeItemLevels;
 
 public final class ET3DocumentHelper {
 
@@ -27,6 +28,7 @@ public final class ET3DocumentHelper {
     private static final String ET3_EMPLOYER_CONTEST_CLAIM_DOCUMENT = "ET3 employer contest claim document";
     private static final String ET3_RESPONDENT_SUPPORT_DOCUMENT = "ET3 respondent support document";
     private static final String ET3_RESPONDENT_CLAIM_DOCUMENT = "ET3 respondent claim document";
+    private static final String ET3_ACCEPTED_NOTIFICATION_DOCUMENT_ID = "2.11";
 
     private ET3DocumentHelper() {
         // Helper classes should not have a public or default constructor.
@@ -52,7 +54,7 @@ public final class ET3DocumentHelper {
      * @param caseData the {@link CaseData} object containing respondents and the document collection to update
      */
     public static void addOrRemoveET3Documents(CaseData caseData) {
-        if (isEmpty(caseData.getRespondentCollection())) {
+        if (CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
             return;
         }
         if (caseData.getDocumentCollection() == null) {
@@ -60,18 +62,49 @@ public final class ET3DocumentHelper {
         }
         for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
             if (ObjectUtils.isNotEmpty(respondentSumTypeItem.getValue())) {
-                if (ACCEPTED_STATE.equals(respondentSumTypeItem.getValue().getResponseStatus())) {
-                    List<DocumentTypeItem> documentTypeItems =
-                            findAllET3DocumentsOfRespondent(respondentSumTypeItem);
+                List<DocumentTypeItem> documentTypeItems = findAllET3DocumentsOfRespondent(respondentSumTypeItem);
+                if (isET3NotificationDocumentTypeResponseAccepted(caseData.getEt3NotificationDocCollection())
+                        && ACCEPTED_STATE.equals(respondentSumTypeItem.getValue().getResponseStatus())) {
                     for (DocumentTypeItem documentTypeItem : documentTypeItems) {
-                        addDocumentIfNotExists(caseData.getDocumentCollection(), documentTypeItem);
+                        addIfBinaryUrlNotExists(caseData.getDocumentCollection(), documentTypeItem);
                     }
                 } else {
-                    removeET3DocumentsFromDocumentCollection(caseData.getDocumentCollection());
+                    removeDocumentsWithMatchingBinaryUrls(caseData.getDocumentCollection(), documentTypeItems);
                 }
             }
         }
         DocumentHelper.setDocumentNumbers(caseData);
+    }
+
+    /**
+     * Determines whether the first {@link DocumentTypeItem} in the provided list represents
+     * an accepted ET3 Notification document response.
+     * <p>
+     * The method checks if the list is non-empty, the first item and its nested properties
+     * are not null or blank, and whether the document type is equal to {@code "2.11"},
+     * which is considered the accepted ET3 response type.
+     * <p>
+     * Returns {@code false} if:
+     * <ul>
+     *   <li>The list is {@code null} or empty</li>
+     *   <li>The first item is {@code null}</li>
+     *   <li>The document type is blank or not equal to {@code "2.11"}</li>
+     * </ul>
+     *
+     * @param documentTypeItems the list of {@code DocumentTypeItem} to evaluate
+     * @return {@code true} if the first document's type is {@code "2.11"}; {@code false} otherwise
+     */
+    public static boolean isET3NotificationDocumentTypeResponseAccepted(List<DocumentTypeItem> documentTypeItems) {
+        if (CollectionUtils.isEmpty(documentTypeItems)) {
+            return false;
+        }
+        DocumentTypeItem documentTypeItem = documentTypeItems.get(0);
+        if (ObjectUtils.isEmpty(documentTypeItem)
+                || ObjectUtils.isEmpty(documentTypeItem.getValue())
+                || StringUtils.isBlank(documentTypeItem.getValue().getTypeOfDocument())) {
+            return false;
+        }
+        return ET3_ACCEPTED_NOTIFICATION_DOCUMENT_ID.equals(documentTypeItem.getValue().getTypeOfDocument());
     }
 
     /**
@@ -152,21 +185,44 @@ public final class ET3DocumentHelper {
     }
 
     /**
-     * Removes ET3-related documents from the given list of {@link DocumentTypeItem}.
+     * Checks whether the acceptance status of document types in the given list is inconsistent.
      * <p>
-     * First, the method checks if the {@code documentTypeItems} list is empty. If not, it iterates through the list and
-     * removes any document whose {@code topLevelDocuments} field has the value "Response to a claim",
-     * indicating it is an ET3 document.
+     * A document type of "2.11" is considered <strong>accepted</strong>, while any other type is considered
+     * <strong>not accepted</strong>. The method returns:
+     * <ul>
+     *   <li>{@code true} if the list is {@code null}, empty, or the first item's type is blank
+     *   (i.e., cannot determine acceptance).</li>
+     *   <li>{@code true} if the list contains a mix of accepted ("2.11") and not accepted
+     *   (any other) document types.</li>
+     *   <li>{@code false} if all documents have the same acceptance status (all "2.11" or all not "2.11").</li>
+     * </ul>
      *
-     * @param documentTypeItems the list of documents to filter, removing any ET3-related items
+     * @param documentTypeItems the list of {@code DocumentTypeItem} objects to evaluate
+     * @return {@code true} if the acceptance status is inconsistent or the list is empty/invalid;
+     *         {@code false} if all document types are uniformly accepted or not accepted
      */
-    public static void removeET3DocumentsFromDocumentCollection(List<DocumentTypeItem> documentTypeItems) {
-        if (CollectionUtils.isEmpty(documentTypeItems)) {
-            return;
+    public static boolean hasInconsistentAcceptanceStatus(List<DocumentTypeItem> documentTypeItems) {
+        if (isFirstDocumentTypeInvalid(documentTypeItems)) {
+            return true;
         }
-        documentTypeItems.removeIf(documentTypeItem -> ObjectUtils.isNotEmpty(documentTypeItem.getValue())
-                && ObjectUtils.isNotEmpty(documentTypeItem.getValue().getUploadedDocument())
-                && RESPONSE_TO_A_CLAIM.equals(documentTypeItem.getValue().getTopLevelDocuments()));
+        String firstType = documentTypeItems.get(0).getValue().getTypeOfDocument();
+        for (int i = 1; i < documentTypeItems.size(); i++) {
+            DocumentTypeItem item = documentTypeItems.get(i);
+            if (ObjectUtils.isEmpty(item) || ObjectUtils.isEmpty(item.getValue())
+                    || ET3_ACCEPTED_NOTIFICATION_DOCUMENT_ID.equals(firstType)
+                    && !ET3_ACCEPTED_NOTIFICATION_DOCUMENT_ID.equals(item.getValue().getTypeOfDocument())
+                    || !ET3_ACCEPTED_NOTIFICATION_DOCUMENT_ID.equals(firstType)
+                    && ET3_ACCEPTED_NOTIFICATION_DOCUMENT_ID.equals(item.getValue().getTypeOfDocument())) {
+                return true;
+            }
+        }
+        return false;
     }
 
+    private static boolean isFirstDocumentTypeInvalid(List<DocumentTypeItem> documentTypeItems) {
+        return CollectionUtils.isEmpty(documentTypeItems)
+                || ObjectUtils.isEmpty(documentTypeItems.get(0))
+                || ObjectUtils.isEmpty(documentTypeItems.get(0).getValue())
+                || StringUtils.isBlank(documentTypeItems.get(0).getValue().getTypeOfDocument());
+    }
 }

@@ -21,7 +21,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.TseStatusTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseReplyData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseReplyDocument;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentUtil;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentUtils;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 import uk.gov.service.notify.RetentionPeriodDuration;
@@ -357,7 +357,7 @@ public final class TseHelper {
             return null;
         }
 
-        return DocumentUtil.generateUploadedDocumentListFromDocumentList(caseData.getTseResponseSupportingMaterial());
+        return DocumentUtils.generateUploadedDocumentListFromDocumentList(caseData.getTseResponseSupportingMaterial());
     }
 
     public static String hasSupportingDocs(List<GenericTypeItem<DocumentType>> supportDocList) {

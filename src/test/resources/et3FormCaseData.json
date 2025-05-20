@@ -14,9 +14,9 @@
         },
         "et3FormWelsh": {
           "category_id": "C18",
-          "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/1824d0e5-aecc-4dff-8e7c-03fbae8cfb39",
+          "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/1824d0e5-aecc-4dff-8e7c-03fbae8cf55",
           "document_filename": "Test Company - ET3 Response - Welsh.pdf",
-          "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/1824d0e5-aecc-4dff-8e7c-03fbae8cfb39/binary"
+          "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/1824d0e5-aecc-4dff-8e7c-03fbae8cfb44/binary"
         },
         "respondent_phone1": "07444518903",
         "respondent_phone2": "07444518904",
@@ -519,5 +519,40 @@
     "value": {
       "label": "Test Company"
     }
-  }
+  },
+  "et3NotificationDocCollection": [
+    {
+      "id": "a1c60f68-f818-4727-b228-cd5ced094518",
+      "value": {
+        "docNumber": "1",
+        "documentType": "2.11",
+        "typeOfDocument": "2.11",
+        "shortDescription": "ET1 - et citizen1",
+        "uploadedDocument": {
+          "category_id": "C11",
+          "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/6e872094-fdc6-4c52-b172-fbe510c0c58d",
+          "document_filename": "ET1 - et citizen1.pdf",
+          "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/6e872094-fdc6-4c52-b172-fbe510c0c58d/binary"
+        },
+        "topLevelDocuments": "Starting a Claim",
+        "dateOfCorrespondence": "2024-05-13",
+        "startingClaimDocuments": "ET1"
+      }
+    },
+    {
+      "id": "75e90068-85ac-472f-8789-b1b384711223",
+      "value": {
+        "documentType": "2.11",
+        "typeOfDocument": "2.11",
+        "uploadedDocument": {
+          "document_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/356d4727-e368-49e0-bf00-35cefd365e3d",
+          "document_filename": "ET1 Vetting - et citizen1.pdf",
+          "document_binary_url": "http://dm-store-aat.service.core-compute-aat.internal/documents/356d4727-e368-49e0-bf00-35cefd365e3d/binary"
+        },
+        "topLevelDocuments": "Starting a Claim",
+        "dateOfCorrespondence": "2024-05-13",
+        "startingClaimDocuments": "ET1 Vetting"
+      }
+    }
+    ]
 }

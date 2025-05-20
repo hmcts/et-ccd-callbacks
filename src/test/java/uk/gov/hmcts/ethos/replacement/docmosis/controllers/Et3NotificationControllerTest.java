@@ -12,13 +12,15 @@ import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et3NotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ServingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
-import java.util.ArrayList;
+import java.util.List;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
@@ -39,7 +41,8 @@ class Et3NotificationControllerTest extends BaseControllerTest {
 
     private static final String MID_UPLOAD_DOCUMENTS_URL = "/et3Notification/midUploadDocuments";
     private static final String SUBMITTED_URL = "/et3Notification/submitted";
-    private CCDRequest ccdRequest;
+    private CCDRequest ccdRequestWithET3NotificationDocument;
+    private CCDRequest ccdRequestWithoutET3NotificationDocument;
 
     @MockBean
     private ServingService servingService;
@@ -70,10 +73,18 @@ class Et3NotificationControllerTest extends BaseControllerTest {
             .withRespondentRepresentative("Respondent Represented", "Rep LastName", "res@rep.com")
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
-        CaseData caseData = caseDetails.getCaseData();
-        caseData.setClaimant("Claimant LastName");
-        caseData.setEt3NotificationDocCollection(new ArrayList<>());
-        ccdRequest = CCDRequestBuilder.builder().withCaseData(caseData).build();
+        CaseData caseDataWithNotificationDocument = caseDetails.getCaseData();
+        caseDataWithNotificationDocument.setClaimant("Claimant LastName");
+        caseDataWithNotificationDocument.setEt3NotificationDocCollection(List.of(DocumentTypeItem.builder()
+                .value(DocumentType.builder().typeOfDocument("2.11").build()).build()));
+
+        ccdRequestWithET3NotificationDocument = CCDRequestBuilder.builder()
+                .withCaseData(caseDataWithNotificationDocument).build();
+        CaseData caseDataWithoutET3NotificationDocument = new CaseData();
+        caseDataWithoutET3NotificationDocument.setEt3NotificationDocCollection(List.of());
+        ccdRequestWithoutET3NotificationDocument = CCDRequestBuilder.builder()
+                .withCaseData(caseDataWithoutET3NotificationDocument).build();
+
     }
 
     @Test
@@ -82,7 +93,7 @@ class Et3NotificationControllerTest extends BaseControllerTest {
         when(servingService.generateOtherTypeDocumentLink(anyList())).thenReturn("expectedDocumentName");
         when(servingService.generateEmailLinkToAcas(any(), anyBoolean())).thenReturn("expectedLink");
         mvc.perform(post(MID_UPLOAD_DOCUMENTS_URL)
-                .content(jsonMapper.toJson(ccdRequest))
+                .content(jsonMapper.toJson(ccdRequestWithET3NotificationDocument))
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
@@ -95,10 +106,21 @@ class Et3NotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
+    void midUploadDocuments_invalidET3NotificationDocumentList() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mvc.perform(post(MID_UPLOAD_DOCUMENTS_URL)
+                        .content(jsonMapper.toJson(ccdRequestWithoutET3NotificationDocument))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()));
+    }
+
+    @Test
     void midUploadDocuments_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MID_UPLOAD_DOCUMENTS_URL)
-                .content(jsonMapper.toJson(ccdRequest))
+                .content(jsonMapper.toJson(ccdRequestWithET3NotificationDocument))
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isForbidden());
@@ -117,7 +139,7 @@ class Et3NotificationControllerTest extends BaseControllerTest {
     void submitted_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(SUBMITTED_URL)
-                .content(jsonMapper.toJson(ccdRequest))
+                .content(jsonMapper.toJson(ccdRequestWithET3NotificationDocument))
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
@@ -132,7 +154,7 @@ class Et3NotificationControllerTest extends BaseControllerTest {
     void submitted_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(SUBMITTED_URL)
-                .content(jsonMapper.toJson(ccdRequest))
+                .content(jsonMapper.toJson(ccdRequestWithET3NotificationDocument))
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isForbidden());

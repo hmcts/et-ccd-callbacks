@@ -17,11 +17,16 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ET3DocumentHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et3NotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ServingService;
 
+import java.util.List;
+
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @Slf4j
@@ -63,10 +68,16 @@ public class Et3NotificationController {
         @RequestHeader("Authorization") String userToken) {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        if (ET3DocumentHelper.hasInconsistentAcceptanceStatus(caseData.getEt3NotificationDocCollection())) {
+            List<String> errors =
+                    List.of("Upload at least one document. All uploaded documents must be the same type.");
+            return getCallbackRespEntityErrors(errors, caseData);
+        }
         caseData.setEt3OtherTypeDocumentName(
             servingService.generateOtherTypeDocumentLink(caseData.getEt3NotificationDocCollection()));
         caseData.setEt3EmailLinkToAcas(servingService.generateEmailLinkToAcas(caseData, true));
-
+        ET3DocumentHelper.addOrRemoveET3Documents(caseData);
+        Et3ResponseHelper.setEt3NotificationAcceptedDates(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
 

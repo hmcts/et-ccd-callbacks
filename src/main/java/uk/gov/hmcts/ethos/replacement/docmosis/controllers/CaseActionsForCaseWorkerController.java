@@ -24,7 +24,6 @@ import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ET3DocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
@@ -489,8 +488,6 @@ public class CaseActionsForCaseWorkerController {
         }
 
         caseFlagsService.setupCaseFlags(caseData);
-
-        ET3DocumentHelper.addOrRemoveET3Documents(caseData);
         caseManagementForCaseWorkerService.updateWorkAllocationField(errors, caseData);
         removeSpacesFromPartyNames(caseData);
 

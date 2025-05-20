@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 
 import java.util.Map;
@@ -62,6 +61,5 @@ public class Et3NotificationService {
             }
             emailService.sendEmail(et3CitizenTemplateId, personalisation.get(EMAIL_ADDRESS), personalisation);
         }
-        Et3ResponseHelper.setEt3NotificationAcceptedDates(caseDetails.getCaseData().getRespondentCollection());
     }
 }

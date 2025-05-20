@@ -9,24 +9,24 @@ import org.testcontainers.shaded.org.apache.commons.lang3.ObjectUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentUtil;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_ET3_FORM_CASE_DATA_FILE;
 
-public class ET3DocumentHelperTest {
+class ET3DocumentHelperTest {
 
     private static final String RESPONSE_STATUS_ACCEPTED = "Accepted";
     private static final String RESPONSE_STATUS_REJECTED = "Rejected";
     private static final String ENGLISH_ET3_FORM_NAME = "Test Company - ET3 Response.pdf";
     private static final String WELSH_ET3_FORM_NAME = "Test Company - ET3 Response - Welsh.pdf";
+    private static final String ET3_ACCEPTED_NOTIFICATION_DOCUMENT_ID = "2.11";
 
     @Test
     void theHasET3Document() {
@@ -67,39 +67,6 @@ public class ET3DocumentHelperTest {
     }
 
     @Test
-    void theRemoveET3DocumentsFromDocumentCollection() {
-        assertDoesNotThrow(() -> ET3DocumentHelper.removeET3DocumentsFromDocumentCollection(null));
-
-        RespondentSumTypeItem respondentSumTypeItem = ResourceLoader.fromString(
-                TEST_ET3_FORM_CASE_DATA_FILE, CaseData.class).getRespondentCollection().get(0);
-        List<DocumentTypeItem> documentTypeItems = new ArrayList<>();
-        documentTypeItems.add(respondentSumTypeItem.getValue().getEt3ResponseContestClaimDocument().get(0));
-        assertThat(documentTypeItems.size()).isEqualTo(1);
-        ET3DocumentHelper.removeET3DocumentsFromDocumentCollection(documentTypeItems);
-        assertThat(documentTypeItems.size()).isEqualTo(1);
-
-        documentTypeItems.remove(0);
-        documentTypeItems.add(DocumentUtil.convertUploadedDocumentTypeToDocumentTypeItemWithLevels(
-                respondentSumTypeItem.getValue().getEt3Form(), RESPONSE_TO_A_CLAIM, ET3));
-        documentTypeItems.add(DocumentUtil.convertUploadedDocumentTypeToDocumentTypeItemWithLevels(
-                respondentSumTypeItem.getValue().getEt3FormWelsh(), RESPONSE_TO_A_CLAIM, ET3));
-        documentTypeItems.add(DocumentUtil.convertUploadedDocumentTypeToDocumentTypeItemWithLevels(
-                respondentSumTypeItem.getValue().getEt3ResponseEmployerClaimDocument(),
-                RESPONSE_TO_A_CLAIM,
-                ET3_ATTACHMENT));
-        documentTypeItems.add(DocumentUtil.convertUploadedDocumentTypeToDocumentTypeItemWithLevels(
-                respondentSumTypeItem.getValue().getEt3ResponseRespondentSupportDocument(),
-                RESPONSE_TO_A_CLAIM,
-                ET3_ATTACHMENT));
-        DocumentUtil.setDocumentTypeItemLevels(
-                respondentSumTypeItem.getValue().getEt3ResponseContestClaimDocument().get(0), RESPONSE_TO_A_CLAIM, ET3_ATTACHMENT);
-        documentTypeItems.add(respondentSumTypeItem.getValue().getEt3ResponseContestClaimDocument().get(0));
-        assertThat(documentTypeItems).hasSize(5);
-        ET3DocumentHelper.removeET3DocumentsFromDocumentCollection(documentTypeItems);
-        assertThat(documentTypeItems).hasSize(0);
-    }
-
-    @Test
     void theFindAllET3DocumentsOfRespondent() {
         assertThat(ET3DocumentHelper.findAllET3DocumentsOfRespondent(null)).isEmpty();
 
@@ -115,22 +82,31 @@ public class ET3DocumentHelperTest {
     @MethodSource("provideDataForModifyDocumentCollectionForET3FormsTest")
     void testAddOrRemoveET3Documents(CaseData caseData) {
         ET3DocumentHelper.addOrRemoveET3Documents(caseData);
-        if (CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
-            assertThat(caseData.getDocumentCollection()).hasSize(7);
-        } else if (ObjectUtils.isEmpty(caseData.getRespondentCollection().get(0).getValue())) {
-            assertThat(caseData.getDocumentCollection().get(5).getValue().getUploadedDocument().getDocumentFilename())
-                    .isEqualTo(ENGLISH_ET3_FORM_NAME);
-            assertThat(caseData.getDocumentCollection().get(6).getValue().getUploadedDocument().getDocumentFilename())
-                    .isEqualTo(WELSH_ET3_FORM_NAME);
-        } else if (RESPONSE_STATUS_REJECTED.equals(
-                caseData.getRespondentCollection().get(0).getValue().getResponseStatus())) {
+        if (ET3_ACCEPTED_NOTIFICATION_DOCUMENT_ID.equals(
+                caseData.getEt3NotificationDocCollection().get(0).getValue().getTypeOfDocument())) {
+            if (CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
+                assertThat(caseData.getDocumentCollection()).hasSize(7);
+            } else if (ObjectUtils.isEmpty(caseData.getRespondentCollection().get(0).getValue())) {
+                assertThat(
+                        caseData.getDocumentCollection().get(5).getValue().getUploadedDocument().getDocumentFilename())
+                        .isEqualTo(ENGLISH_ET3_FORM_NAME);
+                assertThat(
+                        caseData.getDocumentCollection().get(6).getValue().getUploadedDocument().getDocumentFilename())
+                        .isEqualTo(WELSH_ET3_FORM_NAME);
+            } else if (RESPONSE_STATUS_REJECTED.equals(
+                    caseData.getRespondentCollection().get(0).getValue().getResponseStatus())) {
+                assertThat(caseData.getDocumentCollection()).hasSize(2);
+            } else if (RESPONSE_STATUS_ACCEPTED.equals(
+                    caseData.getRespondentCollection().get(0).getValue().getResponseStatus())) {
+                assertThat(
+                        caseData.getDocumentCollection().get(0).getValue().getUploadedDocument().getDocumentFilename())
+                        .isEqualTo(ENGLISH_ET3_FORM_NAME);
+                assertThat(
+                        caseData.getDocumentCollection().get(1).getValue().getUploadedDocument().getDocumentFilename())
+                        .isEqualTo(WELSH_ET3_FORM_NAME);
+            }
+        } else {
             assertThat(caseData.getDocumentCollection()).hasSize(2);
-        } else if (RESPONSE_STATUS_ACCEPTED.equals(
-                caseData.getRespondentCollection().get(0).getValue().getResponseStatus())) {
-            assertThat(caseData.getDocumentCollection().get(0).getValue().getUploadedDocument().getDocumentFilename())
-                    .isEqualTo(ENGLISH_ET3_FORM_NAME);
-            assertThat(caseData.getDocumentCollection().get(1).getValue().getUploadedDocument().getDocumentFilename())
-                    .isEqualTo(WELSH_ET3_FORM_NAME);
         }
     }
 
@@ -154,9 +130,88 @@ public class ET3DocumentHelperTest {
         caseDataWithoutDocumentCollectionAndResponseAccepted.getRespondentCollection()
                 .get(0).getValue().setResponseStatus(RESPONSE_STATUS_ACCEPTED);
 
+        CaseData caseDataET3NotificationDocCollectionAndResponseNotAccepted =
+                ResourceLoader.fromString(TEST_ET3_FORM_CASE_DATA_FILE, CaseData.class);
+        caseDataET3NotificationDocCollectionAndResponseNotAccepted.getEt3NotificationDocCollection()
+                .get(0).getValue().setTypeOfDocument("2.12");
+
         return Stream.of(Arguments.of(caseDataWithoutRespondentCollection),
                 Arguments.of(caseDataRespondentValueNotExists),
                 Arguments.of(caseDataResponseNotAccepted),
-                Arguments.of(caseDataWithoutDocumentCollectionAndResponseAccepted));
+                Arguments.of(caseDataWithoutDocumentCollectionAndResponseAccepted),
+                Arguments.of(caseDataET3NotificationDocCollectionAndResponseNotAccepted));
+    }
+
+    @Test
+    void testHasInconsistentAcceptanceStatus() {
+        // Null list
+        assertTrue(ET3DocumentHelper.hasInconsistentAcceptanceStatus(null),
+                "Should return false for null list");
+        // Empty list
+        assertTrue(ET3DocumentHelper.hasInconsistentAcceptanceStatus(List.of()),
+                "Should return false for empty list");
+        // First item's value is null
+        assertTrue(ET3DocumentHelper.hasInconsistentAcceptanceStatus(
+                List.of(DocumentTypeItem.builder().value(null).build())),
+                "Should return false when first item's value is null");
+        // First item's type is blank
+        assertTrue(ET3DocumentHelper.hasInconsistentAcceptanceStatus(List.of(
+                        DocumentTypeItem.builder().value(DocumentType.builder().typeOfDocument(" ").build()).build())),
+                "Should return false when type is blank");
+        // Single valid item
+        assertFalse(ET3DocumentHelper.hasInconsistentAcceptanceStatus(List.of(
+                DocumentTypeItem.builder().value(DocumentType.builder().typeOfDocument("2.11").build()).build())),
+                "Should return true for single valid item");
+        // All items have the same type
+        List<DocumentTypeItem> sameTypeItems = List.of(
+                DocumentTypeItem.builder().value(DocumentType.builder().typeOfDocument("2.11").build()).build(),
+                DocumentTypeItem.builder().value(DocumentType.builder().typeOfDocument("2.11").build()).build(),
+                DocumentTypeItem.builder().value(DocumentType.builder().typeOfDocument("2.11").build()).build()
+        );
+        assertFalse(ET3DocumentHelper.hasInconsistentAcceptanceStatus(sameTypeItems),
+                "Should return true when all types match");
+        // All items have different types than 2.11
+        List<DocumentTypeItem> differentTypeItemsOf211 = List.of(
+                DocumentTypeItem.builder().value(DocumentType.builder().typeOfDocument("2.12").build()).build(),
+                DocumentTypeItem.builder().value(DocumentType.builder().typeOfDocument("2.13").build()).build(),
+                DocumentTypeItem.builder().value(DocumentType.builder().typeOfDocument("2.14").build()).build()
+        );
+        assertFalse(ET3DocumentHelper.hasInconsistentAcceptanceStatus(differentTypeItemsOf211),
+                "Should return true when all types are different than 2.11");
+        // Items with different types
+        List<DocumentTypeItem> differentTypeItems = List.of(
+                DocumentTypeItem.builder().value(DocumentType.builder().typeOfDocument("2.11").build()).build(),
+                DocumentTypeItem.builder().value(DocumentType.builder().typeOfDocument("2.12").build()).build()
+        );
+        assertTrue(ET3DocumentHelper.hasInconsistentAcceptanceStatus(differentTypeItems),
+                "Should return false when types differ");
+    }
+
+    @Test
+    void testIsET3NotificationDocumentTypeResponseAccepted_AllScenarios() {
+        // Null list
+        assertFalse(ET3DocumentHelper.isET3NotificationDocumentTypeResponseAccepted(null),
+                "Should return false for null list");
+
+        // Empty list
+        assertFalse(ET3DocumentHelper.isET3NotificationDocumentTypeResponseAccepted(List.of()),
+                "Should return false for empty list");
+
+        // First item's document type is blank
+        DocumentTypeItem blankTypeItem = DocumentTypeItem.builder().value(null).build();
+        assertFalse(ET3DocumentHelper.isET3NotificationDocumentTypeResponseAccepted(List.of(blankTypeItem)),
+                "Should return false if document type is blank");
+
+        // First item's document type is not "2.11"
+        DocumentTypeItem wrongTypeItem = DocumentTypeItem.builder().value(DocumentType.builder().typeOfDocument("2.12")
+                .build()).build();
+        assertFalse(ET3DocumentHelper.isET3NotificationDocumentTypeResponseAccepted(List.of(wrongTypeItem)),
+                "Should return false if type is not 2.11");
+
+        // First item's document type is "2.11"
+        DocumentTypeItem acceptedItem = DocumentTypeItem.builder().value(DocumentType.builder().typeOfDocument("2.11")
+                .build()).build();
+        assertTrue(ET3DocumentHelper.isET3NotificationDocumentTypeResponseAccepted(List.of(acceptedItem)),
+                "Should return true if type is 2.11");
     }
 }

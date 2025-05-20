@@ -26,6 +26,7 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ET3DocumentHelper.isET3NotificationDocumentTypeResponseAccepted;
 
 /**
  * ET3 Response Helper provides methods to assist with the ET3 Response Form event.
@@ -509,13 +510,14 @@ public final class Et3ResponseHelper {
                 || isBlank(caseData.getSubmitEt3Respondent().getSelectedLabel());
     }
 
-    public static void setEt3NotificationAcceptedDates(List<RespondentSumTypeItem> respondentSumTypeItems) {
-        if (CollectionUtils.isEmpty(respondentSumTypeItems)) {
+    public static void setEt3NotificationAcceptedDates(CaseData caseData) {
+        if (CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
             return;
         }
-        for (RespondentSumTypeItem respondentSumTypeItem : respondentSumTypeItems) {
+        for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
             if (isNotEmpty(respondentSumTypeItem.getValue())) {
-                if (ACCEPTED_STATE.equals(respondentSumTypeItem.getValue().getResponseStatus())) {
+                if (isET3NotificationDocumentTypeResponseAccepted(caseData.getEt3NotificationDocCollection())
+                        && ACCEPTED_STATE.equals(respondentSumTypeItem.getValue().getResponseStatus())) {
                     respondentSumTypeItem.getValue().setEt3NotificationAcceptedDate(LocalDate.now().toString());
                 } else {
                     respondentSumTypeItem.getValue().setEt3NotificationAcceptedDate(null);

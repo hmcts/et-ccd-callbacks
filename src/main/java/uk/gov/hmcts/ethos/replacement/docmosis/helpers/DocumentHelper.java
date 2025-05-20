@@ -655,8 +655,7 @@ public final class DocumentHelper {
         sectionName = sectionName.replace(" ", "_");
         StringBuilder sb = new StringBuilder();
         if (!sectionName.isEmpty()) {
-            sb.append('"').append('t').append(sectionName)
-                    .append(COLON).append("true").append(NEW_LINE);
+            sb.append("\"t").append(sectionName).append(COLON).append("true").append(NEW_LINE);
         }
         return sb;
     }
@@ -667,8 +666,7 @@ public final class DocumentHelper {
         scotSectionName = scotSectionName.replace(" ", "_");
         StringBuilder sb = new StringBuilder();
         if (!scotSectionName.isEmpty()) {
-            sb.append('"').append("t_Scot_").append(scotSectionName)
-                    .append(COLON).append("true").append(NEW_LINE);
+            sb.append("\"t_Scot_").append(scotSectionName).append(COLON).append("true").append(NEW_LINE);
         }
         return sb;
     }
@@ -776,8 +774,8 @@ public final class DocumentHelper {
         return sb;
     }
 
-    private static int getPageLabelNumber(int startingLabel, int i) {
-        int pageLabelNumber = i + 1;
+    private static int getPageLabelNumber(int startingLabel, int initialLabelNumber) {
+        int pageLabelNumber = initialLabelNumber + 1;
 
         if (startingLabel > 1) {
             pageLabelNumber += startingLabel - 1;

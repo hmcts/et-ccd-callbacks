@@ -11,6 +11,7 @@ import uk.gov.hmcts.et.common.model.generic.BaseCaseData;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET3;
@@ -224,5 +225,24 @@ public final class ET3DocumentHelper {
                 || ObjectUtils.isEmpty(documentTypeItems.get(0))
                 || ObjectUtils.isEmpty(documentTypeItems.get(0).getValue())
                 || StringUtils.isBlank(documentTypeItems.get(0).getValue().getTypeOfDocument());
+    }
+
+    /**
+     * Checks if the list of respondents contains at least one respondent
+     * with an accepted response status.
+     *
+     * @param respondentSumTypeItems the list of {@code RespondentSumTypeItem} objects to check
+     * @return {@code true} if at least one respondent has a response status equal to {@code ACCEPTED_STATE};
+     *         {@code false} otherwise
+     */
+    public static boolean containsNoRespondentWithAcceptedResponse(List<RespondentSumTypeItem> respondentSumTypeItems) {
+        if (respondentSumTypeItems == null) {
+            return true;
+        }
+        return respondentSumTypeItems.stream()
+                .filter(Objects::nonNull)
+                .map(RespondentSumTypeItem::getValue)
+                .filter(Objects::nonNull)
+                .noneMatch(respondent -> ACCEPTED_STATE.equals(respondent.getResponseStatus()));
     }
 }

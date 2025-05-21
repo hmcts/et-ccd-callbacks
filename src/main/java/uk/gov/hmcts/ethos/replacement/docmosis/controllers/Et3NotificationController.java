@@ -17,17 +17,19 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ET3DocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseUpdateForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et3NotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ServingService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -40,6 +42,7 @@ public class Et3NotificationController {
 
     private final ServingService servingService;
     private final Et3NotificationService et3NotificationService;
+    private final CaseUpdateForCaseWorkerService caseUpdateForCaseWorkerService;
 
     /**
      * This service Gets userToken as a parameter for security validation
@@ -68,17 +71,17 @@ public class Et3NotificationController {
         @RequestHeader("Authorization") String userToken) {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        List<String> errors = new ArrayList<>();
         if (ET3DocumentHelper.hasInconsistentAcceptanceStatus(caseData.getEt3NotificationDocCollection())) {
-            List<String> errors =
-                    List.of("Upload at least one document. All uploaded documents must be the same type.");
-            return getCallbackRespEntityErrors(errors, caseData);
+            errors.add("Upload at least one document. All uploaded documents must be accepted or not accepted.");
+        }
+        if (ET3DocumentHelper.containsNoRespondentWithAcceptedResponse(caseData.getRespondentCollection())) {
+            errors.add("There should be at least one respondent with accepted response.");
         }
         caseData.setEt3OtherTypeDocumentName(
             servingService.generateOtherTypeDocumentLink(caseData.getEt3NotificationDocCollection()));
         caseData.setEt3EmailLinkToAcas(servingService.generateEmailLinkToAcas(caseData, true));
-        ET3DocumentHelper.addOrRemoveET3Documents(caseData);
-        Et3ResponseHelper.setEt3NotificationAcceptedDates(caseData);
-        return getCallbackRespEntityNoErrors(caseData);
+        return getCallbackRespEntityErrors(errors, caseData);
     }
 
     /**
@@ -102,7 +105,10 @@ public class Et3NotificationController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 
         et3NotificationService.sendNotifications(ccdRequest.getCaseDetails());
-
+        ET3DocumentHelper.addOrRemoveET3Documents(caseData);
+        Et3ResponseHelper.setEt3NotificationAcceptedDates(caseData);
+        SubmitEvent submitEvent = caseUpdateForCaseWorkerService.caseUpdateRequest(ccdRequest, userToken);
+        log.info("Case updated correctly with id: " + submitEvent.getCaseId());
         return ResponseEntity.ok(CCDCallbackResponse.builder()
             .data(ccdRequest.getCaseDetails().getCaseData())
             .confirmation_header(String.format(SUBMITTED_HEADER, NotificationHelper.getParties(caseData)))

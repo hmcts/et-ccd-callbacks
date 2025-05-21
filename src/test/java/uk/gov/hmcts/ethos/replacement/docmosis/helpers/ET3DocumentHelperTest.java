@@ -10,8 +10,10 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -213,5 +215,41 @@ class ET3DocumentHelperTest {
                 .build()).build();
         assertTrue(ET3DocumentHelper.isET3NotificationDocumentTypeResponseAccepted(List.of(acceptedItem)),
                 "Should return true if type is 2.11");
+    }
+
+    @Test
+    void testContainsNoRespondentWithAcceptedResponse_variousCases() {
+        // Case 1: Empty list
+        assertTrue(ET3DocumentHelper.containsNoRespondentWithAcceptedResponse(null),
+                "Null list should return true");
+
+        // Case 2: Empty list
+        List<RespondentSumTypeItem> emptyList = Collections.emptyList();
+        assertTrue(ET3DocumentHelper.containsNoRespondentWithAcceptedResponse(emptyList),
+                "Empty list should return true");
+
+        // Case 3: No accepted responses
+        RespondentSumTypeItem respondentSumTypeItem1 = new RespondentSumTypeItem();
+        respondentSumTypeItem1.setValue(RespondentSumType.builder().responseStatus("Not Accepted").build());
+        RespondentSumTypeItem respondentSumTypeItem2 = new RespondentSumTypeItem();
+        respondentSumTypeItem2.setValue(RespondentSumType.builder().responseStatus("Not Received").build());
+        List<RespondentSumTypeItem> noAccepted = List.of(respondentSumTypeItem1, respondentSumTypeItem2);
+        assertTrue(ET3DocumentHelper.containsNoRespondentWithAcceptedResponse(noAccepted),
+                "No accepted responses should return true");
+
+        // Case 4: One accepted response
+        RespondentSumTypeItem respondentSumTypeItem3 = new RespondentSumTypeItem();
+        respondentSumTypeItem3.setValue(RespondentSumType.builder().responseStatus("Accepted").build());
+        List<RespondentSumTypeItem> oneAccepted = List.of(
+                respondentSumTypeItem1, respondentSumTypeItem2, respondentSumTypeItem3);
+        assertFalse(ET3DocumentHelper.containsNoRespondentWithAcceptedResponse(oneAccepted),
+                "One accepted response should return false");
+
+        // Case 5: All accepted responses
+        RespondentSumTypeItem respondentSumTypeItem4 = new RespondentSumTypeItem();
+        respondentSumTypeItem4.setValue(RespondentSumType.builder().responseStatus("Accepted").build());
+        List<RespondentSumTypeItem> allAccepted = List.of(respondentSumTypeItem4, respondentSumTypeItem3);
+        assertFalse(ET3DocumentHelper.containsNoRespondentWithAcceptedResponse(allAccepted),
+                "All accepted responses should return false");
     }
 }

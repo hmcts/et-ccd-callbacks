@@ -12,8 +12,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseUpdateForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et3NotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ServingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
@@ -22,11 +24,13 @@ import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.util.List;
 
+import static org.hamcrest.Matchers.emptyCollectionOf;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -43,11 +47,14 @@ class Et3NotificationControllerTest extends BaseControllerTest {
     private static final String SUBMITTED_URL = "/et3Notification/submitted";
     private CCDRequest ccdRequestWithET3NotificationDocument;
     private CCDRequest ccdRequestWithoutET3NotificationDocument;
+    private CCDRequest ccdRequestWithoutRespondentResponseAcceptedState;
 
     @MockBean
     private ServingService servingService;
     @MockBean
     private Et3NotificationService et3NotificationService;
+    @MockBean
+    private CaseUpdateForCaseWorkerService caseUpdateForCaseWorkerService;
     @Autowired
     private MockMvc mvc;
     @Autowired
@@ -75,15 +82,23 @@ class Et3NotificationControllerTest extends BaseControllerTest {
 
         CaseData caseDataWithNotificationDocument = caseDetails.getCaseData();
         caseDataWithNotificationDocument.setClaimant("Claimant LastName");
+        caseDataWithNotificationDocument.getRespondentCollection().get(0).getValue().setResponseStatus("Accepted");
         caseDataWithNotificationDocument.setEt3NotificationDocCollection(List.of(DocumentTypeItem.builder()
                 .value(DocumentType.builder().typeOfDocument("2.11").build()).build()));
-
         ccdRequestWithET3NotificationDocument = CCDRequestBuilder.builder()
                 .withCaseData(caseDataWithNotificationDocument).build();
+
         CaseData caseDataWithoutET3NotificationDocument = new CaseData();
         caseDataWithoutET3NotificationDocument.setEt3NotificationDocCollection(List.of());
         ccdRequestWithoutET3NotificationDocument = CCDRequestBuilder.builder()
                 .withCaseData(caseDataWithoutET3NotificationDocument).build();
+
+        CaseData caseDataWithoutRespondentResponseAcceptedState = new CaseData();
+        caseDataWithoutET3NotificationDocument.setEt3NotificationDocCollection(List.of(
+                DocumentTypeItem.builder().value(DocumentType.builder().typeOfDocument("2.11").build()).build()
+        ));
+        ccdRequestWithoutRespondentResponseAcceptedState = CCDRequestBuilder.builder()
+                .withCaseData(caseDataWithoutRespondentResponseAcceptedState).build();
 
     }
 
@@ -99,7 +114,7 @@ class Et3NotificationControllerTest extends BaseControllerTest {
             .andExpect(status().isOk())
             .andExpect(jsonPath("$.data.et3OtherTypeDocumentName", notNullValue()))
             .andExpect(jsonPath("$.data.et3EmailLinkToAcas", notNullValue()))
-            .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+            .andExpect(jsonPath(JsonMapper.ERRORS, emptyCollectionOf(String.class)))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(servingService, times(1)).generateOtherTypeDocumentLink(anyList());
         verify(servingService, times(1)).generateEmailLinkToAcas(any(), anyBoolean());
@@ -110,6 +125,17 @@ class Et3NotificationControllerTest extends BaseControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MID_UPLOAD_DOCUMENTS_URL)
                         .content(jsonMapper.toJson(ccdRequestWithoutET3NotificationDocument))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()));
+    }
+
+    @Test
+    void midUploadDocuments_invalidRespondentCollection() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mvc.perform(post(MID_UPLOAD_DOCUMENTS_URL)
+                        .content(jsonMapper.toJson(ccdRequestWithoutRespondentResponseAcceptedState))
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -138,6 +164,10 @@ class Et3NotificationControllerTest extends BaseControllerTest {
     @Test
     void submitted_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        SubmitEvent submitEvent = new SubmitEvent();
+        submitEvent.setCaseId(1L);
+        when(caseUpdateForCaseWorkerService.caseUpdateRequest(any(), anyString()))
+                .thenReturn(submitEvent);
         mvc.perform(post(SUBMITTED_URL)
                 .content(jsonMapper.toJson(ccdRequestWithET3NotificationDocument))
                 .header("Authorization", AUTH_TOKEN)

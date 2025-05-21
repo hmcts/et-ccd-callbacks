@@ -38,6 +38,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.RESPONSE_ACCEPTED;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({Et3NotificationController.class, JsonMapper.class})
@@ -82,7 +83,8 @@ class Et3NotificationControllerTest extends BaseControllerTest {
 
         CaseData caseDataWithNotificationDocument = caseDetails.getCaseData();
         caseDataWithNotificationDocument.setClaimant("Claimant LastName");
-        caseDataWithNotificationDocument.getRespondentCollection().get(0).getValue().setResponseStatus("Accepted");
+        caseDataWithNotificationDocument.getRespondentCollection().get(0)
+                .getValue().setResponseStatus(RESPONSE_ACCEPTED);
         caseDataWithNotificationDocument.setEt3NotificationDocCollection(List.of(DocumentTypeItem.builder()
                 .value(DocumentType.builder().typeOfDocument("2.11").build()).build()));
         ccdRequestWithET3NotificationDocument = CCDRequestBuilder.builder()

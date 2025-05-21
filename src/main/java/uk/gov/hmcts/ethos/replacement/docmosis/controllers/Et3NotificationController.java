@@ -78,6 +78,10 @@ public class Et3NotificationController {
         if (ET3DocumentHelper.containsNoRespondentWithResponseStatus(caseData.getRespondentCollection())) {
             errors.add("At least one respondent must have a selected response status.");
         }
+        if (!ET3DocumentHelper.areET3DocumentsConsistentWithRespondentResponses(caseData.getRespondentCollection(),
+                caseData.getEt3NotificationDocCollection())) {
+            errors.add("Please upload the appropriate ET3 document for each respondent’s response status.");
+        }
         caseData.setEt3OtherTypeDocumentName(
             servingService.generateOtherTypeDocumentLink(caseData.getEt3NotificationDocCollection()));
         caseData.setEt3EmailLinkToAcas(servingService.generateEmailLinkToAcas(caseData, true));

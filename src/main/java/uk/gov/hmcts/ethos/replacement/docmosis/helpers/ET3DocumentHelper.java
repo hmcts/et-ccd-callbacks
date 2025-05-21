@@ -299,21 +299,75 @@ public final class ET3DocumentHelper {
     }
 
     /**
-     * Checks if the list of respondents contains at least one respondent
-     * with an accepted response status.
+     * Checks whether none of the respondents in the given list have a non-blank response status.
+     * <p>
+     * This method returns {@code true} if:
+     * <ul>
+     *     <li>The input list is {@code null}, or</li>
+     *     <li>All respondents have a {@code null}, empty, or blank {@code responseStatus} field.</li>
+     * </ul>
      *
-     * @param respondentSumTypeItems the list of {@code RespondentSumTypeItem} objects to check
-     * @return {@code true} if at least one respondent has a response status equal to {@code ACCEPTED_STATE};
-     *         {@code false} otherwise
+     * @param respondentSumTypeItems the list of {@link RespondentSumTypeItem} to check; may be {@code null}
+     * @return {@code true} if no respondent has a non-blank response status; {@code false} otherwise
      */
     public static boolean containsNoRespondentWithResponseStatus(List<RespondentSumTypeItem> respondentSumTypeItems) {
-        if (respondentSumTypeItems == null) {
-            return true;
-        }
-        return respondentSumTypeItems.stream()
+        return respondentSumTypeItems == null || respondentSumTypeItems.stream()
                 .filter(Objects::nonNull)
                 .map(RespondentSumTypeItem::getValue)
                 .filter(Objects::nonNull)
                 .noneMatch(respondent -> StringUtils.isNotBlank(respondent.getResponseStatus()));
     }
+
+    /**
+     * Validates that each respondent with a response status has a corresponding ET3 notification document.
+     * <p>
+     * For every respondent with a non-blank {@code responseStatus}:
+     * <ul>
+     *     <li>If the response status is {@code "Response Accepted"}, then at least one ET3 document with
+     *         the type {@code ET3_ACCEPTED_NOTIFICATION_DOCUMENT_ID} must be present in the document list.</li>
+     *     <li>If the response status is anything else, then at least one ET3 document with a different type
+     *         (i.e., not {@code ET3_ACCEPTED_NOTIFICATION_DOCUMENT_ID}) must be present.</li>
+     * </ul>
+     * <p>
+     * Returns {@code false} if any required document is missing for the given respondent responses.
+     * Returns {@code true} if all response statuses are properly supported by corresponding documents.
+     *
+     * @param respondents the list of {@link RespondentSumTypeItem}s containing respondent response statuses
+     * @param documents   the list of ET3 {@link DocumentTypeItem}s to validate against
+     * @return {@code true} if all respondent response statuses have corresponding ET3 documents;
+     *         {@code false} if any are missing
+     */
+    public static boolean areET3DocumentsConsistentWithRespondentResponses(List<RespondentSumTypeItem> respondents,
+                                                                           List<DocumentTypeItem> documents) {
+        if (respondents == null || documents == null) {
+            return true;
+        }
+        boolean hasAcceptedDoc = documents.stream()
+                .map(DocumentTypeItem::getValue)
+                .filter(Objects::nonNull)
+                .map(DocumentType::getTypeOfDocument)
+                .anyMatch(ET3_ACCEPTED_NOTIFICATION_DOCUMENT_ID::equals);
+        boolean hasRejectedDoc = documents.stream()
+                .map(DocumentTypeItem::getValue)
+                .filter(Objects::nonNull)
+                .map(DocumentType::getTypeOfDocument)
+                .anyMatch(docType -> !ET3_ACCEPTED_NOTIFICATION_DOCUMENT_ID.equals(docType));
+        for (RespondentSumTypeItem respondentItem : respondents) {
+            if (respondentItem == null || respondentItem.getValue() == null) {
+                continue;
+            }
+            String responseStatus = respondentItem.getValue().getResponseStatus();
+            if (StringUtils.isBlank(responseStatus)) {
+                continue;
+            }
+            if (RESPONSE_ACCEPTED.equals(responseStatus) && !hasAcceptedDoc) {
+                return false;
+            }
+            if (!RESPONSE_ACCEPTED.equals(responseStatus) && !hasRejectedDoc) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 }

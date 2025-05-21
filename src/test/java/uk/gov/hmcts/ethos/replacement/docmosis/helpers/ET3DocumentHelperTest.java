@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -317,5 +318,57 @@ class ET3DocumentHelperTest {
         List<RespondentSumTypeItem> allAccepted = List.of(respondentSumTypeItem4, respondentSumTypeItem3);
         assertFalse(ET3DocumentHelper.containsNoRespondentWithResponseStatus(allAccepted),
                 "All users have response status and should return false");
+    }
+
+    @Test
+    void testHasAllRequiredET3DocumentsForRespondentResponses() {
+        // Helper to create respondent
+        Function<String, RespondentSumTypeItem> respondentWithStatus = status -> {
+            RespondentSumType respondent = RespondentSumType.builder().responseStatus(status).build();
+            RespondentSumTypeItem item = new RespondentSumTypeItem();
+            item.setValue(respondent);
+            return item;
+        };
+
+        // Helper to create document
+        Function<String, DocumentTypeItem> documentWithType = type -> {
+            UploadedDocumentType uploaded = UploadedDocumentType.builder().documentBinaryUrl("url-" + type).build();
+            DocumentType doc = DocumentType.builder().typeOfDocument(type).uploadedDocument(uploaded).build();
+            return DocumentTypeItem.builder().value(doc).build();
+        };
+
+        // --- Case 1: Null inputs ---
+        assertTrue(ET3DocumentHelper.areET3DocumentsConsistentWithRespondentResponses(null, null));
+
+        // --- Case 2: Respondent says "Response Accepted", but no accepted document exists ---
+        List<RespondentSumTypeItem> respondents1 = List.of(respondentWithStatus.apply(RESPONSE_ACCEPTED));
+        List<DocumentTypeItem> docs1 = List.of(documentWithType.apply("OTHER_DOC"));
+        assertFalse(ET3DocumentHelper.areET3DocumentsConsistentWithRespondentResponses(respondents1, docs1));
+
+        // --- Case 3: Respondent says "Response Rejected", but only accepted doc exists ---
+        List<RespondentSumTypeItem> respondents2 = List.of(respondentWithStatus.apply(RESPONSE_REJECTED));
+        List<DocumentTypeItem> docs2 = List.of(documentWithType.apply(ET3_ACCEPTED_NOTIFICATION_DOCUMENT_ID));
+        assertFalse(ET3DocumentHelper.areET3DocumentsConsistentWithRespondentResponses(respondents2, docs2));
+
+        // --- Case 4: Respondent says "Response Accepted", and accepted doc exists ---
+        List<RespondentSumTypeItem> respondents3 = List.of(respondentWithStatus.apply(RESPONSE_ACCEPTED));
+        List<DocumentTypeItem> docs3 = List.of(documentWithType.apply(ET3_ACCEPTED_NOTIFICATION_DOCUMENT_ID));
+        assertTrue(ET3DocumentHelper.areET3DocumentsConsistentWithRespondentResponses(respondents3, docs3));
+
+        // --- Case 5: Respondent says "Response Rejected", and rejected doc exists ---
+        List<RespondentSumTypeItem> respondents4 = List.of(respondentWithStatus.apply(RESPONSE_REJECTED));
+        List<DocumentTypeItem> docs4 = List.of(documentWithType.apply("SOME_REJECTED_TYPE"));
+        assertTrue(ET3DocumentHelper.areET3DocumentsConsistentWithRespondentResponses(respondents4, docs4));
+
+        // --- Case 6: Mixed respondents and matching documents ---
+        List<RespondentSumTypeItem> respondents5 = List.of(
+                respondentWithStatus.apply(RESPONSE_ACCEPTED),
+                respondentWithStatus.apply(RESPONSE_REJECTED)
+        );
+        List<DocumentTypeItem> docs5 = List.of(
+                documentWithType.apply(ET3_ACCEPTED_NOTIFICATION_DOCUMENT_ID),
+                documentWithType.apply("SOME_REJECTED_TYPE")
+        );
+        assertTrue(ET3DocumentHelper.areET3DocumentsConsistentWithRespondentResponses(respondents5, docs5));
     }
 }

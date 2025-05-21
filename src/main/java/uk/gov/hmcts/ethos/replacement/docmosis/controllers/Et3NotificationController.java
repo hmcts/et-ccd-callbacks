@@ -75,7 +75,7 @@ public class Et3NotificationController {
         if (ET3DocumentHelper.hasInconsistentAcceptanceStatus(caseData.getEt3NotificationDocCollection())) {
             errors.add("Upload at least one document. All uploaded documents must be accepted or not accepted.");
         }
-        if (ET3DocumentHelper.containsNoRespondentWithAcceptedResponse(caseData.getRespondentCollection())) {
+        if (ET3DocumentHelper.containsNoRespondentWithResponseStatus(caseData.getRespondentCollection())) {
             errors.add("At least one respondent must have a selected response status.");
         }
         caseData.setEt3OtherTypeDocumentName(

@@ -284,14 +284,14 @@ class ET3DocumentHelperTest {
     }
 
     @Test
-    void testContainsNoRespondentWithAcceptedResponse_variousCases() {
+    void testContainsNoRespondentWithResponse_Status_variousCases() {
         // Case 1: Empty list
-        assertTrue(ET3DocumentHelper.containsNoRespondentWithAcceptedResponse(null),
+        assertTrue(ET3DocumentHelper.containsNoRespondentWithResponseStatus(null),
                 "Null list should return true");
 
         // Case 2: Empty list
         List<RespondentSumTypeItem> emptyList = Collections.emptyList();
-        assertTrue(ET3DocumentHelper.containsNoRespondentWithAcceptedResponse(emptyList),
+        assertTrue(ET3DocumentHelper.containsNoRespondentWithResponseStatus(emptyList),
                 "Empty list should return true");
 
         // Case 3: No accepted responses
@@ -300,7 +300,7 @@ class ET3DocumentHelperTest {
         RespondentSumTypeItem respondentSumTypeItem2 = new RespondentSumTypeItem();
         respondentSumTypeItem2.setValue(RespondentSumType.builder().responseStatus(null).build());
         List<RespondentSumTypeItem> noAccepted = List.of(respondentSumTypeItem1, respondentSumTypeItem2);
-        assertTrue(ET3DocumentHelper.containsNoRespondentWithAcceptedResponse(noAccepted),
+        assertTrue(ET3DocumentHelper.containsNoRespondentWithResponseStatus(noAccepted),
                 "No response status found");
 
         // Case 4: One accepted response
@@ -308,14 +308,14 @@ class ET3DocumentHelperTest {
         respondentSumTypeItem3.setValue(RespondentSumType.builder().responseStatus("Not Accepted").build());
         List<RespondentSumTypeItem> oneAccepted = List.of(
                 respondentSumTypeItem1, respondentSumTypeItem2, respondentSumTypeItem3);
-        assertFalse(ET3DocumentHelper.containsNoRespondentWithAcceptedResponse(oneAccepted),
+        assertFalse(ET3DocumentHelper.containsNoRespondentWithResponseStatus(oneAccepted),
                 "One response status as accepted should return false");
 
         // Case 5: All accepted responses
         RespondentSumTypeItem respondentSumTypeItem4 = new RespondentSumTypeItem();
         respondentSumTypeItem4.setValue(RespondentSumType.builder().responseStatus("Accepted").build());
         List<RespondentSumTypeItem> allAccepted = List.of(respondentSumTypeItem4, respondentSumTypeItem3);
-        assertFalse(ET3DocumentHelper.containsNoRespondentWithAcceptedResponse(allAccepted),
+        assertFalse(ET3DocumentHelper.containsNoRespondentWithResponseStatus(allAccepted),
                 "All users have response status and should return false");
     }
 }

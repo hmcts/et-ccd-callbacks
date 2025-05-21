@@ -306,7 +306,7 @@ public final class ET3DocumentHelper {
      * @return {@code true} if at least one respondent has a response status equal to {@code ACCEPTED_STATE};
      *         {@code false} otherwise
      */
-    public static boolean containsNoRespondentWithAcceptedResponse(List<RespondentSumTypeItem> respondentSumTypeItems) {
+    public static boolean containsNoRespondentWithResponseStatus(List<RespondentSumTypeItem> respondentSumTypeItems) {
         if (respondentSumTypeItems == null) {
             return true;
         }

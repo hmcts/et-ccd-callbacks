@@ -76,7 +76,7 @@ public class Et3NotificationController {
             errors.add("Upload at least one document. All uploaded documents must be accepted or not accepted.");
         }
         if (ET3DocumentHelper.containsNoRespondentWithAcceptedResponse(caseData.getRespondentCollection())) {
-            errors.add("There should be at least one respondent with accepted response.");
+            errors.add("At least one respondent must have a selected response status.");
         }
         caseData.setEt3OtherTypeDocumentName(
             servingService.generateOtherTypeDocumentLink(caseData.getEt3NotificationDocCollection()));

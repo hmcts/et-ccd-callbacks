@@ -230,26 +230,26 @@ class ET3DocumentHelperTest {
 
         // Case 3: No accepted responses
         RespondentSumTypeItem respondentSumTypeItem1 = new RespondentSumTypeItem();
-        respondentSumTypeItem1.setValue(RespondentSumType.builder().responseStatus("Not Accepted").build());
+        respondentSumTypeItem1.setValue(RespondentSumType.builder().responseStatus("").build());
         RespondentSumTypeItem respondentSumTypeItem2 = new RespondentSumTypeItem();
-        respondentSumTypeItem2.setValue(RespondentSumType.builder().responseStatus("Not Received").build());
+        respondentSumTypeItem2.setValue(RespondentSumType.builder().responseStatus(null).build());
         List<RespondentSumTypeItem> noAccepted = List.of(respondentSumTypeItem1, respondentSumTypeItem2);
         assertTrue(ET3DocumentHelper.containsNoRespondentWithAcceptedResponse(noAccepted),
-                "No accepted responses should return true");
+                "No response status found");
 
         // Case 4: One accepted response
         RespondentSumTypeItem respondentSumTypeItem3 = new RespondentSumTypeItem();
-        respondentSumTypeItem3.setValue(RespondentSumType.builder().responseStatus("Accepted").build());
+        respondentSumTypeItem3.setValue(RespondentSumType.builder().responseStatus("Not Accepted").build());
         List<RespondentSumTypeItem> oneAccepted = List.of(
                 respondentSumTypeItem1, respondentSumTypeItem2, respondentSumTypeItem3);
         assertFalse(ET3DocumentHelper.containsNoRespondentWithAcceptedResponse(oneAccepted),
-                "One accepted response should return false");
+                "One response status as accepted should return false");
 
         // Case 5: All accepted responses
         RespondentSumTypeItem respondentSumTypeItem4 = new RespondentSumTypeItem();
         respondentSumTypeItem4.setValue(RespondentSumType.builder().responseStatus("Accepted").build());
         List<RespondentSumTypeItem> allAccepted = List.of(respondentSumTypeItem4, respondentSumTypeItem3);
         assertFalse(ET3DocumentHelper.containsNoRespondentWithAcceptedResponse(allAccepted),
-                "All accepted responses should return false");
+                "All users have response status and should return false");
     }
 }

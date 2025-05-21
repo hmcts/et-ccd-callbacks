@@ -243,6 +243,6 @@ public final class ET3DocumentHelper {
                 .filter(Objects::nonNull)
                 .map(RespondentSumTypeItem::getValue)
                 .filter(Objects::nonNull)
-                .noneMatch(respondent -> ACCEPTED_STATE.equals(respondent.getResponseStatus()));
+                .noneMatch(respondent -> StringUtils.isNotBlank(respondent.getResponseStatus()));
     }
 }

@@ -11,15 +11,21 @@ import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.BiFunction;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.RESPONSE_ACCEPTED;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.RESPONSE_REJECTED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_ET3_FORM_CASE_DATA_FILE;
 
 class ET3DocumentHelperTest {
@@ -66,6 +72,66 @@ class ET3DocumentHelperTest {
         // Documents are Removed
         respondentSumTypeItem.getValue().setEt3ResponseEmployerClaimDocument(null);
         assertThat(ET3DocumentHelper.hasET3Document(respondentSumTypeItem)).isFalse();
+    }
+
+    @Test
+    void testUpdateET3NotificationDocumentsInCollection() {
+        // Helper: create DocumentTypeItem with specified params
+        BiFunction<String, String, DocumentTypeItem> createET3Item = (url, typeOfDoc) -> {
+            UploadedDocumentType uploadedDoc = new UploadedDocumentType();
+            uploadedDoc.setDocumentBinaryUrl(url);
+
+            DocumentType docType = new DocumentType();
+            docType.setUploadedDocument(uploadedDoc);
+            docType.setTypeOfDocument(typeOfDoc);
+
+            DocumentTypeItem item = new DocumentTypeItem();
+            item.setValue(docType);
+            return item;
+        };
+
+        // Existing items
+        DocumentTypeItem oldAccepted = createET3Item.apply("url1", ET3_ACCEPTED_NOTIFICATION_DOCUMENT_ID);
+        oldAccepted.getValue().setResponseClaimDocuments(RESPONSE_ACCEPTED);
+
+        DocumentTypeItem unrelated = createET3Item.apply("urlX", "OTHER_DOC_TYPE");
+        unrelated.getValue().setResponseClaimDocuments("Unrelated");
+
+        List<DocumentTypeItem> documentTypeItems = new ArrayList<>(List.of(oldAccepted, unrelated));
+
+        // New ET3 input
+        DocumentTypeItem newAccepted = createET3Item.apply("url2", ET3_ACCEPTED_NOTIFICATION_DOCUMENT_ID);
+        DocumentTypeItem newRejected = createET3Item.apply("url3", "OTHER_ET3_TYPE");
+
+        List<DocumentTypeItem> et3Input = List.of(newAccepted, newRejected);
+
+        // Act
+        ET3DocumentHelper.updateET3NotificationDocumentsInCollection(documentTypeItems, et3Input);
+
+        // Assert
+        List<String> remainingUrls = documentTypeItems.stream()
+                .map(i -> i.getValue().getUploadedDocument().getDocumentBinaryUrl())
+                .toList();
+
+        // Old accepted doc (url1) should be removed
+        assertFalse(remainingUrls.contains("url1"));
+        // New docs should be added
+        assertTrue(remainingUrls.contains("url2"));
+        assertTrue(remainingUrls.contains("url3"));
+        // Unrelated doc should be preserved
+        assertTrue(remainingUrls.contains("urlX"));
+
+        // Validate short descriptions and response claim documents are set correctly
+        documentTypeItems.forEach(item -> {
+            String url = item.getValue().getUploadedDocument().getDocumentBinaryUrl();
+            if ("url2".equals(url)) {
+                assertEquals(RESPONSE_ACCEPTED, item.getValue().getResponseClaimDocuments());
+                assertTrue(item.getValue().getShortDescription().contains(RESPONSE_ACCEPTED));
+            } else if ("url3".equals(url)) {
+                assertEquals(RESPONSE_REJECTED, item.getValue().getResponseClaimDocuments());
+                assertTrue(item.getValue().getShortDescription().contains(RESPONSE_REJECTED));
+            }
+        });
     }
 
     @Test

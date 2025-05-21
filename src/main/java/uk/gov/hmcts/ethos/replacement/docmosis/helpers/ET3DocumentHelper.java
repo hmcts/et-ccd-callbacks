@@ -6,7 +6,9 @@ import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.generic.BaseCaseData;
 
 import java.util.ArrayList;
@@ -16,6 +18,8 @@ import java.util.Objects;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET3;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET3_ATTACHMENT;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.RESPONSE_ACCEPTED;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.RESPONSE_REJECTED;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.RESPONSE_TO_A_CLAIM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentUtils.addIfBinaryUrlNotExists;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentUtils.addUploadedDocumentTypeToDocumentTypeItems;
@@ -30,6 +34,8 @@ public final class ET3DocumentHelper {
     private static final String ET3_RESPONDENT_SUPPORT_DOCUMENT = "ET3 respondent support document";
     private static final String ET3_RESPONDENT_CLAIM_DOCUMENT = "ET3 respondent claim document";
     private static final String ET3_ACCEPTED_NOTIFICATION_DOCUMENT_ID = "2.11";
+    private static final String ET3_NOTIFICATION_DOCUMENT_SHORT_DESCRIPTION =
+            "ET3 response \"%s\" status document";
 
     private ET3DocumentHelper() {
         // Helper classes should not have a public or default constructor.
@@ -183,6 +189,71 @@ public final class ET3DocumentHelper {
                 || CollectionUtils.isNotEmpty(respondentSumTypeItem.getValue().getEt3ResponseContestClaimDocument())
                 || ObjectUtils.isNotEmpty(respondentSumTypeItem.getValue().getEt3ResponseRespondentSupportDocument())
                 || ObjectUtils.isNotEmpty(respondentSumTypeItem.getValue().getEt3ResponseEmployerClaimDocument()));
+    }
+
+    /**
+     * Updates the given list of {@link DocumentTypeItem} by synchronizing ET3 notification documents.
+     * <p>
+     * This method performs two main actions:
+     * <ul>
+     *     <li>Removes any existing documents from {@code documentTypeItems} that have a top-level document
+     *         status of {@code "Response Accepted"} or {@code "Response Rejected"} and are not present
+     *         in the provided {@code et3DocumentTypeItems} list (based on binary document URL).</li>
+     *     <li>Adds new ET3 notification documents from {@code et3DocumentTypeItems} to {@code documentTypeItems}
+     *         if they don't already exist (by binary URL), and sets their document levels and short descriptions
+     *         based on whether the document type indicates acceptance or rejection.</li>
+     * </ul>
+     *
+     * @param documentTypeItems      the list of existing {@link DocumentTypeItem}s to be updated;
+     *                               items may be removed or added based on ET3 matching logic
+     * @param et3DocumentTypeItems   the list of new ET3 notification {@link DocumentTypeItem}s
+     *                               to merge into the collection
+     */
+    public static void updateET3NotificationDocumentsInCollection(List<DocumentTypeItem> documentTypeItems,
+                                                                  List<DocumentTypeItem> et3DocumentTypeItems) {
+        if (CollectionUtils.isEmpty(et3DocumentTypeItems)) {
+            return;
+        }
+
+        // Remove existing items from documentTypeItems if they match RESPONSE_ACCEPTED/REJECTED
+        // and are not present in the new ET3 list
+        documentTypeItems.removeIf(existingItem -> {
+            DocumentType value = existingItem.getValue();
+            if (value == null) {
+                return false;
+            }
+
+            String responseClaimDocuments = value.getResponseClaimDocuments();
+            if (!RESPONSE_ACCEPTED.equals(responseClaimDocuments)
+                    && !RESPONSE_REJECTED.equals(responseClaimDocuments)) {
+                return false;
+            }
+            // Remove if no matching binary URL exists in the ET3 list
+            String binaryUrl = value.getUploadedDocument() != null
+                    ? value.getUploadedDocument().getDocumentBinaryUrl()
+                    : null;
+            return StringUtils.isNotBlank(binaryUrl)
+                    && et3DocumentTypeItems.stream()
+                    .map(DocumentTypeItem::getValue)
+                    .filter(Objects::nonNull)
+                    .map(DocumentType::getUploadedDocument)
+                    .filter(Objects::nonNull)
+                    .map(UploadedDocumentType::getDocumentBinaryUrl)
+                    .noneMatch(binaryUrl::equals);
+        });
+
+        for (DocumentTypeItem item : et3DocumentTypeItems) {
+            DocumentType value = item.getValue();
+            String typeOfDoc = value != null ? value.getTypeOfDocument() : null;
+            if (StringUtils.isNotBlank(typeOfDoc)) {
+                boolean isAccepted = ET3_ACCEPTED_NOTIFICATION_DOCUMENT_ID.equals(typeOfDoc);
+                String status = isAccepted ? RESPONSE_ACCEPTED : RESPONSE_REJECTED;
+                setDocumentTypeItemLevels(item, RESPONSE_TO_A_CLAIM, status);
+                value.setShortDescription(String.format(ET3_NOTIFICATION_DOCUMENT_SHORT_DESCRIPTION, status));
+                value.setTypeOfDocument(ET3);
+                addIfBinaryUrlNotExists(documentTypeItems, item);
+            }
+        }
     }
 
     /**

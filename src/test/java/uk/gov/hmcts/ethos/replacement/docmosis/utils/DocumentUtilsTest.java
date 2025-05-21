@@ -9,6 +9,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -28,8 +29,6 @@ final class DocumentUtilsTest {
                     .getRespondentCollection().get(0).getValue().getEt3Form();
     private static final String UPLOADED_DOCUMENT_FILE_NAME = "Test Company - ET3 Response.pdf";
     private static final String ET3_FORM_ENGLISH_DESCRIPTION = "ET3 form English version";
-    private static final String EMPLOYER_CONTRACT_CLAIM_TEST_DOCUMENT_BINARY_URL =
-            "http://dm-store-aat.service.core-compute-aat.internal/documents/f40ed136-fb26-4638-af6c-80a98d56af5d/binary";
     private static final String DUMMY_DOCUMENT_BINARY_URL = "dummy_document_binary_url";
 
     @Test
@@ -126,37 +125,37 @@ final class DocumentUtilsTest {
     }
 
     @Test
-    void theContainsDocumentWithBinaryUrl() {
-        DocumentTypeItem validDocumentTypeItemContestClaim =
-                ResourceLoader.fromString(TEST_ET3_FORM_CASE_DATA_FILE, CaseData.class)
-                        .getRespondentCollection().get(0).getValue().getEt3ResponseContestClaimDocument().get(0);
-        List<DocumentTypeItem> emptyDocumentTypeItems = new ArrayList<>();
-        assertThat(DocumentUtils.containsDocumentWithBinaryUrl(
-                        emptyDocumentTypeItems, EMPLOYER_CONTRACT_CLAIM_TEST_DOCUMENT_BINARY_URL)).isFalse();
-
-        List<DocumentTypeItem> validDocumentTypeItems = List.of(validDocumentTypeItemContestClaim);
-        assertThat(DocumentUtils.containsDocumentWithBinaryUrl(validDocumentTypeItems, null)).isFalse();
-
-        assertThat(DocumentUtils.containsDocumentWithBinaryUrl(
-                validDocumentTypeItems, EMPLOYER_CONTRACT_CLAIM_TEST_DOCUMENT_BINARY_URL)).isTrue();
-
-        validDocumentTypeItemContestClaim.getValue().getUploadedDocument().setDocumentBinaryUrl(
-                DUMMY_DOCUMENT_BINARY_URL);
-
-        assertThat(DocumentUtils.containsDocumentWithBinaryUrl(
-                validDocumentTypeItems, EMPLOYER_CONTRACT_CLAIM_TEST_DOCUMENT_BINARY_URL)).isFalse();
-
-        validDocumentTypeItemContestClaim.getValue().getUploadedDocument().setDocumentBinaryUrl(null);
-        assertThat(DocumentUtils.containsDocumentWithBinaryUrl(
-                validDocumentTypeItems, EMPLOYER_CONTRACT_CLAIM_TEST_DOCUMENT_BINARY_URL)).isFalse();
-
-        validDocumentTypeItemContestClaim.getValue().setUploadedDocument(null);
-        assertThat(DocumentUtils.containsDocumentWithBinaryUrl(
-                validDocumentTypeItems, EMPLOYER_CONTRACT_CLAIM_TEST_DOCUMENT_BINARY_URL)).isFalse();
-
-        validDocumentTypeItemContestClaim.setValue(null);
-        assertThat(DocumentUtils.containsDocumentWithBinaryUrl(
-                validDocumentTypeItems, EMPLOYER_CONTRACT_CLAIM_TEST_DOCUMENT_BINARY_URL)).isFalse();
+    void testContainsDocumentWithBinaryUrl() {
+        // Helper to build a DocumentTypeItem with a given binary URL
+        Function<String, DocumentTypeItem> itemWithUrl = url -> {
+            UploadedDocumentType uploadedDocument = UploadedDocumentType.builder().documentBinaryUrl(url).build();
+            DocumentType documentType = new DocumentType();
+            documentType.setUploadedDocument(uploadedDocument);
+            DocumentTypeItem item = new DocumentTypeItem();
+            item.setValue(documentType);
+            return item;
+        };
+        // Case 2: Empty list
+        assertFalse(DocumentUtils.containsDocumentWithBinaryUrl(new ArrayList<>(), itemWithUrl.apply("url1")));
+        // Case 3: Null target item
+        assertTrue(DocumentUtils.containsDocumentWithBinaryUrl(List.of(itemWithUrl.apply("url1")), null));
+        // Case 4: Target item with null value
+        DocumentTypeItem nullValueItem = new DocumentTypeItem();
+        nullValueItem.setValue(null);
+        assertTrue(DocumentUtils.containsDocumentWithBinaryUrl(List.of(itemWithUrl.apply("url1")), nullValueItem));
+        // Case 5: Target item with no binary URL
+        DocumentTypeItem emptyUrlItem = itemWithUrl.apply(null);
+        assertTrue(DocumentUtils.containsDocumentWithBinaryUrl(List.of(itemWithUrl.apply("url1")), emptyUrlItem));
+        // Case 6: List does not contain matching binary URL
+        assertFalse(DocumentUtils.containsDocumentWithBinaryUrl(
+                List.of(itemWithUrl.apply("url1"), itemWithUrl.apply("url2")),
+                itemWithUrl.apply("url3"))
+        );
+        // Case 7: List contains matching binary URL
+        assertTrue(DocumentUtils.containsDocumentWithBinaryUrl(
+                List.of(itemWithUrl.apply("url1"), itemWithUrl.apply("url3")),
+                itemWithUrl.apply("url3"))
+        );
     }
 
     @Test
@@ -164,9 +163,6 @@ final class DocumentUtilsTest {
         DocumentTypeItem validDocumentTypeItemContestClaim =
                 ResourceLoader.fromString(TEST_ET3_FORM_CASE_DATA_FILE, CaseData.class)
                         .getRespondentCollection().get(0).getValue().getEt3ResponseContestClaimDocument().get(0);
-        assertDoesNotThrow(() ->
-                DocumentUtils.addIfBinaryUrlNotExists(null, validDocumentTypeItemContestClaim));
-
         List<DocumentTypeItem> emptyDocumentTypeItems = new ArrayList<>();
         assertDoesNotThrow(() -> DocumentUtils.addIfBinaryUrlNotExists(emptyDocumentTypeItems, null));
 

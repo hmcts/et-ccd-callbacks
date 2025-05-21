@@ -146,28 +146,6 @@ public final class DocumentUtils {
     }
 
     /**
-     * Checks whether the provided list of {@link DocumentTypeItem} contains a document with the given name.
-     *
-     * @param documentTypeItems the list of {@link DocumentTypeItem} to search.
-     * @param binaryUrl the name of the document to look for.
-     * @return {@code true} if a document with the specified name exists in the list; {@code false} otherwise.
-     */
-    public static boolean containsDocumentWithBinaryUrl(List<DocumentTypeItem> documentTypeItems, String binaryUrl) {
-        if (CollectionUtils.isEmpty(documentTypeItems) || StringUtils.isBlank(binaryUrl)) {
-            return false;
-        }
-        for (DocumentTypeItem documentTypeItem : documentTypeItems) {
-            if (ObjectUtils.isNotEmpty(documentTypeItem.getValue())
-                    && ObjectUtils.isNotEmpty(documentTypeItem.getValue().getUploadedDocument())
-                    && StringUtils.isNotEmpty(documentTypeItem.getValue().getUploadedDocument().getDocumentBinaryUrl())
-                    && documentTypeItem.getValue().getUploadedDocument().getDocumentBinaryUrl().equals(binaryUrl)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    /**
      * Adds a {@link DocumentTypeItem} to the given list of {@link DocumentTypeItem} only if:
      * <ul>
      *   <li>None of the following are null or empty:
@@ -187,16 +165,49 @@ public final class DocumentUtils {
      */
     public static void addIfBinaryUrlNotExists(List<DocumentTypeItem> documentTypeItems,
                                                DocumentTypeItem documentTypeItem) {
-        if (documentTypeItems == null
-                || ObjectUtils.isEmpty(documentTypeItem)
-                || ObjectUtils.isEmpty(documentTypeItem.getValue())
-                || ObjectUtils.isEmpty(documentTypeItem.getValue().getUploadedDocument())
-                || StringUtils.isEmpty(documentTypeItem.getValue().getUploadedDocument().getDocumentFilename())
-                || containsDocumentWithBinaryUrl(documentTypeItems,
-                documentTypeItem.getValue().getUploadedDocument().getDocumentBinaryUrl())) {
+        if (containsDocumentWithBinaryUrl(documentTypeItems, documentTypeItem)) {
             return;
         }
         documentTypeItems.add(documentTypeItem);
+    }
+
+    /**
+     * Checks whether the specified list of {@link DocumentTypeItem} contains
+     * any item with the same binary document URL as the given {@code targetItem}.
+     * <p>
+     * If the input list is {@code null} or empty, it will be initialized as an empty list.
+     * The method returns {@code false} if the {@code targetItem} or its nested fields
+     * (value, uploaded document, or binary URL) are null or empty.
+     *
+     * @param documentTypeItems the list of {@link DocumentTypeItem} to search within;
+     *                          if {@code null} or empty, it will be replaced with a new empty list.
+     * @param targetItem        the {@link DocumentTypeItem} whose binary document URL is to be matched.
+     * @return {@code true} if any item in the list has the same binary document URL as {@code targetItem};
+     *         {@code false} otherwise.
+     */
+    public static boolean containsDocumentWithBinaryUrl(List<DocumentTypeItem> documentTypeItems,
+                                                            DocumentTypeItem targetItem) {
+        // If target item does not have binary url value returns true not to add it.
+        if (ObjectUtils.isEmpty(targetItem)
+                || ObjectUtils.isEmpty(targetItem.getValue())
+                || ObjectUtils.isEmpty(targetItem.getValue().getUploadedDocument())
+                || StringUtils.isEmpty(targetItem.getValue().getUploadedDocument().getDocumentBinaryUrl())) {
+            return true;
+        }
+        if (CollectionUtils.isEmpty(documentTypeItems)) {
+            return false;
+        }
+        String targetBinaryUrl = targetItem.getValue().getUploadedDocument().getDocumentBinaryUrl();
+        for (DocumentTypeItem item : documentTypeItems) {
+            if (ObjectUtils.isNotEmpty(item)
+                    && ObjectUtils.isNotEmpty(item.getValue())
+                    && ObjectUtils.isNotEmpty(item.getValue().getUploadedDocument())
+                    && StringUtils.isNotEmpty(item.getValue().getUploadedDocument().getDocumentBinaryUrl())
+                    && targetBinaryUrl.equals(item.getValue().getUploadedDocument().getDocumentBinaryUrl())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

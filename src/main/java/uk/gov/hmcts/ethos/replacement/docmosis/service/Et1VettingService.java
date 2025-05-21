@@ -21,7 +21,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.VettingJurisdictionCodesType;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.JurisdictionCode;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.JurisdictionCodeHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.jpaservice.JpaVenueService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 
@@ -44,7 +44,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_L
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_LABEL_ET1_ATTACHMENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_LABEL_TEMPLATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BR_WITH_TAB;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.CASE_NAME_AND_DESCRIPTION_HTML;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.CLAIMANT_AND_RESPONDENT_ADDRESSES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.CLAIMANT_AND_RESPONDENT_ADDRESSES_WITHOUT_WORK_ADDRESS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.CLAIMANT_DETAILS_COMPANY;
@@ -309,7 +308,7 @@ public class Et1VettingService {
     public String generateJurisdictionCodesHtml(List<JurCodesTypeItem> jurisdictionCodes) {
         StringBuilder sb = new StringBuilder();
         for (JurCodesTypeItem codeItem : jurisdictionCodes) {
-            populateCodeNameAndDescriptionHtml(sb, codeItem.getValue().getJuridictionCodesList());
+            JurisdictionCodeHelper.populateCodeNameAndDescriptionHtml(sb, codeItem.getValue().getJuridictionCodesList());
         }
         return String.format(JUR_CODE_HTML, sb);
     }
@@ -425,18 +424,6 @@ public class Et1VettingService {
             claimantAddressStr.append(BR_WITH_TAB).append(address.getPostCode());
         }
         return claimantAddressStr.toString();
-    }
-
-    private void populateCodeNameAndDescriptionHtml(StringBuilder sb, String codeName) {
-        if (codeName != null) {
-            try {
-                sb.append(String.format(CASE_NAME_AND_DESCRIPTION_HTML, codeName,
-                    JurisdictionCode.valueOf(codeName.replaceAll("[^a-zA-Z]+", ""))
-                        .getDescription()));
-            } catch (IllegalArgumentException e) {
-                log.warn("The jurisdiction code {} is invalid.", codeName, e);
-            }
-        }
     }
 
     private void addJurCodeToExistingCollection(CaseData caseData, VettingJurisdictionCodesType code) {

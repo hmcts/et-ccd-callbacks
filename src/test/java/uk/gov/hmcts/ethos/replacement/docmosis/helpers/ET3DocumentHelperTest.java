@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
+import lombok.SneakyThrows;
 import org.apache.commons.collections4.CollectionUtils;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -17,25 +18,26 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.function.BiFunction;
+import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.RESPONSE_ACCEPTED;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.RESPONSE_REJECTED;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_ET3_FORM_CASE_DATA_FILE;
 
 class ET3DocumentHelperTest {
 
-    private static final String RESPONSE_STATUS_ACCEPTED = "Accepted";
     private static final String RESPONSE_STATUS_REJECTED = "Rejected";
     private static final String ENGLISH_ET3_FORM_NAME = "Test Company - ET3 Response.pdf";
     private static final String WELSH_ET3_FORM_NAME = "Test Company - ET3 Response - Welsh.pdf";
-    private static final String ET3_ACCEPTED_NOTIFICATION_DOCUMENT_ID = "2.11";
+    private static final String ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE = "2.11";
+    private static final String ET3_REJECTED_NOTIFICATION_DOCUMENT_TYPE = "2.12";
 
     @Test
     void theHasET3Document() {
@@ -76,63 +78,59 @@ class ET3DocumentHelperTest {
     }
 
     @Test
-    void testUpdateET3NotificationDocumentsInCollection() {
-        // Helper: create DocumentTypeItem with specified params
-        BiFunction<String, String, DocumentTypeItem> createET3Item = (url, typeOfDoc) -> {
-            UploadedDocumentType uploadedDoc = new UploadedDocumentType();
-            uploadedDoc.setDocumentBinaryUrl(url);
-
-            DocumentType docType = new DocumentType();
-            docType.setUploadedDocument(uploadedDoc);
-            docType.setTypeOfDocument(typeOfDoc);
-
-            DocumentTypeItem item = new DocumentTypeItem();
-            item.setValue(docType);
-            return item;
+    @SneakyThrows
+    void testAddET3NotificationDocumentsToDocumentCollection() {
+        // Helpers to create DocumentTypeItem with given type and ID
+        Function<String, DocumentTypeItem> createET3Item = (type) -> {
+            UploadedDocumentType uploaded = UploadedDocumentType.builder()
+                    .documentBinaryUrl("url-" + type)
+                    .documentFilename("doc-" + type + ".pdf")
+                    .documentUrl("http://localhost/doc-" + type)
+                    .build();
+            DocumentType docType = DocumentType.builder()
+                    .typeOfDocument(type)
+                    .uploadedDocument(uploaded)
+                    .build();
+            return DocumentTypeItem.builder()
+                    .id(UUID.randomUUID().toString())
+                    .value(docType)
+                    .build();
         };
-
-        // Existing items
-        DocumentTypeItem oldAccepted = createET3Item.apply("url1", ET3_ACCEPTED_NOTIFICATION_DOCUMENT_ID);
-        oldAccepted.getValue().setResponseClaimDocuments(RESPONSE_ACCEPTED);
-
-        DocumentTypeItem unrelated = createET3Item.apply("urlX", "OTHER_DOC_TYPE");
-        unrelated.getValue().setResponseClaimDocuments("Unrelated");
-
-        List<DocumentTypeItem> documentTypeItems = new ArrayList<>(List.of(oldAccepted, unrelated));
-
-        // New ET3 input
-        DocumentTypeItem newAccepted = createET3Item.apply("url2", ET3_ACCEPTED_NOTIFICATION_DOCUMENT_ID);
-        DocumentTypeItem newRejected = createET3Item.apply("url3", "OTHER_ET3_TYPE");
-
-        List<DocumentTypeItem> et3Input = List.of(newAccepted, newRejected);
-
+        // Create CaseData with accepted and rejected ET3 notification documents
+        List<DocumentTypeItem> et3Docs = List.of(
+                createET3Item.apply(ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE),
+                createET3Item.apply("ET3_REJECTED_TYPE")
+        );
+        CaseData caseData = new CaseData();
+        caseData.setEt3NotificationDocCollection(et3Docs);
+        caseData.setDocumentCollection(new ArrayList<>());
         // Act
-        ET3DocumentHelper.updateET3NotificationDocumentsInCollection(documentTypeItems, et3Input);
-
+        ET3DocumentHelper.addET3NotificationDocumentsToDocumentCollection(caseData);
         // Assert
-        List<String> remainingUrls = documentTypeItems.stream()
-                .map(i -> i.getValue().getUploadedDocument().getDocumentBinaryUrl())
-                .toList();
-
-        // Old accepted doc (url1) should be removed
-        assertFalse(remainingUrls.contains("url1"));
-        // New docs should be added
-        assertTrue(remainingUrls.contains("url2"));
-        assertTrue(remainingUrls.contains("url3"));
-        // Unrelated doc should be preserved
-        assertTrue(remainingUrls.contains("urlX"));
-
-        // Validate short descriptions and response claim documents are set correctly
-        documentTypeItems.forEach(item -> {
-            String url = item.getValue().getUploadedDocument().getDocumentBinaryUrl();
-            if ("url2".equals(url)) {
-                assertEquals(RESPONSE_ACCEPTED, item.getValue().getResponseClaimDocuments());
-                assertTrue(item.getValue().getShortDescription().contains(RESPONSE_ACCEPTED));
-            } else if ("url3".equals(url)) {
-                assertEquals(RESPONSE_REJECTED, item.getValue().getResponseClaimDocuments());
-                assertTrue(item.getValue().getShortDescription().contains(RESPONSE_REJECTED));
-            }
-        });
+        List<DocumentTypeItem> result = caseData.getDocumentCollection();
+        assertEquals(2, result.size());
+        for (DocumentTypeItem item : result) {
+            DocumentType value = item.getValue();
+            assertNotNull(value);
+            assertNotNull(value.getUploadedDocument());
+            assertNotNull(value.getShortDescription());
+            assertNotNull(value.getTopLevelDocuments());
+            assertNotNull(value.getResponseClaimDocuments());
+            assertNull(value.getTypeOfDocument()); // must be cleared
+            assertTrue(value.getShortDescription().contains(value.getResponseClaimDocuments()));
+        }
+        // Edge case: if ET3 collection is empty, nothing should be added
+        CaseData emptyCase = new CaseData();
+        emptyCase.setEt3NotificationDocCollection(Collections.emptyList());
+        ET3DocumentHelper.addET3NotificationDocumentsToDocumentCollection(emptyCase);
+        assertNull(emptyCase.getDocumentCollection());
+        // Edge case: if main collection is null, it should be initialized
+        CaseData noMainCollection = new CaseData();
+        noMainCollection.setEt3NotificationDocCollection(
+                List.of(createET3Item.apply(ET3_REJECTED_NOTIFICATION_DOCUMENT_TYPE)));
+        ET3DocumentHelper.addET3NotificationDocumentsToDocumentCollection(noMainCollection);
+        assertNotNull(noMainCollection.getDocumentCollection());
+        assertEquals(1, noMainCollection.getDocumentCollection().size());
     }
 
     @Test
@@ -149,9 +147,9 @@ class ET3DocumentHelperTest {
 
     @ParameterizedTest
     @MethodSource("provideDataForModifyDocumentCollectionForET3FormsTest")
-    void testAddOrRemoveET3Documents(CaseData caseData) {
+    void theAddOrRemoveET3Documents(CaseData caseData) {
         ET3DocumentHelper.addOrRemoveET3Documents(caseData);
-        if (ET3_ACCEPTED_NOTIFICATION_DOCUMENT_ID.equals(
+        if (ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE.equals(
                 caseData.getEt3NotificationDocCollection().get(0).getValue().getTypeOfDocument())) {
             if (CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
                 assertThat(caseData.getDocumentCollection()).hasSize(7);
@@ -165,7 +163,7 @@ class ET3DocumentHelperTest {
             } else if (RESPONSE_STATUS_REJECTED.equals(
                     caseData.getRespondentCollection().get(0).getValue().getResponseStatus())) {
                 assertThat(caseData.getDocumentCollection()).hasSize(2);
-            } else if (RESPONSE_STATUS_ACCEPTED.equals(
+            } else if (ACCEPTED_STATE.equals(
                     caseData.getRespondentCollection().get(0).getValue().getResponseStatus())) {
                 assertThat(
                         caseData.getDocumentCollection().get(0).getValue().getUploadedDocument().getDocumentFilename())
@@ -197,7 +195,7 @@ class ET3DocumentHelperTest {
                 ResourceLoader.fromString(TEST_ET3_FORM_CASE_DATA_FILE, CaseData.class);
         caseDataWithoutDocumentCollectionAndResponseAccepted.setDocumentCollection(null);
         caseDataWithoutDocumentCollectionAndResponseAccepted.getRespondentCollection()
-                .get(0).getValue().setResponseStatus(RESPONSE_STATUS_ACCEPTED);
+                .get(0).getValue().setResponseStatus(ACCEPTED_STATE);
 
         CaseData caseDataET3NotificationDocCollectionAndResponseNotAccepted =
                 ResourceLoader.fromString(TEST_ET3_FORM_CASE_DATA_FILE, CaseData.class);
@@ -212,7 +210,7 @@ class ET3DocumentHelperTest {
     }
 
     @Test
-    void testHasInconsistentAcceptanceStatus() {
+    void theHasInconsistentAcceptanceStatus() {
         // Null list
         assertTrue(ET3DocumentHelper.hasInconsistentAcceptanceStatus(null),
                 "Should return false for null list");
@@ -257,7 +255,7 @@ class ET3DocumentHelperTest {
     }
 
     @Test
-    void testIsET3NotificationDocumentTypeResponseAccepted_AllScenarios() {
+    void theIsET3NotificationDocumentTypeResponseAccepted_AllScenarios() {
         // Null list
         assertFalse(ET3DocumentHelper.isET3NotificationDocumentTypeResponseAccepted(null),
                 "Should return false for null list");
@@ -285,7 +283,7 @@ class ET3DocumentHelperTest {
     }
 
     @Test
-    void testContainsNoRespondentWithResponse_Status_variousCases() {
+    void theContainsNoRespondentWithResponse_Status_variousCases() {
         // Case 1: Empty list
         assertTrue(ET3DocumentHelper.containsNoRespondentWithResponseStatus(null),
                 "Null list should return true");
@@ -321,54 +319,59 @@ class ET3DocumentHelperTest {
     }
 
     @Test
-    void testHasAllRequiredET3DocumentsForRespondentResponses() {
-        // Helper to create respondent
+    void theAreET3DocumentsConsistentWithRespondentResponses() {
+        // Helper to create RespondentSumTypeItem with a given status
         Function<String, RespondentSumTypeItem> respondentWithStatus = status -> {
             RespondentSumType respondent = RespondentSumType.builder().responseStatus(status).build();
             RespondentSumTypeItem item = new RespondentSumTypeItem();
             item.setValue(respondent);
             return item;
         };
-
-        // Helper to create document
+        // Helper to create DocumentTypeItem with a given type
         Function<String, DocumentTypeItem> documentWithType = type -> {
-            UploadedDocumentType uploaded = UploadedDocumentType.builder().documentBinaryUrl("url-" + type).build();
-            DocumentType doc = DocumentType.builder().typeOfDocument(type).uploadedDocument(uploaded).build();
-            return DocumentTypeItem.builder().value(doc).build();
+            DocumentType document = DocumentType.builder().typeOfDocument(type).build();
+            return DocumentTypeItem.builder().value(document).build();
         };
-
-        // --- Case 1: Null inputs ---
-        assertTrue(ET3DocumentHelper.areET3DocumentsConsistentWithRespondentResponses(null, null));
-
-        // --- Case 2: Respondent says "Response Accepted", but no accepted document exists ---
-        List<RespondentSumTypeItem> respondents1 = List.of(respondentWithStatus.apply(RESPONSE_ACCEPTED));
-        List<DocumentTypeItem> docs1 = List.of(documentWithType.apply("OTHER_DOC"));
-        assertFalse(ET3DocumentHelper.areET3DocumentsConsistentWithRespondentResponses(respondents1, docs1));
-
-        // --- Case 3: Respondent says "Response Rejected", but only accepted doc exists ---
-        List<RespondentSumTypeItem> respondents2 = List.of(respondentWithStatus.apply(RESPONSE_REJECTED));
-        List<DocumentTypeItem> docs2 = List.of(documentWithType.apply(ET3_ACCEPTED_NOTIFICATION_DOCUMENT_ID));
-        assertFalse(ET3DocumentHelper.areET3DocumentsConsistentWithRespondentResponses(respondents2, docs2));
-
-        // --- Case 4: Respondent says "Response Accepted", and accepted doc exists ---
-        List<RespondentSumTypeItem> respondents3 = List.of(respondentWithStatus.apply(RESPONSE_ACCEPTED));
-        List<DocumentTypeItem> docs3 = List.of(documentWithType.apply(ET3_ACCEPTED_NOTIFICATION_DOCUMENT_ID));
-        assertTrue(ET3DocumentHelper.areET3DocumentsConsistentWithRespondentResponses(respondents3, docs3));
-
-        // --- Case 5: Respondent says "Response Rejected", and rejected doc exists ---
-        List<RespondentSumTypeItem> respondents4 = List.of(respondentWithStatus.apply(RESPONSE_REJECTED));
-        List<DocumentTypeItem> docs4 = List.of(documentWithType.apply("SOME_REJECTED_TYPE"));
-        assertTrue(ET3DocumentHelper.areET3DocumentsConsistentWithRespondentResponses(respondents4, docs4));
-
-        // --- Case 6: Mixed respondents and matching documents ---
-        List<RespondentSumTypeItem> respondents5 = List.of(
-                respondentWithStatus.apply(RESPONSE_ACCEPTED),
-                respondentWithStatus.apply(RESPONSE_REJECTED)
-        );
-        List<DocumentTypeItem> docs5 = List.of(
-                documentWithType.apply(ET3_ACCEPTED_NOTIFICATION_DOCUMENT_ID),
-                documentWithType.apply("SOME_REJECTED_TYPE")
-        );
-        assertTrue(ET3DocumentHelper.areET3DocumentsConsistentWithRespondentResponses(respondents5, docs5));
+        // Constants
+        String acceptedType = ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE;
+        String rejectedType = "ET3_REJECTED_TYPE";
+        // Case 1: Null inputs
+        assertFalse(ET3DocumentHelper.areET3DocumentsConsistentWithRespondentResponses(null, null));
+        // Case 2: Respondent has accepted status, but no accepted document
+        assertFalse(ET3DocumentHelper.areET3DocumentsConsistentWithRespondentResponses(
+                List.of(respondentWithStatus.apply(ACCEPTED_STATE)),
+                List.of(documentWithType.apply(rejectedType))
+        ));
+        // Case 3: Respondent has accepted status, and accepted document exists
+        assertTrue(ET3DocumentHelper.areET3DocumentsConsistentWithRespondentResponses(
+                List.of(respondentWithStatus.apply(ACCEPTED_STATE)),
+                List.of(documentWithType.apply(acceptedType))
+        ));
+        // Case 4: Respondent has rejected status, but only accepted document exists
+        assertFalse(ET3DocumentHelper.areET3DocumentsConsistentWithRespondentResponses(
+                List.of(respondentWithStatus.apply("REJECTED")),
+                List.of(documentWithType.apply(acceptedType))
+        ));
+        // Case 5: Respondent has rejected status, and rejected document exists
+        assertTrue(ET3DocumentHelper.areET3DocumentsConsistentWithRespondentResponses(
+                List.of(respondentWithStatus.apply("REJECTED")),
+                List.of(documentWithType.apply(rejectedType))
+        ));
+        // Case 6: Respondent has blank status
+        assertFalse(ET3DocumentHelper.areET3DocumentsConsistentWithRespondentResponses(
+                List.of(respondentWithStatus.apply("")),
+                List.of(documentWithType.apply(acceptedType), documentWithType.apply(rejectedType))
+        ));
+        // Case 7: Multiple respondents — accepted and rejected — both document types present
+        assertTrue(ET3DocumentHelper.areET3DocumentsConsistentWithRespondentResponses(
+                List.of(
+                        respondentWithStatus.apply(ACCEPTED_STATE),
+                        respondentWithStatus.apply("REJECTED")
+                ),
+                List.of(
+                        documentWithType.apply(acceptedType),
+                        documentWithType.apply(rejectedType)
+                )
+        ));
     }
 }

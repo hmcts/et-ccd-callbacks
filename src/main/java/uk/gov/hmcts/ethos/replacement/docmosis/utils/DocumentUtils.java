@@ -13,7 +13,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -146,64 +145,82 @@ public final class DocumentUtils {
     }
 
     /**
-     * Adds a {@link DocumentTypeItem} to the given list of {@link DocumentTypeItem} only if:
+     * Adds the given {@link DocumentTypeItem} to the list of {@code documentTypeItems} only if it
+     * does not already exist in the list based on either a matching ID or a matching binary document URL.
+     * <p>
+     * The method performs two checks before adding:
      * <ul>
-     *   <li>None of the following are null or empty:
-     *     <ul>
-     *       <li>{@code documentTypeItem}</li>
-     *       <li>{@code documentTypeItem.getValue()}</li>
-     *       <li>{@code documentTypeItem.getValue().getUploadedDocument()}</li>
-     *       <li>{@code documentTypeItem.getValue().getUploadedDocument().getDocumentFilename()}</li>
-     *     </ul>
-     *   </li>
-     *   <li>No existing item in {@code documentTypeItems} has the same document filename.</li>
+     *     <li>If the list already contains a document with the same {@code id} as {@code documentTypeItem}</li>
+     *     <li>If the list already contains a document with the same {@code documentBinaryUrl}</li>
      * </ul>
-     * If the filename is unique, the item is added to the {@code documentTypeItems} list.
+     * If either match is found, the document is not added.
      *
-     * @param documentTypeItems the list of existing {@link DocumentTypeItem} instances.
-     * @param documentTypeItem the {@link DocumentTypeItem} to be conditionally added to {@code documentTypeItems}.
+     * @param documentTypeItems the list of {@link DocumentTypeItem}s to check and possibly add to
+     * @param documentTypeItem  the document to be conditionally added to the list
      */
-    public static void addIfBinaryUrlNotExists(List<DocumentTypeItem> documentTypeItems,
-                                               DocumentTypeItem documentTypeItem) {
-        if (containsDocumentWithBinaryUrl(documentTypeItems, documentTypeItem)) {
+    public static void addDocumentIfUnique(List<DocumentTypeItem> documentTypeItems,
+                                           DocumentTypeItem documentTypeItem) {
+        if (hasMatchingId(documentTypeItems, documentTypeItem)
+                || hasMatchingBinaryUrl(documentTypeItems, documentTypeItem)) {
             return;
         }
         documentTypeItems.add(documentTypeItem);
     }
 
     /**
-     * Checks whether the specified list of {@link DocumentTypeItem} contains
-     * any item with the same binary document URL as the given {@code targetItem}.
+     * Checks whether the given list of {@link DocumentTypeItem} contains a document
+     * with the same ID as the specified {@code targetItem}.
      * <p>
-     * If the input list is {@code null} or empty, it will be initialized as an empty list.
-     * The method returns {@code false} if the {@code targetItem} or its nested fields
-     * (value, uploaded document, or binary URL) are null or empty.
+     * The method returns:
+     * <ul>
+     *     <li>{@code true} if {@code targetItem} is {@code null} or its ID is empty</li>
+     *     <li>{@code true} if any item in {@code documentTypeItems} has the same ID as {@code targetItem}</li>
+     *     <li>{@code false} otherwise</li>
+     * </ul>
      *
-     * @param documentTypeItems the list of {@link DocumentTypeItem} to search within;
-     *                          if {@code null} or empty, it will be replaced with a new empty list.
-     * @param targetItem        the {@link DocumentTypeItem} whose binary document URL is to be matched.
-     * @return {@code true} if any item in the list has the same binary document URL as {@code targetItem};
-     *         {@code false} otherwise.
+     * @param documentTypeItems the list of {@link DocumentTypeItem} to search through; may be {@code null} or empty
+     * @param targetItem        the {@link DocumentTypeItem} whose ID is to be matched; may be {@code null}
+     * @return {@code true} if the list contains an item with the same ID as {@code targetItem},
+     *         or if the {@code targetItem} itself is {@code null} or has a blank ID;
+     *         {@code false} otherwise
      */
-    public static boolean containsDocumentWithBinaryUrl(List<DocumentTypeItem> documentTypeItems,
-                                                            DocumentTypeItem targetItem) {
-        // If target item does not have binary url value returns true not to add it.
-        if (ObjectUtils.isEmpty(targetItem)
-                || ObjectUtils.isEmpty(targetItem.getValue())
-                || ObjectUtils.isEmpty(targetItem.getValue().getUploadedDocument())
-                || StringUtils.isEmpty(targetItem.getValue().getUploadedDocument().getDocumentBinaryUrl())) {
+    public static boolean hasMatchingId(List<DocumentTypeItem> documentTypeItems,
+                                        DocumentTypeItem targetItem) {
+        if (ObjectUtils.isEmpty(targetItem) || StringUtils.isEmpty(targetItem.getId())) {
             return true;
         }
         if (CollectionUtils.isEmpty(documentTypeItems)) {
             return false;
         }
-        String targetBinaryUrl = targetItem.getValue().getUploadedDocument().getDocumentBinaryUrl();
+        String targetItemId = targetItem.getId();
         for (DocumentTypeItem item : documentTypeItems) {
-            if (ObjectUtils.isNotEmpty(item)
-                    && ObjectUtils.isNotEmpty(item.getValue())
-                    && ObjectUtils.isNotEmpty(item.getValue().getUploadedDocument())
-                    && StringUtils.isNotEmpty(item.getValue().getUploadedDocument().getDocumentBinaryUrl())
-                    && targetBinaryUrl.equals(item.getValue().getUploadedDocument().getDocumentBinaryUrl())) {
+            if (ObjectUtils.isNotEmpty(item) && targetItemId.equals(item.getId())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static boolean hasMatchingBinaryUrl(List<DocumentTypeItem> documentTypeItems,
+                                               DocumentTypeItem targetItem) {
+        if (ObjectUtils.isEmpty(targetItem)
+                || ObjectUtils.isEmpty(targetItem.getValue())
+                || ObjectUtils.isEmpty(targetItem.getValue().getUploadedDocument())
+                || StringUtils.isBlank(targetItem.getValue().getUploadedDocument().getDocumentBinaryUrl())) {
+            return true;
+        }
+        if (CollectionUtils.isEmpty(documentTypeItems)) {
+            return false;
+        }
+        String targetItemBinaryUrl = targetItem.getValue().getUploadedDocument().getDocumentBinaryUrl();
+        for (DocumentTypeItem item : documentTypeItems) {
+            if (ObjectUtils.isEmpty(item)
+                    || ObjectUtils.isEmpty(item.getValue())
+                    || ObjectUtils.isEmpty(item.getValue().getUploadedDocument())
+                    || StringUtils.isBlank(item.getValue().getUploadedDocument().getDocumentBinaryUrl())) {
+                continue;
+            }
+            if (targetItemBinaryUrl.equals(item.getValue().getUploadedDocument().getDocumentBinaryUrl())) {
                 return true;
             }
         }
@@ -211,43 +228,63 @@ public final class DocumentUtils {
     }
 
     /**
-     * Removes from the primary list any {@link DocumentTypeItem} whose binary URL matches
-     * one found in the reference list.
+     * Removes all documents from the {@code primaryDocumentTypeItems} list that have an ID
+     * matching any document in the {@code referenceDocumentTypeItems} list.
      * <p>
-     * Each {@link DocumentTypeItem} is expected to contain a {@link DocumentType}, which in turn contains an
-     * {@link UploadedDocumentType} that holds the binary URL. This method compares binary URLs between the two lists.
-     * If any document in the primary list has a binary URL that also exists in the reference list, it will be removed
-     * from the primary list.
+     * This method performs an in-place modification of {@code primaryDocumentTypeItems}, removing
+     * any {@link DocumentTypeItem} whose ID is found in the list of reference items.
      * <p>
-     * The comparison is:
-     * <ul>
-     *   <li>Null-safe — any null intermediate object (e.g., value, document type, uploaded document) is ignored.</li>
-     *   <li>Based on exact equality of non-null binary URLs.</li>
-     * </ul>
+     * The comparison is based on the {@code id} field, and null IDs are safely ignored.
      *
-     * @param primaryDocumentTypeItems   the list of {@code DocumentTypeItem} objects to be modified;
-     *                                   matching items will be removed
-     * @param referenceDocumentTypeItems the list of {@code DocumentTypeItem} objects whose
-     *                                   binary URLs are used for comparison
+     * @param primaryDocumentTypeItems   the list of documents to remove items from; must be modifiable
+     * @param referenceDocumentTypeItems the list of documents providing IDs to match against
      */
-    public static void removeDocumentsWithMatchingBinaryUrls(List<DocumentTypeItem> primaryDocumentTypeItems,
-                                                             List<DocumentTypeItem> referenceDocumentTypeItems) {
-        Set<String> referenceBinaryUrls = referenceDocumentTypeItems.stream()
-                .map(item -> Optional.ofNullable(item)
-                .map(DocumentTypeItem::getValue)
-                .map(DocumentType::getUploadedDocument)
-                .map(UploadedDocumentType::getDocumentBinaryUrl)
-                .orElse(null))
+    public static void removeDocumentsWithMatchingIDs(List<DocumentTypeItem> primaryDocumentTypeItems,
+                                                      List<DocumentTypeItem> referenceDocumentTypeItems) {
+        if (CollectionUtils.isEmpty(primaryDocumentTypeItems) || CollectionUtils.isEmpty(referenceDocumentTypeItems)) {
+            return;
+        }
+        Set<String> referenceIds = referenceDocumentTypeItems.stream()
+                .map(DocumentTypeItem::getId)
                 .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
 
-        primaryDocumentTypeItems.removeIf(item -> {
-            String url = Optional.ofNullable(item)
-                    .map(DocumentTypeItem::getValue)
-                    .map(DocumentType::getUploadedDocument)
-                    .map(UploadedDocumentType::getDocumentBinaryUrl)
-                    .orElse(null);
-            return url != null && referenceBinaryUrls.contains(url);
-        });
+        primaryDocumentTypeItems.removeIf(item -> referenceIds.contains(item.getId()));
+    }
+
+    /**
+     * Removes documents from the {@code primaryDocumentTypeItems} list that have a matching
+     * binary document URL with any document in the {@code referenceDocumentTypeItems} list.
+     * <p>
+     * The comparison is based on the {@code documentBinaryUrl} field of the {@link UploadedDocumentType}
+     * inside each {@link DocumentTypeItem}. If a binary URL in the primary list matches a binary URL in the
+     * reference list, the corresponding item is removed from the primary list.
+     * <p>
+     * Documents with {@code null} or blank binary URLs are safely ignored during comparison.
+     * <p>
+     * This method modifies the {@code primaryDocumentTypeItems} list in place.
+     *
+     * @param primaryDocumentTypeItems   the modifiable list of documents to remove items from
+     * @param referenceDocumentTypeItems the list of documents providing binary URLs to match against
+     */
+    public static void removeDocumentsWithMatchingBinaryURLs(List<DocumentTypeItem> primaryDocumentTypeItems,
+                                                             List<DocumentTypeItem> referenceDocumentTypeItems) {
+        if (CollectionUtils.isEmpty(primaryDocumentTypeItems) || CollectionUtils.isEmpty(referenceDocumentTypeItems)) {
+            return;
+        }
+        Set<String> referenceBinaryUrls = referenceDocumentTypeItems.stream()
+                .map(DocumentTypeItem::getValue)
+                .filter(Objects::nonNull)
+                .map(DocumentType::getUploadedDocument)
+                .filter(Objects::nonNull)
+                .map(UploadedDocumentType::getDocumentBinaryUrl)
+                .filter(StringUtils::isNotBlank)
+                .collect(Collectors.toSet());
+        primaryDocumentTypeItems.removeIf(item ->
+                item != null
+                        && item.getValue() != null
+                        && item.getValue().getUploadedDocument() != null
+                        && referenceBinaryUrls.contains(item.getValue().getUploadedDocument().getDocumentBinaryUrl())
+        );
     }
 }

@@ -14,7 +14,9 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseUpdateForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et3NotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ServingService;
@@ -37,17 +39,22 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.RESPONSE_ACCEPTED;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({Et3NotificationController.class, JsonMapper.class})
 class Et3NotificationControllerTest extends BaseControllerTest {
 
     private static final String MID_UPLOAD_DOCUMENTS_URL = "/et3Notification/midUploadDocuments";
+    private static final String ABOUT_TO_START_URL = "/et3Notification/aboutToStart";
+    private static final String ABOUT_TO_SUBMIT_URL = "/et3Notification/aboutToSubmit";
     private static final String SUBMITTED_URL = "/et3Notification/submitted";
+    private static final String ET3_NOTIFICATION_ACCEPTED_DOCUMENT_TYPE = "2.11";
+    private static final String ET3_NOTIFICATION_REJECTED_DOCUMENT_TYPE = "2.12";
+    private CCDRequest ccdRequestWithoutRespondentResponse;
     private CCDRequest ccdRequestWithET3NotificationDocument;
-    private CCDRequest ccdRequestWithoutET3NotificationDocument;
+    private CCDRequest ccdRequestInvalidET3NotificationDocumentCollection;
     private CCDRequest ccdRequestWithoutRespondentResponseAcceptedState;
 
     @MockBean
@@ -84,24 +91,74 @@ class Et3NotificationControllerTest extends BaseControllerTest {
         CaseData caseDataWithNotificationDocument = caseDetails.getCaseData();
         caseDataWithNotificationDocument.setClaimant("Claimant LastName");
         caseDataWithNotificationDocument.getRespondentCollection().get(0)
-                .getValue().setResponseStatus(RESPONSE_ACCEPTED);
+                .getValue().setResponseStatus(ACCEPTED_STATE);
         caseDataWithNotificationDocument.setEt3NotificationDocCollection(List.of(DocumentTypeItem.builder()
-                .value(DocumentType.builder().typeOfDocument("2.11").build()).build()));
+                .value(DocumentType.builder().typeOfDocument(
+                        ET3_NOTIFICATION_ACCEPTED_DOCUMENT_TYPE).build()).build()));
         ccdRequestWithET3NotificationDocument = CCDRequestBuilder.builder()
                 .withCaseData(caseDataWithNotificationDocument).build();
 
-        CaseData caseDataWithoutET3NotificationDocument = new CaseData();
-        caseDataWithoutET3NotificationDocument.setEt3NotificationDocCollection(List.of());
-        ccdRequestWithoutET3NotificationDocument = CCDRequestBuilder.builder()
-                .withCaseData(caseDataWithoutET3NotificationDocument).build();
+        CaseData caseDataRejectedET3NotificationDocument = new CaseData();
+        caseDataRejectedET3NotificationDocument.setEt3NotificationDocCollection(List.of(
+                DocumentTypeItem.builder().value(DocumentType.builder()
+                        .typeOfDocument(ET3_NOTIFICATION_REJECTED_DOCUMENT_TYPE).build()).build(),
+                DocumentTypeItem.builder().value(DocumentType.builder()
+                        .typeOfDocument(ET3_NOTIFICATION_ACCEPTED_DOCUMENT_TYPE).build()).build()
+        ));
+        ccdRequestInvalidET3NotificationDocumentCollection = CCDRequestBuilder.builder()
+                .withCaseData(caseDataRejectedET3NotificationDocument).build();
 
         CaseData caseDataWithoutRespondentResponseAcceptedState = new CaseData();
-        caseDataWithoutET3NotificationDocument.setEt3NotificationDocCollection(List.of(
-                DocumentTypeItem.builder().value(DocumentType.builder().typeOfDocument("2.11").build()).build()
+        caseDataRejectedET3NotificationDocument.setEt3NotificationDocCollection(List.of(
+                DocumentTypeItem.builder().value(DocumentType.builder()
+                        .typeOfDocument(ET3_NOTIFICATION_ACCEPTED_DOCUMENT_TYPE).build()).build()
         ));
         ccdRequestWithoutRespondentResponseAcceptedState = CCDRequestBuilder.builder()
                 .withCaseData(caseDataWithoutRespondentResponseAcceptedState).build();
 
+        CaseData caseDataWithoutRespondentResponse = new CaseData();
+        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+        respondentSumTypeItem.setValue(RespondentSumType.builder().build());
+        caseDataWithoutRespondentResponse.setRespondentCollection(List.of(respondentSumTypeItem));
+        ccdRequestWithoutRespondentResponse = CCDRequestBuilder.builder()
+                .withCaseData(caseDataWithoutRespondentResponse).build();
+
+    }
+
+    @Test
+    void aboutToStart_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mvc.perform(post(ABOUT_TO_START_URL)
+                        .content(jsonMapper.toJson(ccdRequestWithET3NotificationDocument))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.ERRORS, emptyCollectionOf(String.class)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    void aboutToStart_noRespondentResponseStatus() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(servingService.generateOtherTypeDocumentLink(anyList())).thenReturn("expectedDocumentName");
+        when(servingService.generateEmailLinkToAcas(any(), anyBoolean())).thenReturn("expectedLink");
+        mvc.perform(post(ABOUT_TO_START_URL)
+                        .content(jsonMapper.toJson(ccdRequestWithoutRespondentResponse))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue(String.class)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    void aboutToStart_tokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mvc.perform(post(ABOUT_TO_START_URL)
+                        .content(jsonMapper.toJson(ccdRequestWithET3NotificationDocument))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -110,14 +167,14 @@ class Et3NotificationControllerTest extends BaseControllerTest {
         when(servingService.generateOtherTypeDocumentLink(anyList())).thenReturn("expectedDocumentName");
         when(servingService.generateEmailLinkToAcas(any(), anyBoolean())).thenReturn("expectedLink");
         mvc.perform(post(MID_UPLOAD_DOCUMENTS_URL)
-                .content(jsonMapper.toJson(ccdRequestWithET3NotificationDocument))
-                .header("Authorization", AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.data.et3OtherTypeDocumentName", notNullValue()))
-            .andExpect(jsonPath("$.data.et3EmailLinkToAcas", notNullValue()))
-            .andExpect(jsonPath(JsonMapper.ERRORS, emptyCollectionOf(String.class)))
-            .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+                        .content(jsonMapper.toJson(ccdRequestWithET3NotificationDocument))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.et3OtherTypeDocumentName", notNullValue()))
+                .andExpect(jsonPath("$.data.et3EmailLinkToAcas", notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, emptyCollectionOf(String.class)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(servingService, times(1)).generateOtherTypeDocumentLink(anyList());
         verify(servingService, times(1)).generateEmailLinkToAcas(any(), anyBoolean());
     }
@@ -126,7 +183,7 @@ class Et3NotificationControllerTest extends BaseControllerTest {
     void midUploadDocuments_invalidET3NotificationDocumentList() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MID_UPLOAD_DOCUMENTS_URL)
-                        .content(jsonMapper.toJson(ccdRequestWithoutET3NotificationDocument))
+                        .content(jsonMapper.toJson(ccdRequestInvalidET3NotificationDocumentCollection))
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -161,6 +218,31 @@ class Et3NotificationControllerTest extends BaseControllerTest {
                 .header("Authorization", AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void aboutToSubmit_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mvc.perform(post(ABOUT_TO_SUBMIT_URL)
+                        .content(jsonMapper.toJson(ccdRequestWithET3NotificationDocument))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.respondentCollection", notNullValue()))
+                .andExpect(jsonPath("$.data.respondentCollection[0].value.et3NotificationAcceptedDate",
+                        notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, emptyCollectionOf(String.class)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    void aboutToSubmit_tokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mvc.perform(post(ABOUT_TO_SUBMIT_URL)
+                        .content(jsonMapper.toJson(ccdRequestWithET3NotificationDocument))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
     }
 
     @Test

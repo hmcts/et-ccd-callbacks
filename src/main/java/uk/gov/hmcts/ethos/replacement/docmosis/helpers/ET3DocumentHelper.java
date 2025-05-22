@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -8,12 +9,13 @@ import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.generic.BaseCaseData;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.CallbackObjectUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET3;
@@ -21,9 +23,10 @@ import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET3_ATTACHM
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.RESPONSE_ACCEPTED;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.RESPONSE_REJECTED;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.RESPONSE_TO_A_CLAIM;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentUtils.addIfBinaryUrlNotExists;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentUtils.addDocumentIfUnique;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentUtils.addUploadedDocumentTypeToDocumentTypeItems;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentUtils.removeDocumentsWithMatchingBinaryUrls;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentUtils.removeDocumentsWithMatchingBinaryURLs;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentUtils.removeDocumentsWithMatchingIDs;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentUtils.setDocumentTypeItemLevels;
 
 public final class ET3DocumentHelper {
@@ -33,7 +36,7 @@ public final class ET3DocumentHelper {
     private static final String ET3_EMPLOYER_CONTEST_CLAIM_DOCUMENT = "ET3 employer contest claim document";
     private static final String ET3_RESPONDENT_SUPPORT_DOCUMENT = "ET3 respondent support document";
     private static final String ET3_RESPONDENT_CLAIM_DOCUMENT = "ET3 respondent claim document";
-    private static final String ET3_ACCEPTED_NOTIFICATION_DOCUMENT_ID = "2.11";
+    private static final String ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE = "2.11";
     private static final String ET3_NOTIFICATION_DOCUMENT_SHORT_DESCRIPTION =
             "ET3 response \"%s\" status document";
 
@@ -73,10 +76,11 @@ public final class ET3DocumentHelper {
                 if (isET3NotificationDocumentTypeResponseAccepted(caseData.getEt3NotificationDocCollection())
                         && ACCEPTED_STATE.equals(respondentSumTypeItem.getValue().getResponseStatus())) {
                     for (DocumentTypeItem documentTypeItem : documentTypeItems) {
-                        addIfBinaryUrlNotExists(caseData.getDocumentCollection(), documentTypeItem);
+                        addDocumentIfUnique(caseData.getDocumentCollection(), documentTypeItem);
                     }
                 } else {
-                    removeDocumentsWithMatchingBinaryUrls(caseData.getDocumentCollection(), documentTypeItems);
+                    removeDocumentsWithMatchingIDs(caseData.getDocumentCollection(), documentTypeItems);
+                    removeDocumentsWithMatchingBinaryURLs(caseData.getDocumentCollection(), documentTypeItems);
                 }
             }
         }
@@ -111,7 +115,7 @@ public final class ET3DocumentHelper {
                 || StringUtils.isBlank(documentTypeItem.getValue().getTypeOfDocument())) {
             return false;
         }
-        return ET3_ACCEPTED_NOTIFICATION_DOCUMENT_ID.equals(documentTypeItem.getValue().getTypeOfDocument());
+        return ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE.equals(documentTypeItem.getValue().getTypeOfDocument());
     }
 
     /**
@@ -192,68 +196,47 @@ public final class ET3DocumentHelper {
     }
 
     /**
-     * Updates the given list of {@link DocumentTypeItem} by synchronizing ET3 notification documents.
+     * Processes and adds ET3 notification documents from the {@code et3NotificationDocCollection}
+     * into the main {@code documentCollection} of the provided {@link CaseData} object.
      * <p>
-     * This method performs two main actions:
+     * This method performs the following actions:
      * <ul>
-     *     <li>Removes any existing documents from {@code documentTypeItems} that have a top-level document
-     *         status of {@code "Response Accepted"} or {@code "Response Rejected"} and are not present
-     *         in the provided {@code et3DocumentTypeItems} list (based on binary document URL).</li>
-     *     <li>Adds new ET3 notification documents from {@code et3DocumentTypeItems} to {@code documentTypeItems}
-     *         if they don't already exist (by binary URL), and sets their document levels and short descriptions
-     *         based on whether the document type indicates acceptance or rejection.</li>
+     *     <li>Clones each document from the ET3 notification collection to avoid mutating the original items.</li>
+     *     <li>Determines if the document type corresponds to an accepted or rejected ET3 response.</li>
+     *     <li>Sets document classification levels and short descriptions based on the document type.</li>
+     *     <li>Nullifies the original {@code typeOfDocument} after processing.</li>
+     *     <li>Adds the document to the main collection if it doesn't already exist (by ID or binary URL).</li>
+     *     <li>Sets document numbers for the updated collection.</li>
      * </ul>
+     * If the {@code et3NotificationDocCollection} is empty or {@code null}, the method exits early.
+     * If the {@code documentCollection} is {@code null}, it initializes it as a new list.
      *
-     * @param documentTypeItems      the list of existing {@link DocumentTypeItem}s to be updated;
-     *                               items may be removed or added based on ET3 matching logic
-     * @param et3DocumentTypeItems   the list of new ET3 notification {@link DocumentTypeItem}s
-     *                               to merge into the collection
+     * @param caseData the {@link CaseData} object containing both ET3 notification and main document collections
+     * @throws JsonProcessingException if cloning of a document fails during deep copy via JSON
      */
-    public static void updateET3NotificationDocumentsInCollection(List<DocumentTypeItem> documentTypeItems,
-                                                                  List<DocumentTypeItem> et3DocumentTypeItems) {
-        if (CollectionUtils.isEmpty(et3DocumentTypeItems)) {
+    public static void addET3NotificationDocumentsToDocumentCollection(CaseData caseData)
+            throws JsonProcessingException {
+        if (CollectionUtils.isEmpty(caseData.getEt3NotificationDocCollection())) {
             return;
         }
-
-        // Remove existing items from documentTypeItems if they match RESPONSE_ACCEPTED/REJECTED
-        // and are not present in the new ET3 list
-        documentTypeItems.removeIf(existingItem -> {
-            DocumentType value = existingItem.getValue();
-            if (value == null) {
-                return false;
-            }
-
-            String responseClaimDocuments = value.getResponseClaimDocuments();
-            if (!RESPONSE_ACCEPTED.equals(responseClaimDocuments)
-                    && !RESPONSE_REJECTED.equals(responseClaimDocuments)) {
-                return false;
-            }
-            // Remove if no matching binary URL exists in the ET3 list
-            String binaryUrl = value.getUploadedDocument() != null
-                    ? value.getUploadedDocument().getDocumentBinaryUrl()
-                    : null;
-            return StringUtils.isNotBlank(binaryUrl)
-                    && et3DocumentTypeItems.stream()
-                    .map(DocumentTypeItem::getValue)
-                    .filter(Objects::nonNull)
-                    .map(DocumentType::getUploadedDocument)
-                    .filter(Objects::nonNull)
-                    .map(UploadedDocumentType::getDocumentBinaryUrl)
-                    .noneMatch(binaryUrl::equals);
-        });
-
-        for (DocumentTypeItem item : et3DocumentTypeItems) {
-            DocumentType value = item.getValue();
+        if (CollectionUtils.isEmpty(caseData.getDocumentCollection())) {
+            caseData.setDocumentCollection(new ArrayList<>());
+        }
+        for (DocumentTypeItem item : caseData.getEt3NotificationDocCollection()) {
+            DocumentTypeItem clonedItem = CallbackObjectUtils.cloneObject(item, DocumentTypeItem.class);
+            DocumentType value = clonedItem.getValue();
             String typeOfDoc = value != null ? value.getTypeOfDocument() : null;
             if (StringUtils.isNotBlank(typeOfDoc)) {
-                boolean isAccepted = ET3_ACCEPTED_NOTIFICATION_DOCUMENT_ID.equals(typeOfDoc);
+                boolean isAccepted = ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE.equals(typeOfDoc);
                 String status = isAccepted ? RESPONSE_ACCEPTED : RESPONSE_REJECTED;
-                setDocumentTypeItemLevels(item, RESPONSE_TO_A_CLAIM, status);
+                setDocumentTypeItemLevels(clonedItem, RESPONSE_TO_A_CLAIM, status);
+                clonedItem.setId(UUID.randomUUID().toString());
                 value.setShortDescription(String.format(ET3_NOTIFICATION_DOCUMENT_SHORT_DESCRIPTION, status));
-                value.setTypeOfDocument(ET3);
-                addIfBinaryUrlNotExists(documentTypeItems, item);
+                value.setTypeOfDocument(null);
+                addDocumentIfUnique(caseData.getDocumentCollection(), clonedItem);
             }
         }
+        DocumentHelper.setDocumentNumbers(caseData);
     }
 
     /**
@@ -281,10 +264,10 @@ public final class ET3DocumentHelper {
         for (int i = 1; i < documentTypeItems.size(); i++) {
             DocumentTypeItem item = documentTypeItems.get(i);
             if (ObjectUtils.isEmpty(item) || ObjectUtils.isEmpty(item.getValue())
-                    || ET3_ACCEPTED_NOTIFICATION_DOCUMENT_ID.equals(firstType)
-                    && !ET3_ACCEPTED_NOTIFICATION_DOCUMENT_ID.equals(item.getValue().getTypeOfDocument())
-                    || !ET3_ACCEPTED_NOTIFICATION_DOCUMENT_ID.equals(firstType)
-                    && ET3_ACCEPTED_NOTIFICATION_DOCUMENT_ID.equals(item.getValue().getTypeOfDocument())) {
+                    || ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE.equals(firstType)
+                    && !ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE.equals(item.getValue().getTypeOfDocument())
+                    || !ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE.equals(firstType)
+                    && ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE.equals(item.getValue().getTypeOfDocument())) {
                 return true;
             }
         }
@@ -319,55 +302,56 @@ public final class ET3DocumentHelper {
     }
 
     /**
-     * Validates that each respondent with a response status has a corresponding ET3 notification document.
+     * Determines whether the provided ET3 documents are consistent with the response statuses
+     * of the given respondents.
      * <p>
-     * For every respondent with a non-blank {@code responseStatus}:
+     * The method evaluates whether at least one respondent with a non-blank response status
+     * has a corresponding document type:
      * <ul>
-     *     <li>If the response status is {@code "Response Accepted"}, then at least one ET3 document with
-     *         the type {@code ET3_ACCEPTED_NOTIFICATION_DOCUMENT_ID} must be present in the document list.</li>
-     *     <li>If the response status is anything else, then at least one ET3 document with a different type
-     *         (i.e., not {@code ET3_ACCEPTED_NOTIFICATION_DOCUMENT_ID}) must be present.</li>
+     *     <li>If a respondent's response status is {@code ACCEPTED_STATE}, then there must be
+     *         at least one document of type {@code ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE}.</li>
+     *     <li>If the status is any other value, then there must be at least one document with a
+     *         different type.</li>
      * </ul>
-     * <p>
-     * Returns {@code false} if any required document is missing for the given respondent responses.
-     * Returns {@code true} if all response statuses are properly supported by corresponding documents.
+     * The method returns {@code true} as soon as one valid respondent-document match is found.
+     * If the inputs are {@code null} or no valid match exists, it returns {@code false}.
      *
-     * @param respondents the list of {@link RespondentSumTypeItem}s containing respondent response statuses
-     * @param documents   the list of ET3 {@link DocumentTypeItem}s to validate against
-     * @return {@code true} if all respondent response statuses have corresponding ET3 documents;
-     *         {@code false} if any are missing
+     * @param respondents the list of {@link RespondentSumTypeItem}s representing respondents
+     *                    and their response statuses
+     * @param documents   the list of {@link DocumentTypeItem}s representing ET3 documents uploaded to the case
+     * @return {@code true} if any respondent with a valid response status has a matching document type;
+     *         {@code false} otherwise
      */
-    public static boolean areET3DocumentsConsistentWithRespondentResponses(List<RespondentSumTypeItem> respondents,
-                                                                           List<DocumentTypeItem> documents) {
+    public static boolean areET3DocumentsConsistentWithRespondentResponses(
+            List<RespondentSumTypeItem> respondents,
+            List<DocumentTypeItem> documents) {
         if (respondents == null || documents == null) {
-            return true;
+            return false;
         }
         boolean hasAcceptedDoc = documents.stream()
                 .map(DocumentTypeItem::getValue)
                 .filter(Objects::nonNull)
                 .map(DocumentType::getTypeOfDocument)
-                .anyMatch(ET3_ACCEPTED_NOTIFICATION_DOCUMENT_ID::equals);
+                .anyMatch(ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE::equals);
         boolean hasRejectedDoc = documents.stream()
                 .map(DocumentTypeItem::getValue)
                 .filter(Objects::nonNull)
                 .map(DocumentType::getTypeOfDocument)
-                .anyMatch(docType -> !ET3_ACCEPTED_NOTIFICATION_DOCUMENT_ID.equals(docType));
-        for (RespondentSumTypeItem respondentItem : respondents) {
-            if (respondentItem == null || respondentItem.getValue() == null) {
-                continue;
-            }
-            String responseStatus = respondentItem.getValue().getResponseStatus();
-            if (StringUtils.isBlank(responseStatus)) {
-                continue;
-            }
-            if (RESPONSE_ACCEPTED.equals(responseStatus) && !hasAcceptedDoc) {
-                return false;
-            }
-            if (!RESPONSE_ACCEPTED.equals(responseStatus) && !hasRejectedDoc) {
-                return false;
+                .anyMatch(docType -> !ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE.equals(docType));
+        for (RespondentSumTypeItem respondentSumTypeItem : respondents) {
+            if (ObjectUtils.isNotEmpty(respondentSumTypeItem.getValue())
+                    && StringUtils.isNotBlank(respondentSumTypeItem.getValue().getResponseStatus())) {
+                if (ACCEPTED_STATE.equals(respondentSumTypeItem.getValue().getResponseStatus())) {
+                    if (hasAcceptedDoc) {
+                        return true;
+                    }
+                } else {
+                    if (hasRejectedDoc) {
+                        return true;
+                    }
+                }
             }
         }
-        return true;
+        return false;
     }
-
 }

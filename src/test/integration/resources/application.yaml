@@ -189,6 +189,7 @@ cron:
   et1DocGen: ${CRON_ACAS_CERT_TASK:0 */2 * * * ?}
   noticeOfChange: ${CRON_NOTICE_OF_CHANGE:0 10 * * * ?}
   partySpacing: ${CRON_PARTY_SPACING:0 */30 * * * ?}
+  acasCertSubmission: ${CRON_ACAS_CERT_SUBMISSION_TASK:0 */5 * * * ?}
 
 em-ccd-orchestrator:
   api:

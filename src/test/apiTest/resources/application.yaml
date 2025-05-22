@@ -148,8 +148,6 @@ template:
       ${BUNDLES_SUBMITTED_NOTIFICATION_FOR_TRIBUNAL_TEMPLATE_ID:12d604ce-df82-4c64-8544-ebbef66eb8c4}
   et1ProfessionalSubmission: ${ET1_PROFESSIONAL_SUBMISSION_TEMPLATE_ID:ec815e00-39b0-4711-8b24-614ea1f2de89}
 
-
-
 queue:
   create-updates:
     queue-name: ${CREATE_UPDATES_QUEUE_NAME:create-updates}
@@ -190,6 +188,11 @@ cron:
   et1DocGen: ${CRON_ACAS_CERT_TASK:0 */2 * * * ?}
   noticeOfChange: ${CRON_NOTICE_OF_CHANGE:0 10 * * * ?}
   partySpacing: ${CRON_PARTY_SPACING:0 */30 * * * ?}
+  acasCertSubmission: ${CRON_ACAS_CERT_SUBMISSION_TASK:0 */5 * * * ?}
 
 pdf:
   et3form: "ET3_0224.pdf"
+
+feature:
+  secure-doc-store:
+    enabled: false

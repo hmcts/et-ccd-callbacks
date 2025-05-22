@@ -6,7 +6,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.Jurisdiction
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.CASE_NAME_AND_DESCRIPTION_HTML;
 
 @Slf4j
-public class JurisdictionCodeHelper {
+public final class JurisdictionCodeHelper {
 
     private JurisdictionCodeHelper() {
     }

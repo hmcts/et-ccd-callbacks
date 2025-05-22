@@ -120,25 +120,25 @@ class InitialConsiderationServiceTest {
     private static final String EXPECTED_HEARING_BLANK = String.format(HEARING_DETAILS, "-", "-", "-");
 
     private static final String EXPECTED_JURISDICTION_HTML = "<h2>Jurisdiction codes</h2><a "
-        + "target=\"_blank\" href=\"https://judiciary.sharepoint.com/sites/empjudgesew/Shared%20Documents/Forms/"
-        + "AllItems.aspx?id=%2Fsites%2Fempjudgesew%2FShared%20Documents%2FET%20Jurisdiction%20List%2F"
-        + "Jurisdiction%20list%20October%202024.pdf&viewid=9cee6d50-61e5-4d87-92d2-8c9444f00c95&parent=%2F"
-        + "sites%2Fempjudgesew%2FShared%20Documents%2FET%20Jurisdiction%20List\">View all jurisdiction "
-        + "codes and descriptors (opens in new tab)"
-        + "</a><br><br><strong>DAG</strong> - Discrimination, including harassment or discrimination based on "
-        + "association or perception on grounds of age<br><br><strong>SXD</strong> - Discrimination, including "
-        + "indirect discrimination, discrimination based on association or perception, or harassment on "
-        + "grounds of sex, marriage and civil partnership<br><br><hr>";
+            + "target=\"_blank\" href=\"https://judiciary.sharepoint.com/sites/empjudgesew/Shared%20Documents/Forms/"
+            + "AllItems.aspx?id=%2Fsites%2Fempjudgesew%2FShared%20Documents%2FET%20Jurisdiction%20List%2F"
+            + "Jurisdiction%20list%20October%202024.pdf&viewid=9cee6d50-61e5-4d87-92d2-8c9444f00c95&parent=%2F"
+            + "sites%2Fempjudgesew%2FShared%20Documents%2FET%20Jurisdiction%20List\">View all jurisdiction "
+            + "codes and descriptors (opens in new tab)"
+            + "</a><br><br><h4>DAG</h4>Discrimination, including harassment or discrimination based on "
+            + "association or perception on grounds of age<h4>SXD</h4>Discrimination, including "
+            + "indirect discrimination, discrimination based on association or perception, or harassment on "
+            + "grounds of sex, marriage and civil partnership<hr>";
 
     private static final String EXPECTED_JURISDICTION_SCOTLAND_HTML = "<h2>Jurisdiction codes</h2><a "
         + "target=\"_blank\" href=\"https://judiciary.sharepoint"
         + ".com/:w:/r/sites/ScotlandEJs/Shared%20Documents/Jurisdictional%20Codes%20List"
         + "/Jurisdiction%20list%20July%202024%20.doc?d=wfa6ba431b0b941ffa0b82504fd093af0&csf=1&web=1&e=Dm6Hda\">"
         + "View all jurisdiction codes and descriptors (opens in new tab)"
-        + "</a><br><br><strong>DAG</strong> - Discrimination, including harassment or discrimination "
-        + "based on association or perception on grounds of age<br><br><strong>SXD</strong> - "
+        + "</a><br><br><h4>DAG</h4>Discrimination, including harassment or discrimination "
+        + "based on association or perception on grounds of age<h4>SXD</h4>"
         + "Discrimination, including indirect discrimination, discrimination based on association or perception, "
-        + "or harassment on grounds of sex, marriage and civil partnership<br><br><hr>";
+        + "or harassment on grounds of sex, marriage and civil partnership<hr>";
 
     private CaseData caseDataEmpty;
     private CaseData caseData;

@@ -61,7 +61,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsidera
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.VIDEO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.WITH_MEMBERS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.hearingTypeMappings;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.*;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.getHearingDuration;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 
@@ -214,7 +214,9 @@ public class InitialConsiderationService {
         sb.append(String.format(JURISDICTION_HEADER,
                 caseTypeId.startsWith(ENGLANDWALES_CASE_TYPE_ID) ? CODES_URL_ENGLAND : CODES_URL_SCOTLAND));
 
-        validJurisdictionCodes.forEach(jurisdictionCode -> JurisdictionCodeHelper.populateCodeNameAndDescriptionHtml(sb, jurisdictionCode));
+        validJurisdictionCodes.forEach(
+                jurisdictionCode ->
+                        JurisdictionCodeHelper.populateCodeNameAndDescriptionHtml(sb, jurisdictionCode));
 
         return sb.append("<hr>").toString();
     }

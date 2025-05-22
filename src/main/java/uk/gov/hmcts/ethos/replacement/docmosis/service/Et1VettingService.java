@@ -308,7 +308,8 @@ public class Et1VettingService {
     public String generateJurisdictionCodesHtml(List<JurCodesTypeItem> jurisdictionCodes) {
         StringBuilder sb = new StringBuilder();
         for (JurCodesTypeItem codeItem : jurisdictionCodes) {
-            JurisdictionCodeHelper.populateCodeNameAndDescriptionHtml(sb, codeItem.getValue().getJuridictionCodesList());
+            JurisdictionCodeHelper.populateCodeNameAndDescriptionHtml(
+                    sb, codeItem.getValue().getJuridictionCodesList());
         }
         return String.format(JUR_CODE_HTML, sb);
     }

@@ -20,6 +20,7 @@ import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
@@ -31,6 +32,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_ALLOCATED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN2;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportCommonMethods.getHearingJudgeName;
 
 @Slf4j
 public final class HearingsToJudgmentsReport {
@@ -158,19 +160,17 @@ public final class HearingsToJudgmentsReport {
             return hearingJudgmentsList;
         }
 
-        for (DateListedTypeItem dateListedTypeItem : hearingType.getHearingDateCollection()) {
+        hearingType.getHearingDateCollection().forEach(dateListedTypeItem -> {
             DateListedType dateListedType = dateListedTypeItem.getValue();
             LocalDate hearingListedDate = LocalDate.parse(dateListedType.getListedDate(), OLD_DATE_TIME_PATTERN);
             List<JudgementTypeItem> judgements = judgmentsCollection.stream()
-                                .filter(j -> judgmentHearingDateMatchHearingListedDate(j, hearingListedDate))
-                                .toList();
-
+                    .filter(j -> judgmentHearingDateMatchHearingListedDate(j, hearingListedDate))
+                    .toList();
             if (judgements.isEmpty()
-                    || !isWithinDateRange(hearingListedDate)
-                    || !isValidHearingDate(dateListedTypeItem)) {
-                continue;
+                || !isWithinDateRange(hearingListedDate)
+                || !isValidHearingDate(dateListedTypeItem)) {
+                return;
             }
-
             for (JudgementTypeItem judgmentItem : judgements) {
                 JudgementType judgment = judgmentItem.getValue();
                 LocalDate dateJudgmentMade = LocalDate.parse(judgment.getDateJudgmentMade(), OLD_DATE_TIME_PATTERN2);
@@ -183,14 +183,10 @@ public final class HearingsToJudgmentsReport {
                 hearingJudgmentItem.judgmentDateSent = dateJudgmentSent.format(OLD_DATE_TIME_PATTERN2);
                 hearingJudgmentItem.total = hearingListedDate.datesUntil(dateJudgmentSent.plusDays(1)).count();
                 hearingJudgmentItem.reservedHearing = dateListedType.getHearingReservedJudgement();
-                if (hearingType.hasHearingJudge()) {
-                    hearingJudgmentItem.judge = hearingType.getJudge().getSelectedLabel();
-                } else {
-                    hearingJudgmentItem.judge = NOT_ALLOCATED;
-                }
+                hearingJudgmentItem.judge = defaultIfEmpty(getHearingJudgeName(hearingType), NOT_ALLOCATED);
                 hearingJudgmentsList.add(hearingJudgmentItem);
             }
-        }
+        });
 
         return hearingJudgmentsList;
     }

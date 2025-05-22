@@ -82,9 +82,11 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.TIME_TO_FIRST_HEARI
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingHelper.CAUSE_LIST_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper.CASES_SEARCHED;
-import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.*;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ELASTICSEARCH_FIELD_HEARING_LISTED_DATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ELASTICSEARCH_FIELD_HEARING_LOCATION;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ELASTICSEARCH_FIELD_HEARING_VENUE_DAY_SCOTLAND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ELASTICSEARCH_FIELD_MANAGING_OFFICE_KEYWORD;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService.ALL_OFFICES;
-
 
 @RequiredArgsConstructor
 @Slf4j
@@ -238,9 +240,11 @@ public class ListingService {
 
         if (!ALL_OFFICES.equals(managingOffice)) {
             if (TribunalOffice.isEnglandWalesOffice(managingOffice)) {
-                boolQueryBuilder.filter(new TermsQueryBuilder(ELASTICSEARCH_FIELD_MANAGING_OFFICE_KEYWORD, managingOffice));
+                boolQueryBuilder.filter(
+                        new TermsQueryBuilder(ELASTICSEARCH_FIELD_MANAGING_OFFICE_KEYWORD, managingOffice));
             } else if (TribunalOffice.isScotlandOffice(managingOffice)) {
-                boolQueryBuilder.must(new MatchQueryBuilder(ELASTICSEARCH_FIELD_HEARING_VENUE_DAY_SCOTLAND, managingOffice));
+                boolQueryBuilder.must(
+                        new MatchQueryBuilder(ELASTICSEARCH_FIELD_HEARING_VENUE_DAY_SCOTLAND, managingOffice));
             }
         }
 

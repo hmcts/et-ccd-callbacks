@@ -138,7 +138,7 @@ public final class DocumentUtils {
         }
         DocumentTypeItem documentTypeItem = convertUploadedDocumentTypeToDocumentTypeItemWithLevels(
                 uploadedDocumentType, topLevel, secondLevel);
-        if (ObjectUtils.isNotEmpty(documentTypeItem) && ObjectUtils.isNotEmpty(documentTypeItem.getValue())) {
+        if (documentTypeItem != null && ObjectUtils.isNotEmpty(documentTypeItem.getValue())) {
             documentTypeItem.getValue().setShortDescription(shortDescription);
             documentTypeItems.add(documentTypeItem);
         }

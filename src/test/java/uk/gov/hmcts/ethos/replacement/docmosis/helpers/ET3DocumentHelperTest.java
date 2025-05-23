@@ -81,7 +81,7 @@ class ET3DocumentHelperTest {
     @SneakyThrows
     void testAddET3NotificationDocumentsToDocumentCollection() {
         // Helpers to create DocumentTypeItem with given type and ID
-        Function<String, DocumentTypeItem> createET3Item = (type) -> {
+        Function<String, DocumentTypeItem> createET3Item = type -> {
             UploadedDocumentType uploaded = UploadedDocumentType.builder()
                     .documentBinaryUrl("url-" + type)
                     .documentFilename("doc-" + type + ".pdf")

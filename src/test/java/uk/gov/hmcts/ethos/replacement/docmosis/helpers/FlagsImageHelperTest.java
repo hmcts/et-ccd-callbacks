@@ -7,6 +7,7 @@ import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.types.AdditionalCaseInfoType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -14,6 +15,7 @@ import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
@@ -35,7 +37,7 @@ class FlagsImageHelperTest {
             buildFlagsImageFileName(caseDetails);
 
             assertEquals("<font color='DeepPink' size='5'> WITH OUTSTATION </font>", caseData.getFlagsImageAltText());
-            assertEquals("EMP-TRIB-010000000000.jpg", caseData.getFlagsImageFileName());
+            assertEquals("EMP-TRIB-01000000000000.jpg", caseData.getFlagsImageFileName());
         }
     }
 
@@ -106,7 +108,7 @@ class FlagsImageHelperTest {
         buildFlagsImageFileName(caseDetails);
 
         assertEquals("", caseData.getFlagsImageAltText());
-        assertEquals("EMP-TRIB-000000000000.jpg", caseData.getFlagsImageFileName());
+        assertEquals("EMP-TRIB-00000000000000.jpg", caseData.getFlagsImageFileName());
     }
 
     @Test
@@ -120,7 +122,7 @@ class FlagsImageHelperTest {
 
             assertEquals("", caseData.getFlagsImageAltText());
 
-            assertEquals("EMP-TRIB-000000000000.jpg", caseData.getFlagsImageFileName());
+            assertEquals("EMP-TRIB-00000000000000.jpg", caseData.getFlagsImageFileName());
         }
     }
 
@@ -131,7 +133,7 @@ class FlagsImageHelperTest {
                 .build();
         caseData.getRespondentCollection().get(0).getValue().setEt3ResponseRespondentSupportNeeded(YES);
         buildFlagsImageFileName(ENGLANDWALES_CASE_TYPE_ID, caseData);
-        assertEquals("EMP-TRIB-000000000010.jpg", caseData.getFlagsImageFileName());
+        assertEquals("EMP-TRIB-00000000001000.jpg", caseData.getFlagsImageFileName());
         assertEquals("<font color='DarkSlateBlue' size='5'> REASONABLE ADJUSTMENT </font>",
                 caseData.getFlagsImageAltText());
 
@@ -142,13 +144,13 @@ class FlagsImageHelperTest {
         CaseData caseData = new CaseData();
         caseData.setMigratedFromEcm(YES);
         buildFlagsImageFileName(ENGLANDWALES_CASE_TYPE_ID, caseData);
-        assertEquals("EMP-TRIB-100000000000.jpg", caseData.getFlagsImageFileName());
+        assertEquals("EMP-TRIB-10000000000000.jpg", caseData.getFlagsImageFileName());
         assertEquals("<font color='#D6292D' size='5'> MIGRATED FROM ECM </font>",
                 caseData.getFlagsImageAltText());
 
         caseData.setMigratedFromEcm(null);
         buildFlagsImageFileName(ENGLANDWALES_CASE_TYPE_ID, caseData);
-        assertEquals("EMP-TRIB-000000000000.jpg", caseData.getFlagsImageFileName());
+        assertEquals("EMP-TRIB-00000000000000.jpg", caseData.getFlagsImageFileName());
     }
 
     private CaseDetails createCaseDetails(String caseTypeId, CaseData caseData) {
@@ -157,5 +159,21 @@ class FlagsImageHelperTest {
                 .withCaseData(caseData)
                 .build();
         return ccdRequest.getCaseDetails();
+    }
+
+    @Test
+    void interventionFlag() {
+        AdditionalCaseInfoType additionalCaseInfoType = new AdditionalCaseInfoType();
+        additionalCaseInfoType.setInterventionRequired(YES);
+        CaseData caseData = new CaseData();
+        caseData.setAdditionalCaseInfoType(additionalCaseInfoType);
+
+        buildFlagsImageFileName(ENGLANDWALES_CASE_TYPE_ID, caseData);
+        assertEquals("EMP-TRIB-00000000000001.jpg", caseData.getFlagsImageFileName());
+        assertTrue(caseData.getFlagsImageAltText().contains("SPEAK TO REJ"));
+
+        buildFlagsImageFileName(SCOTLAND_CASE_TYPE_ID, caseData);
+        assertEquals("EMP-TRIB-01000000000010.jpg", caseData.getFlagsImageFileName());
+        assertTrue(caseData.getFlagsImageAltText().contains("SPEAK TO VP"));
     }
 }

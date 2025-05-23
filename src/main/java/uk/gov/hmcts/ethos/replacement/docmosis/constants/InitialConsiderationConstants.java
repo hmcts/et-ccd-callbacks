@@ -4,7 +4,7 @@ import java.util.Map;
 
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.DATE_MARKUP;
 
-public class InitialConsiderationConstants {
+public final class InitialConsiderationConstants {
     public static final String RESPONDENT_NAME = """
         | Respondent %s name given | |
         |-------------|:------------|
@@ -64,7 +64,7 @@ public class InitialConsiderationConstants {
     public static final String F2F = "F2F";
     public static final String CVP = "CVP";
     public static final String CVP_HEARING = "CVP hearing";
-    public static final Map<String, String> hearingTypeMappings = Map.of(
+    public static final Map<String, String> HEARING_TYPE_MAPPINGS = Map.of(
             "Video hearing", VIDEO,
             CVP_HEARING, VIDEO,
             "Final F2F hearings (not Aberdeen)", F2F

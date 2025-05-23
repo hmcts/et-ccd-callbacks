@@ -223,11 +223,4 @@
         <packageUrl regex="true">^pkg:maven/org\.springframework/spring\-webmvc@.*$</packageUrl>
         <cve>CVE-2024-38820</cve>
     </suppress>
-    <suppress>
-        <packageUrl regex="true">^pkg:maven/org\.bitbucket\.b_c/jose4j@.*$</packageUrl>
-        Suppressing CVE-2023-51775 for jose4j-0.9.3.jar
-    ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.bitbucket\.b_c/jose4j@0\.9\.3$</packageUrl>
-        <cve>CVE-2023-51775</cve>
-    </suppress>
 </suppressions>

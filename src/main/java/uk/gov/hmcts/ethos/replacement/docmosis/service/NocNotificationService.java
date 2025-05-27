@@ -29,7 +29,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHel
  * Service to support the notification of change journey with email notifications.
  */
 @RequiredArgsConstructor
-@Service("NocNotificationService")
+@Service("nocNotificationService")
 @Slf4j
 public class NocNotificationService {
     private final EmailService emailService;

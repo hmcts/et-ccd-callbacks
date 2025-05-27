@@ -53,8 +53,8 @@ class CourtWorkerServiceTest {
 
     @Test
     void initAddCourtWorker_shouldClearAdminData() {
-        AdminData adminData = new AdminData();
-        courtWorkerService.initAddCourtWorker(adminData);
+        AdminData newAdminData = new AdminData();
+        courtWorkerService.initAddCourtWorker(newAdminData);
         assertNull(adminData.getAdminCourtWorker());
     }
 
@@ -239,29 +239,29 @@ class CourtWorkerServiceTest {
         adminCourtWorker.setCourtWorkerCode(testCode);
         adminCourtWorker.setCourtWorkerType(courtWorkerType);
 
-        AdminData adminData = new AdminData();
-        adminData.setAdminCourtWorker(adminCourtWorker);
+        AdminData newAdminData = new AdminData();
+        newAdminData.setAdminCourtWorker(adminCourtWorker);
 
-        return adminData;
+        return newAdminData;
     }
 
     private AdminData createAdminDataWithDynamicList(String id, String tribunalOffice, String courtWorkerType,
                                                      String code, String name) {
-        AdminData adminData = createAdminData(tribunalOffice, courtWorkerType, code, name);
-        adminData.setCourtWorkerOffice(tribunalOffice);
-        adminData.setCourtWorkerType(courtWorkerType);
+        AdminData newAdminData = createAdminData(tribunalOffice, courtWorkerType, code, name);
+        newAdminData.setCourtWorkerOffice(tribunalOffice);
+        newAdminData.setCourtWorkerType(courtWorkerType);
 
         List<DynamicValueType> listDynamicValueType = new ArrayList<>();
         listDynamicValueType.add(DynamicValueType.create(id, name));
 
         DynamicFixedListType courtWorkerDynamicList = new DynamicFixedListType();
         courtWorkerDynamicList.setListItems(listDynamicValueType);
-        adminData.setCourtWorkerSelectList(courtWorkerDynamicList);
+        newAdminData.setCourtWorkerSelectList(courtWorkerDynamicList);
 
         DynamicValueType dynamicValueType = DynamicValueType.create(id, name);
-        adminData.getCourtWorkerSelectList().setValue(dynamicValueType);
+        newAdminData.getCourtWorkerSelectList().setValue(dynamicValueType);
 
-        return adminData;
+        return newAdminData;
     }
 
     private CourtWorker createCourtWorker(TribunalOffice tribunalOffice, CourtWorkerType courtWorkerType,

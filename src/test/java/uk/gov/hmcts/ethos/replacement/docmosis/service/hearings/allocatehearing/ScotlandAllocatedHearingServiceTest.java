@@ -39,7 +39,7 @@ class ScotlandAllocatedHearingServiceTest {
     private DateListedType selectedListing;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         caseData = createCaseData();
 
         HearingSelectionService hearingSelectionService = mockHearingSelectionService();
@@ -184,8 +184,8 @@ class ScotlandAllocatedHearingServiceTest {
     }
 
     private CaseData createCaseData() {
-        CaseData caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice);
-        caseData.setAllocateHearingHearing(
+        CaseData data = SelectionServiceTestUtils.createCaseData(tribunalOffice);
+        data.setAllocateHearingHearing(
                 SelectionServiceTestUtils.createSelectedDynamicList("hearing ", "Hearing ",
                     1));
 
@@ -196,9 +196,9 @@ class ScotlandAllocatedHearingServiceTest {
         selectedHearing.setHearingDateCollection(List.of(dateListedTypeItem));
         HearingTypeItem hearingTypeItem = new HearingTypeItem();
         hearingTypeItem.setValue(selectedHearing);
-        caseData.setHearingCollection(List.of(hearingTypeItem));
+        data.setHearingCollection(List.of(hearingTypeItem));
 
-        return caseData;
+        return data;
     }
 
     private HearingSelectionService mockHearingSelectionService() {

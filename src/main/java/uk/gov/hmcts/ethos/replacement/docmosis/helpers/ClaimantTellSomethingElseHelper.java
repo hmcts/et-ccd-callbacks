@@ -50,10 +50,12 @@ public final class ClaimantTellSomethingElseHelper {
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().registerModule(new JavaTimeModule());
     private static final String CLAIMANT_TSE_TEMPLATE_NAME = "EM-TRB-EGW-ENG-02822.docx";
     private static final String EMPTY_TABLE_MESSAGE = "There are no applications to view";
-    private static final String TABLE_COLUMNS_MARKDOWN =
-            "| No | Application type | Applicant | Application date | Response due | Number of responses | Status |\r\n"
-                    + "|:---------|:---------|:---------|:---------|:---------|:---------|:---------|\r\n"
-                    + "%s\r\n";
+    private static final String TABLE_COLUMNS_MARKDOWN = """
+                        | No | Application type | Applicant | Application date | Response due | Number of responses |
+                        | Status |
+                        |:---------|:---------|:---------|:---------|:---------|:---------|:---------|
+                        %s
+                        """;
     private static final String TABLE_ROW_MARKDOWN = "|%s|%s|%s|%s|%s|%s|%s|\r\n";
     private static final Map<String, Function<CaseData, TSEApplicationTypeData>>
             APPLICATION_TYPE_DATA_MAP = new ConcurrentHashMap<>();
@@ -204,7 +206,7 @@ public final class ClaimantTellSomethingElseHelper {
      * Retrieves a list of email addresses for respondents and their representatives from the given case data.
      *
      * @param caseData the case data containing respondent and representative information
-     * @return a list of email addresses for respondents and their representatives
+     * @return a mapping of email addresses and respondent ids for respondents and their representatives
      */
     public static Map<String, String> getRespondentsAndRepsEmailAddresses(CaseData caseData) {
         List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();

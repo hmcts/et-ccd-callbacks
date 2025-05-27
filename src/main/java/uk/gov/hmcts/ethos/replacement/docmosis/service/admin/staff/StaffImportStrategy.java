@@ -10,6 +10,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.rowread
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.rowreader.SheetHandler;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.admin.excelimport.rowreader.StaffDataRowHandler;
 
+import javax.annotation.Resource;
+
 @Component
 public class StaffImportStrategy implements ImportStrategy {
 
@@ -24,10 +26,13 @@ public class StaffImportStrategy implements ImportStrategy {
         this.courtWorkerRepository = courtWorkerRepository;
     }
 
+    @Resource
+    private StaffImportStrategy selfProxy;
+
     @Override
     @Transactional
     public void importWorkbook(XSSFWorkbook workbook) {
-        deleteExistingData();
+        selfProxy.deleteExistingData();
         rowHandlerImportStrategy.importWorkbook(workbook);
     }
 

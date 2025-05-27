@@ -47,7 +47,7 @@ class BFActionsScheduledTasksTest {
     private FeatureToggleService featureToggleService;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         bfActionsScheduledTasks = new BFActionsScheduledTasks(adminUserService, ccdClient, featureToggleService);
         when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
         ReflectionTestUtils.setField(bfActionsScheduledTasks, "caseTypeIdsString", "ET_EnglandWales,ET_Scotland");

@@ -74,7 +74,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE_PARAM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.APPLICATION_COMPLETE_RULE92_ANSWERED_NO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.APPLICATION_COMPLETE_RULE92_ANSWERED_YES_RESP_OFFLINE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.APPLICATION_TYPE_MAP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_REP_TITLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_AMEND_CLAIM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_CHANGE_PERSONAL_DETAILS;
@@ -157,10 +156,13 @@ class ClaimantTellSomethingElseServiceTest {
         DOCUMENT_SETTER_MAP.put(CLAIMANT_TSE_WITHDRAW_CLAIM, CaseData::setClaimantTseDocument13);
     }
 
-    private static final String EXPECTED_TABLE_MARKDOWN = "| No | Application type | Applicant | Application date | "
-            + "Response due | Number of responses | Status "
-            + "|\r\n|:---------|:---------|:---------|:---------|:---------|:---------|:---------|\r\n|1|testType"
-            + "|Claimant Representative|testDate|testDueDate|0|Open|\r\n\r\n";
+    private static final String EXPECTED_TABLE_MARKDOWN =
+            """
+            | No | Application type | Applicant | Application date | Response due | Number of responses | Status |
+            |:---------|:---------|:---------|:---------|:---------|:---------|:---------|
+            |1|testType|Claimant Representative|testDate|testDueDate|0|Open|
+    
+            """;
 
     private static final String EXPECTED_EMPTY_TABLE_MESSAGE = "There are no applications to view";
 
@@ -642,7 +644,7 @@ class ClaimantTellSomethingElseServiceTest {
         assertThat(personalisation.get("caseNumber"), is(caseData.getEthosCaseReference()));
         assertThat(personalisation.get("hearingDate"), is("16 Mai 2069"));
         assertThat(personalisation.get("shortText"), is(CY_APP_TYPE_MAP.get(
-                APPLICATION_TYPE_MAP.get(applicationType))));
+                TSEConstants.getApplicationTypeMap().get(applicationType))));
         assertThat(personalisation.get("datePlus7"), is(expectedDueDate));
         assertThat(personalisation.get("linkToDocument").toString(), is("{\"file\":\"\",\"filename\":null,"
                 + "\"confirm_email_before_download\":true,\"retention_period\":\"52 weeks\"}"));
@@ -715,7 +717,7 @@ class ClaimantTellSomethingElseServiceTest {
         assertThat(personalisation.get("caseNumber"), is(caseData.getEthosCaseReference()));
         assertThat(personalisation.get("hearingDate"), is("Heb ei anfon"));
         assertThat(personalisation.get("shortText"), is(CY_APP_TYPE_MAP.get(
-                APPLICATION_TYPE_MAP.get(applicationType))));
+                TSEConstants.getApplicationTypeMap().get(applicationType))));
         assertThat(personalisation.get("datePlus7"), is(expectedDueDate));
         assertThat(personalisation.get("linkToDocument").toString(), is("{\"file\":\"\",\"filename\":null,"
                 + "\"confirm_email_before_download\":true,\"retention_period\":\"52 weeks\"}"));

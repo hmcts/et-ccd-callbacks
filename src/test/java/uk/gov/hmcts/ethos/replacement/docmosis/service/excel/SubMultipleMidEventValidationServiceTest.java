@@ -25,7 +25,7 @@ class SubMultipleMidEventValidationServiceTest {
     private List<String> errors;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         multipleDetails = new MultipleDetails();
         multipleDetails.setCaseData(MultipleUtil.getMultipleData());
         errors = new ArrayList<>();

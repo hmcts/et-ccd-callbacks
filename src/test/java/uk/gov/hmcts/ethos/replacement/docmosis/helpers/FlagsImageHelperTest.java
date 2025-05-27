@@ -42,7 +42,7 @@ class FlagsImageHelperTest {
     @Test
     void testAddWelshFlag() {
         ArrayList<TribunalOffice> tribunalOffices = new ArrayList<>(TribunalOffice.ENGLANDWALES_OFFICES);
-        for (TribunalOffice tribunalOffice : tribunalOffices) {
+        tribunalOffices.forEach(tribunalOffice -> {
             CaseData caseData = new CaseData();
             caseData.setManagingOffice(tribunalOffice.getOfficeName());
             ClaimantHearingPreference hearingPreference = new ClaimantHearingPreference();
@@ -51,13 +51,13 @@ class FlagsImageHelperTest {
             CaseDetails caseDetails = createCaseDetails(ENGLANDWALES_CASE_TYPE_ID, caseData);
             buildFlagsImageFileName(caseDetails);
             assertEquals("<font color='Red' size='5'> Cymraeg </font>", caseData.getFlagsImageAltText());
-        }
+        });
     }
 
     @Test
     void testAddWelshFlagHearingLang() {
         ArrayList<TribunalOffice> tribunalOffices = new ArrayList<>(TribunalOffice.ENGLANDWALES_OFFICES);
-        for (TribunalOffice tribunalOffice : tribunalOffices) {
+        tribunalOffices.forEach(tribunalOffice -> {
             CaseData caseData = new CaseData();
             caseData.setManagingOffice(tribunalOffice.getOfficeName());
             ClaimantHearingPreference hearingPreference = new ClaimantHearingPreference();
@@ -66,13 +66,13 @@ class FlagsImageHelperTest {
             CaseDetails caseDetails = createCaseDetails(ENGLANDWALES_CASE_TYPE_ID, caseData);
             buildFlagsImageFileName(caseDetails);
             assertEquals("<font color='Red' size='5'> Cymraeg </font>", caseData.getFlagsImageAltText());
-        }
+        });
     }
 
     @Test
     void testAddWelshFlagBothOptions() {
         ArrayList<TribunalOffice> tribunalOffices = new ArrayList<>(TribunalOffice.ENGLANDWALES_OFFICES);
-        for (TribunalOffice tribunalOffice : tribunalOffices) {
+        tribunalOffices.forEach(tribunalOffice -> {
             CaseData caseData = new CaseData();
             caseData.setManagingOffice(tribunalOffice.getOfficeName());
             ClaimantHearingPreference hearingPreference = new ClaimantHearingPreference();
@@ -82,19 +82,19 @@ class FlagsImageHelperTest {
             CaseDetails caseDetails = createCaseDetails(ENGLANDWALES_CASE_TYPE_ID, caseData);
             buildFlagsImageFileName(caseDetails);
             assertEquals("<font color='Red' size='5'> Cymraeg </font>", caseData.getFlagsImageAltText());
-        }
+        });
     }
 
     @Test
     void testAddWelshFlagNoOptions() {
         ArrayList<TribunalOffice> tribunalOffices = new ArrayList<>(TribunalOffice.ENGLANDWALES_OFFICES);
-        for (TribunalOffice tribunalOffice : tribunalOffices) {
+        tribunalOffices.forEach(tribunalOffice -> {
             CaseData caseData = new CaseData();
             caseData.setManagingOffice(tribunalOffice.getOfficeName());
             CaseDetails caseDetails = createCaseDetails(ENGLANDWALES_CASE_TYPE_ID, caseData);
             buildFlagsImageFileName(caseDetails);
             assertEquals("", caseData.getFlagsImageAltText());
-        }
+        });
     }
 
     @Test
@@ -111,17 +111,14 @@ class FlagsImageHelperTest {
 
     @Test
     void testDoesNotAddOutstationForEnglandWales() {
-        for (TribunalOffice tribunalOffice : TribunalOffice.ENGLANDWALES_OFFICES) {
+        TribunalOffice.ENGLANDWALES_OFFICES.forEach(tribunalOffice -> {
             CaseData caseData = new CaseData();
             caseData.setManagingOffice(tribunalOffice.getOfficeName());
             CaseDetails caseDetails = createCaseDetails(ENGLANDWALES_CASE_TYPE_ID, caseData);
-
             buildFlagsImageFileName(caseDetails);
-
             assertEquals("", caseData.getFlagsImageAltText());
-
             assertEquals("EMP-TRIB-000000000000.jpg", caseData.getFlagsImageFileName());
-        }
+        });
     }
 
     @Test

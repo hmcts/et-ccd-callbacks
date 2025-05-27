@@ -51,7 +51,7 @@ class CasesAwaitingJudgmentReportTest {
     }
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         submitEvents.clear();
 
         reportDataSource = mock(ReportDataSource.class);

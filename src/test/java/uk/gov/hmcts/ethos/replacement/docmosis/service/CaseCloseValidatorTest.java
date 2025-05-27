@@ -23,7 +23,7 @@ class CaseCloseValidatorTest {
     private CaseData caseData;
 
     @BeforeEach
-    public void setup() throws Exception {
+    void setup() throws Exception {
         caseCloseValidator = new CaseCloseValidator();
         CaseDetails caseDetails = generateCaseDetails("caseDetailsTest1.json");
         caseData = caseDetails.getCaseData();

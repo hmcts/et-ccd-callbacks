@@ -164,9 +164,11 @@ public class TseAdmReplyController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        String body = String.format("### What happens next\r\n\r\nYou can view the response in the <a href"
-                + "=\"/cases/case-details/%s#Applications\" target=\"_blank\">Applications tab (opens in a new tab)"
-                + "</a>",
+        String body = String.format("""
+            ### What happens next
+
+            You can view the response in the <a href="/cases/case-details/%s#Applications" target="_blank">Applications tab (opens in a new tab)</a>
+            """,
             ccdRequest.getCaseDetails().getCaseId());
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()

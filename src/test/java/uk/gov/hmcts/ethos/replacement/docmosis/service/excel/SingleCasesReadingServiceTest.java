@@ -49,7 +49,7 @@ class SingleCasesReadingServiceTest {
     private List<LabelPayloadEvent> labelPayloadEvents;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         multipleDetails = new MultipleDetails();
         multipleDetails.setCaseData(MultipleUtil.getMultipleData());
         multipleDetails.setCaseTypeId("Manchester_Multiple");
@@ -140,10 +140,10 @@ class SingleCasesReadingServiceTest {
                 anyString(),
                 anyList()))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
-        List<LabelPayloadEvent> labelPayloadEvents = singleCasesReadingService.retrieveLabelCases(userToken,
+        List<LabelPayloadEvent> retrievedLabelPayloadEvents = singleCasesReadingService.retrieveLabelCases(userToken,
                 multipleDetails.getCaseTypeId(),
                 new ArrayList<>(Collections.singletonList(CASE_REF)));
-        assertEquals(labelPayloadEvents, new ArrayList<>());
+        assertEquals(new ArrayList<>(), retrievedLabelPayloadEvents);
     }
 
     @Test

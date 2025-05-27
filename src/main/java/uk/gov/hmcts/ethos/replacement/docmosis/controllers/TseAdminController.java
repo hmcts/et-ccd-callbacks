@@ -177,8 +177,11 @@ public class TseAdminController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        String body = String.format("### What happens next\r\n\r\nYou can view the decision in the <a " + "href"
-            + "=\"/cases/case-details/%s#Applications\" target=\"_blank\">Applications tab (opens in new tab)</a>",
+        String body = String.format("""
+            ### What happens next
+
+            You can view the decision in the <a href="/cases/case-details/%s#Applications" target="_blank">Applications tab (opens in new tab)</a>
+            """,
             ccdRequest.getCaseDetails().getCaseId());
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()
@@ -277,10 +280,12 @@ public class TseAdminController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        String body = String.format("### What happens next\r\n\r\nYou can still view the application in the"
-                        + " <a href=\"/cases/case-details/%s#Applications\""
-                        + " target=\"_blank\">Applications tab (opens in a new tab)</a>",
-                ccdRequest.getCaseDetails().getCaseId());
+        String body = String.format("""
+            ### What happens next
+
+            You can still view the application in the <a href="/cases/case-details/%s#Applications" target="_blank">Applications tab (opens in a new tab)</a>
+            """,
+            ccdRequest.getCaseDetails().getCaseId());
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()
                 .confirmation_body(body)

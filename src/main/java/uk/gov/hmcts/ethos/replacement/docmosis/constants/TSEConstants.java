@@ -40,7 +40,11 @@ public final class TSEConstants {
                             + "<p>You may be asked to supply further information. "
                             + "The tribunal will consider all correspondence and let you know what happens next.</p>"
                             + "<h3>%s</h3>";
-    public static final Map<String, String> APPLICATION_TYPE_MAP = new ConcurrentHashMap<>();
+    private static final Map<String, String> APPLICATION_TYPE_MAP = new ConcurrentHashMap<>();
+
+    public static Map<String, String> getApplicationTypeMap() {
+        return java.util.Collections.unmodifiableMap(APPLICATION_TYPE_MAP);
+    }
 
     static {
         TSEConstants.APPLICATION_TYPE_MAP.put(CLAIMANT_TSE_AMEND_CLAIM, "amend");

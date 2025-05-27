@@ -38,7 +38,7 @@ class CaseCreationForCaseWorkerServiceTest {
     private String authToken;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         ccdRequest = new CCDRequest();
         CaseData caseData = MultipleUtil.getCaseData("2123456/2020");
         caseData.setCaseRefNumberCount("2");

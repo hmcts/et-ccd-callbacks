@@ -45,7 +45,7 @@ class HearingsHelperTest {
     private CaseDetails caseDetails1;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         caseDetails1 = generateCaseDetails("caseDetailsTest1.json");
     }
 

@@ -172,7 +172,6 @@ public class ReportHelper {
 
     private static AdhocReportTypeItem getClaimsAcceptedDetailItem(ListingDetails listingDetails,
                                                                    SubmitEvent submitEvent) {
-        CaseData caseData = submitEvent.getCaseData();
         AdhocReportTypeItem adhocReportTypeItem = new AdhocReportTypeItem();
         ListingData listingData = listingDetails.getCaseData();
 
@@ -180,6 +179,7 @@ public class ReportHelper {
             return adhocReportTypeItem;
         }
 
+        CaseData caseData = submitEvent.getCaseData();
         if (caseData.getPreAcceptCase() != null && caseData.getPreAcceptCase().getDateAccepted() != null) {
             boolean matchingDateIsValid =
                     validateMatchingDate(listingData, caseData.getPreAcceptCase().getDateAccepted());

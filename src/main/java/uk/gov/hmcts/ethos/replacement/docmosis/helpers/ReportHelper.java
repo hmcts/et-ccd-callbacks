@@ -13,12 +13,14 @@ import uk.gov.hmcts.et.common.model.listing.ListingDetails;
 import uk.gov.hmcts.et.common.model.listing.items.AdhocReportTypeItem;
 import uk.gov.hmcts.et.common.model.listing.types.AdhocReportType;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportParams;
+
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
@@ -31,6 +33,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.POSITION_TYPE_REJEC
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RANGE_HEARING_DATE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRANSFERRED_STATE;
 
 @Slf4j
 @SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.AvoidInstantiatingObjectsInLoops",
@@ -93,7 +96,7 @@ public class ReportHelper {
             List<AdhocReportTypeItem> localReportsDetailList = new ArrayList<>();
             for (SubmitEvent submitEvent : submitEvents) {
                 AdhocReportTypeItem localReportsDetailItem =
-                        getClaimsAcceptedDetailItem(listingDetails, submitEvent.getCaseData());
+                        getClaimsAcceptedDetailItem(listingDetails, submitEvent);
                 if (localReportsDetailItem.getValue() != null) {
                     totalCases++;
                     if (localReportsDetailItem.getValue().getCaseType().equals(SINGLE_CASE_TYPE)) {
@@ -167,9 +170,16 @@ public class ReportHelper {
         return multiplesTotal;
     }
 
-    private static AdhocReportTypeItem getClaimsAcceptedDetailItem(ListingDetails listingDetails, CaseData caseData) {
+    private static AdhocReportTypeItem getClaimsAcceptedDetailItem(ListingDetails listingDetails,
+                                                                   SubmitEvent submitEvent) {
+        CaseData caseData = submitEvent.getCaseData();
         AdhocReportTypeItem adhocReportTypeItem = new AdhocReportTypeItem();
         ListingData listingData = listingDetails.getCaseData();
+
+        if (submitEvent.getState().equals(TRANSFERRED_STATE)) {
+            return adhocReportTypeItem;
+        }
+
         if (caseData.getPreAcceptCase() != null && caseData.getPreAcceptCase().getDateAccepted() != null) {
             boolean matchingDateIsValid =
                     validateMatchingDate(listingData, caseData.getPreAcceptCase().getDateAccepted());
@@ -180,6 +190,7 @@ public class ReportHelper {
                 adhocReportTypeItem.setValue(adhocReportType);
             }
         }
+
         return adhocReportTypeItem;
     }
 

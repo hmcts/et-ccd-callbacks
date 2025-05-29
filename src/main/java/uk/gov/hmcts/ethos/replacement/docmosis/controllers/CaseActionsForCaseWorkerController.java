@@ -96,7 +96,8 @@ public class CaseActionsForCaseWorkerController {
     public static final String ACCESSED_SUCCESSFULLY = "Accessed successfully";
     public static final String BAD_REQUEST = "Bad Request";
     public static final String INTERNAL_SERVER_ERROR = "Internal Server Error";
-    private static final List<String> SUBMISSION_EVENTS = List.of(SUBMIT_CASE_DRAFT, "initiateCase", "submitEt1Draft");
+    private static final List<String> SUBMISSION_EVENTS = List.of(SUBMIT_CASE_DRAFT, "initiateCase", "submitEt1Draft",
+                                                                 "processCaseTransfer");
     public static final String CREATE_ECM_CASE = "createEcmCase";
 
     private final CaseCloseValidator caseCloseValidator;

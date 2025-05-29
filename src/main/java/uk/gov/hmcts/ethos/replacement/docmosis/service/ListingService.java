@@ -83,6 +83,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingHelper.CAUSE_LIST_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper.CASES_SEARCHED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ELASTICSEARCH_FIELD_HEARING_LISTED_DATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ELASTICSEARCH_FIELD_HEARING_LOCATION;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ELASTICSEARCH_FIELD_HEARING_VENUE_DAY_SCOTLAND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ELASTICSEARCH_FIELD_MANAGING_OFFICE_KEYWORD;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService.ALL_OFFICES;
 
@@ -211,16 +213,10 @@ public class ListingService {
                 ListingVenueHelper.getListingVenueToSearch(listingData).entrySet().iterator().next();
         String venueToSearchMapping = entry.getKey();
         String venueToSearch = entry.getValue();
-        String dateFrom;
-        String dateTo;
+
         boolean dateRange = listingData.getHearingDateType().equals(RANGE_HEARING_DATE_TYPE);
-        if (dateRange) {
-            dateFrom = listingData.getListingDateFrom();
-            dateTo = listingData.getListingDateTo();
-        } else {
-            dateFrom = listingData.getListingDate();
-            dateTo = listingData.getListingDate();
-        }
+        String dateFrom = dateRange ? listingData.getListingDateFrom() : listingData.getListingDate();
+        String dateTo = dateRange ? listingData.getListingDateTo() : listingData.getListingDate();
 
         if (ALL_VENUES.equals(venueToSearch)) {
             venueToSearch = listingData.getManagingOffice();
@@ -233,23 +229,34 @@ public class ListingService {
     }
 
     private String getFieldNameForVenueToSearch(String caseTypeId) {
-        if (SCOTLAND_CASE_TYPE_ID.equals(UtilHelper.getListingCaseTypeId(caseTypeId))) {
-            return ELASTICSEARCH_FIELD_HEARING_VENUE_SCOTLAND;
-        } else {
-            return ELASTICSEARCH_FIELD_MANAGING_OFFICE;
-        }
+        return SCOTLAND_CASE_TYPE_ID.equals(UtilHelper.getListingCaseTypeId(caseTypeId))
+                ? ELASTICSEARCH_FIELD_HEARING_VENUE_SCOTLAND
+                : ELASTICSEARCH_FIELD_MANAGING_OFFICE;
     }
 
     private String getESQuery(String dateFrom, String dateTo, String key, String venue, String managingOffice) {
         BoolQueryBuilder boolQueryBuilder = boolQuery()
                 .filter(new RangeQueryBuilder(ELASTICSEARCH_FIELD_HEARING_LISTED_DATE).gte(dateFrom).lte(dateTo));
+
         if (!ALL_OFFICES.equals(managingOffice)) {
-            boolQueryBuilder.filter(new TermsQueryBuilder(ELASTICSEARCH_FIELD_MANAGING_OFFICE_KEYWORD, managingOffice));
+            if (TribunalOffice.isEnglandWalesOffice(managingOffice)) {
+                boolQueryBuilder.filter(
+                        new TermsQueryBuilder(ELASTICSEARCH_FIELD_MANAGING_OFFICE_KEYWORD, managingOffice));
+            } else if (TribunalOffice.isScotlandOffice(managingOffice)) {
+                boolQueryBuilder.must(
+                        new MatchQueryBuilder(ELASTICSEARCH_FIELD_HEARING_VENUE_DAY_SCOTLAND, managingOffice));
+            }
         }
 
-        if (!ALL_VENUES.equals(venue)) {
-            boolQueryBuilder.must(new MatchQueryBuilder(key, venue));
+        if (!managingOffice.equals(venue)) {
+            if (TribunalOffice.isEnglandWalesOffice(managingOffice)) {
+                boolQueryBuilder.must(new MatchQueryBuilder(key, venue));
+            } else if (TribunalOffice.isScotlandOffice(managingOffice)) {
+                String scotlandField = ELASTICSEARCH_FIELD_HEARING_LOCATION + managingOffice + ".value.code";
+                boolQueryBuilder.must(new MatchQueryBuilder(scotlandField, venue));
+            }
         }
+
         return new SearchSourceBuilder()
                 .size(MAX_ES_SIZE)
                 .query(boolQueryBuilder).toString();

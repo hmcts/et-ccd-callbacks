@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import lombok.SneakyThrows;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -119,6 +120,11 @@ class Et3ResponseServiceTest {
         }
     }
 
+    /**
+     * Ignored because ET3 form should not be saved before response is accepted
+     * <a href="https://tools.hmcts.net/jira/browse/RET-5483">RET-5483</a>.
+     */
+    @Disabled("Disabled according to Ticket https://tools.hmcts.net/jira/browse/RET-5483")
     @Test
     void assertThatEt3DocumentIsSaved() {
         et3ResponseService.saveEt3Response(caseData, documentInfo);

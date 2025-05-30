@@ -88,15 +88,18 @@ public class ReportHelper {
         AdhocReportType localReportsDetailHdr = new AdhocReportType();
         localReportsDetailHdr.setReportOffice(getReportOffice(
                 listingDetails.getCaseTypeId(), listingDetails.getCaseData().getManagingOffice()));
-        if (CollectionUtils.isNotEmpty(submitEvents)) {
-            log.info(CASES_SEARCHED + submitEvents.size());
+        List<SubmitEvent> filteredSubmitEvents = submitEvents.stream()
+            .filter(event -> !TRANSFERRED_STATE.equals(event.getState()))
+            .toList();
+        if (CollectionUtils.isNotEmpty(filteredSubmitEvents)) {
+            log.info(CASES_SEARCHED + filteredSubmitEvents.size());
             int totalCases = 0;
             int totalSingles = 0;
             int totalMultiples = 0;
             List<AdhocReportTypeItem> localReportsDetailList = new ArrayList<>();
-            for (SubmitEvent submitEvent : submitEvents) {
+            for (SubmitEvent submitEvent : filteredSubmitEvents) {
                 AdhocReportTypeItem localReportsDetailItem =
-                        getClaimsAcceptedDetailItem(listingDetails, submitEvent);
+                        getClaimsAcceptedDetailItem(listingDetails, submitEvent.getCaseData());
                 if (localReportsDetailItem.getValue() != null) {
                     totalCases++;
                     if (localReportsDetailItem.getValue().getCaseType().equals(SINGLE_CASE_TYPE)) {
@@ -170,17 +173,10 @@ public class ReportHelper {
         return multiplesTotal;
     }
 
-    private static AdhocReportTypeItem getClaimsAcceptedDetailItem(ListingDetails listingDetails,
-                                                                   SubmitEvent submitEvent) {
+    private static AdhocReportTypeItem getClaimsAcceptedDetailItem(ListingDetails listingDetails, CaseData caseData) {
         AdhocReportTypeItem adhocReportTypeItem = new AdhocReportTypeItem();
-
-        if (submitEvent.getState().equals(TRANSFERRED_STATE)) {
-            return adhocReportTypeItem;
-        }
-
-        CaseData caseData = submitEvent.getCaseData();
+        ListingData listingData = listingDetails.getCaseData();
         if (caseData.getPreAcceptCase() != null && caseData.getPreAcceptCase().getDateAccepted() != null) {
-            ListingData listingData = listingDetails.getCaseData();
             boolean matchingDateIsValid =
                     validateMatchingDate(listingData, caseData.getPreAcceptCase().getDateAccepted());
             if (matchingDateIsValid) {
@@ -190,7 +186,6 @@ public class ReportHelper {
                 adhocReportTypeItem.setValue(adhocReportType);
             }
         }
-
         return adhocReportTypeItem;
     }
 

@@ -17,8 +17,10 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.generic.GenericCallbackResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CcdCaseAssignment;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.NocClaimantRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.NocNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -36,9 +38,11 @@ public class NoticeOfChangeController {
     private final VerifyTokenService verifyTokenService;
     private final NocNotificationService nocNotificationService;
     private final NocRespondentRepresentativeService nocRespondentRepresentativeService;
+    private final NocClaimantRepresentativeService nocClaimantRepresentativeService;
     private final CcdCaseAssignment ccdCaseAssignment;
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String APPLY_NOC_DECISION = "applyNocDecision";
+    private static final String CLAIMANT_REP_ROLE = "claimantRep";
 
     @PostMapping("/about-to-submit")
     public ResponseEntity<CCDCallbackResponse> handleAboutToSubmit(
@@ -49,8 +53,16 @@ public class NoticeOfChangeController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        CaseData caseData = nocRespondentRepresentativeService.updateRepresentation(callbackRequest.getCaseDetails());
-        caseData = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, userToken);
+        CaseData caseData = callbackRequest.getCaseDetails().getCaseData();
+        DynamicFixedListType caseRoleId = caseData.getChangeOrganisationRequestField().getCaseRoleId();
+        String selectedValue = caseRoleId != null ? caseRoleId.getValue().getLabel() : null;
+
+        if (CLAIMANT_REP_ROLE.equals(selectedValue)) {
+            caseData = nocClaimantRepresentativeService.updateClaimantRepresentation(callbackRequest.getCaseDetails());
+        } else {
+            caseData = nocRespondentRepresentativeService.updateRepresentation(callbackRequest.getCaseDetails());
+            caseData = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, userToken);
+        }
 
         callbackRequest.getCaseDetails().setCaseData(caseData);
         return ResponseEntity.ok(ccdCaseAssignment.applyNoc(callbackRequest, userToken));

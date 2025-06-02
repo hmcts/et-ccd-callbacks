@@ -107,7 +107,8 @@ public class Et3NotificationController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>();
         if (ET3DocumentHelper.hasInconsistentAcceptanceStatus(caseData.getEt3NotificationDocCollection())) {
-            errors.add("Upload at least one document. All uploaded documents must be accepted or not accepted.");
+            errors.add("Upload at least one document. All uploaded documents must be accepted or rejected.");
+
         }
 
         if (!ET3DocumentHelper.areET3DocumentsConsistentWithRespondentResponses(caseData.getRespondentCollection(),

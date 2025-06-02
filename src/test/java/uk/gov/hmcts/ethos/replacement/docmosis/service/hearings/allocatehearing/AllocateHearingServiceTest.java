@@ -216,8 +216,8 @@ class AllocateHearingServiceTest {
     }
 
     private CaseData createCaseData() {
-        CaseData localCaseData = SelectionServiceTestUtils.createCaseData(tribunalOffice);
-        localCaseData.setAllocateHearingHearing(new DynamicFixedListType());
+        CaseData newCaseData = SelectionServiceTestUtils.createCaseData(tribunalOffice);
+        newCaseData.setAllocateHearingHearing(new DynamicFixedListType());
 
         selectedHearing = new HearingType();
         selectedListing = new DateListedType();
@@ -226,9 +226,9 @@ class AllocateHearingServiceTest {
         selectedHearing.setHearingDateCollection(List.of(dateListedTypeItem));
         HearingTypeItem hearingTypeItem = new HearingTypeItem();
         hearingTypeItem.setValue(selectedHearing);
-        localCaseData.setHearingCollection(List.of(hearingTypeItem));
+        newCaseData.setHearingCollection(List.of(hearingTypeItem));
 
-        return localCaseData;
+        return newCaseData;
     }
 
     private HearingSelectionService mockHearingSelectionService() {
@@ -267,14 +267,14 @@ class AllocateHearingServiceTest {
     }
 
     private RoomSelectionService mockRoomSelectionService() {
-        RoomSelectionService roomSelectionServiceMock = mock(RoomSelectionService.class);
+        RoomSelectionService mockRoomSelectionService = mock(RoomSelectionService.class);
         List<DynamicValueType> rooms = SelectionServiceTestUtils.createListItems("room", "Room ");
         DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
         dynamicFixedListType.setListItems(rooms);
-        when(roomSelectionService.createRoomSelection(isA(CaseData.class),
+        when(mockRoomSelectionService.createRoomSelection(isA(CaseData.class),
                 isA(DateListedType.class), isA(Boolean.class))).thenReturn(dynamicFixedListType);
 
-        return roomSelectionServiceMock;
+        return mockRoomSelectionService;
     }
 
     private CourtWorkerSelectionService mockCourtWorkerSelectionService() {

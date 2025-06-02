@@ -51,12 +51,10 @@ public final class ClaimantTellSomethingElseHelper {
     private static final String CLAIMANT_TSE_TEMPLATE_NAME = "EM-TRB-EGW-ENG-02822.docx";
     private static final String EMPTY_TABLE_MESSAGE = "There are no applications to view";
     private static final String TABLE_COLUMNS_MARKDOWN = """
-                        | No | Application type | Applicant | Application date | Response due | Number of responses |
-                        | Status |
-                        |:---------|:---------|:---------|:---------|:---------|:---------|:---------|
-                        %s
-                        """;
-    private static final String TABLE_ROW_MARKDOWN = "|%s|%s|%s|%s|%s|%s|%s|\r\n";
+|No|Application type|Applicant|Application date|Response due|Number of responses|Status|
+|:---------|:---------|:---------|:---------|:---------|:---------|:---------|
+%s""";
+    private static final String TABLE_ROW_MARKDOWN = "|%s|%s|%s|%s|%s|%s|%s|\n";
     private static final Map<String, Function<CaseData, TSEApplicationTypeData>>
             APPLICATION_TYPE_DATA_MAP = new ConcurrentHashMap<>();
     private static final Map<String, String> APPLICATION_TYPE_MAP = new ConcurrentHashMap<>();

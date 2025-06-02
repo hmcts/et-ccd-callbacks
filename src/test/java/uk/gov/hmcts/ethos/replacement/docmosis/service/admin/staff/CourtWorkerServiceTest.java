@@ -55,7 +55,7 @@ class CourtWorkerServiceTest {
     void initAddCourtWorker_shouldClearAdminData() {
         AdminData newAdminData = new AdminData();
         courtWorkerService.initAddCourtWorker(newAdminData);
-        assertNull(adminData.getAdminCourtWorker());
+        assertNull(newAdminData.getAdminCourtWorker());
     }
 
     @ParameterizedTest

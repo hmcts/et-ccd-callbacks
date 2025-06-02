@@ -4,7 +4,7 @@ import java.util.Map;
 
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.DATE_MARKUP;
 
-public class InitialConsiderationConstants {
+public final class InitialConsiderationConstants {
     public static final String RESPONDENT_NAME = """
         | Respondent %s name given | |
         |-------------|:------------|

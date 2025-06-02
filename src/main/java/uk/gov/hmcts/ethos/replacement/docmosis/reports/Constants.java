@@ -29,6 +29,7 @@ public final class Constants {
     public static final Set<DayOfWeek> WEEKEND_DAYS_LIST = EnumSet.of(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
     public static final int ES_PARTITION_SIZE = 1000;
     public static final int THREAD_NUMBER = 20;
+    public static final String TWO_JUDGES = "Two Judges";
 
     private Constants() {
     }

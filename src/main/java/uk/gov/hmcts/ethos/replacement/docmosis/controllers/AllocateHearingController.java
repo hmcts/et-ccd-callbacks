@@ -20,12 +20,16 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing.AllocateHearingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing.ScotlandAllocateHearingService;
 
+import java.util.List;
+
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper.validateTwoJudges;
 
 @RestController
 @RequestMapping("/allocatehearing")
@@ -150,6 +154,11 @@ public class AllocateHearingController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        List<String> errors = validateTwoJudges(caseData);
+        if (!errors.isEmpty()) {
+            return getCallbackRespEntityErrors(errors, caseData);
+        }
+
         String caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();
         if (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId)) {
             allocateHearingService.populateRooms(caseData);

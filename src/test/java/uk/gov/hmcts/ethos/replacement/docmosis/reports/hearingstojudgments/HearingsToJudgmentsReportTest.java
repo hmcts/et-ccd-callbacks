@@ -531,7 +531,7 @@ class HearingsToJudgmentsReportTest {
         assertEquals(1, reportData.getReportDetails().size());
 
         HearingsToJudgmentsReportDetail reportDetail = reportData.getReportDetails().get(0);
-        assertEquals(judge, reportDetail.getHearingJudge());
+        assertEquals("Hugh Garfield", reportDetail.getHearingJudge()); // Should not include the ITCO reference
         assertEquals(TribunalOffice.NEWCASTLE.getOfficeName(), reportDetail.getReportOffice());
         assertEquals(caseReference, reportDetail.getCaseReference());
         assertEquals(NO, reportDetail.getReservedHearing());

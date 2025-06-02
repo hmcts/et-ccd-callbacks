@@ -18,10 +18,12 @@ public class JudgeSelectionService {
         this.judgeService = judgeService;
     }
 
-    public DynamicFixedListType createJudgeSelection(TribunalOffice tribunalOffice, HearingType selectedHearing) {
+    public DynamicFixedListType createJudgeSelection(TribunalOffice tribunalOffice, HearingType selectedHearing,
+                                                     boolean additionalJudge) {
         TribunalOffice requiredTribunalOffice = TribunalOffice.getOfficeForReferenceData(tribunalOffice);
         List<DynamicValueType> listItems = judgeService.getJudgesDynamicList(requiredTribunalOffice);
-        DynamicFixedListType selectedJudge = selectedHearing.getJudge();
+        DynamicFixedListType selectedJudge = additionalJudge ? selectedHearing.getAdditionalJudge() :
+                selectedHearing.getJudge();
         return DynamicFixedListType.from(listItems, selectedJudge);
     }
 }

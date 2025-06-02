@@ -27,7 +27,8 @@ class JudgeSelectionServiceTest {
         HearingType selectedHearing = mockHearing(null);
 
         JudgeSelectionService judgeSelectionService = new JudgeSelectionService(judgeService);
-        DynamicFixedListType actualResult = judgeSelectionService.createJudgeSelection(tribunalOffice, selectedHearing);
+        DynamicFixedListType actualResult = judgeSelectionService.createJudgeSelection(tribunalOffice,
+                selectedHearing, false);
 
         verify(judgeService, times(1)).getJudgesDynamicList(tribunalOffice);
         SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(actualResult, "judge", "Judge ");
@@ -41,7 +42,8 @@ class JudgeSelectionServiceTest {
         HearingType selectedHearing = mockHearing(selectedJudge);
 
         JudgeSelectionService judgeSelectionService = new JudgeSelectionService(judgeService);
-        DynamicFixedListType actualResult = judgeSelectionService.createJudgeSelection(tribunalOffice, selectedHearing);
+        DynamicFixedListType actualResult = judgeSelectionService.createJudgeSelection(tribunalOffice,
+                selectedHearing, false);
 
         verify(judgeService, times(1)).getJudgesDynamicList(tribunalOffice);
         SelectionServiceTestUtils.verifyDynamicFixedListSelected(actualResult, "judge", "Judge ", selectedJudge);
@@ -54,7 +56,8 @@ class JudgeSelectionServiceTest {
         HearingType selectedHearing = mockHearing(null);
 
         JudgeSelectionService judgeSelectionService = new JudgeSelectionService(judgeService);
-        DynamicFixedListType actualResult = judgeSelectionService.createJudgeSelection(tribunalOffice, selectedHearing);
+        DynamicFixedListType actualResult = judgeSelectionService.createJudgeSelection(tribunalOffice,
+                selectedHearing, false);
 
         verify(judgeService, times(1)).getJudgesDynamicList(TribunalOffice.SCOTLAND);
 
@@ -69,7 +72,8 @@ class JudgeSelectionServiceTest {
         HearingType selectedHearing = mockHearing(selectedJudge);
 
         JudgeSelectionService judgeSelectionService = new JudgeSelectionService(judgeService);
-        DynamicFixedListType actualResult = judgeSelectionService.createJudgeSelection(tribunalOffice, selectedHearing);
+        DynamicFixedListType actualResult = judgeSelectionService.createJudgeSelection(tribunalOffice,
+                selectedHearing, false);
 
         verify(judgeService, times(1)).getJudgesDynamicList(TribunalOffice.SCOTLAND);
 

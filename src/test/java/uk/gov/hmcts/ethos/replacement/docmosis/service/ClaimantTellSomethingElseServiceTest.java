@@ -157,11 +157,11 @@ class ClaimantTellSomethingElseServiceTest {
     }
 
     private static final String EXPECTED_TABLE_MARKDOWN =
-    """
-    |No|Application type|Applicant|Application date|Response due|Number of responses|Status|
-    |:---------|:---------|:---------|:---------|:---------|:---------|:---------|
-    |1|testType|Claimant Representative|testDate|testDueDate|0|Open|
-    """;
+        """
+        |No|Application type|Applicant|Application date|Response due|Number of responses|Status|
+        |:---------|:---------|:---------|:---------|:---------|:---------|:---------|
+        |1|testType|Claimant Representative|testDate|testDueDate|0|Open|
+        """;
 
     private static final String EXPECTED_EMPTY_TABLE_MESSAGE = "There are no applications to view";
 

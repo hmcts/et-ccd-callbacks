@@ -9,8 +9,9 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationAddress;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
-import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
+import org.apache.commons.collections.CollectionUtils;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantRepRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseConverter;
@@ -18,24 +19,28 @@ import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Map;
 import java.util.Optional;
-import java.util.UUID;
+import org.springframework.http.ResponseEntity;
 import java.io.IOException;
+import java.util.UUID;
 
-import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
-import static org.apache.commons.lang3.ObjectUtils.isEmpty;
+
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class NocClaimantRepresentativeService {
+    private static final String YES = "Yes";
+    private static final String ORGANISATION_NOT_FOUND = "Organisation not found: %s";
+
     private final CaseConverter caseConverter;
     private final OrganisationClient organisationClient;
     private final AuthTokenGenerator authTokenGenerator;
 
     /**
-     * Update claimant representation based on NoC request
+     * Update claimant representation based on NoC request.
      * @param caseDetails containing case data with change organisation request field
      * @return updated case data
      * @throws IOException if CCD operation fails
@@ -49,41 +54,53 @@ public class NocClaimantRepresentativeService {
     }
 
     private Map<String, Object> updateClaimantRepMap(CaseData caseData, String caseId) throws IOException {
-        final ChangeOrganisationRequest change = caseData.getChangeOrganisationRequestField();
-
-        if (isEmpty(change) || isEmpty(change.getCaseRoleId()) || isEmpty(change.getOrganisationToAdd())) {
-            throw new IllegalStateException("Invalid or missing ChangeOrganisationRequest: " + change);
-        }
-
-        String serviceToken = authTokenGenerator.generate();
-        List<OrganisationsResponse> organisationList = organisationClient.getOrganisations("Bearer " + authTokenGenerator.generate(), serviceToken);
-        Optional<OrganisationsResponse> orgRes = organisationList.stream()
-            .filter(org -> org.getOrganisationIdentifier() != null && org.getOrganisationIdentifier().equals(change.getOrganisationToAdd()))
-            .findFirst();
-
-        if (orgRes.isEmpty()) {
-            throw new CcdInputOutputException("Organisation not found: " + change.getOrganisationToAdd(), null);
-        }
-
-        RepresentedTypeR claimantRep = new RepresentedTypeR();
-        updateRepDetails(orgRes.get(), claimantRep);
-        claimantRep.setMyHmctsYesNo("Yes");
-        claimantRep.setNonMyHmctsOrganisationId(UUID.randomUUID().toString());
-
-        List<RepresentedTypeRItem> repCollection = defaultIfNull(caseData.getRepCollection(), new ArrayList<>());
-        RepresentedTypeRItem repItem = new RepresentedTypeRItem();
-        repItem.setValue(claimantRep);
-        repCollection.add(repItem);
-
+        ChangeOrganisationRequest change = validateChangeRequest(caseData);
+        String organisationId = change.getOrganisationToAdd();
+        
+        OrganisationsResponse organisation = findOrganisation(organisationId);
+        RepresentedTypeR claimantRep = createRepresentedTypeR(organisation);
+        
+        List<RepresentedTypeRItem> repCollection = updateRepCollection(caseData, claimantRep);
         return Map.of(ClaimantRepRole.CASE_FIELD.toString(), repCollection);
     }
 
-    private void updateRepDetails(OrganisationsResponse orgRes, RepresentedTypeR repDetails) {
-        repDetails.setNameOfOrganisation(orgRes.getName());
+    private ChangeOrganisationRequest validateChangeRequest(CaseData caseData) {
+        ChangeOrganisationRequest change = caseData.getChangeOrganisationRequestField();
+        if (Objects.isNull(change) || Objects.isNull(change.getCaseRoleId()) || Objects.isNull(change.getOrganisationToAdd())) {
+            throw new IllegalStateException("Invalid or missing ChangeOrganisationRequest: " + change);
+        }
+        return change;
+    }
 
-        if (!isEmpty(orgRes.getContactInformation())) {
+    private OrganisationsResponse findOrganisation(String organisationId) throws IOException {
+        String serviceToken = authTokenGenerator.generate();
+        ResponseEntity<OrganisationsResponse> response = organisationClient.retrieveOrganisationDetailsByUserId(
+            "Bearer " + authTokenGenerator.generate(), serviceToken, organisationId);
+        
+        if (response.getStatusCode().is2xxSuccessful()) {
+            return response.getBody();
+        } else {
+            throw new CcdInputOutputException(
+                String.format(ORGANISATION_NOT_FOUND, organisationId), null);
+        }
+    }
+
+    private RepresentedTypeR createRepresentedTypeR(OrganisationsResponse organisation) {
+        RepresentedTypeR claimantRep = new RepresentedTypeR();
+        updateRepDetails(organisation, claimantRep);
+        claimantRep.setMyHmctsYesNo(YES);
+        claimantRep.setNonMyHmctsOrganisationId(generateOrganisationId());
+        return claimantRep;
+    }
+
+    private void updateRepDetails(OrganisationsResponse orgRes, RepresentedTypeR repDetails) {
+        if (orgRes != null && orgRes.getName() != null) {
+            repDetails.setNameOfOrganisation(orgRes.getName());
+        }
+        if (orgRes != null && !CollectionUtils.isEmpty(orgRes.getContactInformation())) {
+            Address repAddress = Objects.requireNonNullElse(repDetails.getRepresentativeAddress(), new Address());
             OrganisationAddress orgAddress = orgRes.getContactInformation().get(0);
-            Address repAddress = new Address();
+
             repAddress.setAddressLine1(orgAddress.getAddressLine1());
             repAddress.setAddressLine2(orgAddress.getAddressLine2());
             repAddress.setAddressLine3(orgAddress.getAddressLine3());
@@ -91,8 +108,20 @@ public class NocClaimantRepresentativeService {
             repAddress.setCounty(orgAddress.getCounty());
             repAddress.setCountry(orgAddress.getCountry());
             repAddress.setPostCode(orgAddress.getPostCode());
-
             repDetails.setRepresentativeAddress(repAddress);
         }
+    }
+
+    private List<RepresentedTypeRItem> updateRepCollection(CaseData caseData, RepresentedTypeR claimantRep) {
+        List<RepresentedTypeRItem> repCollection = Optional.ofNullable(caseData.getRepCollection())
+            .orElse(new ArrayList<>());
+        RepresentedTypeRItem repItem = new RepresentedTypeRItem();
+        repItem.setValue(claimantRep);
+        repCollection.add(repItem);
+        return repCollection;
+    }
+
+    private String generateOrganisationId() {
+        return UUID.randomUUID().toString();
     }
 }

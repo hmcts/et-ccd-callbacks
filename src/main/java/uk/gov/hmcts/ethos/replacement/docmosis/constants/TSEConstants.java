@@ -18,6 +18,10 @@ public final class TSEConstants {
     public static final String CLAIMANT_TSE_RESTRICT_PUBLICITY = "Restrict publicity";
     public static final String CLAIMANT_TSE_STRIKE_OUT_ALL_OR_PART = "Strike out all or part of the response";
     public static final String CLAIMANT_TSE_VARY_OR_REVOKE_AN_ORDER = "Vary or revoke an order";
+    public static final String CLAIMANT_TSE_WHAT_HAPPENS_NEXT = """
+            ### What happens next
+            You can view the response in the <a href="/cases/case-details/%s#Applications" target="_blank">Applications tab (opens in a new tab)</a>
+            """;
     public static final String CLAIMANT_TSE_WITHDRAW_CLAIM = "Withdraw all or part of claim";
     public static final String CLAIMANT_REP_TITLE = "Claimant Representative";
     public static final String RESPONDENT_REP_TITLE = "Respondent Representative";

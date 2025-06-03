@@ -24,6 +24,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -107,6 +108,13 @@ class ScotlandAllocatedHearingServiceTest {
     }
 
     @Test
+    void testPopulateRoomsInvalidOffice() {
+        caseData.getHearingCollection().get(0).getValue().getHearingDateCollection().get(0).getValue()
+                .setHearingVenueDayScotland(TribunalOffice.LEEDS.getOfficeName());
+        assertThrows(IllegalArgumentException.class, () -> scotlandAllocateHearingService.populateRooms(caseData));
+    }
+
+    @Test
     void testUpdateCase() {
         // Arrange
         String sitAlone = String.valueOf(Boolean.TRUE);
@@ -184,21 +192,23 @@ class ScotlandAllocatedHearingServiceTest {
     }
 
     private CaseData createCaseData() {
-        CaseData data = SelectionServiceTestUtils.createCaseData(tribunalOffice);
-        data.setAllocateHearingHearing(
+        caseData = SelectionServiceTestUtils.createCaseData(tribunalOffice);
+        caseData.setAllocateHearingHearing(
                 SelectionServiceTestUtils.createSelectedDynamicList("hearing ", "Hearing ",
                     1));
 
         selectedHearing = new HearingType();
         selectedListing = new DateListedType();
+        selectedListing.setHearingVenueDayScotland(TribunalOffice.GLASGOW.getOfficeName());
+        selectedListing.setHearingGlasgow(new DynamicFixedListType(TribunalOffice.GLASGOW.getOfficeName()));
         DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
         dateListedTypeItem.setValue(selectedListing);
         selectedHearing.setHearingDateCollection(List.of(dateListedTypeItem));
         HearingTypeItem hearingTypeItem = new HearingTypeItem();
         hearingTypeItem.setValue(selectedHearing);
-        data.setHearingCollection(List.of(hearingTypeItem));
+        caseData.setHearingCollection(List.of(hearingTypeItem));
 
-        return data;
+        return caseData;
     }
 
     private HearingSelectionService mockHearingSelectionService() {
@@ -220,7 +230,7 @@ class ScotlandAllocatedHearingServiceTest {
         DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
         dynamicFixedListType.setListItems(judges);
         when(judgeSelectionService.createJudgeSelection(isA(TribunalOffice.class),
-                isA(HearingType.class))).thenReturn(dynamicFixedListType);
+                isA(HearingType.class), isA(Boolean.class))).thenReturn(dynamicFixedListType);
 
         return judgeSelectionService;
     }

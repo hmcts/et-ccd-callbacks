@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.model.reports.casesawaitingjudgment.CasesAwaitingJudgmentSubmitEvent;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.listing.ListingDetails;
 
@@ -33,6 +34,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICI
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_MEDIATION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MANUALLY_CREATED_POSITION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.TWO_JUDGES;
 
 @ExtendWith(SpringExtension.class)
 class CasesAwaitingJudgmentReportTest {
@@ -478,5 +480,31 @@ class CasesAwaitingJudgmentReportTest {
     private void assertCommonValues(CasesAwaitingJudgmentReportData reportData) {
         assertNotNull(reportData);
         assertEquals(TribunalOffice.LEEDS.getOfficeName(), reportData.getReportSummary().getOffice());
+    }
+
+    @Test
+    void shouldShowValidCaseWithAdditionalJudge() {
+        // Create case with valid data and additional judge
+        submitEvents.add(caseDataBuilder
+                .withPositionType(validPositionType)
+                .withEthosCaseReference("Case 4")
+                .withSingleCaseType()
+                .withHearing("2021-07-01T10:00:00.000", HEARING_STATUS_HEARD,
+                        "1", HEARING_TYPE_JUDICIAL_COSTS_HEARING, "Judge 1")
+                .buildAsSubmitEvent(ACCEPTED_STATE));
+        submitEvents.get(0).getCaseData().getHearingCollection().get(0).getValue().setHearingSitAlone(TWO_JUDGES);
+        submitEvents.get(0).getCaseData().getHearingCollection().get(0).getValue()
+                .setAdditionalJudge(new DynamicFixedListType("Judge 2"));
+
+        ListingDetails listingDetails = new ListingDetails();
+        ListingData caseData = new ListingData();
+        caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
+        listingDetails.setCaseData(caseData);
+        listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        CasesAwaitingJudgmentReportData reportData = casesAwaitingJudgmentReport.runReport(listingDetails);
+        assertCommonValues(reportData);
+        List<ReportDetail> reportDetails = reportData.getReportDetails();
+        assertEquals(1, reportDetails.size());
+        assertEquals("Judge 1, Judge 2", reportDetails.get(0).getJudge());
     }
 }

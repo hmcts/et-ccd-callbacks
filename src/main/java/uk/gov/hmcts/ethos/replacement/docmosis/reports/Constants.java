@@ -21,10 +21,15 @@ public final class Constants {
     public static final String ELASTICSEARCH_FIELD_JUDGMENT_COLLECTION = "data.judgementCollection";
     public static final String ELASTICSEARCH_FIELD_HEARING_LISTED_DATE =
             "data.hearingCollection.value.hearingDateCollection.value.listedDate";
+    public static final String ELASTICSEARCH_FIELD_HEARING_VENUE_DAY_SCOTLAND =
+            "data.hearingCollection.value.hearingDateCollection.value.hearingVenueDayScotland";
+    public static final String ELASTICSEARCH_FIELD_HEARING_LOCATION =
+            "data.hearingCollection.value.hearingDateCollection.value.Hearing_";
 
     public static final Set<DayOfWeek> WEEKEND_DAYS_LIST = EnumSet.of(DayOfWeek.SATURDAY, DayOfWeek.SUNDAY);
     public static final int ES_PARTITION_SIZE = 1000;
     public static final int THREAD_NUMBER = 20;
+    public static final String TWO_JUDGES = "Two Judges";
 
     private Constants() {
     }

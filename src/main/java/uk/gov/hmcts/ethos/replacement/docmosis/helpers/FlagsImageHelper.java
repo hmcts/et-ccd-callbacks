@@ -14,6 +14,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_DIGITAL_FILE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_DO_NOT_POSTPONE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_ECC;
@@ -48,10 +49,12 @@ public final class FlagsImageHelper {
     private static final String WELSH = "Welsh";
     private static final String FLAG_RULE_493B = "RULE 49(3)b";
     private static final String FLAG_MIGRATED_FROM_ECM = "MIGRATED FROM ECM";
+    private static final String SPEAK_TO_VP = "SPEAK TO VP";
+    private static final String SPEAK_TO_REJ = "SPEAK TO REJ";
 
     private static final List<String> FLAGS = List.of(FLAG_MIGRATED_FROM_ECM, FLAG_WITH_OUTSTATION,
             FLAG_DO_NOT_POSTPONE, FLAG_LIVE_APPEAL, FLAG_RULE_493B, FLAG_REPORTING, FLAG_SENSITIVE, FLAG_RESERVED,
-            FLAG_ECC, FLAG_DIGITAL_FILE, FLAG_REASONABLE_ADJUSTMENT, FLAG_WELSH_LANGUAGE);
+            FLAG_ECC, FLAG_DIGITAL_FILE, FLAG_REASONABLE_ADJUSTMENT, FLAG_WELSH_LANGUAGE, SPEAK_TO_VP, SPEAK_TO_REJ);
 
     private FlagsImageHelper() {
     }
@@ -125,6 +128,14 @@ public final class FlagsImageHelper {
                 flagRequired = YES.equals(defaultIfEmpty(caseData.getMigratedFromEcm(), ""));
                 flagColor = "#D6292D";
             }
+            case SPEAK_TO_VP -> {
+                flagRequired = speakToVp(caseTypeId, caseData);
+                flagColor = "#1D70B8";
+            }
+            case SPEAK_TO_REJ -> {
+                flagRequired = speakToRej(caseTypeId, caseData);
+                flagColor = "#1D70B8";
+            }
             default -> {
                 flagRequired = false;
                 flagColor = COLOR_WHITE;
@@ -134,6 +145,33 @@ public final class FlagsImageHelper {
         flagsImageFileName.append(flagRequired ? ONE : ZERO);
         flagsImageAltText.append(flagRequired && !flagsImageAltText.isEmpty() ? "<font size='5'> - </font>" : "")
                 .append(flagRequired ? "<font color='" + flagColor + "' size='5'> " + flagName + " </font>" : "");
+    }
+
+    private static boolean speakToRej(String caseTypeId, CaseData caseData) {
+        if (SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
+            return false;
+        }
+
+        return isInterventionRequired(caseData);
+    }
+
+    private static boolean speakToVp(String caseTypeId, CaseData caseData) {
+        if (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId)) {
+            return false;
+        }
+        return isInterventionRequired(caseData);
+    }
+
+    private static boolean isInterventionRequired(CaseData caseData) {
+        if (caseData.getAdditionalCaseInfoType() != null) {
+            if (isNullOrEmpty(caseData.getAdditionalCaseInfoType().getInterventionRequired())) {
+                return false;
+            } else {
+                return YES.equals(caseData.getAdditionalCaseInfoType().getInterventionRequired());
+            }
+        } else {
+            return false;
+        }
     }
 
     private static boolean sensitiveCase(CaseData caseData) {

@@ -189,6 +189,7 @@ cron:
   noticeOfChange: ${CRON_NOTICE_OF_CHANGE:0 10 * * * ?}
   partySpacing: ${CRON_PARTY_SPACING:0 */30 * * * ?}
   acasCertSubmission: ${CRON_ACAS_CERT_SUBMISSION_TASK:0 */5 * * * ?}
+  bfActionCronCaseIdsToSkip: ${CRON_BFACTION_CRON_CASE_IDS_TO_SKIP:}
 
 pdf:
   et3form: "ET3_0224.pdf"

@@ -337,12 +337,16 @@ public final class ET3DocumentHelper {
                 .map(DocumentTypeItem::getValue)
                 .filter(Objects::nonNull)
                 .map(DocumentType::getTypeOfDocument)
-                .anyMatch(ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_ENGLAND_WALES::equals);
+                .anyMatch(type -> ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_ENGLAND_WALES.equals(type)
+                        || ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_SCOTLAND_LETTER_13.equals(type)
+                        || ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_SCOTLAND_LETTER_14.equals(type));
         boolean hasRejectedDoc = documents.stream()
                 .map(DocumentTypeItem::getValue)
                 .filter(Objects::nonNull)
                 .map(DocumentType::getTypeOfDocument)
-                .anyMatch(docType -> !ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_ENGLAND_WALES.equals(docType));
+                .anyMatch(docType -> !ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_ENGLAND_WALES.equals(docType)
+                        && !ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_SCOTLAND_LETTER_13.equals(docType)
+                        && !ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_SCOTLAND_LETTER_14.equals(docType));
         for (RespondentSumTypeItem respondentSumTypeItem : respondents) {
             if (ObjectUtils.isNotEmpty(respondentSumTypeItem.getValue())
                     && StringUtils.isNotBlank(respondentSumTypeItem.getValue().getResponseStatus())) {

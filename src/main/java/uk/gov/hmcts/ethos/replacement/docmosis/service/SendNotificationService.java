@@ -31,6 +31,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
@@ -324,11 +325,17 @@ public class SendNotificationService {
         CaseData caseData = caseDetails.getCaseData();
         String caseId = caseDetails.getCaseId();
         Map<String, String> emailData = getEmailData(caseData, caseId);
-        emailService.sendEmail(bundlesSubmittedNotificationForClaimantTemplateId,
-                caseDetails.getCaseData()
-                        .getClaimantType().getClaimantEmailAddress(),
-                emailData
-        );
+        boolean doesClaimantHaveEmail = isNotEmpty(caseData.getClaimantType())
+                                        && isNotEmpty(caseData.getClaimantType().getClaimantEmailAddress());
+
+        if (doesClaimantHaveEmail && !isClaimantNonSystemUser(caseData)) {
+            emailService.sendEmail(bundlesSubmittedNotificationForClaimantTemplateId,
+                    caseDetails.getCaseData()
+                            .getClaimantType().getClaimantEmailAddress(),
+                    emailData
+            );
+        }
+
         emailData.remove(LINK_TO_CITIZEN_HUB);
         emailData.put(EXUI_HEARING_DOCUMENTS_LINK, emailService.getExuiHearingDocumentsLink(caseId));
         emailService.sendEmail(bundlesSubmittedNotificationForTribunalTemplateId,

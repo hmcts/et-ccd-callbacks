@@ -36,7 +36,9 @@ public final class ET3DocumentHelper {
     private static final String ET3_EMPLOYER_CONTEST_CLAIM_DOCUMENT = "ET3 employer contest claim document";
     private static final String ET3_RESPONDENT_SUPPORT_DOCUMENT = "ET3 respondent support document";
     private static final String ET3_RESPONDENT_CLAIM_DOCUMENT = "ET3 respondent claim document";
-    private static final String ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE = "2.11";
+    private static final String ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_ENGLAND_WALES = "2.11";
+    private static final String ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_SCOTLAND_LETTER_13 = "Letter 13";
+    private static final String ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_SCOTLAND_LETTER_14 = "Letter 14";
     private static final String ET3_NOTIFICATION_DOCUMENT_SHORT_DESCRIPTION =
             "ET3 response \"%s\" status document";
 
@@ -115,7 +117,7 @@ public final class ET3DocumentHelper {
                 || StringUtils.isBlank(documentTypeItem.getValue().getTypeOfDocument())) {
             return false;
         }
-        return ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE.equals(documentTypeItem.getValue().getTypeOfDocument());
+        return isAcceptedType(documentTypeItem.getValue().getTypeOfDocument());
     }
 
     /**
@@ -227,7 +229,7 @@ public final class ET3DocumentHelper {
             DocumentType value = clonedItem.getValue();
             String typeOfDoc = value != null ? value.getTypeOfDocument() : null;
             if (StringUtils.isNotBlank(typeOfDoc)) {
-                boolean isAccepted = ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE.equals(typeOfDoc);
+                boolean isAccepted = ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_ENGLAND_WALES.equals(typeOfDoc);
                 String status = isAccepted ? RESPONSE_ACCEPTED : RESPONSE_REJECTED;
                 setDocumentTypeItemLevels(clonedItem, RESPONSE_TO_A_CLAIM, status);
                 clonedItem.setId(UUID.randomUUID().toString());
@@ -240,38 +242,41 @@ public final class ET3DocumentHelper {
     }
 
     /**
-     * Checks whether the acceptance status of document types in the given list is inconsistent.
+     * Checks whether the list of document type items contains inconsistent acceptance statuses.
      * <p>
-     * A document type of "2.11" is considered <strong>accepted</strong>, while any other type is considered
-     * <strong>not accepted</strong>. The method returns:
-     * <ul>
-     *   <li>{@code true} if the list is {@code null}, empty, or the first item's type is blank
-     *   (i.e., cannot determine acceptance).</li>
-     *   <li>{@code true} if the list contains a mix of accepted ("2.11") and not accepted
-     *   (any other) document types.</li>
-     *   <li>{@code false} if all documents have the same acceptance status (all "2.11" or all not "2.11").</li>
-     * </ul>
+     * An "acceptance status" is considered consistent if all non-null document types in the list are either:
+     * - All part of the accepted types (England & Wales, Scotland Letter 13, Scotland Letter 14), or
+     * - All not part of the accepted types.
+     * </p>
      *
-     * @param documentTypeItems the list of {@code DocumentTypeItem} objects to evaluate
-     * @return {@code true} if the acceptance status is inconsistent or the list is empty/invalid;
-     *         {@code false} if all document types are uniformly accepted or not accepted
+     * @param documentTypeItems the list of document type items to check
+     * @return {@code true} if the list has inconsistent acceptance statuses or contains invalid entries;
+     *         {@code false} if all document types are consistently accepted or not accepted
      */
     public static boolean hasInconsistentAcceptanceStatus(List<DocumentTypeItem> documentTypeItems) {
         if (isFirstDocumentTypeInvalid(documentTypeItems)) {
             return true;
         }
         String firstType = documentTypeItems.get(0).getValue().getTypeOfDocument();
+        boolean isFirstAcceptedType = isAcceptedType(firstType);
         for (int i = 1; i < documentTypeItems.size(); i++) {
             DocumentTypeItem item = documentTypeItems.get(i);
-            if (ObjectUtils.isEmpty(item) || ObjectUtils.isEmpty(item.getValue())
-                    || ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE.equals(firstType)
-                    && !ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE.equals(item.getValue().getTypeOfDocument())
-                    || !ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE.equals(firstType)
-                    && ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE.equals(item.getValue().getTypeOfDocument())) {
+            if (ObjectUtils.isEmpty(item) || ObjectUtils.isEmpty(item.getValue())) {
+                return true;
+            }
+            String currentType = item.getValue().getTypeOfDocument();
+            boolean isCurrentAcceptedType = isAcceptedType(currentType);
+            if (isFirstAcceptedType != isCurrentAcceptedType) {
                 return true;
             }
         }
         return false;
+    }
+
+    private static boolean isAcceptedType(String type) {
+        return ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_ENGLAND_WALES.equals(type)
+                || ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_SCOTLAND_LETTER_13.equals(type)
+                || ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_SCOTLAND_LETTER_14.equals(type);
     }
 
     private static boolean isFirstDocumentTypeInvalid(List<DocumentTypeItem> documentTypeItems) {
@@ -332,12 +337,12 @@ public final class ET3DocumentHelper {
                 .map(DocumentTypeItem::getValue)
                 .filter(Objects::nonNull)
                 .map(DocumentType::getTypeOfDocument)
-                .anyMatch(ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE::equals);
+                .anyMatch(ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_ENGLAND_WALES::equals);
         boolean hasRejectedDoc = documents.stream()
                 .map(DocumentTypeItem::getValue)
                 .filter(Objects::nonNull)
                 .map(DocumentType::getTypeOfDocument)
-                .anyMatch(docType -> !ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE.equals(docType));
+                .anyMatch(docType -> !ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_ENGLAND_WALES.equals(docType));
         for (RespondentSumTypeItem respondentSumTypeItem : respondents) {
             if (ObjectUtils.isNotEmpty(respondentSumTypeItem.getValue())
                     && StringUtils.isNotBlank(respondentSumTypeItem.getValue().getResponseStatus())) {

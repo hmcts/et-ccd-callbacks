@@ -36,8 +36,12 @@ class ET3DocumentHelperTest {
     private static final String RESPONSE_STATUS_REJECTED = "Rejected";
     private static final String ENGLISH_ET3_FORM_NAME = "Test Company - ET3 Response.pdf";
     private static final String WELSH_ET3_FORM_NAME = "Test Company - ET3 Response - Welsh.pdf";
-    private static final String ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE = "2.11";
-    private static final String ET3_REJECTED_NOTIFICATION_DOCUMENT_TYPE = "2.12";
+    private static final String ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_ENGLAND_WALES = "2.11";
+    private static final String ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_SCOTLAND_LETTER_13 = "Letter 13";
+    private static final String ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_SCOTLAND_LETTER_14 = "Letter 14";
+    private static final String ET3_REJECTED_NOTIFICATION_DOCUMENT_TYPE_1 = "2.12";
+    private static final String ET3_REJECTED_NOTIFICATION_DOCUMENT_TYPE_2 = "2.13";
+    private static final String ET3_REJECTED_NOTIFICATION_DOCUMENT_TYPE_3 = "2.14";
 
     @Test
     void theHasET3Document() {
@@ -98,7 +102,7 @@ class ET3DocumentHelperTest {
         };
         // Create CaseData with accepted and rejected ET3 notification documents
         List<DocumentTypeItem> et3Docs = List.of(
-                createET3Item.apply(ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE),
+                createET3Item.apply(ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_ENGLAND_WALES),
                 createET3Item.apply("ET3_REJECTED_TYPE")
         );
         CaseData caseData = new CaseData();
@@ -127,7 +131,7 @@ class ET3DocumentHelperTest {
         // Edge case: if main collection is null, it should be initialized
         CaseData noMainCollection = new CaseData();
         noMainCollection.setEt3NotificationDocCollection(
-                List.of(createET3Item.apply(ET3_REJECTED_NOTIFICATION_DOCUMENT_TYPE)));
+                List.of(createET3Item.apply(ET3_REJECTED_NOTIFICATION_DOCUMENT_TYPE_1)));
         ET3DocumentHelper.addET3NotificationDocumentsToDocumentCollection(noMainCollection);
         assertNotNull(noMainCollection.getDocumentCollection());
         assertEquals(1, noMainCollection.getDocumentCollection().size());
@@ -149,7 +153,7 @@ class ET3DocumentHelperTest {
     @MethodSource("provideDataForModifyDocumentCollectionForET3FormsTest")
     void theAddOrRemoveET3Documents(CaseData caseData) {
         ET3DocumentHelper.addOrRemoveET3Documents(caseData);
-        if (ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE.equals(
+        if (ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_ENGLAND_WALES.equals(
                 caseData.getEt3NotificationDocCollection().get(0).getValue().getTypeOfDocument())) {
             if (CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
                 assertThat(caseData.getDocumentCollection()).hasSize(7);
@@ -200,7 +204,7 @@ class ET3DocumentHelperTest {
         CaseData caseDataET3NotificationDocCollectionAndResponseNotAccepted =
                 ResourceLoader.fromString(TEST_ET3_FORM_CASE_DATA_FILE, CaseData.class);
         caseDataET3NotificationDocCollectionAndResponseNotAccepted.getEt3NotificationDocCollection()
-                .get(0).getValue().setTypeOfDocument("2.12");
+                .get(0).getValue().setTypeOfDocument(ET3_REJECTED_NOTIFICATION_DOCUMENT_TYPE_1);
 
         return Stream.of(Arguments.of(caseDataWithoutRespondentCollection),
                 Arguments.of(caseDataRespondentValueNotExists),
@@ -213,45 +217,66 @@ class ET3DocumentHelperTest {
     void theHasInconsistentAcceptanceStatus() {
         // Null list
         assertTrue(ET3DocumentHelper.hasInconsistentAcceptanceStatus(null),
-                "Should return false for null list");
+                "Should return true for null list");
         // Empty list
         assertTrue(ET3DocumentHelper.hasInconsistentAcceptanceStatus(List.of()),
-                "Should return false for empty list");
+                "Should return true for empty list");
         // First item's value is null
         assertTrue(ET3DocumentHelper.hasInconsistentAcceptanceStatus(
                 List.of(DocumentTypeItem.builder().value(null).build())),
-                "Should return false when first item's value is null");
+                "Should return true when first item's value is null");
         // First item's type is blank
         assertTrue(ET3DocumentHelper.hasInconsistentAcceptanceStatus(List.of(
                         DocumentTypeItem.builder().value(DocumentType.builder().typeOfDocument(" ").build()).build())),
-                "Should return false when type is blank");
+                "Should return true when type is blank");
         // Single valid item
         assertFalse(ET3DocumentHelper.hasInconsistentAcceptanceStatus(List.of(
-                DocumentTypeItem.builder().value(DocumentType.builder().typeOfDocument("2.11").build()).build())),
-                "Should return true for single valid item");
-        // All items have the same type
+                DocumentTypeItem.builder().value(DocumentType.builder().typeOfDocument(
+                        ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_ENGLAND_WALES).build()).build())),
+                "Should return false for single valid item");
+        // All items have the same type as accepted
         List<DocumentTypeItem> sameTypeItems = List.of(
-                DocumentTypeItem.builder().value(DocumentType.builder().typeOfDocument("2.11").build()).build(),
-                DocumentTypeItem.builder().value(DocumentType.builder().typeOfDocument("2.11").build()).build(),
-                DocumentTypeItem.builder().value(DocumentType.builder().typeOfDocument("2.11").build()).build()
+                DocumentTypeItem.builder().value(DocumentType.builder().typeOfDocument(
+                        ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_ENGLAND_WALES).build()).build(),
+                DocumentTypeItem.builder().value(DocumentType.builder().typeOfDocument(
+                        ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_SCOTLAND_LETTER_13).build()).build(),
+                DocumentTypeItem.builder().value(DocumentType.builder().typeOfDocument(
+                        ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_SCOTLAND_LETTER_14).build()).build()
         );
         assertFalse(ET3DocumentHelper.hasInconsistentAcceptanceStatus(sameTypeItems),
-                "Should return true when all types match");
-        // All items have different types than 2.11
+                "Should return false when all types are accepted");
+        // All items have different types than accepted
         List<DocumentTypeItem> differentTypeItemsOf211 = List.of(
-                DocumentTypeItem.builder().value(DocumentType.builder().typeOfDocument("2.12").build()).build(),
-                DocumentTypeItem.builder().value(DocumentType.builder().typeOfDocument("2.13").build()).build(),
-                DocumentTypeItem.builder().value(DocumentType.builder().typeOfDocument("2.14").build()).build()
+                DocumentTypeItem.builder().value(DocumentType.builder().typeOfDocument(
+                        ET3_REJECTED_NOTIFICATION_DOCUMENT_TYPE_1).build()).build(),
+                DocumentTypeItem.builder().value(DocumentType.builder().typeOfDocument(
+                        ET3_REJECTED_NOTIFICATION_DOCUMENT_TYPE_2).build()).build(),
+                DocumentTypeItem.builder().value(DocumentType.builder().typeOfDocument(
+                        ET3_REJECTED_NOTIFICATION_DOCUMENT_TYPE_3).build()).build()
         );
         assertFalse(ET3DocumentHelper.hasInconsistentAcceptanceStatus(differentTypeItemsOf211),
-                "Should return true when all types are different than 2.11");
+                "Should return false when all types are different than accepted");
+
+        // All items have different types as accepted and rejected
+        List<DocumentTypeItem> mixedTypeItemsOfAccepted = List.of(
+                DocumentTypeItem.builder().value(DocumentType.builder().typeOfDocument(
+                        ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_SCOTLAND_LETTER_13).build()).build(),
+                DocumentTypeItem.builder().value(DocumentType.builder().typeOfDocument(
+                        ET3_REJECTED_NOTIFICATION_DOCUMENT_TYPE_2).build()).build(),
+                DocumentTypeItem.builder().value(DocumentType.builder().typeOfDocument(
+                        ET3_REJECTED_NOTIFICATION_DOCUMENT_TYPE_3).build()).build()
+        );
+        assertTrue(ET3DocumentHelper.hasInconsistentAcceptanceStatus(mixedTypeItemsOfAccepted),
+                "Should return true when there are both accepted and rejected document types");
         // Items with different types
         List<DocumentTypeItem> differentTypeItems = List.of(
-                DocumentTypeItem.builder().value(DocumentType.builder().typeOfDocument("2.11").build()).build(),
-                DocumentTypeItem.builder().value(DocumentType.builder().typeOfDocument("2.12").build()).build()
+                DocumentTypeItem.builder().value(DocumentType.builder().typeOfDocument(
+                        ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_ENGLAND_WALES).build()).build(),
+                DocumentTypeItem.builder().value(DocumentType.builder().typeOfDocument(
+                        ET3_REJECTED_NOTIFICATION_DOCUMENT_TYPE_1).build()).build()
         );
         assertTrue(ET3DocumentHelper.hasInconsistentAcceptanceStatus(differentTypeItems),
-                "Should return false when types differ");
+                "Should return true when types differ");
     }
 
     @Test
@@ -269,17 +294,31 @@ class ET3DocumentHelperTest {
         assertFalse(ET3DocumentHelper.isET3NotificationDocumentTypeResponseAccepted(List.of(blankTypeItem)),
                 "Should return false if document type is blank");
 
-        // First item's document type is not "2.11"
-        DocumentTypeItem wrongTypeItem = DocumentTypeItem.builder().value(DocumentType.builder().typeOfDocument("2.12")
+        // First item's document type is not accepted
+        DocumentTypeItem wrongTypeItem = DocumentTypeItem.builder().value(DocumentType.builder()
+                .typeOfDocument(ET3_REJECTED_NOTIFICATION_DOCUMENT_TYPE_1)
                 .build()).build();
         assertFalse(ET3DocumentHelper.isET3NotificationDocumentTypeResponseAccepted(List.of(wrongTypeItem)),
-                "Should return false if type is not 2.11");
+                "Should return false if type is not accepted");
 
-        // First item's document type is "2.11"
-        DocumentTypeItem acceptedItem = DocumentTypeItem.builder().value(DocumentType.builder().typeOfDocument("2.11")
+        // First item's document type is accepted
+        DocumentTypeItem acceptedItem1 = DocumentTypeItem.builder().value(DocumentType.builder()
+                .typeOfDocument(ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_ENGLAND_WALES)
                 .build()).build();
-        assertTrue(ET3DocumentHelper.isET3NotificationDocumentTypeResponseAccepted(List.of(acceptedItem)),
-                "Should return true if type is 2.11");
+        assertTrue(ET3DocumentHelper.isET3NotificationDocumentTypeResponseAccepted(List.of(acceptedItem1)),
+                "Should return true if type is accepted");
+        // First item's document type is accepted
+        DocumentTypeItem acceptedItem2 = DocumentTypeItem.builder().value(DocumentType.builder()
+                .typeOfDocument(ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_SCOTLAND_LETTER_13)
+                .build()).build();
+        assertTrue(ET3DocumentHelper.isET3NotificationDocumentTypeResponseAccepted(List.of(acceptedItem2)),
+                "Should return true if type is accepted");
+        // First item's document type is accepted
+        DocumentTypeItem acceptedItem3 = DocumentTypeItem.builder().value(DocumentType.builder()
+                .typeOfDocument(ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_SCOTLAND_LETTER_14)
+                .build()).build();
+        assertTrue(ET3DocumentHelper.isET3NotificationDocumentTypeResponseAccepted(List.of(acceptedItem3)),
+                "Should return true if type is accepted");
     }
 
     @Test
@@ -333,7 +372,7 @@ class ET3DocumentHelperTest {
             return DocumentTypeItem.builder().value(document).build();
         };
         // Constants
-        String acceptedType = ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE;
+        String acceptedType = ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_ENGLAND_WALES;
         String rejectedType = "ET3_REJECTED_TYPE";
         // Case 1: Null inputs
         assertFalse(ET3DocumentHelper.areET3DocumentsConsistentWithRespondentResponses(null, null));

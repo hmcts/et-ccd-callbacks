@@ -5,6 +5,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -214,18 +215,18 @@ class DocumentGenerationServiceTest {
         assertEquals(6, caseData.getAddressLabelCollection().size());
     }
 
-    static Stream<org.junit.jupiter.params.provider.Arguments> addressLabelParams() {
+    static Stream<Arguments> addressLabelParams() {
         return Stream.of(
-            org.junit.jupiter.params.provider.Arguments.of("0.3", 1),
-            org.junit.jupiter.params.provider.Arguments.of("0.4", 1),
-            org.junit.jupiter.params.provider.Arguments.of("0.5", 2),
-            org.junit.jupiter.params.provider.Arguments.of("0.6", 3),
-            org.junit.jupiter.params.provider.Arguments.of("0.7", 1),
-            org.junit.jupiter.params.provider.Arguments.of("0.8", 4),
-            org.junit.jupiter.params.provider.Arguments.of("0.9", 4),
-            org.junit.jupiter.params.provider.Arguments.of("0.10", 2),
-            org.junit.jupiter.params.provider.Arguments.of("0.11", 2),
-            org.junit.jupiter.params.provider.Arguments.of("0.12", 4)
+            Arguments.of("0.3", 1),
+            Arguments.of("0.4", 1),
+            Arguments.of("0.5", 2),
+            Arguments.of("0.6", 3),
+            Arguments.of("0.7", 1),
+            Arguments.of("0.8", 4),
+            Arguments.of("0.9", 4),
+            Arguments.of("0.10", 2),
+            Arguments.of("0.11", 2),
+            Arguments.of("0.12", 4)
         );
     }
 

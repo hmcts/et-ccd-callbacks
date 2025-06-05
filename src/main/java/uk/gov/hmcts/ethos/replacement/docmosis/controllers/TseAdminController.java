@@ -25,6 +25,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.APPLICATION_SUBMITTED_BODY_TEMPLATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.APPLICATION_WHAT_HAPPENS_NEXT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantNonSystemUser;
@@ -178,11 +179,7 @@ public class TseAdminController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        String body = String.format("""
-            ### What happens next
-
-            You can view the decision in the <a href="/cases/case-details/%s#Applications" target="_blank">Applications tab (opens in new tab)</a>
-            """,
+        String body = String.format(APPLICATION_SUBMITTED_BODY_TEMPLATE,
             ccdRequest.getCaseDetails().getCaseId());
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()

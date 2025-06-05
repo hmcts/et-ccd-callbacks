@@ -44,6 +44,11 @@ public final class TSEConstants {
             ### What happens next
             You can view the response in the <a href="/cases/case-details/%s#Applications" target="_blank">Applications tab (opens in a new tab)</a>
             """;
+    public static final String APPLICATION_SUBMITTED_BODY_TEMPLATE = """
+        ### What happens next
+
+        You can view the decision in the <a href="/cases/case-details/%s#Applications" target="_blank">Applications tab (opens in new tab)</a>
+        """;
     private static final Map<String, String> APPLICATION_TYPE_MAP = new ConcurrentHashMap<>();
 
     public static Map<String, String> getApplicationTypeMap() {

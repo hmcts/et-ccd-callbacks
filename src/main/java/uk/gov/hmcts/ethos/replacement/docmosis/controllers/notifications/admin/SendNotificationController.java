@@ -33,6 +33,16 @@ public class SendNotificationController {
 
     private final SendNotificationService sendNotificationService;
 
+    private static final String SUBMITTED_BODY_TEMPLATE = """
+    ### What happens next
+
+    The selected parties will receive the notification.
+
+    You can view the notification in the <a href="/cases/case-details/%s#Notifications" target="_blank">Notifications tab (opens in a new tab)</a>
+
+    Another notification can be sent <a href="/cases/case-details/%s/trigger/sendNotification/sendNotification1">using this link</a>
+    """;
+
     /**
      * send Notification about to start.
      *
@@ -115,15 +125,7 @@ public class SendNotificationController {
             @RequestHeader("Authorization") String userToken) {
 
         String caseId = ccdRequest.getCaseDetails().getCaseId();
-        String body = String.format("""
-            ### What happens next
-
-            The selected parties will receive the notification.
-
-            You can view the notification in the <a href="/cases/case-details/%s#Notifications" target="_blank">Notifications tab (opens in a new tab)</a>
-
-            Another notification can be sent <a href="/cases/case-details/%s/trigger/sendNotification/sendNotification1">using this link</a>
-            """, caseId, caseId);
+        String body = String.format(SUBMITTED_BODY_TEMPLATE, caseId, caseId);
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()
                 .confirmation_body(body)

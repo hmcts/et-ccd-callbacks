@@ -36,10 +36,11 @@ public class RespondNotificationController {
 
     private final RespondNotificationService respondNotificationService;
 
-    private static final String RESPOND_SUBMITTED_BODY_TEMPLATE = """
+private static final String RESPOND_SUBMITTED_BODY_TEMPLATE = """
     ### What happens next
 
-    You can still view the response in the <a href="/cases/case-details/%s#Notifications" target="_blank">Notifications tab (opens in a new tab)</a>
+    You can still view the response in the <a href="/cases/case-details/%s#Notifications"
+    target="_blank">Notifications tab (opens in a new tab)</a>
     """;
 
     /**

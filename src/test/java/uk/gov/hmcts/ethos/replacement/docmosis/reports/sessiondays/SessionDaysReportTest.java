@@ -6,6 +6,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.model.reports.sessiondays.SessionDaysSubmitEvent;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.Judge;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportParams;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.JudgeService;
@@ -33,6 +34,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CA
 import static uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.JudgeEmploymentStatus.FEE_PAID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.JudgeEmploymentStatus.SALARIED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.JudgeEmploymentStatus.UNKNOWN;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.TWO_JUDGES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.sessiondays.SessionDaysReport.FULL_DAY;
 
 class SessionDaysReportTest {
@@ -138,6 +140,27 @@ class SessionDaysReportTest {
         assertEquals(1, reportData.getReportSummary2List().size());
         assertEquals(4, reportData.getReportDetails().size());
         assertReportSummary2Values(reportData);
+    }
+
+    @Test
+    void shouldShowCasesWithAdditionalJudges() {
+        // Create 4 hearings with the first hearing having 2 judges
+        caseDataBuilder.withHearingData(HEARING_STATUS_HEARD);
+        submitEvents.add(caseDataBuilder.buildAsSubmitEvent());
+        submitEvents.get(0).getCaseData().getHearingCollection().get(0).getValue().setHearingSitAlone(TWO_JUDGES);
+        submitEvents.get(0).getCaseData().getHearingCollection().get(0).getValue()
+                .setAdditionalJudge(new DynamicFixedListType("ptcJudge"));
+
+        ReportParams params = new ReportParams(ENGLANDWALES_LISTING_CASE_TYPE_ID,
+                TribunalOffice.MANCHESTER.getOfficeName(), DATE_FROM, DATE_TO);
+        SessionDaysReportData reportData = sessionDaysReport.generateReport(params);
+        assertCommonValues(reportData);
+        assertEquals("1", reportData.getReportSummary().getFtSessionDaysTotal());
+        assertEquals("1", reportData.getReportSummary().getPtSessionDaysTotal());
+        assertEquals("3", reportData.getReportSummary().getSessionDaysTotal());
+        assertEquals("33", reportData.getReportSummary().getPtSessionDaysPerCent());
+        // 4 hearings plus 1 Two Judges hearing
+        assertEquals(5, reportData.getReportDetails().size());
     }
 
     private void assertReportSummary2Values(SessionDaysReportData reportData) {

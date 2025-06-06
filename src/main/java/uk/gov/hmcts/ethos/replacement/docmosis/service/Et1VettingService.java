@@ -21,7 +21,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.VettingJurisdictionCodesType;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.JurisdictionCode;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.JurisdictionCodeHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.jpaservice.JpaVenueService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 
@@ -44,7 +44,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_L
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_LABEL_ET1_ATTACHMENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_LABEL_TEMPLATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BR_WITH_TAB;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.CASE_NAME_AND_DESCRIPTION_HTML;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.CLAIMANT_AND_RESPONDENT_ADDRESSES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.CLAIMANT_AND_RESPONDENT_ADDRESSES_WITHOUT_WORK_ADDRESS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.CLAIMANT_DETAILS_COMPANY;
@@ -162,12 +161,12 @@ public class Et1VettingService {
 
     /**
      * Prepare wordings to be displayed in et1VettingBeforeYouStart.
-     * Check uploaded document in documentCollection
+     * Check an uploaded document in documentCollection
      *  For ET1 form
      *  - get and display ET1 form
      *  For Acas cert
-     *  - get and count number of Acas cert
-     *  - if 0 Acas cert, hide the Acas link
+     *  - get and count the number of Acas certs
+     *  - if 0 Acas certs, hide the Acas link
      *  - if 1-5 Acas cert(s), display one or multi Acas link(s)
      *  - if 6 or more Acas certs, display a link to case doc tab
      * @param caseDetails Get caseId and documentCollection
@@ -218,7 +217,7 @@ public class Et1VettingService {
 
     /**
      * Prepare wordings to be displayed in et1VettingClaimantDetailsMarkUp
-     * for the type of current claimant, i.e. Person or Company.
+     * for the type of current claimant, i.e., Person or Company.
      * @param caseData Get ClaimantIndType and ClaimantType
      * @return et1VettingClaimantDetailsMarkUp
      */
@@ -309,7 +308,8 @@ public class Et1VettingService {
     public String generateJurisdictionCodesHtml(List<JurCodesTypeItem> jurisdictionCodes) {
         StringBuilder sb = new StringBuilder();
         for (JurCodesTypeItem codeItem : jurisdictionCodes) {
-            populateCodeNameAndDescriptionHtml(sb, codeItem.getValue().getJuridictionCodesList());
+            JurisdictionCodeHelper.populateCodeNameAndDescriptionHtml(
+                    sb, codeItem.getValue().getJuridictionCodesList());
         }
         return String.format(JUR_CODE_HTML, sb);
     }
@@ -324,7 +324,7 @@ public class Et1VettingService {
         List<String> errors = new ArrayList<>();
         List<VettingJurCodesTypeItem> jurisdictionCodesList = caseData.getVettingJurisdictionCodeCollection();
 
-        if (jurisdictionCodesList != null && !jurisdictionCodesList.isEmpty()) {
+        if (CollectionUtils.isNotEmpty(jurisdictionCodesList)) {
             // Check if the jurisdiction codes already exist in the jurisdictionCodesCollection
             if (CollectionUtils.isNotEmpty(caseData.getJurCodesCollection())) {
                 List<String> existingCodes = caseData.getJurCodesCollection().stream()
@@ -354,14 +354,13 @@ public class Et1VettingService {
     }
 
     /**
-     * Add the jurisdiction codes that's been added by the caseworker to jurCodesCollection.
+     * Add the jurisdiction codes that have been added by the caseworker to jurCodesCollection.
      * Set the Track Allocation field which default the longest track for a claim based on the jurisdiction codes
      */
     public String populateEt1TrackAllocationHtml(CaseData caseData) {
-        if (!caseData.getVettingJurisdictionCodeCollection().isEmpty()) {
-            for (VettingJurCodesTypeItem codeItem : caseData.getVettingJurisdictionCodeCollection()) {
-                addJurCodeToExistingCollection(caseData, codeItem.getValue());
-            }
+        if (CollectionUtils.isNotEmpty(caseData.getVettingJurisdictionCodeCollection())) {
+            caseData.getVettingJurisdictionCodeCollection()
+                    .forEach(codeItem -> addJurCodeToExistingCollection(caseData, codeItem.getValue()));
         }
 
         if (caseData.getJurCodesCollection().stream()
@@ -427,18 +426,6 @@ public class Et1VettingService {
         return claimantAddressStr.toString();
     }
 
-    private void populateCodeNameAndDescriptionHtml(StringBuilder sb, String codeName) {
-        if (codeName != null) {
-            try {
-                sb.append(String.format(CASE_NAME_AND_DESCRIPTION_HTML, codeName,
-                    JurisdictionCode.valueOf(codeName.replaceAll("[^a-zA-Z]+", ""))
-                        .getDescription()));
-            } catch (IllegalArgumentException e) {
-                log.warn("The jurisdiction code {} is invalid.", codeName, e);
-            }
-        }
-    }
-
     private void addJurCodeToExistingCollection(CaseData caseData, VettingJurisdictionCodesType code) {
         JurCodesType newCode = new JurCodesType();
         newCode.setJuridictionCodesList(code.getEt1VettingJurCodeList());
@@ -472,11 +459,11 @@ public class Et1VettingService {
     }
 
     /**
-     * This calls the Tornado service to generate the pdf for the ET1 Vetting journey.
+     * This calls the Tornado service to generate the PDF for the ET1 Vetting journey.
      * @param caseData gets the casedata
      * @param userToken user authentication token
      * @param caseTypeId reference which casetype the document will be uploaded to
-     * @return DocumentInfo which contains the url and markup for the uploaded document
+     * @return DocumentInfo, which contains the url and markup for the uploaded document
      */
     public DocumentInfo generateEt1VettingDocument(CaseData caseData, String userToken, String caseTypeId) {
         try {

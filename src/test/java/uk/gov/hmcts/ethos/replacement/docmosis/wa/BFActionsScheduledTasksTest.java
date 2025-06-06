@@ -47,11 +47,12 @@ class BFActionsScheduledTasksTest {
     private FeatureToggleService featureToggleService;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         bfActionsScheduledTasks = new BFActionsScheduledTasks(adminUserService, ccdClient, featureToggleService);
         when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
         ReflectionTestUtils.setField(bfActionsScheduledTasks, "caseTypeIdsString", "ET_EnglandWales,ET_Scotland");
         ReflectionTestUtils.setField(bfActionsScheduledTasks, "maxCases", 10);
+        ReflectionTestUtils.setField(bfActionsScheduledTasks, "bfActionCronCaseIdsToSkip", "");
     }
 
     @Test
@@ -77,6 +78,22 @@ class BFActionsScheduledTasksTest {
         assertThat(build.getCaseDetails().getCaseData().getWaRule21ReferralSent(), is(YES));
         assertThat(build.getCaseDetails().getCaseData().getWaRule21ReferralSent(), is(YES));
         verify(ccdClient, times(1)).submitEventForCase(any(), any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void shouldSkipCase() throws URISyntaxException, IOException {
+        String resource = ResourceLoader.getResource("bfActionTask_oneExpiredDate.json");
+        SubmitEvent submitEvent = new ObjectMapper().readValue(resource, SubmitEvent.class);
+        when(ccdClient.buildAndGetElasticSearchRequest(any(), eq(ENGLANDWALES_CASE_TYPE_ID), any()))
+                .thenReturn(List.of(submitEvent)).thenReturn(new ArrayList<>());
+        when(ccdClient.buildAndGetElasticSearchRequest(any(), eq(SCOTLAND_CASE_TYPE_ID), any()))
+                .thenReturn(null);
+
+        // Set the case ID to be skipped
+        ReflectionTestUtils.setField(bfActionsScheduledTasks, "bfActionCronCaseIdsToSkip", "1704985449005627");
+        bfActionsScheduledTasks.createTasksForBFDates();
+        verify(ccdClient, times(0)).startEventForCase(any(), any(), any(), any(), any());
+        verify(ccdClient, times(0)).submitEventForCase(any(), any(), any(), any(), any(), any());
     }
 
     @Test

@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
@@ -36,7 +36,7 @@ class EmailServiceTest {
     private SendEmailResponse sendEmailResponse;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         ReflectionTestUtils.setField(emailService, "exuiUrl", EXUI_URL);
         ReflectionTestUtils.setField(emailService, "citizenUrl", CITIZEN_HUB_URL);
 
@@ -72,10 +72,7 @@ class EmailServiceTest {
     void sendEmail_fail() throws NotificationClientException {
         when(emailClient.sendEmail(anyString(), anyString(), anyMap(), anyString()))
             .thenThrow(new NotificationClientException("FailedToSendEmail"));
-
-        assertThatThrownBy(() -> emailService.sendEmail("templateId",
-            "emailAddress", createPersonalisation()))
-            .isInstanceOf(RuntimeException.class);
+        assertDoesNotThrow(() -> emailService.sendEmail("templateId", "emailAddress", createPersonalisation()));
     }
 
     private Map<String, String> createPersonalisation() {

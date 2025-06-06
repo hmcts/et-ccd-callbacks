@@ -50,6 +50,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ALL_VENUES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BROUGHT_FORWARD_REPORT;
@@ -83,6 +84,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingHelper.CAUSE_LIST_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper.CASES_SEARCHED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ELASTICSEARCH_FIELD_HEARING_LISTED_DATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ELASTICSEARCH_FIELD_HEARING_LOCATION;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ELASTICSEARCH_FIELD_HEARING_VENUE_DAY_SCOTLAND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.ELASTICSEARCH_FIELD_MANAGING_OFFICE_KEYWORD;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService.ALL_OFFICES;
 
@@ -126,7 +129,7 @@ public class ListingService {
         CaseData caseData = caseDetails.getCaseData();
         List<ListingTypeItem> listingTypeItems = new ArrayList<>();
         String caseTypeId = getCaseTypeId(caseData);
-        if (caseData.getHearingCollection() != null && !caseData.getHearingCollection().isEmpty()) {
+        if (isNotEmpty(caseData.getHearingCollection())) {
             for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
                 if (hearingTypeItem.getValue().getHearingDateCollection() != null) {
                     log.info("Processing listing single cases");
@@ -159,12 +162,11 @@ public class ListingService {
 
         try {
             List<SubmitEvent> submitEvents = getListingHearingsSearch(listingDetails, authToken);
-            if (submitEvents != null) {
+            if (isNotEmpty(submitEvents)) {
                 log.info(CASES_SEARCHED + "{}", submitEvents.size());
                 List<ListingTypeItem> listingTypeItems = new ArrayList<>();
                 for (SubmitEvent submitEvent : submitEvents) {
-                    if (submitEvent.getCaseData().getHearingCollection() != null
-                            && !submitEvent.getCaseData().getHearingCollection().isEmpty()) {
+                    if (isNotEmpty(submitEvent.getCaseData().getHearingCollection())) {
                         addListingTypeItems(submitEvent, listingTypeItems, listingDetails);
                     }
                 }
@@ -195,7 +197,7 @@ public class ListingService {
                                      List<ListingTypeItem> listingTypeItems,
                                      ListingDetails listingDetails) {
         for (HearingTypeItem hearingTypeItem : submitEvent.getCaseData().getHearingCollection()) {
-            if (hearingTypeItem.getValue().getHearingDateCollection() != null) {
+            if (isNotEmpty(hearingTypeItem.getValue().getHearingDateCollection())) {
                 listingTypeItems.addAll(getListingTypeItems(hearingTypeItem,
                         listingDetails.getCaseData(),
                         submitEvent.getCaseData(),
@@ -211,16 +213,10 @@ public class ListingService {
                 ListingVenueHelper.getListingVenueToSearch(listingData).entrySet().iterator().next();
         String venueToSearchMapping = entry.getKey();
         String venueToSearch = entry.getValue();
-        String dateFrom;
-        String dateTo;
+
         boolean dateRange = listingData.getHearingDateType().equals(RANGE_HEARING_DATE_TYPE);
-        if (dateRange) {
-            dateFrom = listingData.getListingDateFrom();
-            dateTo = listingData.getListingDateTo();
-        } else {
-            dateFrom = listingData.getListingDate();
-            dateTo = listingData.getListingDate();
-        }
+        String dateFrom = dateRange ? listingData.getListingDateFrom() : listingData.getListingDate();
+        String dateTo = dateRange ? listingData.getListingDateTo() : listingData.getListingDate();
 
         if (ALL_VENUES.equals(venueToSearch)) {
             venueToSearch = listingData.getManagingOffice();
@@ -233,23 +229,34 @@ public class ListingService {
     }
 
     private String getFieldNameForVenueToSearch(String caseTypeId) {
-        if (SCOTLAND_CASE_TYPE_ID.equals(UtilHelper.getListingCaseTypeId(caseTypeId))) {
-            return ELASTICSEARCH_FIELD_HEARING_VENUE_SCOTLAND;
-        } else {
-            return ELASTICSEARCH_FIELD_MANAGING_OFFICE;
-        }
+        return SCOTLAND_CASE_TYPE_ID.equals(UtilHelper.getListingCaseTypeId(caseTypeId))
+                ? ELASTICSEARCH_FIELD_HEARING_VENUE_SCOTLAND
+                : ELASTICSEARCH_FIELD_MANAGING_OFFICE;
     }
 
     private String getESQuery(String dateFrom, String dateTo, String key, String venue, String managingOffice) {
         BoolQueryBuilder boolQueryBuilder = boolQuery()
                 .filter(new RangeQueryBuilder(ELASTICSEARCH_FIELD_HEARING_LISTED_DATE).gte(dateFrom).lte(dateTo));
+
         if (!ALL_OFFICES.equals(managingOffice)) {
-            boolQueryBuilder.filter(new TermsQueryBuilder(ELASTICSEARCH_FIELD_MANAGING_OFFICE_KEYWORD, managingOffice));
+            if (TribunalOffice.isEnglandWalesOffice(managingOffice)) {
+                boolQueryBuilder.filter(
+                        new TermsQueryBuilder(ELASTICSEARCH_FIELD_MANAGING_OFFICE_KEYWORD, managingOffice));
+            } else if (TribunalOffice.isScotlandOffice(managingOffice)) {
+                boolQueryBuilder.must(
+                        new MatchQueryBuilder(ELASTICSEARCH_FIELD_HEARING_VENUE_DAY_SCOTLAND, managingOffice));
+            }
         }
 
-        if (!ALL_VENUES.equals(venue)) {
-            boolQueryBuilder.must(new MatchQueryBuilder(key, venue));
+        if (!managingOffice.equals(venue)) {
+            if (TribunalOffice.isEnglandWalesOffice(managingOffice)) {
+                boolQueryBuilder.must(new MatchQueryBuilder(key, venue));
+            } else if (TribunalOffice.isScotlandOffice(managingOffice)) {
+                String scotlandField = ELASTICSEARCH_FIELD_HEARING_LOCATION + managingOffice + ".value.code";
+                boolQueryBuilder.must(new MatchQueryBuilder(scotlandField, venue));
+            }
         }
+
         return new SearchSourceBuilder()
                 .size(MAX_ES_SIZE)
                 .query(boolQueryBuilder).toString();
@@ -274,10 +281,15 @@ public class ListingService {
         if (isHearingTypeValid(listingData, hearingTypeItem)) {
             int hearingDateCollectionSize = hearingTypeItem.getValue().getHearingDateCollection().size();
             for (int i = 0; i < hearingDateCollectionSize; i++) {
-                hearingTypeItem.getValue().getHearingNumber();
                 DateListedTypeItem dateListedTypeItem = hearingTypeItem.getValue().getHearingDateCollection().get(i);
-                boolean isListingVenueValid = isListingVenueValid(listingData, dateListedTypeItem,
-                        caseTypeId, caseData.getEthosCaseReference());
+                boolean isListingVenueValid = false;
+                try {
+                    isListingVenueValid = isListingVenueValid(listingData, dateListedTypeItem,
+                            caseTypeId, caseData.getEthosCaseReference());
+                } catch (Exception e) {
+                    log.error("Unable to get venue code for case reference {}: {}",
+                            caseData.getEthosCaseReference(), e.getMessage());
+                }
                 boolean isListingDateValid = isListingDateValid(listingData, dateListedTypeItem);
                 boolean isListingStatusValid = true;
                 if (!showAllHearingType(listingData)) {
@@ -307,7 +319,7 @@ public class ListingService {
                                           String userName) throws IOException {
         clearListingFields(listingDetails.getCaseData());
         List<SubmitEvent> submitEvents = getDateRangeReportSearch(listingDetails, authToken);
-        log.info("Number of cases found: " + submitEvents.size());
+        log.info("Number of cases found: {}", submitEvents.size());
         return switch (listingDetails.getCaseData().getReportType()) {
             case BROUGHT_FORWARD_REPORT -> bfActionReport.runReport(listingDetails,
                     submitEvents, userName);

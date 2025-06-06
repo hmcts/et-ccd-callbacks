@@ -82,7 +82,7 @@ class TornadoServiceTest {
     private static final String INITIAL_CONSIDERATION_PDF = "Initial Consideration.pdf";
 
     @BeforeEach
-    public void setUp() throws IOException {
+    void setUp() throws IOException {
         createUserService();
         mockTornadoConnection();
         mockDocumentManagement();
@@ -275,7 +275,8 @@ class TornadoServiceTest {
         mockConnectionSuccess();
 
         assertThrows(IllegalArgumentException.class, () ->
-                tornadoService.generateEventDocument(new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, null)
+                tornadoService.generateEventDocument(new CaseData(),
+                        AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, null)
         );
     }
 

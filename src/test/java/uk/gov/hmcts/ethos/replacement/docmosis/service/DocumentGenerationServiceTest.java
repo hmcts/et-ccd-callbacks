@@ -4,6 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -31,6 +34,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -69,7 +73,7 @@ class DocumentGenerationServiceTest {
     private CcdClient ccdClient;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         caseDetailsScot1 = generateCaseDetails("caseDetailsScotTest1.json");
         caseDetails9 = generateCaseDetails("caseDetailsTest9.json");
         caseDetails10 = generateCaseDetails("caseDetailsTest10.json");
@@ -211,94 +215,29 @@ class DocumentGenerationServiceTest {
         assertEquals(6, caseData.getAddressLabelCollection().size());
     }
 
-    @Test
-    void midAddressLabelsClaimantAddress() {
-        CaseData caseData = caseDetails12.getCaseData();
-        caseData.getCorrespondenceType().setPart0Documents("0.3");
-        documentGenerationService.midAddressLabels(caseData);
-        caseData.getCorrespondenceType().setPart0Documents("0.2");
-        assertEquals(1, caseData.getAddressLabelCollection().size());
+    static Stream<Arguments> addressLabelParams() {
+        return Stream.of(
+            Arguments.of("0.3", 1),
+            Arguments.of("0.4", 1),
+            Arguments.of("0.5", 2),
+            Arguments.of("0.6", 3),
+            Arguments.of("0.7", 1),
+            Arguments.of("0.8", 4),
+            Arguments.of("0.9", 4),
+            Arguments.of("0.10", 2),
+            Arguments.of("0.11", 2),
+            Arguments.of("0.12", 4)
+        );
     }
 
-    @Test
-    void midAddressLabelsClaimantRepAddress() {
+    @ParameterizedTest
+    @MethodSource("addressLabelParams")
+    void midAddressLabelsVariousAddressSelections(String part0Documents, int expectedSize) {
         CaseData caseData = caseDetails12.getCaseData();
-        caseData.getCorrespondenceType().setPart0Documents("0.4");
+        caseData.getCorrespondenceType().setPart0Documents(part0Documents);
         documentGenerationService.midAddressLabels(caseData);
         caseData.getCorrespondenceType().setPart0Documents("0.2");
-        assertEquals(1, caseData.getAddressLabelCollection().size());
-    }
-
-    @Test
-    void midAddressLabelsClaimantAndClaimantRepAddresses() {
-        CaseData caseData = caseDetails12.getCaseData();
-        caseData.getCorrespondenceType().setPart0Documents("0.5");
-        documentGenerationService.midAddressLabels(caseData);
-        caseData.getCorrespondenceType().setPart0Documents("0.2");
-        assertEquals(2, caseData.getAddressLabelCollection().size());
-    }
-
-    @Test
-    void midAddressLabelsRespondentsAddresses() {
-        CaseData caseData = caseDetails12.getCaseData();
-        caseData.getCorrespondenceType().setPart0Documents("0.6");
-        documentGenerationService.midAddressLabels(caseData);
-        caseData.getCorrespondenceType().setPart0Documents("0.2");
-        assertEquals(3, caseData.getAddressLabelCollection().size());
-    }
-
-    @Test
-    void midAddressLabelsRespondentsRepsAddresses() {
-        CaseData caseData = caseDetails12.getCaseData();
-        caseData.getCorrespondenceType().setPart0Documents("0.7");
-        documentGenerationService.midAddressLabels(caseData);
-        caseData.getCorrespondenceType().setPart0Documents("0.2");
-        assertEquals(1, caseData.getAddressLabelCollection().size());
-    }
-
-    @Test
-    void midAddressLabelsRespondentsAndRespondentsRepsAddresses() {
-        CaseData caseData = caseDetails12.getCaseData();
-        caseData.getCorrespondenceType().setPart0Documents("0.8");
-        documentGenerationService.midAddressLabels(caseData);
-        caseData.getCorrespondenceType().setPart0Documents("0.2");
-        assertEquals(4, caseData.getAddressLabelCollection().size());
-    }
-
-    @Test
-    void midAddressLabelsClaimantAndRespondentsAddresses() {
-        CaseData caseData = caseDetails12.getCaseData();
-        caseData.getCorrespondenceType().setPart0Documents("0.9");
-        documentGenerationService.midAddressLabels(caseData);
-        caseData.getCorrespondenceType().setPart0Documents("0.2");
-        assertEquals(4, caseData.getAddressLabelCollection().size());
-    }
-
-    @Test
-    void midAddressLabelsClaimantRepAndRespondentsRepsAddresses() {
-        CaseData caseData = caseDetails12.getCaseData();
-        caseData.getCorrespondenceType().setPart0Documents("0.10");
-        documentGenerationService.midAddressLabels(caseData);
-        caseData.getCorrespondenceType().setPart0Documents("0.2");
-        assertEquals(2, caseData.getAddressLabelCollection().size());
-    }
-
-    @Test
-    void midAddressLabelsClaimantAndRespondentsRepsAddresses() {
-        CaseData caseData = caseDetails12.getCaseData();
-        caseData.getCorrespondenceType().setPart0Documents("0.11");
-        documentGenerationService.midAddressLabels(caseData);
-        caseData.getCorrespondenceType().setPart0Documents("0.2");
-        assertEquals(2, caseData.getAddressLabelCollection().size());
-    }
-
-    @Test
-    void midAddressLabelsClaimantRepAndRespondentsAddresses() {
-        CaseData caseData = caseDetails12.getCaseData();
-        caseData.getCorrespondenceType().setPart0Documents("0.12");
-        documentGenerationService.midAddressLabels(caseData);
-        caseData.getCorrespondenceType().setPart0Documents("0.2");
-        assertEquals(4, caseData.getAddressLabelCollection().size());
+        assertEquals(expectedSize, caseData.getAddressLabelCollection().size());
     }
 
     @Test

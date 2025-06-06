@@ -41,7 +41,7 @@ class UpdateDataModelBuilderTest {
     private static final String UNKNOWN_VALUE = "Unknown";
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         caseData = new CaseData();
 
         // Claimant Representative Name

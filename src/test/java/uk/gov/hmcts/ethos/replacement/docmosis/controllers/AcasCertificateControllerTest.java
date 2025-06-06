@@ -57,7 +57,7 @@ class AcasCertificateControllerTest {
     private JsonMapper jsonMapper;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         jsonMapper = new JsonMapper(new ObjectMapper());
         mockMvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         CaseData caseData = new CaseData();

@@ -130,4 +130,20 @@ class DigitalCaseFileServiceTest {
                 caseData.getDigitalCaseFile().getStatus());
     }
 
+    @Test
+    void emptyDcfDocumentType_shouldReturnEmpty() {
+        List<DocumentTypeItem> documentTypeItems = getTribunalCaseFile();
+        documentTypeItems.get(0).getValue().setUploadedDocument(null);
+        caseData.setDocumentCollection(documentTypeItems);
+        assertEquals("", digitalCaseFileService.getReplyToReferralDCFLink(caseData));
+    }
+
+    @Test
+    void emptyBinaryUrl_shouldReturnEmpty() {
+        List<DocumentTypeItem> documentTypeItems = getTribunalCaseFile();
+        documentTypeItems.get(0).getValue().getUploadedDocument().setDocumentBinaryUrl(null);
+        caseData.setDocumentCollection(documentTypeItems);
+        assertEquals("", digitalCaseFileService.getReplyToReferralDCFLink(caseData));
+    }
+
 }

@@ -161,12 +161,12 @@ public class Et1VettingService {
 
     /**
      * Prepare wordings to be displayed in et1VettingBeforeYouStart.
-     * Check uploaded document in documentCollection
+     * Check an uploaded document in documentCollection
      *  For ET1 form
      *  - get and display ET1 form
      *  For Acas cert
-     *  - get and count number of Acas cert
-     *  - if 0 Acas cert, hide the Acas link
+     *  - get and count the number of Acas certs
+     *  - if 0 Acas certs, hide the Acas link
      *  - if 1-5 Acas cert(s), display one or multi Acas link(s)
      *  - if 6 or more Acas certs, display a link to case doc tab
      * @param caseDetails Get caseId and documentCollection
@@ -217,7 +217,7 @@ public class Et1VettingService {
 
     /**
      * Prepare wordings to be displayed in et1VettingClaimantDetailsMarkUp
-     * for the type of current claimant, i.e. Person or Company.
+     * for the type of current claimant, i.e., Person or Company.
      * @param caseData Get ClaimantIndType and ClaimantType
      * @return et1VettingClaimantDetailsMarkUp
      */
@@ -324,7 +324,7 @@ public class Et1VettingService {
         List<String> errors = new ArrayList<>();
         List<VettingJurCodesTypeItem> jurisdictionCodesList = caseData.getVettingJurisdictionCodeCollection();
 
-        if (jurisdictionCodesList != null && !jurisdictionCodesList.isEmpty()) {
+        if (CollectionUtils.isNotEmpty(jurisdictionCodesList)) {
             // Check if the jurisdiction codes already exist in the jurisdictionCodesCollection
             if (CollectionUtils.isNotEmpty(caseData.getJurCodesCollection())) {
                 List<String> existingCodes = caseData.getJurCodesCollection().stream()
@@ -354,14 +354,13 @@ public class Et1VettingService {
     }
 
     /**
-     * Add the jurisdiction codes that's been added by the caseworker to jurCodesCollection.
+     * Add the jurisdiction codes that have been added by the caseworker to jurCodesCollection.
      * Set the Track Allocation field which default the longest track for a claim based on the jurisdiction codes
      */
     public String populateEt1TrackAllocationHtml(CaseData caseData) {
-        if (!caseData.getVettingJurisdictionCodeCollection().isEmpty()) {
-            for (VettingJurCodesTypeItem codeItem : caseData.getVettingJurisdictionCodeCollection()) {
-                addJurCodeToExistingCollection(caseData, codeItem.getValue());
-            }
+        if (CollectionUtils.isNotEmpty(caseData.getVettingJurisdictionCodeCollection())) {
+            caseData.getVettingJurisdictionCodeCollection()
+                    .forEach(codeItem -> addJurCodeToExistingCollection(caseData, codeItem.getValue()));
         }
 
         if (caseData.getJurCodesCollection().stream()
@@ -460,11 +459,11 @@ public class Et1VettingService {
     }
 
     /**
-     * This calls the Tornado service to generate the pdf for the ET1 Vetting journey.
+     * This calls the Tornado service to generate the PDF for the ET1 Vetting journey.
      * @param caseData gets the casedata
      * @param userToken user authentication token
      * @param caseTypeId reference which casetype the document will be uploaded to
-     * @return DocumentInfo which contains the url and markup for the uploaded document
+     * @return DocumentInfo, which contains the url and markup for the uploaded document
      */
     public DocumentInfo generateEt1VettingDocument(CaseData caseData, String userToken, String caseTypeId) {
         try {

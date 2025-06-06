@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.config;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +15,12 @@ public class HttpClientConfiguration {
 
     @Value("${ccd.client.timeout}")
     private int timeout;
+    
+    @Value("${http.client.max.total:100}")
+    private int maxTotalConnections;
+    
+    @Value("${http.client.max.per.route:20}")
+    private int maxConnectionsPerRoute;
 
     @Bean
     public RestTemplate restTemplate() {
@@ -23,6 +30,10 @@ public class HttpClientConfiguration {
     }
 
     private CloseableHttpClient getHttpClient() {
+        PoolingHttpClientConnectionManager connectionManager = new PoolingHttpClientConnectionManager();
+        connectionManager.setMaxTotal(maxTotalConnections);
+        connectionManager.setDefaultMaxPerRoute(maxConnectionsPerRoute);
+        
         RequestConfig config = RequestConfig.custom()
             .setConnectTimeout(timeout)
             .setConnectionRequestTimeout(timeout)
@@ -32,6 +43,7 @@ public class HttpClientConfiguration {
         return HttpClientBuilder
             .create()
             .useSystemProperties()
+            .setConnectionManager(connectionManager)
             .setDefaultRequestConfig(config)
             .build();
     }

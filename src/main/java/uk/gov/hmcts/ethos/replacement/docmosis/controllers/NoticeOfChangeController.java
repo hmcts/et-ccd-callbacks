@@ -75,13 +75,14 @@ public class NoticeOfChangeController {
             CaseDetails caseDetails = callbackRequest.getCaseDetails();
             CaseData caseData = caseDetails.getCaseData();
 
-            //send emails here
+            // Trigger email notifications asynchronously
             try {
                 nocNotificationService.sendNotificationOfChangeEmails(
                         callbackRequest.getCaseDetailsBefore(), caseDetails,
                         callbackRequest.getCaseDetailsBefore().getCaseData().getChangeOrganisationRequestField());
             } catch (Exception exception) {
-                log.error(exception.getMessage(), exception);
+                // Log error but don't block response
+                log.error("Error triggering async notifications: {}", exception.getMessage(), exception);
             }
 
             String caseReference = caseData.getEthosCaseReference();

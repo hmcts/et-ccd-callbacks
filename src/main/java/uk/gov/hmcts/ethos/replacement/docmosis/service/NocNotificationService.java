@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -48,6 +49,13 @@ public class NocNotificationService {
     @Value("${template.nocNotification.tribunal}")
     private String tribunalTemplateId;
 
+    /**
+     * Send notification of change emails asynchronously.
+     * @param caseDetailsPrevious previous case details
+     * @param caseDetailsNew new case details
+     * @param changeRequest change request
+     */
+    @Async
     public void sendNotificationOfChangeEmails(CaseDetails caseDetailsPrevious,
                                                CaseDetails caseDetailsNew,
                                                ChangeOrganisationRequest changeRequest) {

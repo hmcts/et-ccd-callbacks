@@ -20,6 +20,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CcdCaseAssignment;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.NocNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.NocRespondentRepresentativeService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.NocClaimantRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
@@ -42,6 +43,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ContextConfiguration(classes = {
     NoticeOfChangeController.class,
     NocRespondentRepresentativeService.class,
+    NocClaimantRepresentativeService.class,
     VerifyTokenService.class,
     CcdCaseAssignment.class
 })
@@ -51,6 +53,8 @@ class NoticeOfChangeControllerTest {
     private VerifyTokenService verifyTokenService;
     @MockBean
     private NocRespondentRepresentativeService nocRespondentRepresentativeService;
+    @MockBean
+    private NocClaimantRepresentativeService nocClaimantRepresentativeService;
     @MockBean
     private CcdCaseAssignment ccdCaseAssignment;
 
@@ -86,6 +90,8 @@ class NoticeOfChangeControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(nocRespondentRepresentativeService
             .updateRepresentation(any())).thenReturn(caseData);
+        when(nocClaimantRepresentativeService
+            .updateClaimantRepresentation(any())).thenReturn(caseData);
         when(ccdCaseAssignment.applyNoc(any(), any())).thenReturn(CCDCallbackResponse.builder()
             .data(caseData)
             .build());

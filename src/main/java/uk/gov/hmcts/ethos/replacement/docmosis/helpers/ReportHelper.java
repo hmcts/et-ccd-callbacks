@@ -13,12 +13,14 @@ import uk.gov.hmcts.et.common.model.listing.ListingDetails;
 import uk.gov.hmcts.et.common.model.listing.items.AdhocReportTypeItem;
 import uk.gov.hmcts.et.common.model.listing.types.AdhocReportType;
 import uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportParams;
+
 import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
@@ -31,12 +33,10 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.POSITION_TYPE_REJEC
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RANGE_HEARING_DATE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRANSFERRED_STATE;
 
 @Slf4j
-@SuppressWarnings({"PMD.ConfusingTernary", "PDM.CyclomaticComplexity", "PMD.AvoidInstantiatingObjectsInLoops",
-    "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.GodClass", "PMD.CognitiveComplexity",
-    "PMD.InsufficientStringBufferDeclaration", "PMD.LiteralsFirstInComparisons", "PMD.FieldNamingConventions",
-    "PMD.LawOfDemeter", "PMD.ExcessiveImports"})
+@SuppressWarnings({"PMD.ConfusingTernary", "PMD.ClassWithOnlyPrivateConstructorsShouldBeFinal", "PMD.GodClass"})
 public class ReportHelper {
 
     public static final String CASES_SEARCHED = "Cases searched: ";
@@ -85,13 +85,16 @@ public class ReportHelper {
         AdhocReportType localReportsDetailHdr = new AdhocReportType();
         localReportsDetailHdr.setReportOffice(getReportOffice(
                 listingDetails.getCaseTypeId(), listingDetails.getCaseData().getManagingOffice()));
-        if (CollectionUtils.isNotEmpty(submitEvents)) {
-            log.info(CASES_SEARCHED + submitEvents.size());
+        List<SubmitEvent> filteredSubmitEvents = submitEvents.stream()
+            .filter(event -> !TRANSFERRED_STATE.equals(event.getState()))
+            .toList();
+        if (CollectionUtils.isNotEmpty(filteredSubmitEvents)) {
+            log.info(CASES_SEARCHED + filteredSubmitEvents.size());
             int totalCases = 0;
             int totalSingles = 0;
             int totalMultiples = 0;
             List<AdhocReportTypeItem> localReportsDetailList = new ArrayList<>();
-            for (SubmitEvent submitEvent : submitEvents) {
+            for (SubmitEvent submitEvent : filteredSubmitEvents) {
                 AdhocReportTypeItem localReportsDetailItem =
                         getClaimsAcceptedDetailItem(listingDetails, submitEvent.getCaseData());
                 if (localReportsDetailItem.getValue() != null) {

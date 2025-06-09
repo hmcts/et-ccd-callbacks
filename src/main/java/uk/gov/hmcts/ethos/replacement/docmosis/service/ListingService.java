@@ -50,6 +50,7 @@ import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ALL_VENUES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BROUGHT_FORWARD_REPORT;
@@ -128,7 +129,7 @@ public class ListingService {
         CaseData caseData = caseDetails.getCaseData();
         List<ListingTypeItem> listingTypeItems = new ArrayList<>();
         String caseTypeId = getCaseTypeId(caseData);
-        if (caseData.getHearingCollection() != null && !caseData.getHearingCollection().isEmpty()) {
+        if (isNotEmpty(caseData.getHearingCollection())) {
             for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
                 if (hearingTypeItem.getValue().getHearingDateCollection() != null) {
                     log.info("Processing listing single cases");
@@ -161,12 +162,11 @@ public class ListingService {
 
         try {
             List<SubmitEvent> submitEvents = getListingHearingsSearch(listingDetails, authToken);
-            if (submitEvents != null) {
+            if (isNotEmpty(submitEvents)) {
                 log.info(CASES_SEARCHED + "{}", submitEvents.size());
                 List<ListingTypeItem> listingTypeItems = new ArrayList<>();
                 for (SubmitEvent submitEvent : submitEvents) {
-                    if (submitEvent.getCaseData().getHearingCollection() != null
-                            && !submitEvent.getCaseData().getHearingCollection().isEmpty()) {
+                    if (isNotEmpty(submitEvent.getCaseData().getHearingCollection())) {
                         addListingTypeItems(submitEvent, listingTypeItems, listingDetails);
                     }
                 }
@@ -197,7 +197,7 @@ public class ListingService {
                                      List<ListingTypeItem> listingTypeItems,
                                      ListingDetails listingDetails) {
         for (HearingTypeItem hearingTypeItem : submitEvent.getCaseData().getHearingCollection()) {
-            if (hearingTypeItem.getValue().getHearingDateCollection() != null) {
+            if (isNotEmpty(hearingTypeItem.getValue().getHearingDateCollection())) {
                 listingTypeItems.addAll(getListingTypeItems(hearingTypeItem,
                         listingDetails.getCaseData(),
                         submitEvent.getCaseData(),
@@ -281,10 +281,15 @@ public class ListingService {
         if (isHearingTypeValid(listingData, hearingTypeItem)) {
             int hearingDateCollectionSize = hearingTypeItem.getValue().getHearingDateCollection().size();
             for (int i = 0; i < hearingDateCollectionSize; i++) {
-                hearingTypeItem.getValue().getHearingNumber();
                 DateListedTypeItem dateListedTypeItem = hearingTypeItem.getValue().getHearingDateCollection().get(i);
-                boolean isListingVenueValid = isListingVenueValid(listingData, dateListedTypeItem,
-                        caseTypeId, caseData.getEthosCaseReference());
+                boolean isListingVenueValid = false;
+                try {
+                    isListingVenueValid = isListingVenueValid(listingData, dateListedTypeItem,
+                            caseTypeId, caseData.getEthosCaseReference());
+                } catch (Exception e) {
+                    log.error("Unable to get venue code for case reference {}: {}",
+                            caseData.getEthosCaseReference(), e.getMessage());
+                }
                 boolean isListingDateValid = isListingDateValid(listingData, dateListedTypeItem);
                 boolean isListingStatusValid = true;
                 if (!showAllHearingType(listingData)) {
@@ -314,7 +319,7 @@ public class ListingService {
                                           String userName) throws IOException {
         clearListingFields(listingDetails.getCaseData());
         List<SubmitEvent> submitEvents = getDateRangeReportSearch(listingDetails, authToken);
-        log.info("Number of cases found: " + submitEvents.size());
+        log.info("Number of cases found: {}", submitEvents.size());
         return switch (listingDetails.getCaseData().getReportType()) {
             case BROUGHT_FORWARD_REPORT -> bfActionReport.runReport(listingDetails,
                     submitEvents, userName);

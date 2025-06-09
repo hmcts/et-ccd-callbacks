@@ -92,7 +92,7 @@ class ListingHelperTest {
     private UserDetails userDetails;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         listingDetails = generateListingDetails("listingDetailsTest1.json");
         listingDetails2 = generateListingDetails("listingDetailsTest2.json");
         listingDetails3 = generateListingDetails("listingDetailsTest3.json");
@@ -1099,7 +1099,8 @@ class ListingHelperTest {
         dateListedType.setHearingRoom(new DynamicFixedListType("Tribunal 5"));
         expected = "ListingType(causeListDate=12 December 2019, causeListTime=12:11, causeListVenue=Dundee, "
             + "elmoCaseReference=null, "
-            + "jurisdictionCodesList= , hearingType= , positionType= , hearingJudgeName= , hearingEEMember= , "
+            + "jurisdictionCodesList= , hearingType= , positionType= , hearingJudgeName= , "
+            + "hearingEEMember= , "
             + "hearingERMember= , hearingClerk=Clerk, "
             + "hearingDay=2 of 3, claimantName=Rodriguez, claimantTown= , claimantRepresentative= , "
             + "respondent=Juan Pedro, respondentTown= , "
@@ -1147,8 +1148,8 @@ class ListingHelperTest {
         dateListedType.setHearingTypeReadingDeliberation("Neither");
         expected = "ListingType(causeListDate=12 December 2019, causeListTime=12:11, causeListVenue=Edinburgh, "
             + "elmoCaseReference=null, jurisdictionCodesList= , hearingType= , positionType= , hearingJudgeName= , "
-            + "hearingEEMember= , hearingERMember= , hearingClerk=Clerk, hearingDay=2 of 3, claimantName= , "
-            + "claimantTown= , claimantRepresentative= , respondent= , respondentTown= , "
+            + "hearingEEMember= , hearingERMember= , hearingClerk=Clerk, hearingDay=2 of 3, "
+            + "claimantName= , claimantTown= , claimantRepresentative= , respondent= , respondentTown= , "
             + "respondentRepresentative= , estHearingLength=2 hours, hearingPanel=Sit Alone, hearingRoom=Tribunal 7, "
             + "respondentOthers= , hearingNotes= , judicialMediation=Yes, hearingFormat=Telephone,"
             + " hearingReadingDeliberationMembersChambers= )";
@@ -1207,8 +1208,8 @@ class ListingHelperTest {
 
         expected = "ListingType(causeListDate=12 December 2019, causeListTime=12:11, causeListVenue=AberdeenVenue,"
                 + " elmoCaseReference=null, " + "jurisdictionCodesList= , hearingType= , positionType= , "
-                + "hearingJudgeName= , hearingEEMember= , " + "hearingERMember= , hearingClerk=Clerk, "
-                + "hearingDay=2 of 3, claimantName=Rodriguez, claimantTown= ,"
+                + "hearingJudgeName= , hearingEEMember= , " + "hearingERMember= , "
+                + "hearingClerk=Clerk, hearingDay=2 of 3, claimantName=Rodriguez, claimantTown= ,"
                 + " claimantRepresentative= , respondent=Juan Pedro, "
                 + "respondentTown= , " + "respondentRepresentative= , estHearingLength=2 hours,"
                 + " hearingPanel=Sit Alone,"
@@ -1466,7 +1467,7 @@ class ListingHelperTest {
         hearingType.setHearingEstLengthNum("2");
         hearingType.setHearingEstLengthNumType("hours");
         hearingType.setHearingFormat(List.of("Telephone"));
-        hearingType.setHearingSitAlone("Sit Alone");
+        hearingType.setHearingSitAlone("Two Judges");
         hearingType.setJudicialMediation(YES);
 
         listingDetails = generateListingDetails("listingDetailsTest1.json");

@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
@@ -42,6 +43,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CA
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_HEARING_DATE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.TWO_JUDGES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.casescompleted.CasesCompletedReport.COMPLETED_PER_SESSION_FORMAT;
 
 @ExtendWith(SpringExtension.class)
@@ -878,5 +880,32 @@ class CaseCompletedReportTest {
 
     private void verifyReportDetails(ListingData listingData, int size) {
         assertEquals(size, listingData.getLocalReportsDetail().size());
+    }
+
+    @Test
+    void testAdditionalJudgeIsPresentOnReport() {
+        String searchDate = "1970-01-01";
+        ListingDetails listingDetails = new ListingDetails();
+        listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
+        ListingData listingData = new ListingData();
+        listingData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
+        listingData.setListingDate(searchDate);
+        listingData.setHearingDateType(SINGLE_HEARING_DATE_TYPE);
+        listingDetails.setCaseData(listingData);
+        String listingDate = "1970-01-01T00:00:00";
+        DateListedTypeItem dateListedTypeItem = createHearingDateListed(listingDate, HEARING_STATUS_HEARD, YES);
+        List<HearingTypeItem> hearings = createHearingCollection(createHearing(HEARING_TYPE_PERLIMINARY_HEARING,
+                dateListedTypeItem));
+        hearings.get(0).getValue().setHearingSitAlone(TWO_JUDGES);
+        hearings.get(0).getValue().setJudge(new DynamicFixedListType("Judge 1"));
+        hearings.get(0).getValue().setAdditionalJudge(new DynamicFixedListType("Judge 2"));
+        List<SubmitEvent> submitEvents = new ArrayList<>();
+        submitEvents.add(createSubmitEvent(CLOSED_STATE, JURISDICTION_OUTCOME_DISMISSED_AT_HEARING, hearings,
+                CONCILIATION_TRACK_OPEN_TRACK));
+
+        CasesCompletedReport casesCompletedReport = new CasesCompletedReport();
+        ListingData reportListingData = casesCompletedReport.generateReportData(listingDetails, submitEvents);
+        verifyReportDetails(reportListingData, 1);
+        assertEquals("Judge 1, Judge 2", reportListingData.getLocalReportsDetail().get(0).getValue().getHearingJudge());
     }
 }

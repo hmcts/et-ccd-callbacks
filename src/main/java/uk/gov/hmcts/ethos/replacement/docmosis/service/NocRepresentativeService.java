@@ -14,7 +14,7 @@ import java.util.Objects;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class NoCRepresentativeService {
+public class NocRepresentativeService {
     private final NocRespondentRepresentativeService nocRespondentRepresentativeService;
     private final NocClaimantRepresentativeService nocClaimantRepresentativeService;
 

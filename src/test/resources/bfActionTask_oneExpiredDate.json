@@ -1235,9 +1235,8 @@
     "suggestedHearingVenues" : null,
     "listedDateInPastWarning" : null,
     "noticeOfChangeAnswers0" : {
-      "respondentName" : "Another Person",
-      "claimantFirstName" : "Jack",
-      "claimantLastName" : "Reeve"
+      "partyName" : "Another Person",
+      "caseReference" : "6000003/2024"
     },
     "noticeOfChangeAnswers1" : null,
     "noticeOfChangeAnswers2" : null,

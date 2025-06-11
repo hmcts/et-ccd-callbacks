@@ -1,19 +1,19 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
-import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
-import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
-import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
-import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Component;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
+import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator.NoticeOfChangeAnswersPopulationStrategy.BLANK;
@@ -64,7 +64,7 @@ public class NoticeOfChangeFieldPopulator {
             data.put(String.format(SolicitorRole.POLICY_FIELD_TEMPLATE, i), organisationPolicy);
 
             Optional<NoticeOfChangeAnswers> possibleAnswer = populateAnswer(
-                strategy, respondent, caseData.getClaimantIndType()
+                strategy, respondent, caseData
             );
 
             if (possibleAnswer.isPresent()) {
@@ -72,6 +72,10 @@ public class NoticeOfChangeFieldPopulator {
             }
         }
 
+        OrganisationPolicy organisationPolicy = OrganisationPolicy.builder()
+                .orgPolicyCaseAssignedRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())
+                .build();
+        data.put(ClaimantSolicitorRole.POLICY_FIELD_TEMPLATE, organisationPolicy);
         return data;
     }
 
@@ -85,12 +89,13 @@ public class NoticeOfChangeFieldPopulator {
 
     private Optional<NoticeOfChangeAnswers> populateAnswer(NoticeOfChangeAnswersPopulationStrategy strategy,
                                                            Optional<RespondentSumTypeItem> respondentRepresentative,
-                                                           ClaimantIndType claimant) {
+                                                           CaseData caseData) {
         if (BLANK == strategy) {
             return Optional.of(NoticeOfChangeAnswers.builder().build());
         }
 
-        return respondentRepresentative.map(rep -> answersConverter.generateForSubmission(rep, claimant));
+        return respondentRepresentative.map(
+                rep -> answersConverter.generateForSubmission(rep, caseData));
     }
 
     public enum NoticeOfChangeAnswersPopulationStrategy {

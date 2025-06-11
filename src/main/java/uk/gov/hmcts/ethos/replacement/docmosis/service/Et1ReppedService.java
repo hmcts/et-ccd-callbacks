@@ -1,5 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import java.io.IOException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
@@ -24,13 +30,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-
-import java.io.IOException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
@@ -181,7 +180,7 @@ public class Et1ReppedService {
     }
 
     @NotNull
-    private static Address getOrganisationAddress(OrganisationsResponse organisationDetails) {
+    static Address getOrganisationAddress(OrganisationsResponse organisationDetails) {
         Address organisationAddress = new Address();
         if (CollectionUtils.isEmpty(organisationDetails.getContactInformation())) {
             return organisationAddress;

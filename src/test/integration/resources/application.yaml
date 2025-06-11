@@ -185,6 +185,7 @@ es:
 cron:
   bfActionTask: ${CRON_BFACTION_TASK:0 0 * * * ?}
   caseTypeId: ${CRON_CASE_TYPE_ID:ET_EnglandWales,ET_Scotland}
+  bfActionCronCaseIdsToSkip: ${CRON_BFACTION_CRON_CASE_IDS_TO_SKIP:}
   maxCasesPerSearch: ${CRON_MAX_PER_SEARCH:10}
   et1DocGen: ${CRON_ACAS_CERT_TASK:0 */2 * * * ?}
   noticeOfChange: ${CRON_NOTICE_OF_CHANGE:0 10 * * * ?}

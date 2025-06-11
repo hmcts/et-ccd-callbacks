@@ -488,9 +488,12 @@ public final class DocumentHelper {
     }
 
     public static String getHearingDuration(HearingType hearingType) {
+        if (isNullOrEmpty(hearingType.getHearingEstLengthNum())) {
+            return "";
+        }
         String numType = hearingType.getHearingEstLengthNumType();
         try {
-            int tmp = Integer.parseInt(hearingType.getHearingEstLengthNum());
+            double tmp = Double.parseDouble(hearingType.getHearingEstLengthNum());
             if (tmp == 1) {
                 numType = numType.substring(0, numType.length() - 1);
             }

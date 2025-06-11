@@ -502,7 +502,7 @@ public class CaseManagementForCaseWorkerService {
     private void addNegativeHearingLengthsError(HearingTypeItem hearingTypeItem, List<String> errors,
                                                 String hearingNumber) {
         try {
-            int parsed = Integer.parseInt(hearingTypeItem.getValue().getHearingEstLengthNum().trim());
+            double parsed = Double.parseDouble(hearingTypeItem.getValue().getHearingEstLengthNum().trim());
             if (parsed <= 0) {
                 errors.add(String.format(NEGATIVE_HEARING_LENGTH_MESSAGE, hearingNumber));
             }

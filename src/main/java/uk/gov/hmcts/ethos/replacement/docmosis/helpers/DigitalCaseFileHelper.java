@@ -17,6 +17,7 @@ import uk.gov.hmcts.et.common.model.generic.BaseCaseData;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
@@ -60,12 +61,14 @@ public final class DigitalCaseFileHelper {
             case DONE -> {
                 UploadedDocumentType uploadedDocumentType = getUploadedDocumentType(bundleDetails);
                 digitalCaseFile.setUploadedDocument(uploadedDocumentType);
-                digitalCaseFile.setStatus("DCF Generated: " + LocalDateTime.now().format(NEW_DATE_TIME_PATTERN));
+                digitalCaseFile.setStatus("DCF Generated: " + LocalDateTime.now(ZoneId.of("Europe/London"))
+                        .format(NEW_DATE_TIME_PATTERN));
                 digitalCaseFile.setError(null);
             }
             case FAILED -> {
                 digitalCaseFile.setStatus(
-                        "DCF Failed to generate: " + LocalDateTime.now().format(NEW_DATE_TIME_PATTERN));
+                        "DCF Failed to generate: " + LocalDateTime.now(ZoneId.of("Europe/London"))
+                                .format(NEW_DATE_TIME_PATTERN));
                 digitalCaseFile.setError(bundleDetails.getStitchingFailureMessage());
             }
             default -> throw new IllegalStateException("Unexpected value: " + bundleDetails.getStitchStatus());
@@ -125,7 +128,8 @@ public final class DigitalCaseFileHelper {
         if (isEmpty(caseData.getDigitalCaseFile())) {
             caseData.setDigitalCaseFile(new DigitalCaseFileType());
         }
-        caseData.getDigitalCaseFile().setStatus("DCF Updating: " + LocalDateTime.now().format(NEW_DATE_TIME_PATTERN));
+        caseData.getDigitalCaseFile().setStatus("DCF Updating: " + LocalDateTime.now(ZoneId.of("Europe/London"))
+                .format(NEW_DATE_TIME_PATTERN));
         caseData.getDigitalCaseFile().setError(null);
     }
 

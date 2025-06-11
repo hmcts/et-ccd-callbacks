@@ -340,14 +340,9 @@ public final class ET3DocumentHelper {
         for (RespondentSumTypeItem respondentSumTypeItem : respondents) {
             if (ObjectUtils.isNotEmpty(respondentSumTypeItem.getValue())
                     && StringUtils.isNotBlank(respondentSumTypeItem.getValue().getResponseStatus())) {
-                if (ACCEPTED_STATE.equals(respondentSumTypeItem.getValue().getResponseStatus())) {
-                    if (hasAcceptedDoc) {
-                        return true;
-                    }
-                } else {
-                    if (hasRejectedDoc) {
-                        return true;
-                    }
+                if (isDocumentValidForStatus(respondentSumTypeItem.getValue().getResponseStatus(),
+                        hasAcceptedDoc, hasRejectedDoc)) {
+                    return true;
                 }
             }
         }
@@ -372,5 +367,11 @@ public final class ET3DocumentHelper {
                 .anyMatch(docType -> !ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_ENGLAND_WALES.equals(docType)
                         && !ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_SCOTLAND_LETTER_13.equals(docType)
                         && !ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_SCOTLAND_LETTER_14.equals(docType));
+    }
+
+    private static boolean isDocumentValidForStatus(String responseStatus,
+                                                    boolean hasAcceptedDoc,
+                                                    boolean hasRejectedDoc) {
+        return ACCEPTED_STATE.equals(responseStatus) ? hasAcceptedDoc : hasRejectedDoc;
     }
 }

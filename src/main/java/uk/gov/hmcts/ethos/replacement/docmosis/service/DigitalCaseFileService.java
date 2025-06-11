@@ -16,11 +16,13 @@ import uk.gov.hmcts.ethos.replacement.docmosis.client.BundleApiClient;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
+import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_DATE_TIME_PATTERN;
@@ -53,7 +55,8 @@ public class DigitalCaseFileService {
             case UPLOAD -> {
                 DigitalCaseFileType digitalCaseFile = caseData.getDigitalCaseFile();
                 if (isNotEmpty(digitalCaseFile)) {
-                    digitalCaseFile.setStatus("DCF Uploaded: " + LocalDateTime.now().format(NEW_DATE_TIME_PATTERN));
+                    digitalCaseFile.setStatus("DCF Uploaded: "
+                        + LocalDateTime.now(ZoneId.of("Europe/London")).format(NEW_DATE_TIME_PATTERN));
                     digitalCaseFile.setError(null);
 
                     // Deprecating old field
@@ -101,7 +104,7 @@ public class DigitalCaseFileService {
     }
 
     /**
-     * Prepare wordings to display digitalCaseFile link.
+     * Prepare Markdown to display a link to the Digital Case File (DCF) in the UI.
      *
      * @param caseData Get caseData
      * @return Link with Markup
@@ -120,6 +123,9 @@ public class DigitalCaseFileService {
     }
 
     private String formatReplyToReferralDCFLink(UploadedDocumentType uploadedDocumentType) {
+        if (isEmpty(uploadedDocumentType) || isEmpty(uploadedDocumentType.getDocumentBinaryUrl())) {
+            return "";
+        }
         String documentBinaryUrl = uploadedDocumentType.getDocumentBinaryUrl();
         String link = documentBinaryUrl.substring(documentBinaryUrl.indexOf("/documents/"));
         return String.format(DOC_OPENS_IN_NEW_TAB_MARK_UP, link, DIGITAL_CASE_FILE);

@@ -41,6 +41,9 @@ public class BFActionsScheduledTasks {
     @Value("${cron.maxCasesPerSearch}")
     private int maxCases;
 
+    @Value("${cron.bfActionCronCaseIdsToSkip}")
+    private String bfActionCronCaseIdsToSkip;
+
     @Scheduled(cron = "${cron.bfActionTask}")
     public void createTasksForBFDates() {
         if (!featureToggleService.isWorkAllocationEnabled()) {
@@ -60,7 +63,9 @@ public class BFActionsScheduledTasks {
             try {
                 List<SubmitEvent> cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
                 while (CollectionUtils.isNotEmpty(cases)) {
-                    cases.forEach(o -> triggerTaskEventForCase(adminUserToken, o, caseTypeId));
+                    cases.stream()
+                            .filter(o -> !bfActionCronCaseIdsToSkip.contains(String.valueOf(o.getCaseId())))
+                            .forEach(o -> triggerTaskEventForCase(adminUserToken, o, caseTypeId));
                     cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
                 }
 
@@ -97,7 +102,7 @@ public class BFActionsScheduledTasks {
                     jurisdiction, returnedRequest, String.valueOf(submitEvent.getCaseId())
             );
 
-            log.info("Called WA_REVIEW_RULE21_REFERRAL for " + submitEvent.getCaseId());
+            log.info("Called WA_REVIEW_RULE21_REFERRAL for {}", submitEvent.getCaseId());
         } catch (IOException e) {
             log.error(e.getMessage());
         }

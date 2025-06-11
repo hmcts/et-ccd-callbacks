@@ -21,6 +21,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -126,8 +127,24 @@ class DigitalCaseFileServiceTest {
     void createDcf() {
         caseData.setUploadOrRemoveDcf("Create");
         assertDoesNotThrow(() -> digitalCaseFileService.createUploadRemoveDcf("authToken", caseDetails));
-        assertEquals("DCF Updating: " + LocalDateTime.now().format(NEW_DATE_TIME_PATTERN),
+        assertEquals("DCF Updating: " + LocalDateTime.now(ZoneId.of("Europe/London")).format(NEW_DATE_TIME_PATTERN),
                 caseData.getDigitalCaseFile().getStatus());
+    }
+
+    @Test
+    void emptyDcfDocumentType_shouldReturnEmpty() {
+        List<DocumentTypeItem> documentTypeItems = getTribunalCaseFile();
+        documentTypeItems.get(0).getValue().setUploadedDocument(null);
+        caseData.setDocumentCollection(documentTypeItems);
+        assertEquals("", digitalCaseFileService.getReplyToReferralDCFLink(caseData));
+    }
+
+    @Test
+    void emptyBinaryUrl_shouldReturnEmpty() {
+        List<DocumentTypeItem> documentTypeItems = getTribunalCaseFile();
+        documentTypeItems.get(0).getValue().getUploadedDocument().setDocumentBinaryUrl(null);
+        caseData.setDocumentCollection(documentTypeItems);
+        assertEquals("", digitalCaseFileService.getReplyToReferralDCFLink(caseData));
     }
 
 }

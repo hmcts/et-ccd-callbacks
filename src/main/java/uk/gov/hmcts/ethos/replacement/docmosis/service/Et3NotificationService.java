@@ -61,6 +61,5 @@ public class Et3NotificationService {
             }
             emailService.sendEmail(et3CitizenTemplateId, personalisation.get(EMAIL_ADDRESS), personalisation);
         }
-
     }
 }

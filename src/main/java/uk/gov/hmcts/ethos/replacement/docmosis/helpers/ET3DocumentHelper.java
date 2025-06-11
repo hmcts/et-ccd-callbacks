@@ -229,7 +229,9 @@ public final class ET3DocumentHelper {
             DocumentType value = clonedItem.getValue();
             String typeOfDoc = value != null ? value.getTypeOfDocument() : null;
             if (StringUtils.isNotBlank(typeOfDoc)) {
-                boolean isAccepted = ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_ENGLAND_WALES.equals(typeOfDoc);
+                boolean isAccepted = ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_ENGLAND_WALES.equals(typeOfDoc)
+                        || ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_SCOTLAND_LETTER_13.equals(typeOfDoc)
+                        || ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_SCOTLAND_LETTER_14.equals(typeOfDoc);
                 String status = isAccepted ? RESPONSE_ACCEPTED : RESPONSE_REJECTED;
                 setDocumentTypeItemLevels(clonedItem, RESPONSE_TO_A_CLAIM, status);
                 clonedItem.setId(UUID.randomUUID().toString());

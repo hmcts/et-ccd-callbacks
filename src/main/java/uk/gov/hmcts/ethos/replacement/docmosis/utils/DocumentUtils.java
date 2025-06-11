@@ -168,20 +168,24 @@ public final class DocumentUtils {
     }
 
     /**
-     * Checks whether the given list of {@link DocumentTypeItem} contains a document
-     * with the same ID as the specified {@code targetItem}.
-     * <p>
-     * The method returns:
+     * Determines whether a given {@link DocumentTypeItem} (target item) has a matching ID
+     * with any item in the provided list of {@code documentTypeItems}. If a match is found,
+     * the target item is updated with values from the matching item using {@code setDocumentNewValues}.
+     *
+     * <p>The method follows this logic:</p>
      * <ul>
-     *     <li>{@code true} if {@code targetItem} is {@code null} or its ID is empty</li>
-     *     <li>{@code true} if any item in {@code documentTypeItems} has the same ID as {@code targetItem}</li>
-     *     <li>{@code false} otherwise</li>
+     *   <li>If the {@code targetItem} is {@code null} or its ID is {@code null} or empty,
+     *       the method returns {@code true}.</li>
+     *   <li>If the {@code documentTypeItems} list is {@code null} or empty, it returns {@code false}.</li>
+     *   <li>Iterates through each {@code DocumentTypeItem} in the list to find a matching ID.</li>
+     *   <li>If a match is found, the {@code targetItem} is updated using {@code setDocumentNewValues},
+     *       and the method returns {@code true}.</li>
+     *   <li>If no match is found after the iteration, it returns {@code false}.</li>
      * </ul>
      *
-     * @param documentTypeItems the list of {@link DocumentTypeItem} to search through; may be {@code null} or empty
-     * @param targetItem        the {@link DocumentTypeItem} whose ID is to be matched; may be {@code null}
-     * @return {@code true} if the list contains an item with the same ID as {@code targetItem},
-     *         or if the {@code targetItem} itself is {@code null} or has a blank ID;
+     * @param documentTypeItems the list of existing {@link DocumentTypeItem} objects to search
+     * @param targetItem the {@link DocumentTypeItem} whose ID is to be matched
+     * @return {@code true} if a matching ID is found or the target item is {@code null}/empty;
      *         {@code false} otherwise
      */
     public static boolean hasMatchingId(List<DocumentTypeItem> documentTypeItems,
@@ -195,12 +199,34 @@ public final class DocumentUtils {
         String targetItemId = targetItem.getId();
         for (DocumentTypeItem item : documentTypeItems) {
             if (ObjectUtils.isNotEmpty(item) && targetItemId.equals(item.getId())) {
+                setDocumentNewValues(targetItem, item);
                 return true;
             }
         }
         return false;
     }
 
+    /**
+     * Checks whether a given {@link DocumentTypeItem} (target item) has a matching binary URL
+     * with any item in the provided list of {@code documentTypeItems}. If a match is found, the method
+     * updates the {@code targetItem} with values from the matching item using {@code setDocumentNewValues}.
+     *
+     * <p>The method considers the following logic:</p>
+     * <ul>
+     *   <li>If {@code targetItem} or its binary URL is empty or null, the method returns {@code true}.</li>
+     *   <li>If {@code documentTypeItems} is null or empty, it returns {@code false}.</li>
+     *   <li>Iterates through each {@code DocumentTypeItem} in the list and compares its binary URL
+     *       to that of the {@code targetItem}.</li>
+     *   <li>If a match is found, {@code setDocumentNewValues} is invoked to update the target item
+     *       and the method returns {@code true}.</li>
+     *   <li>If no match is found, it returns {@code false}.</li>
+     * </ul>
+     *
+     * @param documentTypeItems the list of existing {@link DocumentTypeItem} objects to search within
+     * @param targetItem the {@link DocumentTypeItem} whose binary URL is to be matched
+     * @return {@code true} if a match is found or if the target item is blank or lacks a binary URL;
+     *         {@code false} otherwise
+     */
     public static boolean hasMatchingBinaryUrl(List<DocumentTypeItem> documentTypeItems,
                                                DocumentTypeItem targetItem) {
         if (ObjectUtils.isEmpty(targetItem)
@@ -221,10 +247,38 @@ public final class DocumentUtils {
                 continue;
             }
             if (targetItemBinaryUrl.equals(item.getValue().getUploadedDocument().getDocumentBinaryUrl())) {
+                setDocumentNewValues(targetItem, item);
                 return true;
             }
         }
         return false;
+    }
+
+    private static void setDocumentNewValues(DocumentTypeItem sourceDocumentTypeItem,
+                                             DocumentTypeItem targetDocumentTypeItem) {
+        if (ObjectUtils.isEmpty(sourceDocumentTypeItem) || ObjectUtils.isEmpty(targetDocumentTypeItem)
+                || sourceDocumentTypeItem.getValue() == null
+                || targetDocumentTypeItem.getValue() == null) {
+            return;
+        }
+        DocumentType source = sourceDocumentTypeItem.getValue();
+        DocumentType target = targetDocumentTypeItem.getValue();
+
+        source.setTypeOfDocument(target.getTypeOfDocument());
+        source.setShortDescription(target.getShortDescription());
+        source.setDateOfCorrespondence(target.getDateOfCorrespondence());
+        source.setTopLevelDocuments(target.getTopLevelDocuments());
+        source.setDocumentType(target.getDocumentType());
+        source.setUploadedDocument(target.getUploadedDocument());
+        source.setResponseClaimDocuments(target.getResponseClaimDocuments());
+        source.setStartingClaimDocuments(target.getStartingClaimDocuments());
+        source.setInitialConsiderationDocuments(target.getInitialConsiderationDocuments());
+        source.setCaseManagementDocuments(target.getCaseManagementDocuments());
+        source.setWithdrawalSettledDocuments(target.getWithdrawalSettledDocuments());
+        source.setHearingsDocuments(target.getHearingsDocuments());
+        source.setJudgmentAndReasonsDocuments(target.getJudgmentAndReasonsDocuments());
+        source.setReconsiderationDocuments(target.getReconsiderationDocuments());
+        source.setMiscDocuments(target.getMiscDocuments());
     }
 
     /**

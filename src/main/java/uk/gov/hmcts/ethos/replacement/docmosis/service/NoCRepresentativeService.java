@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import java.io.IOException;
-import java.util.Objects;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -10,6 +8,8 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
+import java.io.IOException;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -34,7 +34,9 @@ public class NoCRepresentativeService {
 
     private ChangeOrganisationRequest validateChangeRequest(CaseData caseData) {
         ChangeOrganisationRequest change = caseData.getChangeOrganisationRequestField();
-        if (Objects.isNull(change) || Objects.isNull(change.getCaseRoleId()) || Objects.isNull(change.getOrganisationToAdd())) {
+        if (Objects.isNull(change)
+                || Objects.isNull(change.getCaseRoleId())
+                || Objects.isNull(change.getOrganisationToAdd())) {
             throw new IllegalStateException("Invalid or missing ChangeOrganisationRequest: " + change);
         }
         return change;

@@ -1,9 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -11,17 +7,17 @@ import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
-import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1ReppedService.getOrganisationAddress;
-
 
 @Service
 @RequiredArgsConstructor
@@ -56,7 +52,8 @@ public class NocClaimantRepresentativeService {
         caseData.setRepresentativeClaimantType(claimantRep);
     }
 
-    private RepresentedTypeC createRepresentedTypeC(String caseId, ChangeOrganisationRequest change) throws IOException {
+    private RepresentedTypeC createRepresentedTypeC(String caseId, ChangeOrganisationRequest change)
+            throws IOException {
         String accessToken = adminUserService.getAdminUserToken();
 
         Optional<AuditEvent> auditEvent =
@@ -91,15 +88,5 @@ public class NocClaimantRepresentativeService {
                 caseData.setRepresentativeClaimantType(claimantRep);
             }
         }
-    }
-
-
-        private List<RepresentedTypeRItem> updateRepCollection(CaseData caseData, RepresentedTypeR claimantRep) {
-        List<RepresentedTypeRItem> repCollection = Optional.ofNullable(caseData.getRepCollection())
-                .orElse(new ArrayList<>());
-        RepresentedTypeRItem repItem = new RepresentedTypeRItem();
-        repItem.setValue(claimantRep);
-        repCollection.add(repItem);
-        return repCollection;
     }
 }

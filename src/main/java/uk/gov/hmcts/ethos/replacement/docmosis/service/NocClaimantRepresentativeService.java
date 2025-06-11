@@ -25,7 +25,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1ReppedService.g
 public class NocClaimantRepresentativeService {
     public static final String NOC_REQUEST = "nocRequest";
 
-    private final UserIdamService userIdamService;
     private final AuthTokenGenerator authTokenGenerator;
     private final OrganisationClient organisationClient;
     private final AdminUserService adminUserService;

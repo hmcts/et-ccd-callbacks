@@ -339,11 +339,10 @@ public final class ET3DocumentHelper {
         boolean hasRejectedDoc = hasRejectedDoc(documents);
         for (RespondentSumTypeItem respondentSumTypeItem : respondents) {
             if (ObjectUtils.isNotEmpty(respondentSumTypeItem.getValue())
-                    && StringUtils.isNotBlank(respondentSumTypeItem.getValue().getResponseStatus())) {
-                if (isDocumentValidForStatus(respondentSumTypeItem.getValue().getResponseStatus(),
-                        hasAcceptedDoc, hasRejectedDoc)) {
-                    return true;
-                }
+                    && StringUtils.isNotBlank(respondentSumTypeItem.getValue().getResponseStatus())
+                    && isDocumentValidForStatus(
+                            respondentSumTypeItem.getValue().getResponseStatus(), hasAcceptedDoc, hasRejectedDoc)) {
+                return true;
             }
         }
         return false;

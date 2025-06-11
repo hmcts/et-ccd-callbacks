@@ -335,20 +335,8 @@ public final class ET3DocumentHelper {
         if (respondents == null || documents == null) {
             return false;
         }
-        boolean hasAcceptedDoc = documents.stream()
-                .map(DocumentTypeItem::getValue)
-                .filter(Objects::nonNull)
-                .map(DocumentType::getTypeOfDocument)
-                .anyMatch(type -> ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_ENGLAND_WALES.equals(type)
-                        || ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_SCOTLAND_LETTER_13.equals(type)
-                        || ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_SCOTLAND_LETTER_14.equals(type));
-        boolean hasRejectedDoc = documents.stream()
-                .map(DocumentTypeItem::getValue)
-                .filter(Objects::nonNull)
-                .map(DocumentType::getTypeOfDocument)
-                .anyMatch(docType -> !ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_ENGLAND_WALES.equals(docType)
-                        && !ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_SCOTLAND_LETTER_13.equals(docType)
-                        && !ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_SCOTLAND_LETTER_14.equals(docType));
+        boolean hasAcceptedDoc = hasAcceptedDoc(documents);
+        boolean hasRejectedDoc = hasRejectedDoc(documents);
         for (RespondentSumTypeItem respondentSumTypeItem : respondents) {
             if (ObjectUtils.isNotEmpty(respondentSumTypeItem.getValue())
                     && StringUtils.isNotBlank(respondentSumTypeItem.getValue().getResponseStatus())) {
@@ -364,5 +352,25 @@ public final class ET3DocumentHelper {
             }
         }
         return false;
+    }
+
+    private static boolean hasAcceptedDoc(List<DocumentTypeItem> documents) {
+        return documents.stream()
+                .map(DocumentTypeItem::getValue)
+                .filter(Objects::nonNull)
+                .map(DocumentType::getTypeOfDocument)
+                .anyMatch(type -> ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_ENGLAND_WALES.equals(type)
+                        || ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_SCOTLAND_LETTER_13.equals(type)
+                        || ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_SCOTLAND_LETTER_14.equals(type));
+    }
+
+    private static boolean hasRejectedDoc(List<DocumentTypeItem> documents) {
+        return documents.stream()
+                .map(DocumentTypeItem::getValue)
+                .filter(Objects::nonNull)
+                .map(DocumentType::getTypeOfDocument)
+                .anyMatch(docType -> !ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_ENGLAND_WALES.equals(docType)
+                        && !ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_SCOTLAND_LETTER_13.equals(docType)
+                        && !ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_SCOTLAND_LETTER_14.equals(docType));
     }
 }

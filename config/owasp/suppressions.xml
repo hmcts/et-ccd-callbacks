@@ -161,4 +161,18 @@
         <packageUrl regex="true">^pkg:maven/org\.bitbucket\.b_c/jose4j@0\.9\.3$</packageUrl>
         <cve>CVE-2023-51775</cve>
     </suppress>
+    <suppress>
+        <notes><![CDATA[
+        file name: jaxb-runtime-2.3.9.jar
+    ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.glassfish\.jaxb/jaxb\-runtime@2\.3\.9$</packageUrl>
+        <cve>CVE-2024-9329</cve>
+    </suppress>
+    <suppress>
+        <notes><![CDATA[
+        file name: txw2-2.3.9.jar
+    ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.glassfish\.jaxb/txw2@2\.3\.9$</packageUrl>
+        <cve>CVE-2024-9329</cve>
+    </suppress>
 </suppressions>

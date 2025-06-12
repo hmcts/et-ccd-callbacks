@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-@Service("CaseRetrievalForCaseWorkerService")
+@Service("caseRetrievalForCaseWorkerService")
 public class CaseRetrievalForCaseWorkerService {
 
     private static final String MESSAGE = "Failed to retrieve case for : ";

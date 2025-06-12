@@ -36,6 +36,13 @@ public class RespondNotificationController {
 
     private final RespondNotificationService respondNotificationService;
 
+    private static final String RESPOND_SUBMITTED_BODY_TEMPLATE = """
+        ### What happens next
+
+        You can still view the response in the <a href="/cases/case-details/%s#Notifications" target="_blank">
+        Notifications tab (opens in a new tab)</a>
+        """;
+
     /**
      * Respond to a notification about to start.
      *
@@ -162,11 +169,7 @@ public class RespondNotificationController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
 
-        String body = String.format("### What happens next\r\n\r\n"
-                        + "You can still view the response in the"
-                        + " <a href=\"/cases/case-details/%s#Notifications\""
-                        + " target=\"_blank\">Notifications tab (opens in a new tab)</a>",
-                ccdRequest.getCaseDetails().getCaseId());
+        String body = String.format(RESPOND_SUBMITTED_BODY_TEMPLATE, ccdRequest.getCaseDetails().getCaseId());
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()
                 .confirmation_body(body)

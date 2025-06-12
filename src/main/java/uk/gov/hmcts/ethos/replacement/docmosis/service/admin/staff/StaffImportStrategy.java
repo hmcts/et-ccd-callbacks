@@ -27,13 +27,8 @@ public class StaffImportStrategy implements ImportStrategy {
     @Override
     @Transactional
     public void importWorkbook(XSSFWorkbook workbook) {
-        deleteExistingData();
-        rowHandlerImportStrategy.importWorkbook(workbook);
-    }
-
-    @Transactional
-    public void deleteExistingData() {
         judgeRepository.deleteAll();
         courtWorkerRepository.deleteAll();
+        rowHandlerImportStrategy.importWorkbook(workbook);
     }
 }

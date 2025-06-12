@@ -38,7 +38,7 @@ class ClaimsByHearingVenueReportTest {
     static final String OFFICE_NAME = TribunalOffice.LEEDS.getOfficeName();
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         submitEvents.clear();
         caseDataBuilder = new ClaimsByHearingVenueCaseDataBuilder();
         claimsByHearingVenueReportDataSource = mock(ClaimsByHearingVenueReportDataSource.class);

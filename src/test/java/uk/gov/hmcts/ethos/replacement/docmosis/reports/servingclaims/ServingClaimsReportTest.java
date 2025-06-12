@@ -35,7 +35,7 @@ class ServingClaimsReportTest {
     private ListingDetails listingDetails;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         listingDetails = new ListingDetails();
         ListingData listingDataRange = new ListingData();
         listingDataRange.setListingDateFrom("2020-08-02");

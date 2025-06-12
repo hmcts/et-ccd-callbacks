@@ -82,6 +82,68 @@ class ServingServiceTest {
     }
 
     @Test
+    void checkTypeOfDocumentErrorTestEmptyList() {
+        List<String> errors = servingService.checkTypeOfDocumentError(List.of());
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void checkTypeOfDocumentErrorTestNullList() {
+        List<String> errors = servingService.checkTypeOfDocumentError(null);
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void checkTypeOfDocumentErrorTestOnly7() {
+        List<DocumentTypeItem> docList = List.of(createItem("7.8a"));
+        List<String> errors = servingService.checkTypeOfDocumentError(docList);
+        assertThat(errors).hasSize(1);
+    }
+
+    @Test
+    void checkTypeOfDocumentErrorTestAll7() {
+        List<DocumentTypeItem> docList = List.of(
+            createItem("7.7"),
+            createItem("7.8"),
+            createItem("7.8a")
+        );
+        List<String> errors = servingService.checkTypeOfDocumentError(docList);
+        assertThat(errors).hasSize(1);
+    }
+
+    @Test
+    void checkTypeOfDocumentErrorTestIncludes1() {
+        List<DocumentTypeItem> docList = List.of(
+            createItem("7.7"),
+            createItem("1.1")
+        );
+        List<String> errors = servingService.checkTypeOfDocumentError(docList);
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void checkTypeOfDocumentErrorTestOnly1() {
+        List<DocumentTypeItem> docList = List.of(createItem("1.1"));
+        List<String> errors = servingService.checkTypeOfDocumentError(docList);
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void checkTypeOfDocumentErrorTestOnlyUnknownType() {
+        List<DocumentTypeItem> docList = List.of(createItem("999"));
+        List<String> errors = servingService.checkTypeOfDocumentError(docList);
+        assertThat(errors).isEmpty();
+    }
+
+    private DocumentTypeItem createItem(String typeOfDocument) {
+        DocumentType doc = new DocumentType();
+        doc.setTypeOfDocument(typeOfDocument);
+        DocumentTypeItem item = new DocumentTypeItem();
+        item.setValue(doc);
+        return item;
+    }
+
+    @Test
     void generateOtherTypeDocumentLink() {
         String expectedDocumentName = "**<big>test-filename.xlsx</big>**<br/><small><a target=\"_blank\" "
             + "href=\"/documents/test-document/binary\">test-filename.xlsx</a></small><br/>";

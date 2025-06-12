@@ -60,6 +60,12 @@ public class ServingService {
     private static final String SERVING_DOC_7_8 = "7.8";
     private static final String SERVING_DOC_7_8A = "7.8a";
 
+    private static final List<String> NOTICE_OF_CASE_MANAGEMENT_DISCUSSION =
+        List.of(SERVING_DOC_7_7, SERVING_DOC_7_8, SERVING_DOC_7_8A);
+
+    private static final String TYPE_OF_DOCUMENT_ERROR_MESSAGE =
+        "You have only uploaded a notice of hearing. Please also upload the relevant service letter.";
+
     @Value("${template.et1Serving.claimant}")
     private String claimantTemplateId;
 
@@ -67,6 +73,27 @@ public class ServingService {
     private String claimantRepTemplateId;
 
     private final EmailService emailService;
+
+    /**
+     * Check if only 7.7, 7.8 or 7.8a is uploaded, display an error message
+     * @param docList ServingDocumentCollection
+     * @return error message if any
+     */
+    public List<String> checkTypeOfDocumentError(List<DocumentTypeItem> docList) {
+        List<String> errors = new ArrayList<>();
+
+        if (CollectionUtils.isEmpty(docList)) {
+            return errors;
+        }
+
+        boolean onlyNoticeUploaded = docList.stream().map(item -> item.getValue().getTypeOfDocument())
+            .allMatch(NOTICE_OF_CASE_MANAGEMENT_DISCUSSION::contains);
+        if (onlyNoticeUploaded) {
+            errors.add(TYPE_OF_DOCUMENT_ERROR_MESSAGE);
+        }
+
+        return errors;
+    }
 
     public String generateOtherTypeDocumentLink(List<DocumentTypeItem> docList) {
         String documentLinks = "";

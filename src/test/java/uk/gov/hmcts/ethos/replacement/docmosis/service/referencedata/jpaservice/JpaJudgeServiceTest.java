@@ -26,16 +26,17 @@ class JpaJudgeServiceTest {
                 createJudge("judge4", "B John"),
                 createJudge("judge4", "z A John"),
                 createJudge("judge5", "z B John"),
-                createJudge("judge6", "z C Judge"),
-                createJudge("judge7", "C Judge"));
+                createJudge("judge6", "z C Judge"),
+                createJudge("judge7", "C Judge"));
         JudgeRepository judgeRepository = mock(JudgeRepository.class);
         when(judgeRepository.findByTribunalOffice(tribunalOffice)).thenReturn(judges);
 
         JpaJudgeService judgeService = new JpaJudgeService(judgeRepository);
         List<DynamicValueType> values = judgeService.getJudgesDynamicList(tribunalOffice);
 
+        // Results should be sorted in alphabetical order by z values and surname. Also, non-breaking spaces should
+        // be replaced with regular spaces.
         assertEquals(8, values.size());
-        // Results should be sorted in alphabetical order by z values and surname
         verifyValue(values.get(0), "judge3", "A John");
         verifyValue(values.get(1), "judge4", "B John");
         verifyValue(values.get(2), "judge2", "A Judge");

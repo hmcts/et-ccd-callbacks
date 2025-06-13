@@ -24,8 +24,8 @@ class JpaCourtWorkerServiceTest {
         List<CourtWorker> courtWorkers = List.of(
                 createCourtWorker("inactive Worker", "z Worker"),
                 createCourtWorker("worker1", "Worker 1"),
-                createCourtWorker("worker2", "Worker 2"),
-                createCourtWorker("worker3", "Worker 3"),
+                createCourtWorker("worker2", "Worker 2"),
+                createCourtWorker("worker3", "Worker 3"),
                 createCourtWorker("Clerk1", "Clerk1"),
                 createCourtWorker("clerk2", "clerk2"),
                 createCourtWorker("Zander", "Zander"));

@@ -29,9 +29,8 @@ public class JpaJudgeService implements JudgeService {
         return judgeRepository.findByTribunalOffice(tribunalOffice);
     }
 
-
     /**
-     * This method order the judges by their surname and by the z value. Judges are to be ordered by their surname and
+     * This method orders the judges by their surname and by the z value. Judges are to be ordered by their surname, and
      * if they are inactive and begin with a z, they are to be ordered at the end of the list.
      * @param tribunalOffice the tribunal office to get the judges from
      * @return a list of judges ordered by their surname and by the z value
@@ -39,7 +38,7 @@ public class JpaJudgeService implements JudgeService {
     @Override
     public List<DynamicValueType> getJudgesDynamicList(TribunalOffice tribunalOffice) {
         List<DynamicValueType> toSort = judgeRepository.findByTribunalOffice(tribunalOffice).stream()
-                .map(j -> DynamicValueType.create(j.getCode(), j.getName()))
+                .map(j -> DynamicValueType.create(j.getCode(), j.getName().replace("\u00A0", SPACE)))
                 .sorted(comparing(dv -> dv.getLabel().toLowerCase(Locale.ROOT)))
                 .toList();
         Map<Boolean, List<DynamicValueType>> map = toSort.stream()

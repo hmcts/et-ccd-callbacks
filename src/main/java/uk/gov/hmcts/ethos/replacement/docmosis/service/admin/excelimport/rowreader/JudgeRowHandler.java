@@ -42,7 +42,8 @@ public class JudgeRowHandler implements RowHandler {
 
     private Judge rowToJudge(TribunalOffice tribunalOffice, Row row) {
         String code = row.getCell(1).getStringCellValue();
-        String name = row.getCell(2).getStringCellValue();
+        // Replace a non-breaking space with a regular space
+        String name = row.getCell(2).getStringCellValue().replace("\u00A0", " ");
         JudgeEmploymentStatus employmentStatus = convertImportStatusCode(ObjectUtils.isEmpty(row.getCell(4))
                         ? JudgeEmploymentStatus.UNKNOWN.name()
                         : defaultIfEmpty(row.getCell(4).getStringCellValue(), JudgeEmploymentStatus.UNKNOWN.name()));

@@ -119,6 +119,9 @@ configurations {
             if (details.requested.group.startsWith("com.fasterxml.jackson")) {
                 details.useVersion("$jacksonVersion")
             }
+            if (details.requested.group == 'javax.xml.bind' || details.requested.group == 'org.glassfish.jaxb') {
+                details.useVersion('2.3.1')
+            }
         }
     }
 }
@@ -414,7 +417,9 @@ dependencies {
 
     testImplementation group: 'com.auth0', name: 'java-jwt', version: '4.5.0'
     testImplementation group: 'com.warrenstrange', name: 'googleauth', version: '1.5.0'
-    testImplementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.3'
+    testImplementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.1'
+    testImplementation group: 'org.glassfish.jaxb', name: 'jaxb-runtime', version: '2.3.1'
+    testImplementation group: 'org.glassfish.jaxb', name: 'txw2', version: '2.3.1'
     testImplementation group: 'net.serenity-bdd', name: 'serenity-core', version: serenity
     testImplementation group: 'net.serenity-bdd', name: 'serenity-junit', version: serenity
     testImplementation group: 'net.serenity-bdd', name: 'serenity-rest-assured', version: serenity, {

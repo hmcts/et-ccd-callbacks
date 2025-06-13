@@ -92,7 +92,7 @@ class NoticeOfChangeFieldsTaskTest {
                 eq(ENGLANDWALES_CASE_TYPE_ID), eq(EMPLOYMENT), any(), eq("123456789"));
         CaseData caseDataCaptured = caseDataArgumentCaptor.getValue();
         assertNotNull(caseDataCaptured.getNoticeOfChangeAnswers0());
-        assertEquals(caseDataCaptured.getNoticeOfChangeAnswers0().getPartyName(), submitEvent.getCaseData()
+        assertEquals(caseDataCaptured.getNoticeOfChangeAnswers0().getRespondentName(), submitEvent.getCaseData()
                 .getRespondentCollection().get(0).getValue().getRespondentName());
 
     }

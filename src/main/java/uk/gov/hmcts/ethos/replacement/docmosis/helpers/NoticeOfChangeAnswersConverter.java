@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 
 @Component
@@ -13,10 +13,11 @@ public class NoticeOfChangeAnswersConverter {
      * @return notice of change answer
      */
     public NoticeOfChangeAnswers generateForSubmission(RespondentSumTypeItem respondent,
-                                                       CaseData caseData) {
+                                                       ClaimantIndType claimant) {
         return NoticeOfChangeAnswers.builder()
-                .partyName(respondent.getValue().getRespondentName())
-                .caseReference(caseData.getEthosCaseReference())
+                .respondentName(respondent.getValue().getRespondentName())
+                .claimantFirstName(claimant.getClaimantFirstNames())
+                .claimantLastName(claimant.getClaimantLastName())
                 .build();
     }
 }

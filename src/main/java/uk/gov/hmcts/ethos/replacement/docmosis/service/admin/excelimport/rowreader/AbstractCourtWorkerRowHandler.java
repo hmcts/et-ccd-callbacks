@@ -28,7 +28,7 @@ public abstract class AbstractCourtWorkerRowHandler implements RowHandler {
 
     private CourtWorker rowToCourtWorker(TribunalOffice tribunalOffice, Row row) {
         String code = row.getCell(1).getStringCellValue();
-        String name = row.getCell(2).getStringCellValue();
+        String name = row.getCell(2).getStringCellValue().replace("\u00A0", " ");
 
         CourtWorker courtWorker = new CourtWorker();
         courtWorker.setType(courtWorkerType);

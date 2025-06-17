@@ -16,7 +16,7 @@ class CaseCloseServiceTest {
     private CaseData caseData;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         caseCloseService = new CaseCloseService();
         caseData = new CaseData();
     }

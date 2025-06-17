@@ -41,7 +41,7 @@ class TseAdmReplyHelperTest {
     private TornadoService tornadoService;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         caseData = CaseDataBuilder.builder()
             .withClaimantIndType("First", "Last")
             .withEthosCaseReference("1234")

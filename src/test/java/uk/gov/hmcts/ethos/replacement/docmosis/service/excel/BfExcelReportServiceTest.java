@@ -21,7 +21,7 @@ class BfExcelReportServiceTest {
     BfActionReportData reportData;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         reportData = new BfActionReportData();
         reportData.setReportPeriodDescription("Period description");
         reportData.setReportPrintedOnDescription("Printed On Description");

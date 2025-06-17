@@ -29,7 +29,7 @@ class BulkAddSinglesControllerTest {
     private String authToken;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         bulkAddSinglesValidator = mock(BulkAddSinglesValidator.class);
         bulkAddSinglesService = mock(BulkAddSinglesService.class);
         authToken = "some-token";

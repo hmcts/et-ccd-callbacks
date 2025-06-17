@@ -28,7 +28,7 @@ class UserIdamServiceTest {
     private OAuth2Configuration oauth2Configuration;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         userDetails = HelperTest.getUserDetails();
         tokenResponse = HelperTest.getUserToken();
         IdamApi idamApi = new IdamApi() {

@@ -42,8 +42,8 @@ class CaseSourceLocalReportTest {
     void testReportHeaderTotalsAreZeroIfNoCasesExist() {
         listingDetails.setCaseTypeId(ENGLANDWALES_LISTING_CASE_TYPE_ID);
         listingDetails.setCaseData(listingData);
-        ListingData listingData = caseSourceLocalReport.generateReportData(listingDetails, submitEvents);
-        verifyReportHeaderIsZero(listingData);
+        ListingData generatedListingData = caseSourceLocalReport.generateReportData(listingDetails, submitEvents);
+        verifyReportHeaderIsZero(generatedListingData);
     }
 
     private void verifyReportHeaderIsZero(ListingData listingData) {

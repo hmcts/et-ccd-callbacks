@@ -1,0 +1,47 @@
+# Node.js dependencies
+node_modules/
+package-lock.json
+
+# Yarn v3 gitignores
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+# Generated files
+definitions/xlsx/*.xlsx
+*/definitions/xlsx/*.xlsx
+jurisdictions/*/xlsx/*.xlsx
+
+# Symlinks (these are setup artifacts)
+definitions
+jurisdictions/*/definitions
+jurisdictions/*/bin
+jurisdictions/*/yarn.lock
+
+# Logs
+*.log
+yarn-debug.log*
+yarn-error.log*
+npm-debug.log*
+
+# Temporary files
+temp/
+*.tmp
+~$*.xlsx
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Build outputs
+build/
+dist/
+coverage/
+

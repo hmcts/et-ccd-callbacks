@@ -1,0 +1,107 @@
+[
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "managingOffice",
+    "Label": "Tribunal Office",
+    "DisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "ethosCaseReference",
+    "Label": "Case Number",
+    "DisplayOrder": 2
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "feeGroupReference",
+    "Label": "Submission Reference",
+    "DisplayOrder": 3
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "claimantIndType",
+    "ListElementCode": "claimant_last_name",
+    "Label": "Claimant Surname",
+    "DisplayOrder": 4
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "claimantIndType",
+    "ListElementCode": "claimant_first_names",
+    "Label": "Claimant First Name",
+    "DisplayOrder": 5
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "claimant_Company ",
+    "Label": "Claimant Company Name",
+    "DisplayOrder": 6
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "respondent",
+    "Label": "Respondent",
+    "DisplayOrder": 7
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "multipleReference",
+    "Label": "Multiple Reference",
+    "DisplayOrder": 8
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "subMultipleName",
+    "Label": "Submultiple Reference",
+    "DisplayOrder": 9
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "positionType",
+    "Label": "Current Position",
+    "DisplayOrder": 10
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "fileLocation",
+    "Label": "Physical Location",
+    "DisplayOrder": 11
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "clerkResponsible",
+    "Label": "Clerk",
+    "DisplayOrder": 12
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "claimantType",
+    "ListElementCode": "claimant_addressUK.PostCode",
+    "Label": "Claimant Postcode",
+    "DisplayOrder": 13
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales_Listings",
+    "CaseFieldID": "documentName",
+    "Label": "Document Name",
+    "DisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales_Multiple",
+    "CaseFieldID": "multipleName",
+    "Label": "Multiple Name",
+    "DisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales_Multiple",
+    "CaseFieldID": "multipleReference",
+    "Label": "Multiple Reference",
+    "DisplayOrder": 2
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales_Multiple",
+    "CaseFieldID": "managingOffice",
+    "Label": "Tribunal Office",
+    "DisplayOrder": 3
+  }
+]

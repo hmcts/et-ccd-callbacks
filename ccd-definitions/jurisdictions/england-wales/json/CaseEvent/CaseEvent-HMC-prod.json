@@ -1,0 +1,15 @@
+[
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "addAmendClaimantRepresentative",
+    "Name": "Claimant Representative",
+    "Description": "Add or Amend a Claimant Representative",
+    "DisplayOrder": 14,
+    "PreConditionState(s)": "Accepted;Rejected;Closed",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "EventEnablingCondition": "managingOffice !=\"Unassigned\"",
+    "ShowEventNotes": "N",
+    "ShowSummary": "N"
+  }
+]

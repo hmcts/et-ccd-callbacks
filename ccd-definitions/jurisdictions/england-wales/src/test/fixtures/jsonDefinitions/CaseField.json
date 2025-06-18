@@ -1,0 +1,16 @@
+[
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "tribunalCorrespondenceAddress",
+    "Label": "Correspondence Address",
+    "FieldType": "AddressUK",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "tribunalCorrespondenceTelephone",
+    "Label": "Correspondence Telephone",
+    "FieldType": "Text",
+    "SecurityClassification": "Public"
+  }
+]

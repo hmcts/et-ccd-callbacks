@@ -542,7 +542,12 @@ bootWithCCD {
 
 }
 
+<<<<<<< RET-5820-Java21Upgrade
 pmdMain.maxFailures = 31
 pmdTest.maxFailures = 56
+=======
+pmdMain.maxFailures = 249
+pmdTest.maxFailures = 72
+>>>>>>> master
 
 pmdTest.ruleSetFiles = files("config/pmd/rulesetTest.xml")

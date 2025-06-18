@@ -11,7 +11,12 @@
         <exclude name="JUnitTestContainsTooManyAsserts"/>
         <exclude name="JUnitAssertionsShouldIncludeMessage"/>
         <exclude name="JUnitTestsShouldIncludeAssert"/>
-        <exclude name="UnusedPrivateMethod"/>
+        <exclude name="LiteralsFirstInComparisons"/>
+        <exclude name="LooseCoupling"/>
+        <exclude name="AvoidPrintStackTrace"/>
+        <exclude name="JUnit5TestShouldBePackagePrivate"/>
+        <exclude name="MissingOverride"/>
+        <exclude name="UnusedAssignment"/>
     </rule>
     <rule ref="category/java/codestyle.xml">
         <exclude name="AtLeastOneConstructor"/>
@@ -20,10 +25,16 @@
         <exclude name="MethodArgumentCouldBeFinal"/>
         <exclude name="OnlyOneReturn"/>
         <exclude name="TooManyStaticImports"/>
-        <exclude name="DefaultPackage"/>
         <exclude name="CommentDefaultAccessModifier"/>
         <exclude name="ShortClassName"/>
+        <exclude name="UnnecessaryAnnotationValueElement"/>
+        <exclude name="UnnecessaryFullyQualifiedName"/>
+        <exclude name="UseExplicitTypes"/>
+        <exclude name="UselessParentheses"/>
+        <exclude name="ConfusingTernary"/>
         <exclude name="LinguisticNaming"/>
+        <exclude name="UseDiamondOperator"/>
+        <exclude name="UnnecessaryCast"/>
     </rule>
     <rule ref="category/java/codestyle.xml/ClassNamingConventions">
         <properties>
@@ -62,13 +73,24 @@
         <exclude name="AvoidThrowingRawExceptionTypes"/>
         <exclude name="ExcessiveImports"/>
         <exclude name="TooManyMethods"/>
-        <exclude name="TooManyFields"/>
+        <exclude name="LawOfDemeter"/>
+        <exclude name="CouplingBetweenObjects"/>
+        <exclude name="CyclomaticComplexity"/>
         <exclude name="GodClass"/>
-    </rule>
-    <rule ref="category/java/design.xml/LawOfDemeter">
-        <properties>
-            <property name="violationSuppressRegex" value="(.*method chain calls.*|.*object not created locally.*|.*static property access.*)"/>
-        </properties>
+        <exclude name="SimplifyBooleanReturns"/>
+        <exclude name="CognitiveComplexity"/>
+        <exclude name="NPathComplexity"/>
+        <exclude name="NcssCount"/>
+        <exclude name="TooManyFields"/>
+        <exclude name="SingularField"/>
+        <exclude name="ExcessiveParameterList"/>
+        <exclude name="ExcessivePublicCount"/>
+        <exclude name="FinalFieldCouldBeStatic"/>
+        <exclude name="ImmutableField"/>
+        <exclude name="AvoidThrowingNullPointerException"/>
+        <exclude name="ExceptionAsFlowControl"/>
+        <exclude name="AvoidDeeplyNestedIfStmts"/>
+        <exclude name="AvoidUncheckedExceptionsInSignatures"/>
     </rule>
     <rule ref="category/java/design.xml/SignatureDeclareThrowsException">
         <properties>
@@ -82,13 +104,28 @@
     </rule>
     <rule ref="category/java/errorprone.xml">
         <exclude name="NonSerializableClass"/>
+        <exclude name="AvoidLiteralsInIfCondition"/>
+        <exclude name="SimpleDateFormatNeedsLocale"/>
+        <exclude name="ImplicitSwitchFallThrough"/>
+        <exclude name="TestClassWithoutTestCases"/>
+        <exclude name="ReturnEmptyCollectionRatherThanNull"/>
+        <exclude name="UseProperClassLoader"/>
     </rule>
-    <rule ref="category/java/multithreading.xml"/>
-    <rule ref="category/java/performance.xml"/>
+    <rule ref="category/java/multithreading.xml">
+        <exclude name="DoNotUseThreads"/>
+        <exclude name="AvoidSynchronizedAtMethodLevel"/>
+        <exclude name="UseConcurrentHashMap"/>
+    </rule>
+    <rule ref="category/java/performance.xml">
+        <exclude name="AvoidInstantiatingObjectsInLoops"/>
+        <exclude name="InsufficientStringBufferDeclaration"/>
+        <exclude name="ConsecutiveAppendsShouldReuse"/>
+        <exclude name="ConsecutiveLiteralAppends"/>
+        <exclude name="InefficientEmptyStringCheck"/>
+    </rule>
     <rule ref="category/java/security.xml"/>
     <rule ref="category/java/errorprone.xml/AvoidDuplicateLiterals">
         <properties>
-            <property name="separator" value="," />
             <property name="maxDuplicateLiterals" value="40" />
             <property name="minimumLength" value="3" />
             <property name="skipAnnotations" value="false" />

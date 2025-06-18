@@ -24,15 +24,45 @@ spring:
     password: ${ET_COS_DB_PASSWORD:}
     url: jdbc:postgresql://${ET_COS_DB_HOST:localhost}:${ET_COS_DB_PORT:5432}/${ET_COS_DB_NAME:et_cos}${ET_COS_DB_CONN_OPTIONS:}
     username: ${ET_COS_DB_USER_NAME:et_cos}
+    # Optimize database connection pool
+    hikari:
+      maximumPoolSize: 15
+      minimumIdle: 5
+      idleTimeout: 30000
+      connectionTimeout: 40000
+      maxLifetime: 1800000
   config:
     import: optional:configtree:/mnt/secrets/et-cos/,optional:configtree:/mnt/secrets/et/
+  # Enable async task execution
+  task:
+    execution:
+      pool:
+        core-size: 5
+        max-size: 10
+        queue-capacity: 25
+      thread-name-prefix: NotificationAsync-
 
 server:
   port: '8081'
+  # Configure Tomcat for better concurrency
+  tomcat:
+    max-threads: 100
+    min-spare-threads: 20
+    accept-count: 20
+
+# HTTP client connection pooling
+http:
+  client:
+    max:
+      total: 100
+      per:
+        route: 20
 
 feign:
   httpclient:
     enabled: 'true'
+    max-connections: 200
+    max-connections-per-route: 50
 
 tornado:
   accessKey: ${TORNADO_ACCESS_KEY}
@@ -40,7 +70,7 @@ tornado:
 
 ccd:
   client:
-    timeout: '60000'
+    timeout: '60000' # 60 seconds
   data-store-api-url: ${CCD_DATA_STORE_API_URL:http://ccd-data-store-api:4452}
 
 document_management:

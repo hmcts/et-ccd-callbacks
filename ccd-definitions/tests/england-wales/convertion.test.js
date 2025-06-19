@@ -1,5 +1,5 @@
 const assert = require('assert');
-const sheetUtils = require('../../src/main/lib/ccd-spreadsheet-utils');
+const sheetUtils = require('../../tools/ccd-definition-processor/src/main/lib/ccd-spreadsheet-utils');
 
 describe('JsonHelper', () => {
   const createJsonWithNumbers = () => [

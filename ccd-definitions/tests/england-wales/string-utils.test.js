@@ -1,6 +1,6 @@
 const assert = require('assert');
 
-const StringUtils = require('../../src/main/lib/string-utils');
+const StringUtils = require('../../tools/ccd-definition-processor/src/main/lib/string-utils');
 
 describe('StringUtils', () => {
   describe('split', () => {

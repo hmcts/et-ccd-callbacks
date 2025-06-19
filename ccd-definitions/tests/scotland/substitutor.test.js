@@ -1,6 +1,6 @@
 const assert = require('assert');
 
-const { Substitutor } = require('../main/lib/substitutor');
+const { Substitutor } = require('../../tools/ccd-definition-processor/src/main/lib/substitutor');
 
 describe('Substitutor', () => {
   describe('injecting environment variables', () => {

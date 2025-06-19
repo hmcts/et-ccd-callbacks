@@ -1,5 +1,5 @@
 const assert = require('assert').strict;
-const accessControlTransformer = require('../main/lib/access-control-transformer');
+const accessControlTransformer = require('../../tools/ccd-definition-processor/src/main/lib/access-control-transformer');
 
 describe('Access control transformer', () => {
 

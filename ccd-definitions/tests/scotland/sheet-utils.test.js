@@ -1,5 +1,5 @@
 const assert = require('assert');
-const sheetUtils = require('../main/lib/sheet-utils');
+const sheetUtils = require('../../tools/ccd-definition-processor/src/main/lib/sheet-utils');
 
 describe('sheet-utils', () => {
   describe('groupToSheets', () => {

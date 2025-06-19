@@ -1,28 +1,31 @@
 const expect = require('chai').expect;
 const { uniq } = require('lodash');
 
+const path = require('path');
+const basePath = path.join(__dirname, '../../../jurisdictions/admin/json');
+
 const Config = {
-    AuthorisationCaseEvent: Object.assign(require('definitions/json/AuthorisationCaseEvent.json'), []),
-    AuthorisationCaseField: Object.assign(require('definitions/json/AuthorisationCaseField.json'), []),
-    AuthorisationCaseState: Object.assign(require('definitions/json/AuthorisationCaseState.json'), []),
-    AuthorisationCaseType: Object.assign(require('definitions/json/AuthorisationCaseType.json'), []),
-    AuthorisationComplexType: Object.assign(require('definitions/json/AuthorisationComplexType.json'), []),
-    CaseEvent: Object.assign(require('definitions/json/CaseEvent.json'), []),
-    CaseEventToComplexTypes: Object.assign(require('definitions/json/CaseEventToComplexTypes.json'), []),
-    CaseEventToFields: Object.assign(require('definitions/json/CaseEventToFields'), []),
-    CaseField: Object.assign(require('definitions/json/CaseField'), []),
-    CaseType: Object.assign(require('definitions/json/CaseType.json'), []),
-    CaseTypeTab: Object.assign(require('definitions/json/CaseTypeTab'), []),
-    ComplexTypes: Object.assign(require('definitions/json/ComplexTypes.json'), []),
-    FixedLists: Object.assign(require('definitions/json/FixedLists.json'), []),
-    Jurisdiction: Object.assign(require('definitions/json/Jurisdiction.json'), []),
-    SearchInputFields: Object.assign(require('definitions/json/SearchInputFields.json'), []),
-    RoleToAccessProfiles: Object.assign(require('definitions/json/RoleToAccessProfiles.json'), []),
-    SearchResultFields: Object.assign(require('definitions/json/SearchResultFields.json'), []),
-    State: Object.assign(require('definitions/json/State.json'), []),
-    UserProfile: Object.assign(require('definitions/json/UserProfile.json'), []),
-    WorkBasketInputFields: Object.assign(require('definitions/json/WorkBasketInputFields.json'), []),
-    WorkBasketResultFields: Object.assign(require('definitions/json/WorkBasketResultFields.json'), [])
+    AuthorisationCaseEvent: Object.assign(require(path.join(basePath, 'AuthorisationCaseEvent.json')), []),
+    AuthorisationCaseField: Object.assign(require(path.join(basePath, 'AuthorisationCaseField.json')), []),
+    AuthorisationCaseState: Object.assign(require(path.join(basePath, 'AuthorisationCaseState.json')), []),
+    AuthorisationCaseType: Object.assign(require(path.join(basePath, 'AuthorisationCaseType.json')), []),
+    AuthorisationComplexType: Object.assign(require(path.join(basePath, 'AuthorisationComplexType.json')), []),
+    CaseEvent: Object.assign(require(path.join(basePath, 'CaseEvent.json')), []),
+    CaseEventToComplexTypes: Object.assign(require(path.join(basePath, 'CaseEventToComplexTypes.json')), []),
+    CaseEventToFields: Object.assign(require(path.join(basePath, 'CaseEventToFields.json')), []),
+    CaseField: Object.assign(require(path.join(basePath, 'CaseField.json')), []),
+    CaseType: Object.assign(require(path.join(basePath, 'CaseType.json')), []),
+    CaseTypeTab: Object.assign(require(path.join(basePath, 'CaseTypeTab.json')), []),
+    ComplexTypes: Object.assign(require(path.join(basePath, 'ComplexTypes.json')), []),
+    FixedLists: Object.assign(require(path.join(basePath, 'FixedLists.json')), []),
+    Jurisdiction: Object.assign(require(path.join(basePath, 'Jurisdiction.json')), []),
+    SearchInputFields: Object.assign(require(path.join(basePath, 'SearchInputFields.json')), []),
+    RoleToAccessProfiles: Object.assign(require(path.join(basePath, 'RoleToAccessProfiles.json')), []),
+    SearchResultFields: Object.assign(require(path.join(basePath, 'SearchResultFields.json')), []),
+    State: Object.assign(require(path.join(basePath, 'State.json')), []),
+    UserProfile: Object.assign(require(path.join(basePath, 'UserProfile.json')), []),
+    WorkBasketInputFields: Object.assign(require(path.join(basePath, 'WorkBasketInputFields.json')), []),
+    WorkBasketResultFields: Object.assign(require(path.join(basePath, 'WorkBasketResultFields.json')), [])
 };
 
 describe('For each config sheet', () => {

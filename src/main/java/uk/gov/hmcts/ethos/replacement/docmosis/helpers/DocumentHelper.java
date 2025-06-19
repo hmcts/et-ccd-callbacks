@@ -71,6 +71,7 @@ public final class DocumentHelper {
     public static final String HEARING_TIME = "\"Hearing_time\":\"";
     public static final String HEARING_DATE_TIME = "\"Hearing_date_time\":\"";
     public static final String CLAIMANT_OR_REP_FULL_NAME = "\"claimant_or_rep_full_name\":\"";
+    private static final Double DOUBLE_ONE = 1d;
 
     private DocumentHelper() {
     }
@@ -88,10 +89,7 @@ public final class DocumentHelper {
         // Start building the instruction
         sb.append("{\n\"accessKey\":\"").append(accessKey).append(NEW_LINE).append("\"templateName\":\"")
                 .append(templateName).append(FILE_EXTENSION).append(NEW_LINE).append("\"outputName\":\"")
-                .append(OUTPUT_FILE_NAME).append(NEW_LINE);
-
-        // Building the document data
-        sb.append("\"data\":{\n");
+                .append(OUTPUT_FILE_NAME).append(NEW_LINE).append("\"data\":{\n");
 
         if (templateName.equals(ADDRESS_LABELS_TEMPLATE) && multipleData == null) {
             sb.append(getAddressLabelsDataSingleCase(caseData));
@@ -247,13 +245,12 @@ public final class DocumentHelper {
     }
 
     private static StringBuilder getRespondentData(CaseData caseData) {
-        StringBuilder sb = new StringBuilder();
         List<RespondentSumTypeItem> respondentSumTypeItemList = CollectionUtils.isNotEmpty(
                 caseData.getRespondentCollection())
                 ? caseData.getRespondentCollection() : new ArrayList<>();
 
         if (CollectionUtils.isEmpty(respondentSumTypeItemList)) {
-            log.error("No respondents present for case: " + caseData.getEthosCaseReference());
+            log.error("No respondents present for case: {}", caseData.getEthosCaseReference());
         }
 
         boolean responseContinue = false;
@@ -274,18 +271,18 @@ public final class DocumentHelper {
         }
 
         if (!responseContinue) {
-            log.error("Atleast one respondent should have response continuing for case: "
-                    + caseData.getEthosCaseReference());
+            log.error("At least one respondent should have response continuing for case: {}",
+                    caseData.getEthosCaseReference());
         }
 
         if (!responseNotStruckOut) {
-            log.error("Atleast one respondent should have response not struck out for case: "
-                    + caseData.getEthosCaseReference());
+            log.error("At least one respondent should have response not struck out for case: {}",
+                    caseData.getEthosCaseReference());
         }
 
         if (respondentToBeShown.equals(new RespondentSumType())) {
-            log.error("No respondent found whose response is continuing and is not struck out for case: "
-                    + caseData.getEthosCaseReference());
+            log.error("No respondent found whose response is continuing and is not struck out for case: {}",
+                    caseData.getEthosCaseReference());
         }
 
         List<RepresentedTypeRItem> representedTypeRList = caseData.getRepCollection();
@@ -298,6 +295,8 @@ public final class DocumentHelper {
                     .filter(a -> a.getValue().getRespRepName().equals(
                             finalRespondentToBeShown.getRespondentName())).findFirst();
         }
+
+        StringBuilder sb = new StringBuilder();
 
         if (representedTypeRItem.isPresent()) {
             RepresentedTypeR representedTypeR = representedTypeRItem.get().getValue();
@@ -336,8 +335,10 @@ public final class DocumentHelper {
 
             if (isNullOrEmpty(finalRespondentToBeShown.getResponseContinue())
                     || YES.equals(finalRespondentToBeShown.getResponseContinue())) {
-                sb.append("\"Respondent\":\"").append(caseData.getRespondentCollection().size() > 1 ? "1. " : "")
-                        .append(nullCheck(finalRespondentToBeShown.getRespondentName()))
+                String respondentName = nullCheck(finalRespondentToBeShown.getRespondentName());
+                sb.append("\"Respondent\":\"").append(caseData.getRespondentCollection().size() > 1
+                                ? "1. " + respondentName + ","
+                                : respondentName)
                         .append(NEW_LINE);
             }
 
@@ -364,7 +365,7 @@ public final class DocumentHelper {
                 .map(respondentSumTypeItem -> atomicInteger.getAndIncrement() + ". "
                         + respondentSumTypeItem.getValue().getRespondentName())
                 .toList();
-        sb.append("\"resp_others\":\"").append(nullCheck(String.join("\\n", respOthers))).append(NEW_LINE);
+        sb.append("\"resp_others\":\"").append(nullCheck(String.join(", ", respOthers))).append(NEW_LINE);
         return sb;
     }
 
@@ -495,7 +496,7 @@ public final class DocumentHelper {
         String numType = hearingType.getHearingEstLengthNumType();
         try {
             double tmp = Double.parseDouble(hearingType.getHearingEstLengthNum());
-            if (tmp == 1) {
+            if (tmp == DOUBLE_ONE) {
                 numType = numType.substring(0, numType.length() - 1);
             }
         } catch (NumberFormatException e) {
@@ -780,8 +781,8 @@ public final class DocumentHelper {
         return sb;
     }
 
-    private static int getPageLabelNumber(int startingLabel, int i) {
-        int pageLabelNumber = i + 1;
+    private static int getPageLabelNumber(int startingLabel, int pageLabel) {
+        int pageLabelNumber = pageLabel + 1;
 
         if (startingLabel > 1) {
             pageLabelNumber += startingLabel - 1;

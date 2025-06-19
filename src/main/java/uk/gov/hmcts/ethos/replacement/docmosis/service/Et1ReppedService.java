@@ -181,7 +181,7 @@ public class Et1ReppedService {
     }
 
     @NotNull
-    private static Address getOrganisationAddress(OrganisationsResponse organisationDetails) {
+    static Address getOrganisationAddress(OrganisationsResponse organisationDetails) {
         Address organisationAddress = new Address();
         if (CollectionUtils.isEmpty(organisationDetails.getContactInformation())) {
             return organisationAddress;

@@ -1,0 +1,16 @@
+[
+  {
+    "CaseTypeID": "ET_EnglandWales_Multiple",
+    "ID": "close",
+    "Name": "Close",
+    "Description": "Close Multiple",
+    "DisplayOrder": 10,
+    "PreConditionState(s)": "Open",
+    "PostConditionState": "Closed",
+    "CallBackURLAboutToStartEvent": "${ET_COS_URL}/initialiseCloseMultiple",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/closeMultiple",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "N",
+    "ShowSummary": "N"
+  }
+]

@@ -1,0 +1,299 @@
+[
+  {
+    "CaseTypeID": "ET_Admin",
+    "TabID": "importFiles",
+    "TabLabel": "Import Files",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "staffImportFile",
+    "TabFieldDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "TabID": "importFiles",
+    "TabLabel": "Import Files",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "venueImport",
+    "TabFieldDisplayOrder": 2
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "TabID": "CaseHistory",
+    "TabLabel": "History",
+    "TabDisplayOrder": 2,
+    "CaseFieldID": "caseHistory",
+    "TabFieldDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "TabID": "preHearingDepositData",
+    "TabLabel": "Pre-Hearing Deposit",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "caseNumber",
+    "TabFieldDisplayOrder": 1,
+    "FieldShowCondition": "claimantOrRespondentName=\"dummy_claimant_respondent_name_1983_\""
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "TabID": "preHearingDepositData",
+    "TabLabel": "Pre-Hearing Deposit",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "claimantOrRespondentName",
+    "TabFieldDisplayOrder": 2
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "TabID": "preHearingDepositData",
+    "TabLabel": "Pre-Hearing Deposit",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "depositAmount",
+    "TabFieldDisplayOrder": 3
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "TabID": "preHearingDepositData",
+    "TabLabel": "Pre-Hearing Deposit",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "depositOrderedAgainst",
+    "TabFieldDisplayOrder": 4
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "TabID": "preHearingDepositData",
+    "TabLabel": "Pre-Hearing Deposit",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "depositRequestedBy",
+    "TabFieldDisplayOrder": 5
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "TabID": "preHearingDepositData",
+    "TabLabel": "Pre-Hearing Deposit",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "depositCovers",
+    "TabFieldDisplayOrder": 6
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "TabID": "preHearingDepositData",
+    "TabLabel": "Pre-Hearing Deposit",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "depositOrderSent",
+    "TabFieldDisplayOrder": 7
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "TabID": "preHearingDepositData",
+    "TabLabel": "Pre-Hearing Deposit",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "depositDue",
+    "TabFieldDisplayOrder": 8
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "TabID": "preHearingDepositData",
+    "TabLabel": "Pre-Hearing Deposit",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "depositTimeExtension",
+    "TabFieldDisplayOrder": 9
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "TabID": "preHearingDepositData",
+    "TabLabel": "Pre-Hearing Deposit",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "depositTimeExtensionDue",
+    "TabFieldDisplayOrder": 10
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "TabID": "preHearingDepositData",
+    "TabLabel": "Pre-Hearing Deposit",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "depositReceived",
+    "TabFieldDisplayOrder": 11
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "TabID": "preHearingDepositData",
+    "TabLabel": "Pre-Hearing Deposit",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "dateDepositReceived",
+    "TabFieldDisplayOrder": 12
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "TabID": "preHearingDepositData",
+    "TabLabel": "Pre-Hearing Deposit",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "depositRefund",
+    "TabFieldDisplayOrder": 13
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "TabID": "preHearingDepositData",
+    "TabLabel": "Pre-Hearing Deposit",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "amountRefunded",
+    "TabFieldDisplayOrder": 14
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "TabID": "preHearingDepositData",
+    "TabLabel": "Pre-Hearing Deposit",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "depositRefundDate",
+    "TabFieldDisplayOrder": 15
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "TabID": "preHearingDepositData",
+    "TabLabel": "Pre-Hearing Deposit",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "chequeOrPONumber",
+    "TabFieldDisplayOrder": 16
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "TabID": "preHearingDepositData",
+    "TabLabel": "Pre-Hearing Deposit",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "receivedBy",
+    "TabFieldDisplayOrder": 17
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "TabID": "preHearingDepositData",
+    "TabLabel": "Pre-Hearing Deposit",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "depositRefundedTo",
+    "TabFieldDisplayOrder": 18
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "TabID": "preHearingDepositData",
+    "TabLabel": "Pre-Hearing Deposit",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "notes",
+    "TabFieldDisplayOrder": 19
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "TabID": "preHearingDepositData",
+    "TabLabel": "Pre-Hearing Deposit",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "documentUpload",
+    "TabFieldDisplayOrder": 20
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "TabID": "preHearingDepositData",
+    "TabLabel": "Pre-Hearing Deposit",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "depositReceivedFrom",
+    "TabFieldDisplayOrder": 21
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "TabID": "preHearingDepositData",
+    "TabLabel": "Pre-Hearing Deposit",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "depositComments",
+    "TabFieldDisplayOrder": 22
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "TabID": "preHearingDepositData",
+    "TabLabel": "Pre-Hearing Deposit",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "comments",
+    "TabFieldDisplayOrder": 23
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "TabID": "preHearingDepositData",
+    "TabLabel": "Pre-Hearing Deposit",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "phrNumber",
+    "TabFieldDisplayOrder": 24
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "TabID": "preHearingDepositData",
+    "TabLabel": "Pre-Hearing Deposit",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "mr1Reference",
+    "TabFieldDisplayOrder": 25
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "TabID": "preHearingDepositData",
+    "TabLabel": "Pre-Hearing Deposit",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "bankingDate",
+    "TabFieldDisplayOrder": 26
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "TabID": "preHearingDepositData",
+    "TabLabel": "Pre-Hearing Deposit",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "journalConfirmedReceipt",
+    "TabFieldDisplayOrder": 27
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "TabID": "preHearingDepositData",
+    "TabLabel": "Pre-Hearing Deposit",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "status",
+    "TabFieldDisplayOrder": 28
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "TabID": "preHearingDepositData",
+    "TabLabel": "Pre-Hearing Deposit",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "dateSentForRefund",
+    "TabFieldDisplayOrder": 29
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "TabID": "preHearingDepositData",
+    "TabLabel": "Pre-Hearing Deposit",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "refundReference",
+    "TabFieldDisplayOrder": 30
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "TabID": "preHearingDepositData",
+    "TabLabel": "Pre-Hearing Deposit",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "regionOffice",
+    "TabFieldDisplayOrder": 31
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "TabID": "preHearingDepositData",
+    "TabLabel": "Pre-Hearing Deposit",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "payeeName",
+    "TabFieldDisplayOrder": 32
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "TabID": "preHearingDepositData",
+    "TabLabel": "Pre-Hearing Deposit",
+    "TabDisplayOrder": 1,
+    "CaseFieldID": "journalConfirmedPaid",
+    "TabFieldDisplayOrder": 33
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "TabID": "preHearingDepositDataHistory",
+    "TabLabel": "History",
+    "TabDisplayOrder": 2,
+    "CaseFieldID": "preHearingDepositImportFile",
+    "TabFieldDisplayOrder": 1
+  }
+]

@@ -1,0 +1,646 @@
+[
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "importStaffData",
+    "CaseFieldID": "staffImportFile",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "COMPLEX",
+    "PageID": "1",
+    "CaseEventFieldLabel": "Import Staff Data"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "importVenueData",
+    "CaseFieldID": "venueImport",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "COMPLEX",
+    "PageID": 1,
+    "CaseEventFieldLabel": "Import Venue Data"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "addJudge",
+    "CaseFieldID": "tribunalOffice",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "addJudge",
+    "CaseFieldID": "judgeCode",
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "addJudge",
+    "CaseFieldID": "judgeName",
+    "PageFieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "addJudge",
+    "CaseFieldID": "employmentStatus",
+    "PageFieldDisplayOrder": 4,
+    "DisplayContext": "MANDATORY",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "addCourtWorker",
+    "CaseFieldID": "adminCourtWorker",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "COMPLEX",
+    "PageID": 1,
+    "CaseEventFieldLabel": "Add Court Worker"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "updateCourtWorker",
+    "CaseFieldID": "courtWorkerOffice",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "PageID": 1,
+    "CallBackURLMidEvent": "${CCD_DEF_BASE_URL}/admin/staff/midEventCourtWorkerSelectOffice"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "updateCourtWorker",
+    "CaseFieldID": "courtWorkerType",
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY",
+    "PageID": 1
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "updateCourtWorker",
+    "CaseFieldID": "courtWorkerSelectList",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "PageID": 2,
+    "CallBackURLMidEvent": "${CCD_DEF_BASE_URL}/admin/staff/midEventCourtWorkerSelectCourtWorker"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "updateCourtWorker",
+    "CaseFieldID": "courtWorkerCode",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": 3
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "updateCourtWorker",
+    "CaseFieldID": "courtWorkerName",
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY",
+    "PageID": 3
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "deleteCourtWorker",
+    "CaseFieldID": "courtWorkerOffice",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "PageID": 1,
+    "CallBackURLMidEvent": "${CCD_DEF_BASE_URL}/admin/staff/midEventCourtWorkerSelectOffice"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "deleteCourtWorker",
+    "CaseFieldID": "courtWorkerType",
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY",
+    "PageID": 1
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "deleteCourtWorker",
+    "CaseFieldID": "courtWorkerSelectList",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "PageID": 2,
+    "CallBackURLMidEvent": "${CCD_DEF_BASE_URL}/admin/staff/midEventCourtWorkerSelectCourtWorker"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "deleteCourtWorker",
+    "CaseFieldID": "courtWorkerCode",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": 3
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "deleteCourtWorker",
+    "CaseFieldID": "courtWorkerName",
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "READONLY",
+    "PageID": 3
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "updateJudge",
+    "CaseFieldID": "tribunalOffice",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "CallBackURLMidEvent": "${CCD_DEF_BASE_URL}/admin/staff/updateJudgeMidEventSelectOffice"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "updateJudge",
+    "CaseFieldID": "judgeSelectList",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "PageID": 2,
+    "PageDisplayOrder": 2,
+    "CallBackURLMidEvent": "${CCD_DEF_BASE_URL}/admin/staff/updateJudgeMidEventSelectJudge"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "updateJudge",
+    "CaseFieldID": "judgeCode",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": 3,
+    "PageDisplayOrder": 3
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "updateJudge",
+    "CaseFieldID": "judgeName",
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY",
+    "PageID": 3,
+    "PageDisplayOrder": 3
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "updateJudge",
+    "CaseFieldID": "employmentStatus",
+    "PageFieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY",
+    "PageID": 3,
+    "PageDisplayOrder": 3
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "deleteJudge",
+    "CaseFieldID": "tribunalOffice",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "ShowSummaryChangeOption": "Y",
+    "CallBackURLMidEvent": "${CCD_DEF_BASE_URL}/admin/staff/deleteJudgeMidEventSelectOffice"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "deleteJudge",
+    "CaseFieldID": "judgeSelectList",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "PageID": 2,
+    "PageDisplayOrder": 2,
+    "ShowSummaryChangeOption": "Y",
+    "CallBackURLMidEvent": "${CCD_DEF_BASE_URL}/admin/staff/deleteJudgeMidEventSelectJudge",
+    "CaseEventFieldLabel": "Judge Name"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "addFileLocation",
+    "CaseFieldID": "tribunalOffice",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "addFileLocation",
+    "CaseFieldID": "fileLocationCode",
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "MANDATORY",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "addFileLocation",
+    "CaseFieldID": "fileLocationName",
+    "PageFieldDisplayOrder": 3,
+    "DisplayContext": "MANDATORY",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "Y"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "updateFileLocation",
+    "CaseFieldID": "tribunalOffice",
+    "PageFieldDisplayOrder": 1,
+    "PageDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "PageID": 1,
+    "CallBackURLMidEvent": "${CCD_DEF_BASE_URL}/admin/filelocation/midEventSelectTribunalOffice"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "updateFileLocation",
+    "CaseFieldID": "fileLocationList",
+    "PageFieldDisplayOrder": 1,
+    "PageDisplayOrder": 2,
+    "DisplayContext": "MANDATORY",
+    "PageID": 2,
+    "CallBackURLMidEvent": "${CCD_DEF_BASE_URL}/admin/filelocation/midEventSelectFileLocation"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "updateFileLocation",
+    "CaseFieldID": "fileLocationCode",
+    "PageFieldDisplayOrder": 1,
+    "PageDisplayOrder": 3,
+    "DisplayContext": "READONLY",
+    "PageID": 3
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "updateFileLocation",
+    "CaseFieldID": "fileLocationName",
+    "PageFieldDisplayOrder": 2,
+    "PageDisplayOrder": 3,
+    "DisplayContext": "MANDATORY",
+    "PageID": 3
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "deleteFileLocation",
+    "CaseFieldID": "tribunalOffice",
+    "PageFieldDisplayOrder": 1,
+    "PageDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "PageID": 1,
+    "CallBackURLMidEvent": "${CCD_DEF_BASE_URL}/admin/filelocation/midEventSelectTribunalOffice"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "deleteFileLocation",
+    "CaseFieldID": "fileLocationList",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY",
+    "PageID": 2,
+    "PageDisplayOrder": 2,
+    "CallBackURLMidEvent": "${CCD_DEF_BASE_URL}/admin/filelocation/midEventSelectFileLocation"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "deleteFileLocation",
+    "CaseFieldID": "fileLocationCode",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "READONLY",
+    "PageID": 3,
+    "PageDisplayOrder": 3
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "deleteFileLocation",
+    "CaseFieldID": "fileLocationName",
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "READONLY",
+    "PageID": 3,
+    "PageDisplayOrder": 3
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "importPHRDepositsFromExcelFile",
+    "CaseFieldID": "preHearingDepositImportFile",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "COMPLEX",
+    "PageID": 1,
+    "PageDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseEventID": "initiateCase",
+    "CaseFieldID": "caseNumber",
+    "PageFieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL",
+    "PageID": 1,
+    "PageDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseEventID": "initiateCase",
+    "CaseFieldID": "claimantOrRespondentName",
+    "PageFieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL",
+    "PageID": 1,
+    "PageDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseEventID": "initiateCase",
+    "CaseFieldID": "depositOrderedAgainst",
+    "PageFieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL",
+    "PageID": 1,
+    "PageDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseEventID": "initiateCase",
+    "CaseFieldID": "depositRequestedBy",
+    "PageFieldDisplayOrder": 4,
+    "DisplayContext": "OPTIONAL",
+    "PageID": 1,
+    "PageDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseEventID": "initiateCase",
+    "CaseFieldID": "depositCovers",
+    "PageFieldDisplayOrder": 5,
+    "DisplayContext": "OPTIONAL",
+    "PageID": 1,
+    "PageDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseEventID": "initiateCase",
+    "CaseFieldID": "depositOrderSent",
+    "PageFieldDisplayOrder": 6,
+    "DisplayContext": "OPTIONAL",
+    "PageID": 1,
+    "PageDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseEventID": "initiateCase",
+    "CaseFieldID": "depositTimeExtension",
+    "PageFieldDisplayOrder": 7,
+    "DisplayContext": "OPTIONAL",
+    "PageID": 1,
+    "PageDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseEventID": "initiateCase",
+    "CaseFieldID": "depositTimeExtensionDue",
+    "PageFieldDisplayOrder": 8,
+    "DisplayContext": "OPTIONAL",
+    "PageID": 1,
+    "PageDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseEventID": "initiateCase",
+    "CaseFieldID": "depositReceived",
+    "PageFieldDisplayOrder": 9,
+    "DisplayContext": "OPTIONAL",
+    "PageID": 1,
+    "PageDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseEventID": "initiateCase",
+    "CaseFieldID": "depositAmount",
+    "PageFieldDisplayOrder": 10,
+    "DisplayContext": "OPTIONAL",
+    "PageID": 1,
+    "PageDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseEventID": "initiateCase",
+    "CaseFieldID": "dateDepositReceived",
+    "PageFieldDisplayOrder": 11,
+    "DisplayContext": "OPTIONAL",
+    "PageID": 1,
+    "PageDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseEventID": "initiateCase",
+    "CaseFieldID": "depositDue",
+    "PageFieldDisplayOrder": 12,
+    "DisplayContext": "OPTIONAL",
+    "PageID": 1,
+    "PageDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseEventID": "initiateCase",
+    "CaseFieldID": "depositRefund",
+    "PageFieldDisplayOrder": 13,
+    "DisplayContext": "OPTIONAL",
+    "PageID": 1,
+    "PageDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseEventID": "initiateCase",
+    "CaseFieldID": "dateSentForRefund",
+    "PageFieldDisplayOrder": 14,
+    "DisplayContext": "OPTIONAL",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "FieldShowCondition": "depositRefund=\"YES\""
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseEventID": "initiateCase",
+    "CaseFieldID": "amountRefunded",
+    "PageFieldDisplayOrder": 15,
+    "DisplayContext": "OPTIONAL",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "FieldShowCondition": "depositRefund=\"YES\""
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseEventID": "initiateCase",
+    "CaseFieldID": "depositRefundDate",
+    "PageFieldDisplayOrder": 16,
+    "DisplayContext": "OPTIONAL",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "FieldShowCondition": "depositRefund=\"YES\""
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseEventID": "initiateCase",
+    "CaseFieldID": "depositRefundedTo",
+    "PageFieldDisplayOrder": 17,
+    "DisplayContext": "OPTIONAL",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "FieldShowCondition": "depositRefund=\"YES\""
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseEventID": "initiateCase",
+    "CaseFieldID": "chequeOrPONumber",
+    "PageFieldDisplayOrder": 18,
+    "DisplayContext": "OPTIONAL",
+    "PageID": 1,
+    "PageDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseEventID": "initiateCase",
+    "CaseFieldID": "receivedBy",
+    "PageFieldDisplayOrder": 19,
+    "DisplayContext": "OPTIONAL",
+    "PageID": 1,
+    "PageDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseEventID": "initiateCase",
+    "CaseFieldID": "depositReceivedFrom",
+    "PageFieldDisplayOrder": 20,
+    "DisplayContext": "OPTIONAL",
+    "PageID": 1,
+    "PageDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseEventID": "initiateCase",
+    "CaseFieldID": "depositComments",
+    "PageFieldDisplayOrder": 21,
+    "DisplayContext": "OPTIONAL",
+    "PageID": 1,
+    "PageDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseEventID": "initiateCase",
+    "CaseFieldID": "comments",
+    "PageFieldDisplayOrder": 22,
+    "DisplayContext": "OPTIONAL",
+    "PageID": 1,
+    "PageDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseEventID": "initiateCase",
+    "CaseFieldID": "phrNumber",
+    "PageFieldDisplayOrder": 23,
+    "DisplayContext": "OPTIONAL",
+    "PageID": 1,
+    "PageDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseEventID": "initiateCase",
+    "CaseFieldID": "mr1Reference",
+    "PageFieldDisplayOrder": 24,
+    "DisplayContext": "OPTIONAL",
+    "PageID": 1,
+    "PageDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseEventID": "initiateCase",
+    "CaseFieldID": "bankingDate",
+    "PageFieldDisplayOrder": 25,
+    "DisplayContext": "OPTIONAL",
+    "PageID": 1,
+    "PageDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseEventID": "initiateCase",
+    "CaseFieldID": "journalConfirmedReceipt",
+    "PageFieldDisplayOrder": 26,
+    "DisplayContext": "OPTIONAL",
+    "PageID": 1,
+    "PageDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseEventID": "initiateCase",
+    "CaseFieldID": "status",
+    "PageFieldDisplayOrder": 27,
+    "DisplayContext": "OPTIONAL",
+    "PageID": 1,
+    "PageDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseEventID": "initiateCase",
+    "CaseFieldID": "payeeName",
+    "PageFieldDisplayOrder": 28,
+    "DisplayContext": "OPTIONAL",
+    "PageID": 1,
+    "PageDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseEventID": "initiateCase",
+    "CaseFieldID": "refundReference",
+    "PageFieldDisplayOrder": 29,
+    "DisplayContext": "OPTIONAL",
+    "PageID": 1,
+    "PageDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseEventID": "initiateCase",
+    "CaseFieldID": "journalConfirmedPaid",
+    "PageFieldDisplayOrder": 30,
+    "DisplayContext": "OPTIONAL",
+    "PageID": 1,
+    "PageDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseEventID": "initiateCase",
+    "CaseFieldID": "regionOffice",
+    "PageFieldDisplayOrder": 31,
+    "DisplayContext": "OPTIONAL",
+    "PageID": 1,
+    "PageDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseEventID": "initiateCase",
+    "CaseFieldID": "notes",
+    "PageFieldDisplayOrder": 32,
+    "DisplayContext": "OPTIONAL",
+    "PageID": 1,
+    "PageDisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseEventID": "initiateCase",
+    "CaseFieldID": "documentUpload",
+    "PageFieldDisplayOrder": 33,
+    "DisplayContext": "OPTIONAL",
+    "PageID": 1,
+    "PageDisplayOrder": 1
+  }
+]

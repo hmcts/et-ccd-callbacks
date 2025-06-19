@@ -1,15 +1,44 @@
-# Preview Environment for Pull Requests
+# Preview Environment Setup
 
+- [API-Based Setup](#api-based-setup)
 - [PR Environment Features](#pr-environment-features)
 - [Configuration Options](#configuration-options)
 - [Login URLs](#login-urls)
 - [Technical Notes](#technical-notes)
 
-This repo includes Jenkins and Helm configuration to create a full-stack CCD environment in the preview cluster.
+This repository includes robust API-based scripts to create a complete local CCD environment, as well as Jenkins and Helm configuration for preview environments in the cluster.
 
-The Jenkins pipeline will create a separate environment for each pull request.
+## API-Based Setup
 
-This PR environment can then be used to test changes in isolation.
+The workspace now includes modern, reliable API-based preview environment setup scripts located in `bin/preview/`. These replace the slower UI-based functional tests with direct API calls for better speed and reliability.
+
+### Quick Setup
+
+```bash
+# Complete preview environment setup
+./bin/preview/setup-preview-environment.sh
+
+# Or run individual steps
+./bin/preview/create-roles.sh
+./bin/preview/import-definitions.sh
+./bin/preview/create-admin-cases.sh
+./bin/preview/import-reference-data.sh
+```
+
+### Environment Requirements
+
+Ensure you have the required environment variables set:
+
+```bash
+export CCD_DEF_CASE_SERVICE_BASE_URL="http://localhost:4452"
+export IDAM_ADMIN_WEB_SERVICE_KEY="your-service-key"
+export IDAM_ADMIN_SECRET="your-admin-secret"
+export S2S_SECRET="your-s2s-secret"
+```
+
+## Pull Request Environments
+
+The Jenkins pipeline creates a separate environment for each pull request that can be used to test changes in isolation.
 
 ## PR Environment Features
 
@@ -37,28 +66,20 @@ Each PR environment will use the master versions of all CCD configuration and th
 
 To configure the PR environment to use branch versions the following changes are required
 
-### England/Wales CCD Definition
-Update [.gitmodules](https://github.com/hmcts/et-ccd-definitions-admin/blob/master/.gitmodules) to include a branch for the submodule
+### CCD Definitions
 
-e.g. to use branch ret-1234:
+With the unified workspace structure, all jurisdictions (admin, england-wales, scotland) are now managed within the same repository. No submodule configuration is required.
 
-```
-[submodule "et-ccd-definitions-englandwales"]
-path = et-ccd-definitions-englandwales
-url = https://github.com/hmcts/et-ccd-definitions-englandwales
-branch = ret-1234
-```
+To test changes to specific packages:
 
-### Scotland CCD Definition
-Update [.gitmodules](https://github.com/hmcts/et-ccd-definitions-admin/blob/master/.gitmodules) to include a branch for the submodule
+```bash
+# Build specific package for testing
+node tools/build-package.js england-wales --env=preview
+node tools/build-package.js scotland --env=preview
+node tools/build-package.js admin --env=preview
 
-e.g. to use branch ret-1234:
-
-```
-[submodule "et-ccd-definitions-scotland"]
-path = et-ccd-definitions-scotland
-url = https://github.com/hmcts/et-ccd-definitions-scotland
-branch = ret-1234
+# Or build all packages
+yarn generate-excel:preview
 ```
 
 ### PR Images
@@ -104,14 +125,23 @@ You will need to be on the VPN to access the URLs. Make sure to specify HTTPS pr
 The Helm configuration makes use of [charts-ccd](https://github.com/hmcts/chart-ccd)
 
 ### Data Setup
-All data for the PR environment is created during the functional tests pipeline stage using codeceptjs.
 
-To enable the England/Wales and Scotland CCD definitions to be imported they are included in this repo as submodules.
+Data for the PR environment is created using modern API-based scripts that are faster and more reliable than the previous UI-based approach.
 
-| Data              | Test file                                                                                                                     | Test Scenario                              |
-|-------------------|-------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------|
-| CCD roles         | [configImport.js](https://github.com/hmcts/et-ccd-definitions-admin/blob/master/src/test/functional/features/configImport.js) | add all the roles                          |
-| CCD configuration | [configImport.js](https://github.com/hmcts/et-ccd-definitions-admin/blob/master/src/test/functional/features/configImport.js) | import the preview CCD configuration files |
-| ECM Admin case    | [ecmAdminCase.js](https://github.com/hmcts/et-ccd-definitions-admin/blob/master/src/test/functional/features/ecmAdminCase.js) | create ECM Admin case                      |
-| Reference data    | [ecmAdminCase.js](https://github.com/hmcts/et-ccd-definitions-admin/blob/master/src/test/functional/features/ecmAdminCase.js) | create ECM reference data                  |
+All jurisdictions (admin, england-wales, scotland) are now part of the unified workspace, eliminating the need for submodules.
+
+| Data              | Script                                    | Description                                 |
+|-------------------|-------------------------------------------|---------------------------------------------|
+| CCD roles         | `bin/preview/create-roles.sh`            | Create all ET roles via API               |
+| CCD configuration | `bin/preview/import-definitions.sh`      | Import all jurisdiction definitions via API |
+| ECM Admin case    | `bin/preview/create-admin-cases.sh`      | Create ECM Admin cases via API            |
+| Reference data    | `bin/preview/import-reference-data.sh`   | Import venue/staff reference data via API |
+
+### API Scripts Benefits
+
+- **Faster execution**: Direct API calls vs slow UI automation
+- **More reliable**: Less prone to timeout and UI flakiness
+- **Better error handling**: Clear API responses vs DOM inspection
+- **Easier maintenance**: Simple script logic vs complex codeceptjs scenarios
+- **Modular setup**: Run individual setup steps as needed
 

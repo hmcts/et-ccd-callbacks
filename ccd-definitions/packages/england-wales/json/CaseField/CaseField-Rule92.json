@@ -1,0 +1,11 @@
+[
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "tseApplicationStoredCollection",
+    "Label": " ",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "genericTseDetails",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

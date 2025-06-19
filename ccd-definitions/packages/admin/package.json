@@ -1,0 +1,27 @@
+{
+  "name": "admin",
+  "version": "1.0.0",
+  "description": "ET CCD Admin definitions",
+  "private": true,
+  "scripts": {
+    "build": "node ../../tools/build-package.js admin",
+    "build:local": "yarn build --env local",
+    "build:demo": "yarn build --env demo",
+    "build:aat": "yarn build --env aat",
+    "build:prod": "yarn build --env prod",
+    "build:preview": "yarn build --env preview",
+    "generate-json": "node ../../tools/ccd-definition-processor/bin/xlsx2json -D ./json -i ./xlsx/et-admin-ccd-config-base.xlsx",
+    "generate-excel": "node ../../tools/ccd-definition-processor/bin/json2xlsx -D ./json -o ./xlsx/et-admin-ccd-config-${ET_ENV:-base}.xlsx",
+    "test": "mocha ../../src/test/unit/definitions/*.test.js --timeout 10000",
+    "test:functional": "codeceptjs run --steps -c ../../src/test/functional/codecept.conf.js",
+    "test:smoke": "yarn test:functional --grep @smoke",
+    "lint": "eslint . --config ../../configs/eslint.config.js --fix-dry-run",
+    "lint:fix": "eslint . --config ../../configs/eslint.config.js --fix",
+    "clean": "rimraf xlsx/*.xlsx dist/",
+    "start": "node ../../index.js"
+  },
+  "eslintConfig": {
+    "extends": "../../configs/eslint.config.js"
+  },
+  "prettier": "../../configs/prettier.config.js"
+}

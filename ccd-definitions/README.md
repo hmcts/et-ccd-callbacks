@@ -1,213 +1,354 @@
-# ET CCD Definitions - Merged Repository
+# ET CCD Definitions - Unified Workspace
 
-This repository contains consolidated configuration definitions for ET (Employment Tribunals) CCD (Case and Content Data) across all jurisdictions.
+This repository contains consolidated CCD (Case and Content Data) definitions for Employment Tribunals (ET) across all jurisdictions in a modern, maintainable workspace structure.
 
-## Repository Structure
+## 🚀 **Quick Start**
 
-This merged repository combines three previously separate repositories:
+```bash
+# Install dependencies
+yarn install
+
+# Build all definitions for local environment
+yarn generate-excel:local
+
+# Build all definitions for AAT environment  
+yarn generate-excel:aat
+
+# Build all definitions for production
+yarn generate-excel:prod
+```
+
+## 📁 **Repository Structure**
+
+This repository uses a **unified workspace architecture** that combines three previously separate repositories:
+
 - `et-ccd-definitions-admin` - Administrative configurations
 - `et-ccd-definitions-englandwales` - England & Wales specific configurations  
 - `et-ccd-definitions-scotland` - Scotland specific configurations
 
-### Directory Structure
+### **Directory Layout**
 
 ```
-├── jurisdictions/
-│   ├── admin/           # Administrative configurations
-│   │   ├── json/        # JSON configuration files
-│   │   └── xlsx/        # Excel configuration files
-│   ├── england-wales/   # England & Wales configurations
-│   │   ├── data/        # Data files
-│   │   ├── definitions/ # Definition files
-│   │   ├── json/        # JSON configuration files
-│   │   ├── src/         # Source code
-│   │   ├── xlsx/        # Excel configuration files
-│   │   ├── package.json # Jurisdiction-specific package config
-│   │   ├── README.md    # Jurisdiction-specific documentation
-│   │   └── env.json     # Environment configuration
-│   └── scotland/        # Scotland configurations
-│       ├── data/        # Data files
-│       ├── definitions/ # Definition files
-│       ├── json/        # JSON configuration files
-│       ├── src/         # Source code
-│       ├── xlsx/        # Excel configuration files
-│       ├── package.json # Jurisdiction-specific package config
-│       ├── README.md    # Jurisdiction-specific documentation
-│       └── env.json     # Environment configuration
-├── ccd-definition-processor/ # Definition processing tools
-├── bin/                 # Build and deployment scripts
-├── config/              # Global configuration
-├── src/                 # Common source code
-└── ...
+ccd-definitions/
+├── packages/                    # Individual jurisdiction packages
+│   ├── admin/                   # Administrative configurations
+│   │   ├── json/                # JSON definition files
+│   │   ├── xlsx/                # Generated Excel files
+│   │   └── package.json         # Package configuration
+│   ├── england-wales/           # England & Wales configurations
+│   │   ├── json/                # JSON definition files
+│   │   ├── xlsx/                # Generated Excel files
+│   │   ├── src/test/            # Test files
+│   │   └── package.json         # Package configuration
+│   └── scotland/                # Scotland configurations
+│       ├── json/                # JSON definition files
+│       ├── xlsx/                # Generated Excel files
+│       ├── src/test/            # Test files
+│       └── package.json         # Package configuration
+├── tools/                       # Centralized build tools
+│   ├── build-package.js         # Individual package builder
+│   ├── build-workspace.js       # Workspace-wide builder
+│   └── ccd-definition-processor/ # CCD processing engine
+├── configs/                     # Shared configuration
+│   ├── build.config.js          # Build configuration
+│   ├── eslint.config.js         # ESLint configuration
+│   └── prettier.config.js       # Prettier configuration
+├── dist/                        # Build outputs (by environment)
+│   ├── local/                   # Local environment builds
+│   ├── demo/                    # Demo environment builds
+│   ├── aat/                     # AAT environment builds
+│   └── prod/                    # Production environment builds
+├── bin/preview/                 # Preview environment setup scripts
+└── package.json                 # Workspace root configuration
 ```
 
-## Overview
+## 🛠️ **Prerequisites**
 
-This repository generates CCD definition files to enable ET functionality across all jurisdictions. It includes:
+- **Node.js** >= 18.0.0
+- **Yarn** >= 3.0.0
 
-- **Admin functionality** for Employment Case Management (ECM)
-- **England & Wales** specific case configurations
-- **Scotland** specific case configurations
-- Configuration to create full-stack CCD environments for testing
+### **Windows Users**
 
-Please see [Preview Environment](docs/preview-environment.md) for more details.
-
-## ccd-definition-processor
-
-This repo makes use of [CCD Definition Processor](https://github.com/hmcts/ccd-definition-processor) as a sub-module to generate the CCD definitions Excel files.
-
-## Prerequisites
-
-* yarn
-* Node.js >= 14.19.1
-
-## Setup (Windows users)
-
-Windows users must ensure they use Windows Subsystem for Linux (WSL 2) for local development:
+Windows users must use **Windows Subsystem for Linux (WSL 2)** for local development:
 - Install WSL 2: https://docs.microsoft.com/en-us/windows/wsl/install
-- Install nvm, node.js, and npm: https://docs.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-wsl
-- Install nvm: https://github.com/nvm-sh/nvm
-- Install required node version: `nvm install`
+- Install Node.js via nvm: https://docs.microsoft.com/en-us/windows/dev-environment/javascript/nodejs-on-wsl
 
-### Install
-
-Run `yarn setup` and `yarn install` to install the dependencies for this project.
-
-## Features
-
-### Variable substitution
-
-A `json2xlsx` processor replaces variable placeholders defined in JSON definition files with values read from
-environment variables as long as variable name starts with `CCD_DEF` prefix.
-
-For example `CCD_DEF_BASE_URL=http://localhost` environment variable gets injected into a fragment of the following CCD
-definition:
-
-```json
-[
-  {
-    "LiveFrom": "2017-01-01",
-    "CaseTypeID": "DRAFT",
-    "ID": "initiateCase",
-    "CallBackURLSubmittedEvent": "${CCD_DEF_BASE_URL}/callback"
-  }
-]
-```
-
-to become:
-
-```json
-[
-  {
-    "LiveFrom": "2017-01-01",
-    "CaseTypeID": "DRAFT",
-    "ID": "initiateCase",
-    "CallBackURLSubmittedEvent": "http://localhost/callback"
-  }
-]
-```
-
-## Usage
-
-The following commands are available:
-
-### Convert JSON to Excel
-
-**For all environments:**
-
-`yarn generate-excel-all` - Generate excel configs for all environments (Local, Demo, AAT, Prod, Perftest)
-
-The generated excel files will be in `definitions/xlsx/` or `jurisdictions/[jurisdiction]/xlsx/`.
-
-**For a specific environment:**
-
-`yarn generate-excel-(local|demo|aat|prod)`
-
-For example: `yarn generate-excel-aat`
-
-### Convert Excel to JSON
-
-If you prefer to make changes directly on the excel file, and then convert back to JSON:
-
-1. Generate a fresh base Excel file using `yarn generate-excel`
-2. The generated excel file will be in `definitions/xlsx/et-admin-ccd-config-base.xlsx` and will contain placeholder URLs
-3. Make changes to the Excel file but **ensure you don't have any environment-specific URLs** (use placeholders instead)
-4. Convert back to JSON using `yarn generate-json`
-5. Review the JSON file changes to ensure all your changes are correct
-
-## Working with Jurisdictions
-
-Each jurisdiction has its own specific configurations and can be worked on independently:
-
-### England & Wales
-See `jurisdictions/england-wales/README.md` for jurisdiction-specific documentation.
-
-### Scotland  
-See `jurisdictions/scotland/README.md` for jurisdiction-specific documentation.
-
-### Admin
-Administrative configurations are stored in `jurisdictions/admin/`.
-
-## Environment Configuration
-
-### Environment variables
-
-The following environment variables are required:
-
-| Name | Default | Description |
-|------|---------|-------------|
-| CCD_DEF_CASE_SERVICE_BASE_URL | - | Base URL for CCD Data Store API |
-| CCD_DEF_CCD_ADMIN_WEB_INGRESS_URL | - | Admin web URL |
-| IDAM_ADMIN_WEB_SERVICE_KEY | - | Admin web Idam service-to-service secret key |
-| IDAM_ADMIN_SECRET | - | Admin web Idam secret |
-| S2S_SECRET | - | Shared secret for S2S authentication |
-
-## Building and Deploying
-
-### Building
+## 📦 **Installation**
 
 ```bash
+# Initial setup
 yarn install
-yarn run build
+
+# Or use the convenience command
+yarn setup
 ```
 
-### Deploying to AAT
+## 🏗️ **Building CCD Definitions**
+
+### **Environment-Specific Builds**
+
+The workspace supports multiple environments with optimized configurations:
 
 ```bash
-yarn run deploy:aat
+# Local development
+yarn generate-excel:local
+
+# Demo environment
+yarn generate-excel:demo
+
+# AAT (Acceptance Testing)
+yarn generate-excel:aat
+
+# Production
+yarn generate-excel:prod
+
+# Preview environment
+yarn generate-excel:preview
 ```
 
-### Deploying to production
+### **Individual Package Builds**
+
+Build specific jurisdiction packages individually:
 
 ```bash
-yarn run deploy:prod
+# Direct build tool (recommended for development)
+node tools/build-package.js admin --env=local
+node tools/build-package.js england-wales --env=aat
+node tools/build-package.js scotland --env=prod
+
+# Yarn workspace commands
+yarn workspace admin build --env local
+yarn workspace scotland build --env aat
 ```
 
-### Azure Key Vault
+### **Output Files**
 
-Azure Key Vault is used to store secret configuration, e.g., the IDAM client secret.
+Generated Excel files are organized by environment in the `dist/` directory:
 
-## Development Setup
+```
+dist/
+├── local/
+│   ├── et-admin-ccd-config-local.xlsx
+│   ├── et-englandwales-ccd-config-local.xlsx
+│   └── et-scotland-ccd-config-local.xlsx
+├── aat/
+│   ├── et-admin-ccd-config-aat.xlsx
+│   ├── et-englandwales-ccd-config-aat.xlsx
+│   └── et-scotland-ccd-config-aat.xlsx
+└── prod/
+    ├── et-admin-ccd-config-prod.xlsx
+    ├── et-englandwales-ccd-config-prod.xlsx
+    └── et-scotland-ccd-config-prod.xlsx
+```
 
-### Configure environment variables
+## 🔧 **Development**
 
-Copy `.env.example` to `.env` and populate the required configuration.
-
-### Preview the configuration
+### **Code Quality**
 
 ```bash
-yarn run preview:local
+# Lint all packages
+yarn lint
+
+# Fix linting issues
+yarn lint:fix
+
+# Format code
+yarn format
+
+# Check formatting
+yarn format:check
 ```
 
-## Migration Notes
+### **Testing**
 
-This repository was created by merging three separate repositories:
-1. **et-ccd-definitions-admin** (base repository)
-2. **et-ccd-definitions-englandwales** 
-3. **et-ccd-definitions-scotland**
+```bash
+# Run all tests
+yarn test
 
-All git history from the original repositories is preserved.
+# Test specific packages
+yarn test:admin
+yarn test:england-wales
+yarn test:scotland
 
-## Licensing
+# Functional tests
+yarn test:functional
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
+# Smoke tests
+yarn test:smoke
+```
+
+### **Converting Excel to JSON**
+
+If you need to make changes via Excel and convert back to JSON:
+
+```bash
+# 1. Generate base Excel file
+yarn generate-excel:local
+
+# 2. Edit the Excel file (ensure no environment-specific URLs)
+
+# 3. Convert back to JSON
+yarn generate-json
+
+# 4. Review changes
+git diff
+```
+
+## ⚙️ **Environment Configuration**
+
+### **Variable Substitution**
+
+The `json2xlsx` processor replaces variables in JSON files with environment values. Variables must start with `CCD_DEF` prefix:
+
+**Example:**
+```json
+{
+  "CallBackURLSubmittedEvent": "${CCD_DEF_BASE_URL}/callback"
+}
+```
+
+With `CCD_DEF_BASE_URL=http://localhost`, becomes:
+```json
+{
+  "CallBackURLSubmittedEvent": "http://localhost/callback"
+}
+```
+
+### **Required Environment Variables**
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `CCD_DEF_CASE_SERVICE_BASE_URL` | - | Base URL for CCD Data Store API |
+| `CCD_DEF_CCD_ADMIN_WEB_INGRESS_URL` | - | Admin web URL |
+| `IDAM_ADMIN_WEB_SERVICE_KEY` | - | Admin web IDAM service-to-service secret |
+| `IDAM_ADMIN_SECRET` | - | Admin web IDAM secret |
+| `S2S_SECRET` | - | Shared secret for S2S authentication |
+
+## 🐳 **Preview Environment**
+
+Set up a complete local CCD environment using the robust API-based preview scripts:
+
+```bash
+# Setup preview environment
+./bin/preview/setup-preview-environment.sh
+
+# Individual setup steps
+./bin/preview/create-roles.sh
+./bin/preview/import-definitions.sh
+./bin/preview/create-admin-cases.sh
+./bin/preview/import-reference-data.sh
+```
+
+See [Preview Environment Documentation](docs/preview-environment.md) for detailed setup instructions.
+
+## 🚀 **Deployment**
+
+### **CI/CD Integration**
+
+The workspace is designed for modern CI/CD pipelines:
+
+```bash
+# Build for specific environment
+ET_ENV=aat yarn generate-excel:aat
+
+# Deploy to AAT
+yarn deploy:aat
+
+# Deploy to production
+yarn deploy:prod
+```
+
+### **Azure Key Vault**
+
+Secrets are stored in Azure Key Vault. Configure your pipeline to inject these as environment variables.
+
+## 🏗️ **Architecture**
+
+### **Workspace Benefits**
+
+- **Centralized Build System**: Unified build tools for all packages
+- **Shared Configuration**: ESLint, Prettier, and build configs
+- **Environment Management**: Consistent environment handling
+- **Dependency Management**: Shared dependencies and tooling
+- **Scalable Structure**: Easy to add new jurisdictions
+
+### **Build Tools**
+
+1. **`tools/build-package.js`**: Builds individual packages with environment-specific configurations
+2. **`tools/build-workspace.js`**: Orchestrates builds across all packages
+3. **`tools/ccd-definition-processor/`**: Core CCD definition processing engine
+
+### **Package Management**
+
+Each package (`admin`, `england-wales`, `scotland`) maintains:
+- Independent `package.json` with jurisdiction-specific scripts
+- Own test suites and configurations
+- Shared build tools and configurations from workspace root
+
+## 🧹 **Maintenance**
+
+### **Cleanup Commands**
+
+```bash
+# Clean build artifacts
+yarn clean
+
+# Clean dependencies
+yarn clean:deps
+
+# Reset workspace
+yarn reset
+```
+
+### **Adding New Jurisdictions**
+
+1. Create new package directory in `packages/`
+2. Add package configuration to `configs/build.config.js`
+3. Create `package.json` with build scripts
+4. Add JSON definition files
+5. Update workspace scripts if needed
+
+## 🔍 **Troubleshooting**
+
+### **Common Issues**
+
+1. **Yarn workspace resolution errors**: Run `yarn install` to refresh lockfile
+2. **Build failures**: Check environment variables and package configurations
+3. **Permission errors**: Ensure scripts have execute permissions
+4. **Template warnings**: These are normal - JSON files without Excel templates are skipped
+
+### **Debug Mode**
+
+```bash
+# Verbose build output
+DEBUG=* yarn generate-excel:local
+
+# Individual package debugging
+node tools/build-package.js admin --env=local
+```
+
+## 📚 **Documentation**
+
+- [Preview Environment Setup](docs/preview-environment.md)
+- [Migration Guide](docs/migration.md)
+- [API Reference](docs/api.md)
+- [Contributing Guidelines](docs/contributing.md)
+
+## 🤝 **Contributing**
+
+1. Ensure all tests pass: `yarn test`
+2. Follow code style: `yarn lint:fix && yarn format`
+3. Update documentation for significant changes
+4. Test builds for all environments
+
+## 📄 **License**
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 🏛️ **HMCTS Integration**
+
+This repository is part of the HMCTS (HM Courts & Tribunals Service) digital transformation initiative, providing modern case management capabilities for Employment Tribunals across England, Wales, and Scotland.
+
+---
+
+**Need Help?** Check the troubleshooting section above or raise an issue in the repository.

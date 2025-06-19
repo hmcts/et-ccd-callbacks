@@ -12,15 +12,17 @@ package-lock.json
 !.yarn/versions
 
 # Generated files
-definitions/xlsx/*.xlsx
-*/definitions/xlsx/*.xlsx
-jurisdictions/*/xlsx/*.xlsx
+jurisdictions/admin/xlsx/*.xlsx
+jurisdictions/england-wales/xlsx/*.xlsx
+jurisdictions/scotland/xlsx/*.xlsx
 
 # Symlinks (these are setup artifacts)
-definitions
-jurisdictions/*/definitions
-jurisdictions/*/bin
-jurisdictions/*/yarn.lock
+jurisdictions/admin/definitions
+jurisdictions/england-wales/definitions
+jurisdictions/scotland/definitions
+jurisdictions/admin/bin
+jurisdictions/england-wales/bin
+jurisdictions/scotland/bin
 
 # Logs
 *.log
@@ -44,4 +46,26 @@ temp/
 build/
 dist/
 coverage/
+
+# Test artifacts
+tests/**/node_modules/
+tests/**/*.log
+tests/**/coverage/
+tests/**/dist/
+tests/**/temp/
+
+# Scripts and binary artifacts
+scripts/**/node_modules/
+scripts/**/*.log
+scripts/**/temp/
+
+# macOS and OS artifacts
+.DS_Store
+**/.DS_Store
+Thumbs.db
+
+# Individual package yarn.lock files (use workspace root only)
+jurisdictions/admin/yarn.lock
+jurisdictions/england-wales/yarn.lock
+jurisdictions/scotland/yarn.lock
 

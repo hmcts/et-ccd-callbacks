@@ -77,7 +77,7 @@ console.log(`\n📂 Copying files to dist/${environment}/...`);
 
 for (const packageName of packagesToBuild) {
   const packageConfig = packages[packageName];
-  const packagePath = path.join(paths.packages, packageConfig.name);
+  const packagePath = path.join(paths.root, packageConfig.name);
   const xlsxPath = path.join(packagePath, 'xlsx');
   
   if (fs.existsSync(xlsxPath)) {
@@ -102,7 +102,7 @@ if (watch) {
   console.log(`\n👀 Watching for changes... (Press Ctrl+C to stop)`);
   // Simple watch implementation - in production, you might want to use chokidar
   const watchPaths = packagesToBuild.map(pkg => 
-    path.join(paths.packages, packages[pkg].name, 'json')
+    path.join(paths.root, packages[pkg].name, 'json')
   );
   
   // For now, just log that watch mode is enabled

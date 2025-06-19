@@ -30,7 +30,7 @@ This repository uses a **unified workspace architecture** that combines three pr
 
 ```
 ccd-definitions/
-├── packages/                    # Individual jurisdiction packages
+├── jurisdictions/               # Main content area - CCD definitions by jurisdiction
 │   ├── admin/                   # Administrative configurations
 │   │   ├── json/                # JSON definition files
 │   │   ├── xlsx/                # Generated Excel files
@@ -38,27 +38,46 @@ ccd-definitions/
 │   ├── england-wales/           # England & Wales configurations
 │   │   ├── json/                # JSON definition files
 │   │   ├── xlsx/                # Generated Excel files
-│   │   ├── src/test/            # Test files
+│   │   ├── data/                # Template data files
 │   │   └── package.json         # Package configuration
 │   └── scotland/                # Scotland configurations
 │       ├── json/                # JSON definition files
 │       ├── xlsx/                # Generated Excel files
-│       ├── src/test/            # Test files
+│       ├── data/                # Template data files
 │       └── package.json         # Package configuration
 ├── tools/                       # Centralized build tools
 │   ├── build-package.js         # Individual package builder
 │   ├── build-workspace.js       # Workspace-wide builder
 │   └── ccd-definition-processor/ # CCD processing engine
-├── configs/                     # Shared configuration
+├── tests/                       # All test files
+│   ├── functional/              # Functional tests
+│   ├── smoke/                   # Smoke tests
+│   ├── unit/                    # Unit tests
+│   ├── england-wales/           # England & Wales specific tests
+│   └── scotland/                # Scotland specific tests
+├── scripts/                     # Organized scripts
+│   ├── deployment/              # Deployment and setup scripts
+│   ├── environment/             # Environment configuration scripts
+│   └── legacy/                  # Legacy scripts (for migration)
+├── bin/                         # Executable scripts
+│   └── preview/                 # Preview environment API setup scripts
+├── configs/                     # All configuration files
 │   ├── build.config.js          # Build configuration
 │   ├── eslint.config.js         # ESLint configuration
-│   └── prettier.config.js       # Prettier configuration
+│   ├── prettier.config.js       # Prettier configuration
+│   ├── default.yaml             # Default server configuration
+│   ├── renovate.json            # Renovate configuration
+│   ├── sonar-project.properties # SonarQube configuration
+│   └── yarn-audit-known-issues  # Known security issues
 ├── dist/                        # Build outputs (by environment)
 │   ├── local/                   # Local environment builds
 │   ├── demo/                    # Demo environment builds
 │   ├── aat/                     # AAT environment builds
 │   └── prod/                    # Production environment builds
-├── bin/preview/                 # Preview environment setup scripts
+├── docs/                        # Documentation
+├── Dockerfile                   # Container configuration
+├── Jenkinsfile_CNP              # CI/CD pipeline configuration
+├── LICENSE                      # License file
 └── package.json                 # Workspace root configuration
 ```
 
@@ -233,10 +252,11 @@ Set up a complete local CCD environment using the robust API-based preview scrip
 ./bin/preview/setup-preview-environment.sh
 
 # Individual setup steps
-./bin/preview/create-roles.sh
-./bin/preview/import-definitions.sh
-./bin/preview/create-admin-cases.sh
-./bin/preview/import-reference-data.sh
+./bin/preview/create-ccd-roles.sh
+./bin/preview/import-ccd-definitions.sh
+./bin/preview/create-admin-case.sh
+./bin/preview/import-ref-data.sh
+./bin/preview/add-org-roles-to-users.sh
 ```
 
 See [Preview Environment Documentation](docs/preview-environment.md) for detailed setup instructions.
@@ -302,11 +322,11 @@ yarn reset
 
 ### **Adding New Jurisdictions**
 
-1. Create new package directory in `packages/`
+1. Create new jurisdiction directory at the root level
 2. Add package configuration to `configs/build.config.js`
 3. Create `package.json` with build scripts
-4. Add JSON definition files
-5. Update workspace scripts if needed
+4. Add JSON definition files in `json/` subdirectory
+5. Update workspace scripts in root `package.json`
 
 ## 🔍 **Troubleshooting**
 

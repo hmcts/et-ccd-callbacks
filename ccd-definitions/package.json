@@ -4,7 +4,9 @@
   "description": "CCD definitions workspace for Employment Tribunal - Admin, England & Wales, and Scotland",
   "private": true,
   "workspaces": [
-    "packages/*",
+    "jurisdictions/admin",
+    "jurisdictions/england-wales",
+    "jurisdictions/scotland",
     "tools/*"
   ],
   "repository": "https://github.com/hmcts/et-ccd-callbacks",
@@ -32,6 +34,8 @@
     "generate-excel:aat": "ET_ENV=aat node tools/build-workspace.js",
     "generate-excel:prod": "ET_ENV=prod node tools/build-workspace.js",
     "generate-excel:preview": "ET_ENV=preview node tools/build-workspace.js",
+    "scripts:env": "node scripts/environment/json-env.js",
+    "scripts:preview": "node scripts/environment/preview-env.js",
     "generate-json": "yarn workspace admin generate-json",
     "test": "yarn workspaces foreach --parallel run test",
     "test:admin": "yarn workspace admin test",

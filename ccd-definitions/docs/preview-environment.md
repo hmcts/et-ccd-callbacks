@@ -19,10 +19,11 @@ The workspace now includes modern, reliable API-based preview environment setup 
 ./bin/preview/setup-preview-environment.sh
 
 # Or run individual steps
-./bin/preview/create-roles.sh
-./bin/preview/import-definitions.sh
-./bin/preview/create-admin-cases.sh
-./bin/preview/import-reference-data.sh
+./bin/preview/create-ccd-roles.sh
+./bin/preview/import-ccd-definitions.sh
+./bin/preview/create-admin-case.sh
+./bin/preview/import-ref-data.sh
+./bin/preview/add-org-roles-to-users.sh
 ```
 
 ### Environment Requirements

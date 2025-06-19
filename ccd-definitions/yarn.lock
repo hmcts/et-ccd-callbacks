@@ -322,9 +322,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"admin@workspace:packages/admin":
+"admin@workspace:jurisdictions/admin":
   version: 0.0.0-use.local
-  resolution: "admin@workspace:packages/admin"
+  resolution: "admin@workspace:jurisdictions/admin"
   languageName: unknown
   linkType: soft
 
@@ -935,9 +935,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"england-wales@workspace:packages/england-wales":
+"england-wales@workspace:jurisdictions/england-wales":
   version: 0.0.0-use.local
-  resolution: "england-wales@workspace:packages/england-wales"
+  resolution: "england-wales@workspace:jurisdictions/england-wales"
   languageName: unknown
   linkType: soft
 
@@ -3097,9 +3097,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"scotland@workspace:packages/scotland":
+"scotland@workspace:jurisdictions/scotland":
   version: 0.0.0-use.local
-  resolution: "scotland@workspace:packages/scotland"
+  resolution: "scotland@workspace:jurisdictions/scotland"
   languageName: unknown
   linkType: soft
 

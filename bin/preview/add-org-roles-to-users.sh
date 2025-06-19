@@ -1,1 +1,0 @@
-../../ccd-definitions/bin/add-org-roles-to-users.sh

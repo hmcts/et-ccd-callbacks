@@ -40,7 +40,7 @@ if (!environments[environment]) {
 
 console.log(`🔨 Building ${packageConfig.name} for ${environment}...`);
 
-const packagePath = path.join(paths.packages, packageConfig.name);
+const packagePath = path.join(paths.root, packageConfig.name);
 const processorPath = paths.processor;
 const envConfig = environments[environment];
 

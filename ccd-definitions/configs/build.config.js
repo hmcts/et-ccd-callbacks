@@ -4,10 +4,11 @@ module.exports = {
   // Base paths for the workspace
   paths: {
     root: path.resolve(__dirname, '..'),
-    packages: path.resolve(__dirname, '../packages'),
     tools: path.resolve(__dirname, '../tools'),
     processor: path.resolve(__dirname, '../tools/ccd-definition-processor'),
-    output: path.resolve(__dirname, '../dist')
+    output: path.resolve(__dirname, '../dist'),
+    scripts: path.resolve(__dirname, '../scripts'),
+    environment: path.resolve(__dirname, '../scripts/environment')
   },
 
   // Environment-specific configurations
@@ -37,15 +38,15 @@ module.exports = {
   // Package configurations
   packages: {
     admin: {
-      name: 'admin',
+      name: 'jurisdictions/admin',
       outputPrefix: 'et-admin-ccd-config'
     },
     'england-wales': {
-      name: 'england-wales',
+      name: 'jurisdictions/england-wales',
       outputPrefix: 'et-englandwales-ccd-config'
     },
     scotland: {
-      name: 'scotland',
+      name: 'jurisdictions/scotland',
       outputPrefix: 'et-scotland-ccd-config'
     }
   },

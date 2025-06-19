@@ -131,12 +131,12 @@ Data for the PR environment is created using modern API-based scripts that are f
 
 All jurisdictions (admin, england-wales, scotland) are now part of the unified workspace, eliminating the need for submodules.
 
-| Data              | Script                                    | Description                                 |
-|-------------------|-------------------------------------------|---------------------------------------------|
-| CCD roles         | `bin/preview/create-roles.sh`            | Create all ET roles via API               |
-| CCD configuration | `bin/preview/import-definitions.sh`      | Import all jurisdiction definitions via API |
-| ECM Admin case    | `bin/preview/create-admin-cases.sh`      | Create ECM Admin cases via API            |
-| Reference data    | `bin/preview/import-reference-data.sh`   | Import venue/staff reference data via API |
+|| Data              | Script                                    | Description                                 |
+||-------------------|-------------------------------------------|---------------------------------------------|
+|| CCD roles         | `bin/preview/create-ccd-roles.sh`        | Create all ET roles via API               |
+|| CCD configuration | `bin/preview/import-ccd-definitions.sh`  | Import all jurisdiction definitions via API |
+|| ECM Admin case    | `bin/preview/create-admin-case.sh`       | Create ECM Admin cases via API            |
+|| Reference data    | `bin/preview/import-ref-data.sh`         | Import venue/staff reference data via API |
 
 ### API Scripts Benefits
 

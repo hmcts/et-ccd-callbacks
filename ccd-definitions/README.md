@@ -65,10 +65,7 @@ ccd-definitions/
 │   ├── build.config.js          # Build configuration
 │   ├── eslint.config.js         # ESLint configuration
 │   ├── prettier.config.js       # Prettier configuration
-│   ├── default.yaml             # Default server configuration
-│   ├── renovate.json            # Renovate configuration
-│   ├── sonar-project.properties # SonarQube configuration
-│   └── yarn-audit-known-issues  # Known security issues
+│   └── default.yaml             # Default server configuration
 ├── dist/                        # Build outputs (by environment)
 │   ├── local/                   # Local environment builds
 │   ├── demo/                    # Demo environment builds

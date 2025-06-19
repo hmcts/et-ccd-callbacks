@@ -4,7 +4,7 @@ RUN corepack enable
 WORKDIR /opt/app
 COPY --chown=hmcts:hmcts . .
 USER hmcts
-ADD ./config "/config"
+ADD ./configs "/config"
 RUN yarn install && yarn cache clean
 COPY index.js ./
 ENV NODE_CONFIG_DIR="/config"

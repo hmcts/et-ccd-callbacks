@@ -54,6 +54,11 @@
     "dev": "yarn build:all --env local --watch",
     "start": "yarn workspace admin start"
   },
+  "dependencies": {
+    "@hmcts/nodejs-healthcheck": "^1.8.0",
+    "config": "^3.3.9",
+    "express": "^4.18.2"
+  },
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^7.0.0",
     "@typescript-eslint/parser": "^7.0.0",

@@ -18,7 +18,7 @@
     "lint": "eslint . --config ../../configs/eslint.config.js --fix-dry-run",
     "lint:fix": "eslint . --config ../../configs/eslint.config.js --fix",
     "clean": "rimraf xlsx/*.xlsx dist/",
-    "start": "node ../../index.js"
+    "start": "cd ../../ && node index.js"
   },
   "eslintConfig": {
     "extends": "../../configs/eslint.config.js"

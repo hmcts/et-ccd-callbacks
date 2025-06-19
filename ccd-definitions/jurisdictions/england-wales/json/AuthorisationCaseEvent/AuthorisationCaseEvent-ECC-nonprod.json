@@ -1,8 +1,0 @@
-[
-  {
-    "CaseTypeId": "ET_EnglandWales",
-    "CaseEventID": "UPDATE_NOTIFICATION_RESPONSE",
-    "UserRole": "caseworker-wa-task-configuration",
-    "CRUD": "R"
-  }
-]

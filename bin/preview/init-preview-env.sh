@@ -68,7 +68,7 @@ echo "🏢 Adding organizational roles to users..."
 
 echo "✅ Preview environment initialization complete!"
 echo "🌐 Access URLs:"
-echo "   - ExUI: https://xui-et-ccd-definitions-admin-pr-${PR_NUMBER}.preview.platform.hmcts.net"
-echo "   - CCD Admin: https://admin-web-et-ccd-definitions-admin-pr-${PR_NUMBER}.preview.platform.hmcts.net"
-echo "   - ET COS: https://et-cos-et-ccd-definitions-admin-pr-${PR_NUMBER}.preview.platform.hmcts.net"
+echo "   - ExUI: https://xui-et-cos-pr-${PR_NUMBER}.preview.platform.hmcts.net"
+echo "   - CCD Admin: https://admin-web-et-cos-pr-${PR_NUMBER}.preview.platform.hmcts.net"
+echo "   - ET COS: https://et-cos-pr-${PR_NUMBER}.preview.platform.hmcts.net"
 

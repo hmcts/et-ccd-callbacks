@@ -1,8 +1,0 @@
-[
-  {
-    "CaseTypeId": "ET_EnglandWales",
-    "CaseEventID": "addLegalRepToMultiple",
-    "UserRole": "caseworker-employment-legalrep-solicitor",
-    "CRUD": "CRU"
-  }
-]

@@ -1,9 +1,0 @@
-[
-  {
-    "CaseTypeID": "ET_Scotland",
-    "ID": "multipleReferenceLinkLabel",
-    "Label": "<h3> Multiple reference : ${multipleReferenceLinkMarkUp} </h3>",
-    "FieldType": "Label",
-    "SecurityClassification": "Public"
-  }
-]

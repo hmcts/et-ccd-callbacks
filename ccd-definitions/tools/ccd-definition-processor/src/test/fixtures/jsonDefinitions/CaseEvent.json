@@ -1,0 +1,27 @@
+[
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "DRAFT",
+    "ID": "initiateCase",
+    "Name": "Initiate Case",
+    "Description": "Create a new case",
+    "DisplayOrder": 1,
+    "PostConditionState": "1_Initiation",
+    "SecurityClassification": "Public",
+    "CallBackURLSubmittedEvent": "${CCD_DEF_BASE_URL}/initiate/callback",
+    "Publish": "N"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeID": "DRAFT",
+    "ID": "submitCase",
+    "Name": "Submit Case",
+    "Description": "Submit case",
+    "DisplayOrder": 2,
+    "PostConditionState": "1_Initiation",
+    "SecurityClassification": "Public",
+    "CallBackURLSubmittedEvent": "${CCD_DEF_BASE_URL}/submit/callback",
+    "Publish": "Y",
+    "EventEnablingCondition": "caseTitle != \"\""
+  }
+]

@@ -1,0 +1,53 @@
+tags:
+  et-ccd-stack: false
+
+nodejs:
+  applicationPort: 3000
+  aadIdentityName: et
+
+xui-webapp:
+  enabled: false
+
+idam-pr:
+  enabled: false
+
+et-cos:
+  enabled: false
+
+et-sya:
+  enabled: false
+
+et-sya-api:
+  enabled: false
+wa:
+  enabled: false
+servicebus:
+  enabled: false
+ccd-message-publisher:
+  enabled: false
+aac-manage-case-assignment:
+  enabled: false
+am-org-role-mapping-service:
+  enabled: false
+redis:
+  enabled: false
+ccd-case-document-am-api:
+  enabled: false
+rd-caseworker-ref-api:
+  enabled: false
+postgresql:
+  enabled: false
+rd-professional-api:
+  enabled: false
+rd-user-profile-api:
+  enabled: false
+rd-judicial-api:
+  enabled: false
+rd-judicial-data-load:
+  enabled: false
+em-ccdorc:
+  enabled: false
+et-migration:
+  enabled: false
+et-syr:
+  enabled: false

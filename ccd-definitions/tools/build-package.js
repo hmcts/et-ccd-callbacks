@@ -80,10 +80,18 @@ if (!fs.existsSync(templatePath)) {
 }
 
 try {
+  // Get exclude patterns for the environment
+  const excludePatterns = envConfig.excludePatterns || [];
+  const excludeArg = excludePatterns.length > 0 ? ` -e "${excludePatterns.join(',')}"` : '';
+  
   // Build the Excel file using the CCD definition processor with a jurisdiction-specific template
-  const command = `node "${path.join(processorPath, 'bin', 'json2xlsx')}" -D "${jsonPath}" -o "${outputPath}" -t "${templatePath}"`;
+  const command = `node "${path.join(processorPath, 'bin', 'json2xlsx')}" -D "${jsonPath}" -o "${outputPath}" -t "${templatePath}"${excludeArg}`;
   
   console.log(`🔧 Running: ${command}`);
+  if (excludePatterns.length > 0) {
+    console.log(`🚫 Excluding patterns: ${excludePatterns.join(', ')}`);
+  }
+  
   execSync(command, { 
     stdio: 'inherit',
     cwd: processorPath,  // Run from the processor directory

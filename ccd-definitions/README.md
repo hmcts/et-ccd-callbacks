@@ -98,23 +98,43 @@ yarn setup
 
 ### **Environment-Specific Builds**
 
-The workspace supports multiple environments with optimized configurations:
+The workspace supports multiple environments with optimized configurations. Each environment has both **nonprod** (default) and **prod** variants that handle file exclusions differently:
+
+#### **Nonprod Builds (Default)**
+These exclude files ending with `-prod.json` and include nonprod-specific files:
 
 ```bash
-# Local development
+# Local development (nonprod)
 yarn generate-excel:local
 
-# Demo environment
+# Demo environment (nonprod) 
 yarn generate-excel:demo
 
-# AAT (Acceptance Testing)
+# AAT environment (nonprod)
 yarn generate-excel:aat
 
-# Production
+# Preview environment (nonprod)
+yarn generate-excel:preview
+```
+
+#### **Prod Builds**
+These exclude files ending with `-nonprod.json` and include only production-ready configurations:
+
+```bash
+# Local development (prod)
+yarn generate-excel:local-prod
+
+# Demo environment (prod)
+yarn generate-excel:demo-prod
+
+# AAT environment (prod)
+yarn generate-excel:aat-prod
+
+# Production (prod)
 yarn generate-excel:prod
 
-# Preview environment
-yarn generate-excel:preview
+# Preview environment (prod)
+yarn generate-excel:preview-prod
 ```
 
 ### **Individual Package Builds**

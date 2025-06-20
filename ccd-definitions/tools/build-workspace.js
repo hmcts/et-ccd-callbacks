@@ -17,6 +17,7 @@ const environment = args.find(arg => arg.startsWith('--env='))?.split('=')[1] ||
                    'local';
 const watch = args.includes('--watch');
 const packageFilter = args.find(arg => arg.startsWith('--package='))?.split('=')[1];
+const outputSuffix = args.find(arg => arg.startsWith('--output-suffix='))?.split('=')[1];
 
 console.log(`🚀 Building ET CCD Definitions workspace...`);
 console.log(`📦 Environment: ${environment}`);
@@ -73,7 +74,14 @@ for (const packageName of packagesToBuild) {
 }
 
 // Copy generated files to output directory
-console.log(`\n📂 Copying files to dist/${environment}/...`);
+const finalOutputSuffix = outputSuffix || environment;
+console.log(`\n📂 Copying files to dist/${finalOutputSuffix}/...`);
+
+// Create the final output directory
+const finalOutputDir = path.join(paths.root, 'dist', finalOutputSuffix);
+if (!fs.existsSync(finalOutputDir)) {
+  fs.mkdirSync(finalOutputDir, { recursive: true });
+}
 
 for (const packageName of packagesToBuild) {
   const packageConfig = packages[packageName];
@@ -86,13 +94,20 @@ for (const packageName of packagesToBuild) {
     
     for (const file of files) {
       const sourcePath = path.join(xlsxPath, file);
-      const destPath = path.join(outputDir, file);
+      
+      // If we have a custom output suffix, rename the file
+      let destFileName = file;
+      if (outputSuffix && outputSuffix !== environment) {
+        destFileName = file.replace(`-${environment}.xlsx`, `-${outputSuffix}.xlsx`);
+      }
+      
+      const destPath = path.join(finalOutputDir, destFileName);
       
       try {
         fs.copyFileSync(sourcePath, destPath);
-        console.log(`   ✅ Copied ${file}`);
+        console.log(`   ✅ Copied ${destFileName}`);
       } catch (error) {
-        console.warn(`   ⚠️  Failed to copy ${file}:`, error.message);
+        console.warn(`   ⚠️  Failed to copy ${destFileName}:`, error.message);
       }
     }
   }
@@ -111,14 +126,14 @@ if (watch) {
 }
 
 console.log(`\n🎉 Workspace build completed!`);
-console.log(`📁 Output directory: ${outputDir}`);
+console.log(`📁 Output directory: ${finalOutputDir}`);
 console.log(`📋 Generated files:`);
 
 // List generated files
 try {
-  const files = fs.readdirSync(outputDir);
+  const files = fs.readdirSync(finalOutputDir);
   files.forEach(file => {
-    const stats = fs.statSync(path.join(outputDir, file));
+    const stats = fs.statSync(path.join(finalOutputDir, file));
     const sizeKB = Math.round(stats.size / 1024);
     console.log(`   📄 ${file} (${sizeKB}KB)`);
   });

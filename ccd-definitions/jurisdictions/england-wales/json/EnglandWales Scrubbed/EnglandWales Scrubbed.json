@@ -1128,6 +1128,12 @@
     "DisplayOrder": 2
   },
   {
+    "ID": "frl_SitAlone",
+    "ListElementCode": "Two Judges",
+    "ListElement": "Two Judges",
+    "DisplayOrder": 3
+  },
+  {
     "ID": "fl_Stage",
     "ListElementCode": "Stage 1",
     "ListElement": "Stage 1",
@@ -2971,105 +2977,111 @@
   },
   {
     "ID": "fl_Part_2",
+    "ListElementCode": "2.12A",
+    "ListElement": "2.12A - Response rejection - insufficient evidence",
+    "DisplayOrder": 24
+  },
+  {
+    "ID": "fl_Part_2",
     "ListElementCode": "2.13",
     "ListElement": "2.13 - Response rejection - minimum information – Rule 18(1)(b)",
-    "DisplayOrder": 24
+    "DisplayOrder": 25
   },
   {
     "ID": "fl_Part_2",
     "ListElementCode": "2.14",
     "ListElement": "2.14 - Response rejection - out of time – Rule 19",
-    "DisplayOrder": 25
+    "DisplayOrder": 26
   },
   {
     "ID": "fl_Part_2",
     "ListElementCode": "2.15",
     "ListElement": "2.15 - Response Rejection - Your Questions Answered",
-    "DisplayOrder": 26
+    "DisplayOrder": 27
   },
   {
     "ID": "fl_Part_2",
     "ListElementCode": "2.16",
     "ListElement": "2.16 - Response rejection - apply again – Rule 20",
-    "DisplayOrder": 27
+    "DisplayOrder": 28
   },
   {
     "ID": "fl_Part_2",
     "ListElementCode": "2.17",
     "ListElement": "2.17 - Response reconsideration – successful - Rule 20",
-    "DisplayOrder": 28
+    "DisplayOrder": 29
   },
   {
     "ID": "fl_Part_2",
     "ListElementCode": "2.18",
     "ListElement": "2.18 - Response rejection - reconsideration hearing - Rule 20(3) ",
-    "DisplayOrder": 29
+    "DisplayOrder": 30
   },
   {
     "ID": "fl_Part_2",
     "ListElementCode": "2.18A",
     "ListElement": "2.18A - Response rejection - reconsideration - dismissed – Rule 20",
-    "DisplayOrder": 30
+    "DisplayOrder": 31
   },
   {
     "ID": "fl_Part_2",
     "ListElementCode": "2.19",
     "ListElement": "2.19 - Response - extension of time - apply again - Rules 5 & 21",
-    "DisplayOrder": 31
+    "DisplayOrder": 32
   },
   {
     "ID": "fl_Part_2",
     "ListElementCode": "2.20",
     "ListElement": "2.20 - Response - extension of time - time limit not yet expired - granted – Rules 5 & 21",
-    "DisplayOrder": 32
+    "DisplayOrder": 33
   },
   {
     "ID": "fl_Part_2",
     "ListElementCode": "2.21",
     "ListElement": "2.21 - Response - extension of time - time limit not yet expired - refused – Rules 5 & 21",
-    "DisplayOrder": 33
+    "DisplayOrder": 34
   },
   {
     "ID": "fl_Part_2",
     "ListElementCode": "2.22",
     "ListElement": "2.22 - Response submitted late - extension of time - refused – Rules 5 & 21",
-    "DisplayOrder": 34
+    "DisplayOrder": 35
   },
   {
     "ID": "fl_Part_2",
     "ListElementCode": "2.23",
     "ListElement": "2.23 - Response submitted late - extension of time – copy to claimant – Rules 5 & 21",
-    "DisplayOrder": 35
+    "DisplayOrder": 36
   },
   {
     "ID": "fl_Part_2",
     "ListElementCode": "2.24",
     "ListElement": "2.24 - Response submitted late - extension of time – granted – Rules 5 & 21",
-    "DisplayOrder": 36
+    "DisplayOrder": 37
   },
   {
     "ID": "fl_Part_2",
     "ListElementCode": "2.25",
     "ListElement": "2.25 - Response – extension of time - hearing required – Rule 21",
-    "DisplayOrder": 37
+    "DisplayOrder": 38
   },
   {
     "ID": "fl_Part_2",
     "ListElementCode": "2.26",
     "ListElement": "2.26 - No response received - Rule 22",
-    "DisplayOrder": 38
+    "DisplayOrder": 39
   },
   {
     "ID": "fl_Part_2",
     "ListElementCode": "2.26A",
     "ListElement": "2.26A - Case not contested – Rule 22",
-    "DisplayOrder": 39
+    "DisplayOrder": 40
   },
   {
     "ID": "fl_Part_2",
     "ListElementCode": "2.27",
     "ListElement": "2.27 - Response – amendment granted",
-    "DisplayOrder": 40
+    "DisplayOrder": 41
   },
   {
     "ID": "fl_Part_3",

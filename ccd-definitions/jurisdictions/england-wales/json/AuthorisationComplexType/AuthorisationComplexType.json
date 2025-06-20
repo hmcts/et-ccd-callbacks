@@ -659,6 +659,13 @@
   },
   {
     "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "additionalCaseInfo",
+    "ListElementCode": "interventionRequired",
+    "UserRole": "caseworker-employment-legalrep-solicitor",
+    "CRUD": "D"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
     "CaseFieldID": "respondentCollection",
     "ListElementCode": "et3Vetting.et3VettingDocument",
     "UserRole": "caseworker-employment-legalrep-solicitor",

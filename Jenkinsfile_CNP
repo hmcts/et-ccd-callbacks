@@ -113,8 +113,14 @@ withPipeline(type, product, component) {
     ]
   }
 
-  before('smoketest:preview') {
+  onPR() {
+    env.XUI_URL="https://xui-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.CCD_ADMIN_URL="https://admin-web-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.CCD_DEFINITION_STORE_API_BASE_URL="https://ccd-definition-store-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.IMPORT_PREVIEW=true
     env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
+    env.SERVICE_AUTH_PROVIDER_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+
     env.ET_COS_URL = "https://et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.FT_SYA_URL = "http://et-sya-api-aat.service.core-compute-aat.internal"
     env.SERVICE_AUTH_PROVIDER_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
@@ -128,44 +134,59 @@ withPipeline(type, product, component) {
     env.ET_SUBMIT_DRAFT_CASE_URL = "http://et-sya-api-aat.service.core-compute-aat.internal/cases/submit-case/"
     env.RUNNING_ENV = "aat"
 
-    sh """
-      ./bin/pull-latest-e2e-tests.sh
-    """
-  }
+    before('smoketest:preview') {
+      sh """
+        ./bin/pull-latest-e2e-tests.sh
+        cd ccd-definitions && yarn setup && yarn scripts:preview ${CHANGE_ID}
+      """
 
-  afterAlways('smoketest:preview') {
-    publishHTML target: [
-            allowMissing : true,
-            alwaysLinkToLastBuild: true,
-            keepAll : true,
-            reportDir : "functional-output",
-            reportFiles : "ET-CCD-Callbacks-tests.html",
-            reportName : "ET Smoke test report"
-    ]
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'et-xui-e2e-tests/playwright-report/**'
-  }
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'ccd-definitions/jurisdictions/admin/xlsx/et-admin-ccd-config-preview.xlsx'
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'ccd-definitions/jurisdictions/england-wales/xlsx/et-englandwales-ccd-config-preview.xlsx'
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'ccd-definitions/jurisdictions/scotland/xlsx/et-scotland-ccd-config-preview.xlsx'
 
-  afterAlways('functionalTest:preview') {
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'
+      sh """
+        cd ..
+        ./bin/preview/create-ccd-roles.sh
+        ./bin/preview/import-ccd-definitions.sh
+      """
+    }
 
-    stage('Functional UI tests chromium') {
-      try {
-        yarnBuilder.yarn('test:functional-chromium')
-      } catch (Error) {
-        unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
-      } finally {
-          publishHTML([
-              allowMissing: true,
+    afterAlways('smoketest:preview') {
+      publishHTML target: [
+              allowMissing : true,
               alwaysLinkToLastBuild: true,
-              keepAll: true,
-              reportDir: 'playwright-report',
-              reportFiles: 'index.html',
-              reportName: 'CCD Callback - UITestChromiumReport'
+              keepAll : true,
+              reportDir : "functional-output",
+              reportFiles : "ET-CCD-Callbacks-tests.html",
+              reportName : "ET Smoke test report"
+      ]
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'et-xui-e2e-tests/playwright-report/**'
+    }
+
+    afterAlways('functionalTest:preview') {
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'
+
+      stage('Functional UI tests chromium') {
+        try {
+          yarnBuilder.yarn('test:functional-chromium')
+        } catch (Error) {
+          unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
+        } finally {
+          publishHTML([
+                  allowMissing: true,
+                  alwaysLinkToLastBuild: true,
+                  keepAll: true,
+                  reportDir: 'playwright-report',
+                  reportFiles: 'index.html',
+                  reportName: 'CCD Callback - UITestChromiumReport'
           ])
           steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'et-xui-e2e-tests/playwright-report/**'
+        }
       }
     }
+
+
   }
 
   before('smoketest:aat') {

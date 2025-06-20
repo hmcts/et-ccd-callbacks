@@ -1045,6 +1045,7 @@
     "FieldType": "Text",
     "ElementLabel": "Respondent idam id",
     "SecurityClassification": "Public",
+    "FieldShowCondition": "responseReceived=\"Dummy\"",
     "Searchable": "N"
   },
   {

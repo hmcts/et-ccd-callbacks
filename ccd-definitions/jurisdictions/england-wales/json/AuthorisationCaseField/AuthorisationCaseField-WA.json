@@ -973,6 +973,12 @@
   },
   {
     "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "hearingDetailsCollection",
+    "UserRole": "caseworker-wa-task-configuration",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
     "CaseFieldID": "referCaseTo",
     "UserRole": "caseworker-wa-task-configuration",
     "CRUD": "R"

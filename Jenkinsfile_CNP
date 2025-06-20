@@ -27,11 +27,40 @@ def secrets = [
                 secret('idam-client-secret', 'IDAM_CLIENT_SECRET'),
                 secret('et-cos-s2s-secret', 'ET_COS_S2S_SECRET'),
                 secret('cos-system-user', 'ET_COS_SYSTEM_USER'),
-                secret('cos-system-user-password', 'ET_COS_SYSTEM_USER_PASSWORD')
+                secret('cos-system-user-password', 'ET_COS_SYSTEM_USER_PASSWORD'),
+                secret('cos-system-user', 'ET_SYSTEM_USER'),
+                secret('cos-system-user-password', 'ET_SYSTEM_USER_PASSWORD')
         ],
-        's2s-${env}':  [
-                secret('microservicekey-ccd-gw', 'MICROSERVICE_CCD_GW')
-        ]
+        'et-${env}': [
+                secret('ccd-admin-username', 'CCD_ADMIN_USERNAME'),
+                secret('ccd-admin-password', 'CCD_ADMIN_PASSWORD'),
+                secret('caseworker-admin-username', 'TEST_CASEWORKER_USERNAME'),
+                secret('caseworker-admin-password', 'TEST_CASEWORKER_PASSWORD'),
+                secret('et-preview-flexi-db-password', 'ET_PREVIEW_FLEXI_DB_PASSWORD'),
+                secret('et-wa-caseworker-username', 'ET_CASEOFFICER_USERNAME'),
+                secret('et-wa-caseworker-password', 'ET_CASEOFFICER_PASSWORD')
+        ],
+        'rpx-${env}': [
+                secret('mc-idam-client-secret', 'IDAM_CLIENT_SECRET'),
+        ],
+        's2s-${env}': [
+                secret('microservicekey-ccd-data', 'DATA_STORE_S2S_KEY'),
+                secret('microservicekey-ccd-definition', 'DEFINITION_STORE_S2S_KEY'),
+                secret('microservicekey-ccd-gw', 'API_GATEWAY_S2S_KEY'),
+                secret('microservicekey-ccd-gw', 'MICROSERVICE_CCD_GW'),
+                secret('microservicekey-ccd-ps', 'PRINT_S2S_KEY'),
+                secret('microservicekey-ccd-admin', 'ADMIN_S2S_KEY'),
+                secret('microservicekey-et-cos', 'ET_COS_S2S_KEY')
+        ],
+        'ccd-${env}': [
+                secret('ccd-api-gateway-oauth2-client-secret', 'API_GATEWAY_IDAM_SECRET'),
+                secret('ccd-admin-web-oauth2-client-secret', 'ADMIN_WEB_IDAM_SECRET'),
+                secret('postcode-info-address-lookup-token', 'ADDRESS_LOOKUP_TOKEN'),
+                secret('idam-data-store-client-secret','IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET'),
+                secret('idam-data-store-system-user-username','IDAM_DATA_STORE_SYSTEM_USER_USERNAME'),
+                secret('idam-data-store-system-user-password','IDAM_DATA_STORE_SYSTEM_USER_PASSWORD'),
+                secret('AppInsightsInstrumentationKey', 'APP_INSIGHTS_INSTRUMENTATION_KEY')
+        ],
 ]
 
 static LinkedHashMap<String, Object> secret(String secretName, String envVar) {

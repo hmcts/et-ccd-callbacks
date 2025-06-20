@@ -151,7 +151,7 @@
     "SecurityClassification": "Public"
   },
   {
-  "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseTypeID": "Pre_Hearing_Deposit",
     "ID": "caseNumber",
     "Label": "Case Number",
     "FieldType": "Text",

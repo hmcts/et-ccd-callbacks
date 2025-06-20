@@ -15,13 +15,6 @@
     "node": ">=18.0.0",
     "yarn": ">=3.0.0"
   },
-  "config": {
-    "local": "http://host.docker.internal:8081",
-    "cftlib": "http://localhost:8081",
-    "demo": "http://et-cos-demo.service.core-compute-demo.internal",
-    "aat": "http://et-cos-aat.service.core-compute-aat.internal",
-    "prod": "http://et-cos-prod.service.core-compute-prod.internal"
-  },
   "scripts": {
     "build": "node tools/build-workspace.js --env local",
     "build:all": "yarn workspace admin build && yarn workspace england-wales build && yarn workspace scotland build",
@@ -30,6 +23,7 @@
     "build:scotland": "yarn workspace scotland build",
     "generate-excel:all": "ET_ENV=local node tools/build-workspace.js",
     "generate-excel:local": "ET_ENV=local node tools/build-workspace.js",
+    "generate-excel:cftlib": "ET_ENV=cftlib node tools/build-workspace.js",
     "generate-excel:demo": "ET_ENV=demo node tools/build-workspace.js",
     "generate-excel:aat": "ET_ENV=aat node tools/build-workspace.js",
     "generate-excel:prod": "ET_ENV=prod node tools/build-workspace.js",
@@ -37,12 +31,6 @@
     "scripts:env": "node scripts/environment/json-env.js",
     "scripts:preview": "node scripts/environment/preview-env.js",
     "generate-json": "yarn workspace admin generate-json",
-    "test": "yarn workspaces foreach --parallel run test",
-    "test:admin": "yarn workspace admin test",
-    "test:england-wales": "yarn workspace england-wales test",
-    "test:scotland": "yarn workspace scotland test",
-    "test:functional": "yarn workspace admin test:functional",
-    "test:smoke": "yarn workspace admin test:smoke",
     "lint": "yarn workspaces foreach --parallel run lint",
     "lint:fix": "yarn workspaces foreach --parallel run lint:fix",
     "format": "prettier --write \"**/*.{js,json,md,yml,yaml}\"",
@@ -65,9 +53,7 @@
     "eslint": "^8.9.0",
     "eslint-config-prettier": "^10.0.0",
     "eslint-plugin-import": "^2.25.4",
-    "eslint-plugin-mocha": "^10.0.3",
     "eslint-plugin-prettier": "^4.0.0",
-    "mocha": "^11.0.0",
     "prettier": "^2.7.1",
     "rimraf": "^5.0.0",
     "typescript": "^5.0.0"

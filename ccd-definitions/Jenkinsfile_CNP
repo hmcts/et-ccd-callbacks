@@ -107,7 +107,7 @@ withPipeline("nodejs", product, component) {
       env.ROLE_ASSIGNMENT_URL = "https://am-role-assignment-et-ccd-definitions-admin-pr-${CHANGE_ID}.preview.platform.hmcts.net"
       env.XUI_URL = "https://xui-et-ccd-definitions-admin-pr-${CHANGE_ID}.preview.platform.hmcts.net"
       sh """
-      ./bin/add-org-roles-to-users.sh
+      ./bin/add-org-roles-to-users-new.sh
     """
     }
   }

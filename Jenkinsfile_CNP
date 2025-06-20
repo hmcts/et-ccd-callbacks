@@ -145,7 +145,6 @@ withPipeline(type, product, component) {
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'ccd-definitions/jurisdictions/scotland/xlsx/et-scotland-ccd-config-preview.xlsx'
 
       sh """
-        cd ..
         ./bin/preview/create-ccd-roles.sh
         ./bin/preview/import-ccd-definitions.sh
       """

@@ -22,6 +22,14 @@ java:
           alias: ET_COS_SYSTEM_USER_PASSWORD
         - name: idam-client-secret
           alias: IDAM_CLIENT_SECRET
+        - name: et-cos-postgres-user-v15
+          alias: ET_COS_DB_USER_NAME
+        - name: et-cos-postgres-password-v15
+          alias: ET_COS_DB_PASSWORD
+        - name: et-cos-postgres-host-v15
+          alias: ET_COS_DB_HOST
+        - name: et-cos-postgres-port-v15
+          alias: ET_COS_DB_PORT
     et:
       secrets:
         - name: create-updates-queue-send-connection-string

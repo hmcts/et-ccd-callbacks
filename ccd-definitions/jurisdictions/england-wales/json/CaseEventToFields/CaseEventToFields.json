@@ -1568,6 +1568,18 @@
   {
     "CaseTypeID": "ET_EnglandWales",
     "CaseEventID": "allocateHearing",
+    "CaseFieldID": "allocateHearingAdditionalJudge",
+    "DisplayContext": "OPTIONAL",
+    "PageID": 2,
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 3,
+    "FieldShowCondition": "allocateHearingSitAlone=\"Two Judges\"",
+    "ShowSummaryChangeOption": "Y",
+    "PageColumnNumber": 1
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseEventID": "allocateHearing",
     "CaseFieldID": "allocateHearingEmployerMember",
     "DisplayContext": "OPTIONAL",
     "PageID": 2,
@@ -5694,7 +5706,7 @@
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 1,
     "ShowSummaryChangeOption": "Y",
-    "PageLabel": "ADR Documents",
+    "PageLabel": "ADR/Privileged Documents",
     "PageColumnNumber": 1
   },
   {

@@ -69,8 +69,8 @@ create_role() {
 
     if [[ "${http_code}" == "201" ]] || [[ "${http_code}" == "200" ]]; then
         echo "    ✅ Role '${role_name}' created/updated successfully"
-    elif [[ "${http_code}" == "409" ]]; then
-        echo "    ℹ️  Role '${role_name}' already exists"
+    elif [[ "${http_code}" == "205" ]]; then
+        echo "    ✅ Role '${role_name}' already exists and is up-to-date"
     else
         echo "    ❌ Failed to create role '${role_name}' (HTTP ${http_code})"
         echo "    Response: ${response_body}"

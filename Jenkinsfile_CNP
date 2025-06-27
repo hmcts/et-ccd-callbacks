@@ -40,9 +40,6 @@ def secrets = [
     secret('et-wa-caseworker-username', 'ET_CASEOFFICER_USERNAME'),
     secret('et-wa-caseworker-password', 'ET_CASEOFFICER_PASSWORD')
   ],
-  'rpx-${env}': [
-    secret('mc-idam-client-secret', 'IDAM_CLIENT_SECRET'),
-  ],
   's2s-${env}': [
     secret('microservicekey-ccd-data', 'DATA_STORE_S2S_KEY'),
     secret('microservicekey-ccd-definition', 'DEFINITION_STORE_S2S_KEY'),

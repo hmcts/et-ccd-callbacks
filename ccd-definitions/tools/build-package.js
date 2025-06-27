@@ -53,10 +53,14 @@ const xlsxPath = path.join(packagePath, 'xlsx');
 const outputFile = `${packageConfig.outputPrefix}-${envConfig.suffix}.xlsx`;
 const outputPath = path.join(xlsxPath, outputFile);
 
+// Determine a jurisdiction-specific template path
+const templatePath = path.join(packagePath, 'data', 'ccd-template.xlsx');
+
 console.log(`📦 Package: ${packageConfig.name}`);
 console.log(`🌍 Environment: ${environment}`);
 console.log(`📂 JSON source: ${jsonPath}`);
 console.log(`📄 Output: ${outputFile}`);
+console.log(`📋 Template: ${templatePath}`);
 
 // Ensure directories exist
 if (!fs.existsSync(xlsxPath)) {
@@ -69,14 +73,28 @@ if (!fs.existsSync(jsonPath)) {
   process.exit(1);
 }
 
+// Check if a template file exists
+if (!fs.existsSync(templatePath)) {
+  console.error(`❌ Template file not found: ${templatePath}`);
+  process.exit(1);
+}
+
 try {
-  // Build the Excel file using the CCD definition processor
-  const command = `node "${path.join(processorPath, 'bin', 'json2xlsx')}" -D "${jsonPath}" -o "${outputPath}"`;
+  // Get exclude patterns for the environment
+  const excludePatterns = envConfig.excludePatterns || [];
+  const excludeArg = excludePatterns.length > 0 ? ` -e "${excludePatterns.join(',')}"` : '';
+  
+  // Build the Excel file using the CCD definition processor with a jurisdiction-specific template
+  const command = `node "${path.join(processorPath, 'bin', 'json2xlsx')}" -D "${jsonPath}" -o "${outputPath}" -t "${templatePath}"${excludeArg}`;
   
   console.log(`🔧 Running: ${command}`);
+  if (excludePatterns.length > 0) {
+    console.log(`🚫 Excluding patterns: ${excludePatterns.join(', ')}`);
+  }
+  
   execSync(command, { 
     stdio: 'inherit',
-    cwd: processorPath,  // Run from processor directory to find template
+    cwd: processorPath,  // Run from the processor directory
     env: { ...process.env, ET_ENV: environment }
   });
   

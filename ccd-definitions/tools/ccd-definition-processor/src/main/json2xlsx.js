@@ -8,18 +8,23 @@ const sheetUtils = require('./lib/sheet-utils');
 const { Substitutor } = require('./lib/substitutor');
 const accessControl = require('./lib/access-control-transformer');
 
-const sourceXlsx = './data/ccd-template.xlsx';
+const defaultTemplateXlsx = './data/ccd-template.xlsx';
 
 const validateArgs = (args) => {
   assert(!!args.sheetsDir, 'sheets directory argument (-D) is required');
   assert(!!args.destinationXlsx, 'spreadsheet file argument (-o) is required');
 
   assert(fileUtils.exists(args.sheetsDir), `sheets directory ${args.sheetsDir} not found`);
+
+  if (args.template) {
+    assert(fileUtils.exists(args.template), `template file ${args.template} not found`);
+  }
 };
 
 const run = async (args) => {
   validateArgs(args);
 
+  const sourceXlsx = args.template || defaultTemplateXlsx;
   console.log(`Import...\n loading workbook: ${sourceXlsx}`);
   const builder = new ccdUtils.SpreadsheetBuilder(sourceXlsx);
   await builder.loadAsync();

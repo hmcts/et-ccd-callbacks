@@ -15,23 +15,33 @@ module.exports = {
   environments: {
     local: {
       suffix: 'local',
-      excludePatterns: ['*-prod.json']
+      excludePatterns: ['*-prod.json'],
+      isProd: false
+    },
+    cftlib: {
+      suffix: 'cftlib',
+      excludePatterns: ['*-prod.json'],
+      isProd: false
     },
     demo: {
       suffix: 'demo', 
-      excludePatterns: ['*-prod.json']
+      excludePatterns: ['*-prod.json'],
+      isProd: false
     },
     aat: {
       suffix: 'aat',
-      excludePatterns: ['*-prod.json']
+      excludePatterns: ['*-prod.json'],
+      isProd: false
     },
     prod: {
       suffix: 'prod',
-      excludePatterns: ['*-nonprod.json']
+      excludePatterns: ['*-nonprod.json'],
+      isProd: true
     },
     preview: {
       suffix: 'preview',
-      excludePatterns: []
+      excludePatterns: ['*-prod.json'],
+      isProd: false
     }
   },
 

@@ -1280,7 +1280,6 @@
     "ListElementCode": "name_of_organisation",
     "FieldType": "Text",
     "ElementLabel": "Name of Organisation",
-    "FieldShowCondition": "myHmctsYesNo=\"No\"",
     "SecurityClassification": "Public",
     "Searchable": "N"
   },
@@ -1437,6 +1436,13 @@
     "ListElementCode": "reasonableAdjustment",
     "FieldType": "YesOrNo",
     "ElementLabel": "Reasonable Adjustment",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "AdditionalCaseDetails",
+    "ListElementCode": "interventionRequired",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Speak to VP",
     "SecurityClassification": "Public"
   },
   {
@@ -4083,7 +4089,7 @@
     "ID": "adhocReport",
     "ListElementCode": "hearingSitAlone",
     "FieldType": "Text",
-    "ElementLabel": "Sit Alone or Full Panel",
+    "ElementLabel": "Panel Type",
     "SecurityClassification": "Public"
   },
   {
@@ -4771,6 +4777,13 @@
   },
   {
     "ID": "ListingItemType",
+    "ListElementCode": "additionalJudge",
+    "FieldType": "Text",
+    "ElementLabel": "Employment Judge",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "ListingItemType",
     "ListElementCode": "hearingEEMember",
     "FieldType": "Text",
     "ElementLabel": "Employee Member",
@@ -5426,7 +5439,7 @@
     "ID": "Hearing",
     "ListElementCode": "hearingSitAlone",
     "FieldType": "FixedRadioList",
-    "ElementLabel": "Sit Alone or Full Panel",
+    "ElementLabel": "Panel Type",
     "FieldTypeParameter": "frl_SitAlone",
     "SecurityClassification": "Public"
   },
@@ -5435,6 +5448,15 @@
     "ListElementCode": "judge",
     "FieldType": "DynamicList",
     "ElementLabel": "Employment Judge",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "Hearing",
+    "ListElementCode": "additionalJudge",
+    "FieldType": "DynamicList",
+    "ElementLabel": "Employment Judge",
+    "FieldShowCondition": "hearingSitAlone = \"Two Judges\"",
+    "RetainHiddenValue": "No",
     "SecurityClassification": "Public"
   },
   {

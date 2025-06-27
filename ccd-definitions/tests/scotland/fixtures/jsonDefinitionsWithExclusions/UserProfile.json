@@ -1,9 +1,0 @@
-[
-  {
-    "LiveFrom": "01/01/2017",
-    "UserIDAMId": "local-authority@example.com",
-    "WorkBasketDefaultJurisdiction": "PUBLICLAW",
-    "WorkBasketDefaultCaseType": "DRAFT",
-    "WorkBasketDefaultState": "1_Initiation"
-  }
-]

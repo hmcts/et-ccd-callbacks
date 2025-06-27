@@ -814,9 +814,17 @@
   {
     "CaseTypeID": "ET_Scotland",
     "ID": "allocateHearingSitAlone",
-    "Label": "Sit Alone or Full Panel",
+    "Label": "Panel Type",
     "FieldType": "FixedRadioList",
     "FieldTypeParameter": "frl_SitAlone",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "allocateHearingAdditionalJudge",
+    "Label": "Employment Judge",
+    "FieldType": "DynamicList",
     "SecurityClassification": "Public",
     "Searchable": "N"
   },
@@ -5623,7 +5631,7 @@
     "CaseTypeID": "ET_Scotland_Listings",
     "ID": "showAll",
     "Label": "Show all cases?",
-    "HintText": "Includes Settled, Withdrawn and Postponed",
+    "HintText": "Includes Settled, Withdrawn, Postponed and Vacated",
     "FieldType": "YesOrNo",
     "SecurityClassification": "Public"
   },
@@ -6880,5 +6888,13 @@
     "FieldType": "respondentTse",
     "SecurityClassification": "Public",
     "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "acasCertificateRequired",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
   }
 ]

@@ -25,7 +25,7 @@ idam:
   client:
     scope: openid profile roles manage-user
     secret: ${ET_COS_S2S_SECRET:AAAAAAAAAAAAAAAA}
-    id: ${REFORM_SERVICE_NAME:et-cos}
+    id: et-cos
 
 et-sya-api:
   url: http://et-sya-api-aat.service.core-compute-aat.internal

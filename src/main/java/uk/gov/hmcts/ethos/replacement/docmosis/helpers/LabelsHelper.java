@@ -220,12 +220,9 @@ public final class LabelsHelper {
 
         List<AddressLabelTypeItem> labelTypeItemList = new ArrayList<>();
 
-        for (RespondentSumTypeItem activeRespondent : activeRespondents) {
-
+        activeRespondents.forEach(activeRespondent -> {
             AddressLabelType addressLabelType = new AddressLabelType();
-
             RespondentSumType respondentSumType = activeRespondent.getValue();
-
             addressLabelType.setPrintLabel(printRespondentsLabels);
             addressLabelType.setFullName(RESPONDENT + nullCheck(respondentSumType.getRespondentName()));
             addressLabelType.setLabelEntityName01(nullCheck(respondentSumType.getRespondentName()));
@@ -235,15 +232,11 @@ public final class LabelsHelper {
             setEntityFax(addressLabelType, respondentSumType.getRespondentPhone2());
             addressLabelType.setLabelEntityReference(REF);
             addressLabelType.setLabelCaseReference(ethosCaseReference);
-
             AddressLabelTypeItem addressLabelTypeItem = new AddressLabelTypeItem();
-
             addressLabelTypeItem.setId(UUID.randomUUID().toString());
             addressLabelTypeItem.setValue(addressLabelType);
-
             labelTypeItemList.add(addressLabelTypeItem);
-
-        }
+        });
 
         return labelTypeItemList;
 
@@ -283,38 +276,28 @@ public final class LabelsHelper {
 
         List<AddressLabelTypeItem> labelTypeItemList = new ArrayList<>();
 
-        for (RepresentedTypeRItem representedTypeRItem : repCollection) {
-
+        repCollection.forEach(representedTypeRItem -> {
             AddressLabelType addressLabelType = new AddressLabelType();
-
             RepresentedTypeR representedTypeR = representedTypeRItem.getValue();
-
             addressLabelType.setPrintLabel(printRespondentsRepsLabels);
-
             addressLabelType.setFullName(RESPONDENT_REP + nullCheck(representedTypeR.getNameOfRepresentative()));
             addressLabelType.setLabelEntityName01(nullCheck(representedTypeR.getNameOfRepresentative()));
             addressLabelType.setLabelEntityName02(nullCheck(representedTypeR.getNameOfOrganisation()));
             setEntityAddress(addressLabelType, representedTypeR.getRepresentativeAddress());
             setEntityTelephone(addressLabelType, representedTypeR.getRepresentativePhoneNumber());
             setEntityFax(addressLabelType, representedTypeR.getRepresentativeMobileNumber());
-
             if (isNullOrEmpty(nullCheck(representedTypeR.getRepresentativeReference()))) {
                 addressLabelType.setLabelEntityReference(REF);
             } else {
                 addressLabelType.setLabelEntityReference(
                         REF + nullCheck(representedTypeR.getRepresentativeReference()));
             }
-
             addressLabelType.setLabelCaseReference(ethosCaseReference);
-
             AddressLabelTypeItem addressLabelTypeItem = new AddressLabelTypeItem();
-
             addressLabelTypeItem.setId(UUID.randomUUID().toString());
             addressLabelTypeItem.setValue(addressLabelType);
-
             labelTypeItemList.add(addressLabelTypeItem);
-
-        }
+        });
 
         return labelTypeItemList;
 
@@ -363,10 +346,10 @@ public final class LabelsHelper {
                 .append(nullCheck(address.getPostTown()))
                 .append(isNullOrEmpty(nullCheck(address.getCounty())) || sb.isEmpty() ? "" : ", ")
                 .append(nullCheck(address.getCounty()))
-                .append(!isNullOrEmpty(nullCheck(address.getPostCode())) && !sb.isEmpty() ? ", " : "")
+                .append(isNullOrEmpty(nullCheck(address.getPostCode())) || sb.isEmpty() ? "" : ", ")
                 .append(nullCheck(address.getPostCode()))
-                .append(!isNullOrEmpty(nullCheck(address.getCountry())) && !sb.isEmpty() ? ", " : "")
-                .append(nullCheck(address.getCountry())).append(!sb.isEmpty() ? "." : "");
+                .append(isNullOrEmpty(nullCheck(address.getCountry())) || sb.isEmpty() ? "" : ", ")
+                .append(nullCheck(address.getCountry())).append(sb.isEmpty() ? "" : ".");
 
         return sb;
 

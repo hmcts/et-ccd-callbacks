@@ -45,7 +45,7 @@ class CaseUpdateForCaseWorkerServiceTest {
     private DefaultValues scotlandDefaultValues;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         submitEvent = new SubmitEvent();
 
         englandWalesCcdRequest = new CCDRequest();

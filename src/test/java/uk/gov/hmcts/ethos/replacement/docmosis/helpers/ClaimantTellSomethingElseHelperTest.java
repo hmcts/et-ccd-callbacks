@@ -2,7 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -110,10 +109,6 @@ class ClaimantTellSomethingElseHelperTest {
 
         assertThat(ClaimantTellSomethingElseHelper.getDocumentRequest(caseData, "key"))
                 .isEqualTo(expectedDocumentString);
-    }
-
-    @Test
-    void claimantSelectApplicationToType() {
     }
 
     private static Stream<Arguments> selectedApplicationList() {

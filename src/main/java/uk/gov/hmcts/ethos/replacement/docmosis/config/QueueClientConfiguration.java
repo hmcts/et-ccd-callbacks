@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Profile;
 @Profile("!test")
 public class QueueClientConfiguration {
     @ConditionalOnProperty(name = "servicebus.fake", havingValue = "false", matchIfMissing = true)
-    @Bean("create-updates-send-client")
+    @Bean("createUpdatesSendClient")
     public IQueueClient createUpdatesSendClient(
         @Value("${queue.create-updates.send.connection-string}") String connectionString,
         @Value("${queue.create-updates.queue-name}") String queueName

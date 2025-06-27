@@ -30,7 +30,7 @@ class TseViewApplicationHelperTest {
     private CaseData caseData;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         caseData = CaseDataBuilder.builder()
             .withClaimantIndType("First", "Last")
             .withEthosCaseReference("1234")

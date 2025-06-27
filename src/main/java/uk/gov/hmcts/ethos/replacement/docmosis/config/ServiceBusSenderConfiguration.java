@@ -18,9 +18,9 @@ public class ServiceBusSenderConfiguration {
         this.objectMapper = objectMapper;
     }
 
-    @Bean(name = "create-updates-send-helper")
+    @Bean(name = "createUpdatesSendHelper")
     public ServiceBusSender createUpdatesSendHelper(
-        @Qualifier("create-updates-send-client") IQueueClient queueClient) {
+        @Qualifier("createUpdatesSendClient") IQueueClient queueClient) {
         return new ServiceBusSender(queueClient, objectMapper);
     }
 

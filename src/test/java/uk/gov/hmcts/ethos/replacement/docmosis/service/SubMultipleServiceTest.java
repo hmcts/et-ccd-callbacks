@@ -37,7 +37,7 @@ class SubMultipleServiceTest {
     private BulkDetails bulkDetails;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         BulkData bulkData = new BulkData();
         bulkDetails = new BulkDetails();
         bulkData.setSubMultipleName("SubMultipleNew");

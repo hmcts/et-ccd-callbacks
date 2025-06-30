@@ -44,7 +44,7 @@ class CaseRetrievalForCaseWorkerServiceTest {
     private SubmitEvent submitEvent;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         CaseDetails caseDetails;
         ccdRequest = new CCDRequest();
         caseDetails = new CaseDetails();
@@ -193,11 +193,11 @@ class CaseRetrievalForCaseWorkerServiceTest {
     private List<SubmitEvent> getSubmitEvent() {
         CaseData linkedCaseData = new CaseData();
         linkedCaseData.setEthosCaseReference("R5000656");
-        SubmitEvent submitEvent = new SubmitEvent();
+        SubmitEvent newSubmitEvent = new SubmitEvent();
         submitEvent.setCaseId(123_456);
         submitEvent.setCaseData(linkedCaseData);
         List<SubmitEvent> submitEvents = new ArrayList<>();
-        submitEvents.add(submitEvent);
+        submitEvents.add(newSubmitEvent);
         return submitEvents;
     }
 }

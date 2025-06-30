@@ -22,7 +22,7 @@ public class BFHelperTest {
     private List<BFActionTypeItem> bfActionTypeItemList;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         caseData = MultipleUtil.getCaseData("245000/2021");
         bfActionTypeItemList = generateBFActionTypeItems();
     }

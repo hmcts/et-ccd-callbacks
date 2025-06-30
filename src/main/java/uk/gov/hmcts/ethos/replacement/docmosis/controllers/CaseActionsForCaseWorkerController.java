@@ -155,7 +155,7 @@ public class CaseActionsForCaseWorkerController {
         @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
         @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
-    @Deprecated
+    @Deprecated(forRemoval = true)
     public ResponseEntity<CCDCallbackResponse> retrieveCase(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
@@ -201,6 +201,7 @@ public class CaseActionsForCaseWorkerController {
         @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
         @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
+    @Deprecated(forRemoval = true)
     public ResponseEntity<CCDCallbackResponse> updateCase(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {

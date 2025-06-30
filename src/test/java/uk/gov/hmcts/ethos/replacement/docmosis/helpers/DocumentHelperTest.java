@@ -74,7 +74,7 @@ class DocumentHelperTest {
     private VenueAddressReaderService venueAddressReaderService;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         caseDetails1 = generateCaseDetails("caseDetailsTest1.json");
         caseDetails2 = generateCaseDetails("caseDetailsTest2.json");
         caseDetails3 = generateCaseDetails("caseDetailsTest3.json");

@@ -52,7 +52,7 @@ class BulkHelperTest {
     }
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         bulkDetailsListCases = generateBulkDetails("bulkDetailsTest1.json");
         bulkDetailsScheduleDetailed = generateBulkDetails("bulkDetailsTest2.json");
         CaseData caseData = new CaseData();

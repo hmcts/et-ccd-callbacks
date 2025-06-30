@@ -48,7 +48,6 @@ public final class Et3VettingHelper {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().registerModule(new JavaTimeModule());
     private static final String TEMPLATE_NAME = "EM-TRB-EGW-ENG-01145.docx";
-    private static final String OUTPUT_NAME = "ET3 Processing.pdf";
 
     static final String NO_RESPONDENTS_FOUND_ERROR = "No respondents found for case %s";
     static final String NO_CLAIM_SERVED_DATE = "Cannot proceed as there is no claim served date";

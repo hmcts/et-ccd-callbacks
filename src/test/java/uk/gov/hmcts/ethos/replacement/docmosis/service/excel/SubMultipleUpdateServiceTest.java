@@ -42,7 +42,7 @@ class SubMultipleUpdateServiceTest {
     private String userToken;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         multipleObjectsAll = MultipleUtil.getMultipleObjectsAll();
         multipleDetails = new MultipleDetails();
         multipleDetails.setCaseData(MultipleUtil.getMultipleData());

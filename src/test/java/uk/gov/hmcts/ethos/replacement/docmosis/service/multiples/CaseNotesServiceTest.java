@@ -33,7 +33,7 @@ class CaseNotesServiceTest {
     private UserDetails userDetails;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         caseNotesService = new CaseNotesService(userIdamService);
         caseNote = CaseNote.builder()
                 .title("Test note")

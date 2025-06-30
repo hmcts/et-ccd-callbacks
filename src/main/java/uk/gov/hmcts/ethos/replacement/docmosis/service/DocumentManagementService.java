@@ -95,7 +95,7 @@ public class DocumentManagementService {
         this.restTemplate = restTemplate;
     }
 
-    @Retryable(value = {DocumentManagementException.class}, backoff = @Backoff(delay = 200))
+    @Retryable(retryFor = {DocumentManagementException.class}, backoff = @Backoff(delay = 200))
     public URI uploadDocument(String authToken, byte[] byteArray, String outputFileName, String type,
                               String caseTypeID) {
         try {

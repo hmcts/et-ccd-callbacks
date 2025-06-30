@@ -37,7 +37,7 @@ class SingleCaseMultipleMidEventValidationServiceTest {
     private String multipleCaseTypeId;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         caseDetails = new CaseDetails();
         caseDetails.setState(ACCEPTED_STATE);
         caseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);

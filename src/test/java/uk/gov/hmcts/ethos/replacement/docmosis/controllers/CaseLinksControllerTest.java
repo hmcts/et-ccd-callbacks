@@ -48,9 +48,9 @@ class CaseLinksControllerTest {
     @MockBean
     private VerifyTokenService verifyTokenService;
     @MockBean
-    private CaseLinksEmailService caseLinksEmailService;
-    @MockBean
     private FeatureToggleService featureToggleService;
+    @MockBean
+    private CaseLinksEmailService caseLinksEmailService;
 
     @Autowired
     private MockMvc mockMvc;
@@ -59,7 +59,7 @@ class CaseLinksControllerTest {
     private CCDRequest ccdRequest;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         when(featureToggleService.isHmcEnabled()).thenReturn(true);
         CaseDetails caseDetails = CaseDataBuilder.builder()
                 .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
@@ -99,13 +99,13 @@ class CaseLinksControllerTest {
     @ParameterizedTest
     @MethodSource("requests")
     void testStatusForbidden(String url) throws Exception {
-        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
+        CCDRequest localCcdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
 
         mockMvc.perform(post(url)
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonMapper.toJson(ccdRequest)))
+                        .content(jsonMapper.toJson(localCcdRequest)))
                 .andExpect(status().isForbidden());
     }
 
@@ -118,13 +118,13 @@ class CaseLinksControllerTest {
 
     @Test
     void testInitTransferToEnglandWalesForbidden() throws Exception {
-        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
+        CCDRequest localCcdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
 
         mockMvc.perform(post(CREATE_SUBMITTED_URL)
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(jsonMapper.toJson(ccdRequest)))
+                        .content(jsonMapper.toJson(localCcdRequest)))
                 .andExpect(status().isForbidden());
     }
 

@@ -17,7 +17,7 @@ class ClaimsByHearingVenueExcelReportCreationServiceTest {
     ClaimsByHearingVenueReportData reportData;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         reportData = new ClaimsByHearingVenueReportData();
         ClaimsByHearingVenueReportDetail detailEntry = new ClaimsByHearingVenueReportDetail();
         detailEntry.setCaseReference("245000/2021");

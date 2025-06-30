@@ -43,7 +43,7 @@ class LabelsHelperTest {
     private AddressLabelsAttributesType addressLabelsAttributesType;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         multipleDetails = new MultipleDetails();
         multipleDetails.setCaseData(MultipleUtil.getMultipleData());
         multipleDetails.setCaseTypeId("Leeds_Multiple");

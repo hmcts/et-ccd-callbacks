@@ -23,7 +23,7 @@ public class CreateUpdatesBusSender {
     private final ServiceBusSender serviceBusSender;
 
     public CreateUpdatesBusSender(
-            @Qualifier("create-updates-send-helper") ServiceBusSender serviceBusSender) {
+            @Qualifier("createUpdatesSendHelper") ServiceBusSender serviceBusSender) {
         this.serviceBusSender = serviceBusSender;
     }
 

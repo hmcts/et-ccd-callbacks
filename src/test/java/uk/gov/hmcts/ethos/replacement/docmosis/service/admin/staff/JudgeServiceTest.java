@@ -256,52 +256,56 @@ class JudgeServiceTest {
 
     private AdminData createAdminData(String judgeCode, String judgeName, String tribunalOffice,
                                       String employmentStatus) {
-        AdminData adminData = new AdminData();
-        adminData.setJudgeCode(judgeCode);
-        adminData.setJudgeName(judgeName);
-        adminData.setTribunalOffice(tribunalOffice);
-        adminData.setEmploymentStatus(employmentStatus);
-        return adminData;
+        AdminData newAdminData = new AdminData();
+        newAdminData.setJudgeCode(judgeCode);
+        newAdminData.setJudgeName(judgeName);
+        newAdminData.setTribunalOffice(tribunalOffice);
+        newAdminData.setEmploymentStatus(employmentStatus);
+        return newAdminData;
     }
 
     private AdminData createAdminDataWithDynamicList(String id, String tribunalOffice, String code, String name,
                                                      String employmentStatus) {
-        AdminData adminData = createAdminData(code, name, tribunalOffice, employmentStatus);
-        adminData.setJudgeSelectList(DynamicFixedListType.of(DynamicValueType.create(code, name)));
-        adminData.getJudgeSelectList().setValue(DynamicValueType.create(id, name));
-        return adminData;
+        AdminData newAdminData = createAdminData(code, name, tribunalOffice, employmentStatus);
+        newAdminData.setJudgeSelectList(DynamicFixedListType.of(DynamicValueType.create(code, name)));
+        newAdminData.getJudgeSelectList().setValue(DynamicValueType.create(id, name));
+        return newAdminData;
     }
 
     private Judge createJudge(AdminData adminData) {
-        Judge judge =  new Judge();
-        judge.setCode(adminData.getJudgeCode());
-        judge.setName(adminData.getJudgeName());
-        judge.setEmploymentStatus(JudgeEmploymentStatus.valueOf(adminData.getEmploymentStatus()));
-        judge.setTribunalOffice(TribunalOffice.valueOfOfficeName(adminData.getTribunalOffice()));
-        return judge;
+        Judge newJudge =  new Judge();
+        newJudge.setCode(adminData.getJudgeCode());
+        newJudge.setName(adminData.getJudgeName());
+        newJudge.setEmploymentStatus(JudgeEmploymentStatus.valueOf(adminData.getEmploymentStatus()));
+        newJudge.setTribunalOffice(TribunalOffice.valueOfOfficeName(adminData.getTribunalOffice()));
+        return newJudge;
     }
 
     private Judge createJudge(TribunalOffice tribunalOffice, String code, String name, String employmentStatus) {
-        Judge judge =  new Judge();
-        judge.setCode(code);
-        judge.setName(name);
-        judge.setEmploymentStatus(JudgeEmploymentStatus.valueOf(employmentStatus));
-        judge.setTribunalOffice(tribunalOffice);
-        return judge;
+        Judge newJudge =  new Judge();
+        newJudge.setCode(code);
+        newJudge.setName(name);
+        newJudge.setEmploymentStatus(JudgeEmploymentStatus.valueOf(employmentStatus));
+        newJudge.setTribunalOffice(tribunalOffice);
+        return newJudge;
     }
 
-    private Judge createJudgeWithId(int id, TribunalOffice tribunalOffice, String code, String name,
-                                    String employmentStatus) {
-        Judge judge = createJudge(tribunalOffice, code, name, employmentStatus);
-        judge.setId(id);
-        return judge;
+    private Judge createJudgeWithId(
+            int id,
+            TribunalOffice tribunalOffice,
+            String code,
+            String name,
+            String employmentStatus) {
+        Judge newJudge = createJudge(tribunalOffice, code, name, employmentStatus);
+        newJudge.setId(id);
+        return newJudge;
     }
 
-    private List<Judge> createListJudge(int id, TribunalOffice tribunalOffice, String code, String name,
-                                        String employmentStatus) {
-        Judge judge = createJudgeWithId(id, tribunalOffice, code, name, employmentStatus);
+    private List<Judge> createListJudge(int id, TribunalOffice tribunalOffice,
+                                        String code, String name, String employmentStatus) {
+        Judge newJudge = createJudgeWithId(id, tribunalOffice, code, name, employmentStatus);
         List<Judge> listJudge = new ArrayList<>();
-        listJudge.add(judge);
+        listJudge.add(newJudge);
         return listJudge;
     }
 }

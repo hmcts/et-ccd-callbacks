@@ -71,7 +71,7 @@ class SendNotificationServiceTest {
     private static final String CLAIMANT_ONLY = "Claimant only";
 
     @BeforeEach
-    public void setUp() {
+     void setUp() {
         emailService = spy(new EmailUtils());
         sendNotificationService = new SendNotificationService(hearingSelectionService,
                 emailService, featureToggleService);

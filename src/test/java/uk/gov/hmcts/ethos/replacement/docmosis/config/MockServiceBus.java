@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Profile;
 @Configuration
 @Profile("test")
 public class MockServiceBus {
-    @Bean("create-updates-send-client")
+    @Bean("createUpdatesSendClient")
     IQueueClient client() {
         return Mockito.mock(IQueueClient.class);
     }

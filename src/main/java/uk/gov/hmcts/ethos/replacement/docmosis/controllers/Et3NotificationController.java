@@ -57,7 +57,7 @@ public class Et3NotificationController {
      *                          type "Another type of document" in a html string format.
      */
     @PostMapping(value = "/aboutToStart", consumes = MimeTypeUtils.APPLICATION_JSON_VALUE)
-    @Operation(summary = "initialize data for bundles respondent")
+    @Operation(summary = "check data for et3 notification")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
                     content = {
@@ -144,7 +144,7 @@ public class Et3NotificationController {
      *         </ul>
      */
     @PostMapping(value = "/aboutToSubmit", consumes = MimeTypeUtils.APPLICATION_JSON_VALUE)
-    @Operation(summary = "initialize data for bundles respondent")
+    @Operation(summary = "update data, document list, acceptance dates for et3 notification")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
                 content = {

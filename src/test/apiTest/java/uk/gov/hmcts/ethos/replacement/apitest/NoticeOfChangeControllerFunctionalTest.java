@@ -4,6 +4,7 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.core5.http.ParseException;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -21,7 +22,6 @@ import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
-import org.apache.hc.core5.http.ParseException;
 
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.ENGLISH_LANGUAGE;
 

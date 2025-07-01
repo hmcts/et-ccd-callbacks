@@ -18,7 +18,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseReplyData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseReplyDocument;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentUtil;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentUtils;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -116,7 +116,7 @@ public final class TseAdmReplyHelper {
         if (docTypeList == null) {
             return new ArrayList<>();
         }
-        return DocumentUtil.generateUploadedDocumentListFromDocumentList(docTypeList);
+        return DocumentUtils.generateUploadedDocumentListFromDocumentList(docTypeList);
     }
 
 }

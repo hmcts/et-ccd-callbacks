@@ -110,7 +110,7 @@ class SessionDaysTest {
 
     @Test
     void shouldGetSessionDaysForValidHearingType() {
-        for (String hearingType : CasesCompletedReport.VALID_HEARING_TYPES) {
+        CasesCompletedReport.VALID_HEARING_TYPES.forEach(hearingType -> {
             CaseDataBuilder caseDataBuilder = new CaseDataBuilder();
             CaseData caseData = caseDataBuilder
                     .withHearing("1", hearingType, "Judge Dave", null, null, null, null)
@@ -118,11 +118,9 @@ class SessionDaysTest {
                     .withHearingSession(0, "2021-07-02T10:00:00", HEARING_STATUS_HEARD, true)
                     .build();
             ListingData listingData = createListingData("2021-07-02");
-
             SessionDays sessionDays = new SessionDays(listingData, caseData);
-
             verifySessionDays(sessionDays, hearingType, 2, "2021-07-02T10:00:00");
-        }
+        });
     }
 
     @Test
@@ -148,19 +146,18 @@ class SessionDaysTest {
                 HEARING_TYPE_JUDICIAL_RECONSIDERATION,
                 HEARING_TYPE_JUDICIAL_REMEDY);
 
-        for (String invalidHearingType : invalidHearingTypes) {
+        invalidHearingTypes.forEach(invalidHearingType -> {
             CaseDataBuilder caseDataBuilder = new CaseDataBuilder();
             CaseData caseData = caseDataBuilder
                     .withHearing("1", invalidHearingType, "Judge Doris", null, null, null, null)
                     .withHearingSession(0, "2021-07-02T10:00:00", HEARING_STATUS_HEARD, true)
                     .build();
-
             ListingData listingData = new ListingData();
             listingData.setHearingDateType(SINGLE_HEARING_DATE_TYPE);
             listingData.setListingDate("2021-07-02");
             SessionDays sessionDays = new SessionDays(listingData, caseData);
             assertNull(sessionDays.getLatestDisposedHearingSession());
-        }
+        });
     }
 
     @Test

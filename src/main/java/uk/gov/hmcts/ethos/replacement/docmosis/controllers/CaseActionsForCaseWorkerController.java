@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RestController;
+import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
@@ -65,16 +66,6 @@ import java.util.List;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABOUT_TO_SUBMIT_EVENT_CALLBACK;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MID_EVENT_CALLBACK;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.REJECTED_STATE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_CALLBACK;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntity;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
@@ -155,7 +146,7 @@ public class CaseActionsForCaseWorkerController {
         @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
         @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
-    @Deprecated
+    @Deprecated(forRemoval = true)
     public ResponseEntity<CCDCallbackResponse> retrieveCase(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
@@ -201,6 +192,7 @@ public class CaseActionsForCaseWorkerController {
         @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
         @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
+    @Deprecated(forRemoval = true)
     public ResponseEntity<CCDCallbackResponse> updateCase(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
@@ -260,7 +252,7 @@ public class CaseActionsForCaseWorkerController {
             generateEthosCaseReference(caseData, ccdRequest);
             FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
             caseData.setMultipleFlag(caseData.getEcmCaseType() != null
-                    && caseData.getEcmCaseType().equals(MULTIPLE_CASE_TYPE) ? YES : NO);
+                    && Constants.MULTIPLE_CASE_TYPE.equals(caseData.getEcmCaseType()) ? Constants.YES : Constants.NO);
             UploadDocumentHelper.convertLegacyDocsToNewDocNaming(caseData);
             UploadDocumentHelper.setDocumentTypeForDocumentCollection(caseData);
             DocumentHelper.setDocumentNumbers(caseData);
@@ -336,9 +328,9 @@ public class CaseActionsForCaseWorkerController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         clerkService.initialiseClerkResponsible(caseData);
 
-        if (ENGLANDWALES_CASE_TYPE_ID.equals(ccdRequest.getCaseDetails().getCaseTypeId())) {
+        if (Constants.ENGLANDWALES_CASE_TYPE_ID.equals(ccdRequest.getCaseDetails().getCaseTypeId())) {
             fileLocationSelectionService.initialiseFileLocation(caseData);
-        } else if (SCOTLAND_CASE_TYPE_ID.equals(ccdRequest.getCaseDetails().getCaseTypeId())) {
+        } else if (Constants.SCOTLAND_CASE_TYPE_ID.equals(ccdRequest.getCaseDetails().getCaseTypeId())) {
             scotlandFileLocationSelectionService.initialiseFileLocation(caseData);
         }
 
@@ -392,7 +384,7 @@ public class CaseActionsForCaseWorkerController {
                     caseDetails.getJurisdiction(),
                     caseDetails.getCaseId(), errors);
 
-            if (featureToggleService.isWorkAllocationEnabled() && caseTypeId.equals(SCOTLAND_CASE_TYPE_ID)) {
+            if (featureToggleService.isWorkAllocationEnabled() && Constants.SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
                 caseManagementLocationService.setCaseManagementLocation(caseData);
             }
             removeSpacesFromPartyNames(caseData);
@@ -497,7 +489,6 @@ public class CaseActionsForCaseWorkerController {
         }
 
         caseFlagsService.setupCaseFlags(caseData);
-
         caseManagementForCaseWorkerService.updateWorkAllocationField(errors, caseData);
         removeSpacesFromPartyNames(caseData);
 
@@ -734,9 +725,10 @@ public class CaseActionsForCaseWorkerController {
         List<String> errors = new ArrayList<>();
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 
-        if (ccdRequest.getCaseDetails().getState().equals(CLOSED_STATE)) {
+        if (Constants.CLOSED_STATE.equals(ccdRequest.getCaseDetails().getState())) {
             eventValidationService.validateJurisdictionOutcome(caseData,
-                    ccdRequest.getCaseDetails().getState().equals(REJECTED_STATE), false, errors);
+                    Constants.REJECTED_STATE.equals(ccdRequest.getCaseDetails().getState()),
+                    false, errors);
             log.info(EVENT_FIELDS_VALIDATION + errors);
         }
 
@@ -823,7 +815,7 @@ public class CaseActionsForCaseWorkerController {
 
         List<String> errors = new ArrayList<>();
         CaseData caseData = caseManagementForCaseWorkerService.createECC(ccdRequest.getCaseDetails(),
-                userToken, errors, MID_EVENT_CALLBACK);
+                userToken, errors, Constants.MID_EVENT_CALLBACK);
 
         return getCallbackRespEntityErrors(errors, caseData);
     }
@@ -845,7 +837,7 @@ public class CaseActionsForCaseWorkerController {
 
         List<String> errors = new ArrayList<>();
         CaseData caseData = caseManagementForCaseWorkerService.createECC(
-                ccdRequest.getCaseDetails(), userToken, errors, ABOUT_TO_SUBMIT_EVENT_CALLBACK);
+                ccdRequest.getCaseDetails(), userToken, errors, Constants.ABOUT_TO_SUBMIT_EVENT_CALLBACK);
         generateEthosCaseReference(caseData, ccdRequest);
 
         return getCallbackRespEntityErrors(errors, caseData);
@@ -868,7 +860,7 @@ public class CaseActionsForCaseWorkerController {
 
         List<String> errors = new ArrayList<>();
         CaseData caseData = caseManagementForCaseWorkerService.createECC(ccdRequest.getCaseDetails(),
-                userToken, errors, SUBMITTED_CALLBACK);
+                userToken, errors, Constants.SUBMITTED_CALLBACK);
 
         return getCallbackRespEntityErrors(errors, caseData);
     }
@@ -1084,13 +1076,13 @@ public class CaseActionsForCaseWorkerController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 
         errors = eventValidationService.validateCaseBeforeCloseEvent(caseData,
-                ccdRequest.getCaseDetails().getState().equals(REJECTED_STATE), false, errors);
+                Constants.REJECTED_STATE.equals(ccdRequest.getCaseDetails().getState()), false, errors);
 
         if (errors.isEmpty()) {
             String caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();
-            if (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId)) {
+            if (Constants.ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId)) {
                 fileLocationSelectionService.initialiseFileLocation(caseData);
-            } else if (SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
+            } else if (Constants.SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
                 scotlandFileLocationSelectionService.initialiseFileLocation(caseData);
             }
 

@@ -11,27 +11,53 @@ def branchesToSync = ['demo', 'perftest', 'ithc']
 def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
 
 def secrets = [
-        'et-cos-${env}': [
-                secret('et-ccd-caseworker-user-name', 'ET_CCD_CASEWORKER_USER_NAME'),
-                secret('et-ccd-caseworker-password', 'ET_CCD_CASEWORKER_PASSWORD'),
-                secret('et-ccd-api-user-name', 'ET_CCD_API_USER_NAME'),
-                secret('et-ccd-api-password', 'ET_CCD_API_PASSWORD'),
-                secret('et-caseworker-5-username', 'ET_CASEWORKER_USER_NAME'),
-                secret('et-caseworker-5-password', 'ET_CASEWORKER_PASSWORD'),
-                secret('et-judge-4-username', 'ET_JUDGE_4_USER_NAME'),
-                secret('et-judge-4-password', 'ET_JUDGE_4_PASSWORD'),
-                secret('et-judge-user-name-eng','ET_JUDGE_USER_NAME_ENG'),
-                secret('et-judge-user-eng-password','ET_JUDGE_USER_ENG_PASSWORD'),
-                secret('et-citizen-user-name', 'ET_CITIZEN_USER_NAME'),
-                secret('et-citizen-password', 'ET_CITIZEN_PASSWORD'),
-                secret('idam-client-secret', 'IDAM_CLIENT_SECRET'),
-                secret('et-cos-s2s-secret', 'ET_COS_S2S_SECRET'),
-                secret('cos-system-user', 'ET_COS_SYSTEM_USER'),
-                secret('cos-system-user-password', 'ET_COS_SYSTEM_USER_PASSWORD')
-        ],
-        's2s-${env}':  [
-                secret('microservicekey-ccd-gw', 'MICROSERVICE_CCD_GW')
-        ]
+  'et-cos-${env}': [
+    secret('et-ccd-caseworker-user-name', 'ET_CCD_CASEWORKER_USER_NAME'),
+    secret('et-ccd-caseworker-password', 'ET_CCD_CASEWORKER_PASSWORD'),
+    secret('et-ccd-api-user-name', 'ET_CCD_API_USER_NAME'),
+    secret('et-ccd-api-password', 'ET_CCD_API_PASSWORD'),
+    secret('et-caseworker-5-username', 'ET_CASEWORKER_USER_NAME'),
+    secret('et-caseworker-5-password', 'ET_CASEWORKER_PASSWORD'),
+    secret('et-judge-4-username', 'ET_JUDGE_4_USER_NAME'),
+    secret('et-judge-4-password', 'ET_JUDGE_4_PASSWORD'),
+    secret('et-judge-user-name-eng','ET_JUDGE_USER_NAME_ENG'),
+    secret('et-judge-user-eng-password','ET_JUDGE_USER_ENG_PASSWORD'),
+    secret('et-citizen-user-name', 'ET_CITIZEN_USER_NAME'),
+    secret('et-citizen-password', 'ET_CITIZEN_PASSWORD'),
+    secret('idam-client-secret', 'IDAM_CLIENT_SECRET'),
+    secret('et-cos-s2s-secret', 'ET_COS_S2S_SECRET'),
+    secret('cos-system-user', 'ET_COS_SYSTEM_USER'),
+    secret('cos-system-user-password', 'ET_COS_SYSTEM_USER_PASSWORD'),
+    secret('cos-system-user', 'ET_SYSTEM_USER'),
+    secret('cos-system-user-password', 'ET_SYSTEM_USER_PASSWORD')
+  ],
+  'et-${env}': [
+    secret('ccd-admin-username', 'CCD_ADMIN_USERNAME'),
+    secret('ccd-admin-password', 'CCD_ADMIN_PASSWORD'),
+    secret('caseworker-admin-username', 'TEST_CASEWORKER_USERNAME'),
+    secret('caseworker-admin-password', 'TEST_CASEWORKER_PASSWORD'),
+    secret('et-preview-flexi-db-password', 'ET_PREVIEW_FLEXI_DB_PASSWORD'),
+    secret('et-wa-caseworker-username', 'ET_CASEOFFICER_USERNAME'),
+    secret('et-wa-caseworker-password', 'ET_CASEOFFICER_PASSWORD')
+  ],
+  's2s-${env}': [
+    secret('microservicekey-ccd-data', 'DATA_STORE_S2S_KEY'),
+    secret('microservicekey-ccd-definition', 'DEFINITION_STORE_S2S_KEY'),
+    secret('microservicekey-ccd-gw', 'API_GATEWAY_S2S_KEY'),
+    secret('microservicekey-ccd-gw', 'MICROSERVICE_CCD_GW'),
+    secret('microservicekey-ccd-ps', 'PRINT_S2S_KEY'),
+    secret('microservicekey-ccd-admin', 'ADMIN_S2S_KEY'),
+    secret('microservicekey-et-cos', 'ET_COS_S2S_KEY')
+  ],
+  'ccd-${env}': [
+    secret('ccd-api-gateway-oauth2-client-secret', 'API_GATEWAY_IDAM_SECRET'),
+    secret('ccd-admin-web-oauth2-client-secret', 'ADMIN_WEB_IDAM_SECRET'),
+    secret('postcode-info-address-lookup-token', 'ADDRESS_LOOKUP_TOKEN'),
+    secret('idam-data-store-client-secret','IDAM_OAUTH2_DATA_STORE_CLIENT_SECRET'),
+    secret('idam-data-store-system-user-username','IDAM_DATA_STORE_SYSTEM_USER_USERNAME'),
+    secret('idam-data-store-system-user-password','IDAM_DATA_STORE_SYSTEM_USER_PASSWORD'),
+    secret('AppInsightsInstrumentationKey', 'APP_INSIGHTS_INSTRUMENTATION_KEY')
+  ]
 ]
 
 static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
@@ -84,59 +110,78 @@ withPipeline(type, product, component) {
     ]
   }
 
-  before('smoketest:preview') {
+  onPR() {
+    env.XUI_URL="https://xui-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.CCD_ADMIN_URL="https://admin-web-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.CCD_DEFINITION_STORE_API_BASE_URL="https://ccd-definition-store-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.IMPORT_PREVIEW=true
     env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
-    env.ET_COS_URL = "https://et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-    env.FT_SYA_URL = "http://et-sya-api-aat.service.core-compute-aat.internal"
     env.SERVICE_AUTH_PROVIDER_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
-    env.CCD_DATA_STORE_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
-    env.TEST_URL_CITIZEN_UI = "https://et-sya.aat.platform.hmcts.net/"
-    env.TEST_RESP_URL = "https://et-syr.aat.platform.hmcts.net/"
+
+    env.ET_COS_URL = "https://et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.FT_SYA_URL = "http://et-sya-api-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net/"
+    env.CCD_DATA_STORE_API_URL = "http://ccd-data-store-api-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.TEST_URL_CITIZEN_UI = "https://et-sya-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net/"
+    env.TEST_RESP_URL = "https://et-syr-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net/"
     env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net/testing-support/accounts"
-    env.MANAGE_ORG_URL = "https://manage-org.aat.platform.hmcts.net"
-    env.TEST_MANAGE_CASE_URL = "https://manage-case.aat.platform.hmcts.net/cases"
-    env.ET_CASE_API_URL = "http://et-sya-api-aat.service.core-compute-aat.internal/cases/initiate-case/"
-    env.ET_SUBMIT_DRAFT_CASE_URL = "http://et-sya-api-aat.service.core-compute-aat.internal/cases/submit-case/"
+    env.MANAGE_ORG_URL = "https://xui-mo-webapp-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.TEST_MANAGE_CASE_URL = "https://xui-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net/cases"
+    env.ET_CASE_API_URL = "http://et-sya-api-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net/cases/initiate-case/"
+    env.ET_SUBMIT_DRAFT_CASE_URL = "http://et-sya-api-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net/cases/submit-case/"
     env.RUNNING_ENV = "aat"
 
-    sh """
-      ./bin/pull-latest-e2e-tests.sh
-    """
-  }
+    before('smoketest:preview') {
+      sh """
+        ./bin/pull-latest-e2e-tests.sh
+        cd ccd-definitions && yarn install && yarn setup && yarn scripts:preview ${CHANGE_ID}
+      """
 
-  afterAlways('smoketest:preview') {
-    publishHTML target: [
-            allowMissing : true,
-            alwaysLinkToLastBuild: true,
-            keepAll : true,
-            reportDir : "functional-output",
-            reportFiles : "ET-CCD-Callbacks-tests.html",
-            reportName : "ET Smoke test report"
-    ]
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'et-xui-e2e-tests/playwright-report/**'
-  }
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'ccd-definitions/jurisdictions/admin/xlsx/et-admin-ccd-config-preview.xlsx'
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'ccd-definitions/jurisdictions/england-wales/xlsx/et-englandwales-ccd-config-preview.xlsx'
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'ccd-definitions/jurisdictions/scotland/xlsx/et-scotland-ccd-config-preview.xlsx'
 
-  afterAlways('functionalTest:preview') {
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'
+      sh """
+        ./bin/preview/create-ccd-roles.sh
+        ./bin/preview/import-ccd-definitions.sh
+      """
+    }
 
-    stage('Functional UI tests chromium') {
-      try {
-        yarnBuilder.yarn('test:functional-chromium')
-      } catch (Error) {
-        unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
-      } finally {
-          publishHTML([
-              allowMissing: true,
+    afterAlways('smoketest:preview') {
+      publishHTML target: [
+              allowMissing : true,
               alwaysLinkToLastBuild: true,
-              keepAll: true,
-              reportDir: 'playwright-report',
-              reportFiles: 'index.html',
-              reportName: 'CCD Callback - UITestChromiumReport'
+              keepAll : true,
+              reportDir : "functional-output",
+              reportFiles : "ET-CCD-Callbacks-tests.html",
+              reportName : "ET Smoke test report"
+      ]
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'et-xui-e2e-tests/playwright-report/**'
+    }
+
+    afterAlways('functionalTest:preview') {
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'
+
+      stage('Functional UI tests chromium') {
+        try {
+          yarnBuilder.yarn('test:functional-chromium')
+        } catch (Error) {
+          unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
+        } finally {
+          publishHTML([
+                  allowMissing: true,
+                  alwaysLinkToLastBuild: true,
+                  keepAll: true,
+                  reportDir: 'playwright-report',
+                  reportFiles: 'index.html',
+                  reportName: 'CCD Callback - UITestChromiumReport'
           ])
           steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'et-xui-e2e-tests/playwright-report/**'
+        }
       }
     }
+
+
   }
 
   before('smoketest:aat') {

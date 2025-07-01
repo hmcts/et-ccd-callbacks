@@ -262,9 +262,9 @@
     "CaseEventID": "updateFileLocation",
     "CaseFieldID": "tribunalOffice",
     "PageFieldDisplayOrder": 1,
-    "PageDisplayOrder": 1,
     "DisplayContext": "MANDATORY",
     "PageID": 1,
+    "PageDisplayOrder": 1,
     "CallBackURLMidEvent": "${CCD_DEF_BASE_URL}/admin/filelocation/midEventSelectTribunalOffice"
   },
   {
@@ -272,9 +272,9 @@
     "CaseEventID": "updateFileLocation",
     "CaseFieldID": "fileLocationList",
     "PageFieldDisplayOrder": 1,
-    "PageDisplayOrder": 2,
     "DisplayContext": "MANDATORY",
     "PageID": 2,
+    "PageDisplayOrder": 2,
     "CallBackURLMidEvent": "${CCD_DEF_BASE_URL}/admin/filelocation/midEventSelectFileLocation"
   },
   {
@@ -282,27 +282,27 @@
     "CaseEventID": "updateFileLocation",
     "CaseFieldID": "fileLocationCode",
     "PageFieldDisplayOrder": 1,
-    "PageDisplayOrder": 3,
     "DisplayContext": "READONLY",
-    "PageID": 3
+    "PageID": 3,
+    "PageDisplayOrder": 3
   },
   {
     "CaseTypeID": "ET_Admin",
     "CaseEventID": "updateFileLocation",
     "CaseFieldID": "fileLocationName",
     "PageFieldDisplayOrder": 2,
-    "PageDisplayOrder": 3,
     "DisplayContext": "MANDATORY",
-    "PageID": 3
+    "PageID": 3,
+    "PageDisplayOrder": 3
   },
   {
     "CaseTypeID": "ET_Admin",
     "CaseEventID": "deleteFileLocation",
     "CaseFieldID": "tribunalOffice",
     "PageFieldDisplayOrder": 1,
-    "PageDisplayOrder": 1,
     "DisplayContext": "MANDATORY",
     "PageID": 1,
+    "PageDisplayOrder": 1,
     "CallBackURLMidEvent": "${CCD_DEF_BASE_URL}/admin/filelocation/midEventSelectTribunalOffice"
   },
   {

@@ -973,7 +973,7 @@
     "TabDisplayOrder": 9,
     "CaseFieldID": "hearingCollection",
     "TabFieldDisplayOrder": 1,
-    "DisplayContextParameter": "#TABLE(Hearing_type, Hearing_venue_Scotland)"
+    "DisplayContextParameter": "#TABLE(hearingNumber, Hearing_type, Hearing_venue_Scotland)"
   },
   {
     "CaseTypeID": "ET_Scotland",
@@ -1362,7 +1362,7 @@
     "Channel": "CaseWorker",
     "TabDisplayOrder": 19,
     "TabID": "ADR",
-    "TabLabel": "ADR",
+    "TabLabel": "ADR/Privileged",
     "TabFieldDisplayOrder": 1
   },
   {

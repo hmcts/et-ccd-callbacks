@@ -779,7 +779,7 @@
   {
     "CaseTypeID": "ET_EnglandWales",
     "ID": "allocateHearingSitAlone",
-    "Label": "Sit Alone or Full Panel",
+    "Label": "Panel Type",
     "FieldType": "FixedRadioList",
     "FieldTypeParameter": "frl_SitAlone",
     "SecurityClassification": "Public",
@@ -5347,7 +5347,7 @@
     "CaseTypeID": "ET_EnglandWales_Listings",
     "ID": "showAll",
     "Label": "Show all cases?",
-    "HintText": "Includes Settled, Withdrawn and Postponed",
+    "HintText": "Includes Settled, Withdrawn, Postponed and Vacated",
     "FieldType": "YesOrNo",
     "SecurityClassification": "Public"
   },
@@ -6542,5 +6542,21 @@
     "FieldType": "YesOrNo",
     "SecurityClassification": "Public",
     "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "allocateHearingAdditionalJudge",
+    "Label": "Employment Judge",
+    "FieldType": "DynamicList",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "acasCertificateRequired",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
   }
 ]

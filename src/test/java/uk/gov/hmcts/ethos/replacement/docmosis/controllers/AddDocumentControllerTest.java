@@ -53,7 +53,7 @@ class AddDocumentControllerTest {
     private CCDRequest ccdRequest;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         CaseDetails caseDetails = CaseDataBuilder.builder()
                 .withEthosCaseReference("1234")
                 .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);

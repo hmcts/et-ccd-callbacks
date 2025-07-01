@@ -26,7 +26,7 @@ class ConciliationTrackServiceTest {
     private CaseDetails baseCaseDetails;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
         conciliationTrackService = new ConciliationTrackService();
         baseCaseDetails = generateCaseDetails("caseDetailsTest1.json");
     }

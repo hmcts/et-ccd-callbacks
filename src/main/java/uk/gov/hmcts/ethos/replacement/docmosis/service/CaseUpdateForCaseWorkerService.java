@@ -11,7 +11,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 
 @Slf4j
-@Service("CaseUpdateForCaseWorkerService")
+@Service("caseUpdateForCaseWorkerService")
 public class CaseUpdateForCaseWorkerService {
 
     private static final String MESSAGE = "Failed to update case for case id : ";

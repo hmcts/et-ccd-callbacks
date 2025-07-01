@@ -19,6 +19,7 @@ import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 
 import java.util.ArrayList;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
@@ -75,7 +76,7 @@ class ET1ServingControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath("$.data.otherTypeDocumentName", notNullValue()))
                 .andExpect(jsonPath("$.data.claimantAndRespondentAddresses", notNullValue()))
                 .andExpect(jsonPath("$.data.emailLinkToAcas", notNullValue()))
-                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(servingService, times(1)).generateOtherTypeDocumentLink(anyList());
         verify(servingService, times(1)).generateEmailLinkToAcas(any(), anyBoolean());

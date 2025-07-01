@@ -55,7 +55,7 @@ class CaseFlagsDataMigrationControllerTest {
     private MockMvc mvc;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    void setUp() throws Exception {
 
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         ObjectMapper objectMapper = new ObjectMapper();

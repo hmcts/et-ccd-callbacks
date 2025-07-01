@@ -5,7 +5,7 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpStatus;
+import org.apache.hc.core5.http.HttpStatus;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -15,6 +15,7 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
 import uk.gov.hmcts.ethos.replacement.apitest.BaseFunctionalTest;
 
 import java.io.IOException;
+import org.apache.hc.core5.http.ParseException;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
 
@@ -26,7 +27,7 @@ public class SendNotificationMultiplesControllerFunctionalTest extends BaseFunct
     private MultipleRequest request;
 
     @BeforeAll
-    public void setUpCaseData() throws IOException {
+    public void setUpCaseData() throws IOException, ParseException {
         request = new MultipleRequest();
         MultipleDetails multipleDetails = new MultipleDetails();
         multipleDetails.setCaseTypeId(SCOTLAND_BULK_CASE_TYPE_ID);

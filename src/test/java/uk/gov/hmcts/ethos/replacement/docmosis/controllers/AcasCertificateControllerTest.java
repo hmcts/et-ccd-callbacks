@@ -49,6 +49,7 @@ class AcasCertificateControllerTest {
             return new JsonMapper(new ObjectMapper());
         }
     }
+
     private static final String RETRIEVE_ACAS_CERT_URL = "/acasCertificate/retrieveCertificate";
     private static final String ACAS_CONFIRMATION_URL = "/acasCertificate/confirmation";
     private static final String AUTH_TOKEN = "some-token";

@@ -63,7 +63,7 @@ class Et3NotificationControllerTest extends BaseControllerTest {
     private ServingService servingService;
     @MockitoBean
     private Et3NotificationService et3NotificationService;
-    @MockBean
+    @MockitoBean
     private CaseUpdateForCaseWorkerService caseUpdateForCaseWorkerService;
     @Autowired
     private MockMvc mvc;

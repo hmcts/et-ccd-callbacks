@@ -53,8 +53,6 @@ class CaseLinksControllerTest {
     private CaseLinksEmailService caseLinksEmailService;
     @MockitoBean
     private FeatureToggleService featureToggleService;
-    @MockBean
-    private CaseLinksEmailService caseLinksEmailService;
 
     @Autowired
     private MockMvc mockMvc;

@@ -4,7 +4,7 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.http.HttpStatus;
+import org.apache.hc.core5.http.HttpStatus;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -19,6 +19,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.ReferralsUtil;
 
 import java.io.IOException;
 import java.util.List;
+import org.apache.hc.core5.http.ParseException;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
 
@@ -31,7 +32,7 @@ public class UpdateReferralMultiplesControllerFunctionalTest extends BaseFunctio
     private MultipleRequest request;
 
     @BeforeAll
-    public void setUpCaseData() throws IOException, InterruptedException {
+    public void setUpCaseData() throws IOException, InterruptedException, ParseException {
         MultipleData multipleData = MultipleData.builder().build();
         request = new MultipleRequest();
         MultipleDetails multipleDetails = new MultipleDetails();

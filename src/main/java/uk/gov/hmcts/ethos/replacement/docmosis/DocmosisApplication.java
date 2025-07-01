@@ -7,7 +7,8 @@ import org.springframework.context.annotation.Import;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import uk.gov.hmcts.reform.ccd.document.am.config.CaseDocumentManagementClientAutoConfiguration;
 
-@SpringBootApplication(scanBasePackages = {"uk.gov.hmcts.ethos", "uk.gov.hmcts.ecm.common", "uk.gov.hmcts.reform.document", "uk.gov.hmcts.reform.authorisation"})
+@SpringBootApplication(scanBasePackages = {"uk.gov.hmcts.ethos", "uk.gov.hmcts.ecm.common",
+    "uk.gov.hmcts.reform.document", "uk.gov.hmcts.reform.authorisation"})
 @EnableFeignClients(basePackages = {"uk.gov.hmcts.ethos.replacement"})
 @EnableScheduling
 @Import(CaseDocumentManagementClientAutoConfiguration.class)

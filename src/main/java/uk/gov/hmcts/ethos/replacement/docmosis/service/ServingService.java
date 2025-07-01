@@ -9,7 +9,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
@@ -115,15 +114,8 @@ public class ServingService {
             documentBinaryUrl.substring(documentBinaryUrl.indexOf("/documents/")), documentName);
     }
 
-    public String generateClaimantAndRespondentAddress(CaseData caseData) {
+    public String generateRespondentAddressList(CaseData caseData) {
         StringBuilder addressStr = new StringBuilder();
-
-        ClaimantIndType claimant = caseData.getClaimantIndType();
-        addressStr.append(String.format(CLAIMANT_ADDRESS, claimant.getClaimantFirstNames(),
-            claimant.getClaimantLastName(),
-            addressIsEmpty(caseData.getClaimantType().getClaimantAddressUK())
-                    ? "<br>" + ADDRESS_NOT_ENTERED + "<br>"
-                    : caseData.getClaimantType().getClaimantAddressUK().toAddressHtml()));
 
         int index = 1;
         for (RespondentSumTypeItem respondentItem : caseData.getRespondentCollection()) {

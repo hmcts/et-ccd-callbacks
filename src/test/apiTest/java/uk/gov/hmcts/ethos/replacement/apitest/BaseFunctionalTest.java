@@ -80,7 +80,8 @@ public abstract class BaseFunctionalTest {
     private UserIdamService userIdamService;
 
     @BeforeAll
-    public void setup() throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException, IOException, ParseException {
+    public void setup() throws KeyStoreException, NoSuchAlgorithmException, KeyManagementException, IOException,
+            ParseException {
         log.info("BaseFunctionalTest setup started.");
         client = buildClient();
         idamTestApiRequests = new IdamTestApiRequests(client, idamApiUrl);
@@ -118,7 +119,8 @@ public abstract class BaseFunctionalTest {
             .build();
     }
 
-    protected JSONObject createCaseDataStore(String name, String payload, String caseTypeId) throws IOException, ParseException {
+    protected JSONObject createCaseDataStore(String name, String payload, String caseTypeId) throws IOException,
+            ParseException {
         String serviceToken = serviceAuthTokenGenerator.generate();
         String triggerFormat = "%s/caseworkers/%s/jurisdictions/EMPLOYMENT/case-types/%s/event-triggers/%s/token";
         String triggerUrl = String.format(triggerFormat, ccdDataStoreUrl, userId, caseTypeId, name);

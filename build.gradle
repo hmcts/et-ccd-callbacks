@@ -373,7 +373,7 @@ dependencies {
     // Log4J core added to remove startup error message
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4JVersion
 
-    implementation group: 'commons-io', name: 'commons-io', version: '2.18.0'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.19.0'
     implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.5'
     implementation group: 'io.netty', name: 'netty-tcnative-classes', version: '2.0.70.Final'
     implementation group: 'org.json', name: 'json', version: '20250107'
@@ -473,7 +473,7 @@ dependencies {
     contractTestImplementation sourceSets.main.runtimeClasspath
     contractTestImplementation sourceSets.test.runtimeClasspath
 
-    integrationTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.18.0'
+    integrationTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.19.0'
     integrationTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitJupiterVersion
     integrationTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: junitJupiterVersion
     integrationTestRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitJupiterVersion

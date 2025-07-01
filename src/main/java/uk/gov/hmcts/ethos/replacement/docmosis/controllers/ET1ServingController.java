@@ -19,7 +19,10 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ServingService;
 
+import java.util.List;
+
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntity;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @Slf4j
@@ -60,12 +63,15 @@ public class ET1ServingController {
             @RequestHeader("Authorization") String userToken) {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setOtherTypeDocumentName(
+        List<String> errors = servingService.checkTypeOfDocumentError(caseData.getServingDocumentCollection());
+        if (errors.isEmpty()) {
+            caseData.setOtherTypeDocumentName(
                 servingService.generateOtherTypeDocumentLink(caseData.getServingDocumentCollection()));
-        caseData.setClaimantAndRespondentAddresses(servingService.generateClaimantAndRespondentAddress(caseData));
-        caseData.setEmailLinkToAcas(servingService.generateEmailLinkToAcas(caseData, false));
+            caseData.setClaimantAndRespondentAddresses(servingService.generateClaimantAndRespondentAddress(caseData));
+            caseData.setEmailLinkToAcas(servingService.generateEmailLinkToAcas(caseData, false));
 
-        return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
+        }
+        return getCallbackRespEntity(errors, ccdRequest.getCaseDetails());
     }
 
     /**

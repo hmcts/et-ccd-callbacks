@@ -24,12 +24,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET3;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.RESPONSE_TO_A_CLAIM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.DATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItem;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItemFromTopLevel;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.ET3_RESPONSE_PDF_FILE_NAME;
 
@@ -80,7 +78,6 @@ public class Et3ResponseService {
     public void saveEt3Response(CaseData caseData, DocumentInfo documentInfo) {
         UploadedDocumentType uploadedDocument = documentManagementService.addDocumentToDocumentField(documentInfo);
         uploadedDocument.setCategoryId(ET3_CATEGORY_ID);
-        addDocumentToDocCollection(caseData, createDocumentTypeItem(uploadedDocument, ET3));
         saveEt3DetailsToRespondent(caseData, uploadedDocument);
     }
 
@@ -104,18 +101,6 @@ public class Et3ResponseService {
                 }
             }
         }
-    }
-
-    private static void addDocumentToDocCollection(CaseData caseData, DocumentTypeItem documentTypeItem) {
-        if (CollectionUtils.isEmpty(caseData.getDocumentCollection())) {
-            caseData.setDocumentCollection(new ArrayList<>());
-        }
-
-        documentTypeItem.getValue().setShortDescription(
-                String.format("%s : %s", SHORT_DESCRIPTION, "ET3 Form Submission."));
-        documentTypeItem.getValue().setDateOfCorrespondence(LocalDate.now().toString());
-        documentTypeItem.getValue().setTopLevelDocuments(RESPONSE_TO_A_CLAIM);
-        caseData.getDocumentCollection().add(documentTypeItem);
     }
 
     public void saveRelatedDocumentsToDocumentCollection(CaseData caseData) {

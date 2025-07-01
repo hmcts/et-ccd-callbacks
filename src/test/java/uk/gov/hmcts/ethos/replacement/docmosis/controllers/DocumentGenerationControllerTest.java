@@ -7,9 +7,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -45,6 +46,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(DocumentGenerationController.class)
+@ActiveProfiles("test")
 @ContextConfiguration(classes = DocmosisApplication.class)
 class DocumentGenerationControllerTest extends BaseControllerTest {
 
@@ -59,13 +61,13 @@ class DocumentGenerationControllerTest extends BaseControllerTest {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @MockBean
+    @MockitoBean
     private DocumentGenerationService documentGenerationService;
 
-    @MockBean
+    @MockitoBean
     private EventValidationService eventValidationService;
 
-    @MockBean
+    @MockitoBean
     private DefaultValuesReaderService defaultValuesReaderService;
 
     private MockMvc mvc;

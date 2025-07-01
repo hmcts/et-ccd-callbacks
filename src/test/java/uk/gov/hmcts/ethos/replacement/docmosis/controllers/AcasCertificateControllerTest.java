@@ -1,22 +1,18 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import io.restassured.internal.mapping.JsonbMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpHeaders;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.setup.MockMvcBuilders;
-import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AcasService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
@@ -38,28 +34,39 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 
-@ExtendWith(SpringExtension.class)
-@WebMvcTest({AcasCertificateController.class, JsonbMapper.class})
-@ContextConfiguration(classes = DocmosisApplication.class)
+@WebMvcTest(controllers = AcasCertificateController.class,
+            excludeAutoConfiguration = {
+                org.springframework.cloud.openfeign.FeignAutoConfiguration.class,
+                org.springframework.boot.test.autoconfigure.web.servlet.MockMvcWebClientAutoConfiguration.class
+            })
+@ActiveProfiles("test")
 class AcasCertificateControllerTest {
+
+    @TestConfiguration
+    static class TestConfig {
+        @Bean
+        public JsonMapper jsonMapper() {
+            return new JsonMapper(new ObjectMapper());
+        }
+    }
     private static final String RETRIEVE_ACAS_CERT_URL = "/acasCertificate/retrieveCertificate";
     private static final String ACAS_CONFIRMATION_URL = "/acasCertificate/confirmation";
     private static final String AUTH_TOKEN = "some-token";
     private CCDRequest ccdRequest;
 
-    @MockBean
+    @MockitoBean
     private VerifyTokenService verifyTokenService;
-    @MockBean
+    @MockitoBean
     private AcasService acasService;
-    private MockMvc mockMvc;
+    
     @Autowired
-    private WebApplicationContext applicationContext;
+    private MockMvc mockMvc;
+    
+    @Autowired
     private JsonMapper jsonMapper;
 
     @BeforeEach
     void setUp() throws Exception {
-        jsonMapper = new JsonMapper(new ObjectMapper());
-        mockMvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         CaseData caseData = new CaseData();
         caseData.setAcasCertificate("R111111/11/11");
         ccdRequest = CCDRequestBuilder.builder()

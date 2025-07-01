@@ -5,8 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -31,6 +32,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({TseViewApplicationsController.class, JsonMapper.class})
+@ActiveProfiles("test")
 class TseViewApplicationsControllerTest extends BaseControllerTest {
 
     private static final String MID_POPULATE_CHOOSE_APPLICATION_URL =
@@ -44,14 +46,14 @@ class TseViewApplicationsControllerTest extends BaseControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-    @MockBean
+    @MockitoBean
     private UserIdamService userIdamService;
     @Autowired
     private JsonMapper jsonMapper;
 
-    @MockBean
+    @MockitoBean
     private TseService tseService;
-    @MockBean
+    @MockitoBean
     private TornadoService tornadoService;
     private CCDRequest ccdRequest;
 

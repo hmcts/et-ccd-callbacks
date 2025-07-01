@@ -8,7 +8,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
-import org.webjars.NotFoundException;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -102,7 +101,7 @@ public class Et3VettingService {
                 .findFirst();
 
         if (respondent.isEmpty()) {
-            throw new NotFoundException(String.format("Failed to look up %s", respondentName));
+            throw new IllegalArgumentException(String.format("Failed to look up %s", respondentName));
         }
 
         return respondent.get();

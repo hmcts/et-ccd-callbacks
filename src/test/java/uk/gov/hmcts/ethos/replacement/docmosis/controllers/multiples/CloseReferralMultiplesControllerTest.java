@@ -5,8 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -44,6 +45,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.ReferralsUtil.create
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({CloseReferralMultiplesController.class, JsonMapper.class})
+@ActiveProfiles("test")
 class CloseReferralMultiplesControllerTest extends BaseControllerTest {
 
     private static final String ABOUT_TO_START = "/multiples/closeReferral/aboutToStart";
@@ -51,7 +53,7 @@ class CloseReferralMultiplesControllerTest extends BaseControllerTest {
     private static final String ABOUT_TO_SUBMIT_URL = "/multiples/closeReferral/aboutToSubmit";
     private static final String SUBMITTED_URL = "/multiples/closeReferral/completeCloseReferral";
 
-    @MockBean
+    @MockitoBean
     private CaseLookupService caseLookupService;
     @Autowired
     private MockMvc mockMvc;

@@ -1,8 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.functional.docgen;
 
 import net.serenitybdd.junit.runners.SerenityRunner;
-import net.thucydides.core.annotations.WithTag;
-import net.thucydides.core.annotations.WithTags;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,10 +13,6 @@ import java.io.IOException;
 
 @Category(ComponentTest.class)
 @RunWith(SerenityRunner.class)
-@WithTags({
-    @WithTag("ComponentTest"),
-    @WithTag("FunctionalTest")
-})
 public class DocMosisPart11ComponentTest {
 
     private TestUtil testUtil;
@@ -29,7 +23,6 @@ public class DocMosisPart11ComponentTest {
     }
 
     @Test
-    @WithTag("SmokeTest")
     public void generateDocument_Part11_1C() throws Exception {
         testUtil.executeGenerateDocumentTest("11", "1C", "RECONSIDERATION OF JUDGMENT: REFUSAL");
     }

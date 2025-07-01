@@ -7,9 +7,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -61,6 +62,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(BulkActionsController.class)
 @ContextConfiguration(classes = DocmosisApplication.class)
+@ActiveProfiles("test")
 class BulkActionsControllerTest extends BaseControllerTest {
 
     private static final String CREATION_BULK_URL = "/createBulk";
@@ -89,19 +91,19 @@ class BulkActionsControllerTest extends BaseControllerTest {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @MockBean
+    @MockitoBean
     private BulkCreationService bulkCreationService;
 
-    @MockBean
+    @MockitoBean
     private BulkUpdateService bulkUpdateService;
 
-    @MockBean
+    @MockitoBean
     private BulkSearchService bulkSearchService;
 
-    @MockBean
+    @MockitoBean
     private DocumentGenerationService documentGenerationService;
 
-    @MockBean
+    @MockitoBean
     private SubMultipleService subMultipleService;
 
     private MockMvc mvc;

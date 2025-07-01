@@ -8,6 +8,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 
 import java.util.Optional;
+
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 
 @Component

@@ -1,13 +1,14 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
-import org.apache.http.HttpHeaders;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
@@ -43,6 +44,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.TribunalOfficesSer
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({CaseTransferController.class, JsonMapper.class})
+@ActiveProfiles("test")
 class CaseTransferControllerTest extends BaseControllerTest {
 
     private static final String INIT_TRANSFER_TO_SCOTLAND_URL = "/caseTransfer/initTransferToScotland";
@@ -54,22 +56,22 @@ class CaseTransferControllerTest extends BaseControllerTest {
     private static final String CASE_TRANSFER_TO_ECM = "/caseTransfer/transferToEcm";
     private static final String ASSIGN_CASE = "/caseTransfer/assignCase";
 
-    @MockBean
+    @MockitoBean
     CaseTransferSameCountryService caseTransferSameCountryService;
 
-    @MockBean
+    @MockitoBean
     CaseTransferDifferentCountryService caseTransferDifferentCountryService;
 
-    @MockBean
+    @MockitoBean
     CaseTransferToEcmService caseTransferToEcmService;
 
-    @MockBean
+    @MockitoBean
     DefaultValuesReaderService defaultValuesReaderService;
 
-    @MockBean
+    @MockitoBean
     CaseManagementLocationService caseManagementLocationService;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
     @Autowired

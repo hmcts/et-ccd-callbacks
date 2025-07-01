@@ -6,9 +6,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.webjars.NotFoundException;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -38,9 +37,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 @ExtendWith(SpringExtension.class)
 class Et3VettingServiceTest {
     private Et3VettingService et3VettingService;
-    @MockBean
+    @MockitoBean
     private DocumentManagementService documentManagementService;
-    @MockBean
+    @MockitoBean
     private TornadoService tornadoService;
     private CaseData caseData;
     private DocumentInfo documentInfo;
@@ -97,7 +96,7 @@ class Et3VettingServiceTest {
             .withChooseEt3Respondent("Antonio Vazquez")
             .build();
 
-        assertThrows(NotFoundException.class, () -> et3VettingService.saveEt3VettingToRespondent(caseData,
+        assertThrows(IllegalArgumentException.class, () -> et3VettingService.saveEt3VettingToRespondent(caseData,
                 documentInfo));
     }
 

@@ -6,7 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -50,7 +50,7 @@ class SendNotificationServiceTest {
 
     @Mock
     private HearingSelectionService hearingSelectionService;
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
     private CaseData caseData;
     private CaseDetails caseDetails;

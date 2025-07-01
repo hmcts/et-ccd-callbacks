@@ -1,8 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.functional.docgen;
 
 import net.serenitybdd.junit.runners.SerenityRunner;
-import net.thucydides.core.annotations.WithTag;
-import net.thucydides.core.annotations.WithTags;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -16,10 +14,6 @@ import java.io.IOException;
 
 @Category(ComponentTest.class)
 @RunWith(SerenityRunner.class)
-@WithTags({
-    @WithTag("ComponentTest"),
-    @WithTag("FunctionalTest")
-})
 public class DocMosisScotPart3ComponentTest {
 
     private TestUtil testUtil;
@@ -31,7 +25,6 @@ public class DocMosisScotPart3ComponentTest {
 
     @Test
     @Ignore
-    @WithTag("SmokeTest")
     public void generateDocument_Part_Scot_15() throws Exception {
         testUtil.executeGenerateDocumentTest("15", "", "your claim - FURTHER INFORMATION REQUIRED", true);
     }

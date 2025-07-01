@@ -5,8 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
@@ -35,15 +36,16 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({Et3NotificationController.class, JsonMapper.class})
+@ActiveProfiles("test")
 class Et3NotificationControllerTest extends BaseControllerTest {
 
     private static final String MID_UPLOAD_DOCUMENTS_URL = "/et3Notification/midUploadDocuments";
     private static final String SUBMITTED_URL = "/et3Notification/submitted";
     private CCDRequest ccdRequest;
 
-    @MockBean
+    @MockitoBean
     private ServingService servingService;
-    @MockBean
+    @MockitoBean
     private Et3NotificationService et3NotificationService;
     @Autowired
     private MockMvc mvc;

@@ -4,8 +4,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.ethos.replacement.docmosis.controllers.BaseControllerTest;
@@ -39,6 +40,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.filelocation
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({FileLocationController.class, JsonMapper.class})
+@ActiveProfiles("test")
 class FileLocationControllerTest extends BaseControllerTest {
 
     @Autowired
@@ -47,7 +49,7 @@ class FileLocationControllerTest extends BaseControllerTest {
     @Autowired
     private JsonMapper jsonMapper;
 
-    @MockBean
+    @MockitoBean
     private FileLocationService fileLocationService;
 
     @Test

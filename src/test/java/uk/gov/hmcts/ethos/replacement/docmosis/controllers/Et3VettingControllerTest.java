@@ -5,9 +5,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -40,6 +41,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({Et3VettingController.class, Et3VettingService.class, JsonMapper.class})
+@ActiveProfiles("test")
 @ContextConfiguration(classes = DocmosisApplication.class)
 class Et3VettingControllerTest extends BaseControllerTest {
 
@@ -54,11 +56,11 @@ class Et3VettingControllerTest extends BaseControllerTest {
 
     @Autowired
     private WebApplicationContext applicationContext;
-    @MockBean
+    @MockitoBean
     private DocumentManagementService documentManagementService;
-    @MockBean
+    @MockitoBean
     private CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
-    @MockBean
+    @MockitoBean
     private TornadoService tornadoService;
     private MockMvc mvc;
     private CCDRequest ccdRequest;

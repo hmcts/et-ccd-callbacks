@@ -9,9 +9,11 @@ import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantWorkAddressType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportHelper;
+
 import java.time.LocalDate;
 import java.util.Comparator;
 import java.util.List;
+
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMS_BY_HEARING_VENUE_REPORT;
 
 public final class ClaimsByHearingVenueReport {

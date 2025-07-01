@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
@@ -45,13 +45,13 @@ import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.STARTING_A_
 @ExtendWith(SpringExtension.class)
 class AcasCertificateTaskTest {
     private AcasCertificateTask acasCertificateTask;
-    @MockBean
+    @MockitoBean
     private AdminUserService adminUserService;
-    @MockBean
+    @MockitoBean
     private CcdClient ccdClient;
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
-    @MockBean
+    @MockitoBean
     private Et1SubmissionService et1SubmissionService;
     @Captor
     private ArgumentCaptor<CaseData> caseDataArgumentCaptor;

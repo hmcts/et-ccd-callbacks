@@ -7,9 +7,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -54,6 +55,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(PersistentQueueActionsController.class)
+@ActiveProfiles("test")
 @ContextConfiguration(classes = DocmosisApplication.class)
 class PersistentQueueActionsControllerTest extends BaseControllerTest {
 
@@ -64,13 +66,13 @@ class PersistentQueueActionsControllerTest extends BaseControllerTest {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @MockBean
+    @MockitoBean
     private BulkCreationService bulkCreationService;
 
-    @MockBean
+    @MockitoBean
     private BulkUpdateService bulkUpdateService;
 
-    @MockBean
+    @MockitoBean
     private BulkSearchService bulkSearchService;
 
     private MockMvc mvc;

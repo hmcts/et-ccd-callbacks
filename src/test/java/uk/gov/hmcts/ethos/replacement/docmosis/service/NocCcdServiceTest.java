@@ -3,8 +3,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
@@ -37,7 +37,7 @@ class NocCcdServiceTest {
     private static final String JURISDICTION = "EMPLOYMENT";
     public static final String CASE_TYPE = "ET_EnglandWales";
     public static final String CASE_ID = "12345";
-    @MockBean
+    @MockitoBean
     private CcdClient ccdClient;
 
     private NocCcdService nocCcdService;

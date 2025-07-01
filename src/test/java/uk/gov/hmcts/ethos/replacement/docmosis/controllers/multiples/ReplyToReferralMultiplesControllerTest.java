@@ -5,8 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -52,6 +53,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.ReferralsUtil.create
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({ReplyToReferralMultiplesController.class, JsonMapper.class})
+@ActiveProfiles("test")
 class ReplyToReferralMultiplesControllerTest extends BaseControllerTest {
     private static final String START_REPLY_REFERRAL_URL = "/multiples/replyReferral/aboutToStart";
     private static final String MID_HEARING_DETAILS_URL = "/multiples/replyReferral/initHearingAndReferralDetails";
@@ -59,17 +61,17 @@ class ReplyToReferralMultiplesControllerTest extends BaseControllerTest {
     private static final String SUBMITTED_REFERRAL_URL = "/multiples/replyReferral/completeReplyToReferral";
     private static final String VALIDATE_EMAIL_URL = "/multiples/replyReferral/validateReplyToEmail";
 
-    @MockBean
+    @MockitoBean
     private UserIdamService userIdamService;
-    @MockBean
+    @MockitoBean
     private CaseLookupService caseLookupService;
-    @MockBean
+    @MockitoBean
     private ReferralService referralService;
-    @MockBean
+    @MockitoBean
     private DocumentManagementService documentManagementService;
-    @MockBean
+    @MockitoBean
     private EmailService emailService;
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
     @Autowired
     private MockMvc mockMvc;

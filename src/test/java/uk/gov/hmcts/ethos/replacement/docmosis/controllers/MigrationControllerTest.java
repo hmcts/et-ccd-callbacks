@@ -4,8 +4,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
@@ -21,6 +22,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({MigrationController.class, JsonMapper.class})
+@ActiveProfiles("test")
 class MigrationControllerTest extends BaseControllerTest {
 
     private static final String ROLLBACK_ABOUT_TO_SUBMIT_URL = "/migrate/rollback/aboutToSubmit";
@@ -29,7 +31,7 @@ class MigrationControllerTest extends BaseControllerTest {
     private MockMvc mockMvc;
     @Autowired
     private JsonMapper jsonMapper;
-    @MockBean
+    @MockitoBean
     private EcmMigrationService ecmMigrationService;
 
     @Test

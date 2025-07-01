@@ -4,8 +4,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
@@ -28,12 +29,13 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({ListHearingController.class, JsonMapper.class})
+@ActiveProfiles("test")
 class ListHearingControllerTest extends BaseControllerTest {
 
-    @MockBean
+    @MockitoBean
     private VenueSelectionService venueSelectionService;
 
-    @MockBean
+    @MockitoBean
     private ScotlandVenueSelectionService scotlandVenueSelectionService;
 
     @Autowired

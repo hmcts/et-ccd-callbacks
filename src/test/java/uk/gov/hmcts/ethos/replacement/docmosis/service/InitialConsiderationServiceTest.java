@@ -5,7 +5,7 @@ import org.joda.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
@@ -144,9 +144,9 @@ class InitialConsiderationServiceTest {
     private CaseData caseData;
     private DocumentInfo documentInfo;
     private InitialConsiderationService initialConsiderationService;
-    @MockBean
+    @MockitoBean
     private TornadoService tornadoService;
-    @MockBean
+    @MockitoBean
     private DocumentManagementService documentManagementService;
 
     @BeforeEach

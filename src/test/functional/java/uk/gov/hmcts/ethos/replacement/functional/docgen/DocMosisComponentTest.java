@@ -3,7 +3,6 @@ package uk.gov.hmcts.ethos.replacement.functional.docgen;
 import io.restassured.response.Response;
 import net.serenitybdd.junit.runners.SerenityRunner;
 import net.serenitybdd.rest.SerenityRest;
-import net.thucydides.core.annotations.WithTag;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -21,7 +20,6 @@ import java.net.URL;
 
 @Category(ComponentTest.class)
 @RunWith(SerenityRunner.class)
-@WithTag("ComponentTest")
 public class DocMosisComponentTest {
 
     private TestUtil testUtil;
@@ -73,56 +71,47 @@ public class DocMosisComponentTest {
     }
 
     @Test
-    @WithTag("SmokeTest")
     public void verify_document_eng_claimant_individual_not_represented() throws Exception {
         testUtil.executeGenerateDocumentTest("10", "1", BANDERAS, false, Constants.TEST_DATA_CASE1);
     }
 
     @Test
-    @WithTag("FunctionalTest")
     public void verify_document_eng_claimant_company_not_represented() throws Exception {
         testUtil.executeGenerateDocumentTest("10", "1", "Acme Logistics Ltd", false, Constants.TEST_DATA_CASE2);
     }
 
     @Test
-    @WithTag("FunctionalTest")
     public void verify_document_eng_claimant_individual_represented() throws Exception {
         testUtil.executeGenerateDocumentTest("10", "1", BANDERAS, false, Constants.TEST_DATA_CASE3);
     }
 
     @Test
-    @WithTag("FunctionalTest")
     public void verify_document_eng_respondant_represented() throws Exception {
         testUtil.executeGenerateDocumentTest("10", "1", BANDERAS, false, Constants.TEST_DATA_CASE4);
     }
 
     @Test
-    @WithTag("SmokeTest")
     public void verify_document_sco_claimant_individual_not_represented() throws Exception {
         testUtil.executeGenerateDocumentTest("1", "", BANDERAS, true, Constants.TEST_DATA_SCOT_CASE1);
     }
 
     @Test
-    @WithTag("FunctionalTest")
     public void verify_document_sco_claimant_company_not_represented() throws Exception {
         testUtil.executeGenerateDocumentTest("1", "", "Acme Logictics Ltd", true, Constants.TEST_DATA_SCOT_CASE2);
     }
 
     @Test
-    @WithTag("FunctionalTest")
     public void verify_document_sco_claimant_individual_represented() throws Exception {
         testUtil.executeGenerateDocumentTest("1", "", BANDERAS, true, Constants.TEST_DATA_SCOT_CASE3);
     }
 
     @Test
-    @WithTag("FunctionalTest")
     public void verify_document_sco_respondant_represented() throws Exception {
         testUtil.executeGenerateDocumentTest("1", "", BANDERAS, true, Constants.TEST_DATA_SCOT_CASE4);
     }
 
     @Ignore
     @Test
-    @WithTag("FunctionalTest")
     public void invoke_pre_default_endpoint_with_invalid_auth_token() throws IOException {
         CCDRequest ccdRequest = testUtil.getCcdRequest("1", "1", false, Constants.TEST_DATA_CASE1);
 
@@ -136,7 +125,6 @@ public class DocMosisComponentTest {
 
     @Ignore
     @Test
-    @WithTag("FunctionalTest")
     public void invoke_pre_default_endpoint_without_payload() throws IOException {
         testUtil.loadAuthToken();
 
@@ -146,7 +134,6 @@ public class DocMosisComponentTest {
     }
 
     @Test
-    @WithTag("FunctionalTest")
     public void invoke_pre_default_as_get() throws IOException {
         String docmosisUrl = ResponseUtil.getProperty(testUtil.getEnvironment().toLowerCase() + ".docmosis.api.url");
         SerenityRest.given().get(new URL(docmosisUrl + Constants.DOCGEN_URI)).then().statusCode(405);

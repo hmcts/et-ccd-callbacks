@@ -7,9 +7,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -65,6 +66,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(ExcelActionsController.class)
+@ActiveProfiles("test")
 @ContextConfiguration(classes = DocmosisApplication.class)
 class ExcelActionsControllerTest extends BaseControllerTest {
 
@@ -99,61 +101,61 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @MockBean
+    @MockitoBean
     private MultipleCreationService multipleCreationService;
 
-    @MockBean
+    @MockitoBean
     private MultiplePreAcceptService multiplePreAcceptService;
 
-    @MockBean
+    @MockitoBean
     private MultipleUpdateService multipleUpdateService;
 
-    @MockBean
+    @MockitoBean
     private SubMultipleUpdateService subMultipleUpdateService;
 
-    @MockBean
+    @MockitoBean
     private MultipleAmendService multipleAmendService;
 
-    @MockBean
+    @MockitoBean
     private MultipleUploadService multipleUploadService;
 
-    @MockBean
+    @MockitoBean
     private MultipleDynamicListFlagsService multipleDynamicListFlagsService;
 
-    @MockBean
+    @MockitoBean
     private MultipleMidEventValidationService multipleMidEventValidationService;
 
-    @MockBean
+    @MockitoBean
     private SubMultipleMidEventValidationService subMultipleMidEventValidationService;
 
-    @MockBean
+    @MockitoBean
     private MultipleCreationMidEventValidationService multipleCreationMidEventValidationService;
 
-    @MockBean
+    @MockitoBean
     private MultipleSingleMidEventValidationService multipleSingleMidEventValidationService;
 
-    @MockBean
+    @MockitoBean
     private EventValidationService eventValidationService;
 
-    @MockBean
+    @MockitoBean
     private MultipleHelperService multipleHelperService;
 
-    @MockBean
+    @MockitoBean
     private MultipleTransferService multipleTransferService;
 
-    @MockBean
+    @MockitoBean
     private FileLocationSelectionService fileLocationSelectionService;
 
-    @MockBean
+    @MockitoBean
     private ScotlandFileLocationSelectionService scotlandFileLocationSelectionService;
 
-    @MockBean
+    @MockitoBean
     private MultipleCloseEventValidationService multipleCloseEventValidationService;
 
-    @MockBean
+    @MockitoBean
     private FixMultipleCaseApiService fixMultipleCaseApiService;
 
-    @MockBean
+    @MockitoBean
     private ClerkService clerkService;
 
     private MockMvc mvc;

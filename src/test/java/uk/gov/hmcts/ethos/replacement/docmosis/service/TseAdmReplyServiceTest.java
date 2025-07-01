@@ -7,9 +7,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
@@ -72,15 +72,15 @@ class TseAdmReplyServiceTest {
     private TseAdmReplyService tseAdmReplyService;
     private EmailService emailService;
 
-    @MockBean
+    @MockitoBean
     public TseAdminHelper tseAdminHelper;
-    @MockBean
+    @MockitoBean
     private DocumentManagementService documentManagementService;
-    @MockBean
+    @MockitoBean
     private TornadoService tornadoService;
-    @MockBean
+    @MockitoBean
     private TseService tseService;
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
     private CaseData caseData;

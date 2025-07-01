@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
@@ -27,6 +28,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.TRIBUNAL_CA
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({LegalRepDocumentsController.class, JsonMapper.class})
+@ActiveProfiles("test")
 class LegalRepDocumentsControllerTest extends BaseControllerTest {
 
     private static final String ABOUT_TO_START_URL = "/legalrepDocuments/aboutToStart";

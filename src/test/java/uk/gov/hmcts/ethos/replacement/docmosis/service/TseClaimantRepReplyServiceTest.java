@@ -12,7 +12,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.verification.VerificationMode;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
@@ -81,19 +81,19 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.TseApplicationUtil.g
 
 @ExtendWith(SpringExtension.class)
 class TseClaimantRepReplyServiceTest {
-    @MockBean
+    @MockitoBean
     private TornadoService tornadoService;
-    @MockBean
+    @MockitoBean
     private UserIdamService userIdamService;
-    @MockBean
+    @MockitoBean
     private TseService tseService;
-    @MockBean
+    @MockitoBean
     private ClaimantTellSomethingElseService claimantTellSomethingElseService;
-    @MockBean
+    @MockitoBean
     private DocumentManagementService documentManagementService;
-    @MockBean
+    @MockitoBean
     private TseClaimantRepReplyService tseClaimantRepReplyService;
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
     private static final String TRIBUNAL_EMAIL = "tribunalOffice@test.com";

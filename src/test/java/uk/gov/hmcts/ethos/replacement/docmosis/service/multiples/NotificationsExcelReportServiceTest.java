@@ -3,7 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.multiples;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.types.NotificationsExtract;
@@ -35,13 +35,13 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.excel.ExcelDocMana
 @ExtendWith(SpringExtension.class)
 class NotificationsExcelReportServiceTest {
     public static final String DOC_URL = "http://dm-store/documents/64668823-d355-4663-8d38-1ce3c61108df";
-    @MockBean
+    @MockitoBean
     private ExcelReadingService excelReadingService;
-    @MockBean
+    @MockitoBean
     private NotificationScheduleService notificationScheduleService;
-    @MockBean
+    @MockitoBean
     private DocumentManagementService documentManagementService;
-    @MockBean
+    @MockitoBean
     private CcdClient ccdClient;
 
     private NotificationsExcelReportService notificationsExcelReportService;

@@ -2,8 +2,6 @@ package uk.gov.hmcts.ethos.replacement.functional.bulk;
 
 import io.restassured.response.Response;
 import net.serenitybdd.junit.runners.SerenityRunner;
-import net.thucydides.core.annotations.WithTag;
-import net.thucydides.core.annotations.WithTags;
 import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
@@ -22,10 +20,6 @@ import java.util.List;
 
 @Category(ComponentTest.class)
 @RunWith(SerenityRunner.class)
-@WithTags({
-    @WithTag("ComponentTest"),
-    @WithTag("FunctionalTest")
-})
 @Ignore
 public class GenerateBulkLetterComponentTest {
     private TestUtil testUtil;

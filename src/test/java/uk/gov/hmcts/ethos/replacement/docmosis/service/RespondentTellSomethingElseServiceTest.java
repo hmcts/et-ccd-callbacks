@@ -12,7 +12,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
@@ -85,16 +85,16 @@ class RespondentTellSomethingElseServiceTest {
     private TseService tseService;
     private EmailService emailService;
 
-    @MockBean
+    @MockitoBean
     private UserIdamService userIdamService;
 
-    @MockBean
+    @MockitoBean
     private TribunalOfficesService tribunalOfficesService;
 
-    @MockBean
+    @MockitoBean
     private TornadoService tornadoService;
 
-    @MockBean
+    @MockitoBean
     private DocumentManagementService documentManagementService;
     @Mock
     private FeatureToggleService featureToggleService;

@@ -7,9 +7,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -41,14 +42,15 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.controllers.BaseController
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({CaseAccessController.class, JsonbMapper.class})
+@ActiveProfiles("test")
 @ContextConfiguration(classes = DocmosisApplication.class)
 class CaseAccessControllerTest {
     private CCDRequest ccdRequest;
     private static final String CLAIMANT_TRANSFERRED_CASE_URL = "/caseAccess/claimant/transferredCase";
 
-    @MockBean
+    @MockitoBean
     private VerifyTokenService verifyTokenService;
-    @MockBean
+    @MockitoBean
     private CaseAccessService caseAccessService;
     @Autowired
     private WebApplicationContext applicationContext;

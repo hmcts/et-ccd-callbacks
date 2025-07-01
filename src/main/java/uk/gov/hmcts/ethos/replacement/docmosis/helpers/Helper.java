@@ -80,7 +80,7 @@ public final class Helper {
     public static String nullCheck(String value) {
         Optional<String> opt = Optional.ofNullable(value);
         if (opt.isPresent()) {
-            return value.replaceAll("\"", "'");
+            return value.replace("\"", "'");
         } else {
             return "";
         }
@@ -352,8 +352,10 @@ public final class Helper {
     public static boolean isClaimantNonSystemUser(CaseData caseData) {
         if (caseData != null) {
             // TODO rework this logic when working on Claimant Gaps
-            return (caseData.getEt1OnlineSubmission() == null && caseData.getHubLinksStatuses() == null)
-                    || YES.equals(defaultIfNull(caseData.getMigratedFromEcm(), NO));
+            boolean isNotaSystemUser = caseData.getEt1OnlineSubmission() == null
+                                       && caseData.getHubLinksStatuses() == null;
+
+            return isNotaSystemUser || YES.equals(defaultIfNull(caseData.getMigratedFromEcm(), NO));
         }
         return true;
     }

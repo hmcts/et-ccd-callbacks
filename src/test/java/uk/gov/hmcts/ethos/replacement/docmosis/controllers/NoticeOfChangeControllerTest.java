@@ -78,7 +78,7 @@ class NoticeOfChangeControllerTest {
     private CaseData caseData;
 
     @BeforeEach
-    public void setUp() throws URISyntaxException, IOException {
+    void setUp() throws URISyntaxException, IOException {
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         ObjectMapper objectMapper = new ObjectMapper();
         requestContent = objectMapper.readTree(new File(Objects.requireNonNull(getClass()

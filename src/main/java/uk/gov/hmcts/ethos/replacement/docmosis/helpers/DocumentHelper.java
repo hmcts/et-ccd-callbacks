@@ -40,6 +40,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.IntStream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADDRESS_LABELS_PAGE_SIZE;
@@ -660,8 +661,7 @@ public final class DocumentHelper {
         sectionName = sectionName.replace(" ", "_");
         StringBuilder sb = new StringBuilder();
         if (!sectionName.isEmpty()) {
-            sb.append('"').append('t').append(sectionName)
-                    .append(COLON).append("true").append(NEW_LINE);
+            sb.append("\"t").append(sectionName).append(COLON).append("true").append(NEW_LINE);
         }
         return sb;
     }
@@ -672,8 +672,7 @@ public final class DocumentHelper {
         scotSectionName = scotSectionName.replace(" ", "_");
         StringBuilder sb = new StringBuilder();
         if (!scotSectionName.isEmpty()) {
-            sb.append('"').append("t_Scot_").append(scotSectionName)
-                    .append(COLON).append("true").append(NEW_LINE);
+            sb.append("\"t_Scot_").append(scotSectionName).append(COLON).append("true").append(NEW_LINE);
         }
         return sb;
     }
@@ -920,15 +919,14 @@ public final class DocumentHelper {
 
         List<AddressLabelTypeItem> copiedAddressLabels = new ArrayList<>();
         if (!selectedAddressLabels.isEmpty() && numberOfCopies > 1) {
-            for (AddressLabelTypeItem selectedAddressLabel : selectedAddressLabels) {
-                AddressLabelType addressLabelType = selectedAddressLabel.getValue();
-                for (int i = 0; i < numberOfCopies; i++) {
-                    AddressLabelTypeItem addressLabelTypeItem = new AddressLabelTypeItem();
-                    addressLabelTypeItem.setId(String.valueOf(copiedAddressLabels.size()));
-                    addressLabelTypeItem.setValue(addressLabelType);
-                    copiedAddressLabels.add(addressLabelTypeItem);
-                }
-            }
+            selectedAddressLabels.stream().map(AddressLabelTypeItem::getValue)
+                    .forEach(addressLabelType ->
+                            IntStream.range(0, numberOfCopies).mapToObj(i -> new AddressLabelTypeItem())
+                    .forEach(addressLabelTypeItem -> {
+                        addressLabelTypeItem.setId(String.valueOf(copiedAddressLabels.size()));
+                        addressLabelTypeItem.setValue(addressLabelType);
+                        copiedAddressLabels.add(addressLabelTypeItem);
+                    }));
         } else {
             return selectedAddressLabels;
         }

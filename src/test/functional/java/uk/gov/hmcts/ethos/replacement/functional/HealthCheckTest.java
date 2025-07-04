@@ -1,20 +1,20 @@
 package uk.gov.hmcts.ethos.replacement.functional;
 
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.categories.Category;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Tag;
+import org.junit.jupiter.api.Test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
 public class HealthCheckTest {
 
-    @Before
+    @BeforeEach
     public void before() {
     }
 
     @Test
-    @Category(SmokeTest.class)
+    @Tag("SmokeTest")
     public void healthcheck_returns_200() {
         assertThat("smokeTest", is("smokeTest"));
     }

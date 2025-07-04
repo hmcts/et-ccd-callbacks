@@ -5,8 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -29,6 +30,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({IssueInitialConsiderationDirectionsWAController.class, JsonMapper.class})
+@ActiveProfiles("test")
 class IssueInitialConsiderationDirectionsWAControllerTest extends BaseControllerTest {
 
     private static final String START_INITIAL_CONSIDERATION_DIRECTIONS_URL =
@@ -40,7 +42,7 @@ class IssueInitialConsiderationDirectionsWAControllerTest extends BaseController
 
     @Autowired
     private WebApplicationContext applicationContext;
-    @MockBean
+    @MockitoBean
     private CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
 
     private MockMvc mvc;

@@ -7,7 +7,6 @@ import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
-import org.webjars.NotFoundException;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -191,7 +190,7 @@ public class BundlesRespondentService {
         GenericTypeItem<HearingBundleType> bundleToRemove = bundlesCollection.stream()
                 .filter(bundle -> bundle.getId().equals(selectedBundle))
                 .findFirst()
-                .orElseThrow(() -> new NotFoundException("Bundle not found in the collection"));
+                .orElseThrow(() -> new IllegalArgumentException("Bundle not found in the collection"));
 
         bundlesCollection.removeIf(bundle -> bundle.getId().equals(selectedBundle));
 

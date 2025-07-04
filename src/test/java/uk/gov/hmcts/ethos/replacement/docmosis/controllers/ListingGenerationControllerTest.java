@@ -7,9 +7,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -70,6 +71,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest(ListingGenerationController.class)
+@ActiveProfiles("test")
 @ContextConfiguration(classes = DocmosisApplication.class)
 class ListingGenerationControllerTest extends BaseControllerTest {
 
@@ -91,19 +93,19 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @MockBean
+    @MockitoBean
     private ListingService listingService;
 
-    @MockBean
+    @MockitoBean
     private ReportDataService reportDataService;
 
-    @MockBean
+    @MockitoBean
     private DefaultValuesReaderService defaultValuesReaderService;
 
-    @MockBean
+    @MockitoBean
     private PrintHearingListService printHearingListService;
 
-    @MockBean
+    @MockitoBean
     private GenerateReportService generateReportService;
 
     private MockMvc mvc;

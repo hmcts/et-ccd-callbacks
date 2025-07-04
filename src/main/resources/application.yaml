@@ -15,9 +15,6 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-        jdbc:
-          lob:
-            non_contextual_creation: 'true'
   application:
     name: et-cos
   datasource:
@@ -26,6 +23,9 @@ spring:
     username: ${ET_COS_DB_USER_NAME:et_cos}
   config:
     import: optional:configtree:/mnt/secrets/et-cos/,optional:configtree:/mnt/secrets/et/
+  cloud:
+    compatibility-verifier:
+      enabled: false
 
 server:
   port: '8081'

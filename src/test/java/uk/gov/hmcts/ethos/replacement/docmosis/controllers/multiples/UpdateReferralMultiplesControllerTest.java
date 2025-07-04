@@ -5,8 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -49,6 +50,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICI
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({UpdateReferralMultiplesController.class, JsonMapper.class})
+@ActiveProfiles("test")
 @SuppressWarnings({"PMD.MethodNamingConventions", "PMD.ExcessiveImports", "PMD.UnusedPrivateField"})
 class UpdateReferralMultiplesControllerTest extends BaseControllerTest {
     private static final String START_UPDATE_REFERRAL_URL = "/multiples/updateReferral/aboutToStart";
@@ -56,13 +58,13 @@ class UpdateReferralMultiplesControllerTest extends BaseControllerTest {
     private static final String INIT_HEARING_AND_REFERRAL_DETAILS_URL = 
         "/multiples/updateReferral/initHearingAndReferralDetails";
 
-    @MockBean
+    @MockitoBean
     private UserIdamService userIdamService;
-    @MockBean
+    @MockitoBean
     private DocumentManagementService documentManagementService;
-    @MockBean
+    @MockitoBean
     private ReferralService referralService;
-    @MockBean
+    @MockitoBean
     private CaseLookupService caseLookupService;
     @Autowired
     private MockMvc mockMvc;

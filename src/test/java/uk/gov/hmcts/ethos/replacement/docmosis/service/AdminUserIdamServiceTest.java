@@ -3,7 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 
@@ -20,7 +20,7 @@ class AdminUserIdamServiceTest {
 
     public static final String USER_ID = "111-222-333-444";
 
-    @MockBean
+    @MockitoBean
     private UserIdamService userIdamService;
 
     private AdminUserService adminUserService;

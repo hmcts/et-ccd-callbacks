@@ -5,8 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -40,6 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({Et1VettingController.class, JsonMapper.class})
+@ActiveProfiles("test")
 class Et1VettingControllerTest extends BaseControllerTest {
 
     private static final String INIT_CASE_VETTING_ENDPOINT = "/initialiseEt1Vetting";
@@ -49,12 +51,12 @@ class Et1VettingControllerTest extends BaseControllerTest {
     private static final String ET1_VETTING_ABOUT_TO_SUBMIT = "/et1VettingAboutToSubmit";
     private CCDRequest ccdRequest;
 
-    @MockBean
+    @MockitoBean
     private Et1VettingService et1VettingService;
-    @MockBean
+    @MockitoBean
     private ReportDataService reportDataService;
 
-    @MockBean
+    @MockitoBean
     private DocumentManagementService documentManagementService;
     @Autowired
     private MockMvc mockMvc;

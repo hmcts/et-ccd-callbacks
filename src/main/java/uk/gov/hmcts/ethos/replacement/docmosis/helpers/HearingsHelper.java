@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import org.apache.commons.lang3.ObjectUtils;
-import org.webjars.NotFoundException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingDetailTypeItem;
@@ -181,7 +180,7 @@ public final class HearingsHelper {
                         .filter(h -> hearingContainsDate(h.getValue().getHearingDateCollection(), hearingDate))
                         .findFirst();
         if (hearingTypeItem.isEmpty()) {
-            throw new NotFoundException("Failed to find hearing");
+            throw new IllegalArgumentException("Failed to find hearing");
         }
         return hearingTypeItem.get().getValue();
     }

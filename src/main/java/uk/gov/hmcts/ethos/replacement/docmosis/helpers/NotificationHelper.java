@@ -3,7 +3,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
-import org.webjars.NotFoundException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
@@ -106,7 +105,7 @@ public final class NotificationHelper {
     public static String getEmailAddressForClaimant(CaseData caseData) {
         ClaimantType claimantType = caseData.getClaimantType();
         if (claimantType == null) {
-            throw new NotFoundException("Could not find claimant");
+            throw new IllegalArgumentException("Could not find claimant");
         }
         String claimantEmailAddress = claimantType.getClaimantEmailAddress();
         return isNullOrEmpty(claimantEmailAddress) ? "" : claimantEmailAddress;

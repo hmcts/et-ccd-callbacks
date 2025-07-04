@@ -9,8 +9,8 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.dwp.regex.InvalidPostcodeException;
 import uk.gov.hmcts.ecm.common.configuration.PostcodeToOfficeMappings;
@@ -65,34 +65,34 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 class Et1ReppedServiceTest {
 
     private Et1ReppedService et1ReppedService;
-    @MockBean
+    @MockitoBean
     private PostcodeToOfficeMappings postcodeToOfficeMappings;
 
-    @MockBean
+    @MockitoBean
     private AcasService acasService;
-    @MockBean
+    @MockitoBean
     private AuthTokenGenerator authTokenGenerator;
-    @MockBean
+    @MockitoBean
     private CcdCaseAssignment ccdCaseAssignment;
-    @MockBean
+    @MockitoBean
     private DocumentManagementService documentManagementService;
-    @MockBean
+    @MockitoBean
     private JurisdictionCodesMapperService jurisdictionCodesMapperService;
-    @MockBean
+    @MockitoBean
     private OrganisationClient organisationClient;
-    @MockBean
+    @MockitoBean
     private TornadoService tornadoService;
-    @MockBean
+    @MockitoBean
     private UserIdamService userIdamService;
-    @MockBean
+    @MockitoBean
     private AdminUserService adminUserService;
     @Mock
     private RestTemplate restTemplate;
-    @MockBean
+    @MockitoBean
     private EmailService emailService;
-    @MockBean
+    @MockitoBean
     private Et1SubmissionService et1SubmissionService;
-    @MockBean
+    @MockitoBean
     private ET1PdfMapperService et1PdfMapperService;
 
     private CaseDetails caseDetails;

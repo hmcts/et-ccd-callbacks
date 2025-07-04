@@ -1,8 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.functional.docgen;
 
 import net.serenitybdd.junit.runners.SerenityRunner;
-import net.thucydides.core.annotations.WithTag;
-import net.thucydides.core.annotations.WithTags;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -15,10 +13,6 @@ import java.io.IOException;
 
 @Category(ComponentTest.class)
 @RunWith(SerenityRunner.class)
-@WithTags({
-    @WithTag("ComponentTest"),
-    @WithTag("FunctionalTest")
-})
 public class DocMosisScotPart15ComponentTest {
 
     private TestUtil testUtil;
@@ -29,7 +23,6 @@ public class DocMosisScotPart15ComponentTest {
     }
 
     @Test
-    @WithTag("SmokeTest")
     public void generateDocument_Part_Scot_159() throws Exception {
         testUtil.executeGenerateDocumentTest("159", "", "Information pack for Judicial Mediation", true);
     }

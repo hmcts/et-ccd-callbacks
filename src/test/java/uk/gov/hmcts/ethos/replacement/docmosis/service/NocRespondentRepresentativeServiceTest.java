@@ -5,8 +5,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -108,21 +108,21 @@ class NocRespondentRepresentativeServiceTest {
     private ObjectMapper objectMapper;
     private NocRespondentRepresentativeService nocRespondentRepresentativeService;
 
-    @MockBean
+    @MockitoBean
     private NoticeOfChangeFieldPopulator noticeOfChangeFieldPopulator;
-    @MockBean
+    @MockitoBean
     private AdminUserService adminUserService;
-    @MockBean
+    @MockitoBean
     private NocCcdService nocCcdService;
-    @MockBean
+    @MockitoBean
     private NocNotificationService nocNotificationService;
-    @MockBean
+    @MockitoBean
     private CcdClient ccdClient;
-    @MockBean
+    @MockitoBean
     private CcdCaseAssignment ccdCaseAssignment;
-    @MockBean
+    @MockitoBean
     private OrganisationClient organisationClient;
-    @MockBean
+    @MockitoBean
     private AuthTokenGenerator authTokenGenerator;
 
     private NocRespondentHelper nocRespondentHelper;

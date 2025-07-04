@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.service.PostcodeToOfficeService;
@@ -23,10 +23,10 @@ class TribunalOfficeEpimmServiceTest {
 
     @InjectMocks
     private TribunalOfficesService tribunalOfficesService;
-    @MockBean
+    @MockitoBean
     private PostcodeToOfficeService postcodeToOfficeService;
 
-    @MockBean
+    @MockitoBean
     private TribunalOfficesConfiguration config;
 
     @Mock

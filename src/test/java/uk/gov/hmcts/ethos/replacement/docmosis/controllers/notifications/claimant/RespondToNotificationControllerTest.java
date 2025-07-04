@@ -5,8 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -39,6 +40,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.PseRespondToTribun
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({RespondToNotificationController.class, JsonMapper.class})
+@ActiveProfiles("test")
 class RespondToNotificationControllerTest {
     private static final String ABOUT_TO_START_URL = "/claimantRespondNotification/aboutToStart";
     private static final String MID_DETAILS_TABLE_URL = "/claimantRespondNotification/midDetailsTable";
@@ -46,9 +48,9 @@ class RespondToNotificationControllerTest {
     private static final String SUBMITTED_URL = "/claimantRespondNotification/submitted";
     private static final String MID_VALIDATE_INPUT_URL = "/claimantRespondNotification/midValidateInput";
 
-    @MockBean
+    @MockitoBean
     private VerifyTokenService verifyTokenService;
-    @MockBean
+    @MockitoBean
     private PseRespondToTribunalService pseRespondToTribunalService;
     @Autowired
     private JsonMapper jsonMapper;

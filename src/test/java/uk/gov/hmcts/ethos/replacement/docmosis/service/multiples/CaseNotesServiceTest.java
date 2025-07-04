@@ -3,7 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.multiples;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
@@ -24,7 +24,7 @@ class CaseNotesServiceTest {
     private  static final String EMAIL = "email@email.com";
     private static final String NAME = "Mr Magoo";
 
-    @MockBean
+    @MockitoBean
     private UserIdamService userIdamService;
 
     private CaseNotesService caseNotesService;

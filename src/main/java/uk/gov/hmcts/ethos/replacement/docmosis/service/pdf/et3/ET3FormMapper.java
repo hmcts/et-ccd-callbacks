@@ -3,7 +3,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.ObjectUtils;
-import org.webjars.NotFoundException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
@@ -53,7 +52,7 @@ public final class ET3FormMapper {
         Stream<RespondentSumTypeItem> respondentSumTypeStream = caseData.getRespondentCollection().stream()
                 .filter(r -> submitRespondent.equals(r.getValue().getRespondentName()));
         if (ObjectUtils.isEmpty(respondentSumTypeStream)) {
-            Throwable throwable = new NotFoundException(
+            Throwable throwable = new IllegalArgumentException(
                     RESPONDENT_NOT_FOUND_IN_RESPONDENT_COLLECTION_EXCEPTION_MESSAGE);
             throw new GenericServiceException(RESPONDENT_NOT_FOUND_IN_RESPONDENT_COLLECTION_EXCEPTION_MESSAGE,
                     throwable, RESPONDENT_NOT_FOUND_EXCEPTION_FIRST_WORD
@@ -66,7 +65,7 @@ public final class ET3FormMapper {
                 || selectedRespondent.isEmpty()
                 || ObjectUtils.isEmpty(selectedRespondent.get())
                 || ObjectUtils.isEmpty(selectedRespondent.get().getValue())) {
-            Throwable throwable = new NotFoundException(
+            Throwable throwable = new IllegalArgumentException(
                     RESPONDENT_NOT_FOUND_IN_RESPONDENT_COLLECTION_EXCEPTION_MESSAGE);
             throw new GenericServiceException(RESPONDENT_NOT_FOUND_IN_RESPONDENT_COLLECTION_EXCEPTION_MESSAGE,
                     throwable, RESPONDENT_NOT_FOUND_EXCEPTION_FIRST_WORD
@@ -90,13 +89,13 @@ public final class ET3FormMapper {
 
     private static void checkCaseData(CaseData caseData) throws GenericServiceException {
         if (ObjectUtils.isEmpty(caseData)) {
-            Throwable throwable = new NotFoundException(CASE_DATA_NOT_FOUND_EXCEPTION_MESSAGE);
+            Throwable throwable = new IllegalArgumentException(CASE_DATA_NOT_FOUND_EXCEPTION_MESSAGE);
             throw new GenericServiceException(CASE_DATA_NOT_FOUND_EXCEPTION_MESSAGE, throwable,
                     CASE_DATA_NOT_FOUND_EXCEPTION_FIRST_WORD, CASE_DATA_NOT_FOUND_EXCEPTION_MESSAGE,
                     ET3_FORM_MAPPER_CLASS_NAME, ET3_FORM_MAPPER_METHOD_NAME);
         }
         if (CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
-            Throwable throwable = new NotFoundException(RESPONDENT_COLLECTION_NOT_FOUND_EXCEPTION_MESSAGE);
+            Throwable throwable = new IllegalArgumentException(RESPONDENT_COLLECTION_NOT_FOUND_EXCEPTION_MESSAGE);
             throw new GenericServiceException(RESPONDENT_COLLECTION_NOT_FOUND_EXCEPTION_MESSAGE, throwable,
                     RESPONDENT_COLLECTION_NOT_FOUND_EXCEPTION_FIRST_WORD, caseData.getEthosCaseReference(),
                     ET3_FORM_MAPPER_CLASS_NAME, ET3_FORM_CASE_DATA_CHECK_METHOD_NAME);
@@ -107,13 +106,14 @@ public final class ET3FormMapper {
     private static void checkCaseDataSubmitRespondentCollection(CaseData caseData) throws GenericServiceException {
         if (ObjectUtils.isEmpty(caseData.getSubmitEt3Respondent())
                 || ObjectUtils.isEmpty(caseData.getSubmitEt3Respondent().getValue())) {
-            Throwable throwable = new NotFoundException(RESPONDENT_NOT_FOUND_IN_CASE_DATA_EXCEPTION_MESSAGE);
+            Throwable throwable = new IllegalArgumentException(RESPONDENT_NOT_FOUND_IN_CASE_DATA_EXCEPTION_MESSAGE);
             throw new GenericServiceException(RESPONDENT_NOT_FOUND_IN_CASE_DATA_EXCEPTION_MESSAGE, throwable,
                     RESPONDENT_NOT_FOUND_IN_CASE_DATA_EXCEPTION_MESSAGE, caseData.getEthosCaseReference(),
                     ET3_FORM_MAPPER_CLASS_NAME, ET3_FORM_CASE_DATA_CHECK_METHOD_NAME);
         }
         if (StringUtils.isBlank(caseData.getSubmitEt3Respondent().getSelectedLabel())) {
-            Throwable throwable = new NotFoundException(RESPONDENT_NAME_NOT_FOUND_IN_CASE_DATA_EXCEPTION_MESSAGE);
+            Throwable throwable = new IllegalArgumentException(
+                    RESPONDENT_NAME_NOT_FOUND_IN_CASE_DATA_EXCEPTION_MESSAGE);
             throw new GenericServiceException(RESPONDENT_NAME_NOT_FOUND_IN_CASE_DATA_EXCEPTION_MESSAGE, throwable,
                     RESPONDENT_NAME_NOT_FOUND_IN_CASE_DATA_EXCEPTION_MESSAGE, caseData.getEthosCaseReference(),
                     ET3_FORM_MAPPER_CLASS_NAME, ET3_FORM_CASE_DATA_CHECK_METHOD_NAME);

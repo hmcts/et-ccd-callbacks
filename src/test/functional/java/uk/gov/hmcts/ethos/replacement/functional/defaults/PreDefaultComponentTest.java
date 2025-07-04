@@ -3,8 +3,6 @@ package uk.gov.hmcts.ethos.replacement.functional.defaults;
 import io.restassured.response.Response;
 import net.serenitybdd.junit.runners.SerenityRunner;
 import net.serenitybdd.rest.SerenityRest;
-import net.thucydides.core.annotations.WithTag;
-import net.thucydides.core.annotations.WithTags;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Ignore;
@@ -24,10 +22,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.INDIVIDUAL_TYPE_CLA
 
 @Category(ComponentTest.class)
 @RunWith(SerenityRunner.class)
-@WithTags({
-    @WithTag("ComponentTest"),
-    @WithTag("FunctionalTest")
-})
 public class PreDefaultComponentTest {
 
     private TestUtil testUtil;
@@ -38,7 +32,6 @@ public class PreDefaultComponentTest {
     }
 
     @Test
-    @WithTag("SmokeTest")
     public void claimant_type_individual_with_england_template() throws IOException {
         testUtil.executePreDefaultValuesTest("claimant_TypeOfClaimant", INDIVIDUAL_TYPE_CLAIMANT, false,
                 Constants.TEST_DATA_PRE_DEFAULT1);
@@ -51,7 +44,6 @@ public class PreDefaultComponentTest {
     }
 
     @Test
-    @WithTag("SmokeTest")
     public void claimant_type_individual_with_scotland_template() throws IOException {
         testUtil.executePreDefaultValuesTest("claimant_TypeOfClaimant", INDIVIDUAL_TYPE_CLAIMANT, true,
                 Constants.TEST_DATA_SCOT_PRE_DEFAULT1);

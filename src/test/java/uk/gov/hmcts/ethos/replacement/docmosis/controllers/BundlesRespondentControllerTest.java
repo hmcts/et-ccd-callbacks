@@ -2,14 +2,14 @@ package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.runner.RunWith;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import org.webjars.NotFoundException;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.BundlesRespondentService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
@@ -29,8 +29,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@RunWith(SpringRunner.class)
+@ExtendWith(SpringExtension.class)
 @WebMvcTest({BundlesRespondentController.class, JsonMapper.class})
+@ActiveProfiles("test")
 class BundlesRespondentControllerTest extends BaseControllerTest {
 
     private static final String ABOUT_TO_START_URL = "/bundlesRespondent/aboutToStart";
@@ -42,13 +43,13 @@ class BundlesRespondentControllerTest extends BaseControllerTest {
     private static final String MID_POPULATE_REMOVE_HEARING_BUNDLES_URL =
             "/bundlesRespondent/midPopulateRemoveHearingBundles";
 
-    @MockBean
+    @MockitoBean
     private BundlesRespondentService bundlesRespondentService;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
     
-    @MockBean
+    @MockitoBean
     private SendNotificationService sendNotificationService;
 
     @Autowired
@@ -259,7 +260,7 @@ class BundlesRespondentControllerTest extends BaseControllerTest {
     @Test
     void removeHearingBundle_badRequest() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        doThrow(new NotFoundException("Bundle not found in the collection"))
+        doThrow(new IllegalArgumentException("Bundle not found in the collection"))
                 .when(bundlesRespondentService).removeHearingBundles(any());
         mockMvc.perform(post(REMOVE_HEARING_BUNDLE_URL)
                         .content(jsonMapper.toJson(ccdRequest))

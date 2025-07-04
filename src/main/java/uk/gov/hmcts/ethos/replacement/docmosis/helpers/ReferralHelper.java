@@ -9,7 +9,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.validator.routines.EmailValidator;
-import org.webjars.NotFoundException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.model.helper.DocumentCategory;
 import uk.gov.hmcts.ecm.common.model.helper.DocumentConstants;
@@ -759,7 +758,7 @@ public final class ReferralHelper {
         ReferralType selectedReferral = getSelectedReferral(caseData);
 
         if (selectedReferral == null) {
-            throw new NotFoundException("Referral not found");
+            throw new IllegalArgumentException("Referral not found");
         }
 
         personalisation.put(SUBJECT, selectedReferral.getReferralSubject());
@@ -796,7 +795,7 @@ public final class ReferralHelper {
 
         ReferralType selectedReferral = getSelectedReferral(caseData);
         if (selectedReferral == null) {
-            throw new NotFoundException("Referral not found");
+            throw new IllegalArgumentException("Referral not found");
         }
 
         return selectedReferral.getReferralSubject();

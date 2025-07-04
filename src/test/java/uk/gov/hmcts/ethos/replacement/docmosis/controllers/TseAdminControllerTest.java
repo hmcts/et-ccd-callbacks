@@ -5,8 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
@@ -41,6 +42,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({TseAdminController.class, JsonMapper.class})
+@ActiveProfiles("test")
 class TseAdminControllerTest extends BaseControllerTest {
 
     private static final String ABOUT_TO_START_URL = "/tseAdmin/aboutToStart";
@@ -50,15 +52,15 @@ class TseAdminControllerTest extends BaseControllerTest {
     private static final String ABOUT_TO_SUBMIT_CLOSE_APP_URL = "/tseAdmin/aboutToSubmitCloseApplication";
     private static final String SUBMITTED_CLOSE_APP_URL = "/tseAdmin/submittedCloseApplication";
 
-    @MockBean
+    @MockitoBean
     private TseAdminService tseAdminService;
 
-    @MockBean
+    @MockitoBean
     private TseAdmCloseService tseAdmCloseService;
 
-    @MockBean
+    @MockitoBean
     private CaseFlagsService caseFlagsService;
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
     @Autowired

@@ -5,8 +5,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
@@ -36,6 +37,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICI
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({CloseReferralController.class, JsonMapper.class})
+@ActiveProfiles("test")
 class CloseReferralControllerTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String START_CLOSE_REFERRAL_URL = "/closeReferral/aboutToStart";
@@ -43,7 +45,7 @@ class CloseReferralControllerTest {
     private static final String ABOUT_TO_SUBMIT_URL = "/closeReferral/aboutToSubmit";
     private static final String SUBMITTED_REFERRAL_URL = "/closeReferral/completeCloseReferral";
 
-    @MockBean
+    @MockitoBean
     private VerifyTokenService verifyTokenService;
     @Autowired
     private MockMvc mockMvc;

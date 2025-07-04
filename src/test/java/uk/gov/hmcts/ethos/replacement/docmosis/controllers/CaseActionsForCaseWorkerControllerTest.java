@@ -10,9 +10,10 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -84,6 +85,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({CaseActionsForCaseWorkerController.class, JsonMapper.class})
+@ActiveProfiles("test")
 @ContextConfiguration(classes = DocmosisApplication.class)
 class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
@@ -132,74 +134,74 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     @Autowired
     private WebApplicationContext applicationContext;
 
-    @MockBean
+    @MockitoBean
     private CaseCloseValidator caseCloseValidator;
 
-    @MockBean
+    @MockitoBean
     private CaseCreationForCaseWorkerService caseCreationForCaseWorkerService;
 
-    @MockBean
+    @MockitoBean
     private CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
 
-    @MockBean
+    @MockitoBean
     private CaseUpdateForCaseWorkerService caseUpdateForCaseWorkerService;
 
-    @MockBean
+    @MockitoBean
     private DefaultValuesReaderService defaultValuesReaderService;
 
-    @MockBean
+    @MockitoBean
     private CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
 
-    @MockBean
+    @MockitoBean
     private SingleReferenceService singleReferenceService;
 
-    @MockBean
+    @MockitoBean
     private EventValidationService eventValidationService;
 
-    @MockBean
+    @MockitoBean
     private DepositOrderValidationService depositOrderValidationService;
 
-    @MockBean
+    @MockitoBean
     private JudgmentValidationService judgmentValidationService;
 
-    @MockBean
+    @MockitoBean
     private ConciliationTrackService conciliationTrackService;
 
-    @MockBean
+    @MockitoBean
     private SingleCaseMultipleMidEventValidationService singleCaseMultipleMidEventValidationService;
 
-    @MockBean
+    @MockitoBean
     private AddSingleCaseToMultipleService addSingleCaseToMultipleService;
 
-    @MockBean
+    @MockitoBean
     private ClerkService clerkService;
 
-    @MockBean
+    @MockitoBean
     private FileLocationSelectionService fileLocationSelectionService;
 
-    @MockBean
+    @MockitoBean
     private ScotlandFileLocationSelectionService scotlandFileLocationSelectionService;
 
-    @MockBean
+    @MockitoBean
     private FixCaseApiService fixCaseApiService;
-    @MockBean
+    @MockitoBean
     private Et1VettingService et1VettingService;
 
-    @MockBean
+    @MockitoBean
     private NocRespondentRepresentativeService nocRespondentRepresentativeService;
 
-    @MockBean
+    @MockitoBean
     private CaseFlagsService caseFlagsService;
 
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
 
-    @MockBean
+    @MockitoBean
     private Et1SubmissionService et1SubmissionService;
 
-    @MockBean
+    @MockitoBean
     private NocRespondentHelper nocRespondentHelper;
-    @MockBean
+    @MockitoBean
     private CaseManagementLocationService caseManagementLocationService;
     private MockMvc mvc;
     private JsonNode requestContent;

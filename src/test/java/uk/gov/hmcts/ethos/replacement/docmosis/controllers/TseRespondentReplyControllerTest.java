@@ -7,8 +7,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
@@ -38,6 +39,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({TseRespondentReplyController.class, JsonMapper.class})
+@ActiveProfiles("test")
 class TseRespondentReplyControllerTest extends BaseControllerTest {
 
     private static final String ABOUT_TO_START_URL = "/tseResponse/aboutToStart";
@@ -51,9 +53,9 @@ class TseRespondentReplyControllerTest extends BaseControllerTest {
     @Autowired
     private JsonMapper jsonMapper;
 
-    @MockBean
+    @MockitoBean
     private TseRespondentReplyService tseRespondentReplyService;
-    @MockBean
+    @MockitoBean
     private CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
     private MockedStatic<Helper> mockHelper;
     private CCDRequest ccdRequest;

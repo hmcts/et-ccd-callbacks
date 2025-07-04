@@ -7,8 +7,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -31,6 +32,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({MultiplesSendNotificationController.class, JsonMapper.class})
+@ActiveProfiles("test")
 class MultiplesSendNotificationControllerTest extends BaseControllerTest {
 
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
@@ -38,7 +40,7 @@ class MultiplesSendNotificationControllerTest extends BaseControllerTest {
     private static final String ABOUT_TO_START_URL = "/multiples/sendNotification/aboutToStart";
     private static final String SUBMITTED_URL = "/multiples/sendNotification/submitted";
 
-    @MockBean
+    @MockitoBean
     private MultiplesSendNotificationService multiplesSendNotificationService;
 
     @Autowired

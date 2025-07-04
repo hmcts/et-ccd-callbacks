@@ -161,6 +161,7 @@ public class Et1ReppedService {
         claimantRepresentative.setRepresentativeReference(caseData.getRepresentativeReferenceNumber());
         claimantRepresentative.setRepresentativePreference(
                 getFirstListItem(caseData.getRepresentativeContactPreference()));
+        claimantRepresentative.setRepresentativeAddress(caseData.getRepresentativeAddress());
         claimantRepresentative.setRepresentativePhoneNumber(caseData.getRepresentativePhoneNumber());
         claimantRepresentative.setHearingContactLanguage(caseData.getHearingContactLanguage());
         claimantRepresentative.setContactLanguageQuestion(caseData.getContactLanguageQuestion());
@@ -186,13 +187,13 @@ public class Et1ReppedService {
         if (CollectionUtils.isEmpty(organisationDetails.getContactInformation())) {
             return organisationAddress;
         }
-        organisationAddress.setAddressLine1(organisationDetails.getContactInformation().get(0).getAddressLine1());
-        organisationAddress.setAddressLine2(organisationDetails.getContactInformation().get(0).getAddressLine2());
-        organisationAddress.setAddressLine3(organisationDetails.getContactInformation().get(0).getAddressLine3());
-        organisationAddress.setPostCode(organisationDetails.getContactInformation().get(0).getPostCode());
-        organisationAddress.setPostTown(organisationDetails.getContactInformation().get(0).getTownCity());
-        organisationAddress.setCounty(organisationDetails.getContactInformation().get(0).getCounty());
-        organisationAddress.setCountry(organisationDetails.getContactInformation().get(0).getCountry());
+        organisationAddress.setAddressLine1(organisationDetails.getContactInformation().getFirst().getAddressLine1());
+        organisationAddress.setAddressLine2(organisationDetails.getContactInformation().getFirst().getAddressLine2());
+        organisationAddress.setAddressLine3(organisationDetails.getContactInformation().getFirst().getAddressLine3());
+        organisationAddress.setPostCode(organisationDetails.getContactInformation().getFirst().getPostCode());
+        organisationAddress.setPostTown(organisationDetails.getContactInformation().getFirst().getTownCity());
+        organisationAddress.setCounty(organisationDetails.getContactInformation().getFirst().getCounty());
+        organisationAddress.setCountry(organisationDetails.getContactInformation().getFirst().getCountry());
         return organisationAddress;
     }
 

@@ -18,7 +18,9 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CcdCaseAssignment;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.NocClaimantRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.NocNotificationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.NocRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
@@ -52,6 +54,10 @@ class NoticeOfChangeControllerTest {
     @MockBean
     private NocRespondentRepresentativeService nocRespondentRepresentativeService;
     @MockBean
+    private NocClaimantRepresentativeService nocClaimantRepresentativeService;
+    @MockBean
+    private NocRepresentativeService nocRepresentativeService;
+    @MockBean
     private CcdCaseAssignment ccdCaseAssignment;
 
     @MockBean
@@ -82,10 +88,10 @@ class NoticeOfChangeControllerTest {
     }
 
     @Test
-    void handleAboutToSubmit() throws Exception {
+    void handleAboutToSubmit_RespondentRep() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(nocRespondentRepresentativeService
-            .updateRepresentation(any())).thenReturn(caseData);
+            .updateRespondentRepresentation(any())).thenReturn(caseData);
         when(ccdCaseAssignment.applyNoc(any(), any())).thenReturn(CCDCallbackResponse.builder()
             .data(caseData)
             .build());

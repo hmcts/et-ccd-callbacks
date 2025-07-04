@@ -392,15 +392,15 @@ public final class Et1ReppedHelper {
         claimantOtherType.setClaimantPayBeforeTax(formatPay(caseData.getClaimantPayBeforeTax()));
         claimantOtherType.setClaimantPayAfterTax(formatPay(caseData.getClaimantPayAfterTax()));
         claimantOtherType.setClaimantPayCycle(CollectionUtils.isEmpty(caseData.getClaimantPayType())
-                                              || caseData.getClaimantPayType().get(0).equals(
+                                              || caseData.getClaimantPayType().getFirst().equals(
                 NOT_SURE)
                 ? EMPTY_STRING
                 : PAY_PERIODS.get(getFirstListItem(caseData.getClaimantPayType())));
         claimantOtherType.setClaimantPensionContribution(
                 CollectionUtils.isEmpty(caseData.getClaimantPensionContribution())
-                || caseData.getClaimantPensionContribution().get(0).equals(NOT_SURE)
+                || caseData.getClaimantPensionContribution().getFirst().equals(NOT_SURE)
                 ? EMPTY_STRING
-                : caseData.getClaimantPensionContribution().get(0));
+                : caseData.getClaimantPensionContribution().getFirst());
         claimantOtherType.setClaimantPensionWeeklyContribution(formatPay(caseData.getClaimantWeeklyPension()));
         claimantOtherType.setClaimantBenefits(getFirstListItem(caseData.getClaimantEmployeeBenefits()));
         claimantOtherType.setClaimantBenefitsDetail(caseData.getClaimantBenefits());
@@ -413,10 +413,10 @@ public final class Et1ReppedHelper {
         }
         claimantOtherType.setClaimantNoticePeriod(YES);
         if (CollectionUtils.isNotEmpty(caseData.getClaimantNoLongerWorking())) {
-            if (caseData.getClaimantNoLongerWorking().get(0).equals(WEEKS)) {
+            if (caseData.getClaimantNoLongerWorking().getFirst().equals(WEEKS)) {
                 claimantOtherType.setClaimantNoticePeriodUnit(WEEKS);
                 claimantOtherType.setClaimantNoticePeriodDuration(caseData.getClaimantNoLongerWorkingWeeks());
-            } else if (caseData.getClaimantNoLongerWorking().get(0).equals(MONTHS)) {
+            } else if (caseData.getClaimantNoLongerWorking().getFirst().equals(MONTHS)) {
                 claimantOtherType.setClaimantNoticePeriodUnit(MONTHS);
                 claimantOtherType.setClaimantNoticePeriodDuration(caseData.getClaimantNoLongerWorkingMonths());
             }
@@ -428,11 +428,11 @@ public final class Et1ReppedHelper {
         if (CollectionUtils.isEmpty(caseData.getClaimantWorkingNoticePeriod())) {
             return;
         }
-        if (caseData.getClaimantWorkingNoticePeriod().get(0).equals(WEEKS)) {
+        if (caseData.getClaimantWorkingNoticePeriod().getFirst().equals(WEEKS)) {
             claimantOtherType.setClaimantNoticePeriod(YES);
             claimantOtherType.setClaimantNoticePeriodUnit(WEEKS);
             claimantOtherType.setClaimantNoticePeriodDuration(caseData.getClaimantWorkingNoticePeriodWeeks());
-        } else if (caseData.getClaimantWorkingNoticePeriod().get(0).equals(MONTHS)) {
+        } else if (caseData.getClaimantWorkingNoticePeriod().getFirst().equals(MONTHS)) {
             claimantOtherType.setClaimantNoticePeriod(YES);
             claimantOtherType.setClaimantNoticePeriodUnit(MONTHS);
             claimantOtherType.setClaimantNoticePeriodDuration(caseData.getClaimantWorkingNoticePeriodMonths());
@@ -443,15 +443,15 @@ public final class Et1ReppedHelper {
         if (CollectionUtils.isEmpty(caseData.getClaimantStillWorkingNoticePeriod())) {
             return;
         }
-        if (caseData.getClaimantStillWorkingNoticePeriod().get(0).equals(WEEKS)) {
+        if (caseData.getClaimantStillWorkingNoticePeriod().getFirst().equals(WEEKS)) {
             claimantOtherType.setClaimantNoticePeriod(YES);
             claimantOtherType.setClaimantNoticePeriodUnit(WEEKS);
             claimantOtherType.setClaimantNoticePeriodDuration(caseData.getClaimantStillWorkingNoticePeriodWeeks());
-        } else if (caseData.getClaimantStillWorkingNoticePeriod().get(0).equals(MONTHS)) {
+        } else if (caseData.getClaimantStillWorkingNoticePeriod().getFirst().equals(MONTHS)) {
             claimantOtherType.setClaimantNoticePeriod(YES);
             claimantOtherType.setClaimantNoticePeriodUnit(MONTHS);
             claimantOtherType.setClaimantNoticePeriodDuration(caseData.getClaimantStillWorkingNoticePeriodMonths());
-        } else if (caseData.getClaimantStillWorkingNoticePeriod().get(0).equals(NO)) {
+        } else if (caseData.getClaimantStillWorkingNoticePeriod().getFirst().equals(NO)) {
             claimantOtherType.setClaimantNoticePeriod(NO);
         }
     }
@@ -493,10 +493,10 @@ public final class Et1ReppedHelper {
 
     private static String reasonableAdjustmentsMapping(List<String> claimantSupportQuestion) {
         return CollectionUtils.isEmpty(claimantSupportQuestion)
-               || !claimantSupportQuestion.get(0).equals(YES)
-                  && !claimantSupportQuestion.get(0).equals(NO)
+               || !claimantSupportQuestion.getFirst().equals(YES)
+                  && !claimantSupportQuestion.getFirst().equals(NO)
                 ? null
-                : claimantSupportQuestion.get(0);
+                : claimantSupportQuestion.getFirst();
     }
 
     private static List<String> hearingPreferenceMapping(List<String> claimantHearingPreferences) {
@@ -540,6 +540,7 @@ public final class Et1ReppedHelper {
         caseData.setClaimantSupportQuestionReason(null);
         caseData.setRepresentativeContactPreference(null);
         caseData.setContactPreferencePostReason(null);
+        caseData.setRepresentativeAddress(null);
         caseData.setRepresentativePhoneNumber(null);
         caseData.setRepresentativeReferenceNumber(null);
         caseData.setDidClaimantWorkForOrg(null);

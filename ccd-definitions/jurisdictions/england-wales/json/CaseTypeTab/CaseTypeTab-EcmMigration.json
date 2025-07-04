@@ -1,0 +1,25 @@
+[
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "Channel": "CaseWorker",
+    "TabID": "CaseOverview",
+    "CaseFieldID": "ecmFeeGroupReference",
+    "TabFieldDisplayOrder": 17
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "Channel": "CaseWorker",
+    "TabID": "CaseOverview",
+    "CaseFieldID": "ecmCaseLink",
+    "TabFieldDisplayOrder": 34,
+    "FieldShowCondition": "caseType=\"dummy\""
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "Channel": "CaseWorker",
+    "TabID": "CaseOverview",
+    "CaseFieldID": "ecmCaseLinkLabel",
+    "TabFieldDisplayOrder": 35,
+    "FieldShowCondition": "ecmCaseLink=\"*\""
+  }
+]

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
+import lombok.SneakyThrows;
 import org.apache.commons.lang3.ObjectUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.CallbackObjectUtils;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.time.LocalDate;
@@ -113,7 +115,7 @@ class Et3ResponseHelperTest {
         List<String> errors = Et3ResponseHelper.validateEmploymentDates(caseData);
 
         assertThat(errors.size(), is(1));
-        assertThat(errors.get(0), is(END_DATE_MUST_BE_AFTER_THE_START_DATE));
+        assertThat(errors.getFirst(), is(END_DATE_MUST_BE_AFTER_THE_START_DATE));
     }
 
     @Test
@@ -123,7 +125,7 @@ class Et3ResponseHelperTest {
         List<String> errors = Et3ResponseHelper.validateEmploymentDates(caseData);
 
         assertThat(errors.size(), is(1));
-        assertThat(errors.get(0), is(START_DATE_MUST_BE_IN_THE_PAST));
+        assertThat(errors.getFirst(), is(START_DATE_MUST_BE_IN_THE_PAST));
     }
 
     @Test
@@ -155,7 +157,7 @@ class Et3ResponseHelperTest {
         caseData.setEt3RepresentingRespondent(new ArrayList<>());
         List<String> errors = Et3ResponseHelper.validateRespondents(caseData, ET3_RESPONSE_DETAILS);
         assertThat(errors, hasSize(1));
-        assertThat(errors.get(0)).isEqualTo(NO_RESPONDENTS_FOUND);
+        assertThat(errors.getFirst()).isEqualTo(NO_RESPONDENTS_FOUND);
     }
 
     @Test
@@ -169,7 +171,7 @@ class Et3ResponseHelperTest {
         Et3ResponseHelper.addEt3DataToRespondent(caseData, ET3_RESPONSE);
         Et3ResponseHelper.addEt3DataToRespondent(caseData, ET3_RESPONSE_EMPLOYMENT_DETAILS);
         Et3ResponseHelper.addEt3DataToRespondent(caseData, ET3_RESPONSE_DETAILS);
-        RespondentSumType respondentSumType = caseData.getRespondentCollection().get(0).getValue();
+        RespondentSumType respondentSumType = caseData.getRespondentCollection().getFirst().getValue();
         assertThat(respondentSumType.getEt3ResponseIsClaimantNameCorrect()).isEqualTo(YES);
         RepresentedTypeR representative = findRepresentativeFromCaseData(caseData);
         assumeTrue(ObjectUtils.isNotEmpty(representative));
@@ -189,14 +191,14 @@ class Et3ResponseHelperTest {
         caseData.setRespondentCollection(null);
         List<String> errors = Et3ResponseHelper.createDynamicListSelection(caseData);
         assertThat(errors, hasSize(1));
-        assertThat(errors.get(0)).isEqualTo(NO_RESPONDENTS_FOUND);
+        assertThat(errors.getFirst()).isEqualTo(NO_RESPONDENTS_FOUND);
     }
 
     @Test
     void createEt3SubmitRespondents_allSectionsCompleted() {
-        caseData.getRespondentCollection().get(0).getValue().setPersonalDetailsSection(YES);
-        caseData.getRespondentCollection().get(0).getValue().setClaimDetailsSection(YES);
-        caseData.getRespondentCollection().get(0).getValue().setEmploymentDetailsSection(YES);
+        caseData.getRespondentCollection().getFirst().getValue().setPersonalDetailsSection(YES);
+        caseData.getRespondentCollection().getFirst().getValue().setClaimDetailsSection(YES);
+        caseData.getRespondentCollection().getFirst().getValue().setEmploymentDetailsSection(YES);
         List<String> errors = Et3ResponseHelper.et3SubmitRespondents(caseData);
         assertThat(errors).isEmpty();
         assertThat(caseData.getSubmitEt3Respondent()).isNotNull();
@@ -204,12 +206,12 @@ class Et3ResponseHelperTest {
 
     @Test
     void createEt3SubmitRespondents_twoSectionsCompleted() {
-        caseData.getRespondentCollection().get(0).getValue().setPersonalDetailsSection(YES);
-        caseData.getRespondentCollection().get(0).getValue().setClaimDetailsSection(YES);
-        caseData.getRespondentCollection().get(0).getValue().setEmploymentDetailsSection(NO);
+        caseData.getRespondentCollection().getFirst().getValue().setPersonalDetailsSection(YES);
+        caseData.getRespondentCollection().getFirst().getValue().setClaimDetailsSection(YES);
+        caseData.getRespondentCollection().getFirst().getValue().setEmploymentDetailsSection(NO);
         List<String> errors = Et3ResponseHelper.et3SubmitRespondents(caseData);
         assertThat(errors, hasSize(1));
-        assertThat(errors.get(0)).isEqualTo(ALL_RESPONDENTS_INCOMPLETE_SECTIONS);
+        assertThat(errors.getFirst()).isEqualTo(ALL_RESPONDENTS_INCOMPLETE_SECTIONS);
     }
 
     @ParameterizedTest
@@ -217,7 +219,7 @@ class Et3ResponseHelperTest {
     void createDynamicListSelection_extensionRequested(String responseReceived, String extensionRequested,
                                                        String extensionGranted, String extensionDate,
                                                        String extensionResubmitted, int count, int errorsSize) {
-        RespondentSumType respondentSumType = caseData.getRespondentCollection().get(0).getValue();
+        RespondentSumType respondentSumType = caseData.getRespondentCollection().getFirst().getValue();
         respondentSumType.setResponseReceived(responseReceived);
         respondentSumType.setExtensionRequested(extensionRequested);
         respondentSumType.setExtensionGranted(extensionGranted);
@@ -225,7 +227,7 @@ class Et3ResponseHelperTest {
         respondentSumType.setExtensionResubmitted(extensionResubmitted);
         List<String> errors = Et3ResponseHelper.createDynamicListSelection(caseData);
         assertThat(errors, hasSize(errorsSize));
-        assertThat(caseData.getEt3RepresentingRespondent().get(0).getValue().getDynamicList().getListItems(),
+        assertThat(caseData.getEt3RepresentingRespondent().getFirst().getValue().getDynamicList().getListItems(),
             hasSize(count));
     }
 
@@ -240,13 +242,13 @@ class Et3ResponseHelperTest {
 
     @Test
     void setEt3NotificationAcceptedDates() {
-        RespondentSumTypeItem respondentSumTypeItemResponseNotAccepted = caseData.getRespondentCollection().get(0);
+        RespondentSumTypeItem respondentSumTypeItemResponseNotAccepted = caseData.getRespondentCollection().getFirst();
         respondentSumTypeItemResponseNotAccepted.getValue().setResponseStatus("Not Accepted");
         Et3ResponseHelper.setEt3NotificationAcceptedDates(caseData);
         assertThat(respondentSumTypeItemResponseNotAccepted.getValue().getEt3NotificationAcceptedDate()).isNull();
 
         RespondentSumTypeItem respondentSumTypeItemResponseNotificationDocCollectionEmpty =
-                caseData.getRespondentCollection().get(0);
+                caseData.getRespondentCollection().getFirst();
         respondentSumTypeItemResponseNotificationDocCollectionEmpty
                 .getValue().setResponseStatus(ACCEPTED_STATE);
         Et3ResponseHelper.setEt3NotificationAcceptedDates(caseData);
@@ -254,7 +256,7 @@ class Et3ResponseHelperTest {
                 .getValue().getEt3NotificationAcceptedDate()).isNull();
 
         RespondentSumTypeItem respondentSumTypeItemResponseNotificationDocCollectionOfNotAccepted =
-                caseData.getRespondentCollection().get(0);
+                caseData.getRespondentCollection().getFirst();
         respondentSumTypeItemResponseNotificationDocCollectionOfNotAccepted
                 .getValue().setResponseStatus(ACCEPTED_STATE);
         caseData.setEt3NotificationDocCollection(List.of(DocumentTypeItem.builder().value(
@@ -264,7 +266,7 @@ class Et3ResponseHelperTest {
                 .getValue().getEt3NotificationAcceptedDate()).isNull();
 
         RespondentSumTypeItem respondentSumTypeItemResponseNotificationDocCollectionOfAccepted =
-                caseData.getRespondentCollection().get(0);
+                caseData.getRespondentCollection().getFirst();
         respondentSumTypeItemResponseNotificationDocCollectionOfAccepted
                 .getValue().setResponseStatus(ACCEPTED_STATE);
         caseData.setEt3NotificationDocCollection(List.of(DocumentTypeItem.builder().value(
@@ -273,9 +275,42 @@ class Et3ResponseHelperTest {
         assertThat(respondentSumTypeItemResponseNotificationDocCollectionOfAccepted
                 .getValue().getEt3NotificationAcceptedDate()).contains(LocalDate.now().toString());
 
-        RespondentSumTypeItem respondentSumTypeItemValueNull = caseData.getRespondentCollection().get(0);
+        RespondentSumTypeItem respondentSumTypeItemValueNull = caseData.getRespondentCollection().getFirst();
         respondentSumTypeItemValueNull.setValue(null);
         assertDoesNotThrow(() -> Et3ResponseHelper.setEt3NotificationAcceptedDates(caseData));
     }
 
+    @Test
+    @SneakyThrows
+    void theSetRespondentRepresentativeValues() {
+
+        CaseData caseDataWithRep = CallbackObjectUtils.cloneObject(caseData, CaseData.class);
+        caseDataWithRep.setEt3ResponsePhone("0123456789");
+        caseDataWithRep.setEt3ResponseContactPreference("Email");
+        caseDataWithRep.setEt3ResponseReference("Ref-001");
+        caseDataWithRep.setEt3ResponseContactReason("Prefer email");
+        caseDataWithRep.setEt3ResponseContactLanguage("English");
+        Address address = new Address();
+        address.setAddressLine1("50 Tithe Barn Drive");
+        address.setCountry("United Kingdom");
+        address.setCounty("Berkshire");
+        address.setPostCode("SL6 2DE");
+        address.setPostTown("Maidenhead");
+        caseDataWithRep.setEt3ResponseAddress(address);
+        Et3ResponseHelper.setRespondentRepresentativeValues(caseDataWithRep);
+        RepresentedTypeR representative = Et3ResponseHelper.findRepresentativeFromCaseData(caseDataWithRep);
+        assertThat(representative).isNotNull();
+        assertThat(representative.getRepresentativePhoneNumber()).isNotNull().isEqualTo("0123456789");
+        assertThat(representative.getRepresentativePreference()).isEqualTo("Email");
+        assertThat(representative.getRepresentativeReference()).isEqualTo("Ref-001");
+        assertThat(representative.getRepresentativePreferenceReason()).isEqualTo("Prefer email");
+        assertThat(representative.getRepresentativeContactLanguage()).isEqualTo("English");
+        assertThat(representative.getRepresentativeAddress()).isEqualTo(address);
+
+        // --- Scenario 2: Representative is null ---
+        CaseData caseDataWithoutRep = new CaseData(); // no representative assigned
+
+        // Should not throw exception or perform any updates
+        assertDoesNotThrow(() -> Et3ResponseHelper.setRespondentRepresentativeValues(caseDataWithoutRep));
+    }
 }

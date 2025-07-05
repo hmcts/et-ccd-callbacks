@@ -17,6 +17,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
@@ -112,8 +113,7 @@ public class Et3ResponseController {
             @RequestHeader("Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
+            return verifyTokenService.getForbiddenEntityStatusResponse(userToken);
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
@@ -147,8 +147,7 @@ public class Et3ResponseController {
             @RequestHeader("Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
+            return verifyTokenService.getForbiddenEntityStatusResponse(userToken);
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
@@ -173,8 +172,7 @@ public class Et3ResponseController {
             @RequestHeader("Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
+            return verifyTokenService.getForbiddenEntityStatusResponse(userToken);
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
@@ -186,20 +184,19 @@ public class Et3ResponseController {
     @PostMapping(value = "/sectionComplete", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "display the next steps after ET3 response section")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully",
-            content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-            }),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+            @ApiResponse(responseCode = "200", description = "Accessed successfully",
+                    content = {
+                            @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+                    }),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> sectionComplete(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
+            return verifyTokenService.getForbiddenEntityStatusResponse(userToken);
         }
 
         String ccdId = ccdRequest.getCaseDetails().getCaseId();
@@ -232,8 +229,7 @@ public class Et3ResponseController {
             @RequestHeader("Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
+            return verifyTokenService.getForbiddenEntityStatusResponse(userToken);
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
@@ -270,8 +266,7 @@ public class Et3ResponseController {
             @RequestHeader("Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
+            return verifyTokenService.getForbiddenEntityStatusResponse(userToken);
         }
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()
@@ -296,8 +291,7 @@ public class Et3ResponseController {
             @RequestHeader("Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
+            return verifyTokenService.getForbiddenEntityStatusResponse(userToken);
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
@@ -321,8 +315,7 @@ public class Et3ResponseController {
             @RequestHeader("Authorization") String userToken) {
 
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
+            return verifyTokenService.getForbiddenEntityStatusResponse(userToken);
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
@@ -396,5 +389,57 @@ public class Et3ResponseController {
                 .confirmation_body(GENERATED_DOCUMENT_URL + caseData.getDocMarkUp()
                                    + "\r\n\r\n" + SECTION_COMPLETE_BODY.formatted(ccdId, ccdId, ccdId, ccdId))
                 .build());
+    }
+
+    /**
+     * Sets new values to respondent representative model {@link RepresentedTypeR}
+     *
+     * @param ccdRequest generic request from CCD
+     * @param userToken  authentication token to verify the user
+     * @return Callback response entity with case data attached.
+     */
+    @PostMapping(value = "/aboutToSubmitRepresentativeInfo", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Updates RepresentedTypeR model of the respondent representative with new values")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Accessed successfully",
+                    content = {
+                            @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+                    }),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> aboutToSubmitRepresentativeInfo(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader("Authorization") String userToken) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            return verifyTokenService.getForbiddenEntityStatusResponse(userToken);
+        }
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        Et3ResponseHelper.setRespondentRepresentativeValues(caseData);
+        Et3ResponseHelper.resetEt3FormFields(caseData);
+        return getCallbackRespEntityNoErrors(caseData);
+    }
+
+    @PostMapping(value = "/representativeInfoSubmitted", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Approval of submission of representative info")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Accessed successfully",
+                    content = {
+                            @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+                    }),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> representativeInfoSubmitted(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader("Authorization") String userToken) {
+
+        if (!verifyTokenService.verifyTokenSignature(userToken)) {
+            return verifyTokenService.getForbiddenEntityStatusResponse(userToken);
+        }
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        return getCallbackRespEntityNoErrors(caseData);
     }
 }

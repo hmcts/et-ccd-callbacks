@@ -13,11 +13,15 @@ import com.nimbusds.jwt.SignedJWT;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.exceptions.VerifyTokenServiceException;
 
 import java.net.URL;
 import java.security.Key;
+
+import static org.springframework.http.HttpStatus.FORBIDDEN;
 
 @Slf4j
 @Service("verifyTokenService")
@@ -80,4 +84,8 @@ public class VerifyTokenService {
         }
     }
 
+    public ResponseEntity<CCDCallbackResponse> getForbiddenEntityStatusResponse(String userToken) {
+        log.error(INVALID_TOKEN, userToken);
+        return ResponseEntity.status(FORBIDDEN.value()).build();
+    }
 }

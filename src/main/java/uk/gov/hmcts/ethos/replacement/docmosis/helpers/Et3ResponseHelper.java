@@ -236,7 +236,27 @@ public final class Et3ResponseHelper {
         respondent.setEt3ResponseClaimantNameCorrection(caseData.getEt3ResponseClaimantNameCorrection());
         respondent.setResponseRespondentName(caseData.getEt3ResponseRespondentLegalName());
         respondent.setResponseRespondentAddress(caseData.getEt3RespondentAddress());
-        setRespondentRepresentativeValues(caseData);
+        RepresentedTypeR representative = findRepresentativeFromCaseData(caseData);
+        if (representative != null) {
+            // This should be mapped to Representative
+            // mentioned in the ticket https://tools.hmcts.net/jira/browse/RET-5054
+            // existing statement respondent.setResponseRespondentPhone1(caseData.getEt3ResponsePhone())
+            // replaced with representative.setRepresentativePhoneNumber(caseData.getEt3ResponsePhone())
+            representative.setRepresentativePhoneNumber(caseData.getEt3ResponsePhone());
+            // This should be mapped to Representative
+            // mentioned in the ticket https://tools.hmcts.net/jira/browse/RET-5054
+            // existing statement respondent.setResponseRespondentContactPreference(
+            // caseData.getEt3ResponseContactPreference())
+            // replaced with representative.setRepresentativePreference(caseData.getEt3ResponseContactPreference())
+            representative.setRepresentativePreference(caseData.getEt3ResponseContactPreference());
+            // There weren't any mapping of reference for correspondence - representative.
+            // mentioned in the ticket https://tools.hmcts.net/jira/browse/RET-5054
+            // added this field to representative
+            representative.setRepresentativeReference(caseData.getEt3ResponseReference());
+            representative.setRepresentativePreferenceReason(caseData.getEt3ResponseContactReason());
+            representative.setRepresentativeContactLanguage(caseData.getEt3ResponseContactLanguage());
+            representative.setRepresentativeAddress(caseData.getEt3ResponseAddress());
+        }
         respondent.setResponseReference(caseData.getEt3ResponseReference());
         respondent.setEt3ResponseRespondentCompanyNumber(caseData.getEt3ResponseRespondentCompanyNumber());
         respondent.setEt3ResponseContactReason(caseData.getEt3ResponseContactReason());

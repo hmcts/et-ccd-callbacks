@@ -184,12 +184,13 @@ public class Et3ResponseController {
     @PostMapping(value = "/sectionComplete", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "display the next steps after ET3 response section")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                    content = {
-                            @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-                    }),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+                content = {
+                    @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CCDCallbackResponse.class))
+                }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> sectionComplete(
             @RequestBody CCDRequest ccdRequest,
@@ -392,7 +393,7 @@ public class Et3ResponseController {
     }
 
     /**
-     * Sets new values to respondent representative model {@link RepresentedTypeR}
+     * Sets new values to respondent representative model {@link RepresentedTypeR}.
      *
      * @param ccdRequest generic request from CCD
      * @param userToken  authentication token to verify the user
@@ -401,12 +402,13 @@ public class Et3ResponseController {
     @PostMapping(value = "/aboutToSubmitRepresentativeInfo", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Updates RepresentedTypeR model of the respondent representative with new values")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                    content = {
-                            @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-                    }),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+                content = {
+                    @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CCDCallbackResponse.class))
+                }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> aboutToSubmitRepresentativeInfo(
             @RequestBody CCDRequest ccdRequest,
@@ -425,12 +427,13 @@ public class Et3ResponseController {
     @PostMapping(value = "/representativeInfoSubmitted", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Approval of submission of representative info")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                    content = {
-                            @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-                    }),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+                content = {
+                    @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CCDCallbackResponse.class))
+                }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> representativeInfoSubmitted(
             @RequestBody CCDRequest ccdRequest,

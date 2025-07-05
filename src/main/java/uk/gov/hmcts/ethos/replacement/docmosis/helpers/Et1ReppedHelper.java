@@ -113,7 +113,7 @@ public final class Et1ReppedHelper {
 
     /**
      * Sets the ET1 Repped section statuses once each section have been completed.
-     * @param ccdRequest the ccd request
+     * @param ccdRequest the CCD request
      */
     public static void setEt1SectionStatuses(CCDRequest ccdRequest) {
         String eventId = ccdRequest.getEventId();

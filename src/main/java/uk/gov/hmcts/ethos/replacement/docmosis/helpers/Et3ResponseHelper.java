@@ -541,10 +541,6 @@ public final class Et3ResponseHelper {
         RepresentedTypeR respondentRepresentative = findRepresentativeFromCaseData(caseData);
         if (respondentRepresentative != null) {
             respondentRepresentative.setRepresentativePhoneNumber(caseData.getEt3ResponsePhone());
-            respondentRepresentative.setRepresentativePreference(caseData.getEt3ResponseContactPreference());
-            respondentRepresentative.setRepresentativeReference(caseData.getEt3ResponseReference());
-            respondentRepresentative.setRepresentativePreferenceReason(caseData.getEt3ResponseContactReason());
-            respondentRepresentative.setRepresentativeContactLanguage(caseData.getEt3ResponseContactLanguage());
             respondentRepresentative.setRepresentativeAddress(caseData.getEt3ResponseAddress());
         }
     }

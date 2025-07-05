@@ -301,10 +301,6 @@ class Et3ResponseHelperTest {
         RepresentedTypeR representative = Et3ResponseHelper.findRepresentativeFromCaseData(caseDataWithRep);
         assertThat(representative).isNotNull();
         assertThat(representative.getRepresentativePhoneNumber()).isNotNull().isEqualTo("0123456789");
-        assertThat(representative.getRepresentativePreference()).isEqualTo("Email");
-        assertThat(representative.getRepresentativeReference()).isEqualTo("Ref-001");
-        assertThat(representative.getRepresentativePreferenceReason()).isEqualTo("Prefer email");
-        assertThat(representative.getRepresentativeContactLanguage()).isEqualTo("English");
         assertThat(representative.getRepresentativeAddress()).isEqualTo(address);
 
         // --- Scenario 2: Representative is null ---

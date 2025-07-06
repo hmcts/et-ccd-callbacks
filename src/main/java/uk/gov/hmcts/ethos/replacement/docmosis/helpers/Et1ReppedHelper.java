@@ -16,6 +16,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantWorkAddressType;
 import uk.gov.hmcts.et.common.model.ccd.types.CreateRespondentType;
 import uk.gov.hmcts.et.common.model.ccd.types.NewEmploymentType;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants;
 
@@ -621,5 +622,23 @@ public final class Et1ReppedHelper {
         } else {
             return pay.substring(0, pay.length() - 2);
         }
+    }
+
+    public static void setClaimantRepresentativeValues(CaseData caseData) {
+        RepresentedTypeC claimantRepresentative = caseData.getRepresentativeClaimantType();
+        if (ObjectUtils.isEmpty(claimantRepresentative)) {
+            return;
+        }
+        claimantRepresentative.setRepresentativePhoneNumber(caseData.getRepresentativePhoneNumber());
+        claimantRepresentative.setRepresentativeAddress(caseData.getRepresentativeAddress());
+    }
+
+    public static void loadClaimantRepresentativeValues(CaseData caseData) {
+        RepresentedTypeC claimantRepresentative = caseData.getRepresentativeClaimantType();
+        if (ObjectUtils.isEmpty(claimantRepresentative)) {
+            return;
+        }
+        caseData.setRepresentativePhoneNumber(claimantRepresentative.getRepresentativePhoneNumber());
+        caseData.setRepresentativeAddress(claimantRepresentative.getRepresentativeAddress());
     }
 }

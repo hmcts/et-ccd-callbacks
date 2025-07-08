@@ -161,7 +161,6 @@ public class Et1ReppedService {
         claimantRepresentative.setRepresentativeReference(caseData.getRepresentativeReferenceNumber());
         claimantRepresentative.setRepresentativePreference(
                 getFirstListItem(caseData.getRepresentativeContactPreference()));
-        claimantRepresentative.setRepresentativeAddress(caseData.getRepresentativeAddress());
         claimantRepresentative.setRepresentativePhoneNumber(caseData.getRepresentativePhoneNumber());
         claimantRepresentative.setHearingContactLanguage(caseData.getHearingContactLanguage());
         claimantRepresentative.setContactLanguageQuestion(caseData.getContactLanguageQuestion());
@@ -174,7 +173,8 @@ public class Et1ReppedService {
                     .organisationName(organisationDetails.getName())
                     .build());
             claimantRepresentative.setNameOfOrganisation(organisationDetails.getName());
-            claimantRepresentative.setRepresentativeAddress(getOrganisationAddress(organisationDetails));
+            claimantRepresentative.setRepresentativeAddress(ObjectUtils.isEmpty(caseData.getRepresentativeAddress())
+                    ? getOrganisationAddress(organisationDetails) : caseData.getRepresentativeAddress());
             setClaimantRepOrgPolicy(caseData, organisationDetails);
         }
         caseData.setClaimantRepresentedQuestion(YES);

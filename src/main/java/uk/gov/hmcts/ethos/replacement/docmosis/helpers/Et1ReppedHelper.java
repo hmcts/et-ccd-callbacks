@@ -343,10 +343,8 @@ public final class Et1ReppedHelper {
     }
 
     private static ClaimantWorkAddressType claimantWorkAddress(CaseData caseData) {
-        ClaimantWorkAddressType claimantWorkAddressType = new ClaimantWorkAddressType();
         if (YES.equals(caseData.getDidClaimantWorkAtSameAddress())) {
             caseData.setClaimantWorkAddressQuestion(YES);
-            claimantWorkAddressType.setClaimantWorkAddress(caseData.getRespondentAddress());
         } else if (NO.equals(caseData.getDidClaimantWorkAtSameAddress())) {
             caseData.setClaimantWorkAddressQuestion(NO);
             return caseData.getClaimantWorkAddress();
@@ -624,21 +622,45 @@ public final class Et1ReppedHelper {
         }
     }
 
+    /**
+     * Sets the claimant representative's phone number and address fields in the provided
+     * {@link RepresentedTypeC} object within the given {@link CaseData}, if the representative exists.
+     *
+     * <p>This method first checks whether the {@code representativeClaimantType} in {@code caseData}
+     * is non-null and non-empty. If it is, the method updates its phone number and address
+     * using the corresponding values from the {@code caseData}.</p>
+     *
+     * @param caseData the {@link CaseData} object containing the representative and associated contact details.
+     */
     public static void setClaimantRepresentativeValues(CaseData caseData) {
-        RepresentedTypeC claimantRepresentative = caseData.getRepresentativeClaimantType();
-        if (ObjectUtils.isEmpty(claimantRepresentative)) {
+        if (ObjectUtils.isEmpty(caseData)) {
             return;
         }
-        claimantRepresentative.setRepresentativePhoneNumber(caseData.getRepresentativePhoneNumber());
-        claimantRepresentative.setRepresentativeAddress(caseData.getRepresentativeAddress());
+        if (caseData.getRepresentativeClaimantType() == null) {
+            caseData.setRepresentativeClaimantType(RepresentedTypeC.builder().build());
+        }
+        caseData.getRepresentativeClaimantType().setRepresentativePhoneNumber(caseData.getRepresentativePhoneNumber());
+        caseData.getRepresentativeClaimantType().setRepresentativeAddress(caseData.getRepresentativeAddress());
     }
 
+    /**
+     * Populates the claimant representative's contact details into the given {@link CaseData} object.
+     * <p>
+     * If the {@code representativeClaimantType} field in the {@code caseData} is not empty,
+     * this method copies the representative's phone number and address into the top-level
+     * {@code caseData} fields {@code representativePhoneNumber} and {@code representativeAddress}.
+     * </p>
+     *
+     * @param caseData the {@link CaseData} instance containing representative details
+     */
     public static void loadClaimantRepresentativeValues(CaseData caseData) {
-        RepresentedTypeC claimantRepresentative = caseData.getRepresentativeClaimantType();
-        if (ObjectUtils.isEmpty(claimantRepresentative)) {
+        if (ObjectUtils.isEmpty(caseData)) {
             return;
         }
-        caseData.setRepresentativePhoneNumber(claimantRepresentative.getRepresentativePhoneNumber());
-        caseData.setRepresentativeAddress(claimantRepresentative.getRepresentativeAddress());
+        if (caseData.getRepresentativeClaimantType() == null) {
+            return;
+        }
+        caseData.setRepresentativePhoneNumber(caseData.getRepresentativeClaimantType().getRepresentativePhoneNumber());
+        caseData.setRepresentativeAddress(caseData.getRepresentativeClaimantType().getRepresentativeAddress());
     }
 }

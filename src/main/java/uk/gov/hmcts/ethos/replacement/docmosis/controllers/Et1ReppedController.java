@@ -654,7 +654,7 @@ public class Et1ReppedController {
     }
 
     /**
-     * Sets new values to respondent representative model {@link RepresentedTypeC}.
+     * Sets existing values from claimant representative to case data model {@link CaseData}.
      *
      * @param ccdRequest generic request from CCD
      * @param userToken  authentication token to verify the user
@@ -663,13 +663,13 @@ public class Et1ReppedController {
     @PostMapping(value = "/aboutToStartRepresentativeInfo", consumes = MimeTypeUtils.APPLICATION_JSON_VALUE)
     @Operation(summary = "Loads RepresentedTypeC model values to case data")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                    content = {
-                            @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = CCDCallbackResponse.class))
-                    }),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                        schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> aboutToStartRepresentativeInfo(
             @RequestBody CCDRequest ccdRequest,
@@ -690,13 +690,13 @@ public class Et1ReppedController {
     @PostMapping(value = "/aboutToSubmitRepresentativeInfo", consumes = MimeTypeUtils.APPLICATION_JSON_VALUE)
     @Operation(summary = "Updates RepresentedTypeC model of the claimant representative with new values")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                    content = {
-                            @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = CCDCallbackResponse.class))
-                    }),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                        schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> aboutToSubmitRepresentativeInfo(
             @RequestBody CCDRequest ccdRequest,
@@ -704,20 +704,19 @@ public class Et1ReppedController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         Et1ReppedHelper.setClaimantRepresentativeValues(caseData);
-        Et1ReppedHelper.clearEt1ReppedCreationFields(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
 
     @PostMapping(value = "/representativeInfoSubmitted", consumes = MimeTypeUtils.APPLICATION_JSON_VALUE)
     @Operation(summary = "Approval of submission of representative info")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                    content = {
-                            @Content(mediaType = "application/json",
-                                    schema = @Schema(implementation = CCDCallbackResponse.class))
-                    }),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                        schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> representativeInfoSubmitted(
             @RequestBody CCDRequest ccdRequest,
@@ -725,6 +724,5 @@ public class Et1ReppedController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         return getCallbackRespEntityNoErrors(caseData);
-
     }
 }

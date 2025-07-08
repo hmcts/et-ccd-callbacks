@@ -286,10 +286,6 @@ class Et3ResponseHelperTest {
 
         CaseData caseDataWithRep = CallbackObjectUtils.cloneObject(caseData, CaseData.class);
         caseDataWithRep.setEt3ResponsePhone("0123456789");
-        caseDataWithRep.setEt3ResponseContactPreference("Email");
-        caseDataWithRep.setEt3ResponseReference("Ref-001");
-        caseDataWithRep.setEt3ResponseContactReason("Prefer email");
-        caseDataWithRep.setEt3ResponseContactLanguage("English");
         Address address = new Address();
         address.setAddressLine1("50 Tithe Barn Drive");
         address.setCountry("United Kingdom");

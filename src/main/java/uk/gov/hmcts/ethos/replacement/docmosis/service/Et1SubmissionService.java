@@ -207,18 +207,15 @@ public class Et1SubmissionService {
         }
 
         List<DocumentTypeItem> documentTypeItems = synchronizedList(new ArrayList<>());
-        ForkJoinPool customThreadPool = new ForkJoinPool(documentInfoList.size());
-        try {
+        try (ForkJoinPool customThreadPool = new ForkJoinPool(documentInfoList.size())) {
             customThreadPool.submit(() ->
-                documentInfoList.parallelStream()
-                    .map(documentManagementService::addDocumentToDocumentField)
-                    .forEach(doc -> {
-                        doc.setCategoryId(DocumentCategory.ACAS_CERTIFICATE.getCategory());
-                        documentTypeItems.add(createDocumentTypeItem(doc, ACAS_CERTIFICATE));
-                    })
+                    documentInfoList.parallelStream()
+                            .map(documentManagementService::addDocumentToDocumentField)
+                            .forEach(doc -> {
+                                doc.setCategoryId(DocumentCategory.ACAS_CERTIFICATE.getCategory());
+                                documentTypeItems.add(createDocumentTypeItem(doc, ACAS_CERTIFICATE));
+                            })
             ).get();
-        } finally {
-            customThreadPool.shutdown();
         }
 
         return documentTypeItems;

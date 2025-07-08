@@ -124,7 +124,8 @@ class Et1SubmissionServiceTest {
     }
 
     @Test
-    void createAndUploadEt1DocsMyHmcts() throws Exception {
+    @SneakyThrows
+    void createAndUploadEt1DocsMyHmcts() {
         caseDetails =  generateCaseDetails("et1ReppedDraftStillWorking.json");
         Et1ReppedHelper.setEt1SubmitData(caseDetails.getCaseData());
         et1ReppedService.addDefaultData(caseDetails.getCaseTypeId(), caseDetails.getCaseData());
@@ -159,7 +160,8 @@ class Et1SubmissionServiceTest {
     }
 
     @Test
-    void shouldAddDocsIfAcasCertThrowsError() throws Exception {
+    @SneakyThrows
+    void shouldAddDocsIfAcasCertThrowsError() {
         caseDetails =  generateCaseDetails("et1ReppedDraftStillWorking.json");
         caseDetails.getCaseData().setRespondentAcasNumber("123456");
         Et1ReppedHelper.setEt1SubmitData(caseDetails.getCaseData());
@@ -183,7 +185,8 @@ class Et1SubmissionServiceTest {
     }
 
     @Test
-    void shouldSendEmailMyHmcts() throws URISyntaxException, IOException {
+    @SneakyThrows
+    void shouldSendEmailMyHmcts() {
         when(userIdamService.getUserDetails("authToken")).thenReturn(HelperTest.getUserDetails());
         caseDetails =  generateCaseDetails("et1ReppedDraftStillWorking.json");
         Et1ReppedHelper.setEt1SubmitData(caseDetails.getCaseData());
@@ -192,7 +195,8 @@ class Et1SubmissionServiceTest {
     }
 
     @Test
-    void createAndUploadEt1DocsEt1() throws Exception {
+    @SneakyThrows
+    void createAndUploadEt1DocsEt1() {
         caseDetails =  generateCaseDetails("citizenCaseData.json");
         DocumentInfo documentInfo = DocumentInfo.builder()
                 .description("ET1 - John Doe")
@@ -220,8 +224,9 @@ class Et1SubmissionServiceTest {
     }
 
     @ParameterizedTest
+    @SneakyThrows
     @MethodSource("shouldSendEmailClaimantArguments")
-    void shouldSendEmailClaimant(String languagePreference) throws URISyntaxException, IOException {
+    void shouldSendEmailClaimant(String languagePreference) {
         when(userIdamService.getUserDetails("authToken")).thenReturn(HelperTest.getUserDetails());
         caseDetails =  generateCaseDetails("citizenCaseData.json");
         caseDetails.getCaseData().getClaimantHearingPreference().setContactLanguage(languagePreference);
@@ -237,7 +242,8 @@ class Et1SubmissionServiceTest {
     }
 
     @Test
-    void shouldNotAddAcasDocsIfNewLogicIsEnabled() throws Exception {
+    @SneakyThrows
+    void shouldNotAddAcasDocsIfNewLogicIsEnabled() {
         when(featureToggleService.isAcasCertificatePostSubmissionEnabled()).thenReturn(true);
         caseDetails =  generateCaseDetails("citizenCaseData.json");
         DocumentInfo documentInfo = DocumentInfo.builder()

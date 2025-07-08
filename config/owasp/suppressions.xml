@@ -1,56 +1,56 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
     <!--Below suppressed as library no longer getting updates. Needs to be removed once DB switchover from queue -->
-    <suppress until="2025-07-07Z">
+    <suppress until="2025-07-21Z">
         <notes><![CDATA[file name: adal4j-1.6.7.jar]]></notes>
         <packageUrl regex="true">^pkg:maven/com\.microsoft\.azure/adal4j@.*$</packageUrl>
         <cve>CVE-2021-42306</cve>
     </suppress>
-    <suppress until="2025-07-07Z">
+    <suppress until="2025-07-21Z">
         <packageUrl regex="true">^pkg:maven/com\.microsoft.*$</packageUrl>
         <cve>CVE-2023-36052</cve>
     </suppress>
-    <suppress until="2025-07-07Z">
+    <suppress until="2025-07-21Z">
         <packageUrl regex="true">^pkg:maven/com\.azure.*$</packageUrl>
         <cve>CVE-2023-36052</cve>
     </suppress>
-    <suppress until="2025-07-07Z">
+    <suppress until="2025-07-21Z">
         <notes><![CDATA[
    file name: azure-client-authentication-1.7.14.jar
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/com\.microsoft\.azure/azure\-client\-authentication@.*$</packageUrl>
         <cve>CVE-2024-35255</cve>
     </suppress>
-    <suppress until="2025-07-07Z">
+    <suppress until="2025-07-21Z">
         <notes><![CDATA[
    file name: azure-client-runtime-1.7.14.jar
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/com\.microsoft\.azure/azure\-client\-runtime@.*$</packageUrl>
         <cve>CVE-2024-43591</cve>
     </suppress>
-    <suppress until="2025-07-07Z">
+    <suppress until="2025-07-21Z">
         <notes><![CDATA[
    file name: client-runtime-1.7.14.jar
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/com\.microsoft\.rest/client\-runtime@.*$</packageUrl>
         <cve>CVE-2024-43591</cve>
     </suppress>
-    <suppress until="2025-07-07Z">
+    <suppress until="2025-07-21Z">
         <notes><![CDATA[
    file name: azure-client-authentication-1.7.14.jar
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/com\.microsoft\.azure/azure\-client\-authentication@.*$</packageUrl>
         <cve>CVE-2024-43591</cve>
     </suppress>
-    <suppress until="2025-07-07Z">
+    <suppress until="2025-07-21Z">
         <packageUrl regex="true">^pkg:maven/com\.microsoft\.azure/azure-client-authentication.*$</packageUrl>
         <cve>CVE-2024-43591</cve>
     </suppress>
-    <suppress until="2025-07-07Z">
+    <suppress until="2025-07-21Z">
         <packageUrl regex="true">^pkg:maven/com\.microsoft\.azure/azure-client-runtime.*$</packageUrl>
         <cve>CVE-2024-43591</cve>
     </suppress>
-    <suppress until="2025-07-07Z">
+    <suppress until="2025-07-21Z">
         <packageUrl regex="true">^pkg:maven/com\.microsoft\.rest/client-runtime.*$</packageUrl>
         <cve>CVE-2024-43591</cve>
     </suppress>

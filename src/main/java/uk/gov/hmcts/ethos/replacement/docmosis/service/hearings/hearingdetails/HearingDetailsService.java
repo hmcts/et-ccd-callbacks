@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper.buildFlagsImageFileName;
@@ -52,10 +51,6 @@ public class HearingDetailsService {
         if (isNotEmpty(hearingDetailTypeItemList)) {
             caseData.setHearingDetailsCollection(hearingDetailTypeItemList);
         }
-    }
-
-    private String nonNull(String value) {
-        return isNullOrEmpty(value) ? " " : value;
     }
 
     public void updateCase(CaseDetails caseDetails) {

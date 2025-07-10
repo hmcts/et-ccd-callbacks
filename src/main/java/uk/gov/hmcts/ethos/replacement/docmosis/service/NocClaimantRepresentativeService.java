@@ -69,6 +69,8 @@ public class NocClaimantRepresentativeService {
         claimantRep.setRepresentativeEmailAddress(userDetails.getEmail());
 
         Organisation organisation = change.getOrganisationToAdd();
+        log.info("NoC testing: Organisation to add: {}", organisation);
+        log.info("NoC testing: org name {}", organisation.getOrganisationName());
         claimantRep.setNameOfOrganisation(organisation.getOrganisationName());
         claimantRep.setMyHmctsOrganisation(organisation);
 

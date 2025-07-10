@@ -16,6 +16,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
@@ -27,6 +28,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -56,6 +58,7 @@ public class Et3ResponseService {
     private static final String USER_NOT_FOUND = "User not found";
     private static final String USER_ID_NOT_FOUND = "User ID not found";
     private static final String NO_REPRESENTED_RESPONDENT_FOUND = "No represented respondent found";
+    private static final String CASE_DATA_NOT_FOUND = "Case data not found";
     private final DocumentManagementService documentManagementService;
     private final PdfBoxService pdfBoxService;
     private final EmailService emailService;
@@ -203,31 +206,39 @@ public class Et3ResponseService {
     }
 
     /**
-     * Validates whether the user is a representative (solicitor) for any respondents in the specified case.
-     * <p>
-     * This method attempts to retrieve the respondent indexes that the user represents. If an exception occurs
-     * during the check, or if no represented respondents are found, it collects the relevant error messages
-     * into a list and returns them.
-     * <p>
-     * This method is useful for client-side validation or error handling logic where you need to display
-     * reasons why the user is not recognized as a representative.
+     * Validates the representation of respondents in the given case data and extracts
+     * contact details of the first represented respondent's representative.
      *
-     * @param userToken the authentication token of the user
-     * @param caseId the ID of the case to evaluate
-     * @return a list of error messages indicating why the user is not a representative.
-     *         Returns an empty list if the user is successfully validated as a representative.
+     * <p>This method performs the following steps:
+     * <ul>
+     *   <li>Attempts to retrieve the list of respondent indexes that are marked as represented
+     *       using the provided user token and case ID.</li>
+     *   <li>If an error occurs during this retrieval (e.g. service exception or I/O issue), the
+     *       error message is added to the returned list.</li>
+     *   <li>If no represented respondents are found, an appropriate error message is added.</li>
+     *   <li>If at least one represented respondent is found, their representative's phone number
+     *       and address are extracted and stored in the case data as ET3 response details.</li>
+     * </ul>
+     *
+     * @param userToken the user authentication token used to retrieve represented respondent indexes.
+     * @param caseData the case data containing respondent and representative information.
+     * @return a list of error messages if any issues are encountered during validation.
      */
-    public List<String> validateRespondentRepresentation(String userToken, String caseId) {
+    public List<String> validateAndExtractRepresentativeContact(String userToken, CaseData caseData) {
         List<Integer> representedRespondentIndexes = new ArrayList<>();
         List<String> errors = new ArrayList<>();
         try {
-            representedRespondentIndexes = getRepresentedRespondentIndexes(userToken, caseId);
+            representedRespondentIndexes = getRepresentedRespondentIndexes(userToken, caseData.getCcdID());
         } catch (GenericServiceException | IOException ex) {
             errors.add(ex.getMessage());
         }
         if (representedRespondentIndexes.isEmpty()) {
             errors.add(NO_REPRESENTED_RESPONDENT_FOUND);
         }
+        RepresentedTypeR representedTypeR = caseData.getRepCollection()
+                .get(representedRespondentIndexes.getFirst()).getValue();
+        caseData.setEt3ResponsePhone(representedTypeR.getRepresentativePhoneNumber());
+        caseData.setEt3ResponseAddress(representedTypeR.getRepresentativeAddress());
         return errors;
     }
 
@@ -290,5 +301,59 @@ public class Et3ResponseService {
             throw new GenericServiceException(INVALID_CASE_ID, new Exception(INVALID_CASE_ID),
                     INVALID_CASE_ID, caseId, "Et3ResponseService", "isRespondentRepresentative");
         }
+    }
+
+    /**
+     * Updates the contact details (phone number and address) of representatives for the respondents
+     * that are marked as represented in the case data. If an error occurs during retrieval of
+     * represented respondent indexes or if no such respondents are found, appropriate error messages
+     * are returned.
+     *
+     * <p>The method performs the following operations:
+     * <ul>
+     *   <li>Attempts to retrieve indexes of represented respondents using the provided user token and case ID.</li>
+     *   <li>If retrieval fails or no represented respondents are found, adds corresponding error messages
+     *   to the list.</li>
+     *   <li>For each represented respondent index, if the representative exists, updates their phone number and address
+     *       with the ET3 response contact details from the case data.</li>
+     * </ul>
+     *
+     * @param userToken the user authentication token used to fetch represented respondent indexes.
+     * @param caseData the case data object containing respondent representatives and ET3 response details.
+     * @return a list of error messages encountered during the update process, if any.
+     */
+    public List<String> setRespondentRepresentsContactDetails(String userToken, CaseData caseData) {
+        List<String> errors = new ArrayList<>();
+        if (ObjectUtils.isEmpty(caseData)) {
+            errors.add(CASE_DATA_NOT_FOUND);
+            return errors;
+        }
+        if (StringUtils.isBlank(userToken)) {
+            errors.add(INVALID_USER_TOKEN);
+            return errors;
+        }
+        List<Integer> representedRespondentIndexes;
+        try {
+            representedRespondentIndexes = getRepresentedRespondentIndexes(userToken, caseData.getCcdID());
+        } catch (GenericServiceException gex) {
+            errors.add(gex.getCause().getMessage());
+            return errors;
+        } catch (NoSuchElementException | IOException ex) {
+            errors.add(ex.getMessage());
+            return errors;
+        }
+        if (representedRespondentIndexes.isEmpty() || CollectionUtils.isEmpty(caseData.getRepCollection())) {
+            errors.add(NO_REPRESENTED_RESPONDENT_FOUND);
+            return errors;
+        }
+        for (int i : representedRespondentIndexes) {
+            if (ObjectUtils.isEmpty(caseData.getRepCollection().get(i))
+                    || ObjectUtils.isEmpty(caseData.getRepCollection().get(i).getValue())) {
+                continue;
+            }
+            caseData.getRepCollection().get(i).getValue().setRepresentativePhoneNumber(caseData.getEt3ResponsePhone());
+            caseData.getRepCollection().get(i).getValue().setRepresentativeAddress(caseData.getEt3ResponseAddress());
+        }
+        return errors;
     }
 }

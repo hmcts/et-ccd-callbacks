@@ -544,24 +544,4 @@ public final class Et3ResponseHelper {
             }
         }
     }
-
-    /**
-     * Updates the respondent's representative information in the given {@link CaseData} object.
-     *
-     * <p>This method populates the {@link RepresentedTypeR} representative fields with the respondent's
-     * contact details provided in the ET3 response section of the case data, including phone number,
-     * contact preference, reference, reason for preference, contact language, and address.</p>
-     *
-     * <p>If no representative is associated with the case data (i.e., {@code findRepresentativeFromCaseData}
-     * returns {@code null}), this method performs no action.</p>
-     *
-     * @param caseData the {@link CaseData} object containing the ET3 respondent response and representative details
-     */
-    public static void setRespondentRepresentativeValues(CaseData caseData) {
-        RepresentedTypeR respondentRepresentative = findRepresentativeFromCaseData(caseData);
-        if (respondentRepresentative != null) {
-            respondentRepresentative.setRepresentativePhoneNumber(caseData.getEt3ResponsePhone());
-            respondentRepresentative.setRepresentativeAddress(caseData.getEt3ResponseAddress());
-        }
-    }
 }

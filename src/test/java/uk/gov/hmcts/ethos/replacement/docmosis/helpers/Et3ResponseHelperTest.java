@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
-import lombok.SneakyThrows;
 import org.apache.commons.lang3.ObjectUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -16,7 +15,6 @@ import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.CallbackObjectUtils;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.time.LocalDate;
@@ -278,31 +276,5 @@ class Et3ResponseHelperTest {
         RespondentSumTypeItem respondentSumTypeItemValueNull = caseData.getRespondentCollection().getFirst();
         respondentSumTypeItemValueNull.setValue(null);
         assertDoesNotThrow(() -> Et3ResponseHelper.setEt3NotificationAcceptedDates(caseData));
-    }
-
-    @Test
-    @SneakyThrows
-    void theSetRespondentRepresentativeValues() {
-
-        CaseData caseDataWithRep = CallbackObjectUtils.cloneObject(caseData, CaseData.class);
-        caseDataWithRep.setEt3ResponsePhone("0123456789");
-        Address address = new Address();
-        address.setAddressLine1("50 Tithe Barn Drive");
-        address.setCountry("United Kingdom");
-        address.setCounty("Berkshire");
-        address.setPostCode("SL6 2DE");
-        address.setPostTown("Maidenhead");
-        caseDataWithRep.setEt3ResponseAddress(address);
-        Et3ResponseHelper.setRespondentRepresentativeValues(caseDataWithRep);
-        RepresentedTypeR representative = Et3ResponseHelper.findRepresentativeFromCaseData(caseDataWithRep);
-        assertThat(representative).isNotNull();
-        assertThat(representative.getRepresentativePhoneNumber()).isNotNull().isEqualTo("0123456789");
-        assertThat(representative.getRepresentativeAddress()).isEqualTo(address);
-
-        // --- Scenario 2: Representative is null ---
-        CaseData caseDataWithoutRep = new CaseData(); // no representative assigned
-
-        // Should not throw exception or perform any updates
-        assertDoesNotThrow(() -> Et3ResponseHelper.setRespondentRepresentativeValues(caseDataWithoutRep));
     }
 }

@@ -414,8 +414,9 @@ public class Et3ResponseController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseData.setCcdID(ccdRequest.getCaseDetails().getCaseId());
         List<String> errors = et3ResponseService
-                .validateRespondentRepresentation(userToken, ccdRequest.getCaseDetails().getCaseId());
+                .validateAndExtractRepresentativeContact(userToken, caseData);
         return getCallbackRespEntityErrors(errors, caseData);
     }
 
@@ -441,7 +442,8 @@ public class Et3ResponseController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        Et3ResponseHelper.setRespondentRepresentativeValues(caseData);
-        return getCallbackRespEntityNoErrors(caseData);
+        caseData.setCcdID(ccdRequest.getCaseDetails().getCaseId());
+        List<String> errors = et3ResponseService.setRespondentRepresentsContactDetails(userToken, caseData);
+        return getCallbackRespEntityErrors(errors, caseData);
     }
 }

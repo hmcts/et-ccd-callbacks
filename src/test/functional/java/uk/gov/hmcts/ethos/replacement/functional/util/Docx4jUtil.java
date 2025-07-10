@@ -1,17 +1,18 @@
 package uk.gov.hmcts.ethos.replacement.functional.util;
 
+import jakarta.xml.bind.JAXBElement;
+import jakarta.xml.bind.JAXBException;
 import org.apache.commons.lang3.StringUtils;
 import org.docx4j.openpackaging.exceptions.Docx4JException;
 import org.docx4j.openpackaging.packages.WordprocessingMLPackage;
 import org.docx4j.openpackaging.parts.WordprocessingML.MainDocumentPart;
 import org.docx4j.wml.Text;
+
 import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.xml.bind.JAXBElement;
-import javax.xml.bind.JAXBException;
 
 public class Docx4jUtil {
 
@@ -27,7 +28,12 @@ public class Docx4jUtil {
 
         String textNodesXPath = "//w:t";
 
-        List<Object> textNodes = mainDocumentPart.getJAXBNodesViaXPath(textNodesXPath, true);
+        List<Object> textNodes;
+        try {
+            textNodes = mainDocumentPart.getJAXBNodesViaXPath(textNodesXPath, true);
+        } catch (Exception e) {
+            throw new RuntimeException("Error accessing JAXB nodes", e);
+        }
 
         for (Object obj : textNodes) {
             Text text = (Text) ((JAXBElement) obj).getValue();
@@ -47,7 +53,12 @@ public class Docx4jUtil {
 
         String textNodesXPath = "//w:t";
 
-        List<Object> textNodes = mainDocumentPart.getJAXBNodesViaXPath(textNodesXPath, true);
+        List<Object> textNodes;
+        try {
+            textNodes = mainDocumentPart.getJAXBNodesViaXPath(textNodesXPath, true);
+        } catch (Exception e) {
+            throw new RuntimeException("Error accessing JAXB nodes", e);
+        }
 
         //Flag to check if the given doc version found
         boolean isElemFound = false;
@@ -94,7 +105,12 @@ public class Docx4jUtil {
 
         String textNodesXPath = "//w:t";
 
-        List<Object> textNodes = mainDocumentPart.getJAXBNodesViaXPath(textNodesXPath, true);
+        List<Object> textNodes;
+        try {
+            textNodes = mainDocumentPart.getJAXBNodesViaXPath(textNodesXPath, true);
+        } catch (Exception e) {
+            throw new RuntimeException("Error accessing JAXB nodes", e);
+        }
 
         Pattern patternEng = Pattern.compile(".*([0-9]_[0-9A-Z]+).*");
         Pattern patternScot1 = Pattern.compile(".*_(Scot_[0-9A-Z_]+).*");

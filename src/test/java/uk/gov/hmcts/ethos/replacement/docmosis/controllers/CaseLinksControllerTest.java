@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -76,8 +75,7 @@ class CaseLinksControllerTest {
 
     @ParameterizedTest
     @MethodSource("requests")
-    @SneakyThrows
-    void submitted_tokenOk(String url) {
+    void submitted_tokenOk(String url) throws Exception {
         mockMvc.perform(post(url)
                         .content(jsonMapper.toJson(ccdRequest))
                         .header("Authorization", AUTH_TOKEN)
@@ -90,8 +88,7 @@ class CaseLinksControllerTest {
 
     @ParameterizedTest
     @MethodSource("requests")
-    @SneakyThrows
-    void aboutToSubmit_badRequest(String url) {
+    void aboutToSubmit_badRequest(String url) throws Exception {
         mockMvc.perform(post(url)
                         .content("garbage content")
                         .header("Authorization", AUTH_TOKEN)
@@ -101,8 +98,7 @@ class CaseLinksControllerTest {
 
     @ParameterizedTest
     @MethodSource("requests")
-    @SneakyThrows
-    void testStatusForbidden(String url) {
+    void testStatusForbidden(String url) throws Exception {
         CCDRequest localCcdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
 
@@ -121,8 +117,7 @@ class CaseLinksControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void testInitTransferToEnglandWalesForbidden() {
+    void testInitTransferToEnglandWalesForbidden() throws Exception {
         CCDRequest localCcdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
 
@@ -134,8 +129,7 @@ class CaseLinksControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void testHearingIsLinkedFlagIsYes() {
+    void testHearingIsLinkedFlagIsYes() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
         mockMvc.perform(post(CREATE_SUBMITTED_URL)
@@ -150,8 +144,7 @@ class CaseLinksControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void testHearingIsLinkedFlagIsFalse() {
+    void testHearingIsLinkedFlagIsFalse() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
         mockMvc.perform(post(MAINTAIN_SUBMITTED_URL)
@@ -166,11 +159,10 @@ class CaseLinksControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void shouldNotSetHearingIsLinkedFlagWhenLinksRemain() {
+    void shouldNotSetHearingIsLinkedFlagWhenLinksRemain() throws Exception {
 
-        CaseLink caseLink1 = getCaseLink();
-        CaseLink caseLink2 = getCaseLink();
+        CaseLink caseLink1 = getCaseLink("CLRC016");
+        CaseLink caseLink2 = getCaseLink("CLRC016");
 
         ListTypeItem<CaseLink> caseLinks = ListTypeItem.from(caseLink1, caseLink2);
 
@@ -190,9 +182,9 @@ class CaseLinksControllerTest {
                 .andExpect(jsonPath("$.data.hearingIsLinkedFlag").value(YES));
     }
 
-    private CaseLink getCaseLink() {
+    private CaseLink getCaseLink(String linkReasonCode) {
         LinkReason linkReason = new LinkReason();
-        linkReason.setReason("CLRC016");
+        linkReason.setReason(linkReasonCode);
         ListTypeItem<LinkReason> linkReasons = ListTypeItem.from(linkReason, "1");
 
         return CaseLink.builder().caseReference("1").caseType(ENGLANDWALES_CASE_TYPE_ID)

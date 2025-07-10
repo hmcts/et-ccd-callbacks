@@ -270,7 +270,7 @@ class NocRespondentRepresentativeServiceTest {
         when(nocCcdService.getLatestAuditEventByName(any(), any(), any())).thenReturn(
             Optional.of(mockAuditEvent()));
 
-        nocRespondentRepresentativeService.updateRespondentRepresentation(caseDetails);
+        nocRespondentRepresentativeService.updateRepresentation(caseDetails);
 
         assertThat(
             caseData.getRepCollection().get(1).getValue().getRespondentOrganisation().getOrganisationID()).isEqualTo(

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -71,7 +70,7 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
 
     @BeforeEach
     @Override
-    protected void setUp()  {
+    protected void setUp() throws Exception {
         super.setUp();
         CaseData caseData = CaseDataBuilder.builder()
                 .withEthosCaseReference("test")
@@ -95,8 +94,7 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToStartClaimantTSE_SystemUser_Success()  {
+    void aboutToStartClaimantTSE_SystemUser_Success() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(Helper.isRespondentSystemUser(any())).thenReturn(true);
         mockMvc.perform(post(ABOUT_TO_START_URL)
@@ -111,8 +109,7 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToStartClaimantTSE_NonSystemUser_Success()  {
+    void aboutToStartClaimantTSE_NonSystemUser_Success() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(Helper.isRespondentSystemUser(any())).thenReturn(false);
         mockMvc.perform(post(ABOUT_TO_START_URL)
@@ -127,8 +124,7 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToStartClaimantTSE_badRequest()  {
+    void aboutToStartClaimantTSE_badRequest() throws Exception {
         mockMvc.perform(post(ABOUT_TO_START_URL)
                         .content("garbage content")
                         .header("Authorization", AUTH_TOKEN)
@@ -137,8 +133,7 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToSubmitClaimantTSE_Success()  {
+    void aboutToSubmitClaimantTSE_Success() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(Helper.isRespondentSystemUser(any())).thenReturn(false);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
@@ -155,8 +150,7 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToSubmitClaimantTSE_NonSystemRespondent_Success()  {
+    void aboutToSubmitClaimantTSE_NonSystemRespondent_Success() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(Helper.isRespondentSystemUser(any())).thenReturn(true);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
@@ -174,8 +168,7 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void completeApplication_Success()  {
+    void completeApplication_Success() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(claimantTseService.buildApplicationCompleteResponse(any())).thenReturn("body");
         mockMvc.perform(post(COMPLETE_APPLICATION_URL)
@@ -191,8 +184,7 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void validateGiveDetails_Success()  {
+    void validateGiveDetails_Success() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(VALIDATE_DETAILS_URL)
                         .contentType(APPLICATION_JSON)
@@ -217,8 +209,7 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void displayClaimantApplicationsTable_Success()  {
+    void displayClaimantApplicationsTable_Success() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(DISPLAY_TABLE_URL)
                         .contentType(APPLICATION_JSON)
@@ -232,8 +223,7 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void displayClaimantApplicationsTable_invalidToken()  {
+    void displayClaimantApplicationsTable_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(DISPLAY_TABLE_URL)
                         .contentType(APPLICATION_JSON)
@@ -243,8 +233,7 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToStart_tokenOk()  {
+    void aboutToStart_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(VIEW_APPLICATION_ABOUT_TO_START_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -257,8 +246,7 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToStart_tokenFail()  {
+    void aboutToStart_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(VIEW_APPLICATION_ABOUT_TO_START_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -268,8 +256,7 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToStart_badRequest()  {
+    void aboutToStart_badRequest() throws Exception {
         mockMvc.perform(post(VIEW_APPLICATION_ABOUT_TO_START_URL)
                         .content("garbage content")
                         .header("Authorization", AUTH_TOKEN)
@@ -278,8 +265,7 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void midPopulateChooseApplication_tokenOk()  {
+    void midPopulateChooseApplication_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(MID_POPULATE_CHOOSE_APPLICATION_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -292,8 +278,7 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void midPopulateChooseApplication_tokenFail()  {
+    void midPopulateChooseApplication_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(MID_POPULATE_CHOOSE_APPLICATION_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -303,8 +288,7 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void midPopulateChooseApplication_badRequest()  {
+    void midPopulateChooseApplication_badRequest() throws Exception {
         mockMvc.perform(post(MID_POPULATE_CHOOSE_APPLICATION_URL)
                         .content("test content")
                         .header("Authorization", AUTH_TOKEN)
@@ -313,8 +297,7 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void midPopulateReply_tokenOk()  {
+    void midPopulateReply_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(MID_POPULATE_SELECTED_APPLICATION)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -327,8 +310,7 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void midPopulateReply_tokenFail()  {
+    void midPopulateReply_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(MID_POPULATE_SELECTED_APPLICATION)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -338,8 +320,7 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void midPopulateReply_badRequest()  {
+    void midPopulateReply_badRequest() throws Exception {
         mockMvc.perform(post(MID_POPULATE_SELECTED_APPLICATION)
                         .content("garbage content")
                         .header("Authorization", AUTH_TOKEN)

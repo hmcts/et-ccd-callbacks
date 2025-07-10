@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -53,7 +52,7 @@ class TseRespondentControllerTest extends BaseControllerTest {
 
     @BeforeEach
     @Override
-    protected void setUp() {
+    protected void setUp() throws Exception {
         super.setUp();
         CaseDetails caseDetails = CaseDataBuilder.builder()
                 .withEthosCaseReference("1234")
@@ -75,8 +74,7 @@ class TseRespondentControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToSubmit_tokenOk() {
+    void aboutToSubmit_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(ABOUT_TO_SUBMIT)
                         .content(jsonMapper.toJson(ccdRequest))

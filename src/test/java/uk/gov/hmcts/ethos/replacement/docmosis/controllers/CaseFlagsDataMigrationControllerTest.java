@@ -2,7 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -54,8 +53,7 @@ class CaseFlagsDataMigrationControllerTest {
     private MockMvc mvc;
 
     @BeforeEach
-    @SneakyThrows
-    void setUp() {
+    void setUp() throws Exception {
 
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         ObjectMapper objectMapper = new ObjectMapper();
@@ -64,8 +62,7 @@ class CaseFlagsDataMigrationControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void shouldMigrateCaseFlags() {
+    void shouldMigrateCaseFlags() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(CASE_FLAGS_DATA_MIGRATION)
                         .content(requestContent.toString())
@@ -80,8 +77,7 @@ class CaseFlagsDataMigrationControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void shouldMigrateCaseFlags_tokenFail() {
+    void shouldMigrateCaseFlags_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(CASE_FLAGS_DATA_MIGRATION)
                         .content(requestContent.toString())
@@ -91,8 +87,7 @@ class CaseFlagsDataMigrationControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void shouldRollbackCaseFlags() {
+    void shouldRollbackCaseFlags() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(CASE_FLAGS_DATA_ROLLBACK)
                         .content(requestContent.toString())
@@ -105,8 +100,7 @@ class CaseFlagsDataMigrationControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void shouldRollbackCaseFlags_tokenFail() {
+    void shouldRollbackCaseFlags_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(CASE_FLAGS_DATA_ROLLBACK)
                         .content(requestContent.toString())

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -65,7 +64,7 @@ class AddLegalRepToMultipleControllerTest extends BaseControllerTest {
 
     @BeforeEach
     @Override
-    protected void setUp() {
+    protected void setUp() throws Exception {
         super.setUp();
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
 
@@ -83,8 +82,7 @@ class AddLegalRepToMultipleControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void startAddLegalRepToMultipleTest_TokenOk() {
+    void startAddLegalRepToMultipleTest_TokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(multipleReferenceService.validateSubcaseIsOfMultiple(any())).thenReturn(new ArrayList<>());
         mvc.perform(post(START_ADD_LEGAL_REP_TO_MULTIPLE_URL)
@@ -96,8 +94,7 @@ class AddLegalRepToMultipleControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void startAddLegalRepToMultiple_TokenFail() {
+    void startAddLegalRepToMultiple_TokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(START_ADD_LEGAL_REP_TO_MULTIPLE_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -107,8 +104,7 @@ class AddLegalRepToMultipleControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void startAddLegalRepToMultiple_BadRequest() {
+    void startAddLegalRepToMultiple_BadRequest() throws Exception {
         mvc.perform(post(START_ADD_LEGAL_REP_TO_MULTIPLE_URL)
                         .content("bad request")
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -117,8 +113,7 @@ class AddLegalRepToMultipleControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void submitAddLegalRepToMultiple_TokenOk() {
+    void submitAddLegalRepToMultiple_TokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(userService.getUserDetails(AUTH_TOKEN)).thenReturn(userDetails);
         mvc.perform(post(SUBMIT_ADD_LEGAL_REP_TO_MULTIPLE_URL)
@@ -132,8 +127,7 @@ class AddLegalRepToMultipleControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void submitAddLegalRepToMultiple_TokenFail() {
+    void submitAddLegalRepToMultiple_TokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(SUBMIT_ADD_LEGAL_REP_TO_MULTIPLE_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -143,8 +137,7 @@ class AddLegalRepToMultipleControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void submitAddLegalRepToMultiple_BadRequest() {
+    void submitAddLegalRepToMultiple_BadRequest() throws Exception {
         mvc.perform(post(SUBMIT_ADD_LEGAL_REP_TO_MULTIPLE_URL)
                         .content("bad request")
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -153,8 +146,7 @@ class AddLegalRepToMultipleControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void completeAddLegalRepToMultiple_TokenOk() {
+    void completeAddLegalRepToMultiple_TokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(COMPLETE_ADD_LEGAL_REP_TO_MULTIPLE_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -165,8 +157,7 @@ class AddLegalRepToMultipleControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void completeAddLegalRepToMultiple_TokenFail() {
+    void completeAddLegalRepToMultiple_TokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(COMPLETE_ADD_LEGAL_REP_TO_MULTIPLE_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -176,8 +167,7 @@ class AddLegalRepToMultipleControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void completeAddLegalRepToMultiple_BadRequest() {
+    void completeAddLegalRepToMultiple_BadRequest() throws Exception {
         mvc.perform(post(COMPLETE_ADD_LEGAL_REP_TO_MULTIPLE_URL)
                         .content("bad request")
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)

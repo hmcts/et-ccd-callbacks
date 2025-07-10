@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -46,8 +45,7 @@ class ClaimantHearingPreferencesControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void testMidEventOk()  {
+    void testMidEventOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
         mockMvc.perform(post(MID_EVENT_HEARING_PREFERENCES_URL)
@@ -61,8 +59,7 @@ class ClaimantHearingPreferencesControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void testMidEventForbidden()  {
+    void testMidEventForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
 
         mockMvc.perform(post(MID_EVENT_HEARING_PREFERENCES_URL)

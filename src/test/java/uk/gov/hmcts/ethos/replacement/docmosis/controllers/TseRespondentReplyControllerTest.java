@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -61,7 +60,7 @@ class TseRespondentReplyControllerTest extends BaseControllerTest {
 
     @BeforeEach
     @Override
-    protected void setUp() {
+    protected void setUp() throws Exception {
         super.setUp();
         CaseData caseData = CaseDataBuilder.builder()
             .withEthosCaseReference("9876")
@@ -85,8 +84,7 @@ class TseRespondentReplyControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToStart_tokenOk() {
+    void aboutToStart_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(ABOUT_TO_START_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -101,8 +99,7 @@ class TseRespondentReplyControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToStart_tokenOk_isClaimantNonSystemUser_isRepresentedClaimantWithMyHmctsCase_true() {
+    void aboutToStart_tokenOk_isClaimantNonSystemUser_isRepresentedClaimantWithMyHmctsCase_true() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(Helper.isClaimantNonSystemUser(any())).thenReturn(true);
         when(Helper.isRepresentedClaimantWithMyHmctsCase(any())).thenReturn(true);
@@ -119,8 +116,7 @@ class TseRespondentReplyControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToStart_tokenOk_isRepresentedClaimantWithMyHmctsCase_false() {
+    void aboutToStart_tokenOk_isRepresentedClaimantWithMyHmctsCase_false() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(Helper.isClaimantNonSystemUser(any())).thenReturn(true);
         when(Helper.isRepresentedClaimantWithMyHmctsCase(any())).thenReturn(false);
@@ -135,8 +131,7 @@ class TseRespondentReplyControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToStart_tokenOk_isClaimantNonSystemUser_false() {
+    void aboutToStart_tokenOk_isClaimantNonSystemUser_false() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(Helper.isClaimantNonSystemUser(any())).thenReturn(false);
         when(Helper.isRepresentedClaimantWithMyHmctsCase(any())).thenReturn(true);
@@ -151,8 +146,7 @@ class TseRespondentReplyControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToStart_tokenFail() {
+    void aboutToStart_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(ABOUT_TO_START_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -162,8 +156,7 @@ class TseRespondentReplyControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToStart_badRequest() {
+    void aboutToStart_badRequest() throws Exception {
         mockMvc.perform(post(ABOUT_TO_START_URL)
                 .content("garbage content")
                 .header("Authorization", AUTH_TOKEN)
@@ -172,8 +165,7 @@ class TseRespondentReplyControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void showError_returnError() {
+    void showError_returnError() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockHelper.when(() -> Helper.isClaimantNonSystemUser(any()))
                 .thenReturn(true);
@@ -190,8 +182,7 @@ class TseRespondentReplyControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void showError_noError() {
+    void showError_noError() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockHelper.when(() -> Helper.isClaimantNonSystemUser(any()))
                 .thenReturn(false);
@@ -210,8 +201,7 @@ class TseRespondentReplyControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void midPopulateReply_tokenOk() {
+    void midPopulateReply_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(MID_POPULATE_REPLY_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -224,8 +214,7 @@ class TseRespondentReplyControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void midPopulateReply_isRespondingToTribunal() {
+    void midPopulateReply_isRespondingToTribunal() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(tseRespondentReplyService.isRespondingToTribunal(any())).thenReturn(true);
         mockMvc.perform(post(MID_POPULATE_REPLY_URL)
@@ -241,8 +230,7 @@ class TseRespondentReplyControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void midPopulateReply_tokenFail() {
+    void midPopulateReply_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(MID_POPULATE_REPLY_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -252,8 +240,7 @@ class TseRespondentReplyControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void midPopulateReply_badRequest() {
+    void midPopulateReply_badRequest() throws Exception {
         mockMvc.perform(post(MID_POPULATE_REPLY_URL)
                 .content("garbage content")
                 .header("Authorization", AUTH_TOKEN)
@@ -262,8 +249,7 @@ class TseRespondentReplyControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToSubmit_tokenOk() {
+    void aboutToSubmit_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -277,8 +263,7 @@ class TseRespondentReplyControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToSubmit_tokenFail() {
+    void aboutToSubmit_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -288,8 +273,7 @@ class TseRespondentReplyControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToSubmit_badRequest() {
+    void aboutToSubmit_badRequest() throws Exception {
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                 .content("garbage content")
                 .header("Authorization", AUTH_TOKEN)
@@ -298,8 +282,7 @@ class TseRespondentReplyControllerTest extends BaseControllerTest {
     }
     
     @Test
-    @SneakyThrows
-    void submitted_tokenOk() {
+    void submitted_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(SUBMITTED_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -312,8 +295,7 @@ class TseRespondentReplyControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void submitted_tokenFail() {
+    void submitted_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(SUBMITTED_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -323,8 +305,7 @@ class TseRespondentReplyControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void submitted_badRequest() {
+    void submitted_badRequest() throws Exception {
         mockMvc.perform(post(SUBMITTED_URL)
                 .content("garbage content")
                 .header("Authorization", AUTH_TOKEN)

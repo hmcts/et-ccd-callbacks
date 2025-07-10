@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,8 +13,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
@@ -32,14 +29,13 @@ class InvalidCharacterCheckTest {
     private CaseDetails caseDetails1;
 
     @BeforeEach
-    @SneakyThrows
-    public void setUp() {
-        caseDetails1 = generateCaseDetails();
+    public void setUp() throws Exception {
+        caseDetails1 = generateCaseDetails("caseDetailsTest1.json");
     }
 
-    private CaseDetails generateCaseDetails() throws URISyntaxException, IOException {
+    private CaseDetails generateCaseDetails(String jsonFileName) throws Exception {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
-            .getContextClassLoader().getResource("caseDetailsTest1.json")).toURI())));
+            .getContextClassLoader().getResource(jsonFileName)).toURI())));
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(json, CaseDetails.class);
     }
@@ -49,7 +45,7 @@ class InvalidCharacterCheckTest {
         CaseData casedata = caseDetails1.getCaseData();
         casedata.setClaimant("Double  Space");
         casedata.getRepresentativeClaimantType().setNameOfRepresentative("New\nLine");
-        casedata.getRespondentCollection().getFirst().getValue().setRespondentName("Double  Space and New\nLine");
+        casedata.getRespondentCollection().get(0).getValue().setRespondentName("Double  Space and New\nLine");
 
         RepresentedTypeR representedTypeR = RepresentedTypeR.builder()
             .nameOfRepresentative("No Errors In Name").build();

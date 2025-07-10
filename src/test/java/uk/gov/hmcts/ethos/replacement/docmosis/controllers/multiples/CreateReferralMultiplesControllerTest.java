@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers.multiples;
 
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -81,8 +80,7 @@ class CreateReferralMultiplesControllerTest extends BaseControllerTest {
 
     @BeforeEach
     @Override
-    @SneakyThrows
-    protected void setUp() {
+    protected void setUp() throws Exception {
         when(emailService.getExuiCaseLink(any())).thenReturn("exui");
         CaseData caseData = CaseDataBuilder.builder()
                 .withHearingScotland("hearingNumber", HEARING_TYPE_JUDICIAL_HEARING, "Judge",
@@ -116,8 +114,7 @@ class CreateReferralMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void initReferralHearingDetails_Success() {
+    void initReferralHearingDetails_Success() throws Exception {
         mockMvc.perform(post(START_CREATE_REFERRAL_URL)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -129,8 +126,7 @@ class CreateReferralMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void initReferralHearingDetails_tokenOk() {
+    void initReferralHearingDetails_tokenOk() throws Exception {
         mockMvc.perform(post(START_CREATE_REFERRAL_URL)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -139,8 +135,7 @@ class CreateReferralMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void createReferral_invalidToken() {
+    void createReferral_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(START_CREATE_REFERRAL_URL)
                         .contentType(APPLICATION_JSON)
@@ -150,8 +145,7 @@ class CreateReferralMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void initAboutToSubmit_invalidToken() {
+    void initAboutToSubmit_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                         .contentType(APPLICATION_JSON)
@@ -161,8 +155,7 @@ class CreateReferralMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToSubmit_tokenOk() {
+    void aboutToSubmit_tokenOk() throws Exception {
         UserDetails details = new UserDetails();
         details.setName("First Last");
         when(userIdamService.getUserDetails(any())).thenReturn(details);
@@ -181,8 +174,7 @@ class CreateReferralMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToSubmit_NoReferentEmail_tokenOk() {
+    void aboutToSubmit_NoReferentEmail_tokenOk() throws Exception {
         UserDetails details = new UserDetails();
         details.setName("First Last");
         when(userIdamService.getUserDetails(any())).thenReturn(details);
@@ -202,8 +194,7 @@ class CreateReferralMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToSubmit_ReferentEmail_tokenOk() {
+    void aboutToSubmit_ReferentEmail_tokenOk() throws Exception {
         UserDetails details = new UserDetails();
         details.setName("First Last");
         when(userIdamService.getUserDetails(any())).thenReturn(details);
@@ -223,8 +214,7 @@ class CreateReferralMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToSubmit_invalidToken() {
+    void aboutToSubmit_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                         .contentType(APPLICATION_JSON)
@@ -234,8 +224,7 @@ class CreateReferralMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void completeCreateReferral_tokenOk() {
+    void completeCreateReferral_tokenOk() throws Exception {
         mockMvc.perform(post(SUBMITTED_REFERRAL_URL)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -245,8 +234,7 @@ class CreateReferralMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void completeCreateReferral_invalidToken() {
+    void completeCreateReferral_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(SUBMITTED_REFERRAL_URL)
                         .contentType(APPLICATION_JSON)
@@ -256,8 +244,7 @@ class CreateReferralMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void validateNoReferentEmail_tokenOk() {
+    void validateNoReferentEmail_tokenOk() throws Exception {
         CCDRequest noReferentEmailCCDRequest = ccdRequest;
         noReferentEmailCCDRequest.getCaseDetails().getCaseData().setReferentEmail("");
         mockMvc.perform(post(VALIDATE_EMAIL_URL)
@@ -269,8 +256,7 @@ class CreateReferralMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void validateReferentEmail_tokenOk() {
+    void validateReferentEmail_tokenOk() throws Exception {
         mockMvc.perform(post(VALIDATE_EMAIL_URL)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -280,8 +266,7 @@ class CreateReferralMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void validateReferentEmail_invalidToken() {
+    void validateReferentEmail_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(VALIDATE_EMAIL_URL)
                         .contentType(APPLICATION_JSON)
@@ -291,8 +276,7 @@ class CreateReferralMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void validateReferentEmail_WithDocumentUploadErrors() {
+    void validateReferentEmail_WithDocumentUploadErrors() throws Exception {
         MultipleData caseData = new MultipleData();
         caseData.setReferentEmail("test@example.com");
         DocumentType documentTypeWithError = new DocumentType();

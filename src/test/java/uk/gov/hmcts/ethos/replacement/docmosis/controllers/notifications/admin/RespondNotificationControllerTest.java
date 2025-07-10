@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers.notifications.admin;
 
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -49,7 +48,7 @@ class RespondNotificationControllerTest extends BaseControllerTest {
 
     @BeforeEach
     @Override
-    protected void setUp() {
+    protected void setUp() throws Exception {
         super.setUp();
         CaseDetails caseDetails = CaseDataBuilder.builder()
                 .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
@@ -62,8 +61,7 @@ class RespondNotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToStart_tokenOk() {
+    void aboutToStart_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(ABOUT_TO_START_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -76,8 +74,7 @@ class RespondNotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToStart_tokenFail() {
+    void aboutToStart_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(ABOUT_TO_START_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -87,8 +84,7 @@ class RespondNotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToStart_badRequest() {
+    void aboutToStart_badRequest() throws Exception {
         mockMvc.perform(post(ABOUT_TO_START_URL)
                         .content("garbage content")
                         .header("Authorization", AUTH_TOKEN)
@@ -97,8 +93,7 @@ class RespondNotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToSubmit_tokenOk() {
+    void aboutToSubmit_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -111,8 +106,7 @@ class RespondNotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToSubmit_tokenFail() {
+    void aboutToSubmit_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -122,8 +116,7 @@ class RespondNotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToSubmit_badRequest() {
+    void aboutToSubmit_badRequest() throws Exception {
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                         .content("garbage content")
                         .header("Authorization", AUTH_TOKEN)
@@ -132,8 +125,7 @@ class RespondNotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void midGetNotification_tokenOk() {
+    void midGetNotification_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(MID_GET_NOTIFICATION_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -147,8 +139,7 @@ class RespondNotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void midGetNotification_tokenFail() {
+    void midGetNotification_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(MID_GET_NOTIFICATION_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -158,8 +149,7 @@ class RespondNotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void midGetNotification_badRequest() {
+    void midGetNotification_badRequest() throws Exception {
         mockMvc.perform(post(MID_GET_NOTIFICATION_URL)
                         .content("garbage content")
                         .header("Authorization", AUTH_TOKEN)
@@ -168,8 +158,7 @@ class RespondNotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void midValidateInput_tokenOk() {
+    void midValidateInput_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(MID_GET_INPUT_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -183,8 +172,7 @@ class RespondNotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void midValidateInput_tokenFail() {
+    void midValidateInput_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(MID_GET_INPUT_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -194,8 +182,7 @@ class RespondNotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void midValidateInput_badRequest() {
+    void midValidateInput_badRequest() throws Exception {
         mockMvc.perform(post(MID_GET_INPUT_URL)
                 .content("garbage content")
                 .header("Authorization", AUTH_TOKEN)
@@ -204,8 +191,7 @@ class RespondNotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void submitted_tokenOk() {
+    void submitted_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(SUBMITTED_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -219,8 +205,7 @@ class RespondNotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void submitted_tokenFail() {
+    void submitted_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(SUBMITTED_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -230,8 +215,7 @@ class RespondNotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void submitted_badRequest() {
+    void submitted_badRequest() throws Exception {
         mockMvc.perform(post(SUBMITTED_URL)
                         .content("garbage content")
                         .header("Authorization", AUTH_TOKEN)

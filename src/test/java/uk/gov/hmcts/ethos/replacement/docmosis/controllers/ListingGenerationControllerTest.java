@@ -2,7 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -41,8 +40,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
 import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -121,22 +118,22 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     private ListingRequest singleListingRequest;
     private ListingRequest listingRequest;
 
-    private void doRequestSetUp() throws IOException, URISyntaxException {
+    private void doRequestSetUp() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
-        requestContent = objectMapper.readTree(new File(Objects.requireNonNull(getClass()
-                .getResource("/exampleListingV1.json")).toURI()));
-        requestContent1 = objectMapper.readTree(new File(Objects.requireNonNull(getClass()
-                .getResource("/exampleListingV2.json")).toURI()));
-        requestContentSingleCase = objectMapper.readTree(new File(Objects.requireNonNull(getClass()
-                .getResource("/exampleListingSingleV1.json")).toURI()));
-        requestContentSingleCase1 = objectMapper.readTree(new File(Objects.requireNonNull(getClass()
-                .getResource("/exampleListingSingleV2.json")).toURI()));
+        requestContent = objectMapper.readTree(new File(getClass()
+                .getResource("/exampleListingV1.json").toURI()));
+        requestContent1 = objectMapper.readTree(new File(getClass()
+                .getResource("/exampleListingV2.json").toURI()));
+        requestContentSingleCase = objectMapper.readTree(new File(getClass()
+                .getResource("/exampleListingSingleV1.json").toURI()));
+        requestContentSingleCase1 = objectMapper.readTree(new File(getClass()
+                .getResource("/exampleListingSingleV2.json").toURI()));
 
         listingRequest = generateListingDetails("exampleListingV3.json");
         singleListingRequest = generateListingDetails("exampleListingV2.json");
     }
 
-    private ListingRequest generateListingDetails(String jsonFileName) throws IOException, URISyntaxException {
+    private ListingRequest generateListingDetails(String jsonFileName) throws Exception {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(
                 Thread.currentThread().getContextClassLoader().getResource(jsonFileName)).toURI())));
 
@@ -214,8 +211,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
 
     @BeforeEach
     @Override
-    @SneakyThrows
-    public void setUp() {
+    public void setUp() throws Exception {
         super.setUp();
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         doRequestSetUp();
@@ -246,8 +242,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void listingCaseCreation() {
+    void listingCaseCreation() throws Exception {
         when(listingService.listingCaseCreation(isA(ListingDetails.class)))
                 .thenReturn(singleListingRequest.getCaseDetails().getCaseData());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -262,8 +257,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void listingHearings() {
+    void listingHearings() throws Exception {
         when(listingService.processListingHearingsRequest(isA(ListingDetails.class), eq(AUTH_TOKEN)))
                 .thenReturn(listingDetails.getCaseData());
         when(defaultValuesReaderService.getListingDefaultValues(isA(ListingDetails.class)))
@@ -282,8 +276,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void generateHearingDocument() {
+    void generateHearingDocument() throws Exception {
         when(listingService.processHearingDocument(isA(ListingData.class), isA(String.class), eq(AUTH_TOKEN)))
                 .thenReturn(documentInfo);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -298,8 +291,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void dynamicListingVenue() {
+    void dynamicListingVenue() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(DYNAMIC_LISTING_VENUE)
                 .content(requestContent.toString())
@@ -312,8 +304,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void generateHearingDocumentConfirmation() {
+    void generateHearingDocumentConfirmation() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(GENERATE_HEARING_DOCUMENT_CONFIRMATION_URL)
                 .content(requestContent.toString())
@@ -326,8 +317,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void generateHearingDocumentWithErrors() {
+    void generateHearingDocumentWithErrors() throws Exception {
         when(listingService.processHearingDocument(isA(ListingData.class), isA(String.class), eq(AUTH_TOKEN)))
                 .thenReturn(documentInfo);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -342,8 +332,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void listingSingleCases() {
+    void listingSingleCases() throws Exception {
         when(listingService.processListingSingleCasesRequest(isA(CaseDetails.class))).thenReturn(caseData);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(LISTING_SINGLE_CASES_URL)
@@ -357,8 +346,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void generateListingsDocSingleCases() {
+    void generateListingsDocSingleCases() throws Exception {
         when(listingService.setManagingOfficeAndCourtAddressFromCaseData(isA(CaseData.class)))
                 .thenReturn(singleListingRequest.getCaseDetails().getCaseData());
         when(listingService.processHearingDocument(isA(ListingData.class), isA(String.class), eq(AUTH_TOKEN)))
@@ -375,8 +363,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void generateListingsDocSingleCasesConfirmation() {
+    void generateListingsDocSingleCasesConfirmation() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(GENERATE_LISTINGS_DOC_SINGLE_CASES_CONFIRMATION_URL)
                 .content(requestContentSingleCase.toString())
@@ -389,8 +376,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void generateListingsDocSingleCasesWithErrors() {
+    void generateListingsDocSingleCasesWithErrors() throws Exception {
         when(listingService.processHearingDocument(isA(ListingData.class), isA(String.class), eq(AUTH_TOKEN)))
                 .thenReturn(documentInfo);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -405,8 +391,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void generateReportOk() {
+    void generateReportOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(reportDataService.generateReportData(isA(ListingDetails.class), eq(AUTH_TOKEN)))
                 .thenReturn(listingRequest.getCaseDetails().getCaseData());
@@ -424,8 +409,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void generateHearingsToJudgmentsReportOk() {
+    void generateHearingsToJudgmentsReportOk() throws Exception {
         HearingsToJudgmentsReportSummary reportSummary = new HearingsToJudgmentsReportSummary(
             TribunalOffice.LEEDS.getOfficeName());
         HearingsToJudgmentsReportData reportData = new HearingsToJudgmentsReportData(reportSummary);
@@ -448,8 +432,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void generateCasesAwaitingJudgmentReportOk() {
+    void generateCasesAwaitingJudgmentReportOk() throws Exception {
         ReportSummary reportSummary = new ReportSummary(ENGLANDWALES_CASE_TYPE_ID);
         CasesAwaitingJudgmentReportData reportData = new CasesAwaitingJudgmentReportData(reportSummary);
         reportData.setReportType(CASES_AWAITING_JUDGMENT_REPORT);
@@ -471,8 +454,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void generateCMemberDaysReportOk() {
+    void generateCMemberDaysReportOk() throws Exception {
         MemberDaysReportData reportData = new MemberDaysReportData();
         reportData.setReportType(MEMBER_DAYS_REPORT);
 
@@ -495,8 +477,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void initGenerateReportOk() {
+    void initGenerateReportOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
         mvc.perform(post(INIT_GENERATE_REPORT_URL)
@@ -511,8 +492,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void generateReportError400() {
+    void generateReportError400() throws Exception {
         mvc.perform(post(GENERATE_REPORT_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -521,8 +501,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void generateReportError500() {
+    void generateReportError500() throws Exception {
         when(reportDataService.generateReportData(isA(ListingDetails.class), eq(AUTH_TOKEN)))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -534,8 +513,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void generateReportForbidden() {
+    void generateReportForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(GENERATE_REPORT_URL)
                 .content(requestContent.toString())
@@ -545,8 +523,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void dynamicListingVenueError400() {
+    void dynamicListingVenueError400() throws Exception {
         mvc.perform(post(DYNAMIC_LISTING_VENUE)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -555,8 +532,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void generateHearingDocumentError400() {
+    void generateHearingDocumentError400() throws Exception {
         mvc.perform(post(GENERATE_HEARING_DOCUMENT_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -565,8 +541,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void listingCaseCreationError400() {
+    void listingCaseCreationError400() throws Exception {
         mvc.perform(post(LISTING_CASE_CREATION_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -575,8 +550,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void listingHearingsError400() {
+    void listingHearingsError400() throws Exception {
         mvc.perform(post(LISTING_HEARINGS_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -585,8 +559,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void listingSingleCasesError400() {
+    void listingSingleCasesError400() throws Exception {
         mvc.perform(post(LISTING_SINGLE_CASES_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -595,8 +568,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void generateListingsDocSingleCasesError400() {
+    void generateListingsDocSingleCasesError400() throws Exception {
         mvc.perform(post(GENERATE_LISTINGS_DOC_SINGLE_CASES_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -605,20 +577,18 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void initGenerateReportError400() {
+    void initGenerateReportError400() throws Exception {
         mvc.perform(post(INIT_GENERATE_REPORT_URL)
                         .header(AUTHORIZATION, AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("\"error\""))
+                        .content("error"))
                 .andExpect(status().isBadRequest());
 
         verify(generateReportService, never()).initGenerateReport(any(ListingDetails.class));
     }
 
     @Test
-    @SneakyThrows
-    void listingCaseCreationError500() {
+    void listingCaseCreationError500() throws Exception {
         when(listingService.listingCaseCreation(isA(ListingDetails.class)))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -630,8 +600,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void listingSingleCasesError500() {
+    void listingSingleCasesError500() throws Exception {
         when(listingService.processListingSingleCasesRequest(isA(CaseDetails.class)))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -643,8 +612,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void generateListingsDocSingleCasesError500() {
+    void generateListingsDocSingleCasesError500() throws Exception {
         when(listingService.processHearingDocument(isA(ListingData.class), isA(String.class), eq(AUTH_TOKEN)))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
 
@@ -660,8 +628,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void generateHearingDocumentError500() {
+    void generateHearingDocumentError500() throws Exception {
         when(listingService.processHearingDocument(isA(ListingData.class), isA(String.class), eq(AUTH_TOKEN)))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -673,8 +640,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void listingHearingsError500() {
+    void listingHearingsError500() throws Exception {
         when(listingService.processListingHearingsRequest(isA(ListingDetails.class), eq(AUTH_TOKEN)))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -686,8 +652,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void initGenerateReportError500() {
+    void initGenerateReportError500() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         doThrow(new InternalException(ERROR_MESSAGE)).when(generateReportService).initGenerateReport(
                 isA(ListingDetails.class));
@@ -702,8 +667,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void listingCaseCreationForbidden() {
+    void listingCaseCreationForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(LISTING_CASE_CREATION_URL)
                 .content(requestContent.toString())
@@ -713,8 +677,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void listingHearingsForbidden() {
+    void listingHearingsForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(LISTING_HEARINGS_URL)
                 .content(requestContent.toString())
@@ -724,8 +687,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void generateHearingDocumentConfirmationForbidden() {
+    void generateHearingDocumentConfirmationForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(GENERATE_HEARING_DOCUMENT_CONFIRMATION_URL)
                 .content(requestContent.toString())
@@ -735,8 +697,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void generateHearingDocumentWithErrorsForbidden() {
+    void generateHearingDocumentWithErrorsForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(GENERATE_HEARING_DOCUMENT_URL)
                 .content(requestContent1.toString())
@@ -746,8 +707,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void listingSingleCasesForbidden() {
+    void listingSingleCasesForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(LISTING_SINGLE_CASES_URL)
                 .content(requestContentSingleCase.toString())
@@ -757,8 +717,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void generateListingsDocSingleCasesForbidden() {
+    void generateListingsDocSingleCasesForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(GENERATE_LISTINGS_DOC_SINGLE_CASES_URL)
                 .content(requestContentSingleCase.toString())
@@ -768,8 +727,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void generateListingsDocSingleCasesConfirmationForbidden() {
+    void generateListingsDocSingleCasesConfirmationForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(GENERATE_LISTINGS_DOC_SINGLE_CASES_CONFIRMATION_URL)
                 .content(requestContentSingleCase.toString())
@@ -779,8 +737,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void initPrintHearingLists() {
+    void initPrintHearingLists() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
         mvc.perform(post(INIT_PRINT_HEARING_LISTS_URL)
@@ -796,8 +753,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void initPrintHearingListsForbidden() {
+    void initPrintHearingListsForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
 
         mvc.perform(post(INIT_PRINT_HEARING_LISTS_URL)
@@ -810,22 +766,20 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void initPrintHearingListsError400() {
+    void initPrintHearingListsError400() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
         mvc.perform(post(INIT_PRINT_HEARING_LISTS_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .header(AUTHORIZATION, AUTH_TOKEN)
-                .content("\"bad-content\""))
+                .content("bad-content"))
                 .andExpect(status().isBadRequest());
 
         verify(printHearingListService, never()).initPrintHearingLists(any(CaseData.class));
     }
 
     @Test
-    @SneakyThrows
-    void initGenerateReportForbidden() {
+    void initGenerateReportForbidden() throws Exception {
         mvc.perform(post(INIT_GENERATE_REPORT_URL)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestContent.toString()))

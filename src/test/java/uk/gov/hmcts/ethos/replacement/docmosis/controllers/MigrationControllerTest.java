@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,8 +33,7 @@ class MigrationControllerTest extends BaseControllerTest {
     private EcmMigrationService ecmMigrationService;
 
     @Test
-    @SneakyThrows
-    void rollbackAboutToSubmit() {
+    void rollbackAboutToSubmit() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder()
                 .withCaseData(CaseDataBuilder.builder()
                         .withEthosCaseReference("123456/2021")

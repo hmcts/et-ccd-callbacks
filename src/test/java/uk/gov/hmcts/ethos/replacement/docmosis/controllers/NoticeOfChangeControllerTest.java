@@ -2,7 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -19,9 +18,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CcdCaseAssignment;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.NocClaimantRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.NocNotificationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.NocRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
@@ -55,10 +52,6 @@ class NoticeOfChangeControllerTest {
     @MockBean
     private NocRespondentRepresentativeService nocRespondentRepresentativeService;
     @MockBean
-    private NocClaimantRepresentativeService nocClaimantRepresentativeService;
-    @MockBean
-    private NocRepresentativeService nocRepresentativeService;
-    @MockBean
     private CcdCaseAssignment ccdCaseAssignment;
 
     @MockBean
@@ -89,11 +82,10 @@ class NoticeOfChangeControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void handleAboutToSubmit_RespondentRep() {
+    void handleAboutToSubmit() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(nocRespondentRepresentativeService
-            .updateRespondentRepresentation(any())).thenReturn(caseData);
+            .updateRepresentation(any())).thenReturn(caseData);
         when(ccdCaseAssignment.applyNoc(any(), any())).thenReturn(CCDCallbackResponse.builder()
             .data(caseData)
             .build());
@@ -109,8 +101,7 @@ class NoticeOfChangeControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void nocSubmitted() {
+    void nocSubmitted() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         doNothing().when(notificationService).sendNotificationOfChangeEmails(any(),
             any(), any());

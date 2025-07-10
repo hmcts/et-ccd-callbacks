@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,8 +44,7 @@ class ListHearingControllerTest extends BaseControllerTest {
     private JsonMapper jsonMapper;
 
     @Test
-    @SneakyThrows
-    void testInitialiseHearingEnglandWales() {
+    void testInitialiseHearingEnglandWales() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder().withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID).build();
         String userToken = "some-token";
         when(verifyTokenService.verifyTokenSignature(userToken)).thenReturn(true);
@@ -66,8 +64,7 @@ class ListHearingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void testInitialiseHearingScotland() {
+    void testInitialiseHearingScotland() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder().withCaseTypeId(SCOTLAND_CASE_TYPE_ID).build();
         String userToken = "some-token";
         when(verifyTokenService.verifyTokenSignature(userToken)).thenReturn(true);
@@ -88,8 +85,7 @@ class ListHearingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void testInitialiseHearingInvalidToken() {
+    void testInitialiseHearingInvalidToken() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder().withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID).build();
         String userToken = "invalid-token";
         when(verifyTokenService.verifyTokenSignature(userToken)).thenReturn(false);

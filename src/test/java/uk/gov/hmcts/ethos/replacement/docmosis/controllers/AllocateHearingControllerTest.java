@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,8 +47,7 @@ class AllocateHearingControllerTest {
     private JsonMapper jsonMapper;
 
     @Test
-    @SneakyThrows
-    void testInitialiseHearingDynamicList() {
+    void testInitialiseHearingDynamicList() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder()
                 .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
                 .build();
@@ -69,8 +67,7 @@ class AllocateHearingControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void testInitialiseHearingDynamicListInvalidToken() {
+    void testInitialiseHearingDynamicListInvalidToken() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder()
                 .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
                 .build();
@@ -87,8 +84,7 @@ class AllocateHearingControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void testHandleListingSelected() {
+    void testHandleListingSelected() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder()
                 .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
                 .build();
@@ -108,8 +104,7 @@ class AllocateHearingControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void testHandleListingSelectedInvalidToken() {
+    void testHandleListingSelectedInvalidToken() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder()
                 .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
                 .build();
@@ -126,8 +121,7 @@ class AllocateHearingControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void testHandleListingSelectedInvalidCaseTypeId() {
+    void testHandleListingSelectedInvalidCaseTypeId() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder()
                 .withCaseTypeId("InvalidCaseTypeId")
                 .build();
@@ -143,8 +137,7 @@ class AllocateHearingControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void testPopulateRoomsEnglandWales() {
+    void testPopulateRoomsEnglandWales() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder()
                 .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
                 .build();
@@ -165,8 +158,7 @@ class AllocateHearingControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void testPopulateRoomsScotland() {
+    void testPopulateRoomsScotland() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder()
                 .withCaseTypeId(SCOTLAND_CASE_TYPE_ID)
                 .build();
@@ -187,8 +179,7 @@ class AllocateHearingControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void testPopulateRoomsInvalidToken() {
+    void testPopulateRoomsInvalidToken() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder()
                 .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
                 .build();
@@ -205,8 +196,7 @@ class AllocateHearingControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void testAboutToSubmit() {
+    void testAboutToSubmit() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder()
                 .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
                 .build();
@@ -226,8 +216,7 @@ class AllocateHearingControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void testAboutToSubmitInvalidToken() {
+    void testAboutToSubmitInvalidToken() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder()
                 .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
                 .build();

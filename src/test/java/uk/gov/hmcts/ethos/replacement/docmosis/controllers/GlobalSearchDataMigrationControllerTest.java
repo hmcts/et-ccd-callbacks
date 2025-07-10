@@ -2,7 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -54,8 +53,7 @@ class GlobalSearchDataMigrationControllerTest extends BaseControllerTest {
 
     @BeforeEach
     @Override
-    @SneakyThrows
-    public void setUp() {
+    public void setUp() throws Exception {
         super.setUp();
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         ObjectMapper objectMapper = new ObjectMapper();
@@ -64,8 +62,7 @@ class GlobalSearchDataMigrationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void shouldMigrateCaseDetails() {
+    void shouldMigrateCaseDetails() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(GLOBAL_SEARCH_MIGRATION_ABOUT_TO_SUBMIT)
                         .content(requestContent.toString())
@@ -80,8 +77,7 @@ class GlobalSearchDataMigrationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void shouldRollbackGlobalSearchDataFromCaseDetails() {
+    void shouldRollbackGlobalSearchDataFromCaseDetails() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(GLOBAL_SEARCH_ROLLBACK_ABOUT_TO_SUBMIT)
                         .content(requestContent.toString())
@@ -95,8 +91,7 @@ class GlobalSearchDataMigrationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void shouldMigrateCaseDetails_tokenFail() {
+    void shouldMigrateCaseDetails_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(GLOBAL_SEARCH_MIGRATION_ABOUT_TO_SUBMIT)
                         .content(requestContent.toString())
@@ -106,8 +101,7 @@ class GlobalSearchDataMigrationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void addServiceIdUrl_tokenOk() {
+    void addServiceIdUrl_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(GLOBAL_SEARCH_MIGRATION_SUBMITTED)
                         .content(requestContent.toString())
@@ -122,8 +116,7 @@ class GlobalSearchDataMigrationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void addServiceIdUrl_tokenFail() {
+    void addServiceIdUrl_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(GLOBAL_SEARCH_MIGRATION_SUBMITTED)
                         .content(requestContent.toString())
@@ -133,8 +126,7 @@ class GlobalSearchDataMigrationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void addServiceIdUrl_badRequest() {
+    void addServiceIdUrl_badRequest() throws Exception {
         mvc.perform(post(GLOBAL_SEARCH_MIGRATION_SUBMITTED)
                         .content("garbage content")
                         .header(AUTHORIZATION, AUTH_TOKEN)
@@ -143,8 +135,7 @@ class GlobalSearchDataMigrationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void removeServiceIdUrl_tokenOk() {
+    void removeServiceIdUrl_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(GLOBAL_SEARCH_ROLLBACK_SUBMITTED)
                         .content(requestContent.toString())
@@ -159,8 +150,7 @@ class GlobalSearchDataMigrationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void removeServiceIdUrl_tokenFail() {
+    void removeServiceIdUrl_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(GLOBAL_SEARCH_ROLLBACK_SUBMITTED)
                         .content(requestContent.toString())
@@ -170,8 +160,7 @@ class GlobalSearchDataMigrationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void removeServiceIdUrl_badRequest() {
+    void removeServiceIdUrl_badRequest() throws Exception {
         mvc.perform(post(GLOBAL_SEARCH_ROLLBACK_SUBMITTED)
                         .content("garbage content")
                         .header(AUTHORIZATION, AUTH_TOKEN)

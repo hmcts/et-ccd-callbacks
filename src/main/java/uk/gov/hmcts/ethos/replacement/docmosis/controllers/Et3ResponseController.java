@@ -393,6 +393,33 @@ public class Et3ResponseController {
     }
 
     /**
+     * Checks if solicitor has any role that is assigned to him/her as representative.
+     *
+     * @param ccdRequest generic request from CCD
+     * @param userToken  authentication token to verify the user
+     * @return Callback response entity with case data attached.
+     */
+    @PostMapping(value = "/aboutToStartRepresentativeInfo", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Updates RepresentedTypeR model of the respondent representative with new values")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Accessed successfully",
+                    content = {
+                            @Content(mediaType = "application/json",
+                                    schema = @Schema(implementation = CCDCallbackResponse.class))
+                    }),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> aboutToStartRepresentativeInfo(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader("Authorization") String userToken) {
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        Et3ResponseHelper.setRespondentRepresentativeValues(caseData);
+        Et3ResponseHelper.resetEt3FormFields(caseData);
+        return getCallbackRespEntityNoErrors(caseData);
+    }
+
+    /**
      * Sets new values to respondent representative model {@link RepresentedTypeR}.
      *
      * @param ccdRequest generic request from CCD

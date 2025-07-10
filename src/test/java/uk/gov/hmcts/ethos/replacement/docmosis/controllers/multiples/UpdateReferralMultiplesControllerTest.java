@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers.multiples;
 
-import lombok.SneakyThrows;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -75,8 +73,7 @@ class UpdateReferralMultiplesControllerTest extends BaseControllerTest {
 
     @BeforeEach
     @Override
-    @SneakyThrows
-    protected void setUp() {
+    protected void setUp() throws Exception {
         CaseData caseData = CaseDataBuilder.builder()
             .withHearingScotland("hearingNumber", HEARING_TYPE_JUDICIAL_HEARING, "Judge",
                 TribunalOffice.ABERDEEN, "venue")
@@ -105,7 +102,6 @@ class UpdateReferralMultiplesControllerTest extends BaseControllerTest {
         multipleData.setReferralCollection(List.of(createReferralTypeItem()));
         DynamicFixedListType selectReferralList = 
             ReferralHelper.populateSelectReferralDropdown(multipleData.getReferralCollection());
-        Assertions.assertNotNull(selectReferralList);
         selectReferralList.setValue(new DynamicValueType());
         selectReferralList.getValue().setCode("1");
         multipleData.setSelectReferral(selectReferralList);
@@ -127,8 +123,7 @@ class UpdateReferralMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void startUpdate_Success() {
+    void startUpdate_Success() throws Exception {
         mockMvc.perform(post(START_UPDATE_REFERRAL_URL)
                 .contentType(APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -141,8 +136,7 @@ class UpdateReferralMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void initReferralHearingDetails_invalidToken() {
+    void initReferralHearingDetails_invalidToken() throws Exception {
 
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(START_UPDATE_REFERRAL_URL)
@@ -153,8 +147,7 @@ class UpdateReferralMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToSubmit_tokenOk() {
+    void aboutToSubmit_tokenOk() throws Exception {
         RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
         respondentSumTypeItem.setId(UUID.randomUUID().toString());
         RespondentSumType respondentSumType = new RespondentSumType();
@@ -177,8 +170,7 @@ class UpdateReferralMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToSubmitNoUpdateReferentEmailAddress_tokenOk() {
+    void aboutToSubmitNoUpdateReferentEmailAddress_tokenOk() throws Exception {
         RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
         respondentSumTypeItem.setId(UUID.randomUUID().toString());
         RespondentSumType respondentSumType = new RespondentSumType();
@@ -201,10 +193,8 @@ class UpdateReferralMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void referralStatusNotCorrect() {
-        request.getCaseDetails().getCaseData().getReferralCollection()
-                .getFirst().getValue().setReferralStatus("Closed");
+    void referralStatusNotCorrect() throws Exception {
+        request.getCaseDetails().getCaseData().getReferralCollection().get(0).getValue().setReferralStatus("Closed");
         mockMvc.perform(post(INIT_HEARING_AND_REFERRAL_DETAILS_URL)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -217,10 +207,9 @@ class UpdateReferralMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void referralStatusCorrect() {
+    void referralStatusCorrect() throws Exception {
         request.getCaseDetails().getCaseData().getReferralCollection()
-                .getFirst().getValue().setReferralStatus("Awaiting instructions");
+                .get(0).getValue().setReferralStatus("Awaiting instructions");
         mockMvc.perform(post(INIT_HEARING_AND_REFERRAL_DETAILS_URL)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -232,8 +221,7 @@ class UpdateReferralMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToSubmit_invalidToken() {
+    void aboutToSubmit_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                 .contentType(APPLICATION_JSON)

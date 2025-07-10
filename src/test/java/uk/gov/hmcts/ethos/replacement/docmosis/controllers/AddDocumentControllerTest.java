@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -66,8 +65,7 @@ class AddDocumentControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToSubmitWithValidToken() {
+    void aboutToSubmitWithValidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -81,8 +79,7 @@ class AddDocumentControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void testAboutToSubmitWithInvalidToken() {
+    void testAboutToSubmitWithInvalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature("invalidToken")).thenReturn(false);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                         .contentType(APPLICATION_JSON)
@@ -93,8 +90,7 @@ class AddDocumentControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void testAboutToSubmitWithInvalidDocumentIndex() {
+    void testAboutToSubmitWithInvalidDocumentIndex() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         doThrow(new RuntimeException("Invalid document index"))
                 .when(documentManagementService).addUploadedDocsToCaseDocCollection(any());

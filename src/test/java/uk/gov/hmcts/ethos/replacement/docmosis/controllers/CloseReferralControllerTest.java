@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
-import lombok.SneakyThrows;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -54,7 +52,6 @@ class CloseReferralControllerTest {
     private CCDRequest ccdRequest;
 
     @BeforeEach
-
     void setUp() {
         CaseData caseData = CaseDataBuilder.builder()
             .withHearingScotland("hearingNumber", HEARING_TYPE_JUDICIAL_HEARING, "Judge",
@@ -67,7 +64,6 @@ class CloseReferralControllerTest {
         caseData.setReferralCollection(List.of(createReferralTypeItem()));
         DynamicFixedListType selectReferralList = 
             ReferralHelper.populateSelectReferralDropdown(caseData.getReferralCollection());
-        Assertions.assertNotNull(selectReferralList);
         selectReferralList.setValue(new DynamicValueType());
         selectReferralList.getValue().setCode("1");
         caseData.setSelectReferral(selectReferralList);
@@ -78,8 +74,7 @@ class CloseReferralControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToStartReferralReply_Success()  {
+    void aboutToStartReferralReply_Success() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(START_CLOSE_REFERRAL_URL)
                 .contentType(APPLICATION_JSON)
@@ -92,8 +87,7 @@ class CloseReferralControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void initHearingAndReferralDetails_Success()  {
+    void initHearingAndReferralDetails_Success() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(INIT_HEARING_AND_REFERRAL_DETAILS_URL)
                 .contentType(APPLICATION_JSON)
@@ -106,8 +100,7 @@ class CloseReferralControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToSubmitCloseReferral_Success()  {
+    void aboutToSubmitCloseReferral_Success() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                 .contentType(APPLICATION_JSON)
@@ -120,8 +113,7 @@ class CloseReferralControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToStartCloseReferral_invalidToken()  {
+    void aboutToStartCloseReferral_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(START_CLOSE_REFERRAL_URL)
                 .contentType(APPLICATION_JSON)
@@ -131,8 +123,7 @@ class CloseReferralControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void initHearingAndReferralDetails_invalidToken()  {
+    void initHearingAndReferralDetails_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(INIT_HEARING_AND_REFERRAL_DETAILS_URL)
                 .contentType(APPLICATION_JSON)
@@ -142,8 +133,7 @@ class CloseReferralControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToSubmitCloseReferral_invalidToken()  {
+    void aboutToSubmitCloseReferral_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                 .contentType(APPLICATION_JSON)
@@ -153,8 +143,7 @@ class CloseReferralControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void completeCloseReferral_tokenOk()  {
+    void completeCloseReferral_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(SUBMITTED_REFERRAL_URL)
                 .contentType(APPLICATION_JSON)
@@ -165,8 +154,7 @@ class CloseReferralControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void completeCloseReferral_invalidToken()  {
+    void completeCloseReferral_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(SUBMITTED_REFERRAL_URL)
                 .contentType(APPLICATION_JSON)

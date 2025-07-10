@@ -2,7 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,7 +25,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.Objects;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
@@ -58,14 +56,13 @@ class ReferenceDataControllerTest extends BaseControllerTest {
 
     private void doRequestSetUp() throws IOException, URISyntaxException {
         ObjectMapper objectMapper = new ObjectMapper();
-        requestContent = objectMapper.readTree(new File(Objects.requireNonNull(getClass()
-                .getResource("/exampleV1.json")).toURI()));
+        requestContent = objectMapper.readTree(new File(getClass()
+                .getResource("/exampleV1.json").toURI()));
     }
 
     @BeforeEach
     @Override
-    @SneakyThrows
-    public void setUp() {
+    public void setUp() throws Exception {
         super.setUp();
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         doRequestSetUp();
@@ -74,8 +71,7 @@ class ReferenceDataControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void hearingVenueReferenceData() {
+    void hearingVenueReferenceData() throws Exception {
         when(referenceService.fetchHearingVenueRefData(
                 isA(CaseDetails.class), eq(AUTH_TOKEN))).thenReturn(submitEvent.getCaseData());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -90,8 +86,7 @@ class ReferenceDataControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void dateListedReferenceData() {
+    void dateListedReferenceData() throws Exception {
         when(referenceService.fetchDateListedRefData(
                 isA(CaseDetails.class), eq(AUTH_TOKEN))).thenReturn(submitEvent.getCaseData());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -106,8 +101,7 @@ class ReferenceDataControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void hearingVenueReferenceDataError400() {
+    void hearingVenueReferenceDataError400() throws Exception {
         mvc.perform(post(HEARING_VENUE_REFERENCE_DATA)
                 .content("error")
                 .header("Authorization", AUTH_TOKEN)
@@ -116,8 +110,7 @@ class ReferenceDataControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void dateListedReferenceDataError400() {
+    void dateListedReferenceDataError400() throws Exception {
         mvc.perform(post(DATE_LISTED_REFERENCE_DATA)
                 .content("error")
                 .header("Authorization", AUTH_TOKEN)
@@ -126,8 +119,7 @@ class ReferenceDataControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void hearingVenueReferenceDataError500() {
+    void hearingVenueReferenceDataError500() throws Exception {
         when(referenceService.fetchHearingVenueRefData(
                 isA(CaseDetails.class), eq(AUTH_TOKEN))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -139,8 +131,7 @@ class ReferenceDataControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void dateListedReferenceDataError500() {
+    void dateListedReferenceDataError500() throws Exception {
         when(referenceService.fetchDateListedRefData(
                 isA(CaseDetails.class), eq(AUTH_TOKEN))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -152,8 +143,7 @@ class ReferenceDataControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void hearingVenueReferenceDataForbidden() {
+    void hearingVenueReferenceDataForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(HEARING_VENUE_REFERENCE_DATA)
                 .content(requestContent.toString())
@@ -163,8 +153,7 @@ class ReferenceDataControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void dateListedReferenceDataForbidden() {
+    void dateListedReferenceDataForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(DATE_LISTED_REFERENCE_DATA)
                 .content(requestContent.toString())

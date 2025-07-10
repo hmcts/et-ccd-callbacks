@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
-import lombok.SneakyThrows;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -101,7 +99,6 @@ class CreateReferralControllerTest {
         caseData.setReferralCollection(List.of(createReferralTypeItem()));
         DynamicFixedListType selectReferralList =
                 ReferralHelper.populateSelectReferralDropdown(caseData.getReferralCollection());
-        Assertions.assertNotNull(selectReferralList);
         selectReferralList.setValue(new DynamicValueType());
         selectReferralList.getValue().setCode("1");
         caseData.setSelectReferral(selectReferralList);
@@ -113,8 +110,7 @@ class CreateReferralControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void initReferralHearingDetails_Success()  {
+    void initReferralHearingDetails_Success() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(START_CREATE_REFERRAL_URL)
                 .contentType(APPLICATION_JSON)
@@ -128,8 +124,7 @@ class CreateReferralControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void initReferralHearingDetails_invalidToken()  {
+    void initReferralHearingDetails_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(START_CREATE_REFERRAL_URL)
                 .contentType(APPLICATION_JSON)
@@ -139,8 +134,7 @@ class CreateReferralControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToSubmit_tokenOk()  {
+    void aboutToSubmit_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         UserDetails details = new UserDetails();
         details.setName("First Last");
@@ -159,8 +153,7 @@ class CreateReferralControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToSubmit_NoReferentEmail_tokenOk()  {
+    void aboutToSubmit_NoReferentEmail_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         UserDetails details = new UserDetails();
         details.setName("First Last");
@@ -181,8 +174,7 @@ class CreateReferralControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToSubmit_invalidToken()  {
+    void aboutToSubmit_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                 .contentType(APPLICATION_JSON)
@@ -192,8 +184,7 @@ class CreateReferralControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void completeCreateReferral_tokenOk()  {
+    void completeCreateReferral_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(SUBMITTED_REFERRAL_URL)
                 .contentType(APPLICATION_JSON)
@@ -204,8 +195,7 @@ class CreateReferralControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void completeCreateReferral_invalidToken()  {
+    void completeCreateReferral_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(SUBMITTED_REFERRAL_URL)
                 .contentType(APPLICATION_JSON)
@@ -215,8 +205,7 @@ class CreateReferralControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void validateNoReferentEmail_tokenOk()  {
+    void validateNoReferentEmail_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         CCDRequest noReferentEmailCCDRequest = ccdRequest;
         noReferentEmailCCDRequest.getCaseDetails().getCaseData().setReferentEmail("");
@@ -229,8 +218,7 @@ class CreateReferralControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void validateReferentEmail_tokenOk()  {
+    void validateReferentEmail_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(VALIDATE_EMAIL_URL)
                 .contentType(APPLICATION_JSON)
@@ -241,8 +229,7 @@ class CreateReferralControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void validateReferentEmail_invalidToken()  {
+    void validateReferentEmail_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(VALIDATE_EMAIL_URL)
                 .contentType(APPLICATION_JSON)

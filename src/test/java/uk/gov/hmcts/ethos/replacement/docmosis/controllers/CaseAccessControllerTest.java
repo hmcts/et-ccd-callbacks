@@ -2,7 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.internal.mapping.JsonbMapper;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -71,8 +70,7 @@ class CaseAccessControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void assignClaimantTransferredCaseAccess_success() {
+    void assignClaimantTransferredCaseAccess_success() throws Exception {
         when(caseAccessService.assignExistingCaseRoles(any())).thenReturn(new ArrayList<>());
 
         mockMvc.perform(post(CLAIMANT_TRANSFERRED_CASE_URL)
@@ -88,8 +86,7 @@ class CaseAccessControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void assignClaimantTransferredCaseAccess_error() {
+    void assignClaimantTransferredCaseAccess_error() throws Exception {
         ccdRequest.getCaseDetails().getCaseData().setLinkedCaseCT(null);
         doCallRealMethod().when(caseAccessService).assignExistingCaseRoles(ccdRequest.getCaseDetails());
 

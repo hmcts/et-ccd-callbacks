@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,8 +20,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
@@ -47,7 +44,7 @@ class BulkHelperTest {
     private BulkDetails bulkDetailsListCases;
     private BulkDetails bulkDetailsScheduleDetailed;
 
-    private BulkDetails generateBulkDetails(String jsonFileName) throws IOException, URISyntaxException {
+    private BulkDetails generateBulkDetails(String jsonFileName) throws Exception {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
             .getContextClassLoader().getResource(jsonFileName)).toURI())));
         ObjectMapper mapper = new ObjectMapper();
@@ -55,8 +52,7 @@ class BulkHelperTest {
     }
 
     @BeforeEach
-    @SneakyThrows
-    void setUp() {
+    void setUp() throws Exception {
         bulkDetailsListCases = generateBulkDetails("bulkDetailsTest1.json");
         bulkDetailsScheduleDetailed = generateBulkDetails("bulkDetailsTest2.json");
         CaseData caseData = new CaseData();

@@ -2,7 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -45,7 +44,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -114,14 +112,13 @@ class BulkActionsControllerTest extends BaseControllerTest {
 
     private void doRequestSetUp() throws IOException, URISyntaxException {
         ObjectMapper objectMapper = new ObjectMapper();
-        requestContent = objectMapper.readTree(new File(Objects.requireNonNull(getClass()
-                .getResource("/exampleBulkV1.json")).toURI()));
+        requestContent = objectMapper.readTree(new File(getClass()
+                .getResource("/exampleBulkV1.json").toURI()));
     }
 
     @BeforeEach
     @Override
-    @SneakyThrows
-    public void setUp() {
+    public void setUp() throws Exception {
         super.setUp();
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         doRequestSetUp();
@@ -148,8 +145,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void createBulkCase() {
+    void createBulkCase() throws Exception {
         when(bulkSearchService.bulkCasesRetrievalRequest(isA(
                 BulkDetails.class), eq(AUTH_TOKEN), isA(Boolean.class))).thenReturn(bulkCasesPayload);
         when(bulkCreationService.bulkCreationLogic(isA(
@@ -168,8 +164,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void createBulkCaseES() {
+    void createBulkCaseES() throws Exception {
         when(bulkSearchService.bulkCasesRetrievalRequestElasticSearch(
                 isA(BulkDetails.class), eq(AUTH_TOKEN), isA(Boolean.class), isA(Boolean.class)))
                 .thenReturn(bulkCasesPayload);
@@ -189,8 +184,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void createSearchBulkCase() {
+    void createSearchBulkCase() throws Exception {
         when(bulkSearchService.bulkSearchLogic(isA(BulkDetails.class))).thenReturn(bulkRequestPayload);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(SEARCH_BULK_URL)
@@ -204,8 +198,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void midSearchBulkCase() {
+    void midSearchBulkCase() throws Exception {
         when(bulkSearchService.bulkMidSearchLogic(
                 isA(BulkDetails.class), isA(Boolean.class)))
                 .thenReturn(bulkRequestPayload);
@@ -222,8 +215,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void updateBulk() {
+    void updateBulk() throws Exception {
         when(bulkUpdateService.bulkUpdateLogic(
                 isA(BulkDetails.class), eq(AUTH_TOKEN))).thenReturn(bulkRequestPayload);
         when(bulkUpdateService.clearUpFields(
@@ -240,8 +232,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void updateBulkCase() {
+    void updateBulkCase() throws Exception {
         when(bulkCreationService.bulkUpdateCaseIdsLogic(
                 isA(BulkRequest.class), eq(AUTH_TOKEN), isA(Boolean.class))).thenReturn(bulkRequestPayload);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -276,8 +267,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void generateBulkLetter() {
+    void generateBulkLetter() throws Exception {
         when(documentGenerationService.processBulkDocumentRequest(
                 isA(BulkRequest.class), eq(AUTH_TOKEN))).thenReturn(bulkDocumentInfo);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -292,8 +282,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void generateBulkLetterConfirmation() {
+    void generateBulkLetterConfirmation() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(GENERATE_BULK_LETTER_CONFIRMATION_URL)
                 .content(requestContent.toString())
@@ -306,8 +295,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void generateBulkLetterWithErrors() {
+    void generateBulkLetterWithErrors() throws Exception {
         BulkDocumentInfo bulkDocumentInfo1 = new BulkDocumentInfo();
         bulkDocumentInfo1.setErrors(new ArrayList<>(Collections.singleton(
                 "There are not cases searched to generate letters")));
@@ -326,8 +314,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void midCreateSubMultiple() {
+    void midCreateSubMultiple() throws Exception {
         when(bulkSearchService.bulkMidSearchLogic(
                 isA(BulkDetails.class), isA(Boolean.class))).thenReturn(bulkRequestPayload);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -342,8 +329,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void createSubMultiple() {
+    void createSubMultiple() throws Exception {
         when(subMultipleService.createSubMultipleLogic(
                 isA(BulkDetails.class))).thenReturn(bulkRequestPayload);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -358,8 +344,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void subMultipleDynamicList() {
+    void subMultipleDynamicList() throws Exception {
         when(subMultipleService.populateSubMultipleDynamicListLogic(
                 isA(BulkDetails.class))).thenReturn(bulkRequestPayload);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -374,8 +359,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void filterDefaultedAllDynamicList() {
+    void filterDefaultedAllDynamicList() throws Exception {
         when(subMultipleService.populateFilterDefaultedDynamicListLogic(
                 isA(BulkDetails.class), isA(String.class))).thenReturn(bulkRequestPayload);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -390,8 +374,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void filterDefaultedNoneDynamicList() {
+    void filterDefaultedNoneDynamicList() throws Exception {
         when(subMultipleService.populateFilterDefaultedDynamicListLogic(
                 isA(BulkDetails.class), isA(String.class))).thenReturn(bulkRequestPayload);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -406,8 +389,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void midUpdateSubMultiple() {
+    void midUpdateSubMultiple() throws Exception {
         when(subMultipleService.bulkMidUpdateLogic(
                 isA(BulkDetails.class))).thenReturn(bulkRequestPayload);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -422,8 +404,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void updateSubMultiple() {
+    void updateSubMultiple() throws Exception {
         when(subMultipleService.updateSubMultipleLogic(
                 isA(BulkDetails.class))).thenReturn(bulkRequestPayload);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -438,8 +419,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void deleteSubMultiple() {
+    void deleteSubMultiple() throws Exception {
         when(subMultipleService.deleteSubMultipleLogic(
                 isA(BulkDetails.class))).thenReturn(bulkRequestPayload);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -454,8 +434,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void generateBulkSchedule() {
+    void generateBulkSchedule() throws Exception {
         when(documentGenerationService.processBulkScheduleRequest(
                 isA(BulkRequest.class), isA(String.class))).thenReturn(bulkDocumentInfo);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -470,8 +449,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void generateBulkScheduleConfirmation() {
+    void generateBulkScheduleConfirmation() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(GENERATE_BULK_SCHEDULE_CONFIRMATION_URL)
                 .content(requestContent.toString())
@@ -484,8 +462,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void generateBulkScheduleWithErrors() {
+    void generateBulkScheduleWithErrors() throws Exception {
         bulkDocumentInfo.setErrors(new ArrayList<>(Collections.singleton("Error")));
         when(documentGenerationService.processBulkScheduleRequest(
                 isA(BulkRequest.class), isA(String.class))).thenReturn(bulkDocumentInfo);
@@ -501,8 +478,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void generateBulkScheduleWithBulkInfo() {
+    void generateBulkScheduleWithBulkInfo() throws Exception {
         bulkDocumentInfo.setDocumentInfo(new DocumentInfo());
         when(documentGenerationService.processBulkScheduleRequest(
                 isA(BulkRequest.class), isA(String.class))).thenReturn(bulkDocumentInfo);
@@ -518,8 +494,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void preAcceptBulk() {
+    void preAcceptBulk() throws Exception {
         when(bulkSearchService.retrievalCasesForPreAcceptRequest(
                 isA(BulkDetails.class), eq(AUTH_TOKEN))).thenReturn(bulkCasesPayload.getSubmitEvents());
         when(bulkUpdateService.bulkPreAcceptLogic(
@@ -536,8 +511,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void afterSubmittedBulk() {
+    void afterSubmittedBulk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(AFTER_SUBMITTED_BULK_URL)
                 .content(requestContent.toString())
@@ -549,8 +523,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void createBulkCaseError400() {
+    void createBulkCaseError400() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(CREATION_BULK_URL)
                 .content("error")
@@ -560,8 +533,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void createBulkCaseESError400() {
+    void createBulkCaseESError400() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(CREATION_BULK_ES_URL)
                 .content("error")
@@ -571,8 +543,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void createSearchBulkCaseError400() {
+    void createSearchBulkCaseError400() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(SEARCH_BULK_URL)
                 .content("error")
@@ -582,8 +553,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void midSearchBulkCaseError400() {
+    void midSearchBulkCaseError400() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MID_SEARCH_BULK_URL)
                 .content("error")
@@ -593,8 +563,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void updateBulkError400() {
+    void updateBulkError400() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(UPDATE_BULK_URL)
                 .content("error")
@@ -604,8 +573,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void updateBulkCaseError400() {
+    void updateBulkCaseError400() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(UPDATE_BULK_CASE_URL)
                 .content("error")
@@ -615,8 +583,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void generateBulkLetterError400() {
+    void generateBulkLetterError400() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(GENERATE_BULK_LETTER_URL)
                 .content("error")
@@ -626,8 +593,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void midCreateSubMultipleError400() {
+    void midCreateSubMultipleError400() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MID_CREATE_SUB_MULTIPLE_URL)
                 .content("error")
@@ -637,8 +603,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void subMultipleDynamicListError400() {
+    void subMultipleDynamicListError400() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(SUB_MULTIPLE_DYNAMIC_LIST_URL)
                 .content("error")
@@ -648,8 +613,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void createSubMultipleError400() {
+    void createSubMultipleError400() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(CREATE_SUB_MULTIPLE_URL)
                 .content("error")
@@ -659,8 +623,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void filterDefaultedAllDynamicListError400() {
+    void filterDefaultedAllDynamicListError400() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(FILTER_DEFAULTED_ALL_DYNAMIC_LIST_URL)
                 .content("error")
@@ -670,8 +633,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void filterDefaultedNoneDynamicListError400() {
+    void filterDefaultedNoneDynamicListError400() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(FILTER_DEFAULTED_NONE_DYNAMIC_LIST_URL)
                 .content("error")
@@ -681,8 +643,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void midUpdateSubMultipleError400() {
+    void midUpdateSubMultipleError400() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MID_UPDATE_SUB_MULTIPLE_URL)
                 .content("error")
@@ -692,8 +653,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void updateSubMultipleError400() {
+    void updateSubMultipleError400() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(UPDATE_SUB_MULTIPLE_URL)
                 .content("error")
@@ -703,8 +663,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void deleteSubMultipleError400() {
+    void deleteSubMultipleError400() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(DELETE_SUB_MULTIPLE_URL)
                 .content("error")
@@ -714,8 +673,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void generateBulkScheduleError400() {
+    void generateBulkScheduleError400() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(GENERATE_BULK_SCHEDULE_URL)
                 .content("error")
@@ -725,8 +683,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void preAcceptBulkError400() {
+    void preAcceptBulkError400() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(PRE_ACCEPT_BULK_URL)
                 .content("error")
@@ -736,8 +693,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void createBulkCaseError500() {
+    void createBulkCaseError500() throws Exception {
         when(bulkSearchService.bulkCasesRetrievalRequest(
                 isA(BulkDetails.class), eq(AUTH_TOKEN),
                 isA(Boolean.class))).thenThrow(new InternalException(ERROR_MESSAGE));
@@ -750,8 +706,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void createBulkCaseESError500() {
+    void createBulkCaseESError500() throws Exception {
         when(bulkSearchService.bulkCasesRetrievalRequestElasticSearch(
                 isA(BulkDetails.class), eq(AUTH_TOKEN), isA(Boolean.class),
                 isA(Boolean.class))).thenThrow(new InternalException(ERROR_MESSAGE));
@@ -764,8 +719,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void createSearchBulkCaseError500() {
+    void createSearchBulkCaseError500() throws Exception {
         when(bulkSearchService.bulkSearchLogic(isA(BulkDetails.class)))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -777,8 +731,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void midSearchBulkCaseError500() {
+    void midSearchBulkCaseError500() throws Exception {
         when(bulkSearchService.bulkMidSearchLogic(
                 isA(BulkDetails.class), isA(Boolean.class))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -790,8 +743,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void updateBulkError500() {
+    void updateBulkError500() throws Exception {
         when(bulkUpdateService.bulkUpdateLogic(
                 isA(BulkDetails.class), eq(AUTH_TOKEN))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -803,8 +755,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void updateBulkCaseError500() {
+    void updateBulkCaseError500() throws Exception {
         when(bulkCreationService.bulkUpdateCaseIdsLogic(
                 isA(BulkRequest.class), eq(AUTH_TOKEN), isA(Boolean.class)))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
@@ -817,8 +768,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void generateBulkLetterError500() {
+    void generateBulkLetterError500() throws Exception {
         when(documentGenerationService.processBulkDocumentRequest(
                 isA(BulkRequest.class), eq(AUTH_TOKEN))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -830,8 +780,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void midCreateSubMultipleError500() {
+    void midCreateSubMultipleError500() throws Exception {
         when(bulkSearchService.bulkMidSearchLogic(
                 isA(BulkDetails.class), isA(Boolean.class))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -843,8 +792,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void createSubMultipleError500() {
+    void createSubMultipleError500() throws Exception {
         when(subMultipleService.createSubMultipleLogic(
                 isA(BulkDetails.class))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -856,8 +804,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void subMultipleDynamicListError500() {
+    void subMultipleDynamicListError500() throws Exception {
         when(subMultipleService.populateSubMultipleDynamicListLogic(
                 isA(BulkDetails.class))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -869,8 +816,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void filterDefaultedAllDynamicListError500() {
+    void filterDefaultedAllDynamicListError500() throws Exception {
         when(subMultipleService.populateFilterDefaultedDynamicListLogic(
                 isA(BulkDetails.class), isA(String.class))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -882,8 +828,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void filterDefaultedNoneDynamicListError500() {
+    void filterDefaultedNoneDynamicListError500() throws Exception {
         when(subMultipleService.populateFilterDefaultedDynamicListLogic(
                 isA(BulkDetails.class), isA(String.class))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -895,8 +840,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void midUpdateSubMultipleError500() {
+    void midUpdateSubMultipleError500() throws Exception {
         when(subMultipleService.bulkMidUpdateLogic(
                 isA(BulkDetails.class))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -908,8 +852,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void updateSubMultipleError500() {
+    void updateSubMultipleError500() throws Exception {
         when(subMultipleService.updateSubMultipleLogic(
                 isA(BulkDetails.class))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -921,8 +864,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void deleteSubMultipleError500() {
+    void deleteSubMultipleError500() throws Exception {
         when(subMultipleService.deleteSubMultipleLogic(
                 isA(BulkDetails.class))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -934,8 +876,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void generateBulkScheduleError500() {
+    void generateBulkScheduleError500() throws Exception {
         when(documentGenerationService.processBulkScheduleRequest(
                 isA(BulkRequest.class), isA(String.class))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -947,8 +888,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void preAcceptBulkError500() {
+    void preAcceptBulkError500() throws Exception {
         when(bulkSearchService.retrievalCasesForPreAcceptRequest(
                 isA(BulkDetails.class), eq(AUTH_TOKEN))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -960,8 +900,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void createBulkCaseForbidden() {
+    void createBulkCaseForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(CREATION_BULK_URL)
                 .content(requestContent.toString())
@@ -971,8 +910,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void createBulkCaseESForbidden() {
+    void createBulkCaseESForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(CREATION_BULK_ES_URL)
                 .content(requestContent.toString())
@@ -982,8 +920,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void createSearchBulkCaseForbidden() {
+    void createSearchBulkCaseForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(SEARCH_BULK_URL)
                 .content(requestContent.toString())
@@ -993,8 +930,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void midSearchBulkCaseForbidden() {
+    void midSearchBulkCaseForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MID_SEARCH_BULK_URL)
                 .content(requestContent.toString())
@@ -1004,8 +940,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void updateBulkForbidden() {
+    void updateBulkForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(UPDATE_BULK_URL)
                 .content(requestContent.toString())
@@ -1015,8 +950,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void updateBulkCaseForbidden() {
+    void updateBulkCaseForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(UPDATE_BULK_CASE_URL)
                 .content(requestContent.toString())
@@ -1026,8 +960,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void generateBulkLetterForbidden() {
+    void generateBulkLetterForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(GENERATE_BULK_LETTER_URL)
                 .content(requestContent.toString())
@@ -1037,8 +970,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void generateBulkLetterConfirmationForbidden() {
+    void generateBulkLetterConfirmationForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(GENERATE_BULK_LETTER_CONFIRMATION_URL)
                 .content(requestContent.toString())
@@ -1048,8 +980,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void midCreateSubMultipleForbidden() {
+    void midCreateSubMultipleForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MID_CREATE_SUB_MULTIPLE_URL)
                 .content(requestContent.toString())
@@ -1059,8 +990,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void createSubMultipleForbidden() {
+    void createSubMultipleForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(CREATE_SUB_MULTIPLE_URL)
                 .content(requestContent.toString())
@@ -1070,8 +1000,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void subMultipleDynamicListForbidden() {
+    void subMultipleDynamicListForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(SUB_MULTIPLE_DYNAMIC_LIST_URL)
                 .content(requestContent.toString())
@@ -1081,8 +1010,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void filterDefaultedAllDynamicListForbidden() {
+    void filterDefaultedAllDynamicListForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(FILTER_DEFAULTED_ALL_DYNAMIC_LIST_URL)
                 .content(requestContent.toString())
@@ -1092,8 +1020,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void filterDefaultedNoneDynamicListForbidden() {
+    void filterDefaultedNoneDynamicListForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(FILTER_DEFAULTED_NONE_DYNAMIC_LIST_URL)
                 .content(requestContent.toString())
@@ -1103,8 +1030,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void midUpdateSubMultipleForbidden() {
+    void midUpdateSubMultipleForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MID_UPDATE_SUB_MULTIPLE_URL)
                 .content(requestContent.toString())
@@ -1114,8 +1040,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void updateSubMultipleForbidden() {
+    void updateSubMultipleForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(UPDATE_SUB_MULTIPLE_URL)
                 .content(requestContent.toString())
@@ -1125,8 +1050,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void deleteSubMultipleForbidden() {
+    void deleteSubMultipleForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(DELETE_SUB_MULTIPLE_URL)
                 .content(requestContent.toString())
@@ -1136,8 +1060,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void generateBulkScheduleForbidden() {
+    void generateBulkScheduleForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(GENERATE_BULK_SCHEDULE_URL)
                 .content(requestContent.toString())
@@ -1147,8 +1070,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void generateBulkScheduleConfirmationForbidden() {
+    void generateBulkScheduleConfirmationForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(GENERATE_BULK_SCHEDULE_CONFIRMATION_URL)
                 .content(requestContent.toString())
@@ -1158,8 +1080,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void preAcceptBulkForbidden() {
+    void preAcceptBulkForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(PRE_ACCEPT_BULK_URL)
                 .content(requestContent.toString())
@@ -1169,8 +1090,7 @@ class BulkActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void afterSubmittedBulkForbidden() {
+    void afterSubmittedBulkForbidden() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(AFTER_SUBMITTED_BULK_URL)
                 .content(requestContent.toString())

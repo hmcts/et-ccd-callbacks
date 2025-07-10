@@ -2,19 +2,28 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
+import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxService;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,6 +37,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.RESPONSE_TO
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.DATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
+import static uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole.CLAIMANTSOLICITOR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItemFromTopLevel;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.ET3_RESPONSE_PDF_FILE_NAME;
 
@@ -42,9 +52,17 @@ public class Et3ResponseService {
     public static final String ET3_ATTACHMENT = "ET3 Attachment";
     public static final String SHORT_DESCRIPTION = "Attached document submitted with a Response";
     public static final String ET3_CATEGORY_ID = "C18";
+    private static final String INVALID_USER_TOKEN = "Invalid user token";
+    private static final String INVALID_CASE_ID = "Invalid case ID";
+    private static final String CASE_ROLES_NOT_FOUND = "Case roles not found";
+    private static final String USER_NOT_FOUND = "User not found";
+    private static final String USER_ID_NOT_FOUND = "User ID not found";
+    private static final String USER_NOT_RESPONDENT_REPRESENTATIVE = "User is not respondent representative";
     private final DocumentManagementService documentManagementService;
     private final PdfBoxService pdfBoxService;
     private final EmailService emailService;
+    private final UserIdamService userIdamService;
+    private final CcdCaseAssignment ccdCaseAssignment;
 
     @Value("${template.et3Response.tribunal}")
     private String et3EmailTribunalTemplateId;
@@ -184,5 +202,64 @@ public class Et3ResponseService {
         return caseData.getRespondentCollection().stream()
             .map(o -> o.getValue().getRespondentName())
             .collect(Collectors.joining(", "));
+    }
+
+    /**
+     * Determines whether the currently authenticated user, identified by the given token, is
+     * a representative (solicitor) for any respondent in the specified case.
+     * <p>
+     * This method performs the following steps:
+     * <ul>
+     *     <li>Validates the provided user token and case ID.</li>
+     *     <li>Retrieves user details using the user token. Throws an exception if the user is not found or
+     *     lacks a UID.</li>
+     *     <li>Fetches the case user role assignments for the given case.</li>
+     *     <li>Parses solicitor roles from the case user roles and collects their indices.</li>
+     * </ul>
+     *
+     * @param userToken the authentication token of the user
+     * @param caseId the ID of the case to check roles against
+     * @return a list of integer indices indicating which respondents the user represents
+     * @throws GenericServiceException if the user or required data (e.g., user details, case roles)
+     *         cannot be found or parsed
+     * @throws IOException if an error occurs during communication with downstream services
+     */
+    public List<Integer> isRespondentRepresentative(String userToken, String caseId)
+            throws GenericServiceException, IOException {
+        checkUserTokenAndCaseid(userToken, caseId);
+
+        UserDetails userDetails = userIdamService.getUserDetails(userToken);
+        if (ObjectUtils.isEmpty(userDetails)) {
+            throw new GenericServiceException(USER_NOT_FOUND, new Exception(USER_NOT_FOUND),
+                    USER_NOT_FOUND, caseId, "Et3ResponseService", "isRespondentRepresentative");
+        }
+        if (StringUtils.isBlank(userDetails.getUid())) {
+            throw new GenericServiceException(USER_ID_NOT_FOUND, new Exception(USER_ID_NOT_FOUND),
+                    USER_ID_NOT_FOUND, caseId, "Et3ResponseService", "isRespondentRepresentative");
+        }
+
+        CaseUserAssignmentData caseUserAssignmentData = ccdCaseAssignment.getCaseUserRoles(caseId);
+        if (ObjectUtils.isEmpty(caseUserAssignmentData)) {
+            throw new GenericServiceException(CASE_ROLES_NOT_FOUND, new Exception(CASE_ROLES_NOT_FOUND),
+                    CASE_ROLES_NOT_FOUND, caseId, "Et3ResponseService", "isRespondentRepresentative");
+        }
+
+        List<Integer> solicitorIndexList = new ArrayList<>();
+        for (CaseUserAssignment caseUserAssignment : caseUserAssignmentData.getCaseUserAssignments()) {
+            SolicitorRole solicitorRole = SolicitorRole.from(caseUserAssignment.getCaseRole()).orElseThrow();
+            solicitorIndexList.add(solicitorRole.getIndex());
+        }
+        return solicitorIndexList;
+    }
+
+    private static void checkUserTokenAndCaseid(String userToken, String caseId) throws GenericServiceException {
+        if (StringUtils.isBlank(caseId)) {
+            throw new GenericServiceException(INVALID_CASE_ID, new Exception(INVALID_CASE_ID),
+                    INVALID_CASE_ID, StringUtils.EMPTY, "Et3ResponseService", "isRespondentRepresentative");
+        }
+        if (StringUtils.isBlank(userToken)) {
+            throw new GenericServiceException(INVALID_USER_TOKEN, new Exception(INVALID_USER_TOKEN),
+                    INVALID_USER_TOKEN, caseId, "Et3ResponseService", "isRespondentRepresentative");
+        }
     }
 }

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -64,7 +63,7 @@ class Et1VettingControllerTest extends BaseControllerTest {
 
     @BeforeEach
     @Override
-    protected void setUp()  {
+    protected void setUp() throws Exception {
         super.setUp();
         CaseData caseData = new CaseData();
         caseData.setManagingOffice("Manchester");
@@ -73,8 +72,7 @@ class Et1VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void initialiseEt1Vetting_Success()  {
+    void initialiseEt1Vetting_Success() throws Exception {
 
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(et1VettingService.generateJurisdictionCodesHtml(anyList())).thenReturn("jurCodeHtml");
@@ -92,8 +90,7 @@ class Et1VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void initialiseEt1Vetting_invalidToken()  {
+    void initialiseEt1Vetting_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(INIT_CASE_VETTING_ENDPOINT)
                         .contentType(APPLICATION_JSON)
@@ -104,20 +101,18 @@ class Et1VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void initialiseEt1Vetting_BadRequest()  {
+    void initialiseEt1Vetting_BadRequest() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(INIT_CASE_VETTING_ENDPOINT)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                        .content("\"error\""))
+                        .content("error"))
                 .andExpect(status().isBadRequest());
         verify(et1VettingService, never()).initialiseEt1Vetting(ccdRequest.getCaseDetails());
     }
 
     @Test
-    @SneakyThrows
-    void jurisdictionCodes_Success()  {
+    void jurisdictionCodes_Success() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(et1VettingService.validateJurisdictionCodes(any())).thenReturn(List.of());
         when(et1VettingService.populateEt1TrackAllocationHtml(any())).thenReturn("jurCodeHtml");
@@ -136,8 +131,7 @@ class Et1VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void jurisdictionCodes_invalidToken()  {
+    void jurisdictionCodes_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(JURISDICTION_CODE_ENDPOINT)
                 .contentType(APPLICATION_JSON)
@@ -148,8 +142,7 @@ class Et1VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void hearingVenues_Success()  {
+    void hearingVenues_Success() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(et1VettingService.getAddressesHtml(any())).thenReturn("addressesHtml");
         when(et1VettingService.getHearingVenuesList(any())).thenReturn(new DynamicFixedListType());
@@ -164,8 +157,7 @@ class Et1VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void hearingVenues_invalidToken()  {
+    void hearingVenues_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(HEARING_VENUE_ENDPOINT)
                 .contentType(APPLICATION_JSON)
@@ -185,8 +177,7 @@ class Et1VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void et1ProcessingComplete_tokenOk()  {
+    void et1ProcessingComplete_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(ET1_PROCESSING_COMPLETE_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -199,8 +190,7 @@ class Et1VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void et1ProcessingComplete_tokenFail()  {
+    void et1ProcessingComplete_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(ET1_PROCESSING_COMPLETE_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -210,8 +200,7 @@ class Et1VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void et1ProcessingComplete_badRequest()  {
+    void et1ProcessingComplete_badRequest() throws Exception {
         mockMvc.perform(post(ET1_PROCESSING_COMPLETE_URL)
                 .content("garbage content")
                 .header("Authorization", AUTH_TOKEN)
@@ -220,8 +209,7 @@ class Et1VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void et1VettingAboutToSubmittokenOk()  {
+    void et1VettingAboutToSubmittokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(ET1_VETTING_ABOUT_TO_SUBMIT)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -234,8 +222,7 @@ class Et1VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void et1VettingAboutToSubmit_tokenFail()  {
+    void et1VettingAboutToSubmit_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(ET1_VETTING_ABOUT_TO_SUBMIT)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -245,8 +232,7 @@ class Et1VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void et1VettingAboutToSubmit_badRequest()  {
+    void et1VettingAboutToSubmit_badRequest() throws Exception {
         mockMvc.perform(post(ET1_VETTING_ABOUT_TO_SUBMIT)
                         .content("garbage content")
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)

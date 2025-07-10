@@ -2,7 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.controllers.multiples;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,7 +20,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.Objects;
 
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.notNullValue;
@@ -52,21 +50,19 @@ class MultiplesSendNotificationControllerTest extends BaseControllerTest {
 
     private void doRequestSetUp() throws IOException, URISyntaxException {
         ObjectMapper objectMapper = new ObjectMapper();
-        requestContent = objectMapper.readTree(new File(Objects.requireNonNull(getClass()
-                .getResource("/exampleBulkV1.json")).toURI()));
+        requestContent = objectMapper.readTree(new File(getClass()
+                .getResource("/exampleBulkV1.json").toURI()));
     }
 
     @BeforeEach
-    @SneakyThrows
-    void setUpTests() {
+    void setUpTests() throws Exception {
         super.setUp();
         mockMvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         doRequestSetUp();
     }
 
     @Test
-    @SneakyThrows
-    void aboutToStart_ok() {
+    void aboutToStart_ok() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(ABOUT_TO_START_URL)
                         .content(requestContent.toString())
@@ -79,8 +75,7 @@ class MultiplesSendNotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToStart_badToken() {
+    void aboutToStart_badToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(ABOUT_TO_START_URL)
                         .content(requestContent.toString())
@@ -90,8 +85,7 @@ class MultiplesSendNotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToSubmit_ok() {
+    void aboutToSubmit_ok() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                         .content(requestContent.toString())
@@ -104,8 +98,7 @@ class MultiplesSendNotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToSubmit_badToken() {
+    void aboutToSubmit_badToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                         .content(requestContent.toString())
@@ -115,8 +108,7 @@ class MultiplesSendNotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void submitted_ok() {
+    void submitted_ok() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(SUBMITTED_URL)
                         .content(requestContent.toString())
@@ -129,8 +121,7 @@ class MultiplesSendNotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void submitted_badToken() {
+    void submitted_badToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(SUBMITTED_URL)
                         .content(requestContent.toString())

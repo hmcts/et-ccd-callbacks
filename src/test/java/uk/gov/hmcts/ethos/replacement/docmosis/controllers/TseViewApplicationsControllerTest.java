@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -58,11 +57,11 @@ class TseViewApplicationsControllerTest extends BaseControllerTest {
 
     @BeforeEach
     @Override
-    protected void setUp() {
+    protected void setUp() throws Exception {
         super.setUp();
         CaseData caseData = CaseDataBuilder.builder()
             .withEthosCaseReference("9876")
-            .withClaimantType("testing@Test.com")
+            .withClaimantType("testing@test.com")
             .withRespondent("respondent", YES, "01-Jan-2023", false)
             .build();
 
@@ -79,8 +78,7 @@ class TseViewApplicationsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToStart_tokenOk() {
+    void aboutToStart_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(ABOUT_TO_START_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -93,8 +91,7 @@ class TseViewApplicationsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToStart_tokenFail() {
+    void aboutToStart_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(ABOUT_TO_START_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -104,8 +101,7 @@ class TseViewApplicationsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToStart_badRequest() {
+    void aboutToStart_badRequest() throws Exception {
         mockMvc.perform(post(ABOUT_TO_START_URL)
                         .content("garbage content")
                         .header("Authorization", AUTH_TOKEN)
@@ -114,8 +110,7 @@ class TseViewApplicationsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void midPopulateChooseApplication_tokenOk() {
+    void midPopulateChooseApplication_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(MID_POPULATE_CHOOSE_APPLICATION_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -128,8 +123,7 @@ class TseViewApplicationsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void midPopulateChooseApplication_tokenFail() {
+    void midPopulateChooseApplication_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(MID_POPULATE_CHOOSE_APPLICATION_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -139,8 +133,7 @@ class TseViewApplicationsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void midPopulateChooseApplication_badRequest() {
+    void midPopulateChooseApplication_badRequest() throws Exception {
         mockMvc.perform(post(MID_POPULATE_CHOOSE_APPLICATION_URL)
                         .content("test content")
                         .header("Authorization", AUTH_TOKEN)
@@ -149,8 +142,7 @@ class TseViewApplicationsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void midPopulateReply_tokenOk() {
+    void midPopulateReply_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(MID_POPULATE_SELECTED_APPLICATION)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -163,8 +155,7 @@ class TseViewApplicationsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void midPopulateReply_tokenFail() {
+    void midPopulateReply_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(MID_POPULATE_SELECTED_APPLICATION)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -174,8 +165,7 @@ class TseViewApplicationsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void midPopulateReply_badRequest() {
+    void midPopulateReply_badRequest() throws Exception {
         mockMvc.perform(post(MID_POPULATE_SELECTED_APPLICATION)
                         .content("garbage content")
                         .header("Authorization", AUTH_TOKEN)

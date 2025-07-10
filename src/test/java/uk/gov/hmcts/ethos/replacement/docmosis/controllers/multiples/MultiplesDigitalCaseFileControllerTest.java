@@ -2,7 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.controllers.multiples;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,7 +20,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.Objects;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
@@ -48,21 +46,19 @@ class MultiplesDigitalCaseFileControllerTest extends BaseControllerTest {
 
     private void doRequestSetUp() throws IOException, URISyntaxException {
         ObjectMapper objectMapper = new ObjectMapper();
-        requestContent = objectMapper.readTree(new File(Objects.requireNonNull(getClass()
-                .getResource("/exampleBulkV1.json")).toURI()));
+        requestContent = objectMapper.readTree(new File(getClass()
+                .getResource("/exampleBulkV1.json").toURI()));
     }
 
     @BeforeEach
-    @SneakyThrows
-    void setUpTests() {
+    void setUpTests() throws Exception {
         super.setUp();
         mockMvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         doRequestSetUp();
     }
 
     @Test
-    @SneakyThrows
-    void aboutToStart_ok() {
+    void aboutToStart_ok() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(ABOUT_TO_START_URL)
                         .content(requestContent.toString())
@@ -74,8 +70,7 @@ class MultiplesDigitalCaseFileControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToSubmit_ok() {
+    void aboutToSubmit_ok() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                         .content(requestContent.toString())

@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -71,7 +70,7 @@ class Et3NotificationControllerTest extends BaseControllerTest {
 
     @BeforeEach
     @Override
-    protected void setUp() {
+    protected void setUp() throws Exception {
         super.setUp();
         CaseDetails caseDetails = CaseDataBuilder.builder()
             .withEthosCaseReference("12345/6789")
@@ -91,7 +90,7 @@ class Et3NotificationControllerTest extends BaseControllerTest {
 
         CaseData caseDataWithNotificationDocument = caseDetails.getCaseData();
         caseDataWithNotificationDocument.setClaimant("Claimant LastName");
-        caseDataWithNotificationDocument.getRespondentCollection().getFirst()
+        caseDataWithNotificationDocument.getRespondentCollection().get(0)
                 .getValue().setResponseStatus(ACCEPTED_STATE);
         caseDataWithNotificationDocument.setEt3NotificationDocCollection(List.of(DocumentTypeItem.builder()
                 .value(DocumentType.builder().typeOfDocument(
@@ -127,8 +126,7 @@ class Et3NotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToStart_tokenOk() {
+    void aboutToStart_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(ABOUT_TO_START_URL)
                         .content(jsonMapper.toJson(ccdRequestWithET3NotificationDocument))
@@ -140,8 +138,7 @@ class Et3NotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToStart_noRespondentResponseStatus() {
+    void aboutToStart_noRespondentResponseStatus() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(servingService.generateOtherTypeDocumentLink(anyList())).thenReturn("expectedDocumentName");
         when(servingService.generateEmailLinkToAcas(any(), anyBoolean())).thenReturn("expectedLink");
@@ -155,8 +152,7 @@ class Et3NotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToStart_tokenFail() {
+    void aboutToStart_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(ABOUT_TO_START_URL)
                         .content(jsonMapper.toJson(ccdRequestWithET3NotificationDocument))
@@ -166,8 +162,7 @@ class Et3NotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void midUploadDocuments_tokenOk() {
+    void midUploadDocuments_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(servingService.generateOtherTypeDocumentLink(anyList())).thenReturn("expectedDocumentName");
         when(servingService.generateEmailLinkToAcas(any(), anyBoolean())).thenReturn("expectedLink");
@@ -185,8 +180,7 @@ class Et3NotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void midUploadDocuments_invalidET3NotificationDocumentList() {
+    void midUploadDocuments_invalidET3NotificationDocumentList() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MID_UPLOAD_DOCUMENTS_URL)
                         .content(jsonMapper.toJson(ccdRequestInvalidET3NotificationDocumentCollection))
@@ -197,8 +191,7 @@ class Et3NotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void midUploadDocuments_invalidRespondentCollection() {
+    void midUploadDocuments_invalidRespondentCollection() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MID_UPLOAD_DOCUMENTS_URL)
                         .content(jsonMapper.toJson(ccdRequestWithoutRespondentResponseAcceptedState))
@@ -209,8 +202,7 @@ class Et3NotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void midUploadDocuments_tokenFail() {
+    void midUploadDocuments_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MID_UPLOAD_DOCUMENTS_URL)
                 .content(jsonMapper.toJson(ccdRequestWithET3NotificationDocument))
@@ -220,8 +212,7 @@ class Et3NotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void midUploadDocuments_badRequest() {
+    void midUploadDocuments_badRequest() throws Exception {
         mvc.perform(post(SUBMITTED_URL)
                 .content("garbage content")
                 .header("Authorization", AUTH_TOKEN)
@@ -230,8 +221,7 @@ class Et3NotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToSubmit_tokenOk() {
+    void aboutToSubmit_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(ABOUT_TO_SUBMIT_URL)
                         .content(jsonMapper.toJson(ccdRequestWithET3NotificationDocument))
@@ -246,8 +236,7 @@ class Et3NotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToSubmit_tokenFail() {
+    void aboutToSubmit_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(ABOUT_TO_SUBMIT_URL)
                         .content(jsonMapper.toJson(ccdRequestWithET3NotificationDocument))
@@ -257,8 +246,7 @@ class Et3NotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void submitted_tokenOk() {
+    void submitted_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         SubmitEvent submitEvent = new SubmitEvent();
         submitEvent.setCaseId(1L);
@@ -277,8 +265,7 @@ class Et3NotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void submitted_tokenFail() {
+    void submitted_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(SUBMITTED_URL)
                 .content(jsonMapper.toJson(ccdRequestWithET3NotificationDocument))
@@ -288,8 +275,7 @@ class Et3NotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void submitted_badRequest() {
+    void submitted_badRequest() throws Exception {
         mvc.perform(post(SUBMITTED_URL)
                 .content("garbage content")
                 .header("Authorization", AUTH_TOKEN)

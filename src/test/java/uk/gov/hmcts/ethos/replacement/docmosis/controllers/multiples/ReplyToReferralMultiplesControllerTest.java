@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers.multiples;
 
-import lombok.SneakyThrows;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -81,8 +79,7 @@ class ReplyToReferralMultiplesControllerTest extends BaseControllerTest {
 
     @BeforeEach
     @Override
-    @SneakyThrows
-    protected void setUp() {
+    protected void setUp() throws Exception {
         super.setUp();
         when(emailService.getExuiCaseLink(any())).thenReturn("exui");
         CaseData caseData = CaseDataBuilder.builder()
@@ -115,7 +112,6 @@ class ReplyToReferralMultiplesControllerTest extends BaseControllerTest {
         multipleData.setReferralCollection(List.of(createReferralTypeItem()));
         DynamicFixedListType selectReferralList = 
             ReferralHelper.populateSelectReferralDropdown(multipleData.getReferralCollection());
-        Assertions.assertNotNull(selectReferralList);
         selectReferralList.setValue(new DynamicValueType());
         selectReferralList.getValue().setCode("1");
         multipleData.setSelectReferral(selectReferralList);
@@ -127,8 +123,8 @@ class ReplyToReferralMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToStartReferralReply_Success() {
+    void aboutToStartReferralReply_Success() throws Exception {
+
         mockMvc.perform(post(START_REPLY_REFERRAL_URL)
                 .contentType(APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -140,8 +136,10 @@ class ReplyToReferralMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToSubmit_NoReplyToEmailAddress_tokenOk() {
+    void aboutToSubmit_NoReplyToEmailAddress_tokenOk() throws Exception {
+
+        UserDetails details = new UserDetails();
+        details.setName("First Last");
         request.getCaseDetails().getCaseData().setReplyToEmailAddress("");
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                         .contentType(APPLICATION_JSON)
@@ -155,8 +153,7 @@ class ReplyToReferralMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void initHearingAndReferralDetails_Success() {
+    void initHearingAndReferralDetails_Success() throws Exception {
 
         mockMvc.perform(post(MID_HEARING_DETAILS_URL)
                 .contentType(APPLICATION_JSON)
@@ -169,8 +166,7 @@ class ReplyToReferralMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToSubmitReferralReply_Success() {
+    void aboutToSubmitReferralReply_Success() throws Exception {
 
         UserDetails details = new UserDetails();
         details.setName("First Last");
@@ -186,8 +182,7 @@ class ReplyToReferralMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToStartReferralReply_invalidToken() {
+    void aboutToStartReferralReply_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(START_REPLY_REFERRAL_URL)
                 .contentType(APPLICATION_JSON)
@@ -197,8 +192,7 @@ class ReplyToReferralMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void initHearingAndReferralDetails_invalidToken() {
+    void initHearingAndReferralDetails_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(MID_HEARING_DETAILS_URL)
                 .contentType(APPLICATION_JSON)
@@ -208,8 +202,7 @@ class ReplyToReferralMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToSubmitReferralReply_invalidToken() {
+    void aboutToSubmitReferralReply_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         when(userIdamService.getUserDetails(any())).thenReturn(new UserDetails());
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
@@ -220,8 +213,7 @@ class ReplyToReferralMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void completeReplyToReferral_tokenOk() {
+    void completeReplyToReferral_tokenOk() throws Exception {
 
         mockMvc.perform(post(SUBMITTED_REFERRAL_URL)
                 .contentType(APPLICATION_JSON)
@@ -232,8 +224,7 @@ class ReplyToReferralMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void completeReplyToReferral_invalidToken() {
+    void completeReplyToReferral_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(SUBMITTED_REFERRAL_URL)
                 .contentType(APPLICATION_JSON)
@@ -243,8 +234,7 @@ class ReplyToReferralMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void validateReplyToEmail_tokenOk() {
+    void validateReplyToEmail_tokenOk() throws Exception {
         mockMvc.perform(post(VALIDATE_EMAIL_URL)
                 .contentType(APPLICATION_JSON)
                 .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -254,8 +244,7 @@ class ReplyToReferralMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void validateNoReplyToEmail_tokenOk() {
+    void validateNoReplyToEmail_tokenOk() throws Exception {
         request.getCaseDetails().getCaseData().setReplyToEmailAddress("");
         mockMvc.perform(post(VALIDATE_EMAIL_URL)
                         .contentType(APPLICATION_JSON)
@@ -266,8 +255,7 @@ class ReplyToReferralMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void validateReplyToEmail_invalidToken() {
+    void validateReplyToEmail_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(VALIDATE_EMAIL_URL)
                 .contentType(APPLICATION_JSON)

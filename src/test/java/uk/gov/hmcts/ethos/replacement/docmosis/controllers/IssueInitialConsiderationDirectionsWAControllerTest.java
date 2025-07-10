@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -53,7 +52,7 @@ class IssueInitialConsiderationDirectionsWAControllerTest extends BaseController
 
     @BeforeEach
     @Override
-    protected void setUp() {
+    protected void setUp() throws Exception {
         super.setUp();
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
 
@@ -68,8 +67,7 @@ class IssueInitialConsiderationDirectionsWAControllerTest extends BaseController
     }
 
     @Test
-    @SneakyThrows
-    void startInitialConsiderationTest() {
+    void startInitialConsiderationTest() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(START_INITIAL_CONSIDERATION_DIRECTIONS_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -80,8 +78,7 @@ class IssueInitialConsiderationDirectionsWAControllerTest extends BaseController
     }
 
     @Test
-    @SneakyThrows
-    void submitInitialConsideration_TokenOk() {
+    void submitInitialConsideration_TokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(SUBMIT_INITIAL_CONSIDERATION_DIRECTIONS_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -94,8 +91,7 @@ class IssueInitialConsiderationDirectionsWAControllerTest extends BaseController
     }
 
     @Test
-    @SneakyThrows
-    void submitInitialConsideration_TokenFail() {
+    void submitInitialConsideration_TokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(SUBMIT_INITIAL_CONSIDERATION_DIRECTIONS_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -105,8 +101,7 @@ class IssueInitialConsiderationDirectionsWAControllerTest extends BaseController
     }
 
     @Test
-    @SneakyThrows
-    void submitInitialConsideration_BadRequest() {
+    void submitInitialConsideration_BadRequest() throws Exception {
         mvc.perform(post(SUBMIT_INITIAL_CONSIDERATION_DIRECTIONS_URL)
                         .content("bad request")
                         .header("Authorization", AUTH_TOKEN)
@@ -115,8 +110,7 @@ class IssueInitialConsiderationDirectionsWAControllerTest extends BaseController
     }
 
     @Test
-    @SneakyThrows
-    void initICCompleteTokenOk() {
+    void initICCompleteTokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(COMPLETE_INITIAL_CONSIDERATION_DIRECTIONS_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -127,8 +121,7 @@ class IssueInitialConsiderationDirectionsWAControllerTest extends BaseController
     }
 
     @Test
-    @SneakyThrows
-    void initICCompleteTokenFail() {
+    void initICCompleteTokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(COMPLETE_INITIAL_CONSIDERATION_DIRECTIONS_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -138,8 +131,7 @@ class IssueInitialConsiderationDirectionsWAControllerTest extends BaseController
     }
 
     @Test
-    @SneakyThrows
-    void initICCompleteBadRequest() {
+    void initICCompleteBadRequest() throws Exception {
         mvc.perform(post(COMPLETE_INITIAL_CONSIDERATION_DIRECTIONS_URL)
                         .content("bad request")
                         .header("Authorization", AUTH_TOKEN)

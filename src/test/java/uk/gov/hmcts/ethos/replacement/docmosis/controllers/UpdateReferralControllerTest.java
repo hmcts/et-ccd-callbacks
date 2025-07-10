@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
-import lombok.SneakyThrows;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -84,7 +82,6 @@ class UpdateReferralControllerTest {
         caseData.setReferralSubject("ET1");
         DynamicFixedListType selectReferralList = 
             ReferralHelper.populateSelectReferralDropdown(caseData.getReferralCollection());
-        Assertions.assertNotNull(selectReferralList);
         selectReferralList.setValue(new DynamicValueType());
         selectReferralList.getValue().setCode("1");
         caseData.setSelectReferral(selectReferralList);
@@ -105,8 +102,7 @@ class UpdateReferralControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void startUpdate_Success() {
+    void startUpdate_Success() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(START_UPDATE_REFERRAL_URL)
                 .contentType(APPLICATION_JSON)
@@ -120,8 +116,7 @@ class UpdateReferralControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void initReferralHearingDetails_invalidToken() {
+    void initReferralHearingDetails_invalidToken() throws Exception {
 
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(START_UPDATE_REFERRAL_URL)
@@ -132,8 +127,7 @@ class UpdateReferralControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToSubmit_tokenOk() {
+    void aboutToSubmit_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         UserDetails details = new UserDetails();
         details.setName("First Last");
@@ -160,8 +154,7 @@ class UpdateReferralControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToSubmitNoUpdateReferentEmailAddress_tokenOk() {
+    void aboutToSubmitNoUpdateReferentEmailAddress_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         UserDetails details = new UserDetails();
         details.setName("First Last");
@@ -188,13 +181,11 @@ class UpdateReferralControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void referralStatusNotCorrect() {
+    void referralStatusNotCorrect() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         UserDetails details = new UserDetails();
         details.setName("First Last");
-        ccdRequest.getCaseDetails().getCaseData().getReferralCollection()
-                .getFirst().getValue().setReferralStatus("Closed");
+        ccdRequest.getCaseDetails().getCaseData().getReferralCollection().get(0).getValue().setReferralStatus("Closed");
         when(userIdamService.getUserDetails(any())).thenReturn(details);
         mockMvc.perform(post(INIT_HEARING_AND_REFERRAL_DETAILS_URL)
                         .contentType(APPLICATION_JSON)
@@ -208,13 +199,12 @@ class UpdateReferralControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void referralStatusCorrect() {
+    void referralStatusCorrect() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         UserDetails details = new UserDetails();
         details.setName("First Last");
         ccdRequest.getCaseDetails().getCaseData().getReferralCollection()
-                .getFirst().getValue().setReferralStatus("Awaiting instructions");
+                .get(0).getValue().setReferralStatus("Awaiting instructions");
         when(userIdamService.getUserDetails(any())).thenReturn(details);
         mockMvc.perform(post(INIT_HEARING_AND_REFERRAL_DETAILS_URL)
                         .contentType(APPLICATION_JSON)
@@ -227,8 +217,7 @@ class UpdateReferralControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void aboutToSubmit_invalidToken() {
+    void aboutToSubmit_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                 .contentType(APPLICATION_JSON)

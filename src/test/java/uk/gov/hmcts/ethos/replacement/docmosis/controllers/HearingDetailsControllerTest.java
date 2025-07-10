@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,8 +45,7 @@ class HearingDetailsControllerTest {
     private JsonMapper jsonMapper;
 
     @Test
-    @SneakyThrows
-    void testInitialiseHearingDynamicList() {
+    void testInitialiseHearingDynamicList() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         String token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
@@ -65,8 +63,7 @@ class HearingDetailsControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void testInitialiseHearingDynamicListInvalidToken() {
+    void testInitialiseHearingDynamicListInvalidToken() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         String token = "invalid-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
@@ -81,8 +78,7 @@ class HearingDetailsControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void testHandleListingSelected() {
+    void testHandleListingSelected() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         String token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
@@ -100,8 +96,7 @@ class HearingDetailsControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void testHandleListingSelectedInvalidToken() {
+    void testHandleListingSelectedInvalidToken() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         String token = "invalid-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
@@ -116,8 +111,7 @@ class HearingDetailsControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void testhearingMidEventValidation() {
+    void testhearingMidEventValidation() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         String token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
@@ -134,8 +128,7 @@ class HearingDetailsControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void testhearingMidEventValidationInvalidToken() {
+    void testhearingMidEventValidationInvalidToken() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         String token = "invalid-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);
@@ -150,8 +143,7 @@ class HearingDetailsControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void testAboutToSubmit() {
+    void testAboutToSubmit() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         String token = "some-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
@@ -169,8 +161,7 @@ class HearingDetailsControllerTest {
     }
 
     @Test
-    @SneakyThrows
-    void testAboutToSubmitInvalidToken() {
+    void testAboutToSubmitInvalidToken() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         String token = "invalid-token";
         when(verifyTokenService.verifyTokenSignature(token)).thenReturn(false);

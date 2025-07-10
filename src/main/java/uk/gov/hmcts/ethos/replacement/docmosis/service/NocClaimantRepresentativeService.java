@@ -8,7 +8,6 @@ import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
-import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
@@ -67,10 +66,7 @@ public class NocClaimantRepresentativeService {
         RepresentedTypeC claimantRep = new RepresentedTypeC();
         claimantRep.setNameOfRepresentative(userDetails.getFirstName() + " " + userDetails.getLastName());
         claimantRep.setRepresentativeEmailAddress(userDetails.getEmail());
-
-        Organisation organisation = change.getOrganisationToAdd();
-        claimantRep.setNameOfOrganisation(organisation.getOrganisationName());
-        claimantRep.setMyHmctsOrganisation(organisation);
+        claimantRep.setMyHmctsOrganisation(change.getOrganisationToAdd());
 
         return claimantRep;
     }
@@ -89,6 +85,7 @@ public class NocClaimantRepresentativeService {
             if (organisationResponse.isPresent()) {
                 OrganisationsResponse organisation = organisationResponse.get();
                 claimantRep.setRepresentativeAddress(getOrganisationAddress(organisation));
+                claimantRep.setNameOfOrganisation(organisation.getName());
                 caseData.setRepresentativeClaimantType(claimantRep);
             }
         }

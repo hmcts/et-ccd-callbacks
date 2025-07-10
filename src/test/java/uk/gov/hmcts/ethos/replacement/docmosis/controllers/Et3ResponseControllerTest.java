@@ -68,6 +68,7 @@ class Et3ResponseControllerTest extends BaseControllerTest {
 
     @BeforeEach
     @Override
+    @SneakyThrows
     protected void setUp() {
         super.setUp();
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();

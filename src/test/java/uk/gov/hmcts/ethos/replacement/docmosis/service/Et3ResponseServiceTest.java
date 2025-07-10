@@ -60,6 +60,11 @@ class Et3ResponseServiceTest {
     private DocumentManagementService documentManagementService;
     @MockBean
     private PdfBoxService pdfBoxService;
+    @MockBean
+    private UserIdamService userIdamService;
+    @MockBean
+    private CcdCaseAssignment ccdCaseAssignment;
+
     private EmailService emailService;
     private CaseData caseData;
     private DocumentInfo documentInfo;
@@ -68,7 +73,8 @@ class Et3ResponseServiceTest {
     void setUp() {
         emailService = spy(new EmailUtils());
 
-        et3ResponseService = new Et3ResponseService(documentManagementService, pdfBoxService, emailService);
+        et3ResponseService = new Et3ResponseService(documentManagementService, pdfBoxService, emailService,
+                userIdamService, ccdCaseAssignment);
         caseData = CaseDataBuilder.builder()
             .withClaimantIndType("Doris", "Johnson")
             .withClaimantType("232 Petticoat Square", "3 House", null,
@@ -130,18 +136,18 @@ class Et3ResponseServiceTest {
         et3ResponseService.saveEt3Response(caseData, documentInfo);
 
         assertThat(caseData.getDocumentCollection()).hasSize(1);
-        assertNotNull(caseData.getRespondentCollection().get(0).getValue().getEt3Form());
-        assertThat(caseData.getDocumentCollection().get(0).getValue().getUploadedDocument().getCategoryId())
+        assertNotNull(caseData.getRespondentCollection().getFirst().getValue().getEt3Form());
+        assertThat(caseData.getDocumentCollection().getFirst().getValue().getUploadedDocument().getCategoryId())
                 .isEqualTo("C18");
     }
 
     @Test
     void assertDataSavedWithTrailingSpace() {
-        caseData.getRespondentCollection().get(0).getValue().setRespondentName("Antonio Vazquez ");
+        caseData.getRespondentCollection().getFirst().getValue().setRespondentName("Antonio Vazquez ");
         et3ResponseService.saveEt3Response(caseData, documentInfo);
 
-        assertNotNull(caseData.getRespondentCollection().get(0).getValue().getEt3Form());
-        assertEquals(YES, caseData.getRespondentCollection().get(0).getValue().getResponseReceived());
+        assertNotNull(caseData.getRespondentCollection().getFirst().getValue().getEt3Form());
+        assertEquals(YES, caseData.getRespondentCollection().getFirst().getValue().getResponseReceived());
     }
 
     @Test
@@ -211,7 +217,7 @@ class Et3ResponseServiceTest {
     @MethodSource("addEt3DataToRespondentExtensionResubmitted")
     void addEt3DataToRespondent_setExtensionResubmitted(String responseReceived, String extensionRequested,
                                                         String extensionGranted, String result) {
-        RespondentSumType respondentSumType = caseData.getRespondentCollection().get(0).getValue();
+        RespondentSumType respondentSumType = caseData.getRespondentCollection().getFirst().getValue();
         respondentSumType.setResponseReceived(responseReceived);
         respondentSumType.setExtensionRequested(extensionRequested);
         respondentSumType.setExtensionGranted(extensionGranted);

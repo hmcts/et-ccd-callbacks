@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers.multiples;
 
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,8 +15,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
-import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
-import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.controllers.BaseControllerTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultiplesDocumentAccessService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
@@ -29,7 +28,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.REJECTED_STATE;
 
 @ExtendWith(SpringExtension.class)
@@ -50,7 +48,7 @@ class MultiplesDocumentAccessControllerTest extends BaseControllerTest {
 
     @BeforeEach
     @Override
-    protected void setUp() throws Exception {
+    protected void setUp() {
 
         super.setUp();
         CaseDetails caseDetails = CaseDataBuilder.builder()
@@ -69,22 +67,14 @@ class MultiplesDocumentAccessControllerTest extends BaseControllerTest {
         caseData.setClaimantType(claimant);
         caseData.setClaimant("First Last");
         caseData.setEthosCaseReference("1234");
-
         MultipleData multipleData = MultipleData.builder().build();
-        MultipleRequest multipleRequest = new MultipleRequest();
-
-        MultipleDetails multipleDetails = new MultipleDetails();
-        multipleDetails.setCaseData(multipleData);
-
-        multipleDetails.setCaseTypeId(MULTIPLE_CASE_TYPE);
-        multipleRequest.setCaseDetails(multipleDetails);
-        multipleDetails.setCaseData(multipleData);
         multipleData.setMultipleName("multiple");
         multipleData.setState(REJECTED_STATE);
     }
 
     @Test
-    void aboutToStart_tokenOk() throws Exception {
+    @SneakyThrows
+    void aboutToStart_tokenOk() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(ABOUT_TO_START_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -97,7 +87,8 @@ class MultiplesDocumentAccessControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToStart_tokenFail() throws Exception {
+    @SneakyThrows
+    void aboutToStart_tokenFail() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(ABOUT_TO_START_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -107,7 +98,8 @@ class MultiplesDocumentAccessControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToStart_badRequest() throws Exception {
+    @SneakyThrows
+    void aboutToStart_badRequest() {
         mockMvc.perform(post(ABOUT_TO_START_URL)
                         .content("garbage content")
                         .header("Authorization", AUTH_TOKEN)
@@ -116,7 +108,8 @@ class MultiplesDocumentAccessControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToSubmit_tokenOk() throws Exception {
+    @SneakyThrows
+    void aboutToSubmit_tokenOk() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -129,7 +122,8 @@ class MultiplesDocumentAccessControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToSubmit_tokenFail() throws Exception {
+    @SneakyThrows
+    void aboutToSubmit_tokenFail() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -139,7 +133,8 @@ class MultiplesDocumentAccessControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToSubmit_badRequest() throws Exception {
+    @SneakyThrows
+    void aboutToSubmit_badRequest() {
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                         .content("garbage content")
                         .header("Authorization", AUTH_TOKEN)

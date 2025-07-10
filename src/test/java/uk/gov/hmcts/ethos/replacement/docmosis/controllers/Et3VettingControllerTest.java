@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -68,7 +69,7 @@ class Et3VettingControllerTest extends BaseControllerTest {
 
     @BeforeEach
     @Override
-    protected void setUp() throws Exception {
+    protected void setUp() {
         super.setUp();
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
 
@@ -89,7 +90,8 @@ class Et3VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void populateEt3Dates_tokenOk_Et3Response() throws Exception {
+    @SneakyThrows
+    void populateEt3Dates_tokenOk_Et3Response() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(POPULATE_ET3_DATES_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -102,9 +104,11 @@ class Et3VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void populateEt3Dates_tokenOk_NoEt3Response() throws Exception {
+    @SneakyThrows
+    void populateEt3Dates_tokenOk_NoEt3Response() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        ccdRequest.getCaseDetails().getCaseData().getRespondentCollection().get(0).getValue().setResponseReceived(NO);
+        ccdRequest.getCaseDetails().getCaseData().getRespondentCollection()
+                .getFirst().getValue().setResponseReceived(NO);
         mvc.perform(post(POPULATE_ET3_DATES_URL)
                 .content(jsonMapper.toJson(ccdRequest))
                 .header("Authorization", AUTH_TOKEN)
@@ -116,7 +120,8 @@ class Et3VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void populateEt3Dates_tokenFail() throws Exception {
+    @SneakyThrows
+    void populateEt3Dates_tokenFail() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(POPULATE_ET3_DATES_URL)
             .content(jsonMapper.toJson(ccdRequest))
@@ -126,7 +131,8 @@ class Et3VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void populateEt3Dates_badRequest() throws Exception {
+    @SneakyThrows
+    void populateEt3Dates_badRequest() {
         mvc.perform(post(POPULATE_ET3_DATES_URL)
             .content("garbage content")
             .header("Authorization", AUTH_TOKEN)
@@ -135,7 +141,8 @@ class Et3VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void initEt3RespondentList_tokenOkWithRespondentCollection() throws Exception {
+    @SneakyThrows
+    void initEt3RespondentList_tokenOkWithRespondentCollection() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(INIT_ET3_RESPONDENT_LIST_URL)
             .content(jsonMapper.toJson(ccdRequest))
@@ -148,7 +155,8 @@ class Et3VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void initEt3RespondentList_tokenOkWithoutRespondentCollection() throws Exception {
+    @SneakyThrows
+    void initEt3RespondentList_tokenOkWithoutRespondentCollection() {
         ccdRequest.getCaseDetails().getCaseData().setRespondentCollection(null);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(INIT_ET3_RESPONDENT_LIST_URL)
@@ -162,7 +170,8 @@ class Et3VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void initEt3RespondentList_tokenFail() throws Exception {
+    @SneakyThrows
+    void initEt3RespondentList_tokenFail() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(INIT_ET3_RESPONDENT_LIST_URL)
             .content(jsonMapper.toJson(ccdRequest))
@@ -172,7 +181,8 @@ class Et3VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void initEt3RespondentList_badRequest() throws Exception {
+    @SneakyThrows
+    void initEt3RespondentList_badRequest() {
         mvc.perform(post(INIT_ET3_RESPONDENT_LIST_URL)
             .content("garbage content")
             .header("Authorization", AUTH_TOKEN)
@@ -181,7 +191,8 @@ class Et3VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void calculateResponseInTime_tokenOk() throws Exception {
+    @SneakyThrows
+    void calculateResponseInTime_tokenOk() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(CALCULATE_RESPONSE_TIME_URL)
             .content(jsonMapper.toJson(ccdRequest))
@@ -194,7 +205,8 @@ class Et3VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void calculateResponseInTime_tokenFail() throws Exception {
+    @SneakyThrows
+    void calculateResponseInTime_tokenFail() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(CALCULATE_RESPONSE_TIME_URL)
             .content(jsonMapper.toJson(ccdRequest))
@@ -204,7 +216,8 @@ class Et3VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void calculateResponseInTime_badRequest() throws Exception {
+    @SneakyThrows
+    void calculateResponseInTime_badRequest() {
         mvc.perform(post(CALCULATE_RESPONSE_TIME_URL)
             .content("garbage content")
             .header("Authorization", AUTH_TOKEN)
@@ -213,7 +226,8 @@ class Et3VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void initRespondentDetails_tokenOk() throws Exception {
+    @SneakyThrows
+    void initRespondentDetails_tokenOk() {
         ccdRequest.getCaseDetails().getCaseData().setRespondentCollection(new ArrayList<>());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(INIT_RESPONDENT_DETAILS)
@@ -227,7 +241,8 @@ class Et3VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void initRespondentDetails_tokenFail() throws Exception {
+    @SneakyThrows
+    void initRespondentDetails_tokenFail() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(INIT_RESPONDENT_DETAILS)
             .content(jsonMapper.toJson(ccdRequest))
@@ -237,7 +252,8 @@ class Et3VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void initRespondentDetails_badRequest() throws Exception {
+    @SneakyThrows
+    void initRespondentDetails_badRequest() {
         mvc.perform(post(INIT_RESPONDENT_DETAILS)
             .content("garbage content")
             .header("Authorization", AUTH_TOKEN)
@@ -246,7 +262,8 @@ class Et3VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void et3ProcessingComplete_tokenOk() throws Exception {
+    @SneakyThrows
+    void et3ProcessingComplete_tokenOk() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(ET3_PROCESSING_COMPLETE_URL)
             .content(jsonMapper.toJson(ccdRequest))
@@ -261,7 +278,8 @@ class Et3VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void et3ProcessingComplete_tokenFail() throws Exception {
+    @SneakyThrows
+    void et3ProcessingComplete_tokenFail() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(ET3_PROCESSING_COMPLETE_URL)
             .content(jsonMapper.toJson(ccdRequest))
@@ -271,7 +289,8 @@ class Et3VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void et3ProcessingComplete_badRequest() throws Exception {
+    @SneakyThrows
+    void et3ProcessingComplete_badRequest() {
         mvc.perform(post(ET3_PROCESSING_COMPLETE_URL)
             .content("garbage content")
             .header("Authorization", AUTH_TOKEN)
@@ -280,7 +299,8 @@ class Et3VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void checkHearingListed_tokenOk() throws Exception {
+    @SneakyThrows
+    void checkHearingListed_tokenOk() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(CHECK_HEARING_LISTED_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -293,7 +313,8 @@ class Et3VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void checkHearingListed_tokenFail() throws Exception {
+    @SneakyThrows
+    void checkHearingListed_tokenFail() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(CHECK_HEARING_LISTED_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -303,7 +324,8 @@ class Et3VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void checkHearingListed_badRequest() throws Exception {
+    @SneakyThrows
+    void checkHearingListed_badRequest() {
         mvc.perform(post(CHECK_HEARING_LISTED_URL)
                 .content("garbage content")
                 .header("Authorization", AUTH_TOKEN)
@@ -312,7 +334,8 @@ class Et3VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void transferApplication_tokenOk() throws Exception {
+    @SneakyThrows
+    void transferApplication_tokenOk() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(TRANSFER_APPLICATION_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -325,7 +348,8 @@ class Et3VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void transferApplication_tokenFail() throws Exception {
+    @SneakyThrows
+    void transferApplication_tokenFail() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(TRANSFER_APPLICATION_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -335,7 +359,8 @@ class Et3VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void transferApplication_badRequest() throws Exception {
+    @SneakyThrows
+    void transferApplication_badRequest() {
         mvc.perform(post(TRANSFER_APPLICATION_URL)
                 .content("garbage content")
                 .header("Authorization", AUTH_TOKEN)
@@ -344,7 +369,8 @@ class Et3VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToSubmit_tokenOk() throws Exception {
+    @SneakyThrows
+    void aboutToSubmit_tokenOk() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(ABOUT_TO_SUBMIT_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -357,7 +383,8 @@ class Et3VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToSubmit_tokenFail() throws Exception {
+    @SneakyThrows
+    void aboutToSubmit_tokenFail() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(ABOUT_TO_SUBMIT_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -367,7 +394,8 @@ class Et3VettingControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToSubmit_badRequest() throws Exception {
+    @SneakyThrows
+    void aboutToSubmit_badRequest() {
         mvc.perform(post(ABOUT_TO_SUBMIT_URL)
                 .content("garbage content")
                 .header("Authorization", AUTH_TOKEN)

@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.controllers.multiples;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +17,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.CaseNotesServic
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
 import java.io.File;
+import java.util.Objects;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
@@ -38,15 +40,17 @@ class CaseNotesControllerTest extends BaseControllerTest {
 
     @BeforeEach
     @Override
-    protected void setUp() throws Exception {
+    @SneakyThrows
+    protected void setUp() {
         super.setUp();
         ObjectMapper objectMapper = new ObjectMapper();
-        requestContent = objectMapper.readTree(new File(getClass()
-                .getResource("/exampleBulkV1.json").toURI()));
+        requestContent = objectMapper.readTree(new File(Objects.requireNonNull(getClass()
+                .getResource("/exampleBulkV1.json")).toURI()));
     }
 
     @Test
-    void aboutToSubmit_ok() throws Exception {
+    @SneakyThrows
+    void aboutToSubmit_ok() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                         .content(requestContent.toString())
@@ -58,7 +62,8 @@ class CaseNotesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToSubmit_badToken() throws Exception {
+    @SneakyThrows
+    void aboutToSubmit_badToken() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                         .content(requestContent.toString())
@@ -68,7 +73,8 @@ class CaseNotesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToSubmit_badRequest() throws Exception {
+    @SneakyThrows
+    void aboutToSubmit_badRequest() {
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                         .content("garbage content")
                         .header("Authorization", AUTH_TOKEN)

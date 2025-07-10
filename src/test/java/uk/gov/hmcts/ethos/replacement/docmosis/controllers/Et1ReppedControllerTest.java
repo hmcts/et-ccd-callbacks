@@ -196,7 +196,6 @@ class Et1ReppedControllerTest {
     private CaseManagementLocationService caseManagementLocationService;
 
     @BeforeEach
-    @SneakyThrows
     void setUp() {
         caseData = new CaseData();
         caseData.setEt1ReppedSectionOne(NO);

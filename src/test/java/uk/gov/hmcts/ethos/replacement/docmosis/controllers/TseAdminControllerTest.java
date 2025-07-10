@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -69,7 +70,7 @@ class TseAdminControllerTest extends BaseControllerTest {
 
     @BeforeEach
     @Override
-    protected void setUp() throws Exception {
+    protected void setUp() {
         super.setUp();
         when(featureToggleService.isHmcEnabled()).thenReturn(true);
         CaseDetails caseDetails = CaseDataBuilder.builder()
@@ -94,7 +95,8 @@ class TseAdminControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToStart_tokenOk() throws Exception {
+    @SneakyThrows
+    void aboutToStart_tokenOk() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(ABOUT_TO_START_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -107,7 +109,8 @@ class TseAdminControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToStart_tokenFail() throws Exception {
+    @SneakyThrows
+    void aboutToStart_tokenFail() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(ABOUT_TO_START_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -117,7 +120,8 @@ class TseAdminControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToStart_badRequest() throws Exception {
+    @SneakyThrows
+    void aboutToStart_badRequest() {
         mockMvc.perform(post(ABOUT_TO_START_URL)
                 .content("garbage content")
                 .header("Authorization", AUTH_TOKEN)
@@ -126,7 +130,8 @@ class TseAdminControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midDetailsTable_tokenOk() throws Exception {
+    @SneakyThrows
+    void midDetailsTable_tokenOk() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(MID_DETAILS_TABLE)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -142,7 +147,8 @@ class TseAdminControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midDetailsTable_tokenFail() throws Exception {
+    @SneakyThrows
+    void midDetailsTable_tokenFail() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(MID_DETAILS_TABLE)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -155,7 +161,8 @@ class TseAdminControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midDetailsTable_badRequest() throws Exception {
+    @SneakyThrows
+    void midDetailsTable_badRequest() {
         mockMvc.perform(post(MID_DETAILS_TABLE)
                         .content("garbage content")
                         .header("Authorization", AUTH_TOKEN)
@@ -167,7 +174,8 @@ class TseAdminControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToSubmit_tokenOk() throws Exception {
+    @SneakyThrows
+    void aboutToSubmit_tokenOk() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -188,7 +196,8 @@ class TseAdminControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToSubmit_tokenFail() throws Exception {
+    @SneakyThrows
+    void aboutToSubmit_tokenFail() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -205,7 +214,8 @@ class TseAdminControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToSubmit_badRequest() throws Exception {
+    @SneakyThrows
+    void aboutToSubmit_badRequest() {
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                 .content("garbage content")
                 .header("Authorization", AUTH_TOKEN)
@@ -221,7 +231,8 @@ class TseAdminControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void submitted_tokenOk() throws Exception {
+    @SneakyThrows
+    void submitted_tokenOk() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(SUBMITTED_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -235,7 +246,8 @@ class TseAdminControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void submitted_tokenFail() throws Exception {
+    @SneakyThrows
+    void submitted_tokenFail() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(SUBMITTED_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -245,7 +257,8 @@ class TseAdminControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void submitted_badRequest() throws Exception {
+    @SneakyThrows
+    void submitted_badRequest() {
         mockMvc.perform(post(SUBMITTED_URL)
                 .content("garbage content")
                 .header("Authorization", AUTH_TOKEN)
@@ -254,7 +267,8 @@ class TseAdminControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToSubmitCloseApplication_tokenOk() throws Exception {
+    @SneakyThrows
+    void aboutToSubmitCloseApplication_tokenOk() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_CLOSE_APP_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -269,7 +283,8 @@ class TseAdminControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToSubmitCloseApplication_tokenFail() throws Exception {
+    @SneakyThrows
+    void aboutToSubmitCloseApplication_tokenFail() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_CLOSE_APP_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -281,7 +296,8 @@ class TseAdminControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToSubmitCloseApplication_badRequest() throws Exception {
+    @SneakyThrows
+    void aboutToSubmitCloseApplication_badRequest() {
         mockMvc.perform(post(ABOUT_TO_SUBMIT_CLOSE_APP_URL)
                 .content("garbage content")
                 .header("Authorization", AUTH_TOKEN)
@@ -292,7 +308,8 @@ class TseAdminControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void submittedCloseApplication_tokenOk() throws Exception {
+    @SneakyThrows
+    void submittedCloseApplication_tokenOk() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(SUBMITTED_CLOSE_APP_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -306,7 +323,8 @@ class TseAdminControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void submittedCloseApplication_tokenFail() throws Exception {
+    @SneakyThrows
+    void submittedCloseApplication_tokenFail() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(SUBMITTED_CLOSE_APP_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -316,7 +334,8 @@ class TseAdminControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void submittedCloseApplication_badRequest() throws Exception {
+    @SneakyThrows
+    void submittedCloseApplication_badRequest() {
         mockMvc.perform(post(SUBMITTED_CLOSE_APP_URL)
                         .content("garbage content")
                         .header("Authorization", AUTH_TOKEN)

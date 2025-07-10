@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers.multiples;
 
+import lombok.SneakyThrows;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -9,7 +11,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -62,7 +63,8 @@ class CloseReferralMultiplesControllerTest extends BaseControllerTest {
 
     @BeforeEach
     @Override
-    protected void setUp() throws Exception {
+    @SneakyThrows
+    protected void setUp() {
         super.setUp();
         CaseData caseData = CaseDataBuilder.builder()
                 .withHearing("1", "test", "Judy", "Venue", List.of("Telephone", "Video"),
@@ -94,17 +96,16 @@ class CloseReferralMultiplesControllerTest extends BaseControllerTest {
         multipleData.setReferralCollection(List.of(createReferralTypeItem()));
         DynamicFixedListType selectReferralList =
                 ReferralHelper.populateSelectReferralDropdown(multipleData.getReferralCollection());
+        Assertions.assertNotNull(selectReferralList);
         selectReferralList.setValue(new DynamicValueType());
         selectReferralList.getValue().setCode("1");
         multipleData.setSelectReferral(selectReferralList);
-
-        UserDetails userDetails = new UserDetails();
-        userDetails.setRoles(List.of("role1"));
         when(caseLookupService.getLeadCaseFromMultipleAsAdmin(any())).thenReturn(caseData);
     }
 
     @Test
-    void aboutToStartCloseReferral_Success() throws Exception {
+    @SneakyThrows
+    void aboutToStartCloseReferral_Success() {
 
         mockMvc.perform(post(ABOUT_TO_START)
                         .contentType(APPLICATION_JSON)
@@ -117,7 +118,8 @@ class CloseReferralMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void initHearingAndReferralDetails_Success() throws Exception {
+    @SneakyThrows
+    void initHearingAndReferralDetails_Success() {
 
         mockMvc.perform(post(MID_HEARING_DETAILS_URL)
                         .contentType(APPLICATION_JSON)
@@ -130,7 +132,8 @@ class CloseReferralMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToSubmit_CloseReferral_tokenOk() throws Exception {
+    @SneakyThrows
+    void aboutToSubmit_CloseReferral_tokenOk() {
 
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                         .contentType(APPLICATION_JSON)
@@ -143,7 +146,8 @@ class CloseReferralMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void completeCloseReferral_tokenOk() throws Exception {
+    @SneakyThrows
+    void completeCloseReferral_tokenOk() {
 
         mockMvc.perform(post(SUBMITTED_URL)
                         .contentType(APPLICATION_JSON)

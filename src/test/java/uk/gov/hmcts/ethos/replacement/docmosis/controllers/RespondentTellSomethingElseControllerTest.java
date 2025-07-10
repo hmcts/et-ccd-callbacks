@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -73,7 +74,7 @@ class RespondentTellSomethingElseControllerTest extends BaseControllerTest {
 
     @BeforeEach
     @Override
-    protected void setUp() throws Exception {
+    protected void setUp() {
         super.setUp();
         CaseData caseData = CaseDataBuilder.builder()
             .withEthosCaseReference("test")
@@ -98,7 +99,8 @@ class RespondentTellSomethingElseControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToStart_tokenOk() throws Exception {
+    @SneakyThrows
+    void aboutToStart_tokenOk() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(ABOUT_TO_START_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -113,7 +115,8 @@ class RespondentTellSomethingElseControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToStart_tokenFail() throws Exception {
+    @SneakyThrows
+    void aboutToStart_tokenFail() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(ABOUT_TO_START_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -123,7 +126,8 @@ class RespondentTellSomethingElseControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToStart_badRequest() throws Exception {
+    @SneakyThrows
+    void aboutToStart_badRequest() {
         mockMvc.perform(post(ABOUT_TO_START_URL)
                         .content("garbage content")
                         .header("Authorization", AUTH_TOKEN)
@@ -132,7 +136,8 @@ class RespondentTellSomethingElseControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void showError_returnError() throws Exception {
+    @SneakyThrows
+    void showError_returnError() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockHelper.when(() -> Helper.isClaimantNonSystemUser(any()))
                 .thenReturn(true);
@@ -149,7 +154,8 @@ class RespondentTellSomethingElseControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void showError_noError() throws Exception {
+    @SneakyThrows
+    void showError_noError() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockHelper.when(() -> Helper.isClaimantNonSystemUser(any()))
                 .thenReturn(false);
@@ -166,7 +172,8 @@ class RespondentTellSomethingElseControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void validateGiveDetails_Success() throws Exception {
+    @SneakyThrows
+    void validateGiveDetails_Success() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(VALIDATE_GIVE_DETAILS)
                         .contentType(APPLICATION_JSON)
@@ -180,7 +187,8 @@ class RespondentTellSomethingElseControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void validateGiveDetails_invalidToken() throws Exception {
+    @SneakyThrows
+    void validateGiveDetails_invalidToken() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(VALIDATE_GIVE_DETAILS)
                         .contentType(APPLICATION_JSON)
@@ -190,7 +198,8 @@ class RespondentTellSomethingElseControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToSubmitRespondentTSE_Success() throws Exception {
+    @SneakyThrows
+    void aboutToSubmitRespondentTSE_Success() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                 .contentType(APPLICATION_JSON)
@@ -205,7 +214,8 @@ class RespondentTellSomethingElseControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToSubmitRespondentTSE_invalidToken() throws Exception {
+    @SneakyThrows
+    void aboutToSubmitRespondentTSE_invalidToken() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                 .contentType(APPLICATION_JSON)
@@ -215,7 +225,8 @@ class RespondentTellSomethingElseControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void displayRespondentApplicationsTable_Success() throws Exception {
+    @SneakyThrows
+    void displayRespondentApplicationsTable_Success() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(DISPLAY_TABLE_URL)
                 .contentType(APPLICATION_JSON)
@@ -229,7 +240,8 @@ class RespondentTellSomethingElseControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void displayRespondentApplicationsTable_invalidToken() throws Exception {
+    @SneakyThrows
+    void displayRespondentApplicationsTable_invalidToken() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(DISPLAY_TABLE_URL)
                 .contentType(APPLICATION_JSON)
@@ -239,7 +251,8 @@ class RespondentTellSomethingElseControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void completeApplication_Success() throws Exception {
+    @SneakyThrows
+    void completeApplication_Success() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(COMPLETE_APPLICATION_URL)
                 .contentType(APPLICATION_JSON)
@@ -253,7 +266,8 @@ class RespondentTellSomethingElseControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void completeApplication_invalidToken() throws Exception {
+    @SneakyThrows
+    void completeApplication_invalidToken() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(COMPLETE_APPLICATION_URL)
                 .contentType(APPLICATION_JSON)

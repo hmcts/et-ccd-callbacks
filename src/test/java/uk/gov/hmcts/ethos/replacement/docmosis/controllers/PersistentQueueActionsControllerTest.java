@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -40,6 +41,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
@@ -80,13 +82,14 @@ class PersistentQueueActionsControllerTest extends BaseControllerTest {
 
     private void doRequestSetUp() throws IOException, URISyntaxException {
         ObjectMapper objectMapper = new ObjectMapper();
-        requestContent = objectMapper.readTree(new File(getClass()
-                .getResource("/exampleBulkV1.json").toURI()));
+        requestContent = objectMapper.readTree(new File(Objects.requireNonNull(getClass()
+                .getResource("/exampleBulkV1.json")).toURI()));
     }
 
     @BeforeEach
     @Override
-    public void setUp() throws Exception {
+    @SneakyThrows
+    public void setUp() {
         super.setUp();
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         doRequestSetUp();
@@ -124,7 +127,8 @@ class PersistentQueueActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void afterSubmittedBulkPQ() throws Exception {
+    @SneakyThrows
+    void afterSubmittedBulkPQ() {
         when(bulkSearchService.bulkCasesRetrievalRequestElasticSearch(
                 isA(BulkDetails.class), eq(AUTH_TOKEN), isA(Boolean.class), isA(Boolean.class)))
                 .thenReturn(bulkCasesPayload);
@@ -144,7 +148,8 @@ class PersistentQueueActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void preAcceptBulkPq() throws Exception {
+    @SneakyThrows
+    void preAcceptBulkPq() {
         when(bulkSearchService.retrievalCasesForPreAcceptRequest(
                 isA(BulkDetails.class), eq(AUTH_TOKEN)))
                 .thenReturn(bulkCasesPayload.getSubmitEvents());
@@ -163,7 +168,8 @@ class PersistentQueueActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void updateBulkCasePq() throws Exception {
+    @SneakyThrows
+    void updateBulkCasePq() {
         when(bulkCreationService.bulkUpdateCaseIdsLogic(
                 isA(BulkRequest.class), eq(AUTH_TOKEN), isA(Boolean.class)))
                 .thenReturn(bulkRequestPayload);
@@ -180,7 +186,8 @@ class PersistentQueueActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void preAcceptBulkPqError400() throws Exception {
+    @SneakyThrows
+    void preAcceptBulkPqError400() {
         mvc.perform(post(PRE_ACCEPT_PQ_BULK_URL)
                 .content("error")
                 .header("Authorization", AUTH_TOKEN)
@@ -189,7 +196,8 @@ class PersistentQueueActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void updateBulkCasePqError400() throws Exception {
+    @SneakyThrows
+    void updateBulkCasePqError400() {
         mvc.perform(post(UPDATE_BULK_CASE_PQ_URL)
                 .content("error")
                 .header("Authorization", AUTH_TOKEN)
@@ -198,7 +206,8 @@ class PersistentQueueActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void preAcceptBulkPqError500() throws Exception {
+    @SneakyThrows
+    void preAcceptBulkPqError500() {
         when(bulkSearchService.retrievalCasesForPreAcceptRequest(
                 isA(BulkDetails.class), eq(AUTH_TOKEN)))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
@@ -211,7 +220,8 @@ class PersistentQueueActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void updateBulkCasePqError500() throws Exception {
+    @SneakyThrows
+    void updateBulkCasePqError500() {
         when(bulkCreationService.bulkUpdateCaseIdsLogic(
                 isA(BulkRequest.class), eq(AUTH_TOKEN), isA(Boolean.class)))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
@@ -224,7 +234,8 @@ class PersistentQueueActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void afterSubmittedPqBulkForbidden() throws Exception {
+    @SneakyThrows
+    void afterSubmittedPqBulkForbidden() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(AFTER_SUBMITTED_PQ_BULK_URL)
                 .content(requestContent.toString())
@@ -234,7 +245,8 @@ class PersistentQueueActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void preAcceptBulkPqForbidden() throws Exception {
+    @SneakyThrows
+    void preAcceptBulkPqForbidden() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(PRE_ACCEPT_PQ_BULK_URL)
                 .content(requestContent.toString())
@@ -244,7 +256,8 @@ class PersistentQueueActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void updateBulkCasePqForbidden() throws Exception {
+    @SneakyThrows
+    void updateBulkCasePqForbidden() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(UPDATE_BULK_CASE_PQ_URL)
                 .content(requestContent.toString())

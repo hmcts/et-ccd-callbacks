@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,7 +53,8 @@ class CaseTransferMultiplesControllerTest extends BaseControllerTest {
     MockMvc mockMvc;
 
     @Test
-    void testInitTransferToScotland() throws Exception {
+    @SneakyThrows
+    void testInitTransferToScotland() {
         CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
@@ -64,16 +66,18 @@ class CaseTransferMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void testInitTransferToScotlandError400() throws Exception {
+    @SneakyThrows
+    void testInitTransferToScotlandError400() {
         mockMvc.perform(post(INIT_TRANSFER_TO_SCOTLAND_URL)
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("error"))
+                        .content("\"error\""))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    void testInitTransferToScotlandForbidden() throws Exception {
+    @SneakyThrows
+    void testInitTransferToScotlandForbidden() {
         CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
 
@@ -85,7 +89,8 @@ class CaseTransferMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void testInitTransferToEnglandWales() throws Exception {
+    @SneakyThrows
+    void testInitTransferToEnglandWales() {
         CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
@@ -97,16 +102,18 @@ class CaseTransferMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void testInitTransferToEnglandWalesError400() throws Exception {
+    @SneakyThrows
+    void testInitTransferToEnglandWalesError400() {
         mockMvc.perform(post(INIT_TRANSFER_TO_ENGLANDWALES_URL)
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("error"))
+                        .content("\"error\""))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    void testInitTransferToEnglandWalesForbidden() throws Exception {
+    @SneakyThrows
+    void testInitTransferToEnglandWalesForbidden() {
         CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
 
@@ -118,7 +125,8 @@ class CaseTransferMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void testTransferSameCountry() throws Exception {
+    @SneakyThrows
+    void testTransferSameCountry() {
         MultipleRequest multipleRequest = MultipleDataBuilder.builder().buildAsMultipleRequest();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
@@ -136,18 +144,20 @@ class CaseTransferMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void testTransferSameCountryError400() throws Exception {
+    @SneakyThrows
+    void testTransferSameCountryError400() {
         mockMvc.perform(post(CASE_TRANSFER_SAME_COUNTRY_URL)
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("error"))
+                        .content("\"error\""))
                 .andExpect(status().isBadRequest());
 
         verify(multipleTransferSameCountryService, never()).transferMultiple(any(MultipleDetails.class), anyString());
     }
 
     @Test
-    void testTransferSameCountryForbidden() throws Exception {
+    @SneakyThrows
+    void testTransferSameCountryForbidden() {
         MultipleRequest multipleRequest = MultipleDataBuilder.builder().buildAsMultipleRequest();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
 
@@ -161,7 +171,8 @@ class CaseTransferMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void testTransferDifferentCountry() throws Exception {
+    @SneakyThrows
+    void testTransferDifferentCountry() {
         MultipleRequest multipleRequest = MultipleDataBuilder.builder().buildAsMultipleRequest();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
@@ -179,11 +190,12 @@ class CaseTransferMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void testTransferDifferentCountryError400() throws Exception {
+    @SneakyThrows
+    void testTransferDifferentCountryError400() {
         mockMvc.perform(post(CASE_TRANSFER_DIFFERENT_COUNTRY_URL)
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("error"))
+                        .content("\"error\""))
                 .andExpect(status().isBadRequest());
 
         verify(multipleTransferDifferentCountryService, never()).transferMultiple(any(MultipleDetails.class),
@@ -191,7 +203,8 @@ class CaseTransferMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void testTransferDifferentCountryForbidden() throws Exception {
+    @SneakyThrows
+    void testTransferDifferentCountryForbidden() {
         MultipleRequest multipleRequest = MultipleDataBuilder.builder().buildAsMultipleRequest();
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
 

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockitoAnnotations;
@@ -22,7 +23,8 @@ public class BaseControllerTest {
     public VerifyTokenService verifyTokenService;
 
     @BeforeEach
-    protected void setUp() throws Exception {
+    @SneakyThrows
+    protected void setUp() {
         MockitoAnnotations.openMocks(this);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
     }

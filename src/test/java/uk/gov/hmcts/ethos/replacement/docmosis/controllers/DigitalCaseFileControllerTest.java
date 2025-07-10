@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -60,7 +61,7 @@ class DigitalCaseFileControllerTest extends BaseControllerTest {
 
     @BeforeEach
     @Override
-    protected void setUp() throws Exception {
+    protected void setUp()  {
         super.setUp();
         CaseDetails caseDetails = CaseDataBuilder.builder()
                 .withEthosCaseReference("123456/2021")
@@ -80,7 +81,8 @@ class DigitalCaseFileControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void uploadOrRemoveDcf_Remove() throws Exception {
+    @SneakyThrows
+    void uploadOrRemoveDcf_Remove()  {
         DigitalCaseFileType digitalCaseFileType = new DigitalCaseFileType();
         digitalCaseFileType.setUploadedDocument(
                 UploadedDocumentType.builder()
@@ -100,7 +102,8 @@ class DigitalCaseFileControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void uploadOrRemoveDcf_Upload() throws Exception {
+    @SneakyThrows
+    void uploadOrRemoveDcf_Upload()  {
         DigitalCaseFileType digitalCaseFileType = new DigitalCaseFileType();
         digitalCaseFileType.setUploadedDocument(
                 UploadedDocumentType.builder()
@@ -122,7 +125,8 @@ class DigitalCaseFileControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void asyncAboutToSubmit() throws Exception {
+    @SneakyThrows
+    void asyncAboutToSubmit()  {
         when(bundleApiClient.asyncStitchBundle(anyString(), anyString(), any()))
                 .thenReturn(ResourceLoader.stitchBundleRequest());
         ccdRequest.getCaseDetails().getCaseData().setUploadOrRemoveDcf("Create");
@@ -135,7 +139,8 @@ class DigitalCaseFileControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void asyncCompleteAboutToSubmit() throws Exception {
+    @SneakyThrows
+    void asyncCompleteAboutToSubmit()  {
         when(bundleApiClient.asyncStitchBundle(anyString(), anyString(), any()))
                 .thenReturn(ResourceLoader.stitchBundleRequest());
         mockMvc.perform(post(ASYNC_COMPLETE_ABOUT_TO_SUBMIT_URL)

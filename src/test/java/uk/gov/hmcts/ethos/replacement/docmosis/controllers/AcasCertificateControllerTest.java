@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.internal.mapping.JsonbMapper;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -69,7 +70,8 @@ class AcasCertificateControllerTest {
     }
 
     @Test
-    void retrieveAcasCert_Success() throws Exception {
+    @SneakyThrows
+    void retrieveAcasCert_Success() {
 
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(acasService.getAcasCertificate(any(), anyString(), anyString())).thenReturn(new ArrayList<>());
@@ -85,7 +87,8 @@ class AcasCertificateControllerTest {
     }
 
     @Test
-    void retrieveAcasCert_invalidToken() throws Exception {
+    @SneakyThrows
+    void retrieveAcasCert_invalidToken() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(RETRIEVE_ACAS_CERT_URL)
                         .contentType(APPLICATION_JSON)
@@ -96,18 +99,20 @@ class AcasCertificateControllerTest {
     }
 
     @Test
-    void retrieveAcasCert_BadRequest() throws Exception {
+    @SneakyThrows
+    void retrieveAcasCert_BadRequest() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(RETRIEVE_ACAS_CERT_URL)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                        .content("error"))
+                        .content("\"error\""))
                 .andExpect(status().isBadRequest());
         verify(acasService, never()).getAcasCertificate(any(), anyString(), anyString());
     }
 
     @Test
-    void acasConfirmation_Success() throws Exception {
+    @SneakyThrows
+    void acasConfirmation_Success() {
 
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(acasService.getAcasCertificate(any(), anyString(), anyString())).thenReturn(new ArrayList<>());
@@ -122,7 +127,8 @@ class AcasCertificateControllerTest {
     }
 
     @Test
-    void acasConfirmation_invalidToken() throws Exception {
+    @SneakyThrows
+    void acasConfirmation_invalidToken() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(ACAS_CONFIRMATION_URL)
                         .contentType(APPLICATION_JSON)
@@ -132,12 +138,13 @@ class AcasCertificateControllerTest {
     }
 
     @Test
-    void acasConfirmation_BadRequest() throws Exception {
+    @SneakyThrows
+    void acasConfirmation_BadRequest() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(ACAS_CONFIRMATION_URL)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                        .content("error"))
+                        .content("\"error\""))
                 .andExpect(status().isBadRequest());
     }
 }

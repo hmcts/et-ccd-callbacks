@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -30,6 +31,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Objects;
 
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.notNullValue;
@@ -75,12 +77,14 @@ class DocumentGenerationControllerTest extends BaseControllerTest {
 
     private void doRequestSetUp() throws IOException, URISyntaxException {
         ObjectMapper objectMapper = new ObjectMapper();
-        requestContent = objectMapper.readTree(new File(getClass().getResource("/exampleV1.json").toURI()));
+        requestContent = objectMapper.readTree(new File(Objects.requireNonNull(getClass()
+                .getResource("/exampleV1.json")).toURI()));
     }
 
     @BeforeEach
     @Override
-    public void setUp() throws Exception {
+    @SneakyThrows
+    public void setUp()  {
         super.setUp();
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         doRequestSetUp();
@@ -90,7 +94,8 @@ class DocumentGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midAddressLabelsOk() throws Exception {
+    @SneakyThrows
+    void midAddressLabelsOk()  {
         when(documentGenerationService.midAddressLabels(isA(CaseData.class))).thenReturn(submitEvent.getCaseData());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MID_ADDRESS_LABELS_URL)
@@ -104,7 +109,8 @@ class DocumentGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midAddressLabelsError400() throws Exception {
+    @SneakyThrows
+    void midAddressLabelsError400()  {
         mvc.perform(post(MID_ADDRESS_LABELS_URL)
                 .content("error")
                 .header("Authorization", AUTH_TOKEN)
@@ -113,7 +119,8 @@ class DocumentGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midAddressLabelsError500() throws Exception {
+    @SneakyThrows
+    void midAddressLabelsError500()  {
         when(documentGenerationService.midAddressLabels(isA(CaseData.class)))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -125,7 +132,8 @@ class DocumentGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midAddressLabelsForbidden() throws Exception {
+    @SneakyThrows
+    void midAddressLabelsForbidden()  {
         when(documentGenerationService.midAddressLabels(isA(CaseData.class))).thenReturn(submitEvent.getCaseData());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MID_ADDRESS_LABELS_URL)
@@ -136,7 +144,8 @@ class DocumentGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midSelectedAddressLabelsOk() throws Exception {
+    @SneakyThrows
+    void midSelectedAddressLabelsOk()  {
         when(documentGenerationService.midSelectedAddressLabels(isA(CaseData.class)))
                 .thenReturn(submitEvent.getCaseData());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -151,7 +160,8 @@ class DocumentGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midSelectedAddressLabelsError400() throws Exception {
+    @SneakyThrows
+    void midSelectedAddressLabelsError400()  {
         mvc.perform(post(MID_SELECTED_ADDRESS_LABELS_URL)
                 .content("error")
                 .header("Authorization", AUTH_TOKEN)
@@ -160,7 +170,8 @@ class DocumentGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midSelectedAddressLabelsError500() throws Exception {
+    @SneakyThrows
+    void midSelectedAddressLabelsError500()  {
         when(documentGenerationService.midSelectedAddressLabels(isA(CaseData.class)))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -172,7 +183,8 @@ class DocumentGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midSelectedAddressLabelsForbidden() throws Exception {
+    @SneakyThrows
+    void midSelectedAddressLabelsForbidden()  {
         when(documentGenerationService.midSelectedAddressLabels(isA(CaseData.class)))
                 .thenReturn(submitEvent.getCaseData());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
@@ -184,7 +196,8 @@ class DocumentGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midValidateAddressLabelsOk() throws Exception {
+    @SneakyThrows
+    void midValidateAddressLabelsOk()  {
         when(documentGenerationService.midValidateAddressLabels(isA(CaseData.class)))
                 .thenReturn(new ArrayList<>(Collections.singletonList("")));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -199,7 +212,8 @@ class DocumentGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midValidateAddressLabelsErrors() throws Exception {
+    @SneakyThrows
+    void midValidateAddressLabelsErrors()  {
         when(documentGenerationService.midValidateAddressLabels(isA(CaseData.class)))
                 .thenReturn(new ArrayList<>(Collections.singletonList("Errors")));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -214,7 +228,8 @@ class DocumentGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midValidateAddressLabelsError400() throws Exception {
+    @SneakyThrows
+    void midValidateAddressLabelsError400()  {
         mvc.perform(post(MID_VALIDATE_ADDRESS_LABELS_URL)
                 .content("error")
                 .header("Authorization", AUTH_TOKEN)
@@ -223,7 +238,8 @@ class DocumentGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midValidateAddressLabelsError500() throws Exception {
+    @SneakyThrows
+    void midValidateAddressLabelsError500()  {
         when(documentGenerationService.midValidateAddressLabels(isA(CaseData.class)))
                 .thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -235,7 +251,8 @@ class DocumentGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midValidateAddressLabelsForbidden() throws Exception {
+    @SneakyThrows
+    void midValidateAddressLabelsForbidden()  {
         when(documentGenerationService.midValidateAddressLabels(isA(CaseData.class)))
                 .thenReturn(new ArrayList<>(Collections.singletonList("Error")));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
@@ -247,7 +264,8 @@ class DocumentGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void generateDocumentOk() throws Exception {
+    @SneakyThrows
+    void generateDocumentOk()  {
         when(documentGenerationService.processDocumentRequest(isA(CCDRequest.class),
                 eq(AUTH_TOKEN))).thenReturn(documentInfo);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -262,7 +280,8 @@ class DocumentGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void generateDocumentValidationErrors() throws Exception {
+    @SneakyThrows
+    void generateDocumentValidationErrors()  {
         when(eventValidationService.validateHearingNumber(any(), any(), any()))
                 .thenReturn(new ArrayList<>(Collections.singletonList("Error")));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -277,7 +296,8 @@ class DocumentGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void generateDocumentError400() throws Exception {
+    @SneakyThrows
+    void generateDocumentError400()  {
         mvc.perform(post(GEN_DOC_URL)
                 .content("error")
                 .header("Authorization", AUTH_TOKEN)
@@ -286,7 +306,8 @@ class DocumentGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void generateDocumentError500() throws Exception {
+    @SneakyThrows
+    void generateDocumentError500()  {
         when(documentGenerationService.processDocumentRequest(isA(CCDRequest.class),
                 eq(AUTH_TOKEN))).thenThrow(new InternalException(ERROR_MESSAGE));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -298,7 +319,8 @@ class DocumentGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void generateDocumentOkForbidden() throws Exception {
+    @SneakyThrows
+    void generateDocumentOkForbidden()  {
         when(documentGenerationService.processDocumentRequest(isA(CCDRequest.class),
                 eq(AUTH_TOKEN))).thenReturn(documentInfo);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
@@ -310,7 +332,8 @@ class DocumentGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void generateDocumentConfirmationOk() throws Exception {
+    @SneakyThrows
+    void generateDocumentConfirmationOk()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(GEN_DOC_CONFIRMATION_URL)
                 .content(requestContent.toString())
@@ -323,7 +346,8 @@ class DocumentGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void generateDocumentConfirmationError400() throws Exception {
+    @SneakyThrows
+    void generateDocumentConfirmationError400()  {
         mvc.perform(post(GEN_DOC_CONFIRMATION_URL)
                 .content("error")
                 .header("Authorization", AUTH_TOKEN)
@@ -332,7 +356,8 @@ class DocumentGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void generateDocumentConfirmationForbidden() throws Exception {
+    @SneakyThrows
+    void generateDocumentConfirmationForbidden()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(GEN_DOC_CONFIRMATION_URL)
                 .content(requestContent.toString())
@@ -342,7 +367,8 @@ class DocumentGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void dynamicLettersOk() throws Exception {
+    @SneakyThrows
+    void dynamicLettersOk()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(DYNAMIC_LETTERS)
                         .content(requestContent.toString())
@@ -355,7 +381,8 @@ class DocumentGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void dynamicLettersError400() throws Exception {
+    @SneakyThrows
+    void dynamicLettersError400()  {
         mvc.perform(post(DYNAMIC_LETTERS)
                 .content("error")
                 .header("Authorization", AUTH_TOKEN)
@@ -364,7 +391,8 @@ class DocumentGenerationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void dynamicLettersForbidden() throws Exception {
+    @SneakyThrows
+    void dynamicLettersForbidden()  {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(DYNAMIC_LETTERS)
                 .content(requestContent.toString())

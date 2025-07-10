@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
@@ -61,7 +62,7 @@ class BundlesRespondentControllerTest extends BaseControllerTest {
 
     @BeforeEach
     @Override
-    protected void setUp() throws Exception {
+    protected void setUp() {
         super.setUp();
         ccdRequest = CCDRequestBuilder.builder()
             .withCaseData(CaseDataBuilder.builder().build())
@@ -71,7 +72,8 @@ class BundlesRespondentControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToStart_tokenOk() throws Exception {
+    @SneakyThrows
+    void aboutToStart_tokenOk() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(ABOUT_TO_START_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -84,7 +86,8 @@ class BundlesRespondentControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToStart_tokenFail() throws Exception {
+    @SneakyThrows
+    void aboutToStart_tokenFail() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(ABOUT_TO_START_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -94,7 +97,8 @@ class BundlesRespondentControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToStart_badRequest() throws Exception {
+    @SneakyThrows
+    void aboutToStart_badRequest() {
         mockMvc.perform(post(ABOUT_TO_START_URL)
                 .content("garbage content")
                 .header("Authorization", AUTH_TOKEN)
@@ -103,7 +107,8 @@ class BundlesRespondentControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToSubmit_tokenOk() throws Exception {
+    @SneakyThrows
+    void aboutToSubmit_tokenOk() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -117,7 +122,8 @@ class BundlesRespondentControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToSubmit_tokenFail() throws Exception {
+    @SneakyThrows
+    void aboutToSubmit_tokenFail() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -128,7 +134,8 @@ class BundlesRespondentControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void aboutToSubmit_badRequest() throws Exception {
+    @SneakyThrows
+    void aboutToSubmit_badRequest() {
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                 .content("garbage content")
                 .header("Authorization", AUTH_TOKEN)
@@ -138,7 +145,8 @@ class BundlesRespondentControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midPopulateHearings_tokenOk() throws Exception {
+    @SneakyThrows
+    void midPopulateHearings_tokenOk() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(MID_POPULATE_HEARINGS_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -151,7 +159,8 @@ class BundlesRespondentControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midPopulateHearings_tokenFail() throws Exception {
+    @SneakyThrows
+    void midPopulateHearings_tokenFail() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(MID_POPULATE_HEARINGS_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -161,7 +170,8 @@ class BundlesRespondentControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midPopulateHearings_badRequest() throws Exception {
+    @SneakyThrows
+    void midPopulateHearings_badRequest() {
         mockMvc.perform(post(MID_POPULATE_HEARINGS_URL)
                 .content("garbage content")
                 .header("Authorization", AUTH_TOKEN)
@@ -170,7 +180,8 @@ class BundlesRespondentControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midValidateUpload_tokenOk() throws Exception {
+    @SneakyThrows
+    void midValidateUpload_tokenOk() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(MID_VALIDATE_UPLOAD_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -183,7 +194,8 @@ class BundlesRespondentControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midValidateUpload_tokenFail() throws Exception {
+    @SneakyThrows
+    void midValidateUpload_tokenFail() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(MID_VALIDATE_UPLOAD_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -193,7 +205,8 @@ class BundlesRespondentControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midValidateUpload_badRequest() throws Exception {
+    @SneakyThrows
+    void midValidateUpload_badRequest() {
         mockMvc.perform(post(MID_VALIDATE_UPLOAD_URL)
                 .content("garbage content")
                 .header("Authorization", AUTH_TOKEN)
@@ -202,7 +215,8 @@ class BundlesRespondentControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void submitted_tokenOk() throws Exception {
+    @SneakyThrows
+    void submitted_tokenOk() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(SUBMITTED_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -215,7 +229,8 @@ class BundlesRespondentControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void submitted_tokenFail() throws Exception {
+    @SneakyThrows
+    void submitted_tokenFail() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(SUBMITTED_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -225,7 +240,8 @@ class BundlesRespondentControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void submitted_badRequest() throws Exception {
+    @SneakyThrows
+    void submitted_badRequest() {
         mockMvc.perform(post(SUBMITTED_URL)
                 .content("garbage content")
                 .header("Authorization", AUTH_TOKEN)
@@ -234,7 +250,8 @@ class BundlesRespondentControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void removeHearingBundle_tokenOk() throws Exception {
+    @SneakyThrows
+    void removeHearingBundle_tokenOk() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(REMOVE_HEARING_BUNDLE_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -247,7 +264,8 @@ class BundlesRespondentControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void removeHearingBundle_tokenFail() throws Exception {
+    @SneakyThrows
+    void removeHearingBundle_tokenFail() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(REMOVE_HEARING_BUNDLE_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -257,7 +275,8 @@ class BundlesRespondentControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void removeHearingBundle_badRequest() throws Exception {
+    @SneakyThrows
+    void removeHearingBundle_badRequest() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         doThrow(new NotFoundException("Bundle not found in the collection"))
                 .when(bundlesRespondentService).removeHearingBundles(any());
@@ -270,7 +289,8 @@ class BundlesRespondentControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midPopulateRemoveHearingBundles_tokenOk() throws Exception {
+    @SneakyThrows
+    void midPopulateRemoveHearingBundles_tokenOk() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(MID_POPULATE_REMOVE_HEARING_BUNDLES_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -283,7 +303,8 @@ class BundlesRespondentControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midPopulateRemoveHearingBundles_tokenFail() throws Exception {
+    @SneakyThrows
+    void midPopulateRemoveHearingBundles_tokenFail() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(MID_POPULATE_REMOVE_HEARING_BUNDLES_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -293,7 +314,8 @@ class BundlesRespondentControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void midPopulateRemoveHearingBundles_badRequest() throws Exception {
+    @SneakyThrows
+    void midPopulateRemoveHearingBundles_badRequest() {
         mockMvc.perform(post(MID_POPULATE_REMOVE_HEARING_BUNDLES_URL)
                         .content("garbage content")
                         .header("Authorization", AUTH_TOKEN)

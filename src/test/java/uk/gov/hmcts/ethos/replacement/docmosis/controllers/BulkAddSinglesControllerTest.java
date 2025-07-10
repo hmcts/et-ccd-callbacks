@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -84,6 +85,7 @@ class BulkAddSinglesControllerTest {
 
     private void verifyResponse(ResponseEntity<MultipleCallbackResponse> response) {
         assertEquals(HttpStatus.OK, response.getStatusCode());
+        Assertions.assertNotNull(response.getBody());
         assertEquals(3, response.getBody().getErrors().size());
         assertEquals("Error 1", response.getBody().getErrors().get(0));
         assertEquals("Error 2", response.getBody().getErrors().get(1));

@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -88,7 +89,8 @@ class NoticeOfChangeControllerTest {
     }
 
     @Test
-    void handleAboutToSubmit_RespondentRep() throws Exception {
+    @SneakyThrows
+    void handleAboutToSubmit_RespondentRep() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(nocRespondentRepresentativeService
             .updateRespondentRepresentation(any())).thenReturn(caseData);
@@ -107,7 +109,8 @@ class NoticeOfChangeControllerTest {
     }
 
     @Test
-    void nocSubmitted() throws Exception {
+    @SneakyThrows
+    void nocSubmitted() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         doNothing().when(notificationService).sendNotificationOfChangeEmails(any(),
             any(), any());

@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -14,7 +15,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
@@ -173,16 +173,16 @@ class ExcelActionsControllerTest extends BaseControllerTest {
 
     @BeforeEach
     @Override
-    public void setUp() throws Exception {
+    @SneakyThrows
+    public void setUp() {
         super.setUp();
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         doRequestSetUp();
-        DocumentInfo documentInfo = new DocumentInfo();
-        documentInfo.setMarkUp("<a target=\"_blank\" href=\"null/documents/85d97996-22a5-40d7-882e-3a382c8ae1b4/binary\">Document</a>");
     }
 
     @Test
-    void createMultiple() throws Exception {
+    @SneakyThrows
+    void createMultiple() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(CREATE_MULTIPLE_URL)
                 .content(requestContent.toString())
@@ -195,7 +195,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void amendMultiple() throws Exception {
+    @SneakyThrows
+    void amendMultiple() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(AMEND_MULTIPLE_URL)
                 .content(requestContent.toString())
@@ -208,7 +209,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void fixMultipleCaseApi() throws Exception {
+    @SneakyThrows
+    void fixMultipleCaseApi() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(FIX_MULTIPLE_CASE_API_URL)
                 .content(requestContent.toString())
@@ -221,7 +223,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void amendMultipleAPI() throws Exception {
+    @SneakyThrows
+    void amendMultipleAPI() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(AMEND_MULTIPLE_API_URL)
                 .content(requestContent.toString())
@@ -234,7 +237,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void uploadBulkExcel() throws Exception {
+    @SneakyThrows
+    void uploadBulkExcel() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(IMPORT_MULTIPLE_URL)
                 .content(requestContent.toString())
@@ -247,7 +251,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void preAcceptMultiple() throws Exception {
+    @SneakyThrows
+    void preAcceptMultiple() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(PRE_ACCEPT_MULTIPLE_URL)
                 .content(requestContent.toString())
@@ -260,7 +265,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void initialiseBatchUpdate() throws Exception {
+    @SneakyThrows
+    void initialiseBatchUpdate() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(INITIALISE_BATCH_UPDATE_URL)
                 .content(requestContent.toString())
@@ -274,7 +280,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void batchUpdate() throws Exception {
+    @SneakyThrows
+    void batchUpdate() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(BATCH_UPDATE_URL)
                 .content(requestContent.toString())
@@ -287,7 +294,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void updateSubMultiple() throws Exception {
+    @SneakyThrows
+    void updateSubMultiple() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(UPDATE_SUB_MULTIPLE_URL)
                 .content(requestContent.toString())
@@ -300,7 +308,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void dynamicListFlags() throws Exception {
+    @SneakyThrows
+    void dynamicListFlags() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(DYNAMIC_LIST_FLAGS_URL)
                 .content(requestContent.toString())
@@ -313,7 +322,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void multipleMidEventValidation() throws Exception {
+    @SneakyThrows
+    void multipleMidEventValidation() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MULTIPLE_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
@@ -326,7 +336,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void subMultipleMidEventValidation() throws Exception {
+    @SneakyThrows
+    void subMultipleMidEventValidation() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(SUB_MULTIPLE_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
@@ -339,7 +350,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void multipleCreationMidEventValidation() throws Exception {
+    @SneakyThrows
+    void multipleCreationMidEventValidation() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MULTIPLE_CREATION_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
@@ -352,7 +364,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void multipleAmendCaseIdsMidEventValidation() throws Exception {
+    @SneakyThrows
+    void multipleAmendCaseIdsMidEventValidation() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MULTIPLE_AMEND_CASE_IDS_MID_EVENT_VALIDATION_URL)
                         .content(requestContent.toString())
@@ -365,7 +378,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void multipleRemoveCaseIdsMidEventValidation() throws Exception {
+    @SneakyThrows
+    void multipleRemoveCaseIdsMidEventValidation() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MULTIPLE_REMOVE_CASE_IDS_MID_EVENT_VALIDATION_URL)
                         .content(requestContent.toString())
@@ -378,7 +392,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void multipleSingleMidEventValidation() throws Exception {
+    @SneakyThrows
+    void multipleSingleMidEventValidation() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MULTIPLE_SINGLE_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
@@ -391,7 +406,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void multipleMidBatch1Validation() throws Exception {
+    @SneakyThrows
+    void multipleMidBatch1Validation() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MULTIPLE_MID_BATCH_1_VALIDATION_URL)
                 .content(requestContent.toString())
@@ -404,7 +420,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void initialiseCloseMultiple() throws Exception {
+    @SneakyThrows
+    void initialiseCloseMultiple() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(INITIALISE_CLOSE_MULTIPLE_URL)
                 .content(requestContent.toString())
@@ -418,7 +435,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void closeMultiple() throws Exception {
+    @SneakyThrows
+    void closeMultiple() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(multipleCloseEventValidationService.validateCasesBeforeCloseEvent(eq(AUTH_TOKEN),
                 isA(MultipleDetails.class))).thenReturn(new ArrayList<>());
@@ -433,7 +451,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void closeMultipleValidationErrors() throws Exception {
+    @SneakyThrows
+    void closeMultipleValidationErrors() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(multipleCloseEventValidationService.validateCasesBeforeCloseEvent(eq(AUTH_TOKEN),
                 isA(MultipleDetails.class))).thenReturn(List.of("some error"));
@@ -448,7 +467,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void updatePayloadMultiple() throws Exception {
+    @SneakyThrows
+    void updatePayloadMultiple() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(UPDATE_PAYLOAD_MULTIPLE_URL)
                 .content(requestContent.toString())
@@ -461,7 +481,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void resetMultipleState() throws Exception {
+    @SneakyThrows
+    void resetMultipleState() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(RESET_MULTIPLE_STATE_URL)
                 .content(requestContent.toString())
@@ -474,7 +495,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void dynamicListOfficesMultiple() throws Exception {
+    @SneakyThrows
+    void dynamicListOfficesMultiple() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(DYNAMIC_LIST_OFFICES_MULTIPLE_URL)
                 .content(requestContent.toString())
@@ -487,7 +509,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void multipleTransfer() throws Exception {
+    @SneakyThrows
+    void multipleTransfer() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(MULTIPLE_TRANSFER_URL)
                 .content(requestContent.toString())
@@ -500,7 +523,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void createMultipleError400() throws Exception {
+    @SneakyThrows
+    void createMultipleError400() {
         mvc.perform(post(CREATE_MULTIPLE_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -509,7 +533,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void amendMultipleError400() throws Exception {
+    @SneakyThrows
+    void amendMultipleError400() {
         mvc.perform(post(AMEND_MULTIPLE_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -518,7 +543,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void fixMultipleCaseApi400() throws Exception {
+    @SneakyThrows
+    void fixMultipleCaseApi400() {
         mvc.perform(post(FIX_MULTIPLE_CASE_API_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -527,7 +553,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void amendMultipleAPIError400() throws Exception {
+    @SneakyThrows
+    void amendMultipleAPIError400() {
         mvc.perform(post(AMEND_MULTIPLE_API_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -536,7 +563,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void uploadBulkExcelError400() throws Exception {
+    @SneakyThrows
+    void uploadBulkExcelError400() {
         mvc.perform(post(IMPORT_MULTIPLE_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -545,7 +573,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void preAcceptMultipleError400() throws Exception {
+    @SneakyThrows
+    void preAcceptMultipleError400() {
         mvc.perform(post(PRE_ACCEPT_MULTIPLE_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -554,7 +583,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void batchUpdateError400() throws Exception {
+    @SneakyThrows
+    void batchUpdateError400() {
         mvc.perform(post(BATCH_UPDATE_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -563,7 +593,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void updateSubMultipleError400() throws Exception {
+    @SneakyThrows
+    void updateSubMultipleError400() {
         mvc.perform(post(UPDATE_SUB_MULTIPLE_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -572,7 +603,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void dynamicListFlagsError400() throws Exception {
+    @SneakyThrows
+    void dynamicListFlagsError400() {
         mvc.perform(post(DYNAMIC_LIST_FLAGS_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -581,7 +613,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void multipleMidEventValidationError400() throws Exception {
+    @SneakyThrows
+    void multipleMidEventValidationError400() {
         mvc.perform(post(MULTIPLE_MID_EVENT_VALIDATION_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -590,7 +623,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void subMultipleMidEventValidationError400() throws Exception {
+    @SneakyThrows
+    void subMultipleMidEventValidationError400() {
         mvc.perform(post(SUB_MULTIPLE_MID_EVENT_VALIDATION_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -599,7 +633,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void multipleCreationMidEventValidationError400() throws Exception {
+    @SneakyThrows
+    void multipleCreationMidEventValidationError400() {
         mvc.perform(post(MULTIPLE_CREATION_MID_EVENT_VALIDATION_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -608,7 +643,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void multipleAmendCaseIdsMidEventValidationError400() throws Exception {
+    @SneakyThrows
+    void multipleAmendCaseIdsMidEventValidationError400() {
         mvc.perform(post(MULTIPLE_AMEND_CASE_IDS_MID_EVENT_VALIDATION_URL)
                         .content("error")
                         .header(AUTHORIZATION, AUTH_TOKEN)
@@ -617,7 +653,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void multipleRemoveCaseIdsMidEventValidationError400() throws Exception {
+    @SneakyThrows
+    void multipleRemoveCaseIdsMidEventValidationError400() {
         mvc.perform(post(MULTIPLE_REMOVE_CASE_IDS_MID_EVENT_VALIDATION_URL)
                         .content("error")
                         .header(AUTHORIZATION, AUTH_TOKEN)
@@ -626,7 +663,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void multipleSingleMidEventValidationError400() throws Exception {
+    @SneakyThrows
+    void multipleSingleMidEventValidationError400() {
         mvc.perform(post(MULTIPLE_SINGLE_MID_EVENT_VALIDATION_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -635,7 +673,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void multipleMidBatch1tValidationError400() throws Exception {
+    @SneakyThrows
+    void multipleMidBatch1tValidationError400() {
         mvc.perform(post(MULTIPLE_MID_BATCH_1_VALIDATION_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -644,7 +683,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void closeMultipleError400() throws Exception {
+    @SneakyThrows
+    void closeMultipleError400() {
         mvc.perform(post(CLOSE_MULTIPLE_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -653,7 +693,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void updatePayloadMultipleError400() throws Exception {
+    @SneakyThrows
+    void updatePayloadMultipleError400() {
         mvc.perform(post(UPDATE_PAYLOAD_MULTIPLE_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -662,7 +703,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void resetMultipleStateError400() throws Exception {
+    @SneakyThrows
+    void resetMultipleStateError400() {
         mvc.perform(post(RESET_MULTIPLE_STATE_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -671,7 +713,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void dynamicListOfficesMultipleError400() throws Exception {
+    @SneakyThrows
+    void dynamicListOfficesMultipleError400() {
         mvc.perform(post(DYNAMIC_LIST_OFFICES_MULTIPLE_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -680,7 +723,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void multipleTransferError400() throws Exception {
+    @SneakyThrows
+    void multipleTransferError400() {
         mvc.perform(post(MULTIPLE_TRANSFER_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
@@ -689,7 +733,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void createMultipleError500() throws Exception {
+    @SneakyThrows
+    void createMultipleError500() {
         doThrow(new InternalException(ERROR_MESSAGE)).when(multipleCreationService).bulkCreationLogic(
                 eq(AUTH_TOKEN), isA(MultipleDetails.class), anyList());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -701,7 +746,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void amendMultipleError500() throws Exception {
+    @SneakyThrows
+    void amendMultipleError500() {
         doThrow(new InternalException(ERROR_MESSAGE)).when(multipleAmendService).bulkAmendMultipleLogic(
                 eq(AUTH_TOKEN), isA(MultipleDetails.class), anyList());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -713,7 +759,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void uploadBulkExcelError500() throws Exception {
+    @SneakyThrows
+    void uploadBulkExcelError500() {
         doThrow(new InternalException(ERROR_MESSAGE)).when(multipleUploadService).bulkUploadLogic(
                 eq(AUTH_TOKEN), isA(MultipleDetails.class), anyList());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -725,7 +772,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void preAcceptMultipleError500() throws Exception {
+    @SneakyThrows
+    void preAcceptMultipleError500() {
         doThrow(new InternalException(ERROR_MESSAGE)).when(multiplePreAcceptService).bulkPreAcceptLogic(
                 eq(AUTH_TOKEN), isA(MultipleDetails.class), anyList());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -737,7 +785,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void batchUpdateError500() throws Exception {
+    @SneakyThrows
+    void batchUpdateError500() {
         doThrow(new InternalException(ERROR_MESSAGE)).when(multipleUpdateService).bulkUpdateLogic(
                 eq(AUTH_TOKEN), isA(MultipleDetails.class), anyList());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -749,7 +798,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void updateSubMultipleError500() throws Exception {
+    @SneakyThrows
+    void updateSubMultipleError500() {
         doThrow(new InternalException(ERROR_MESSAGE)).when(subMultipleUpdateService).subMultipleUpdateLogic(
                 eq(AUTH_TOKEN), isA(MultipleDetails.class), anyList());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -761,7 +811,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void dynamicListFlagsError500() throws Exception {
+    @SneakyThrows
+    void dynamicListFlagsError500() {
         doThrow(new InternalException(ERROR_MESSAGE))
                 .when(multipleDynamicListFlagsService).populateDynamicListFlagsLogic(
                 eq(AUTH_TOKEN), isA(MultipleDetails.class), anyList());
@@ -774,7 +825,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void multipleMidEventValidationError500() throws Exception {
+    @SneakyThrows
+    void multipleMidEventValidationError500() {
         doThrow(new InternalException(ERROR_MESSAGE)).when(multipleMidEventValidationService).multipleValidationLogic(
                 eq(AUTH_TOKEN), isA(MultipleDetails.class), anyList());
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
@@ -786,7 +838,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void subMultipleMidEventValidationError500() throws Exception {
+    @SneakyThrows
+    void subMultipleMidEventValidationError500() {
         doThrow(new InternalException(ERROR_MESSAGE))
                 .when(subMultipleMidEventValidationService).subMultipleValidationLogic(
                 isA(MultipleDetails.class), anyList());
@@ -799,7 +852,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void multipleCreationMidEventValidationError500() throws Exception {
+    @SneakyThrows
+    void multipleCreationMidEventValidationError500() {
         doThrow(new InternalException(ERROR_MESSAGE))
                 .when(multipleCreationMidEventValidationService).multipleCreationValidationLogic(
                 eq(AUTH_TOKEN), isA(MultipleDetails.class), anyList(), anyList(), isA(Boolean.class));
@@ -812,7 +866,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void multipleAmendCaseIdsMidEventValidationError500() throws Exception {
+    @SneakyThrows
+    void multipleAmendCaseIdsMidEventValidationError500() {
         doThrow(new InternalException(ERROR_MESSAGE))
                 .when(multipleCreationMidEventValidationService).multipleCreationValidationLogic(
                         eq(AUTH_TOKEN), isA(MultipleDetails.class), anyList(), anyList(), isA(Boolean.class));
@@ -825,7 +880,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void multipleRemoveCaseIdsMidEventValidationError500() throws Exception {
+    @SneakyThrows
+    void multipleRemoveCaseIdsMidEventValidationError500() {
         doThrow(new InternalException(ERROR_MESSAGE))
                 .when(multipleCreationMidEventValidationService).multipleRemoveCasesValidationLogic(
                         eq(AUTH_TOKEN), isA(MultipleDetails.class), anyList());
@@ -838,7 +894,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void multipleSingleMidEventValidationError500() throws Exception {
+    @SneakyThrows
+    void multipleSingleMidEventValidationError500() {
         doThrow(new InternalException(ERROR_MESSAGE))
                 .when(multipleSingleMidEventValidationService).multipleSingleValidationLogic(
                 eq(AUTH_TOKEN), isA(MultipleDetails.class), anyList());
@@ -851,7 +908,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void createMultipleForbidden() throws Exception {
+    @SneakyThrows
+    void createMultipleForbidden() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(CREATE_MULTIPLE_URL)
                 .content(requestContent.toString())
@@ -861,7 +919,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void amendMultipleForbidden() throws Exception {
+    @SneakyThrows
+    void amendMultipleForbidden() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(AMEND_MULTIPLE_URL)
                 .content(requestContent.toString())
@@ -871,7 +930,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void amendMultipleAPIForbidden() throws Exception {
+    @SneakyThrows
+    void amendMultipleAPIForbidden() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(AMEND_MULTIPLE_API_URL)
                 .content(requestContent.toString())
@@ -881,7 +941,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void uploadBulkExcelForbidden() throws Exception {
+    @SneakyThrows
+    void uploadBulkExcelForbidden() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(IMPORT_MULTIPLE_URL)
                 .content(requestContent.toString())
@@ -891,7 +952,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void preAcceptMultipleForbidden() throws Exception {
+    @SneakyThrows
+    void preAcceptMultipleForbidden() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(PRE_ACCEPT_MULTIPLE_URL)
                 .content(requestContent.toString())
@@ -901,7 +963,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void batchUpdateForbidden() throws Exception {
+    @SneakyThrows
+    void batchUpdateForbidden() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(BATCH_UPDATE_URL)
                 .content(requestContent.toString())
@@ -911,7 +974,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void initialiseBatchUpdateForbidden() throws Exception {
+    @SneakyThrows
+    void initialiseBatchUpdateForbidden() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(INITIALISE_BATCH_UPDATE_URL)
                 .content(requestContent.toString())
@@ -922,7 +986,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void updateSubMultipleForbidden() throws Exception {
+    @SneakyThrows
+    void updateSubMultipleForbidden() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(UPDATE_SUB_MULTIPLE_URL)
                 .content(requestContent.toString())
@@ -932,7 +997,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void dynamicListFlagsForbidden() throws Exception {
+    @SneakyThrows
+    void dynamicListFlagsForbidden() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(DYNAMIC_LIST_FLAGS_URL)
                 .content(requestContent.toString())
@@ -942,7 +1008,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void multipleMidEventValidationForbidden() throws Exception {
+    @SneakyThrows
+    void multipleMidEventValidationForbidden() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MULTIPLE_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
@@ -952,7 +1019,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void subMultipleMidEventValidationForbidden() throws Exception {
+    @SneakyThrows
+    void subMultipleMidEventValidationForbidden() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(SUB_MULTIPLE_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
@@ -962,7 +1030,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void multipleCreationMidEventValidationForbidden() throws Exception {
+    @SneakyThrows
+    void multipleCreationMidEventValidationForbidden() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MULTIPLE_CREATION_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
@@ -972,7 +1041,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void multipleAmendCaseIdsMidEventValidationForbidden() throws Exception {
+    @SneakyThrows
+    void multipleAmendCaseIdsMidEventValidationForbidden() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MULTIPLE_AMEND_CASE_IDS_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
@@ -982,7 +1052,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void multipleSingleMidEventValidationForbidden() throws Exception {
+    @SneakyThrows
+    void multipleSingleMidEventValidationForbidden() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MULTIPLE_SINGLE_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
@@ -992,7 +1063,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void multipleMidBatch1ValidationForbidden() throws Exception {
+    @SneakyThrows
+    void multipleMidBatch1ValidationForbidden() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MULTIPLE_MID_BATCH_1_VALIDATION_URL)
                 .content(requestContent.toString())
@@ -1002,7 +1074,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void initialiseCloseMultipleForbidden() throws Exception {
+    @SneakyThrows
+    void initialiseCloseMultipleForbidden() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(INITIALISE_CLOSE_MULTIPLE_URL)
                 .content(requestContent.toString())
@@ -1013,7 +1086,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void closeMultipleForbidden() throws Exception {
+    @SneakyThrows
+    void closeMultipleForbidden() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(CLOSE_MULTIPLE_URL)
                 .content(requestContent.toString())
@@ -1023,7 +1097,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void fixMultipleCaseForbidden() throws Exception {
+    @SneakyThrows
+    void fixMultipleCaseForbidden() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(FIX_MULTIPLE_CASE_API_URL)
                 .content(requestContent.toString())
@@ -1033,7 +1108,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void updatePayloadMultipleForbidden() throws Exception {
+    @SneakyThrows
+    void updatePayloadMultipleForbidden() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(UPDATE_PAYLOAD_MULTIPLE_URL)
                 .content(requestContent.toString())
@@ -1043,7 +1119,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void resetMultipleStateForbidden() throws Exception {
+    @SneakyThrows
+    void resetMultipleStateForbidden() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(RESET_MULTIPLE_STATE_URL)
                 .content(requestContent.toString())
@@ -1053,7 +1130,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void dynamicListOfficesMultipleForbidden() throws Exception {
+    @SneakyThrows
+    void dynamicListOfficesMultipleForbidden() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(DYNAMIC_LIST_OFFICES_MULTIPLE_URL)
                 .content(requestContent.toString())
@@ -1063,7 +1141,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void multipleTransferForbidden() throws Exception {
+    @SneakyThrows
+    void multipleTransferForbidden() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MULTIPLE_TRANSFER_URL)
                 .content(requestContent.toString())
@@ -1073,7 +1152,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void listingsDateRangeMidEventValidationOk() throws Exception {
+    @SneakyThrows
+    void listingsDateRangeMidEventValidationOk() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(LISTINGS_DATE_RANGE_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
@@ -1086,7 +1166,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void listingsDateRangeMidEventValidationForbidden() throws Exception {
+    @SneakyThrows
+    void listingsDateRangeMidEventValidationForbidden() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(LISTINGS_DATE_RANGE_MID_EVENT_VALIDATION_URL)
                 .content(requestContent.toString())
@@ -1096,7 +1177,8 @@ class ExcelActionsControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void listingsDateRangeMidEventValidationError500() throws Exception {
+    @SneakyThrows
+    void listingsDateRangeMidEventValidationError500() {
         doThrow(new InternalException(ERROR_MESSAGE)).when(eventValidationService).validateListingDateRange(
                 isA(String.class), isA(String.class));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);

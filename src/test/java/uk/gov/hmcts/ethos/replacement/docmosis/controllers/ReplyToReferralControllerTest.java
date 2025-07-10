@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
+import lombok.SneakyThrows;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -100,6 +102,7 @@ class ReplyToReferralControllerTest {
         caseData.setReferralCollection(List.of(createReferralTypeItem()));
         DynamicFixedListType selectReferralList =
             ReferralHelper.populateSelectReferralDropdown(caseData.getReferralCollection());
+        Assertions.assertNotNull(selectReferralList);
         selectReferralList.setValue(new DynamicValueType());
         selectReferralList.getValue().setCode("1");
         caseData.setSelectReferral(selectReferralList);
@@ -123,7 +126,8 @@ class ReplyToReferralControllerTest {
     }
 
     @Test
-    void aboutToStartReferralReply_Success() throws Exception {
+    @SneakyThrows
+    void aboutToStartReferralReply_Success() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(START_REPLY_REFERRAL_URL)
                 .contentType(APPLICATION_JSON)
@@ -136,10 +140,9 @@ class ReplyToReferralControllerTest {
     }
 
     @Test
-    void aboutToSubmit_NoReplyToEmailAddress_tokenOk() throws Exception {
+    @SneakyThrows
+    void aboutToSubmit_NoReplyToEmailAddress_tokenOk() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        UserDetails details = new UserDetails();
-        details.setName("First Last");
         CCDRequest noReplyToEmailAddressCDRequest = ccdRequest;
         noReplyToEmailAddressCDRequest.getCaseDetails().getCaseData().setReplyToEmailAddress("");
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
@@ -154,7 +157,8 @@ class ReplyToReferralControllerTest {
     }
 
     @Test
-    void initHearingAndReferralDetails_Success() throws Exception {
+    @SneakyThrows
+    void initHearingAndReferralDetails_Success() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(INIT_HEARING_AND_REFERRAL_DETAILS_URL)
                 .contentType(APPLICATION_JSON)
@@ -167,7 +171,8 @@ class ReplyToReferralControllerTest {
     }
 
     @Test
-    void aboutToSubmitReferralReply_Success() throws Exception {
+    @SneakyThrows
+    void aboutToSubmitReferralReply_Success() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         UserDetails details = new UserDetails();
         details.setName("First Last");
@@ -183,7 +188,8 @@ class ReplyToReferralControllerTest {
     }
 
     @Test
-    void aboutToStartReferralReply_invalidToken() throws Exception {
+    @SneakyThrows
+    void aboutToStartReferralReply_invalidToken() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(START_REPLY_REFERRAL_URL)
                 .contentType(APPLICATION_JSON)
@@ -193,7 +199,8 @@ class ReplyToReferralControllerTest {
     }
 
     @Test
-    void initHearingAndReferralDetails_invalidToken() throws Exception {
+    @SneakyThrows
+    void initHearingAndReferralDetails_invalidToken() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(INIT_HEARING_AND_REFERRAL_DETAILS_URL)
                 .contentType(APPLICATION_JSON)
@@ -203,7 +210,8 @@ class ReplyToReferralControllerTest {
     }
 
     @Test
-    void aboutToSubmitReferralReply_invalidToken() throws Exception {
+    @SneakyThrows
+    void aboutToSubmitReferralReply_invalidToken() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         when(userIdamService.getUserDetails(any())).thenReturn(new UserDetails());
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
@@ -214,7 +222,8 @@ class ReplyToReferralControllerTest {
     }
 
     @Test
-    void completeReplyToReferral_tokenOk() throws Exception {
+    @SneakyThrows
+    void completeReplyToReferral_tokenOk() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(SUBMITTED_REFERRAL_URL)
                 .contentType(APPLICATION_JSON)
@@ -225,7 +234,8 @@ class ReplyToReferralControllerTest {
     }
 
     @Test
-    void completeReplyToReferral_invalidToken() throws Exception {
+    @SneakyThrows
+    void completeReplyToReferral_invalidToken() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(SUBMITTED_REFERRAL_URL)
                 .contentType(APPLICATION_JSON)
@@ -235,7 +245,8 @@ class ReplyToReferralControllerTest {
     }
 
     @Test
-    void validateReplyToEmail_tokenOk() throws Exception {
+    @SneakyThrows
+    void validateReplyToEmail_tokenOk() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(VALIDATE_EMAIL_URL)
                 .contentType(APPLICATION_JSON)
@@ -246,7 +257,8 @@ class ReplyToReferralControllerTest {
     }
 
     @Test
-    void validateNoReplyToEmail_tokenOk() throws Exception {
+    @SneakyThrows
+    void validateNoReplyToEmail_tokenOk() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         CCDRequest noReplyToEmailAddressCDRequest = ccdRequest;
         noReplyToEmailAddressCDRequest.getCaseDetails().getCaseData().setReplyToEmailAddress("");
@@ -259,7 +271,8 @@ class ReplyToReferralControllerTest {
     }
 
     @Test
-    void validateReplyToEmail_invalidToken() throws Exception {
+    @SneakyThrows
+    void validateReplyToEmail_invalidToken() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(VALIDATE_EMAIL_URL)
                 .contentType(APPLICATION_JSON)

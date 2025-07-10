@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -83,7 +84,7 @@ class InitialConsiderationControllerTest extends BaseControllerTest {
 
     @BeforeEach
     @Override
-    protected void setUp() throws Exception {
+    protected void setUp() {
         super.setUp();
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         when(featureToggleService.isHmcEnabled()).thenReturn(true);
@@ -105,7 +106,8 @@ class InitialConsiderationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void initICCompleteTokenOk() throws Exception {
+    @SneakyThrows
+    void initICCompleteTokenOk() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(COMPLETE_INITIAL_CONSIDERATION_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -116,7 +118,8 @@ class InitialConsiderationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void initICCompleteTokenFail() throws Exception {
+    @SneakyThrows
+    void initICCompleteTokenFail() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(COMPLETE_INITIAL_CONSIDERATION_URL)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -126,7 +129,8 @@ class InitialConsiderationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void initICCompleteBadRequest() throws Exception {
+    @SneakyThrows
+    void initICCompleteBadRequest() {
         mvc.perform(post(COMPLETE_INITIAL_CONSIDERATION_URL)
                 .content("bad request")
                 .header("Authorization", AUTH_TOKEN)
@@ -135,7 +139,8 @@ class InitialConsiderationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void submitInitialConsideration_TokenOk() throws Exception {
+    @SneakyThrows
+    void submitInitialConsideration_TokenOk() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(SUBMIT_INITIAL_CONSIDERATION_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -149,7 +154,8 @@ class InitialConsiderationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void submitInitialConsideration_TokenFail() throws Exception {
+    @SneakyThrows
+    void submitInitialConsideration_TokenFail() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(SUBMIT_INITIAL_CONSIDERATION_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -159,7 +165,8 @@ class InitialConsiderationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void submitInitialConsideration_BadRequest() throws Exception {
+    @SneakyThrows
+    void submitInitialConsideration_BadRequest() {
         mvc.perform(post(SUBMIT_INITIAL_CONSIDERATION_URL)
                         .content("bad request")
                         .header("Authorization", AUTH_TOKEN)
@@ -168,7 +175,8 @@ class InitialConsiderationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void startInitialConsiderationTest() throws Exception {
+    @SneakyThrows
+    void startInitialConsiderationTest() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(initialConsiderationService.generateJurisdictionCodesHtml(anyList(), any())).thenReturn("Jurisdictions");
         when(initialConsiderationService.getHearingDetails(anyList())).thenReturn("hearings");

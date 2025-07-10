@@ -1,5 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -8,15 +11,10 @@ import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
-import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
-
-import java.io.IOException;
-import java.util.List;
-import java.util.Optional;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1ReppedService.getOrganisationAddress;
@@ -67,12 +65,7 @@ public class NocClaimantRepresentativeService {
         RepresentedTypeC claimantRep = new RepresentedTypeC();
         claimantRep.setNameOfRepresentative(userDetails.getFirstName() + " " + userDetails.getLastName());
         claimantRep.setRepresentativeEmailAddress(userDetails.getEmail());
-
-        Organisation organisation = change.getOrganisationToAdd();
-        log.info("NoC testing: Organisation to add: {}", organisation);
-        log.info("NoC testing: org name {}", organisation.getOrganisationName());
-        claimantRep.setNameOfOrganisation(organisation.getOrganisationName());
-        claimantRep.setMyHmctsOrganisation(organisation);
+        claimantRep.setMyHmctsOrganisation(change.getOrganisationToAdd());
 
         return claimantRep;
     }
@@ -91,6 +84,7 @@ public class NocClaimantRepresentativeService {
             if (organisationResponse.isPresent()) {
                 OrganisationsResponse organisation = organisationResponse.get();
                 claimantRep.setRepresentativeAddress(getOrganisationAddress(organisation));
+                claimantRep.setNameOfOrganisation(organisation.getName());
                 caseData.setRepresentativeClaimantType(claimantRep);
             }
         }

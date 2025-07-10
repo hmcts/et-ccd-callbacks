@@ -675,8 +675,9 @@ public class Et1ReppedController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        Et1ReppedHelper.loadClaimantRepresentativeValues(caseData);
-        return getCallbackRespEntityNoErrors(caseData);
+
+        List<String> errors = Et1ReppedHelper.loadClaimantRepresentativeValues(caseData);
+        return getCallbackRespEntityErrors(errors, caseData);
     }
 
     /**
@@ -701,7 +702,7 @@ public class Et1ReppedController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        Et1ReppedHelper.setClaimantRepresentativeValues(caseData);
-        return getCallbackRespEntityNoErrors(caseData);
+        List<String> errors = Et1ReppedHelper.setClaimantRepresentativeValues(caseData);
+        return getCallbackRespEntityErrors(errors, caseData);
     }
 }

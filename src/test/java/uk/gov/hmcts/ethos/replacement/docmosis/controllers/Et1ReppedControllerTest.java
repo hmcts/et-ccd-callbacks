@@ -17,6 +17,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
@@ -71,7 +72,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.CLAIMANT_REPRESENTATIVE_MISSING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.CLAIM_DETAILS_MISSING;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.CLAIM_MISSING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.MULTIPLE_OPTION_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.ORGANISATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.TRIAGE_ERROR_MESSAGE;
@@ -123,6 +126,9 @@ class Et1ReppedControllerTest {
     private CCDRequest ccdRequest;
     private CCDRequest ccdRequest2;
     private CaseData caseData;
+    private CCDRequest ccdRequestWithClaimantRepresentative;
+    private CCDRequest ccdRequestWithoutCaseData;
+    private CCDRequest ccdRequestWithoutClaimantRepresentative;
 
     @MockBean
     private VerifyTokenService verifyTokenService;
@@ -210,6 +216,51 @@ class Et1ReppedControllerTest {
         CaseDetails caseDetails = generateCaseDetails();
         ccdRequest2 = CCDRequestBuilder.builder()
                 .withCaseData(caseDetails.getCaseData())
+                .withState(caseDetails.getState())
+                .withCaseTypeId(caseDetails.getCaseTypeId())
+                .withCaseId(caseDetails.getCaseId())
+                .build();
+
+        CaseData caseDataWithClaimantRepresentative = new CaseData();
+        caseDataWithClaimantRepresentative.setEt1ReppedSectionOne(NO);
+        caseDataWithClaimantRepresentative.setEt1ReppedSectionTwo(NO);
+        caseDataWithClaimantRepresentative.setEt1ReppedSectionThree(NO);
+        caseDataWithClaimantRepresentative.setClaimantFirstName("First");
+        caseDataWithClaimantRepresentative.setClaimantLastName("Last");
+        caseDataWithClaimantRepresentative.setRespondentType(ORGANISATION);
+        caseDataWithClaimantRepresentative.setRespondentOrganisationName("Org");
+        caseDataWithClaimantRepresentative.setRespondentAddress(createGenericAddress());
+        caseDataWithClaimantRepresentative.setClaimantRepresentedQuestion("Yes");
+        caseDataWithClaimantRepresentative.setRepresentativeClaimantType(
+                RepresentedTypeC.builder().representativeAddress(createGenericAddress())
+                        .representativePhoneNumber("07444518903").build());
+        ccdRequestWithClaimantRepresentative = CCDRequestBuilder.builder()
+                .withCaseData(caseDataWithClaimantRepresentative)
+                .withState(caseDetails.getState())
+                .withCaseTypeId(caseDetails.getCaseTypeId())
+                .withCaseId(caseDetails.getCaseId())
+                .build();
+
+        CaseData caseDataWithOutClaimantRepresentative = new CaseData();
+        caseDataWithOutClaimantRepresentative.setEt1ReppedSectionOne(NO);
+        caseDataWithOutClaimantRepresentative.setEt1ReppedSectionTwo(NO);
+        caseDataWithOutClaimantRepresentative.setEt1ReppedSectionThree(NO);
+        caseDataWithOutClaimantRepresentative.setClaimantFirstName("First");
+        caseDataWithOutClaimantRepresentative.setClaimantLastName("Last");
+        caseDataWithOutClaimantRepresentative.setRespondentType(ORGANISATION);
+        caseDataWithOutClaimantRepresentative.setRespondentOrganisationName("Org");
+        caseDataWithOutClaimantRepresentative.setRespondentAddress(createGenericAddress());
+        caseDataWithOutClaimantRepresentative.setClaimantRepresentedQuestion("Yes");
+        caseDataWithOutClaimantRepresentative.setRepresentativeClaimantType(null);
+        ccdRequestWithoutClaimantRepresentative = CCDRequestBuilder.builder()
+                .withCaseData(caseDataWithOutClaimantRepresentative)
+                .withState(caseDetails.getState())
+                .withCaseTypeId(caseDetails.getCaseTypeId())
+                .withCaseId(caseDetails.getCaseId())
+                .build();
+
+        ccdRequestWithoutCaseData = CCDRequestBuilder.builder()
+                .withCaseData(null)
                 .withState(caseDetails.getState())
                 .withCaseTypeId(caseDetails.getCaseTypeId())
                 .withCaseId(caseDetails.getCaseId())
@@ -1004,52 +1055,72 @@ class Et1ReppedControllerTest {
     @SneakyThrows
     void theAboutToStartRepresentativeInfo() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+
+        // When there is no representative should have any claimant representative missing error and have data
         mockMvc.perform(post(ABOUT_TO_START_REPRESENTATIVE_INFO)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                        .content(jsonMapper.toJson(ccdRequest2)))
+                        .content(jsonMapper.toJson(ccdRequestWithoutClaimantRepresentative)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath("$.errors[0]", is(CLAIMANT_REPRESENTATIVE_MISSING)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
 
-    @Test
-    @SneakyThrows
-    void theAboutToStartRepresentativeInfoNotAuthorized() {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        // When there is no case data should have any claim missing error and have no data
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(ABOUT_TO_START_REPRESENTATIVE_INFO)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
+                        .content(jsonMapper.toJson(ccdRequestWithoutCaseData)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, nullValue()))
+                .andExpect(jsonPath("$.errors[0]", is(CLAIM_MISSING)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        // When both representative and case data exists should not have any error and have data
+        mockMvc.perform(post(ABOUT_TO_START_REPRESENTATIVE_INFO)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequestWithClaimantRepresentative)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath("$.errors.size()", is(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
     @Test
     @SneakyThrows
     void theAboutToSubmitRepresentativeInfo() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        mockMvc.perform(post(ABOUT_TO_SUBMIT_REPRESENTATIVE_INFO)
-                        .contentType(APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                        .content(jsonMapper.toJson(ccdRequest2)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
-                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
 
-    @Test
-    @SneakyThrows
-    void theRepresentativeInfoSubmitted() {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        // When there is no case data should have any claim missing error and not have data
         mockMvc.perform(post(ABOUT_TO_SUBMIT_REPRESENTATIVE_INFO)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                        .content(jsonMapper.toJson(ccdRequest2)))
+                        .content(jsonMapper.toJson(ccdRequestWithoutCaseData)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, nullValue()))
+                .andExpect(jsonPath("$.errors[0]", is(CLAIM_MISSING)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        // When there is no representative should not have any error and have data
+        mockMvc.perform(post(ABOUT_TO_SUBMIT_REPRESENTATIVE_INFO)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequestWithoutClaimantRepresentative)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath("$.errors.size()", is(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        // When both representative and case data exists should not have any error and have data
+        mockMvc.perform(post(ABOUT_TO_SUBMIT_REPRESENTATIVE_INFO)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequestWithClaimantRepresentative)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath("$.errors.size()", is(0)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 }

@@ -70,6 +70,8 @@ public final class ET1ReppedConstants {
     public static final String NOT_SURE = "Not sure";
     public static final String CLAIM_DETAILS_MISSING = "Provide the details of the claim by uploading a document or "
                                                        + "entering them in the text box below";
+    public static final String CLAIMANT_REPRESENTATIVE_MISSING = "There is no claimant representative for the claim";
+    public static final String CLAIM_MISSING = "There is no claim";
 
     private ET1ReppedConstants() {
         // Access through static methods

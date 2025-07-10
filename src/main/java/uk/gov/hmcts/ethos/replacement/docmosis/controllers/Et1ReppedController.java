@@ -674,7 +674,6 @@ public class Et1ReppedController {
     public ResponseEntity<CCDCallbackResponse> aboutToStartRepresentativeInfo(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         Et1ReppedHelper.loadClaimantRepresentativeValues(caseData);
         return getCallbackRespEntityNoErrors(caseData);
@@ -701,28 +700,8 @@ public class Et1ReppedController {
     public ResponseEntity<CCDCallbackResponse> aboutToSubmitRepresentativeInfo(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         Et1ReppedHelper.setClaimantRepresentativeValues(caseData);
-        return getCallbackRespEntityNoErrors(caseData);
-    }
-
-    @PostMapping(value = "/representativeInfoSubmitted", consumes = MimeTypeUtils.APPLICATION_JSON_VALUE)
-    @Operation(summary = "Approval of submission of representative info")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully",
-            content = {
-                @Content(mediaType = "application/json",
-                        schema = @Schema(implementation = CCDCallbackResponse.class))
-            }),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
-    public ResponseEntity<CCDCallbackResponse> representativeInfoSubmitted(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
-
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         return getCallbackRespEntityNoErrors(caseData);
     }
 }

@@ -413,36 +413,9 @@ public class Et3ResponseController {
     public ResponseEntity<CCDCallbackResponse> aboutToSubmitRepresentativeInfo(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return verifyTokenService.getForbiddenEntityStatusResponse(userToken);
-        }
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         Et3ResponseHelper.setRespondentRepresentativeValues(caseData);
         Et3ResponseHelper.resetEt3FormFields(caseData);
-        return getCallbackRespEntityNoErrors(caseData);
-    }
-
-    @PostMapping(value = "/representativeInfoSubmitted", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Approval of submission of representative info")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                content = {
-                    @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = CCDCallbackResponse.class))
-                }),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
-    public ResponseEntity<CCDCallbackResponse> representativeInfoSubmitted(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return verifyTokenService.getForbiddenEntityStatusResponse(userToken);
-        }
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         return getCallbackRespEntityNoErrors(caseData);
     }
 }

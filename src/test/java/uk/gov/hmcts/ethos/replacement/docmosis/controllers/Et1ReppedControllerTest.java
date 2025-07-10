@@ -1041,17 +1041,6 @@ class Et1ReppedControllerTest {
 
     @Test
     @SneakyThrows
-    void theAboutToSubmitRepresentativeInfoNotAuthorized() {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(ABOUT_TO_SUBMIT_REPRESENTATIVE_INFO)
-                        .contentType(APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
     void theRepresentativeInfoSubmitted() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_REPRESENTATIVE_INFO)
@@ -1062,16 +1051,5 @@ class Et1ReppedControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    @SneakyThrows
-    void theRepresentativeInfoSubmittedNotAuthorized() {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(ABOUT_TO_SUBMIT_REPRESENTATIVE_INFO)
-                        .contentType(APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
     }
 }

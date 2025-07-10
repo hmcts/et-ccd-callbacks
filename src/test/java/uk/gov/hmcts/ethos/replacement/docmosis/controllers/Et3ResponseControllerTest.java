@@ -53,7 +53,6 @@ class Et3ResponseControllerTest extends BaseControllerTest {
     private static final String DOWNLOAD_DRAFT_ABOUT_TO_SUBMIT = "/et3Response/downloadDraft/aboutToSubmit";
     private static final String DOWNLOAD_DRAFT_SUBMITTED = "/et3Response/downloadDraft/submitted";
     private static final String ABOUT_TO_SUBMIT_REPRESENTATIVE_INFO = "/et3Response/aboutToSubmitRepresentativeInfo";
-    private static final String REPRESENTATIVE_INFO_SUBMITTED = "/et3Response/representativeInfoSubmitted";
 
     @Autowired
     private WebApplicationContext applicationContext;
@@ -430,41 +429,5 @@ class Et3ResponseControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    @SneakyThrows
-    void theAboutToSubmitRepresentativeInfoNotAuthorized() {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(ABOUT_TO_SUBMIT_REPRESENTATIVE_INFO)
-                        .contentType(APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void theSubmitRepresentativeInfoSubmitted() {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        mvc.perform(post(REPRESENTATIVE_INFO_SUBMITTED)
-                        .contentType(APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
-                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    @SneakyThrows
-    void theRepresentativeInfoSubmittedNotAuthorized() {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(REPRESENTATIVE_INFO_SUBMITTED)
-                        .contentType(APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isForbidden());
     }
 }

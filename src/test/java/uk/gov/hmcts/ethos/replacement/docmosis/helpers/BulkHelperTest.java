@@ -47,7 +47,6 @@ class BulkHelperTest {
     private BulkDetails bulkDetailsListCases;
     private BulkDetails bulkDetailsScheduleDetailed;
 
-
     private BulkDetails generateBulkDetails(String jsonFileName) throws IOException, URISyntaxException {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
             .getContextClassLoader().getResource(jsonFileName)).toURI())));

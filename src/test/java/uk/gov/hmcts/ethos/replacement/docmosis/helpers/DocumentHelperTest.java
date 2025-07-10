@@ -162,7 +162,8 @@ class DocumentHelperTest {
                 + "12 Small Street, 24 House, Manchester, North West, M12 4ED, UK\\n3. 11 Small Street, 22 House, "
                 + "Manchester, North West, M12 42R, UK\"" + COMMA_NEW_LINE
                 + "\"Hearing_date\":\"25 November 2019, 14 December 2019, 28 December 2019\"" + COMMA_NEW_LINE
-                + "\"Hearing_date_time\":\"25 November 2019, 14 December 2019, 28 December 2019 at 10:30\"" + COMMA_NEW_LINE
+                + "\"Hearing_date_time\":\"25 November 2019, 14 December 2019, 28 December 2019 at 10:30\""
+                + COMMA_NEW_LINE
                 + "\"Hearing_time\":\"10:30\"" + COMMA_NEW_LINE
                 + "\"Hearing_venue\":\"Manchester Employment Tribunals, Alexandra House, 14-22 The Parsonage, "
                 + "Manchester, M3 2JA\"" + COMMA_NEW_LINE
@@ -186,7 +187,8 @@ class DocumentHelperTest {
                 + "\"iScot_schmcts2\":\"[userImage:schmcts.png]\"" + COMMA_NEW_LINE
                 + "\"Clerk\":\"Mike Jordan\"" + COMMA_NEW_LINE
                 + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + COMMA_NEW_LINE
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\"" + COMMA_NEW_LINE
+                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
+                + COMMA_NEW_LINE
                 + "\"Case_No\":\"123456\"" + COMMA_NEW_LINE
                 + "\"submission_reference\":\"12212121\"" + COMMA_NEW_LINE
                 + "}" + NEW_LINE
@@ -257,7 +259,8 @@ class DocumentHelperTest {
                 + "\"iScot_schmcts2\":\"[userImage:schmcts.png]\"" + COMMA_NEW_LINE
                 + "\"Clerk\":\"Mike Jordan\"" + COMMA_NEW_LINE
                 + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + COMMA_NEW_LINE
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\"" + COMMA_NEW_LINE
+                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
+                + COMMA_NEW_LINE
                 + "\"Case_No\":\"123456\"" + COMMA_NEW_LINE
                 + "\"submission_reference\":\"12212121\"" + COMMA_NEW_LINE
                 + "}" + NEW_LINE
@@ -312,7 +315,8 @@ class DocumentHelperTest {
                 + "\"respondent_postCode\":\"M12 42R\"" + COMMA_NEW_LINE
                 + "\"Respondent\":\"Antonio Vazquez\"" + COMMA_NEW_LINE
                 + "\"resp_others\":\"\"" + COMMA_NEW_LINE
-                + "\"resp_address\":\"11 Small Street, 22 House, Manchester, North West, M12 42R, UK\"" + COMMA_NEW_LINE
+                + "\"resp_address\":\"11 Small Street, 22 House, Manchester, North West, M12 42R, UK\""
+                + COMMA_NEW_LINE
                 + "\"Hearing_date\":\"\"" + COMMA_NEW_LINE
                 + "\"Hearing_date_time\":\"\"" + COMMA_NEW_LINE
                 + "\"Hearing_time\":\"\"" + COMMA_NEW_LINE
@@ -338,7 +342,8 @@ class DocumentHelperTest {
                 + "\"iScot_schmcts2\":\"[userImage:schmcts.png]\"" + COMMA_NEW_LINE
                 + "\"Clerk\":\"Mike Jordan\"" + COMMA_NEW_LINE
                 + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + COMMA_NEW_LINE
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\"" + COMMA_NEW_LINE
+                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
+                + COMMA_NEW_LINE
                 + "\"Case_No\":\"123456\"" + COMMA_NEW_LINE
                 + "\"submission_reference\":\"12212121\"" + COMMA_NEW_LINE
                 + "}" + NEW_LINE
@@ -350,7 +355,8 @@ class DocumentHelperTest {
                 caseDetails2.getCaseData().getCorrespondenceType(),
                 caseDetails2.getCaseData().getCorrespondenceScotType(), null,
                 null, venueAddressReaderService).toString());
-        caseDetails2.getCaseData().getRepCollection().getFirst().getValue().setRespRepName("RepresentativeNameRespondent");
+        caseDetails2.getCaseData().getRepCollection()
+                .getFirst().getValue().setRespRepName("RepresentativeNameRespondent");
     }
 
     @Test
@@ -418,7 +424,8 @@ class DocumentHelperTest {
                 + "\"iScot_schmcts2\":\"[userImage:schmcts.png]\"" + COMMA_NEW_LINE
                 + "\"Clerk\":\"Mike Jordan\"" + COMMA_NEW_LINE
                 + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + COMMA_NEW_LINE
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\"" + COMMA_NEW_LINE
+                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
+                + COMMA_NEW_LINE
                 + "\"Case_No\":\"123456\"" + COMMA_NEW_LINE
                 + "\"submission_reference\":\"12212121\"" + COMMA_NEW_LINE
                 + "}" + NEW_LINE
@@ -495,7 +502,8 @@ class DocumentHelperTest {
                 + "\"iScot_schmcts2\":\"[userImage:schmcts.png]\"" + COMMA_NEW_LINE
                 + "\"Clerk\":\"Mike Jordan\"" + COMMA_NEW_LINE
                 + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + COMMA_NEW_LINE
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\"" + COMMA_NEW_LINE
+                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
+                + COMMA_NEW_LINE
                 + "\"Case_No\":\"123456\"" + COMMA_NEW_LINE
                 + "\"submission_reference\":\"12212121\"" + COMMA_NEW_LINE
                 + "}" + NEW_LINE
@@ -575,7 +583,8 @@ class DocumentHelperTest {
                 + "\"iScot_schmcts2\":\"[userImage:schmcts.png]\"" + COMMA_NEW_LINE
                 + "\"Clerk\":\"Mike Jordan\"" + COMMA_NEW_LINE
                 + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + COMMA_NEW_LINE
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\"" + COMMA_NEW_LINE
+                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
+                + COMMA_NEW_LINE
                 + "\"Case_No\":\"123456\"" + COMMA_NEW_LINE
                 + "\"submission_reference\":\"12212121\"" + COMMA_NEW_LINE
                 + "}" + NEW_LINE
@@ -654,7 +663,8 @@ class DocumentHelperTest {
                 + "\"iScot_schmcts2\":\"[userImage:schmcts.png]\"" + COMMA_NEW_LINE
                 + "\"Clerk\":\"Mike Jordan\"" + COMMA_NEW_LINE
                 + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + COMMA_NEW_LINE
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\"" + COMMA_NEW_LINE
+                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
+                + COMMA_NEW_LINE
                 + "\"Case_No\":\"123456\"" + COMMA_NEW_LINE
                 + "\"submission_reference\":\"12212121\"" + COMMA_NEW_LINE
                 + "}" + NEW_LINE
@@ -734,7 +744,8 @@ class DocumentHelperTest {
                 + "\"iScot_schmcts2\":\"[userImage:schmcts.png]\"" + COMMA_NEW_LINE
                 + "\"Clerk\":\"Mike Jordan\"" + COMMA_NEW_LINE
                 + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + COMMA_NEW_LINE
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\"" + COMMA_NEW_LINE
+                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
+                + COMMA_NEW_LINE
                 + "\"Case_No\":\"123456\"" + COMMA_NEW_LINE
                 + "\"submission_reference\":\"12212121\"" + COMMA_NEW_LINE
                 + "}" + NEW_LINE
@@ -813,7 +824,8 @@ class DocumentHelperTest {
                 + "\"iScot_schmcts2\":\"[userImage:schmcts.png]\"" + COMMA_NEW_LINE
                 + "\"Clerk\":\"Mike Jordan\"" + COMMA_NEW_LINE
                 + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + COMMA_NEW_LINE
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\"" + COMMA_NEW_LINE
+                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
+                + COMMA_NEW_LINE
                 + "\"Case_No\":\"123456\"" + COMMA_NEW_LINE
                 + "\"submission_reference\":\"12212121\"" + COMMA_NEW_LINE
                 + "}" + NEW_LINE
@@ -891,7 +903,8 @@ class DocumentHelperTest {
                 + "\"iScot_schmcts2\":\"[userImage:schmcts.png]\"" + COMMA_NEW_LINE
                 + "\"Clerk\":\"Mike Jordan\"" + COMMA_NEW_LINE
                 + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + COMMA_NEW_LINE
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\"" + COMMA_NEW_LINE
+                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
+                + COMMA_NEW_LINE
                 + "\"Case_No\":\"123456\"" + COMMA_NEW_LINE
                 + "\"submission_reference\":\"12212121\"" + COMMA_NEW_LINE
                 + "}" + NEW_LINE
@@ -920,7 +933,8 @@ class DocumentHelperTest {
                 + "\"iScot_schmcts2\":\"[userImage:schmcts.png]\"" + COMMA_NEW_LINE
                 + "\"Clerk\":\"Mike Jordan\"" + COMMA_NEW_LINE
                 + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + COMMA_NEW_LINE
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\"" + COMMA_NEW_LINE
+                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
+                + COMMA_NEW_LINE
                 + "\"Case_No\":\"123456\"" + COMMA_NEW_LINE
                 + "\"submission_reference\":\"12212121\"" + COMMA_NEW_LINE
                 + "}" + NEW_LINE
@@ -970,7 +984,8 @@ class DocumentHelperTest {
                 + "\"iScot_schmcts2\":\"[userImage:schmcts.png]\"" + COMMA_NEW_LINE
                 + "\"Clerk\":\"Mike Jordan\"" + COMMA_NEW_LINE
                 + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + COMMA_NEW_LINE
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\"" + COMMA_NEW_LINE
+                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
+                + COMMA_NEW_LINE
                 + "\"Case_No\":\"123456\"" + COMMA_NEW_LINE
                 + "\"submission_reference\":\"12212121\"" + COMMA_NEW_LINE
                 + "}" + NEW_LINE
@@ -1013,7 +1028,8 @@ class DocumentHelperTest {
                 + "\"iScot_schmcts2\":\"[userImage:schmcts.png]\"" + COMMA_NEW_LINE
                 + "\"Clerk\":\"Mike Jordan\"" + COMMA_NEW_LINE
                 + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + COMMA_NEW_LINE
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\"" + COMMA_NEW_LINE
+                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
+                + COMMA_NEW_LINE
                 + "\"Case_No\":\"123456\"" + COMMA_NEW_LINE
                 + "\"submission_reference\":\"12212121\"" + COMMA_NEW_LINE
                 + "}" + NEW_LINE
@@ -1173,7 +1189,8 @@ class DocumentHelperTest {
                 + "\"iScot_schmcts2\":\"[userImage:schmcts.png]\"" + COMMA_NEW_LINE
                 + "\"Clerk\":\"Mike Jordan\"" + COMMA_NEW_LINE
                 + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + COMMA_NEW_LINE
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\"" + COMMA_NEW_LINE
+                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
+                + COMMA_NEW_LINE
                 + "\"Case_No\":\"123456\"" + COMMA_NEW_LINE
                 + "\"submission_reference\":\"12212121\"" + COMMA_NEW_LINE
                 + "}" + NEW_LINE
@@ -1400,7 +1417,8 @@ class DocumentHelperTest {
                 + "\"iScot_schmcts2\":\"[userImage:schmcts.png]\"" + COMMA_NEW_LINE
                 + "\"Clerk\":\"Mike Jordan\"" + COMMA_NEW_LINE
                 + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + COMMA_NEW_LINE
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\"" + COMMA_NEW_LINE
+                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
+                + COMMA_NEW_LINE
                 + "\"Case_No\":\"123456\"" + COMMA_NEW_LINE
                 + "\"submission_reference\":\"12212121\"" + COMMA_NEW_LINE
                 + "}" + NEW_LINE
@@ -1480,7 +1498,8 @@ class DocumentHelperTest {
                 + "\"iScot_schmcts2\":\"[userImage:schmcts.png]\"" + COMMA_NEW_LINE
                 + "\"Clerk\":\"Mike Jordan\"" + COMMA_NEW_LINE
                 + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + COMMA_NEW_LINE
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\"" + COMMA_NEW_LINE
+                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
+                + COMMA_NEW_LINE
                 + "\"Case_No\":\"123456\"" + COMMA_NEW_LINE
                 + "\"submission_reference\":\"12212121\"" + COMMA_NEW_LINE
                 + "}" + NEW_LINE
@@ -1551,7 +1570,8 @@ class DocumentHelperTest {
                 + "\"iScot_schmcts2\":\"[userImage:schmcts.png]\"" + COMMA_NEW_LINE
                 + "\"Clerk\":\"Mike Jordan\"" + COMMA_NEW_LINE
                 + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + COMMA_NEW_LINE
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\"" + COMMA_NEW_LINE
+                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
+                + COMMA_NEW_LINE
                 + "\"Case_No\":\"\"" + COMMA_NEW_LINE
                 + "\"submission_reference\":\"\"" + COMMA_NEW_LINE
                 + "}" + NEW_LINE
@@ -1610,7 +1630,8 @@ class DocumentHelperTest {
                 + "\"Hearing_date\":\"\"" + COMMA_NEW_LINE
                 + "\"Hearing_date_time\":\"\"" + COMMA_NEW_LINE
                 + "\"Hearing_time\":\"\"" + COMMA_NEW_LINE
-                + "\"Hearing_venue\":\"Glasgow Tribunal Centre, Atlantic Quay, 20 York Street, Glasgow, G2 8GT\"" + COMMA_NEW_LINE
+                + "\"Hearing_venue\":\"Glasgow Tribunal Centre, Atlantic Quay, 20 York Street, Glasgow, G2 8GT\""
+                + COMMA_NEW_LINE
                 + "\"Hearing_duration\":\"2 days\"" + COMMA_NEW_LINE
                 + "\"t_Scot_7_1\":\"true\"" + COMMA_NEW_LINE
                 + "\"Court_addressLine1\":\"Eagle Building,\"" + COMMA_NEW_LINE
@@ -1631,7 +1652,8 @@ class DocumentHelperTest {
                 + "\"iScot7_1_schmcts2\":\"[userImage:schmcts.png]\"" + COMMA_NEW_LINE
                 + "\"Clerk\":\"Mike Jordan\"" + COMMA_NEW_LINE
                 + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + COMMA_NEW_LINE
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\"" + COMMA_NEW_LINE
+                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
+                + COMMA_NEW_LINE
                 + "\"Case_No\":\"123456\"" + COMMA_NEW_LINE
                 + "\"submission_reference\":\"12212121\"" + COMMA_NEW_LINE
                 + "}" + NEW_LINE
@@ -1686,7 +1708,8 @@ class DocumentHelperTest {
                 + "\"Hearing_date\":\"25 November 2019\"" + COMMA_NEW_LINE
                 + "\"Hearing_date_time\":\"25 November 2019 at 12:11\"" + COMMA_NEW_LINE
                 + "\"Hearing_time\":\"12:11\"" + COMMA_NEW_LINE
-                + "\"Hearing_venue\":\"Glasgow Tribunal Centre, Atlantic Quay, 20 York Street, Glasgow, G2 8GT\"" + COMMA_NEW_LINE
+                + "\"Hearing_venue\":\"Glasgow Tribunal Centre, Atlantic Quay, 20 York Street, Glasgow, G2 8GT\""
+                + COMMA_NEW_LINE
                 + "\"Hearing_duration\":\"2 days\"" + COMMA_NEW_LINE
                 + "\"t_Scot_24\":\"true\"" + COMMA_NEW_LINE
                 + "\"Court_addressLine1\":\"Eagle Building,\"" + COMMA_NEW_LINE
@@ -1707,7 +1730,8 @@ class DocumentHelperTest {
                 + "\"iScot24_schmcts2\":\"[userImage:schmcts.png]\"" + COMMA_NEW_LINE
                 + "\"Clerk\":\"Mike Jordan\"" + COMMA_NEW_LINE
                 + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + COMMA_NEW_LINE
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\"" + COMMA_NEW_LINE
+                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
+                + COMMA_NEW_LINE
                 + "\"Case_No\":\"123456\"" + COMMA_NEW_LINE
                 + "\"submission_reference\":\"12212121\"" + COMMA_NEW_LINE
                 + "}" + NEW_LINE
@@ -1783,7 +1807,8 @@ class DocumentHelperTest {
                 + "\"iScot34_schmcts2\":\"[userImage:schmcts.png]\"" + COMMA_NEW_LINE
                 + "\"Clerk\":\"Mike Jordan\"" + COMMA_NEW_LINE
                 + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + COMMA_NEW_LINE
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\"" + COMMA_NEW_LINE
+                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
+                + COMMA_NEW_LINE
                 + "\"Case_No\":\"123456\"" + COMMA_NEW_LINE
                 + "\"submission_reference\":\"12212121\"" + COMMA_NEW_LINE
                 + "}" + NEW_LINE
@@ -1860,7 +1885,8 @@ class DocumentHelperTest {
                 + "\"iScot34_schmcts2\":\"[userImage:schmcts.png]\"" + COMMA_NEW_LINE
                 + "\"Clerk\":\"Mike Jordan\"" + COMMA_NEW_LINE
                 + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + COMMA_NEW_LINE
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\"" + COMMA_NEW_LINE
+                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
+                + COMMA_NEW_LINE
                 + "\"Case_No\":\"123456\"" + COMMA_NEW_LINE
                 + "\"submission_reference\":\"12212121\"" + COMMA_NEW_LINE
                 + "}" + NEW_LINE
@@ -2053,7 +2079,8 @@ class DocumentHelperTest {
                 + "\"iScot_schmcts2\":\"[userImage:schmcts.png]\"" + COMMA_NEW_LINE
                 + "\"Clerk\":\"Mike Jordan\"" + COMMA_NEW_LINE
                 + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + COMMA_NEW_LINE
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\"" + COMMA_NEW_LINE
+                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
+                + COMMA_NEW_LINE
                 + "\"Case_No\":\"\"" + COMMA_NEW_LINE
                 + "\"submission_reference\":\"\"" + COMMA_NEW_LINE
                 + "}" + NEW_LINE
@@ -2123,7 +2150,8 @@ class DocumentHelperTest {
                 + "\"iScot" + part + "_schmcts2\":\"[userImage:schmcts.png]\"" + COMMA_NEW_LINE
                 + "\"Clerk\":\"Mike Jordan\"" + COMMA_NEW_LINE
                 + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + COMMA_NEW_LINE
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\"" + COMMA_NEW_LINE
+                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
+                + COMMA_NEW_LINE
                 + "\"Case_No\":\"\"" + COMMA_NEW_LINE
                 + "\"submission_reference\":\"\"" + COMMA_NEW_LINE
                 + "}" + NEW_LINE
@@ -2167,7 +2195,8 @@ class DocumentHelperTest {
                 + "\"iScot_schmcts2\":\"[userImage:schmcts.png]\"" + COMMA_NEW_LINE
                 + "\"Clerk\":\"Mike Jordan\"" + COMMA_NEW_LINE
                 + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + COMMA_NEW_LINE
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\"" + COMMA_NEW_LINE
+                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
+                + COMMA_NEW_LINE
                 + "\"Case_No\":\"123456\"" + COMMA_NEW_LINE
                 + "\"submission_reference\":\"12212121\"" + COMMA_NEW_LINE
                 + "}" + NEW_LINE

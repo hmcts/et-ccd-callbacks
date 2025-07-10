@@ -331,7 +331,8 @@ class DynamicListHelperTest {
                         Constants.HEARING_STATUS_HEARD,
                         true)
                 .build();
-        caseData.getHearingCollection().getFirst().getValue().setHearingVenueScotland(TribunalOffice.LEEDS.getOfficeName());
+        caseData.getHearingCollection()
+                .getFirst().getValue().setHearingVenueScotland(TribunalOffice.LEEDS.getOfficeName());
 
         assertThrows(IllegalStateException.class, () -> DynamicListHelper.createDynamicHearingList(caseData));
     }

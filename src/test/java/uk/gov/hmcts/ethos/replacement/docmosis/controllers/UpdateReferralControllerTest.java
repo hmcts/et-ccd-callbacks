@@ -193,7 +193,8 @@ class UpdateReferralControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         UserDetails details = new UserDetails();
         details.setName("First Last");
-        ccdRequest.getCaseDetails().getCaseData().getReferralCollection().getFirst().getValue().setReferralStatus("Closed");
+        ccdRequest.getCaseDetails().getCaseData().getReferralCollection()
+                .getFirst().getValue().setReferralStatus("Closed");
         when(userIdamService.getUserDetails(any())).thenReturn(details);
         mockMvc.perform(post(INIT_HEARING_AND_REFERRAL_DETAILS_URL)
                         .contentType(APPLICATION_JSON)

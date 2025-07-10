@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.SneakyThrows;
 import org.assertj.core.api.AssertionsForClassTypes;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -9,16 +10,21 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.junit.platform.commons.util.StringUtils;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormMapper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentFixtures;
@@ -29,6 +35,7 @@ import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
@@ -37,6 +44,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -64,6 +72,20 @@ class Et3ResponseServiceTest {
     private UserIdamService userIdamService;
     @MockBean
     private CcdCaseAssignment ccdCaseAssignment;
+
+    private static final String INVALID_USER_TOKEN = "invalidUserToken";
+    private static final String VALID_USER_TOKEN = "validUserToken";
+    private static final String VALID_USER_TOKEN_RETURNS_INVALID_USER = "validUserTokenReturnsInvalidUser";
+    private static final String INVALID_CASE_ID = "invalidCaseId";
+    private static final String VALID_CASE_ID = "validCaseId";
+    private static final String VALID_CASE_ID_RETURNS_INVALID_CASE = "validCaseIdReturnsInvalidCase";
+    private static final String TEST_USER_ID = "testUserId";
+
+    private static final String ERROR_INVALID_USER_TOKEN = "Invalid user token";
+    private static final String ERROR_INVALID_CASE_ID = "Invalid case ID";
+    private static final String ERROR_CASE_ROLES_NOT_FOUND = "Case roles not found";
+    private static final String ERROR_USER_NOT_FOUND = "User not found";
+    private static final String ERROR_USER_ID_NOT_FOUND = "User ID not found";
 
     private EmailService emailService;
     private CaseData caseData;
@@ -230,6 +252,101 @@ class Et3ResponseServiceTest {
                 Arguments.of(YES, YES, YES, YES),
                 Arguments.of(NO, null, null, null),
                 Arguments.of(null, null, null, null)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("generateTestGetDataForRepresentedRespondentIndexes")
+    @SneakyThrows
+    void getRepresentedRespondentIndexesTest(String userToken, String caseId) {
+        when(userIdamService.getUserDetails(INVALID_USER_TOKEN)).thenReturn(null);
+
+        UserDetails validUserDetails = new UserDetails();
+        validUserDetails.setUid(TEST_USER_ID);
+        when(userIdamService.getUserDetails(VALID_USER_TOKEN)).thenReturn(validUserDetails);
+
+        UserDetails invalidUserDetails = new UserDetails();
+        invalidUserDetails.setUid(null);
+        when(userIdamService.getUserDetails(VALID_USER_TOKEN_RETURNS_INVALID_USER)).thenReturn(invalidUserDetails);
+
+        when(ccdCaseAssignment.getCaseUserRoles(INVALID_CASE_ID)).thenReturn(null);
+
+        CaseUserAssignmentData caseUserAssignmentData = getValidCaseUserAssignmentData();
+        when(ccdCaseAssignment.getCaseUserRoles(VALID_CASE_ID)).thenReturn(caseUserAssignmentData);
+
+        CaseUserAssignmentData invalidCaseUserAssignmentData = getInvalidCaseUserAssignmentData();
+        when(ccdCaseAssignment.getCaseUserRoles(VALID_CASE_ID_RETURNS_INVALID_CASE))
+                .thenReturn(invalidCaseUserAssignmentData);
+
+        if (StringUtils.isBlank(userToken)) {
+            GenericServiceException genericServiceException = assertThrows(GenericServiceException.class,
+                    () -> et3ResponseService.getRepresentedRespondentIndexes(userToken, caseId));
+            assertEquals(ERROR_INVALID_USER_TOKEN, genericServiceException.getCause().getMessage());
+            return;
+        }
+        if (StringUtils.isBlank(caseId)) {
+            GenericServiceException genericServiceException = assertThrows(GenericServiceException.class,
+                    () -> et3ResponseService.getRepresentedRespondentIndexes(userToken, caseId));
+            assertEquals(ERROR_INVALID_CASE_ID, genericServiceException.getCause().getMessage());
+            return;
+        }
+        if (INVALID_USER_TOKEN.equals(userToken)) {
+            GenericServiceException genericServiceException = assertThrows(GenericServiceException.class,
+                    () -> et3ResponseService.getRepresentedRespondentIndexes(userToken, caseId));
+            assertEquals(ERROR_USER_NOT_FOUND, genericServiceException.getCause().getMessage());
+            return;
+        }
+        if (VALID_USER_TOKEN_RETURNS_INVALID_USER.equals(userToken)) {
+            GenericServiceException genericServiceException = assertThrows(GenericServiceException.class,
+                    () -> et3ResponseService.getRepresentedRespondentIndexes(userToken, caseId));
+            assertEquals(ERROR_USER_ID_NOT_FOUND, genericServiceException.getCause().getMessage());
+        }
+        if (VALID_USER_TOKEN.equals(userToken) && INVALID_CASE_ID.equals(caseId)) {
+            GenericServiceException genericServiceException = assertThrows(GenericServiceException.class,
+                    () -> et3ResponseService.getRepresentedRespondentIndexes(userToken, caseId));
+            assertEquals(ERROR_CASE_ROLES_NOT_FOUND, genericServiceException.getCause().getMessage());
+        }
+        if (VALID_USER_TOKEN.equals(userToken) && VALID_CASE_ID_RETURNS_INVALID_CASE.equals(caseId)) {
+            assertThrows(NoSuchElementException.class,
+                    () -> et3ResponseService.getRepresentedRespondentIndexes(userToken, caseId));
+        }
+        if (VALID_USER_TOKEN.equals(userToken) && VALID_CASE_ID.equals(caseId)) {
+            List<Integer> solicitorIndexList = et3ResponseService.getRepresentedRespondentIndexes(userToken, caseId);
+            assertEquals(0, solicitorIndexList.getFirst());
+        }
+    }
+
+    private static @NotNull CaseUserAssignmentData getValidCaseUserAssignmentData() {
+        CaseUserAssignment validRespondentSolicitorCaseUserAssignment = new CaseUserAssignment();
+        validRespondentSolicitorCaseUserAssignment.setCaseId(VALID_CASE_ID_RETURNS_INVALID_CASE);
+        validRespondentSolicitorCaseUserAssignment.setUserId(TEST_USER_ID);
+        validRespondentSolicitorCaseUserAssignment.setCaseRole("[SOLICITORA]");
+        CaseUserAssignmentData caseUserAssignmentData = new CaseUserAssignmentData();
+        caseUserAssignmentData.setCaseUserAssignments(List.of(validRespondentSolicitorCaseUserAssignment));
+        return caseUserAssignmentData;
+    }
+
+    private static @NotNull CaseUserAssignmentData getInvalidCaseUserAssignmentData() {
+        CaseUserAssignment validRespondentSolicitorCaseUserAssignment = new CaseUserAssignment();
+        validRespondentSolicitorCaseUserAssignment.setCaseId(VALID_CASE_ID);
+        validRespondentSolicitorCaseUserAssignment.setUserId(TEST_USER_ID);
+        validRespondentSolicitorCaseUserAssignment.setCaseRole("[CLAIMANTSOLICITOR]");
+        CaseUserAssignmentData caseUserAssignmentData = new CaseUserAssignmentData();
+        caseUserAssignmentData.setCaseUserAssignments(List.of(validRespondentSolicitorCaseUserAssignment));
+        return caseUserAssignmentData;
+    }
+
+    private static Stream<Arguments> generateTestGetDataForRepresentedRespondentIndexes() {
+        return Stream.of(
+                Arguments.of(null, null),
+                Arguments.of(null, VALID_CASE_ID),
+                Arguments.of(VALID_USER_TOKEN, null),
+                Arguments.of(INVALID_USER_TOKEN, INVALID_CASE_ID),
+                Arguments.of(INVALID_USER_TOKEN, VALID_CASE_ID),
+                Arguments.of(VALID_USER_TOKEN_RETURNS_INVALID_USER, VALID_CASE_ID),
+                Arguments.of(VALID_USER_TOKEN, INVALID_CASE_ID),
+                Arguments.of(VALID_USER_TOKEN, VALID_CASE_ID_RETURNS_INVALID_CASE),
+                Arguments.of(VALID_USER_TOKEN, VALID_CASE_ID)
         );
     }
 }

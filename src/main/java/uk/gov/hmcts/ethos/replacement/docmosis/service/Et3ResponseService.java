@@ -55,6 +55,7 @@ public class Et3ResponseService {
     private static final String CASE_ROLES_NOT_FOUND = "Case roles not found";
     private static final String USER_NOT_FOUND = "User not found";
     private static final String USER_ID_NOT_FOUND = "User ID not found";
+    private static final String NO_REPRESENTED_RESPONDENT_FOUND = "No represented respondent found";
     private final DocumentManagementService documentManagementService;
     private final PdfBoxService pdfBoxService;
     private final EmailService emailService;
@@ -202,6 +203,35 @@ public class Et3ResponseService {
     }
 
     /**
+     * Validates whether the user is a representative (solicitor) for any respondents in the specified case.
+     * <p>
+     * This method attempts to retrieve the respondent indexes that the user represents. If an exception occurs
+     * during the check, or if no represented respondents are found, it collects the relevant error messages
+     * into a list and returns them.
+     * <p>
+     * This method is useful for client-side validation or error handling logic where you need to display
+     * reasons why the user is not recognized as a representative.
+     *
+     * @param userToken the authentication token of the user
+     * @param caseId the ID of the case to evaluate
+     * @return a list of error messages indicating why the user is not a representative.
+     *         Returns an empty list if the user is successfully validated as a representative.
+     */
+    public List<String> validateRespondentRepresentation(String userToken, String caseId) {
+        List<Integer> representedRespondentIndexes = new ArrayList<>();
+        List<String> errors = new ArrayList<>();
+        try {
+            representedRespondentIndexes = getRepresentedRespondentIndexes(userToken, caseId);
+        } catch (GenericServiceException | IOException ex) {
+            errors.add(ex.getMessage());
+        }
+        if (representedRespondentIndexes.isEmpty()) {
+            errors.add(NO_REPRESENTED_RESPONDENT_FOUND);
+        }
+        return errors;
+    }
+
+    /**
      * Determines whether the currently authenticated user, identified by the given token, is
      * a representative (solicitor) for any respondent in the specified case.
      * <p>
@@ -221,7 +251,7 @@ public class Et3ResponseService {
      *         cannot be found or parsed
      * @throws IOException if an error occurs during communication with downstream services
      */
-    public List<Integer> isRespondentRepresentative(String userToken, String caseId)
+    public List<Integer> getRepresentedRespondentIndexes(String userToken, String caseId)
             throws GenericServiceException, IOException {
         checkUserTokenAndCaseid(userToken, caseId);
 
@@ -243,20 +273,22 @@ public class Et3ResponseService {
 
         List<Integer> solicitorIndexList = new ArrayList<>();
         for (CaseUserAssignment caseUserAssignment : caseUserAssignmentData.getCaseUserAssignments()) {
-            SolicitorRole solicitorRole = SolicitorRole.from(caseUserAssignment.getCaseRole()).orElseThrow();
-            solicitorIndexList.add(solicitorRole.getIndex());
+            if (userDetails.getUid().equals(caseUserAssignment.getUserId())) {
+                SolicitorRole solicitorRole = SolicitorRole.from(caseUserAssignment.getCaseRole()).orElseThrow();
+                solicitorIndexList.add(solicitorRole.getIndex());
+            }
         }
         return solicitorIndexList;
     }
 
     private static void checkUserTokenAndCaseid(String userToken, String caseId) throws GenericServiceException {
-        if (StringUtils.isBlank(caseId)) {
-            throw new GenericServiceException(INVALID_CASE_ID, new Exception(INVALID_CASE_ID),
-                    INVALID_CASE_ID, StringUtils.EMPTY, "Et3ResponseService", "isRespondentRepresentative");
-        }
         if (StringUtils.isBlank(userToken)) {
             throw new GenericServiceException(INVALID_USER_TOKEN, new Exception(INVALID_USER_TOKEN),
-                    INVALID_USER_TOKEN, caseId, "Et3ResponseService", "isRespondentRepresentative");
+                    INVALID_USER_TOKEN, StringUtils.EMPTY, "Et3ResponseService", "isRespondentRepresentative");
+        }
+        if (StringUtils.isBlank(caseId)) {
+            throw new GenericServiceException(INVALID_CASE_ID, new Exception(INVALID_CASE_ID),
+                    INVALID_CASE_ID, caseId, "Et3ResponseService", "isRespondentRepresentative");
         }
     }
 }

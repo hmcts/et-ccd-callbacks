@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -83,7 +84,8 @@ class ReportDocHelperTest {
     private UserDetails userDetails;
 
     @BeforeEach
-    public void setUp() throws Exception {
+    @SneakyThrows
+    public void setUp() {
         reportDetails = generateReportDetails("reportDetailsTest1.json");
         reportDetails2 = generateReportDetails("reportDetailsTest2.json");
         reportDetails3 = generateReportDetails("reportDetailsTest3.json");
@@ -93,7 +95,7 @@ class ReportDocHelperTest {
         userDetails = HelperTest.getUserDetails();
     }
 
-    private ListingDetails generateReportDetails(String jsonFileName) throws Exception {
+    private ListingDetails generateReportDetails(String jsonFileName) throws URISyntaxException, IOException {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
             .getContextClassLoader().getResource(jsonFileName)).toURI())));
         ObjectMapper mapper = new ObjectMapper();

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,6 +25,8 @@ import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.listing.ListingDetails;
 import uk.gov.hmcts.et.common.model.listing.types.ListingType;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
@@ -92,7 +95,8 @@ class ListingHelperTest {
     private UserDetails userDetails;
 
     @BeforeEach
-    void setUp() throws Exception {
+    @SneakyThrows
+    void setUp() {
         listingDetails = generateListingDetails("listingDetailsTest1.json");
         listingDetails2 = generateListingDetails("listingDetailsTest2.json");
         listingDetails3 = generateListingDetails("listingDetailsTest3.json");
@@ -100,7 +104,7 @@ class ListingHelperTest {
         userDetails = HelperTest.getUserDetails();
     }
 
-    private ListingDetails generateListingDetails(String jsonFileName) throws Exception {
+    private ListingDetails generateListingDetails(String jsonFileName) throws URISyntaxException, IOException {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
             .getContextClassLoader().getResource(jsonFileName)).toURI())));
         ObjectMapper mapper = new ObjectMapper();

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -21,6 +22,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicRespo
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicRestrictedReporting;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
@@ -46,7 +49,8 @@ class DynamicListHelperTest {
     private DynamicValueType dynamicValueType;
 
     @BeforeEach
-    void setUp() throws Exception {
+    @SneakyThrows
+    void setUp() {
         caseDetails1 = generateCaseDetails("caseDetailsTest1.json");
         caseDetails2 = generateCaseDetails("caseDetailsTest2.json");
         caseDetails4 = generateCaseDetails("caseDetailsTest4.json");
@@ -55,7 +59,7 @@ class DynamicListHelperTest {
         dynamicValueType = new DynamicValueType();
     }
 
-    private CaseDetails generateCaseDetails(String jsonFileName) throws Exception {
+    private CaseDetails generateCaseDetails(String jsonFileName) throws URISyntaxException, IOException {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
             .getContextClassLoader().getResource(jsonFileName)).toURI())));
         ObjectMapper mapper = new ObjectMapper();
@@ -69,19 +73,19 @@ class DynamicListHelperTest {
         dynamicValueType = new DynamicValueType();
         dynamicValueType.setCode("R: Antonio Vazquez");
         dynamicValueType.setLabel("Antonio Vazquez");
-        assertEquals(dynamicValueType, caseDetails1.getCaseData().getRepCollection().get(0)
-                .getValue().getDynamicRespRepName().getListItems().get(0));
+        assertEquals(dynamicValueType, caseDetails1.getCaseData().getRepCollection().getFirst()
+                .getValue().getDynamicRespRepName().getListItems().getFirst());
     }
 
     @Test
     void populateDynamicRespondentRepList() {
         DynamicRespondentRepresentative.dynamicRespondentRepresentativeNames(caseDetails6.getCaseData());
-        assertNotNull(caseDetails6.getCaseData().getRepCollection().get(0).getValue().getDynamicRespRepName());
+        assertNotNull(caseDetails6.getCaseData().getRepCollection().getFirst().getValue().getDynamicRespRepName());
         dynamicValueType = new DynamicValueType();
         dynamicValueType.setCode("R: Antonio Vazquez");
         dynamicValueType.setLabel("Antonio Vazquez");
-        assertEquals(dynamicValueType, caseDetails6.getCaseData().getRepCollection().get(0)
-                .getValue().getDynamicRespRepName().getListItems().get(0));
+        assertEquals(dynamicValueType, caseDetails6.getCaseData().getRepCollection().getFirst()
+                .getValue().getDynamicRespRepName().getListItems().getFirst());
     }
 
     @Test
@@ -91,7 +95,7 @@ class DynamicListHelperTest {
         dynamicValueType.setCode("R: Antonio Vazquez");
         dynamicValueType.setLabel("Antonio Vazquez");
         assertEquals(dynamicValueType, caseDetails1.getCaseData().getRestrictedReporting()
-                .getDynamicRequestedBy().getListItems().get(0));
+                .getDynamicRequestedBy().getListItems().getFirst());
     }
 
     @Test
@@ -124,21 +128,21 @@ class DynamicListHelperTest {
         assertNotNull(caseDetails1.getCaseData().getDepositCollection());
         dynamicValueType.setCode("R: Antonio Vazquez");
         dynamicValueType.setLabel("Antonio Vazquez");
-        assertEquals(dynamicValueType, caseDetails1.getCaseData().getDepositCollection().get(0)
+        assertEquals(dynamicValueType, caseDetails1.getCaseData().getDepositCollection().getFirst()
                 .getValue().getDynamicDepositOrderAgainst().getValue());
         dynamicValueType.setCode("Tribunal");
         dynamicValueType.setLabel("Tribunal");
-        assertEquals(dynamicValueType, caseDetails1.getCaseData().getDepositCollection().get(0)
+        assertEquals(dynamicValueType, caseDetails1.getCaseData().getDepositCollection().getFirst()
                 .getValue().getDynamicDepositRequestedBy().getValue());
     }
 
     @Test
     void dynamicDepositRefund() {
-        caseDetails1.getCaseData().getDepositCollection().get(0).getValue().setDepositRefund("Yes");
+        caseDetails1.getCaseData().getDepositCollection().getFirst().getValue().setDepositRefund("Yes");
         DynamicDepositOrder.dynamicDepositOrder(caseDetails1.getCaseData());
         dynamicValueType.setCode("R: Antonio Vazquez");
         dynamicValueType.setLabel("Antonio Vazquez");
-        assertEquals(dynamicValueType, caseDetails1.getCaseData().getDepositCollection().get(0)
+        assertEquals(dynamicValueType, caseDetails1.getCaseData().getDepositCollection().getFirst()
                 .getValue().getDynamicDepositRefundedTo().getValue());
     }
 
@@ -148,7 +152,7 @@ class DynamicListHelperTest {
                 caseDetails1.getCaseData());
         dynamicValueType.setCode("1");
         dynamicValueType.setLabel("1 - Single - Manchester - 01 Nov 2019");
-        assertEquals(dynamicValueType, dynamicHearingList.get(0));
+        assertEquals(dynamicValueType, dynamicHearingList.getFirst());
         dynamicValueType.setCode("2");
         dynamicValueType.setLabel("2 - Single - Manchester - 25 Nov 2019");
         assertEquals(dynamicValueType, dynamicHearingList.get(1));
@@ -160,7 +164,7 @@ class DynamicListHelperTest {
         dynamicValueType.setCode("1");
         dynamicValueType.setLabel("1 - Single - Manchester - 01 Nov 2019");
         assertEquals(dynamicValueType, caseDetails1.getCaseData().getCorrespondenceType()
-                .getDynamicHearingNumber().getListItems().get(0));
+                .getDynamicHearingNumber().getListItems().getFirst());
         assertNull(caseDetails1.getCaseData().getCorrespondenceScotType());
     }
 
@@ -170,7 +174,7 @@ class DynamicListHelperTest {
         dynamicValueType.setCode("1");
         dynamicValueType.setLabel("1 - Single - Glasgow - 25 Nov 2019");
         assertEquals(dynamicValueType, caseDetailsScotTest1.getCaseData()
-                .getCorrespondenceScotType().getDynamicHearingNumber().getListItems().get(0));
+                .getCorrespondenceScotType().getDynamicHearingNumber().getListItems().getFirst());
         assertNull(caseDetailsScotTest1.getCaseData().getCorrespondenceType());
     }
 
@@ -181,8 +185,8 @@ class DynamicListHelperTest {
         int totalJurisdictions = caseDetails1.getCaseData().getJurCodesCollection().size();
         DynamicValueType dynamicValue = DynamicListHelper
                 .getDynamicValue(caseDetails1.getCaseData().getJurCodesCollection()
-                .get(0).getValue().getJuridictionCodesList());
-        assertEquals(dynamicValue, listItems.get(0));
+                .getFirst().getValue().getJuridictionCodesList());
+        assertEquals(dynamicValue, listItems.getFirst());
         assertEquals(totalJurisdictions, listItems.size());
     }
 
@@ -199,19 +203,19 @@ class DynamicListHelperTest {
         CaseData caseData = caseDetails1.getCaseData();
         DynamicJudgements.dynamicJudgements(caseData);
         int totalHearings = caseData.getHearingCollection().size();
-        JudgementType judgementType = caseData.getJudgementCollection().get(0).getValue();
+        JudgementType judgementType = caseData.getJudgementCollection().getFirst().getValue();
         assertEquals(totalHearings, judgementType.getDynamicJudgementHearing().getListItems().size());
     }
 
     @Test
     void dynamicJudgementHearing_HearingDateFilled() {
         CaseData caseData = caseDetails1.getCaseData();
-        caseData.getJudgementCollection().get(0).getValue().setJudgmentHearingDate("2019-11-01");
+        caseData.getJudgementCollection().getFirst().getValue().setJudgmentHearingDate("2019-11-01");
         DynamicJudgements.dynamicJudgements(caseData);
         dynamicValueType.setCode("1");
         dynamicValueType.setLabel("1 : Manchester - Single - 2019-11-01");
         assertEquals(dynamicValueType, caseData.getJudgementCollection()
-                .get(0).getValue().getDynamicJudgementHearing().getValue());
+                .getFirst().getValue().getDynamicJudgementHearing().getValue());
     }
 
     @Test
@@ -220,13 +224,13 @@ class DynamicListHelperTest {
         List<DynamicValueType> hearingListItems = DynamicListHelper.createDynamicHearingList(caseData);
         DynamicFixedListType listHearing = new DynamicFixedListType();
         listHearing.setListItems(hearingListItems);
-        caseData.getJudgementCollection().get(0).getValue().setDynamicJudgementHearing(listHearing);
+        caseData.getJudgementCollection().getFirst().getValue().setDynamicJudgementHearing(listHearing);
         dynamicValueType.setCode("1");
         dynamicValueType.setLabel("1 : Manchester - Single - 2019-11-01");
-        caseData.getJudgementCollection().get(0).getValue().getDynamicJudgementHearing().setValue(dynamicValueType);
+        caseData.getJudgementCollection().getFirst().getValue().getDynamicJudgementHearing().setValue(dynamicValueType);
         DynamicJudgements.dynamicJudgements(caseData);
         assertEquals(dynamicValueType, caseData.getJudgementCollection()
-                .get(0).getValue().getDynamicJudgementHearing().getValue());
+                .getFirst().getValue().getDynamicJudgementHearing().getValue());
     }
 
     @Test
@@ -235,7 +239,7 @@ class DynamicListHelperTest {
         DynamicJudgements.dynamicJudgements(caseData);
         assertNotNull(caseData.getJudgementCollection());
         int totalHearings = caseData.getHearingCollection().size();
-        JudgementType judgementType = caseData.getJudgementCollection().get(0).getValue();
+        JudgementType judgementType = caseData.getJudgementCollection().getFirst().getValue();
         assertEquals(totalHearings, judgementType.getDynamicJudgementHearing().getListItems().size());
     }
 
@@ -245,8 +249,8 @@ class DynamicListHelperTest {
         caseData.setHearingCollection(null);
         DynamicJudgements.dynamicJudgements(caseData);
         assertNotNull(caseData.getJudgementCollection());
-        JudgementType judgementType = caseData.getJudgementCollection().get(0).getValue();
-        assertEquals("No Hearings", judgementType.getDynamicJudgementHearing().getListItems().get(0).getCode());
+        JudgementType judgementType = caseData.getJudgementCollection().getFirst().getValue();
+        assertEquals("No Hearings", judgementType.getDynamicJudgementHearing().getListItems().getFirst().getCode());
     }
 
     @Test
@@ -261,7 +265,7 @@ class DynamicListHelperTest {
         DynamicJudgements.dynamicJudgements(casedata);
 
         assertNotNull(casedata.getJudgementCollection());
-        JudgementType judgementType = casedata.getJudgementCollection().get(0).getValue();
+        JudgementType judgementType = casedata.getJudgementCollection().getFirst().getValue();
         assertNull(judgementType.getJudgmentHearingDate());
     }
 
@@ -280,10 +284,10 @@ class DynamicListHelperTest {
         List<DynamicValueType> hearingList = DynamicListHelper.createDynamicHearingList(caseData);
 
         assertEquals(1, hearingList.size());
-        assertEquals(hearingNumber, hearingList.get(0).getCode());
+        assertEquals(hearingNumber, hearingList.getFirst().getCode());
         String expectedLabel = String.format(DYNAMIC_HEARING_LABEL_FORMAT, hearingNumber, HEARING_TYPE_JUDICIAL_HEARING,
                 venue, "25 Nov 2019");
-        assertEquals(expectedLabel, hearingList.get(0).getLabel());
+        assertEquals(expectedLabel, hearingList.getFirst().getLabel());
     }
 
     @ParameterizedTest
@@ -302,10 +306,10 @@ class DynamicListHelperTest {
         List<DynamicValueType> hearingList = DynamicListHelper.createDynamicHearingList(caseData);
 
         assertEquals(1, hearingList.size());
-        assertEquals(hearingNumber, hearingList.get(0).getCode());
+        assertEquals(hearingNumber, hearingList.getFirst().getCode());
         String expectedLabel = String.format(DYNAMIC_HEARING_LABEL_FORMAT, hearingNumber, HEARING_TYPE_JUDICIAL_HEARING,
                 venue, "25 Nov 2019");
-        assertEquals(expectedLabel, hearingList.get(0).getLabel());
+        assertEquals(expectedLabel, hearingList.getFirst().getLabel());
     }
 
     private static Stream<Arguments> testCreateDynamicHearingListWithScotlandVenue() {
@@ -327,7 +331,7 @@ class DynamicListHelperTest {
                         Constants.HEARING_STATUS_HEARD,
                         true)
                 .build();
-        caseData.getHearingCollection().get(0).getValue().setHearingVenueScotland(TribunalOffice.LEEDS.getOfficeName());
+        caseData.getHearingCollection().getFirst().getValue().setHearingVenueScotland(TribunalOffice.LEEDS.getOfficeName());
 
         assertThrows(IllegalStateException.class, () -> DynamicListHelper.createDynamicHearingList(caseData));
     }
@@ -346,9 +350,9 @@ class DynamicListHelperTest {
         List<DynamicValueType> hearingList = DynamicListHelper.createDynamicHearingList(caseData);
 
         assertEquals(1, hearingList.size());
-        assertEquals(hearingNumber, hearingList.get(0).getCode());
+        assertEquals(hearingNumber, hearingList.getFirst().getCode());
         String expectedLabel = String.format(DYNAMIC_HEARING_LABEL_FORMAT, hearingNumber, HEARING_TYPE_JUDICIAL_HEARING,
                 null, "25 Nov 2019");
-        assertEquals(expectedLabel, hearingList.get(0).getLabel());
+        assertEquals(expectedLabel, hearingList.getFirst().getLabel());
     }
 }

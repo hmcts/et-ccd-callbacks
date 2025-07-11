@@ -232,11 +232,11 @@ public class Et3ResponseService {
         } catch (GenericServiceException | IOException ex) {
             errors.add(ex.getMessage());
         }
-        if (representedRespondentIndexes.isEmpty()) {
+        if (CollectionUtils.isEmpty(representedRespondentIndexes) || representedRespondentIndexes.getFirst() == null) {
             errors.add(NO_REPRESENTED_RESPONDENT_FOUND);
         }
         RepresentedTypeR representedTypeR = caseData.getRepCollection()
-                .get(representedRespondentIndexes.getFirst()).getValue();
+                .get(representedRespondentIndexes.get(representedRespondentIndexes.getFirst())).getValue();
         caseData.setEt3ResponsePhone(representedTypeR.getRepresentativePhoneNumber());
         caseData.setEt3ResponseAddress(representedTypeR.getRepresentativeAddress());
         return errors;

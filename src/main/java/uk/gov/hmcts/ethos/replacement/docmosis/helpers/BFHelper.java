@@ -12,7 +12,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_ACAS;
@@ -90,7 +89,7 @@ public final class BFHelper {
 
         List<BFActionTypeItem> expiredBfActions = caseData.getBfActions().stream()
                 .filter(item -> LocalDate.parse(item.getValue().getBfDate()).isBefore(
-                        LocalDate.parse(yesterday))).collect(Collectors.toList());
+                        LocalDate.parse(yesterday))).toList();
 
         expiredBfActions.forEach(bfActionTypeItem -> {
             if (bfActionTypeItem.getValue().getIsWaTaskCreated() == null) {

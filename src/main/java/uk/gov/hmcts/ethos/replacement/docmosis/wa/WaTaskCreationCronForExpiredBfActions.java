@@ -4,8 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
-//import org.elasticsearch.index.query.ExistsQueryBuilder;
-//import org.elasticsearch.index.query.MatchQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -25,7 +23,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
-//import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Component
 @Slf4j
@@ -90,7 +87,6 @@ public class WaTaskCreationCronForExpiredBfActions {
                     "WA_EXPIRED_BF_ACTION_TASK_CREATION");
 
             CaseData caseData = returnedRequest.getCaseDetails().getCaseData();
-            //
             String jurisdiction = returnedRequest.getCaseDetails().getJurisdiction();
             ccdClient.submitEventForCase(adminUserToken, caseData, caseTypeId,
                     jurisdiction, returnedRequest, String.valueOf(submitEvent.getCaseId())

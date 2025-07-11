@@ -26,7 +26,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
@@ -84,11 +83,6 @@ public class Et3ResponseController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setEt3ResponseShowInset(YES);
         caseData.setEt3ResponseNameShowInset(YES);
@@ -111,10 +105,6 @@ public class Et3ResponseController {
     public ResponseEntity<CCDCallbackResponse> validateRespondent(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return verifyTokenService.getForbiddenEntityStatusResponse(userToken);
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = Et3ResponseHelper.validateRespondents(caseData, ccdRequest.getEventId());
@@ -146,10 +136,6 @@ public class Et3ResponseController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return verifyTokenService.getForbiddenEntityStatusResponse(userToken);
-        }
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = Et3ResponseHelper.validateEmploymentDates(caseData);
 
@@ -170,10 +156,6 @@ public class Et3ResponseController {
     public ResponseEntity<CCDCallbackResponse> submitSection(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return verifyTokenService.getForbiddenEntityStatusResponse(userToken);
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         Et3ResponseHelper.addEt3DataToRespondent(caseData, ccdRequest.getEventId());
@@ -196,10 +178,6 @@ public class Et3ResponseController {
     public ResponseEntity<CCDCallbackResponse> sectionComplete(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return verifyTokenService.getForbiddenEntityStatusResponse(userToken);
-        }
 
         String ccdId = ccdRequest.getCaseDetails().getCaseId();
         String body = String.format(SECTION_COMPLETE_BODY, ccdId, ccdId, ccdId, ccdId);
@@ -229,10 +207,6 @@ public class Et3ResponseController {
     public ResponseEntity<CCDCallbackResponse> aboutToSubmit(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return verifyTokenService.getForbiddenEntityStatusResponse(userToken);
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         DocumentInfo documentInfo = et3ResponseService.generateEt3ResponseDocument(caseData, userToken,
@@ -267,10 +241,6 @@ public class Et3ResponseController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return verifyTokenService.getForbiddenEntityStatusResponse(userToken);
-        }
-
         return ResponseEntity.ok(CCDCallbackResponse.builder()
                 .data(ccdRequest.getCaseDetails().getCaseData())
                 .confirmation_header(ET3_COMPLETE_HEADER)
@@ -292,13 +262,8 @@ public class Et3ResponseController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return verifyTokenService.getForbiddenEntityStatusResponse(userToken);
-        }
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = Et3ResponseHelper.et3SubmitRespondents(caseData);
-
         return getCallbackRespEntityErrors(errors, caseData);
     }
 
@@ -316,13 +281,8 @@ public class Et3ResponseController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return verifyTokenService.getForbiddenEntityStatusResponse(userToken);
-        }
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         Et3ResponseHelper.reloadSubmitOntoEt3(caseData);
-
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -342,7 +302,6 @@ public class Et3ResponseController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = Et3ResponseHelper.createDynamicListSelection(caseData);
-
         return getCallbackRespEntityErrors(errors, caseData);
     }
 
@@ -366,7 +325,6 @@ public class Et3ResponseController {
         documentInfo.setMarkUp(documentInfo.getMarkUp().replace("Document",
                 "Draft ET3 - " + caseData.getSubmitEt3Respondent().getSelectedLabel()));
         caseData.setDocMarkUp(documentInfo.getMarkUp());
-
         return getCallbackRespEntityNoErrors(caseData);
     }
 

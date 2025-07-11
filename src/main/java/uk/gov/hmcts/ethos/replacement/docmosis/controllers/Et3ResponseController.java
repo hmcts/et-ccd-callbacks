@@ -177,8 +177,9 @@ public class Et3ResponseController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         Et3ResponseHelper.addEt3DataToRespondent(caseData, ccdRequest.getEventId());
+        List<String> errors = et3ResponseService.setRespondentRepresentsContactDetails(userToken, caseData);
         Et3ResponseHelper.resetEt3FormFields(caseData);
-        return getCallbackRespEntityNoErrors(caseData);
+        return getCallbackRespEntityErrors(errors, caseData);
     }
 
     @PostMapping(value = "/sectionComplete", consumes = APPLICATION_JSON_VALUE)

@@ -18,12 +18,13 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et3ResponseService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
@@ -41,7 +42,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RequiredArgsConstructor
 public class Et3ResponseController {
     private static final String GENERATED_DOCUMENT_URL = "Please download the draft ET3 : ";
-    private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String ET3_COMPLETE_HEADER = "<h1>ET3 Response submitted</h1>";
     private static final String ET3_COMPLETE_BODY =
             """
@@ -57,7 +57,6 @@ public class Et3ResponseController {
         <br><a href="/cases/case-details/%s/trigger/et3ResponseDetails/et3ResponseDetails1">ET3 - \
         Response Details</a>
         <br><a href="/cases/case-details/%s/trigger/downloadDraftEt3/downloadDraftEt31">Download draft ET3 Form</a>""";
-    private final VerifyTokenService verifyTokenService;
     private final Et3ResponseService et3ResponseService;
     private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
 
@@ -159,7 +158,12 @@ public class Et3ResponseController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         Et3ResponseHelper.addEt3DataToRespondent(caseData, ccdRequest.getEventId());
-        List<String> errors = et3ResponseService.setRespondentRepresentsContactDetails(userToken, caseData);
+        List<String> errors = new ArrayList<>();
+        try {
+            et3ResponseService.setRespondentRepresentsContactDetails(userToken, caseData);
+        }  catch (GenericServiceException gse) {
+            errors.add(gse.getMessage());
+        }
         Et3ResponseHelper.resetEt3FormFields(caseData);
         return getCallbackRespEntityErrors(errors, caseData);
     }
@@ -372,10 +376,14 @@ public class Et3ResponseController {
     public ResponseEntity<CCDCallbackResponse> aboutToStartRepresentativeInfo(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
+        List<String> errors = new ArrayList<>();
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setCcdID(ccdRequest.getCaseDetails().getCaseId());
-        List<String> errors = et3ResponseService
-                .validateAndExtractRepresentativeContact(userToken, caseData);
+        try {
+            et3ResponseService.validateAndExtractRepresentativeContact(userToken, caseData);
+        } catch (GenericServiceException gse) {
+            errors.add(gse.getMessage());
+        }
         return getCallbackRespEntityErrors(errors, caseData);
     }
 
@@ -402,7 +410,12 @@ public class Et3ResponseController {
             @RequestHeader("Authorization") String userToken) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setCcdID(ccdRequest.getCaseDetails().getCaseId());
-        List<String> errors = et3ResponseService.setRespondentRepresentsContactDetails(userToken, caseData);
+        List<String> errors = new ArrayList<>();
+        try {
+            et3ResponseService.setRespondentRepresentsContactDetails(userToken, caseData);
+        } catch (GenericServiceException gse) {
+            errors.add(gse.getMessage());
+        }
         return getCallbackRespEntityErrors(errors, caseData);
     }
 }

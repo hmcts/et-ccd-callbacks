@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -19,6 +20,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.NewEmploymentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -634,16 +636,20 @@ public final class Et1ReppedHelper {
      *
      * @param caseData the {@link CaseData} object containing the representative and associated contact details.
      */
-    public static List<String> setClaimantRepresentativeValues(CaseData caseData) {
+    public static void setClaimantRepresentativeValues(CaseData caseData) throws GenericServiceException {
         if (ObjectUtils.isEmpty(caseData)) {
-            return List.of(CLAIM_MISSING);
+            throw new GenericServiceException(CLAIM_MISSING,
+                    new Exception(CLAIM_MISSING),
+                    CLAIM_MISSING,
+                    StringUtils.EMPTY,
+                    "Et1ReppedHelper",
+                    "setClaimantRepresentativeValues");
         }
         if (caseData.getRepresentativeClaimantType() == null) {
             caseData.setRepresentativeClaimantType(RepresentedTypeC.builder().build());
         }
         caseData.getRepresentativeClaimantType().setRepresentativePhoneNumber(caseData.getRepresentativePhoneNumber());
         caseData.getRepresentativeClaimantType().setRepresentativeAddress(caseData.getRepresentativeAddress());
-        return List.of();
     }
 
     /**
@@ -656,15 +662,24 @@ public final class Et1ReppedHelper {
      *
      * @param caseData the {@link CaseData} instance containing representative details
      */
-    public static List<String> loadClaimantRepresentativeValues(CaseData caseData) {
+    public static void loadClaimantRepresentativeValues(CaseData caseData) throws GenericServiceException {
         if (ObjectUtils.isEmpty(caseData)) {
-            return List.of(CLAIM_MISSING);
+            throw new GenericServiceException(CLAIM_MISSING,
+                    new Exception(CLAIM_MISSING),
+                    CLAIM_MISSING,
+                    StringUtils.EMPTY,
+                    "Et1ReppedHelper",
+                    "loadClaimantRepresentativeValues");
         }
         if (caseData.getRepresentativeClaimantType() == null) {
-            return List.of(CLAIMANT_REPRESENTATIVE_MISSING);
+            throw new GenericServiceException(CLAIMANT_REPRESENTATIVE_MISSING,
+                    new Exception(CLAIMANT_REPRESENTATIVE_MISSING),
+                    CLAIMANT_REPRESENTATIVE_MISSING,
+                    StringUtils.EMPTY,
+                    "Et1ReppedHelper",
+                    "loadClaimantRepresentativeValues");
         }
         caseData.setRepresentativePhoneNumber(caseData.getRepresentativeClaimantType().getRepresentativePhoneNumber());
         caseData.setRepresentativeAddress(caseData.getRepresentativeClaimantType().getRepresentativeAddress());
-        return List.of();
     }
 }

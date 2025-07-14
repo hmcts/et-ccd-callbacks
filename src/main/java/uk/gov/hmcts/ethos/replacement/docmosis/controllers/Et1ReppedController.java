@@ -22,6 +22,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1ReppedHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1ReppedService;
@@ -676,7 +677,12 @@ public class Et1ReppedController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        List<String> errors = Et1ReppedHelper.loadClaimantRepresentativeValues(caseData);
+        List<String> errors = new ArrayList<>();
+        try {
+            Et1ReppedHelper.loadClaimantRepresentativeValues(caseData);
+        } catch (GenericServiceException gse) {
+            errors.add(gse.getMessage());
+        }
         return getCallbackRespEntityErrors(errors, caseData);
     }
 
@@ -702,7 +708,12 @@ public class Et1ReppedController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        List<String> errors = Et1ReppedHelper.setClaimantRepresentativeValues(caseData);
+        List<String> errors = new ArrayList<>();
+        try {
+            Et1ReppedHelper.setClaimantRepresentativeValues(caseData);
+        } catch (GenericServiceException gse) {
+            errors.add(gse.getMessage());
+        }
         return getCallbackRespEntityErrors(errors, caseData);
     }
 }

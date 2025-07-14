@@ -7,6 +7,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.BFActionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.BFActionType;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -71,4 +72,35 @@ public class BFHelperTest {
         return new ArrayList<>(Collections.singletonList(bfActionTypeItem));
     }
 
+    @Test
+    void updateWaTaskCreationTrackerSetsIsWaTaskCreatedToYesForExpiredBfActions() {
+        bfActionTypeItemList.get(0).getValue().setBfDate(LocalDate.now().minusDays(2).toString());
+        bfActionTypeItemList.get(0).getValue().setIsWaTaskCreated(null);
+        caseData.setBfActions(bfActionTypeItemList);
+        BFHelper.updateWaTaskCreationTrackerOfBfActionItems(caseData);
+        assertEquals("Yes", caseData.getBfActions().get(0).getValue().getIsWaTaskCreated());
+    }
+
+    @Test
+    void updateWaTaskCreationTrackerDoesNotChangeIsWaTaskCreatedForNonExpiredBfActions() {
+        bfActionTypeItemList.get(0).getValue().setBfDate(LocalDate.now().plusDays(1).toString());
+        bfActionTypeItemList.get(0).getValue().setIsWaTaskCreated(null);
+        caseData.setBfActions(bfActionTypeItemList);
+        BFHelper.updateWaTaskCreationTrackerOfBfActionItems(caseData);
+        assertEquals(null, caseData.getBfActions().get(0).getValue().getIsWaTaskCreated());
+    }
+
+    @Test
+    void updateWaTaskCreationTrackerHandlesNullBfActionsGracefully() {
+        caseData.setBfActions(null);
+        BFHelper.updateWaTaskCreationTrackerOfBfActionItems(caseData);
+        assertEquals(null, caseData.getBfActions());
+    }
+
+    @Test
+    void updateWaTaskCreationTrackerHandlesEmptyBfActionsListGracefully() {
+        caseData.setBfActions(Collections.emptyList());
+        BFHelper.updateWaTaskCreationTrackerOfBfActionItems(caseData);
+        assertEquals(0, caseData.getBfActions().size());
+    }
 }

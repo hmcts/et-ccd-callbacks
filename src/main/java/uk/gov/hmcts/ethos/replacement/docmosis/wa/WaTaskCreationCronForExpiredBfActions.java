@@ -69,7 +69,7 @@ public class WaTaskCreationCronForExpiredBfActions {
      *
      * @param yesterday - bfaction due date, from which on cases meet the search criterion
      */
-    private String buildQueryForExpiredBFActions(String yesterday) {
+    String buildQueryForExpiredBFActions(String yesterday) {
         return new SearchSourceBuilder()
                 .size(maxCases)
                 .query(new BoolQueryBuilder()

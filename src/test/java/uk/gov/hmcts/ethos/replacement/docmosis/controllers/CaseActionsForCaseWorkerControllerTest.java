@@ -23,6 +23,8 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.et.common.model.ccd.items.BFActionTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.BFActionType;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AddSingleCaseToMultipleService;
@@ -115,6 +117,7 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     private static final String HEARING_MID_EVENT_VALIDATION_URL = "/hearingMidEventValidation";
     private static final String BF_ACTIONS_URL = "/bfActions";
     private static final String DYNAMIC_LIST_BF_ACTIONS_URL = "/dynamicListBfActions";
+    private static final String WA_TASK_FOR_EXPIRED_BF_ACTIONS_URL = "/waTaskForExpiredBfActions";
     private static final String ABOUT_TO_START_DISPOSAL_URL = "/aboutToStartDisposal";
     private static final String INITIALISE_AMEND_CASE_DETAILS_URL = "/initialiseAmendCaseDetails";
     private static final String DYNAMIC_RESPONDENT_REPRESENTATIVE_NAMES_URL = "/dynamicRespondentRepresentativeNames";
@@ -863,6 +866,31 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .content(requestContent2.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    @SneakyThrows
+    void waTaskForExpiredBfActions()  {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        CaseData caseData = new CaseData();
+        BFActionType bfActionType = new BFActionType();
+        bfActionType.setBfDate("2023-10-01");
+        BFActionTypeItem item = new BFActionTypeItem();
+        item.setValue(bfActionType);
+        caseData.setBfActions(List.of(item));
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+        CCDRequest ccdRequest = new CCDRequest(caseDetails);
+        doNothing().when(caseManagementForCaseWorkerService).setNextListedDate(any());
+
+        mvc.perform(post(WA_TASK_FOR_EXPIRED_BF_ACTIONS_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))

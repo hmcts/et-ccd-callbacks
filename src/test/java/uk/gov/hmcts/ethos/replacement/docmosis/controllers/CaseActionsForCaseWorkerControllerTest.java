@@ -884,7 +884,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
         caseData.setBfActions(List.of(item));
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
-        CCDRequest ccdRequest = new CCDRequest(caseDetails);
         doNothing().when(caseManagementForCaseWorkerService).setNextListedDate(any());
 
         mvc.perform(post(WA_TASK_FOR_EXPIRED_BF_ACTIONS_URL)

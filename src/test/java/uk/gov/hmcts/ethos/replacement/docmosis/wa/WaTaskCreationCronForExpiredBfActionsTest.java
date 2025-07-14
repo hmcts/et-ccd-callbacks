@@ -35,7 +35,7 @@ import static org.mockito.internal.verification.VerificationModeFactory.atLeastO
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 
 @ExtendWith(SpringExtension.class)
-public class WaTaskCreationCronForExpiredBfActionsTest {
+class WaTaskCreationCronForExpiredBfActionsTest {
 
     @Mock
     private AdminUserService adminUserService;
@@ -107,7 +107,7 @@ public class WaTaskCreationCronForExpiredBfActionsTest {
     void buildQueryForExpiredBFActions_validInput_returnsQuery() {
         String yesterday = UtilHelper.formatCurrentDate2(LocalDate.now().minusDays(1));
         String query = cron.buildQueryForExpiredBFActions(yesterday);
-
+        assertDoesNotThrow(() -> cron.createWaTasksForExpiredBFDates());
         assert query.contains("data.bfActions.value.bfDate");
         assert query.contains(yesterday);
     }

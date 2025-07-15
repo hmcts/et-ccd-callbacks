@@ -71,7 +71,7 @@ public class FeatureToggleService {
     }
 
     public boolean isWaTaskForExpiredBfActionsEnabled() {
-        return this.featureToggleApi.isFeatureEnabled("waTaskForExpiredBfActions");
+        return this.featureToggleApi.isFeatureEnabled("waTaskExpieredBfActions");
     }
 
     public boolean isPartySpacingCronEnabled() {

@@ -130,20 +130,20 @@ class HearingDetailServiceTest {
         CaseData caseData = createCaseData();
         hearingDetailsService.handleListingSelected(caseData);
         HearingDetailType hearingDetailType = caseData.getHearingDetailsCollection().get(0).getValue();
-        assertEquals(" ", hearingDetailType.getHearingDetailsStatus());
-        assertEquals(" ", hearingDetailType.getHearingDetailsPostponedBy());
-        assertEquals(" ", hearingDetailType.getHearingDetailsCaseDisposed());
-        assertEquals(" ", hearingDetailType.getHearingDetailsPartHeard());
-        assertEquals(" ", hearingDetailType.getHearingDetailsReservedJudgment());
-        assertEquals(" ", hearingDetailType.getHearingDetailsAttendeeClaimant());
-        assertEquals(" ", hearingDetailType.getHearingDetailsAttendeeNonAttendees());
-        assertEquals(" ", hearingDetailType.getHearingDetailsAttendeeRespNoRep());
-        assertEquals(" ", hearingDetailType.getHearingDetailsAttendeeRespAndRep());
-        assertEquals(" ", hearingDetailType.getHearingDetailsAttendeeRepOnly());
-        assertEquals(" ", hearingDetailType.getHearingDetailsTimingStart());
-        assertEquals(" ", hearingDetailType.getHearingDetailsTimingFinish());
-        assertEquals(" ", hearingDetailType.getHearingDetailsTimingDuration());
-        assertEquals(" ", hearingDetailType.getHearingDetailsHearingNotes2());
+        assertNull(hearingDetailType.getHearingDetailsStatus());
+        assertNull(hearingDetailType.getHearingDetailsPostponedBy());
+        assertNull(hearingDetailType.getHearingDetailsCaseDisposed());
+        assertNull(hearingDetailType.getHearingDetailsPartHeard());
+        assertNull(hearingDetailType.getHearingDetailsReservedJudgment());
+        assertNull(hearingDetailType.getHearingDetailsAttendeeClaimant());
+        assertNull(hearingDetailType.getHearingDetailsAttendeeNonAttendees());
+        assertNull(hearingDetailType.getHearingDetailsAttendeeRespNoRep());
+        assertNull(hearingDetailType.getHearingDetailsAttendeeRespAndRep());
+        assertNull(hearingDetailType.getHearingDetailsAttendeeRepOnly());
+        assertNull(hearingDetailType.getHearingDetailsTimingStart());
+        assertNull(hearingDetailType.getHearingDetailsTimingFinish());
+        assertNull(hearingDetailType.getHearingDetailsTimingDuration());
+        assertNull(hearingDetailType.getHearingDetailsHearingNotes2());
     }
 
     @Test

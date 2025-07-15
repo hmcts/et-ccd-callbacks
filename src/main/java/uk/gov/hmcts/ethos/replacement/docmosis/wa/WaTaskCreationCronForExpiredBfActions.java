@@ -84,7 +84,7 @@ public class WaTaskCreationCronForExpiredBfActions {
         try {
             CCDRequest returnedRequest = ccdClient.startEventForCase(adminUserToken, caseTypeId,
                     "EMPLOYMENT", String.valueOf(submitEvent.getCaseId()),
-                    "WA_EXPIRED_BF_ACTION_TASK_CREATION");
+                    "WA_EXPIRED_BF_ACTION_TASK");
 
             CaseData caseData = returnedRequest.getCaseDetails().getCaseData();
             String jurisdiction = returnedRequest.getCaseDetails().getJurisdiction();

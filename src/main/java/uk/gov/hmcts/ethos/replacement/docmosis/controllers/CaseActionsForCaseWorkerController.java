@@ -972,7 +972,7 @@ public class CaseActionsForCaseWorkerController {
     public ResponseEntity<CCDCallbackResponse> waTaskForExpiredBfActions(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(AUTHORIZATION) String userToken) {
-        log.info("BF ACTIONS ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("EXPIRED BF ACTIONS ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         BFHelper.updateWaTaskCreationTrackerOfBfActionItems(caseData);

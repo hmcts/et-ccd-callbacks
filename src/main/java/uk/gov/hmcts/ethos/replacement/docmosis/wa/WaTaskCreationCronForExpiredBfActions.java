@@ -40,7 +40,8 @@ public class WaTaskCreationCronForExpiredBfActions {
 
     @Scheduled(cron = "${cron.waTaskForExpiredBfActionTask}")
     public void createWaTasksForExpiredBFDates() {
-        if (!featureToggleService.isWorkAllocationEnabled()) {
+        if (!featureToggleService.isWorkAllocationEnabled()
+                || !featureToggleService.isWaTaskForExpiredBfActionsEnabled()) {
             return;
         }
 

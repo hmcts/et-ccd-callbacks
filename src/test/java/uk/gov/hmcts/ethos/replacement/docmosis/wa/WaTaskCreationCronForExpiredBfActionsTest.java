@@ -69,6 +69,7 @@ class WaTaskCreationCronForExpiredBfActionsTest {
     @Test
     void createWaTasksForExpiredBFDates_noCasesFound_doesNothing() throws Exception {
         when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
+        when(featureToggleService.isWaTaskForExpiredBfActionsEnabled()).thenReturn(true);
         when(adminUserService.getAdminUserToken()).thenReturn("mockToken");
         when(ccdClient.buildAndGetElasticSearchRequest(anyString(), anyString(), anyString()))
                 .thenReturn(Collections.emptyList());
@@ -82,6 +83,7 @@ class WaTaskCreationCronForExpiredBfActionsTest {
     @Test
     void createWaTasksForExpiredBFDates_casesFound_triggersTaskEvent() throws Exception {
         when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
+        when(featureToggleService.isWaTaskForExpiredBfActionsEnabled()).thenReturn(true);
         when(adminUserService.getAdminUserToken()).thenReturn("mockToken");
 
         String resource = ResourceLoader.getResource("bfActionTask_oneExpiredDate.json");

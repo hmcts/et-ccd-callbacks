@@ -14,7 +14,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.applications.TseHelper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.utils.TseApplicationBuilder;
@@ -64,7 +64,7 @@ public class TseRespondentReplyControllerFunctionalTest extends BaseFunctionalTe
         caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
         caseData.getTseRespondSelectApplication().setValue(DynamicValueType.create("1", ""));
 
-        caseData.getGenericTseApplicationCollection().get(0).getValue()
+        caseData.getGenericTseApplicationCollection().getFirst().getValue()
             .setRespondCollection(List.of(
                 TseRespondTypeItem.builder()
                     .id("c0bae193-ded6-4db8-a64d-b260847bcc9b")

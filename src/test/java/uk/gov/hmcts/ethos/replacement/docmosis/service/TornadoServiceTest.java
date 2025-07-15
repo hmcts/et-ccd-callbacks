@@ -27,6 +27,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TornadoDocument;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.SignificantItemType;
 import uk.gov.hmcts.ethos.replacement.docmosis.idam.IdamApi;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.applications.TseService;
 import uk.gov.hmcts.ethos.utils.TseApplicationBuilder;
 
 import java.io.IOException;

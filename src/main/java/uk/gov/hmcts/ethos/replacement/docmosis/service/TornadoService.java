@@ -17,7 +17,6 @@ import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TornadoDocument;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BulkHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ClaimantTellSomethingElseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1VettingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3VettingHelper;
@@ -26,11 +25,13 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.InitialConsiderationHelpe
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReportDocHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.RespondentTellSomethingElseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.SignificantItemType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TornadoDocumentFilter;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseAdmReplyHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TseHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.applications.ClaimantTellSomethingElseHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.applications.RespondentTellSomethingElseHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.applications.TseAdmReplyHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.applications.TseHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.applications.TseService;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -419,7 +420,7 @@ public class TornadoService {
                 return ReferralHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             }
             case TSE_REPLY -> {
-                return TseHelper.getReplyDocumentRequest(caseData, tornadoConnection.getAccessKey());
+                return TseHelper.getRespondentReplyDocumentRequest(caseData, tornadoConnection.getAccessKey());
             }
             case TSE_CLAIMANT_REP_REPLY -> {
                 return TseHelper.getClaimantReplyDocumentRequest(caseData, tornadoConnection.getAccessKey());

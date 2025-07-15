@@ -138,7 +138,8 @@ class NocNotificationServiceTest {
         nocNotificationService.sendNotificationOfChangeEmails(
                 caseDetailsBefore,
                 caseDetailsNew,
-                caseDetailsBefore.getCaseData().getChangeOrganisationRequestField());
+                caseDetailsBefore.getCaseData().getChangeOrganisationRequestField(),
+                anyString());
         // Claimant rep emails to be done in another ticket
         verify(emailService, times(0)).sendEmail(any(), eq("claimant@represented.com"), any());
         //New Representative
@@ -169,7 +170,8 @@ class NocNotificationServiceTest {
         nocNotificationService.sendNotificationOfChangeEmails(
                 caseDetailsBefore,
                 caseDetailsNew,
-                caseDetailsBefore.getCaseData().getChangeOrganisationRequestField());
+                caseDetailsBefore.getCaseData().getChangeOrganisationRequestField(),
+                anyString());
         // Claimant rep emails to be done in another ticket
         verify(emailService, times(0)).sendEmail(any(), eq("claimant@represented.com"), any());
         //New Representative
@@ -208,7 +210,8 @@ class NocNotificationServiceTest {
         nocNotificationService.sendNotificationOfChangeEmails(
                 caseDetailsBefore,
                 caseDetailsNew,
-                caseDetailsBefore.getCaseData().getChangeOrganisationRequestField());
+                caseDetailsBefore.getCaseData().getChangeOrganisationRequestField(),
+                anyString());
         verify(emailService, times(0)).sendEmail(any(), any(), any());
     }
 }

@@ -355,7 +355,11 @@ public final class Helper {
             boolean isNotaSystemUser = caseData.getEt1OnlineSubmission() == null
                                        && caseData.getHubLinksStatuses() == null;
 
-            return isNotaSystemUser || YES.equals(defaultIfNull(caseData.getMigratedFromEcm(), NO));
+            boolean isClaimantNotRepresented = caseData.getRepresentativeClaimantType() == null
+                    || caseData.getRepresentativeClaimantType().getMyHmctsOrganisation() == null;
+
+            return isNotaSystemUser || isClaimantNotRepresented
+                    || YES.equals(defaultIfNull(caseData.getMigratedFromEcm(), NO));
         }
         return true;
     }

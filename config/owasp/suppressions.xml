@@ -1,57 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
     <!--Below suppressed as library no longer getting updates. Needs to be removed once DB switchover from queue -->
-    <suppress until="2025-07-07Z">
+    <suppress>
         <notes><![CDATA[file name: adal4j-1.6.7.jar]]></notes>
         <packageUrl regex="true">^pkg:maven/com\.microsoft\.azure/adal4j@.*$</packageUrl>
         <cve>CVE-2021-42306</cve>
     </suppress>
-    <suppress until="2025-07-07Z">
-        <packageUrl regex="true">^pkg:maven/com\.microsoft.*$</packageUrl>
+    <suppress>
         <cve>CVE-2023-36052</cve>
     </suppress>
-    <suppress until="2025-07-07Z">
-        <packageUrl regex="true">^pkg:maven/com\.azure.*$</packageUrl>
-        <cve>CVE-2023-36052</cve>
-    </suppress>
-    <suppress until="2025-07-07Z">
+    <suppress>
         <notes><![CDATA[
    file name: azure-client-authentication-1.7.14.jar
    ]]></notes>
         <packageUrl regex="true">^pkg:maven/com\.microsoft\.azure/azure\-client\-authentication@.*$</packageUrl>
         <cve>CVE-2024-35255</cve>
     </suppress>
-    <suppress until="2025-07-07Z">
-        <notes><![CDATA[
-   file name: azure-client-runtime-1.7.14.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/com\.microsoft\.azure/azure\-client\-runtime@.*$</packageUrl>
-        <cve>CVE-2024-43591</cve>
-    </suppress>
-    <suppress until="2025-07-07Z">
-        <notes><![CDATA[
-   file name: client-runtime-1.7.14.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/com\.microsoft\.rest/client\-runtime@.*$</packageUrl>
-        <cve>CVE-2024-43591</cve>
-    </suppress>
-    <suppress until="2025-07-07Z">
-        <notes><![CDATA[
-   file name: azure-client-authentication-1.7.14.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/com\.microsoft\.azure/azure\-client\-authentication@.*$</packageUrl>
-        <cve>CVE-2024-43591</cve>
-    </suppress>
-    <suppress until="2025-07-07Z">
-        <packageUrl regex="true">^pkg:maven/com\.microsoft\.azure/azure-client-authentication.*$</packageUrl>
-        <cve>CVE-2024-43591</cve>
-    </suppress>
-    <suppress until="2025-07-07Z">
-        <packageUrl regex="true">^pkg:maven/com\.microsoft\.azure/azure-client-runtime.*$</packageUrl>
-        <cve>CVE-2024-43591</cve>
-    </suppress>
-    <suppress until="2025-07-07Z">
-        <packageUrl regex="true">^pkg:maven/com\.microsoft\.rest/client-runtime.*$</packageUrl>
+    <suppress>
         <cve>CVE-2024-43591</cve>
     </suppress>
     <suppress>
@@ -70,105 +35,6 @@
         <cpe>cpe:/a:apache:lucene</cpe>
     </suppress>
     <suppress>
-        <notes><![CDATA[
-   file name: lucene-backward-codecs-8.11.1.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.apache\.lucene/lucene\-backward\-codecs@.*$</packageUrl>
         <cve>CVE-2024-45772</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: lucene-core-8.11.1.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.apache\.lucene/lucene\-core@.*$</packageUrl>
-        <cve>CVE-2024-45772</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: lucene-grouping-8.11.1.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.apache\.lucene/lucene\-grouping@.*$</packageUrl>
-        <cve>CVE-2024-45772</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: lucene-highlighter-8.11.1.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.apache\.lucene/lucene\-highlighter@.*$</packageUrl>
-        <cve>CVE-2024-45772</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: lucene-join-8.11.1.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.apache\.lucene/lucene\-join@.*$</packageUrl>
-        <cve>CVE-2024-45772</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: lucene-memory-8.11.1.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.apache\.lucene/lucene\-memory@.*$</packageUrl>
-        <cve>CVE-2024-45772</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: lucene-misc-8.11.1.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.apache\.lucene/lucene\-misc@.*$</packageUrl>
-        <cve>CVE-2024-45772</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: lucene-queries-8.11.1.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.apache\.lucene/lucene\-queries@.*$</packageUrl>
-        <cve>CVE-2024-45772</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: lucene-queryparser-8.11.1.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.apache\.lucene/lucene\-queryparser@.*$</packageUrl>
-        <cve>CVE-2024-45772</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: lucene-sandbox-8.11.1.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.apache\.lucene/lucene\-sandbox@.*$</packageUrl>
-        <cve>CVE-2024-45772</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: lucene-spatial3d-8.11.1.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.apache\.lucene/lucene\-spatial3d@.*$</packageUrl>
-        <cve>CVE-2024-45772</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: lucene-suggest-8.11.1.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.apache\.lucene/lucene\-suggest@.*$</packageUrl>
-        <cve>CVE-2024-45772</cve>
-    </suppress>
-    <!-- Below to be removed when migrated from Springboot 2.7.18 to 3.x https://tools.hmcts.net/jira/browse/RET-5770 -->
-    <suppress>
-        <cve>CVE-2024-38820</cve>
-    </suppress>
-    <suppress>
-        <cve>CVE-2024-38808</cve>
-    </suppress>
-    <suppress>
-        <cve>CVE-2024-22259</cve>
-    </suppress>
-    <!-- Above to be removed when migrated from Springboot 2.7.18 to 3.x https://tools.hmcts.net/jira/browse/RET-5770-->
-    <suppress>
-        <notes><![CDATA[
-        Suppressing CVE-2023-51775 for jose4j-0.9.3.jar
-    ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.bitbucket\.b_c/jose4j@0\.9\.3$</packageUrl>
-        <cve>CVE-2023-51775</cve>
     </suppress>
 </suppressions>

@@ -19,6 +19,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -53,9 +54,18 @@ public class WaTaskCreationCronForExpiredBfActions {
 
         Arrays.stream(caseTypeIds).forEach(caseTypeId -> {
             try {
+                List<Long> testCaseIds = new ArrayList<Long>();
+                testCaseIds.add(Long.valueOf("1741699642715149"));
+                testCaseIds.add(Long.valueOf("1736943057619843"));
+                testCaseIds.add(Long.valueOf("1736944768623090"));
+                testCaseIds.add(Long.valueOf("1744278728630907"));
+                testCaseIds.add(Long.valueOf("1741710954147332"));
                 List<SubmitEvent> cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
+
                 while (CollectionUtils.isNotEmpty(cases)) {
-                    cases.forEach(o -> triggerTaskEventForCase(adminUserToken, o, caseTypeId));
+                    //filter only test cases used for logic validation in demo - to be removed when released for QA
+                    cases.stream().filter(c -> testCaseIds.contains(c.getCaseId()))
+                            .forEach(o -> triggerTaskEventForCase(adminUserToken, o, caseTypeId));
                     cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
                 }
             } catch (Exception e) {
@@ -78,6 +88,7 @@ public class WaTaskCreationCronForExpiredBfActions {
                         .must(QueryBuilders.rangeQuery("data.bfActions.value.bfDate").to(yesterday).includeUpper(true))
                         .must(new TermQueryBuilder("data.bfActions.value.allActions.keyword", "Claim served"))
                         .mustNot(QueryBuilders.existsQuery("data.bfActions.value.cleared"))
+                        .mustNot(QueryBuilders.existsQuery("data.bfActions.value.isWaTaskCreated"))
                 ).toString();
     }
 

@@ -34,7 +34,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -325,7 +324,7 @@ class TornadoServiceTest {
     }
 
     private void mockTornadoConnection() throws IOException {
-        mockConnection = new MockHttpURLConnection(new URL("http://testdocmosis"));
+        mockConnection = new MockHttpURLConnection(URI.create("http://testdocmosis").toURL());
         tornadoConnection = mock(TornadoConnection.class);
         when(tornadoConnection.createConnection()).thenReturn(mockConnection);
     }

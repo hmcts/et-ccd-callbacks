@@ -20,6 +20,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.applications.TseService;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.setDocumentNumbers;
 
 @Slf4j
 @RestController
@@ -48,6 +49,7 @@ public class TseRespondentController {
             tseService.createApplication(caseDetails.getCaseData(), RESPONDENT_TITLE);
             tseService.clearApplicationData(caseDetails.getCaseData());
         }
+        setDocumentNumbers(caseDetails.getCaseData());
         caseManagementForCaseWorkerService.setNextListedDate(caseDetails.getCaseData());
         return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
     }

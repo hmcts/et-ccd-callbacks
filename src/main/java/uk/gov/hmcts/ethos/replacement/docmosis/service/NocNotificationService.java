@@ -1,7 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -23,6 +21,9 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantNonSystemUser;
@@ -181,8 +182,8 @@ public class NocNotificationService {
             return;
         }
 
-        String citUILink = claimantRep != null ?
-                emailService.getExuiCaseLink(caseDetailsNew.getCaseId())
+        String citUILink = claimantRep != null
+                ? emailService.getExuiCaseLink(caseDetailsNew.getCaseId())
                 : emailService.getCitizenCaseLink(caseDetailsNew.getCaseId());
 
         var personalisation = buildPersonalisationWithPartyName(caseDetailsPrevious, partyName, citUILink);

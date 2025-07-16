@@ -53,7 +53,7 @@ create_role() {
 
     echo "  Creating role: ${role_name}"
     local response
-    response=$(curl -s -w "%{http_code}" \
+    response=$(curl -w "%{http_code}" \
         -X PUT \
         "${CCD_DEFINITION_STORE_API_BASE_URL}/api/user-role" \
         -H "Authorization: Bearer ${USER_TOKEN}" \

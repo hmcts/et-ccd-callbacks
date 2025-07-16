@@ -234,7 +234,7 @@ class Et1ReppedHelperTest {
         // Scenario 1: CaseData is empty
         GenericServiceException gse = assertThrows(GenericServiceException.class,
                 () -> Et1ReppedHelper.setClaimantRepresentativeValues(null));
-        assertThat(gse.getMessage()).contains(ET1ReppedConstants.CLAIM_MISSING);
+        assertThat(gse.getMessage()).contains(ET1ReppedConstants.ERROR_CASE_NOT_FOUND);
 
         // Scenario 2: Representative is null
         CaseData caseDataWithoutRepresentative = new CaseData();
@@ -265,7 +265,7 @@ class Et1ReppedHelperTest {
         // Scenario 1: CaseData is empty
         GenericServiceException gse = assertThrows(GenericServiceException.class,
                 () -> Et1ReppedHelper.loadClaimantRepresentativeValues(null));
-        assertThat(gse.getMessage()).isEqualTo(ET1ReppedConstants.CLAIM_MISSING);
+        assertThat(gse.getMessage()).isEqualTo(ET1ReppedConstants.ERROR_CASE_NOT_FOUND);
 
         // Scenario 2: Representative is null
         CaseData caseDataWithoutRepresentative = new CaseData();
@@ -274,7 +274,7 @@ class Et1ReppedHelperTest {
                 () -> Et1ReppedHelper.loadClaimantRepresentativeValues(caseDataWithoutRepresentative));
         assertThat(caseDataWithoutRepresentative.getRepresentativePhoneNumber()).isNull();
         assertThat(caseDataWithoutRepresentative.getRepresentativeAddress()).isNull();
-        assertThat(gse.getMessage()).contains(ET1ReppedConstants.CLAIMANT_REPRESENTATIVE_MISSING);
+        assertThat(gse.getMessage()).contains(ET1ReppedConstants.CLAIMANT_REPRESENTATIVE_NOT_FOUND);
 
         // Scenario 3: Representative is not null
         CaseData caseDataWithRepresentative = new CaseData();

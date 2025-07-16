@@ -72,9 +72,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.CLAIMANT_REPRESENTATIVE_MISSING;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.CLAIMANT_REPRESENTATIVE_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.CLAIM_DETAILS_MISSING;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.CLAIM_MISSING;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.ERROR_CASE_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.MULTIPLE_OPTION_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.ORGANISATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.TRIAGE_ERROR_MESSAGE;
@@ -1062,7 +1062,7 @@ class Et1ReppedControllerTest {
                         .content(jsonMapper.toJson(ccdRequestWithoutClaimantRepresentative)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath("$.errors[0]", is(CLAIMANT_REPRESENTATIVE_MISSING)))
+                .andExpect(jsonPath("$.errors[0]", is(CLAIMANT_REPRESENTATIVE_NOT_FOUND)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
         // When there is no case data should have any claim missing error and have no data
@@ -1073,7 +1073,7 @@ class Et1ReppedControllerTest {
                         .content(jsonMapper.toJson(ccdRequestWithoutCaseData)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, nullValue()))
-                .andExpect(jsonPath("$.errors[0]", is(CLAIM_MISSING)))
+                .andExpect(jsonPath("$.errors[0]", is(ERROR_CASE_NOT_FOUND)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
         // When both representative and case data exists should not have any error and have data
@@ -1099,7 +1099,7 @@ class Et1ReppedControllerTest {
                         .content(jsonMapper.toJson(ccdRequestWithoutCaseData)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, nullValue()))
-                .andExpect(jsonPath("$.errors[0]", is(CLAIM_MISSING)))
+                .andExpect(jsonPath("$.errors[0]", is(ERROR_CASE_NOT_FOUND)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
         // When there is no representative should not have any error and have data

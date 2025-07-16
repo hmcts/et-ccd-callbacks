@@ -33,10 +33,10 @@ import static uk.gov.hmcts.ecm.common.helpers.UtilHelper.listingFormatLocalDate;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.INDIVIDUAL_TYPE_CLAIMANT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.CLAIMANT_REPRESENTATIVE_MISSING;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.CLAIMANT_REPRESENTATIVE_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.CLAIM_DETAILS_MISSING;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.CLAIM_MISSING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.COMPLETED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.ERROR_CASE_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.INDIVIDUAL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.MONTHS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.NOTICE;
@@ -638,9 +638,9 @@ public final class Et1ReppedHelper {
      */
     public static void setClaimantRepresentativeValues(CaseData caseData) throws GenericServiceException {
         if (ObjectUtils.isEmpty(caseData)) {
-            throw new GenericServiceException(CLAIM_MISSING,
-                    new Exception(CLAIM_MISSING),
-                    CLAIM_MISSING,
+            throw new GenericServiceException(ERROR_CASE_NOT_FOUND,
+                    new Exception(ERROR_CASE_NOT_FOUND),
+                    ERROR_CASE_NOT_FOUND,
                     StringUtils.EMPTY,
                     "Et1ReppedHelper",
                     "setClaimantRepresentativeValues");
@@ -664,17 +664,17 @@ public final class Et1ReppedHelper {
      */
     public static void loadClaimantRepresentativeValues(CaseData caseData) throws GenericServiceException {
         if (ObjectUtils.isEmpty(caseData)) {
-            throw new GenericServiceException(CLAIM_MISSING,
-                    new Exception(CLAIM_MISSING),
-                    CLAIM_MISSING,
+            throw new GenericServiceException(ERROR_CASE_NOT_FOUND,
+                    new Exception(ERROR_CASE_NOT_FOUND),
+                    ERROR_CASE_NOT_FOUND,
                     StringUtils.EMPTY,
                     "Et1ReppedHelper",
                     "loadClaimantRepresentativeValues");
         }
         if (caseData.getRepresentativeClaimantType() == null) {
-            throw new GenericServiceException(CLAIMANT_REPRESENTATIVE_MISSING,
-                    new Exception(CLAIMANT_REPRESENTATIVE_MISSING),
-                    CLAIMANT_REPRESENTATIVE_MISSING,
+            throw new GenericServiceException(CLAIMANT_REPRESENTATIVE_NOT_FOUND,
+                    new Exception(CLAIMANT_REPRESENTATIVE_NOT_FOUND),
+                    CLAIMANT_REPRESENTATIVE_NOT_FOUND,
                     StringUtils.EMPTY,
                     "Et1ReppedHelper",
                     "loadClaimantRepresentativeValues");

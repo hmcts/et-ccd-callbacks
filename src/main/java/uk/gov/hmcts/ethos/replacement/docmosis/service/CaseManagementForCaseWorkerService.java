@@ -169,8 +169,8 @@ public class CaseManagementForCaseWorkerService {
             caseData.setClaimant(MISSING_CLAIMANT);
         } else {
             if (claimantTypeOfClaimant.equals(INDIVIDUAL_TYPE_CLAIMANT)) {
-                String claimantFirstNames = "First";
-                String claimantLastName = "Last";
+                String claimantFirstNames = nullCheck(caseData.getClaimantIndType().getClaimantFirstNames());
+                String claimantLastName = nullCheck(caseData.getClaimantIndType().getClaimantLastName());
                 caseData.setClaimant(claimantFirstNames + " " + claimantLastName);
             } else {
                 caseData.setClaimant(nullCheck(caseData.getClaimantCompany()));

@@ -22,6 +22,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.NocClaimantRepresentative
 import uk.gov.hmcts.ethos.replacement.docmosis.service.NocNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.NocRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.NocRespondentRepresentativeService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
@@ -62,6 +63,9 @@ class NoticeOfChangeControllerTest {
 
     @MockBean
     private NocNotificationService notificationService;
+
+    @MockBean
+    private UserIdamService userIdamService;
 
     @Autowired
     private WebApplicationContext applicationContext;

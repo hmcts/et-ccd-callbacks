@@ -27,6 +27,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantNonSystemUser;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isRepresentedClaimantWithMyHmctsCase;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper.buildPersonalisationWithPartyName;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper.buildRespondentPersonalisation;
@@ -118,7 +119,7 @@ public class NocNotificationService {
         CaseData caseDataPrevious = caseDetailsPrevious.getCaseData();
         String partyName = NocNotificationHelper.getRespondentNameForNewSolicitor(changeRequest, caseDataNew);
         // send claimant or claimant solicitor noc change email
-        if (!isClaimantNonSystemUser(caseDataPrevious)) {
+        if (!isClaimantNonSystemUser(caseDataPrevious) || isRepresentedClaimantWithMyHmctsCase(caseDataPrevious)) {
             sendClaimantEmail(caseDetailsPrevious, caseDetailsNew, partyName);
         }
 

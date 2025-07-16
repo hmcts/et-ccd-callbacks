@@ -60,10 +60,10 @@ public class ClaimantTellSomethingElseController {
             @RequestBody CCDRequest ccdRequest) {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        if (!Helper.isRespondentSystemUser(caseData)) {
-            caseData.setClaimantTseRespNotAvailable(YES);
-        } else {
+        if (Helper.isRespondentSystemUser(caseData)) {
             caseData.setClaimantTseRespNotAvailable(NO);
+        } else {
+            caseData.setClaimantTseRespNotAvailable(YES);
         }
         return getCallbackRespEntityNoErrors(caseData);
     }

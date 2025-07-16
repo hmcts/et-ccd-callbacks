@@ -74,10 +74,10 @@ public class TseClaimantRepReplyController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setClaimantRepRespondSelectApplication(TseHelper.populateClaimantRepSelectApplication(caseData));
 
-        if (!Helper.isRespondentSystemUser(caseData)) {
-            caseData.setClaimantTseRespNotAvailable(YES);
-        } else {
+        if (Helper.isRespondentSystemUser(caseData)) {
             caseData.setClaimantTseRespNotAvailable(NO);
+        } else {
+            caseData.setClaimantTseRespNotAvailable(YES);
         }
         return getCallbackRespEntityNoErrors(caseData);
     }
@@ -103,9 +103,10 @@ public class TseClaimantRepReplyController {
             @RequestBody CCDRequest ccdRequest) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>();
-        if (!Helper.isRespondentSystemUser(caseData)) {
-            errors.add(FUNCTION_NOT_AVAILABLE_ERROR);
+        if (Helper.isRespondentSystemUser(caseData)) {
+            return getCallbackRespEntityErrors(errors, caseData);
         }
+        errors.add(FUNCTION_NOT_AVAILABLE_ERROR);
 
         return getCallbackRespEntityErrors(errors, caseData);
     }

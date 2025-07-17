@@ -355,13 +355,14 @@ class TseClaimantRepReplyServiceTest {
                 .thenReturn(DocumentFixtures.getUploadedDocumentType());
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseId("caseId");
+        caseData.setClaimantRepResSupportingMaterial(createSupportingMaterial());
         caseDetails.setCaseData(caseData);
         caseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
 
         tseClaimantRepReplyService.addTseClaimantRepReplyPdfToDocCollection(caseData, "testUserToken",
                 caseDetails.getCaseTypeId());
 
-        MatcherAssert.assertThat(caseData.getDocumentCollection().size(), is(1));
+        MatcherAssert.assertThat(caseData.getDocumentCollection().size(), is(2));
         MatcherAssert.assertThat(caseData.getDocumentCollection().getFirst().getValue().getTopLevelDocuments(),
                 is(CASE_MANAGEMENT));
     }

@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.applications.respondent;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -168,6 +169,23 @@ public class TseRespondentReplyService {
                     applicationDoc, applicationType.getType());
 
             caseData.getDocumentCollection().add(docItem);
+
+            if (isNotEmpty(caseData.getTseResponseSupportingMaterial())) {
+                caseData.getTseResponseSupportingMaterial().stream()
+                        .map(supportingMaterial -> supportingMaterial.getValue().getUploadedDocument())
+                        .filter(Objects::nonNull)
+                        .forEach(uploadedDocument -> {
+                            uploadedDocument.setDocumentFilename(
+                                    ("Application %s - %s - Respondent Response Attachment.%s").formatted(
+                                            applicationType.getNumber(),
+                                            applicationType.getType(),
+                                            FilenameUtils.getExtension(uploadedDocument.getDocumentFilename())));
+                            DocumentTypeItem documentTypeItemFromTopLevel = createDocumentTypeItemFromTopLevel(
+                                    uploadedDocument, topLevel, applicationDoc, applicationType.getType());
+                            caseData.getDocumentCollection().add(documentTypeItemFromTopLevel);
+                        });
+            }
+
             setDocumentNumbers(caseData);
 
         } catch (Exception e) {

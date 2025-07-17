@@ -319,13 +319,14 @@ class TseRespondentReplyServiceTest {
                 .thenReturn(DocumentFixtures.getUploadedDocumentType());
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseId("caseId");
+        caseData.setTseResponseSupportingMaterial(createSupportingMaterial());
         caseDetails.setCaseData(caseData);
         caseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
 
         tseRespondentReplyService.addTseRespondentReplyPdfToDocCollection(caseData, "testUserToken",
                 caseDetails.getCaseTypeId());
 
-        assertThat(caseData.getDocumentCollection().size(), is(1));
+        assertThat(caseData.getDocumentCollection().size(), is(2));
         assertThat(caseData.getDocumentCollection().getFirst().getValue().getTopLevelDocuments(),
                 is(WITHDRAWAL_SETTLED));
     }

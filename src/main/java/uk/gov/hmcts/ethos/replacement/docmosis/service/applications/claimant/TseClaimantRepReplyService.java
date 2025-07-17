@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.applications.claimant;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.FilenameUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -28,12 +29,14 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -143,6 +146,20 @@ public class TseClaimantRepReplyService {
                     applicationDoc, applicationType.getType());
 
             caseData.getDocumentCollection().add(docItem);
+            if (isNotEmpty(caseData.getClaimantRepResSupportingMaterial())) {
+                caseData.getClaimantRepResSupportingMaterial().stream()
+                        .map(supportingMaterial -> supportingMaterial.getValue().getUploadedDocument())
+                        .filter(Objects::nonNull)
+                        .forEach(uploadedDocument -> {
+                            uploadedDocument.setDocumentFilename("Application %s - %s - Claimant Response Attachment.%s"
+                                    .formatted(applicationType.getNumber(),
+                                            applicationType.getType(),
+                                            FilenameUtils.getExtension(uploadedDocument.getDocumentFilename())));
+                            DocumentTypeItem documentTypeItemFromTopLevel = createDocumentTypeItemFromTopLevel(
+                                    uploadedDocument, topLevel, applicationDoc, applicationType.getType());
+                            caseData.getDocumentCollection().add(documentTypeItemFromTopLevel);
+                        });
+            }
             setDocumentNumbers(caseData);
         } catch (Exception e) {
             throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);

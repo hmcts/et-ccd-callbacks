@@ -16,6 +16,7 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.et.common.model.ccd.Address;
@@ -36,6 +37,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
+import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
@@ -61,6 +63,14 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_HEARING;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_CASE_DATA_NOT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_CASE_ROLES_NOT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_INVALID_CASE_ID;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_INVALID_USER_TOKEN;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_NO_REPRESENTED_RESPONDENT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_USER_ID_NOT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_USER_NOT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.SYSTEM_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.SUBMIT_ET3;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_ET3_FORM_CASE_DATA_FILE;
 
@@ -81,17 +91,14 @@ class Et3ResponseServiceTest {
     private static final String VALID_USER_TOKEN = "validUserToken";
     private static final String VALID_USER_TOKEN_RETURNS_INVALID_USER = "validUserTokenReturnsInvalidUser";
     private static final String INVALID_CASE_ID = "invalidCaseId";
+    private static final String INVALID_CASE_ID_FOR_GET_USER_ROLES = "invalidCaseIdForGetUserRoles";
     private static final String VALID_CASE_ID = "validCaseId";
     private static final String VALID_CASE_ID_RETURNS_INVALID_CASE = "validCaseIdReturnsInvalidCase";
-    private static final String TEST_USER_ID = "testUserId";
-
-    private static final String ERROR_INVALID_USER_TOKEN = "Invalid user token";
-    private static final String ERROR_INVALID_CASE_ID = "Invalid case ID";
-    private static final String ERROR_CASE_ROLES_NOT_FOUND = "Case roles not found";
-    private static final String ERROR_USER_NOT_FOUND = "User not found";
-    private static final String ERROR_USER_ID_NOT_FOUND = "User ID not found";
-    private static final String ERROR_CASE_DATA_NOT_FOUND = "Case data not found";
-    private static final String ERROR_REPRESENTED_RESPONDENT_NOT_FOUND = "No represented respondent found";
+    private static final String VALID_CASE_ID_RETURNS_INVALID_USER = "validCaseIdReturnsInvalidUser";
+    private static final String USER_ID = "userId";
+    private static final String INVALID_USER_ID = "invalidUserId";
+    private static final String ERROR_PDF_BOX_SERVICE_GENERATE_PDF_DOCUMENT_INFO =
+            "Dummy pdf box service generate pdf document info error";
 
     private EmailService emailService;
     private CaseData caseData;
@@ -124,7 +131,8 @@ class Et3ResponseServiceTest {
 
     @Test
     @SneakyThrows
-    void generateEt3ProcessingDocumentNullWithoutException() {
+    void generateEt3ResponseDocumentNullWithoutException() {
+        // when pdfboxService.generatePdfDocumentInfo returns null
         try (MockedStatic<ET3FormMapper> et3FormMapperMockedStatic = Mockito.mockStatic(ET3FormMapper.class)) {
             et3FormMapperMockedStatic.when(() -> ET3FormMapper.mapEt3Form(any(), anyString())).thenReturn(
                     new ConcurrentHashMap<String, Optional<String>>());
@@ -137,14 +145,16 @@ class Et3ResponseServiceTest {
                     "userToken", ENGLANDWALES_CASE_TYPE_ID, SUBMIT_ET3);
             assertThat(documentInfo1).isNull();
         }
-    }
-
-    @Test
-    @SneakyThrows
-    void generateEt3ProcessingDocumentNoExceptions() {
+        // when pdfboxService.generatePdfDocumentInfo returns documentInfo
         try (MockedStatic<ET3FormMapper> et3FormMapperMockedStatic = Mockito.mockStatic(ET3FormMapper.class)) {
-            et3FormMapperMockedStatic.when(() -> ET3FormMapper.mapEt3Form(any(), anyString())).thenReturn(
-                    new ConcurrentHashMap<String, Optional<String>>());
+            et3FormMapperMockedStatic.when(() -> ET3FormMapper.mapEt3Form(any(), anyString())).thenThrow(
+                    new GenericServiceException(
+                            ERROR_PDF_BOX_SERVICE_GENERATE_PDF_DOCUMENT_INFO,
+                            new Throwable(ERROR_PDF_BOX_SERVICE_GENERATE_PDF_DOCUMENT_INFO),
+                            ERROR_PDF_BOX_SERVICE_GENERATE_PDF_DOCUMENT_INFO,
+                            "123456",
+                            "PDFBoxService",
+                            "generatePdfDocumentInfo"));
             when(documentManagementService.uploadDocument(anyString(), any(), anyString(), anyString(), anyString()))
                     .thenReturn(new URI("testUri"));
             when(pdfBoxService.generatePdfDocumentInfo(any(), anyString(),
@@ -152,6 +162,13 @@ class Et3ResponseServiceTest {
             assertDoesNotThrow(() -> et3ResponseService.generateEt3ResponseDocument(new CaseData(), "userToken",
                     ENGLANDWALES_CASE_TYPE_ID, SUBMIT_ET3));
         }
+        // when pdfboxService.generatePdfDocumentInfo throws exception
+        when(pdfBoxService.generatePdfDocumentInfo(any(), anyString(),
+                anyString(), anyString(), eq(null), anyString()))
+                .thenThrow(new IOException(ERROR_PDF_BOX_SERVICE_GENERATE_PDF_DOCUMENT_INFO));
+        assertThrows(DocumentManagementException.class,
+                () -> et3ResponseService.generateEt3ResponseDocument(new CaseData(), "userToken",
+                ENGLANDWALES_CASE_TYPE_ID, SUBMIT_ET3));
     }
 
     /**
@@ -264,11 +281,11 @@ class Et3ResponseServiceTest {
     @ParameterizedTest
     @MethodSource("generateTestGetDataForRepresentedRespondentIndexes")
     @SneakyThrows
-    void getRepresentedRespondentIndexesTest(String userToken, String caseId) {
+    void theGetRepresentedRespondentIndexesTest(String userToken, String caseId) {
         when(userIdamService.getUserDetails(INVALID_USER_TOKEN)).thenReturn(null);
 
         UserDetails validUserDetails = new UserDetails();
-        validUserDetails.setUid(TEST_USER_ID);
+        validUserDetails.setUid(USER_ID);
         when(userIdamService.getUserDetails(VALID_USER_TOKEN)).thenReturn(validUserDetails);
 
         UserDetails invalidUserDetails = new UserDetails();
@@ -284,48 +301,73 @@ class Et3ResponseServiceTest {
         when(ccdCaseAssignment.getCaseUserRoles(VALID_CASE_ID_RETURNS_INVALID_CASE))
                 .thenReturn(invalidCaseUserAssignmentData);
 
+        CaseUserAssignmentData validCaseInvalidUserAssignmentData = getValidCaseInvalidUserAssignmentData();
+        when(ccdCaseAssignment.getCaseUserRoles(VALID_CASE_ID_RETURNS_INVALID_USER))
+                .thenReturn(validCaseInvalidUserAssignmentData);
+
+        when(ccdCaseAssignment.getCaseUserRoles(INVALID_CASE_ID_FOR_GET_USER_ROLES))
+                .thenThrow(new IOException(SYSTEM_ERROR));
+
         if (StringUtils.isBlank(userToken)) {
             GenericServiceException genericServiceException = assertThrows(GenericServiceException.class,
                     () -> et3ResponseService.getRepresentedRespondentIndexes(userToken, caseId));
-            assertThat(genericServiceException.getCause().getMessage()).isEqualTo(ERROR_INVALID_USER_TOKEN);
+            assertThat(genericServiceException.getMessage()).isEqualTo(ERROR_INVALID_USER_TOKEN);
             return;
         }
         if (StringUtils.isBlank(caseId)) {
             GenericServiceException genericServiceException = assertThrows(GenericServiceException.class,
                     () -> et3ResponseService.getRepresentedRespondentIndexes(userToken, caseId));
-            assertThat(genericServiceException.getCause().getMessage()).isEqualTo(ERROR_INVALID_CASE_ID);
+            assertThat(genericServiceException.getMessage()).isEqualTo(ERROR_INVALID_CASE_ID);
             return;
         }
         if (INVALID_USER_TOKEN.equals(userToken)) {
             GenericServiceException genericServiceException = assertThrows(GenericServiceException.class,
                     () -> et3ResponseService.getRepresentedRespondentIndexes(userToken, caseId));
-            assertThat(genericServiceException.getCause().getMessage()).isEqualTo(ERROR_USER_NOT_FOUND);
+            assertThat(genericServiceException.getMessage()).isEqualTo(ERROR_USER_NOT_FOUND);
             return;
         }
         if (VALID_USER_TOKEN_RETURNS_INVALID_USER.equals(userToken)) {
             GenericServiceException genericServiceException = assertThrows(GenericServiceException.class,
                     () -> et3ResponseService.getRepresentedRespondentIndexes(userToken, caseId));
-            assertThat(genericServiceException.getCause().getMessage()).isEqualTo(ERROR_USER_ID_NOT_FOUND);
+            assertThat(genericServiceException.getMessage()).isEqualTo(ERROR_USER_ID_NOT_FOUND);
         }
         if (VALID_USER_TOKEN.equals(userToken) && INVALID_CASE_ID.equals(caseId)) {
             GenericServiceException genericServiceException = assertThrows(GenericServiceException.class,
                     () -> et3ResponseService.getRepresentedRespondentIndexes(userToken, caseId));
-            assertThat(genericServiceException.getCause().getMessage()).isEqualTo(ERROR_CASE_ROLES_NOT_FOUND);
+            assertThat(genericServiceException.getMessage()).isEqualTo(ERROR_CASE_ROLES_NOT_FOUND);
         }
         if (VALID_USER_TOKEN.equals(userToken) && VALID_CASE_ID_RETURNS_INVALID_CASE.equals(caseId)) {
             assertThrows(NoSuchElementException.class,
                     () -> et3ResponseService.getRepresentedRespondentIndexes(userToken, caseId));
         }
+        if (VALID_USER_TOKEN.equals(userToken) && INVALID_CASE_ID_FOR_GET_USER_ROLES.equals(caseId)) {
+            GenericServiceException genericServiceException = assertThrows(GenericServiceException.class,
+                    () -> et3ResponseService.getRepresentedRespondentIndexes(userToken, caseId));
+            assertThat(genericServiceException.getMessage()).isEqualTo(SYSTEM_ERROR);
+        }
+        if (VALID_USER_TOKEN.equals(userToken) && VALID_CASE_ID_RETURNS_INVALID_USER.equals(caseId)) {
+            assertThat(et3ResponseService.getRepresentedRespondentIndexes(userToken, caseId)).isEmpty();
+        }
         if (VALID_USER_TOKEN.equals(userToken) && VALID_CASE_ID.equals(caseId)) {
             List<Integer> solicitorIndexList = et3ResponseService.getRepresentedRespondentIndexes(userToken, caseId);
-            assertThat(solicitorIndexList.getFirst()).isEqualTo(0);
+            assertThat(solicitorIndexList.getFirst()).isZero();
         }
+    }
+
+    private static @NotNull CaseUserAssignmentData getValidCaseInvalidUserAssignmentData() {
+        CaseUserAssignment validRespondentSolicitorCaseUserAssignment = new CaseUserAssignment();
+        validRespondentSolicitorCaseUserAssignment.setCaseId(VALID_CASE_ID);
+        validRespondentSolicitorCaseUserAssignment.setUserId(INVALID_USER_ID);
+        validRespondentSolicitorCaseUserAssignment.setCaseRole("[SOLICITORA]");
+        CaseUserAssignmentData caseUserAssignmentData = new CaseUserAssignmentData();
+        caseUserAssignmentData.setCaseUserAssignments(List.of(validRespondentSolicitorCaseUserAssignment));
+        return caseUserAssignmentData;
     }
 
     private static @NotNull CaseUserAssignmentData getValidCaseUserAssignmentData() {
         CaseUserAssignment validRespondentSolicitorCaseUserAssignment = new CaseUserAssignment();
         validRespondentSolicitorCaseUserAssignment.setCaseId(VALID_CASE_ID);
-        validRespondentSolicitorCaseUserAssignment.setUserId(TEST_USER_ID);
+        validRespondentSolicitorCaseUserAssignment.setUserId(USER_ID);
         validRespondentSolicitorCaseUserAssignment.setCaseRole("[SOLICITORA]");
         CaseUserAssignmentData caseUserAssignmentData = new CaseUserAssignmentData();
         caseUserAssignmentData.setCaseUserAssignments(List.of(validRespondentSolicitorCaseUserAssignment));
@@ -335,7 +377,7 @@ class Et3ResponseServiceTest {
     private static @NotNull CaseUserAssignmentData getInvalidCaseUserAssignmentData() {
         CaseUserAssignment validRespondentSolicitorCaseUserAssignment = new CaseUserAssignment();
         validRespondentSolicitorCaseUserAssignment.setCaseId(VALID_CASE_ID);
-        validRespondentSolicitorCaseUserAssignment.setUserId(TEST_USER_ID);
+        validRespondentSolicitorCaseUserAssignment.setUserId(USER_ID);
         validRespondentSolicitorCaseUserAssignment.setCaseRole("[CLAIMANTSOLICITOR]");
         CaseUserAssignmentData caseUserAssignmentData = new CaseUserAssignmentData();
         caseUserAssignmentData.setCaseUserAssignments(List.of(validRespondentSolicitorCaseUserAssignment));
@@ -352,14 +394,16 @@ class Et3ResponseServiceTest {
                 Arguments.of(VALID_USER_TOKEN_RETURNS_INVALID_USER, VALID_CASE_ID),
                 Arguments.of(VALID_USER_TOKEN, INVALID_CASE_ID),
                 Arguments.of(VALID_USER_TOKEN, VALID_CASE_ID_RETURNS_INVALID_CASE),
+                Arguments.of(VALID_USER_TOKEN, INVALID_CASE_ID_FOR_GET_USER_ROLES),
+                Arguments.of(VALID_USER_TOKEN, VALID_CASE_ID_RETURNS_INVALID_USER),
                 Arguments.of(VALID_USER_TOKEN, VALID_CASE_ID)
         );
     }
 
     @ParameterizedTest
-    @MethodSource("generateTestGetRespondentRepresentsContactDetails")
+    @MethodSource("generateTestSetRespondentRepresentsContactDetails")
     @SneakyThrows
-    void getRespondentRepresentsContactDetails(String userToken, CaseData caseData) {
+    void theSetRespondentRepresentsContactDetails(String userToken, CaseData caseData) {
         // When both user token and case data are empty
         if (StringUtils.isBlank(userToken) && ObjectUtils.isEmpty(caseData)) {
             GenericServiceException gex = assertThrows(GenericServiceException.class,
@@ -385,23 +429,46 @@ class Et3ResponseServiceTest {
         // gives case roles not found exception.
         if (VALID_USER_TOKEN.equals(userToken) && INVALID_CASE_ID.equals(caseData.getCcdID())) {
             UserDetails validUserDetails = new UserDetails();
-            validUserDetails.setUid(TEST_USER_ID);
+            validUserDetails.setUid(USER_ID);
             when(userIdamService.getUserDetails(VALID_USER_TOKEN)).thenReturn(validUserDetails);
-            when(ccdCaseAssignment.getCaseUserRoles(VALID_CASE_ID)).thenReturn(getInvalidCaseUserAssignmentData());
+            when(ccdCaseAssignment.getCaseUserRoles(INVALID_CASE_ID)).thenReturn(getInvalidCaseUserAssignmentData());
             GenericServiceException gex = assertThrows(GenericServiceException.class,
                     () -> et3ResponseService.setRespondentRepresentsContactDetails(userToken, caseData));
-            assertThat(gex.getMessage()).isEqualTo(ERROR_CASE_ROLES_NOT_FOUND);
+            assertThat(gex.getMessage()).isEqualTo(SYSTEM_ERROR);
         }
 
         // when case data doesn't have any representative in representative collection
         if (VALID_USER_TOKEN.equals(userToken) && VALID_CASE_ID.equals(caseData.getCcdID())) {
             UserDetails validUserDetails = new UserDetails();
-            validUserDetails.setUid(TEST_USER_ID);
+            validUserDetails.setUid(USER_ID);
             when(userIdamService.getUserDetails(VALID_USER_TOKEN)).thenReturn(validUserDetails);
             when(ccdCaseAssignment.getCaseUserRoles(VALID_CASE_ID)).thenReturn(getValidCaseUserAssignmentData());
             GenericServiceException gex = assertThrows(GenericServiceException.class,
                     () -> et3ResponseService.setRespondentRepresentsContactDetails(userToken, caseData));
-            assertThat(gex.getMessage()).isEqualTo(ERROR_REPRESENTED_RESPONDENT_NOT_FOUND);
+            assertThat(gex.getMessage()).isEqualTo(ERROR_NO_REPRESENTED_RESPONDENT_FOUND);
+        }
+
+        // when there is no user role found should throw no represented respondent found exception
+        if (VALID_USER_TOKEN.equals(userToken) && VALID_CASE_ID_RETURNS_INVALID_USER.equals(caseData.getCcdID())) {
+            UserDetails validUserDetails = new UserDetails();
+            validUserDetails.setUid(USER_ID);
+            when(userIdamService.getUserDetails(VALID_USER_TOKEN)).thenReturn(validUserDetails);
+            when(ccdCaseAssignment.getCaseUserRoles(VALID_CASE_ID_RETURNS_INVALID_USER))
+                    .thenReturn(getValidCaseInvalidUserAssignmentData());
+            GenericServiceException gex = assertThrows(GenericServiceException.class,
+                    () -> et3ResponseService.setRespondentRepresentsContactDetails(userToken, caseData));
+            assertThat(gex.getMessage()).isEqualTo(ERROR_NO_REPRESENTED_RESPONDENT_FOUND);
+        }
+
+        // when case data has no representative but representative has no value
+        if (VALID_USER_TOKEN.equals(userToken) && VALID_CASE_ID.equals(caseData.getCcdID())) {
+            caseData.setRepCollection(List.of(RepresentedTypeRItem.builder().value(null).build()));
+            UserDetails validUserDetails = new UserDetails();
+            validUserDetails.setUid(USER_ID);
+            when(userIdamService.getUserDetails(VALID_USER_TOKEN)).thenReturn(validUserDetails);
+            when(ccdCaseAssignment.getCaseUserRoles(VALID_CASE_ID)).thenReturn(getValidCaseUserAssignmentData());
+            et3ResponseService.setRespondentRepresentsContactDetails(userToken, caseData);
+            assertThat(caseData.getRepCollection().getFirst().getValue()).isNull();
         }
 
         // when case data has representative in representative collection
@@ -409,7 +476,7 @@ class Et3ResponseServiceTest {
             RepresentedTypeR representedTypeR = new RepresentedTypeR();
             caseData.setRepCollection(List.of(RepresentedTypeRItem.builder().value(representedTypeR).build()));
             UserDetails validUserDetails = new UserDetails();
-            validUserDetails.setUid(TEST_USER_ID);
+            validUserDetails.setUid(USER_ID);
             when(userIdamService.getUserDetails(VALID_USER_TOKEN)).thenReturn(validUserDetails);
             when(ccdCaseAssignment.getCaseUserRoles(VALID_CASE_ID)).thenReturn(getValidCaseUserAssignmentData());
             et3ResponseService.setRespondentRepresentsContactDetails(userToken, caseData);
@@ -420,7 +487,7 @@ class Et3ResponseServiceTest {
         }
     }
 
-    private static Stream<Arguments> generateTestGetRespondentRepresentsContactDetails() {
+    private static Stream<Arguments> generateTestSetRespondentRepresentsContactDetails() {
         CaseData validCaseData = CaseDataBuilder.builder()
                 .withClaimantIndType("Doris", "Johnson")
                 .withClaimantType("232 Petticoat Square", "3 House", null,
@@ -437,6 +504,7 @@ class Et3ResponseServiceTest {
         address.setAddressLine1("Address Line 1");
         validCaseData.setEt3ResponseAddress(address);
         validCaseData.setEt3ResponsePhone("1234567890");
+
         CaseData invalidCaseData = CaseDataBuilder.builder()
                 .withClaimantIndType("Doris", "Johnson")
                 .withClaimantType("232 Petticoat Square", "3 House", null,
@@ -449,11 +517,127 @@ class Et3ResponseServiceTest {
                 .withSubmitEt3Respondent("Antonio Vazquez")
                 .build();
         invalidCaseData.setCcdID(INVALID_CASE_ID);
+
+        CaseData notRepresentedCaseData = CaseDataBuilder.builder()
+                .withClaimantIndType("Doris", "Johnson")
+                .withClaimantType("232 Petticoat Square", "3 House", null,
+                        "London", "W10 4AG", "United Kingdom")
+                .withRespondentWithAddress("Antonio Vazquez",
+                        "11 Small Street", "22 House", null,
+                        "Manchester", "M12 42R", "United Kingdom",
+                        "1234/5678/90")
+                .withEt3RepresentingRespondent("Antonio Vazquez")
+                .withSubmitEt3Respondent("Antonio Vazquez")
+                .build();
+        invalidCaseData.setCcdID(VALID_CASE_ID_RETURNS_INVALID_USER);
         return Stream.of(
                 Arguments.of(null, null),
                 Arguments.of(VALID_USER_TOKEN, null),
                 Arguments.of(null, validCaseData),
                 Arguments.of(VALID_USER_TOKEN, invalidCaseData),
+                Arguments.of(VALID_USER_TOKEN, notRepresentedCaseData),
+                Arguments.of(VALID_USER_TOKEN, validCaseData)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("generateTestValidateAndExtractRepresentativeContact")
+    @SneakyThrows
+    void theValidateAndExtractRepresentativeContact(String userToken, CaseData caseData) {
+        if (VALID_USER_TOKEN.equals(userToken) && INVALID_CASE_ID.equals(caseData.getCcdID())) {
+            UserDetails validUserDetails = new UserDetails();
+            validUserDetails.setUid(USER_ID);
+            when(userIdamService.getUserDetails(VALID_USER_TOKEN)).thenReturn(validUserDetails);
+            when(ccdCaseAssignment.getCaseUserRoles(INVALID_CASE_ID)).thenThrow(
+                    new GenericServiceException(ERROR_INVALID_CASE_ID,
+                            new Throwable(ERROR_INVALID_CASE_ID),
+                            ERROR_INVALID_CASE_ID,
+                            "123456",
+                            "CcdCaseAssignment",
+                            "getCaseUserRoles"));
+            GenericServiceException gex = assertThrows(GenericServiceException.class,
+                    () -> et3ResponseService.validateAndExtractRepresentativeContact(userToken, caseData));
+            assertThat(gex.getMessage()).isEqualTo(ERROR_INVALID_CASE_ID);
+        }
+
+        if (VALID_USER_TOKEN.equals(userToken) && VALID_CASE_ID_RETURNS_INVALID_USER.equals(caseData.getCcdID())) {
+            UserDetails validUserDetails = new UserDetails();
+            validUserDetails.setUid(USER_ID);
+            when(userIdamService.getUserDetails(VALID_USER_TOKEN)).thenReturn(validUserDetails);
+            when(ccdCaseAssignment.getCaseUserRoles(VALID_CASE_ID_RETURNS_INVALID_USER)).thenReturn(
+                    getValidCaseInvalidUserAssignmentData());
+            GenericServiceException gex = assertThrows(GenericServiceException.class,
+                    () -> et3ResponseService.validateAndExtractRepresentativeContact(userToken, caseData));
+            assertThat(gex.getMessage()).isEqualTo(ERROR_NO_REPRESENTED_RESPONDENT_FOUND);
+        }
+
+        if (VALID_USER_TOKEN.equals(userToken) && VALID_CASE_ID.equals(caseData.getCcdID())) {
+            UserDetails validUserDetails = new UserDetails();
+            validUserDetails.setUid(USER_ID);
+            Address address = new Address();
+            address.setAddressLine1("Address Line 1");
+            caseData.setRepCollection(
+                    List.of(RepresentedTypeRItem.builder().value(
+                            RepresentedTypeR.builder().representativeAddress(address)
+                                    .representativePhoneNumber("1234567890").build()).build()));
+            when(userIdamService.getUserDetails(VALID_USER_TOKEN)).thenReturn(validUserDetails);
+            when(ccdCaseAssignment.getCaseUserRoles(VALID_CASE_ID)).thenReturn(getValidCaseUserAssignmentData());
+            when(userIdamService.getUserDetails(VALID_USER_TOKEN)).thenReturn(validUserDetails);
+            when(ccdCaseAssignment.getCaseUserRoles(VALID_CASE_ID)).thenReturn(
+                    getValidCaseUserAssignmentData());
+            assertDoesNotThrow(() ->
+                    et3ResponseService.validateAndExtractRepresentativeContact(userToken, caseData));
+            assertThat(caseData.getEt3ResponseAddress().getAddressLine1()).isEqualTo("Address Line 1");
+            assertThat(caseData.getEt3ResponsePhone()).isEqualTo("1234567890");
+        }
+    }
+
+    private static Stream<Arguments> generateTestValidateAndExtractRepresentativeContact() {
+        CaseData validCaseData = CaseDataBuilder.builder()
+                .withClaimantIndType("Doris", "Johnson")
+                .withClaimantType("232 Petticoat Square", "3 House", null,
+                        "London", "W10 4AG", "United Kingdom")
+                .withRespondentWithAddress("Antonio Vazquez",
+                        "11 Small Street", "22 House", null,
+                        "Manchester", "M12 42R", "United Kingdom",
+                        "1234/5678/90")
+                .withEt3RepresentingRespondent("Antonio Vazquez")
+                .withSubmitEt3Respondent("Antonio Vazquez")
+                .build();
+        validCaseData.setCcdID(VALID_CASE_ID);
+        Address address = new Address();
+        address.setAddressLine1("Address Line 1");
+        validCaseData.setEt3ResponseAddress(address);
+        validCaseData.setEt3ResponsePhone("1234567890");
+
+        CaseData invalidCaseData = CaseDataBuilder.builder()
+                .withClaimantIndType("Doris", "Johnson")
+                .withClaimantType("232 Petticoat Square", "3 House", null,
+                        "London", "W10 4AG", "United Kingdom")
+                .withRespondentWithAddress("Antonio Vazquez",
+                        "11 Small Street", "22 House", null,
+                        "Manchester", "M12 42R", "United Kingdom",
+                        "1234/5678/90")
+                .withEt3RepresentingRespondent("Antonio Vazquez")
+                .withSubmitEt3Respondent("Antonio Vazquez")
+                .build();
+        invalidCaseData.setCcdID(INVALID_CASE_ID);
+
+        CaseData notRepresentedCaseData = CaseDataBuilder.builder()
+                .withClaimantIndType("Doris", "Johnson")
+                .withClaimantType("232 Petticoat Square", "3 House", null,
+                        "London", "W10 4AG", "United Kingdom")
+                .withRespondentWithAddress("Antonio Vazquez",
+                        "11 Small Street", "22 House", null,
+                        "Manchester", "M12 42R", "United Kingdom",
+                        "1234/5678/90")
+                .withEt3RepresentingRespondent("Antonio Vazquez")
+                .withSubmitEt3Respondent("Antonio Vazquez")
+                .build();
+        invalidCaseData.setCcdID(VALID_CASE_ID_RETURNS_INVALID_USER);
+        return Stream.of(
+                Arguments.of(VALID_USER_TOKEN, invalidCaseData),
+                Arguments.of(VALID_USER_TOKEN, notRepresentedCaseData),
                 Arguments.of(VALID_USER_TOKEN, validCaseData)
         );
     }

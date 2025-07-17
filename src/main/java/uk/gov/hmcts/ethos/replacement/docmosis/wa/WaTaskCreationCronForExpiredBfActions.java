@@ -46,30 +46,39 @@ public class WaTaskCreationCronForExpiredBfActions {
             return;
         }
 
-        log.info("Checking for expired BFDates");
+        log.info("In WaTaskCreation ... cron job - Checking for expired BFDates");
         String yesterday = UtilHelper.formatCurrentDate2(LocalDate.now().minusDays(1));
-        String query = buildQueryForExpiredBFActions(yesterday);
-        String adminUserToken = adminUserService.getAdminUserToken();
         String[] caseTypeIds = caseTypeIdsString.split(",");
-
+        List<Long> caseIdsToSkip = new ArrayList<Long>();
+        String adminUserToken = adminUserService.getAdminUserToken();
+        String query = buildQueryForExpiredBFActions(yesterday);
         Arrays.stream(caseTypeIds).forEach(caseTypeId -> {
             try {
+                List<SubmitEvent> cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
+
+                if (cases.isEmpty()) {
+                    log.info("In first search  request - No expired BFActions found for case type: {}", caseTypeId);
+                    return;
+                }
+
                 List<Long> testCaseIds = new ArrayList<Long>();
                 testCaseIds.add(Long.valueOf("1741699642715149"));
                 testCaseIds.add(Long.valueOf("1736943057619843"));
                 testCaseIds.add(Long.valueOf("1736944768623090"));
                 testCaseIds.add(Long.valueOf("1744278728630907"));
                 testCaseIds.add(Long.valueOf("1741710954147332"));
-
-                List<SubmitEvent> cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
                 int iterationCount = 0;
                 while (CollectionUtils.isNotEmpty(cases)) {
-                    //filter only test cases used for logic validation in demo - to be removed when released for QA
-                    cases.stream().filter(c -> testCaseIds.contains(c.getCaseId()));
-                    if (!cases.isEmpty()) {
-                        for (SubmitEvent currentCase : cases) {
+                    List<SubmitEvent> tempCaseList = cases.stream()
+                            .filter(c -> testCaseIds.contains(c.getCaseId())
+                                    && !caseIdsToSkip.contains(c.getCaseId())).toList();
+                    if (!tempCaseList.isEmpty()) {
+                        for (SubmitEvent currentCase : tempCaseList) {
                             triggerTaskEventForCase(adminUserToken, currentCase, caseTypeId);
                             iterationCount++;
+                            caseIdsToSkip.add(currentCase.getCaseId());
+                            log.info("Triggered WA task for case ID: {} in case type: {}",
+                                    currentCase.getCaseId(), caseTypeId);
                         }
 
                         if (iterationCount >= testCaseIds.size()) {

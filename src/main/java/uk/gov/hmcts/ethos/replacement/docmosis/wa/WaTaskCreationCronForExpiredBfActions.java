@@ -60,12 +60,24 @@ public class WaTaskCreationCronForExpiredBfActions {
                 testCaseIds.add(Long.valueOf("1736944768623090"));
                 testCaseIds.add(Long.valueOf("1744278728630907"));
                 testCaseIds.add(Long.valueOf("1741710954147332"));
-                List<SubmitEvent> cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
 
+                List<SubmitEvent> cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
+                int iterationCount = 0;
                 while (CollectionUtils.isNotEmpty(cases)) {
                     //filter only test cases used for logic validation in demo - to be removed when released for QA
-                    cases.stream().filter(c -> testCaseIds.contains(c.getCaseId()))
-                            .forEach(o -> triggerTaskEventForCase(adminUserToken, o, caseTypeId));
+                    cases.stream().filter(c -> testCaseIds.contains(c.getCaseId()));
+                    if (!cases.isEmpty()) {
+                        for (SubmitEvent currentCase : cases) {
+                            triggerTaskEventForCase(adminUserToken, currentCase, caseTypeId);
+                            iterationCount++;
+                        }
+
+                        if (iterationCount >= testCaseIds.size()) {
+                            log.info("Processed all {} test cases for case type: {}", testCaseIds.size(), caseTypeId);
+                            break;
+                        }
+                    }
+
                     cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
                 }
             } catch (Exception e) {

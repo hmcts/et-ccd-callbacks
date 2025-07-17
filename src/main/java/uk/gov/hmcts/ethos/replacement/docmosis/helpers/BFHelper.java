@@ -95,11 +95,14 @@ public final class BFHelper {
         List<BFActionTypeItem> expiredBfActions = caseData.getBfActions().stream()
                 .filter(item -> LocalDate.parse(item.getValue().getBfDate()).isBefore(
                         LocalDate.parse(yesterday))).toList();
-
-        expiredBfActions.forEach(bfActionTypeItem -> {
-            if (bfActionTypeItem.getValue().getIsWaTaskCreated() == null) {
-                bfActionTypeItem.getValue().setIsWaTaskCreated("Yes");
-            }
-        });
+        if (!expiredBfActions.isEmpty()) {
+            log.info("Updating WA task creation tracker for {} expired BF Actions for case reference {}",
+                    expiredBfActions.size(), caseData.getEthosCaseReference());
+            expiredBfActions.forEach(bfActionTypeItem -> {
+                if (bfActionTypeItem.getValue().getIsWaTaskCreated() == null) {
+                    bfActionTypeItem.getValue().setIsWaTaskCreated("Yes");
+                }
+            });
+        }
     }
 }

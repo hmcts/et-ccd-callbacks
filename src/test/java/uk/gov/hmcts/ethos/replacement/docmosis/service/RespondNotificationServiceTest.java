@@ -61,6 +61,10 @@ class RespondNotificationServiceTest {
     private HearingSelectionService hearingSelectionService;
     @MockBean
     private FeatureToggleService featureToggleService;
+    @MockBean
+    private CaseAccessService caseAccessService;
+    @MockBean
+    private AdminUserService adminUserService;
 
     private EmailService emailService;
     private RespondNotificationService respondNotificationService;
@@ -71,7 +75,8 @@ class RespondNotificationServiceTest {
         doNothing().when(emailService).sendEmail(anyString(), anyString(), anyMap());
 
         SendNotificationService sendNotificationService =
-            new SendNotificationService(hearingSelectionService, emailService, featureToggleService);
+            new SendNotificationService(hearingSelectionService, emailService,
+                    featureToggleService, caseAccessService, adminUserService);
 
         respondNotificationService = new RespondNotificationService(emailService, sendNotificationService);
 

@@ -57,7 +57,7 @@ public class WaTaskCreationCronForExpiredBfActions {
                 while (CollectionUtils.isNotEmpty(cases)) {
                     cases.stream()
                             .filter(o ->
-                                    !alreadyProcessedCaseIdsToSkip.contains(String.valueOf(o.getCaseId())))
+                                    !alreadyProcessedCaseIdsToSkip.contains(o.getCaseId()))
                             .forEach(o -> {
                                 triggerTaskEventForCase(adminUserToken, o, caseTypeId);
                                 log.info("Triggered WA task for case ID: {} in case type: {}",

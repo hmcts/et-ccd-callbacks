@@ -1,5 +1,9 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -11,11 +15,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
@@ -89,6 +88,16 @@ public class CaseAccessService {
 
         return matcher.group(1);
 
+    }
+
+    public List<String> getCaseUserAssignmentsById(String caseId) {
+        try {
+            List<CaseUserAssignment> assignments = caseAssignment.getCaseUserRoles(caseId).getCaseUserAssignments();
+
+        } catch (Exception e) {
+            log.error("Error retrieving user assignments for case {}: {}", caseId, e.getMessage());
+        }
+        return new ArrayList<>();
     }
 
     public List<String> getClaimantSolicitorUserIds(String caseId) {

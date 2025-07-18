@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.wa;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -44,27 +45,27 @@ public class WaTaskCreationCronForExpiredBfActions {
 
         log.info("In WaTaskCreation ... cron job - Checking for expired BFDates");
         String yesterday = UtilHelper.formatCurrentDate2(LocalDate.now().minusDays(1));
+        String threeDaysAgo = UtilHelper.formatCurrentDate2(LocalDate.now().minusDays(2));
         String[] caseTypeIds = caseTypeIdsString.split(",");
         String adminUserToken = adminUserService.getAdminUserToken();
-        String query = buildQueryForExpiredBFActions(yesterday);
+        String query = buildQueryForExpiredBFActions(threeDaysAgo, yesterday);
+        List<Long> alreadyProcessedCaseIdsToSkip = new ArrayList<>();
         Arrays.stream(caseTypeIds).forEach(caseTypeId -> {
             try {
                 List<SubmitEvent> cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
 
-                if (cases.isEmpty()) {
-                    log.info("In first search  request - No expired BFActions found for case type: {}", caseTypeId);
-                    return;
-                } else {
-                    log.info("In first search request - Found {} expired BFActions for case type: {}",
-                            cases.size(), caseTypeId);
+                while (CollectionUtils.isNotEmpty(cases)) {
+                    cases.stream()
+                            .filter(o ->
+                                    !alreadyProcessedCaseIdsToSkip.contains(String.valueOf(o.getCaseId())))
+                            .forEach(o -> {
+                                triggerTaskEventForCase(adminUserToken, o, caseTypeId);
+                                log.info("Triggered WA task for case ID: {} in case type: {}",
+                                        o.getCaseId(), caseTypeId);
+                                alreadyProcessedCaseIdsToSkip.add(o.getCaseId());
+                            });
+                    cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
                 }
-
-                for (SubmitEvent currentCase : cases) {
-                    triggerTaskEventForCase(adminUserToken, currentCase, caseTypeId);
-                    log.info("Triggered WA task for case ID: {} in case type: {}",
-                            currentCase.getCaseId(), caseTypeId);
-                }
-
             } catch (Exception e) {
                 log.error(e.getMessage());
             }
@@ -77,22 +78,16 @@ public class WaTaskCreationCronForExpiredBfActions {
      *
      * @param yesterday - bfaction due date, from which on cases meet the search criterion
      */
-    String buildQueryForExpiredBFActions(String yesterday) {
-        List<Long> testCaseIds = new ArrayList<Long>();
-        testCaseIds.add(Long.valueOf("1741699642715149"));
-        testCaseIds.add(Long.valueOf("1736943057619843"));
-        testCaseIds.add(Long.valueOf("1736944768623090"));
-        testCaseIds.add(Long.valueOf("1744278728630907"));
-        testCaseIds.add(Long.valueOf("1741710954147332"));
+    String buildQueryForExpiredBFActions(String threeDaysAgo, String yesterday) {
         return new SearchSourceBuilder()
                 .size(maxCases)
                 .query(new BoolQueryBuilder()
                         .must(QueryBuilders.existsQuery("data.bfActions"))
-                        .must(QueryBuilders.termsQuery("reference", testCaseIds))
                         .mustNot(QueryBuilders.existsQuery("data.bfActions.value.cleared"))
                         .mustNot(QueryBuilders.existsQuery("data.bfActions.value.isWaTaskCreated"))
-                        .must(QueryBuilders.rangeQuery("data.bfActions.value.bfDate").to(yesterday)
-                                .includeUpper(true))
+                        .must(QueryBuilders.rangeQuery("data.bfActions.value.bfDate")
+                                .from(threeDaysAgo).to(yesterday)
+                                .includeLower(true).includeUpper(true))
                 ).toString();
     }
 

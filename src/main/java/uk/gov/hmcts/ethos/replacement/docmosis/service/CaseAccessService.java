@@ -106,7 +106,7 @@ public class CaseAccessService {
         return userIds;
     }
 
-    public List<String> getSolicitorUserIds(String caseId) {
+    public List<String> getRespondentSolicitorUserIds(String caseId) {
         List<String> userIds = new ArrayList<>();
         try {
             List<CaseUserAssignment> assignments = caseAssignment.getCaseUserRoles(caseId).getCaseUserAssignments();

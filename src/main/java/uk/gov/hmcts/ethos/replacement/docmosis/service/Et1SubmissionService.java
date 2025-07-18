@@ -290,12 +290,12 @@ public class Et1SubmissionService {
             return;
         }
 
-        AdditionalCaseInfoType additionalCaseInfoType = caseDetails.getCaseData().getAdditionalCaseInfoType();
-        if (ObjectUtils.isEmpty(additionalCaseInfoType)) {
-            additionalCaseInfoType = new AdditionalCaseInfoType();
-            caseDetails.getCaseData().setAdditionalCaseInfoType(additionalCaseInfoType);
-        }
+        AdditionalCaseInfoType additionalCaseInfoType = ObjectUtils.defaultIfNull(
+                caseDetails.getCaseData().getAdditionalCaseInfoType(),
+                new AdditionalCaseInfoType()
+        );
         additionalCaseInfoType.setInterventionRequired(YES);
+        caseDetails.getCaseData().setAdditionalCaseInfoType(additionalCaseInfoType);
 
         caseDetails.getCaseData().setCaseNotes(setVexationNotes(submitEventList));
         FlagsImageHelper.buildFlagsImageFileName(caseDetails);

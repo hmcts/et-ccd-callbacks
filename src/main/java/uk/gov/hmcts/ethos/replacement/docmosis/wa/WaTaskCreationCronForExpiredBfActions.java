@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
-import org.elasticsearch.index.query.TermQueryBuilder;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -22,8 +21,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 
 @Component
 @Slf4j
@@ -105,11 +102,11 @@ public class WaTaskCreationCronForExpiredBfActions {
         return new SearchSourceBuilder()
                 .size(maxCases)
                 .query(new BoolQueryBuilder()
-                        .must(new TermQueryBuilder("data.respondentCollection.value.responseReceived", NO))
-                        .must(QueryBuilders.rangeQuery("data.bfActions.value.bfDate").to(yesterday).includeUpper(true))
-                        .must(new TermQueryBuilder("data.bfActions.value.allActions.keyword", "Claim served"))
+                        .must(QueryBuilders.existsQuery("data.bfActions"))
                         .mustNot(QueryBuilders.existsQuery("data.bfActions.value.cleared"))
                         .mustNot(QueryBuilders.existsQuery("data.bfActions.value.isWaTaskCreated"))
+                        .must(QueryBuilders.rangeQuery("data.bfActions.value.bfDate").to(yesterday)
+                                .includeUpper(true))
                 ).toString();
     }
 

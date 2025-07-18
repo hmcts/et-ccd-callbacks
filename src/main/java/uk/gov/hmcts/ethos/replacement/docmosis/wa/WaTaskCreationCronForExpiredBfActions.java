@@ -2,7 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.wa;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
 import org.elasticsearch.search.builder.SearchSourceBuilder;
@@ -46,7 +45,6 @@ public class WaTaskCreationCronForExpiredBfActions {
         log.info("In WaTaskCreation ... cron job - Checking for expired BFDates");
         String yesterday = UtilHelper.formatCurrentDate2(LocalDate.now().minusDays(1));
         String[] caseTypeIds = caseTypeIdsString.split(",");
-        List<Long> caseIdsToSkip = new ArrayList<Long>();
         String adminUserToken = adminUserService.getAdminUserToken();
         String query = buildQueryForExpiredBFActions(yesterday);
         Arrays.stream(caseTypeIds).forEach(caseTypeId -> {
@@ -56,36 +54,17 @@ public class WaTaskCreationCronForExpiredBfActions {
                 if (cases.isEmpty()) {
                     log.info("In first search  request - No expired BFActions found for case type: {}", caseTypeId);
                     return;
+                } else {
+                    log.info("In first search request - Found {} expired BFActions for case type: {}",
+                            cases.size(), caseTypeId);
                 }
 
-                List<Long> testCaseIds = new ArrayList<Long>();
-                testCaseIds.add(Long.valueOf("1741699642715149"));
-                testCaseIds.add(Long.valueOf("1736943057619843"));
-                testCaseIds.add(Long.valueOf("1736944768623090"));
-                testCaseIds.add(Long.valueOf("1744278728630907"));
-                testCaseIds.add(Long.valueOf("1741710954147332"));
-                int iterationCount = 0;
-                while (CollectionUtils.isNotEmpty(cases)) {
-                    List<SubmitEvent> tempCaseList = cases.stream()
-                            .filter(c -> testCaseIds.contains(c.getCaseId())
-                                    && !caseIdsToSkip.contains(c.getCaseId())).toList();
-                    if (!tempCaseList.isEmpty()) {
-                        for (SubmitEvent currentCase : tempCaseList) {
-                            triggerTaskEventForCase(adminUserToken, currentCase, caseTypeId);
-                            iterationCount++;
-                            caseIdsToSkip.add(currentCase.getCaseId());
-                            log.info("Triggered WA task for case ID: {} in case type: {}",
-                                    currentCase.getCaseId(), caseTypeId);
-                        }
-
-                        if (iterationCount >= testCaseIds.size()) {
-                            log.info("Processed all {} test cases for case type: {}", testCaseIds.size(), caseTypeId);
-                            break;
-                        }
-                    }
-
-                    cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
+                for (SubmitEvent currentCase : cases) {
+                    triggerTaskEventForCase(adminUserToken, currentCase, caseTypeId);
+                    log.info("Triggered WA task for case ID: {} in case type: {}",
+                            currentCase.getCaseId(), caseTypeId);
                 }
+
             } catch (Exception e) {
                 log.error(e.getMessage());
             }
@@ -99,10 +78,17 @@ public class WaTaskCreationCronForExpiredBfActions {
      * @param yesterday - bfaction due date, from which on cases meet the search criterion
      */
     String buildQueryForExpiredBFActions(String yesterday) {
+        List<Long> testCaseIds = new ArrayList<Long>();
+        testCaseIds.add(Long.valueOf("1741699642715149"));
+        testCaseIds.add(Long.valueOf("1736943057619843"));
+        testCaseIds.add(Long.valueOf("1736944768623090"));
+        testCaseIds.add(Long.valueOf("1744278728630907"));
+        testCaseIds.add(Long.valueOf("1741710954147332"));
         return new SearchSourceBuilder()
                 .size(maxCases)
                 .query(new BoolQueryBuilder()
                         .must(QueryBuilders.existsQuery("data.bfActions"))
+                        .must(QueryBuilders.termsQuery("reference", testCaseIds))
                         .mustNot(QueryBuilders.existsQuery("data.bfActions.value.cleared"))
                         .mustNot(QueryBuilders.existsQuery("data.bfActions.value.isWaTaskCreated"))
                         .must(QueryBuilders.rangeQuery("data.bfActions.value.bfDate").to(yesterday)

@@ -110,7 +110,8 @@ class WaTaskCreationCronForExpiredBfActionsTest {
     @Test
     void buildQueryForExpiredBFActions_validInput_returnsQuery() {
         String yesterday = UtilHelper.formatCurrentDate2(LocalDate.now().minusDays(1));
-        String query = cron.buildQueryForExpiredBFActions(yesterday);
+        String today = UtilHelper.formatCurrentDate2(LocalDate.now());
+        String query = cron.buildQueryForExpiredBFActions(yesterday, today);
         assertDoesNotThrow(() -> cron.createWaTasksForExpiredBFDates());
         assert query.contains("data.bfActions.value.bfDate");
         assert query.contains(yesterday);

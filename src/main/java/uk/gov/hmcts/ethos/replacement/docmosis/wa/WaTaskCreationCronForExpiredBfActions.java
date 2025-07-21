@@ -17,6 +17,7 @@ import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,10 +45,10 @@ public class WaTaskCreationCronForExpiredBfActions {
         }
 
         log.info("In WaTaskCreation ... cron job - Checking for expired BFDates");
-        String yesterday = UtilHelper.formatCurrentDate2(LocalDate.now().minusDays(1));
         String[] caseTypeIds = caseTypeIdsString.split(",");
         String adminUserToken = adminUserService.getAdminUserToken();
-        String query = buildQueryForExpiredBFActions(yesterday);
+        String today = UtilHelper.formatCurrentDate2(LocalDate.now());
+        String query = buildQueryForExpiredBFActions(getEffectiveYesterday(), today);
         List<Long> alreadyProcessedCaseIdsToSkip = new ArrayList<>();
         Arrays.stream(caseTypeIds).forEach(caseTypeId -> {
             try {
@@ -70,21 +71,46 @@ public class WaTaskCreationCronForExpiredBfActions {
         });
     }
 
+    private String getEffectiveYesterday() {
+        // Determine the effective "yesterday" based on the current day of the week
+        LocalDate today = LocalDate.now();
+        DayOfWeek dayOfWeek = today.getDayOfWeek();
+
+        LocalDate effectiveYesterday;
+
+        switch (dayOfWeek) {
+            case DayOfWeek.MONDAY -> {
+                // If today is Monday, go back to Friday
+                effectiveYesterday = today.minusDays(3);
+            }
+            case DayOfWeek.SUNDAY -> {
+                // If today is Sunday, go back to Friday as well
+                effectiveYesterday = today.minusDays(2);
+            }
+            default -> {
+                // Regular yesterday
+                effectiveYesterday = today.minusDays(1);
+            }
+        }
+
+        return UtilHelper.formatCurrentDate2(effectiveYesterday);
+    }
+
     /**
      * builds query for Expired BFActions that are not reviewed yet
      * or its 'date cleared' field is empty.
      *
      * @param yesterday - bfaction due date, from which on cases meet the search criterion
      */
-    String buildQueryForExpiredBFActions(String yesterday) {
+    String buildQueryForExpiredBFActions(String yesterday, String today) {
         return new SearchSourceBuilder()
                 .size(maxCases)
                 .query(new BoolQueryBuilder()
                         .must(QueryBuilders.existsQuery("data.bfActions"))
                         .mustNot(QueryBuilders.existsQuery("data.bfActions.value.cleared"))
                         .mustNot(QueryBuilders.existsQuery("data.bfActions.value.isWaTaskCreated"))
-                        .must(QueryBuilders.rangeQuery("data.bfActions.value.bfDate")
-                                .from(yesterday).includeLower(true).includeUpper(false))
+                        .must(QueryBuilders.rangeQuery("data.bfActions.value.bfDate").from(yesterday)
+                                .to(today).includeLower(true).includeUpper(false))
                 ).toString();
     }
 

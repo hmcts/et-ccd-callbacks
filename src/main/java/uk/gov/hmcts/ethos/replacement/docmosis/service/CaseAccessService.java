@@ -13,8 +13,6 @@ import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 
@@ -90,7 +88,7 @@ public class CaseAccessService {
 
     }
 
-    public List<String> getCaseUserAssignmentsById(String caseId) {
+    public List<CaseUserAssignment> getCaseUserAssignmentsById(String caseId) {
         try {
             List<CaseUserAssignment> assignments = caseAssignment.getCaseUserRoles(caseId).getCaseUserAssignments();
 
@@ -98,35 +96,5 @@ public class CaseAccessService {
             log.error("Error retrieving user assignments for case {}: {}", caseId, e.getMessage());
         }
         return new ArrayList<>();
-    }
-
-    public List<String> getClaimantSolicitorUserIds(String caseId) {
-        List<String> userIds = new ArrayList<>();
-        try {
-            List<CaseUserAssignment> assignments = caseAssignment.getCaseUserRoles(caseId).getCaseUserAssignments();
-            for (CaseUserAssignment assignment : assignments) {
-                if (ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel().equals(assignment.getCaseRole())) {
-                    userIds.add(assignment.getUserId());
-                }
-            }
-        } catch (Exception e) {
-            log.error("Error retrieving claimant solicitor users for case {}: {}", caseId, e.getMessage());
-        }
-        return userIds;
-    }
-
-    public List<String> getRespondentSolicitorUserIds(String caseId) {
-        List<String> userIds = new ArrayList<>();
-        try {
-            List<CaseUserAssignment> assignments = caseAssignment.getCaseUserRoles(caseId).getCaseUserAssignments();
-            for (CaseUserAssignment assignment : assignments) {
-                if (SolicitorRole.from(assignment.getCaseRole()).isPresent()) {
-                    userIds.add(assignment.getUserId());
-                }
-            }
-        } catch (Exception e) {
-            log.error("Error retrieving solicitor users for case {}: {}", caseId, e.getMessage());
-        }
-        return userIds;
     }
 }

@@ -12,11 +12,14 @@ import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.HubLinksStatuses;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -318,8 +321,14 @@ class SendNotificationServiceTest {
         when(emailService.getClaimantRepExuiCaseNotificationsLink(anyString()))
                 .thenReturn("http://localhost:3455/cases/case-details/"
                         + caseDetails.getCaseId() + "#Notifications");
-        when(caseAccessService.getClaimantSolicitorUserIds(anyString())).thenReturn(
-                List.of("claimantSolicitorUserId"));
+        CaseUserAssignment mockAssignment = CaseUserAssignment
+                .builder()
+                .userId("claimantSolicitorUserId")
+                .caseRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())
+                .build();
+
+        when(caseAccessService.getCaseUserAssignmentsById(anyString())).thenReturn(
+                List.of(mockAssignment));
 
         UserDetails userDetails = mock(UserDetails.class);
         when(adminUserService.getUserDetails(anyString())).thenReturn(userDetails);
@@ -348,8 +357,25 @@ class SendNotificationServiceTest {
                 .thenReturn("http://localhost:3455/cases/case-details/"
                         + caseDetails.getCaseId() + "#Notifications");
 
-        when(caseAccessService.getClaimantSolicitorUserIds(anyString())).thenReturn(
-                List.of("claimantSolicitorUserId", "sharedListUserId", "sharedListUserId2"));
+        CaseUserAssignment assignment1 = CaseUserAssignment.builder()
+                .userId("claimantSolicitorUserId")
+                .caseRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())
+                .build();
+
+        CaseUserAssignment assignment2 = CaseUserAssignment.builder()
+                .userId("sharedListUserId")
+                .caseRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())
+                .build();
+
+        CaseUserAssignment assignment3 = CaseUserAssignment.builder()
+                .userId("sharedListUserId2")
+                .caseRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())
+                .build();
+
+        List<CaseUserAssignment> assignments = List.of(assignment1, assignment2, assignment3);
+
+        when(caseAccessService.getCaseUserAssignmentsById(anyString())).thenReturn(assignments);
+
         UserDetails userDetails = mock(UserDetails.class);
         when(adminUserService.getUserDetails(anyString())).thenAnswer(invocation -> {
             String userId = invocation.getArgument(0);
@@ -416,9 +442,24 @@ class SendNotificationServiceTest {
         caseData.setSendNotificationNotify(RESPONDENT_ONLY);
         caseData.setCcdID("1234");
 
-        // Mock shared list user IDs
-        when(caseAccessService.getRespondentSolicitorUserIds(anyString()))
-                .thenReturn(List.of("respondentSolicitorUserId", "sharedListUserId", "sharedListUserId2"));
+        CaseUserAssignment assignment1 = CaseUserAssignment.builder()
+                .userId("respondentSolicitorUserId")
+                .caseRole(SolicitorRole.SOLICITORA.getCaseRoleLabel())
+                .build();
+
+        CaseUserAssignment assignment2 = CaseUserAssignment.builder()
+                .userId("sharedListUserId")
+                .caseRole(SolicitorRole.SOLICITORB.getCaseRoleLabel())
+                .build();
+
+        CaseUserAssignment assignment3 = CaseUserAssignment.builder()
+                .userId("sharedListUserId2")
+                .caseRole(SolicitorRole.SOLICITORC.getCaseRoleLabel())
+                .build();
+
+        List<CaseUserAssignment> assignments = List.of(assignment1, assignment2, assignment3);
+
+        when(caseAccessService.getCaseUserAssignmentsById(anyString())).thenReturn(assignments);
 
         UserDetails userDetails = mock(UserDetails.class);
         when(adminUserService.getUserDetails(anyString())).thenAnswer(invocation -> {

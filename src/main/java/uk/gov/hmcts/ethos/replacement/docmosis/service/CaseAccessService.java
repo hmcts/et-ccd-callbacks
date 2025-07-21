@@ -1,9 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
@@ -13,7 +9,11 @@ import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
-
+import java.util.ArrayList;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import static com.google.common.base.Strings.isNullOrEmpty;
 
 @Slf4j
@@ -90,11 +90,11 @@ public class CaseAccessService {
 
     public List<CaseUserAssignment> getCaseUserAssignmentsById(String caseId) {
         try {
-            List<CaseUserAssignment> assignments = caseAssignment.getCaseUserRoles(caseId).getCaseUserAssignments();
-
+            return caseAssignment.getCaseUserRoles(caseId).getCaseUserAssignments();
         } catch (Exception e) {
             log.error("Error retrieving user assignments for case {}: {}", caseId, e.getMessage());
+            throw new NoSuchElementException(
+                    String.format("No user assignments found for case %s", caseId), e);
         }
-        return new ArrayList<>();
     }
 }

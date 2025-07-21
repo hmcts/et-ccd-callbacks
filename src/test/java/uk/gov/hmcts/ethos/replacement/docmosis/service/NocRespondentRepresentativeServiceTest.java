@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -623,16 +624,16 @@ class NocRespondentRepresentativeServiceTest {
         orgDetails.add(resOrg3);
 
         when(organisationClient.getOrganisations(anyString(), anyString())).thenReturn(orgDetails);
-
+        caseData.getRepCollection().getFirst().getValue().setRepresentativeAddress(null);
         CaseData returned = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, "someToken");
 
         verify(organisationClient, times(1)).getOrganisations(anyString(), anyString());
 
         List<RepresentedTypeRItem> repCollection = returned.getRepCollection();
 
-        RepresentedTypeR rep1 = repCollection.get(0).getValue();
+        RepresentedTypeR rep1 = repCollection.getFirst().getValue();
         assertThat(rep1.getRepresentativeAddress().getAddressLine1())
-                .isEqualTo(resOrg1.getContactInformation().get(0).getAddressLine1());
+                .isEqualTo(resOrg1.getContactInformation().getFirst().getAddressLine1());
         assertThat(rep1.getNameOfOrganisation()).isEqualTo(resOrg1.getName());
 
         RepresentedTypeR rep2 = repCollection.get(1).getValue();
@@ -641,7 +642,7 @@ class NocRespondentRepresentativeServiceTest {
 
         RepresentedTypeR rep3 = repCollection.get(2).getValue();
         assertThat(rep3.getRepresentativeAddress().getAddressLine1())
-                .isEqualTo(resOrg3.getContactInformation().get(0).getAddressLine1());
+                .isEqualTo(resOrg3.getContactInformation().getFirst().getAddressLine1());
         assertThat(rep3.getNameOfOrganisation()).isEqualTo(resOrg3.getName());
     }
 
@@ -710,9 +711,9 @@ class NocRespondentRepresentativeServiceTest {
         OrganisationsResponse resOrg2 = createOrganisationsResponse(ORGANISATION_ID_TWO, ET_ORG_2);
         resOrg2.setContactInformation(new ArrayList<>());
         OrganisationsResponse resOrg3 = createOrganisationsResponse(ORGANISATION_ID_THREE, ET_ORG_3);
-        resOrg3.getContactInformation().get(0).setAddressLine1(null);
-        resOrg3.getContactInformation().get(0).setTownCity(null);
-        resOrg3.getContactInformation().get(0).setCountry(null);
+        resOrg3.getContactInformation().getFirst().setAddressLine1(null);
+        resOrg3.getContactInformation().getFirst().setTownCity(null);
+        resOrg3.getContactInformation().getFirst().setCountry(null);
 
         List<OrganisationsResponse> orgDetails = new ArrayList<>();
         orgDetails.add(resOrg1);
@@ -720,7 +721,7 @@ class NocRespondentRepresentativeServiceTest {
         orgDetails.add(resOrg3);
 
         when(organisationClient.getOrganisations(anyString(), anyString())).thenReturn(orgDetails);
-
+        caseData.getRepCollection().getFirst().getValue().setRepresentativeAddress(null);
         CaseData returned = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, "someToken");
 
         verify(organisationClient, times(1)).getOrganisations(anyString(), anyString());
@@ -733,6 +734,7 @@ class NocRespondentRepresentativeServiceTest {
     }
 
     @Test
+    @Disabled("Should not overwrite existing addresses")
     void prepopulateOrgAddress_OverwriteExistingAddress() {
         OrganisationsResponse resOrg1 = createOrganisationsResponse(ORGANISATION_ID, ET_ORG_1);
         OrganisationsResponse resOrg2 = createOrganisationsResponse(ORGANISATION_ID_TWO, ET_ORG_2);
@@ -746,7 +748,7 @@ class NocRespondentRepresentativeServiceTest {
         List<RepresentedTypeRItem> existingRepCollection = caseData.getRepCollection();
         Address rep1Address = new Address();
         rep1Address.setAddressLine1("Rep 1 - Address 1");
-        existingRepCollection.get(0).getValue().setRepresentativeAddress(rep1Address);
+        existingRepCollection.getFirst().getValue().setRepresentativeAddress(rep1Address);
         Address rep2Address = new Address();
         rep2Address.setAddressLine1("Rep 2 - Address 1");
         existingRepCollection.get(1).getValue().setRepresentativeAddress(rep2Address);
@@ -764,7 +766,7 @@ class NocRespondentRepresentativeServiceTest {
 
         Address representative1Org = repCollection.get(0).getValue().getRepresentativeAddress();
         assertThat(representative1Org.getAddressLine1())
-                .isEqualTo(resOrg1.getContactInformation().get(0).getAddressLine1());
+                .isEqualTo(resOrg1.getContactInformation().getFirst().getAddressLine1());
 
         Address representative2Org = repCollection.get(1).getValue().getRepresentativeAddress();
         assertThat(representative2Org.getAddressLine1())
@@ -772,7 +774,7 @@ class NocRespondentRepresentativeServiceTest {
 
         Address representative3Org = repCollection.get(2).getValue().getRepresentativeAddress();
         assertThat(representative3Org.getAddressLine1())
-                .isEqualTo(resOrg3.getContactInformation().get(0).getAddressLine1());
+                .isEqualTo(resOrg3.getContactInformation().getFirst().getAddressLine1());
     }
 
     @Test

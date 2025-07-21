@@ -45,15 +45,13 @@ public class WaTaskCreationCronForExpiredBfActions {
 
         log.info("In WaTaskCreation ... cron job - Checking for expired BFDates");
         String yesterday = UtilHelper.formatCurrentDate2(LocalDate.now().minusDays(1));
-        String threeDaysAgo = UtilHelper.formatCurrentDate2(LocalDate.now().minusDays(2));
         String[] caseTypeIds = caseTypeIdsString.split(",");
         String adminUserToken = adminUserService.getAdminUserToken();
-        String query = buildQueryForExpiredBFActions(threeDaysAgo, yesterday);
+        String query = buildQueryForExpiredBFActions(yesterday);
         List<Long> alreadyProcessedCaseIdsToSkip = new ArrayList<>();
         Arrays.stream(caseTypeIds).forEach(caseTypeId -> {
             try {
                 List<SubmitEvent> cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
-
                 while (CollectionUtils.isNotEmpty(cases)) {
                     cases.stream()
                             .filter(o ->
@@ -78,7 +76,7 @@ public class WaTaskCreationCronForExpiredBfActions {
      *
      * @param yesterday - bfaction due date, from which on cases meet the search criterion
      */
-    String buildQueryForExpiredBFActions(String threeDaysAgo, String yesterday) {
+    String buildQueryForExpiredBFActions(String yesterday) {
         return new SearchSourceBuilder()
                 .size(maxCases)
                 .query(new BoolQueryBuilder()
@@ -86,8 +84,7 @@ public class WaTaskCreationCronForExpiredBfActions {
                         .mustNot(QueryBuilders.existsQuery("data.bfActions.value.cleared"))
                         .mustNot(QueryBuilders.existsQuery("data.bfActions.value.isWaTaskCreated"))
                         .must(QueryBuilders.rangeQuery("data.bfActions.value.bfDate")
-                                .from(threeDaysAgo).to(yesterday)
-                                .includeLower(true).includeUpper(true))
+                                .from(yesterday).includeLower(true).includeUpper(false))
                 ).toString();
     }
 

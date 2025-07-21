@@ -119,8 +119,8 @@ withPipeline(type, product, component) {
     env.SERVICE_AUTH_PROVIDER_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
 
     env.ET_COS_URL = "https://et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-    env.FT_SYA_URL = "http://et-sya-api-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net/"
-    env.CCD_DATA_STORE_API_URL = "http://ccd-data-store-api-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.FT_SYA_URL = "https://et-sya-api-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net/"
+    env.CCD_DATA_STORE_API_URL = "https://ccd-data-store-api-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.TEST_URL_CITIZEN_UI = "https://et-sya-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net/"
     env.TEST_RESP_URL = "https://et-syr-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net/"
     env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net/testing-support/accounts"

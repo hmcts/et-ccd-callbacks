@@ -50,4 +50,15 @@ final class AddressUtilsTest {
         nonEmptyCountry.setCountry("Test Country");
         assertThat(AddressUtils.isNullOrEmpty(nonEmptyCountry)).isFalse();
     }
+
+    @Test
+    void testCreateIfNull() {
+        // When address is null, it should return a new Address instance
+        assertThat(AddressUtils.createIfNull(null)).isNotNull().isInstanceOf(Address.class);
+
+        // When address is not null, it should return the same instance
+        Address address = new Address();
+        address.setAddressLine1("123 Street");
+        assertThat(AddressUtils.createIfNull(address)).isNotNull().isEqualTo(address);
+    }
 }

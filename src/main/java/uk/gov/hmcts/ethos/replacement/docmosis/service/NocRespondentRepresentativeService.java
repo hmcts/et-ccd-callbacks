@@ -301,7 +301,7 @@ public class NocRespondentRepresentativeService {
         if (!CollectionUtils.isEmpty(orgRes.getContactInformation())) {
             Address repAddress = repDetails.getRepresentativeAddress();
             if (AddressUtils.isNullOrEmpty(repAddress)) {
-                repAddress = new Address();
+                repAddress = AddressUtils.createIfNull(repDetails.getRepresentativeAddress());
                 OrganisationAddress orgAddress = orgRes.getContactInformation().getFirst();
                 // update Representative Address with Org Address
                 repAddress.setAddressLine1(orgAddress.getAddressLine1());

@@ -54,9 +54,6 @@ public final class AddressUtils {
      *         otherwise, a new {@code Address} instance
      */
     public static Address createIfNull(Address address) {
-        if (address == null) {
-            return new Address();
-        }
-        return address;
+        return address == null ? new Address() : address;
     }
 }

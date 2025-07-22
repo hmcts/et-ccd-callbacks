@@ -85,7 +85,6 @@ public class CaseAccessService {
         }
 
         return matcher.group(1);
-
     }
 
     public List<CaseUserAssignment> getCaseUserAssignmentsById(String caseId) {

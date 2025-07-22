@@ -1,16 +1,20 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -18,6 +22,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -37,6 +43,9 @@ class Et1ReppedHelperTest {
     private CaseData caseData;
     private CCDRequest ccdRequest;
     private CaseDetails caseDetails;
+    private static final Address TEST_REPRESENTATIVE_ADDRESS = new Address();
+    private static final String TEST_PHONE_NUMBER_1 = "1234567890";
+    private static final String TEST_PHONE_NUMBER_2 = "9876543210";
 
     @BeforeEach
     void setUp() {
@@ -49,6 +58,11 @@ class Et1ReppedHelperTest {
 
         ccdRequest = new CCDRequest();
         ccdRequest.setCaseDetails(caseDetails);
+        TEST_REPRESENTATIVE_ADDRESS.setAddressLine1("50 Tithe Barn Drive");
+        TEST_REPRESENTATIVE_ADDRESS.setCountry("United Kingdom");
+        TEST_REPRESENTATIVE_ADDRESS.setCounty("Berkshire");
+        TEST_REPRESENTATIVE_ADDRESS.setPostCode("SL6 2DE");
+        TEST_REPRESENTATIVE_ADDRESS.setPostTown("Maidenhead");
     }
 
     @Test
@@ -136,7 +150,8 @@ class Et1ReppedHelperTest {
     }
 
     @Test
-    void clearEt1ReppedFields() throws Exception {
+    @SneakyThrows
+    void clearEt1ReppedFields() {
         CaseData caseData1 = generateCaseDetails("et1ReppedDraftStillWorking.json").getCaseData();
         Et1ReppedHelper.clearEt1ReppedCreationFields(caseData1);
         assertNull(caseData1.getEt1ReppedSectionOne());
@@ -146,21 +161,24 @@ class Et1ReppedHelperTest {
     }
 
     @Test
-    void setEt1SubmitDataStillWorking() throws Exception {
+    @SneakyThrows
+    void setEt1SubmitDataStillWorking() {
         caseData = generateCaseDetails("et1ReppedDraftStillWorking.json").getCaseData();
         Et1ReppedHelper.setEt1SubmitData(caseData);
         assertEquals(WORKING, caseData.getClaimantOtherType().getStillWorking());
     }
 
     @Test
-    void setEt1SubmitDataNoticePeriod() throws Exception {
+    @SneakyThrows
+    void setEt1SubmitDataNoticePeriod() {
         caseData = generateCaseDetails("et1ReppedDraftWorkingNoticePeriod.json").getCaseData();
         Et1ReppedHelper.setEt1SubmitData(caseData);
         assertEquals(NOTICE, caseData.getClaimantOtherType().getStillWorking());
     }
 
     @Test
-    void setEt1SubmitDataNoLongerWorking() throws Exception {
+    @SneakyThrows
+    void setEt1SubmitDataNoLongerWorking() {
         caseData = generateCaseDetails("et1ReppedDraftNoLongerWorking.json").getCaseData();
         Et1ReppedHelper.setEt1SubmitData(caseData);
         assertEquals(NO_LONGER_WORKING, caseData.getClaimantOtherType().getStillWorking());
@@ -176,7 +194,8 @@ class Et1ReppedHelperTest {
         }
     }
 
-    private CaseDetails generateCaseDetails(String jsonFileName) throws Exception {
+    @SneakyThrows
+    private CaseDetails generateCaseDetails(String jsonFileName) {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
                 .getContextClassLoader().getResource(jsonFileName)).toURI())));
         ObjectMapper mapper = new ObjectMapper();
@@ -207,6 +226,63 @@ class Et1ReppedHelperTest {
         caseData.setEt1SectionThreeDocumentUpload(null);
         List<String> errors = Et1ReppedHelper.validateGrounds(caseData);
         assertEquals(1, errors.size());
-        assertEquals(ET1ReppedConstants.CLAIM_DETAILS_MISSING, errors.get(0));
+        assertEquals(ET1ReppedConstants.CLAIM_DETAILS_MISSING, errors.getFirst());
+    }
+
+    @Test
+    void theSetClaimantRepresentativeValues() {
+        // Scenario 1: CaseData is empty
+        GenericServiceException gse = assertThrows(GenericServiceException.class,
+                () -> Et1ReppedHelper.setClaimantRepresentativeValues(null));
+        assertThat(gse.getMessage()).contains(ET1ReppedConstants.ERROR_CASE_NOT_FOUND);
+
+        // Scenario 2: Representative is null
+        CaseData caseDataWithoutRepresentative = new CaseData();
+        caseDataWithoutRepresentative.setRepresentativeClaimantType(null);
+        caseDataWithoutRepresentative.setRepresentativeAddress(TEST_REPRESENTATIVE_ADDRESS);
+        caseDataWithoutRepresentative.setRepresentativePhoneNumber(TEST_PHONE_NUMBER_1);
+        assertDoesNotThrow(() -> Et1ReppedHelper.setClaimantRepresentativeValues(caseDataWithoutRepresentative));
+        assertThat(caseDataWithoutRepresentative.getRepresentativeClaimantType().getRepresentativePhoneNumber())
+                .isEqualTo(TEST_PHONE_NUMBER_1);
+        assertThat(caseDataWithoutRepresentative.getRepresentativeClaimantType().getRepresentativeAddress())
+                .isEqualTo(TEST_REPRESENTATIVE_ADDRESS);
+
+        // Scenario 3: Representative is not null
+        CaseData caseDataWithRepresentative = new CaseData();
+        caseDataWithRepresentative.setRepresentativeClaimantType(RepresentedTypeC.builder()
+                .representativeAddress(new Address()).representativePhoneNumber(TEST_PHONE_NUMBER_2).build());
+        caseDataWithRepresentative.setRepresentativeAddress(TEST_REPRESENTATIVE_ADDRESS);
+        caseDataWithRepresentative.setRepresentativePhoneNumber(TEST_PHONE_NUMBER_1);
+        assertDoesNotThrow(() -> Et1ReppedHelper.setClaimantRepresentativeValues(caseDataWithRepresentative));
+        assertThat(caseDataWithRepresentative.getRepresentativeClaimantType().getRepresentativePhoneNumber())
+                .isEqualTo(TEST_PHONE_NUMBER_1);
+        assertThat(caseDataWithRepresentative.getRepresentativeClaimantType().getRepresentativeAddress())
+                .isEqualTo(TEST_REPRESENTATIVE_ADDRESS);
+    }
+
+    @Test
+    void theLoadClaimantRepresentativeValues() {
+        // Scenario 1: CaseData is empty
+        GenericServiceException gse = assertThrows(GenericServiceException.class,
+                () -> Et1ReppedHelper.loadClaimantRepresentativeValues(null));
+        assertThat(gse.getMessage()).isEqualTo(ET1ReppedConstants.ERROR_CASE_NOT_FOUND);
+
+        // Scenario 2: Representative is null
+        CaseData caseDataWithoutRepresentative = new CaseData();
+        caseDataWithoutRepresentative.setRepresentativeClaimantType(null);
+        gse = assertThrows(GenericServiceException.class,
+                () -> Et1ReppedHelper.loadClaimantRepresentativeValues(caseDataWithoutRepresentative));
+        assertThat(caseDataWithoutRepresentative.getRepresentativePhoneNumber()).isNull();
+        assertThat(caseDataWithoutRepresentative.getRepresentativeAddress()).isNull();
+        assertThat(gse.getMessage()).contains(ET1ReppedConstants.CLAIMANT_REPRESENTATIVE_NOT_FOUND);
+
+        // Scenario 3: Representative is not null
+        CaseData caseDataWithRepresentative = new CaseData();
+        caseDataWithRepresentative.setRepresentativeClaimantType(RepresentedTypeC.builder()
+                .representativeAddress(TEST_REPRESENTATIVE_ADDRESS)
+                .representativePhoneNumber(TEST_PHONE_NUMBER_2).build());
+        assertDoesNotThrow(() -> Et1ReppedHelper.loadClaimantRepresentativeValues(caseDataWithRepresentative));
+        assertThat(caseDataWithRepresentative.getRepresentativePhoneNumber()).isEqualTo(TEST_PHONE_NUMBER_2);
+        assertThat(caseDataWithRepresentative.getRepresentativeAddress()).isEqualTo(TEST_REPRESENTATIVE_ADDRESS);
     }
 }

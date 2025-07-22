@@ -27,6 +27,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
@@ -301,19 +302,19 @@ public class NocRespondentRepresentativeService {
 
         if (!CollectionUtils.isEmpty(orgRes.getContactInformation())) {
             Address repAddress = repDetails.getRepresentativeAddress();
-            repAddress = repAddress == null ? new Address() : repAddress;
-            OrganisationAddress orgAddress = orgRes.getContactInformation().get(0);
-
-            // update Representative Address with Org Address
-            repAddress.setAddressLine1(orgAddress.getAddressLine1());
-            repAddress.setAddressLine2(orgAddress.getAddressLine2());
-            repAddress.setAddressLine3(orgAddress.getAddressLine3());
-            repAddress.setPostTown(orgAddress.getTownCity());
-            repAddress.setCounty(orgAddress.getCounty());
-            repAddress.setCountry(orgAddress.getCountry());
-            repAddress.setPostCode(orgAddress.getPostCode());
-
-            repDetails.setRepresentativeAddress(repAddress);
+            if (AddressUtils.isNullOrEmpty(repAddress)) {
+                repAddress = AddressUtils.createIfNull(repDetails.getRepresentativeAddress());
+                OrganisationAddress orgAddress = orgRes.getContactInformation().getFirst();
+                // update Representative Address with Org Address
+                repAddress.setAddressLine1(orgAddress.getAddressLine1());
+                repAddress.setAddressLine2(orgAddress.getAddressLine2());
+                repAddress.setAddressLine3(orgAddress.getAddressLine3());
+                repAddress.setPostTown(orgAddress.getTownCity());
+                repAddress.setCounty(orgAddress.getCounty());
+                repAddress.setCountry(orgAddress.getCountry());
+                repAddress.setPostCode(orgAddress.getPostCode());
+                repDetails.setRepresentativeAddress(repAddress);
+            }
         }
     }
 

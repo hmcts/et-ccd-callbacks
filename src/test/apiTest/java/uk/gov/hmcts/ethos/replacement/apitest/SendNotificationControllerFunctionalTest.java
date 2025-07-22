@@ -27,7 +27,7 @@ public class SendNotificationControllerFunctionalTest extends BaseFunctionalTest
     @BeforeAll
     public void setUpCaseData() {
         CaseData caseData = CaseDataBuilder.builder()
-                .withEthosCaseReference("1234567890123456")
+                .withEthosCaseReference("1234")
                 .withRespondent("Name", YES, "2020-01-02", "respondent@email.com", false)
                 .withRespondentRepresentative("Name", "Sally", "respondentRep@email.com")
                 .withClaimant("Claimant")
@@ -39,7 +39,7 @@ public class SendNotificationControllerFunctionalTest extends BaseFunctionalTest
 
         ccdRequest = CCDRequestBuilder.builder()
                 .withCaseData(caseData)
-                .withCaseId("123")
+                .withCaseId("1234567890123456")
                 .build();
     }
 

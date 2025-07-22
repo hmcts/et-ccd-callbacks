@@ -1,18 +1,19 @@
 package uk.gov.hmcts.ethos.replacement.apitest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
+import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
 
 import static org.hamcrest.Matchers.notNullValue;
 
@@ -45,12 +46,21 @@ public class Et1ReppedControllerFunctionalTest extends BaseFunctionalTest {
     private CCDRequest ccdRequest;
 
     @BeforeAll
-    void setUpEt1ReppedData() throws URISyntaxException, IOException {
-        CaseData caseData = generateCaseDetails("et1Repped.json").getCaseData();
+    void setUpEt1ReppedData() throws IOException {
+        // Create a real case in CCD
+        JSONObject caseJson = createSinglesCaseDataStore();
+
+        // Map the created case JSON to CaseDetails and CaseData
+        ObjectMapper mapper = new ObjectMapper();
+        CaseDetails caseDetails = mapper.readValue(caseJson.toString(),
+                CaseDetails.class);
+        CaseData caseData = caseDetails.getCaseData();
+
+        // Build the CCDRequest using the real case data
         ccdRequest = CCDRequestBuilder.builder()
                 .withCaseData(caseData)
-                .withCaseTypeId("ET_EnglandWales")
-                .withCaseId("1234123412341324")
+                .withCaseTypeId(caseDetails.getCaseTypeId())
+                .withCaseId(caseDetails.getCaseId())
                 .build();
     }
 

@@ -50,7 +50,7 @@ public class Et1ReppedControllerFunctionalTest extends BaseFunctionalTest {
         JSONObject caseJson = createSinglesCaseDataStore();
 
         // Map the created case JSON to CaseDetails and CaseData
-        ObjectMapper mapper = new ObjectMapper();
+        ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
         CaseDetails caseDetails = mapper.readValue(caseJson.toString(),
                 CaseDetails.class);
         CaseData caseData = caseDetails.getCaseData();

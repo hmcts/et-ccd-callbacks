@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
+import java.util.List;
 import org.apache.http.HttpStatus;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeAll;
@@ -32,6 +33,8 @@ public class SendNotificationControllerFunctionalTest extends BaseFunctionalTest
 
         CaseDetails caseDetails = mapper.readValue(caseJson.toString(), CaseDetails.class);
         CaseData caseData = caseDetails.getCaseData();
+        caseData.setSendNotificationTitle("Test title");
+        caseData.setSendNotificationSubject(List.of("Judgment", "Hearing"));
 
         // Build the CCDRequest using the real case data
         ccdRequest = CCDRequestBuilder.builder()

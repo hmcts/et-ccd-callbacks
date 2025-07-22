@@ -26,6 +26,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantNonSystemUser;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isRepresentedClaimantWithMyHmctsCase;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper.buildPersonalisationWithPartyName;
@@ -49,6 +50,8 @@ public class NocNotificationService {
     private String respondentTemplateId;
     @Value("${template.nocNotification.claimant}")
     private String claimantTemplateId;
+    @Value("${template.nocNotification.claimantRepAssigned}")
+    private String claimantRepAssignedTemplateId;
     @Value("${template.nocNotification.respondent-solicitor.previous}")
     private String previousRespondentSolicitorTemplateId;
     @Value("${template.nocNotification.respondent-solicitor.new}")
@@ -67,7 +70,7 @@ public class NocNotificationService {
 
         if (caseRoleId.getValue().getCode().equals(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())) {
             // send claimant noc change email
-            partyName = NotificationHelper.getNameForClaimant(caseDataPrevious);
+            partyName = caseDataPrevious.getClaimant();
             handleClaimantNocEmails(caseDetailsNew, partyName);
         } else {
             // send respondent noc change email
@@ -108,7 +111,8 @@ public class NocNotificationService {
         }
 
         Map<String, String> personalisation = buildRespondentPersonalisation(caseDetailsNew, partyName);
-        emailService.sendEmail(respondentTemplateId, claimantEmail, personalisation);
+        personalisation.put(LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseDetailsNew.getCaseId()));
+        emailService.sendEmail(claimantRepAssignedTemplateId, claimantEmail, personalisation);
     }
 
     public void handleRespondentNocEmails(CaseDetails caseDetailsPrevious,

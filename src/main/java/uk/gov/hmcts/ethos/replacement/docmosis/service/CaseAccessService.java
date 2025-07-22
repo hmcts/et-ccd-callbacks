@@ -86,7 +86,5 @@ public class CaseAccessService {
         }
 
         return matcher.group(1);
-
     }
-
 }

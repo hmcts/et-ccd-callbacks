@@ -135,11 +135,15 @@ class NocNotificationServiceTest {
         respondentSumType.setRespondentEmail("res@rep.com");
         when(nocRespondentHelper.getRespondent(any(), any())).thenReturn(respondentSumType);
         when(emailService.getCitizenCaseLink(any())).thenReturn("http://domain/citizen-hub/1234");
+        when(emailService.getExuiCaseLink(anyString())).thenReturn("linkToExui");
+
         nocNotificationService.sendNotificationOfChangeEmails(
                 caseDetailsBefore,
                 caseDetailsNew,
-                caseDetailsBefore.getCaseData().getChangeOrganisationRequestField());
-        // Claimant rep emails to be done in another ticket
+                caseDetailsBefore.getCaseData().getChangeOrganisationRequestField(),
+                "test@test.com");
+
+        // Claimant Representative
         verify(emailService, times(0)).sendEmail(any(), eq("claimant@represented.com"), any());
         //New Representative
         verify(emailService, times(1)).sendEmail(any(), eq(NEW_ORG_ADMIN_EMAIL), any());
@@ -166,11 +170,15 @@ class NocNotificationServiceTest {
         respondentSumType.setRespondentEmail("res@rep.com");
         when(nocRespondentHelper.getRespondent(any(), any())).thenReturn(respondentSumType);
         when(emailService.getCitizenCaseLink(any())).thenReturn("http://domain/citizen-hub/1234");
+        when(emailService.getExuiCaseLink(anyString())).thenReturn("linkToExui");
+
         nocNotificationService.sendNotificationOfChangeEmails(
                 caseDetailsBefore,
                 caseDetailsNew,
-                caseDetailsBefore.getCaseData().getChangeOrganisationRequestField());
-        // Claimant rep emails to be done in another ticket
+                caseDetailsBefore.getCaseData().getChangeOrganisationRequestField(),
+                "test@test.com");
+
+        // Claimant Representative
         verify(emailService, times(0)).sendEmail(any(), eq("claimant@represented.com"), any());
         //New Representative
         verify(emailService, never()).sendEmail(any(), eq(NEW_ORG_ADMIN_EMAIL), any());
@@ -204,11 +212,14 @@ class NocNotificationServiceTest {
         respondentSumType.setRespondentEmail(null);
 
         when(nocRespondentHelper.getRespondent(any(), any())).thenReturn(respondentSumType);
-
+        when(emailService.getExuiCaseLink(anyString())).thenReturn("linkToExui");
         nocNotificationService.sendNotificationOfChangeEmails(
                 caseDetailsBefore,
                 caseDetailsNew,
-                caseDetailsBefore.getCaseData().getChangeOrganisationRequestField());
-        verify(emailService, times(0)).sendEmail(any(), any(), any());
+                caseDetailsBefore.getCaseData().getChangeOrganisationRequestField(),
+                "test@test.com");
+
+        // the email will only be sent to the current user
+        verify(emailService, times(1)).sendEmail(any(), any(), any());
     }
 }

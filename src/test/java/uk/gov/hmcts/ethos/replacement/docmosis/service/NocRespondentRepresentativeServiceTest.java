@@ -333,13 +333,13 @@ class NocRespondentRepresentativeServiceTest {
                 .data(caseData)
                 .build());
 
-        nocRespondentRepresentativeService.updateRepresentativesAccess(getCallBackCallbackRequest());
+        nocRespondentRepresentativeService.updateRepresentativesAccess(getCallBackCallbackRequest(), "test@test.com");
 
         verify(nocCcdService, times(2))
             .updateCaseRepresentation(any(), any(), any(), any());
 
         verify(nocNotificationService, times(2))
-                .sendNotificationOfChangeEmails(any(), any(), any());
+                .sendNotificationOfChangeEmails(any(), any(), any(), anyString());
 
         verify(ccdClient, times(2))
                 .submitUpdateRepEvent(any(), any(), any(), any(), any(), any());

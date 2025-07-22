@@ -112,7 +112,7 @@ class NocNotificationHelperTest {
     @Test
     void testBuildRespondentPersonalisation() {
         Map<String, String> claimantPersonalisation =
-            NocNotificationHelper.buildRespondentPersonalisation(caseDetails, respondentSumType);
+            NocNotificationHelper.buildRespondentPersonalisation(caseDetails, respondentSumType.getRespondentName());
         assertThat(claimantPersonalisation.size(), is(6));
         for (String value : claimantPersonalisation.values()) {
             assertThat(value, notNullValue());

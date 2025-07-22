@@ -21,6 +21,7 @@ import uk.gov.hmcts.et.common.model.generic.GenericCallbackResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CcdCaseAssignment;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.NocNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.NocRepresentativeService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import java.io.IOException;
@@ -37,6 +38,8 @@ public class NoticeOfChangeController {
     private final NocNotificationService nocNotificationService;
     private final NocRepresentativeService noCRepresentativeService;
     private final CcdCaseAssignment ccdCaseAssignment;
+    private final UserIdamService userIdamService;
+
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String APPLY_NOC_DECISION = "applyNocDecision";
 
@@ -76,9 +79,11 @@ public class NoticeOfChangeController {
 
             //send emails here
             try {
+                String currentUserEmail = userIdamService.getUserDetails(userToken).getEmail();
                 nocNotificationService.sendNotificationOfChangeEmails(
                         callbackRequest.getCaseDetailsBefore(), caseDetails,
-                        callbackRequest.getCaseDetailsBefore().getCaseData().getChangeOrganisationRequestField());
+                        callbackRequest.getCaseDetailsBefore().getCaseData().getChangeOrganisationRequestField(),
+                        currentUserEmail);
             } catch (Exception exception) {
                 log.error(exception.getMessage(), exception);
             }

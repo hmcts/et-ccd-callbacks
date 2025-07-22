@@ -65,7 +65,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_ST
 
 @Slf4j
 public final class Helper {
-
     public static final String HEARING_CREATION_NUMBER_ERROR = "A new hearing can only "
             + "be added from the List Hearing menu item";
     public static final String HEARING_CREATION_DAY_ERROR = "A new day for a hearing can "
@@ -355,7 +354,8 @@ public final class Helper {
             boolean isNotaSystemUser = caseData.getEt1OnlineSubmission() == null
                                        && caseData.getHubLinksStatuses() == null;
 
-            return isNotaSystemUser || YES.equals(defaultIfNull(caseData.getMigratedFromEcm(), NO));
+            return isNotaSystemUser
+                    || YES.equals(defaultIfNull(caseData.getMigratedFromEcm(), NO));
         }
         return true;
     }
@@ -411,8 +411,7 @@ public final class Helper {
     }
 
     public static boolean isRepresentedClaimantWithMyHmctsCase(CaseData caseData) {
-        return MY_HMCTS.equals(caseData.getCaseSource())
-               && YES.equals(caseData.getClaimantRepresentedQuestion())
+        return YES.equals(caseData.getClaimantRepresentedQuestion())
                && ObjectUtils.isNotEmpty(caseData.getRepresentativeClaimantType())
                && ObjectUtils.isNotEmpty(caseData.getRepresentativeClaimantType().getMyHmctsOrganisation());
     }

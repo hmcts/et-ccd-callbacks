@@ -126,8 +126,8 @@ withPipeline(type, product, component) {
     env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net/testing-support/accounts"
     env.MANAGE_ORG_URL = "https://xui-mo-webapp-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.TEST_MANAGE_CASE_URL = "https://xui-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net/cases"
-    env.ET_CASE_API_URL = "http://et-sya-api-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net/cases/initiate-case/"
-    env.ET_SUBMIT_DRAFT_CASE_URL = "http://et-sya-api-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net/cases/submit-case/"
+    env.ET_CASE_API_URL = "https://et-sya-api-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net/cases/initiate-case/"
+    env.ET_SUBMIT_DRAFT_CASE_URL = "https://et-sya-api-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net/cases/submit-case/"
     env.RUNNING_ENV = "aat"
 
     before('smoketest:preview') {

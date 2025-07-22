@@ -1,6 +1,6 @@
 java:
   image: ${IMAGE_NAME}
-  ingressHost: ${SERVICE_FQDN}
+  ingressHost: ${SERVICE_FQDN} # e.g. et-cos-pr-2674.preview.platform.hmcts.net
   devcpuRequests: 250m
   devmemoryRequests: 2Gi
   devcpuLimits: 1024m
@@ -8,7 +8,23 @@ java:
   environment:
     EXUI_CASE_DETAILS_URL: "https://xui-${SERVICE_FQDN}/cases/case-details/"
     CITIZEN_CASE_DETAILS_URL: "https://et-sya-${SERVICE_FQDN}/citizen-hub/"
-    LAUNCH_DARKLY_ENV: ${SERVICE_FQDN}
+    LAUNCH_DARKLY_ENV: '{{ .Values.global.environment }}'
+    ET_COS_URL: "https://${SERVICE_NAME}"
+    AAC_URL: "https://aac-${SERVICE_FQDN}"
+    TORNADO_URL: "https://docmosis.aat.platform.hmcts.net/rs/render"
+    IDAM_API_URL: "https://idam-api.aat.platform.hmcts.net"
+    IDAM_API_JWK_URL: "https://idam-api.aat.platform.hmcts.net/jwks"
+    CCD_DATA_STORE_API_URL: "http://ccd-data-store-api-${SERVICE_FQDN}"
+    DOCUMENT_MANAGEMENT_URL: http://dm-store-aat.service.core-compute-aat.internal
+    SERVICE_AUTH_PROVIDER_URL: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+    CCD_GATEWAY_BASE_URL: "https://xui-${SERVICE_FQDN}"
+    MICRO_SERVICE: "et_cos"
+    ET_COS_DB_CONN_OPTIONS: ?sslmode=require
+    CASE_DOCUMENT_AM_URL: http://ccd-case-document-am-api-aat.service.core-compute-aat.internal
+    RD_PROFESSIONAL_API_URL: http://rd-professional-api-aat.service.core-compute-aat.internal
+    SECURE_DOC_STORE_FEATURE: true
+    EM_CCD_ORCHESTRATOR_URL: http://em-ccd-orchestrator-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
+    ACAS_BASE_URL: "https://api-dev-acas-01.azure-api.net/ECCLUAT"
   keyVaults:
     et-cos:
       secrets:

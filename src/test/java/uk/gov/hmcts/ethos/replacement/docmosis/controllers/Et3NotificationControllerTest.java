@@ -246,7 +246,7 @@ class Et3NotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void submitted_tokenOk() throws Exception {
+    void submitted_tokenOk() throws Throwable {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         SubmitEvent submitEvent = new SubmitEvent();
         submitEvent.setCaseId(1L);

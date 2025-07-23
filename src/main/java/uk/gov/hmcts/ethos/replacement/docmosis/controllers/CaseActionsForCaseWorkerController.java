@@ -195,7 +195,7 @@ public class CaseActionsForCaseWorkerController {
     @Deprecated(forRemoval = true)
     public ResponseEntity<CCDCallbackResponse> updateCase(
             @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) throws Throwable {
         log.info("UPDATE CASE ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
 
         SubmitEvent submitEvent = caseUpdateForCaseWorkerService.caseUpdateRequest(ccdRequest, userToken);

@@ -9,6 +9,7 @@ import org.apache.http.HttpStatus;
 import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -49,13 +50,19 @@ public class Et1ReppedControllerFunctionalTest extends BaseFunctionalTest {
         // Create a real case in CCD
         JSONObject caseJson = createSinglesCaseDataStore();
 
-        // Map the created case JSON to CaseDetails and CaseData
         ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
-        CaseDetails caseDetails = mapper.readValue(caseJson.toString(),
-                CaseDetails.class);
+        CaseDetails caseDetails = mapper.readValue(caseJson.toString(), CaseDetails.class);
         CaseData caseData = caseDetails.getCaseData();
+        caseData.setClaimantFirstName("John");
+        caseData.setClaimantLastName("Doe");
 
-        // Build the CCDRequest using the real case data
+        Address address = new Address();
+        address.setAddressLine1("123 Main Street");
+        address.setAddressLine2("Suite 456");
+        address.setPostCode("SW1A 1AA");
+        address.setCountry("United Kingdom");
+        caseData.setRespondentAddress(address);
+
         ccdRequest = CCDRequestBuilder.builder()
                 .withCaseData(caseData)
                 .withCaseTypeId(caseDetails.getCaseTypeId())

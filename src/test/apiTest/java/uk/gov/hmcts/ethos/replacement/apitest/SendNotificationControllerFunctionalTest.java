@@ -12,6 +12,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
+import java.io.IOException;
 import java.util.List;
 
 public class SendNotificationControllerFunctionalTest extends BaseFunctionalTest {
@@ -24,7 +25,7 @@ public class SendNotificationControllerFunctionalTest extends BaseFunctionalTest
     private CCDRequest ccdRequest;
 
     @BeforeAll
-    public void setUpCaseData() throws Exception {
+    public void setUpCaseData() throws IOException {
         // Create a real case in CCD
         JSONObject caseJson = createSinglesCaseDataStore();
 

@@ -36,6 +36,8 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
     @Value("${cron.maxCasesPerSearch}")
     private int maxCases;
 
+    private List<Long> processedCaseIdsToSkip = new ArrayList<>();
+
     @Override
     public void run() {
         log.info("WaTaskCreationCronForExpiredBfActions is running");
@@ -50,19 +52,19 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
         String adminUserToken = adminUserService.getAdminUserToken();
         String today = UtilHelper.formatCurrentDate2(LocalDate.now());
         String query = buildQueryForExpiredBFActions(getEffectiveYesterday(), today);
-        List<Long> alreadyProcessedCaseIdsToSkip = new ArrayList<>();
+
         Arrays.stream(caseTypeIds).forEach(caseTypeId -> {
             try {
                 List<SubmitEvent> cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
                 while (CollectionUtils.isNotEmpty(cases)) {
                     cases.stream()
                             .filter(o ->
-                                    !alreadyProcessedCaseIdsToSkip.contains(o.getCaseId()))
+                                    !processedCaseIdsToSkip.contains(o.getCaseId()))
                             .forEach(o -> {
                                 triggerTaskEventForCase(adminUserToken, o, caseTypeId);
                                 log.info("Triggered WA task for case ID: {} in case type: {}",
                                         o.getCaseId(), caseTypeId);
-                                alreadyProcessedCaseIdsToSkip.add(o.getCaseId());
+                                processedCaseIdsToSkip.add(o.getCaseId());
                             });
                     cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
                 }
@@ -70,7 +72,7 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
                 log.error(e.getMessage());
             }
         });
-        log.info("WaTaskCreationCronForExpiredBfActions processed {} case IDs", alreadyProcessedCaseIdsToSkip.size());
+        log.info("WaTaskCreationCronForExpiredBfActions processed {} case IDs", processedCaseIdsToSkip.size());
         log.info("WaTaskCreationCronForExpiredBfActions completed execution");
     }
 

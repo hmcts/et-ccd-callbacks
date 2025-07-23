@@ -7,6 +7,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.BFActionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.BFActionType;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -14,6 +15,7 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_ACAS;
 
 public class BFHelperTest {
@@ -71,4 +73,35 @@ public class BFHelperTest {
         return new ArrayList<>(Collections.singletonList(bfActionTypeItem));
     }
 
+    @Test
+    void updateWaTaskCreationTrackerSetsIsWaTaskCreatedToYesForExpiredBfActions() {
+        bfActionTypeItemList.getFirst().getValue().setBfDate(LocalDate.now().minusDays(2).toString());
+        bfActionTypeItemList.getFirst().getValue().setIsWaTaskCreated(null);
+        caseData.setBfActions(bfActionTypeItemList);
+        BFHelper.updateWaTaskCreationTrackerOfBfActionItems(caseData);
+        assertEquals("Yes", caseData.getBfActions().get(0).getValue().getIsWaTaskCreated());
+    }
+
+    @Test
+    void updateWaTaskCreationTrackerDoesNotChangeIsWaTaskCreatedForNonExpiredBfActions() {
+        bfActionTypeItemList.getFirst().getValue().setBfDate(LocalDate.now().plusDays(1).toString());
+        bfActionTypeItemList.getFirst().getValue().setIsWaTaskCreated(null);
+        caseData.setBfActions(bfActionTypeItemList);
+        BFHelper.updateWaTaskCreationTrackerOfBfActionItems(caseData);
+        assertNull(caseData.getBfActions().get(0).getValue().getIsWaTaskCreated());
+    }
+
+    @Test
+    void updateWaTaskCreationTrackerHandlesNullBfActionsGracefully() {
+        caseData.setBfActions(null);
+        BFHelper.updateWaTaskCreationTrackerOfBfActionItems(caseData);
+        assertNull(caseData.getBfActions());
+    }
+
+    @Test
+    void updateWaTaskCreationTrackerHandlesEmptyBfActionsListGracefully() {
+        caseData.setBfActions(Collections.emptyList());
+        BFHelper.updateWaTaskCreationTrackerOfBfActionItems(caseData);
+        assertEquals(0, caseData.getBfActions().size());
+    }
 }

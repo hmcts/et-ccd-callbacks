@@ -84,7 +84,7 @@ public final class BFHelper {
 
     public static void updateWaTaskCreationTrackerOfBfActionItems(CaseData caseData) {
         String yesterday = UtilHelper.formatCurrentDate2(LocalDate.now().minusDays(1));
-        if (caseData.getBfActions() == null || caseData.getBfActions().isEmpty()) {
+        if (CollectionUtils.isEmpty(caseData.getBfActions())) {
             log.info("No BF Actions found for case reference {}. No updates made to WA task creation tracker.",
                     caseData.getEthosCaseReference());
             return;

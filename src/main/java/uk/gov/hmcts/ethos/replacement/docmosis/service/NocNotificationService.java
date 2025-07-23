@@ -31,7 +31,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantN
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isRepresentedClaimantWithMyHmctsCase;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper.buildPersonalisationWithPartyName;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper.buildRespondentPersonalisation;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper.buildNoCPersonalisation;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper.getRespondentAndRepEmailAddresses;
 
 /**
@@ -85,7 +85,7 @@ public class NocNotificationService {
         sendTribunalEmail(caseDataPrevious);
     }
 
-    public void handleClaimantNocEmails(CaseDetails caseDetailsNew, String partyName) {
+    private void handleClaimantNocEmails(CaseDetails caseDetailsNew, String partyName) {
         CaseData caseDataNew = caseDetailsNew.getCaseData();
 
         // send respondent or respondent solicitor noc change email
@@ -110,12 +110,12 @@ public class NocNotificationService {
             return;
         }
 
-        Map<String, String> personalisation = buildRespondentPersonalisation(caseDetailsNew, partyName);
+        Map<String, String> personalisation = buildNoCPersonalisation(caseDetailsNew, partyName);
         personalisation.put(LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseDetailsNew.getCaseId()));
         emailService.sendEmail(claimantRepAssignedTemplateId, claimantEmail, personalisation);
     }
 
-    public void handleRespondentNocEmails(CaseDetails caseDetailsPrevious,
+    private void handleRespondentNocEmails(CaseDetails caseDetailsPrevious,
                                           CaseDetails caseDetailsNew,
                                           ChangeOrganisationRequest changeRequest) {
 
@@ -137,12 +137,12 @@ public class NocNotificationService {
             return;
         }
 
-        Map<String, String> personalisation = buildRespondentPersonalisation(caseDetailsPrevious,
+        Map<String, String> personalisation = buildNoCPersonalisation(caseDetailsPrevious,
                 respondent.getRespondentName());
         emailService.sendEmail(respondentTemplateId, respondentEmail, personalisation);
     }
 
-    public void handleOrganisationNocEmails(CaseData caseDataPrevious,
+    private void handleOrganisationNocEmails(CaseData caseDataPrevious,
                                             CaseDetails caseDetailsNew,
                                             ChangeOrganisationRequest changeRequest,
                                             String partyName,

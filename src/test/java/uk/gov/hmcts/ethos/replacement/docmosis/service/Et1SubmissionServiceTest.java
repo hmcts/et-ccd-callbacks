@@ -1,5 +1,9 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import lombok.SneakyThrows;
+import net.bytebuddy.utility.RandomString;
+import org.apache.commons.lang3.RandomUtils;
+import org.joda.time.LocalDate;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -11,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
+import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.configuration.PostcodeToOfficeMappings;
 import uk.gov.hmcts.ecm.common.service.JurisdictionCodesMapperService;
 import uk.gov.hmcts.ecm.common.service.PostcodeToOfficeService;
@@ -19,6 +24,7 @@ import uk.gov.hmcts.ecm.common.service.pdf.PdfService;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
+import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.CaseDefaultValuesConfiguration;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.TribunalOfficesConfiguration;
@@ -30,12 +36,14 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.UploadedDocumentBuilder;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
-import java.net.URISyntaxException;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -43,6 +51,7 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.ENGLISH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
@@ -82,6 +91,8 @@ class Et1SubmissionServiceTest {
     private ET1PdfMapperService et1PdfMapperService;
     @MockBean
     private FeatureToggleService featureToggleService;
+    @MockBean
+    private CcdClient ccdClient;
 
     private Et1SubmissionService et1SubmissionService;
     private CaseDetails caseDetails;
@@ -99,7 +110,7 @@ class Et1SubmissionServiceTest {
         TribunalOfficesService tribunalOfficesService = new TribunalOfficesService(new TribunalOfficesConfiguration(),
                 postcodeToOfficeService);
         et1SubmissionService = new Et1SubmissionService(acasService, documentManagementService,
-                pdfService, tornadoService, userIdamService, emailService, featureToggleService);
+                pdfService, tornadoService, userIdamService, emailService, featureToggleService, ccdClient);
         et1ReppedService = new Et1ReppedService(authTokenGenerator, ccdCaseAssignment,
                 jurisdictionCodesMapperService, organisationClient, postcodeToOfficeService, tribunalOfficesService,
                 userIdamService, adminUserService, et1SubmissionService);
@@ -112,7 +123,8 @@ class Et1SubmissionServiceTest {
     }
 
     @Test
-    void createAndUploadEt1DocsMyHmcts() throws Exception {
+    @SneakyThrows
+    void createAndUploadEt1DocsMyHmcts() {
         caseDetails =  generateCaseDetails("et1ReppedDraftStillWorking.json");
         Et1ReppedHelper.setEt1SubmitData(caseDetails.getCaseData());
         et1ReppedService.addDefaultData(caseDetails.getCaseTypeId(), caseDetails.getCaseData());
@@ -147,7 +159,8 @@ class Et1SubmissionServiceTest {
     }
 
     @Test
-    void shouldAddDocsIfAcasCertThrowsError() throws Exception {
+    @SneakyThrows
+    void shouldAddDocsIfAcasCertThrowsError() {
         caseDetails =  generateCaseDetails("et1ReppedDraftStillWorking.json");
         caseDetails.getCaseData().setRespondentAcasNumber("123456");
         Et1ReppedHelper.setEt1SubmitData(caseDetails.getCaseData());
@@ -171,7 +184,8 @@ class Et1SubmissionServiceTest {
     }
 
     @Test
-    void shouldSendEmailMyHmcts() throws URISyntaxException, IOException {
+    @SneakyThrows
+    void shouldSendEmailMyHmcts() {
         when(userIdamService.getUserDetails("authToken")).thenReturn(HelperTest.getUserDetails());
         caseDetails =  generateCaseDetails("et1ReppedDraftStillWorking.json");
         Et1ReppedHelper.setEt1SubmitData(caseDetails.getCaseData());
@@ -180,7 +194,8 @@ class Et1SubmissionServiceTest {
     }
 
     @Test
-    void createAndUploadEt1DocsEt1() throws Exception {
+    @SneakyThrows
+    void createAndUploadEt1DocsEt1() {
         caseDetails =  generateCaseDetails("citizenCaseData.json");
         DocumentInfo documentInfo = DocumentInfo.builder()
                 .description("ET1 - John Doe")
@@ -208,8 +223,9 @@ class Et1SubmissionServiceTest {
     }
 
     @ParameterizedTest
+    @SneakyThrows
     @MethodSource("shouldSendEmailClaimantArguments")
-    void shouldSendEmailClaimant(String languagePreference) throws URISyntaxException, IOException {
+    void shouldSendEmailClaimant(String languagePreference) {
         when(userIdamService.getUserDetails("authToken")).thenReturn(HelperTest.getUserDetails());
         caseDetails =  generateCaseDetails("citizenCaseData.json");
         caseDetails.getCaseData().getClaimantHearingPreference().setContactLanguage(languagePreference);
@@ -225,7 +241,8 @@ class Et1SubmissionServiceTest {
     }
 
     @Test
-    void shouldNotAddAcasDocsIfNewLogicIsEnabled() throws Exception {
+    @SneakyThrows
+    void shouldNotAddAcasDocsIfNewLogicIsEnabled() {
         when(featureToggleService.isAcasCertificatePostSubmissionEnabled()).thenReturn(true);
         caseDetails =  generateCaseDetails("citizenCaseData.json");
         DocumentInfo documentInfo = DocumentInfo.builder()
@@ -245,5 +262,52 @@ class Et1SubmissionServiceTest {
         assertEquals(2, caseDetails.getCaseData().getDocumentCollection().size());
         assertEquals(YES, caseDetails.getCaseData().getAcasCertificateRequired());
         verify(acasService, times(0)).getAcasCertificates(any(), anyList(), anyString(), anyString());
+    }
+
+    @SneakyThrows
+    @Test
+    void shouldNotAddVexationNotes() {
+        caseDetails = generateCaseDetails("citizenCaseData.json");
+        when(ccdClient.buildAndGetElasticSearchRequest(anyString(), anyString(), anyString()))
+            .thenReturn(Collections.emptyList());
+        et1SubmissionService.vexationCheck(caseDetails, "authToken");
+        assertNull(caseDetails.getCaseData().getCaseNotes());
+        assertNull(caseDetails.getCaseData().getAdditionalCaseInfoType());
+    }
+
+    @SneakyThrows
+    @Test
+    void shouldAddVexationNotes() {
+        caseDetails = generateCaseDetails("citizenCaseData.json");
+        // CCD client will be called twice to return 4 cases which will trigger adding vexation notes
+        when(ccdClient.buildAndGetElasticSearchRequest(anyString(), anyString(), anyString()))
+            .thenReturn(createSubmitEventList());
+        et1SubmissionService.vexationCheck(caseDetails, "authToken");
+        assertEquals(YES, caseDetails.getCaseData().getAdditionalCaseInfoType().getInterventionRequired());
+        assertTrue(caseDetails.getCaseData().getFlagsImageAltText().contains("SPEAK TO REJ"));
+    }
+
+    private List<SubmitEvent> createSubmitEventList() {
+        SubmitEvent submitEvent = new SubmitEvent();
+        submitEvent.setState(SUBMITTED_STATE);
+        CaseData caseData = new CaseData();
+        caseData.setClaimant("Michael Jackson");
+        caseData.setRespondent(RandomString.make(10));
+        caseData.setReceiptDate(LocalDate.now().minusDays(RandomUtils.secure().randomInt(10, 90)).toString());
+        caseData.setEthosCaseReference("6000010/2025");
+        submitEvent.setCaseData(caseData);
+        // Returns a list of 2 cases
+        return List.of(submitEvent, submitEvent);
+    }
+
+    @SneakyThrows
+    @Test
+    void shouldNotAddVexationNotesIfCcdThrowsAnError() {
+        caseDetails = generateCaseDetails("citizenCaseData.json");
+        when(ccdClient.buildAndGetElasticSearchRequest(anyString(), anyString(), anyString()))
+            .thenThrow(new IOException("CCD error"));
+        et1SubmissionService.vexationCheck(caseDetails, "authToken");
+        assertNull(caseDetails.getCaseData().getCaseNotes());
+        assertNull(caseDetails.getCaseData().getAdditionalCaseInfoType());
     }
 }

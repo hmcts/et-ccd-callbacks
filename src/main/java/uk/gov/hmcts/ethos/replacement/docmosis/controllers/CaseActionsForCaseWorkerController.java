@@ -282,6 +282,7 @@ public class CaseActionsForCaseWorkerController {
                 caseDetails.setCaseData(caseData);
                 et1SubmissionService.createAndUploadEt1Docs(caseDetails, userToken);
                 et1SubmissionService.sendEt1ConfirmationClaimant(caseDetails, userToken);
+                et1SubmissionService.vexationCheck(caseDetails, userToken);
             }
         }
 

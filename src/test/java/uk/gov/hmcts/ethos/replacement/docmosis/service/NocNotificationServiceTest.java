@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -8,11 +10,15 @@ import org.mockito.Mock;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.RetrieveOrgByIdResponse;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -221,5 +227,64 @@ class NocNotificationServiceTest {
 
         // the email will only be sent to the current user
         verify(emailService, times(1)).sendEmail(any(), any(), any());
+    }
+
+    @Test
+    void sendNotificationsShouldSendClaimantRepNoCEmails() {
+        RetrieveOrgByIdResponse.SuperUser oldSuperUser = RetrieveOrgByIdResponse.SuperUser.builder()
+                .email(OLD_ORG_ADMIN_EMAIL).build();
+        RetrieveOrgByIdResponse retrieveOrgByIdResponse1 = RetrieveOrgByIdResponse.builder()
+                .superUser(oldSuperUser).build();
+        when(organisationClient.getOrganisationById(anyString(), anyString(), eq(OLD_ORG_ID)))
+                .thenReturn(ResponseEntity.ok(retrieveOrgByIdResponse1));
+
+        RetrieveOrgByIdResponse.SuperUser newSuperUser = RetrieveOrgByIdResponse.SuperUser.builder()
+                .email(NEW_ORG_ADMIN_EMAIL).build();
+        RetrieveOrgByIdResponse retrieveOrgByIdResponse2 = RetrieveOrgByIdResponse.builder()
+                .superUser(newSuperUser).build();
+        when(organisationClient.getOrganisationById(anyString(), anyString(), eq(NEW_ORG_ID)))
+                .thenReturn(ResponseEntity.ok(retrieveOrgByIdResponse2));
+
+        // Set up caseRoleId to trigger claimant NOC logic
+        DynamicFixedListType caseRoleId = new DynamicFixedListType();
+        DynamicValueType dynamicValueType = new DynamicValueType();
+        dynamicValueType.setCode(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
+        caseRoleId.setValue(dynamicValueType);
+        caseDetailsBefore.getCaseData().getChangeOrganisationRequestField().setCaseRoleId(caseRoleId);
+
+        // Mock respondent email
+        RespondentSumType respondentSumType = new RespondentSumType();
+        respondentSumType.setRespondentName("Respondent");
+        respondentSumType.setRespondentEmail("respondent@unrepresented.com");
+        when(nocRespondentHelper.getRespondent(any(), any())).thenReturn(respondentSumType);
+
+        List<RespondentSumTypeItem> respondentCollection = new ArrayList<>();
+        RespondentSumTypeItem respondentItem = new RespondentSumTypeItem();
+        respondentItem.setId("123");
+        respondentItem.setValue(respondentSumType);
+        respondentCollection.add(respondentItem);
+
+        caseDetailsBefore.getCaseData().setRespondentCollection(respondentCollection);
+        caseDetailsNew.getCaseData().setRespondentCollection(respondentCollection);
+
+        caseDetailsBefore.getCaseData().setTribunalCorrespondenceEmail("tribunal@email.com");
+
+        // Mock emailService links
+        when(emailService.getSyrCaseLink(anyString(), anyString())).thenReturn("syrLink");
+        when(emailService.getExuiCaseLink(anyString())).thenReturn("exuiLink");
+        when(emailService.getCitizenCaseLink(any())).thenReturn("citizenLink");
+
+        nocNotificationService.sendNotificationOfChangeEmails(
+                caseDetailsBefore,
+                caseDetailsNew,
+                caseDetailsBefore.getCaseData().getChangeOrganisationRequestField(),
+                "test@test.com");
+
+        // Respondent email notification
+        verify(emailService, times(1)).sendEmail(any(), eq("respondent@unrepresented.com"), any());
+        // Claimant email notification
+        verify(emailService, times(1)).sendEmail(any(), eq("claimant@unrepresented.com"), any());
+        // Tribunal email notification
+        verify(emailService, times(1)).sendEmail(any(), eq("tribunal@email.com"), any());
     }
 }

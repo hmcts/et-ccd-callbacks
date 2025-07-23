@@ -1,0 +1,18 @@
+[
+  {
+    "CaseTypeID": "ET_Admin",
+    "ID": "Open",
+    "Name": "Open",
+    "Description": "Open",
+    "DisplayOrder": 1,
+    "TitleDisplay": "# ECM Admin"
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "ID": "Open",
+    "Name": "Open",
+    "Description": "Open",
+    "DisplayOrder": 1,
+    "TitleDisplay": "# Case Number: ${caseNumber}"
+  }
+]

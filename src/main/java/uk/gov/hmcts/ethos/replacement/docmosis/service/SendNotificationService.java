@@ -9,27 +9,30 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
+import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
-import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
-
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
@@ -63,6 +66,9 @@ public class SendNotificationService {
     private final HearingSelectionService hearingSelectionService;
     private final EmailService emailService;
     private final FeatureToggleService featureToggleService;
+    private final CaseAccessService caseAccessService;
+    private final AdminUserService adminUserService;
+
     private static final String EMAIL_ADDRESS = "emailAddress";
     @Value("${template.claimantSendNotification}")
     private String claimantSendNotificationTemplateId;
@@ -226,6 +232,7 @@ public class SendNotificationService {
 
         // Send notification to the claimant
         String caseId = caseDetails.getCaseId();
+        List<CaseUserAssignment> caseUserAssignments = caseAccessService.getCaseUserAssignmentsById(caseId);
         if (!RESPONDENT_ONLY.equals(caseData.getSendNotificationNotify())) {
             // If represented, send notification to claimant representative Only
             Map<String, String> personalisation;
@@ -235,8 +242,13 @@ public class SendNotificationService {
                 personalisation.put(LINK_TO_EXUI, emailService.getClaimantRepExuiCaseNotificationsLink(
                         caseDetails.getCaseId()));
                 if (!isNullOrEmpty(personalisation.get(EMAIL_ADDRESS))) {
-                    emailService.sendEmail(claimantRepSendNotificationTemplateId, personalisation.get(EMAIL_ADDRESS),
-                            personalisation);
+                    // with shared case there's going to be multiple claimant representatives
+                    getCaseClaimantSolicitorEmails(caseUserAssignments).stream()
+                            .filter(email -> email != null && !email.isEmpty())
+                            .forEach(email -> emailService.sendEmail(
+                                    respondentSendNotificationTemplateId,
+                                    email,
+                                    personalisation));
                 }
             } else {
                 // If not represented, send notification to the claimant
@@ -254,7 +266,7 @@ public class SendNotificationService {
             Map<String, String> personalisation = buildPersonalisation(caseDetails,
                     emailService.getExuiCaseLink(caseId));
             List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
-            respondents.forEach(obj -> sendRespondentEmailHearingOther(caseData, personalisation, obj.getValue()));
+            sendRespondentEmailHearingOther(caseData, personalisation, respondents, caseUserAssignments);
         }
     }
 
@@ -263,6 +275,28 @@ public class SendNotificationService {
                 .stream()
                 .filter(s -> s.getId().equals(caseData.getSelectNotificationDropdown().getSelectedCode()))
                 .findFirst();
+    }
+
+    private List<String> getCaseClaimantSolicitorEmails(List<CaseUserAssignment> assignments) {
+        List<String> emailAddresses = new ArrayList<>();
+        for (CaseUserAssignment assignment : assignments) {
+            if (ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel().equals(assignment.getCaseRole())) {
+                UserDetails userDetails = adminUserService.getUserDetails(assignment.getUserId());
+                emailAddresses.add(userDetails.getEmail());
+            }
+        }
+        return emailAddresses;
+    }
+
+    private List<String> getRespondentSolicitorEmails(List<CaseUserAssignment> assignments) {
+        List<String> emailAddresses = new ArrayList<>();
+        for (CaseUserAssignment assignment : assignments) {
+            if (SolicitorRole.from(assignment.getCaseRole()).isPresent()) {
+                UserDetails userDetails = adminUserService.getUserDetails(assignment.getUserId());
+                emailAddresses.add(userDetails.getEmail());
+            }
+        }
+        return emailAddresses;
     }
 
     private String getSendNotificationSingleDocumentMarkdown(DocumentType uploadedDocumentType) {
@@ -307,12 +341,22 @@ public class SendNotificationService {
     }
 
     private void sendRespondentEmailHearingOther(CaseData caseData, Map<String, String> emailData,
-                                                 RespondentSumType respondent) {
-        String respondentEmail = NotificationHelper.getEmailAddressForRespondent(caseData, respondent);
-        if (isNullOrEmpty(respondentEmail)) {
-            return;
-        }
-        emailService.sendEmail(respondentSendNotificationTemplateId, respondentEmail, emailData);
+                                                 List<RespondentSumTypeItem> respondents,
+                                                 List<CaseUserAssignment> assignments) {
+
+        Set<String> emails = new HashSet<>();
+        respondents.stream()
+                .map(respondent ->
+                        NotificationHelper.getEmailAddressForRespondent(caseData, respondent.getValue()))
+                .filter(email -> email != null && !email.isEmpty())
+                .forEach(emails::add);
+
+        getRespondentSolicitorEmails(assignments).stream()
+                .filter(email -> email != null && !email.isEmpty())
+                .forEach(emails::add);
+
+        emails.forEach(email ->
+                emailService.sendEmail(respondentSendNotificationTemplateId, email, emailData));
     }
 
     private Map<String, String> buildPersonalisation(CaseDetails caseDetails, String envUrl) {

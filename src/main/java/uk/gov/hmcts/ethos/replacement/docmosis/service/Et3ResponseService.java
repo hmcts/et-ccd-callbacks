@@ -2,29 +2,50 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
+import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxService;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.RESPONSE_TO_A_CLAIM;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_CASE_DATA_NOT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_CASE_ROLES_NOT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_INVALID_CASE_ID;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_INVALID_USER_TOKEN;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_NO_REPRESENTED_RESPONDENT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_USER_ID_NOT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_USER_NOT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ET3_ATTACHMENT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ET3_CATEGORY_ID;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.SHORT_DESCRIPTION;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.SYSTEM_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.DATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
@@ -39,12 +60,11 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceC
 @RequiredArgsConstructor
 public class Et3ResponseService {
 
-    public static final String ET3_ATTACHMENT = "ET3 Attachment";
-    public static final String SHORT_DESCRIPTION = "Attached document submitted with a Response";
-    public static final String ET3_CATEGORY_ID = "C18";
     private final DocumentManagementService documentManagementService;
     private final PdfBoxService pdfBoxService;
     private final EmailService emailService;
+    private final UserIdamService userIdamService;
+    private final CcdCaseAssignment ccdCaseAssignment;
 
     @Value("${template.et3Response.tribunal}")
     private String et3EmailTribunalTemplateId;
@@ -184,5 +204,214 @@ public class Et3ResponseService {
         return caseData.getRespondentCollection().stream()
             .map(o -> o.getValue().getRespondentName())
             .collect(Collectors.joining(", "));
+    }
+
+    /**
+     * Validates and extracts the representative's contact information from the case data.
+     * <p>
+     * This method retrieves the list of indexes corresponding to respondents that are represented
+     * by a legal representative in a given case. It then uses the index of the first represented
+     * respondent to extract and set the representative's phone number and address into the
+     * {@link CaseData} object.
+     * </p>
+     *
+     * <p>
+     * If no represented respondent is found, or if an error occurs while retrieving
+     * the respondent indexes, a {@link GenericServiceException} is thrown.
+     * </p>
+     *
+     * @param userToken the user's authentication token used for making downstream service calls
+     * @param caseData the case data object containing information about the case and respondents
+     * @throws GenericServiceException if an error occurs while retrieving represented respondent indexes,
+     *         or if no represented respondent is found in the case data
+     */
+    public void validateAndExtractRepresentativeContact(String userToken, CaseData caseData)
+            throws GenericServiceException {
+        List<Integer> representedRespondentIndexes;
+        try {
+            representedRespondentIndexes = getRepresentedRespondentIndexes(userToken, caseData.getCcdID());
+        } catch (GenericServiceException gse) {
+            throw new GenericServiceException(gse.getMessage(),
+                    new Exception(gse),
+                    gse.getMessage(),
+                    caseData.getCcdID(),
+                    "Et3ResponseService",
+                    "validateAndExtractRepresentativeContact");
+        }
+        if (CollectionUtils.isEmpty(representedRespondentIndexes) || representedRespondentIndexes.getFirst() == null) {
+            throw new GenericServiceException(ERROR_NO_REPRESENTED_RESPONDENT_FOUND,
+                    new Exception(ERROR_NO_REPRESENTED_RESPONDENT_FOUND),
+                    ERROR_NO_REPRESENTED_RESPONDENT_FOUND,
+                    caseData.getCcdID(),
+                    "Et3ResponseService",
+                    "validateAndExtractRepresentativeContact");
+        }
+        RepresentedTypeR representedTypeR = caseData.getRepCollection()
+                .get(representedRespondentIndexes.get(representedRespondentIndexes.getFirst())).getValue();
+        caseData.setEt3ResponsePhone(representedTypeR.getRepresentativePhoneNumber());
+        caseData.setEt3ResponseAddress(representedTypeR.getRepresentativeAddress());
+    }
+
+    /**
+     * Determines whether the currently authenticated user, identified by the given token, is
+     * a representative (solicitor) for any respondent in the specified case.
+     * <p>
+     * This method performs the following steps:
+     * <ul>
+     *     <li>Validates the provided user token and case ID.</li>
+     *     <li>Retrieves user details using the user token. Throws an exception if the user is not found or
+     *     lacks a UID.</li>
+     *     <li>Fetches the case user role assignments for the given case.</li>
+     *     <li>Parses solicitor roles from the case user roles and collects their indices.</li>
+     * </ul>
+     *
+     * @param userToken the authentication token of the user
+     * @param caseId the ID of the case to check roles against
+     * @return a list of integer indices indicating which respondents the user represents
+     * @throws GenericServiceException if the user or required data (e.g., user details, case roles)
+     *         cannot be found or parsed
+     */
+    public List<Integer> getRepresentedRespondentIndexes(String userToken, String caseId)
+            throws GenericServiceException {
+        checkUserTokenAndCaseid(userToken, caseId);
+        UserDetails userDetails = userIdamService.getUserDetails(userToken);
+        if (ObjectUtils.isEmpty(userDetails)) {
+            throw new GenericServiceException(ERROR_USER_NOT_FOUND,
+                    new Exception(ERROR_USER_NOT_FOUND),
+                    ERROR_USER_NOT_FOUND,
+                    caseId,
+                    "Et3ResponseService",
+                    "getRepresentedRespondentIndexes");
+        }
+        if (StringUtils.isBlank(userDetails.getUid())) {
+            throw new GenericServiceException(ERROR_USER_ID_NOT_FOUND,
+                    new Exception(ERROR_USER_ID_NOT_FOUND),
+                    ERROR_USER_ID_NOT_FOUND,
+                    caseId,
+                    "Et3ResponseService",
+                    "getRepresentedRespondentIndexes");
+        }
+        CaseUserAssignmentData caseUserAssignmentData;
+        try {
+            caseUserAssignmentData = ccdCaseAssignment.getCaseUserRoles(caseId);
+        } catch (IOException ioe) {
+            throw new GenericServiceException(SYSTEM_ERROR,
+                    new Exception(ioe),
+                    ioe.getMessage(),
+                    caseId,
+                    "Et3ResponseService",
+                    "getRepresentedRespondentIndexes");
+        }
+        if (ObjectUtils.isEmpty(caseUserAssignmentData)) {
+            throw new GenericServiceException(ERROR_CASE_ROLES_NOT_FOUND,
+                    new Exception(ERROR_CASE_ROLES_NOT_FOUND),
+                    ERROR_CASE_ROLES_NOT_FOUND,
+                    caseId, "Et3ResponseService",
+                    "getRepresentedRespondentIndexes");
+        }
+        List<Integer> solicitorIndexList = new ArrayList<>();
+        for (CaseUserAssignment caseUserAssignment : caseUserAssignmentData.getCaseUserAssignments()) {
+            if (userDetails.getUid().equals(caseUserAssignment.getUserId())) {
+                SolicitorRole solicitorRole = SolicitorRole.from(caseUserAssignment.getCaseRole()).orElseThrow();
+                solicitorIndexList.add(solicitorRole.getIndex());
+            }
+        }
+        return solicitorIndexList;
+    }
+
+    private static void checkUserTokenAndCaseid(String userToken, String caseId) throws GenericServiceException {
+        if (StringUtils.isBlank(userToken)) {
+            throw new GenericServiceException(ERROR_INVALID_USER_TOKEN,
+                    new Exception(ERROR_INVALID_USER_TOKEN),
+                    ERROR_INVALID_USER_TOKEN,
+                    caseId,
+                    "Et3ResponseService",
+                    "checkUserTokenAndCaseid");
+        }
+        if (StringUtils.isBlank(caseId)) {
+            throw new GenericServiceException(ERROR_INVALID_CASE_ID,
+                    new Exception(ERROR_INVALID_CASE_ID),
+                    ERROR_INVALID_CASE_ID,
+                    caseId,
+                    "Et3ResponseService",
+                    "checkUserTokenAndCaseid");
+        }
+    }
+
+    /**
+     * Updates the contact details (phone number and address) of all represented respondents
+     * in the case with values from the ET3 response section of the {@link CaseData}.
+     * <p>
+     * This method validates the input data and token, retrieves the list of represented
+     * respondent indexes, and for each valid representative entry, updates their contact
+     * details using the ET3 response phone number and address.
+     * </p>
+     * <p>
+     * Throws a {@link GenericServiceException} if:
+     * <ul>
+     *   <li>Case data is null or invalid</li>
+     *   <li>User token is blank</li>
+     *   <li>Represented respondent indexes cannot be retrieved</li>
+     *   <li>No represented respondents are found</li>
+     * </ul>
+     * </p>
+     *
+     * @param userToken the authentication token used to fetch respondent indexes
+     * @param caseData the case data containing respondent and representative information
+     * @throws GenericServiceException if validation fails, no representatives are found,
+     *         or a service error occurs during index retrieval
+     */
+    public void setRespondentRepresentsContactDetails(String userToken, CaseData caseData)
+            throws GenericServiceException {
+        if (ObjectUtils.isEmpty(caseData)) {
+            throw new GenericServiceException(ERROR_CASE_DATA_NOT_FOUND,
+                    new Exception(ERROR_CASE_DATA_NOT_FOUND),
+                    ERROR_CASE_DATA_NOT_FOUND,
+                    StringUtils.EMPTY,
+                    "Et3ResponseService",
+                    "setRespondentRepresentsContactDetails");
+        }
+        if (StringUtils.isBlank(userToken)) {
+            throw new GenericServiceException(ERROR_INVALID_USER_TOKEN,
+                    new Exception(ERROR_INVALID_USER_TOKEN),
+                    ERROR_INVALID_USER_TOKEN,
+                    caseData.getCcdID(),
+                    "Et3ResponseService",
+                    "setRespondentRepresentsContactDetails");
+        }
+        List<Integer> representedRespondentIndexes;
+        try {
+            representedRespondentIndexes = getRepresentedRespondentIndexes(userToken, caseData.getCcdID());
+        } catch (GenericServiceException gex) {
+            throw new GenericServiceException(gex.getMessage(),
+                    new Exception(gex),
+                    gex.getMessage(),
+                    caseData.getCcdID(),
+                    "Et3ResponseService",
+                    "setRespondentRepresentsContactDetails");
+        } catch (NoSuchElementException nse) {
+            throw new GenericServiceException(SYSTEM_ERROR,
+                    new Exception(nse),
+                    nse.getMessage(),
+                    caseData.getCcdID(),
+                    "Et3ResponseService",
+                    "setRespondentRepresentsContactDetails");
+        }
+        if (representedRespondentIndexes.isEmpty() || CollectionUtils.isEmpty(caseData.getRepCollection())) {
+            throw new GenericServiceException(ERROR_NO_REPRESENTED_RESPONDENT_FOUND,
+                    new Exception(ERROR_NO_REPRESENTED_RESPONDENT_FOUND),
+                    ERROR_NO_REPRESENTED_RESPONDENT_FOUND,
+                    caseData.getCcdID(),
+                    "Et3ResponseService",
+                    "setRespondentRepresentsContactDetails");
+        }
+        for (int i : representedRespondentIndexes) {
+            if (ObjectUtils.isEmpty(caseData.getRepCollection().get(i))
+                    || ObjectUtils.isEmpty(caseData.getRepCollection().get(i).getValue())) {
+                continue;
+            }
+            caseData.getRepCollection().get(i).getValue().setRepresentativePhoneNumber(caseData.getEt3ResponsePhone());
+            caseData.getRepCollection().get(i).getValue().setRepresentativeAddress(caseData.getEt3ResponseAddress());
+        }
     }
 }

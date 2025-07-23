@@ -70,6 +70,10 @@ public class FeatureToggleService {
         return this.featureToggleApi.isFeatureEnabled("noticeOfChangeFields");
     }
 
+    public boolean isWaTaskForExpiredBfActionsEnabled() {
+        return this.featureToggleApi.isFeatureEnabled("waTaskExpieredBfActions");
+    }
+
     public boolean isPartySpacingCronEnabled() {
         return this.featureToggleApi.isFeatureEnabled("party-spacing-cron");
     }

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
+import com.nimbusds.oauth2.sdk.util.CollectionUtils;
 import lombok.extern.slf4j.Slf4j;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -76,11 +77,31 @@ public final class BFHelper {
             bfActionType.setAction(dynamicFixedListType);
             bfActionTypeItem.setId(UUID.randomUUID().toString());
             bfActionTypeItem.setValue(bfActionType);
-
             bfActionTypeItemListAux = new ArrayList<>(Collections.singletonList(bfActionTypeItem));
-
         }
 
         caseData.setBfActions(bfActionTypeItemListAux);
+    }
+
+    public static void updateWaTaskCreationTrackerOfBfActionItems(CaseData caseData) {
+        String yesterday = UtilHelper.formatCurrentDate2(LocalDate.now().minusDays(1));
+        if (CollectionUtils.isEmpty(caseData.getBfActions())) {
+            log.info("No BF Actions found for case reference {}. No updates made to WA task creation tracker.",
+                    caseData.getEthosCaseReference());
+            return;
+        }
+
+        List<BFActionTypeItem> expiredBfActions = caseData.getBfActions().stream()
+                .filter(item -> LocalDate.parse(item.getValue().getBfDate()).isBefore(
+                        LocalDate.parse(yesterday))).toList();
+        if (!expiredBfActions.isEmpty()) {
+            log.info("Updating WA task creation tracker for {} expired BF Actions for case reference {}",
+                    expiredBfActions.size(), caseData.getEthosCaseReference());
+            expiredBfActions.forEach(bfActionTypeItem -> {
+                if (bfActionTypeItem.getValue().getIsWaTaskCreated() == null) {
+                    bfActionTypeItem.getValue().setIsWaTaskCreated("Yes");
+                }
+            });
+        }
     }
 }

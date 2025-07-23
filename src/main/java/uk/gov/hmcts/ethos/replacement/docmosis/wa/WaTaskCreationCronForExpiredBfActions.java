@@ -80,22 +80,11 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
         // Determine the effective "yesterday" based on the current day of the week
         LocalDate today = LocalDate.now();
         DayOfWeek dayOfWeek = today.getDayOfWeek();
-        LocalDate effectiveYesterday;
-
-        switch (dayOfWeek) {
-            case DayOfWeek.MONDAY -> {
-                // If today is Monday, go back to Friday
-                effectiveYesterday = today.minusDays(3);
-            }
-            case DayOfWeek.SUNDAY -> {
-                // If today is Sunday, go back to Friday as well
-                effectiveYesterday = today.minusDays(2);
-            }
-            default -> {
-                // Regular yesterday
-                effectiveYesterday = today.minusDays(1);
-            }
-        }
+        LocalDate effectiveYesterday = switch (dayOfWeek) {
+            case MONDAY -> today.minusDays(3); // If today is Monday, go back to Friday
+            case SUNDAY -> today.minusDays(2); // If today is Sunday, go back to Friday as well
+            default -> today.minusDays(1);     // Regular yesterday
+        };```
 
         return UtilHelper.formatCurrentDate2(effectiveYesterday);
     }

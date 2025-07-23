@@ -117,7 +117,6 @@ withPipeline(type, product, component) {
     env.IMPORT_PREVIEW=true
     env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
     env.SERVICE_AUTH_PROVIDER_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
-
     env.ET_COS_URL = "https://et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.FT_SYA_URL = "https://et-sya-api-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net/"
     env.CCD_DATA_STORE_API_URL = "https://ccd-data-store-api-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
@@ -164,6 +163,8 @@ withPipeline(type, product, component) {
 
       stage('Functional UI tests chromium') {
         try {
+          env.ET_COS_PREVIEW_ET_SYA_API = "https://et-sya-api-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+          env.ET_COS_PREVIEW_CCD = "https://ccd-data-store-api-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
           yarnBuilder.yarn('test:functional-chromium')
         } catch (Error) {
           unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())

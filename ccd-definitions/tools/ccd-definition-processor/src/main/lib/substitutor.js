@@ -5,7 +5,7 @@ class Substitutor {
     // Load environment variables from env.json based on ET_ENV
     const etEnv = process.env.ET_ENV || 'local';
     try {
-      const envConfig = require('../../../../../scripts/environment/env.json');
+      const envConfig = require('../../../../../configs/environment/env.json');
       if (envConfig[etEnv]) {
         // Set ET environment variables from the config
         Object.keys(envConfig[etEnv]).forEach(key => {

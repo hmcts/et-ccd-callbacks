@@ -87,7 +87,6 @@ try {
   // Build the Excel file using the CCD definition processor with a jurisdiction-specific template
   const command = `node "${path.join(processorPath, 'bin', 'json2xlsx')}" -D "${jsonPath}" -o "${outputPath}" -t "${templatePath}"${excludeArg}`;
   
-  console.log(`🔧 Running: ${command}`);
   if (excludePatterns.length > 0) {
     console.log(`🚫 Excluding patterns: ${excludePatterns.join(', ')}`);
   }

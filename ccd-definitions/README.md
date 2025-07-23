@@ -529,8 +529,7 @@ node tools/build-package.js admin --env=local
 
 ## 📚 **Available Scripts**
 
-- **Environment Scripts**: `scripts/environment/` - Environment configuration and setup
-- **Deployment Scripts**: `scripts/deployment/` - Deployment automation and utilities
+- **Environment Scripts**: `configs/environment/` - Environment configuration and setup
 - **Build Tools**: `tools/` - Core build and processing utilities
 
 ## 🤝 **Contributing**

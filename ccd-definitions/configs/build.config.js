@@ -7,8 +7,8 @@ module.exports = {
     tools: path.resolve(__dirname, '../tools'),
     processor: path.resolve(__dirname, '../tools/ccd-definition-processor'),
     output: path.resolve(__dirname, '../dist'),
-    scripts: path.resolve(__dirname, '../scripts'),
-    environment: path.resolve(__dirname, '../scripts/environment')
+    scripts: path.resolve(__dirname, '../configs'),
+    environment: path.resolve(__dirname, '../configs/environment')
   },
 
   // Environment-specific configurations

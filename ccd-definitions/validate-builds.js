@@ -5,7 +5,7 @@ const path = require('path');
 const xlsx = require('xlsx');
 
 // Load environment configuration
-const envConfig = require('./scripts/environment/env.json');
+const envConfig = require('./configs/environment/env.json');
 
 // Validation function
 function validateExcelFile(filePath, environment, jurisdiction) {

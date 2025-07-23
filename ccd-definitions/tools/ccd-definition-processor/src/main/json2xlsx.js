@@ -36,8 +36,11 @@ const run = async (args) => {
   const sheetToFragmentsMap = sheetUtils.groupToSheets(paths);
 
   for (const sheetName in sheetToFragmentsMap) {
-    const readSheetData = async (relativeFilePath) => fileUtils.readJson(
-      path.join(args.sheetsDir, relativeFilePath), Substitutor.injectEnvironmentVariables);
+    const readSheetData = async (relativeFilePath) => {
+      console.log(`  - reading sheet data from ${relativeFilePath}`);
+      return fileUtils.readJson(
+        path.join(args.sheetsDir, relativeFilePath), Substitutor.injectEnvironmentVariables);
+    };
 
     const readSheetDataFromFragments = async (rootSheetName, filesFragments) => {
       const jsonFragments = await Promise.all(
@@ -45,7 +48,7 @@ const run = async (args) => {
       return jsonFragments.flat();
     };
 
-    console.log(`  importing sheet data from ${sheetName} ${sheetName.indexOf('.json') === -1 ? 'directory' : 'file'}`);
+    console.log(`  importing ${sheetName}`);
 
     const json = await (sheetToFragmentsMap[sheetName].length === 0 ?
       readSheetData(sheetName) : readSheetDataFromFragments(sheetName, sheetToFragmentsMap[sheetName]));

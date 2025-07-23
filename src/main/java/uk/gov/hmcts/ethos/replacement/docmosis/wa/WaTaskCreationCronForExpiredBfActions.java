@@ -84,7 +84,7 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
             case MONDAY -> today.minusDays(3); // If today is Monday, go back to Friday
             case SUNDAY -> today.minusDays(2); // If today is Sunday, go back to Friday as well
             default -> today.minusDays(1);     // Regular yesterday
-        };```
+        };
 
         return UtilHelper.formatCurrentDate2(effectiveYesterday);
     }

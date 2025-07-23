@@ -18,6 +18,7 @@ import javax.annotation.PostConstruct;
 @SuppressWarnings("HideUtilityClassConstructor") // Spring needs a constructor, this is not a utility class
 @Slf4j
 public class DocmosisApplication implements CommandLineRunner {
+    private static final String TASK_NAME = "TASK_NAME";
 
     @Autowired(required = false)
     ScheduledTaskRunner taskRunner;
@@ -26,15 +27,15 @@ public class DocmosisApplication implements CommandLineRunner {
         final var application = new SpringApplication(DocmosisApplication.class);
         final var instance = application.run(args);
 
-        if (System.getenv("TASK_NAME") != null) {
+        if (System.getenv(TASK_NAME) != null) {
             instance.close();
         }
     }
 
     @Override
     public void run(String... args) {
-        if (System.getenv("TASK_NAME") != null && taskRunner != null) {
-            taskRunner.run(System.getenv("TASK_NAME"));
+        if (System.getenv(TASK_NAME) != null && taskRunner != null) {
+            taskRunner.run(System.getenv(TASK_NAME));
         }
     }
 

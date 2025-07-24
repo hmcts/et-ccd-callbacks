@@ -233,6 +233,7 @@ public class SendNotificationService {
         // Send notification to the claimant
         String caseId = caseDetails.getCaseId();
         List<CaseUserAssignment> caseUserAssignments = caseAccessService.getCaseUserAssignmentsById(caseId);
+        log.info("CaseId: " + caseId + " caseUserAssignments: " + caseUserAssignments);
         if (!RESPONDENT_ONLY.equals(caseData.getSendNotificationNotify())) {
             log.info("sending notification emails for claimant and/or claimant representative");
             // If represented, send notification to claimant representative Only

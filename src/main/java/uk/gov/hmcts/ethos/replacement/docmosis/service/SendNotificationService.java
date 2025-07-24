@@ -241,16 +241,14 @@ public class SendNotificationService {
                 String linkEnv = emailService.getClaimantRepExuiCaseNotificationsLink(
                         caseDetails.getCaseId());
                 personalisation = buildPersonalisation(caseDetails, linkEnv);
-                if (!isNullOrEmpty(personalisation.get(EMAIL_ADDRESS))) {
-                    log.info("Sending emails for claimant and/or claimant representative");
-                    // with shared case there's going to be multiple claimant representatives
-                    getCaseClaimantSolicitorEmails(caseUserAssignments).stream()
-                            .filter(email -> email != null && !email.isEmpty())
-                            .forEach(email -> emailService.sendEmail(
-                                    respondentSendNotificationTemplateId,
-                                    email,
-                                    personalisation));
-                }
+                log.info("Sending emails for claimant and/or claimant representative");
+                // with shared case there's going to be multiple claimant representatives
+                getCaseClaimantSolicitorEmails(caseUserAssignments).stream()
+                        .filter(email -> email != null && !email.isEmpty())
+                        .forEach(email -> emailService.sendEmail(
+                                respondentSendNotificationTemplateId,
+                                email,
+                                personalisation));
             } else {
                 // If not represented, send notification to the claimant
                 String claimantEmailAddress = caseData.getClaimantType().getClaimantEmailAddress();

@@ -8,6 +8,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.BFActionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.BFActionType;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -84,16 +85,15 @@ public final class BFHelper {
     }
 
     public static void updateWaTaskCreationTrackerOfBfActionItems(CaseData caseData) {
-        String yesterday = UtilHelper.formatCurrentDate2(LocalDate.now().minusDays(1));
         if (CollectionUtils.isEmpty(caseData.getBfActions())) {
             log.info("No BF Actions found for case reference {}. No updates made to WA task creation tracker.",
                     caseData.getEthosCaseReference());
             return;
         }
-
+        String yesterday = BFHelper.getEffectiveYesterday();
         List<BFActionTypeItem> expiredBfActions = caseData.getBfActions().stream()
-                .filter(item -> LocalDate.parse(item.getValue().getBfDate()).isBefore(
-                        LocalDate.parse(yesterday))).toList();
+                .filter(item -> !(LocalDate.parse(item.getValue().getBfDate()).isAfter(
+                        LocalDate.parse(yesterday)))).toList();
         if (!expiredBfActions.isEmpty()) {
             log.info("Updating WA task creation tracker for {} expired BF Actions for case reference {}",
                     expiredBfActions.size(), caseData.getEthosCaseReference());
@@ -103,5 +103,18 @@ public final class BFHelper {
                 }
             });
         }
+    }
+
+    public static String getEffectiveYesterday() {
+        // Determine the effective "yesterday" based on the current day of the week
+        LocalDate today = LocalDate.now();
+        DayOfWeek dayOfWeek = today.getDayOfWeek();
+        LocalDate effectiveYesterday = switch (dayOfWeek) {
+            case MONDAY -> today.minusDays(3); // If today is Monday, go back to Friday
+            case SUNDAY -> today.minusDays(2); // If today is Sunday, go back to Friday as well
+            default -> today.minusDays(1);     // Regular yesterday
+        };
+
+        return UtilHelper.formatCurrentDate2(effectiveYesterday);
     }
 }

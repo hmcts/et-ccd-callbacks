@@ -13,10 +13,10 @@ import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -51,7 +51,7 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
         String[] caseTypeIds = caseTypeIdsString.split(",");
         String adminUserToken = adminUserService.getAdminUserToken();
         String today = UtilHelper.formatCurrentDate2(LocalDate.now());
-        String query = buildQueryForExpiredBFActions(getEffectiveYesterday(), today);
+        String query = buildQueryForExpiredBFActions(BFHelper.getEffectiveYesterday(), today);
 
         Arrays.stream(caseTypeIds).forEach(caseTypeId -> {
             try {
@@ -74,19 +74,6 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
         });
         log.info("WaTaskCreationCronForExpiredBfActions processed {} case IDs", processedCaseIdsToSkip.size());
         log.info("WaTaskCreationCronForExpiredBfActions completed execution");
-    }
-
-    private String getEffectiveYesterday() {
-        // Determine the effective "yesterday" based on the current day of the week
-        LocalDate today = LocalDate.now();
-        DayOfWeek dayOfWeek = today.getDayOfWeek();
-        LocalDate effectiveYesterday = switch (dayOfWeek) {
-            case MONDAY -> today.minusDays(3); // If today is Monday, go back to Friday
-            case SUNDAY -> today.minusDays(2); // If today is Sunday, go back to Friday as well
-            default -> today.minusDays(1);     // Regular yesterday
-        };
-
-        return UtilHelper.formatCurrentDate2(effectiveYesterday);
     }
 
     /**

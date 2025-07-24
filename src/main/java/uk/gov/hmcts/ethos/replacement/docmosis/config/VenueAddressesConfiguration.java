@@ -16,5 +16,5 @@ import java.util.concurrent.ConcurrentHashMap;
 @PropertySource(value = "classpath:venueAddressValues.yml", factory = YamlPropertySourceFactory.class)
 @Getter
 public class VenueAddressesConfiguration {
-    private Map<TribunalOffice, List<VenueAddress>> tribunalOffices = new ConcurrentHashMap<>();
+    private final Map<TribunalOffice, List<VenueAddress>> tribunalOffices = new ConcurrentHashMap<>();
 }

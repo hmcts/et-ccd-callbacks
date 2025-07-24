@@ -1,8 +1,9 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.config;
 
-import org.apache.http.client.config.RequestConfig;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.hc.client5.http.config.RequestConfig;
+import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
+import org.apache.hc.client5.http.impl.classic.HttpClientBuilder;
+import org.apache.hc.core5.util.Timeout;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -24,9 +25,9 @@ public class HttpClientConfiguration {
 
     private CloseableHttpClient getHttpClient() {
         RequestConfig config = RequestConfig.custom()
-            .setConnectTimeout(timeout)
-            .setConnectionRequestTimeout(timeout)
-            .setSocketTimeout(timeout)
+            .setConnectTimeout(Timeout.ofMilliseconds(timeout))
+            .setConnectionRequestTimeout(Timeout.ofMilliseconds(timeout))
+            .setResponseTimeout(Timeout.ofMilliseconds(timeout))
             .build();
 
         return HttpClientBuilder

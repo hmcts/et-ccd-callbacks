@@ -362,7 +362,7 @@ dependencies {
 
 
     implementation group: 'com.github.hmcts', name: 'et-common', version: '3.0.2'
-    implementation group: 'com.github.hmcts', name: 'et-data-model', version: '4.2.7'
+    implementation group: 'com.github.hmcts', name: 'et-data-model', version: 'RET-5927-ea214f7'
     implementation group: 'com.github.hmcts', name: 'ecm-common', version: '3.0.1'
     implementation group: 'com.github.hmcts', name: 'ecm-data-model', version: '2.0.1'
 
@@ -401,6 +401,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'jakarta.servlet:jakarta.servlet-api:6.0.0'
     implementation 'javax.servlet:javax.servlet-api:4.0.1'
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.1.2'
@@ -457,6 +458,7 @@ dependencies {
     // ByteBuddy dependencies required for Mockito with Java 21
     testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.14.9'
     testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.14.9'
+    testImplementation group: 'com.squareup.okhttp3', name: 'mockwebserver', version: '4.12.0'
 
     // Contract Tests
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.6.17'

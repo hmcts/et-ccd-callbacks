@@ -34,6 +34,7 @@ public class TseReplyData {
     private String copy;
     @JsonProperty("response")
     private String response;
+    // Called party to represent the party who is replying to the application, but all the templates use respondentParty
     @JsonProperty("respondentParty")
-    private String respondentParty;
+    private String party;
 }

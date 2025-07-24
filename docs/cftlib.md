@@ -35,6 +35,11 @@ The latest version of the RSE CFT lib can be found [here](https://github.com/hmc
 
 ## Setup
 
+### Prerequisites
+- **Java 21**: Required for Spring Boot 3 compatibility
+- **Docker**: For RSE IdAM Simulator and other containerized services
+- **Git**: For accessing CCD definition repositories
+
 ### Environment Variables
 | Variable                       | Purpose                                                                               |
 |--------------------------------|---------------------------------------------------------------------------------------|

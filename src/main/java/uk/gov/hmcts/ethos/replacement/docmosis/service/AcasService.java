@@ -4,12 +4,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 import uk.gov.hmcts.ecm.common.model.acas.AcasCertificate;
 import uk.gov.hmcts.ecm.common.model.acas.AcasCertificateRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -22,6 +19,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 
@@ -32,16 +30,16 @@ public class AcasService {
     private static final String OCP_APIM_SUBSCRIPTION_KEY = "Ocp-Apim-Subscription-Key";
     private static final String NOT_FOUND = "not found";
     private final TornadoService tornadoService;
-    private final RestTemplate restTemplate;
+    private final WebClient webClient;
 
     private final String acasApiUrl;
     private final String acasApiKey;
 
-    public AcasService(TornadoService tornadoService, RestTemplate restTemplate,
+    public AcasService(TornadoService tornadoService, WebClient webClient,
                        @Value("${acas.api.url}") String acasApiUrl,
                        @Value("${acas.api.key}") String acasApiKey) {
         this.tornadoService = tornadoService;
-        this.restTemplate = restTemplate;
+        this.webClient = webClient;
         this.acasApiUrl = acasApiUrl;
         this.acasApiKey = acasApiKey;
     }
@@ -53,7 +51,7 @@ public class AcasService {
 
         List<AcasCertificate> acasCertificateObject;
         try {
-            acasCertificateObject = fetchAcasCertificates(caseData.getAcasCertificate()).getBody();
+            acasCertificateObject = fetchAcasCertificates(caseData.getAcasCertificate());
             if (ObjectUtils.isEmpty(acasCertificateObject)) {
                 return List.of("Error reading ACAS Certificate");
             }
@@ -62,7 +60,7 @@ public class AcasService {
             return List.of("Error retrieving ACAS Certificate");
         }
 
-        AcasCertificate acasCertificate = acasCertificateObject.get(0);
+        AcasCertificate acasCertificate = acasCertificateObject.getFirst();
         if (NOT_FOUND.equals(acasCertificate.getCertificateDocument())) {
             return List.of("No ACAS Certificate found");
         }
@@ -83,7 +81,7 @@ public class AcasService {
 
     private DocumentInfo convertCertificateToPdf(CaseData caseData, AcasCertificate acasCertificate, String authToken,
                                                  String caseTypeId) {
-        Optional<RespondentSumTypeItem> respondent = caseData.getRespondentCollection().stream()
+        Optional<RespondentSumTypeItem> respondent = emptyIfNull(caseData.getRespondentCollection()).stream()
             .filter(r -> acasCertificate.getCertificateNumber().equals(
                     defaultIfEmpty(r.getValue().getRespondentAcas(), "")))
             .findFirst();
@@ -97,32 +95,25 @@ public class AcasService {
                 caseTypeId);
     }
 
-    private ResponseEntity<List<AcasCertificate>> fetchAcasCertificates(String... acasCertificate) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(OCP_APIM_SUBSCRIPTION_KEY, acasApiKey);
+    private List<AcasCertificate> fetchAcasCertificates(String... acasCertificate) {
         AcasCertificateRequest acasCertificateRequest = new AcasCertificateRequest();
         acasCertificateRequest.setCertificateNumbers(acasCertificate);
-        HttpEntity<AcasCertificateRequest> request = new HttpEntity<>(acasCertificateRequest, headers);
-        return restTemplate.exchange(
-                acasApiUrl,
-                HttpMethod.POST,
-                request,
-                new ParameterizedTypeReference<>() {
-                }
-        );
+        
+        return webClient.post()
+                .uri(acasApiUrl)
+                .header(OCP_APIM_SUBSCRIPTION_KEY, acasApiKey)
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(acasCertificateRequest)
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<List<AcasCertificate>>() {})
+                .block(); // Convert reactive to blocking for existing synchronous API
     }
 
     public List<DocumentInfo> getAcasCertificates(CaseData caseData, List<String> acasNumber, String authToken,
                                             String caseTypeId) {
         List<AcasCertificate> acasCertificateList;
         try {
-            ResponseEntity<List<AcasCertificate>> response = fetchAcasCertificates(acasNumber.toArray(new String[0]));
-            if (response.getStatusCode().is2xxSuccessful()) {
-                acasCertificateList = response.getBody();
-            } else {
-                log.error("Error retrieving ACAS Certificate with status code : {}", response.getStatusCode());
-                return new ArrayList<>();
-            }
+            acasCertificateList = fetchAcasCertificates(acasNumber.toArray(new String[0]));
             if (isEmpty(acasCertificateList)) {
                 return new ArrayList<>();
             }

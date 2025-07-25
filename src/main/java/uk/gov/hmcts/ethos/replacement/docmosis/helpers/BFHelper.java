@@ -83,4 +83,26 @@ public final class BFHelper {
 
         caseData.setBfActions(bfActionTypeItemListAux);
     }
+
+    public static void updateWaTaskCreationTrackerOfBfActionItems(CaseData caseData) {
+        String yesterday = UtilHelper.formatCurrentDate2(LocalDate.now().minusDays(1));
+        if (caseData.getBfActions() == null || caseData.getBfActions().isEmpty()) {
+            log.info("No BF Actions found for case reference {}. No updates made to WA task creation tracker.",
+                    caseData.getEthosCaseReference());
+            return;
+        }
+
+        List<BFActionTypeItem> expiredBfActions = caseData.getBfActions().stream()
+                .filter(item -> LocalDate.parse(item.getValue().getBfDate()).isBefore(
+                        LocalDate.parse(yesterday))).toList();
+        if (!expiredBfActions.isEmpty()) {
+            log.info("Updating WA task creation tracker for {} expired BF Actions for case reference {}",
+                    expiredBfActions.size(), caseData.getEthosCaseReference());
+            expiredBfActions.forEach(bfActionTypeItem -> {
+                if (bfActionTypeItem.getValue().getIsWaTaskCreated() == null) {
+                    bfActionTypeItem.getValue().setIsWaTaskCreated("Yes");
+                }
+            });
+        }
+    }
 }

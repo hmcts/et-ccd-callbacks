@@ -458,8 +458,8 @@ dependencies {
     testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.21.3'
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.3'
     // Mockito 5.0.0+ has merged mockito-inline into mockito-core
-    testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.13.0'
-    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '5.13.0'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.18.0'
+    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '5.18.0'
     // ByteBuddy dependencies required for Mockito with Java 21
     testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.14.9'
     testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.14.9'
@@ -489,7 +489,7 @@ dependencies {
     integrationTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-commons', version: junitPlatformVersion
     integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.38'
 
-    cftlibImplementation group: 'org.mockito', name: 'mockito-core', version: '5.13.0'
+    cftlibImplementation group: 'org.mockito', name: 'mockito-core', version: '5.18.0'
     cftlibImplementation 'org.springframework.boot:spring-boot-devtools'
 }
 

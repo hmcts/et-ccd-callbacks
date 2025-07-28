@@ -55,7 +55,7 @@ public class PreAcceptanceCaseController {
             @RequestBody CCDRequest ccdRequest) {
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
-        List<String> errors = preAcceptanceCaseService.validateAcceptanceDate(caseDetails.getCaseData());
+        List<String> errors = preAcceptanceCaseService.validateAcceptanceDate(caseData);
         return getCallbackRespEntityErrors(errors, caseData);
     }
 }

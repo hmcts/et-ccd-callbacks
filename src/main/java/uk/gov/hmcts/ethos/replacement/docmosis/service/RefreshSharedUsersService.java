@@ -31,12 +31,14 @@ public class RefreshSharedUsersService {
     private CaseData caseData;
 
     public void refreshSharedUsers(CaseDetails caseDetails) throws IOException {
-        List<CaseUserAssignment> caseAssignedUserRolesList = ccdCaseAssignment.getCaseUserRoles(caseDetails.getCaseId()).getCaseUserAssignments();
+        List<CaseUserAssignment> caseAssignedUserRolesList =
+                ccdCaseAssignment.getCaseUserRoles(caseDetails.getCaseId()).getCaseUserAssignments();
         claimantRepresentativeUsers(caseDetails, caseAssignedUserRolesList);
         respondentRepresentativeUsers(caseDetails, caseAssignedUserRolesList);
     }
 
-    private void respondentRepresentativeUsers(CaseDetails caseDetails, List<CaseUserAssignment> caseAssignedUserRolesList) {
+    private void respondentRepresentativeUsers(CaseDetails caseDetails,
+                                               List<CaseUserAssignment> caseAssignedUserRolesList) {
         Map<String, String> respondentSolicitors = caseAssignedUserRolesList.stream()
                 .filter(caseUserAssignment -> SolicitorRole.from(caseUserAssignment.getCaseRole()).isPresent())
                 .collect(Collectors.toMap(CaseUserAssignment::getUserId, CaseUserAssignment::getCaseRole, (a, b) -> b));
@@ -65,9 +67,11 @@ public class RefreshSharedUsersService {
 
     }
 
-    private void claimantRepresentativeUsers(CaseDetails caseDetails, List<CaseUserAssignment> caseAssignedUserRolesList) {
+    private void claimantRepresentativeUsers(CaseDetails caseDetails,
+                                             List<CaseUserAssignment> caseAssignedUserRolesList) {
         List<String> claimantSolicitors = caseAssignedUserRolesList.stream()
-                .filter(caseUserAssignment -> caseUserAssignment.getCaseRole().equals(ClaimantSolicitorRole.CLAIMANTSOLICITOR.toString()))
+                .filter(caseUserAssignment ->
+                        caseUserAssignment.getCaseRole().equals(ClaimantSolicitorRole.CLAIMANTSOLICITOR.toString()))
                 .map(CaseUserAssignment::getUserId)
                 .toList();
         List<GenericTypeItem<OrganisationUsersIdamUser>> claimantUsers = new ArrayList<>();

@@ -36,7 +36,7 @@ public class RefreshSharedUsersController {
     private final RefreshSharedUsersService refreshSharedUsersService;
 
     /**
-     * Called for the Refresh Shared Users event for a Legal Rep
+     * Called for the Refresh Shared Users event for a Legal Rep.
      * @param ccdRequest holds the request and case data
      * @param userToken  used for authorization
      * @return Callback response entity with case data and errors attached.

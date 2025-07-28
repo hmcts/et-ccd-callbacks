@@ -119,11 +119,11 @@ class TribunalOfficeServiceTest {
 
     private static Stream<Arguments> tribunalContactDetails() {
         return Stream.of(
-                Arguments.of(TribunalOffice.MANCHESTER.getOfficeName(), "M3 2JA", "301017", "4", "ET_EnglandWales"),
-                Arguments.of(TribunalOffice.GLASGOW.getOfficeName(), "G2 8GT", "366559", "11", "ET_Scotland"),
-                Arguments.of(TribunalOffice.ABERDEEN.getOfficeName(), "AB10 1SH", "219164", "11", "ET_Scotland"),
-                Arguments.of(TribunalOffice.DUNDEE.getOfficeName(), "DD1 4QB", "367564", "11", "ET_Scotland"),
-                Arguments.of(TribunalOffice.EDINBURGH.getOfficeName(), "EH3 7HF", "368308", "11", "ET_Scotland"),
+                Arguments.of(TribunalOffice.MANCHESTER.getOfficeName(), "M3 2JA", "301017", "4"),
+                Arguments.of(TribunalOffice.GLASGOW.getOfficeName(), "G2 8GT", "366559", "11"),
+                Arguments.of(TribunalOffice.ABERDEEN.getOfficeName(), "AB10 1SH", "219164", "11"),
+                Arguments.of(TribunalOffice.DUNDEE.getOfficeName(), "DD1 4QB", "367564", "11"),
+                Arguments.of(TribunalOffice.EDINBURGH.getOfficeName(), "EH3 7HF", "368308", "11"),
                 Arguments.of(UNASSIGNED_OFFICE, "", "", ""));
     }
 

@@ -1,7 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.domain.repository;
 
+import feign.Param;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.query.Procedure;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SubMultipleReferenceEnglandWales;
@@ -9,6 +10,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.SubMultipleReferenceEnglan
 @Repository
 @Transactional
 public interface SubMultipleRefEnglandWalesRepository extends JpaRepository<SubMultipleReferenceEnglandWales, Integer> {
-    @Procedure("fn_EnglandWalesEthosSubMultipleCaseRefGen")
-    String ethosSubMultipleCaseRefGen(int multipleRef, int numberCases);
+    @Query(value = "SELECT fn_EnglandWalesEthosSubMultipleCaseRefGen(:multipleRef, :numberCases)", nativeQuery = true)
+    String ethosSubMultipleCaseRefGen(@Param("multipleRef") int multipleRef,
+                                      @Param("numberCases") int numberCases);
 }

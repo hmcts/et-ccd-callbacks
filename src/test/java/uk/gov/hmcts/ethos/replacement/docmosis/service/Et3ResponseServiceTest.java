@@ -407,21 +407,22 @@ class Et3ResponseServiceTest {
         // When both user token and case data are empty
         if (StringUtils.isBlank(userToken) && ObjectUtils.isEmpty(caseData)) {
             GenericServiceException gex = assertThrows(GenericServiceException.class,
-                    () -> et3ResponseService.setRespondentRepresentsContactDetails(userToken, caseData));
+                    () -> et3ResponseService.setRespondentRepresentsContactDetails(userToken, caseData, null));
             assertThat(gex.getMessage()).isEqualTo(ERROR_CASE_DATA_NOT_FOUND);
             return;
         }
         // When only case data is empty
         if (ObjectUtils.isEmpty(caseData)) {
             GenericServiceException gex = assertThrows(GenericServiceException.class,
-                    () -> et3ResponseService.setRespondentRepresentsContactDetails(userToken, caseData));
+                    () -> et3ResponseService.setRespondentRepresentsContactDetails(userToken, caseData, null));
             assertThat(gex.getMessage()).isEqualTo(ERROR_CASE_DATA_NOT_FOUND);
             return;
         }
         // When only user token is empty
         if (ObjectUtils.isEmpty(userToken)) {
             GenericServiceException gex = assertThrows(GenericServiceException.class,
-                    () -> et3ResponseService.setRespondentRepresentsContactDetails(userToken, caseData));
+                    () -> et3ResponseService.setRespondentRepresentsContactDetails(
+                            userToken, caseData, caseData.getCcdID()));
             assertThat(gex.getMessage()).isEqualTo(ERROR_INVALID_USER_TOKEN);
             return;
         }
@@ -433,7 +434,8 @@ class Et3ResponseServiceTest {
             when(userIdamService.getUserDetails(VALID_USER_TOKEN)).thenReturn(validUserDetails);
             when(ccdCaseAssignment.getCaseUserRoles(INVALID_CASE_ID)).thenReturn(getInvalidCaseUserAssignmentData());
             GenericServiceException gex = assertThrows(GenericServiceException.class,
-                    () -> et3ResponseService.setRespondentRepresentsContactDetails(userToken, caseData));
+                    () -> et3ResponseService.setRespondentRepresentsContactDetails(
+                            userToken, caseData, caseData.getCcdID()));
             assertThat(gex.getMessage()).isEqualTo(SYSTEM_ERROR);
         }
 
@@ -444,7 +446,8 @@ class Et3ResponseServiceTest {
             when(userIdamService.getUserDetails(VALID_USER_TOKEN)).thenReturn(validUserDetails);
             when(ccdCaseAssignment.getCaseUserRoles(VALID_CASE_ID)).thenReturn(getValidCaseUserAssignmentData());
             GenericServiceException gex = assertThrows(GenericServiceException.class,
-                    () -> et3ResponseService.setRespondentRepresentsContactDetails(userToken, caseData));
+                    () -> et3ResponseService.setRespondentRepresentsContactDetails(
+                            userToken, caseData, caseData.getCcdID()));
             assertThat(gex.getMessage()).isEqualTo(ERROR_NO_REPRESENTED_RESPONDENT_FOUND);
         }
 
@@ -456,7 +459,8 @@ class Et3ResponseServiceTest {
             when(ccdCaseAssignment.getCaseUserRoles(VALID_CASE_ID_RETURNS_INVALID_USER))
                     .thenReturn(getValidCaseInvalidUserAssignmentData());
             GenericServiceException gex = assertThrows(GenericServiceException.class,
-                    () -> et3ResponseService.setRespondentRepresentsContactDetails(userToken, caseData));
+                    () -> et3ResponseService.setRespondentRepresentsContactDetails(
+                            userToken, caseData, caseData.getCcdID()));
             assertThat(gex.getMessage()).isEqualTo(ERROR_NO_REPRESENTED_RESPONDENT_FOUND);
         }
 
@@ -467,7 +471,7 @@ class Et3ResponseServiceTest {
             validUserDetails.setUid(USER_ID);
             when(userIdamService.getUserDetails(VALID_USER_TOKEN)).thenReturn(validUserDetails);
             when(ccdCaseAssignment.getCaseUserRoles(VALID_CASE_ID)).thenReturn(getValidCaseUserAssignmentData());
-            et3ResponseService.setRespondentRepresentsContactDetails(userToken, caseData);
+            et3ResponseService.setRespondentRepresentsContactDetails(userToken, caseData, caseData.getCcdID());
             assertThat(caseData.getRepCollection().getFirst().getValue()).isNull();
         }
 
@@ -479,7 +483,7 @@ class Et3ResponseServiceTest {
             validUserDetails.setUid(USER_ID);
             when(userIdamService.getUserDetails(VALID_USER_TOKEN)).thenReturn(validUserDetails);
             when(ccdCaseAssignment.getCaseUserRoles(VALID_CASE_ID)).thenReturn(getValidCaseUserAssignmentData());
-            et3ResponseService.setRespondentRepresentsContactDetails(userToken, caseData);
+            et3ResponseService.setRespondentRepresentsContactDetails(userToken, caseData, caseData.getCcdID());
             assertThat(caseData.getRepCollection().getFirst().getValue().getRepresentativeAddress()
                     .getAddressLine1()).isEqualTo("Address Line 1");
             assertThat(caseData.getRepCollection().getFirst().getValue().getRepresentativePhoneNumber())
@@ -556,7 +560,8 @@ class Et3ResponseServiceTest {
                             "CcdCaseAssignment",
                             "getCaseUserRoles"));
             GenericServiceException gex = assertThrows(GenericServiceException.class,
-                    () -> et3ResponseService.validateAndExtractRepresentativeContact(userToken, caseData));
+                    () -> et3ResponseService.validateAndExtractRepresentativeContact(
+                            userToken, caseData, caseData.getCcdID()));
             assertThat(gex.getMessage()).isEqualTo(ERROR_INVALID_CASE_ID);
         }
 
@@ -567,7 +572,8 @@ class Et3ResponseServiceTest {
             when(ccdCaseAssignment.getCaseUserRoles(VALID_CASE_ID_RETURNS_INVALID_USER)).thenReturn(
                     getValidCaseInvalidUserAssignmentData());
             GenericServiceException gex = assertThrows(GenericServiceException.class,
-                    () -> et3ResponseService.validateAndExtractRepresentativeContact(userToken, caseData));
+                    () -> et3ResponseService.validateAndExtractRepresentativeContact(
+                            userToken, caseData, caseData.getCcdID()));
             assertThat(gex.getMessage()).isEqualTo(ERROR_NO_REPRESENTED_RESPONDENT_FOUND);
         }
 
@@ -586,7 +592,8 @@ class Et3ResponseServiceTest {
             when(ccdCaseAssignment.getCaseUserRoles(VALID_CASE_ID)).thenReturn(
                     getValidCaseUserAssignmentData());
             assertDoesNotThrow(() ->
-                    et3ResponseService.validateAndExtractRepresentativeContact(userToken, caseData));
+                    et3ResponseService.validateAndExtractRepresentativeContact(
+                            userToken, caseData, caseData.getCcdID()));
             assertThat(caseData.getEt3ResponseAddress().getAddressLine1()).isEqualTo("Address Line 1");
             assertThat(caseData.getEt3ResponsePhone()).isEqualTo("1234567890");
         }

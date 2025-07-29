@@ -20,18 +20,24 @@ public class PreAcceptanceCaseService {
             "Accepted date should not be earlier than the case received date";
     private static final String REJECTED_DATE_SHOULD_NOT_BE_EARLIER_THAN_THE_CASE_RECEIVED_DATE =
             "Rejected date should not be earlier than the case received date";
+    private static final String CASE_DATA_MISSING = "Case data is missing";
+    private static final String PRE_ACCEPT_CASE_MISSING = "Pre-acceptance case data is missing";
+    private static final String RECEIPT_DATE_MISSING_OR_INVALID = "Receipt date is missing or invalid";
+    private static final String CASE_ACCEPTANCE_STATUS_MISSING = "Case acceptance status is missing";
+    private static final String ACCEPTED_DATE_MISSING_OR_INVALID = "Accepted date is missing or invalid";
+    private static final String REJECTED_DATE_MISSING_OR_INVALID = "Rejected date is missing or invalid";
 
     public List<String> validateAcceptanceDate(CaseData caseData) {
         List<String> errors = new ArrayList<>();
 
         if (caseData == null) {
-            errors.add("Case data is missing");
+            errors.add(CASE_DATA_MISSING);
             return errors;
         }
 
         CasePreAcceptType preAcceptCase = caseData.getPreAcceptCase();
         if (preAcceptCase == null) {
-            errors.add("Pre-acceptance case data is missing");
+            errors.add(PRE_ACCEPT_CASE_MISSING);
             return errors;
         }
 
@@ -39,12 +45,12 @@ public class PreAcceptanceCaseService {
         try {
             receiptDate = LocalDate.parse(caseData.getReceiptDate());
         } catch (Exception e) {
-            errors.add("Receipt date is missing or invalid");
+            errors.add(RECEIPT_DATE_MISSING_OR_INVALID);
             return errors;
         }
 
         if (isNullOrEmpty(preAcceptCase.getCaseAccepted())) {
-            errors.add("Case acceptance status is missing");
+            errors.add(CASE_ACCEPTANCE_STATUS_MISSING);
             return errors;
         }
 
@@ -53,7 +59,7 @@ public class PreAcceptanceCaseService {
             try {
                 dateAccepted = LocalDate.parse(preAcceptCase.getDateAccepted());
             } catch (Exception e) {
-                errors.add("Accepted date is missing or invalid");
+                errors.add(ACCEPTED_DATE_MISSING_OR_INVALID);
                 return errors;
             }
             if (dateAccepted.isBefore(receiptDate)) {
@@ -64,7 +70,7 @@ public class PreAcceptanceCaseService {
             try {
                 dateRejected = LocalDate.parse(preAcceptCase.getDateRejected());
             } catch (Exception e) {
-                errors.add("Rejected date is missing or invalid");
+                errors.add(REJECTED_DATE_MISSING_OR_INVALID);
                 return errors;
             }
             if (dateRejected.isBefore(receiptDate)) {
@@ -74,5 +80,4 @@ public class PreAcceptanceCaseService {
 
         return errors;
     }
-
 }

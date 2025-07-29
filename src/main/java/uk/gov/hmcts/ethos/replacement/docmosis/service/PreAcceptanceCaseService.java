@@ -35,8 +35,10 @@ public class PreAcceptanceCaseService {
             return errors;
         }
 
-        LocalDate receiptDate = getLocalDate(caseData.getReceiptDate());
-        if (receiptDate == null) {
+        LocalDate receiptDate;
+        try {
+            receiptDate = LocalDate.parse(caseData.getReceiptDate());
+        } catch (Exception e) {
             errors.add("Receipt date is missing or invalid");
             return errors;
         }
@@ -47,8 +49,10 @@ public class PreAcceptanceCaseService {
         }
 
         if (YES.equals(preAcceptCase.getCaseAccepted())) {
-            LocalDate dateAccepted = getLocalDate(preAcceptCase.getDateAccepted());
-            if (dateAccepted == null) {
+            LocalDate dateAccepted;
+            try {
+                dateAccepted = LocalDate.parse(preAcceptCase.getDateAccepted());
+            } catch (Exception e) {
                 errors.add("Accepted date is missing or invalid");
                 return errors;
             }
@@ -56,8 +60,10 @@ public class PreAcceptanceCaseService {
                 errors.add(ACCEPTED_DATE_SHOULD_NOT_BE_EARLIER_THAN_THE_CASE_RECEIVED_DATE);
             }
         } else if (NO.equals(preAcceptCase.getCaseAccepted())) {
-            LocalDate dateRejected = getLocalDate(preAcceptCase.getDateRejected());
-            if (dateRejected == null) {
+            LocalDate dateRejected;
+            try {
+                dateRejected = LocalDate.parse(preAcceptCase.getDateRejected());
+            } catch (Exception e) {
                 errors.add("Rejected date is missing or invalid");
                 return errors;
             }
@@ -69,11 +75,4 @@ public class PreAcceptanceCaseService {
         return errors;
     }
 
-    private static LocalDate getLocalDate(String date) {
-        try {
-            return LocalDate.parse(date);
-        } catch (Exception e) {
-            return null;
-        }
-    }
 }

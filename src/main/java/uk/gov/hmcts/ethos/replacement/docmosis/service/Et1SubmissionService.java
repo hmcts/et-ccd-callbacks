@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ForkJoinPool;
 import java.util.stream.IntStream;
@@ -310,10 +311,9 @@ public class Et1SubmissionService {
             return;
         }
 
-        AdditionalCaseInfoType additionalCaseInfoType = ObjectUtils.getIfNull(
-                caseDetails.getCaseData().getAdditionalCaseInfoType(),
-                new AdditionalCaseInfoType()
-        );
+        AdditionalCaseInfoType additionalCaseInfoType = Optional.ofNullable(
+                caseDetails.getCaseData().getAdditionalCaseInfoType()
+        ).orElse(new AdditionalCaseInfoType());
         additionalCaseInfoType.setInterventionRequired(YES);
         caseDetails.getCaseData().setAdditionalCaseInfoType(additionalCaseInfoType);
 

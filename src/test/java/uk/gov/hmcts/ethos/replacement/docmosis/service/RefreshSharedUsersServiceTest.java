@@ -3,7 +3,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.*;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -12,15 +13,20 @@ import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
-import uk.gov.hmcts.et.common.model.ccd.types.*;
+import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
+import uk.gov.hmcts.et.common.model.ccd.types.OrganisationUsersIdamUser;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class RefreshSharedUsersServiceTest {
@@ -49,12 +55,14 @@ class RefreshSharedUsersServiceTest {
     void shouldPopulateClaimantRepresentativeUsers() throws IOException {
         setupRepresentativeClaimantType();
         UserDetails userDetails = createUserDetails("test@example.com", "Test", "User");
-        CaseUserAssignment assignment = createCaseUserAssignment("user1", ClaimantSolicitorRole.CLAIMANTSOLICITOR.toString());
+        CaseUserAssignment assignment = createCaseUserAssignment("user1",
+                ClaimantSolicitorRole.CLAIMANTSOLICITOR.toString());
         setupMockBehaviour("user1", userDetails, assignment);
 
         service.refreshSharedUsers(caseDetails);
 
-        List<GenericTypeItem<OrganisationUsersIdamUser>> orgUsers = caseData.getRepresentativeClaimantType().getOrganisationUsers();
+        List<GenericTypeItem<OrganisationUsersIdamUser>> orgUsers =
+                caseData.getRepresentativeClaimantType().getOrganisationUsers();
         assertThat(orgUsers).hasSize(1);
         assertThat(orgUsers.get(0).getValue().getEmail()).isEqualTo("test@example.com");
         assertThat(orgUsers.get(0).getValue().getFirstName()).isEqualTo("Test");
@@ -68,8 +76,10 @@ class RefreshSharedUsersServiceTest {
         UserDetails userDetails = createUserDetails("test@example.com", "Test", "User");
         UserDetails userDetails2 = createUserDetails("test2@example.com", "Test2", "User2");
 
-        CaseUserAssignment assignment1 = createCaseUserAssignment("user1", ClaimantSolicitorRole.CLAIMANTSOLICITOR.toString());
-        CaseUserAssignment assignment2 = createCaseUserAssignment("user2", ClaimantSolicitorRole.CLAIMANTSOLICITOR.toString());
+        CaseUserAssignment assignment1 = createCaseUserAssignment("user1",
+                ClaimantSolicitorRole.CLAIMANTSOLICITOR.toString());
+        CaseUserAssignment assignment2 = createCaseUserAssignment("user2",
+                ClaimantSolicitorRole.CLAIMANTSOLICITOR.toString());
 
         when(ccdCaseAssignment.getCaseUserRoles(CASE_ID)).thenReturn(mockUserRolesResponse);
         when(mockUserRolesResponse.getCaseUserAssignments()).thenReturn(List.of(assignment1, assignment2));
@@ -95,7 +105,6 @@ class RefreshSharedUsersServiceTest {
                 .extracting(user -> user.getValue().getLastName())
                 .containsExactlyInAnyOrder("User", "User2");
     }
-
 
     @Test
     void shouldPopulateRespondentRepresentativeUsers() throws IOException {
@@ -201,7 +210,8 @@ class RefreshSharedUsersServiceTest {
         return assignment;
     }
 
-    private void setupMockBehaviour(String userId, UserDetails userDetails, CaseUserAssignment assignment) throws IOException {
+    private void setupMockBehaviour(String userId, UserDetails userDetails, CaseUserAssignment assignment)
+            throws IOException {
         when(ccdCaseAssignment.getCaseUserRoles(CASE_ID)).thenReturn(mockUserRolesResponse);
         when(mockUserRolesResponse.getCaseUserAssignments()).thenReturn(List.of(assignment));
         when(adminUserService.getUserDetails(userId)).thenReturn(userDetails);

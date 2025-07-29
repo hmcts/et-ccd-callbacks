@@ -33,7 +33,7 @@ public class RefreshSharedUsersService {
     public void refreshSharedUsers(CaseDetails caseDetails) throws IOException {
         List<CaseUserAssignment> caseAssignedUserRolesList =
                 ccdCaseAssignment.getCaseUserRoles(caseDetails.getCaseId()).getCaseUserAssignments();
-        if(isEmpty(caseAssignedUserRolesList)) {
+        if (isEmpty(caseAssignedUserRolesList)) {
             log.info("No case user assignments found for case id {}", caseDetails.getCaseId());
             return;
         }

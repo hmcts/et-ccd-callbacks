@@ -160,7 +160,8 @@ public class Et3ResponseController {
         Et3ResponseHelper.addEt3DataToRespondent(caseData, ccdRequest.getEventId());
         List<String> errors = new ArrayList<>();
         try {
-            et3ResponseService.setRespondentRepresentsContactDetails(userToken, caseData);
+            et3ResponseService.setRespondentRepresentsContactDetails(
+                    userToken, caseData, ccdRequest.getCaseDetails().getCaseId());
         }  catch (GenericServiceException gse) {
             errors.add(gse.getMessage());
         }
@@ -378,9 +379,9 @@ public class Et3ResponseController {
             @RequestHeader("Authorization") String userToken) {
         List<String> errors = new ArrayList<>();
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setCcdID(ccdRequest.getCaseDetails().getCaseId());
         try {
-            et3ResponseService.validateAndExtractRepresentativeContact(userToken, caseData);
+            et3ResponseService.validateAndExtractRepresentativeContact(
+                    userToken, caseData, ccdRequest.getCaseDetails().getCaseId());
         } catch (GenericServiceException gse) {
             errors.add(gse.getMessage());
         }
@@ -409,10 +410,10 @@ public class Et3ResponseController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setCcdID(ccdRequest.getCaseDetails().getCaseId());
         List<String> errors = new ArrayList<>();
         try {
-            et3ResponseService.setRespondentRepresentsContactDetails(userToken, caseData);
+            et3ResponseService.setRespondentRepresentsContactDetails(
+                    userToken, caseData, ccdRequest.getCaseDetails().getCaseId());
         } catch (GenericServiceException gse) {
             errors.add(gse.getMessage());
         }

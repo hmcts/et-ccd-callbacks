@@ -62,10 +62,12 @@ public class RefreshSharedUsersService {
             GenericTypeItem<OrganisationUsersIdamUser> user = new GenericTypeItem<>();
             user.setValue(organisationUsersIdamUser);
             user.setId(UUID.randomUUID().toString());
-            int index = SolicitorRole.from(value).get().getIndex();
-            if (isEmpty(caseData.getRepCollection().get(index).getValue().getOrganisationUsers())) {
-                caseData.getRepCollection().get(index).getValue().setOrganisationUsers(new ArrayList<>());
-            }
+            int index = SolicitorRole.from(value)
+                    .orElseThrow(() -> new IllegalArgumentException("Unknown solicitor role: " + value))
+                    .getIndex();
+
+            // new list to prevent duplicates of the same user being added
+            caseData.getRepCollection().get(index).getValue().setOrganisationUsers(new ArrayList<>());
             caseData.getRepCollection().get(index).getValue().getOrganisationUsers().add(user);
         });
     }

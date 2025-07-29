@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Slf4j
@@ -28,7 +29,7 @@ public class PreAcceptanceCaseService {
             if (dateAccepted.isBefore(dateOfReceipt)) {
                 errors.add(ACCEPTED_DATE_SHOULD_NOT_BE_EARLIER_THAN_THE_CASE_RECEIVED_DATE);
             }
-        } else {
+        } else if (NO.equals(preAcceptCase.getCaseAccepted())) {
             LocalDate dateRejected = LocalDate.parse(preAcceptCase.getDateRejected());
             if (dateRejected.isBefore(dateOfReceipt)) {
                 errors.add(REJECTED_DATE_SHOULD_NOT_BE_EARLIER_THAN_THE_CASE_RECEIVED_DATE);

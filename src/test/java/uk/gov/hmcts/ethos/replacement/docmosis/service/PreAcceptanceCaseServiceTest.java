@@ -60,14 +60,14 @@ class PreAcceptanceCaseServiceTest {
     void shouldReturnErrorWhenReceiptDateIsNull() {
         CaseData caseData = buildCaseData(null, NO, null, "2024-01-25");
         List<String> errors = preAcceptanceCaseService.validateAcceptanceDate(caseData);
-        assertThat(errors).containsExactly("Receipt date is missing");
+        assertThat(errors).containsExactly("Receipt date is missing or invalid");
     }
 
     @Test
     void shouldReturnErrorWhenReceiptDateIsInvalid() {
         CaseData caseData = buildCaseData("2024-13-20", NO, null, "2024-01-25");
         List<String> errors = preAcceptanceCaseService.validateAcceptanceDate(caseData);
-        assertThat(errors).containsExactly("Receipt date must be a real date");
+        assertThat(errors).containsExactly("Receipt date is missing or invalid");
     }
 
     @Test
@@ -81,28 +81,28 @@ class PreAcceptanceCaseServiceTest {
     void shouldReturnErrorWhenDateAcceptedIsNull() {
         CaseData caseData = buildCaseData("2024-01-20", YES, null, null);
         List<String> errors = preAcceptanceCaseService.validateAcceptanceDate(caseData);
-        assertThat(errors).containsExactly("Accepted date is missing");
+        assertThat(errors).containsExactly("Accepted date is missing or invalid");
     }
 
     @Test
     void shouldReturnErrorWhenDateAcceptedIsInvalid() {
         CaseData caseData = buildCaseData("2024-01-20", YES, "2024-13-25", null);
         List<String> errors = preAcceptanceCaseService.validateAcceptanceDate(caseData);
-        assertThat(errors).containsExactly("Accepted date must be a real date");
+        assertThat(errors).containsExactly("Accepted date is missing or invalid");
     }
 
     @Test
     void shouldReturnErrorWhenDateRejectedIsNull() {
         CaseData caseData = buildCaseData("2024-01-20", NO, null, null);
         List<String> errors = preAcceptanceCaseService.validateAcceptanceDate(caseData);
-        assertThat(errors).containsExactly("Rejected date is missing");
+        assertThat(errors).containsExactly("Rejected date is missing or invalid");
     }
 
     @Test
     void shouldReturnErrorWhenDateRejectedIsInvalid() {
         CaseData caseData = buildCaseData("2024-01-20", NO, null, "2024-13-25");
         List<String> errors = preAcceptanceCaseService.validateAcceptanceDate(caseData);
-        assertThat(errors).containsExactly("Rejected date must be a real date");
+        assertThat(errors).containsExactly("Rejected date is missing or invalid");
     }
 
     private CaseData buildCaseData(String receiptDate, String acceptedFlag, String dateAccepted, String dateRejected) {

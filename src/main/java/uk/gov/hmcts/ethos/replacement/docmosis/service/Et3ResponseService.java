@@ -301,6 +301,7 @@ public class Et3ResponseService {
         try {
             caseUserAssignmentData = ccdCaseAssignment.getCaseUserRoles(caseId);
         } catch (IOException ioe) {
+            log.info("******* hereeeeeeee");
             throw new GenericServiceException(SYSTEM_ERROR,
                     new Exception(ioe),
                     ioe.getMessage(),

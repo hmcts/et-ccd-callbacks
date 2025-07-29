@@ -274,6 +274,9 @@ public class Et1SubmissionService {
      * @param userToken the user token
      */
     public void vexationCheck(CaseDetails caseDetails, String userToken) {
+        if (!featureToggleService.isFeatureEnabled("vexationCheck")) {
+            return;
+        }
         String query = """
             {
               "size": 10000,

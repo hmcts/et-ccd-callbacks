@@ -9,6 +9,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
@@ -22,19 +23,68 @@ public class PreAcceptanceCaseService {
 
     public List<String> validateAcceptanceDate(CaseData caseData) {
         List<String> errors = new ArrayList<>();
+
+        if (caseData == null) {
+            errors.add("Case data is missing");
+            return errors;
+        }
+
         CasePreAcceptType preAcceptCase = caseData.getPreAcceptCase();
-        LocalDate dateOfReceipt = LocalDate.parse(caseData.getReceiptDate());
+        if (preAcceptCase == null) {
+            errors.add("Pre-acceptance case data is missing");
+            return errors;
+        }
+
+        if (isNullOrEmpty(caseData.getReceiptDate())) {
+            errors.add("Receipt date is missing");
+            return errors;
+        }
+
+        LocalDate receiptDate;
+        try {
+            receiptDate = LocalDate.parse(caseData.getReceiptDate());
+        } catch (Exception e) {
+            errors.add("Receipt date must be a real date");
+            return errors;
+        }
+
+        if (isNullOrEmpty(preAcceptCase.getCaseAccepted())) {
+            errors.add("Case acceptance status is missing");
+            return errors;
+        }
+
         if (YES.equals(preAcceptCase.getCaseAccepted())) {
-            LocalDate dateAccepted = LocalDate.parse(preAcceptCase.getDateAccepted());
-            if (dateAccepted.isBefore(dateOfReceipt)) {
+            if (isNullOrEmpty(preAcceptCase.getDateAccepted())) {
+                errors.add("Accepted date is missing");
+                return errors;
+            }
+            LocalDate dateAccepted;
+            try {
+                dateAccepted = LocalDate.parse(preAcceptCase.getDateAccepted());
+            } catch (Exception e) {
+                errors.add("Accepted date must be a real date");
+                return errors;
+            }
+            if (dateAccepted.isBefore(receiptDate)) {
                 errors.add(ACCEPTED_DATE_SHOULD_NOT_BE_EARLIER_THAN_THE_CASE_RECEIVED_DATE);
             }
         } else if (NO.equals(preAcceptCase.getCaseAccepted())) {
-            LocalDate dateRejected = LocalDate.parse(preAcceptCase.getDateRejected());
-            if (dateRejected.isBefore(dateOfReceipt)) {
+            if (isNullOrEmpty(preAcceptCase.getDateRejected())) {
+                errors.add("Rejected date is missing");
+                return errors;
+            }
+            LocalDate dateRejected;
+            try {
+                dateRejected = LocalDate.parse(preAcceptCase.getDateRejected());
+            } catch (Exception e) {
+                errors.add("Rejected date must be a real date");
+                return errors;
+            }
+            if (dateRejected.isBefore(receiptDate)) {
                 errors.add(REJECTED_DATE_SHOULD_NOT_BE_EARLIER_THAN_THE_CASE_RECEIVED_DATE);
             }
         }
+
         return errors;
     }
 }

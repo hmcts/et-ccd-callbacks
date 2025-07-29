@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.CasePreAcceptType;
@@ -12,62 +11,110 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 class PreAcceptanceCaseServiceTest {
-
-    private CaseData caseData;
-
     private final PreAcceptanceCaseService preAcceptanceCaseService = new PreAcceptanceCaseService();
 
-    @BeforeEach
-    void setUp() {
-        caseData = new CaseData();
-        caseData.setReceiptDate("2024-01-10");
-    }
-
     @Test
-    void shouldReturnError_whenDateAcceptedBeforeReceiptDate() {
-        CasePreAcceptType preAcceptType = new CasePreAcceptType();
-        preAcceptType.setCaseAccepted(YES);
-        preAcceptType.setDateAccepted("2024-01-05");
-        caseData.setPreAcceptCase(preAcceptType);
-
+    void shouldReturnErrorWhenDateAcceptedBeforeReceiptDate() {
+        CaseData caseData = buildCaseData("2024-01-20", YES, "2024-01-15", null);
         List<String> errors = preAcceptanceCaseService.validateAcceptanceDate(caseData);
-
         assertThat(errors).containsExactly("Accepted date should not be earlier than the case received date");
     }
 
     @Test
-    void shouldNotReturnError_whenDateAcceptedAfterReceiptDate() {
-        CasePreAcceptType preAcceptType = new CasePreAcceptType();
-        preAcceptType.setCaseAccepted(YES);
-        preAcceptType.setDateAccepted("2024-01-15");
-        caseData.setPreAcceptCase(preAcceptType);
-
+    void shouldNotReturnErrorWhenDateAcceptedAfterReceiptDate() {
+        CaseData caseData = buildCaseData("2024-01-20", YES, "2024-01-25", null);
         List<String> errors = preAcceptanceCaseService.validateAcceptanceDate(caseData);
-
         assertThat(errors).isEmpty();
     }
 
     @Test
-    void shouldReturnError_whenDateRejectedBeforeReceiptDate() {
-        CasePreAcceptType preAcceptType = new CasePreAcceptType();
-        preAcceptType.setCaseAccepted(NO);
-        preAcceptType.setDateRejected("2024-01-05");
-        caseData.setPreAcceptCase(preAcceptType);
-
+    void shouldReturnErrorWhenDateRejectedBeforeReceiptDate() {
+        CaseData caseData = buildCaseData("2024-01-20", NO, null, "2024-01-15");
         List<String> errors = preAcceptanceCaseService.validateAcceptanceDate(caseData);
-
         assertThat(errors).containsExactly("Rejected date should not be earlier than the case received date");
     }
 
     @Test
-    void shouldNotReturnError_whenDateRejectedAfterReceiptDate() {
-        CasePreAcceptType preAcceptType = new CasePreAcceptType();
-        preAcceptType.setCaseAccepted(NO);
-        preAcceptType.setDateRejected("2024-01-15");
-        caseData.setPreAcceptCase(preAcceptType);
-
+    void shouldNotReturnErrorWhenDateRejectedAfterReceiptDate() {
+        CaseData caseData = buildCaseData("2024-01-20", NO, null, "2024-01-25");
         List<String> errors = preAcceptanceCaseService.validateAcceptanceDate(caseData);
-
         assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void shouldReturnErrorWhenCaseDataIsNull() {
+        List<String> errors = preAcceptanceCaseService.validateAcceptanceDate(null);
+        assertThat(errors).containsExactly("Case data is missing");
+    }
+
+    @Test
+    void shouldReturnErrorWhenPreAcceptCaseIsNull() {
+        CaseData caseData = new CaseData();
+        caseData.setReceiptDate("2024-01-10");
+        caseData.setPreAcceptCase(null);
+        List<String> errors = preAcceptanceCaseService.validateAcceptanceDate(caseData);
+        assertThat(errors).containsExactly("Pre-acceptance case data is missing");
+    }
+
+    @Test
+    void shouldReturnErrorWhenReceiptDateIsNull() {
+        CaseData caseData = buildCaseData(null, NO, null, "2024-01-25");
+        List<String> errors = preAcceptanceCaseService.validateAcceptanceDate(caseData);
+        assertThat(errors).containsExactly("Receipt date is missing");
+    }
+
+    @Test
+    void shouldReturnErrorWhenReceiptDateIsInvalid() {
+        CaseData caseData = buildCaseData("2024-13-20", NO, null, "2024-01-25");
+        List<String> errors = preAcceptanceCaseService.validateAcceptanceDate(caseData);
+        assertThat(errors).containsExactly("Receipt date must be a real date");
+    }
+
+    @Test
+    void shouldReturnErrorWhenCaseAcceptedIsNull() {
+        CaseData caseData = buildCaseData("2024-01-20", null, null, "2024-01-25");
+        List<String> errors = preAcceptanceCaseService.validateAcceptanceDate(caseData);
+        assertThat(errors).containsExactly("Case acceptance status is missing");
+    }
+
+    @Test
+    void shouldReturnErrorWhenDateAcceptedIsNull() {
+        CaseData caseData = buildCaseData("2024-01-20", YES, null, null);
+        List<String> errors = preAcceptanceCaseService.validateAcceptanceDate(caseData);
+        assertThat(errors).containsExactly("Accepted date is missing");
+    }
+
+    @Test
+    void shouldReturnErrorWhenDateAcceptedIsInvalid() {
+        CaseData caseData = buildCaseData("2024-01-20", YES, "2024-13-25", null);
+        List<String> errors = preAcceptanceCaseService.validateAcceptanceDate(caseData);
+        assertThat(errors).containsExactly("Accepted date must be a real date");
+    }
+
+    @Test
+    void shouldReturnErrorWhenDateRejectedIsNull() {
+        CaseData caseData = buildCaseData("2024-01-20", NO, null, null);
+        List<String> errors = preAcceptanceCaseService.validateAcceptanceDate(caseData);
+        assertThat(errors).containsExactly("Rejected date is missing");
+    }
+
+    @Test
+    void shouldReturnErrorWhenDateRejectedIsInvalid() {
+        CaseData caseData = buildCaseData("2024-01-20", NO, null, "2024-13-25");
+        List<String> errors = preAcceptanceCaseService.validateAcceptanceDate(caseData);
+        assertThat(errors).containsExactly("Rejected date must be a real date");
+    }
+
+    private CaseData buildCaseData(String receiptDate, String acceptedFlag, String dateAccepted, String dateRejected) {
+        CasePreAcceptType preAccept = new CasePreAcceptType();
+        preAccept.setCaseAccepted(acceptedFlag);
+        preAccept.setDateAccepted(dateAccepted);
+        preAccept.setDateRejected(dateRejected);
+
+        CaseData caseData = new CaseData();
+        caseData.setReceiptDate(receiptDate);
+        caseData.setPreAcceptCase(preAccept);
+
+        return caseData;
     }
 }

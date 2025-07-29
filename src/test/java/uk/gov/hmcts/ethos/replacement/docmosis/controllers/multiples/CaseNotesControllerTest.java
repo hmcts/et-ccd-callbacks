@@ -12,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.ethos.replacement.docmosis.controllers.BaseControllerTest;
+import uk.gov.hmcts.ethos.replacement.docmosis.controllers.CaseNotesController;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.CaseNotesService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 

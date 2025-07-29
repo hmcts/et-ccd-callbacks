@@ -310,7 +310,7 @@ public class Et1SubmissionService {
             return;
         }
 
-        AdditionalCaseInfoType additionalCaseInfoType = ObjectUtils.defaultIfNull(
+        AdditionalCaseInfoType additionalCaseInfoType = ObjectUtils.getIfNull(
                 caseDetails.getCaseData().getAdditionalCaseInfoType(),
                 new AdditionalCaseInfoType()
         );

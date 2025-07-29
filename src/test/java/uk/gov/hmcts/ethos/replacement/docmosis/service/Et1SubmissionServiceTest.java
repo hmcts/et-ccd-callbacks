@@ -267,6 +267,7 @@ class Et1SubmissionServiceTest {
     @SneakyThrows
     @Test
     void shouldNotAddVexationNotes() {
+        when(featureToggleService.isFeatureEnabled("vexationCheck")).thenReturn(true);
         caseDetails = generateCaseDetails("citizenCaseData.json");
         when(ccdClient.buildAndGetElasticSearchRequest(anyString(), anyString(), anyString()))
             .thenReturn(Collections.emptyList());
@@ -278,6 +279,7 @@ class Et1SubmissionServiceTest {
     @SneakyThrows
     @Test
     void shouldAddVexationNotes() {
+        when(featureToggleService.isFeatureEnabled("vexationCheck")).thenReturn(true);
         caseDetails = generateCaseDetails("citizenCaseData.json");
         // CCD client will be called twice to return 4 cases which will trigger adding vexation notes
         when(ccdClient.buildAndGetElasticSearchRequest(anyString(), anyString(), anyString()))
@@ -285,6 +287,16 @@ class Et1SubmissionServiceTest {
         et1SubmissionService.vexationCheck(caseDetails, "authToken");
         assertEquals(YES, caseDetails.getCaseData().getAdditionalCaseInfoType().getInterventionRequired());
         assertTrue(caseDetails.getCaseData().getFlagsImageAltText().contains("SPEAK TO REJ"));
+    }
+
+    @SneakyThrows
+    @Test
+    void shouldAddVexationNotesWhenToggleIsOff() {
+        when(featureToggleService.isFeatureEnabled("vexationCheck")).thenReturn(false);
+        caseDetails = generateCaseDetails("citizenCaseData.json");
+        et1SubmissionService.vexationCheck(caseDetails, "authToken");
+        verify(ccdClient, times(0)).buildAndGetElasticSearchRequest(anyString(), anyString(), anyString());
+
     }
 
     private List<SubmitEvent> createSubmitEventList() {

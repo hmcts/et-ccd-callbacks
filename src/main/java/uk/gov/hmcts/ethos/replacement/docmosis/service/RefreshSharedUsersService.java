@@ -33,6 +33,12 @@ public class RefreshSharedUsersService {
     public void refreshSharedUsers(CaseDetails caseDetails) throws IOException {
         List<CaseUserAssignment> caseAssignedUserRolesList =
                 ccdCaseAssignment.getCaseUserRoles(caseDetails.getCaseId()).getCaseUserAssignments();
+        if(isEmpty(caseAssignedUserRolesList)) {
+            log.info("No case user assignments found for case id {}", caseDetails.getCaseId());
+            return;
+        }
+        log.info("Found {} case user assignments for case id {}", caseAssignedUserRolesList.size(),
+                caseDetails.getCaseId());
         claimantRepresentativeUsers(caseDetails, caseAssignedUserRolesList);
         respondentRepresentativeUsers(caseDetails, caseAssignedUserRolesList);
     }
@@ -47,7 +53,7 @@ public class RefreshSharedUsersService {
         if (respondentSolicitors.isEmpty() || isEmpty(caseData.getRepCollection())) {
             return;
         }
-
+        log.info("{} Respondent solicitors found for case id {}", respondentSolicitors.size(), caseDetails.getCaseId());
         respondentSolicitors.forEach((key, value) -> {
             UserDetails userDetails1 = adminUserService.getUserDetails(key);
             OrganisationUsersIdamUser organisationUsersIdamUser = OrganisationUsersIdamUser.builder()
@@ -58,13 +64,12 @@ public class RefreshSharedUsersService {
             GenericTypeItem<OrganisationUsersIdamUser> user = new GenericTypeItem<>();
             user.setValue(organisationUsersIdamUser);
             user.setId(UUID.randomUUID().toString());
-            int index = SolicitorRole.valueOf(value).getIndex();
+            int index = SolicitorRole.from(value).get().getIndex();
             if (isEmpty(caseData.getRepCollection().get(index).getValue().getOrganisationUsers())) {
                 caseData.getRepCollection().get(index).getValue().setOrganisationUsers(new ArrayList<>());
             }
             caseData.getRepCollection().get(index).getValue().getOrganisationUsers().add(user);
         });
-
     }
 
     private void claimantRepresentativeUsers(CaseDetails caseDetails,
@@ -78,6 +83,7 @@ public class RefreshSharedUsersService {
         if (isEmpty(claimantSolicitors)) {
             return;
         }
+        log.info("{} Claimant solicitors found for case id {}", claimantSolicitors.size(), caseDetails.getCaseId());
         claimantSolicitors.stream()
                 .map(adminUserService::getUserDetails)
                 .map(userDetails1 -> OrganisationUsersIdamUser.builder()
@@ -86,6 +92,7 @@ public class RefreshSharedUsersService {
                         .lastName(userDetails1.getLastName())
                         .build())
                 .forEach(organisationUsersIdamUser -> {
+                    log.info("User details {}", organisationUsersIdamUser);
                     GenericTypeItem<OrganisationUsersIdamUser> user = new GenericTypeItem<>();
                     user.setValue(organisationUsersIdamUser);
                     user.setId(UUID.randomUUID().toString());
@@ -95,5 +102,6 @@ public class RefreshSharedUsersService {
         if (claimantRep != null && claimantRep.getMyHmctsOrganisation() != null) {
             claimantRep.setOrganisationUsers(claimantUsers);
         }
+        log.info(String.valueOf(caseDetails.getCaseData().getRepresentativeClaimantType()));
     }
 }

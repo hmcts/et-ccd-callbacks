@@ -37,8 +37,6 @@ public class RefreshSharedUsersService {
             log.info("No case user assignments found for case id {}", caseDetails.getCaseId());
             return;
         }
-        log.info("Found {} case user assignments for case id {}", caseAssignedUserRolesList.size(),
-                caseDetails.getCaseId());
         claimantRepresentativeUsers(caseDetails, caseAssignedUserRolesList);
         respondentRepresentativeUsers(caseDetails, caseAssignedUserRolesList);
     }
@@ -76,7 +74,8 @@ public class RefreshSharedUsersService {
                                              List<CaseUserAssignment> caseAssignedUserRolesList) {
         List<String> claimantSolicitors = caseAssignedUserRolesList.stream()
                 .filter(caseUserAssignment ->
-                        caseUserAssignment.getCaseRole().equals(ClaimantSolicitorRole.CLAIMANTSOLICITOR.toString()))
+                        caseUserAssignment.getCaseRole().equals(
+                                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()))
                 .map(CaseUserAssignment::getUserId)
                 .toList();
         List<GenericTypeItem<OrganisationUsersIdamUser>> claimantUsers = new ArrayList<>();
@@ -92,7 +91,6 @@ public class RefreshSharedUsersService {
                         .lastName(userDetails1.getLastName())
                         .build())
                 .forEach(organisationUsersIdamUser -> {
-                    log.info("User details {}", organisationUsersIdamUser);
                     GenericTypeItem<OrganisationUsersIdamUser> user = new GenericTypeItem<>();
                     user.setValue(organisationUsersIdamUser);
                     user.setId(UUID.randomUUID().toString());
@@ -102,6 +100,5 @@ public class RefreshSharedUsersService {
         if (claimantRep != null && claimantRep.getMyHmctsOrganisation() != null) {
             claimantRep.setOrganisationUsers(claimantUsers);
         }
-        log.info(String.valueOf(caseDetails.getCaseData().getRepresentativeClaimantType()));
     }
 }

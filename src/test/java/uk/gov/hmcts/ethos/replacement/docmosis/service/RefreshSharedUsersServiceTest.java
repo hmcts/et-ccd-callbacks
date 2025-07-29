@@ -56,7 +56,7 @@ class RefreshSharedUsersServiceTest {
         setupRepresentativeClaimantType();
         UserDetails userDetails = createUserDetails("test@example.com", "Test", "User");
         CaseUserAssignment assignment = createCaseUserAssignment("user1",
-                ClaimantSolicitorRole.CLAIMANTSOLICITOR.toString());
+                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
         setupMockBehaviour("user1", userDetails, assignment);
 
         service.refreshSharedUsers(caseDetails);
@@ -77,9 +77,9 @@ class RefreshSharedUsersServiceTest {
         UserDetails userDetails2 = createUserDetails("test2@example.com", "Test2", "User2");
 
         CaseUserAssignment assignment1 = createCaseUserAssignment("user1",
-                ClaimantSolicitorRole.CLAIMANTSOLICITOR.toString());
+                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
         CaseUserAssignment assignment2 = createCaseUserAssignment("user2",
-                ClaimantSolicitorRole.CLAIMANTSOLICITOR.toString());
+                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
 
         when(ccdCaseAssignment.getCaseUserRoles(CASE_ID)).thenReturn(mockUserRolesResponse);
         when(mockUserRolesResponse.getCaseUserAssignments()).thenReturn(List.of(assignment1, assignment2));

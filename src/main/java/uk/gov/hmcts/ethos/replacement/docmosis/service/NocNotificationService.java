@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -197,7 +198,7 @@ public class NocNotificationService {
 
     private void sendEmailToOldOrgAdmin(String orgId, CaseData caseDataPrevious) {
         ResponseEntity<RetrieveOrgByIdResponse> getOrgResponse = getOrganisationById(orgId);
-        HttpStatus statusCode = getOrgResponse.getStatusCode();
+        HttpStatusCode statusCode = getOrgResponse.getStatusCode();
 
         if (!HttpStatus.OK.equals(statusCode)) {
             log.error("Cannot retrieve old org by id {} [{}] {}", orgId, statusCode, getOrgResponse.getBody());
@@ -223,7 +224,7 @@ public class NocNotificationService {
 
     private void sendEmailToNewOrgAdmin(String orgId, CaseDetails caseDetailsNew, String partyName) {
         ResponseEntity<RetrieveOrgByIdResponse> getOrgResponse = getOrganisationById(orgId);
-        HttpStatus statusCode = getOrgResponse.getStatusCode();
+        HttpStatusCode statusCode = getOrgResponse.getStatusCode();
 
         if (!HttpStatus.OK.equals(statusCode)) {
             log.error("Cannot retrieve new org by id {} [{}] {}", orgId, statusCode, getOrgResponse.getBody());

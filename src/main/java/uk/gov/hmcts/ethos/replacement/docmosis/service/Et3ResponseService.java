@@ -207,34 +207,40 @@ public class Et3ResponseService {
     }
 
     /**
-     * Validates and extracts the representative's contact information from the case data.
+     * Validates the presence of a represented respondent for a given case and extracts the representative's contact
+     * details (phone number and address) into the provided {@link CaseData} object.
      * <p>
-     * This method retrieves the list of indexes corresponding to respondents that are represented
-     * by a legal representative in a given case. It then uses the index of the first represented
-     * respondent to extract and set the representative's phone number and address into the
-     * {@link CaseData} object.
-     * </p>
+     * This method performs the following:
+     * <ul>
+     *     <li>Retrieves the list of respondent indexes that are represented, using the provided user token and
+     *     submission reference.</li>
+     *     <li>Validates that there is at least one represented respondent with a non-null index.</li>
+     *     <li>Extracts the phone number and address of the representative associated with the first valid respondent
+     *     and sets them in {@link CaseData}.</li>
+     * </ul>
+     * If any validation fails or the list of represented respondent indexes is empty or contains a null first element,
+     * a {@link GenericServiceException} is thrown.
      *
-     * <p>
-     * If no represented respondent is found, or if an error occurs while retrieving
-     * the respondent indexes, a {@link GenericServiceException} is thrown.
-     * </p>
-     *
-     * @param userToken the user's authentication token used for making downstream service calls
-     * @param caseData the case data object containing information about the case and respondents
-     * @throws GenericServiceException if an error occurs while retrieving represented respondent indexes,
-     *         or if no represented respondent is found in the case data
+     * @param userToken          The user authorization token required for secure communication with downstream
+     *                           services.
+     * @param caseData           The case data containing respondent and representative information.
+     * @param submissionReference A unique reference string identifying the submission associated with this operation.
+     * @throws GenericServiceException if:
+     *      <ul>
+     *          <li>There is an issue retrieving the represented respondent indexes.</li>
+     *          <li>No represented respondent is found.</li>
+     *      </ul>
      */
-    public void validateAndExtractRepresentativeContact(String userToken, CaseData caseData)
+    public void validateAndExtractRepresentativeContact(String userToken, CaseData caseData, String submissionReference)
             throws GenericServiceException {
         List<Integer> representedRespondentIndexes;
         try {
-            representedRespondentIndexes = getRepresentedRespondentIndexes(userToken, caseData.getCcdID());
+            representedRespondentIndexes = getRepresentedRespondentIndexes(userToken, submissionReference);
         } catch (GenericServiceException gse) {
             throw new GenericServiceException(gse.getMessage(),
                     new Exception(gse),
                     gse.getMessage(),
-                    caseData.getCcdID(),
+                    submissionReference,
                     "Et3ResponseService",
                     "validateAndExtractRepresentativeContact");
         }
@@ -242,7 +248,7 @@ public class Et3ResponseService {
             throw new GenericServiceException(ERROR_NO_REPRESENTED_RESPONDENT_FOUND,
                     new Exception(ERROR_NO_REPRESENTED_RESPONDENT_FOUND),
                     ERROR_NO_REPRESENTED_RESPONDENT_FOUND,
-                    caseData.getCcdID(),
+                    submissionReference,
                     "Et3ResponseService",
                     "validateAndExtractRepresentativeContact");
         }
@@ -339,29 +345,36 @@ public class Et3ResponseService {
     }
 
     /**
-     * Updates the contact details (phone number and address) of all represented respondents
-     * in the case with values from the ET3 response section of the {@link CaseData}.
+     * Updates the contact details (phone number and address) of the representatives for all represented respondents
+     * within the given {@link CaseData} object.
      * <p>
-     * This method validates the input data and token, retrieves the list of represented
-     * respondent indexes, and for each valid representative entry, updates their contact
-     * details using the ET3 response phone number and address.
-     * </p>
-     * <p>
-     * Throws a {@link GenericServiceException} if:
+     * This method performs the following steps:
      * <ul>
-     *   <li>Case data is null or invalid</li>
-     *   <li>User token is blank</li>
-     *   <li>Represented respondent indexes cannot be retrieved</li>
-     *   <li>No represented respondents are found</li>
+     *     <li>Validates that the {@code caseData} object and {@code userToken} are not null or empty.</li>
+     *     <li>Retrieves the indexes of respondents that are represented using the {@code userToken} and CCD ID from
+     *     the case data.</li>
+     *     <li>Iterates over the list of represented respondent indexes and updates each representative's phone number
+     *     and address with the values stored in {@code caseData.getEt3ResponsePhone()} and
+     *     {@code caseData.getEt3ResponseAddress()}.</li>
      * </ul>
-     * </p>
+     * <p>
+     * If any validation fails, or if there are no represented respondents or the representative data is missing, a
+     * {@link GenericServiceException} is thrown with relevant context.
      *
-     * @param userToken the authentication token used to fetch respondent indexes
-     * @param caseData the case data containing respondent and representative information
-     * @throws GenericServiceException if validation fails, no representatives are found,
-     *         or a service error occurs during index retrieval
+     * @param userToken           The authorization token used to authenticate service calls.
+     * @param caseData            The case data containing respondent and representative information, including
+     *                            ET3 response contact details.
+     * @param submissionReference A unique identifier for the current case submission, used for error tracking
+     *                            and logging.
+     * @throws GenericServiceException if:
+     *      <ul>
+     *          <li>{@code caseData} is null or empty.</li>
+     *          <li>{@code userToken} is blank.</li>
+     *          <li>An error occurs while retrieving represented respondent indexes.</li>
+     *          <li>No represented respondents are found or the representative collection is empty.</li>
+     *      </ul>
      */
-    public void setRespondentRepresentsContactDetails(String userToken, CaseData caseData)
+    public void setRespondentRepresentsContactDetails(String userToken, CaseData caseData, String submissionReference)
             throws GenericServiceException {
         if (ObjectUtils.isEmpty(caseData)) {
             throw new GenericServiceException(ERROR_CASE_DATA_NOT_FOUND,
@@ -375,25 +388,25 @@ public class Et3ResponseService {
             throw new GenericServiceException(ERROR_INVALID_USER_TOKEN,
                     new Exception(ERROR_INVALID_USER_TOKEN),
                     ERROR_INVALID_USER_TOKEN,
-                    caseData.getCcdID(),
+                    submissionReference,
                     "Et3ResponseService",
                     "setRespondentRepresentsContactDetails");
         }
         List<Integer> representedRespondentIndexes;
         try {
-            representedRespondentIndexes = getRepresentedRespondentIndexes(userToken, caseData.getCcdID());
+            representedRespondentIndexes = getRepresentedRespondentIndexes(userToken, submissionReference);
         } catch (GenericServiceException gex) {
             throw new GenericServiceException(gex.getMessage(),
                     new Exception(gex),
                     gex.getMessage(),
-                    caseData.getCcdID(),
+                    submissionReference,
                     "Et3ResponseService",
                     "setRespondentRepresentsContactDetails");
         } catch (NoSuchElementException nse) {
             throw new GenericServiceException(SYSTEM_ERROR,
                     new Exception(nse),
                     nse.getMessage(),
-                    caseData.getCcdID(),
+                    submissionReference,
                     "Et3ResponseService",
                     "setRespondentRepresentsContactDetails");
         }
@@ -401,7 +414,7 @@ public class Et3ResponseService {
             throw new GenericServiceException(ERROR_NO_REPRESENTED_RESPONDENT_FOUND,
                     new Exception(ERROR_NO_REPRESENTED_RESPONDENT_FOUND),
                     ERROR_NO_REPRESENTED_RESPONDENT_FOUND,
-                    caseData.getCcdID(),
+                    submissionReference,
                     "Et3ResponseService",
                     "setRespondentRepresentsContactDetails");
         }

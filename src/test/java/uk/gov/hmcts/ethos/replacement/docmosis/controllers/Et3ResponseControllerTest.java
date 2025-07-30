@@ -464,7 +464,7 @@ class Et3ResponseControllerTest extends BaseControllerTest {
     void theAboutToStartRepresentativeInfo() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         doNothing().when(et3ResponseService).setRespondentRepresentsContactDetails(AUTH_TOKEN,
-                ccdRequest.getCaseDetails().getCaseData());
+                ccdRequest.getCaseDetails().getCaseData(), ccdRequest.getCaseDetails().getCaseId());
         mvc.perform(post(ABOUT_TO_START_REPRESENTATIVE_INFO)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -485,7 +485,7 @@ class Et3ResponseControllerTest extends BaseControllerTest {
                 StringUtils.EMPTY,
                 "Et3ResponseService",
                 "validateAndExtractRepresentativeContact")).when(et3ResponseService)
-                .validateAndExtractRepresentativeContact(anyString(), any(CaseData.class));
+                .validateAndExtractRepresentativeContact(anyString(), any(CaseData.class), anyString());
         mvc.perform(post(ABOUT_TO_START_REPRESENTATIVE_INFO)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -502,7 +502,7 @@ class Et3ResponseControllerTest extends BaseControllerTest {
     void theAboutToSubmitRepresentativeInfo() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         doNothing().when(et3ResponseService).setRespondentRepresentsContactDetails(AUTH_TOKEN,
-                ccdRequest.getCaseDetails().getCaseData());
+                ccdRequest.getCaseDetails().getCaseData(), ccdRequest.getCaseDetails().getCaseId());
         mvc.perform(post(ABOUT_TO_SUBMIT_REPRESENTATIVE_INFO)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -523,7 +523,7 @@ class Et3ResponseControllerTest extends BaseControllerTest {
                 StringUtils.EMPTY,
                 "Et3ResponseService",
                 "setRespondentRepresentsContactDetails")).when(et3ResponseService)
-                .setRespondentRepresentsContactDetails(anyString(), any(CaseData.class));
+                .setRespondentRepresentsContactDetails(anyString(), any(CaseData.class), anyString());
         mvc.perform(post(ABOUT_TO_SUBMIT_REPRESENTATIVE_INFO)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)

@@ -27,3 +27,5 @@ cron:
   caseTypeId: ${CRON_CASE_TYPE_ID:ET_EnglandWales,ET_Scotland}
   maxCasesPerSearch: ${CRON_MAX_PER_SEARCH:10}
   acasCertSubmission: ${CRON_ACAS_CERT_SUBMISSION_TASK:0 */5 * * * ?}
+
+etcos.url: ${ET_COS_URL:http://localhost:8080}

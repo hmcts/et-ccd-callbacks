@@ -57,16 +57,16 @@ class RefreshSharedUsersServiceTest {
         UserDetails userDetails = createUserDetails("test@example.com", "Test", "User");
         CaseUserAssignment assignment = createCaseUserAssignment("user1",
                 ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
-        setupMockBehaviour("user1", userDetails, assignment);
+        setupMockBehaviour(userDetails, assignment);
 
         service.refreshSharedUsers(caseDetails);
 
         List<GenericTypeItem<OrganisationUsersIdamUser>> orgUsers =
                 caseData.getRepresentativeClaimantType().getOrganisationUsers();
         assertThat(orgUsers).hasSize(1);
-        assertThat(orgUsers.get(0).getValue().getEmail()).isEqualTo("test@example.com");
-        assertThat(orgUsers.get(0).getValue().getFirstName()).isEqualTo("Test");
-        assertThat(orgUsers.get(0).getValue().getLastName()).isEqualTo("User");
+        assertThat(orgUsers.getFirst().getValue().getEmail()).isEqualTo("test@example.com");
+        assertThat(orgUsers.getFirst().getValue().getFirstName()).isEqualTo("Test");
+        assertThat(orgUsers.getFirst().getValue().getLastName()).isEqualTo("User");
     }
 
     @Test
@@ -112,16 +112,16 @@ class RefreshSharedUsersServiceTest {
         setupRespondentOrganisation(index);
         UserDetails userDetails = createUserDetails("resp@example.com", "Resp", "Solicitor");
         CaseUserAssignment assignment = createCaseUserAssignment("user1", SolicitorRole.SOLICITORA.getCaseRoleLabel());
-        setupMockBehaviour("user1", userDetails, assignment);
+        setupMockBehaviour(userDetails, assignment);
 
         service.refreshSharedUsers(caseDetails);
 
         List<GenericTypeItem<OrganisationUsersIdamUser>> users =
                 caseData.getRepCollection().get(index).getValue().getOrganisationUsers();
         assertThat(users).hasSize(1);
-        assertThat(users.get(0).getValue().getEmail()).isEqualTo("resp@example.com");
-        assertThat(users.get(0).getValue().getFirstName()).isEqualTo("Resp");
-        assertThat(users.get(0).getValue().getLastName()).isEqualTo("Solicitor");
+        assertThat(users.getFirst().getValue().getEmail()).isEqualTo("resp@example.com");
+        assertThat(users.getFirst().getValue().getFirstName()).isEqualTo("Resp");
+        assertThat(users.getFirst().getValue().getLastName()).isEqualTo("Solicitor");
     }
 
     @Test
@@ -146,17 +146,17 @@ class RefreshSharedUsersServiceTest {
         List<GenericTypeItem<OrganisationUsersIdamUser>> usersA =
                 caseData.getRepCollection().get(indexA).getValue().getOrganisationUsers();
         assertThat(usersA).hasSize(1);
-        assertThat(usersA.get(0).getValue().getEmail()).isEqualTo("resp@example.com");
-        assertThat(usersA.get(0).getValue().getFirstName()).isEqualTo("Resp");
-        assertThat(usersA.get(0).getValue().getLastName()).isEqualTo("Solicitor");
+        assertThat(usersA.getFirst().getValue().getEmail()).isEqualTo("resp@example.com");
+        assertThat(usersA.getFirst().getValue().getFirstName()).isEqualTo("Resp");
+        assertThat(usersA.getFirst().getValue().getLastName()).isEqualTo("Solicitor");
 
         int indexB = SolicitorRole.SOLICITORB.getIndex();
         List<GenericTypeItem<OrganisationUsersIdamUser>> usersB =
                 caseData.getRepCollection().get(indexB).getValue().getOrganisationUsers();
         assertThat(usersB).hasSize(1);
-        assertThat(usersB.get(0).getValue().getEmail()).isEqualTo("resp2@example.com");
-        assertThat(usersB.get(0).getValue().getFirstName()).isEqualTo("Resp2");
-        assertThat(usersB.get(0).getValue().getLastName()).isEqualTo("Solicitor2");
+        assertThat(usersB.getFirst().getValue().getEmail()).isEqualTo("resp2@example.com");
+        assertThat(usersB.getFirst().getValue().getFirstName()).isEqualTo("Resp2");
+        assertThat(usersB.getFirst().getValue().getLastName()).isEqualTo("Solicitor2");
     }
 
     @Test
@@ -210,10 +210,10 @@ class RefreshSharedUsersServiceTest {
         return assignment;
     }
 
-    private void setupMockBehaviour(String userId, UserDetails userDetails, CaseUserAssignment assignment)
+    private void setupMockBehaviour(UserDetails userDetails, CaseUserAssignment assignment)
             throws IOException {
         when(ccdCaseAssignment.getCaseUserRoles(CASE_ID)).thenReturn(mockUserRolesResponse);
         when(mockUserRolesResponse.getCaseUserAssignments()).thenReturn(List.of(assignment));
-        when(adminUserService.getUserDetails(userId)).thenReturn(userDetails);
+        when(adminUserService.getUserDetails("user1")).thenReturn(userDetails);
     }
 }

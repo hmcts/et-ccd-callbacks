@@ -51,24 +51,28 @@ public class RefreshSharedUsersService {
         if (respondentSolicitors.isEmpty() || isEmpty(caseData.getRepCollection())) {
             return;
         }
+
         log.info("{} Respondent solicitors found for case id {}", respondentSolicitors.size(), caseDetails.getCaseId());
-        respondentSolicitors.forEach((key, value) -> {
-            UserDetails userDetails1 = adminUserService.getUserDetails(key);
+        caseData.getRepCollection().forEach(item -> item.getValue().setOrganisationUsers(new ArrayList<>()));
+
+        respondentSolicitors.forEach((userId, roleLabel) -> {
+            UserDetails userDetails = adminUserService.getUserDetails(userId);
             OrganisationUsersIdamUser organisationUsersIdamUser = OrganisationUsersIdamUser.builder()
-                    .email(userDetails1.getEmail())
-                    .firstName(userDetails1.getFirstName())
-                    .lastName(userDetails1.getLastName())
+                    .email(userDetails.getEmail())
+                    .firstName(userDetails.getFirstName())
+                    .lastName(userDetails.getLastName())
                     .build();
             GenericTypeItem<OrganisationUsersIdamUser> user = new GenericTypeItem<>();
             user.setValue(organisationUsersIdamUser);
             user.setId(UUID.randomUUID().toString());
-            int index = SolicitorRole.from(value)
-                    .orElseThrow(() -> new IllegalArgumentException("Unknown solicitor role: " + value))
+
+            int index = SolicitorRole.from(roleLabel)
+                    .orElseThrow(() -> new IllegalArgumentException("Unknown solicitor role: " + roleLabel))
                     .getIndex();
 
-            // new list to prevent duplicates of the same user being added
-            caseData.getRepCollection().get(index).getValue().setOrganisationUsers(new ArrayList<>());
-            caseData.getRepCollection().get(index).getValue().getOrganisationUsers().add(user);
+            List<GenericTypeItem<OrganisationUsersIdamUser>> usersList =
+                    caseData.getRepCollection().get(index).getValue().getOrganisationUsers();
+            usersList.add(user);
         });
     }
 

@@ -17,7 +17,10 @@ import static uk.gov.hmcts.ecm.common.helpers.UtilHelper.formatCurrentDate;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper.getHearingVenue;
 
-public class HearingDocumentsHelper {
+public final class HearingDocumentsHelper {
+
+    public static final String HEARING_DOCUMENT_NO_HEARING_ERROR =
+        "There are no hearings for this case. List a hearing before uploading a hearing document.";
 
     private HearingDocumentsHelper() {
         // Helper class should not have public constructors
@@ -31,7 +34,7 @@ public class HearingDocumentsHelper {
      */
     public static List<String> populateHearingDetails(CaseData caseData) {
         if (isEmpty(caseData.getHearingCollection())) {
-            return List.of("There are no hearings for this case. List a hearing before uploading a hearing document.");
+            return List.of(HEARING_DOCUMENT_NO_HEARING_ERROR);
         } else {
             caseData.setUploadHearingDocumentsSelectFutureHearing(
                     DynamicFixedListType.from(caseData.getHearingCollection().stream()
@@ -59,8 +62,8 @@ public class HearingDocumentsHelper {
 
         if (hearingType.getHearingDateCollection().stream()
             .filter(item -> item != null && item.getValue() != null)
-            .map(item -> LocalDateTime.parse(item.getValue().getListedDate()).toLocalDate())
-            .anyMatch(listedDate -> listedDate.isBefore(LocalDate.now()))) {
+            .map(item -> LocalDateTime.parse(item.getValue().getListedDate()))
+            .anyMatch(listedDate -> listedDate.isBefore(LocalDateTime.now()))) {
             return getHearingDynamicValueType(hearingType);
         }
         return null;
@@ -82,7 +85,7 @@ public class HearingDocumentsHelper {
         return hearingType.getHearingDateCollection().stream()
             .filter(item -> item != null && item.getValue() != null)
             .anyMatch(item ->
-                LocalDateTime.parse(item.getValue().getListedDate()).toLocalDate().isAfter(LocalDate.now())
+                LocalDateTime.parse(item.getValue().getListedDate()).isAfter(LocalDateTime.now())
                 && HEARING_STATUS_LISTED.equals(item.getValue().getHearingStatus()))
             ? getHearingDynamicValueType(hearingType)
             : null;
@@ -121,10 +124,10 @@ public class HearingDocumentsHelper {
             case "Future" -> {
                 return caseData.getUploadHearingDocumentsSelectFutureHearing().getValue();
             }
-            default -> {
+            default ->
                 throw new IllegalArgumentException("Invalid hearing selection: {}"
                                                    + caseData.getUploadHearingDocumentsSelectPastOrFutureHearing());
-            }
+
         }
     }
 }

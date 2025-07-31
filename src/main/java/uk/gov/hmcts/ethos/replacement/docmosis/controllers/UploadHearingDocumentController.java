@@ -71,7 +71,6 @@ public class UploadHearingDocumentController {
     public ResponseEntity<CCDCallbackResponse> aboutToSubmit(
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
-
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
         hearingDocumentsService.addDocumentToHearingDocuments(caseData, userToken);

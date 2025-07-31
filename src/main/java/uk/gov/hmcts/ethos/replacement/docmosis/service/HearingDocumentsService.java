@@ -10,12 +10,14 @@ import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingBundleType;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadHearingDocumentType;
 
 import java.util.ArrayList;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.helpers.UtilHelper.listingFormatLocalDate;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.OTHER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingDocumentsHelper.getSelectedHearing;
 
@@ -24,7 +26,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingDocumentsHe
 @Slf4j
 public class HearingDocumentsService {
     private final UserIdamService userIdamService;
-    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormat.forPattern("d MMMM yyyy HH:mm");
+    private static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormat.forPattern("d MMMM yyyy HH:mm");
 
     /**
      * Adds a document to the hearing document collection in the case data.
@@ -37,33 +39,48 @@ public class HearingDocumentsService {
         try {
             UserDetails userDetails = userIdamService.getUserDetails(userToken);
             if (userDetails != null) {
-                uploadedBy = userDetails.getFirstName() + " " + userDetails.getLastName();
+                uploadedBy = userDetails.getName();
             }
         } catch (Exception e) {
-            log.error("Error getting user details", e);
+            log.warn("Error getting user details", e);
         }
 
-        GenericTypeItem<HearingBundleType> documentToAdd =
-            GenericTypeItem.from(
-                HearingBundleType.builder()
-                    .hearing(getSelectedHearing(caseData).getCode())
-                    .formattedSelectedHearing(getSelectedHearing(caseData).getLabel())
-                    .uploadFile(caseData.getUploadHearingDocumentsUploadFile())
-                    .whatDocuments(caseData.getUploadHearingDocumentsWhatAreDocuments())
-                    .whatDocumentsOther(OTHER.equals(caseData.getUploadHearingDocumentsWhatAreDocuments())
-                        ? caseData.getUploadHearingDocumentsWhatAreDocumentsOther() : null)
-                    .whoseDocuments(isNullOrEmpty(caseData.getUploadHearingDocumentsWhatAreDocuments())
-                        ? null : caseData.getUploadHearingDocumentsWhoseDocuments())
-                    .submittedDate(listingFormatLocalDate(caseData.getUploadHearingDocumentsDateSubmitted()))
-                    .uploadDateTime(dateTimeFormatter.print(DateTime.now()))
-                    .uploadedBy(uploadedBy)
-                    .build()
-
-            );
-        if (isEmpty(caseData.getHearingDocumentCollection())) {
-            caseData.setHearingDocumentCollection(new ArrayList<>());
+        if (isEmpty(caseData.getUploadHearingDocumentType())) {
+            throw new IllegalArgumentException("UploadHearingDocumentType cannot be empty");
         }
-        caseData.getHearingDocumentCollection().add(documentToAdd);
+
+        if (isEmpty(caseData.getBundlesRespondentCollection())) {
+            caseData.setBundlesRespondentCollection(new ArrayList<>());
+        }
+        if (isEmpty(caseData.getBundlesClaimantCollection())) {
+            caseData.setBundlesClaimantCollection(new ArrayList<>());
+        }
+
+        for (GenericTypeItem<UploadHearingDocumentType> hearingDoc : caseData.getUploadHearingDocumentType()) {
+            UploadHearingDocumentType hearingDocumentType = hearingDoc.getValue();
+            GenericTypeItem<HearingBundleType> documentToAdd =
+                GenericTypeItem.from(
+                    HearingBundleType.builder()
+                        .hearing(getSelectedHearing(caseData).getCode())
+                        .formattedSelectedHearing(getSelectedHearing(caseData).getLabel())
+                        .uploadFile(hearingDocumentType.getDocument())
+                        .whatDocuments(hearingDocumentType.getType())
+                        .whatDocumentsOther(OTHER.equals(hearingDocumentType.getType())
+                            ? hearingDocumentType.getTypeOther() : null)
+                        .submittedDate(listingFormatLocalDate(caseData.getUploadHearingDocumentsDateSubmitted()))
+                        .uploadDateTime(DATE_TIME_FORMATTER.print(DateTime.now()))
+                        .uploadedBy(uploadedBy)
+                        .build()
+                );
+
+            switch (caseData.getUploadHearingDocumentsWhoseDocuments()) {
+                case CLAIMANT_TITLE -> caseData.getBundlesClaimantCollection().add(documentToAdd);
+                case RESPONDENT_TITLE -> caseData.getBundlesRespondentCollection().add(documentToAdd);
+                default -> throw new IllegalArgumentException(
+                    "Invalid value for UploadHearingDocumentsWhoseDocuments: "
+                        + caseData.getUploadHearingDocumentsWhoseDocuments());
+            }
+        }
 
         clearUploadHearingDocumentFields(caseData);
     }
@@ -72,9 +89,7 @@ public class HearingDocumentsService {
         caseData.setUploadHearingDocumentsSelectFutureHearing(null);
         caseData.setUploadHearingDocumentsSelectPastHearing(null);
         caseData.setUploadHearingDocumentsSelectPastOrFutureHearing(null);
-        caseData.setUploadHearingDocumentsUploadFile(null);
-        caseData.setUploadHearingDocumentsWhatAreDocuments(null);
-        caseData.setUploadHearingDocumentsWhatAreDocumentsOther(null);
+        caseData.setUploadHearingDocumentType(null);
         caseData.setUploadHearingDocumentsWhoseDocuments(null);
         caseData.setUploadHearingDocumentsDateSubmitted(null);
     }

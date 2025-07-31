@@ -231,17 +231,13 @@ public class SendNotificationService {
         // Send notification to the claimant
         String caseId = caseDetails.getCaseId();
         List<CaseUserAssignment> caseUserAssignments = caseAccessService.getCaseUserAssignmentsById(caseId);
-        log.info("CaseId: " + caseId + " caseUserAssignments: " + caseUserAssignments);
         if (!RESPONDENT_ONLY.equals(caseData.getSendNotificationNotify())) {
-            log.info("sending notification emails for claimant and/or claimant representative");
             // If represented, send notification to claimant representative Only
             Map<String, String> personalisation;
             if (isRepresentedClaimantWithMyHmctsCase(caseDetails.getCaseData())) {
-                log.info("Claimant is represented with MyHMCTS case");
                 String linkEnv = emailService.getClaimantRepExuiCaseNotificationsLink(
                         caseDetails.getCaseId());
                 personalisation = buildPersonalisation(caseDetails, linkEnv);
-                log.info("Sending emails for claimant and/or claimant representative");
                 // with shared case there's going to be multiple claimant representatives
                 getCaseClaimantSolicitorEmails(caseUserAssignments).stream()
                         .filter(email -> email != null && !email.isEmpty())
@@ -262,7 +258,6 @@ public class SendNotificationService {
 
         // Send notification to the respondent(s)
         if (!CLAIMANT_ONLY.equals(caseData.getSendNotificationNotify())) {
-            log.info("sending notification emails for respondent(s)");
             Map<String, String> personalisation = buildPersonalisation(caseDetails,
                     emailService.getExuiCaseLink(caseId));
             List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
@@ -355,7 +350,6 @@ public class SendNotificationService {
         getRespondentSolicitorEmails(assignments).stream()
                 .filter(email -> email != null && !email.isEmpty())
                 .forEach(emails::add);
-        log.info("Respondent emails: {}", emails);
         emails.forEach(email ->
                 emailService.sendEmail(respondentSendNotificationTemplateId, email, emailData));
     }

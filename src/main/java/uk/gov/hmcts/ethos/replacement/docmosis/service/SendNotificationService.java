@@ -45,12 +45,10 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRIBUNAL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CCD_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.EXUI_HEARING_DOCUMENTS_LINK;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.HEARING_DATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENT_NAMES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.createLinkForUploadedDocument;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantNonSystemUser;
@@ -237,19 +235,16 @@ public class SendNotificationService {
             // If represented, send notification to claimant representative Only
             Map<String, String> personalisation;
             if (isRepresentedClaimantWithMyHmctsCase(caseDetails.getCaseData())) {
-                personalisation = NotificationHelper.buildMapForClaimantRepresentative(caseDetails.getCaseData());
-                personalisation.put(CCD_ID, caseDetails.getCaseId());
-                personalisation.put(LINK_TO_EXUI, emailService.getClaimantRepExuiCaseNotificationsLink(
-                        caseDetails.getCaseId()));
-                if (!isNullOrEmpty(personalisation.get(EMAIL_ADDRESS))) {
-                    // with shared case there's going to be multiple claimant representatives
-                    getCaseClaimantSolicitorEmails(caseUserAssignments).stream()
-                            .filter(email -> email != null && !email.isEmpty())
-                            .forEach(email -> emailService.sendEmail(
-                                    respondentSendNotificationTemplateId,
-                                    email,
-                                    personalisation));
-                }
+                String linkEnv = emailService.getClaimantRepExuiCaseNotificationsLink(
+                        caseDetails.getCaseId());
+                personalisation = buildPersonalisation(caseDetails, linkEnv);
+                // with shared case there's going to be multiple claimant representatives
+                getCaseClaimantSolicitorEmails(caseUserAssignments).stream()
+                        .filter(email -> email != null && !email.isEmpty())
+                        .forEach(email -> emailService.sendEmail(
+                                respondentSendNotificationTemplateId,
+                                email,
+                                personalisation));
             } else {
                 // If not represented, send notification to the claimant
                 String claimantEmailAddress = caseData.getClaimantType().getClaimantEmailAddress();
@@ -354,7 +349,6 @@ public class SendNotificationService {
         getRespondentSolicitorEmails(assignments).stream()
                 .filter(email -> email != null && !email.isEmpty())
                 .forEach(emails::add);
-
         emails.forEach(email ->
                 emailService.sendEmail(respondentSendNotificationTemplateId, email, emailData));
     }

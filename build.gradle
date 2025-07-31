@@ -426,6 +426,7 @@ dependencies {
     // CVE-2025-48734
     implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.11.0'
     implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.10.1'
+    implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
 
     runtimeOnly group: 'com.squareup.okio', name: 'okio-jvm', version: '3.10.2'
 

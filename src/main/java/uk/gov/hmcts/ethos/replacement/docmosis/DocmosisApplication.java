@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis;
 
+import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -10,7 +11,6 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScheduledTaskRunner;
 
 import java.util.TimeZone;
-import javax.annotation.PostConstruct;
 
 @SpringBootApplication(scanBasePackages = {"uk.gov.hmcts.ethos", "uk.gov.hmcts.ecm.common",
     "uk.gov.hmcts.reform.document", "uk.gov.hmcts.reform.authorisation", "uk.gov.hmcts.reform.ccd.document"})

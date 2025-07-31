@@ -4,9 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
-import org.elasticsearch.index.query.RangeQueryBuilder;
-import org.elasticsearch.index.query.TermsQueryBuilder;
-import org.elasticsearch.search.builder.SearchSourceBuilder;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
@@ -30,6 +27,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ForkJoinPool;
 import java.util.stream.IntStream;
@@ -39,10 +37,8 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.synchronizedList;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
-import static org.elasticsearch.index.query.QueryBuilders.boolQuery;
 import static uk.gov.hmcts.ecm.common.helpers.UtilHelper.listingFormatLocalDate;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MAX_ES_SIZE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ACAS_CERTIFICATE;
@@ -272,17 +268,45 @@ public class Et1SubmissionService {
 
     /**
      * Checks for vexation by querying ElasticSearch for cases. It checks to see if a claimant has submitted 4 or more
-     * claims in the last 6 months.
+     * claims in the last 6 months. Note the query is in a String format to allow the usage of _source that works
+     * with CCD's ElasticSearch.
      * @param caseDetails the case details
      * @param userToken the user token
      */
     public void vexationCheck(CaseDetails caseDetails, String userToken) {
-        String query = new SearchSourceBuilder()
-            .size(MAX_ES_SIZE)
-            .query(boolQuery()
-                .mustNot(new TermsQueryBuilder("state.keyword", "AWAITING_SUBMISSION_TO_HMCTS"))
-                .filter(new RangeQueryBuilder("data.receiptDate").gte(LocalDate.now().minusMonths(6L))))
-            .toString();
+        if (!featureToggleService.isFeatureEnabled("vexationCheck")) {
+            return;
+        }
+        String query = """
+            {
+              "size": 10000,
+              "query": {
+                "bool": {
+                  "filter": [
+                    {
+                      "range": {
+                        "data.receiptDate": {
+                          "gte": "%s"
+                        }
+                      }
+                    }
+                  ],
+                  "must_not": [
+                    {
+                      "terms": {
+                        "state.keyword": [
+                          "AWAITING_SUBMISSION_TO_HMCTS"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "_source": [
+                "data.ethosCaseReference", "data.claimant", "state.keyword", "data.receiptDate", "data.respondent"
+              ]
+            }
+            """.formatted(LocalDate.now().minusMonths(6L));
 
         List<SubmitEvent> submitEventList = getSubmitEventList(userToken, query);
 
@@ -290,10 +314,9 @@ public class Et1SubmissionService {
             return;
         }
 
-        AdditionalCaseInfoType additionalCaseInfoType = ObjectUtils.defaultIfNull(
-                caseDetails.getCaseData().getAdditionalCaseInfoType(),
-                new AdditionalCaseInfoType()
-        );
+        AdditionalCaseInfoType additionalCaseInfoType = Optional.ofNullable(
+                caseDetails.getCaseData().getAdditionalCaseInfoType()
+        ).orElse(new AdditionalCaseInfoType());
         additionalCaseInfoType.setInterventionRequired(YES);
         caseDetails.getCaseData().setAdditionalCaseInfoType(additionalCaseInfoType);
 

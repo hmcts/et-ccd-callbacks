@@ -280,7 +280,6 @@ public class SendNotificationService {
                 emailAddresses.add(userDetails.getEmail());
             }
         }
-        log.info("Claimant solicitor emails: {}", emailAddresses);
         return emailAddresses;
     }
 

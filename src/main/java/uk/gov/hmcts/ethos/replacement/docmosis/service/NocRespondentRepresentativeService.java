@@ -27,6 +27,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
@@ -87,7 +88,7 @@ public class NocRespondentRepresentativeService {
      * @param caseDetails containing case data with change organisation request field
      * @return updated case
      */
-    public CaseData updateRepresentation(CaseDetails caseDetails) throws IOException {
+    public CaseData updateRespondentRepresentation(CaseDetails caseDetails) throws IOException {
         CaseData caseData = caseDetails.getCaseData();
         Map<String, Object> caseDataAsMap = caseConverter.toMap(caseData);
         Map<String, Object> repCollection = updateRepresentationMap(caseData, caseDetails.getCaseId());
@@ -143,7 +144,8 @@ public class NocRespondentRepresentativeService {
      * @throws IOException - exception thrown by ccd
      */
     @SuppressWarnings({"PMD.PrematureDeclaration", "checkstyle:VariableDeclarationUsageDistance"})
-    public void updateRepresentativesAccess(CallbackRequest callbackRequest) throws IOException {
+    public void updateRepresentativesAccess(CallbackRequest callbackRequest, String currentUserEmail)
+            throws IOException {
         CaseDetails caseDetails = callbackRequest.getCaseDetails();
         CaseDetails caseDetailsBefore = callbackRequest.getCaseDetailsBefore();
         CaseData caseDataBefore = caseDetailsBefore.getCaseData();
@@ -163,7 +165,8 @@ public class NocRespondentRepresentativeService {
             log.info("Representation change applied {}", changeRequest);
 
             try {
-                nocNotificationService.sendNotificationOfChangeEmails(caseDetailsBefore, caseDetails, changeRequest);
+                nocNotificationService.sendNotificationOfChangeEmails(caseDetailsBefore, caseDetails, changeRequest,
+                        currentUserEmail);
             } catch (Exception exception) {
                 log.error(exception.getMessage(), exception);
             }
@@ -299,19 +302,19 @@ public class NocRespondentRepresentativeService {
 
         if (!CollectionUtils.isEmpty(orgRes.getContactInformation())) {
             Address repAddress = repDetails.getRepresentativeAddress();
-            repAddress = repAddress == null ? new Address() : repAddress;
-            OrganisationAddress orgAddress = orgRes.getContactInformation().get(0);
-
-            // update Representative Address with Org Address
-            repAddress.setAddressLine1(orgAddress.getAddressLine1());
-            repAddress.setAddressLine2(orgAddress.getAddressLine2());
-            repAddress.setAddressLine3(orgAddress.getAddressLine3());
-            repAddress.setPostTown(orgAddress.getTownCity());
-            repAddress.setCounty(orgAddress.getCounty());
-            repAddress.setCountry(orgAddress.getCountry());
-            repAddress.setPostCode(orgAddress.getPostCode());
-
-            repDetails.setRepresentativeAddress(repAddress);
+            if (AddressUtils.isNullOrEmpty(repAddress)) {
+                repAddress = AddressUtils.createIfNull(repDetails.getRepresentativeAddress());
+                OrganisationAddress orgAddress = orgRes.getContactInformation().getFirst();
+                // update Representative Address with Org Address
+                repAddress.setAddressLine1(orgAddress.getAddressLine1());
+                repAddress.setAddressLine2(orgAddress.getAddressLine2());
+                repAddress.setAddressLine3(orgAddress.getAddressLine3());
+                repAddress.setPostTown(orgAddress.getTownCity());
+                repAddress.setCounty(orgAddress.getCounty());
+                repAddress.setCountry(orgAddress.getCountry());
+                repAddress.setPostCode(orgAddress.getPostCode());
+                repDetails.setRepresentativeAddress(repAddress);
+            }
         }
     }
 

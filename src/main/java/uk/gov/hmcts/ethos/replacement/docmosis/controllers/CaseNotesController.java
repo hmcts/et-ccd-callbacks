@@ -18,7 +18,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleCallbackResponse;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.CaseNotesService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseNotesService;
 
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
@@ -55,6 +55,12 @@ public class CaseNotesController {
         return multipleResponse(multipleData, null);
     }
 
+    /**
+     * Saves note to collection on singles case.
+     *
+     * @param ccdRequest holds the request and case data
+     * @return Callback response entity with case data and errors attached.
+     */
     @PostMapping(value = "/singles/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "aboutToSubmit")
     @ApiResponse(responseCode = "200", description = "Accessed successfully",

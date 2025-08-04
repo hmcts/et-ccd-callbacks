@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.service.multiples;
+package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,7 +8,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.CaseNote;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -17,6 +16,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import static java.util.UUID.randomUUID;
+import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 /**
@@ -66,8 +66,16 @@ public class CaseNotesService {
         DateFormat formatter = new SimpleDateFormat("dd MMM yyyy HH:mm", Locale.ENGLISH);
         caseNote.setDate(formatter.format(new Date()));
 
-        UserDetails userDetails = userIdamService.getUserDetails(userToken);
-        caseNote.setAuthor(isNotEmpty(userDetails.getName()) ? userDetails.getName() : userDetails.getEmail());
+        try {
+            UserDetails userDetails = userIdamService.getUserDetails(userToken);
+            if (isEmpty(userDetails)) {
+                throw new IllegalArgumentException("User details cannot be null or empty");
+            }
+            caseNote.setAuthor(isNotEmpty(userDetails.getName()) ? userDetails.getName() : userDetails.getEmail());
+        } catch (Exception e) {
+            log.warn("Failed to retrieve user details with error: ", e);
+            caseNote.setAuthor("Unknown");
+        }
 
         GenericTypeItem<CaseNote> caseNoteListTypeItem = new GenericTypeItem<>();
         caseNoteListTypeItem.setId(String.valueOf(randomUUID()));

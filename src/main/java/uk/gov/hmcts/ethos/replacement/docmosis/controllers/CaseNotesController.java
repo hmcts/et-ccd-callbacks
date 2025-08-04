@@ -66,7 +66,7 @@ public class CaseNotesController {
     @ApiResponse(responseCode = "200", description = "Accessed successfully",
         content = {
             @Content(mediaType = "application/json",
-                schema = @Schema(implementation = MultipleCallbackResponse.class))
+                schema = @Schema(implementation = CCDCallbackResponse.class))
         })
     @ApiResponse(responseCode = "400", description = "Bad Request")
     @ApiResponse(responseCode = "500", description = "Internal Server Error")

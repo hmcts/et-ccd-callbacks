@@ -8162,7 +8162,7 @@ __metadata:
     request-promise-native: 1.0.9
     require-directory: 2.1.1
     rewire: 7.0.0
-    selenium-standalone: 10.0.1
+    selenium-standalone: 10.0.2
     sinon: 19.0.5
     sinon-chai: 4.0.0
     sonar-scanner: 3.1.0
@@ -15719,9 +15719,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"selenium-standalone@npm:10.0.1":
-  version: 10.0.1
-  resolution: "selenium-standalone@npm:10.0.1"
+"selenium-standalone@npm:10.0.2":
+  version: 10.0.2
+  resolution: "selenium-standalone@npm:10.0.2"
   dependencies:
     commander: ^8.3.0
     cross-spawn: ^7.0.3
@@ -15744,7 +15744,7 @@ __metadata:
     yauzl: ^3.1.2
   bin:
     selenium-standalone: bin/selenium-standalone
-  checksum: f86e58dc2a284c626ac764961a476e649460887f4275e795b5b933ad5ac5ef2c38e56ec49323e0d2434d266815bc2f8c82f845103f47f9e505ac3e9f820af123
+  checksum: 4ddb831ee680ae40b2bb6e92b33735143bfe59b1b0b98977cd788bf34b952c509f9c80a1718ec53fde8edcff92b6040bac39e9359592b0ed8a8c14bb2301a603
   languageName: node
   linkType: hard
 

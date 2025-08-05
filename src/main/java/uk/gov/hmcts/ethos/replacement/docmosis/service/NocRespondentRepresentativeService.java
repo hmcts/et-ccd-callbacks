@@ -134,7 +134,7 @@ public class NocRespondentRepresentativeService {
         List<RepresentedTypeRItem> repCollection = defaultIfNull(caseData.getRepCollection(), new ArrayList<>());
 
         int repIndex = nocRespondentHelper.getIndexOfRep(respondent, repCollection);
-        respondent.getValue().setRepresentativeRemoved(NO);
+
         if (repIndex >= 0) {
             repCollection.get(repIndex).setValue(addedSolicitor);
         } else {

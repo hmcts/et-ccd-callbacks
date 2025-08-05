@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1ReppedService.getOrganisationAddress;
 
@@ -49,6 +50,7 @@ public class NocClaimantRepresentativeService {
     private void updateClaimantRepMap(CaseData caseData, String caseId) throws IOException {
         RepresentedTypeC claimantRep = createRepresentedTypeC(caseId, caseData.getChangeOrganisationRequestField());
         caseData.setClaimantRepresentedQuestion(YES);
+        caseData.setClaimantRepresentativeRemoved(NO);
         caseData.setRepresentativeClaimantType(claimantRep);
     }
 

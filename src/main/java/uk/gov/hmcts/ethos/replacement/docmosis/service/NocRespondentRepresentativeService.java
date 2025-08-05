@@ -42,6 +42,7 @@ import java.util.UUID;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Service
@@ -90,19 +91,31 @@ public class NocRespondentRepresentativeService {
      */
     public CaseData updateRespondentRepresentation(CaseDetails caseDetails) throws IOException {
         CaseData caseData = caseDetails.getCaseData();
+        resetRespondentRepresentativeRemovedField(caseData);
         Map<String, Object> caseDataAsMap = caseConverter.toMap(caseData);
         Map<String, Object> repCollection = updateRepresentationMap(caseData, caseDetails.getCaseId());
         caseDataAsMap.putAll(repCollection);
         return  caseConverter.convert(caseDataAsMap, CaseData.class);
     }
 
-    private Map<String, Object> updateRepresentationMap(CaseData caseData, String caseId) throws IOException {
+    private static void resetRespondentRepresentativeRemovedField(CaseData caseData) {
+        ChangeOrganisationRequest change = findChangeOrganisationRequest(caseData);
+        SolicitorRole role = SolicitorRole.from(change.getCaseRoleId().getSelectedCode()).orElseThrow();
+        RespondentSumTypeItem respondent = caseData.getRespondentCollection().get(role.getIndex());
+        respondent.getValue().setRepresentativeRemoved(NO);
+    }
 
-        final ChangeOrganisationRequest change = caseData.getChangeOrganisationRequestField();
-
+    private static ChangeOrganisationRequest findChangeOrganisationRequest(CaseData caseData) {
+        ChangeOrganisationRequest change = caseData.getChangeOrganisationRequestField();
         if (isEmpty(change) || isEmpty(change.getCaseRoleId()) || isEmpty(change.getOrganisationToAdd())) {
             throw new IllegalStateException("Invalid or missing ChangeOrganisationRequest: " + change);
         }
+        return change;
+    }
+
+    private Map<String, Object> updateRepresentationMap(CaseData caseData, String caseId) throws IOException {
+
+        final ChangeOrganisationRequest change = findChangeOrganisationRequest(caseData);
 
         String accessToken = adminUserService.getAdminUserToken();
 
@@ -121,7 +134,7 @@ public class NocRespondentRepresentativeService {
         List<RepresentedTypeRItem> repCollection = defaultIfNull(caseData.getRepCollection(), new ArrayList<>());
 
         int repIndex = nocRespondentHelper.getIndexOfRep(respondent, repCollection);
-
+        respondent.getValue().setRepresentativeRemoved(NO);
         if (repIndex >= 0) {
             repCollection.get(repIndex).setValue(addedSolicitor);
         } else {

@@ -56,6 +56,7 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
         Arrays.stream(caseTypeIds).forEach(caseTypeId -> {
             try {
                 List<SubmitEvent> cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
+                log.info("{} cases for {} retrieved for Expired BF Task", cases.size(), caseTypeId);
                 while (CollectionUtils.isNotEmpty(cases)) {
                     cases.stream()
                             .filter(o ->

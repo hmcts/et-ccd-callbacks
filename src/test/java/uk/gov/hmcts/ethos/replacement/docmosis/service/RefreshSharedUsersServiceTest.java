@@ -41,7 +41,8 @@ class RefreshSharedUsersServiceTest {
     @Mock 
     private CaseUserAssignmentData mockUserRolesResponse;
 
-    @InjectMocks private RefreshSharedUsersService service;
+    @InjectMocks 
+    private RefreshSharedUsersService service;
 
     private CaseDetails caseDetails;
     private CaseData caseData;

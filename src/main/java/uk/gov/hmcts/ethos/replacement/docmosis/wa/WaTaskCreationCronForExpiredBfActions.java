@@ -68,6 +68,7 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
                                 processedCaseIdsToSkip.add(o.getCaseId());
                             });
                     cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
+                    log.info("Follow up fetch {} cases for {} retrieved for Expired BF Task", cases.size(), caseTypeId);
                 }
             } catch (Exception e) {
                 log.error(e.getMessage());

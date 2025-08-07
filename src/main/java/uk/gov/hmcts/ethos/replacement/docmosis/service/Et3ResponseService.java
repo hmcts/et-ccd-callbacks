@@ -301,6 +301,7 @@ public class Et3ResponseService {
         try {
             caseUserAssignmentData = ccdCaseAssignment.getCaseUserRoles(caseId);
         } catch (IOException ioe) {
+            log.info("******* hereeeeeeee");
             throw new GenericServiceException(SYSTEM_ERROR,
                     new Exception(ioe),
                     ioe.getMessage(),
@@ -318,6 +319,7 @@ public class Et3ResponseService {
         List<Integer> solicitorIndexList = new ArrayList<>();
         for (CaseUserAssignment caseUserAssignment : caseUserAssignmentData.getCaseUserAssignments()) {
             if (userDetails.getUid().equals(caseUserAssignment.getUserId())) {
+                log.info("******* CASE ROLE = " + caseUserAssignment.getCaseRole());
                 SolicitorRole solicitorRole = SolicitorRole.from(caseUserAssignment.getCaseRole()).orElseThrow();
                 solicitorIndexList.add(solicitorRole.getIndex());
             }
@@ -382,7 +384,7 @@ public class Et3ResponseService {
                     ERROR_CASE_DATA_NOT_FOUND,
                     StringUtils.EMPTY,
                     "Et3ResponseService",
-                    "setRespondentRepresentsContactDetails");
+                    "setRespondentRepresentsContactDetails - caseData is null or empty");
         }
         if (StringUtils.isBlank(userToken)) {
             throw new GenericServiceException(ERROR_INVALID_USER_TOKEN,
@@ -390,7 +392,7 @@ public class Et3ResponseService {
                     ERROR_INVALID_USER_TOKEN,
                     submissionReference,
                     "Et3ResponseService",
-                    "setRespondentRepresentsContactDetails");
+                    "setRespondentRepresentsContactDetails - userToken is blank");
         }
         List<Integer> representedRespondentIndexes;
         try {
@@ -401,14 +403,14 @@ public class Et3ResponseService {
                     gex.getMessage(),
                     submissionReference,
                     "Et3ResponseService",
-                    "setRespondentRepresentsContactDetails");
+                    "setRespondentRepresentsContactDetails - getRepresentedRespondentIndexes failed");
         } catch (NoSuchElementException nse) {
             throw new GenericServiceException(SYSTEM_ERROR,
                     new Exception(nse),
                     nse.getMessage(),
                     submissionReference,
                     "Et3ResponseService",
-                    "setRespondentRepresentsContactDetails");
+                    "setRespondentRepresentsContactDetails - NoSuchElementException");
         }
         if (representedRespondentIndexes.isEmpty() || CollectionUtils.isEmpty(caseData.getRepCollection())) {
             throw new GenericServiceException(ERROR_NO_REPRESENTED_RESPONDENT_FOUND,
@@ -416,7 +418,7 @@ public class Et3ResponseService {
                     ERROR_NO_REPRESENTED_RESPONDENT_FOUND,
                     submissionReference,
                     "Et3ResponseService",
-                    "setRespondentRepresentsContactDetails");
+                    "setRespondentRepresentsContactDetails - No represented respondents found");
         }
         for (int i : representedRespondentIndexes) {
             if (ObjectUtils.isEmpty(caseData.getRepCollection().get(i))

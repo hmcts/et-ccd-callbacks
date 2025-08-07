@@ -31,7 +31,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 class RefreshSharedUsersServiceTest {
 
-    private static final String CASE_ID = "1234";
+    private static final String CASE_ID = "1234123412341234";
     private static final String DUMMY_ORG_ID = "dummyId";
 
     @Mock private AdminUserService adminUserService;

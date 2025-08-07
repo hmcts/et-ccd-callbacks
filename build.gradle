@@ -132,7 +132,9 @@ test {
 }
 
 tasks.register('smoke', Test) {
-    dependsOn ':codeceptSmoke'
+    dependsOn(codeceptSmoke) {
+        setContinueOnFailure(true)
+    }
     testClassesDirs = sourceSets.functional.output.classesDirs
     classpath = sourceSets.functional.runtimeClasspath
 

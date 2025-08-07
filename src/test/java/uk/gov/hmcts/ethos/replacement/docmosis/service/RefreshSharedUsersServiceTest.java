@@ -34,9 +34,12 @@ class RefreshSharedUsersServiceTest {
     private static final String CASE_ID = "1234123412341234";
     private static final String DUMMY_ORG_ID = "dummyId";
 
-    @Mock private AdminUserService adminUserService;
-    @Mock private CcdCaseAssignment ccdCaseAssignment;
-    @Mock private CaseUserAssignmentData mockUserRolesResponse;
+    @Mock 
+    private AdminUserService adminUserService;
+    @Mock 
+    private CcdCaseAssignment ccdCaseAssignment;
+    @Mock 
+    private CaseUserAssignmentData mockUserRolesResponse;
 
     @InjectMocks private RefreshSharedUsersService service;
 

@@ -81,7 +81,7 @@ class WaTaskCreationCronForExpiredBfActionsTest {
         SubmitEvent submitEvent = new ObjectMapper().readValue(resource, SubmitEvent.class);
         submitEvent.setCaseId(Long.parseLong("1741710954147332"));
         when(ccdClient.buildAndGetElasticSearchRequest(any(), eq(ENGLANDWALES_CASE_TYPE_ID), any()))
-                .thenReturn(List.of(submitEvent)).thenReturn(Collections.emptyList());
+                .thenReturn(List.of(submitEvent)).thenReturn(List.of(submitEvent)).thenReturn(Collections.emptyList());
 
         CaseData caseData = submitEvent.getCaseData();
         CCDRequest build = CCDRequestBuilder.builder().withCaseData(caseData).build();
@@ -90,30 +90,8 @@ class WaTaskCreationCronForExpiredBfActionsTest {
 
         waTaskCreationCronForExpiredBfActions.run();
 
-        verify(ccdClient, times(1)).startEventForCase(any(), any(), any(), any(), any());
-        verify(ccdClient, times(1)).submitEventForCase(
-                any(), any(), any(), any(), any(), any());
-    }
-
-    @Test
-    void skipsAlreadyProcessedCases() throws IOException {
-        when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
-        when(featureToggleService.isWaTaskForExpiredBfActionsEnabled()).thenReturn(true);
-        when(adminUserService.getAdminUserToken()).thenReturn("adminToken");
-
-        SubmitEvent submitEvent = new SubmitEvent();
-        submitEvent.setCaseId(12345L);
-        List<Long> alreadyProcessedCaseIdsToSkip = new ArrayList<>();
-        alreadyProcessedCaseIdsToSkip.add(12345L);
-        ReflectionTestUtils.setField(waTaskCreationCronForExpiredBfActions,
-                "processedCaseIdsToSkip", alreadyProcessedCaseIdsToSkip);
-        when(ccdClient.buildAndGetElasticSearchRequest(any(), any(), any())).thenReturn(
-                List.of(submitEvent)).thenReturn(new ArrayList<>());
-
-        waTaskCreationCronForExpiredBfActions.run();
-
-        verify(ccdClient, times(0)).startEventForCase(any(), any(), any(), any(), any());
-        verify(ccdClient, times(0)).submitEventForCase(
+        verify(ccdClient, times(2)).startEventForCase(any(), any(), any(), any(), any());
+        verify(ccdClient, times(2)).submitEventForCase(
                 any(), any(), any(), any(), any(), any());
     }
 

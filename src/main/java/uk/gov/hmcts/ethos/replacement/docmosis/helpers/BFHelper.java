@@ -37,9 +37,7 @@ public final class BFHelper {
                     bfActionType.setDateEntered(UtilHelper.formatCurrentDate2(LocalDate.now()));
                 }
             }
-
         }
-
     }
 
     public static void populateDynamicListBfActions(CaseData caseData) {

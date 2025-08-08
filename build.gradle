@@ -455,7 +455,7 @@ dependencies {
     testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-commons', version: junitPlatformVersion
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
     testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.21.3'
-    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.3'
+    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.4'
     // Mockito 5.0.0+ has merged mockito-inline into mockito-core
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.13.0'
     testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '5.13.0'

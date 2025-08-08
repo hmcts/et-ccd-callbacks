@@ -111,7 +111,7 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
             boolean keepSearching;
             // Initialize the list with the initial search results so that to aggregate total search results returned
             List<SubmitEvent> caseSubmitEvents = new ArrayList<>(initialSearchResultSubmitEvents);
-
+            int tempCaseCounter = 0;
             do {
                 elasticSearchQuery = ElasticSearchQuery.builder()
                         .initialSearch(false)
@@ -125,11 +125,15 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
                         subsequentSearchResultSubmitEvents.size(), caseTypeId);
                 // Check if there are more cases to process
                 keepSearching = !subsequentSearchResultSubmitEvents.isEmpty();
-                if (keepSearching) {
+                if (keepSearching && tempCaseCounter < 10) {
                     caseSubmitEvents.addAll(subsequentSearchResultSubmitEvents);
-                }
-                if (keepSearching) {
                     searchAfterValue = String.valueOf(subsequentSearchResultSubmitEvents.getLast().getCaseId());
+                    tempCaseCounter++;
+                }
+                if (tempCaseCounter == 10) {
+                    log.info("Reached the maximum temp number of cases limit to process in this run: {}",
+                            tempCaseCounter);
+                    break;
                 }
             } while (keepSearching);
             log.info("The search for cases with expired bf action returned {} cases.", caseSubmitEvents.size());

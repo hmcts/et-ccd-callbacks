@@ -74,6 +74,18 @@ class WaTaskCreationCronForExpiredBfActionsTest {
     }
 
     @Test
+    void skipsProcessingWhenFeatureTogglesAreDisabled() throws IOException {
+        when(featureToggleService.isWorkAllocationEnabled()).thenReturn(false);
+        when(featureToggleService.isWaTaskForExpiredBfActionsEnabled()).thenReturn(false);
+
+        waTaskCreationCronForExpiredBfActions.run();
+
+        verify(ccdClient, times(0)).buildAndGetElasticSearchRequest(any(), any(), any());
+        verify(ccdClient, times(0)).startEventForCase(any(), any(), any(), any(), any());
+        verify(ccdClient, times(0)).submitEventForCase(any(), any(), any(), any(), any(), any());
+    }
+
+    @Test
     void processesCasesSuccessfully() throws IOException, URISyntaxException {
         when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
         when(featureToggleService.isWaTaskForExpiredBfActionsEnabled()).thenReturn(true);
@@ -137,4 +149,20 @@ class WaTaskCreationCronForExpiredBfActionsTest {
         verify(ccdClient, times(0)).startEventForCase(any(), any(), any(), any(), any());
         verify(ccdClient, times(0)).submitEventForCase(any(), any(), any(), any(), any(), any());
     }
+
+    @Test
+    void handlesEmptyCaseTypeIdsGracefully() throws IOException {
+        ReflectionTestUtils.setField(waTaskCreationCronForExpiredBfActions, "caseTypeIdsString", "");
+
+        when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
+        when(featureToggleService.isWaTaskForExpiredBfActionsEnabled()).thenReturn(true);
+        waTaskCreationCronForExpiredBfActions.run();
+
+        try {
+            verify(ccdClient, times(1)).buildAndGetElasticSearchRequest(any(), any(), any());
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
 }

@@ -68,7 +68,7 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
                     }
                     return false;
                 }).forEach(submitEvent -> {
-                    //invoke wa task creation event for each valid bf action on each case
+                    //invoke wa task creation event for each case with one or more expired bf action
                     triggerTaskEventForCase(adminUserToken, submitEvent, caseTypeId);
 
                 });
@@ -121,15 +121,19 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
                         .size(maxCases)
                         .searchAfterValue(searchAfterValue)
                         .build();
+
                 String followUpQuery = followUpESQuery.getQuery(BFHelper.getEffectiveYesterday());
                 List<SubmitEvent> subsequentSearchResultSubmitEvents = ccdClient.buildAndGetElasticSearchRequest(
                         adminUserToken, caseTypeId, followUpQuery);
                 log.info("Follow up fetch {} cases for {} retrieved for Expired BF Task",
                         subsequentSearchResultSubmitEvents.size(), caseTypeId);
+                subsequentSearchResultSubmitEvents.forEach(se -> log.info("Case ID: {}", se.getCaseId()));
 
                 // Check if there are more cases to process
                 keepSearching = !subsequentSearchResultSubmitEvents.isEmpty();
                 if (keepSearching && tempCaseCounter < 10) {
+                    log.info("Adding {} cases to the list for case type: {}", subsequentSearchResultSubmitEvents.size(),
+                            caseTypeId);
                     caseSubmitEvents.addAll(subsequentSearchResultSubmitEvents);
                     searchAfterValue = String.valueOf(subsequentSearchResultSubmitEvents.getLast().getCaseId());
                     tempCaseCounter++;
@@ -141,6 +145,8 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
                 }
             } while (keepSearching);
             log.info("The search for cases with expired bf action returned {} cases.", caseSubmitEvents.size());
+            caseSubmitEvents.forEach(se -> log.info("Case type id of {} found with Case ID: {}",
+                    se.getCaseId()));
             return caseSubmitEvents;
 
         } else {

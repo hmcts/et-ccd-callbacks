@@ -72,11 +72,10 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
                     return false;
                 });
 
-                validSubmitEvents.forEach(submitEvent -> {
+                validSubmitEvents.forEach(submitEvent ->
                     //invoke wa task creation event for each case with one or more expired bf action
-                    triggerTaskEventForCase(adminUserToken, submitEvent, caseTypeId);
-
-                });
+                    triggerTaskEventForCase(adminUserToken, submitEvent, caseTypeId)
+                );
             } catch (Exception e) {
                 log.error(e.getMessage());
             }
@@ -111,7 +110,7 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
         List<SubmitEvent> initialSearchResultSubmitEvents = ccdClient.buildAndGetElasticSearchRequest(
                 adminUserToken, caseTypeId, query);
 
-        if (initialSearchResultSubmitEvents != null && !initialSearchResultSubmitEvents.isEmpty()) {
+        if (!CollectionUtils.isEmpty(initialSearchResultSubmitEvents)) {
             log.info("Found {} cases for case type: {}", initialSearchResultSubmitEvents.size(), caseTypeId);
             String searchAfterValue = String.valueOf(initialSearchResultSubmitEvents.getLast().getCaseId());
             log.info("First search after case id is {} cases for case type: {}", searchAfterValue, caseTypeId);
@@ -136,16 +135,16 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
                 subsequentSearchResultSubmitEvents.forEach(se -> log.info("Case ID: {}", se.getCaseId()));
 
                 // Check if there are more cases to process
-                keepSearching = !subsequentSearchResultSubmitEvents.isEmpty();
-                if (keepSearching && tempCaseCounter < 10) {
+                keepSearching = !subsequentSearchResultSubmitEvents.isEmpty() && tempCaseCounter < 10;
+                if (keepSearching) {
                     log.info("Adding {} cases to the list for case type: {}", subsequentSearchResultSubmitEvents.size(),
                             caseTypeId);
-                    subsequentSearchResultSubmitEvents.forEach(followUpSubmitEvent -> {
-                        if (!caseSubmitEvents.contains(followUpSubmitEvent)) {
-                            caseSubmitEvents.add(followUpSubmitEvent);
-                        }
-                    });
+                    subsequentSearchResultSubmitEvents.forEach(followUpSubmitEvent ->
+                            addCaseToSubmitEvents(caseSubmitEvents, followUpSubmitEvent));
+                    // Update the searchAfterValue for the next iteration
                     searchAfterValue = String.valueOf(subsequentSearchResultSubmitEvents.getLast().getCaseId());
+                    log.info("Next search after case id is {} cases for case type: {}", searchAfterValue, caseTypeId);
+                    log.info("Current tempCaseCounter is {} for case type: {}", tempCaseCounter, caseTypeId);
                     tempCaseCounter++;
                 }
                 if (tempCaseCounter == 10) {
@@ -161,6 +160,17 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
 
         } else {
             return new ArrayList<>();
+        }
+    }
+
+    //Distinct/Unique list of submit events, i.e. no duplicate cases
+    private void addCaseToSubmitEvents(List<SubmitEvent> caseSubmitEvents, SubmitEvent submitEvent) {
+        if (submitEvent != null) {
+            if (!caseSubmitEvents.contains(submitEvent)) {
+                caseSubmitEvents.add(submitEvent);
+            }
+        } else {
+            log.warn("Submit event is null and cannot be added to the list.");
         }
     }
 }

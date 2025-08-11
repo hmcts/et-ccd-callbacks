@@ -135,6 +135,20 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isAcasCertificatePostSubmissionEnabled()).isEqualTo(toggleStat);
     }
 
+
+    @ValueSource(booleans = {true, false})
+    void returnsCorrectValue_whenCitizenEt1GenerationIsEnabled(Boolean toggleStat) {
+        givenToggle("citizen-et1-generation", toggleStat);
+        assertThat(featureToggleService.citizenEt1Generation()).isEqualTo(toggleStat);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void returnsCorrectValue_whenWaTaskForExpiredBfActionsIsEnabled(Boolean toggleStat) {
+        givenToggle("waTaskExpieredBfActions", toggleStat);
+        assertThat(featureToggleService.isWaTaskForExpiredBfActionsEnabled()).isEqualTo(toggleStat);
+    }
+
     private void givenToggle(String feature, boolean state) {
         when(featureToggleApi.isFeatureEnabled(feature)).thenReturn(state);
     }

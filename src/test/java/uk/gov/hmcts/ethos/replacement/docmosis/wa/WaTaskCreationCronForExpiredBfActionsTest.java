@@ -109,4 +109,32 @@ class WaTaskCreationCronForExpiredBfActionsTest {
         verify(ccdClient, times(0)).submitEventForCase(
                 any(), any(), any(), any(), any(), any());
     }
+
+    @Test
+    void skipsProcessingWhenNoCasesFound() throws IOException {
+        when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
+        when(featureToggleService.isWaTaskForExpiredBfActionsEnabled()).thenReturn(true);
+        when(ccdClient.buildAndGetElasticSearchRequest(any(), any(), any())).thenReturn(Collections.emptyList());
+
+        waTaskCreationCronForExpiredBfActions.run();
+
+        verify(ccdClient, times(0)).startEventForCase(any(), any(), any(), any(), any());
+        verify(ccdClient, times(0)).submitEventForCase(any(), any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void skipsCasesWithoutExpiredBfActions() throws IOException, URISyntaxException {
+        when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
+        when(featureToggleService.isWaTaskForExpiredBfActionsEnabled()).thenReturn(true);
+
+        String resource = ResourceLoader.getResource("bfActionTask_NoExpiredDate.json");
+        SubmitEvent submitEvent = new ObjectMapper().readValue(resource, SubmitEvent.class);
+        when(ccdClient.buildAndGetElasticSearchRequest(any(), eq(ENGLANDWALES_CASE_TYPE_ID), any()))
+                .thenReturn(List.of(submitEvent)).thenReturn(Collections.emptyList());
+
+        waTaskCreationCronForExpiredBfActions.run();
+
+        verify(ccdClient, times(0)).startEventForCase(any(), any(), any(), any(), any());
+        verify(ccdClient, times(0)).submitEventForCase(any(), any(), any(), any(), any(), any());
+    }
 }

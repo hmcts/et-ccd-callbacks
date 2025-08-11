@@ -55,7 +55,7 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
                     return;
                 }
 
-                caseSubmitEvents.stream().filter(submitEvent -> {
+                var validSubmitEvents = caseSubmitEvents.stream().filter(submitEvent -> {
                     if (submitEvent.getCaseData() != null && submitEvent.getCaseData().getBfActions() != null) {
                         return submitEvent.getCaseData().getBfActions().stream()
                                 .anyMatch(bfAction -> bfAction.getValue() != null
@@ -63,11 +63,16 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
                                     && !bfAction.getValue().getBfDate().isEmpty()
                                     && !Boolean.parseBoolean(bfAction.getValue().getCleared())
                                     && !Boolean.parseBoolean(bfAction.getValue().getIsWaTaskCreated())
-                                    && LocalDate.parse(bfAction.getValue().getBfDate())
-                                            .isBefore(LocalDate.parse(BFHelper.getEffectiveYesterday())));
+                                    && (LocalDate.parse(bfAction.getValue().getBfDate())
+                                            .isAfter(LocalDate.parse(BFHelper.getEffectiveYesterday())
+                                                    .minusDays(1))
+                                            && LocalDate.parse(bfAction.getValue().getBfDate()).isBefore(
+                                                    LocalDate.now())));
                     }
                     return false;
-                }).forEach(submitEvent -> {
+                });
+
+                validSubmitEvents.forEach(submitEvent -> {
                     //invoke wa task creation event for each case with one or more expired bf action
                     triggerTaskEventForCase(adminUserToken, submitEvent, caseTypeId);
 
@@ -105,6 +110,7 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
         String query = elasticSearchQuery.getQuery(BFHelper.getEffectiveYesterday());
         List<SubmitEvent> initialSearchResultSubmitEvents = ccdClient.buildAndGetElasticSearchRequest(
                 adminUserToken, caseTypeId, query);
+
         if (initialSearchResultSubmitEvents != null && !initialSearchResultSubmitEvents.isEmpty()) {
             log.info("Found {} cases for case type: {}", initialSearchResultSubmitEvents.size(), caseTypeId);
             String searchAfterValue = String.valueOf(initialSearchResultSubmitEvents.getLast().getCaseId());
@@ -134,7 +140,11 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
                 if (keepSearching && tempCaseCounter < 10) {
                     log.info("Adding {} cases to the list for case type: {}", subsequentSearchResultSubmitEvents.size(),
                             caseTypeId);
-                    caseSubmitEvents.addAll(subsequentSearchResultSubmitEvents);
+                    subsequentSearchResultSubmitEvents.forEach(followUpSubmitEvent -> {
+                        if (!caseSubmitEvents.contains(followUpSubmitEvent)) {
+                            caseSubmitEvents.add(followUpSubmitEvent);
+                        }
+                    });
                     searchAfterValue = String.valueOf(subsequentSearchResultSubmitEvents.getLast().getCaseId());
                     tempCaseCounter++;
                 }

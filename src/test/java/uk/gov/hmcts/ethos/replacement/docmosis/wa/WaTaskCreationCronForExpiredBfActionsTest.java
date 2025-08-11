@@ -80,8 +80,9 @@ class WaTaskCreationCronForExpiredBfActionsTest {
         String resource = ResourceLoader.getResource("bfActionTask_oneExpiredDate.json");
         SubmitEvent submitEvent = new ObjectMapper().readValue(resource, SubmitEvent.class);
         submitEvent.setCaseId(Long.parseLong("1741710954147332"));
+        submitEvent.getCaseData().getBfActions().getFirst().getValue().setBfDate("2025-08-10");
         when(ccdClient.buildAndGetElasticSearchRequest(any(), eq(ENGLANDWALES_CASE_TYPE_ID), any()))
-                .thenReturn(List.of(submitEvent)).thenReturn(List.of(submitEvent)).thenReturn(Collections.emptyList());
+                .thenReturn(List.of(submitEvent)).thenReturn(Collections.emptyList());
 
         CaseData caseData = submitEvent.getCaseData();
         CCDRequest build = CCDRequestBuilder.builder().withCaseData(caseData).build();
@@ -90,8 +91,8 @@ class WaTaskCreationCronForExpiredBfActionsTest {
 
         waTaskCreationCronForExpiredBfActions.run();
 
-        verify(ccdClient, times(2)).startEventForCase(any(), any(), any(), any(), any());
-        verify(ccdClient, times(2)).submitEventForCase(
+        verify(ccdClient, times(1)).startEventForCase(any(), any(), any(), any(), any());
+        verify(ccdClient, times(1)).submitEventForCase(
                 any(), any(), any(), any(), any(), any());
     }
 

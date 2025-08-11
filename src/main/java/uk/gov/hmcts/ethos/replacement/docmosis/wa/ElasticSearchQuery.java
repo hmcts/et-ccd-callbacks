@@ -57,7 +57,8 @@ public class ElasticSearchQuery {
             {
               "reference.keyword": "asc"
             }
-          ]
+          ],
+          "search_after": [%s]
         }
         """;
 
@@ -66,17 +67,15 @@ public class ElasticSearchQuery {
         if (initialSearch) {
             return getInitialQuery(fromDate, today.toString());
         } else {
-            return getSubsequentQuery(fromDate, today.toString());
+            return getSubsequentQuery(fromDate, today.toString(), searchAfterValue);
         }
     }
 
     private String getInitialQuery(String fromDate, String toDate) {
-        return String.format(START_BF_ACTIONS_QUERY, fromDate, toDate, size) + END_QUERY;
+        return String.format(START_BF_ACTIONS_QUERY, fromDate, toDate, size, searchAfterValue) + END_QUERY;
     }
 
-    private String getSubsequentQuery(String fromDate, String toDate) {
-        return String.format(START_BF_ACTIONS_QUERY, fromDate, toDate, size)
-                + ","
-                + String.format(SEARCH_AFTER, searchAfterValue) + END_QUERY;
+    private String getSubsequentQuery(String fromDate, String toDate, String searchAfterValue) {
+        return String.format(START_BF_ACTIONS_QUERY, fromDate, toDate, size, searchAfterValue) + END_QUERY;
     }
 }

@@ -2,12 +2,14 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.BFActionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.BFActionType;
 
 import java.time.LocalDate;
+import java.time.Month;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -105,5 +107,26 @@ public class BFHelperTest {
         caseData.setBfActions(Collections.emptyList());
         BFHelper.updateWaTaskCreationTrackerOfBfActionItems(caseData);
         assertEquals(0, caseData.getBfActions().size());
+    }
+
+    @Test
+    void testMondayCase() {
+        LocalDate monday = LocalDate.of(2025, Month.AUGUST, 11); // Monday
+        String result = BFHelper.getEffectiveYesterday(monday);
+        assertEquals(UtilHelper.formatCurrentDate2(LocalDate.of(2025, Month.AUGUST, 8)), result);
+    }
+
+    @Test
+    void testSundayCase() {
+        LocalDate sunday = LocalDate.of(2025, Month.AUGUST, 10); // Sunday
+        String result = BFHelper.getEffectiveYesterday(sunday);
+        assertEquals(UtilHelper.formatCurrentDate2(LocalDate.of(2025, Month.AUGUST, 8)), result);
+    }
+
+    @Test
+    void testRegularDayCase() {
+        LocalDate wednesday = LocalDate.of(2025, Month.AUGUST, 13); // Wednesday
+        String result = BFHelper.getEffectiveYesterday(wednesday);
+        assertEquals(UtilHelper.formatCurrentDate2(LocalDate.of(2025, Month.AUGUST, 12)), result);
     }
 }

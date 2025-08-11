@@ -64,7 +64,7 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
                                     && !Boolean.parseBoolean(bfAction.getValue().getCleared())
                                     && !Boolean.parseBoolean(bfAction.getValue().getIsWaTaskCreated())
                                     && (LocalDate.parse(bfAction.getValue().getBfDate())
-                                            .isAfter(LocalDate.parse(BFHelper.getEffectiveYesterday())
+                                            .isAfter(LocalDate.parse(BFHelper.getEffectiveYesterday(LocalDate.now()))
                                                     .minusDays(1))
                                             && LocalDate.parse(bfAction.getValue().getBfDate()).isBefore(
                                                     LocalDate.now())));
@@ -106,7 +106,7 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
                 .build();
 
         log.info("Processing the expired bf action search for case type {}.", caseTypeId);
-        String query = elasticSearchQuery.getQuery(BFHelper.getEffectiveYesterday());
+        String query = elasticSearchQuery.getQuery(BFHelper.getEffectiveYesterday(LocalDate.now()));
         List<SubmitEvent> initialSearchResultSubmitEvents = ccdClient.buildAndGetElasticSearchRequest(
                 adminUserToken, caseTypeId, query);
 
@@ -127,7 +127,7 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
                         .searchAfterValue(searchAfterValue)
                         .build();
 
-                String followUpQuery = followUpESQuery.getQuery(BFHelper.getEffectiveYesterday());
+                String followUpQuery = followUpESQuery.getQuery(BFHelper.getEffectiveYesterday(LocalDate.now()));
                 List<SubmitEvent> subsequentSearchResultSubmitEvents = ccdClient.buildAndGetElasticSearchRequest(
                         adminUserToken, caseTypeId, followUpQuery);
                 log.info("Follow up fetch {} cases for {} retrieved for Expired BF Task",

@@ -88,7 +88,7 @@ public final class BFHelper {
                     caseData.getEthosCaseReference());
             return;
         }
-        String yesterday = BFHelper.getEffectiveYesterday();
+        String yesterday = BFHelper.getEffectiveYesterday(LocalDate.now());
         List<BFActionTypeItem> expiredBfActions = caseData.getBfActions().stream()
                 .filter(item -> (LocalDate.parse(item.getValue().getBfDate()).isAfter(
                         LocalDate.parse(yesterday).minusDays(1))
@@ -104,9 +104,8 @@ public final class BFHelper {
         }
     }
 
-    public static String getEffectiveYesterday() {
+    public static String getEffectiveYesterday(LocalDate today) {
         // Determine the effective "yesterday" based on the current day of the week
-        LocalDate today = LocalDate.now();
         DayOfWeek dayOfWeek = today.getDayOfWeek();
         log.info("Today is: {}, effective yesterday will be calculated based on this day", dayOfWeek);
         LocalDate effectiveYesterday = switch (dayOfWeek) {

@@ -9,7 +9,6 @@ import java.time.LocalDate;
 @Builder
 public class ElasticSearchQuery {
     private static final String END_QUERY = "\n}";
-    private static final String SEARCH_AFTER = "\"search_after\": [%s]";
     private String searchAfterValue;
     private int size;
     private boolean initialSearch;
@@ -57,25 +56,17 @@ public class ElasticSearchQuery {
             {
               "reference.keyword": "asc"
             }
-          ],
-          "search_after": [%s]
-        }
+          ]
         """;
 
     public String getQuery(String fromDate) {
         LocalDate today = LocalDate.now();
-        if (initialSearch) {
-            return getInitialQuery(fromDate, today.toString());
-        } else {
-            return getSubsequentQuery(fromDate, today.toString(), searchAfterValue);
+        String baseQuery = String.format(START_BF_ACTIONS_QUERY, fromDate, today, size);
+
+        if (!initialSearch && searchAfterValue != null && !searchAfterValue.isEmpty()) {
+            baseQuery += String.format(",%n  \"search_after\": [%s]", searchAfterValue);
         }
-    }
 
-    private String getInitialQuery(String fromDate, String toDate) {
-        return String.format(START_BF_ACTIONS_QUERY, fromDate, toDate, size, searchAfterValue) + END_QUERY;
-    }
-
-    private String getSubsequentQuery(String fromDate, String toDate, String searchAfterValue) {
-        return String.format(START_BF_ACTIONS_QUERY, fromDate, toDate, size, searchAfterValue) + END_QUERY;
+        return baseQuery + END_QUERY;
     }
 }

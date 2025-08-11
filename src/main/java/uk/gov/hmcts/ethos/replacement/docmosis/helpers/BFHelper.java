@@ -91,8 +91,8 @@ public final class BFHelper {
         String yesterday = BFHelper.getEffectiveYesterday();
         List<BFActionTypeItem> expiredBfActions = caseData.getBfActions().stream()
                 .filter(item -> (LocalDate.parse(item.getValue().getBfDate()).isAfter(
-                        LocalDate.parse(yesterday).minusDays(1)) &&
-                        (LocalDate.parse(item.getValue().getBfDate()).isBefore(LocalDate.now())))).toList();
+                        LocalDate.parse(yesterday).minusDays(1))
+                        && (LocalDate.parse(item.getValue().getBfDate()).isBefore(LocalDate.now())))).toList();
         if (!expiredBfActions.isEmpty()) {
             log.info("Updating WA task creation tracker for {} expired BF Actions for case reference {}",
                     expiredBfActions.size(), caseData.getEthosCaseReference());

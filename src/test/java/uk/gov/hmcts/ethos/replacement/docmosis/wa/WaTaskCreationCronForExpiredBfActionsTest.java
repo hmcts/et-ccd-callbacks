@@ -11,6 +11,8 @@ import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.et.common.model.ccd.items.BFActionTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.BFActionType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader;
@@ -18,6 +20,7 @@ import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -165,4 +168,59 @@ class WaTaskCreationCronForExpiredBfActionsTest {
         }
     }
 
+    @Test
+    void skipsCasesWithNullCaseDataOrNullBfActions() throws IOException {
+        when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
+        when(featureToggleService.isWaTaskForExpiredBfActionsEnabled()).thenReturn(true);
+
+        SubmitEvent eventWithNullCaseData = new SubmitEvent();
+        eventWithNullCaseData.setCaseId(1L);
+        eventWithNullCaseData.setCaseData(null);
+
+        SubmitEvent eventWithNullBfActions = new SubmitEvent();
+        eventWithNullBfActions.setCaseId(2L);
+        CaseData caseData = new CaseData();
+        caseData.setBfActions(null);
+        eventWithNullBfActions.setCaseData(caseData);
+
+        when(ccdClient.buildAndGetElasticSearchRequest(any(), eq(ENGLANDWALES_CASE_TYPE_ID), any()))
+                .thenReturn(List.of(eventWithNullCaseData, eventWithNullBfActions)).thenReturn(Collections.emptyList());
+
+        waTaskCreationCronForExpiredBfActions.run();
+
+        verify(ccdClient, times(0)).startEventForCase(any(), any(), any(), any(), any());
+        verify(ccdClient, times(0)).submitEventForCase(any(), any(), any(), any(), any(), any());
+    }
+
+    @Test
+    void logsErrorWhenTriggerTaskEventForCaseThrowsException() throws IOException {
+        when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
+        when(featureToggleService.isWaTaskForExpiredBfActionsEnabled()).thenReturn(true);
+        BFActionType bfActionType = new BFActionType();
+        bfActionType.setBfDate(String.valueOf(LocalDate.now().minusDays(1)));
+        bfActionType.setCleared(null);
+        bfActionType.setIsWaTaskCreated(null);
+        BFActionTypeItem bfActionTypeItem = new BFActionTypeItem();
+        bfActionTypeItem.setValue(bfActionType);
+        bfActionTypeItem.setId("TestId");
+        List<BFActionTypeItem> bfActions = new ArrayList<>();
+        bfActions.add(bfActionTypeItem);
+
+        SubmitEvent submitEvent = new SubmitEvent();
+        submitEvent.setCaseId(123L);
+        CaseData caseData = new CaseData();
+        caseData.setEthosCaseReference("1234567890");
+        caseData.setBfActions(bfActions);
+        submitEvent.setCaseData(caseData);
+
+        when(ccdClient.buildAndGetElasticSearchRequest(any(), eq(ENGLANDWALES_CASE_TYPE_ID), any()))
+                .thenReturn(List.of(submitEvent)).thenReturn(List.of(submitEvent)).thenReturn(Collections.emptyList());
+        when(ccdClient.startEventForCase(any(), any(), any(), any(), any()))
+                .thenThrow(new RuntimeException("Simulated error"));
+
+        waTaskCreationCronForExpiredBfActions.run();
+
+        verify(ccdClient, times(1)).startEventForCase(any(), any(), any(), any(), any());
+        verify(ccdClient, times(0)).submitEventForCase(any(), any(), any(), any(), any(), any());
+    }
 }

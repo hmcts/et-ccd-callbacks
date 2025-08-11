@@ -1,8 +1,10 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 
 import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.et.common.model.ccd.Address;
+import uk.gov.hmcts.et.common.model.ccd.types.OrganisationAddress;
 
 public final class AddressUtils {
 
@@ -55,5 +57,18 @@ public final class AddressUtils {
      */
     public static Address createIfNull(Address address) {
         return address == null ? new Address() : address;
+    }
+
+    @NotNull
+    public static Address getAddress(OrganisationAddress organisationAddress) {
+        Address et3ResponseAddress = new Address();
+        et3ResponseAddress.setAddressLine1(organisationAddress.getAddressLine1());
+        et3ResponseAddress.setAddressLine2(organisationAddress.getAddressLine2());
+        et3ResponseAddress.setAddressLine3(organisationAddress.getAddressLine3());
+        et3ResponseAddress.setCountry(organisationAddress.getCountry());
+        et3ResponseAddress.setCounty(organisationAddress.getCounty());
+        et3ResponseAddress.setPostCode(organisationAddress.getPostCode());
+        et3ResponseAddress.setPostTown(organisationAddress.getTownCity());
+        return et3ResponseAddress;
     }
 }

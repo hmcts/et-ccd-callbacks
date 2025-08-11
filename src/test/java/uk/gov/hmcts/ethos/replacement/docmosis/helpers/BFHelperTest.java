@@ -77,9 +77,10 @@ public class BFHelperTest {
     void updateWaTaskCreationTrackerSetsIsWaTaskCreatedToYesForExpiredBfActions() {
         bfActionTypeItemList.getFirst().getValue().setBfDate(LocalDate.now().minusDays(2).toString());
         bfActionTypeItemList.getFirst().getValue().setIsWaTaskCreated(null);
+        bfActionTypeItemList.getFirst().getValue().setCleared(null);
         caseData.setBfActions(bfActionTypeItemList);
         BFHelper.updateWaTaskCreationTrackerOfBfActionItems(caseData);
-        assertEquals("Yes", caseData.getBfActions().get(0).getValue().getIsWaTaskCreated());
+        assertEquals("Yes", caseData.getBfActions().getFirst().getValue().getIsWaTaskCreated());
     }
 
     @Test
@@ -88,7 +89,7 @@ public class BFHelperTest {
         bfActionTypeItemList.getFirst().getValue().setIsWaTaskCreated(null);
         caseData.setBfActions(bfActionTypeItemList);
         BFHelper.updateWaTaskCreationTrackerOfBfActionItems(caseData);
-        assertNull(caseData.getBfActions().get(0).getValue().getIsWaTaskCreated());
+        assertNull(caseData.getBfActions().getFirst().getValue().getIsWaTaskCreated());
     }
 
     @Test

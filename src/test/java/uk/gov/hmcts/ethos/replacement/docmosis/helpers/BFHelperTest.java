@@ -87,6 +87,7 @@ public class BFHelperTest {
     void updateWaTaskCreationTrackerDoesNotChangeIsWaTaskCreatedForNonExpiredBfActions() {
         bfActionTypeItemList.getFirst().getValue().setBfDate(LocalDate.now().plusDays(1).toString());
         bfActionTypeItemList.getFirst().getValue().setIsWaTaskCreated(null);
+        bfActionTypeItemList.getFirst().getValue().setCleared(null);
         caseData.setBfActions(bfActionTypeItemList);
         BFHelper.updateWaTaskCreationTrackerOfBfActionItems(caseData);
         assertNull(caseData.getBfActions().getFirst().getValue().getIsWaTaskCreated());

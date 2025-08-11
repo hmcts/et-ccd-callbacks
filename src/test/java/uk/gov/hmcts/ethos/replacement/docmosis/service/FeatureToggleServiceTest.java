@@ -135,7 +135,6 @@ class FeatureToggleServiceTest {
         assertThat(featureToggleService.isAcasCertificatePostSubmissionEnabled()).isEqualTo(toggleStat);
     }
 
-
     @ValueSource(booleans = {true, false})
     void returnsCorrectValue_whenCitizenEt1GenerationIsEnabled(Boolean toggleStat) {
         givenToggle("citizen-et1-generation", toggleStat);

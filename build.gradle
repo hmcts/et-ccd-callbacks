@@ -375,7 +375,7 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '6.1.9'
     implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '8.0'
-    implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.0.2'
+    implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.4.1'
 
     // Log4J core added to remove startup error message
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4JVersion
@@ -419,7 +419,7 @@ dependencies {
     implementation group: 'org.webjars', name: 'webjars-locator-core', version: '0.59'
     implementation group: 'org.asynchttpclient', name: 'async-http-client-netty-utils', version: '2.12.4'
     implementation group: 'com.fasterxml.woodstox', name: 'woodstox-core', version: '7.1.1'
-    implementation group: 'com.squareup.okio', name: 'okio', version: '3.10.2'
+    implementation group: 'com.squareup.okio', name: 'okio', version: '3.16.0'
     implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.6'
     implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.5.6'
     // CVE-2025-48734
@@ -427,7 +427,7 @@ dependencies {
     implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.10.1'
     implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
 
-    runtimeOnly group: 'com.squareup.okio', name: 'okio-jvm', version: '3.10.2'
+    runtimeOnly group: 'com.squareup.okio', name: 'okio-jvm', version: '3.16.0'
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
@@ -456,7 +456,7 @@ dependencies {
     testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-commons', version: junitPlatformVersion
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
     testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.21.3'
-    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.3'
+    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.4'
     // Mockito 5.0.0+ has merged mockito-inline into mockito-core
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.13.0'
     testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '5.13.0'

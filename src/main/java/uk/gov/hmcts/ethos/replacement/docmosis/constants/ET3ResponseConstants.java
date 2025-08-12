@@ -14,7 +14,6 @@ public final class ET3ResponseConstants {
     public static final String ERROR_CASE_DATA_NOT_FOUND = "Case data not found";
     public static final String SYSTEM_ERROR = "A system error occurred. Please try again later!";
     public static final String ERROR_ORGANISATION_DETAILS_NOT_FOUND = "Organisation details not found";
-    public static final String REPRESENTATIVE_CONTACT_CHANGE_OPTION_AMEND_CONTACT_DETAILS = "Amend contact details";
     public static final String REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS = "Use MyHMCTS details";
 
     private ET3ResponseConstants() {

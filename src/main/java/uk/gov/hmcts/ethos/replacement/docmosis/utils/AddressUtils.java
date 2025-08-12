@@ -59,6 +59,22 @@ public final class AddressUtils {
         return address == null ? new Address() : address;
     }
 
+    /**
+     * Converts an {@link OrganisationAddress} into a corresponding {@link Address} object.
+     *
+     * <p>
+     * This method maps each available field from the {@code organisationAddress} to the
+     * appropriate field in a new {@code Address} instance:
+     * <ul>
+     *     <li>{@code addressLine1}, {@code addressLine2}, and {@code addressLine3}</li>
+     *     <li>{@code country}, {@code county}, {@code postCode}, and {@code townCity} (mapped to {@code postTown})</li>
+     * </ul>
+     *
+     * @param organisationAddress the source address object containing organisation address details
+     * @return a non-null {@link Address} populated with values from the provided {@code organisationAddress}
+     *
+     * @throws NullPointerException if {@code organisationAddress} is {@code null}
+     */
     @NotNull
     public static Address getAddress(OrganisationAddress organisationAddress) {
         Address et3ResponseAddress = new Address();
@@ -70,5 +86,39 @@ public final class AddressUtils {
         et3ResponseAddress.setPostCode(organisationAddress.getPostCode());
         et3ResponseAddress.setPostTown(organisationAddress.getTownCity());
         return et3ResponseAddress;
+    }
+
+    /**
+     * Converts the given {@link OrganisationAddress} into a formatted multi-line string representation.
+     *
+     * <p>
+     * Each non-null component of the address is appended in a readable format:
+     * <ul>
+     *     <li>Address lines 1 to 3 are concatenated with spaces (if present).</li>
+     *     <li>Town/City, Postcode, County, and Country are appended on new lines (if present).</li>
+     * </ul>
+     * Null fields are skipped to avoid blank or malformed lines.
+     *
+     * @param organisationAddress the organisation address object to convert
+     * @return a non-null string containing the formatted address
+     *
+     * @throws NullPointerException if {@code organisationAddress} is {@code null}
+     */
+    @NotNull
+    public static String getAddressAsText(OrganisationAddress organisationAddress) {
+        StringBuilder sb = (organisationAddress.getAddressLine1() == null ? new StringBuilder() : new StringBuilder(
+                organisationAddress.getAddressLine1()))
+                .append(organisationAddress.getAddressLine2() == null ? "" :
+                        "\n" + organisationAddress.getAddressLine2()).append(
+                                organisationAddress.getAddressLine3() == null ? "" :
+                                        "\n" + organisationAddress.getAddressLine3()).append(
+                                                organisationAddress.getTownCity() == null ? "" :
+                                                        "\n" + organisationAddress.getTownCity()).append(
+                                                                organisationAddress.getPostCode() == null ? "" :
+                                                                        "\n" + organisationAddress.getPostCode())
+                .append(organisationAddress.getCounty() == null ? "" :
+                        "\n" + organisationAddress.getCounty()).append(organisationAddress.getCountry() == null ? "" :
+                        "\n" + organisationAddress.getCountry());
+        return sb.toString();
     }
 }

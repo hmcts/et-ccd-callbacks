@@ -42,6 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_CASE_DATA_NOT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.ET3_RESPONSE;
 
 @ExtendWith(SpringExtension.class)
@@ -63,6 +64,8 @@ class Et3ResponseControllerTest extends BaseControllerTest {
     private static final String DOWNLOAD_DRAFT_SUBMITTED = "/et3Response/downloadDraft/submitted";
     private static final String ABOUT_TO_SUBMIT_AMEND_REPRESENTATIVE_CONTACT =
             "/et3Response/aboutToSubmitAmendRepresentativeContact";
+    private static final String MID_EVENT_AMEND_REPRESENTATIVE_CONTACT =
+            "/et3Response/midEventAmendRepresentativeContact";
 
     @Autowired
     private WebApplicationContext applicationContext;
@@ -456,6 +459,50 @@ class Et3ResponseControllerTest extends BaseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    @SneakyThrows
+    void theMidEventAmendRepresentativeContact() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        doNothing().when(et3ResponseService).setRespondentRepresentsContactDetails(AUTH_TOKEN,
+                ccdRequest.getCaseDetails().getCaseData(), ccdRequest.getCaseDetails().getCaseId());
+        ccdRequest.getCaseDetails().getCaseData().setRepresentativeContactChangeOption(
+                REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS);
+        mvc.perform(post(MID_EVENT_AMEND_REPRESENTATIVE_CONTACT)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath("$.errors.size()", is(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+        ccdRequest.getCaseDetails().getCaseData().setRepresentativeContactChangeOption("DUMMY");
+    }
+
+    @Test
+    @SneakyThrows
+    void theMidEventAmendRepresentativeContact_WithException() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        doThrow(new GenericServiceException(ERROR_CASE_DATA_NOT_FOUND,
+                new Exception(ERROR_CASE_DATA_NOT_FOUND),
+                ERROR_CASE_DATA_NOT_FOUND,
+                StringUtils.EMPTY,
+                "Et3ResponseService",
+                "setRespondentRepresentsContactDetails")).when(et3ResponseService)
+                .setRepresentativeMyHmctsContactAddress(anyString(), any(CaseData.class), anyString());
+        ccdRequest.getCaseDetails().getCaseData().setRepresentativeContactChangeOption(
+                REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS);
+        mvc.perform(post(MID_EVENT_AMEND_REPRESENTATIVE_CONTACT)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath("$.errors.size()", is(1)))
+                .andExpect(jsonPath("$.errors[0]", is(ERROR_CASE_DATA_NOT_FOUND)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+        ccdRequest.getCaseDetails().getCaseData().setRepresentativeContactChangeOption("DUMMY");
     }
 
     @Test

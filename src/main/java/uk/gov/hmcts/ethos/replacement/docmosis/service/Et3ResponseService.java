@@ -58,6 +58,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItemFromTopLevel;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.ET3_RESPONSE_PDF_FILE_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils.getAddress;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils.getAddressAsText;
 
 /**
  * Service to support ET3 Response journey. Contains methods for generating and saving ET3 Response documents.
@@ -216,31 +217,20 @@ public class Et3ResponseService {
     }
 
     /**
-     * Sets the ET3 representative's contact information in the provided {@link CaseData} object,
-     * based on the selected contact change option.
+     * Sets the representative's MyHMCTS contact address in the provided {@link CaseData} object.
      *
-     * <p>This method determines how the contact details for the representative should be populated
-     * in the ET3 Response amend contact details page. It handles two scenarios:</p>
+     * <p>
+     * This method retrieves user details using the provided user token, fetches the associated
+     * organisation's contact information, and then updates the ET3 response address and
+     * MyHMCTS address text fields in the case data. It throws a {@link GenericServiceException}
+     * if user or organisation details cannot be found.
      *
-     * <ul>
-     *   <li>
-     *     If the option is {@code AMEND_CONTACT_DETAILS}, it retrieves the representative details
-     *     from the case data based on the list of represented respondent indexes and populates
-     *     the contact phone number and address.
-     *   </li>
-     *   <li>
-     *     If the option is {@code USE_MYHMCTS_DETAILS}, it fetches the user's organisation contact
-     *     information from IDAM and Organisation APIs and sets the address accordingly.
-     *   </li>
-     * </ul>
+     * @param userToken            the JWT bearer token representing the authenticated user
+     * @param caseData             the case data object to be updated with address information
+     * @param submissionReference  the reference string for identifying the current case submission
      *
-     * @param userToken           the JWT token for the user, used to authorize and retrieve user and organisation
-     *                            details
-     * @param caseData            the {@link CaseData} object containing current case details and representative
-     *                            information
-     * @param submissionReference the unique reference ID for the ET3 submission, used for error context
-     * @throws GenericServiceException if no represented respondent is found, the user details cannot be retrieved,
-     *                                  or if organisation contact details are missing or inaccessible
+     * @throws GenericServiceException if user details or organisation contact information
+     *                                  cannot be retrieved, or are missing or invalid
      */
     public void setRepresentativeMyHmctsContactAddress(String userToken, CaseData caseData, String submissionReference)
             throws GenericServiceException {
@@ -270,6 +260,7 @@ public class Et3ResponseService {
                     "setRepresentativeContactInfo - organisation details not found");
         }
         caseData.setEt3ResponseAddress(getAddress(response.getBody().getContactInformation().getFirst()));
+        caseData.setMyHmctsAddressText(getAddressAsText(response.getBody().getContactInformation().getFirst()));
     }
 
     /**

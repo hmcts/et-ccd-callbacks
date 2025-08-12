@@ -29,6 +29,7 @@ import java.util.List;
 
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
@@ -354,6 +355,41 @@ public class Et3ResponseController {
                 .confirmation_body(GENERATED_DOCUMENT_URL + caseData.getDocMarkUp()
                                    + "\r\n\r\n" + SECTION_COMPLETE_BODY.formatted(ccdId, ccdId, ccdId, ccdId))
                 .build());
+    }
+
+    /**
+     * Sets new values to respondent representative model {@link RepresentedTypeR}.
+     *
+     * @param ccdRequest generic request from CCD
+     * @param userToken  authentication token to verify the user
+     * @return Callback response entity with case data attached.
+     */
+    @PostMapping(value = "/midEventAmendRepresentativeContact", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Updates RepresentedTypeR model of the respondent representative with new values")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> midEventAmendRepresentativeContact(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader("Authorization") String userToken) {
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        List<String> errors = new ArrayList<>();
+        try {
+            if (REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS.equals(
+                    caseData.getRepresentativeContactChangeOption())) {
+                et3ResponseService.setRepresentativeMyHmctsContactAddress(userToken,
+                        caseData, ccdRequest.getCaseDetails().getCaseId());
+            }
+        } catch (GenericServiceException gse) {
+            errors.add(gse.getMessage());
+        }
+        return getCallbackRespEntityErrors(errors, caseData);
     }
 
     /**

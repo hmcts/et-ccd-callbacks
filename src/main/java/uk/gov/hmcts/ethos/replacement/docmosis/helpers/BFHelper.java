@@ -107,7 +107,6 @@ public final class BFHelper {
     public static String getEffectiveYesterday(LocalDate today) {
         // Determine the effective "yesterday" based on the current day of the week
         DayOfWeek dayOfWeek = today.getDayOfWeek();
-        log.info("Today is: {}, effective yesterday will be calculated based on this day", dayOfWeek);
         LocalDate effectiveYesterday = switch (dayOfWeek) {
             case MONDAY -> today.minusDays(3); // If today is Monday, go back to Friday
             case SUNDAY -> today.minusDays(2); // If today is Sunday, go back to Friday as well

@@ -73,8 +73,12 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
                 });
 
                 validSubmitEvents.forEach(submitEvent ->
-                    //invoke wa task creation event for each case with one or more expired bf action
-                    triggerTaskEventForCase(adminUserToken, submitEvent, caseTypeId)
+                        {
+                            log.info("Invoked expired bf wa task creation event for case with ID: {} for case type: {}",
+                                    submitEvent.getCaseId(), caseTypeId);
+                            //invoke wa task creation event for each case with one or more expired bf action
+                            triggerTaskEventForCase(adminUserToken, submitEvent, caseTypeId);
+                        }
                 );
             } catch (Exception e) {
                 log.error(e.getMessage());
@@ -101,7 +105,6 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
 
     private List<SubmitEvent> findCasesByCaseType(String adminUserToken, String caseTypeId) throws IOException {
         log.info("Processing expired BF action search for case type {}.", caseTypeId);
-
         List<SubmitEvent> caseSubmitEvents = new ArrayList<>();
         String query = ElasticSearchQuery.builder()
                 .initialSearch(true)
@@ -116,8 +119,7 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
 
         log.info("Found {} cases for case type: {}", searchResults.size(), caseTypeId);
         searchResults.forEach(se -> addCaseToSubmitEvents(caseSubmitEvents, se));
-
-        String searchAfterValue = String.valueOf(searchResults.get(searchResults.size() - 1).getCaseId());
+        String searchAfterValue = String.valueOf(searchResults.getLast().getCaseId());
 
         while (caseSubmitEvents.size() < maxCases) {
             query = ElasticSearchQuery.builder()

@@ -77,7 +77,8 @@ public class BFHelperTest {
 
     @Test
     void updateWaTaskCreationTrackerSetsIsWaTaskCreatedToYesForExpiredBfActions() {
-        bfActionTypeItemList.getFirst().getValue().setBfDate(LocalDate.now().minusDays(2).toString());
+        bfActionTypeItemList.getFirst().getValue().setBfDate(BFHelper.getEffectiveYesterday(
+                LocalDate.now()));
         bfActionTypeItemList.getFirst().getValue().setIsWaTaskCreated(null);
         bfActionTypeItemList.getFirst().getValue().setCleared(null);
         caseData.setBfActions(bfActionTypeItemList);

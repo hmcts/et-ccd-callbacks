@@ -72,6 +72,7 @@
       "claimant_last_name": "Johnson",
       "claimant_first_names": "Doris"
     },
+    "claimant": "Doris Johnson",
     "servingDocumentRecipient": [
       "Claimant",
       "Respondent"

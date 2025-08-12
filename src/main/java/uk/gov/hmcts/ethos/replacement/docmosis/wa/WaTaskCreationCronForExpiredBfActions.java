@@ -72,14 +72,12 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
                     return false;
                 });
 
-                validSubmitEvents.forEach(submitEvent ->
-                        {
-                            log.info("Invoked expired bf wa task creation event for case with ID: {} for case type: {}",
-                                    submitEvent.getCaseId(), caseTypeId);
-                            //invoke wa task creation event for each case with one or more expired bf action
-                            triggerTaskEventForCase(adminUserToken, submitEvent, caseTypeId);
-                        }
-                );
+                validSubmitEvents.forEach(submitEvent -> {
+                    log.info("Invoked expired bf wa task creation event for case with ID: {} for case type: {}",
+                            submitEvent.getCaseId(), caseTypeId);
+                    //invoke wa task creation event for each case with one or more expired bf action
+                    triggerTaskEventForCase(adminUserToken, submitEvent, caseTypeId);
+                });
             } catch (Exception e) {
                 log.error(e.getMessage());
             }

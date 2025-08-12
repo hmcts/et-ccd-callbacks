@@ -27,9 +27,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ForkJoinPool;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -80,6 +79,12 @@ public class Et1SubmissionService {
     private String claimantSubmissionTemplateIdWelsh;
     private static final String ET1_EN_PDF = "ET1_0224.pdf";
     private static final String ET1_CY_PDF = "CY_ET1_2222.pdf";
+
+    public void et1CitizenSubmissionLogic(CaseDetails caseDetails, String userToken) {
+        Thread.startVirtualThread(() -> createAndUploadEt1Docs(caseDetails, userToken));
+        Thread.startVirtualThread(() -> sendEt1ConfirmationClaimant(caseDetails, userToken));
+        Thread.startVirtualThread(() -> vexationCheck(caseDetails, userToken));
+    }
 
     /**
      * Creates the ET1 PDF and calls off to ACAS to retrieve the certificates.
@@ -182,7 +187,7 @@ public class Et1SubmissionService {
 
     @SuppressWarnings("PMD.SignatureDeclareThrowsException")
     public List<DocumentTypeItem> retrieveAndAddAcasCertificates(
-            CaseData caseData, String userToken, String caseTypeId) throws Exception {
+            CaseData caseData, String userToken, String caseTypeId) {
         if (isEmpty(caseData.getRespondentCollection())) {
             return new ArrayList<>();
         }
@@ -203,16 +208,19 @@ public class Et1SubmissionService {
         }
 
         List<DocumentTypeItem> documentTypeItems = synchronizedList(new ArrayList<>());
-        try (ForkJoinPool customThreadPool = new ForkJoinPool(documentInfoList.size())) {
-            customThreadPool.submit(() ->
-                    documentInfoList.parallelStream()
-                            .map(documentManagementService::addDocumentToDocumentField)
-                            .forEach(doc -> {
-                                doc.setCategoryId(DocumentCategory.ACAS_CERTIFICATE.getCategory());
-                                documentTypeItems.add(createDocumentTypeItem(doc, ACAS_CERTIFICATE));
-                            })
-            ).get();
-        }
+        List<Thread> threads = documentInfoList.stream().map(docInfo -> Thread.ofVirtual().start(() -> {
+            UploadedDocumentType doc = documentManagementService.addDocumentToDocumentField(docInfo);
+            doc.setCategoryId(DocumentCategory.ACAS_CERTIFICATE.getCategory());
+            documentTypeItems.add(createDocumentTypeItem(doc, ACAS_CERTIFICATE));
+        })).toList();
+        threads.forEach(thread -> {
+            try {
+                thread.join();
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                log.error("Virtual thread interrupted while processing ACAS certificates", e);
+            }
+        });
 
         return documentTypeItems;
     }
@@ -326,13 +334,23 @@ public class Et1SubmissionService {
     }
 
     private List<SubmitEvent> getSubmitEventList(String userToken, String query) {
-        CompletableFuture<List<SubmitEvent>> englandWalesFuture = CompletableFuture.supplyAsync(
-                () -> fetchSubmitEvents(userToken, ENGLANDWALES_CASE_TYPE_ID, query));
-        CompletableFuture<List<SubmitEvent>> scotlandFuture = CompletableFuture.supplyAsync(
-                () -> fetchSubmitEvents(userToken, SCOTLAND_CASE_TYPE_ID, query));
+        List<SubmitEvent>[] submitEvents = new List[2];
 
-        return Stream.of(englandWalesFuture, scotlandFuture)
-                .map(CompletableFuture::join)
+        Thread englandWalesThread = Thread.ofVirtual().start(() -> submitEvents[0] = fetchSubmitEvents(userToken,
+                ENGLANDWALES_CASE_TYPE_ID, query));
+        Thread scotlandThread = Thread.ofVirtual().start(() -> submitEvents[1] = fetchSubmitEvents(userToken,
+                 SCOTLAND_CASE_TYPE_ID, query));
+
+        try {
+            englandWalesThread.join();
+            scotlandThread.join();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.error("Virtual thread interrupted while fetching submit events", e);
+        }
+
+        return Stream.of(submitEvents)
+                .filter(Objects::nonNull)
                 .flatMap(List::stream)
                 .sorted(Comparator.comparing(a -> a.getCaseData().getReceiptDate()))
                 .toList();

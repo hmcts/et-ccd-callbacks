@@ -100,67 +100,46 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
     }
 
     private List<SubmitEvent> findCasesByCaseType(String adminUserToken, String caseTypeId) throws IOException {
-        ElasticSearchQuery elasticSearchQuery = ElasticSearchQuery.builder()
+        log.info("Processing expired BF action search for case type {}.", caseTypeId);
+
+        List<SubmitEvent> caseSubmitEvents = new ArrayList<>();
+        String query = ElasticSearchQuery.builder()
                 .initialSearch(true)
                 .size(maxCases)
-                .build();
+                .build()
+                .getQuery(BFHelper.getEffectiveYesterday(LocalDate.now()));
 
-        log.info("Processing the expired bf action search for case type {}.", caseTypeId);
-        String query = elasticSearchQuery.getQuery(BFHelper.getEffectiveYesterday(LocalDate.now()));
-        List<SubmitEvent> initialSearchResultSubmitEvents = ccdClient.buildAndGetElasticSearchRequest(
-                adminUserToken, caseTypeId, query);
-
-        if (!CollectionUtils.isEmpty(initialSearchResultSubmitEvents)) {
-            log.info("Found {} cases for case type: {}", initialSearchResultSubmitEvents.size(), caseTypeId);
-            String searchAfterValue = String.valueOf(initialSearchResultSubmitEvents.getLast().getCaseId());
-            log.info("First search after case id is {} cases for case type: {}", searchAfterValue, caseTypeId);
-
-            boolean keepSearching;
-            // Initialize the list with the initial search results so that to aggregate total search results returned
-            List<SubmitEvent> caseSubmitEvents = new ArrayList<>(initialSearchResultSubmitEvents);
-            int tempCaseCounter = 0;
-            do {
-                // A follow-up search query
-                ElasticSearchQuery followUpESQuery = ElasticSearchQuery.builder()
-                        .initialSearch(false)
-                        .size(maxCases)
-                        .searchAfterValue(searchAfterValue)
-                        .build();
-
-                String followUpQuery = followUpESQuery.getQuery(BFHelper.getEffectiveYesterday(LocalDate.now()));
-                List<SubmitEvent> subsequentSearchResultSubmitEvents = ccdClient.buildAndGetElasticSearchRequest(
-                        adminUserToken, caseTypeId, followUpQuery);
-                log.info("Follow up fetch {} cases for {} retrieved for Expired BF Task",
-                        subsequentSearchResultSubmitEvents.size(), caseTypeId);
-                subsequentSearchResultSubmitEvents.forEach(se -> log.info("Case ID: {}", se.getCaseId()));
-
-                // Check if there are more cases to process
-                keepSearching = !subsequentSearchResultSubmitEvents.isEmpty() && tempCaseCounter < 10;
-                if (keepSearching) {
-                    log.info("Adding {} cases to the list for case type: {}", subsequentSearchResultSubmitEvents.size(),
-                            caseTypeId);
-                    subsequentSearchResultSubmitEvents.forEach(followUpSubmitEvent ->
-                            addCaseToSubmitEvents(caseSubmitEvents, followUpSubmitEvent));
-                    // Update the searchAfterValue for the next iteration
-                    searchAfterValue = String.valueOf(subsequentSearchResultSubmitEvents.getLast().getCaseId());
-                    log.info("Next search after case id is {} cases for case type: {}", searchAfterValue, caseTypeId);
-                    log.info("Current tempCaseCounter is {} for case type: {}", tempCaseCounter, caseTypeId);
-                    tempCaseCounter++;
-                }
-                if (tempCaseCounter == 10) {
-                    log.info("Reached the maximum temp number of cases limit to process in this run: {}",
-                            tempCaseCounter);
-                    break;
-                }
-            } while (keepSearching);
-            log.info("The search for cases with expired bf action returned {} cases.", caseSubmitEvents.size());
-            caseSubmitEvents.forEach(se -> log.info("Case type id of {} found with Case ID: {}",
-                    se.getCaseId()));
+        List<SubmitEvent> searchResults = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
+        if (CollectionUtils.isEmpty(searchResults)) {
             return caseSubmitEvents;
-
-        } else {
-            return new ArrayList<>();
         }
+
+        log.info("Found {} cases for case type: {}", searchResults.size(), caseTypeId);
+        searchResults.forEach(se -> addCaseToSubmitEvents(caseSubmitEvents, se));
+
+        String searchAfterValue = String.valueOf(searchResults.get(searchResults.size() - 1).getCaseId());
+
+        while (caseSubmitEvents.size() < maxCases) {
+            query = ElasticSearchQuery.builder()
+                    .initialSearch(false)
+                    .size(maxCases)
+                    .searchAfterValue(searchAfterValue)
+                    .build()
+                    .getQuery(BFHelper.getEffectiveYesterday(LocalDate.now()));
+
+            List<SubmitEvent> nextResults = ccdClient.buildAndGetElasticSearchRequest(
+                    adminUserToken, caseTypeId, query);
+            if (CollectionUtils.isEmpty(nextResults)) {
+                break;
+            }
+
+            log.info("Fetched {} additional cases for case type: {}", nextResults.size(), caseTypeId);
+            nextResults.forEach(se -> addCaseToSubmitEvents(caseSubmitEvents, se));
+            searchAfterValue = String.valueOf(nextResults.getLast().getCaseId());
+        }
+
+        log.info("Total cases found: {}", caseSubmitEvents.size());
+        return caseSubmitEvents;
     }
 
     //Distinct/Unique list of submit events, i.e. no duplicate cases

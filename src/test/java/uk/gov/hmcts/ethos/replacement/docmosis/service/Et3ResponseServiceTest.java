@@ -15,7 +15,6 @@ import org.junit.platform.commons.util.StringUtils;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -29,12 +28,10 @@ import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationAddress;
-import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.enums.RespondentSolicitorType;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
-import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormMapper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentFixtures;
@@ -61,6 +58,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -74,6 +72,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConst
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_INVALID_CASE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_INVALID_USER_TOKEN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_NO_REPRESENTED_RESPONDENT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_ORGANISATION_DETAILS_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_USER_ID_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_USER_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS;
@@ -96,7 +95,7 @@ class Et3ResponseServiceTest {
     @MockBean
     private AuthTokenGenerator authTokenGenerator;
     @MockBean
-    private OrganisationClient organisationClient;
+    private MyHmctsService myHmctsService;
 
     private static final String INVALID_USER_TOKEN = "invalidUserToken";
     private static final String VALID_USER_TOKEN = "validUserToken";
@@ -128,7 +127,7 @@ class Et3ResponseServiceTest {
         emailService = spy(new EmailUtils());
 
         et3ResponseService = new Et3ResponseService(documentManagementService, pdfBoxService, emailService,
-                userIdamService, ccdCaseAssignment, authTokenGenerator, organisationClient);
+                userIdamService, ccdCaseAssignment, myHmctsService);
         caseData = CaseDataBuilder.builder()
             .withClaimantIndType("Doris", "Johnson")
             .withClaimantType("232 Petticoat Square", "3 House", null,
@@ -592,11 +591,7 @@ class Et3ResponseServiceTest {
                 .country(COUNTRY)
                 .build();
         when(authTokenGenerator.generate()).thenReturn(userToken);
-        OrganisationsResponse orgResponse = OrganisationsResponse.builder()
-                .contactInformation(List.of(organisationAddress)).build();
-        when(organisationClient.retrieveOrganisationDetailsByUserId(userToken,
-                userToken,
-                userDetails.getUid())).thenReturn(ResponseEntity.ok(orgResponse));
+        when(myHmctsService.getOrganisationAddress(userToken)).thenReturn(organisationAddress);
         et3ResponseService.setRespondentRepresentsContactDetails(userToken, caseData2, submissionReference);
         assertThat(caseData2.getEt3ResponseAddress()).isNotNull();
         assertThat(caseData2.getEt3ResponseAddress().getAddressLine1()).isEqualTo(ADDRESS_LINE_1);
@@ -624,9 +619,13 @@ class Et3ResponseServiceTest {
 
         when(userIdamService.getUserDetails(userToken)).thenReturn(userDetails);
         when(authTokenGenerator.generate()).thenReturn(userToken);
-        when(organisationClient.retrieveOrganisationDetailsByUserId(userToken,
-                userToken,
-                userDetails.getUid())).thenReturn(ResponseEntity.ok(null));
+        doThrow(new GenericServiceException(ERROR_ORGANISATION_DETAILS_NOT_FOUND,
+                new Exception(ERROR_ORGANISATION_DETAILS_NOT_FOUND),
+                ERROR_ORGANISATION_DETAILS_NOT_FOUND,
+                org.apache.commons.lang3.StringUtils.EMPTY,
+                "MyHmctsService",
+                "getOrganisationAddress - organisation details not found"))
+                .when(myHmctsService).getOrganisationAddress(userToken);
         GenericServiceException organisationNotFound = assertThrows(GenericServiceException.class, () ->
                 et3ResponseService.setRespondentRepresentsContactDetails(userToken, caseData4, submissionReference));
         assertThat(organisationNotFound.getMessage()).isEqualTo("Organisation details not found");

@@ -6,7 +6,6 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -17,14 +16,12 @@ import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
+import uk.gov.hmcts.et.common.model.ccd.types.OrganisationAddress;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxService;
-import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -32,7 +29,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -44,7 +40,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConst
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_INVALID_CASE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_INVALID_USER_TOKEN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_NO_REPRESENTED_RESPONDENT_FOUND;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_ORGANISATION_DETAILS_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_USER_ID_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_USER_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ET3_ATTACHMENT;
@@ -73,8 +68,7 @@ public class Et3ResponseService {
     private final EmailService emailService;
     private final UserIdamService userIdamService;
     private final CcdCaseAssignment ccdCaseAssignment;
-    private final AuthTokenGenerator authTokenGenerator;
-    private final OrganisationClient organisationClient;
+    private final MyHmctsService myHmctsService;
 
     @Value("${template.et3Response.tribunal}")
     private String et3EmailTribunalTemplateId;
@@ -244,23 +238,9 @@ public class Et3ResponseService {
                     "Et3ResponseService",
                     "setRepresentativeContactInfo - user not found");
         }
-        ResponseEntity<OrganisationsResponse> response =
-                organisationClient.retrieveOrganisationDetailsByUserId(userToken,
-                        authTokenGenerator.generate(),
-                        userDetails.getUid());
-        if (ObjectUtils.isEmpty(response)
-                || ObjectUtils.isEmpty(response.getBody())
-                || CollectionUtils.isEmpty(Objects.requireNonNull(response.getBody()).getContactInformation())
-                || ObjectUtils.isEmpty(response.getBody().getContactInformation().getFirst())) {
-            throw new GenericServiceException(ERROR_ORGANISATION_DETAILS_NOT_FOUND,
-                    new Exception(ERROR_ORGANISATION_DETAILS_NOT_FOUND),
-                    ERROR_ORGANISATION_DETAILS_NOT_FOUND,
-                    StringUtils.EMPTY,
-                    "Et3ResponseService",
-                    "setRepresentativeContactInfo - organisation details not found");
-        }
-        caseData.setEt3ResponseAddress(getAddress(response.getBody().getContactInformation().getFirst()));
-        caseData.setMyHmctsAddressText(getAddressAsText(response.getBody().getContactInformation().getFirst()));
+        OrganisationAddress organisationAddress = myHmctsService.getOrganisationAddress(userToken);
+        caseData.setEt3ResponseAddress(getAddress(organisationAddress));
+        caseData.setMyHmctsAddressText(getAddressAsText(organisationAddress));
     }
 
     /**

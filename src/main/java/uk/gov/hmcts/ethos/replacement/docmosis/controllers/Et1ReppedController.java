@@ -36,6 +36,7 @@ import java.util.List;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
@@ -662,7 +663,8 @@ public class Et1ReppedController {
      * @param userToken  authentication token to verify the user
      * @return Callback response entity with case data attached.
      */
-    @PostMapping(value = "/aboutToStartRepresentativeInfo", consumes = MimeTypeUtils.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/aboutToStartAmendClaimantRepresentativeContact",
+            consumes = MimeTypeUtils.APPLICATION_JSON_VALUE)
     @Operation(summary = "Loads RepresentedTypeC model values to case data")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
@@ -673,7 +675,7 @@ public class Et1ReppedController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<CCDCallbackResponse> aboutToStartRepresentativeInfo(
+    public ResponseEntity<CCDCallbackResponse> aboutToStartAmendClaimantRepresentativeContact(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
@@ -693,7 +695,7 @@ public class Et1ReppedController {
      * @param userToken  authentication token to verify the user
      * @return Callback response entity with case data attached.
      */
-    @PostMapping(value = "/aboutToSubmitRepresentativeInfo", consumes = MimeTypeUtils.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/midEventAmendClaimantRepresentativeContact", consumes = MimeTypeUtils.APPLICATION_JSON_VALUE)
     @Operation(summary = "Updates RepresentedTypeC model of the claimant representative with new values")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
@@ -704,13 +706,48 @@ public class Et1ReppedController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public ResponseEntity<CCDCallbackResponse> aboutToSubmitRepresentativeInfo(
+    public ResponseEntity<CCDCallbackResponse> midEventAmendClaimantRepresentativeContact(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>();
         try {
-            Et1ReppedHelper.setClaimantRepresentativeValues(caseData);
+            if (REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS
+                    .equals(caseData.getRepresentativeContactChangeOption())) {
+                et1ReppedService.setMyHmctsOrganisationAddress(userToken, caseData);
+            }
+        } catch (GenericServiceException gse) {
+            errors.add(gse.getMessage());
+        }
+        return getCallbackRespEntityErrors(errors, caseData);
+    }
+
+    /**
+     * Sets new values to respondent representative model {@link RepresentedTypeC}.
+     *
+     * @param ccdRequest generic request from CCD
+     * @param userToken  authentication token to verify the user
+     * @return Callback response entity with case data attached.
+     */
+    @PostMapping(value = "/aboutToSubmitAmendClaimantRepresentativeContact",
+            consumes = MimeTypeUtils.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Updates RepresentedTypeC model of the claimant representative with new values")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                        schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> aboutToSubmitAmendClaimantRepresentativeContact(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader("Authorization") String userToken) {
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        List<String> errors = new ArrayList<>();
+        try {
+            et1ReppedService.setClaimantRepresentativeValues(userToken, caseData);
         } catch (GenericServiceException gse) {
             errors.add(gse.getMessage());
         }

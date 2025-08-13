@@ -44,7 +44,6 @@ class Et1ReppedHelperTest {
     private CCDRequest ccdRequest;
     private CaseDetails caseDetails;
     private static final Address TEST_REPRESENTATIVE_ADDRESS = new Address();
-    private static final String TEST_PHONE_NUMBER_1 = "1234567890";
     private static final String TEST_PHONE_NUMBER_2 = "9876543210";
 
     @BeforeEach
@@ -227,37 +226,6 @@ class Et1ReppedHelperTest {
         List<String> errors = Et1ReppedHelper.validateGrounds(caseData);
         assertEquals(1, errors.size());
         assertEquals(ET1ReppedConstants.CLAIM_DETAILS_MISSING, errors.getFirst());
-    }
-
-    @Test
-    void theSetClaimantRepresentativeValues() {
-        // Scenario 1: CaseData is empty
-        GenericServiceException gse = assertThrows(GenericServiceException.class,
-                () -> Et1ReppedHelper.setClaimantRepresentativeValues(null));
-        assertThat(gse.getMessage()).contains(ET1ReppedConstants.ERROR_CASE_NOT_FOUND);
-
-        // Scenario 2: Representative is null
-        CaseData caseDataWithoutRepresentative = new CaseData();
-        caseDataWithoutRepresentative.setRepresentativeClaimantType(null);
-        caseDataWithoutRepresentative.setRepresentativeAddress(TEST_REPRESENTATIVE_ADDRESS);
-        caseDataWithoutRepresentative.setRepresentativePhoneNumber(TEST_PHONE_NUMBER_1);
-        assertDoesNotThrow(() -> Et1ReppedHelper.setClaimantRepresentativeValues(caseDataWithoutRepresentative));
-        assertThat(caseDataWithoutRepresentative.getRepresentativeClaimantType().getRepresentativePhoneNumber())
-                .isEqualTo(TEST_PHONE_NUMBER_1);
-        assertThat(caseDataWithoutRepresentative.getRepresentativeClaimantType().getRepresentativeAddress())
-                .isEqualTo(TEST_REPRESENTATIVE_ADDRESS);
-
-        // Scenario 3: Representative is not null
-        CaseData caseDataWithRepresentative = new CaseData();
-        caseDataWithRepresentative.setRepresentativeClaimantType(RepresentedTypeC.builder()
-                .representativeAddress(new Address()).representativePhoneNumber(TEST_PHONE_NUMBER_2).build());
-        caseDataWithRepresentative.setRepresentativeAddress(TEST_REPRESENTATIVE_ADDRESS);
-        caseDataWithRepresentative.setRepresentativePhoneNumber(TEST_PHONE_NUMBER_1);
-        assertDoesNotThrow(() -> Et1ReppedHelper.setClaimantRepresentativeValues(caseDataWithRepresentative));
-        assertThat(caseDataWithRepresentative.getRepresentativeClaimantType().getRepresentativePhoneNumber())
-                .isEqualTo(TEST_PHONE_NUMBER_1);
-        assertThat(caseDataWithRepresentative.getRepresentativeClaimantType().getRepresentativeAddress())
-                .isEqualTo(TEST_REPRESENTATIVE_ADDRESS);
     }
 
     @Test

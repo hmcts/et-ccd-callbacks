@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -18,11 +19,14 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
+import uk.gov.hmcts.et.common.model.ccd.types.OrganisationAddress;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
@@ -37,6 +41,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_CASE_DATA_NOT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1ReppedHelper.setEt1Statuses;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getFirstListItem;
 
@@ -54,6 +60,7 @@ public class Et1ReppedService {
     private final UserIdamService userIdamService;
     private final AdminUserService adminUserService;
     private final Et1SubmissionService et1SubmissionService;
+    private final MyHmctsService myHmctsService;
 
     private static final String ET1_EN_PDF = "ET1_0224.pdf";
     private final List<TribunalOffice> liveTribunalOffices = List.of(TribunalOffice.LEEDS,
@@ -258,6 +265,84 @@ public class Et1ReppedService {
                 .orgPolicyCaseAssignedRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())
                 .build();
         caseData.setClaimantRepresentativeOrganisationPolicy(organisationPolicy);
+    }
+
+    /**
+     * Sets the claimant representative's phone number and address fields in the provided
+     * {@link RepresentedTypeC} object within the given {@link CaseData}, if the representative exists.
+     *
+     * <p>This method first checks whether the {@code representativeClaimantType} in {@code caseData}
+     * is non-null and non-empty. If it is, the method updates its phone number and address
+     * using the corresponding values from the {@code caseData}.</p>
+     *
+     * @param caseData the {@link CaseData} object containing the representative and associated contact details.
+     */
+    public void setClaimantRepresentativeValues(String userToken, CaseData caseData) throws GenericServiceException {
+        if (REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS
+                .equals(caseData.getRepresentativeContactChangeOption())) {
+            setMyHmctsOrganisationAddress(userToken, caseData);
+        } else {
+            checkCaseData(caseData);
+            caseData.getRepresentativeClaimantType()
+                    .setRepresentativePhoneNumber(caseData.getRepresentativePhoneNumber());
+            caseData.getRepresentativeClaimantType().setRepresentativeAddress(caseData.getRepresentativeAddress());
+        }
+    }
+
+    /**
+     * Sets the address of the claimant's representative in the provided {@link CaseData}
+     * using the organisation address retrieved from the MyHMCTS service.
+     *
+     * <p>This method performs the following steps:
+     * <ol>
+     *   <li>Validates the input {@code caseData} to ensure it's not null and has the required structure.</li>
+     *   <li>Retrieves the organisation address associated with the user token via the {@code myHmctsService}.</li>
+     *   <li>Converts the retrieved {@link OrganisationAddress} to a generic address format using
+     *   {@link AddressUtils#getAddress(OrganisationAddress)}.</li>
+     *   <li>Sets this address as the representative address for the claimant in the {@code caseData}.</li>
+     * </ol>
+     *
+     * @param userToken the authentication token of the currently authenticated user, used to retrieve organisation
+     *                  details
+     * @param caseData the case data object where the representative's address will be updated
+     * @throws GenericServiceException if there is an error retrieving the organisation address from MyHMCTS
+     * @throws NullPointerException or other runtime exceptions if {@code caseData} is invalid
+     *      (depending on {@code checkCaseData} implementation)
+     */
+    public void setMyHmctsOrganisationAddress(String userToken, CaseData caseData)
+            throws GenericServiceException {
+        checkCaseData(caseData);
+        OrganisationAddress organisationAddress = myHmctsService.getOrganisationAddress(userToken);
+        caseData.getRepresentativeClaimantType().setRepresentativeAddress(AddressUtils.getAddress(organisationAddress));
+        caseData.setMyHmctsAddressText(AddressUtils.getAddressAsText(organisationAddress));
+    }
+
+    /**
+     * Validates the provided {@link CaseData} object to ensure it is not null or empty,
+     * and that it contains a non-null {@code representativeClaimantType}.
+     *
+     * <p>If the {@code caseData} is {@code null} or considered empty (as per {@link ObjectUtils#isEmpty(Object)}),
+     * this method throws a {@link GenericServiceException} indicating that the case could not be found.</p>
+     *
+     * <p>If the {@code representativeClaimantType} field of the {@code caseData} is {@code null},
+     * this method initializes it with a default empty instance of {@link RepresentedTypeC} using the builder pattern.
+     * </p>
+     *
+     * @param caseData the {@link CaseData} object to validate and potentially update
+     * @throws GenericServiceException if {@code caseData} is null or empty
+     */
+    private static void checkCaseData(CaseData caseData) throws GenericServiceException {
+        if (ObjectUtils.isEmpty(caseData)) {
+            throw new GenericServiceException(ERROR_CASE_DATA_NOT_FOUND,
+                    new Exception(ERROR_CASE_DATA_NOT_FOUND),
+                    ERROR_CASE_DATA_NOT_FOUND,
+                    StringUtils.EMPTY,
+                    "Et1ReppedService",
+                    "checkCaseData");
+        }
+        if (caseData.getRepresentativeClaimantType() == null) {
+            caseData.setRepresentativeClaimantType(RepresentedTypeC.builder().build());
+        }
     }
 
 }

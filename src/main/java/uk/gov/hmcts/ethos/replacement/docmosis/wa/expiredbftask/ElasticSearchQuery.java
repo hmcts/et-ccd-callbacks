@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.wa;
+package uk.gov.hmcts.ethos.replacement.docmosis.wa.expiredbftask;
 
 import lombok.Builder;
 import lombok.Data;

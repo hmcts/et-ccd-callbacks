@@ -960,27 +960,6 @@ public class CaseActionsForCaseWorkerController {
         return getCallbackRespEntityNoErrors(caseData);
     }
 
-    @PostMapping(value = "/waTaskForExpiredBfActions", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "updates the wa task creation tracker field for expired Bf Actions.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
-            content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-            }),
-        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
-        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
-    })
-    public ResponseEntity<CCDCallbackResponse> waTaskForExpiredBfActions(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader(AUTHORIZATION) String userToken) {
-        log.info("EXPIRED BF ACTIONS ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
-
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        BFHelper.updateWaTaskCreationTrackerOfBfActionItems(caseData);
-
-        return getCallbackRespEntityNoErrors(caseData);
-    }
-
     @PostMapping(value = "/dynamicJudgments", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "populates the dynamic lists for judgements")
     @ApiResponses(value = {

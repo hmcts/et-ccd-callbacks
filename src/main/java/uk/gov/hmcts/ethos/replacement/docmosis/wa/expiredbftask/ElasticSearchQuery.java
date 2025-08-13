@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.wa;
+package uk.gov.hmcts.ethos.replacement.docmosis.wa.expiredbftask;
 
 import lombok.Builder;
 import lombok.Data;
@@ -40,6 +40,7 @@ public class ElasticSearchQuery {
                     "state.keyword": [
                       "Accepted",
                       "Rejected",
+                      "Submitted",
                       "Vetted"
                     ]
                   }
@@ -60,8 +61,7 @@ public class ElasticSearchQuery {
         """;
 
     public String getQuery(String fromDate) {
-        LocalDate today = LocalDate.now();
-        String baseQuery = String.format(START_BF_ACTIONS_QUERY, fromDate, today, size);
+        String baseQuery = String.format(START_BF_ACTIONS_QUERY, fromDate, LocalDate.now(), size);
 
         if (!initialSearch && searchAfterValue != null && !searchAfterValue.isEmpty()) {
             baseQuery += String.format(",%n  \"search_after\": [%s]", searchAfterValue);

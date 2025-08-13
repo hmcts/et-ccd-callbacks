@@ -15,9 +15,11 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_ACAS;
 
 public class BFHelperTest {
@@ -33,11 +35,11 @@ public class BFHelperTest {
 
     @Test
     void updateBfActionItems() {
-        bfActionTypeItemList.get(0).getValue().setDateEntered(null);
+        bfActionTypeItemList.getFirst().getValue().setDateEntered(null);
         caseData.setBfActions(bfActionTypeItemList);
         BFHelper.updateBfActionItems(caseData);
         assertEquals(1, caseData.getBfActions().size());
-        assertNotNull(caseData.getBfActions().get(0).getValue().getDateEntered());
+        assertNotNull(caseData.getBfActions().getFirst().getValue().getDateEntered());
     }
 
     @Test
@@ -97,17 +99,31 @@ public class BFHelperTest {
     }
 
     @Test
-    void updateWaTaskCreationTrackerHandlesNullBfActionsGracefully() {
+    void updateWaTaskCreationTrackerThrowsExceptionForNullBfActions() {
         caseData.setBfActions(null);
-        BFHelper.updateWaTaskCreationTrackerOfBfActionItems(caseData);
-        assertNull(caseData.getBfActions());
+        IllegalStateException exception = assertThrows(IllegalStateException.class,
+                () -> BFHelper.updateWaTaskCreationTrackerOfBfActionItems(caseData));
+        assertEquals("No BF Actions found for case reference {} " + caseData.getEthosCaseReference(),
+                exception.getMessage());
     }
 
     @Test
-    void updateWaTaskCreationTrackerHandlesEmptyBfActionsListGracefully() {
-        caseData.setBfActions(Collections.emptyList());
+    void updateWaTaskCreationTrackerDoesNotChangeIsWaTaskCreatedForClearedBfActions() {
+        bfActionTypeItemList.getFirst().getValue().setBfDate(BFHelper.getEffectiveYesterday(LocalDate.now()));
+        bfActionTypeItemList.getFirst().getValue().setIsWaTaskCreated(null);
+        bfActionTypeItemList.getFirst().getValue().setCleared("Some cleared value");
+        caseData.setBfActions(bfActionTypeItemList);
         BFHelper.updateWaTaskCreationTrackerOfBfActionItems(caseData);
-        assertEquals(0, caseData.getBfActions().size());
+        assertNull(caseData.getBfActions().getFirst().getValue().getIsWaTaskCreated());
+    }
+
+    @Test
+    void isBfExpiredReturnsTrueForExpiredBfAction() {
+        BFActionType bfAction = new BFActionType();
+        bfAction.setBfDate(LocalDate.now().minusDays(1).toString());
+        bfAction.setCleared(null);
+        String yesterday = BFHelper.getEffectiveYesterday(LocalDate.now());
+        assertTrue(BFHelper.isBfExpired(bfAction, yesterday));
     }
 
     @Test

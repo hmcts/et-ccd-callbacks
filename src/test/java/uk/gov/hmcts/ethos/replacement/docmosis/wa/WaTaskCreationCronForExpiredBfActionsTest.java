@@ -17,6 +17,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader;
+import uk.gov.hmcts.ethos.replacement.docmosis.wa.expiredbftask.WaTaskCreationCronForExpiredBfActions;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 
 import java.io.IOException;
@@ -53,7 +54,8 @@ class WaTaskCreationCronForExpiredBfActionsTest {
         when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
         ReflectionTestUtils.setField(waTaskCreationCronForExpiredBfActions,
                 "caseTypeIdsString", "ET_EnglandWales,ET_Scotland");
-        ReflectionTestUtils.setField(waTaskCreationCronForExpiredBfActions, "maxCases", 10);
+        ReflectionTestUtils.setField(waTaskCreationCronForExpiredBfActions, "maxCasesPerSearch", 10);
+        ReflectionTestUtils.setField(waTaskCreationCronForExpiredBfActions, "maxCasesToProcess", 10);
         when(adminUserService.getAdminUserToken()).thenReturn("adminToken");
     }
 

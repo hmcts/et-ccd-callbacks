@@ -8,7 +8,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.BFActionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.BFActionType;
 
-import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,6 +15,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_ACAS;
 
 @Slf4j
@@ -84,35 +84,38 @@ public final class BFHelper {
 
     public static void updateWaTaskCreationTrackerOfBfActionItems(CaseData caseData) {
         if (CollectionUtils.isEmpty(caseData.getBfActions())) {
-            log.info("No BF Actions found for case reference {}. No updates made to WA task creation tracker.",
-                    caseData.getEthosCaseReference());
-            return;
+            // Should never happen
+            throw new IllegalStateException("No BF Actions found for case reference {} "
+                    + caseData.getEthosCaseReference());
         }
+
         String yesterday = BFHelper.getEffectiveYesterday(LocalDate.now());
         List<BFActionTypeItem> expiredBfActions = caseData.getBfActions().stream()
-                .filter(item -> (LocalDate.parse(item.getValue().getBfDate()).isAfter(
-                        LocalDate.parse(yesterday).minusDays(1))
-                        && (LocalDate.parse(item.getValue().getBfDate()).isBefore(LocalDate.now())))).toList();
-        if (!expiredBfActions.isEmpty()) {
-            log.info("Updating WA task creation tracker for {} expired BF Actions for case reference {}",
-                    expiredBfActions.size(), caseData.getEthosCaseReference());
-            expiredBfActions.forEach(bfActionTypeItem -> {
-                if (bfActionTypeItem.getValue().getIsWaTaskCreated() == null) {
-                    bfActionTypeItem.getValue().setIsWaTaskCreated("Yes");
-                }
-            });
-        }
+                .filter(item ->  isBfExpired(item.getValue(), yesterday)).toList();
+
+        emptyIfNull(expiredBfActions).stream()
+                .filter(bfActionTypeItem -> bfActionTypeItem.getValue().getIsWaTaskCreated() == null)
+                .forEach(bfActionTypeItem -> bfActionTypeItem.getValue().setIsWaTaskCreated("Yes"));
     }
 
-    public static String getEffectiveYesterday(LocalDate today) {
-        // Determine the effective "yesterday" based on the current day of the week
-        DayOfWeek dayOfWeek = today.getDayOfWeek();
-        LocalDate effectiveYesterday = switch (dayOfWeek) {
-            case MONDAY -> today.minusDays(3); // If today is Monday, go back to Friday
-            case SUNDAY -> today.minusDays(2); // If today is Sunday, go back to Friday as well
-            default -> today.minusDays(1);     // Regular yesterday
-        };
+    public static boolean isBfExpired(BFActionType item, String yesterday) {
+        LocalDate bfDate = LocalDate.parse(item.getBfDate());
+        return bfDate.isAfter(LocalDate.parse(yesterday).minusDays(1))
+                && bfDate.isBefore(LocalDate.now())
+                && isNullOrEmpty(item.getCleared());
+    }
 
-        return UtilHelper.formatCurrentDate2(effectiveYesterday);
+    /**
+     * Returns the effective "yesterday" based on the current day of the week.
+     * @param today LocalDate
+     * @return String formatted date
+     */
+    public static String getEffectiveYesterday(LocalDate today) {
+        int daysToSubtract = switch (today.getDayOfWeek()) {
+            case MONDAY -> 3; // If today is Monday, go back to Friday
+            case SUNDAY -> 2; // If today is Sunday, go back to Friday as well
+            default -> 1; // Regular yesterday
+        };
+        return UtilHelper.formatCurrentDate2(today.minusDays(daysToSubtract));
     }
 }

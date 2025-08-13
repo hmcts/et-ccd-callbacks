@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.wa;
+package uk.gov.hmcts.ethos.replacement.docmosis.wa.expiredbftask;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,15 +9,22 @@ import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.et.common.model.ccd.items.BFActionTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 
 import java.io.IOException;
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Arrays.stream;
 
 @Component
@@ -32,8 +39,16 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
     private String caseTypeIdsString;
 
     @Value("${cron.maxCasesPerSearch}")
-    private int maxCases;
+    private int maxCasesPerSearch;
 
+    @Value("${cron.maxCasesToProcess}")
+    private int maxCasesToProcess;
+
+    /**
+     * This cron job runs every day at 00:01 to create WA tasks for expired BF actions.
+     * It checks for cases with BF actions that have a date of yesterday and are not cleared or
+     * already have a WA task created.
+     */
     @Override
     public void run() {
         log.info("WaTaskCreationCronForExpiredBfActions is running");
@@ -49,40 +64,47 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
 
         stream(caseTypeIds).forEach(caseTypeId -> {
             try {
-                List<SubmitEvent> caseSubmitEvents = findCasesByCaseType(adminUserToken, caseTypeId);
+                // Fetch cases with one or more bf actions, and
+                // with bf action date being yesterday, and
+                // the case is in accepted, rejected or vetted state
+                Set<SubmitEvent> caseSubmitEvents = findCasesByCaseType(adminUserToken, caseTypeId);
                 if (CollectionUtils.isEmpty(caseSubmitEvents)) {
                     log.info("No cases found for case type: {}", caseTypeId);
                     return;
                 }
 
-                var validSubmitEvents = caseSubmitEvents.stream().filter(submitEvent -> {
+                List<SubmitEvent> validSubmitEvents = caseSubmitEvents.stream().filter(submitEvent -> {
                     if (submitEvent.getCaseData() != null && submitEvent.getCaseData().getBfActions() != null) {
-                        return submitEvent.getCaseData().getBfActions().stream()
-                                .anyMatch(bfAction -> bfAction.getValue() != null
-                                    && bfAction.getValue().getBfDate() != null
-                                    && !bfAction.getValue().getBfDate().isEmpty()
-                                    && !Boolean.parseBoolean(bfAction.getValue().getCleared())
-                                    && !Boolean.parseBoolean(bfAction.getValue().getIsWaTaskCreated())
-                                    && (LocalDate.parse(bfAction.getValue().getBfDate())
-                                            .isAfter(LocalDate.parse(BFHelper.getEffectiveYesterday(LocalDate.now()))
-                                                    .minusDays(1))
-                                            && LocalDate.parse(bfAction.getValue().getBfDate()).isBefore(
-                                                    LocalDate.now())));
+                        return isBfActionsValid(submitEvent);
                     }
                     return false;
-                });
+                }).toList();
 
-                validSubmitEvents.forEach(submitEvent -> {
-                    log.info("Invoked expired bf wa task creation event for case with ID: {} for case type: {}",
-                            submitEvent.getCaseId(), caseTypeId);
-                    //invoke wa task creation event for each case with one or more expired bf action
-                    triggerTaskEventForCase(adminUserToken, submitEvent, caseTypeId);
-                });
+                if (validSubmitEvents.isEmpty()) {
+                    log.info("No valid cases found for case type: {}", caseTypeId);
+                } else {
+                    try (ExecutorService executorService = Executors.newFixedThreadPool(10)) {
+                        validSubmitEvents.forEach(submitEvent -> executorService.execute(() -> {
+                            log.info("Invoked expired bf wa task creation event for case ID: {} for case type: {}",
+                                    submitEvent.getCaseId(), caseTypeId);
+                            triggerTaskEventForCase(adminUserToken, submitEvent, caseTypeId);
+                        }));
+                    }
+                }
             } catch (Exception e) {
                 log.error(e.getMessage());
             }
         });
         log.info("WaTaskCreationCronForExpiredBfActions completed execution");
+    }
+
+    private static boolean isBfActionsValid(SubmitEvent submitEvent) {
+        return submitEvent.getCaseData().getBfActions().stream()
+                .filter(bfAction -> bfAction != null && bfAction.getValue() != null)
+                .map(BFActionTypeItem::getValue)
+                .anyMatch(bfActionValue -> !isNullOrEmpty(bfActionValue.getBfDate())
+                        && BFHelper.isBfExpired(bfActionValue, BFHelper.getEffectiveYesterday(LocalDate.now()))
+                        && !Boolean.parseBoolean(bfActionValue.getIsWaTaskCreated()));
     }
 
     private void triggerTaskEventForCase(String adminUserToken, SubmitEvent submitEvent, String caseTypeId) {
@@ -93,6 +115,7 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
 
             CaseData caseData = returnedRequest.getCaseDetails().getCaseData();
             String jurisdiction = returnedRequest.getCaseDetails().getJurisdiction();
+            BFHelper.updateWaTaskCreationTrackerOfBfActionItems(caseData);
             ccdClient.submitEventForCase(adminUserToken, caseData, caseTypeId,
                     jurisdiction, returnedRequest, String.valueOf(submitEvent.getCaseId())
             );
@@ -101,28 +124,27 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
         }
     }
 
-    private List<SubmitEvent> findCasesByCaseType(String adminUserToken, String caseTypeId) throws IOException {
+    private Set<SubmitEvent> findCasesByCaseType(String adminUserToken, String caseTypeId) throws IOException {
         log.info("Processing expired BF action search for case type {}.", caseTypeId);
-        List<SubmitEvent> caseSubmitEvents = new ArrayList<>();
         String query = ElasticSearchQuery.builder()
                 .initialSearch(true)
-                .size(maxCases)
+                .size(maxCasesPerSearch)
                 .build()
                 .getQuery(BFHelper.getEffectiveYesterday(LocalDate.now()));
 
         List<SubmitEvent> searchResults = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
         if (CollectionUtils.isEmpty(searchResults)) {
-            return caseSubmitEvents;
+            return new HashSet<>();
         }
 
         log.info("Found {} cases for case type: {}", searchResults.size(), caseTypeId);
-        searchResults.forEach(se -> addCaseToSubmitEvents(caseSubmitEvents, se));
+        Set<SubmitEvent> caseSubmitEvents = searchResults.stream().filter(Objects::nonNull).collect(Collectors.toSet());
         String searchAfterValue = String.valueOf(searchResults.getLast().getCaseId());
 
-        while (caseSubmitEvents.size() < maxCases) {
+        while (caseSubmitEvents.size() < maxCasesToProcess) {
             query = ElasticSearchQuery.builder()
                     .initialSearch(false)
-                    .size(maxCases)
+                    .size(maxCasesPerSearch)
                     .searchAfterValue(searchAfterValue)
                     .build()
                     .getQuery(BFHelper.getEffectiveYesterday(LocalDate.now()));
@@ -134,22 +156,11 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
             }
 
             log.info("Fetched {} additional cases for case type: {}", nextResults.size(), caseTypeId);
-            nextResults.forEach(se -> addCaseToSubmitEvents(caseSubmitEvents, se));
+            nextResults.stream().filter(Objects::nonNull).forEach(caseSubmitEvents::add);
             searchAfterValue = String.valueOf(nextResults.getLast().getCaseId());
         }
 
         log.info("Total cases found: {}", caseSubmitEvents.size());
         return caseSubmitEvents;
-    }
-
-    //Distinct/Unique list of submit events, i.e. no duplicate cases
-    private void addCaseToSubmitEvents(List<SubmitEvent> caseSubmitEvents, SubmitEvent submitEvent) {
-        if (submitEvent != null) {
-            if (!caseSubmitEvents.contains(submitEvent)) {
-                caseSubmitEvents.add(submitEvent);
-            }
-        } else {
-            log.warn("Submit event is null and cannot be added to the list.");
-        }
     }
 }

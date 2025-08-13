@@ -53,6 +53,12 @@ template:
   referral: ${REFERRAL_TEMPLATE_ID:f975c1cc-e102-472a-a6cb-84dffa0a6d42}
   rejected:  ${REJECTED_TEMPLATE_ID:e480e011-ffeb-4adc-9682-8758cf206375}
 
+  case-links:
+    linked: ${CASE_LINKED_TEMPLATE_ID:7e8c6fc1-520a-41cd-a85c-9d3e0b22b282}
+    unlinked: ${CASE_UNLINKED_TEMPLATE_ID:8099d7b8-1703-40c3-95e6-464a3ac776cd}
+    linked-rep: ${CASE_LINKED_LEGAL_REP_TEMPLATE_ID:2d125a77-17b7-48c5-b220-78b2440eb049}
+    unlinked-rep: ${CASE_UNLINKED_LEGAL_REP_TEMPLATE_ID:63e550c3-6977-4687-b26d-72b61a266085}
+
   et1Serving:
     claimant: ${ET1SERVING_TEMPLATE_ID:fa49291f-49cf-4330-8031-c05c101eb32a}
     respondent: ${ET1SERVING_RESPONDENT_TEMPLATE_ID:05af8477-7313-4ef1-9a8e-6b2d9d128b50}
@@ -121,10 +127,16 @@ template:
         respondent: ${TSE_ADMIN_RECORD_A_DECISION_RESPONDENT_TEMPLATE_ID:ca1a1dd2-13c9-435d-b63e-0ca07abe937d}
 
   pse:
+    claimant-rep:
+      acknowledgement-of-response: ${PSE_CLAIMANT_REP_ACKNOWLEDGEMENT_OF_RESPONSE_TEMPLATE_ID:000070c4-5968-4f6b-aca1-095e37988be9}
+      new-notification: ${PSE_CLAIMANT_REP_NEW_NOTIFICATION:9352bba3-cdb4-4150-9840-599696147489}
     claimant: ${PSE_RESPONDENT_NOTIFICATION_CLAIMANT_TEMPLATE_ID:bdf1a2b7-5bb4-45d0-9b71-9d6c024aafff}
-    respondent:
+    cyClaimant: ${CY_PSE_RESPONDENT_NOTIFICATION_CLAIMANT_TEMPLATE_ID:fcd14cac-5e8e-478e-ab3c-89e394a3c663}
+    myhmcts:
       rule-92-yes: ${PSE_RESPONDENT_ACKNOWLEDGEMENT_YES_TEMPLATE_ID:aa114479-e72b-4893-9024-c25aee1be6fc}
       rule-92-no: ${PSE_RESPONDENT_ACKNOWLEDGEMENT_NO_TEMPLATE_ID:3a7ff23d-d49f-4c28-b00b-08ca3f0b38ee}
+    respondent-rep:
+      response-received: ${PSE_RESPONDENT_REP_RESPONSE_RECEIVED_TEMPLATE_ID:9ea43b1d-7029-48ea-a0bd-b9fc4c3c8b66}
     admin: ${PSE_RESPONDENT_NOTIFICATION_ADMIN_TEMPLATE_ID:296d3c6e-00d7-4f43-a8bd-260d52b171a7}
 
   nocNotification:
@@ -137,6 +149,10 @@ template:
 
   sendNotification: ${SEND_NOTIFICATION_TEMPLATE_ID:1b8299d7-5051-4b78-a870-726b6384d8a8}
 
+  claimantSendNotification: ${CLAIMANT_SEND_NOTIFICATION_TEMPLATE_ID:a71ee3fd-a577-4a11-9bdb-de7fecd81336}
+
+  respondentSendNotification: ${RESPONDENT_SEND_NOTIFICATION_TEMPLATE_ID:6e79a4db-873d-4ea3-85cd-3fdfbdaed38e}
+
   respondNotification:
     noResponse: ${RESPOND_NOTIFICATION_NO_RESPONSE_TEMPLATE_ID:d2caad87-2bab-4bc0-b598-01f1a7341f9e}
 
@@ -146,7 +162,11 @@ template:
       ${BUNDLES_SUBMITTED_NOTIFICATION_FOR_CLAIMANT_TEMPLATE_ID:cdb6288d-8247-435a-875f-4ea48ca23c9e}
     respondentSubmittedNotificationForTribunal:
       ${BUNDLES_SUBMITTED_NOTIFICATION_FOR_TRIBUNAL_TEMPLATE_ID:12d604ce-df82-4c64-8544-ebbef66eb8c4}
-  et1ProfessionalSubmission: ${ET1_PROFESSIONAL_SUBMISSION_TEMPLATE_ID:ec815e00-39b0-4711-8b24-614ea1f2de89}
+
+  et1:
+    et1ProfessionalSubmission: ${ET1_PROFESSIONAL_SUBMISSION_TEMPLATE_ID:ec815e00-39b0-4711-8b24-614ea1f2de89}
+    submitCaseEmailTemplateId: ${SUBMIT_CASE_EMAIL_TEMPLATE_ID:7b1f33eb-31c5-4a00-b1a4-c1bca84bc441}
+    cySubmitCaseEmailTemplateId: ${CY_SUBMIT_CASE_EMAIL_TEMPLATE_ID:7b1f33eb-31c5-4a00-b1a4-c1bca84bc441}
 
 queue:
   create-updates:
@@ -164,6 +184,8 @@ etcos:
 
 assign_case_access_api_url: ${AAC_URL:http://localhost:4454}
 apply_noc_access_api_assignments_path: /noc/apply-decision
+
+rd_professional-api-url: ${RD_PROFESSIONAL_API_URL:http://localhost:4507}
 
 case-details-url:
   citizen: ${CITIZEN_CASE_DETAILS_URL:http://localhost:3001/citizen-hub/}
@@ -197,3 +219,15 @@ pdf:
 feature:
   secure-doc-store:
     enabled: false
+
+em-ccd-orchestrator:
+  api:
+    url: ${EM_CCD_ORCHESTRATOR_URL:http://localhost:8082}
+
+acas:
+  api:
+    url: ${ACAS_BASE_URL:https://api-dev-acas-01.azure-api.net/ECCLUAT}
+    key: ${ACAS_KEY:AAAAAAAAAAAAAAAAA}
+
+feature-flags:
+  hearings-api: ${HEARINGS_API_FLAG:true}

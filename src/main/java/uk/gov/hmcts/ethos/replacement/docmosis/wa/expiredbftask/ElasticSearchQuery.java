@@ -32,14 +32,6 @@ public class ElasticSearchQuery {
                       "include_upper": false
                     }
                   }
-                },
-                {
-                  "bool": {
-                    "should": [
-                      { "bool": { "must_not": { "exists": { "field": "bfActions.value.cleared" } } } },
-                      { "term": { "bfActions.value.cleared.keyword": "" } }
-                    ]
-                  }
                 }
               ],
               "filter": [

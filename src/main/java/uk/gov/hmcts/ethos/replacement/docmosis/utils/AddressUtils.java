@@ -6,6 +6,10 @@ import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationAddress;
 
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 public final class AddressUtils {
 
     private AddressUtils() {
@@ -76,7 +80,7 @@ public final class AddressUtils {
      * @throws NullPointerException if {@code organisationAddress} is {@code null}
      */
     @NotNull
-    public static Address getAddress(OrganisationAddress organisationAddress) {
+    public static Address mapOrganisationAddressToAddress(OrganisationAddress organisationAddress) {
         Address address = new Address();
         address.setAddressLine1(organisationAddress.getAddressLine1());
         address.setAddressLine2(organisationAddress.getAddressLine2());
@@ -89,24 +93,34 @@ public final class AddressUtils {
     }
 
     /**
-     * Converts the given {@link OrganisationAddress} into a formatted multi-line string representation.
+     * Builds a single multi-line string representation of the given {@link OrganisationAddress}.
      *
      * <p>
-     * Each non-null component of the address is appended in a readable format:
+     * Each non-null and non-blank field from the address is appended in the following order:
      * <ul>
-     *     <li>Address lines 1 to 3 are concatenated with spaces (if present).</li>
-     *     <li>Town/City, Postcode, County, and Country are appended on new lines (if present).</li>
+     *     <li>Address Line 1</li>
+     *     <li>Address Line 2</li>
+     *     <li>Address Line 3</li>
+     *     <li>Town/City</li>
+     *     <li>Postcode</li>
+     *     <li>County</li>
+     *     <li>Country</li>
      * </ul>
-     * Null fields are skipped to avoid blank or malformed lines.
+     * Fields are separated by a newline character (<code>\n</code>).
+     * Missing or blank fields are skipped without adding extra blank lines.
+     * <p>
+     * If the {@code organisationAddress} argument is {@code null}, an empty string is returned.
      *
-     * @param organisationAddress the organisation address object to convert
-     * @return a non-null string containing the formatted address
-     *
-     * @throws NullPointerException if {@code organisationAddress} is {@code null}
+     * @param organisationAddress the address object to convert to text; may be {@code null}
+     * @return a multi-line string containing the address fields, or an empty string if the address is {@code null}
+     *         or has no non-blank fields
      */
     @NotNull
-    public static String getAddressAsText(OrganisationAddress organisationAddress) {
-        return Arrays.stream(new String[] {
+    public static String getOrganisationAddressAsText(OrganisationAddress organisationAddress) {
+        if (ObjectUtils.isEmpty(organisationAddress)) {
+            return StringUtils.EMPTY;
+        }
+        return Stream.of(
                         organisationAddress.getAddressLine1(),
                         organisationAddress.getAddressLine2(),
                         organisationAddress.getAddressLine3(),
@@ -114,9 +128,9 @@ public final class AddressUtils {
                         organisationAddress.getPostCode(),
                         organisationAddress.getCounty(),
                         organisationAddress.getCountry()
-                })
+                )
                 .filter(Objects::nonNull)
-                .filter(s -> !s.trim().isEmpty())
-                .collect(Collectors.joining("\n"));
+                .filter(s -> !s.isBlank())
+                .collect(Collectors.joining(StringUtils.LF));
     }
 }

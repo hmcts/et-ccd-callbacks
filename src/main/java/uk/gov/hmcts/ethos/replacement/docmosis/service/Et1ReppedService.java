@@ -298,7 +298,7 @@ public class Et1ReppedService {
      *   <li>Validates the input {@code caseData} to ensure it's not null and has the required structure.</li>
      *   <li>Retrieves the organisation address associated with the user token via the {@code myHmctsService}.</li>
      *   <li>Converts the retrieved {@link OrganisationAddress} to a generic address format using
-     *   {@link AddressUtils#getAddress(OrganisationAddress)}.</li>
+     *   {@link AddressUtils#mapOrganisationAddressToAddress(OrganisationAddress)}.</li>
      *   <li>Sets this address as the representative address for the claimant in the {@code caseData}.</li>
      * </ol>
      *
@@ -313,8 +313,8 @@ public class Et1ReppedService {
             throws GenericServiceException {
         checkCaseData(caseData);
         OrganisationAddress organisationAddress = myHmctsService.getOrganisationAddress(userToken);
-        caseData.getRepresentativeClaimantType().setRepresentativeAddress(AddressUtils.getAddress(organisationAddress));
-        caseData.setMyHmctsAddressText(AddressUtils.getAddressAsText(organisationAddress));
+        caseData.getRepresentativeClaimantType().setRepresentativeAddress(AddressUtils.mapOrganisationAddressToAddress(organisationAddress));
+        caseData.setMyHmctsAddressText(AddressUtils.getOrganisationAddressAsText(organisationAddress));
     }
 
     /**

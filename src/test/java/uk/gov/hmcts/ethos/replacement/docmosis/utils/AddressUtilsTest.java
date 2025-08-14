@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationAddress;
@@ -72,7 +73,7 @@ final class AddressUtilsTest {
     }
 
     @Test
-    void testGetAddress() {
+    void theMapOrganisationAddressToAddress() {
 
         OrganisationAddress organisationAddress = OrganisationAddress.builder()
                 .addressLine1(ORGANISATION_ADDRESS_LINE_1)
@@ -83,7 +84,7 @@ final class AddressUtilsTest {
                 .postCode(ORGANISATION_POST_CODE)
                 .townCity(ORGANISATION_TOWN_CITY)
                 .build();
-        Address address = AddressUtils.getAddress(organisationAddress);
+        Address address = AddressUtils.mapOrganisationAddressToAddress(organisationAddress);
         assertThat(address.getAddressLine1()).isEqualTo(ORGANISATION_ADDRESS_LINE_1);
         assertThat(address.getAddressLine2()).isEqualTo(ORGANISATION_ADDRESS_LINE_2);
         assertThat(address.getAddressLine3()).isEqualTo(ORGANISATION_ADDRESS_LINE_3);
@@ -91,5 +92,31 @@ final class AddressUtilsTest {
         assertThat(address.getCounty()).isEqualTo(ORGANISATION_COUNTY);
         assertThat(address.getPostCode()).isEqualTo(ORGANISATION_POST_CODE);
         assertThat(address.getPostTown()).isEqualTo(ORGANISATION_TOWN_CITY);
+    }
+
+    @Test
+    void theGetOrganisationAddressAsText() {
+        // Should return empty string when organisationAddress is null
+        assertThat(AddressUtils.getOrganisationAddressAsText(null)).isEqualTo(StringUtils.EMPTY);
+        // Should return organisation address as text when organisation address is not empty
+        OrganisationAddress organisationAddress = OrganisationAddress.builder()
+                .addressLine1(ORGANISATION_ADDRESS_LINE_1)
+                .addressLine2(ORGANISATION_ADDRESS_LINE_2)
+                .addressLine3(ORGANISATION_ADDRESS_LINE_3)
+                .country(ORGANISATION_COUNTRY)
+                .county(ORGANISATION_COUNTY)
+                .postCode(ORGANISATION_POST_CODE)
+                .townCity(ORGANISATION_TOWN_CITY)
+                .build();
+        String expectedText = String.join(StringUtils.LF,
+                ORGANISATION_ADDRESS_LINE_1,
+                ORGANISATION_ADDRESS_LINE_2,
+                ORGANISATION_ADDRESS_LINE_3,
+                ORGANISATION_TOWN_CITY,
+                ORGANISATION_POST_CODE,
+                ORGANISATION_COUNTY,
+                ORGANISATION_COUNTRY);
+        assertThat(AddressUtils.getOrganisationAddressAsText(organisationAddress)).isEqualTo(expectedText);
+
     }
 }

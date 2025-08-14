@@ -284,7 +284,7 @@ class Et1ReppedServiceTest {
                 .county(TEST_COUNTY)
                 .townCity(TEST_TOWN_CITY)
                 .build();
-        caseData.setRepresentativeAddress(AddressUtils.getAddress(organisationAddress));
+        caseData.setRepresentativeAddress(AddressUtils.mapOrganisationAddressToAddress(organisationAddress));
         when(myHmctsService.getOrganisationAddress(DUMMY_USER_TOKEN)).thenReturn(organisationAddress);
         et1ReppedService.setClaimantRepresentativeValues(DUMMY_USER_TOKEN, caseData);
         assertRepresentativeAddress(organisationAddress, caseData);

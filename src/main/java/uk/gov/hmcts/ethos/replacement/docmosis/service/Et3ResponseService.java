@@ -52,8 +52,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItemFromTopLevel;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.ET3_RESPONSE_PDF_FILE_NAME;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils.getAddress;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils.getAddressAsText;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils.mapOrganisationAddressToAddress;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils.getOrganisationAddressAsText;
 
 /**
  * Service to support ET3 Response journey. Contains methods for generating and saving ET3 Response documents.
@@ -239,8 +239,8 @@ public class Et3ResponseService {
                     "setRepresentativeContactInfo - user not found");
         }
         OrganisationAddress organisationAddress = myHmctsService.getOrganisationAddress(userToken);
-        caseData.setEt3ResponseAddress(getAddress(organisationAddress));
-        caseData.setMyHmctsAddressText(getAddressAsText(organisationAddress));
+        caseData.setEt3ResponseAddress(mapOrganisationAddressToAddress(organisationAddress));
+        caseData.setMyHmctsAddressText(getOrganisationAddressAsText(organisationAddress));
     }
 
     /**

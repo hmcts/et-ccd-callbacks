@@ -75,7 +75,7 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
 
                 List<SubmitEvent> validSubmitEvents = caseSubmitEvents.stream().filter(submitEvent -> {
                     if (submitEvent.getCaseData() != null && submitEvent.getCaseData().getBfActions() != null) {
-                        return isBfActionsValid(submitEvent);
+                        return hasAtLeastOneValidBfAction(submitEvent);
                     }
                     return false;
                 }).toList();
@@ -84,9 +84,8 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
                     log.info("No valid cases found for case type: {}", caseTypeId);
                 } else {
                     try (ExecutorService executorService = Executors.newFixedThreadPool(10)) {
+                        log.info("Processing {} valid cases for case type: {}", validSubmitEvents.size(), caseTypeId);
                         validSubmitEvents.forEach(submitEvent -> executorService.execute(() -> {
-                            log.info("Invoked expired bf wa task creation event for case ID: {} for case type: {}",
-                                    submitEvent.getCaseId(), caseTypeId);
                             triggerTaskEventForCase(adminUserToken, submitEvent, caseTypeId);
                         }));
                     }
@@ -98,13 +97,21 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
         log.info("WaTaskCreationCronForExpiredBfActions completed execution");
     }
 
-    private static boolean isBfActionsValid(SubmitEvent submitEvent) {
+    /**
+     * Checks if there is at least one valid BF action in the submit event.
+     * A valid BF action is one that has a non-empty BF date, is expired, not yet cleared
+     * and does not have a WA task created yet.
+     *
+     * @param submitEvent the submit event to check
+     * @return true if there is at least one valid BF action, false otherwise
+     */
+    private static boolean hasAtLeastOneValidBfAction(SubmitEvent submitEvent) {
         return submitEvent.getCaseData().getBfActions().stream()
                 .filter(bfAction -> bfAction != null && bfAction.getValue() != null)
                 .map(BFActionTypeItem::getValue)
                 .anyMatch(bfActionValue -> !isNullOrEmpty(bfActionValue.getBfDate())
                         && BFHelper.isBfExpired(bfActionValue, BFHelper.getEffectiveYesterday(LocalDate.now()))
-                        && !Boolean.parseBoolean(bfActionValue.getIsWaTaskCreated())
+                        && isNullOrEmpty(bfActionValue.getIsWaTaskCreated())
                         && isNullOrEmpty(bfActionValue.getCleared()));
     }
 
@@ -117,6 +124,8 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
             CaseData caseData = returnedRequest.getCaseDetails().getCaseData();
             String jurisdiction = returnedRequest.getCaseDetails().getJurisdiction();
             BFHelper.updateWaTaskCreationTrackerOfBfActionItems(caseData);
+            log.info("Invoked expired bf wa task creation event for case ID: {} for case type: {}",
+                    submitEvent.getCaseId(), caseTypeId);
             ccdClient.submitEventForCase(adminUserToken, caseData, caseTypeId,
                     jurisdiction, returnedRequest, String.valueOf(submitEvent.getCaseId())
             );

@@ -20,12 +20,12 @@ public class ElasticSearchQuery {
               "must": [
                 {
                   "exists": {
-                    "field": "bfActions"
+                    "field": "data.bfActions"
                   }
                 },
                 {
                   "range": {
-                    "bfActions.value.bfDate": {
+                    "data.bfActions.value.bfDate": {
                       "from": "%s",
                       "to": "%s",
                       "include_lower": true,
@@ -50,7 +50,7 @@ public class ElasticSearchQuery {
           },
           "_source": [
             "reference",
-            "bfActions"
+            "data.bfActions"
           ],
           "size": %s,
           "sort": [

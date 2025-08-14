@@ -14,37 +14,31 @@ public class ElasticSearchQuery {
     private boolean initialSearch;
 
     private static final String START_BF_ACTIONS_QUERY = """
-       {
+        {
           "query": {
             "bool": {
               "must": [
                 {
-                  "nested": {
-                    "path": "bfActions",
-                    "query": {
-                      "bool": {
-                        "must": [
-                          {
-                            "range": {
-                              "bfActions.value.bfDate": {
-                                "from": "%s",
-                                "to": "%s",
-                                "include_lower": true,
-                                "include_upper": false
-                              }
-                            }
-                          },
-                          {
-                            "bool": {
-                              "should": [
-                                { "bool": { "must_not": { "exists": { "field": "bfActions.value.cleared" } } } },
-                                { "term": { "bfActions.value.cleared.keyword": "" } }
-                              ]
-                            }
-                          }
-                        ]
-                      }
+                  "exists": {
+                    "field": "bfActions"
+                  }
+                },
+                {
+                  "range": {
+                    "bfActions.value.bfDate": {
+                      "from": "%s",
+                      "to": "%s",
+                      "include_lower": true,
+                      "include_upper": false
                     }
+                  }
+                },
+                {
+                  "bool": {
+                    "should": [
+                      { "bool": { "must_not": { "exists": { "field": "bfActions.value.cleared" } } } },
+                      { "term": { "bfActions.value.cleared.keyword": "" } }
+                    ]
                   }
                 }
               ],

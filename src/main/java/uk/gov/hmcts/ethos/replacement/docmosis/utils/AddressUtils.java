@@ -77,15 +77,15 @@ public final class AddressUtils {
      */
     @NotNull
     public static Address getAddress(OrganisationAddress organisationAddress) {
-        Address et3ResponseAddress = new Address();
-        et3ResponseAddress.setAddressLine1(organisationAddress.getAddressLine1());
-        et3ResponseAddress.setAddressLine2(organisationAddress.getAddressLine2());
-        et3ResponseAddress.setAddressLine3(organisationAddress.getAddressLine3());
-        et3ResponseAddress.setCountry(organisationAddress.getCountry());
-        et3ResponseAddress.setCounty(organisationAddress.getCounty());
-        et3ResponseAddress.setPostCode(organisationAddress.getPostCode());
-        et3ResponseAddress.setPostTown(organisationAddress.getTownCity());
-        return et3ResponseAddress;
+        Address address = new Address();
+        address.setAddressLine1(organisationAddress.getAddressLine1());
+        address.setAddressLine2(organisationAddress.getAddressLine2());
+        address.setAddressLine3(organisationAddress.getAddressLine3());
+        address.setCountry(organisationAddress.getCountry());
+        address.setCounty(organisationAddress.getCounty());
+        address.setPostCode(organisationAddress.getPostCode());
+        address.setPostTown(organisationAddress.getTownCity());
+        return address;
     }
 
     /**

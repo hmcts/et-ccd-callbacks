@@ -19,17 +19,31 @@ public class ElasticSearchQuery {
             "bool": {
               "must": [
                 {
-                  "exists": {
-                    "field": "bfActions"
-                  }
-                },
-                {
-                  "range": {
-                    "bfActions.value.bfDate": {
-                      "from": "%s",
-                      "to": "%s",
-                      "include_lower": true,
-                      "include_upper": false
+                  "nested": {
+                    "path": "data.bfActions",
+                    "query": {
+                      "bool": {
+                        "must": [
+                          {
+                            "range": {
+                              "data.bfActions.value.bfDate": {
+                                "from": "%s",
+                                "to": "%s",
+                                "include_lower": true,
+                                "include_upper": false
+                              }
+                            }
+                          },
+                          {
+                            "bool": {
+                              "should": [
+                                { "bool": { "must_not": { "exists": { "field": "data.bfActions.value.cleared" } } } },
+                                { "term": { "data.bfActions.value.cleared.keyword": "" } }
+                              ]
+                            }
+                          }
+                        ]
+                      }
                     }
                   }
                 }
@@ -50,7 +64,7 @@ public class ElasticSearchQuery {
           },
           "_source": [
             "reference",
-            "bfActions"
+            "data.bfActions"
           ],
           "size": %s,
           "sort": [
@@ -58,6 +72,7 @@ public class ElasticSearchQuery {
               "reference.keyword": "asc"
             }
           ]
+        }
         """;
 
     public String getQuery(String fromDate) {

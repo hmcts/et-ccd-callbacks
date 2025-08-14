@@ -106,19 +106,17 @@ public final class AddressUtils {
      */
     @NotNull
     public static String getAddressAsText(OrganisationAddress organisationAddress) {
-        StringBuilder sb = (organisationAddress.getAddressLine1() == null ? new StringBuilder() : new StringBuilder(
-                organisationAddress.getAddressLine1()))
-                .append(organisationAddress.getAddressLine2() == null ? "" :
-                        "\n" + organisationAddress.getAddressLine2()).append(
-                                organisationAddress.getAddressLine3() == null ? "" :
-                                        "\n" + organisationAddress.getAddressLine3()).append(
-                                                organisationAddress.getTownCity() == null ? "" :
-                                                        "\n" + organisationAddress.getTownCity()).append(
-                                                                organisationAddress.getPostCode() == null ? "" :
-                                                                        "\n" + organisationAddress.getPostCode())
-                .append(organisationAddress.getCounty() == null ? "" :
-                        "\n" + organisationAddress.getCounty()).append(organisationAddress.getCountry() == null ? "" :
-                        "\n" + organisationAddress.getCountry());
-        return sb.toString();
+        return Arrays.stream(new String[] {
+                        organisationAddress.getAddressLine1(),
+                        organisationAddress.getAddressLine2(),
+                        organisationAddress.getAddressLine3(),
+                        organisationAddress.getTownCity(),
+                        organisationAddress.getPostCode(),
+                        organisationAddress.getCounty(),
+                        organisationAddress.getCountry()
+                })
+                .filter(Objects::nonNull)
+                .filter(s -> !s.trim().isEmpty())
+                .collect(Collectors.joining("\n"));
     }
 }

@@ -115,7 +115,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     private static final String HEARING_MID_EVENT_VALIDATION_URL = "/hearingMidEventValidation";
     private static final String BF_ACTIONS_URL = "/bfActions";
     private static final String DYNAMIC_LIST_BF_ACTIONS_URL = "/dynamicListBfActions";
-    private static final String WA_TASK_FOR_EXPIRED_BF_ACTIONS_URL = "/waTaskForExpiredBfActions";
     private static final String ABOUT_TO_START_DISPOSAL_URL = "/aboutToStartDisposal";
     private static final String INITIALISE_AMEND_CASE_DETAILS_URL = "/initialiseAmendCaseDetails";
     private static final String DYNAMIC_RESPONDENT_REPRESENTATIVE_NAMES_URL = "/dynamicRespondentRepresentativeNames";

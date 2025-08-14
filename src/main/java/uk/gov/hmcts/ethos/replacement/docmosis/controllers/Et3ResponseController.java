@@ -418,6 +418,7 @@ public class Et3ResponseController {
         try {
             et3ResponseService.setRespondentRepresentsContactDetails(
                     userToken, caseData, ccdRequest.getCaseDetails().getCaseId());
+            caseData.setMyHmctsAddressText(null);
         } catch (GenericServiceException gse) {
             errors.add(gse.getMessage());
         }

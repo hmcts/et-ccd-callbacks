@@ -748,6 +748,7 @@ public class Et1ReppedController {
         List<String> errors = new ArrayList<>();
         try {
             et1ReppedService.setClaimantRepresentativeValues(userToken, caseData);
+            caseData.setMyHmctsAddressText(null);
         } catch (GenericServiceException gse) {
             errors.add(gse.getMessage());
         }

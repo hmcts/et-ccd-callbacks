@@ -42,7 +42,7 @@ class PreAcceptanceCaseControllerTest extends BaseControllerTest {
     private JsonMapper jsonMapper;
 
     @BeforeEach
-    protected void setUp() throws Exception {
+    protected void setUp() {
         when(preAcceptanceCaseService.validateAcceptanceDate(any())).thenReturn(new ArrayList<>());
 
         ccdRequest = CCDRequestBuilder.builder()

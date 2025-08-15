@@ -20,6 +20,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWork
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.Objects;
 
 import static org.hamcrest.Matchers.notNullValue;
@@ -53,7 +55,7 @@ class GlobalSearchDataMigrationControllerTest extends BaseControllerTest {
 
     @BeforeEach
     @Override
-    public void setUp() throws Exception {
+    public void setUp() throws IOException, URISyntaxException {
         super.setUp();
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         ObjectMapper objectMapper = new ObjectMapper();

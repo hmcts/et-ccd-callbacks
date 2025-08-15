@@ -52,6 +52,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCasesSendin
 import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -140,8 +142,7 @@ class CaseManagementForCaseWorkerServiceTest {
     private MultipleCasesSendingService multipleCasesSendingService;
 
     @BeforeEach
-    @SneakyThrows
-    void setUp() {
+    void setUp() throws URISyntaxException, IOException {
 
         setScotlandCaseRequests();
         setGenericCaseRequests();
@@ -159,7 +160,7 @@ class CaseManagementForCaseWorkerServiceTest {
                 multipleCasesSendingService);
     }
 
-    private void setScotlandCaseRequests() throws Exception {
+    private void setScotlandCaseRequests() throws URISyntaxException, IOException {
         scotlandCcdRequest1 = new CCDRequest();
         CaseDetails caseDetailsScot1 = generateCaseDetails("caseDetailsScotTest1.json");
         scotlandCcdRequest1.setCaseDetails(caseDetailsScot1);
@@ -178,7 +179,7 @@ class CaseManagementForCaseWorkerServiceTest {
 
     }
 
-    private void setGenericCaseRequests() throws Exception {
+    private void setGenericCaseRequests() throws URISyntaxException, IOException {
         ccdRequest10 = new CCDRequest();
         CaseDetails caseDetails10 = generateCaseDetails("caseDetailsTest10.json");
         ccdRequest10.setCaseDetails(caseDetails10);
@@ -210,10 +211,6 @@ class CaseManagementForCaseWorkerServiceTest {
         ccdRequest22 = new CCDRequest();
         CaseDetails caseDetails22 = generateCaseDetails("caseDetailsTest22.json");
         ccdRequest22.setCaseDetails(caseDetails22);
-
-        CCDRequest ccdRequest2 = new CCDRequest();
-        CaseDetails caseDetails2 = generateCaseDetails("caseDetailsTest2.json");
-        ccdRequest2.setCaseDetails(caseDetails2);
     }
 
     private void setManchesterCCDRequest() {
@@ -624,7 +621,7 @@ class CaseManagementForCaseWorkerServiceTest {
         assertThat(caseDetails.getCaseData().getFlagsImageAltText()).isEqualTo(expected);
     }
 
-    private CaseDetails generateCaseDetails(String jsonFileName) throws Exception {
+    private CaseDetails generateCaseDetails(String jsonFileName) throws URISyntaxException, IOException {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
             .getContextClassLoader().getResource(jsonFileName)).toURI())));
         ObjectMapper mapper = new ObjectMapper();

@@ -74,7 +74,7 @@ class DocumentHelperTest {
     private VenueAddressReaderService venueAddressReaderService;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() throws URISyntaxException, IOException {
         caseDetails1 = generateCaseDetails("caseDetailsTest1.json");
         caseDetails2 = generateCaseDetails("caseDetailsTest2.json");
         caseDetails3 = generateCaseDetails("caseDetailsTest3.json");
@@ -107,7 +107,7 @@ class DocumentHelperTest {
         when(venueAddressReaderService.getVenueAddress(any(), any(), any())).thenReturn(MANCHESTER_VENUE_ADDRESS);
     }
 
-    private CaseDetails generateCaseDetails(String jsonFileName) throws Exception {
+    private CaseDetails generateCaseDetails(String jsonFileName) throws URISyntaxException, IOException {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
             .getContextClassLoader().getResource(jsonFileName)).toURI())));
         ObjectMapper mapper = new ObjectMapper();
@@ -258,13 +258,14 @@ class DocumentHelperTest {
                 + "\"submission_reference\":\"12212121\",\n"
                 + "}\n"
                 + "}\n";
-        caseDetails2.getCaseData().getRepCollection().get(0).getValue().setRespRepName("Antonio Vazquez");
+        caseDetails2.getCaseData().getRepCollection().getFirst().getValue().setRespRepName("Antonio Vazquez");
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails2.getCaseData(), "",
                 userDetails, ENGLANDWALES_CASE_TYPE_ID,
                 caseDetails2.getCaseData().getCorrespondenceType(),
                 caseDetails2.getCaseData().getCorrespondenceScotType(), null,
                 null, venueAddressReaderService).toString());
-        caseDetails2.getCaseData().getRepCollection().get(0).getValue().setRespRepName("RepresentativeNameRespondent");
+        caseDetails2.getCaseData().getRepCollection().getFirst()
+                .getValue().setRespRepName("RepresentativeNameRespondent");
     }
 
     @Test
@@ -338,14 +339,15 @@ class DocumentHelperTest {
                 + "\"submission_reference\":\"12212121\",\n"
                 + "}\n"
                 + "}\n";
-        caseDetails2.getCaseData().getRespondentCollection().get(0).getValue().setResponseStruckOut(NO);
-        caseDetails2.getCaseData().getRepCollection().get(0).getValue().setRespRepName("Antonio Vazquez");
+        caseDetails2.getCaseData().getRespondentCollection().getFirst().getValue().setResponseStruckOut(NO);
+        caseDetails2.getCaseData().getRepCollection().getFirst().getValue().setRespRepName("Antonio Vazquez");
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails2.getCaseData(), "",
                 userDetails, ENGLANDWALES_CASE_TYPE_ID,
                 caseDetails2.getCaseData().getCorrespondenceType(),
                 caseDetails2.getCaseData().getCorrespondenceScotType(), null,
                 null, venueAddressReaderService).toString());
-        caseDetails2.getCaseData().getRepCollection().get(0).getValue().setRespRepName("RepresentativeNameRespondent");
+        caseDetails2.getCaseData().getRepCollection().getFirst()
+                .getValue().setRespRepName("RepresentativeNameRespondent");
     }
 
     @Test

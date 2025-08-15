@@ -11,7 +11,7 @@ plugins {
     id 'io.freefair.lombok' version '8.12.2'
     id 'org.sonarqube' version '6.2.0.5505'
     id 'pmd'
-    id 'com.github.hmcts.rse-cft-lib' version '0.19.1836'
+    id 'com.github.hmcts.rse-cft-lib' version '0.19.1839'
 }
 
 group = 'uk.gov.hmcts.et'
@@ -375,7 +375,7 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '6.1.9'
     implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '8.0'
-    implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.4.1'
+    implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.4.2'
 
     // Log4J core added to remove startup error message
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4JVersion
@@ -406,14 +406,14 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
-    implementation 'jakarta.servlet:jakarta.servlet-api:6.0.0'
+    implementation 'jakarta.servlet:jakarta.servlet-api:6.1.0'
     implementation 'javax.servlet:javax.servlet-api:4.0.1'
     implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.1.2'
     implementation group: 'org.springframework.retry', name: 'spring-retry', version: '2.0.12'
     // CVE-2022-25857
     implementation group: 'org.yaml', name: 'snakeyaml', version: '2.4'
     implementation group: 'uk.gov.service.notify', name: 'notifications-java-client', version: '5.2.1-RELEASE'
-    implementation group: 'commons-validator', name: 'commons-validator', version: '1.9.0'
+    implementation group: 'commons-validator', name: 'commons-validator', version: '1.10.0'
     // 1084765
     implementation group: 'org.webjars.npm', name: 'minimatch', version: '9.0.5'
     implementation group: 'org.webjars', name: 'webjars-locator-core', version: '0.59'

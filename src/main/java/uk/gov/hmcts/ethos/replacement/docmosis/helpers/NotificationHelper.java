@@ -1,12 +1,14 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.ObjectUtils;
 import org.webjars.NotFoundException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
@@ -93,7 +95,7 @@ public final class NotificationHelper {
         return name.substring(name.lastIndexOf(' ') + 1);
     }
 
-    private static String getNameForClaimant(CaseData caseData) {
+    public static String getNameForClaimant(CaseData caseData) {
         RepresentedTypeC representativeClaimantType = caseData.getRepresentativeClaimantType();
 
         if (representativeClaimantType == null || representativeClaimantType.getNameOfRepresentative() == null) {
@@ -179,5 +181,28 @@ public final class NotificationHelper {
                 isNullOrEmpty(caseData.getRepresentativeClaimantType().getRepresentativeEmailAddress()) ? EMPTY_STRING :
                 caseData.getRepresentativeClaimantType().getRepresentativeEmailAddress());
         return personalisation;
+    }
+
+    /**
+     * Retrieves a list of email addresses for respondents and their representatives from the given case data.
+     *
+     * @param caseData the case data containing respondent and representative information
+     */
+    public static void getRespondentAndRepEmailAddresses(CaseData caseData, RespondentSumTypeItem respondentSumTypeItem,
+                                                         Map<String, String> emailAddressesMap) {
+        RespondentSumType respondent = respondentSumTypeItem.getValue();
+        String responseEmail = respondent.getResponseRespondentEmail();
+        String respondentEmail = respondent.getRespondentEmail();
+
+        if (StringUtils.isNotBlank(responseEmail)) {
+            emailAddressesMap.put(responseEmail, respondentSumTypeItem.getId());
+        } else if (StringUtils.isNotBlank(respondentEmail)) {
+            emailAddressesMap.put(respondentEmail, respondentSumTypeItem.getId());
+        }
+
+        RepresentedTypeR representative = getRespondentRepresentative(caseData, respondent);
+        if (representative != null && StringUtils.isNotBlank(representative.getRepresentativeEmailAddress())) {
+            emailAddressesMap.put(representative.getRepresentativeEmailAddress(), "");
+        }
     }
 }

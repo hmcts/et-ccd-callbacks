@@ -17,7 +17,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantWorkAddressType;
 import uk.gov.hmcts.et.common.model.ccd.types.CreateRespondentType;
 import uk.gov.hmcts.et.common.model.ccd.types.NewEmploymentType;
-import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
@@ -624,32 +623,6 @@ public final class Et1ReppedHelper {
         } else {
             return pay.substring(0, pay.length() - 2);
         }
-    }
-
-    /**
-     * Sets the claimant representative's phone number and address fields in the provided
-     * {@link RepresentedTypeC} object within the given {@link CaseData}, if the representative exists.
-     *
-     * <p>This method first checks whether the {@code representativeClaimantType} in {@code caseData}
-     * is non-null and non-empty. If it is, the method updates its phone number and address
-     * using the corresponding values from the {@code caseData}.</p>
-     *
-     * @param caseData the {@link CaseData} object containing the representative and associated contact details.
-     */
-    public static void setClaimantRepresentativeValues(CaseData caseData) throws GenericServiceException {
-        if (ObjectUtils.isEmpty(caseData)) {
-            throw new GenericServiceException(ERROR_CASE_NOT_FOUND,
-                    new Exception(ERROR_CASE_NOT_FOUND),
-                    ERROR_CASE_NOT_FOUND,
-                    StringUtils.EMPTY,
-                    "Et1ReppedHelper",
-                    "setClaimantRepresentativeValues");
-        }
-        if (caseData.getRepresentativeClaimantType() == null) {
-            caseData.setRepresentativeClaimantType(RepresentedTypeC.builder().build());
-        }
-        caseData.getRepresentativeClaimantType().setRepresentativePhoneNumber(caseData.getRepresentativePhoneNumber());
-        caseData.getRepresentativeClaimantType().setRepresentativeAddress(caseData.getRepresentativeAddress());
     }
 
     /**

@@ -13,6 +13,9 @@ public final class ET3ResponseConstants {
     public static final String ERROR_NO_REPRESENTED_RESPONDENT_FOUND = "No represented respondent found";
     public static final String ERROR_CASE_DATA_NOT_FOUND = "Case data not found";
     public static final String SYSTEM_ERROR = "A system error occurred. Please try again later!";
+    // TODO: https://tools.hmcts.net/jira/browse/RET-5960
+    public static final String ERROR_ORGANISATION_DETAILS_NOT_FOUND = "Organisation details not found";
+    public static final String REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS = "Use MyHMCTS details";
 
     private ET3ResponseConstants() {
         // Access through static methods

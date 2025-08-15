@@ -27,8 +27,10 @@ import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
+import uk.gov.hmcts.et.common.model.ccd.types.OrganisationAddress;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.et.common.model.enums.RespondentSolicitorType;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormMapper;
@@ -36,6 +38,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentFixtures;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
 import java.net.URI;
@@ -55,6 +58,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -68,8 +72,10 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConst
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_INVALID_CASE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_INVALID_USER_TOKEN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_NO_REPRESENTED_RESPONDENT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_ORGANISATION_DETAILS_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_USER_ID_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_USER_NOT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.SYSTEM_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.SUBMIT_ET3;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_ET3_FORM_CASE_DATA_FILE;
@@ -86,6 +92,10 @@ class Et3ResponseServiceTest {
     private UserIdamService userIdamService;
     @MockBean
     private CcdCaseAssignment ccdCaseAssignment;
+    @MockBean
+    private AuthTokenGenerator authTokenGenerator;
+    @MockBean
+    private MyHmctsService myHmctsService;
 
     private static final String INVALID_USER_TOKEN = "invalidUserToken";
     private static final String VALID_USER_TOKEN = "validUserToken";
@@ -99,6 +109,14 @@ class Et3ResponseServiceTest {
     private static final String INVALID_USER_ID = "invalidUserId";
     private static final String ERROR_PDF_BOX_SERVICE_GENERATE_PDF_DOCUMENT_INFO =
             "Dummy pdf box service generate pdf document info error";
+    private static final String ADDRESS_LINE_1 = "addressLine1";
+    private static final String ADDRESS_LINE_2 = "addressLine2";
+    private static final String ADDRESS_LINE_3 = "addressLine3";
+    private static final String POST_CODE = "postalCode";
+    private static final String COUNTRY = "country";
+    private static final String COUNTY = "county";
+    private static final String POST_TOWN = "postTown";
+    private static final String PHONE_NUMBER = "1234567890";
 
     private EmailService emailService;
     private CaseData caseData;
@@ -109,7 +127,7 @@ class Et3ResponseServiceTest {
         emailService = spy(new EmailUtils());
 
         et3ResponseService = new Et3ResponseService(documentManagementService, pdfBoxService, emailService,
-                userIdamService, ccdCaseAssignment);
+                userIdamService, ccdCaseAssignment, myHmctsService);
         caseData = CaseDataBuilder.builder()
             .withClaimantIndType("Doris", "Johnson")
             .withClaimantType("232 Petticoat Square", "3 House", null,
@@ -544,108 +562,72 @@ class Et3ResponseServiceTest {
         );
     }
 
-    @ParameterizedTest
-    @MethodSource("generateTestValidateAndExtractRepresentativeContact")
+    @Test
     @SneakyThrows
-    void theValidateAndExtractRepresentativeContact(String userToken, CaseData caseData) {
-        if (VALID_USER_TOKEN.equals(userToken) && INVALID_CASE_ID.equals(caseData.getCcdID())) {
-            UserDetails validUserDetails = new UserDetails();
-            validUserDetails.setUid(USER_ID);
-            when(userIdamService.getUserDetails(VALID_USER_TOKEN)).thenReturn(validUserDetails);
-            when(ccdCaseAssignment.getCaseUserRoles(INVALID_CASE_ID)).thenThrow(
-                    new GenericServiceException(ERROR_INVALID_CASE_ID,
-                            new Throwable(ERROR_INVALID_CASE_ID),
-                            ERROR_INVALID_CASE_ID,
-                            "123456",
-                            "CcdCaseAssignment",
-                            "getCaseUserRoles"));
-            GenericServiceException gex = assertThrows(GenericServiceException.class,
-                    () -> et3ResponseService.validateAndExtractRepresentativeContact(
-                            userToken, caseData, caseData.getCcdID()));
-            assertThat(gex.getMessage()).isEqualTo(ERROR_INVALID_CASE_ID);
-        }
-
-        if (VALID_USER_TOKEN.equals(userToken) && VALID_CASE_ID_RETURNS_INVALID_USER.equals(caseData.getCcdID())) {
-            UserDetails validUserDetails = new UserDetails();
-            validUserDetails.setUid(USER_ID);
-            when(userIdamService.getUserDetails(VALID_USER_TOKEN)).thenReturn(validUserDetails);
-            when(ccdCaseAssignment.getCaseUserRoles(VALID_CASE_ID_RETURNS_INVALID_USER)).thenReturn(
-                    getValidCaseInvalidUserAssignmentData());
-            GenericServiceException gex = assertThrows(GenericServiceException.class,
-                    () -> et3ResponseService.validateAndExtractRepresentativeContact(
-                            userToken, caseData, caseData.getCcdID()));
-            assertThat(gex.getMessage()).isEqualTo(ERROR_NO_REPRESENTED_RESPONDENT_FOUND);
-        }
-
-        if (VALID_USER_TOKEN.equals(userToken) && VALID_CASE_ID.equals(caseData.getCcdID())) {
-            UserDetails validUserDetails = new UserDetails();
-            validUserDetails.setUid(USER_ID);
-            Address address = new Address();
-            address.setAddressLine1("Address Line 1");
-            caseData.setRepCollection(
-                    List.of(RepresentedTypeRItem.builder().value(
-                            RepresentedTypeR.builder().representativeAddress(address)
-                                    .representativePhoneNumber("1234567890").build()).build()));
-            when(userIdamService.getUserDetails(VALID_USER_TOKEN)).thenReturn(validUserDetails);
-            when(ccdCaseAssignment.getCaseUserRoles(VALID_CASE_ID)).thenReturn(getValidCaseUserAssignmentData());
-            when(userIdamService.getUserDetails(VALID_USER_TOKEN)).thenReturn(validUserDetails);
-            when(ccdCaseAssignment.getCaseUserRoles(VALID_CASE_ID)).thenReturn(
-                    getValidCaseUserAssignmentData());
-            assertDoesNotThrow(() ->
-                    et3ResponseService.validateAndExtractRepresentativeContact(
-                            userToken, caseData, caseData.getCcdID()));
-            assertThat(caseData.getEt3ResponseAddress().getAddressLine1()).isEqualTo("Address Line 1");
-            assertThat(caseData.getEt3ResponsePhone()).isEqualTo("1234567890");
-        }
-    }
-
-    private static Stream<Arguments> generateTestValidateAndExtractRepresentativeContact() {
-        CaseData validCaseData = CaseDataBuilder.builder()
-                .withClaimantIndType("Doris", "Johnson")
-                .withClaimantType("232 Petticoat Square", "3 House", null,
-                        "London", "W10 4AG", "United Kingdom")
-                .withRespondentWithAddress("Antonio Vazquez",
-                        "11 Small Street", "22 House", null,
-                        "Manchester", "M12 42R", "United Kingdom",
-                        "1234/5678/90")
-                .withEt3RepresentingRespondent("Antonio Vazquez")
-                .withSubmitEt3Respondent("Antonio Vazquez")
+    void testSetRepresentativeContactInfo() {
+        String userToken = "mockToken";
+        String submissionReference = "mockRef";
+        UserDetails userDetails = new UserDetails();
+        userDetails.setUid(USER_ID);
+        when(userIdamService.getUserDetails(userToken)).thenReturn(userDetails);
+        CaseUserAssignmentData caseUserAssignmentData = CaseUserAssignmentData.builder()
+                .caseUserAssignments(List.of(CaseUserAssignment.builder().userId(USER_ID)
+                        .caseRole(RespondentSolicitorType.SOLICITORA.getLabel()).build())).build();
+        when(ccdCaseAssignment.getCaseUserRoles(submissionReference)).thenReturn(caseUserAssignmentData);
+        // Scenario 2: Use MyHMCTS contact details
+        CaseData caseData2 = new CaseData();
+        caseData2.setRepCollection(
+                List.of(RepresentedTypeRItem.builder().value(RepresentedTypeR.builder().build()).build()));
+        caseData2.setEt3ResponsePhone(PHONE_NUMBER);
+        caseData2.setRepresentativeContactChangeOption(REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS);
+        when(userIdamService.getUserDetails(userToken)).thenReturn(userDetails);
+        OrganisationAddress organisationAddress = OrganisationAddress.builder()
+                .addressLine1(ADDRESS_LINE_1)
+                .addressLine2(ADDRESS_LINE_2)
+                .addressLine3(ADDRESS_LINE_3)
+                .townCity(POST_TOWN)
+                .postCode(POST_CODE)
+                .county(COUNTY)
+                .country(COUNTRY)
                 .build();
-        validCaseData.setCcdID(VALID_CASE_ID);
-        Address address = new Address();
-        address.setAddressLine1("Address Line 1");
-        validCaseData.setEt3ResponseAddress(address);
-        validCaseData.setEt3ResponsePhone("1234567890");
+        when(authTokenGenerator.generate()).thenReturn(userToken);
+        when(myHmctsService.getOrganisationAddress(userToken)).thenReturn(organisationAddress);
+        et3ResponseService.setRespondentRepresentsContactDetails(userToken, caseData2, submissionReference);
+        assertThat(caseData2.getEt3ResponseAddress()).isNotNull();
+        assertThat(caseData2.getEt3ResponseAddress().getAddressLine1()).isEqualTo(ADDRESS_LINE_1);
+        assertThat(caseData2.getEt3ResponseAddress().getAddressLine2()).isEqualTo(ADDRESS_LINE_2);
+        assertThat(caseData2.getEt3ResponseAddress().getAddressLine3()).isEqualTo(ADDRESS_LINE_3);
+        assertThat(caseData2.getEt3ResponseAddress().getPostTown()).isEqualTo(POST_TOWN);
+        assertThat(caseData2.getEt3ResponseAddress().getPostCode()).isEqualTo(POST_CODE);
+        assertThat(caseData2.getEt3ResponseAddress().getCounty()).isEqualTo(COUNTY);
+        assertThat(caseData2.getEt3ResponseAddress().getCountry()).isEqualTo(COUNTRY);
+        assertThat(caseData2.getEt3ResponsePhone()).isEqualTo(PHONE_NUMBER);
 
-        CaseData invalidCaseData = CaseDataBuilder.builder()
-                .withClaimantIndType("Doris", "Johnson")
-                .withClaimantType("232 Petticoat Square", "3 House", null,
-                        "London", "W10 4AG", "United Kingdom")
-                .withRespondentWithAddress("Antonio Vazquez",
-                        "11 Small Street", "22 House", null,
-                        "Manchester", "M12 42R", "United Kingdom",
-                        "1234/5678/90")
-                .withEt3RepresentingRespondent("Antonio Vazquez")
-                .withSubmitEt3Respondent("Antonio Vazquez")
-                .build();
-        invalidCaseData.setCcdID(INVALID_CASE_ID);
+        // Scenario 3: Throws when user not found
+        CaseData caseData3 = new CaseData();
+        caseData3.setRepresentativeContactChangeOption(REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS);
 
-        CaseData notRepresentedCaseData = CaseDataBuilder.builder()
-                .withClaimantIndType("Doris", "Johnson")
-                .withClaimantType("232 Petticoat Square", "3 House", null,
-                        "London", "W10 4AG", "United Kingdom")
-                .withRespondentWithAddress("Antonio Vazquez",
-                        "11 Small Street", "22 House", null,
-                        "Manchester", "M12 42R", "United Kingdom",
-                        "1234/5678/90")
-                .withEt3RepresentingRespondent("Antonio Vazquez")
-                .withSubmitEt3Respondent("Antonio Vazquez")
-                .build();
-        invalidCaseData.setCcdID(VALID_CASE_ID_RETURNS_INVALID_USER);
-        return Stream.of(
-                Arguments.of(VALID_USER_TOKEN, invalidCaseData),
-                Arguments.of(VALID_USER_TOKEN, notRepresentedCaseData),
-                Arguments.of(VALID_USER_TOKEN, validCaseData)
-        );
+        when(userIdamService.getUserDetails(userToken)).thenReturn(null);
+
+        GenericServiceException userNotFound = assertThrows(GenericServiceException.class, () ->
+                et3ResponseService.setRespondentRepresentsContactDetails(userToken, caseData3, submissionReference));
+        assertThat(userNotFound.getMessage()).isEqualTo("User not found");
+
+        // Scenario 3: Throws when organisation not found
+        CaseData caseData4 = new CaseData();
+        caseData4.setRepresentativeContactChangeOption(REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS);
+
+        when(userIdamService.getUserDetails(userToken)).thenReturn(userDetails);
+        when(authTokenGenerator.generate()).thenReturn(userToken);
+        doThrow(new GenericServiceException(ERROR_ORGANISATION_DETAILS_NOT_FOUND,
+                new Exception(ERROR_ORGANISATION_DETAILS_NOT_FOUND),
+                ERROR_ORGANISATION_DETAILS_NOT_FOUND,
+                org.apache.commons.lang3.StringUtils.EMPTY,
+                "MyHmctsService",
+                "getOrganisationAddress - organisation details not found"))
+                .when(myHmctsService).getOrganisationAddress(userToken);
+        GenericServiceException organisationNotFound = assertThrows(GenericServiceException.class, () ->
+                et3ResponseService.setRespondentRepresentsContactDetails(userToken, caseData4, submissionReference));
+        assertThat(organisationNotFound.getMessage()).isEqualTo("Organisation details not found");
     }
 }

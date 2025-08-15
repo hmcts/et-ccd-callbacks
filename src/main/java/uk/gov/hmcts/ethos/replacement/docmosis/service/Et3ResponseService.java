@@ -2,11 +2,11 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -16,7 +16,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
+import uk.gov.hmcts.et.common.model.ccd.types.OrganisationAddress;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
@@ -44,6 +44,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConst
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_USER_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ET3_ATTACHMENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ET3_CATEGORY_ID;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.SHORT_DESCRIPTION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.SYSTEM_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
@@ -51,6 +52,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItemFromTopLevel;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.ET3_RESPONSE_PDF_FILE_NAME;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils.getOrganisationAddressAsText;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils.mapOrganisationAddressToAddress;
 
 /**
  * Service to support ET3 Response journey. Contains methods for generating and saving ET3 Response documents.
@@ -65,6 +68,7 @@ public class Et3ResponseService {
     private final EmailService emailService;
     private final UserIdamService userIdamService;
     private final CcdCaseAssignment ccdCaseAssignment;
+    private final MyHmctsService myHmctsService;
 
     @Value("${template.et3Response.tribunal}")
     private String et3EmailTribunalTemplateId;
@@ -207,55 +211,36 @@ public class Et3ResponseService {
     }
 
     /**
-     * Validates the presence of a represented respondent for a given case and extracts the representative's contact
-     * details (phone number and address) into the provided {@link CaseData} object.
-     * <p>
-     * This method performs the following:
-     * <ul>
-     *     <li>Retrieves the list of respondent indexes that are represented, using the provided user token and
-     *     submission reference.</li>
-     *     <li>Validates that there is at least one represented respondent with a non-null index.</li>
-     *     <li>Extracts the phone number and address of the representative associated with the first valid respondent
-     *     and sets them in {@link CaseData}.</li>
-     * </ul>
-     * If any validation fails or the list of represented respondent indexes is empty or contains a null first element,
-     * a {@link GenericServiceException} is thrown.
+     * Sets the representative's MyHMCTS contact address in the provided {@link CaseData} object.
      *
-     * @param userToken          The user authorization token required for secure communication with downstream
-     *                           services.
-     * @param caseData           The case data containing respondent and representative information.
-     * @param submissionReference A unique reference string identifying the submission associated with this operation.
-     * @throws GenericServiceException if:
-     *      <ul>
-     *          <li>There is an issue retrieving the represented respondent indexes.</li>
-     *          <li>No represented respondent is found.</li>
-     *      </ul>
+     * <p>
+     * This method retrieves user details using the provided user token, fetches the associated
+     * organisation's contact information, and then updates the ET3 response address and
+     * MyHMCTS address text fields in the case data. It throws a {@link GenericServiceException}
+     * if user or organisation details cannot be found.
+     *
+     * @param userToken            the JWT bearer token representing the authenticated user
+     * @param caseData             the case data object to be updated with address information
+     * @param submissionReference  the reference string for identifying the current case submission
+     *
+     * @throws GenericServiceException if user details or organisation contact information
+     *                                  cannot be retrieved, or are missing or invalid
      */
-    public void validateAndExtractRepresentativeContact(String userToken, CaseData caseData, String submissionReference)
+    public void setRepresentativeMyHmctsContactAddress(String userToken, CaseData caseData, String submissionReference)
             throws GenericServiceException {
-        List<Integer> representedRespondentIndexes;
-        try {
-            representedRespondentIndexes = getRepresentedRespondentIndexes(userToken, submissionReference);
-        } catch (GenericServiceException gse) {
-            throw new GenericServiceException(gse.getMessage(),
-                    new Exception(gse),
-                    gse.getMessage(),
+
+        UserDetails userDetails = userIdamService.getUserDetails(userToken);
+        if (ObjectUtils.isEmpty(userDetails)) {
+            throw new GenericServiceException(ERROR_USER_NOT_FOUND,
+                    new Exception(ERROR_USER_NOT_FOUND),
+                    ERROR_USER_NOT_FOUND,
                     submissionReference,
                     "Et3ResponseService",
-                    "validateAndExtractRepresentativeContact");
+                    "setRepresentativeContactInfo - user not found");
         }
-        if (CollectionUtils.isEmpty(representedRespondentIndexes) || representedRespondentIndexes.getFirst() == null) {
-            throw new GenericServiceException(ERROR_NO_REPRESENTED_RESPONDENT_FOUND,
-                    new Exception(ERROR_NO_REPRESENTED_RESPONDENT_FOUND),
-                    ERROR_NO_REPRESENTED_RESPONDENT_FOUND,
-                    submissionReference,
-                    "Et3ResponseService",
-                    "validateAndExtractRepresentativeContact");
-        }
-        RepresentedTypeR representedTypeR = caseData.getRepCollection()
-                .get(representedRespondentIndexes.get(representedRespondentIndexes.getFirst())).getValue();
-        caseData.setEt3ResponsePhone(representedTypeR.getRepresentativePhoneNumber());
-        caseData.setEt3ResponseAddress(representedTypeR.getRepresentativeAddress());
+        OrganisationAddress organisationAddress = myHmctsService.getOrganisationAddress(userToken);
+        caseData.setEt3ResponseAddress(mapOrganisationAddressToAddress(organisationAddress));
+        caseData.setMyHmctsAddressText(getOrganisationAddressAsText(organisationAddress));
     }
 
     /**
@@ -301,7 +286,6 @@ public class Et3ResponseService {
         try {
             caseUserAssignmentData = ccdCaseAssignment.getCaseUserRoles(caseId);
         } catch (IOException ioe) {
-            log.info("******* hereeeeeeee");
             throw new GenericServiceException(SYSTEM_ERROR,
                     new Exception(ioe),
                     ioe.getMessage(),
@@ -319,7 +303,7 @@ public class Et3ResponseService {
         List<Integer> solicitorIndexList = new ArrayList<>();
         for (CaseUserAssignment caseUserAssignment : caseUserAssignmentData.getCaseUserAssignments()) {
             if (userDetails.getUid().equals(caseUserAssignment.getUserId())) {
-                log.info("******* CASE ROLE = " + caseUserAssignment.getCaseRole());
+                log.info("******* CASE ROLE = {}", caseUserAssignment.getCaseRole());
                 SolicitorRole solicitorRole = SolicitorRole.from(caseUserAssignment.getCaseRole()).orElseThrow();
                 solicitorIndexList.add(solicitorRole.getIndex());
             }
@@ -378,6 +362,7 @@ public class Et3ResponseService {
      */
     public void setRespondentRepresentsContactDetails(String userToken, CaseData caseData, String submissionReference)
             throws GenericServiceException {
+        // Set the representative contact details in caseData
         if (ObjectUtils.isEmpty(caseData)) {
             throw new GenericServiceException(ERROR_CASE_DATA_NOT_FOUND,
                     new Exception(ERROR_CASE_DATA_NOT_FOUND),
@@ -393,6 +378,10 @@ public class Et3ResponseService {
                     submissionReference,
                     "Et3ResponseService",
                     "setRespondentRepresentsContactDetails - userToken is blank");
+        }
+        if (REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS.equals(
+                caseData.getRepresentativeContactChangeOption())) {
+            setRepresentativeMyHmctsContactAddress(userToken, caseData, submissionReference);
         }
         List<Integer> representedRespondentIndexes;
         try {

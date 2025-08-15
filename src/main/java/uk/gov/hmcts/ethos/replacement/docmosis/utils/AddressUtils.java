@@ -108,7 +108,7 @@ public final class AddressUtils {
      * </ul>
      * Fields are separated by a newline character (<code>\n</code>).
      * Missing or blank fields are skipped without adding extra blank lines.
-     * <p>
+     * </p>
      * If the {@code organisationAddress} argument is {@code null}, an empty string is returned.
      *
      * @param organisationAddress the address object to convert to text; may be {@code null}

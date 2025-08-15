@@ -8,7 +8,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
-import uk.gov.hmcts.et.common.model.bulk.BulkData;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -56,7 +55,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTIN
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_DOC_ETCL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_ETCL_STAFF;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.LETTER_ADDRESS_ALLOCATED_OFFICE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.LIST_CASES_CONFIG;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_HEARING_DATE_TYPE;
@@ -110,15 +108,6 @@ class TornadoServiceTest {
 
         assertThrows(IOException.class, () ->
                 tornadoService.listingGeneration(AUTH_TOKEN, createListingData(), ENGLANDWALES_LISTING_CASE_TYPE_ID)
-        );
-    }
-
-    @Test
-    void scheduleGenerationNoTornadoConnectionShouldThrowException() throws IOException {
-        when(tornadoConnection.createConnection()).thenThrow(IOException.class);
-
-        assertThrows(IOException.class, () ->
-                tornadoService.scheduleGeneration(AUTH_TOKEN, createBulkData(), ENGLANDWALES_LISTING_CASE_TYPE_ID)
         );
     }
 
@@ -189,19 +178,6 @@ class TornadoServiceTest {
 
         DocumentInfo documentInfo = tornadoService.listingGeneration(
             AUTH_TOKEN, listingData, ENGLANDWALES_LISTING_CASE_TYPE_ID);
-
-        verifyDocumentInfo(documentInfo);
-    }
-
-    @Test
-    void shouldCreateDocumentInforForScheduleGeneration() throws IOException {
-        mockConnectionSuccess();
-        BulkData bulkData = new BulkData();
-        bulkData.setScheduleDocName(LIST_CASES_CONFIG);
-        bulkData.setSearchCollection(new ArrayList<>());
-
-        DocumentInfo documentInfo = tornadoService.scheduleGeneration(
-            AUTH_TOKEN, bulkData, ENGLANDWALES_LISTING_CASE_TYPE_ID);
 
         verifyDocumentInfo(documentInfo);
     }
@@ -384,13 +360,6 @@ class TornadoServiceTest {
         listingData.setListingCollection(new ArrayList<>(Collections.singleton(listingTypeItem)));
 
         return listingData;
-    }
-
-    private BulkData createBulkData() {
-        BulkData bulkData = new BulkData();
-        bulkData.setScheduleDocName(LIST_CASES_CONFIG);
-        bulkData.setSearchCollection(new ArrayList<>());
-        return bulkData;
     }
 
     private void verifyDocumentInfo(DocumentInfo documentInfo) {

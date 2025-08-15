@@ -40,6 +40,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -118,22 +120,22 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     private ListingRequest singleListingRequest;
     private ListingRequest listingRequest;
 
-    private void doRequestSetUp() throws Exception {
+    private void doRequestSetUp() throws URISyntaxException, IOException {
         ObjectMapper objectMapper = new ObjectMapper();
-        requestContent = objectMapper.readTree(new File(getClass()
-                .getResource("/exampleListingV1.json").toURI()));
-        requestContent1 = objectMapper.readTree(new File(getClass()
-                .getResource("/exampleListingV2.json").toURI()));
-        requestContentSingleCase = objectMapper.readTree(new File(getClass()
-                .getResource("/exampleListingSingleV1.json").toURI()));
-        requestContentSingleCase1 = objectMapper.readTree(new File(getClass()
-                .getResource("/exampleListingSingleV2.json").toURI()));
+        requestContent = objectMapper.readTree(new File(Objects.requireNonNull(getClass()
+                .getResource("/exampleListingV1.json")).toURI()));
+        requestContent1 = objectMapper.readTree(new File(Objects.requireNonNull(getClass()
+                .getResource("/exampleListingV2.json")).toURI()));
+        requestContentSingleCase = objectMapper.readTree(new File(Objects.requireNonNull(getClass()
+                .getResource("/exampleListingSingleV1.json")).toURI()));
+        requestContentSingleCase1 = objectMapper.readTree(new File(Objects.requireNonNull(getClass()
+                .getResource("/exampleListingSingleV2.json")).toURI()));
 
         listingRequest = generateListingDetails("exampleListingV3.json");
         singleListingRequest = generateListingDetails("exampleListingV2.json");
     }
 
-    private ListingRequest generateListingDetails(String jsonFileName) throws Exception {
+    private ListingRequest generateListingDetails(String jsonFileName) throws URISyntaxException, IOException {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(
                 Thread.currentThread().getContextClassLoader().getResource(jsonFileName)).toURI())));
 
@@ -211,7 +213,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
 
     @BeforeEach
     @Override
-    public void setUp() throws Exception {
+    public void setUp() throws URISyntaxException, IOException {
         super.setUp();
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         doRequestSetUp();
@@ -581,7 +583,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
         mvc.perform(post(INIT_GENERATE_REPORT_URL)
                         .header(AUTHORIZATION, AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("error"))
+                        .content("\"error\""))
                 .andExpect(status().isBadRequest());
 
         verify(generateReportService, never()).initGenerateReport(any(ListingDetails.class));
@@ -772,7 +774,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
         mvc.perform(post(INIT_PRINT_HEARING_LISTS_URL)
                 .contentType(MediaType.APPLICATION_JSON)
                 .header(AUTHORIZATION, AUTH_TOKEN)
-                .content("bad-content"))
+                .content("\"bad-content\""))
                 .andExpect(status().isBadRequest());
 
         verify(printHearingListService, never()).initPrintHearingLists(any(CaseData.class));

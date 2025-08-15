@@ -1,0 +1,1466 @@
+{
+  "id" : 1704985449005627,
+  "security_classification" : "PUBLIC",
+  "state" : "Accepted",
+  "case_data" : {
+    "caseFlags" : {
+      "partyName" : null,
+      "roleOnCase" : null,
+      "details" : null
+    },
+    "claimantFlags" : {
+      "partyName" : "Jack Reeve",
+      "roleOnCase" : "claimant",
+      "details" : null
+    },
+    "respondentFlags" : {
+      "partyName" : "Another Person",
+      "roleOnCase" : "respondent",
+      "details" : null
+    },
+    "waRule21ReferralSent" : null,
+    "typeOfClaim" : null,
+    "typesOfClaim" : null,
+    "caseType" : "Single",
+    "caseSource" : "Manually Created",
+    "claimantRepresentedQuestion" : "No",
+    "claimantWorkAddressQuestion" : "Yes",
+    "ClaimantPcqId" : null,
+    "jurCodesCollection" : null,
+    "claimantIndType" : {
+      "claimant_preferred_title" : null,
+      "claimant_title1" : "Mr",
+      "claimant_title_other" : null,
+      "claimant_first_names" : "Jack",
+      "claimant_last_name" : "Reeve",
+      "claimant_date_of_birth" : "1989-01-01",
+      "claimant_gender" : "Male",
+      "claimant_sex" : "Male",
+      "claimant_gender_identity_same" : null,
+      "claimant_gender_identity" : "Male"
+    },
+    "claimantType" : {
+      "claimant_addressUK" : {
+        "AddressLine1" : "35 Bridge Road",
+        "AddressLine2" : null,
+        "AddressLine3" : null,
+        "PostTown" : "Erith",
+        "County" : null,
+        "PostCode" : "DA8 2DE",
+        "Country" : "United Kingdom"
+      },
+      "claimant_phone_number" : "07666666666",
+      "claimant_mobile_number" : "07333333333",
+      "claimant_email_address" : "person@gmail.com",
+      "claimant_contact_preference" : "Email"
+    },
+    "representativeClaimantType" : null,
+    "claimantOtherType" : {
+      "claimant_occupation" : "Fall Guy",
+      "claimant_employed_from" : "2022-01-01",
+      "claimant_employed_currently" : "Yes",
+      "claimant_employed_to" : null,
+      "claimant_employed_notice_period" : "2022-02-01",
+      "claimant_disabled" : "No",
+      "claimant_disabled_details" : null,
+      "claimant_notice_period" : null,
+      "claimant_notice_period_unit" : null,
+      "claimant_notice_period_duration" : null,
+      "claimant_average_weekly_hours" : null,
+      "claimant_pay_before_tax" : null,
+      "claimant_pay_after_tax" : null,
+      "claimant_pay_cycle" : null,
+      "claimant_pension_contribution" : null,
+      "claimant_pension_weekly_contribution" : null,
+      "claimant_benefits" : null,
+      "claimant_benefits_detail" : null,
+      "pastEmployer" : null,
+      "stillWorking" : null
+    },
+    "respondentCollection" : [ {
+      "id" : "5f69a174-fce3-4286-a13c-58832514be9e",
+      "value" : {
+        "response_status" : null,
+        "responseToClaim" : null,
+        "rejection_reason" : null,
+        "rejection_reason_other" : null,
+        "responseOutOfTime" : null,
+        "responseNotOnPrescribedForm" : null,
+        "responseRequiredInfoAbsent" : null,
+        "responseNotes" : null,
+        "response_referred_to_judge" : null,
+        "response_returned_from_judge" : null,
+        "respondent_name" : "Another Person",
+        "respondentType" : null,
+        "respondentOrganisation" : null,
+        "respondentFirstName" : null,
+        "respondentLastName" : null,
+        "respondent_ACAS_question" : "Yes",
+        "respondent_ACAS" : "123",
+        "respondent_ACAS_no" : null,
+        "respondent_address" : {
+          "AddressLine1" : "35 Bridge Road",
+          "AddressLine2" : null,
+          "AddressLine3" : null,
+          "PostTown" : "Erith",
+          "County" : null,
+          "PostCode" : "DA8 2DE",
+          "Country" : "United Kingdom"
+        },
+        "respondent_phone1" : "07123456789",
+        "respondent_phone2" : null,
+        "respondent_email" : "respondent@email.com",
+        "respondent_contact_preference" : null,
+        "responseStruckOut" : "No",
+        "responseStruckOutDate" : null,
+        "responseStruckOutChairman" : null,
+        "responseStruckOutReason" : null,
+        "responseRespondentAddress" : null,
+        "responseRespondentPhone1" : null,
+        "responseRespondentPhone2" : null,
+        "responseRespondentEmail" : null,
+        "responseRespondentContactPreference" : null,
+        "responseReceived" : "No",
+        "responseReceivedDate" : null,
+        "responseRespondentNameQuestion" : null,
+        "responseRespondentName" : null,
+        "responseContinue" : "Yes",
+        "responseCounterClaim" : null,
+        "responseReference" : null,
+        "extensionRequested" : "No",
+        "extensionGranted" : null,
+        "extensionDate" : null,
+        "extensionResubmitted" : null,
+        "et3Vetting" : null,
+        "et3VettingCompleted" : null,
+        "et3ResponseIsClaimantNameCorrect" : null,
+        "et3ResponseClaimantNameCorrection" : null,
+        "et3ResponseRespondentCompanyNumber" : null,
+        "et3ResponseRespondentEmployerType" : null,
+        "et3ResponseRespondentPreferredTitle" : null,
+        "et3ResponseRespondentContactName" : null,
+        "et3ResponseDXAddress" : null,
+        "et3ResponseContactReason" : null,
+        "et3ResponseHearingRepresentative" : null,
+        "et3ResponseHearingRespondent" : null,
+        "et3ResponseEmploymentCount" : null,
+        "et3ResponseMultipleSites" : null,
+        "et3ResponseSiteEmploymentCount" : null,
+        "et3ResponseAcasAgree" : null,
+        "et3ResponseAcasAgreeReason" : null,
+        "et3ResponseAreDatesCorrect" : null,
+        "et3ResponseEmploymentStartDate" : null,
+        "et3ResponseEmploymentEndDate" : null,
+        "et3ResponseEmploymentInformation" : null,
+        "et3ResponseContinuingEmployment" : null,
+        "et3ResponseIsJobTitleCorrect" : null,
+        "et3ResponseCorrectJobTitle" : null,
+        "et3ResponseClaimantWeeklyHours" : null,
+        "et3ResponseClaimantCorrectHours" : null,
+        "et3ResponseEarningDetailsCorrect" : null,
+        "et3ResponsePayFrequency" : null,
+        "et3ResponsePayBeforeTax" : null,
+        "et3ResponsePayTakehome" : null,
+        "et3ResponseIsNoticeCorrect" : null,
+        "et3ResponseCorrectNoticeDetails" : null,
+        "et3ResponseIsPensionCorrect" : null,
+        "et3ResponsePensionCorrectDetails" : null,
+        "et3ResponseRespondentContestClaim" : null,
+        "et3ResponseContestClaimDocument" : null,
+        "et3ResponseContestClaimDetails" : null,
+        "et3ResponseEmployerClaim" : null,
+        "et3ResponseEmployerClaimDetails" : null,
+        "et3ResponseEmployerClaimDocument" : null,
+        "et3ResponseRespondentSupportNeeded" : null,
+        "et3ResponseRespondentSupportDetails" : null,
+        "et3ResponseRespondentSupportDocument" : null,
+        "et3Form" : null,
+        "personalDetailsSection" : null,
+        "employmentDetailsSection" : null,
+        "claimDetailsSection" : null
+      }
+    } ],
+    "claimantWorkAddress" : {
+      "claimant_work_address" : {
+        "AddressLine1" : "35 Bridge Road",
+        "AddressLine2" : null,
+        "AddressLine3" : null,
+        "PostTown" : "Erith",
+        "County" : null,
+        "PostCode" : "DA8 2DE",
+        "Country" : "United Kingdom"
+      },
+      "claimant_work_phone_number" : null
+    },
+    "caseNotes" : null,
+    "additionalCaseInfo" : null,
+    "managingOffice" : "Bristol",
+    "newEmploymentType" : null,
+    "claimantRequests" : null,
+    "claimantHearingPreference" : {
+      "hearing_preferences" : [ "Video", "Phone" ],
+      "hearing_assistance" : null,
+      "reasonable_adjustments" : null,
+      "reasonable_adjustments_detail" : null,
+      "contact_language" : null,
+      "hearing_language" : null
+    },
+    "claimantTaskListChecks" : null,
+    "receiptDate" : "1989-01-01",
+    "triageQuestions" : null,
+    "et1OnlineSubmission" : "Yes",
+    "hubLinksStatuses" : null,
+    "tribunalCorrespondenceAddress" : {
+      "AddressLine1" : "Bristol Civil and Family Justice Centre",
+      "AddressLine2" : "2 Redcliff Street",
+      "AddressLine3" : null,
+      "PostTown" : "Bristol",
+      "County" : null,
+      "PostCode" : "BS1 6GR",
+      "Country" : null
+    },
+    "tribunalCorrespondenceTelephone" : "0117 929 8261",
+    "tribunalCorrespondenceFax" : "0870 739 4009",
+    "tribunalCorrespondenceDX" : "DX 95903 Bristol 3",
+    "tribunalCorrespondenceEmail" : "bristolet@justice.gov.uk",
+    "ethosCaseReference" : "6000003/2024",
+    "multipleReference" : null,
+    "multipleReferenceLinkMarkUp" : null,
+    "parentMultipleCaseId" : null,
+    "subMultipleName" : null,
+    "leadClaimant" : null,
+    "multipleFlag" : "No",
+    "claimant_TypeOfClaimant" : "Individual",
+    "claimant_Company" : null,
+    "preAcceptCase" : {
+      "caseAccepted" : "Yes",
+      "dateAccepted" : "2022-09-06",
+      "dateRejected" : null,
+      "rejectReason" : null
+    },
+    "claimServedDate" : "2024-01-11",
+    "et3DueDate" : "2024-02-08",
+    "feeGroupReference" : "1669195565007471",
+    "claimantWorkAddressQRespondent" : null,
+    "repCollection" : null,
+    "positionType" : "Manually Created",
+    "dateToPosition" : "2024-01-11",
+    "currentPosition" : "Manually Created",
+    "fileLocation" : null,
+    "fileLocationGlasgow" : null,
+    "fileLocationAberdeen" : null,
+    "fileLocationDundee" : null,
+    "fileLocationEdinburgh" : null,
+    "hearingCollection" : [ {
+      "id" : "c73bcbc4-430e-41c9-9790-182543914c0c",
+      "value" : {
+        "Hearing_type" : "Hearing",
+        "hearingPublicPrivate" : null,
+        "hearingNumber" : "1",
+        "Hearing_venue" : {
+          "value" : {
+            "code" : "Barnstaple",
+            "label" : "Barnstaple"
+          },
+          "selectedCode" : "Barnstaple",
+          "selectedLabel" : "Barnstaple",
+          "list_items" : [ {
+            "code" : "Barnstaple",
+            "label" : "Barnstaple"
+          }, {
+            "code" : "Bath Law Courts",
+            "label" : "Bath Law Courts"
+          }, {
+            "code" : "Bodmin",
+            "label" : "Bodmin"
+          }, {
+            "code" : "Bournemouth MC",
+            "label" : "Bournemouth MC"
+          }, {
+            "code" : "Brighton",
+            "label" : "Brighton"
+          }, {
+            "code" : "Brighton CC",
+            "label" : "Brighton CC"
+          }, {
+            "code" : "Bristol",
+            "label" : "Bristol"
+          }, {
+            "code" : "Bristol 1",
+            "label" : "Bristol 1"
+          }, {
+            "code" : "Bristol 2",
+            "label" : "Bristol 2"
+          }, {
+            "code" : "Bristol 3",
+            "label" : "Bristol 3"
+          }, {
+            "code" : "Bristol 4",
+            "label" : "Bristol 4"
+          }, {
+            "code" : "Bristol 5",
+            "label" : "Bristol 5"
+          }, {
+            "code" : "Bristol 6",
+            "label" : "Bristol 6"
+          }, {
+            "code" : "Bristol CFJC",
+            "label" : "Bristol CFJC"
+          }, {
+            "code" : "BristolCityHall",
+            "label" : "BristolCityHall"
+          }, {
+            "code" : "Bristol Crown",
+            "label" : "Bristol Crown"
+          }, {
+            "code" : "Bristol Mags",
+            "label" : "Bristol Mags"
+          }, {
+            "code" : "Bristol TBC",
+            "label" : "Bristol TBC"
+          }, {
+            "code" : "Bristol Vintry",
+            "label" : "Bristol Vintry"
+          }, {
+            "code" : "Cardiff CFJC",
+            "label" : "Cardiff CFJC"
+          }, {
+            "code" : "Exeter",
+            "label" : "Exeter"
+          }, {
+            "code" : "Exeter Combined",
+            "label" : "Exeter Combined"
+          }, {
+            "code" : "Exeter Mags",
+            "label" : "Exeter Mags"
+          }, {
+            "code" : "Floating Case",
+            "label" : "Floating Case"
+          }, {
+            "code" : "Gloucester CCFC",
+            "label" : "Gloucester CCFC"
+          }, {
+            "code" : "Havant",
+            "label" : "Havant"
+          }, {
+            "code" : "Plymouth Mags",
+            "label" : "Plymouth Mags"
+          }, {
+            "code" : "Plym St Cath Ho",
+            "label" : "Plym St Cath Ho"
+          }, {
+            "code" : "Queensway House",
+            "label" : "Queensway House"
+          }, {
+            "code" : "Remote Hearing",
+            "label" : "Remote Hearing"
+          }, {
+            "code" : "ROIT",
+            "label" : "ROIT"
+          }, {
+            "code" : "Southampton",
+            "label" : "Southampton"
+          }, {
+            "code" : "Swindon",
+            "label" : "Swindon"
+          }, {
+            "code" : "Swindon2",
+            "label" : "Swindon2"
+          }, {
+            "code" : "Taunton",
+            "label" : "Taunton"
+          }, {
+            "code" : "Truro",
+            "label" : "Truro"
+          }, {
+            "code" : "Truro Mags",
+            "label" : "Truro Mags"
+          }, {
+            "code" : "UWE Bristol",
+            "label" : "UWE Bristol"
+          }, {
+            "code" : "Vintry House",
+            "label" : "Vintry House"
+          }, {
+            "code" : "Worle",
+            "label" : "Worle"
+          }, {
+            "code" : "Yeovil Mags",
+            "label" : "Yeovil Mags"
+          } ]
+        },
+        "Hearing_venue_Scotland" : null,
+        "hearingEstLengthNum" : "60",
+        "hearingEstLengthNumType" : "Days",
+        "hearingSitAlone" : "Sit Alone",
+        "hearingERMember" : null,
+        "hearingEEMember" : null,
+        "Hearing_stage" : null,
+        "Hearing_notes" : null,
+        "judge" : null,
+        "Hearing_Glasgow" : null,
+        "Hearing_Aberdeen" : null,
+        "Hearing_Dundee" : null,
+        "Hearing_Edinburgh" : null,
+        "hearingDateCollection" : [ {
+          "id" : "bfd521ce-355f-4f89-9e45-c80be48710d8",
+          "value" : {
+            "listedDate" : "2022-05-16T01:00:00.000",
+            "Hearing_status" : "Listed",
+            "Postponed_by" : null,
+            "hearingVenueDay" : {
+              "value" : {
+                "code" : "Barnstaple",
+                "label" : "Barnstaple"
+              },
+              "selectedCode" : "Barnstaple",
+              "selectedLabel" : "Barnstaple",
+              "list_items" : [ {
+                "code" : "Barnstaple",
+                "label" : "Barnstaple"
+              }, {
+                "code" : "Bath Law Courts",
+                "label" : "Bath Law Courts"
+              }, {
+                "code" : "Bodmin",
+                "label" : "Bodmin"
+              }, {
+                "code" : "Bournemouth MC",
+                "label" : "Bournemouth MC"
+              }, {
+                "code" : "Brighton",
+                "label" : "Brighton"
+              }, {
+                "code" : "Brighton CC",
+                "label" : "Brighton CC"
+              }, {
+                "code" : "Bristol",
+                "label" : "Bristol"
+              }, {
+                "code" : "Bristol 1",
+                "label" : "Bristol 1"
+              }, {
+                "code" : "Bristol 2",
+                "label" : "Bristol 2"
+              }, {
+                "code" : "Bristol 3",
+                "label" : "Bristol 3"
+              }, {
+                "code" : "Bristol 4",
+                "label" : "Bristol 4"
+              }, {
+                "code" : "Bristol 5",
+                "label" : "Bristol 5"
+              }, {
+                "code" : "Bristol 6",
+                "label" : "Bristol 6"
+              }, {
+                "code" : "Bristol CFJC",
+                "label" : "Bristol CFJC"
+              }, {
+                "code" : "BristolCityHall",
+                "label" : "BristolCityHall"
+              }, {
+                "code" : "Bristol Crown",
+                "label" : "Bristol Crown"
+              }, {
+                "code" : "Bristol Mags",
+                "label" : "Bristol Mags"
+              }, {
+                "code" : "Bristol TBC",
+                "label" : "Bristol TBC"
+              }, {
+                "code" : "Bristol Vintry",
+                "label" : "Bristol Vintry"
+              }, {
+                "code" : "Cardiff CFJC",
+                "label" : "Cardiff CFJC"
+              }, {
+                "code" : "Exeter",
+                "label" : "Exeter"
+              }, {
+                "code" : "Exeter Combined",
+                "label" : "Exeter Combined"
+              }, {
+                "code" : "Exeter Mags",
+                "label" : "Exeter Mags"
+              }, {
+                "code" : "Floating Case",
+                "label" : "Floating Case"
+              }, {
+                "code" : "Gloucester CCFC",
+                "label" : "Gloucester CCFC"
+              }, {
+                "code" : "Havant",
+                "label" : "Havant"
+              }, {
+                "code" : "Plymouth Mags",
+                "label" : "Plymouth Mags"
+              }, {
+                "code" : "Plym St Cath Ho",
+                "label" : "Plym St Cath Ho"
+              }, {
+                "code" : "Queensway House",
+                "label" : "Queensway House"
+              }, {
+                "code" : "Remote Hearing",
+                "label" : "Remote Hearing"
+              }, {
+                "code" : "ROIT",
+                "label" : "ROIT"
+              }, {
+                "code" : "Southampton",
+                "label" : "Southampton"
+              }, {
+                "code" : "Swindon",
+                "label" : "Swindon"
+              }, {
+                "code" : "Swindon2",
+                "label" : "Swindon2"
+              }, {
+                "code" : "Taunton",
+                "label" : "Taunton"
+              }, {
+                "code" : "Truro",
+                "label" : "Truro"
+              }, {
+                "code" : "Truro Mags",
+                "label" : "Truro Mags"
+              }, {
+                "code" : "UWE Bristol",
+                "label" : "UWE Bristol"
+              }, {
+                "code" : "Vintry House",
+                "label" : "Vintry House"
+              }, {
+                "code" : "Worle",
+                "label" : "Worle"
+              }, {
+                "code" : "Yeovil Mags",
+                "label" : "Yeovil Mags"
+              } ]
+            },
+            "hearingVenueDayScotland" : null,
+            "hearingRoom" : null,
+            "hearingClerk" : null,
+            "Hearing_typeReadingDeliberation" : null,
+            "Hearing_Glasgow" : null,
+            "Hearing_Aberdeen" : null,
+            "Hearing_Dundee" : null,
+            "Hearing_Edinburgh" : null,
+            "hearingCaseDisposed" : null,
+            "Hearing_part_heard" : null,
+            "Hearing_reserved_judgement" : null,
+            "attendee_claimant" : null,
+            "attendee_non_attendees" : null,
+            "attendee_resp_no_rep" : null,
+            "attendee_resp_&_rep" : null,
+            "attendee_rep_only" : null,
+            "hearingTimingStart" : "2022-05-16T01:00:00.000",
+            "hearingTimingBreak" : null,
+            "hearingTimingResume" : null,
+            "hearingTimingFinish" : "2022-05-16T01:00:00.000",
+            "hearingTimingDuration" : null,
+            "HearingNotes2" : null,
+            "postponedDate" : null
+          }
+        }, {
+          "id" : "4d7724a0-643d-4137-9e41-7966c0f1f9a4",
+          "value" : {
+            "listedDate" : "2069-05-16T01:00:00.000",
+            "Hearing_status" : "Listed",
+            "Postponed_by" : null,
+            "hearingVenueDay" : {
+              "value" : {
+                "code" : "Barnstaple",
+                "label" : "Barnstaple"
+              },
+              "selectedCode" : "Barnstaple",
+              "selectedLabel" : "Barnstaple",
+              "list_items" : [ {
+                "code" : "Barnstaple",
+                "label" : "Barnstaple"
+              }, {
+                "code" : "Bath Law Courts",
+                "label" : "Bath Law Courts"
+              }, {
+                "code" : "Bodmin",
+                "label" : "Bodmin"
+              }, {
+                "code" : "Bournemouth MC",
+                "label" : "Bournemouth MC"
+              }, {
+                "code" : "Brighton",
+                "label" : "Brighton"
+              }, {
+                "code" : "Brighton CC",
+                "label" : "Brighton CC"
+              }, {
+                "code" : "Bristol",
+                "label" : "Bristol"
+              }, {
+                "code" : "Bristol 1",
+                "label" : "Bristol 1"
+              }, {
+                "code" : "Bristol 2",
+                "label" : "Bristol 2"
+              }, {
+                "code" : "Bristol 3",
+                "label" : "Bristol 3"
+              }, {
+                "code" : "Bristol 4",
+                "label" : "Bristol 4"
+              }, {
+                "code" : "Bristol 5",
+                "label" : "Bristol 5"
+              }, {
+                "code" : "Bristol 6",
+                "label" : "Bristol 6"
+              }, {
+                "code" : "Bristol CFJC",
+                "label" : "Bristol CFJC"
+              }, {
+                "code" : "BristolCityHall",
+                "label" : "BristolCityHall"
+              }, {
+                "code" : "Bristol Crown",
+                "label" : "Bristol Crown"
+              }, {
+                "code" : "Bristol Mags",
+                "label" : "Bristol Mags"
+              }, {
+                "code" : "Bristol TBC",
+                "label" : "Bristol TBC"
+              }, {
+                "code" : "Bristol Vintry",
+                "label" : "Bristol Vintry"
+              }, {
+                "code" : "Cardiff CFJC",
+                "label" : "Cardiff CFJC"
+              }, {
+                "code" : "Exeter",
+                "label" : "Exeter"
+              }, {
+                "code" : "Exeter Combined",
+                "label" : "Exeter Combined"
+              }, {
+                "code" : "Exeter Mags",
+                "label" : "Exeter Mags"
+              }, {
+                "code" : "Floating Case",
+                "label" : "Floating Case"
+              }, {
+                "code" : "Gloucester CCFC",
+                "label" : "Gloucester CCFC"
+              }, {
+                "code" : "Havant",
+                "label" : "Havant"
+              }, {
+                "code" : "Plymouth Mags",
+                "label" : "Plymouth Mags"
+              }, {
+                "code" : "Plym St Cath Ho",
+                "label" : "Plym St Cath Ho"
+              }, {
+                "code" : "Queensway House",
+                "label" : "Queensway House"
+              }, {
+                "code" : "Remote Hearing",
+                "label" : "Remote Hearing"
+              }, {
+                "code" : "ROIT",
+                "label" : "ROIT"
+              }, {
+                "code" : "Southampton",
+                "label" : "Southampton"
+              }, {
+                "code" : "Swindon",
+                "label" : "Swindon"
+              }, {
+                "code" : "Swindon2",
+                "label" : "Swindon2"
+              }, {
+                "code" : "Taunton",
+                "label" : "Taunton"
+              }, {
+                "code" : "Truro",
+                "label" : "Truro"
+              }, {
+                "code" : "Truro Mags",
+                "label" : "Truro Mags"
+              }, {
+                "code" : "UWE Bristol",
+                "label" : "UWE Bristol"
+              }, {
+                "code" : "Vintry House",
+                "label" : "Vintry House"
+              }, {
+                "code" : "Worle",
+                "label" : "Worle"
+              }, {
+                "code" : "Yeovil Mags",
+                "label" : "Yeovil Mags"
+              } ]
+            },
+            "hearingVenueDayScotland" : null,
+            "hearingRoom" : null,
+            "hearingClerk" : null,
+            "Hearing_typeReadingDeliberation" : null,
+            "Hearing_Glasgow" : null,
+            "Hearing_Aberdeen" : null,
+            "Hearing_Dundee" : null,
+            "Hearing_Edinburgh" : null,
+            "hearingCaseDisposed" : null,
+            "Hearing_part_heard" : null,
+            "Hearing_reserved_judgement" : null,
+            "attendee_claimant" : null,
+            "attendee_non_attendees" : null,
+            "attendee_resp_no_rep" : null,
+            "attendee_resp_&_rep" : null,
+            "attendee_rep_only" : null,
+            "hearingTimingStart" : "2069-05-16T01:00:00.000",
+            "hearingTimingBreak" : null,
+            "hearingTimingResume" : null,
+            "hearingTimingFinish" : "2069-05-16T01:00:00.000",
+            "hearingTimingDuration" : null,
+            "HearingNotes2" : null,
+            "postponedDate" : null
+          }
+        } ],
+        "hearingFormat" : [ "In person" ],
+        "judicialMediation" : null
+      }
+    } ],
+    "hearingDetailsCollection" : null,
+    "depositType" : null,
+    "judgementCollection" : null,
+    "bfActions" : [ {
+      "id" : "9db421e3-704d-4452-90e4-58b3ad8fb2c5",
+      "value" : {
+        "action" : null,
+        "cwActions" : "Other action",
+        "dateEntered" : "2024-01-11",
+        "imported" : null,
+        "letters" : "Yes",
+        "allActions" : "Claim served",
+        "bfDate" : "2058-01-09",
+        "cleared" : null,
+        "notes" : null
+      }
+    } ],
+    "clerkResponsible" : null,
+    "userLocation" : null,
+    "documentCollection" : null,
+    "claimantDocumentCollection" : null,
+    "correspondenceScotType" : null,
+    "correspondenceType" : null,
+    "addressLabelsSelectionType" : null,
+    "addressLabelCollection" : null,
+    "addressLabelsAttributesType" : null,
+    "allocatedOffice" : null,
+    "conciliationTrack" : null,
+    "counterClaim" : null,
+    "eccCases" : null,
+    "restrictedReporting" : null,
+    "printHearingDetails" : null,
+    "printHearingCollection" : null,
+    "targetHearingDate" : "1989-06-30",
+    "claimant" : "Jack Reeve",
+    "claimantId" : "fc90d37e-7039-4263-9dfa-6f7e82ed6467",
+    "respondent" : "Another Person",
+    "EQP" : null,
+    "flag1" : null,
+    "flag2" : null,
+    "docMarkUp" : "<a target=\"_blank\" href=\"http://127.0.0.1:3453/documents/2a3de985-a8d8-43a8-bee6-cbc18d076028/binary\">Document</a>",
+    "caseRefNumberCount" : null,
+    "startCaseRefNumber" : null,
+    "multipleRefNumber" : null,
+    "caseRefECC" : null,
+    "respondentECC" : null,
+    "ccdID" : null,
+    "flagsImageFileName" : "EMP-TRIB-00000000000.jpg",
+    "flagsImageAltText" : null,
+    "hearingNumbers" : null,
+    "hearingTypes" : null,
+    "hearingPublicPrivate" : null,
+    "hearingVenue" : null,
+    "hearingEstLengthNum" : null,
+    "hearingEstLengthNumType" : null,
+    "hearingSitAlone" : null,
+    "Hearing_stage" : null,
+    "listedDate" : null,
+    "Hearing_notes" : null,
+    "hearingSelection" : null,
+    "hearingActions" : null,
+    "hearingERMember" : null,
+    "hearingEEMember" : null,
+    "hearingDatesRequireAmending" : null,
+    "hearingDateSelection" : null,
+    "hearingDateActions" : null,
+    "hearingStatus" : null,
+    "Postponed_by" : null,
+    "hearingRoom" : null,
+    "hearingClerk" : null,
+    "hearingJudge" : null,
+    "hearingCaseDisposed" : null,
+    "Hearing_part_heard" : null,
+    "Hearing_reserved_judgement" : null,
+    "attendee_claimant" : null,
+    "attendee_non_attendees" : null,
+    "attendee_resp_no_rep" : null,
+    "attendee_resp_&_rep" : null,
+    "attendee_rep_only" : null,
+    "companyPremises" : null,
+    "officeCT" : null,
+    "reasonForCT" : null,
+    "relatedCaseCT" : null,
+    "positionTypeCT" : null,
+    "linkedCaseCT" : null,
+    "transferredCaseLink" : null,
+    "ecmOfficeCT" : null,
+    "assignOffice" : null,
+    "stateAPI" : null,
+    "allocateHearingHearing" : null,
+    "allocateHearingManagingOffice" : null,
+    "allocateHearingVenue" : null,
+    "allocateHearingRoom" : null,
+    "allocateHearingClerk" : null,
+    "allocateHearingSitAlone" : null,
+    "allocateHearingJudge" : null,
+    "allocateHearingEmployerMember" : null,
+    "allocateHearingEmployeeMember" : null,
+    "allocateHearingPostponedBy" : null,
+    "allocateHearingStatus" : null,
+    "allocateHearingReadingDeliberation" : null,
+    "hearingDetailsHearing" : null,
+    "hearingDetailsStatus" : null,
+    "hearingDetailsPostponedBy" : null,
+    "hearingDetailsCaseDisposed" : null,
+    "hearingDetailsPartHeard" : null,
+    "hearingDetailsReservedJudgment" : null,
+    "hearingDetailsAttendeeClaimant" : null,
+    "hearingDetailsAttendeeNonAttendees" : null,
+    "hearingDetailsAttendeeRespNoRep" : null,
+    "hearingDetailsAttendeeRespAndRep" : null,
+    "hearingDetailsAttendeeRepOnly" : null,
+    "hearingDetailsTimingStart" : null,
+    "hearingDetailsTimingBreak" : null,
+    "hearingDetailsTimingResume" : null,
+    "hearingDetailsTimingFinish" : null,
+    "hearingDetailsTimingDuration" : null,
+    "hearingDetailsHearingNotes2" : null,
+    "trackType" : null,
+    "et1VettingDocument" : {
+      "document_binary_url" : "http://dm-store:8080/documents/85a528a1-8ac2-4033-b7e7-39f1821b25b5/binary",
+      "document_filename" : "ET1 Vetting.pdf",
+      "document_url" : "http://dm-store:8080/documents/85a528a1-8ac2-4033-b7e7-39f1821b25b5",
+      "category_id" : null,
+      "upload_timestamp" : null
+    },
+    "et1VettingBeforeYouStart" : null,
+    "et1VettingClaimantDetailsMarkUp" : null,
+    "et1VettingRespondentDetailsMarkUp" : null,
+    "et1VettingCanServeClaimYesOrNo" : "Yes",
+    "et1VettingCanServeClaimNoReason" : null,
+    "et1VettingCanServeClaimGeneralNote" : null,
+    "et1VettingRespondentAcasDetails1" : null,
+    "et1VettingRespondentAcasDetails2" : null,
+    "et1VettingRespondentAcasDetails3" : null,
+    "et1VettingRespondentAcasDetails4" : null,
+    "et1VettingRespondentAcasDetails5" : null,
+    "et1VettingRespondentAcasDetails6" : null,
+    "et1VettingAcasCertIsYesOrNo1" : "Yes",
+    "et1VettingAcasCertExemptYesOrNo1" : null,
+    "et1VettingAcasCertIsYesOrNo2" : null,
+    "et1VettingAcasCertExemptYesOrNo2" : null,
+    "et1VettingAcasCertIsYesOrNo3" : null,
+    "et1VettingAcasCertExemptYesOrNo3" : null,
+    "et1VettingRespondentAcasDetailsLabel4" : null,
+    "et1VettingAcasCertIsYesOrNo4" : null,
+    "et1VettingAcasCertExemptYesOrNo4" : null,
+    "et1VettingAcasCertIsYesOrNo5" : null,
+    "et1VettingAcasCertExemptYesOrNo5" : null,
+    "et1VettingAcasCertIsYesOrNo6" : null,
+    "et1VettingAcasCertExemptYesOrNo6" : null,
+    "et1VettingAcasCertGeneralNote" : null,
+    "et1VettingCompletedBy" : "A User",
+    "et1DateCompleted" : "11 Jan 2024",
+    "icCompletedBy" : null,
+    "icDateCompleted" : null,
+    "substantiveDefectsList" : null,
+    "rule121aTextArea" : null,
+    "rule121bTextArea" : null,
+    "rule121cTextArea" : null,
+    "rule121dTextArea" : null,
+    "rule121daTextArea" : null,
+    "rule121eTextArea" : null,
+    "rule121fTextArea" : null,
+    "et1SubstantiveDefectsGeneralNotes" : null,
+    "areTheseCodesCorrect" : "Yes",
+    "codesCorrectGiveDetails" : null,
+    "et1JurisdictionCodeGeneralNotes" : null,
+    "existingJurisdictionCodes" : null,
+    "vettingJurisdictionCodeCollection" : null,
+    "isTrackAllocationCorrect" : "Yes",
+    "suggestAnotherTrack" : null,
+    "whyChangeTrackAllocation" : null,
+    "trackAllocationGeneralNotes" : null,
+    "isLocationCorrect" : "Yes",
+    "whyChangeOffice" : null,
+    "et1LocationGeneralNotes" : null,
+    "trackAllocation" : null,
+    "tribunalAndOfficeLocation" : "<hr><h3>Tribunal location</h3><pre>Tribunal &#09&#09&#09&#09&nbsp; England<br><br>Office &#09&#09&#09&#09&#09 Bristol</pre><hr>",
+    "regionalOffice" : null,
+    "regionalOfficeList" : null,
+    "et1AddressDetails" : null,
+    "et1TribunalRegion" : "Bristol",
+    "et1HearingVenues" : null,
+    "et1SuggestHearingVenue" : "No",
+    "et1HearingVenueGeneralNotes" : null,
+    "et1GovOrMajorQuestion" : "No",
+    "et1ReasonableAdjustmentsQuestion" : "No",
+    "et1ReasonableAdjustmentsTextArea" : null,
+    "et1VideoHearingQuestion" : "Yes",
+    "et1VideoHearingTextArea" : null,
+    "et1FurtherQuestionsGeneralNotes" : null,
+    "referralToJudgeOrLOList" : null,
+    "aClaimOfInterimReliefTextArea" : null,
+    "aStatutoryAppealTextArea" : null,
+    "anAllegationOfCommissionOfSexualOffenceTextArea" : null,
+    "insolvencyTextArea" : null,
+    "jurisdictionsUnclearTextArea" : null,
+    "lengthOfServiceTextArea" : null,
+    "potentiallyLinkedCasesInTheEcmTextArea" : null,
+    "rule50IssuesTextArea" : null,
+    "anotherReasonForJudicialReferralTextArea" : null,
+    "et1JudgeReferralGeneralNotes" : null,
+    "referralToREJOrVPList" : null,
+    "vexatiousLitigantOrderTextArea" : null,
+    "aNationalSecurityIssueTextArea" : null,
+    "nationalMultipleOrPresidentialOrderTextArea" : null,
+    "transferToOtherRegionTextArea" : null,
+    "serviceAbroadTextArea" : null,
+    "aSensitiveIssueTextArea" : null,
+    "anyPotentialConflictTextArea" : null,
+    "anotherReasonREJOrVPTextArea" : null,
+    "et1REJOrVPReferralGeneralNotes" : null,
+    "otherReferralList" : null,
+    "claimOutOfTimeTextArea" : null,
+    "multipleClaimTextArea" : null,
+    "employmentStatusIssuesTextArea" : null,
+    "pidJurisdictionRegulatorTextArea" : null,
+    "videoHearingPreferenceTextArea" : null,
+    "rule50IssuesForOtherReferralTextArea" : null,
+    "anotherReasonForOtherReferralTextArea" : null,
+    "et1OtherReferralGeneralNotes" : null,
+    "et1VettingAdditionalInformationTextArea" : null,
+    "servingDocumentCollection" : null,
+    "otherTypeDocumentName" : null,
+    "servingDocumentRecipient" : null,
+    "claimantAndRespondentAddresses" : null,
+    "emailLinkToAcas" : null,
+    "et3ChooseRespondent" : null,
+    "et3Date" : null,
+    "et3IsThereAnEt3Response" : null,
+    "et3NoEt3Response" : null,
+    "et3GeneralNotes" : null,
+    "et3IsThereACompaniesHouseSearchDocument" : null,
+    "et3CompanyHouseDocument" : null,
+    "et3GeneralNotesCompanyHouse" : null,
+    "et3IsThereAnIndividualSearchDocument" : null,
+    "et3IndividualInsolvencyDocument" : null,
+    "et3GeneralNotesIndividualInsolvency" : null,
+    "et3LegalIssue" : null,
+    "et3LegalIssueGiveDetails" : null,
+    "et3GeneralNotesLegalEntity" : null,
+    "et3ResponseInTime" : null,
+    "et3ResponseInTimeDetails" : null,
+    "et3NameAddressRespondent" : null,
+    "et3DoWeHaveRespondentsName" : null,
+    "et3GeneralNotesRespondentName" : null,
+    "et3DoesRespondentsNameMatch" : null,
+    "et3RespondentNameMismatchDetails" : null,
+    "et3GeneralNotesRespondentNameMatch" : null,
+    "et3DoWeHaveRespondentsAddress" : null,
+    "et3DoesRespondentsAddressMatch" : null,
+    "et3RespondentAddressMismatchDetails" : null,
+    "et3GeneralNotesRespondentAddress" : null,
+    "et3GeneralNotesAddressMatch" : null,
+    "et3HearingDetails" : null,
+    "et3IsCaseListedForHearing" : null,
+    "et3IsCaseListedForHearingDetails" : null,
+    "et3GeneralNotesCaseListed" : null,
+    "et3TribunalLocation" : null,
+    "et3IsThisLocationCorrect" : null,
+    "et3GeneralNotesTransferApplication" : null,
+    "et3RegionalOffice" : null,
+    "et3WhyWeShouldChangeTheOffice" : null,
+    "et3ContestClaim" : null,
+    "et3ContestClaimGiveDetails" : null,
+    "et3GeneralNotesContestClaim" : null,
+    "et3ContractClaimSection7" : null,
+    "et3ContractClaimSection7Details" : null,
+    "et3GeneralNotesContractClaimSection7" : null,
+    "et3Rule26" : null,
+    "et3Rule26Details" : null,
+    "et3SuggestedIssues" : null,
+    "et3SuggestedIssuesStrikeOut" : null,
+    "et3SuggestedIssueInterpreters" : null,
+    "et3SuggestedIssueJurisdictional" : null,
+    "et3SuggestedIssueAdjustments" : null,
+    "et3SuggestedIssueRule50" : null,
+    "et3SuggestedIssueTimePoints" : null,
+    "et3GeneralNotesRule26" : null,
+    "et3AdditionalInformation" : null,
+    "etInitialConsiderationDocument" : null,
+    "etInitialConsiderationRespondent" : null,
+    "etInitialConsiderationHearing" : null,
+    "etInitialConsiderationJurisdictionCodes" : null,
+    "icReceiptET3FormIssues" : null,
+    "icRespondentsNameIdentityIssues" : null,
+    "icJurisdictionCodeIssues" : null,
+    "icApplicationIssues" : null,
+    "icEmployersContractClaimIssues" : null,
+    "icClaimProspectIssues" : null,
+    "icListingIssues" : null,
+    "icListingPreliminaryHearing" : null,
+    "icDdaDisabilityIssues" : null,
+    "icOrderForFurtherInformation" : null,
+    "icOtherIssuesOrFinalOrders" : null,
+    "etICJuridictionCodesInvalid" : null,
+    "etICInvalidDetails" : null,
+    "etICCanProceed" : null,
+    "etICHearingAlreadyListed" : null,
+    "etICHearingNotListedList" : null,
+    "etICHearingNotListedSeekComments" : null,
+    "etICHearingNotListedListForPrelimHearing" : null,
+    "etICHearingNotListedListForFinalHearing" : null,
+    "etICHearingNotListedUDLHearing" : null,
+    "etICHearingNotListedAnyOtherDirections" : null,
+    "etICHearingListedAnswers" : null,
+    "etICHearingListed" : null,
+    "etICExtendDurationGiveDetails" : null,
+    "etICOtherGiveDetails" : null,
+    "etICHearingAnyOtherDirections" : null,
+    "etICPostponeGiveDetails" : null,
+    "etICConvertPreliminaryGiveDetails" : null,
+    "etICConvertF2fGiveDetails" : null,
+    "etICFurtherInformation" : null,
+    "etICFurtherInfoAnswers" : null,
+    "etICFurtherInformationHearingAnyOtherDirections" : null,
+    "etICFurtherInformationGiveDetails" : null,
+    "etICFurtherInformationTimeToComply" : null,
+    "etInitialConsiderationRule27" : null,
+    "etInitialConsiderationRule28" : null,
+    "et3ResponseShowInset" : null,
+    "et3ResponseClaimantName" : null,
+    "et3ResponseIsClaimantNameCorrect" : null,
+    "et3ResponseClaimantNameCorrection" : null,
+    "et3ResponseNameShowInset" : null,
+    "et3ResponseRespondentLegalName" : null,
+    "et3ResponseRespondentCompanyNumber" : null,
+    "et3ResponseRespondentEmployerType" : null,
+    "et3ResponseRespondentPreferredTitle" : null,
+    "et3ResponseRespondentContactName" : null,
+    "et3RespondentAddress" : null,
+    "et3ResponseDXAddress" : null,
+    "et3ResponsePhone" : null,
+    "et3ResponseReference" : null,
+    "et3ResponseContactPreference" : null,
+    "et3ResponseContactReason" : null,
+    "et3ResponseHearingRepresentative" : null,
+    "et3ResponseHearingRespondent" : null,
+    "et3ResponseEmploymentCount" : null,
+    "et3ResponseMultipleSites" : null,
+    "et3ResponseSiteEmploymentCount" : null,
+    "et3ResponseAcasAgree" : null,
+    "et3ResponseAcasAgreeReason" : null,
+    "et3ResponseAreDatesCorrect" : null,
+    "et3ResponseEmploymentStartDate" : null,
+    "et3ResponseEmploymentEndDate" : null,
+    "et3ResponseEmploymentInformation" : null,
+    "et3ResponseContinuingEmployment" : null,
+    "et3ResponseIsJobTitleCorrect" : null,
+    "et3ResponseCorrectJobTitle" : null,
+    "et3ResponseClaimantWeeklyHours" : null,
+    "et3ResponseClaimantCorrectHours" : null,
+    "et3ResponseEarningDetailsCorrect" : null,
+    "et3ResponsePayFrequency" : null,
+    "et3ResponsePayBeforeTax" : null,
+    "et3ResponsePayTakehome" : null,
+    "et3ResponseIsNoticeCorrect" : null,
+    "et3ResponseCorrectNoticeDetails" : null,
+    "et3ResponseIsPensionCorrect" : null,
+    "et3ResponsePensionCorrectDetails" : null,
+    "et3ResponseRespondentContestClaim" : null,
+    "et3ResponseContestClaimDocument" : null,
+    "et3ResponseContestClaimDetails" : null,
+    "et3ResponseEmployerClaim" : null,
+    "et3ResponseEmployerClaimDetails" : null,
+    "et3ResponseEmployerClaimDocument" : null,
+    "et3ResponseRespondentSupportNeeded" : null,
+    "et3ResponseRespondentSupportDetails" : null,
+    "et3ResponseRespondentSupportDocument" : null,
+    "et3NotificationDocCollection" : null,
+    "et3OtherTypeDocumentName" : null,
+    "et3NotificationDocRecipient" : null,
+    "et3ClaimantAndRespondentAddresses" : null,
+    "et3EmailLinkToAcas" : null,
+    "referralCollection" : null,
+    "referralHearingDetails" : null,
+    "selectReferral" : null,
+    "referCaseTo" : null,
+    "referentEmail" : null,
+    "isUrgent" : null,
+    "referralSubject" : null,
+    "referralSubjectSpecify" : null,
+    "referralDetails" : null,
+    "referralDocument" : null,
+    "referralInstruction" : null,
+    "referredBy" : null,
+    "referralDate" : null,
+    "updateReferralNumber" : null,
+    "updateReferCaseTo" : null,
+    "updateReferentEmail" : null,
+    "updateIsUrgent" : null,
+    "updateReferralSubject" : null,
+    "updateReferralSubjectSpecify" : null,
+    "updateReferralDetails" : null,
+    "updateReferralDocument" : null,
+    "updateReferralInstruction" : null,
+    "hearingAndReferralDetails" : null,
+    "directionTo" : null,
+    "replyToEmailAddress" : null,
+    "isUrgentReply" : null,
+    "directionDetails" : null,
+    "replyDocument" : null,
+    "replyGeneralNotes" : null,
+    "replyTo" : null,
+    "replyDetails" : null,
+    "isJudge" : null,
+    "closeReferralHearingDetails" : null,
+    "confirmCloseReferral" : null,
+    "closeReferralGeneralNotes" : null,
+    "caseRejectedEmailSent" : null,
+    "respondentOrganisationPolicy0" : {
+      "Organisation" : {
+        "OrganisationID" : null,
+        "OrganisationName" : null
+      },
+      "OrgPolicyReference" : null,
+      "OrgPolicyCaseAssignedRole" : "[SOLICITORA]",
+      "PrepopulateToUsersOrganisation" : null
+    },
+    "respondentOrganisationPolicy1" : {
+      "Organisation" : {
+        "OrganisationID" : null,
+        "OrganisationName" : null
+      },
+      "OrgPolicyReference" : null,
+      "OrgPolicyCaseAssignedRole" : "[SOLICITORB]",
+      "PrepopulateToUsersOrganisation" : null
+    },
+    "respondentOrganisationPolicy2" : {
+      "Organisation" : {
+        "OrganisationID" : null,
+        "OrganisationName" : null
+      },
+      "OrgPolicyReference" : null,
+      "OrgPolicyCaseAssignedRole" : "[SOLICITORC]",
+      "PrepopulateToUsersOrganisation" : null
+    },
+    "respondentOrganisationPolicy3" : {
+      "Organisation" : {
+        "OrganisationID" : null,
+        "OrganisationName" : null
+      },
+      "OrgPolicyReference" : null,
+      "OrgPolicyCaseAssignedRole" : "[SOLICITORD]",
+      "PrepopulateToUsersOrganisation" : null
+    },
+    "respondentOrganisationPolicy4" : {
+      "Organisation" : {
+        "OrganisationID" : null,
+        "OrganisationName" : null
+      },
+      "OrgPolicyReference" : null,
+      "OrgPolicyCaseAssignedRole" : "[SOLICITORE]",
+      "PrepopulateToUsersOrganisation" : null
+    },
+    "respondentOrganisationPolicy5" : {
+      "Organisation" : {
+        "OrganisationID" : null,
+        "OrganisationName" : null
+      },
+      "OrgPolicyReference" : null,
+      "OrgPolicyCaseAssignedRole" : "[SOLICITORF]",
+      "PrepopulateToUsersOrganisation" : null
+    },
+    "respondentOrganisationPolicy6" : {
+      "Organisation" : {
+        "OrganisationID" : null,
+        "OrganisationName" : null
+      },
+      "OrgPolicyReference" : null,
+      "OrgPolicyCaseAssignedRole" : "[SOLICITORG]",
+      "PrepopulateToUsersOrganisation" : null
+    },
+    "respondentOrganisationPolicy7" : {
+      "Organisation" : {
+        "OrganisationID" : null,
+        "OrganisationName" : null
+      },
+      "OrgPolicyReference" : null,
+      "OrgPolicyCaseAssignedRole" : "[SOLICITORH]",
+      "PrepopulateToUsersOrganisation" : null
+    },
+    "respondentOrganisationPolicy8" : {
+      "Organisation" : {
+        "OrganisationID" : null,
+        "OrganisationName" : null
+      },
+      "OrgPolicyReference" : null,
+      "OrgPolicyCaseAssignedRole" : "[SOLICITORI]",
+      "PrepopulateToUsersOrganisation" : null
+    },
+    "respondentOrganisationPolicy9" : {
+      "Organisation" : {
+        "OrganisationID" : null,
+        "OrganisationName" : null
+      },
+      "OrgPolicyReference" : null,
+      "OrgPolicyCaseAssignedRole" : "[SOLICITORJ]",
+      "PrepopulateToUsersOrganisation" : null
+    },
+    "suggestedHearingVenues" : null,
+    "listedDateInPastWarning" : null,
+    "noticeOfChangeAnswers0" : {
+      "respondentName" : "Another Person",
+      "claimantFirstName" : "Jack",
+      "claimantLastName" : "Reeve"
+    },
+    "noticeOfChangeAnswers1" : null,
+    "noticeOfChangeAnswers2" : null,
+    "noticeOfChangeAnswers3" : null,
+    "noticeOfChangeAnswers4" : null,
+    "noticeOfChangeAnswers5" : null,
+    "noticeOfChangeAnswers6" : null,
+    "noticeOfChangeAnswers7" : null,
+    "noticeOfChangeAnswers8" : null,
+    "noticeOfChangeAnswers9" : null,
+    "changeOrganisationRequestField" : null,
+    "claimantTse" : null,
+    "resTseNotAvailableWarning" : null,
+    "tseRespondNotAvailableWarning" : null,
+    "respondToTribunalNotAvailableWarning" : null,
+    "resTseSelectApplication" : null,
+    "resTseVariableContent" : null,
+    "resTseDocument1" : null,
+    "resTseTextBox1" : null,
+    "resTseDocument2" : null,
+    "resTseTextBox2" : null,
+    "resTseDocument3" : null,
+    "resTseTextBox3" : null,
+    "resTseDocument4" : null,
+    "resTseTextBox4" : null,
+    "resTseDocument5" : null,
+    "resTseTextBox5" : null,
+    "resTseDocument6" : null,
+    "resTseTextBox6" : null,
+    "resTseDocument7" : null,
+    "resTseTextBox7" : null,
+    "resTseDocument8" : null,
+    "resTseTextBox8" : null,
+    "resTseDocument9" : null,
+    "resTseTextBox9" : null,
+    "resTseDocument10" : null,
+    "resTseTextBox10" : null,
+    "resTseDocument11" : null,
+    "resTseTextBox11" : null,
+    "resTseDocument12" : null,
+    "resTseTextBox12" : null,
+    "resTseCopyToOtherPartyYesOrNo" : null,
+    "resTseCopyToOtherPartyTextArea" : null,
+    "genericTseApplicationCollection" : null,
+    "tseAdminSelectApplication" : null,
+    "tseAdminTableMarkUp" : null,
+    "tseAdminEnterNotificationTitle" : null,
+    "tseAdminDecision" : null,
+    "tseAdminDecisionDetails" : null,
+    "tseAdminTypeOfDecision" : null,
+    "tseAdminIsResponseRequired" : null,
+    "tseAdminSelectPartyRespond" : null,
+    "tseAdminAdditionalInformation" : null,
+    "tseAdminResponseRequiredYesDoc" : null,
+    "tseAdminResponseRequiredNoDoc" : null,
+    "tseAdminDecisionMadeBy" : null,
+    "tseAdminDecisionMadeByFullName" : null,
+    "tseAdminSelectPartyNotify" : null,
+    "tseRespondSelectApplication" : null,
+    "tseResponseIntro" : null,
+    "tseResponseTable" : null,
+    "tseResponseText" : null,
+    "tseResponseHasSupportingMaterial" : null,
+    "tseResponseSupportingMaterial" : null,
+    "tseResponseCopyToOtherParty" : null,
+    "tseResponseCopyNoGiveDetails" : null,
+    "resTseTableMarkUp" : null,
+    "tseRespondingToTribunal" : null,
+    "tseRespondingToTribunalText" : null,
+    "tseAdmReplyTableMarkUp" : null,
+    "tseAdmReplyEnterResponseTitle" : null,
+    "tseAdmReplyAdditionalInformation" : null,
+    "tseAdmReplyAddDocument" : null,
+    "tseAdmReplyIsCmoOrRequest" : null,
+    "tseAdmReplyCmoMadeBy" : null,
+    "tseAdmReplyRequestMadeBy" : null,
+    "tseAdmReplyCmoEnterFullName" : null,
+    "tseAdmReplyCmoIsResponseRequired" : null,
+    "tseAdmReplyRequestEnterFullName" : null,
+    "tseAdmReplyRequestIsResponseRequired" : null,
+    "tseAdmReplyRequestSelectPartyRespond" : null,
+    "tseAdmReplyCmoSelectPartyRespond" : null,
+    "tseAdmReplySelectPartyNotify" : null,
+    "tseAdminCloseApplicationTable" : null,
+    "tseAdminCloseApplicationText" : null,
+    "tseViewApplicationOpenOrClosed" : null,
+    "tseViewApplicationSelect" : null,
+    "tseApplicationSummaryAndResponsesMarkup" : null,
+    "pseRespondentSelectOrderOrRequest" : null,
+    "pseRespondentOrdReqTableMarkUp" : null,
+    "pseRespondentOrdReqResponseText" : null,
+    "pseRespondentOrdReqHasSupportingMaterial" : null,
+    "pseRespondentOrdReqUploadDocument" : null,
+    "pseRespondentOrdReqCopyToOtherParty" : null,
+    "pseRespondentOrdReqCopyNoGiveDetails" : null,
+    "pseRespondentSelectJudgmentOrderNotification" : null,
+    "sendNotificationCollection" : null,
+    "sendNotificationTitle" : null,
+    "sendNotificationLetter" : null,
+    "sendNotificationUploadDocument" : null,
+    "sendNotificationSubject" : null,
+    "sendNotificationAdditionalInfo" : null,
+    "sendNotificationNotify" : null,
+    "sendNotificationSelectHearing" : null,
+    "sendNotificationCaseManagement" : null,
+    "sendNotificationResponseTribunal" : null,
+    "sendNotificationWhoCaseOrder" : null,
+    "sendNotificationSelectParties" : null,
+    "sendNotificationFullName" : null,
+    "sendNotificationFullName2" : null,
+    "sendNotificationDetails" : null,
+    "sendNotificationDecision" : null,
+    "sendNotificationRequestMadeBy" : null,
+    "sendNotificationEccQuestion" : null,
+    "sendNotificationWhoMadeJudgement" : null,
+    "selectNotificationDropdown" : null,
+    "notificationMarkdown" : null,
+    "pseViewNotifications" : null,
+    "et3RepresentingRespondent" : null,
+    "respondNotificationTitle" : null,
+    "respondNotificationAdditionalInfo" : null,
+    "respondNotificationUploadDocument" : null,
+    "respondNotificationCmoOrRequest" : null,
+    "respondNotificationResponseRequired" : null,
+    "respondNotificationWhoRespond" : null,
+    "respondNotificationCaseManagementMadeBy" : null,
+    "respondNotificationRequestMadeBy" : null,
+    "respondNotificationFullName" : null,
+    "respondNotificationPartyToNotify" : null,
+    "bundlesRespondentPrepareDocNotesShow" : null,
+    "bundlesRespondentAgreedDocWith" : null,
+    "bundlesRespondentAgreedDocWithBut" : null,
+    "bundlesRespondentAgreedDocWithNo" : null,
+    "bundlesRespondentSelectHearing" : null,
+    "submitEt3Respondent" : null,
+    "bundlesRespondentWhatDocuments" : null,
+    "bundlesRespondentWhoseDocuments" : null,
+    "bundlesRespondentUploadFile" : null,
+    "bundlesRespondentCollection" : null,
+    "legalrepDocumentCollection" : null,
+    "adrDocumentCollection" : null,
+    "piiDocumentCollection" : null,
+    "appealDocumentCollection" : null,
+    "bundlesClaimantCollection" : null,
+    "autoListFlag" : null,
+    "caseAdditionalSecurityFlag" : null,
+    "caseCategories" : null,
+    "caseDeepLink" : null,
+    "caseInterpreterRequiredFlag" : null,
+    "caseManagementLocationCode" : "819890",
+    "caseSLAStartDate" : null,
+    "caseRestrictedFlag" : null,
+    "duration" : null,
+    "externalCaseReference" : null,
+    "facilitiesRequiredList" : null,
+    "hearingChannels" : null,
+    "hearingInWelshFlag" : null,
+    "hearingIsLinkedFlag" : null,
+    "hearingLocations" : null,
+    "hearingPriorityType" : null,
+    "hearingRequester" : null,
+    "hearingType" : null,
+    "hearingWindow" : null,
+    "nextListedDate" : "2069-05-16",
+    "caseNameHmctsInternal" : "Jack Reeve vs Another Person",
+    "caseManagementCategory" : {
+      "value" : {
+        "code" : "Employment Tribunals",
+        "label" : "Employment"
+      },
+      "selectedCode" : "Employment Tribunals",
+      "selectedLabel" : "Employment",
+      "list_items" : [ {
+        "code" : "Employment Tribunals",
+        "label" : "Employment"
+      } ]
+    },
+    "caseManagementLocation" : {
+      "baseLocation" : "819890",
+      "region" : "6"
+    },
+    "hmctsServiceID" : null,
+    "judiciary" : null,
+    "leadJudgeContractType" : null,
+    "listingComments" : null,
+    "numberOfPhysicalAttendees" : null,
+    "panelRequirements" : null,
+    "parties" : null,
+    "privateHearingRequiredFlag" : null,
+    "publicCaseName" : "Jack Reeve vs Another Person",
+    "screenFlow" : null,
+    "vocabulary" : null,
+    "caseLinks" : null,
+    "partySelection" : null,
+    "claimantUnavailability" : null,
+    "respondentUnavailability" : null,
+    "acasCertificate" : null,
+    "SearchCriteria" : {
+      "OtherCaseReferences" : [ {
+        "id" : "40a3d60e-7add-4ba2-ac0b-67e115052e47",
+        "value" : "6000003/2024"
+      } ],
+      "SearchParties" : [ {
+        "id" : "2543a370-86ee-472b-ac9a-80a52df0fd8e",
+        "value" : {
+          "DateOfBirth" : "1989-01-01",
+          "DateOfDeath" : null,
+          "PostCode" : "DA8 2DE",
+          "AddressLine1" : "35 Bridge Road",
+          "EmailAddress" : "person@gmail.com",
+          "Name" : "Jack Reeve"
+        }
+      }, {
+        "id" : "616a57ad-2b4c-4240-b835-b30e3cbfe229",
+        "value" : {
+          "DateOfBirth" : null,
+          "DateOfDeath" : null,
+          "PostCode" : "DA8 2DE",
+          "AddressLine1" : "35 Bridge Road",
+          "EmailAddress" : "respondent@email.com",
+          "Name" : "Another Person"
+        }
+      } ]
+    }
+  }
+}

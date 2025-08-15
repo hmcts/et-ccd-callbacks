@@ -73,7 +73,7 @@ class WaTaskCreationCronForExpiredBfActionsTest {
     @Test
     void doesNotRunWhenFeatureToggleDisabled() throws IOException {
         when(featureToggleService.isWorkAllocationEnabled()).thenReturn(false);
-
+        when(featureToggleService.isWaTaskForExpiredBfActionsEnabled()).thenReturn(true);
         waTaskCreationCronForExpiredBfActions.run();
 
         verify(ccdClient, times(0)).buildAndGetElasticSearchRequest(any(), any(), any());

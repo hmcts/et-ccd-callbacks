@@ -5,7 +5,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.bouncycastle.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -49,13 +48,11 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 public class DocumentGenerationService {
 
     private final TornadoService tornadoService;
-    private final CcdClient ccdClient;
     private static final String MESSAGE = "Failed to generate document for case id : ";
 
     @Autowired
-    public DocumentGenerationService(TornadoService tornadoService, CcdClient ccdClient) {
+    public DocumentGenerationService(TornadoService tornadoService) {
         this.tornadoService = tornadoService;
-        this.ccdClient = ccdClient;
     }
 
     public CaseData midAddressLabels(CaseData caseData) {

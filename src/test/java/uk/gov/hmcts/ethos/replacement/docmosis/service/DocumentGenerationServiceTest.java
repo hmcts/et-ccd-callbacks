@@ -10,7 +10,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -58,8 +57,6 @@ class DocumentGenerationServiceTest {
     private CaseDetails caseDetails15;
     private CCDRequest ccdRequest;
     private DocumentInfo documentInfo;
-    @Mock
-    private CcdClient ccdClient;
 
     @BeforeEach
     void setUp() throws URISyntaxException, IOException {
@@ -78,7 +75,7 @@ class DocumentGenerationServiceTest {
         CaseData caseData = new CaseData();
         caseDetails.setCaseData(caseData);
         ccdRequest.setCaseDetails(caseDetails);
-        documentGenerationService = new DocumentGenerationService(tornadoService, ccdClient);
+        documentGenerationService = new DocumentGenerationService(tornadoService);
         documentInfo = DocumentInfo.builder().description("resources/exampleV1.json").build();
         documentInfo.setMarkUp("Markup");
         documentInfo.setType("Document");

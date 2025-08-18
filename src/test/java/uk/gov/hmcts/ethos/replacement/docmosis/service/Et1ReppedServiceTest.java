@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -30,6 +31,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.config.TribunalOfficesConfigurati
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1ReppedHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
@@ -43,6 +45,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -94,14 +97,28 @@ class Et1ReppedServiceTest {
     private Et1SubmissionService et1SubmissionService;
     @MockBean
     private ET1PdfMapperService et1PdfMapperService;
+    @MockBean
+    private MyHmctsService myHmctsService;
 
     private CaseDetails caseDetails;
     private CaseData caseData;
 
     private CaseDetails draftCaseDetails;
 
+    private static final String REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS = "Use MyHMCTS details";
+    private static final String TEST_ADDRESS_LINE_1 = "Test Address Line 1";
+    private static final String TEST_ADDRESS_LINE_2 = "Test Address Line 2";
+    private static final String TEST_ADDRESS_LINE_3 = "Test Address Line 3";
+    private static final String TEST_COUNTY = "Test County";
+    private static final String TEST_POSTCODE = "AA1 1AA";
+    private static final String TEST_TOWN_CITY = "Test Town City";
+    private static final String TEST_COUNTRY = "Test Country";
+    private static final String DUMMY_USER_TOKEN = "Dummy User Token";
+    private static final String DUMMY_PHONE_NUMBER = "Dummy Phone Number";
+
     @BeforeEach
-    void setUp() throws Exception {
+    @SneakyThrows
+    void setUp() {
         caseDetails = new CaseDetails();
         caseData = new CaseData();
         Address address = new Address();
@@ -110,7 +127,7 @@ class Et1ReppedServiceTest {
         caseDetails.setCaseId("1234567890123456");
         caseDetails.setCaseTypeId("ET_EnglandWales");
 
-        draftCaseDetails = generateCaseDetails("et1ReppedDraftStillWorking.json");
+        draftCaseDetails = generateCaseDetails();
 
         emailService = spy(new EmailUtils());
         PostcodeToOfficeService postcodeToOfficeService = new PostcodeToOfficeService(postcodeToOfficeMappings);
@@ -118,7 +135,7 @@ class Et1ReppedServiceTest {
                 postcodeToOfficeService);
         et1ReppedService = new Et1ReppedService(authTokenGenerator, ccdCaseAssignment,
                 jurisdictionCodesMapperService, organisationClient, postcodeToOfficeService, tribunalOfficesService,
-                userIdamService, adminUserService, et1SubmissionService);
+                userIdamService, adminUserService, et1SubmissionService, myHmctsService);
         when(postcodeToOfficeMappings.getPostcodes()).thenReturn(getPostcodes());
     }
 
@@ -158,7 +175,7 @@ class Et1ReppedServiceTest {
         caseData.setEt1ReppedTriageAddress(new Address());
         List<String> errors =  et1ReppedService.validatePostcode(caseData, ENGLANDWALES_CASE_TYPE_ID);
         assertEquals(1, errors.size());
-        assertEquals("Please enter a valid postcode", errors.get(0));
+        assertEquals("Please enter a valid postcode", errors.getFirst());
     }
 
     @ParameterizedTest
@@ -212,7 +229,7 @@ class Et1ReppedServiceTest {
 
     @Test
     void createDraftEt1() throws Exception {
-        caseDetails =  generateCaseDetails("et1ReppedDraftStillWorking.json");
+        caseDetails =  generateCaseDetails();
         Et1ReppedHelper.setEt1SubmitData(caseDetails.getCaseData());
         et1ReppedService.addDefaultData(caseDetails.getCaseTypeId(), caseDetails.getCaseData());
 
@@ -227,9 +244,10 @@ class Et1ReppedServiceTest {
         assertNotNull(caseDetails.getCaseData().getDocMarkUp());
     }
 
-    private CaseDetails generateCaseDetails(String jsonFileName) throws Exception {
+    @SneakyThrows
+    private CaseDetails generateCaseDetails() {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
-                .getContextClassLoader().getResource(jsonFileName)).toURI())));
+                .getContextClassLoader().getResource("et1ReppedDraftStillWorking.json")).toURI())));
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(json, CaseDetails.class);
     }
@@ -249,4 +267,53 @@ class Et1ReppedServiceTest {
         );
     }
 
+    @Test
+    @SneakyThrows
+    void theSetClaimantRepresentativeValues() {
+        // 1: Sets the representative contact change option to use MyHMCTS details and there is no
+        // claimant representative exists.
+        CaseData caseData = caseDetails.getCaseData();
+        caseData.setRepresentativePhoneNumber(DUMMY_PHONE_NUMBER);
+        caseData.setRepresentativeContactChangeOption(REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS);
+        OrganisationAddress organisationAddress = OrganisationAddress.builder()
+                .addressLine1(TEST_ADDRESS_LINE_1)
+                .addressLine2(TEST_ADDRESS_LINE_2)
+                .addressLine3(TEST_ADDRESS_LINE_3)
+                .postCode(TEST_POSTCODE)
+                .country(TEST_COUNTRY)
+                .county(TEST_COUNTY)
+                .townCity(TEST_TOWN_CITY)
+                .build();
+        caseData.setRepresentativeAddress(AddressUtils.mapOrganisationAddressToAddress(organisationAddress));
+        when(myHmctsService.getOrganisationAddress(DUMMY_USER_TOKEN)).thenReturn(organisationAddress);
+        et1ReppedService.setClaimantRepresentativeValues(DUMMY_USER_TOKEN, caseData);
+        assertRepresentativeAddress(organisationAddress, caseData);
+        // 2: Sets the representative contact change option to use MyHMCTS details when claimant representative exists.
+        et1ReppedService.setClaimantRepresentativeValues(DUMMY_USER_TOKEN, caseData);
+        assertRepresentativeAddress(organisationAddress, caseData);
+        // 3. Set caseData values to representative address when representative contact change option is not
+        // REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS.
+        caseData.setRepresentativeContactChangeOption("Use other details");
+        caseData.getRepresentativeClaimantType().setRepresentativeAddress(null);
+        et1ReppedService.setClaimantRepresentativeValues(DUMMY_USER_TOKEN, caseData);
+        assertRepresentativeAddress(organisationAddress, caseData);
+
+    }
+
+    private static void assertRepresentativeAddress(OrganisationAddress organisationAddress, CaseData caseData) {
+        assertThat(caseData.getRepresentativeClaimantType().getRepresentativeAddress().getAddressLine1())
+                .isEqualTo(organisationAddress.getAddressLine1());
+        assertThat(caseData.getRepresentativeClaimantType().getRepresentativeAddress().getAddressLine2())
+                .isEqualTo(organisationAddress.getAddressLine2());
+        assertThat(caseData.getRepresentativeClaimantType().getRepresentativeAddress().getAddressLine3())
+                .isEqualTo(organisationAddress.getAddressLine3());
+        assertThat(caseData.getRepresentativeClaimantType().getRepresentativeAddress().getPostCode())
+                .isEqualTo(organisationAddress.getPostCode());
+        assertThat(caseData.getRepresentativeClaimantType().getRepresentativeAddress().getCountry())
+                .isEqualTo(organisationAddress.getCountry());
+        assertThat(caseData.getRepresentativeClaimantType().getRepresentativeAddress().getCounty())
+                .isEqualTo(organisationAddress.getCounty());
+        assertThat(caseData.getRepresentativeClaimantType().getRepresentativeAddress().getPostTown())
+                .isEqualTo(organisationAddress.getTownCity());
+    }
 }

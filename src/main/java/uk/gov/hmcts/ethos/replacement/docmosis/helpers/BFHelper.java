@@ -27,14 +27,17 @@ public final class BFHelper {
     public static void updateBfActionItems(CaseData caseData) {
 
         List<BFActionTypeItem> bfActions = caseData.getBfActions();
-
         if (bfActions != null && !bfActions.isEmpty()) {
 
             for (BFActionTypeItem bfActionTypeItem : bfActions) {
                 BFActionType bfActionType = bfActionTypeItem.getValue();
-
                 if (isNullOrEmpty(bfActionType.getDateEntered())) {
                     bfActionType.setDateEntered(UtilHelper.formatCurrentDate2(LocalDate.now()));
+                }
+
+                //Clear bf action wa tracker flag if the bf action is expired
+                if (BFHelper.isBfExpired(bfActionType, BFHelper.getEffectiveYesterday(LocalDate.now()))) {
+                    bfActionType.setIsWaTaskCreated(null);
                 }
             }
         }
@@ -92,12 +95,20 @@ public final class BFHelper {
         String yesterday = BFHelper.getEffectiveYesterday(LocalDate.now());
         List<BFActionTypeItem> expiredBfActions = caseData.getBfActions().stream()
                 .filter(item ->  isBfExpired(item.getValue(), yesterday)).toList();
-
         emptyIfNull(expiredBfActions).stream()
                 .filter(bfActionTypeItem -> bfActionTypeItem.getValue().getIsWaTaskCreated() == null)
                 .forEach(bfActionTypeItem -> bfActionTypeItem.getValue().setIsWaTaskCreated("Yes"));
     }
 
+    /**
+     * Checks if the BF action is expired.
+     * A BF action is considered expired if its date is after one day before yesterday and
+     * before today, and it has not been cleared yet.
+     *
+     * @param item BFActionTypeItem
+     * @param yesterday String formatted date
+     * @return true if the BF action is expired, false otherwise
+     */
     public static boolean isBfExpired(BFActionType item, String yesterday) {
         LocalDate bfDate = LocalDate.parse(item.getBfDate());
         return bfDate.isAfter(LocalDate.parse(yesterday).minusDays(1))

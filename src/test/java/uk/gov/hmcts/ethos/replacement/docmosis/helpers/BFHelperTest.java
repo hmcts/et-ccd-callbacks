@@ -67,10 +67,10 @@ public class BFHelperTest {
         BFActionType bfActionType = new BFActionType();
         bfActionType.setAction(getBfActionsDynamicFixedList());
         bfActionType.setCleared("Date Cleared");
-        bfActionType.setBfDate("24-08-2020");
+        bfActionType.setBfDate("2025-08-12");
         bfActionType.setNotes("Notes");
         bfActionType.setAction(getBfActionsDynamicFixedList());
-        bfActionType.setDateEntered("01-01-2020 23:00:00");
+        bfActionType.setDateEntered("12-08-2025 23:00:00");
         BFActionTypeItem bfActionTypeItem = new BFActionTypeItem();
         bfActionTypeItem.setId(UUID.randomUUID().toString());
         bfActionTypeItem.setValue(bfActionType);

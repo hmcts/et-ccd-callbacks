@@ -66,7 +66,7 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
             try {
                 // Fetch cases with one or more bf actions, and
                 // with bf action date being yesterday, and
-                // the case is in accepted, rejected or vetted state
+                // the case is in accepted, rejected, submitted or vetted state
                 Set<SubmitEvent> caseSubmitEvents = findCasesByCaseType(adminUserToken, caseTypeId);
                 if (CollectionUtils.isEmpty(caseSubmitEvents)) {
                     log.info("No cases found for case type: {}", caseTypeId);

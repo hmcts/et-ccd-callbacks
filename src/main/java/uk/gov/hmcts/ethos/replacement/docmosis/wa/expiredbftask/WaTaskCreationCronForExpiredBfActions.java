@@ -111,8 +111,7 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
                 .map(BFActionTypeItem::getValue)
                 .anyMatch(bfActionValue -> !isNullOrEmpty(bfActionValue.getBfDate())
                         && BFHelper.isBfExpired(bfActionValue, BFHelper.getEffectiveYesterday(LocalDate.now()))
-                        && isNullOrEmpty(bfActionValue.getIsWaTaskCreated())
-                        && isNullOrEmpty(bfActionValue.getCleared()));
+                        && isNullOrEmpty(bfActionValue.getIsWaTaskCreated()));
     }
 
     private void triggerTaskEventForCase(String adminUserToken, SubmitEvent submitEvent, String caseTypeId) {

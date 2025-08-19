@@ -19,7 +19,6 @@ import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
@@ -103,7 +102,7 @@ public class BFActionsScheduledTasks {
             );
 
             log.info("Called WA_REVIEW_RULE21_REFERRAL for {}", submitEvent.getCaseId());
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error(e.getMessage());
         }
     }

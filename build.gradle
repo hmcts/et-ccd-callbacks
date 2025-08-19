@@ -461,8 +461,8 @@ dependencies {
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.13.0'
     testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '5.13.0'
     // ByteBuddy dependencies required for Mockito with Java 21
-    testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.14.9'
-    testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.14.9'
+    testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.17.7'
+    testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.17.7'
     testImplementation group: 'com.squareup.okhttp3', name: 'mockwebserver', version: '4.12.0'
 
     // Contract Tests

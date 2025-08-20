@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.controllers.multiples;
+package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -11,8 +11,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
-import uk.gov.hmcts.ethos.replacement.docmosis.controllers.BaseControllerTest;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.CaseNotesService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseNotesService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
 import java.io.File;
@@ -29,7 +28,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({CaseNotesController.class, JsonMapper.class})
 class CaseNotesControllerTest extends BaseControllerTest {
-    private static final String ABOUT_TO_SUBMIT_URL = "/multiples/caseNotes/aboutToSubmit";
+    private static final String MULTIPLES_ABOUT_TO_SUBMIT_URL = "/caseNotes/multiples/aboutToSubmit";
+    private static final String SINGLES_ABOUT_TO_SUBMIT_URL = "/caseNotes/singles/aboutToSubmit";
 
     @MockBean
     private CaseNotesService caseNotesService;
@@ -50,7 +50,7 @@ class CaseNotesControllerTest extends BaseControllerTest {
     @Test
     void aboutToSubmit_ok() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
+        mockMvc.perform(post(MULTIPLES_ABOUT_TO_SUBMIT_URL)
                         .content(requestContent.toString())
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -62,7 +62,7 @@ class CaseNotesControllerTest extends BaseControllerTest {
     @Test
     void aboutToSubmit_badToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
+        mockMvc.perform(post(MULTIPLES_ABOUT_TO_SUBMIT_URL)
                         .content(requestContent.toString())
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
@@ -71,10 +71,22 @@ class CaseNotesControllerTest extends BaseControllerTest {
 
     @Test
     void aboutToSubmit_badRequest() throws Exception {
-        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
+        mockMvc.perform(post(MULTIPLES_ABOUT_TO_SUBMIT_URL)
                         .content("garbage content")
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void aboutToSubmitSingles_ok() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(SINGLES_ABOUT_TO_SUBMIT_URL)
+                        .content(requestContent.toString())
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 }

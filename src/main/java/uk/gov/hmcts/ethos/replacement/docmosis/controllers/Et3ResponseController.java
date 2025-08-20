@@ -23,6 +23,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWork
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et3ResponseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
@@ -245,6 +246,8 @@ public class Et3ResponseController {
         et3ResponseService.sendNotifications(ccdRequest.getCaseDetails());
         Et3ResponseHelper.resetEt3FormFields(caseData);
         caseManagementForCaseWorkerService.setNextListedDate(caseData);
+        caseManagementForCaseWorkerService.updateWorkAllocationField(new ArrayList<>(), caseData);
+
         return getCallbackRespEntityNoErrors(caseData);
     }
 

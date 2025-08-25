@@ -1353,9 +1353,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codeceptjs/ui@npm:1.2.5":
-  version: 1.2.5
-  resolution: "@codeceptjs/ui@npm:1.2.5"
+"@codeceptjs/ui@npm:1.3.0":
+  version: 1.3.0
+  resolution: "@codeceptjs/ui@npm:1.3.0"
   dependencies:
     "@codeceptjs/configure": ^1.0.3
     axios: ^1.10.0
@@ -1366,7 +1366,7 @@ __metadata:
     core-js: 2.6.12
     dayjs: ^1.11.13
     debug: ^4.3.4
-    electron: ^35.1.4
+    electron: ^37.3.0
     express: ^4.21.2
     lodash.clonedeep: ^4.5.0
     nanoid: ^5.1.5
@@ -1376,7 +1376,7 @@ __metadata:
     codeceptjs: ^3.7.3
   bin:
     codecept-ui: bin/codecept-ui.js
-  checksum: 07fd926a74aedee8cb0fbf0df5b61e2f24204667e93a4ff001a46318c982c7a14501cb016fd80816bd9fc0cb2035177814d7147010780ccffd853d94a8c4fbdb
+  checksum: 003591a8ab183c5d037a8a19cc982e1fdb3bd5173bbbf6b40e97da428bacc9e5e335b8d82aded7772f1fc333eeda2819ad49ab87532944185cb2c2732dd0d56f
   languageName: node
   linkType: hard
 
@@ -7275,16 +7275,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"electron@npm:^35.1.4":
-  version: 35.7.2
-  resolution: "electron@npm:35.7.2"
+"electron@npm:^37.3.0":
+  version: 37.3.1
+  resolution: "electron@npm:37.3.1"
   dependencies:
     "@electron/get": ^2.0.0
     "@types/node": ^22.7.7
     extract-zip: ^2.0.1
   bin:
     electron: cli.js
-  checksum: 5bded64ea0a5537eeadb186cef6509f37ea7072e2715b0aab2f783923b7d0edebf330f3a0d58fc3ac7760e0466ba758a60825dd7f50d03179e7a03c3a2d8c08c
+  checksum: ae11c88bbc4b376ca13aedb0eb01ceeb7812b901295704ce09f1d02f9188bae00a07af6882de229855ee031865054969e32c564e7c9c68e13e637912c15673a3
   languageName: node
   linkType: hard
 
@@ -8335,7 +8335,7 @@ __metadata:
     "@babel/eslint-parser": ^7.17.0
     "@codeceptjs/configure": 1.0.6
     "@codeceptjs/examples": 1.2.4
-    "@codeceptjs/ui": 1.2.5
+    "@codeceptjs/ui": 1.3.0
     "@hmcts/nodejs-logging": 4.0.4
     "@types/archiver": ^6.0.0
     "@types/chai-as-promised": ^8.0.0

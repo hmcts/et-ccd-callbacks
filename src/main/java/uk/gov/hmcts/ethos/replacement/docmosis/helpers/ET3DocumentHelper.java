@@ -141,21 +141,25 @@ public final class ET3DocumentHelper {
         List<DocumentTypeItem> documentTypeItems = new ArrayList<>();
         if (hasET3Document(respondentSumTypeItem)) {
             RespondentSumType respondentSumType = respondentSumTypeItem.getValue();
+            String responseReceivedDate = respondentSumType.getResponseReceivedDate();
             addUploadedDocumentTypeToDocumentTypeItems(documentTypeItems,
                     respondentSumType.getEt3Form(),
                     RESPONSE_TO_A_CLAIM,
                     ET3,
-                    ET3_FORM_ENGLISH_DESCRIPTION);
+                    ET3_FORM_ENGLISH_DESCRIPTION,
+                    responseReceivedDate);
             addUploadedDocumentTypeToDocumentTypeItems(documentTypeItems,
                     respondentSumType.getEt3FormWelsh(),
                     RESPONSE_TO_A_CLAIM,
                     ET3,
-                    ET3_FORM_WELSH_DESCRIPTION);
+                    ET3_FORM_WELSH_DESCRIPTION,
+                    responseReceivedDate);
             addUploadedDocumentTypeToDocumentTypeItems(documentTypeItems,
                     respondentSumType.getEt3ResponseEmployerClaimDocument(),
                     RESPONSE_TO_A_CLAIM,
                     ET3_ATTACHMENT,
-                    ET3_RESPONDENT_CLAIM_DOCUMENT);
+                    ET3_RESPONDENT_CLAIM_DOCUMENT,
+                    responseReceivedDate);
             if (CollectionUtils.isNotEmpty(respondentSumType.getEt3ResponseContestClaimDocument())) {
                 for (DocumentTypeItem documentTypeItem : respondentSumType.getEt3ResponseContestClaimDocument()) {
                     setDocumentTypeItemLevels(documentTypeItem, RESPONSE_TO_A_CLAIM, ET3_ATTACHMENT);
@@ -167,7 +171,8 @@ public final class ET3DocumentHelper {
                     respondentSumTypeItem.getValue().getEt3ResponseRespondentSupportDocument(),
                     RESPONSE_TO_A_CLAIM,
                     ET3_ATTACHMENT,
-                    ET3_RESPONDENT_SUPPORT_DOCUMENT);
+                    ET3_RESPONDENT_SUPPORT_DOCUMENT,
+                    responseReceivedDate);
         }
         return documentTypeItems;
     }

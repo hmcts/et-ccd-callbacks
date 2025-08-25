@@ -5,24 +5,16 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.bouncycastle.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
-import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
-import uk.gov.hmcts.et.common.model.bulk.BulkData;
-import uk.gov.hmcts.et.common.model.bulk.BulkDetails;
-import uk.gov.hmcts.et.common.model.bulk.BulkDocumentInfo;
-import uk.gov.hmcts.et.common.model.bulk.BulkRequest;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
-import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.AddressLabelTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.BFActionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.AddressLabelsAttributesType;
 import uk.gov.hmcts.et.common.model.ccd.types.AddressLabelsSelectionType;
 import uk.gov.hmcts.et.common.model.ccd.types.BFActionType;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BulkHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.LabelsHelper;
 
@@ -32,7 +24,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADDRESS_LABELS_TEMPLATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ALL_AVAILABLE_ADDRESSES;
@@ -48,7 +39,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET3_DUE_DATE_FROM_S
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENTS_ADDRESSES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENTS_AND_RESPONDENTS_REPS_ADDRESSES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENTS_REPS_ADDRESSES;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -58,13 +48,11 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 public class DocumentGenerationService {
 
     private final TornadoService tornadoService;
-    private final CcdClient ccdClient;
     private static final String MESSAGE = "Failed to generate document for case id : ";
 
     @Autowired
-    public DocumentGenerationService(TornadoService tornadoService, CcdClient ccdClient) {
+    public DocumentGenerationService(TornadoService tornadoService) {
         this.tornadoService = tornadoService;
-        this.ccdClient = ccdClient;
     }
 
     public CaseData midAddressLabels(CaseData caseData) {
@@ -155,16 +143,6 @@ public class DocumentGenerationService {
         caseData.setAddressLabelsAttributesType(null);
     }
 
-    public void clearUserChoicesForMultiples(BulkDetails bulkDetails) {
-        BulkData bulkData = bulkDetails.getCaseData();
-
-        if (bulkDetails.getCaseTypeId().equals(SCOTLAND_BULK_CASE_TYPE_ID)) {
-            bulkData.setCorrespondenceScotType(null);
-        } else {
-            bulkData.setCorrespondenceType(null);
-        }
-    }
-
     public DocumentInfo processDocumentRequest(CCDRequest ccdRequest, String authToken) {
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         try {
@@ -177,13 +155,12 @@ public class DocumentGenerationService {
         }
     }
 
-    public CaseData updateBfActions(DocumentInfo documentInfo, CaseData caseData) {
+    public void updateBfActions(DocumentInfo documentInfo, CaseData caseData) {
         String sectionName = Strings.split(documentInfo.getDescription(), '_')[1];
         if (areBfActionsForEnglandOrWalesToBeUpdated(caseData, sectionName)
             || areBfActionsForScotlandToBeUpdated(caseData, sectionName)) {
-            return setBfActions(caseData);
+            setBfActions(caseData);
         }
-        return caseData;
     }
 
     public boolean areBfActionsForEnglandOrWalesToBeUpdated(CaseData caseData, String sectionName) {
@@ -230,66 +207,6 @@ public class DocumentGenerationService {
             .plusDays(ET3_DUE_DATE_FROM_SERVING_DATE).toString());
 
         return caseData;
-    }
-
-    public BulkDocumentInfo processBulkDocumentRequest(BulkRequest bulkRequest, String authToken) {
-        BulkDetails bulkDetails = bulkRequest.getCaseDetails();
-        List<String> errors = new ArrayList<>();
-        String markUps = "";
-        try {
-            List<DocumentInfo> documentInfoList = new ArrayList<>();
-            if (bulkDetails.getCaseData().getSearchCollection() != null
-                    && !bulkDetails.getCaseData().getSearchCollection().isEmpty()) {
-                List<String> caseIds =
-                        BulkHelper.getEthosRefNumsFromSearchCollection(bulkDetails.getCaseData().getSearchCollection());
-                List<SubmitEvent> submitEventList = ccdClient.retrieveCasesElasticSearch(authToken,
-                        UtilHelper.getCaseTypeId(bulkDetails.getCaseTypeId()), caseIds);
-                for (SubmitEvent submitEvent : submitEventList) {
-                    log.info("Generating document for: " + submitEvent.getCaseData().getEthosCaseReference());
-                    submitEvent.getCaseData().setCorrespondenceType(bulkDetails.getCaseData().getCorrespondenceType());
-                    submitEvent.getCaseData().setCorrespondenceScotType(
-                            bulkDetails.getCaseData().getCorrespondenceScotType());
-                    documentInfoList.add(tornadoService.documentGeneration(authToken, submitEvent.getCaseData(),
-                            bulkDetails.getCaseTypeId(), submitEvent.getCaseData().getCorrespondenceType(),
-                            submitEvent.getCaseData().getCorrespondenceScotType(), null));
-                }
-            }
-
-            if (documentInfoList.isEmpty()) {
-                errors.add("There are not cases searched to generate letters");
-            } else {
-                markUps = documentInfoList.stream().map(DocumentInfo::getMarkUp)
-                        .collect(Collectors.joining(", "));
-            }
-        } catch (Exception ex) {
-            throw new DocumentManagementException(MESSAGE + bulkDetails.getCaseId() + ex.getMessage());
-        }
-        BulkDocumentInfo bulkDocumentInfo = new BulkDocumentInfo();
-        bulkDocumentInfo.setErrors(errors);
-        bulkDocumentInfo.setMarkUps(markUps);
-        log.info("Markups: " + markUps);
-        return bulkDocumentInfo;
-    }
-
-    public BulkDocumentInfo processBulkScheduleRequest(BulkRequest bulkRequest, String authToken) {
-        BulkData bulkData = bulkRequest.getCaseDetails().getCaseData();
-        String caseTypeId = bulkRequest.getCaseDetails().getCaseTypeId();
-        List<String> errors = new ArrayList<>();
-        DocumentInfo documentInfo = new DocumentInfo();
-        try {
-            if (bulkData.getSearchCollection() != null && !bulkData.getSearchCollection().isEmpty()) {
-                documentInfo = tornadoService.scheduleGeneration(authToken, bulkData, caseTypeId);
-            } else {
-                errors.add("There are not cases searched to generate schedules");
-            }
-        } catch (Exception ex) {
-            throw new DocumentManagementException(MESSAGE + bulkRequest.getCaseDetails().getCaseId() + ex.getMessage());
-        }
-        BulkDocumentInfo bulkDocumentInfo = new BulkDocumentInfo();
-        bulkDocumentInfo.setErrors(errors);
-        bulkDocumentInfo.setMarkUps(documentInfo.getMarkUp() != null ? documentInfo.getMarkUp() : " ");
-        bulkDocumentInfo.setDocumentInfo(documentInfo);
-        return bulkDocumentInfo;
     }
 
     private List<AddressLabelTypeItem> customiseSelectedAddresses(CaseData caseData) {

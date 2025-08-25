@@ -15,6 +15,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseNotesService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
 import java.io.File;
+import java.io.IOException;
+import java.net.URISyntaxException;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
@@ -38,7 +40,7 @@ class CaseNotesControllerTest extends BaseControllerTest {
 
     @BeforeEach
     @Override
-    protected void setUp() throws Exception {
+    protected void setUp() throws IOException, URISyntaxException {
         super.setUp();
         ObjectMapper objectMapper = new ObjectMapper();
         requestContent = objectMapper.readTree(new File(getClass()

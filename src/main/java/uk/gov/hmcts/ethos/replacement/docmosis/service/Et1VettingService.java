@@ -36,6 +36,13 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.JurisdictionCodeConstants.JUR_CODE_CONCILIATION_TRACK_OP;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.JurisdictionCodeConstants.JUR_CODE_CONCILIATION_TRACK_SH;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.JurisdictionCodeConstants.JUR_CODE_CONCILIATION_TRACK_ST;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.JurisdictionCodeConstants.TRACK_NO;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.JurisdictionCodeConstants.TRACK_OPEN;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.JurisdictionCodeConstants.TRACK_SHORT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.JurisdictionCodeConstants.TRACK_STANDARD;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ACAS_CERT_LIST_DISPLAY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ACAS_DOC_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_LABEL_ACAS;
@@ -66,13 +73,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.TRIBUNAL
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.TRIBUNAL_OFFICE_LOCATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.TRIBUNAL_SCOTLAND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.addressIsEmpty;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.JUR_CODE_CONCILIATION_TRACK_OP;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.JUR_CODE_CONCILIATION_TRACK_SH;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.JUR_CODE_CONCILIATION_TRACK_ST;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.TRACK_NO;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.TRACK_OPEN;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.TRACK_SHORT;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.TRACK_STANDARD;
 
 @Slf4j
 @Service
@@ -252,7 +252,7 @@ public class Et1VettingService {
      */
     private String initialRespondentDetailsMarkUp(CaseData caseData) {
         if (caseData.getRespondentCollection().size() == ONE_RESPONDENT_COUNT) {
-            RespondentSumType respondentSumType = caseData.getRespondentCollection().get(0).getValue();
+            RespondentSumType respondentSumType = caseData.getRespondentCollection().getFirst().getValue();
             return String.format(RESPONDENT_DETAILS, "",
                     respondentSumType.getRespondentName(),
                     toAddressWithTab(respondentSumType.getRespondentAddress()));
@@ -449,11 +449,11 @@ public class Et1VettingService {
                     toAddressWithTab(ObjectUtils.isEmpty(caseData.getClaimantWorkAddress().getClaimantWorkAddress())
                             ? new Address()
                             : caseData.getClaimantWorkAddress().getClaimantWorkAddress()),
-                    toAddressWithTab(caseData.getRespondentCollection().get(0).getValue().getRespondentAddress()));
+                    toAddressWithTab(caseData.getRespondentCollection().getFirst().getValue().getRespondentAddress()));
         } else {
             return String.format(CLAIMANT_AND_RESPONDENT_ADDRESSES_WITHOUT_WORK_ADDRESS,
                     toAddressWithTab(caseData.getClaimantType().getClaimantAddressUK()),
-                    toAddressWithTab(caseData.getRespondentCollection().get(0).getValue().getRespondentAddress())
+                    toAddressWithTab(caseData.getRespondentCollection().getFirst().getValue().getRespondentAddress())
             );
         }
     }

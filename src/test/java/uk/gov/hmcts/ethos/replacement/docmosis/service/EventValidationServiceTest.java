@@ -26,6 +26,8 @@ import uk.gov.hmcts.et.common.model.listing.ListingRequest;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelperTest;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
@@ -120,7 +122,7 @@ class EventValidationServiceTest {
     private MultipleData multipleData;
 
     @BeforeEach
-    public void setup() throws Exception {
+    void setup() throws URISyntaxException, IOException {
         eventValidationService = new EventValidationService();
 
         caseDetails1 = generateCaseDetails("caseDetailsTest1.json");
@@ -791,14 +793,14 @@ class EventValidationServiceTest {
         assertEquals(INVALID_LISTING_DATE_RANGE_ERROR_MESSAGE, errors.get(0));
     }
 
-    private CaseDetails generateCaseDetails(String jsonFileName) throws Exception {
+    private CaseDetails generateCaseDetails(String jsonFileName) throws URISyntaxException, IOException {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
             .getContextClassLoader().getResource(jsonFileName)).toURI())));
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(json, CaseDetails.class);
     }
 
-    private ListingRequest generateListingDetails(String jsonFileName) throws Exception {
+    private ListingRequest generateListingDetails(String jsonFileName) throws URISyntaxException, IOException {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
             .getContextClassLoader().getResource(jsonFileName)).toURI())));
         ObjectMapper mapper = new ObjectMapper();

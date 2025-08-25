@@ -18,6 +18,9 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Mockito.when;
@@ -52,7 +55,7 @@ class IssueInitialConsiderationDirectionsWAControllerTest extends BaseController
 
     @BeforeEach
     @Override
-    protected void setUp() throws Exception {
+    protected void setUp() throws IOException, URISyntaxException {
         super.setUp();
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
 

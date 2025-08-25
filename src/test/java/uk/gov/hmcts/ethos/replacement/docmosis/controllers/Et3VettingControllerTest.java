@@ -25,6 +25,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentBuilder;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 
 import static org.hamcrest.Matchers.hasSize;
@@ -68,7 +70,7 @@ class Et3VettingControllerTest extends BaseControllerTest {
 
     @BeforeEach
     @Override
-    protected void setUp() throws Exception {
+    protected void setUp() throws IOException, URISyntaxException {
         super.setUp();
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
 

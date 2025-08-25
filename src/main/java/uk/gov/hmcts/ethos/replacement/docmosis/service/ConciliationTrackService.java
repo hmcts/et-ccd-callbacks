@@ -9,10 +9,10 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_NO_CONCILIATION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_OPEN_TRACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_STANDARD_TRACK;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.JUR_CODE_CONCILIATION_TRACK_NO;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.JUR_CODE_CONCILIATION_TRACK_OP;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.JUR_CODE_CONCILIATION_TRACK_SH;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.JUR_CODE_CONCILIATION_TRACK_ST;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.JurisdictionCodeConstants.JUR_CODE_CONCILIATION_TRACK_NO;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.JurisdictionCodeConstants.JUR_CODE_CONCILIATION_TRACK_OP;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.JurisdictionCodeConstants.JUR_CODE_CONCILIATION_TRACK_SH;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.JurisdictionCodeConstants.JUR_CODE_CONCILIATION_TRACK_ST;
 
 @Service("conciliationTrackService")
 public class ConciliationTrackService {

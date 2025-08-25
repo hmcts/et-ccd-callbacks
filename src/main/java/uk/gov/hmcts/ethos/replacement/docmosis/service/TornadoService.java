@@ -8,7 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
-import uk.gov.hmcts.et.common.model.bulk.BulkData;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceScotType;
@@ -16,7 +15,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceType;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TornadoDocument;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BulkHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1VettingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3VettingHelper;
@@ -193,32 +191,6 @@ public class TornadoService {
             sb = ListingHelper.buildListingDocumentContent(listingData, tornadoConnection.getAccessKey(),
                     documentName, userDetails, caseType);
         }
-        try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(
-            conn.getOutputStream(), StandardCharsets.UTF_8)) {
-            writeOutputStream(outputStreamWriter, sb);
-        }
-    }
-
-    DocumentInfo scheduleGeneration(String authToken, BulkData bulkData, String caseTypeId) throws IOException {
-        HttpURLConnection conn = null;
-        try {
-            conn = createConnection();
-
-            String documentName = BulkHelper.getScheduleDocName(bulkData.getScheduleDocName());
-            buildScheduleInstruction(conn, bulkData);
-            byte[] bytes = getDocumentByteArray(conn);
-            return createDocumentInfoFromBytes(authToken, bytes, documentName, caseTypeId);
-        } catch (IOException e) {
-            log.error(UNABLE_TO_CONNECT_TO_DOCMOSIS, e);
-            throw e;
-        } finally {
-            closeConnection(conn);
-        }
-    }
-
-    private void buildScheduleInstruction(HttpURLConnection conn, BulkData bulkData) throws IOException {
-        StringBuilder sb = BulkHelper.buildScheduleDocumentContent(bulkData, tornadoConnection.getAccessKey());
-
         try (OutputStreamWriter outputStreamWriter = new OutputStreamWriter(
             conn.getOutputStream(), StandardCharsets.UTF_8)) {
             writeOutputStream(outputStreamWriter, sb);

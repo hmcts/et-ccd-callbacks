@@ -277,9 +277,7 @@ public class CaseActionsForCaseWorkerController {
 
             if (featureToggleService.citizenEt1Generation() && SUBMIT_CASE_DRAFT.equals(ccdRequest.getEventId())) {
                 caseDetails.setCaseData(caseData);
-                et1SubmissionService.createAndUploadEt1Docs(caseDetails, userToken);
-                et1SubmissionService.sendEt1ConfirmationClaimant(caseDetails, userToken);
-                et1SubmissionService.vexationCheck(caseDetails, userToken);
+                et1SubmissionService.et1CitizenSubmissionLogic(caseDetails, userToken);
             }
         }
 

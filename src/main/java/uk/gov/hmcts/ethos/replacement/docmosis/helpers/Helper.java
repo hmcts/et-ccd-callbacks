@@ -127,7 +127,7 @@ public final class Helper {
                 caseData.setClaimantWorkAddressQRespondent(dynamicFixedListType);
             }
             //Default dynamic list
-            caseData.getClaimantWorkAddressQRespondent().setValue(listItems.get(0));
+            caseData.getClaimantWorkAddressQRespondent().setValue(listItems.getFirst());
         }
         return caseData;
     }
@@ -144,9 +144,9 @@ public final class Helper {
                     .toList();
 
             if (caseData.getRespondentCollection().size() == 1
-                    && YES.equals(caseData.getRespondentCollection().get(0).getValue().getResponseStruckOut())
-                    && YES.equals(caseData.getRespondentCollection().get(0).getValue().getResponseReceived())
-                    && !isNullOrEmpty(caseData.getRespondentCollection().get(0)
+                    && YES.equals(caseData.getRespondentCollection().getFirst().getValue().getResponseStruckOut())
+                    && YES.equals(caseData.getRespondentCollection().getFirst().getValue().getResponseReceived())
+                    && !isNullOrEmpty(caseData.getRespondentCollection().getFirst()
                     .getValue().getResponseReceivedDate())) {
                 return caseData.getRespondentCollection();
             }
@@ -193,21 +193,6 @@ public final class Helper {
             }
         }
         return listItems;
-    }
-
-    public static void midRespondentECC(CaseData caseData, CaseData originalCaseData) {
-        List<DynamicValueType> listItems = createDynamicRespondentNameList(originalCaseData.getRespondentCollection());
-        if (!listItems.isEmpty()) {
-            if (caseData.getRespondentECC() != null) {
-                caseData.getRespondentECC().setListItems(listItems);
-            } else {
-                DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
-                dynamicFixedListType.setListItems(listItems);
-                caseData.setRespondentECC(dynamicFixedListType);
-            }
-            //Default dynamic list
-            caseData.getRespondentECC().setValue(listItems.get(0));
-        }
     }
 
     public static List<DynamicValueType> getDefaultBfListItems() {
@@ -407,7 +392,7 @@ public final class Helper {
      * @return the first item in the list or null if the list is empty
      */
     public static String getFirstListItem(List<String> list) {
-        return CollectionUtils.isEmpty(list) ? null : list.get(0);
+        return CollectionUtils.isEmpty(list) ? null : list.getFirst();
     }
 
     public static boolean isRepresentedClaimantWithMyHmctsCase(CaseData caseData) {

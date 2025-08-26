@@ -513,10 +513,10 @@ class CaseManagementForCaseWorkerServiceTest {
                 .isEmpty();
         assertThat(caseData.getRespondentCollection().getFirst().getValue().getResponseRespondentAddress().getCounty())
                 .isEmpty();
-        assertThat(caseData.getRespondentCollection().getFirst().getValue().getResponseRespondentAddress().getPostCode())
-                .isEmpty();
-        assertThat(caseData.getRespondentCollection().getFirst().getValue().getResponseRespondentAddress().getPostTown())
-                .isEmpty();
+        assertThat(caseData.getRespondentCollection().getFirst().getValue().getResponseRespondentAddress()
+                .getPostCode()).isEmpty();
+        assertThat(caseData.getRespondentCollection().getFirst().getValue().getResponseRespondentAddress()
+                .getPostTown()).isEmpty();
     }
 
     @Test
@@ -625,20 +625,20 @@ class CaseManagementForCaseWorkerServiceTest {
     void amendHearingNonScotland() {
         CaseData caseData = ccdRequest13.getCaseDetails().getCaseData();
         caseManagementForCaseWorkerService.amendHearing(caseData, ENGLANDWALES_CASE_TYPE_ID);
-        assertThat(caseData.getHearingCollection().getFirst().getValue().getHearingDateCollection().getFirst().getValue()
-                .getHearingStatus()).isEqualTo(HEARING_STATUS_LISTED);
+        assertThat(caseData.getHearingCollection().getFirst().getValue().getHearingDateCollection().getFirst()
+                .getValue().getHearingStatus()).isEqualTo(HEARING_STATUS_LISTED);
         assertThat(caseData.getHearingCollection().get(1).getValue().getHearingDateCollection().getFirst().getValue()
                 .getHearingStatus()).isEqualTo(HEARING_STATUS_LISTED);
         assertThat(caseData.getHearingCollection().get(2).getValue().getHearingDateCollection().getFirst().getValue()
                 .getHearingStatus()).isEqualTo(HEARING_STATUS_LISTED);
         assertThat(caseData.getHearingCollection().get(2).getValue().getHearingDateCollection().getFirst().getValue()
                 .getHearingStatus()).isEqualTo(HEARING_STATUS_LISTED);
-        assertThat(caseData.getHearingCollection().getFirst().getValue().getHearingDateCollection().getFirst().getValue()
-                .getHearingVenueDay().getSelectedLabel()).isEqualTo("Manchester");
-        assertThat(caseData.getHearingCollection().getFirst().getValue().getHearingDateCollection().getFirst().getValue()
-                .getHearingTimingStart()).isEqualTo("2019-11-01T12:11:00.000");
-        assertThat(caseData.getHearingCollection().getFirst().getValue().getHearingDateCollection().getFirst().getValue()
-                .getHearingTimingFinish()).isEqualTo("2019-11-01T12:11:00.000");
+        assertThat(caseData.getHearingCollection().getFirst().getValue().getHearingDateCollection().getFirst()
+                .getValue().getHearingVenueDay().getSelectedLabel()).isEqualTo("Manchester");
+        assertThat(caseData.getHearingCollection().getFirst().getValue().getHearingDateCollection().getFirst()
+                .getValue().getHearingTimingStart()).isEqualTo("2019-11-01T12:11:00.000");
+        assertThat(caseData.getHearingCollection().getFirst().getValue().getHearingDateCollection().getFirst()
+                .getValue().getHearingTimingFinish()).isEqualTo("2019-11-01T12:11:00.000");
     }
 
     @Test
@@ -809,12 +809,12 @@ class CaseManagementForCaseWorkerServiceTest {
     void amendHearingScotland() {
         CaseData caseData = scotlandCcdRequest3.getCaseDetails().getCaseData();
         caseManagementForCaseWorkerService.amendHearing(caseData, SCOTLAND_CASE_TYPE_ID);
-        assertThat(caseData.getHearingCollection().getFirst().getValue().getHearingDateCollection().getFirst().getValue()
-                .getHearingStatus()).isEqualTo(HEARING_STATUS_LISTED);
-        assertThat(caseData.getHearingCollection().getFirst().getValue().getHearingDateCollection().getFirst().getValue()
-                .getHearingAberdeen().getSelectedLabel()).isEqualTo(TribunalOffice.ABERDEEN.getOfficeName());
-        assertThat(caseData.getHearingCollection().getFirst().getValue().getHearingDateCollection().getFirst().getValue()
-                .getHearingGlasgow()).isNull();
+        assertThat(caseData.getHearingCollection().getFirst().getValue().getHearingDateCollection().getFirst()
+                .getValue().getHearingStatus()).isEqualTo(HEARING_STATUS_LISTED);
+        assertThat(caseData.getHearingCollection().getFirst().getValue().getHearingDateCollection().getFirst()
+                .getValue().getHearingAberdeen().getSelectedLabel()).isEqualTo(TribunalOffice.ABERDEEN.getOfficeName());
+        assertThat(caseData.getHearingCollection().getFirst().getValue().getHearingDateCollection().getFirst()
+                .getValue().getHearingGlasgow()).isNull();
 
         assertThat(caseData.getHearingCollection().get(1).getValue().getHearingDateCollection().getFirst().getValue()
                 .getHearingGlasgow().getSelectedLabel()).isEqualTo(TribunalOffice.GLASGOW.getOfficeName());
@@ -822,8 +822,8 @@ class CaseManagementForCaseWorkerServiceTest {
                 .getHearingAberdeen()).isNull();
         assertThat(caseData.getHearingCollection().get(2).getValue().getHearingDateCollection().getFirst().getValue()
                 .getHearingEdinburgh().getSelectedLabel()).isEqualTo(TribunalOffice.EDINBURGH.getOfficeName());
-        assertThat(caseData.getHearingCollection().getFirst().getValue().getHearingDateCollection().getFirst().getValue()
-                .getHearingGlasgow()).isNull();
+        assertThat(caseData.getHearingCollection().getFirst().getValue().getHearingDateCollection().getFirst()
+                .getValue().getHearingGlasgow()).isNull();
         final String dundee = TribunalOffice.DUNDEE.getOfficeName();
         assertThat(caseData.getHearingCollection().get(3).getValue().getHearingDateCollection().getFirst().getValue()
                 .getHearingDundee().getSelectedLabel()).isEqualTo(dundee);
@@ -1353,49 +1353,6 @@ class CaseManagementForCaseWorkerServiceTest {
                 Arguments.of(" John", " Doe", "John Doe"),
                 Arguments.of(" John ", " Doe ", "John Doe"));
     }
-
-//    @ParameterizedTest
-//    @MethodSource("respondentEccTestCases")
-//    void testUpdateListOfRespondentsWithAnEcc(
-//            List<RespondentSumTypeItem> respondentCollection, List<GenericTypeItem<RespondentWithAnEcc>> expected) {
-//        CaseData caseData = new CaseData();
-//        caseData.setRespondentCollection(respondentCollection);
-//
-//        caseManagementForCaseWorkerService.updateListOfRespondentsWithAnEcc(caseData);
-//
-//        assertThat(caseData.getRespondentsWithEcc().stream().map(GenericTypeItem::getValue).toList())
-//                .containsExactlyElementsOf(expected.stream().map(GenericTypeItem::getValue).toList());
-//    }
-//
-//    private static Stream<Arguments> respondentEccTestCases() {
-//        RespondentSumType respondentYes = new RespondentSumType();
-//        respondentYes.setRespondentName("Resp1");
-//        respondentYes.setRespondentEcc(YES);
-//
-//        RespondentSumType respondentNo = new RespondentSumType();
-//        respondentNo.setRespondentName("Resp2");
-//        respondentNo.setRespondentEcc(NO);
-//
-//        RespondentSumTypeItem respondentSumTypeItemYes = new RespondentSumTypeItem();
-//        respondentSumTypeItemYes.setValue(respondentYes);
-//
-//        RespondentSumTypeItem respondentSumTypeItemNo = new RespondentSumTypeItem();
-//        respondentSumTypeItemNo.setValue(respondentNo);
-//
-//        RespondentWithAnEcc respondentWithAnEcc = new RespondentWithAnEcc();
-//        respondentWithAnEcc.setRespondentName("Resp1");
-//
-//        return Stream.of(
-//                Arguments.of(
-//                        List.of(respondentSumTypeItemYes, respondentSumTypeItemNo),
-//                        List.of(GenericTypeItem.from(respondentWithAnEcc))
-//                ),
-//                Arguments.of(
-//                        List.of(respondentSumTypeItemNo),
-//                        List.of()
-//                )
-//        );
-//    }
 
     @ParameterizedTest
     @MethodSource("respondentEccTestCases")

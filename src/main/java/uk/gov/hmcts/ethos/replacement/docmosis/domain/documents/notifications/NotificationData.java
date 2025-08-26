@@ -61,34 +61,4 @@ public class NotificationData {
     private final String areThereTribunalResponses;
     @JsonProperty("tribunalResponses")
     private final List<ResponseAdminData> tribunalResponses;
-
-    @Override
-    public String toString() {
-        return "NotificationData{" + "ethosCaseReference='" + ethosCaseReference + '\''
-               + ", notificationNumber='" + notificationNumber + '\''
-               + ", notificationTitle='" + notificationTitle + '\''
-               + ", notificationSubject='" + notificationSubject + '\''
-               + ", dateSent='" + dateSent + '\''
-               + ", partyToNotify='" + partyToNotify + '\''
-               + ", additionalInformation='" + additionalInformation + '\''
-               + ", isHearingSubject='" + isHearingSubject + '\''
-               + ", hearing='" + hearing + '\''
-               + ", areThereLetters='" + areThereLetters + '\''
-               + ", documents=" + documents
-               + ", isCmoSubject='" + isCmoSubject + '\''
-               + ", cmoOrRequest='" + cmoOrRequest + '\''
-               + ", cmoRequestMadeBy='" + cmoRequestMadeBy + '\''
-               + ", cmoRequestResponseRequired='" + cmoRequestResponseRequired + '\''
-               + ", isJudgmentSubject='" + isJudgmentSubject + '\''
-               + ", judgmentName='" + judgmentName + '\''
-               + ", judgmentDecision='" + judgmentDecision + '\''
-               + ", isEccSubject='" + isEccSubject + '\''
-               + ", eccType='" + eccType + '\''
-               + ", eccResponseRequired='" + eccResponseRequired + '\''
-               + ", areThereResponses='" + areThereResponses + '\''
-               + ", responses=" + responses
-               + ", areThereTribunalResponses='" + areThereTribunalResponses + '\''
-               + ", tribunalResponses=" + tribunalResponses
-               + '}';
-    }
 }

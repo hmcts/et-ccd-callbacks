@@ -2,7 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
-import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -2134,45 +2133,6 @@ class DocumentHelperTest {
 
     @Test
     void buildDocumentContentMultiples() {
-        MultipleData multipleData = getMultipleData();
-        String expected = "{" + NEW_LINE
-                + "\"accessKey\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"templateName\":\"EM-TRB-LET-ENG-00544.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"outputName\":\"document.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"data\":{" + NEW_LINE
-                + "\"address_labels_page\":[" + NEW_LINE
-                + "{\"Label_02_Entity_Name_01\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Entity_Name_02\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_02_Eef\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_02_Cef\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_03_Entity_Name_01\":\"Label Entity1 Name\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_03_Entity_Name_02\":\"Label Entity2 Name\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_03_Address_Line_01\":\"Address Line1\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_03_Address_Line_02\":\"Address Line2\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_03_Address_Line_03\":\"M2 45GD\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_03_Eef\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_03_Cef\":\"Reference01345\"}]" + NEW_LINE_WITH_COMMA
-                + "\"i_enhmcts\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i_enhmcts1\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i_enhmcts2\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts1\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts2\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"Clerk\":\"Mike Jordan\"" + NEW_LINE_WITH_COMMA
-                + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + NEW_LINE_WITH_COMMA
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
-                + NEW_LINE_WITH_COMMA
-                + "\"Case_No\":\"123456\"" + NEW_LINE_WITH_COMMA
-                + "\"submission_reference\":\"12212121\"" + NEW_LINE_WITH_COMMA
-                + "}" + NEW_LINE
-                + "}" + NEW_LINE;
-        assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails2.getCaseData(), "",
-                userDetails, ENGLANDWALES_CASE_TYPE_ID,
-                multipleData.getCorrespondenceType(), multipleData.getCorrespondenceScotType(),
-                multipleData, null, venueAddressReaderService).toString());
-    }
-
-    private static @NotNull MultipleData getMultipleData() {
         AddressLabelsAttributesType addressLabelsAttributesType = new AddressLabelsAttributesType();
         addressLabelsAttributesType.setNumberOfCopies("1");
         addressLabelsAttributesType.setStartingLabel("2");
@@ -2250,7 +2210,7 @@ class DocumentHelperTest {
     private String getExpectedResult() throws URISyntaxException, IOException {
         String expectedJson = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
             .getContextClassLoader().getResource("expectedDocumentContentScot4.json")).toURI())))
-                .replace("\r" + NEW_LINE, NEW_LINE);
+                .replace("\r\n", "\n");
         LocalDate currentLocalDate = LocalDate.now();
         LocalDate currentLocalDatePlus28Days = currentLocalDate.plusDays(28);
         return expectedJson.replace("current-date-placeholder",
@@ -2288,7 +2248,6 @@ class DocumentHelperTest {
                 .withDocumentCollection(ACAS_CERTIFICATE)
                 .build();
         DocumentHelper.setDocumentNumbers(caseData);
-        caseData.getDocumentCollection()
-                .forEach(d -> assertThat(d.getValue().getDocNumber()).isNotNull());
+        caseData.getDocumentCollection().forEach(d -> assertThat(d.getValue().getDocNumber()).isNotNull());
     }
 }

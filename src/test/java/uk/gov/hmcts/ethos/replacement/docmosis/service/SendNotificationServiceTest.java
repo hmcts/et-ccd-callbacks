@@ -52,6 +52,8 @@ class SendNotificationServiceTest {
     private HearingSelectionService hearingSelectionService;
     @MockBean
     private FeatureToggleService featureToggleService;
+    @Mock
+    private TornadoService tornadoService;
     private CaseData caseData;
     private CaseDetails caseDetails;
     private SendNotificationService sendNotificationService;
@@ -74,7 +76,7 @@ class SendNotificationServiceTest {
      void setUp() {
         emailService = spy(new EmailUtils());
         sendNotificationService = new SendNotificationService(hearingSelectionService,
-                emailService, featureToggleService);
+                emailService, featureToggleService, tornadoService);
         ReflectionTestUtils.setField(sendNotificationService,
                 RESPONDENT_SEND_NOTIFICATION_TEMPLATE_ID,
                 "respondentSendNotificationTemplateId");

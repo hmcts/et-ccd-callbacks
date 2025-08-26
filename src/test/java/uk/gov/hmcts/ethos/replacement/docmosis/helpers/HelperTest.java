@@ -20,6 +20,8 @@ import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.HubLinksStatuses;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.TokenResponse;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -49,7 +51,7 @@ public class HelperTest {
     private CaseDetails caseDetailsScot2;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() throws URISyntaxException, IOException {
         caseDetails1 = generateCaseDetails("caseDetailsTest1.json");
         caseDetails4 = generateCaseDetails("caseDetailsTest4.json");
         caseDetailsScot1 = generateCaseDetails("caseDetailsScotTest1.json");
@@ -71,7 +73,7 @@ public class HelperTest {
                 "openid profile roles", "Bearer");
     }
 
-    private CaseDetails generateCaseDetails(String jsonFileName) throws Exception {
+    private CaseDetails generateCaseDetails(String jsonFileName) throws URISyntaxException, IOException {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
             .getContextClassLoader().getResource(jsonFileName)).toURI())));
         ObjectMapper mapper = new ObjectMapper();

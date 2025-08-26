@@ -93,7 +93,7 @@ public class CcdCaseAssignment {
         }
 
         log.info("Apply NoC. Http status received from AAC API; {} for case {}",
-                response.getStatusCodeValue(), callback.getCaseDetails().getCaseId());
+                response.getStatusCode().value(), callback.getCaseDetails().getCaseId());
 
         if (featureToggleService.isMul2Enabled()) {
             addRespondentRepresentativeToMultiple(callback.getCaseDetails());
@@ -149,7 +149,7 @@ public class CcdCaseAssignment {
             throw exception;
         }
 
-        log.info("Remove case user roles. Http status received from CCD API; {}", response.getStatusCodeValue());
+        log.info("Remove case user roles. Http status received from CCD API; {}", response.getStatusCode().value());
     }
 
     public void addCaseUserRoles(
@@ -170,7 +170,7 @@ public class CcdCaseAssignment {
             throw exception;
         }
 
-        log.info("Add case user roles. Http status received from CCD API; {}", response.getStatusCodeValue());
+        log.info("Add case user roles. Http status received from CCD API; {}", response.getStatusCode().value());
     }
 
     public CaseAssignmentUserWithOrganisationRolesRequest getCaseAssignmentRequest(
@@ -225,6 +225,6 @@ public class CcdCaseAssignment {
             throw exception;
         }
 
-        log.info("Add case user roles. Http status received from CCD API; {}", response.getStatusCodeValue());
+        log.info("Add case user roles. Http status received from CCD API; {}", response.getStatusCode().value());
     }
 }

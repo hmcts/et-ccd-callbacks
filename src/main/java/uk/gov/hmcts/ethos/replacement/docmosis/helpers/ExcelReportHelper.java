@@ -167,46 +167,48 @@ public final class ExcelReportHelper {
             List<String> caseIdCollection, List<String> errors, Logger log,
             SingleCasesReadingService singleCasesReadingService) {
 
-        ExecutorService executor = Executors.newFixedThreadPool(THREAD_NUMBER);
+        List<SchedulePayload> result;
+        try (ExecutorService executor = Executors.newFixedThreadPool(THREAD_NUMBER)) {
 
-        List<Future<HashSet<SchedulePayload>>> resultList = new ArrayList<>();
+            List<Future<HashSet<SchedulePayload>>> resultList = new ArrayList<>();
 
-        log.info("CaseIdCollectionSize: {}", caseIdCollection.size());
+            log.info("CaseIdCollectionSize: {}", caseIdCollection.size());
 
-        for (List<String> partitionCaseIds : Lists.partition(caseIdCollection, ES_PARTITION_SIZE)) {
+            for (List<String> partitionCaseIds : Lists.partition(caseIdCollection, ES_PARTITION_SIZE)) {
 
-            ScheduleCallable scheduleCallable =
-                    new ScheduleCallable(singleCasesReadingService, userToken, caseTypeId, partitionCaseIds);
+                ScheduleCallable scheduleCallable =
+                        new ScheduleCallable(singleCasesReadingService, userToken, caseTypeId, partitionCaseIds);
 
-            resultList.add(executor.submit(scheduleCallable));
-
-        }
-
-        List<SchedulePayload> result = new ArrayList<>();
-
-        for (Future<HashSet<SchedulePayload>> fut : resultList) {
-
-            try {
-
-                HashSet<SchedulePayload> schedulePayloads = fut.get();
-
-                log.info("PartialSize: {}", schedulePayloads.size());
-
-                result.addAll(schedulePayloads);
-
-            } catch (InterruptedException | ExecutionException e) {
-
-                errors.add("Error Generating Schedules");
-
-                log.error(e.getMessage(), e);
-
-                Thread.currentThread().interrupt();
+                resultList.add(executor.submit(scheduleCallable));
 
             }
 
-        }
+            result = new ArrayList<>();
 
-        executor.shutdown();
+            for (Future<HashSet<SchedulePayload>> fut : resultList) {
+
+                try {
+
+                    HashSet<SchedulePayload> schedulePayloads = fut.get();
+
+                    log.info("PartialSize: {}", schedulePayloads.size());
+
+                    result.addAll(schedulePayloads);
+
+                } catch (InterruptedException | ExecutionException e) {
+
+                    errors.add("Error Generating Schedules");
+
+                    log.error(e.getMessage(), e);
+
+                    Thread.currentThread().interrupt();
+
+                }
+
+            }
+
+            executor.shutdown();
+        }
 
         log.info("ResultSize: {}", result.size());
 

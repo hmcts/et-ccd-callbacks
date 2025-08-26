@@ -43,9 +43,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.TribunalOffice.LEEDS;
 import static uk.gov.hmcts.ecm.common.model.helper.TribunalOffice.LONDON_CENTRAL;
 import static uk.gov.hmcts.ecm.common.model.helper.TribunalOffice.MANCHESTER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.JurisdictionCodeConstants.TRACK_OPEN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.ADDRESS_NOT_ENTERED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.JurisdictionCodeTrackConstants.TRACK_OPEN;
 
 @ExtendWith(SpringExtension.class)
 class Et1VettingServiceTest {
@@ -579,7 +579,7 @@ class Et1VettingServiceTest {
         when(jpaVenueService.getVenues(MANCHESTER)).thenReturn(List.of(expectedHearingVenue));
 
         assertThat(et1VettingService.getHearingVenuesList(caseDetails.getCaseData().getManagingOffice())
-                .getListItems().get(0)).isEqualTo(expectedHearingVenue);
+                .getListItems().getFirst()).isEqualTo(expectedHearingVenue);
     }
 
     @Test

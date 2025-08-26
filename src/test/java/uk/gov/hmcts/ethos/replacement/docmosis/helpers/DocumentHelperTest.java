@@ -52,8 +52,8 @@ class DocumentHelperTest {
     private static final String GLASGOW_VENUE_ADDRESS =
             "Glasgow Tribunal Centre, Atlantic Quay, 20 York Street, Glasgow, G2 8GT";
     private static final String ABERDEEN_VENUE_ADDRESS = "Ground Floor, AB1, 48 Huntly Street, Aberdeen, AB10 1SH";
-    private static final String NEW_LINE_WITH_COMMA = ",\n";
-    private static final String NEW_LINE = "\n";
+    private static final String CLOSE_BRACE_NEW_LINE = "}\n";
+    private static final String COMMA_NEWLINE = "\",\n";
     private CaseDetails caseDetails1;
     private CaseDetails caseDetails2;
     private CaseDetails caseDetails3;
@@ -112,7 +112,7 @@ class DocumentHelperTest {
         when(venueAddressReaderService.getVenueAddress(any(), any(), any())).thenReturn(MANCHESTER_VENUE_ADDRESS);
     }
 
-    private CaseDetails generateCaseDetails(String jsonFileName) throws Exception {
+    private CaseDetails generateCaseDetails(String jsonFileName) throws URISyntaxException, IOException {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
             .getContextClassLoader().getResource(jsonFileName)).toURI())));
         ObjectMapper mapper = new ObjectMapper();
@@ -121,79 +121,77 @@ class DocumentHelperTest {
 
     @Test
     void buildDocumentContent1() {
-        String expected = "{" + NEW_LINE
-                + "\"accessKey\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"templateName\":\"EM-TRB-EGW-ENG-00026.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"outputName\":\"document.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"data\":{" + NEW_LINE
-                + "\"claimant_or_rep_full_name\":\"RepresentativeNameClaimant\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_rep_organisation\":\"RepresentativeOrganisation\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine1\":\"56 Block C\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine2\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_county\":\"Lancashire\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_postCode\":\"M3 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_reference\":\"1111111\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_full_name\":\"Mr A J Rodriguez\"" + NEW_LINE_WITH_COMMA
-                + "\"Claimant\":\"Mr A J Rodriguez\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine1\":\"34\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine2\":\"Low Street\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_county\":\"Lancashire\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_postCode\":\"M3 6gw\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_full_name\":\"Antonio Vazquez\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine1\":\"11 Small Street\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine2\":\"22 House\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_county\":\"North West\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_postCode\":\"M12 42R\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_full_name\":\"Antonio Vazquez\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine1\":\"11 Small Street\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine2\":\"22 House\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_county\":\"North West\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_postCode\":\"M12 42R\"" + NEW_LINE_WITH_COMMA
-                + "\"Respondent\":\"1. Antonio Vazquez,\"" + NEW_LINE_WITH_COMMA
-                + "\"resp_others\":\"2. Juan Garcia, 3. Mike Jordan\"" + NEW_LINE_WITH_COMMA
-                + "\"resp_address\":\"1. 11 Small Street, 22 House, Manchester, North West, M12 42R, UK\\n2. "
-                + "12 Small Street, 24 House, Manchester, North West, M12 4ED, UK\\n3. 11 Small Street, 22 House, "
-                + "Manchester, North West, M12 42R, UK\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_date\":\"25 November 2019, 14 December 2019, 28 December 2019\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_date_time\":\"25 November 2019, 14 December 2019, 28 December 2019 at 10:30\""
-                + NEW_LINE_WITH_COMMA
-                + "\"Hearing_time\":\"10:30\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_venue\":\"Manchester Employment Tribunals, Alexandra House, 14-22 The Parsonage, "
-                + "Manchester, M3 2JA\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_duration\":\"2 days\"" + NEW_LINE_WITH_COMMA
-                + "\"t1_2\":\"true\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine1\":\"Manchester Employment Tribunal,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine2\":\"Alexandra House,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine3\":\"14-22 The Parsonage,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_town\":\"Manchester,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_county\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_postCode\":\"M3 2JA\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_telephone\":\"03577131270\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_fax\":\"07577126570\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_DX\":\"123456\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_Email\":\"ManchesterOfficeET@hmcts.gov.uk\"" + NEW_LINE_WITH_COMMA
-                + "\"i1_2_enhmcts\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i1_2_enhmcts1\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i1_2_enhmcts2\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts1\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts2\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"Clerk\":\"Mike Jordan\"" + NEW_LINE_WITH_COMMA
-                + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + NEW_LINE_WITH_COMMA
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
-                + NEW_LINE_WITH_COMMA
-                + "\"Case_No\":\"123456\"" + NEW_LINE_WITH_COMMA
-                + "\"submission_reference\":\"12212121\"" + NEW_LINE_WITH_COMMA
-                + "}" + NEW_LINE
-                + "}" + NEW_LINE;
+        String expected = "{\n"
+            + "\"accessKey\":\"" + COMMA_NEWLINE
+            + "\"templateName\":\"EM-TRB-EGW-ENG-00026.docx" + COMMA_NEWLINE
+            + "\"outputName\":\"document.docx" + COMMA_NEWLINE
+            + "\"data\":{\n"
+            + "\"claimant_or_rep_full_name\":\"RepresentativeNameClaimant" + COMMA_NEWLINE
+            + "\"claimant_rep_organisation\":\"RepresentativeOrganisation" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine1\":\"56 Block C" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine2\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"claimant_or_rep_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"claimant_or_rep_county\":\"Lancashire" + COMMA_NEWLINE
+            + "\"claimant_or_rep_postCode\":\"M3 KJR" + COMMA_NEWLINE
+            + "\"claimant_reference\":\"1111111" + COMMA_NEWLINE
+            + "\"claimant_full_name\":\"Mr A J Rodriguez" + COMMA_NEWLINE
+            + "\"Claimant\":\"Mr A J Rodriguez" + COMMA_NEWLINE
+            + "\"claimant_addressLine1\":\"34" + COMMA_NEWLINE
+            + "\"claimant_addressLine2\":\"Low Street" + COMMA_NEWLINE
+            + "\"claimant_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"claimant_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"claimant_county\":\"Lancashire" + COMMA_NEWLINE
+            + "\"claimant_postCode\":\"M3 6gw" + COMMA_NEWLINE
+            + "\"respondent_or_rep_full_name\":\"Antonio Vazquez" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine1\":\"11 Small Street" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine2\":\"22 House" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"respondent_or_rep_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"respondent_or_rep_county\":\"North West" + COMMA_NEWLINE
+            + "\"respondent_or_rep_postCode\":\"M12 42R" + COMMA_NEWLINE
+            + "\"respondent_full_name\":\"Antonio Vazquez" + COMMA_NEWLINE
+            + "\"respondent_addressLine1\":\"11 Small Street" + COMMA_NEWLINE
+            + "\"respondent_addressLine2\":\"22 House" + COMMA_NEWLINE
+            + "\"respondent_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"respondent_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"respondent_county\":\"North West" + COMMA_NEWLINE
+            + "\"respondent_postCode\":\"M12 42R" + COMMA_NEWLINE
+            + "\"Respondent\":\"1. Antonio Vazquez," + COMMA_NEWLINE
+            + "\"resp_others\":\"2. Juan Garcia, 3. Mike Jordan" + COMMA_NEWLINE
+            + "\"resp_address\":\"1. 11 Small Street, 22 House, Manchester, North West, M12 42R, UK\\n2. "
+            + "12 Small Street, 24 House, Manchester, North West, M12 4ED, UK\\n3. 11 Small Street, 22 House, "
+            + "Manchester, North West, M12 42R, UK" + COMMA_NEWLINE
+            + "\"Hearing_date\":\"25 November 2019, 14 December 2019, 28 December 2019" + COMMA_NEWLINE
+            + "\"Hearing_date_time\":\"25 November 2019, 14 December 2019, 28 December 2019 at 10:30" + COMMA_NEWLINE
+            + "\"Hearing_time\":\"10:30" + COMMA_NEWLINE
+            + "\"Hearing_venue\":\"Manchester Employment Tribunals, Alexandra House, 14-22 The Parsonage, "
+            + "Manchester, M3 2JA" + COMMA_NEWLINE
+            + "\"Hearing_duration\":\"2 days" + COMMA_NEWLINE
+            + "\"t1_2\":\"true" + COMMA_NEWLINE
+            + "\"Court_addressLine1\":\"Manchester Employment Tribunal," + COMMA_NEWLINE
+            + "\"Court_addressLine2\":\"Alexandra House," + COMMA_NEWLINE
+            + "\"Court_addressLine3\":\"14-22 The Parsonage," + COMMA_NEWLINE
+            + "\"Court_town\":\"Manchester," + COMMA_NEWLINE
+            + "\"Court_county\":\"" + COMMA_NEWLINE
+            + "\"Court_postCode\":\"M3 2JA" + COMMA_NEWLINE
+            + "\"Court_telephone\":\"03577131270" + COMMA_NEWLINE
+            + "\"Court_fax\":\"07577126570" + COMMA_NEWLINE
+            + "\"Court_DX\":\"123456" + COMMA_NEWLINE
+            + "\"Court_Email\":\"ManchesterOfficeET@hmcts.gov.uk" + COMMA_NEWLINE
+            + "\"i1_2_enhmcts\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i1_2_enhmcts1\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i1_2_enhmcts2\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts1\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts2\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"Clerk\":\"Mike Jordan" + COMMA_NEWLINE
+            + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + COMMA_NEWLINE
+            + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + COMMA_NEWLINE
+            + "\"Case_No\":\"123456" + COMMA_NEWLINE
+            + "\"submission_reference\":\"12212121" + COMMA_NEWLINE
+            + CLOSE_BRACE_NEW_LINE
+            + CLOSE_BRACE_NEW_LINE;
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails1.getCaseData(), "",
                 userDetails, ENGLANDWALES_CASE_TYPE_ID,
                 caseDetails1.getCaseData().getCorrespondenceType(),
@@ -203,152 +201,149 @@ class DocumentHelperTest {
 
     @Test
     void buildDocumentContent2_ResponseStruckOut() {
-        String expected = "{" + NEW_LINE
-                + "\"accessKey\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"templateName\":\"EM-TRB-EGW-ENG-00027.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"outputName\":\"document.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"data\":{" + NEW_LINE
-                + "\"claimant_or_rep_full_name\":\"Orlando LTD\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_full_name\":\"Orlando LTD\"" + NEW_LINE_WITH_COMMA
-                + "\"Claimant\":\"Orlando LTD\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine1\":\"34\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine2\":\"Low Street\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_county\":\"Lancashire\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_postCode\":\"M3 6gw\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine1\":\"34\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine2\":\"Low Street\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_county\":\"Lancashire\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_postCode\":\"M3 6gw\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_full_name\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_rep_organisation\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine1\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine2\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_town\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_county\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_postCode\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_full_name\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Respondent\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"resp_others\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"resp_address\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_date\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_date_time\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_time\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_venue\":\"Manchester Employment Tribunals, Alexandra House, 14-22 The Parsonage, "
-                + "Manchester, M3 2JA\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_duration\":\"2 days\"" + NEW_LINE_WITH_COMMA
-                + "\"t2_2A\":\"true\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine1\":\"Manchester Employment Tribunal,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine2\":\"Alexandra House,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine3\":\"14-22 The Parsonage,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_town\":\"Manchester,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_county\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_postCode\":\"M3 2JA\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_telephone\":\"03577131270\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_fax\":\"07577126570\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_DX\":\"123456\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_Email\":\"ManchesterOfficeET@hmcts.gov.uk\"" + NEW_LINE_WITH_COMMA
-                + "\"i2_2A_enhmcts\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i2_2A_enhmcts1\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i2_2A_enhmcts2\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts1\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts2\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"Clerk\":\"Mike Jordan\"" + NEW_LINE_WITH_COMMA
-                + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + NEW_LINE_WITH_COMMA
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
-                + NEW_LINE_WITH_COMMA
-                + "\"Case_No\":\"123456\"" + NEW_LINE_WITH_COMMA
-                + "\"submission_reference\":\"12212121\"" + NEW_LINE_WITH_COMMA
-                + "}" + NEW_LINE
-                + "}" + NEW_LINE;
+        String expected = "{\n"
+            + "\"accessKey\":\"" + COMMA_NEWLINE
+            + "\"templateName\":\"EM-TRB-EGW-ENG-00027.docx" + COMMA_NEWLINE
+            + "\"outputName\":\"document.docx" + COMMA_NEWLINE
+            + "\"data\":{\n"
+            + "\"claimant_or_rep_full_name\":\"Orlando LTD" + COMMA_NEWLINE
+            + "\"claimant_full_name\":\"Orlando LTD" + COMMA_NEWLINE
+            + "\"Claimant\":\"Orlando LTD" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine1\":\"34" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine2\":\"Low Street" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"claimant_or_rep_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"claimant_or_rep_county\":\"Lancashire" + COMMA_NEWLINE
+            + "\"claimant_or_rep_postCode\":\"M3 6gw" + COMMA_NEWLINE
+            + "\"claimant_addressLine1\":\"34" + COMMA_NEWLINE
+            + "\"claimant_addressLine2\":\"Low Street" + COMMA_NEWLINE
+            + "\"claimant_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"claimant_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"claimant_county\":\"Lancashire" + COMMA_NEWLINE
+            + "\"claimant_postCode\":\"M3 6gw" + COMMA_NEWLINE
+            + "\"respondent_or_rep_full_name\":\"" + COMMA_NEWLINE
+            + "\"respondent_rep_organisation\":\"" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine1\":\"" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine2\":\"" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"respondent_or_rep_town\":\"" + COMMA_NEWLINE
+            + "\"respondent_or_rep_county\":\"" + COMMA_NEWLINE
+            + "\"respondent_or_rep_postCode\":\"" + COMMA_NEWLINE
+            + "\"respondent_full_name\":\"" + COMMA_NEWLINE
+            + "\"Respondent\":\"" + COMMA_NEWLINE
+            + "\"resp_others\":\"" + COMMA_NEWLINE
+            + "\"resp_address\":\"" + COMMA_NEWLINE
+            + "\"Hearing_date\":\"" + COMMA_NEWLINE
+            + "\"Hearing_date_time\":\"" + COMMA_NEWLINE
+            + "\"Hearing_time\":\"" + COMMA_NEWLINE
+            + "\"Hearing_venue\":\"Manchester Employment Tribunals, Alexandra House, 14-22 The Parsonage, "
+            + "Manchester, M3 2JA" + COMMA_NEWLINE
+            + "\"Hearing_duration\":\"2 days" + COMMA_NEWLINE
+            + "\"t2_2A\":\"true" + COMMA_NEWLINE
+            + "\"Court_addressLine1\":\"Manchester Employment Tribunal," + COMMA_NEWLINE
+            + "\"Court_addressLine2\":\"Alexandra House," + COMMA_NEWLINE
+            + "\"Court_addressLine3\":\"14-22 The Parsonage," + COMMA_NEWLINE
+            + "\"Court_town\":\"Manchester," + COMMA_NEWLINE
+            + "\"Court_county\":\"" + COMMA_NEWLINE
+            + "\"Court_postCode\":\"M3 2JA" + COMMA_NEWLINE
+            + "\"Court_telephone\":\"03577131270" + COMMA_NEWLINE
+            + "\"Court_fax\":\"07577126570" + COMMA_NEWLINE
+            + "\"Court_DX\":\"123456" + COMMA_NEWLINE
+            + "\"Court_Email\":\"ManchesterOfficeET@hmcts.gov.uk" + COMMA_NEWLINE
+            + "\"i2_2A_enhmcts\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i2_2A_enhmcts1\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i2_2A_enhmcts2\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts1\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts2\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"Clerk\":\"Mike Jordan" + COMMA_NEWLINE
+            + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + COMMA_NEWLINE
+            + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + COMMA_NEWLINE
+            + "\"Case_No\":\"123456" + COMMA_NEWLINE
+            + "\"submission_reference\":\"12212121" + COMMA_NEWLINE
+            + CLOSE_BRACE_NEW_LINE
+            + CLOSE_BRACE_NEW_LINE;
         caseDetails2.getCaseData().getRepCollection().getFirst().getValue().setRespRepName("Antonio Vazquez");
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails2.getCaseData(), "",
                 userDetails, ENGLANDWALES_CASE_TYPE_ID,
                 caseDetails2.getCaseData().getCorrespondenceType(),
                 caseDetails2.getCaseData().getCorrespondenceScotType(), null,
                 null, venueAddressReaderService).toString());
-        caseDetails2.getCaseData().getRepCollection()
-                .getFirst().getValue().setRespRepName("RepresentativeNameRespondent");
+        caseDetails2.getCaseData().getRepCollection().getFirst()
+                .getValue().setRespRepName("RepresentativeNameRespondent");
     }
 
     @Test
     void buildDocumentContent2_ResponseNotStruckOut() {
-        String expected = "{" + NEW_LINE
-                + "\"accessKey\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"templateName\":\"EM-TRB-EGW-ENG-00027.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"outputName\":\"document.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"data\":{" + NEW_LINE
-                + "\"claimant_or_rep_full_name\":\"Orlando LTD\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_full_name\":\"Orlando LTD\"" + NEW_LINE_WITH_COMMA
-                + "\"Claimant\":\"Orlando LTD\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine1\":\"34\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine2\":\"Low Street\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_county\":\"Lancashire\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_postCode\":\"M3 6gw\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine1\":\"34\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine2\":\"Low Street\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_county\":\"Lancashire\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_postCode\":\"M3 6gw\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_full_name\":\"RepresentativeNameRespondent\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine1\":\"56 Block C\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine2\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_county\":\"Lancashire\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_postCode\":\"M3 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_reference\":\"1111111\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_rep_organisation\":\"RepresentativeOrganisation\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_full_name\":\"Antonio Vazquez\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine1\":\"11 Small Street\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine2\":\"22 House\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_county\":\"North West\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_postCode\":\"M12 42R\"" + NEW_LINE_WITH_COMMA
-                + "\"Respondent\":\"Antonio Vazquez\"" + NEW_LINE_WITH_COMMA
-                + "\"resp_others\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"resp_address\":\"11 Small Street, 22 House, Manchester, North West, M12 42R, UK\""
-                + NEW_LINE_WITH_COMMA
-                + "\"Hearing_date\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_date_time\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_time\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_venue\":\"Manchester Employment Tribunals, Alexandra House, 14-22 The Parsonage, "
-                + "Manchester, M3 2JA\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_duration\":\"2 days\"" + NEW_LINE_WITH_COMMA
-                + "\"t2_2A\":\"true\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine1\":\"Manchester Employment Tribunal,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine2\":\"Alexandra House,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine3\":\"14-22 The Parsonage,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_town\":\"Manchester,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_county\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_postCode\":\"M3 2JA\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_telephone\":\"03577131270\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_fax\":\"07577126570\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_DX\":\"123456\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_Email\":\"ManchesterOfficeET@hmcts.gov.uk\"" + NEW_LINE_WITH_COMMA
-                + "\"i2_2A_enhmcts\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i2_2A_enhmcts1\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i2_2A_enhmcts2\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts1\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts2\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"Clerk\":\"Mike Jordan\"" + NEW_LINE_WITH_COMMA
-                + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + NEW_LINE_WITH_COMMA
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
-                + NEW_LINE_WITH_COMMA
-                + "\"Case_No\":\"123456\"" + NEW_LINE_WITH_COMMA
-                + "\"submission_reference\":\"12212121\"" + NEW_LINE_WITH_COMMA
-                + "}" + NEW_LINE
-                + "}" + NEW_LINE;
+        String expected = "{\n"
+            + "\"accessKey\":\"" + COMMA_NEWLINE
+            + "\"templateName\":\"EM-TRB-EGW-ENG-00027.docx" + COMMA_NEWLINE
+            + "\"outputName\":\"document.docx" + COMMA_NEWLINE
+            + "\"data\":{\n"
+            + "\"claimant_or_rep_full_name\":\"Orlando LTD" + COMMA_NEWLINE
+            + "\"claimant_full_name\":\"Orlando LTD" + COMMA_NEWLINE
+            + "\"Claimant\":\"Orlando LTD" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine1\":\"34" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine2\":\"Low Street" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"claimant_or_rep_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"claimant_or_rep_county\":\"Lancashire" + COMMA_NEWLINE
+            + "\"claimant_or_rep_postCode\":\"M3 6gw" + COMMA_NEWLINE
+            + "\"claimant_addressLine1\":\"34" + COMMA_NEWLINE
+            + "\"claimant_addressLine2\":\"Low Street" + COMMA_NEWLINE
+            + "\"claimant_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"claimant_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"claimant_county\":\"Lancashire" + COMMA_NEWLINE
+            + "\"claimant_postCode\":\"M3 6gw" + COMMA_NEWLINE
+            + "\"respondent_or_rep_full_name\":\"RepresentativeNameRespondent" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine1\":\"56 Block C" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine2\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"respondent_or_rep_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"respondent_or_rep_county\":\"Lancashire" + COMMA_NEWLINE
+            + "\"respondent_or_rep_postCode\":\"M3 KJR" + COMMA_NEWLINE
+            + "\"respondent_reference\":\"1111111" + COMMA_NEWLINE
+            + "\"respondent_rep_organisation\":\"RepresentativeOrganisation" + COMMA_NEWLINE
+            + "\"respondent_full_name\":\"Antonio Vazquez" + COMMA_NEWLINE
+            + "\"respondent_addressLine1\":\"11 Small Street" + COMMA_NEWLINE
+            + "\"respondent_addressLine2\":\"22 House" + COMMA_NEWLINE
+            + "\"respondent_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"respondent_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"respondent_county\":\"North West" + COMMA_NEWLINE
+            + "\"respondent_postCode\":\"M12 42R" + COMMA_NEWLINE
+            + "\"Respondent\":\"Antonio Vazquez" + COMMA_NEWLINE
+            + "\"resp_others\":\"" + COMMA_NEWLINE
+            + "\"resp_address\":\"11 Small Street, 22 House, Manchester, North West, M12 42R, UK" + COMMA_NEWLINE
+            + "\"Hearing_date\":\"" + COMMA_NEWLINE
+            + "\"Hearing_date_time\":\"" + COMMA_NEWLINE
+            + "\"Hearing_time\":\"" + COMMA_NEWLINE
+            + "\"Hearing_venue\":\"Manchester Employment Tribunals, Alexandra House, 14-22 The Parsonage, "
+            + "Manchester, M3 2JA" + COMMA_NEWLINE
+            + "\"Hearing_duration\":\"2 days" + COMMA_NEWLINE
+            + "\"t2_2A\":\"true" + COMMA_NEWLINE
+            + "\"Court_addressLine1\":\"Manchester Employment Tribunal," + COMMA_NEWLINE
+            + "\"Court_addressLine2\":\"Alexandra House," + COMMA_NEWLINE
+            + "\"Court_addressLine3\":\"14-22 The Parsonage," + COMMA_NEWLINE
+            + "\"Court_town\":\"Manchester," + COMMA_NEWLINE
+            + "\"Court_county\":\"" + COMMA_NEWLINE
+            + "\"Court_postCode\":\"M3 2JA" + COMMA_NEWLINE
+            + "\"Court_telephone\":\"03577131270" + COMMA_NEWLINE
+            + "\"Court_fax\":\"07577126570" + COMMA_NEWLINE
+            + "\"Court_DX\":\"123456" + COMMA_NEWLINE
+            + "\"Court_Email\":\"ManchesterOfficeET@hmcts.gov.uk" + COMMA_NEWLINE
+            + "\"i2_2A_enhmcts\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i2_2A_enhmcts1\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i2_2A_enhmcts2\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts1\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts2\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"Clerk\":\"Mike Jordan" + COMMA_NEWLINE
+            + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + COMMA_NEWLINE
+            + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + COMMA_NEWLINE
+            + "\"Case_No\":\"123456" + COMMA_NEWLINE
+            + "\"submission_reference\":\"12212121" + COMMA_NEWLINE
+            + CLOSE_BRACE_NEW_LINE
+            + CLOSE_BRACE_NEW_LINE;
         caseDetails2.getCaseData().getRespondentCollection().getFirst().getValue().setResponseStruckOut(NO);
         caseDetails2.getCaseData().getRepCollection().getFirst().getValue().setRespRepName("Antonio Vazquez");
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails2.getCaseData(), "",
@@ -356,82 +351,80 @@ class DocumentHelperTest {
                 caseDetails2.getCaseData().getCorrespondenceType(),
                 caseDetails2.getCaseData().getCorrespondenceScotType(), null,
                 null, venueAddressReaderService).toString());
-        caseDetails2.getCaseData().getRepCollection()
-                .getFirst().getValue().setRespRepName("RepresentativeNameRespondent");
+        caseDetails2.getCaseData().getRepCollection().getFirst()
+                .getValue().setRespRepName("RepresentativeNameRespondent");
     }
 
     @Test
     void buildDocumentContent3() {
-        String expected = "{" + NEW_LINE
-                + "\"accessKey\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"templateName\":\"EM-TRB-EGW-ENG-00028.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"outputName\":\"document.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"data\":{" + NEW_LINE
-                + "\"claimant_or_rep_full_name\":\"Mr A J Rodriguez\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_full_name\":\"Mr A J Rodriguez\"" + NEW_LINE_WITH_COMMA
-                + "\"Claimant\":\"Mr A J Rodriguez\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine1\":\"34\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine2\":\"Low Street\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_county\":\"Lancashire\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_postCode\":\"M3 6gw\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine1\":\"34\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine2\":\"Low Street\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_county\":\"Lancashire\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_postCode\":\"M3 6gw\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_full_name\":\"RepresentativeNameRespondent\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine1\":\"56 Block C\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine2\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_county\":\"Lancashire\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_postCode\":\"M3 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_reference\":\"1111111\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_rep_organisation\":\"RepresentativeOrganisation\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_full_name\":\"Antonio Vazquez\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine1\":\"11 Small Street\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine2\":\"22 House\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_county\":\"North West\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_postCode\":\"M12 42R\"" + NEW_LINE_WITH_COMMA
-                + "\"Respondent\":\"Antonio Vazquez\"" + NEW_LINE_WITH_COMMA
-                + "\"resp_others\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"resp_address\":\"11 Small Street, 22 House, Manchester, North West, M12 42R, UK\""
-                + NEW_LINE_WITH_COMMA
-                + "\"Hearing_date\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_date_time\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_venue\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_duration\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_time\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"t3_2\":\"true\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine1\":\"Manchester Employment Tribunal,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine2\":\"Alexandra House,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine3\":\"14-22 The Parsonage,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_town\":\"Manchester,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_county\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_postCode\":\"M3 2JA\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_telephone\":\"03577131270\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_fax\":\"07577126570\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_DX\":\"123456\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_Email\":\"ManchesterOfficeET@hmcts.gov.uk\"" + NEW_LINE_WITH_COMMA
-                + "\"i3_2_enhmcts\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i3_2_enhmcts1\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i3_2_enhmcts2\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts1\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts2\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"Clerk\":\"Mike Jordan\"" + NEW_LINE_WITH_COMMA
-                + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + NEW_LINE_WITH_COMMA
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
-                + NEW_LINE_WITH_COMMA
-                + "\"Case_No\":\"123456\"" + NEW_LINE_WITH_COMMA
-                + "\"submission_reference\":\"12212121\"" + NEW_LINE_WITH_COMMA
-                + "}" + NEW_LINE
-                + "}" + NEW_LINE;
+        String expected = "{\n"
+            + "\"accessKey\":\"" + COMMA_NEWLINE
+            + "\"templateName\":\"EM-TRB-EGW-ENG-00028.docx" + COMMA_NEWLINE
+            + "\"outputName\":\"document.docx" + COMMA_NEWLINE
+            + "\"data\":{\n"
+            + "\"claimant_or_rep_full_name\":\"Mr A J Rodriguez" + COMMA_NEWLINE
+            + "\"claimant_full_name\":\"Mr A J Rodriguez" + COMMA_NEWLINE
+            + "\"Claimant\":\"Mr A J Rodriguez" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine1\":\"34" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine2\":\"Low Street" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"claimant_or_rep_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"claimant_or_rep_county\":\"Lancashire" + COMMA_NEWLINE
+            + "\"claimant_or_rep_postCode\":\"M3 6gw" + COMMA_NEWLINE
+            + "\"claimant_addressLine1\":\"34" + COMMA_NEWLINE
+            + "\"claimant_addressLine2\":\"Low Street" + COMMA_NEWLINE
+            + "\"claimant_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"claimant_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"claimant_county\":\"Lancashire" + COMMA_NEWLINE
+            + "\"claimant_postCode\":\"M3 6gw" + COMMA_NEWLINE
+            + "\"respondent_or_rep_full_name\":\"RepresentativeNameRespondent" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine1\":\"56 Block C" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine2\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"respondent_or_rep_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"respondent_or_rep_county\":\"Lancashire" + COMMA_NEWLINE
+            + "\"respondent_or_rep_postCode\":\"M3 KJR" + COMMA_NEWLINE
+            + "\"respondent_reference\":\"1111111" + COMMA_NEWLINE
+            + "\"respondent_rep_organisation\":\"RepresentativeOrganisation" + COMMA_NEWLINE
+            + "\"respondent_full_name\":\"Antonio Vazquez" + COMMA_NEWLINE
+            + "\"respondent_addressLine1\":\"11 Small Street" + COMMA_NEWLINE
+            + "\"respondent_addressLine2\":\"22 House" + COMMA_NEWLINE
+            + "\"respondent_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"respondent_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"respondent_county\":\"North West" + COMMA_NEWLINE
+            + "\"respondent_postCode\":\"M12 42R" + COMMA_NEWLINE
+            + "\"Respondent\":\"Antonio Vazquez" + COMMA_NEWLINE
+            + "\"resp_others\":\"" + COMMA_NEWLINE
+            + "\"resp_address\":\"11 Small Street, 22 House, Manchester, North West, M12 42R, UK" + COMMA_NEWLINE
+            + "\"Hearing_date\":\"" + COMMA_NEWLINE
+            + "\"Hearing_date_time\":\"" + COMMA_NEWLINE
+            + "\"Hearing_venue\":\"" + COMMA_NEWLINE
+            + "\"Hearing_duration\":\"" + COMMA_NEWLINE
+            + "\"Hearing_time\":\"" + COMMA_NEWLINE
+            + "\"t3_2\":\"true" + COMMA_NEWLINE
+            + "\"Court_addressLine1\":\"Manchester Employment Tribunal," + COMMA_NEWLINE
+            + "\"Court_addressLine2\":\"Alexandra House," + COMMA_NEWLINE
+            + "\"Court_addressLine3\":\"14-22 The Parsonage," + COMMA_NEWLINE
+            + "\"Court_town\":\"Manchester," + COMMA_NEWLINE
+            + "\"Court_county\":\"" + COMMA_NEWLINE
+            + "\"Court_postCode\":\"M3 2JA" + COMMA_NEWLINE
+            + "\"Court_telephone\":\"03577131270" + COMMA_NEWLINE
+            + "\"Court_fax\":\"07577126570" + COMMA_NEWLINE
+            + "\"Court_DX\":\"123456" + COMMA_NEWLINE
+            + "\"Court_Email\":\"ManchesterOfficeET@hmcts.gov.uk" + COMMA_NEWLINE
+            + "\"i3_2_enhmcts\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i3_2_enhmcts1\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i3_2_enhmcts2\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts1\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts2\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"Clerk\":\"Mike Jordan" + COMMA_NEWLINE
+            + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + COMMA_NEWLINE
+            + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + COMMA_NEWLINE
+            + "\"Case_No\":\"123456" + COMMA_NEWLINE
+            + "\"submission_reference\":\"12212121" + COMMA_NEWLINE
+            + CLOSE_BRACE_NEW_LINE
+            + CLOSE_BRACE_NEW_LINE;
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails3.getCaseData(), "",
                 userDetails, ENGLANDWALES_CASE_TYPE_ID,
                 caseDetails3.getCaseData().getCorrespondenceType(),
@@ -441,76 +434,74 @@ class DocumentHelperTest {
 
     @Test
     void buildDocumentContent4() {
-        String expected = "{" + NEW_LINE
-                + "\"accessKey\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"templateName\":\"EM-TRB-EGW-ENG-00029.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"outputName\":\"document.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"data\":{" + NEW_LINE
-                + "\"claimant_or_rep_full_name\":\"RepresentativeNameClaimant\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_rep_organisation\":\"RepresentativeOrganisation\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine1\":\"56 Block C\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine2\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_county\":\"Lancashire\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_postCode\":\"M3 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_reference\":\"1111111\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_full_name\":\"Mr A J Rodriguez\"" + NEW_LINE_WITH_COMMA
-                + "\"Claimant\":\"Mr A J Rodriguez\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine1\":\"34\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine2\":\"Low Street\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_county\":\"Lancashire\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_postCode\":\"M3 6gw\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_full_name\":\"Antonio Vazquez\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine1\":\"11 Small Street\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine2\":\"22 House\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_county\":\"North West\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_postCode\":\"M12 42R\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_full_name\":\"Antonio Vazquez\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine1\":\"11 Small Street\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine2\":\"22 House\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_county\":\"North West\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_postCode\":\"M12 42R\"" + NEW_LINE_WITH_COMMA
-                + "\"Respondent\":\"Antonio Vazquez\"" + NEW_LINE_WITH_COMMA
-                + "\"resp_others\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"resp_address\":\"11 Small Street, 22 House, Manchester, North West, M12 42R, UK\""
-                + NEW_LINE_WITH_COMMA
-                + "\"Hearing_date\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_date_time\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_venue\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_duration\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_time\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"t4_2\":\"true\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine1\":\"Manchester Employment Tribunal,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine2\":\"Alexandra House,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine3\":\"14-22 The Parsonage,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_town\":\"Manchester,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_county\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_postCode\":\"M3 2JA\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_telephone\":\"03577131270\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_fax\":\"07577126570\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_DX\":\"123456\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_Email\":\"ManchesterOfficeET@hmcts.gov.uk\"" + NEW_LINE_WITH_COMMA
-                + "\"i4_2_enhmcts\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i4_2_enhmcts1\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i4_2_enhmcts2\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts1\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts2\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"Clerk\":\"Mike Jordan\"" + NEW_LINE_WITH_COMMA
-                + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + NEW_LINE_WITH_COMMA
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
-                + NEW_LINE_WITH_COMMA
-                + "\"Case_No\":\"123456\"" + NEW_LINE_WITH_COMMA
-                + "\"submission_reference\":\"12212121\"" + NEW_LINE_WITH_COMMA
-                + "}" + NEW_LINE
-                + "}" + NEW_LINE;
+        String expected = "{\n"
+            + "\"accessKey\":\"" + COMMA_NEWLINE
+            + "\"templateName\":\"EM-TRB-EGW-ENG-00029.docx" + COMMA_NEWLINE
+            + "\"outputName\":\"document.docx" + COMMA_NEWLINE
+            + "\"data\":{\n"
+            + "\"claimant_or_rep_full_name\":\"RepresentativeNameClaimant" + COMMA_NEWLINE
+            + "\"claimant_rep_organisation\":\"RepresentativeOrganisation" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine1\":\"56 Block C" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine2\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"claimant_or_rep_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"claimant_or_rep_county\":\"Lancashire" + COMMA_NEWLINE
+            + "\"claimant_or_rep_postCode\":\"M3 KJR" + COMMA_NEWLINE
+            + "\"claimant_reference\":\"1111111" + COMMA_NEWLINE
+            + "\"claimant_full_name\":\"Mr A J Rodriguez" + COMMA_NEWLINE
+            + "\"Claimant\":\"Mr A J Rodriguez" + COMMA_NEWLINE
+            + "\"claimant_addressLine1\":\"34" + COMMA_NEWLINE
+            + "\"claimant_addressLine2\":\"Low Street" + COMMA_NEWLINE
+            + "\"claimant_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"claimant_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"claimant_county\":\"Lancashire" + COMMA_NEWLINE
+            + "\"claimant_postCode\":\"M3 6gw" + COMMA_NEWLINE
+            + "\"respondent_or_rep_full_name\":\"Antonio Vazquez" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine1\":\"11 Small Street" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine2\":\"22 House" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"respondent_or_rep_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"respondent_or_rep_county\":\"North West" + COMMA_NEWLINE
+            + "\"respondent_or_rep_postCode\":\"M12 42R" + COMMA_NEWLINE
+            + "\"respondent_full_name\":\"Antonio Vazquez" + COMMA_NEWLINE
+            + "\"respondent_addressLine1\":\"11 Small Street" + COMMA_NEWLINE
+            + "\"respondent_addressLine2\":\"22 House" + COMMA_NEWLINE
+            + "\"respondent_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"respondent_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"respondent_county\":\"North West" + COMMA_NEWLINE
+            + "\"respondent_postCode\":\"M12 42R" + COMMA_NEWLINE
+            + "\"Respondent\":\"Antonio Vazquez" + COMMA_NEWLINE
+            + "\"resp_others\":\"" + COMMA_NEWLINE
+            + "\"resp_address\":\"11 Small Street, 22 House, Manchester, North West, M12 42R, UK" + COMMA_NEWLINE
+            + "\"Hearing_date\":\"" + COMMA_NEWLINE
+            + "\"Hearing_date_time\":\"" + COMMA_NEWLINE
+            + "\"Hearing_venue\":\"" + COMMA_NEWLINE
+            + "\"Hearing_duration\":\"" + COMMA_NEWLINE
+            + "\"Hearing_time\":\"" + COMMA_NEWLINE
+            + "\"t4_2\":\"true" + COMMA_NEWLINE
+            + "\"Court_addressLine1\":\"Manchester Employment Tribunal," + COMMA_NEWLINE
+            + "\"Court_addressLine2\":\"Alexandra House," + COMMA_NEWLINE
+            + "\"Court_addressLine3\":\"14-22 The Parsonage," + COMMA_NEWLINE
+            + "\"Court_town\":\"Manchester," + COMMA_NEWLINE
+            + "\"Court_county\":\"" + COMMA_NEWLINE
+            + "\"Court_postCode\":\"M3 2JA" + COMMA_NEWLINE
+            + "\"Court_telephone\":\"03577131270" + COMMA_NEWLINE
+            + "\"Court_fax\":\"07577126570" + COMMA_NEWLINE
+            + "\"Court_DX\":\"123456" + COMMA_NEWLINE
+            + "\"Court_Email\":\"ManchesterOfficeET@hmcts.gov.uk" + COMMA_NEWLINE
+            + "\"i4_2_enhmcts\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i4_2_enhmcts1\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i4_2_enhmcts2\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts1\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts2\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"Clerk\":\"Mike Jordan" + COMMA_NEWLINE
+            + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + COMMA_NEWLINE
+            + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + COMMA_NEWLINE
+            + "\"Case_No\":\"123456" + COMMA_NEWLINE
+            + "\"submission_reference\":\"12212121" + COMMA_NEWLINE
+            + CLOSE_BRACE_NEW_LINE
+            + CLOSE_BRACE_NEW_LINE;
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails4.getCaseData(), "",
                 userDetails, ENGLANDWALES_CASE_TYPE_ID,
                 caseDetails4.getCaseData().getCorrespondenceType(),
@@ -520,78 +511,77 @@ class DocumentHelperTest {
 
     @Test
     void buildDocumentContent5() {
-        String expected = "{" + NEW_LINE
-                + "\"accessKey\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"templateName\":\"EM-TRB-EGW-ENG-00030.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"outputName\":\"document.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"data\":{" + NEW_LINE
-                + "\"claimant_or_rep_full_name\":\"RepresentativeNameClaimant\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_rep_organisation\":\"RepresentativeOrganisation\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine1\":\"56 Block C\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine2\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_county\":\"Lancashire\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_postCode\":\"M3 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_reference\":\"1111111\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_full_name\":\"Mr A J Rodriguez\"" + NEW_LINE_WITH_COMMA
-                + "\"Claimant\":\"Mr A J Rodriguez\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine1\":\"34\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine2\":\"Low Street\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_county\":\"Lancashire\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_postCode\":\"M3 6gw\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_full_name\":\"RepresentativeNameRespondent1\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine1\":\"56 Block C\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine2\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_county\":\"Lancashire\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_postCode\":\"M3 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_reference\":\"3333333333\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_rep_organisation\":\"RepresentativeOrganisation\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_full_name\":\"Antonio Vazquez\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine1\":\"11 Small Street\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine2\":\"22 House\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_county\":\"North West\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_postCode\":\"M12 42R\"" + NEW_LINE_WITH_COMMA
-                + "\"Respondent\":\"1. Antonio Vazquez,\"" + NEW_LINE_WITH_COMMA
-                + "\"resp_others\":\"2. Antonio Vazquez2\"" + NEW_LINE_WITH_COMMA
-                + "\"resp_address\":\"1. 11 Small Street, 22 House, Manchester, North West, M12 42R, UK\\n2. 11 Small"
-                + " Street, 22 House, Manchester, North West, M12 42R, UK\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_date\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_date_time\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_venue\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_duration\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_time\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"t5_2\":\"true\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine1\":\"Manchester Employment Tribunal,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine2\":\"Alexandra House,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine3\":\"14-22 The Parsonage,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_town\":\"Manchester,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_county\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_postCode\":\"M3 2JA\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_telephone\":\"03577131270\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_fax\":\"07577126570\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_DX\":\"123456\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_Email\":\"ManchesterOfficeET@hmcts.gov.uk\"" + NEW_LINE_WITH_COMMA
-                + "\"i5_2_enhmcts\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i5_2_enhmcts1\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i5_2_enhmcts2\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts1\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts2\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"Clerk\":\"Mike Jordan\"" + NEW_LINE_WITH_COMMA
-                + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + NEW_LINE_WITH_COMMA
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
-                + NEW_LINE_WITH_COMMA
-                + "\"Case_No\":\"123456\"" + NEW_LINE_WITH_COMMA
-                + "\"submission_reference\":\"12212121\"" + NEW_LINE_WITH_COMMA
-                + "}" + NEW_LINE
-                + "}" + NEW_LINE;
+        String expected = "{\n"
+            + "\"accessKey\":\"" + COMMA_NEWLINE
+            + "\"templateName\":\"EM-TRB-EGW-ENG-00030.docx" + COMMA_NEWLINE
+            + "\"outputName\":\"document.docx" + COMMA_NEWLINE
+            + "\"data\":{\n"
+            + "\"claimant_or_rep_full_name\":\"RepresentativeNameClaimant" + COMMA_NEWLINE
+            + "\"claimant_rep_organisation\":\"RepresentativeOrganisation" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine1\":\"56 Block C" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine2\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"claimant_or_rep_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"claimant_or_rep_county\":\"Lancashire" + COMMA_NEWLINE
+            + "\"claimant_or_rep_postCode\":\"M3 KJR" + COMMA_NEWLINE
+            + "\"claimant_reference\":\"1111111" + COMMA_NEWLINE
+            + "\"claimant_full_name\":\"Mr A J Rodriguez" + COMMA_NEWLINE
+            + "\"Claimant\":\"Mr A J Rodriguez" + COMMA_NEWLINE
+            + "\"claimant_addressLine1\":\"34" + COMMA_NEWLINE
+            + "\"claimant_addressLine2\":\"Low Street" + COMMA_NEWLINE
+            + "\"claimant_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"claimant_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"claimant_county\":\"Lancashire" + COMMA_NEWLINE
+            + "\"claimant_postCode\":\"M3 6gw" + COMMA_NEWLINE
+            + "\"respondent_or_rep_full_name\":\"RepresentativeNameRespondent1" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine1\":\"56 Block C" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine2\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"respondent_or_rep_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"respondent_or_rep_county\":\"Lancashire" + COMMA_NEWLINE
+            + "\"respondent_or_rep_postCode\":\"M3 KJR" + COMMA_NEWLINE
+            + "\"respondent_reference\":\"3333333333" + COMMA_NEWLINE
+            + "\"respondent_rep_organisation\":\"RepresentativeOrganisation" + COMMA_NEWLINE
+            + "\"respondent_full_name\":\"Antonio Vazquez" + COMMA_NEWLINE
+            + "\"respondent_addressLine1\":\"11 Small Street" + COMMA_NEWLINE
+            + "\"respondent_addressLine2\":\"22 House" + COMMA_NEWLINE
+            + "\"respondent_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"respondent_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"respondent_county\":\"North West" + COMMA_NEWLINE
+            + "\"respondent_postCode\":\"M12 42R" + COMMA_NEWLINE
+            + "\"Respondent\":\"1. Antonio Vazquez," + COMMA_NEWLINE
+            + "\"resp_others\":\"2. Antonio Vazquez2" + COMMA_NEWLINE
+            + "\"resp_address\":\"1. 11 Small Street, 22 House, Manchester, North West, M12 42R, UK\\n2. 11 Small"
+            + " Street, 22 House, Manchester, North West, M12 42R, UK" + COMMA_NEWLINE
+            + "\"Hearing_date\":\"" + COMMA_NEWLINE
+            + "\"Hearing_date_time\":\"" + COMMA_NEWLINE
+            + "\"Hearing_venue\":\"" + COMMA_NEWLINE
+            + "\"Hearing_duration\":\"" + COMMA_NEWLINE
+            + "\"Hearing_time\":\"" + COMMA_NEWLINE
+            + "\"t5_2\":\"true" + COMMA_NEWLINE
+            + "\"Court_addressLine1\":\"Manchester Employment Tribunal," + COMMA_NEWLINE
+            + "\"Court_addressLine2\":\"Alexandra House," + COMMA_NEWLINE
+            + "\"Court_addressLine3\":\"14-22 The Parsonage," + COMMA_NEWLINE
+            + "\"Court_town\":\"Manchester," + COMMA_NEWLINE
+            + "\"Court_county\":\"" + COMMA_NEWLINE
+            + "\"Court_postCode\":\"M3 2JA" + COMMA_NEWLINE
+            + "\"Court_telephone\":\"03577131270" + COMMA_NEWLINE
+            + "\"Court_fax\":\"07577126570" + COMMA_NEWLINE
+            + "\"Court_DX\":\"123456" + COMMA_NEWLINE
+            + "\"Court_Email\":\"ManchesterOfficeET@hmcts.gov.uk" + COMMA_NEWLINE
+            + "\"i5_2_enhmcts\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i5_2_enhmcts1\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i5_2_enhmcts2\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts1\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts2\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"Clerk\":\"Mike Jordan" + COMMA_NEWLINE
+            + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + COMMA_NEWLINE
+            + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + COMMA_NEWLINE
+            + "\"Case_No\":\"123456" + COMMA_NEWLINE
+            + "\"submission_reference\":\"12212121" + COMMA_NEWLINE
+            + CLOSE_BRACE_NEW_LINE
+            + CLOSE_BRACE_NEW_LINE;
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails5.getCaseData(), "",
                 userDetails, ENGLANDWALES_CASE_TYPE_ID,
                 caseDetails5.getCaseData().getCorrespondenceType(),
@@ -601,78 +591,76 @@ class DocumentHelperTest {
 
     @Test
     void buildDocumentContent6() {
-        String expected = "{" + NEW_LINE
-                + "\"accessKey\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"templateName\":\"EM-TRB-EGW-ENG-00031.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"outputName\":\"document.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"data\":{" + NEW_LINE
-                + "\"claimant_or_rep_full_name\":\"RepresentativeNameClaimant\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_rep_organisation\":\"RepresentativeOrganisation\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine1\":\"56 Block C\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine2\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_county\":\"Lancashire\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_postCode\":\"M3 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_reference\":\"1111111\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_full_name\":\"Orlando LTD\"" + NEW_LINE_WITH_COMMA
-                + "\"Claimant\":\"Orlando LTD\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine1\":\"34\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine2\":\"Low Street\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_county\":\"Lancashire\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_postCode\":\"M3 6gw\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_full_name\":\"RepresentativeNameRespondent1\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine1\":\"56 Block C\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine2\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_county\":\"Lancashire\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_postCode\":\"M3 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_reference\":\"3333333333\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_rep_organisation\":\"RepresentativeOrganisation\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_full_name\":\"Antonio Vazquez\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine1\":\"11 Small Street\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine2\":\"22 House\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_county\":\"North West\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_postCode\":\"M12 42R\"" + NEW_LINE_WITH_COMMA
-                + "\"Respondent\":\"Antonio Vazquez\"" + NEW_LINE_WITH_COMMA
-                + "\"resp_others\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"resp_address\":\"11 Small Street, 22 House, Manchester, North West, M12 42R, UK\""
-                + NEW_LINE_WITH_COMMA
-                + "\"Hearing_date\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_date_time\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_venue\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_duration\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_time\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"t6_2\":\"true\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine1\":\"Manchester Employment Tribunal,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine2\":\"Alexandra House,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine3\":\"14-22 The Parsonage,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_town\":\"Manchester,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_county\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_postCode\":\"M3 2JA\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_telephone\":\"03577131270\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_fax\":\"07577126570\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_DX\":\"123456\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_Email\":\"ManchesterOfficeET@hmcts.gov.uk\"" + NEW_LINE_WITH_COMMA
-                + "\"i6_2_enhmcts\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i6_2_enhmcts1\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i6_2_enhmcts2\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts1\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts2\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"Clerk\":\"Mike Jordan\"" + NEW_LINE_WITH_COMMA
-                + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + NEW_LINE_WITH_COMMA
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
-                + NEW_LINE_WITH_COMMA
-                + "\"Case_No\":\"123456\"" + NEW_LINE_WITH_COMMA
-                + "\"submission_reference\":\"12212121\"" + NEW_LINE_WITH_COMMA
-                + "}" + NEW_LINE
-                + "}" + NEW_LINE;
+        String expected = "{\n"
+            + "\"accessKey\":\"" + COMMA_NEWLINE
+            + "\"templateName\":\"EM-TRB-EGW-ENG-00031.docx" + COMMA_NEWLINE
+            + "\"outputName\":\"document.docx" + COMMA_NEWLINE
+            + "\"data\":{\n"
+            + "\"claimant_or_rep_full_name\":\"RepresentativeNameClaimant" + COMMA_NEWLINE
+            + "\"claimant_rep_organisation\":\"RepresentativeOrganisation" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine1\":\"56 Block C" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine2\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"claimant_or_rep_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"claimant_or_rep_county\":\"Lancashire" + COMMA_NEWLINE
+            + "\"claimant_or_rep_postCode\":\"M3 KJR" + COMMA_NEWLINE
+            + "\"claimant_reference\":\"1111111" + COMMA_NEWLINE
+            + "\"claimant_full_name\":\"Orlando LTD" + COMMA_NEWLINE
+            + "\"Claimant\":\"Orlando LTD" + COMMA_NEWLINE
+            + "\"claimant_addressLine1\":\"34" + COMMA_NEWLINE
+            + "\"claimant_addressLine2\":\"Low Street" + COMMA_NEWLINE
+            + "\"claimant_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"claimant_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"claimant_county\":\"Lancashire" + COMMA_NEWLINE
+            + "\"claimant_postCode\":\"M3 6gw" + COMMA_NEWLINE
+            + "\"respondent_or_rep_full_name\":\"RepresentativeNameRespondent1" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine1\":\"56 Block C" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine2\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"respondent_or_rep_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"respondent_or_rep_county\":\"Lancashire" + COMMA_NEWLINE
+            + "\"respondent_or_rep_postCode\":\"M3 KJR" + COMMA_NEWLINE
+            + "\"respondent_reference\":\"3333333333" + COMMA_NEWLINE
+            + "\"respondent_rep_organisation\":\"RepresentativeOrganisation" + COMMA_NEWLINE
+            + "\"respondent_full_name\":\"Antonio Vazquez" + COMMA_NEWLINE
+            + "\"respondent_addressLine1\":\"11 Small Street" + COMMA_NEWLINE
+            + "\"respondent_addressLine2\":\"22 House" + COMMA_NEWLINE
+            + "\"respondent_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"respondent_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"respondent_county\":\"North West" + COMMA_NEWLINE
+            + "\"respondent_postCode\":\"M12 42R" + COMMA_NEWLINE
+            + "\"Respondent\":\"Antonio Vazquez" + COMMA_NEWLINE
+            + "\"resp_others\":\"" + COMMA_NEWLINE
+            + "\"resp_address\":\"11 Small Street, 22 House, Manchester, North West, M12 42R, UK" + COMMA_NEWLINE
+            + "\"Hearing_date\":\"" + COMMA_NEWLINE
+            + "\"Hearing_date_time\":\"" + COMMA_NEWLINE
+            + "\"Hearing_venue\":\"" + COMMA_NEWLINE
+            + "\"Hearing_duration\":\"" + COMMA_NEWLINE
+            + "\"Hearing_time\":\"" + COMMA_NEWLINE
+            + "\"t6_2\":\"true" + COMMA_NEWLINE
+            + "\"Court_addressLine1\":\"Manchester Employment Tribunal," + COMMA_NEWLINE
+            + "\"Court_addressLine2\":\"Alexandra House," + COMMA_NEWLINE
+            + "\"Court_addressLine3\":\"14-22 The Parsonage," + COMMA_NEWLINE
+            + "\"Court_town\":\"Manchester," + COMMA_NEWLINE
+            + "\"Court_county\":\"" + COMMA_NEWLINE
+            + "\"Court_postCode\":\"M3 2JA" + COMMA_NEWLINE
+            + "\"Court_telephone\":\"03577131270" + COMMA_NEWLINE
+            + "\"Court_fax\":\"07577126570" + COMMA_NEWLINE
+            + "\"Court_DX\":\"123456" + COMMA_NEWLINE
+            + "\"Court_Email\":\"ManchesterOfficeET@hmcts.gov.uk" + COMMA_NEWLINE
+            + "\"i6_2_enhmcts\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i6_2_enhmcts1\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i6_2_enhmcts2\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts1\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts2\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"Clerk\":\"Mike Jordan" + COMMA_NEWLINE
+            + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + COMMA_NEWLINE
+            + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + COMMA_NEWLINE
+            + "\"Case_No\":\"123456" + COMMA_NEWLINE
+            + "\"submission_reference\":\"12212121" + COMMA_NEWLINE
+            + CLOSE_BRACE_NEW_LINE
+            + CLOSE_BRACE_NEW_LINE;
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails6.getCaseData(), "",
                 userDetails, ENGLANDWALES_CASE_TYPE_ID,
                 caseDetails6.getCaseData().getCorrespondenceType(),
@@ -682,79 +670,77 @@ class DocumentHelperTest {
 
     @Test
     void buildDocumentContent7() {
-        String expected = "{" + NEW_LINE
-                + "\"accessKey\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"templateName\":\"EM-TRB-EGW-ENG-00032.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"outputName\":\"document.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"data\":{" + NEW_LINE
-                + "\"claimant_or_rep_full_name\":\"RepresentativeNameClaimant\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_rep_organisation\":\"RepresentativeOrganisation\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine1\":\"56 Block C\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine2\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_county\":\"Lancashire\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_postCode\":\"M3 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_reference\":\"1111111\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_full_name\":\"Mr A J Rodriguez\"" + NEW_LINE_WITH_COMMA
-                + "\"Claimant\":\"Mr A J Rodriguez\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine1\":\"34\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine2\":\"Low Street\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_county\":\"Lancashire\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_postCode\":\"M3 6gw\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_full_name\":\"RepresentativeNameRespondent1\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine1\":\"56 Block C\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine2\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_county\":\"Lancashire\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_postCode\":\"M3 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_reference\":\"3333333333\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_rep_organisation\":\"RepresentativeOrganisation\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_full_name\":\"Antonio Vazquez\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine1\":\"11 Small Street\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine2\":\"22 House\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_county\":\"North West\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_postCode\":\"M12 42R\"" + NEW_LINE_WITH_COMMA
-                + "\"Respondent\":\"Antonio Vazquez\"" + NEW_LINE_WITH_COMMA
-                + "\"resp_others\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"resp_address\":\"11 Small Street, 22 House, Manchester, North West, M12 42R, UK\""
-                + NEW_LINE_WITH_COMMA
-                + "\"Hearing_date\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_date_time\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_time\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_venue\":\"Manchester Employment Tribunals, Alexandra House, 14-22 The Parsonage, "
-                + "Manchester, M3 2JA\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_duration\":\"2 days\"" + NEW_LINE_WITH_COMMA
-                + "\"t7_2\":\"true\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine1\":\"Manchester Employment Tribunal,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine2\":\"Alexandra House,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine3\":\"14-22 The Parsonage,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_town\":\"Manchester,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_county\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_postCode\":\"M3 2JA\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_telephone\":\"03577131270\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_fax\":\"07577126570\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_DX\":\"123456\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_Email\":\"ManchesterOfficeET@hmcts.gov.uk\"" + NEW_LINE_WITH_COMMA
-                + "\"i7_2_enhmcts\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i7_2_enhmcts1\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i7_2_enhmcts2\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts1\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts2\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"Clerk\":\"Mike Jordan\"" + NEW_LINE_WITH_COMMA
-                + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + NEW_LINE_WITH_COMMA
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
-                + NEW_LINE_WITH_COMMA
-                + "\"Case_No\":\"123456\"" + NEW_LINE_WITH_COMMA
-                + "\"submission_reference\":\"12212121\"" + NEW_LINE_WITH_COMMA
-                + "}" + NEW_LINE
-                + "}" + NEW_LINE;
+        String expected = "{\n"
+            + "\"accessKey\":\"" + COMMA_NEWLINE
+            + "\"templateName\":\"EM-TRB-EGW-ENG-00032.docx" + COMMA_NEWLINE
+            + "\"outputName\":\"document.docx" + COMMA_NEWLINE
+            + "\"data\":{\n"
+            + "\"claimant_or_rep_full_name\":\"RepresentativeNameClaimant" + COMMA_NEWLINE
+            + "\"claimant_rep_organisation\":\"RepresentativeOrganisation" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine1\":\"56 Block C" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine2\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"claimant_or_rep_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"claimant_or_rep_county\":\"Lancashire" + COMMA_NEWLINE
+            + "\"claimant_or_rep_postCode\":\"M3 KJR" + COMMA_NEWLINE
+            + "\"claimant_reference\":\"1111111" + COMMA_NEWLINE
+            + "\"claimant_full_name\":\"Mr A J Rodriguez" + COMMA_NEWLINE
+            + "\"Claimant\":\"Mr A J Rodriguez" + COMMA_NEWLINE
+            + "\"claimant_addressLine1\":\"34" + COMMA_NEWLINE
+            + "\"claimant_addressLine2\":\"Low Street" + COMMA_NEWLINE
+            + "\"claimant_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"claimant_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"claimant_county\":\"Lancashire" + COMMA_NEWLINE
+            + "\"claimant_postCode\":\"M3 6gw" + COMMA_NEWLINE
+            + "\"respondent_or_rep_full_name\":\"RepresentativeNameRespondent1" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine1\":\"56 Block C" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine2\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"respondent_or_rep_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"respondent_or_rep_county\":\"Lancashire" + COMMA_NEWLINE
+            + "\"respondent_or_rep_postCode\":\"M3 KJR" + COMMA_NEWLINE
+            + "\"respondent_reference\":\"3333333333" + COMMA_NEWLINE
+            + "\"respondent_rep_organisation\":\"RepresentativeOrganisation" + COMMA_NEWLINE
+            + "\"respondent_full_name\":\"Antonio Vazquez" + COMMA_NEWLINE
+            + "\"respondent_addressLine1\":\"11 Small Street" + COMMA_NEWLINE
+            + "\"respondent_addressLine2\":\"22 House" + COMMA_NEWLINE
+            + "\"respondent_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"respondent_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"respondent_county\":\"North West" + COMMA_NEWLINE
+            + "\"respondent_postCode\":\"M12 42R" + COMMA_NEWLINE
+            + "\"Respondent\":\"Antonio Vazquez" + COMMA_NEWLINE
+            + "\"resp_others\":\"" + COMMA_NEWLINE
+            + "\"resp_address\":\"11 Small Street, 22 House, Manchester, North West, M12 42R, UK" + COMMA_NEWLINE
+            + "\"Hearing_date\":\"" + COMMA_NEWLINE
+            + "\"Hearing_date_time\":\"" + COMMA_NEWLINE
+            + "\"Hearing_time\":\"" + COMMA_NEWLINE
+            + "\"Hearing_venue\":\"Manchester Employment Tribunals, Alexandra House, 14-22 The Parsonage, "
+            + "Manchester, M3 2JA" + COMMA_NEWLINE
+            + "\"Hearing_duration\":\"2 days" + COMMA_NEWLINE
+            + "\"t7_2\":\"true" + COMMA_NEWLINE
+            + "\"Court_addressLine1\":\"Manchester Employment Tribunal," + COMMA_NEWLINE
+            + "\"Court_addressLine2\":\"Alexandra House," + COMMA_NEWLINE
+            + "\"Court_addressLine3\":\"14-22 The Parsonage," + COMMA_NEWLINE
+            + "\"Court_town\":\"Manchester," + COMMA_NEWLINE
+            + "\"Court_county\":\"" + COMMA_NEWLINE
+            + "\"Court_postCode\":\"M3 2JA" + COMMA_NEWLINE
+            + "\"Court_telephone\":\"03577131270" + COMMA_NEWLINE
+            + "\"Court_fax\":\"07577126570" + COMMA_NEWLINE
+            + "\"Court_DX\":\"123456" + COMMA_NEWLINE
+            + "\"Court_Email\":\"ManchesterOfficeET@hmcts.gov.uk" + COMMA_NEWLINE
+            + "\"i7_2_enhmcts\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i7_2_enhmcts1\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i7_2_enhmcts2\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts1\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts2\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"Clerk\":\"Mike Jordan" + COMMA_NEWLINE
+            + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + COMMA_NEWLINE
+            + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + COMMA_NEWLINE
+            + "\"Case_No\":\"123456" + COMMA_NEWLINE
+            + "\"submission_reference\":\"12212121" + COMMA_NEWLINE
+            + CLOSE_BRACE_NEW_LINE
+            + CLOSE_BRACE_NEW_LINE;
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails7.getCaseData(), "",
                 userDetails, ENGLANDWALES_CASE_TYPE_ID,
                 caseDetails7.getCaseData().getCorrespondenceType(),
@@ -764,77 +750,76 @@ class DocumentHelperTest {
 
     @Test
     void buildDocumentContent8() {
-        String expected = "{" + NEW_LINE
-                + "\"accessKey\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"templateName\":\"EM-TRB-EGW-ENG-00033.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"outputName\":\"document.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"data\":{" + NEW_LINE
-                + "\"claimant_or_rep_full_name\":\"RepresentativeNameClaimant\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_rep_organisation\":\"RepresentativeOrganisation\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine1\":\"56 Block C\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine2\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_county\":\"Lancashire\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_postCode\":\"M3 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_reference\":\"1111111\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_full_name\":\"Mr A J Rodriguez\"" + NEW_LINE_WITH_COMMA
-                + "\"Claimant\":\"Mr A J Rodriguez\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine1\":\"34\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine2\":\"Low Street\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_county\":\"Lancashire\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_postCode\":\"M3 6gw\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_full_name\":\"Antonio Vazquez\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine1\":\"11 Small Street\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine2\":\"22 House\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_county\":\"North West\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_postCode\":\"M12 42R\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_full_name\":\"Antonio Vazquez\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine1\":\"11 Small Street\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine2\":\"22 House\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_county\":\"North West\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_postCode\":\"M12 42R\"" + NEW_LINE_WITH_COMMA
-                + "\"Respondent\":\"1. Antonio Vazquez,\"" + NEW_LINE_WITH_COMMA
-                + "\"resp_others\":\"2. Mikey McCollier\"" + NEW_LINE_WITH_COMMA
-                + "\"resp_address\":\"1. 11 Small Street, 22 House, Manchester, North West, M12 42R, UK\\n2. 1333 "
-                + "Small Street, 22222 House, Liverpool, North West, L12 42R, UK\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_date\":\"25 November 2019\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_date_time\":\"25 November 2019 at 12:11\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_time\":\"12:11\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_venue\":\"Manchester Employment Tribunals, Alexandra House, 14-22 The Parsonage, "
-                + "Manchester, M3 2JA\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_duration\":\"2 days\"" + NEW_LINE_WITH_COMMA
-                + "\"t10_2\":\"true\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine1\":\"Manchester Employment Tribunal,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine2\":\"Alexandra House,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine3\":\"14-22 The Parsonage,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_town\":\"Manchester,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_county\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_postCode\":\"M3 2JA\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_telephone\":\"03577131270\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_fax\":\"07577126570\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_DX\":\"123456\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_Email\":\"ManchesterOfficeET@hmcts.gov.uk\"" + NEW_LINE_WITH_COMMA
-                + "\"i10_2_enhmcts\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i10_2_enhmcts1\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i10_2_enhmcts2\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts1\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts2\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"Clerk\":\"Mike Jordan\"" + NEW_LINE_WITH_COMMA
-                + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + NEW_LINE_WITH_COMMA
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
-                + NEW_LINE_WITH_COMMA
-                + "\"Case_No\":\"123456\"" + NEW_LINE_WITH_COMMA
-                + "\"submission_reference\":\"12212121\"" + NEW_LINE_WITH_COMMA
-                + "}" + NEW_LINE
-                + "}" + NEW_LINE;
+        String expected = "{\n"
+            + "\"accessKey\":\"" + COMMA_NEWLINE
+            + "\"templateName\":\"EM-TRB-EGW-ENG-00033.docx" + COMMA_NEWLINE
+            + "\"outputName\":\"document.docx" + COMMA_NEWLINE
+            + "\"data\":{\n"
+            + "\"claimant_or_rep_full_name\":\"RepresentativeNameClaimant" + COMMA_NEWLINE
+            + "\"claimant_rep_organisation\":\"RepresentativeOrganisation" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine1\":\"56 Block C" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine2\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"claimant_or_rep_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"claimant_or_rep_county\":\"Lancashire" + COMMA_NEWLINE
+            + "\"claimant_or_rep_postCode\":\"M3 KJR" + COMMA_NEWLINE
+            + "\"claimant_reference\":\"1111111" + COMMA_NEWLINE
+            + "\"claimant_full_name\":\"Mr A J Rodriguez" + COMMA_NEWLINE
+            + "\"Claimant\":\"Mr A J Rodriguez" + COMMA_NEWLINE
+            + "\"claimant_addressLine1\":\"34" + COMMA_NEWLINE
+            + "\"claimant_addressLine2\":\"Low Street" + COMMA_NEWLINE
+            + "\"claimant_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"claimant_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"claimant_county\":\"Lancashire" + COMMA_NEWLINE
+            + "\"claimant_postCode\":\"M3 6gw" + COMMA_NEWLINE
+            + "\"respondent_or_rep_full_name\":\"Antonio Vazquez" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine1\":\"11 Small Street" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine2\":\"22 House" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"respondent_or_rep_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"respondent_or_rep_county\":\"North West" + COMMA_NEWLINE
+            + "\"respondent_or_rep_postCode\":\"M12 42R" + COMMA_NEWLINE
+            + "\"respondent_full_name\":\"Antonio Vazquez" + COMMA_NEWLINE
+            + "\"respondent_addressLine1\":\"11 Small Street" + COMMA_NEWLINE
+            + "\"respondent_addressLine2\":\"22 House" + COMMA_NEWLINE
+            + "\"respondent_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"respondent_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"respondent_county\":\"North West" + COMMA_NEWLINE
+            + "\"respondent_postCode\":\"M12 42R" + COMMA_NEWLINE
+            + "\"Respondent\":\"1. Antonio Vazquez," + COMMA_NEWLINE
+            + "\"resp_others\":\"2. Mikey McCollier" + COMMA_NEWLINE
+            + "\"resp_address\":\"1. 11 Small Street, 22 House, Manchester, North West, M12 42R, UK\\n2. 1333 "
+            + "Small Street, 22222 House, Liverpool, North West, L12 42R, UK" + COMMA_NEWLINE
+            + "\"Hearing_date\":\"25 November 2019" + COMMA_NEWLINE
+            + "\"Hearing_date_time\":\"25 November 2019 at 12:11" + COMMA_NEWLINE
+            + "\"Hearing_time\":\"12:11" + COMMA_NEWLINE
+            + "\"Hearing_venue\":\"Manchester Employment Tribunals, Alexandra House, 14-22 The Parsonage, "
+            + "Manchester, M3 2JA" + COMMA_NEWLINE
+            + "\"Hearing_duration\":\"2 days" + COMMA_NEWLINE
+            + "\"t10_2\":\"true" + COMMA_NEWLINE
+            + "\"Court_addressLine1\":\"Manchester Employment Tribunal," + COMMA_NEWLINE
+            + "\"Court_addressLine2\":\"Alexandra House," + COMMA_NEWLINE
+            + "\"Court_addressLine3\":\"14-22 The Parsonage," + COMMA_NEWLINE
+            + "\"Court_town\":\"Manchester," + COMMA_NEWLINE
+            + "\"Court_county\":\"" + COMMA_NEWLINE
+            + "\"Court_postCode\":\"M3 2JA" + COMMA_NEWLINE
+            + "\"Court_telephone\":\"03577131270" + COMMA_NEWLINE
+            + "\"Court_fax\":\"07577126570" + COMMA_NEWLINE
+            + "\"Court_DX\":\"123456" + COMMA_NEWLINE
+            + "\"Court_Email\":\"ManchesterOfficeET@hmcts.gov.uk" + COMMA_NEWLINE
+            + "\"i10_2_enhmcts\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i10_2_enhmcts1\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i10_2_enhmcts2\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts1\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts2\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"Clerk\":\"Mike Jordan" + COMMA_NEWLINE
+            + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + COMMA_NEWLINE
+            + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + COMMA_NEWLINE
+            + "\"Case_No\":\"123456" + COMMA_NEWLINE
+            + "\"submission_reference\":\"12212121" + COMMA_NEWLINE
+            + CLOSE_BRACE_NEW_LINE
+            + CLOSE_BRACE_NEW_LINE;
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails8.getCaseData(), "",
                 userDetails, ENGLANDWALES_CASE_TYPE_ID,
                 caseDetails8.getCaseData().getCorrespondenceType(),
@@ -844,77 +829,75 @@ class DocumentHelperTest {
 
     @Test
     void buildDocumentContent9() {
-        String expected = "{" + NEW_LINE
-                + "\"accessKey\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"templateName\":\"EM-TRB-EGW-ENG-00034.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"outputName\":\"document.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"data\":{" + NEW_LINE
-                + "\"claimant_or_rep_full_name\":\"RepresentativeNameClaimant\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_rep_organisation\":\"RepresentativeOrganisation\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine1\":\"56 Block C\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine2\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_county\":\"Lancashire\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_postCode\":\"M3 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_reference\":\"1111111\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_full_name\":\"Mr A J Rodriguez\"" + NEW_LINE_WITH_COMMA
-                + "\"Claimant\":\"Mr A J Rodriguez\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine1\":\"34\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine2\":\"Low Street\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_county\":\"Lancashire\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_postCode\":\"M3 6gw\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_full_name\":\"Antonio Vazquez\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine1\":\"11 Small Street\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine2\":\"22 House\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_county\":\"North West\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_postCode\":\"M12 42R\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_full_name\":\"Antonio Vazquez\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine1\":\"11 Small Street\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine2\":\"22 House\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_county\":\"North West\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_postCode\":\"M12 42R\"" + NEW_LINE_WITH_COMMA
-                + "\"Respondent\":\"Antonio Vazquez\"" + NEW_LINE_WITH_COMMA
-                + "\"resp_others\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"resp_address\":\"11 Small Street, 22 House, Manchester, North West, M12 42R, UK\""
-                + NEW_LINE_WITH_COMMA
-                + "\"Hearing_date\":\"25 November 2019\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_date_time\":\"25 November 2019 at 12:11\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_time\":\"12:11\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_venue\":\"Manchester Employment Tribunals, Alexandra House, 14-22 The Parsonage, "
-                + "Manchester, M3 2JA\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_duration\":\"2 days\"" + NEW_LINE_WITH_COMMA
-                + "\"t9_2\":\"true\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine1\":\"Manchester Employment Tribunal,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine2\":\"Alexandra House,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine3\":\"14-22 The Parsonage,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_town\":\"Manchester,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_county\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_postCode\":\"M3 2JA\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_telephone\":\"03577131270\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_fax\":\"07577126570\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_DX\":\"123456\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_Email\":\"ManchesterOfficeET@hmcts.gov.uk\"" + NEW_LINE_WITH_COMMA
-                + "\"i9_2_enhmcts\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i9_2_enhmcts1\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i9_2_enhmcts2\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts1\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts2\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"Clerk\":\"Mike Jordan\"" + NEW_LINE_WITH_COMMA
-                + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + NEW_LINE_WITH_COMMA
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
-                + NEW_LINE_WITH_COMMA
-                + "\"Case_No\":\"123456\"" + NEW_LINE_WITH_COMMA
-                + "\"submission_reference\":\"12212121\"" + NEW_LINE_WITH_COMMA
-                + "}" + NEW_LINE
-                + "}" + NEW_LINE;
+        String expected = "{\n"
+            + "\"accessKey\":\"" + COMMA_NEWLINE
+            + "\"templateName\":\"EM-TRB-EGW-ENG-00034.docx" + COMMA_NEWLINE
+            + "\"outputName\":\"document.docx" + COMMA_NEWLINE
+            + "\"data\":{\n"
+            + "\"claimant_or_rep_full_name\":\"RepresentativeNameClaimant" + COMMA_NEWLINE
+            + "\"claimant_rep_organisation\":\"RepresentativeOrganisation" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine1\":\"56 Block C" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine2\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"claimant_or_rep_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"claimant_or_rep_county\":\"Lancashire" + COMMA_NEWLINE
+            + "\"claimant_or_rep_postCode\":\"M3 KJR" + COMMA_NEWLINE
+            + "\"claimant_reference\":\"1111111" + COMMA_NEWLINE
+            + "\"claimant_full_name\":\"Mr A J Rodriguez" + COMMA_NEWLINE
+            + "\"Claimant\":\"Mr A J Rodriguez" + COMMA_NEWLINE
+            + "\"claimant_addressLine1\":\"34" + COMMA_NEWLINE
+            + "\"claimant_addressLine2\":\"Low Street" + COMMA_NEWLINE
+            + "\"claimant_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"claimant_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"claimant_county\":\"Lancashire" + COMMA_NEWLINE
+            + "\"claimant_postCode\":\"M3 6gw" + COMMA_NEWLINE
+            + "\"respondent_or_rep_full_name\":\"Antonio Vazquez" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine1\":\"11 Small Street" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine2\":\"22 House" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"respondent_or_rep_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"respondent_or_rep_county\":\"North West" + COMMA_NEWLINE
+            + "\"respondent_or_rep_postCode\":\"M12 42R" + COMMA_NEWLINE
+            + "\"respondent_full_name\":\"Antonio Vazquez" + COMMA_NEWLINE
+            + "\"respondent_addressLine1\":\"11 Small Street" + COMMA_NEWLINE
+            + "\"respondent_addressLine2\":\"22 House" + COMMA_NEWLINE
+            + "\"respondent_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"respondent_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"respondent_county\":\"North West" + COMMA_NEWLINE
+            + "\"respondent_postCode\":\"M12 42R" + COMMA_NEWLINE
+            + "\"Respondent\":\"Antonio Vazquez" + COMMA_NEWLINE
+            + "\"resp_others\":\"" + COMMA_NEWLINE
+            + "\"resp_address\":\"11 Small Street, 22 House, Manchester, North West, M12 42R, UK" + COMMA_NEWLINE
+            + "\"Hearing_date\":\"25 November 2019" + COMMA_NEWLINE
+            + "\"Hearing_date_time\":\"25 November 2019 at 12:11" + COMMA_NEWLINE
+            + "\"Hearing_time\":\"12:11" + COMMA_NEWLINE
+            + "\"Hearing_venue\":\"Manchester Employment Tribunals, Alexandra House, 14-22 The Parsonage, "
+            + "Manchester, M3 2JA" + COMMA_NEWLINE
+            + "\"Hearing_duration\":\"2 days" + COMMA_NEWLINE
+            + "\"t9_2\":\"true" + COMMA_NEWLINE
+            + "\"Court_addressLine1\":\"Manchester Employment Tribunal," + COMMA_NEWLINE
+            + "\"Court_addressLine2\":\"Alexandra House," + COMMA_NEWLINE
+            + "\"Court_addressLine3\":\"14-22 The Parsonage," + COMMA_NEWLINE
+            + "\"Court_town\":\"Manchester," + COMMA_NEWLINE
+            + "\"Court_county\":\"" + COMMA_NEWLINE
+            + "\"Court_postCode\":\"M3 2JA" + COMMA_NEWLINE
+            + "\"Court_telephone\":\"03577131270" + COMMA_NEWLINE
+            + "\"Court_fax\":\"07577126570" + COMMA_NEWLINE
+            + "\"Court_DX\":\"123456" + COMMA_NEWLINE
+            + "\"Court_Email\":\"ManchesterOfficeET@hmcts.gov.uk" + COMMA_NEWLINE
+            + "\"i9_2_enhmcts\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i9_2_enhmcts1\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i9_2_enhmcts2\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts1\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts2\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"Clerk\":\"Mike Jordan" + COMMA_NEWLINE
+            + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + COMMA_NEWLINE
+            + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + COMMA_NEWLINE
+            + "\"Case_No\":\"123456" + COMMA_NEWLINE
+            + "\"submission_reference\":\"12212121" + COMMA_NEWLINE
+            + CLOSE_BRACE_NEW_LINE
+            + CLOSE_BRACE_NEW_LINE;
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails9.getCaseData(), "",
                 userDetails, ENGLANDWALES_CASE_TYPE_ID,
                 caseDetails9.getCaseData().getCorrespondenceType(),
@@ -924,78 +907,76 @@ class DocumentHelperTest {
 
     @Test
     void buildDocumentContent10() {
-        String expected = "{" + NEW_LINE
-                + "\"accessKey\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"templateName\":\"EM-TRB-LET-ENG-00544.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"outputName\":\"document.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"data\":{" + NEW_LINE
-                + "\"address_labels_page\":[" + NEW_LINE
-                + "]" + NEW_LINE_WITH_COMMA
-                + "\"i0_1_enhmcts\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i0_1_enhmcts1\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i0_1_enhmcts2\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts1\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts2\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"Clerk\":\"Mike Jordan\"" + NEW_LINE_WITH_COMMA
-                + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + NEW_LINE_WITH_COMMA
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
-                + NEW_LINE_WITH_COMMA
-                + "\"Case_No\":\"123456\"" + NEW_LINE_WITH_COMMA
-                + "\"submission_reference\":\"12212121\"" + NEW_LINE_WITH_COMMA
-                + "}" + NEW_LINE
-                + "}" + NEW_LINE;
+        String expected = "{\n"
+            + "\"accessKey\":\"" + COMMA_NEWLINE
+            + "\"templateName\":\"EM-TRB-LET-ENG-00544.docx" + COMMA_NEWLINE
+            + "\"outputName\":\"document.docx" + COMMA_NEWLINE
+            + "\"data\":{\n"
+            + "\"address_labels_page\":[\n"
+            + "],\n"
+            + "\"i0_1_enhmcts\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i0_1_enhmcts1\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i0_1_enhmcts2\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts1\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts2\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"Clerk\":\"Mike Jordan" + COMMA_NEWLINE
+            + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + COMMA_NEWLINE
+            + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + COMMA_NEWLINE
+            + "\"Case_No\":\"123456" + COMMA_NEWLINE
+            + "\"submission_reference\":\"12212121" + COMMA_NEWLINE
+            + CLOSE_BRACE_NEW_LINE
+            + CLOSE_BRACE_NEW_LINE;
         assertEquals(expected, DocumentHelper
                 .buildDocumentContent(caseDetails10.getCaseData(), "", userDetails, ENGLANDWALES_CASE_TYPE_ID,
-                        caseDetails10.getCaseData().getCorrespondenceType(),
-                        caseDetails10.getCaseData().getCorrespondenceScotType(),
-                        null, null, venueAddressReaderService).toString());
+            caseDetails10.getCaseData().getCorrespondenceType(),
+            caseDetails10.getCaseData().getCorrespondenceScotType(),
+            null, null, venueAddressReaderService).toString());
     }
 
     @Test
     void buildDocumentContent12() {
-        String expected = "{" + NEW_LINE
-                + "\"accessKey\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"templateName\":\"EM-TRB-LET-ENG-00544.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"outputName\":\"document.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"data\":{" + NEW_LINE
-                + "\"address_labels_page\":[" + NEW_LINE
-                + "{\"Label_01_Entity_Name_01\":\"Claimant Name\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_01_Entity_Name_02\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_01_Address_Line_01\":\"11 Block A\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_01_Address_Line_02\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_01_Address_Line_03\":\"Address Line 3\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_01_Address_Line_04\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_01_Address_Line_05\":\"Lancashire M1 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_01_Telephone\":\"07577 136511\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_01_Fax\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_01_Eef\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_01_Cef\":\"1850011/2020\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Entity_Name_01\":\"Claimant Rep\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Entity_Name_02\":\"Claimant Org\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Address_Line_01\":\"22 Block B\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Address_Line_02\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Address_Line_03\":\"Address Line 3\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Address_Line_04\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Address_Line_05\":\"Lancashire M2 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Telephone\":\"07577 136722\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Fax\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_02_Eef\":\"OSCA/222/ABC\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_02_Cef\":\"1850022/2020\"}]" + NEW_LINE_WITH_COMMA
-                + "\"i0_2_enhmcts\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i0_2_enhmcts1\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i0_2_enhmcts2\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts1\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts2\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"Clerk\":\"Mike Jordan\"" + NEW_LINE_WITH_COMMA
-                + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + NEW_LINE_WITH_COMMA
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
-                + NEW_LINE_WITH_COMMA
-                + "\"Case_No\":\"123456\"" + NEW_LINE_WITH_COMMA
-                + "\"submission_reference\":\"12212121\"" + NEW_LINE_WITH_COMMA
-                + "}" + NEW_LINE
-                + "}" + NEW_LINE;
+        String expected = "{\n"
+            + "\"accessKey\":\"" + COMMA_NEWLINE
+            + "\"templateName\":\"EM-TRB-LET-ENG-00544.docx" + COMMA_NEWLINE
+            + "\"outputName\":\"document.docx" + COMMA_NEWLINE
+            + "\"data\":{\n"
+            + "\"address_labels_page\":[\n"
+            + "{\"Label_01_Entity_Name_01\":\"Claimant Name" + COMMA_NEWLINE
+            + "\"Label_01_Entity_Name_02\":\"" + COMMA_NEWLINE
+            + "\"Label_01_Address_Line_01\":\"11 Block A" + COMMA_NEWLINE
+            + "\"Label_01_Address_Line_02\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"Label_01_Address_Line_03\":\"Address Line 3" + COMMA_NEWLINE
+            + "\"Label_01_Address_Line_04\":\"Manchester" + COMMA_NEWLINE
+            + "\"Label_01_Address_Line_05\":\"Lancashire M1 KJR" + COMMA_NEWLINE
+            + "\"Label_01_Telephone\":\"07577 136511" + COMMA_NEWLINE
+            + "\"Label_01_Fax\":\"" + COMMA_NEWLINE
+            + "\"lbl_01_Eef\":\"" + COMMA_NEWLINE
+            + "\"lbl_01_Cef\":\"1850011/2020" + COMMA_NEWLINE
+            + "\"Label_02_Entity_Name_01\":\"Claimant Rep" + COMMA_NEWLINE
+            + "\"Label_02_Entity_Name_02\":\"Claimant Org" + COMMA_NEWLINE
+            + "\"Label_02_Address_Line_01\":\"22 Block B" + COMMA_NEWLINE
+            + "\"Label_02_Address_Line_02\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"Label_02_Address_Line_03\":\"Address Line 3" + COMMA_NEWLINE
+            + "\"Label_02_Address_Line_04\":\"Manchester" + COMMA_NEWLINE
+            + "\"Label_02_Address_Line_05\":\"Lancashire M2 KJR" + COMMA_NEWLINE
+            + "\"Label_02_Telephone\":\"07577 136722" + COMMA_NEWLINE
+            + "\"Label_02_Fax\":\"" + COMMA_NEWLINE
+            + "\"lbl_02_Eef\":\"OSCA/222/ABC" + COMMA_NEWLINE
+            + "\"lbl_02_Cef\":\"1850022/2020\"}],\n"
+            + "\"i0_2_enhmcts\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i0_2_enhmcts1\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i0_2_enhmcts2\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts1\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts2\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"Clerk\":\"Mike Jordan" + COMMA_NEWLINE
+            + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + COMMA_NEWLINE
+            + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + COMMA_NEWLINE
+            + "\"Case_No\":\"123456" + COMMA_NEWLINE
+            + "\"submission_reference\":\"12212121" + COMMA_NEWLINE
+            + CLOSE_BRACE_NEW_LINE
+            + CLOSE_BRACE_NEW_LINE;
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails12.getCaseData(), "",
                 userDetails,
                 ENGLANDWALES_CASE_TYPE_ID,
@@ -1006,40 +987,39 @@ class DocumentHelperTest {
 
     @Test
     void buildDocumentContent13() {
-        String expected = "{" + NEW_LINE
-                + "\"accessKey\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"templateName\":\"EM-TRB-LET-ENG-00544.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"outputName\":\"document.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"data\":{" + NEW_LINE
-                + "\"address_labels_page\":[" + NEW_LINE
-                + "{\"Label_01_Entity_Name_01\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_01_Entity_Name_02\":\"Claimant Org\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_01_Address_Line_01\":\"11 Block A\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_01_Address_Line_02\":\"M1 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_01_Eef\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_01_Cef\":\"1850011/2020\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Entity_Name_01\":\"Claimant Rep\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Entity_Name_02\":\"Claimant Org\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Address_Line_01\":\"22 Block B\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Address_Line_02\":\"Address Line 3\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Address_Line_03\":\"Lancashire\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Address_Line_04\":\"M2 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_02_Eef\":\"OSCA/222/ABC\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_02_Cef\":\"1850022/2020\"}]" + NEW_LINE_WITH_COMMA
-                + "\"i0_2_enhmcts\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i0_2_enhmcts1\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i0_2_enhmcts2\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts1\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts2\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"Clerk\":\"Mike Jordan\"" + NEW_LINE_WITH_COMMA
-                + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + NEW_LINE_WITH_COMMA
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
-                + NEW_LINE_WITH_COMMA
-                + "\"Case_No\":\"123456\"" + NEW_LINE_WITH_COMMA
-                + "\"submission_reference\":\"12212121\"" + NEW_LINE_WITH_COMMA
-                + "}" + NEW_LINE
-                + "}" + NEW_LINE;
+        String expected = "{\n"
+            + "\"accessKey\":\"" + COMMA_NEWLINE
+            + "\"templateName\":\"EM-TRB-LET-ENG-00544.docx" + COMMA_NEWLINE
+            + "\"outputName\":\"document.docx" + COMMA_NEWLINE
+            + "\"data\":{\n"
+            + "\"address_labels_page\":[\n"
+            + "{\"Label_01_Entity_Name_01\":\"" + COMMA_NEWLINE
+            + "\"Label_01_Entity_Name_02\":\"Claimant Org" + COMMA_NEWLINE
+            + "\"Label_01_Address_Line_01\":\"11 Block A" + COMMA_NEWLINE
+            + "\"Label_01_Address_Line_02\":\"M1 KJR" + COMMA_NEWLINE
+            + "\"lbl_01_Eef\":\"" + COMMA_NEWLINE
+            + "\"lbl_01_Cef\":\"1850011/2020" + COMMA_NEWLINE
+            + "\"Label_02_Entity_Name_01\":\"Claimant Rep" + COMMA_NEWLINE
+            + "\"Label_02_Entity_Name_02\":\"Claimant Org" + COMMA_NEWLINE
+            + "\"Label_02_Address_Line_01\":\"22 Block B" + COMMA_NEWLINE
+            + "\"Label_02_Address_Line_02\":\"Address Line 3" + COMMA_NEWLINE
+            + "\"Label_02_Address_Line_03\":\"Lancashire" + COMMA_NEWLINE
+            + "\"Label_02_Address_Line_04\":\"M2 KJR" + COMMA_NEWLINE
+            + "\"lbl_02_Eef\":\"OSCA/222/ABC" + COMMA_NEWLINE
+            + "\"lbl_02_Cef\":\"1850022/2020\"}],\n"
+            + "\"i0_2_enhmcts\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i0_2_enhmcts1\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i0_2_enhmcts2\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts1\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts2\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"Clerk\":\"Mike Jordan" + COMMA_NEWLINE
+            + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + COMMA_NEWLINE
+            + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + COMMA_NEWLINE
+            + "\"Case_No\":\"123456" + COMMA_NEWLINE
+            + "\"submission_reference\":\"12212121" + COMMA_NEWLINE
+            + CLOSE_BRACE_NEW_LINE
+            + CLOSE_BRACE_NEW_LINE;
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails13.getCaseData(), "",
                 userDetails, ENGLANDWALES_CASE_TYPE_ID,
                 caseDetails13.getCaseData().getCorrespondenceType(),
@@ -1049,158 +1029,157 @@ class DocumentHelperTest {
 
     @Test
     void buildDocumentContent14() {
-        String expected = "{" + NEW_LINE
-                + "\"accessKey\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"templateName\":\"EM-TRB-LET-ENG-00544.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"outputName\":\"document.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"data\":{" + NEW_LINE
-                + "\"address_labels_page\":[" + NEW_LINE
-                + "{\"Label_01_Entity_Name_01\":\"Claimant Name\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_01_Entity_Name_02\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_01_Address_Line_01\":\"11 Block A\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_01_Address_Line_02\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_01_Address_Line_03\":\"Address Line 3\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_01_Address_Line_04\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_01_Address_Line_05\":\"Lancashire M1 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_01_Telephone\":\"07577 136511\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_01_Fax\":\"07577 136712\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_01_Eef\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_01_Cef\":\"1850011/2020\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Entity_Name_01\":\"Claimant Name\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Entity_Name_02\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Address_Line_01\":\"11 Block A\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Address_Line_02\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Address_Line_03\":\"Address Line 3\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Address_Line_04\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Address_Line_05\":\"Lancashire M1 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Telephone\":\"07577 136511\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Fax\":\"07577 136712\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_02_Eef\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_02_Cef\":\"1850011/2020\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_03_Entity_Name_01\":\"Claimant Rep\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_03_Entity_Name_02\":\"Claimant Org\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_03_Address_Line_01\":\"22 Block B\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_03_Address_Line_02\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_03_Address_Line_03\":\"Address Line 3\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_03_Address_Line_04\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_03_Address_Line_05\":\"Lancashire M2 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_03_Telephone\":\"07577 136521\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_03_Fax\":\"07577 136722\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_03_Eef\":\"OSCA/222/ABC\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_03_Cef\":\"1850022/2020\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_04_Entity_Name_01\":\"Claimant Rep\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_04_Entity_Name_02\":\"Claimant Org\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_04_Address_Line_01\":\"22 Block B\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_04_Address_Line_02\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_04_Address_Line_03\":\"Address Line 3\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_04_Address_Line_04\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_04_Address_Line_05\":\"Lancashire M2 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_04_Telephone\":\"07577 136521\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_04_Fax\":\"07577 136722\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_04_Eef\":\"OSCA/222/ABC\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_04_Cef\":\"1850022/2020\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_05_Entity_Name_01\":\"Respondent One\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_05_Entity_Name_02\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_05_Address_Line_01\":\"33 Block C\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_05_Address_Line_02\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_05_Address_Line_03\":\"Address Line 3\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_05_Address_Line_04\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_05_Address_Line_05\":\"Lancashire M3 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_05_Telephone\":\"07577 136531\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_05_Fax\":\"07577 136732\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_05_Eef\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_05_Cef\":\"1850033/2020\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_06_Entity_Name_01\":\"Respondent One\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_06_Entity_Name_02\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_06_Address_Line_01\":\"33 Block C\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_06_Address_Line_02\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_06_Address_Line_03\":\"Address Line 3\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_06_Address_Line_04\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_06_Address_Line_05\":\"Lancashire M3 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_06_Telephone\":\"07577 136531\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_06_Fax\":\"07577 136732\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_06_Eef\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_06_Cef\":\"1850033/2020\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_07_Entity_Name_01\":\"Respondent Two\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_07_Entity_Name_02\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_07_Address_Line_01\":\"44 Block D\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_07_Address_Line_02\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_07_Address_Line_03\":\"Address Line 3\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_07_Address_Line_04\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_07_Address_Line_05\":\"Lancashire M4 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_07_Telephone\":\"07577 136541\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_07_Fax\":\"07577 136742\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_07_Eef\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_07_Cef\":\"1850044/2020\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_08_Entity_Name_01\":\"Respondent Two\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_08_Entity_Name_02\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_08_Address_Line_01\":\"44 Block D\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_08_Address_Line_02\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_08_Address_Line_03\":\"Address Line 3\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_08_Address_Line_04\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_08_Address_Line_05\":\"Lancashire M4 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_08_Telephone\":\"07577 136541\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_08_Fax\":\"07577 136742\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_08_Eef\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_08_Cef\":\"1850044/2020\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_09_Entity_Name_01\":\"Respondent three\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_09_Entity_Name_02\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_09_Address_Line_01\":\"55 Block E\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_09_Address_Line_02\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_09_Address_Line_03\":\"Address Line 3\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_09_Address_Line_04\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_09_Address_Line_05\":\"Lancashire M5 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_09_Telephone\":\"07577 136551\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_09_Fax\":\"07577 136752\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_09_Eef\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_09_Cef\":\"1850055/2020\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_10_Entity_Name_01\":\"Respondent three\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_10_Entity_Name_02\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_10_Address_Line_01\":\"55 Block E\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_10_Address_Line_02\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_10_Address_Line_03\":\"Address Line 3\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_10_Address_Line_04\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_10_Address_Line_05\":\"Lancashire M5 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_10_Telephone\":\"07577 136551\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_10_Fax\":\"07577 136752\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_10_Eef\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_10_Cef\":\"1850055/2020\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_11_Entity_Name_01\":\"Respondent Rep\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_11_Entity_Name_02\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_11_Address_Line_01\":\"66 Block F\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_11_Address_Line_02\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_11_Address_Line_03\":\"Address Line 3\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_11_Address_Line_04\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_11_Address_Line_05\":\"Lancashire M6 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_11_Telephone\":\"07577 136561\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_11_Fax\":\"07577 136762\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_11_Eef\":\"OSCA/666/ABC\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_11_Cef\":\"1850066/2020\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_12_Entity_Name_01\":\"Respondent Rep\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_12_Entity_Name_02\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_12_Address_Line_01\":\"66 Block F\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_12_Address_Line_02\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_12_Address_Line_03\":\"Address Line 3\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_12_Address_Line_04\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_12_Address_Line_05\":\"Lancashire M6 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_12_Telephone\":\"07577 136561\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_12_Fax\":\"07577 136762\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_12_Eef\":\"OSCA/666/ABC\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_12_Cef\":\"1850066/2020\"}]" + NEW_LINE_WITH_COMMA
-                + "\"i0_2_enhmcts\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i0_2_enhmcts1\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i0_2_enhmcts2\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts1\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts2\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"Clerk\":\"Mike Jordan\"" + NEW_LINE_WITH_COMMA
-                + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + NEW_LINE_WITH_COMMA
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
-                + NEW_LINE_WITH_COMMA
-                + "\"Case_No\":\"123456\"" + NEW_LINE_WITH_COMMA
-                + "\"submission_reference\":\"12212121\"" + NEW_LINE_WITH_COMMA
-                + "}" + NEW_LINE
-                + "}" + NEW_LINE;
+        String expected = "{\n"
+            + "\"accessKey\":\"" + COMMA_NEWLINE
+            + "\"templateName\":\"EM-TRB-LET-ENG-00544.docx" + COMMA_NEWLINE
+            + "\"outputName\":\"document.docx" + COMMA_NEWLINE
+            + "\"data\":{\n"
+            + "\"address_labels_page\":[\n"
+            + "{\"Label_01_Entity_Name_01\":\"Claimant Name" + COMMA_NEWLINE
+            + "\"Label_01_Entity_Name_02\":\"" + COMMA_NEWLINE
+            + "\"Label_01_Address_Line_01\":\"11 Block A" + COMMA_NEWLINE
+            + "\"Label_01_Address_Line_02\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"Label_01_Address_Line_03\":\"Address Line 3" + COMMA_NEWLINE
+            + "\"Label_01_Address_Line_04\":\"Manchester" + COMMA_NEWLINE
+            + "\"Label_01_Address_Line_05\":\"Lancashire M1 KJR" + COMMA_NEWLINE
+            + "\"Label_01_Telephone\":\"07577 136511" + COMMA_NEWLINE
+            + "\"Label_01_Fax\":\"07577 136712" + COMMA_NEWLINE
+            + "\"lbl_01_Eef\":\"" + COMMA_NEWLINE
+            + "\"lbl_01_Cef\":\"1850011/2020" + COMMA_NEWLINE
+            + "\"Label_02_Entity_Name_01\":\"Claimant Name" + COMMA_NEWLINE
+            + "\"Label_02_Entity_Name_02\":\"" + COMMA_NEWLINE
+            + "\"Label_02_Address_Line_01\":\"11 Block A" + COMMA_NEWLINE
+            + "\"Label_02_Address_Line_02\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"Label_02_Address_Line_03\":\"Address Line 3" + COMMA_NEWLINE
+            + "\"Label_02_Address_Line_04\":\"Manchester" + COMMA_NEWLINE
+            + "\"Label_02_Address_Line_05\":\"Lancashire M1 KJR" + COMMA_NEWLINE
+            + "\"Label_02_Telephone\":\"07577 136511" + COMMA_NEWLINE
+            + "\"Label_02_Fax\":\"07577 136712" + COMMA_NEWLINE
+            + "\"lbl_02_Eef\":\"" + COMMA_NEWLINE
+            + "\"lbl_02_Cef\":\"1850011/2020" + COMMA_NEWLINE
+            + "\"Label_03_Entity_Name_01\":\"Claimant Rep" + COMMA_NEWLINE
+            + "\"Label_03_Entity_Name_02\":\"Claimant Org" + COMMA_NEWLINE
+            + "\"Label_03_Address_Line_01\":\"22 Block B" + COMMA_NEWLINE
+            + "\"Label_03_Address_Line_02\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"Label_03_Address_Line_03\":\"Address Line 3" + COMMA_NEWLINE
+            + "\"Label_03_Address_Line_04\":\"Manchester" + COMMA_NEWLINE
+            + "\"Label_03_Address_Line_05\":\"Lancashire M2 KJR" + COMMA_NEWLINE
+            + "\"Label_03_Telephone\":\"07577 136521" + COMMA_NEWLINE
+            + "\"Label_03_Fax\":\"07577 136722" + COMMA_NEWLINE
+            + "\"lbl_03_Eef\":\"OSCA/222/ABC" + COMMA_NEWLINE
+            + "\"lbl_03_Cef\":\"1850022/2020" + COMMA_NEWLINE
+            + "\"Label_04_Entity_Name_01\":\"Claimant Rep" + COMMA_NEWLINE
+            + "\"Label_04_Entity_Name_02\":\"Claimant Org" + COMMA_NEWLINE
+            + "\"Label_04_Address_Line_01\":\"22 Block B" + COMMA_NEWLINE
+            + "\"Label_04_Address_Line_02\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"Label_04_Address_Line_03\":\"Address Line 3" + COMMA_NEWLINE
+            + "\"Label_04_Address_Line_04\":\"Manchester" + COMMA_NEWLINE
+            + "\"Label_04_Address_Line_05\":\"Lancashire M2 KJR" + COMMA_NEWLINE
+            + "\"Label_04_Telephone\":\"07577 136521" + COMMA_NEWLINE
+            + "\"Label_04_Fax\":\"07577 136722" + COMMA_NEWLINE
+            + "\"lbl_04_Eef\":\"OSCA/222/ABC" + COMMA_NEWLINE
+            + "\"lbl_04_Cef\":\"1850022/2020" + COMMA_NEWLINE
+            + "\"Label_05_Entity_Name_01\":\"Respondent One" + COMMA_NEWLINE
+            + "\"Label_05_Entity_Name_02\":\"" + COMMA_NEWLINE
+            + "\"Label_05_Address_Line_01\":\"33 Block C" + COMMA_NEWLINE
+            + "\"Label_05_Address_Line_02\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"Label_05_Address_Line_03\":\"Address Line 3" + COMMA_NEWLINE
+            + "\"Label_05_Address_Line_04\":\"Manchester" + COMMA_NEWLINE
+            + "\"Label_05_Address_Line_05\":\"Lancashire M3 KJR" + COMMA_NEWLINE
+            + "\"Label_05_Telephone\":\"07577 136531" + COMMA_NEWLINE
+            + "\"Label_05_Fax\":\"07577 136732" + COMMA_NEWLINE
+            + "\"lbl_05_Eef\":\"" + COMMA_NEWLINE
+            + "\"lbl_05_Cef\":\"1850033/2020" + COMMA_NEWLINE
+            + "\"Label_06_Entity_Name_01\":\"Respondent One" + COMMA_NEWLINE
+            + "\"Label_06_Entity_Name_02\":\"" + COMMA_NEWLINE
+            + "\"Label_06_Address_Line_01\":\"33 Block C" + COMMA_NEWLINE
+            + "\"Label_06_Address_Line_02\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"Label_06_Address_Line_03\":\"Address Line 3" + COMMA_NEWLINE
+            + "\"Label_06_Address_Line_04\":\"Manchester" + COMMA_NEWLINE
+            + "\"Label_06_Address_Line_05\":\"Lancashire M3 KJR" + COMMA_NEWLINE
+            + "\"Label_06_Telephone\":\"07577 136531" + COMMA_NEWLINE
+            + "\"Label_06_Fax\":\"07577 136732" + COMMA_NEWLINE
+            + "\"lbl_06_Eef\":\"" + COMMA_NEWLINE
+            + "\"lbl_06_Cef\":\"1850033/2020" + COMMA_NEWLINE
+            + "\"Label_07_Entity_Name_01\":\"Respondent Two" + COMMA_NEWLINE
+            + "\"Label_07_Entity_Name_02\":\"" + COMMA_NEWLINE
+            + "\"Label_07_Address_Line_01\":\"44 Block D" + COMMA_NEWLINE
+            + "\"Label_07_Address_Line_02\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"Label_07_Address_Line_03\":\"Address Line 3" + COMMA_NEWLINE
+            + "\"Label_07_Address_Line_04\":\"Manchester" + COMMA_NEWLINE
+            + "\"Label_07_Address_Line_05\":\"Lancashire M4 KJR" + COMMA_NEWLINE
+            + "\"Label_07_Telephone\":\"07577 136541" + COMMA_NEWLINE
+            + "\"Label_07_Fax\":\"07577 136742" + COMMA_NEWLINE
+            + "\"lbl_07_Eef\":\"" + COMMA_NEWLINE
+            + "\"lbl_07_Cef\":\"1850044/2020" + COMMA_NEWLINE
+            + "\"Label_08_Entity_Name_01\":\"Respondent Two" + COMMA_NEWLINE
+            + "\"Label_08_Entity_Name_02\":\"" + COMMA_NEWLINE
+            + "\"Label_08_Address_Line_01\":\"44 Block D" + COMMA_NEWLINE
+            + "\"Label_08_Address_Line_02\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"Label_08_Address_Line_03\":\"Address Line 3" + COMMA_NEWLINE
+            + "\"Label_08_Address_Line_04\":\"Manchester" + COMMA_NEWLINE
+            + "\"Label_08_Address_Line_05\":\"Lancashire M4 KJR" + COMMA_NEWLINE
+            + "\"Label_08_Telephone\":\"07577 136541" + COMMA_NEWLINE
+            + "\"Label_08_Fax\":\"07577 136742" + COMMA_NEWLINE
+            + "\"lbl_08_Eef\":\"" + COMMA_NEWLINE
+            + "\"lbl_08_Cef\":\"1850044/2020" + COMMA_NEWLINE
+            + "\"Label_09_Entity_Name_01\":\"Respondent three" + COMMA_NEWLINE
+            + "\"Label_09_Entity_Name_02\":\"" + COMMA_NEWLINE
+            + "\"Label_09_Address_Line_01\":\"55 Block E" + COMMA_NEWLINE
+            + "\"Label_09_Address_Line_02\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"Label_09_Address_Line_03\":\"Address Line 3" + COMMA_NEWLINE
+            + "\"Label_09_Address_Line_04\":\"Manchester" + COMMA_NEWLINE
+            + "\"Label_09_Address_Line_05\":\"Lancashire M5 KJR" + COMMA_NEWLINE
+            + "\"Label_09_Telephone\":\"07577 136551" + COMMA_NEWLINE
+            + "\"Label_09_Fax\":\"07577 136752" + COMMA_NEWLINE
+            + "\"lbl_09_Eef\":\"" + COMMA_NEWLINE
+            + "\"lbl_09_Cef\":\"1850055/2020" + COMMA_NEWLINE
+            + "\"Label_10_Entity_Name_01\":\"Respondent three" + COMMA_NEWLINE
+            + "\"Label_10_Entity_Name_02\":\"" + COMMA_NEWLINE
+            + "\"Label_10_Address_Line_01\":\"55 Block E" + COMMA_NEWLINE
+            + "\"Label_10_Address_Line_02\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"Label_10_Address_Line_03\":\"Address Line 3" + COMMA_NEWLINE
+            + "\"Label_10_Address_Line_04\":\"Manchester" + COMMA_NEWLINE
+            + "\"Label_10_Address_Line_05\":\"Lancashire M5 KJR" + COMMA_NEWLINE
+            + "\"Label_10_Telephone\":\"07577 136551" + COMMA_NEWLINE
+            + "\"Label_10_Fax\":\"07577 136752" + COMMA_NEWLINE
+            + "\"lbl_10_Eef\":\"" + COMMA_NEWLINE
+            + "\"lbl_10_Cef\":\"1850055/2020" + COMMA_NEWLINE
+            + "\"Label_11_Entity_Name_01\":\"Respondent Rep" + COMMA_NEWLINE
+            + "\"Label_11_Entity_Name_02\":\"" + COMMA_NEWLINE
+            + "\"Label_11_Address_Line_01\":\"66 Block F" + COMMA_NEWLINE
+            + "\"Label_11_Address_Line_02\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"Label_11_Address_Line_03\":\"Address Line 3" + COMMA_NEWLINE
+            + "\"Label_11_Address_Line_04\":\"Manchester" + COMMA_NEWLINE
+            + "\"Label_11_Address_Line_05\":\"Lancashire M6 KJR" + COMMA_NEWLINE
+            + "\"Label_11_Telephone\":\"07577 136561" + COMMA_NEWLINE
+            + "\"Label_11_Fax\":\"07577 136762" + COMMA_NEWLINE
+            + "\"lbl_11_Eef\":\"OSCA/666/ABC" + COMMA_NEWLINE
+            + "\"lbl_11_Cef\":\"1850066/2020" + COMMA_NEWLINE
+            + "\"Label_12_Entity_Name_01\":\"Respondent Rep" + COMMA_NEWLINE
+            + "\"Label_12_Entity_Name_02\":\"" + COMMA_NEWLINE
+            + "\"Label_12_Address_Line_01\":\"66 Block F" + COMMA_NEWLINE
+            + "\"Label_12_Address_Line_02\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"Label_12_Address_Line_03\":\"Address Line 3" + COMMA_NEWLINE
+            + "\"Label_12_Address_Line_04\":\"Manchester" + COMMA_NEWLINE
+            + "\"Label_12_Address_Line_05\":\"Lancashire M6 KJR" + COMMA_NEWLINE
+            + "\"Label_12_Telephone\":\"07577 136561" + COMMA_NEWLINE
+            + "\"Label_12_Fax\":\"07577 136762" + COMMA_NEWLINE
+            + "\"lbl_12_Eef\":\"OSCA/666/ABC" + COMMA_NEWLINE
+            + "\"lbl_12_Cef\":\"1850066/2020\"}],\n"
+            + "\"i0_2_enhmcts\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i0_2_enhmcts1\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i0_2_enhmcts2\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts1\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts2\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"Clerk\":\"Mike Jordan" + COMMA_NEWLINE
+            + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + COMMA_NEWLINE
+            + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + COMMA_NEWLINE
+            + "\"Case_No\":\"123456" + COMMA_NEWLINE
+            + "\"submission_reference\":\"12212121" + COMMA_NEWLINE
+            + CLOSE_BRACE_NEW_LINE
+            + CLOSE_BRACE_NEW_LINE;
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails14.getCaseData(), "",
                 userDetails,
                 ENGLANDWALES_CASE_TYPE_ID,
@@ -1211,224 +1190,223 @@ class DocumentHelperTest {
 
     @Test
     void buildDocumentContent15() {
-        String expected = "{" + NEW_LINE
-                + "\"accessKey\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"templateName\":\"EM-TRB-LET-ENG-00544.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"outputName\":\"document.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"data\":{" + NEW_LINE
-                + "\"address_labels_page\":[" + NEW_LINE
-                + "{\"Label_13_Entity_Name_01\":\"Claimant Name\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_13_Entity_Name_02\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_13_Address_Line_01\":\"11 Block A\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_13_Address_Line_02\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_13_Address_Line_03\":\"Address Line 3\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_13_Address_Line_04\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_13_Address_Line_05\":\"Lancashire M1 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_13_Telephone\":\"07577 136511\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_13_Fax\":\"07577 136712\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_13_Eef\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_13_Cef\":\"1850011/2020\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_14_Entity_Name_01\":\"Claimant Name\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_14_Entity_Name_02\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_14_Address_Line_01\":\"11 Block A\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_14_Address_Line_02\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_14_Address_Line_03\":\"Address Line 3\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_14_Address_Line_04\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_14_Address_Line_05\":\"Lancashire M1 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_14_Telephone\":\"07577 136511\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_14_Fax\":\"07577 136712\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_14_Eef\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_14_Cef\":\"1850011/2020\"}" + NEW_LINE_WITH_COMMA
-                + "{\"Label_01_Entity_Name_01\":\"Claimant Name\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_01_Entity_Name_02\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_01_Address_Line_01\":\"11 Block A\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_01_Address_Line_02\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_01_Address_Line_03\":\"Address Line 3\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_01_Address_Line_04\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_01_Address_Line_05\":\"Lancashire M1 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_01_Telephone\":\"07577 136511\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_01_Fax\":\"07577 136712\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_01_Eef\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_01_Cef\":\"1850011/2020\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Entity_Name_01\":\"Claimant Rep\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Entity_Name_02\":\"Claimant Org\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Address_Line_01\":\"22 Block B\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Address_Line_02\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Address_Line_03\":\"Address Line 3\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Address_Line_04\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Address_Line_05\":\"Lancashire M2 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Telephone\":\"07577 136521\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Fax\":\"07577 136722\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_02_Eef\":\"OSCA/222/ABC\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_02_Cef\":\"1850022/2020\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_03_Entity_Name_01\":\"Claimant Rep\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_03_Entity_Name_02\":\"Claimant Org\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_03_Address_Line_01\":\"22 Block B\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_03_Address_Line_02\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_03_Address_Line_03\":\"Address Line 3\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_03_Address_Line_04\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_03_Address_Line_05\":\"Lancashire M2 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_03_Telephone\":\"07577 136521\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_03_Fax\":\"07577 136722\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_03_Eef\":\"OSCA/222/ABC\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_03_Cef\":\"1850022/2020\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_04_Entity_Name_01\":\"Claimant Rep\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_04_Entity_Name_02\":\"Claimant Org\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_04_Address_Line_01\":\"22 Block B\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_04_Address_Line_02\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_04_Address_Line_03\":\"Address Line 3\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_04_Address_Line_04\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_04_Address_Line_05\":\"Lancashire M2 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_04_Telephone\":\"07577 136521\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_04_Fax\":\"07577 136722\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_04_Eef\":\"OSCA/222/ABC\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_04_Cef\":\"1850022/2020\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_05_Entity_Name_01\":\"Respondent One\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_05_Entity_Name_02\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_05_Address_Line_01\":\"33 Block C\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_05_Address_Line_02\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_05_Address_Line_03\":\"Address Line 3\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_05_Address_Line_04\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_05_Address_Line_05\":\"Lancashire M3 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_05_Telephone\":\"07577 136531\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_05_Fax\":\"07577 136732\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_05_Eef\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_05_Cef\":\"1850033/2020\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_06_Entity_Name_01\":\"Respondent One\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_06_Entity_Name_02\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_06_Address_Line_01\":\"33 Block C\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_06_Address_Line_02\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_06_Address_Line_03\":\"Address Line 3\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_06_Address_Line_04\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_06_Address_Line_05\":\"Lancashire M3 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_06_Telephone\":\"07577 136531\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_06_Fax\":\"07577 136732\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_06_Eef\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_06_Cef\":\"1850033/2020\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_07_Entity_Name_01\":\"Respondent One\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_07_Entity_Name_02\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_07_Address_Line_01\":\"33 Block C\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_07_Address_Line_02\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_07_Address_Line_03\":\"Address Line 3\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_07_Address_Line_04\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_07_Address_Line_05\":\"Lancashire M3 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_07_Telephone\":\"07577 136531\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_07_Fax\":\"07577 136732\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_07_Eef\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_07_Cef\":\"1850033/2020\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_08_Entity_Name_01\":\"Respondent Two\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_08_Entity_Name_02\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_08_Address_Line_01\":\"44 Block D\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_08_Address_Line_02\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_08_Address_Line_03\":\"Address Line 3\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_08_Address_Line_04\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_08_Address_Line_05\":\"Lancashire M4 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_08_Telephone\":\"07577 136541\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_08_Fax\":\"07577 136742\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_08_Eef\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_08_Cef\":\"1850044/2020\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_09_Entity_Name_01\":\"Respondent Two\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_09_Entity_Name_02\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_09_Address_Line_01\":\"44 Block D\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_09_Address_Line_02\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_09_Address_Line_03\":\"Address Line 3\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_09_Address_Line_04\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_09_Address_Line_05\":\"Lancashire M4 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_09_Telephone\":\"07577 136541\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_09_Fax\":\"07577 136742\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_09_Eef\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_09_Cef\":\"1850044/2020\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_10_Entity_Name_01\":\"Respondent Two\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_10_Entity_Name_02\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_10_Address_Line_01\":\"44 Block D\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_10_Address_Line_02\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_10_Address_Line_03\":\"Address Line 3\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_10_Address_Line_04\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_10_Address_Line_05\":\"Lancashire M4 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_10_Telephone\":\"07577 136541\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_10_Fax\":\"07577 136742\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_10_Eef\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_10_Cef\":\"1850044/2020\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_11_Entity_Name_01\":\"Respondent three\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_11_Entity_Name_02\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_11_Address_Line_01\":\"55 Block E\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_11_Address_Line_02\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_11_Address_Line_03\":\"Address Line 3\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_11_Address_Line_04\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_11_Address_Line_05\":\"Lancashire M5 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_11_Telephone\":\"07577 136551\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_11_Fax\":\"07577 136752\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_11_Eef\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_11_Cef\":\"1850055/2020\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_12_Entity_Name_01\":\"Respondent three\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_12_Entity_Name_02\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_12_Address_Line_01\":\"55 Block E\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_12_Address_Line_02\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_12_Address_Line_03\":\"Address Line 3\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_12_Address_Line_04\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_12_Address_Line_05\":\"Lancashire M5 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_12_Telephone\":\"07577 136551\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_12_Fax\":\"07577 136752\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_12_Eef\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_12_Cef\":\"1850055/2020\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_13_Entity_Name_01\":\"Respondent three\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_13_Entity_Name_02\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_13_Address_Line_01\":\"55 Block E\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_13_Address_Line_02\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_13_Address_Line_03\":\"Address Line 3\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_13_Address_Line_04\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_13_Address_Line_05\":\"Lancashire M5 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_13_Telephone\":\"07577 136551\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_13_Fax\":\"07577 136752\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_13_Eef\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_13_Cef\":\"1850055/2020\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_14_Entity_Name_01\":\"Respondent Rep\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_14_Entity_Name_02\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_14_Address_Line_01\":\"66 Block F\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_14_Address_Line_02\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_14_Address_Line_03\":\"Address Line 3\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_14_Address_Line_04\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_14_Address_Line_05\":\"Lancashire M6 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_14_Telephone\":\"07577 136561\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_14_Fax\":\"07577 136762\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_14_Eef\":\"OSCA/666/ABC\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_14_Cef\":\"1850066/2020\"}" + NEW_LINE_WITH_COMMA
-                + "{\"Label_01_Entity_Name_01\":\"Respondent Rep\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_01_Entity_Name_02\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_01_Address_Line_01\":\"66 Block F\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_01_Address_Line_02\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_01_Address_Line_03\":\"Address Line 3\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_01_Address_Line_04\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_01_Address_Line_05\":\"Lancashire M6 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_01_Telephone\":\"07577 136561\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_01_Fax\":\"07577 136762\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_01_Eef\":\"OSCA/666/ABC\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_01_Cef\":\"1850066/2020\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Entity_Name_01\":\"Respondent Rep\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Entity_Name_02\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Address_Line_01\":\"66 Block F\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Address_Line_02\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Address_Line_03\":\"Address Line 3\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Address_Line_04\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Address_Line_05\":\"Lancashire M6 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Telephone\":\"07577 136561\"" + NEW_LINE_WITH_COMMA
-                + "\"Label_02_Fax\":\"07577 136762\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_02_Eef\":\"OSCA/666/ABC\"" + NEW_LINE_WITH_COMMA
-                + "\"lbl_02_Cef\":\"1850066/2020\"}]" + NEW_LINE_WITH_COMMA
-                + "\"i0_2_enhmcts\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i0_2_enhmcts1\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i0_2_enhmcts2\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts1\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts2\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"Clerk\":\"Mike Jordan\"" + NEW_LINE_WITH_COMMA
-                + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + NEW_LINE_WITH_COMMA
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
-                + NEW_LINE_WITH_COMMA
-                + "\"Case_No\":\"123456\"" + NEW_LINE_WITH_COMMA
-                + "\"submission_reference\":\"12212121\"" + NEW_LINE_WITH_COMMA
-                + "}" + NEW_LINE
-                + "}" + NEW_LINE;
+        String expected = "{\n"
+            + "\"accessKey\":\"" + COMMA_NEWLINE
+            + "\"templateName\":\"EM-TRB-LET-ENG-00544.docx" + COMMA_NEWLINE
+            + "\"outputName\":\"document.docx" + COMMA_NEWLINE
+            + "\"data\":{\n"
+            + "\"address_labels_page\":[\n"
+            + "{\"Label_13_Entity_Name_01\":\"Claimant Name" + COMMA_NEWLINE
+            + "\"Label_13_Entity_Name_02\":\"" + COMMA_NEWLINE
+            + "\"Label_13_Address_Line_01\":\"11 Block A" + COMMA_NEWLINE
+            + "\"Label_13_Address_Line_02\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"Label_13_Address_Line_03\":\"Address Line 3" + COMMA_NEWLINE
+            + "\"Label_13_Address_Line_04\":\"Manchester" + COMMA_NEWLINE
+            + "\"Label_13_Address_Line_05\":\"Lancashire M1 KJR" + COMMA_NEWLINE
+            + "\"Label_13_Telephone\":\"07577 136511" + COMMA_NEWLINE
+            + "\"Label_13_Fax\":\"07577 136712" + COMMA_NEWLINE
+            + "\"lbl_13_Eef\":\"" + COMMA_NEWLINE
+            + "\"lbl_13_Cef\":\"1850011/2020" + COMMA_NEWLINE
+            + "\"Label_14_Entity_Name_01\":\"Claimant Name" + COMMA_NEWLINE
+            + "\"Label_14_Entity_Name_02\":\"" + COMMA_NEWLINE
+            + "\"Label_14_Address_Line_01\":\"11 Block A" + COMMA_NEWLINE
+            + "\"Label_14_Address_Line_02\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"Label_14_Address_Line_03\":\"Address Line 3" + COMMA_NEWLINE
+            + "\"Label_14_Address_Line_04\":\"Manchester" + COMMA_NEWLINE
+            + "\"Label_14_Address_Line_05\":\"Lancashire M1 KJR" + COMMA_NEWLINE
+            + "\"Label_14_Telephone\":\"07577 136511" + COMMA_NEWLINE
+            + "\"Label_14_Fax\":\"07577 136712" + COMMA_NEWLINE
+            + "\"lbl_14_Eef\":\"" + COMMA_NEWLINE
+            + "\"lbl_14_Cef\":\"1850011/2020\"},\n"
+            + "{\"Label_01_Entity_Name_01\":\"Claimant Name" + COMMA_NEWLINE
+            + "\"Label_01_Entity_Name_02\":\"" + COMMA_NEWLINE
+            + "\"Label_01_Address_Line_01\":\"11 Block A" + COMMA_NEWLINE
+            + "\"Label_01_Address_Line_02\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"Label_01_Address_Line_03\":\"Address Line 3" + COMMA_NEWLINE
+            + "\"Label_01_Address_Line_04\":\"Manchester" + COMMA_NEWLINE
+            + "\"Label_01_Address_Line_05\":\"Lancashire M1 KJR" + COMMA_NEWLINE
+            + "\"Label_01_Telephone\":\"07577 136511" + COMMA_NEWLINE
+            + "\"Label_01_Fax\":\"07577 136712" + COMMA_NEWLINE
+            + "\"lbl_01_Eef\":\"" + COMMA_NEWLINE
+            + "\"lbl_01_Cef\":\"1850011/2020" + COMMA_NEWLINE
+            + "\"Label_02_Entity_Name_01\":\"Claimant Rep" + COMMA_NEWLINE
+            + "\"Label_02_Entity_Name_02\":\"Claimant Org" + COMMA_NEWLINE
+            + "\"Label_02_Address_Line_01\":\"22 Block B" + COMMA_NEWLINE
+            + "\"Label_02_Address_Line_02\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"Label_02_Address_Line_03\":\"Address Line 3" + COMMA_NEWLINE
+            + "\"Label_02_Address_Line_04\":\"Manchester" + COMMA_NEWLINE
+            + "\"Label_02_Address_Line_05\":\"Lancashire M2 KJR" + COMMA_NEWLINE
+            + "\"Label_02_Telephone\":\"07577 136521" + COMMA_NEWLINE
+            + "\"Label_02_Fax\":\"07577 136722" + COMMA_NEWLINE
+            + "\"lbl_02_Eef\":\"OSCA/222/ABC" + COMMA_NEWLINE
+            + "\"lbl_02_Cef\":\"1850022/2020" + COMMA_NEWLINE
+            + "\"Label_03_Entity_Name_01\":\"Claimant Rep" + COMMA_NEWLINE
+            + "\"Label_03_Entity_Name_02\":\"Claimant Org" + COMMA_NEWLINE
+            + "\"Label_03_Address_Line_01\":\"22 Block B" + COMMA_NEWLINE
+            + "\"Label_03_Address_Line_02\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"Label_03_Address_Line_03\":\"Address Line 3" + COMMA_NEWLINE
+            + "\"Label_03_Address_Line_04\":\"Manchester" + COMMA_NEWLINE
+            + "\"Label_03_Address_Line_05\":\"Lancashire M2 KJR" + COMMA_NEWLINE
+            + "\"Label_03_Telephone\":\"07577 136521" + COMMA_NEWLINE
+            + "\"Label_03_Fax\":\"07577 136722" + COMMA_NEWLINE
+            + "\"lbl_03_Eef\":\"OSCA/222/ABC" + COMMA_NEWLINE
+            + "\"lbl_03_Cef\":\"1850022/2020" + COMMA_NEWLINE
+            + "\"Label_04_Entity_Name_01\":\"Claimant Rep" + COMMA_NEWLINE
+            + "\"Label_04_Entity_Name_02\":\"Claimant Org" + COMMA_NEWLINE
+            + "\"Label_04_Address_Line_01\":\"22 Block B" + COMMA_NEWLINE
+            + "\"Label_04_Address_Line_02\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"Label_04_Address_Line_03\":\"Address Line 3" + COMMA_NEWLINE
+            + "\"Label_04_Address_Line_04\":\"Manchester" + COMMA_NEWLINE
+            + "\"Label_04_Address_Line_05\":\"Lancashire M2 KJR" + COMMA_NEWLINE
+            + "\"Label_04_Telephone\":\"07577 136521" + COMMA_NEWLINE
+            + "\"Label_04_Fax\":\"07577 136722" + COMMA_NEWLINE
+            + "\"lbl_04_Eef\":\"OSCA/222/ABC" + COMMA_NEWLINE
+            + "\"lbl_04_Cef\":\"1850022/2020" + COMMA_NEWLINE
+            + "\"Label_05_Entity_Name_01\":\"Respondent One" + COMMA_NEWLINE
+            + "\"Label_05_Entity_Name_02\":\"" + COMMA_NEWLINE
+            + "\"Label_05_Address_Line_01\":\"33 Block C" + COMMA_NEWLINE
+            + "\"Label_05_Address_Line_02\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"Label_05_Address_Line_03\":\"Address Line 3" + COMMA_NEWLINE
+            + "\"Label_05_Address_Line_04\":\"Manchester" + COMMA_NEWLINE
+            + "\"Label_05_Address_Line_05\":\"Lancashire M3 KJR" + COMMA_NEWLINE
+            + "\"Label_05_Telephone\":\"07577 136531" + COMMA_NEWLINE
+            + "\"Label_05_Fax\":\"07577 136732" + COMMA_NEWLINE
+            + "\"lbl_05_Eef\":\"" + COMMA_NEWLINE
+            + "\"lbl_05_Cef\":\"1850033/2020" + COMMA_NEWLINE
+            + "\"Label_06_Entity_Name_01\":\"Respondent One" + COMMA_NEWLINE
+            + "\"Label_06_Entity_Name_02\":\"" + COMMA_NEWLINE
+            + "\"Label_06_Address_Line_01\":\"33 Block C" + COMMA_NEWLINE
+            + "\"Label_06_Address_Line_02\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"Label_06_Address_Line_03\":\"Address Line 3" + COMMA_NEWLINE
+            + "\"Label_06_Address_Line_04\":\"Manchester" + COMMA_NEWLINE
+            + "\"Label_06_Address_Line_05\":\"Lancashire M3 KJR" + COMMA_NEWLINE
+            + "\"Label_06_Telephone\":\"07577 136531" + COMMA_NEWLINE
+            + "\"Label_06_Fax\":\"07577 136732" + COMMA_NEWLINE
+            + "\"lbl_06_Eef\":\"" + COMMA_NEWLINE
+            + "\"lbl_06_Cef\":\"1850033/2020" + COMMA_NEWLINE
+            + "\"Label_07_Entity_Name_01\":\"Respondent One" + COMMA_NEWLINE
+            + "\"Label_07_Entity_Name_02\":\"" + COMMA_NEWLINE
+            + "\"Label_07_Address_Line_01\":\"33 Block C" + COMMA_NEWLINE
+            + "\"Label_07_Address_Line_02\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"Label_07_Address_Line_03\":\"Address Line 3" + COMMA_NEWLINE
+            + "\"Label_07_Address_Line_04\":\"Manchester" + COMMA_NEWLINE
+            + "\"Label_07_Address_Line_05\":\"Lancashire M3 KJR" + COMMA_NEWLINE
+            + "\"Label_07_Telephone\":\"07577 136531" + COMMA_NEWLINE
+            + "\"Label_07_Fax\":\"07577 136732" + COMMA_NEWLINE
+            + "\"lbl_07_Eef\":\"" + COMMA_NEWLINE
+            + "\"lbl_07_Cef\":\"1850033/2020" + COMMA_NEWLINE
+            + "\"Label_08_Entity_Name_01\":\"Respondent Two" + COMMA_NEWLINE
+            + "\"Label_08_Entity_Name_02\":\"" + COMMA_NEWLINE
+            + "\"Label_08_Address_Line_01\":\"44 Block D" + COMMA_NEWLINE
+            + "\"Label_08_Address_Line_02\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"Label_08_Address_Line_03\":\"Address Line 3" + COMMA_NEWLINE
+            + "\"Label_08_Address_Line_04\":\"Manchester" + COMMA_NEWLINE
+            + "\"Label_08_Address_Line_05\":\"Lancashire M4 KJR" + COMMA_NEWLINE
+            + "\"Label_08_Telephone\":\"07577 136541" + COMMA_NEWLINE
+            + "\"Label_08_Fax\":\"07577 136742" + COMMA_NEWLINE
+            + "\"lbl_08_Eef\":\"" + COMMA_NEWLINE
+            + "\"lbl_08_Cef\":\"1850044/2020" + COMMA_NEWLINE
+            + "\"Label_09_Entity_Name_01\":\"Respondent Two" + COMMA_NEWLINE
+            + "\"Label_09_Entity_Name_02\":\"" + COMMA_NEWLINE
+            + "\"Label_09_Address_Line_01\":\"44 Block D" + COMMA_NEWLINE
+            + "\"Label_09_Address_Line_02\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"Label_09_Address_Line_03\":\"Address Line 3" + COMMA_NEWLINE
+            + "\"Label_09_Address_Line_04\":\"Manchester" + COMMA_NEWLINE
+            + "\"Label_09_Address_Line_05\":\"Lancashire M4 KJR" + COMMA_NEWLINE
+            + "\"Label_09_Telephone\":\"07577 136541" + COMMA_NEWLINE
+            + "\"Label_09_Fax\":\"07577 136742" + COMMA_NEWLINE
+            + "\"lbl_09_Eef\":\"" + COMMA_NEWLINE
+            + "\"lbl_09_Cef\":\"1850044/2020" + COMMA_NEWLINE
+            + "\"Label_10_Entity_Name_01\":\"Respondent Two" + COMMA_NEWLINE
+            + "\"Label_10_Entity_Name_02\":\"" + COMMA_NEWLINE
+            + "\"Label_10_Address_Line_01\":\"44 Block D" + COMMA_NEWLINE
+            + "\"Label_10_Address_Line_02\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"Label_10_Address_Line_03\":\"Address Line 3" + COMMA_NEWLINE
+            + "\"Label_10_Address_Line_04\":\"Manchester" + COMMA_NEWLINE
+            + "\"Label_10_Address_Line_05\":\"Lancashire M4 KJR" + COMMA_NEWLINE
+            + "\"Label_10_Telephone\":\"07577 136541" + COMMA_NEWLINE
+            + "\"Label_10_Fax\":\"07577 136742" + COMMA_NEWLINE
+            + "\"lbl_10_Eef\":\"" + COMMA_NEWLINE
+            + "\"lbl_10_Cef\":\"1850044/2020" + COMMA_NEWLINE
+            + "\"Label_11_Entity_Name_01\":\"Respondent three" + COMMA_NEWLINE
+            + "\"Label_11_Entity_Name_02\":\"" + COMMA_NEWLINE
+            + "\"Label_11_Address_Line_01\":\"55 Block E" + COMMA_NEWLINE
+            + "\"Label_11_Address_Line_02\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"Label_11_Address_Line_03\":\"Address Line 3" + COMMA_NEWLINE
+            + "\"Label_11_Address_Line_04\":\"Manchester" + COMMA_NEWLINE
+            + "\"Label_11_Address_Line_05\":\"Lancashire M5 KJR" + COMMA_NEWLINE
+            + "\"Label_11_Telephone\":\"07577 136551" + COMMA_NEWLINE
+            + "\"Label_11_Fax\":\"07577 136752" + COMMA_NEWLINE
+            + "\"lbl_11_Eef\":\"" + COMMA_NEWLINE
+            + "\"lbl_11_Cef\":\"1850055/2020" + COMMA_NEWLINE
+            + "\"Label_12_Entity_Name_01\":\"Respondent three" + COMMA_NEWLINE
+            + "\"Label_12_Entity_Name_02\":\"" + COMMA_NEWLINE
+            + "\"Label_12_Address_Line_01\":\"55 Block E" + COMMA_NEWLINE
+            + "\"Label_12_Address_Line_02\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"Label_12_Address_Line_03\":\"Address Line 3" + COMMA_NEWLINE
+            + "\"Label_12_Address_Line_04\":\"Manchester" + COMMA_NEWLINE
+            + "\"Label_12_Address_Line_05\":\"Lancashire M5 KJR" + COMMA_NEWLINE
+            + "\"Label_12_Telephone\":\"07577 136551" + COMMA_NEWLINE
+            + "\"Label_12_Fax\":\"07577 136752" + COMMA_NEWLINE
+            + "\"lbl_12_Eef\":\"" + COMMA_NEWLINE
+            + "\"lbl_12_Cef\":\"1850055/2020" + COMMA_NEWLINE
+            + "\"Label_13_Entity_Name_01\":\"Respondent three" + COMMA_NEWLINE
+            + "\"Label_13_Entity_Name_02\":\"" + COMMA_NEWLINE
+            + "\"Label_13_Address_Line_01\":\"55 Block E" + COMMA_NEWLINE
+            + "\"Label_13_Address_Line_02\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"Label_13_Address_Line_03\":\"Address Line 3" + COMMA_NEWLINE
+            + "\"Label_13_Address_Line_04\":\"Manchester" + COMMA_NEWLINE
+            + "\"Label_13_Address_Line_05\":\"Lancashire M5 KJR" + COMMA_NEWLINE
+            + "\"Label_13_Telephone\":\"07577 136551" + COMMA_NEWLINE
+            + "\"Label_13_Fax\":\"07577 136752" + COMMA_NEWLINE
+            + "\"lbl_13_Eef\":\"" + COMMA_NEWLINE
+            + "\"lbl_13_Cef\":\"1850055/2020" + COMMA_NEWLINE
+            + "\"Label_14_Entity_Name_01\":\"Respondent Rep" + COMMA_NEWLINE
+            + "\"Label_14_Entity_Name_02\":\"" + COMMA_NEWLINE
+            + "\"Label_14_Address_Line_01\":\"66 Block F" + COMMA_NEWLINE
+            + "\"Label_14_Address_Line_02\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"Label_14_Address_Line_03\":\"Address Line 3" + COMMA_NEWLINE
+            + "\"Label_14_Address_Line_04\":\"Manchester" + COMMA_NEWLINE
+            + "\"Label_14_Address_Line_05\":\"Lancashire M6 KJR" + COMMA_NEWLINE
+            + "\"Label_14_Telephone\":\"07577 136561" + COMMA_NEWLINE
+            + "\"Label_14_Fax\":\"07577 136762" + COMMA_NEWLINE
+            + "\"lbl_14_Eef\":\"OSCA/666/ABC" + COMMA_NEWLINE
+            + "\"lbl_14_Cef\":\"1850066/2020\"},\n"
+            + "{\"Label_01_Entity_Name_01\":\"Respondent Rep" + COMMA_NEWLINE
+            + "\"Label_01_Entity_Name_02\":\"" + COMMA_NEWLINE
+            + "\"Label_01_Address_Line_01\":\"66 Block F" + COMMA_NEWLINE
+            + "\"Label_01_Address_Line_02\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"Label_01_Address_Line_03\":\"Address Line 3" + COMMA_NEWLINE
+            + "\"Label_01_Address_Line_04\":\"Manchester" + COMMA_NEWLINE
+            + "\"Label_01_Address_Line_05\":\"Lancashire M6 KJR" + COMMA_NEWLINE
+            + "\"Label_01_Telephone\":\"07577 136561" + COMMA_NEWLINE
+            + "\"Label_01_Fax\":\"07577 136762" + COMMA_NEWLINE
+            + "\"lbl_01_Eef\":\"OSCA/666/ABC" + COMMA_NEWLINE
+            + "\"lbl_01_Cef\":\"1850066/2020" + COMMA_NEWLINE
+            + "\"Label_02_Entity_Name_01\":\"Respondent Rep" + COMMA_NEWLINE
+            + "\"Label_02_Entity_Name_02\":\"" + COMMA_NEWLINE
+            + "\"Label_02_Address_Line_01\":\"66 Block F" + COMMA_NEWLINE
+            + "\"Label_02_Address_Line_02\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"Label_02_Address_Line_03\":\"Address Line 3" + COMMA_NEWLINE
+            + "\"Label_02_Address_Line_04\":\"Manchester" + COMMA_NEWLINE
+            + "\"Label_02_Address_Line_05\":\"Lancashire M6 KJR" + COMMA_NEWLINE
+            + "\"Label_02_Telephone\":\"07577 136561" + COMMA_NEWLINE
+            + "\"Label_02_Fax\":\"07577 136762" + COMMA_NEWLINE
+            + "\"lbl_02_Eef\":\"OSCA/666/ABC" + COMMA_NEWLINE
+            + "\"lbl_02_Cef\":\"1850066/2020\"}],\n"
+            + "\"i0_2_enhmcts\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i0_2_enhmcts1\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i0_2_enhmcts2\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts1\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts2\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"Clerk\":\"Mike Jordan" + COMMA_NEWLINE
+            + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + COMMA_NEWLINE
+            + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + COMMA_NEWLINE
+            + "\"Case_No\":\"123456" + COMMA_NEWLINE
+            + "\"submission_reference\":\"12212121" + COMMA_NEWLINE
+            + CLOSE_BRACE_NEW_LINE
+            + CLOSE_BRACE_NEW_LINE;
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails15.getCaseData(), "",
                 userDetails, ENGLANDWALES_CASE_TYPE_ID,
                 caseDetails15.getCaseData().getCorrespondenceType(),
@@ -1438,79 +1416,77 @@ class DocumentHelperTest {
 
     @Test
     void buildDocumentContent20() {
-        String expected = "{" + NEW_LINE
-                + "\"accessKey\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"templateName\":\"EM-TRB-EGW-ENG-00043.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"outputName\":\"document.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"data\":{" + NEW_LINE
-                + "\"claimant_or_rep_full_name\":\"RepresentativeNameClaimant\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_rep_organisation\":\"RepresentativeOrganisation\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine1\":\"56 Block C\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine2\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_county\":\"Lancashire\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_postCode\":\"M3 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_reference\":\"1111111\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_full_name\":\"Mr A J Rodriguez\"" + NEW_LINE_WITH_COMMA
-                + "\"Claimant\":\"Mr A J Rodriguez\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine1\":\"34\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine2\":\"Low Street\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_county\":\"Lancashire\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_postCode\":\"M3 6gw\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_full_name\":\"Antonio Vazquez\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine1\":\"11 Small Street\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine2\":\"22 House\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_county\":\"North West\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_postCode\":\"M12 42R\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_full_name\":\"Antonio Vazquez\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine1\":\"11 Small Street\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine2\":\"22 House\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_county\":\"North West\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_postCode\":\"M12 42R\"" + NEW_LINE_WITH_COMMA
-                + "\"Respondent\":\"1. Antonio Vazquez,\"" + NEW_LINE_WITH_COMMA
-                + "\"resp_others\":\"2. Juan Garcia, 3. Mike Jordan\"" + NEW_LINE_WITH_COMMA
-                + "\"resp_address\":\"1. 11 Small Street, 22 House, Manchester, North West, M12 42R, "
-                + "UK\\n2. 12 Small Street, 24 House, Manchester, North West, M12 4ED, UK\\n3. 11 Small Street, "
-                + "22 House, Manchester, North West, M12 42R, UK\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_date\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_date_time\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_time\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_venue\":\"Manchester Employment Tribunals, "
-                + "Alexandra House, 14-22 The Parsonage, Manchester, M3 2JA\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_duration\":\"3 days\"" + NEW_LINE_WITH_COMMA
-                + "\"t1_2\":\"true\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine1\":\"Manchester Employment Tribunal,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine2\":\"Alexandra House,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine3\":\"14-22 The Parsonage,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_town\":\"Manchester,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_county\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_postCode\":\"M3 2JA\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_telephone\":\"03577131270\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_fax\":\"07577126570\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_DX\":\"123456\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_Email\":\"ManchesterOfficeET@hmcts.gov.uk\"" + NEW_LINE_WITH_COMMA
-                + "\"i1_2_enhmcts\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i1_2_enhmcts1\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i1_2_enhmcts2\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts1\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts2\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"Clerk\":\"Mike Jordan\"" + NEW_LINE_WITH_COMMA
-                + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + NEW_LINE_WITH_COMMA
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
-                + NEW_LINE_WITH_COMMA
-                + "\"Case_No\":\"123456\"" + NEW_LINE_WITH_COMMA
-                + "\"submission_reference\":\"12212121\"" + NEW_LINE_WITH_COMMA
-                + "}" + NEW_LINE
-                + "}" + NEW_LINE;
-
+        String expected = "{\n"
+            + "\"accessKey\":\"" + COMMA_NEWLINE
+            + "\"templateName\":\"EM-TRB-EGW-ENG-00043.docx" + COMMA_NEWLINE
+            + "\"outputName\":\"document.docx" + COMMA_NEWLINE
+            + "\"data\":{\n"
+            + "\"claimant_or_rep_full_name\":\"RepresentativeNameClaimant" + COMMA_NEWLINE
+            + "\"claimant_rep_organisation\":\"RepresentativeOrganisation" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine1\":\"56 Block C" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine2\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"claimant_or_rep_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"claimant_or_rep_county\":\"Lancashire" + COMMA_NEWLINE
+            + "\"claimant_or_rep_postCode\":\"M3 KJR" + COMMA_NEWLINE
+            + "\"claimant_reference\":\"1111111" + COMMA_NEWLINE
+            + "\"claimant_full_name\":\"Mr A J Rodriguez" + COMMA_NEWLINE
+            + "\"Claimant\":\"Mr A J Rodriguez" + COMMA_NEWLINE
+            + "\"claimant_addressLine1\":\"34" + COMMA_NEWLINE
+            + "\"claimant_addressLine2\":\"Low Street" + COMMA_NEWLINE
+            + "\"claimant_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"claimant_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"claimant_county\":\"Lancashire" + COMMA_NEWLINE
+            + "\"claimant_postCode\":\"M3 6gw" + COMMA_NEWLINE
+            + "\"respondent_or_rep_full_name\":\"Antonio Vazquez" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine1\":\"11 Small Street" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine2\":\"22 House" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"respondent_or_rep_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"respondent_or_rep_county\":\"North West" + COMMA_NEWLINE
+            + "\"respondent_or_rep_postCode\":\"M12 42R" + COMMA_NEWLINE
+            + "\"respondent_full_name\":\"Antonio Vazquez" + COMMA_NEWLINE
+            + "\"respondent_addressLine1\":\"11 Small Street" + COMMA_NEWLINE
+            + "\"respondent_addressLine2\":\"22 House" + COMMA_NEWLINE
+            + "\"respondent_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"respondent_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"respondent_county\":\"North West" + COMMA_NEWLINE
+            + "\"respondent_postCode\":\"M12 42R" + COMMA_NEWLINE
+            + "\"Respondent\":\"1. Antonio Vazquez," + COMMA_NEWLINE
+            + "\"resp_others\":\"2. Juan Garcia, 3. Mike Jordan" + COMMA_NEWLINE
+            + "\"resp_address\":\"1. 11 Small Street, 22 House, Manchester, North West, M12 42R, "
+            + "UK\\n2. 12 Small Street, 24 House, Manchester, North West, M12 4ED, UK\\n3. 11 Small Street, "
+            + "22 House, Manchester, North West, M12 42R, UK" + COMMA_NEWLINE
+            + "\"Hearing_date\":\"" + COMMA_NEWLINE
+            + "\"Hearing_date_time\":\"" + COMMA_NEWLINE
+            + "\"Hearing_time\":\"" + COMMA_NEWLINE
+            + "\"Hearing_venue\":\"Manchester Employment Tribunals, "
+            + "Alexandra House, 14-22 The Parsonage, Manchester, M3 2JA" + COMMA_NEWLINE
+            + "\"Hearing_duration\":\"3 days" + COMMA_NEWLINE
+            + "\"t1_2\":\"true" + COMMA_NEWLINE
+            + "\"Court_addressLine1\":\"Manchester Employment Tribunal," + COMMA_NEWLINE
+            + "\"Court_addressLine2\":\"Alexandra House," + COMMA_NEWLINE
+            + "\"Court_addressLine3\":\"14-22 The Parsonage," + COMMA_NEWLINE
+            + "\"Court_town\":\"Manchester," + COMMA_NEWLINE
+            + "\"Court_county\":\"" + COMMA_NEWLINE
+            + "\"Court_postCode\":\"M3 2JA" + COMMA_NEWLINE
+            + "\"Court_telephone\":\"03577131270" + COMMA_NEWLINE
+            + "\"Court_fax\":\"07577126570" + COMMA_NEWLINE
+            + "\"Court_DX\":\"123456" + COMMA_NEWLINE
+            + "\"Court_Email\":\"ManchesterOfficeET@hmcts.gov.uk" + COMMA_NEWLINE
+            + "\"i1_2_enhmcts\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i1_2_enhmcts1\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i1_2_enhmcts2\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts1\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts2\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"Clerk\":\"Mike Jordan" + COMMA_NEWLINE
+            + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + COMMA_NEWLINE
+            + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + COMMA_NEWLINE
+            + "\"Case_No\":\"123456" + COMMA_NEWLINE
+            + "\"submission_reference\":\"12212121" + COMMA_NEWLINE
+            + CLOSE_BRACE_NEW_LINE
+            + CLOSE_BRACE_NEW_LINE;
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails20.getCaseData(), "",
                 userDetails, ENGLANDWALES_CASE_TYPE_ID,
                 caseDetails20.getCaseData().getCorrespondenceType(),
@@ -1520,68 +1496,67 @@ class DocumentHelperTest {
 
     @Test
     void buildDocumentWithNotContent() {
-        String expected = "{" + NEW_LINE
-                + "\"accessKey\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"templateName\":\".docx\"" + NEW_LINE_WITH_COMMA
-                + "\"outputName\":\"document.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"data\":{" + NEW_LINE
-                + "\"claimant_or_rep_full_name\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_full_name\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Claimant\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_rep_organisation\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine1\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine2\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_town\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_county\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_postCode\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine1\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine2\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_town\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_county\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_postCode\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_full_name\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_rep_organisation\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine1\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine2\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_town\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_county\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_postCode\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_full_name\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine1\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine2\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_town\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_county\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_postCode\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Respondent\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"resp_others\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"resp_address\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_date\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_date_time\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_venue\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_duration\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_time\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_telephone\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_fax\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_DX\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_Email\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"i_enhmcts\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i_enhmcts1\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i_enhmcts2\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts1\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts2\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"Clerk\":\"Mike Jordan\"" + NEW_LINE_WITH_COMMA
-                + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + NEW_LINE_WITH_COMMA
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
-                + NEW_LINE_WITH_COMMA
-                + "\"Case_No\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"submission_reference\":\"\"" + NEW_LINE_WITH_COMMA
-                + "}" + NEW_LINE
-                + "}" + NEW_LINE;
+        String expected = "{\n"
+            + "\"accessKey\":\"" + COMMA_NEWLINE
+            + "\"templateName\":\".docx" + COMMA_NEWLINE
+            + "\"outputName\":\"document.docx" + COMMA_NEWLINE
+            + "\"data\":{\n"
+            + "\"claimant_or_rep_full_name\":\"" + COMMA_NEWLINE
+            + "\"claimant_full_name\":\"" + COMMA_NEWLINE
+            + "\"Claimant\":\"" + COMMA_NEWLINE
+            + "\"claimant_rep_organisation\":\"" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine1\":\"" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine2\":\"" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"claimant_or_rep_town\":\"" + COMMA_NEWLINE
+            + "\"claimant_or_rep_county\":\"" + COMMA_NEWLINE
+            + "\"claimant_or_rep_postCode\":\"" + COMMA_NEWLINE
+            + "\"claimant_addressLine1\":\"" + COMMA_NEWLINE
+            + "\"claimant_addressLine2\":\"" + COMMA_NEWLINE
+            + "\"claimant_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"claimant_town\":\"" + COMMA_NEWLINE
+            + "\"claimant_county\":\"" + COMMA_NEWLINE
+            + "\"claimant_postCode\":\"" + COMMA_NEWLINE
+            + "\"respondent_or_rep_full_name\":\"" + COMMA_NEWLINE
+            + "\"respondent_rep_organisation\":\"" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine1\":\"" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine2\":\"" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"respondent_or_rep_town\":\"" + COMMA_NEWLINE
+            + "\"respondent_or_rep_county\":\"" + COMMA_NEWLINE
+            + "\"respondent_or_rep_postCode\":\"" + COMMA_NEWLINE
+            + "\"respondent_full_name\":\"" + COMMA_NEWLINE
+            + "\"respondent_addressLine1\":\"" + COMMA_NEWLINE
+            + "\"respondent_addressLine2\":\"" + COMMA_NEWLINE
+            + "\"respondent_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"respondent_town\":\"" + COMMA_NEWLINE
+            + "\"respondent_county\":\"" + COMMA_NEWLINE
+            + "\"respondent_postCode\":\"" + COMMA_NEWLINE
+            + "\"Respondent\":\"" + COMMA_NEWLINE
+            + "\"resp_others\":\"" + COMMA_NEWLINE
+            + "\"resp_address\":\"" + COMMA_NEWLINE
+            + "\"Hearing_date\":\"" + COMMA_NEWLINE
+            + "\"Hearing_date_time\":\"" + COMMA_NEWLINE
+            + "\"Hearing_venue\":\"" + COMMA_NEWLINE
+            + "\"Hearing_duration\":\"" + COMMA_NEWLINE
+            + "\"Hearing_time\":\"" + COMMA_NEWLINE
+            + "\"Court_telephone\":\"" + COMMA_NEWLINE
+            + "\"Court_fax\":\"" + COMMA_NEWLINE
+            + "\"Court_DX\":\"" + COMMA_NEWLINE
+            + "\"Court_Email\":\"" + COMMA_NEWLINE
+            + "\"i_enhmcts\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i_enhmcts1\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i_enhmcts2\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts1\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts2\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"Clerk\":\"Mike Jordan" + COMMA_NEWLINE
+            + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + COMMA_NEWLINE
+            + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + COMMA_NEWLINE
+            + "\"Case_No\":\"" + COMMA_NEWLINE
+            + "\"submission_reference\":\"" + COMMA_NEWLINE
+            + CLOSE_BRACE_NEW_LINE
+            + CLOSE_BRACE_NEW_LINE;
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetailsEmpty.getCaseData(), "",
                 userDetails, "",
                 caseDetailsEmpty.getCaseData().getCorrespondenceType(),
@@ -1592,78 +1567,76 @@ class DocumentHelperTest {
     @Test
     void buildDocumentContentScot1() {
         when(venueAddressReaderService.getVenueAddress(any(), any(), any())).thenReturn(GLASGOW_VENUE_ADDRESS);
-
-        String expected = "{" + NEW_LINE
-                + "\"accessKey\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"templateName\":\"EM-TRB-SCO-ENG-00042.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"outputName\":\"document.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"data\":{" + NEW_LINE
-                + "\"claimant_or_rep_full_name\":\"RepresentativeNameClaimant\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_rep_organisation\":\"RepresentativeOrganisation\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine1\":\"56 Block C\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine2\":\"Ellesmere Street\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_county\":\"Lancashire\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_postCode\":\"M3 KJR\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_reference\":\"1111111\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_full_name\":\"Mr A J Rodriguez\"" + NEW_LINE_WITH_COMMA
-                + "\"Claimant\":\"Mr A J Rodriguez\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine1\":\"34\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine2\":\"Low Street\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_county\":\"Lancashire\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_postCode\":\"M3 6gw\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_full_name\":\"Antonio Vazquez\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine1\":\"11 Small Street\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine2\":\"22 House\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_county\":\"North West\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_postCode\":\"M12 42R\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_full_name\":\"Antonio Vazquez\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine1\":\"11 Small Street\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine2\":\"22 House\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_county\":\"North West\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_postCode\":\"M12 42R\"" + NEW_LINE_WITH_COMMA
-                + "\"Respondent\":\"1. Antonio Vazquez,\"" + NEW_LINE_WITH_COMMA
-                + "\"resp_others\":\"2. Roberto Dondini\"" + NEW_LINE_WITH_COMMA
-                + "\"resp_address\":\"1. 11 Small Street, 22 House, Manchester, North West, M12 42R, UK\\n2. 13 Small"
-                + " Street, 26 House, Scotland, North West, SC13 4ED, UK\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_date\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_date_time\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_time\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_venue\":\"Glasgow Tribunal Centre, Atlantic Quay, 20 York Street, Glasgow, G2 8GT\""
-                + NEW_LINE_WITH_COMMA
-                + "\"Hearing_duration\":\"2 days\"" + NEW_LINE_WITH_COMMA
-                + "\"t_Scot_7_1\":\"true\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine1\":\"Eagle Building,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine2\":\"215 Bothwell Street,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_town\":\"Glasgow,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_county\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_postCode\":\"G2 7TS\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_telephone\":\"03577123270\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_fax\":\"07127126570\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_DX\":\"1234567\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_Email\":\"GlasgowOfficeET@hmcts.gov.uk\"" + NEW_LINE_WITH_COMMA
-                + "\"i_enhmcts\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i_enhmcts1\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i_enhmcts2\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot7_1_schmcts\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot7_1_schmcts1\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot7_1_schmcts2\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"Clerk\":\"Mike Jordan\"" + NEW_LINE_WITH_COMMA
-                + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + NEW_LINE_WITH_COMMA
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
-                + NEW_LINE_WITH_COMMA
-                + "\"Case_No\":\"123456\"" + NEW_LINE_WITH_COMMA
-                + "\"submission_reference\":\"12212121\"" + NEW_LINE_WITH_COMMA
-                + "}" + NEW_LINE
-                + "}" + NEW_LINE;
+        String expected = "{\n"
+            + "\"accessKey\":\"" + COMMA_NEWLINE
+            + "\"templateName\":\"EM-TRB-SCO-ENG-00042.docx" + COMMA_NEWLINE
+            + "\"outputName\":\"document.docx" + COMMA_NEWLINE
+            + "\"data\":{\n"
+            + "\"claimant_or_rep_full_name\":\"RepresentativeNameClaimant" + COMMA_NEWLINE
+            + "\"claimant_rep_organisation\":\"RepresentativeOrganisation" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine1\":\"56 Block C" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine2\":\"Ellesmere Street" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"claimant_or_rep_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"claimant_or_rep_county\":\"Lancashire" + COMMA_NEWLINE
+            + "\"claimant_or_rep_postCode\":\"M3 KJR" + COMMA_NEWLINE
+            + "\"claimant_reference\":\"1111111" + COMMA_NEWLINE
+            + "\"claimant_full_name\":\"Mr A J Rodriguez" + COMMA_NEWLINE
+            + "\"Claimant\":\"Mr A J Rodriguez" + COMMA_NEWLINE
+            + "\"claimant_addressLine1\":\"34" + COMMA_NEWLINE
+            + "\"claimant_addressLine2\":\"Low Street" + COMMA_NEWLINE
+            + "\"claimant_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"claimant_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"claimant_county\":\"Lancashire" + COMMA_NEWLINE
+            + "\"claimant_postCode\":\"M3 6gw" + COMMA_NEWLINE
+            + "\"respondent_or_rep_full_name\":\"Antonio Vazquez" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine1\":\"11 Small Street" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine2\":\"22 House" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"respondent_or_rep_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"respondent_or_rep_county\":\"North West" + COMMA_NEWLINE
+            + "\"respondent_or_rep_postCode\":\"M12 42R" + COMMA_NEWLINE
+            + "\"respondent_full_name\":\"Antonio Vazquez" + COMMA_NEWLINE
+            + "\"respondent_addressLine1\":\"11 Small Street" + COMMA_NEWLINE
+            + "\"respondent_addressLine2\":\"22 House" + COMMA_NEWLINE
+            + "\"respondent_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"respondent_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"respondent_county\":\"North West" + COMMA_NEWLINE
+            + "\"respondent_postCode\":\"M12 42R" + COMMA_NEWLINE
+            + "\"Respondent\":\"1. Antonio Vazquez," + COMMA_NEWLINE
+            + "\"resp_others\":\"2. Roberto Dondini" + COMMA_NEWLINE
+            + "\"resp_address\":\"1. 11 Small Street, 22 House, Manchester, North West, M12 42R, UK\\n2. 13 Small"
+            + " Street, 26 House, Scotland, North West, SC13 4ED, UK" + COMMA_NEWLINE
+            + "\"Hearing_date\":\"" + COMMA_NEWLINE
+            + "\"Hearing_date_time\":\"" + COMMA_NEWLINE
+            + "\"Hearing_time\":\"" + COMMA_NEWLINE
+            + "\"Hearing_venue\":\"Glasgow Tribunal Centre, Atlantic Quay, 20 York Street, Glasgow, G2 8GT" 
+            + COMMA_NEWLINE
+            + "\"Hearing_duration\":\"2 days" + COMMA_NEWLINE
+            + "\"t_Scot_7_1\":\"true" + COMMA_NEWLINE
+            + "\"Court_addressLine1\":\"Eagle Building," + COMMA_NEWLINE
+            + "\"Court_addressLine2\":\"215 Bothwell Street," + COMMA_NEWLINE
+            + "\"Court_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"Court_town\":\"Glasgow," + COMMA_NEWLINE
+            + "\"Court_county\":\"" + COMMA_NEWLINE
+            + "\"Court_postCode\":\"G2 7TS" + COMMA_NEWLINE
+            + "\"Court_telephone\":\"03577123270" + COMMA_NEWLINE
+            + "\"Court_fax\":\"07127126570" + COMMA_NEWLINE
+            + "\"Court_DX\":\"1234567" + COMMA_NEWLINE
+            + "\"Court_Email\":\"GlasgowOfficeET@hmcts.gov.uk" + COMMA_NEWLINE
+            + "\"i_enhmcts\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i_enhmcts1\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i_enhmcts2\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"iScot7_1_schmcts\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot7_1_schmcts1\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot7_1_schmcts2\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"Clerk\":\"Mike Jordan" + COMMA_NEWLINE
+            + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + COMMA_NEWLINE
+            + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + COMMA_NEWLINE
+            + "\"Case_No\":\"123456" + COMMA_NEWLINE
+            + "\"submission_reference\":\"12212121" + COMMA_NEWLINE
+            + CLOSE_BRACE_NEW_LINE
+            + CLOSE_BRACE_NEW_LINE;
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetailsScot1.getCaseData(), "",
                 userDetails, SCOTLAND_CASE_TYPE_ID,
                 caseDetailsScot1.getCaseData().getCorrespondenceType(),
@@ -1673,75 +1646,74 @@ class DocumentHelperTest {
 
     @Test
     void buildDocumentContentScot2() {
-        String expected = "{" + NEW_LINE
-                + "\"accessKey\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"templateName\":\"EM-TRB-SCO-ENG-00043.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"outputName\":\"document.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"data\":{" + NEW_LINE
-                + "\"claimant_or_rep_full_name\":\"Orlando LTD\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_full_name\":\"Orlando LTD\"" + NEW_LINE_WITH_COMMA
-                + "\"Claimant\":\"Orlando LTD\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine1\":\"34\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine2\":\"Low Street\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_county\":\"Lancashire\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_postCode\":\"M3 6gw\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine1\":\"34\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine2\":\"Low Street\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_county\":\"Lancashire\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_postCode\":\"M3 6gw\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_full_name\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_rep_organisation\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine1\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine2\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_town\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_county\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_postCode\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_full_name\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine1\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine2\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_town\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_county\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_postCode\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Respondent\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"resp_others\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"resp_address\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_date\":\"25 November 2019\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_date_time\":\"25 November 2019 at 12:11\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_time\":\"12:11\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_venue\":\"Glasgow Tribunal Centre, Atlantic Quay, 20 York Street, Glasgow, G2 8GT\""
-                + NEW_LINE_WITH_COMMA
-                + "\"Hearing_duration\":\"2 days\"" + NEW_LINE_WITH_COMMA
-                + "\"t_Scot_24\":\"true\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine1\":\"Eagle Building,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine2\":\"215 Bothwell Street,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_town\":\"Glasgow,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_county\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_postCode\":\"G2 7TS\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_telephone\":\"03577123270\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_fax\":\"07127126570\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_DX\":\"1234567\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_Email\":\"GlasgowOfficeET@hmcts.gov.uk\"" + NEW_LINE_WITH_COMMA
-                + "\"i_enhmcts\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i_enhmcts1\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i_enhmcts2\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot24_schmcts\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot24_schmcts1\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot24_schmcts2\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"Clerk\":\"Mike Jordan\"" + NEW_LINE_WITH_COMMA
-                + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + NEW_LINE_WITH_COMMA
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
-                + NEW_LINE_WITH_COMMA
-                + "\"Case_No\":\"123456\"" + NEW_LINE_WITH_COMMA
-                + "\"submission_reference\":\"12212121\"" + NEW_LINE_WITH_COMMA
-                + "}" + NEW_LINE
-                + "}" + NEW_LINE;
+        String expected = "{\n"
+            + "\"accessKey\":\"" + COMMA_NEWLINE
+            + "\"templateName\":\"EM-TRB-SCO-ENG-00043.docx" + COMMA_NEWLINE
+            + "\"outputName\":\"document.docx" + COMMA_NEWLINE
+            + "\"data\":{\n"
+            + "\"claimant_or_rep_full_name\":\"Orlando LTD" + COMMA_NEWLINE
+            + "\"claimant_full_name\":\"Orlando LTD" + COMMA_NEWLINE
+            + "\"Claimant\":\"Orlando LTD" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine1\":\"34" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine2\":\"Low Street" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"claimant_or_rep_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"claimant_or_rep_county\":\"Lancashire" + COMMA_NEWLINE
+            + "\"claimant_or_rep_postCode\":\"M3 6gw" + COMMA_NEWLINE
+            + "\"claimant_addressLine1\":\"34" + COMMA_NEWLINE
+            + "\"claimant_addressLine2\":\"Low Street" + COMMA_NEWLINE
+            + "\"claimant_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"claimant_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"claimant_county\":\"Lancashire" + COMMA_NEWLINE
+            + "\"claimant_postCode\":\"M3 6gw" + COMMA_NEWLINE
+            + "\"respondent_or_rep_full_name\":\"" + COMMA_NEWLINE
+            + "\"respondent_rep_organisation\":\"" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine1\":\"" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine2\":\"" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"respondent_or_rep_town\":\"" + COMMA_NEWLINE
+            + "\"respondent_or_rep_county\":\"" + COMMA_NEWLINE
+            + "\"respondent_or_rep_postCode\":\"" + COMMA_NEWLINE
+            + "\"respondent_full_name\":\"" + COMMA_NEWLINE
+            + "\"respondent_addressLine1\":\"" + COMMA_NEWLINE
+            + "\"respondent_addressLine2\":\"" + COMMA_NEWLINE
+            + "\"respondent_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"respondent_town\":\"" + COMMA_NEWLINE
+            + "\"respondent_county\":\"" + COMMA_NEWLINE
+            + "\"respondent_postCode\":\"" + COMMA_NEWLINE
+            + "\"Respondent\":\"" + COMMA_NEWLINE
+            + "\"resp_others\":\"" + COMMA_NEWLINE
+            + "\"resp_address\":\"" + COMMA_NEWLINE
+            + "\"Hearing_date\":\"25 November 2019" + COMMA_NEWLINE
+            + "\"Hearing_date_time\":\"25 November 2019 at 12:11" + COMMA_NEWLINE
+            + "\"Hearing_time\":\"12:11" + COMMA_NEWLINE
+            + "\"Hearing_venue\":\"Glasgow Tribunal Centre, Atlantic Quay, 20 York Street, Glasgow, G2 8GT" 
+            + COMMA_NEWLINE
+            + "\"Hearing_duration\":\"2 days" + COMMA_NEWLINE
+            + "\"t_Scot_24\":\"true" + COMMA_NEWLINE
+            + "\"Court_addressLine1\":\"Eagle Building," + COMMA_NEWLINE
+            + "\"Court_addressLine2\":\"215 Bothwell Street," + COMMA_NEWLINE
+            + "\"Court_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"Court_town\":\"Glasgow," + COMMA_NEWLINE
+            + "\"Court_county\":\"" + COMMA_NEWLINE
+            + "\"Court_postCode\":\"G2 7TS" + COMMA_NEWLINE
+            + "\"Court_telephone\":\"03577123270" + COMMA_NEWLINE
+            + "\"Court_fax\":\"07127126570" + COMMA_NEWLINE
+            + "\"Court_DX\":\"1234567" + COMMA_NEWLINE
+            + "\"Court_Email\":\"GlasgowOfficeET@hmcts.gov.uk" + COMMA_NEWLINE
+            + "\"i_enhmcts\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i_enhmcts1\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i_enhmcts2\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"iScot24_schmcts\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot24_schmcts1\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot24_schmcts2\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"Clerk\":\"Mike Jordan" + COMMA_NEWLINE
+            + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + COMMA_NEWLINE
+            + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + COMMA_NEWLINE
+            + "\"Case_No\":\"123456" + COMMA_NEWLINE
+            + "\"submission_reference\":\"12212121" + COMMA_NEWLINE
+            + CLOSE_BRACE_NEW_LINE
+            + CLOSE_BRACE_NEW_LINE;
         when(venueAddressReaderService.getVenueAddress(any(), any(), any())).thenReturn(GLASGOW_VENUE_ADDRESS);
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetailsScot2.getCaseData(), "",
                 userDetails, DUMMY_CASE_TYPE_ID,
@@ -1752,74 +1724,72 @@ class DocumentHelperTest {
 
     @Test
     void buildDocumentContentScot3() {
-        String expected = "{" + NEW_LINE
-                + "\"accessKey\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"templateName\":\"EM-TRB-SCO-ENG-00044.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"outputName\":\"document.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"data\":{" + NEW_LINE
-                + "\"claimant_or_rep_full_name\":\"Mr A J Rodriguez\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_full_name\":\"Mr A J Rodriguez\"" + NEW_LINE_WITH_COMMA
-                + "\"Claimant\":\"Mr A J Rodriguez\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine1\":\"34\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine2\":\"Low Street\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_county\":\"Lancashire\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_postCode\":\"M3 6gw\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine1\":\"34\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine2\":\"Low Street\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_county\":\"Lancashire\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_postCode\":\"M3 6gw\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_full_name\":\"Antonio Vazquez\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine1\":\"11 Small Street\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine2\":\"22 House\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_county\":\"North West\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_postCode\":\"M12 42R\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_full_name\":\"Antonio Vazquez\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine1\":\"11 Small Street\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine2\":\"22 House\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_county\":\"North West\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_postCode\":\"M12 42R\"" + NEW_LINE_WITH_COMMA
-                + "\"Respondent\":\"Antonio Vazquez\"" + NEW_LINE_WITH_COMMA
-                + "\"resp_others\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"resp_address\":\"11 Small Street, 22 House, Manchester, North West, M12 42R, UK\""
-                + NEW_LINE_WITH_COMMA
-                + "\"Hearing_date\":\"1 November 2019\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_date_time\":\"1 November 2019 at 12:11\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_time\":\"12:11\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_venue\":\"Ground Floor, AB1, 48 Huntly Street, Aberdeen, AB10 1SH\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_duration\":\"1 day\"" + NEW_LINE_WITH_COMMA
-                + "\"t_Scot_34\":\"true\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine1\":\"Eagle Building,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine2\":\"215 Bothwell Street,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_town\":\"Glasgow,\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_county\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_postCode\":\"G2 7TS\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_telephone\":\"03577123270\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_fax\":\"07127126570\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_DX\":\"1234567\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_Email\":\"GlasgowOfficeET@hmcts.gov.uk\"" + NEW_LINE_WITH_COMMA
-                + "\"i_enhmcts\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i_enhmcts1\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i_enhmcts2\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot34_schmcts\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot34_schmcts1\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot34_schmcts2\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"Clerk\":\"Mike Jordan\"" + NEW_LINE_WITH_COMMA
-                + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + NEW_LINE_WITH_COMMA
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
-                + NEW_LINE_WITH_COMMA
-                + "\"Case_No\":\"123456\"" + NEW_LINE_WITH_COMMA
-                + "\"submission_reference\":\"12212121\"" + NEW_LINE_WITH_COMMA
-                + "}" + NEW_LINE
-                + "}" + NEW_LINE;
+        String expected = "{\n"
+            + "\"accessKey\":\"" + COMMA_NEWLINE
+            + "\"templateName\":\"EM-TRB-SCO-ENG-00044.docx" + COMMA_NEWLINE
+            + "\"outputName\":\"document.docx" + COMMA_NEWLINE
+            + "\"data\":{\n"
+            + "\"claimant_or_rep_full_name\":\"Mr A J Rodriguez" + COMMA_NEWLINE
+            + "\"claimant_full_name\":\"Mr A J Rodriguez" + COMMA_NEWLINE
+            + "\"Claimant\":\"Mr A J Rodriguez" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine1\":\"34" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine2\":\"Low Street" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"claimant_or_rep_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"claimant_or_rep_county\":\"Lancashire" + COMMA_NEWLINE
+            + "\"claimant_or_rep_postCode\":\"M3 6gw" + COMMA_NEWLINE
+            + "\"claimant_addressLine1\":\"34" + COMMA_NEWLINE
+            + "\"claimant_addressLine2\":\"Low Street" + COMMA_NEWLINE
+            + "\"claimant_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"claimant_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"claimant_county\":\"Lancashire" + COMMA_NEWLINE
+            + "\"claimant_postCode\":\"M3 6gw" + COMMA_NEWLINE
+            + "\"respondent_or_rep_full_name\":\"Antonio Vazquez" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine1\":\"11 Small Street" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine2\":\"22 House" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"respondent_or_rep_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"respondent_or_rep_county\":\"North West" + COMMA_NEWLINE
+            + "\"respondent_or_rep_postCode\":\"M12 42R" + COMMA_NEWLINE
+            + "\"respondent_full_name\":\"Antonio Vazquez" + COMMA_NEWLINE
+            + "\"respondent_addressLine1\":\"11 Small Street" + COMMA_NEWLINE
+            + "\"respondent_addressLine2\":\"22 House" + COMMA_NEWLINE
+            + "\"respondent_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"respondent_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"respondent_county\":\"North West" + COMMA_NEWLINE
+            + "\"respondent_postCode\":\"M12 42R" + COMMA_NEWLINE
+            + "\"Respondent\":\"Antonio Vazquez" + COMMA_NEWLINE
+            + "\"resp_others\":\"" + COMMA_NEWLINE
+            + "\"resp_address\":\"11 Small Street, 22 House, Manchester, North West, M12 42R, UK" + COMMA_NEWLINE
+            + "\"Hearing_date\":\"1 November 2019" + COMMA_NEWLINE
+            + "\"Hearing_date_time\":\"1 November 2019 at 12:11" + COMMA_NEWLINE
+            + "\"Hearing_time\":\"12:11" + COMMA_NEWLINE
+            + "\"Hearing_venue\":\"Ground Floor, AB1, 48 Huntly Street, Aberdeen, AB10 1SH" + COMMA_NEWLINE
+            + "\"Hearing_duration\":\"1 day" + COMMA_NEWLINE
+            + "\"t_Scot_34\":\"true" + COMMA_NEWLINE
+            + "\"Court_addressLine1\":\"Eagle Building," + COMMA_NEWLINE
+            + "\"Court_addressLine2\":\"215 Bothwell Street," + COMMA_NEWLINE
+            + "\"Court_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"Court_town\":\"Glasgow," + COMMA_NEWLINE
+            + "\"Court_county\":\"" + COMMA_NEWLINE
+            + "\"Court_postCode\":\"G2 7TS" + COMMA_NEWLINE
+            + "\"Court_telephone\":\"03577123270" + COMMA_NEWLINE
+            + "\"Court_fax\":\"07127126570" + COMMA_NEWLINE
+            + "\"Court_DX\":\"1234567" + COMMA_NEWLINE
+            + "\"Court_Email\":\"GlasgowOfficeET@hmcts.gov.uk" + COMMA_NEWLINE
+            + "\"i_enhmcts\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i_enhmcts1\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i_enhmcts2\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"iScot34_schmcts\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot34_schmcts1\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot34_schmcts2\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"Clerk\":\"Mike Jordan" + COMMA_NEWLINE
+            + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + COMMA_NEWLINE
+            + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + COMMA_NEWLINE
+            + "\"Case_No\":\"123456" + COMMA_NEWLINE
+            + "\"submission_reference\":\"12212121" + COMMA_NEWLINE
+            + CLOSE_BRACE_NEW_LINE
+            + CLOSE_BRACE_NEW_LINE;
         when(venueAddressReaderService.getVenueAddress(any(), any(), any())).thenReturn(ABERDEEN_VENUE_ADDRESS);
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetailsScot3.getCaseData(), "",
                 userDetails, SCOTLAND_CASE_TYPE_ID,
@@ -1831,74 +1801,72 @@ class DocumentHelperTest {
     @Test
     void buildDocumentContentScot3AllocatedOffice() {
         when(venueAddressReaderService.getVenueAddress(any(), any(), any())).thenReturn(ABERDEEN_VENUE_ADDRESS);
-        String expected = "{" + NEW_LINE
-                + "\"accessKey\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"templateName\":\"EM-TRB-SCO-ENG-00044.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"outputName\":\"document.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"data\":{" + NEW_LINE
-                + "\"claimant_or_rep_full_name\":\"Mr A J Rodriguez\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_full_name\":\"Mr A J Rodriguez\"" + NEW_LINE_WITH_COMMA
-                + "\"Claimant\":\"Mr A J Rodriguez\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine1\":\"34\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine2\":\"Low Street\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_county\":\"Lancashire\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_postCode\":\"M3 6gw\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine1\":\"34\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine2\":\"Low Street\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_county\":\"Lancashire\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_postCode\":\"M3 6gw\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_full_name\":\"Antonio Vazquez\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine1\":\"11 Small Street\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine2\":\"22 House\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_county\":\"North West\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_postCode\":\"M12 42R\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_full_name\":\"Antonio Vazquez\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine1\":\"11 Small Street\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine2\":\"22 House\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_town\":\"Manchester\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_county\":\"North West\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_postCode\":\"M12 42R\"" + NEW_LINE_WITH_COMMA
-                + "\"Respondent\":\"Antonio Vazquez\"" + NEW_LINE_WITH_COMMA
-                + "\"resp_others\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"resp_address\":\"11 Small Street, 22 House, Manchester, North West, M12 42R, UK\""
-                + NEW_LINE_WITH_COMMA
-                + "\"Hearing_date\":\"1 November 2019\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_date_time\":\"1 November 2019 at 12:11\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_time\":\"12:11\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_venue\":\"Ground Floor, AB1, 48 Huntly Street, Aberdeen, AB10 1SH\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_duration\":\"1 day\"" + NEW_LINE_WITH_COMMA
-                + "\"t_Scot_34\":\"true\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine1\":\"Aberdeen Address Line1\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine2\":\"Aberdeen Address Line2\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_town\":\"Aberdeen\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_county\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_postCode\":\"BA 3453\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_telephone\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_fax\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_DX\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_Email\":\"aberdeen@gmail.com\"" + NEW_LINE_WITH_COMMA
-                + "\"i_enhmcts\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i_enhmcts1\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i_enhmcts2\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot34_schmcts\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot34_schmcts1\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot34_schmcts2\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"Clerk\":\"Mike Jordan\"" + NEW_LINE_WITH_COMMA
-                + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + NEW_LINE_WITH_COMMA
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
-                + NEW_LINE_WITH_COMMA
-                + "\"Case_No\":\"123456\"" + NEW_LINE_WITH_COMMA
-                + "\"submission_reference\":\"12212121\"" + NEW_LINE_WITH_COMMA
-                + "}" + NEW_LINE
-                + "}" + NEW_LINE;
+        String expected = "{\n"
+            + "\"accessKey\":\"" + COMMA_NEWLINE
+            + "\"templateName\":\"EM-TRB-SCO-ENG-00044.docx" + COMMA_NEWLINE
+            + "\"outputName\":\"document.docx" + COMMA_NEWLINE
+            + "\"data\":{\n"
+            + "\"claimant_or_rep_full_name\":\"Mr A J Rodriguez" + COMMA_NEWLINE
+            + "\"claimant_full_name\":\"Mr A J Rodriguez" + COMMA_NEWLINE
+            + "\"Claimant\":\"Mr A J Rodriguez" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine1\":\"34" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine2\":\"Low Street" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"claimant_or_rep_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"claimant_or_rep_county\":\"Lancashire" + COMMA_NEWLINE
+            + "\"claimant_or_rep_postCode\":\"M3 6gw" + COMMA_NEWLINE
+            + "\"claimant_addressLine1\":\"34" + COMMA_NEWLINE
+            + "\"claimant_addressLine2\":\"Low Street" + COMMA_NEWLINE
+            + "\"claimant_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"claimant_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"claimant_county\":\"Lancashire" + COMMA_NEWLINE
+            + "\"claimant_postCode\":\"M3 6gw" + COMMA_NEWLINE
+            + "\"respondent_or_rep_full_name\":\"Antonio Vazquez" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine1\":\"11 Small Street" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine2\":\"22 House" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"respondent_or_rep_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"respondent_or_rep_county\":\"North West" + COMMA_NEWLINE
+            + "\"respondent_or_rep_postCode\":\"M12 42R" + COMMA_NEWLINE
+            + "\"respondent_full_name\":\"Antonio Vazquez" + COMMA_NEWLINE
+            + "\"respondent_addressLine1\":\"11 Small Street" + COMMA_NEWLINE
+            + "\"respondent_addressLine2\":\"22 House" + COMMA_NEWLINE
+            + "\"respondent_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"respondent_town\":\"Manchester" + COMMA_NEWLINE
+            + "\"respondent_county\":\"North West" + COMMA_NEWLINE
+            + "\"respondent_postCode\":\"M12 42R" + COMMA_NEWLINE
+            + "\"Respondent\":\"Antonio Vazquez" + COMMA_NEWLINE
+            + "\"resp_others\":\"" + COMMA_NEWLINE
+            + "\"resp_address\":\"11 Small Street, 22 House, Manchester, North West, M12 42R, UK" + COMMA_NEWLINE
+            + "\"Hearing_date\":\"1 November 2019" + COMMA_NEWLINE
+            + "\"Hearing_date_time\":\"1 November 2019 at 12:11" + COMMA_NEWLINE
+            + "\"Hearing_time\":\"12:11" + COMMA_NEWLINE
+            + "\"Hearing_venue\":\"Ground Floor, AB1, 48 Huntly Street, Aberdeen, AB10 1SH" + COMMA_NEWLINE
+            + "\"Hearing_duration\":\"1 day" + COMMA_NEWLINE
+            + "\"t_Scot_34\":\"true" + COMMA_NEWLINE
+            + "\"Court_addressLine1\":\"Aberdeen Address Line1" + COMMA_NEWLINE
+            + "\"Court_addressLine2\":\"Aberdeen Address Line2" + COMMA_NEWLINE
+            + "\"Court_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"Court_town\":\"Aberdeen" + COMMA_NEWLINE
+            + "\"Court_county\":\"" + COMMA_NEWLINE
+            + "\"Court_postCode\":\"BA 3453" + COMMA_NEWLINE
+            + "\"Court_telephone\":\"" + COMMA_NEWLINE
+            + "\"Court_fax\":\"" + COMMA_NEWLINE
+            + "\"Court_DX\":\"" + COMMA_NEWLINE
+            + "\"Court_Email\":\"aberdeen@gmail.com" + COMMA_NEWLINE
+            + "\"i_enhmcts\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i_enhmcts1\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i_enhmcts2\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"iScot34_schmcts\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot34_schmcts1\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot34_schmcts2\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"Clerk\":\"Mike Jordan" + COMMA_NEWLINE
+            + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + COMMA_NEWLINE
+            + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + COMMA_NEWLINE
+            + "\"Case_No\":\"123456" + COMMA_NEWLINE
+            + "\"submission_reference\":\"12212121" + COMMA_NEWLINE
+            + CLOSE_BRACE_NEW_LINE
+            + CLOSE_BRACE_NEW_LINE;
         DefaultValues allocatedCourtAddress = DefaultValues.builder()
                 .tribunalCorrespondenceAddressLine1("Aberdeen Address Line1")
                 .tribunalCorrespondenceAddressLine2("Aberdeen Address Line2")
@@ -2030,69 +1998,68 @@ class DocumentHelperTest {
         caseData.setCorrespondenceType(correspondenceType);
         CaseDetails caseDetailsTemplates = new CaseDetails();
         caseDetailsTemplates.setCaseData(caseData);
-        String result = "{" + NEW_LINE
-                + "\"accessKey\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"templateName\":\"Part_18.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"outputName\":\"document.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"data\":{" + NEW_LINE
-                + "\"claimant_or_rep_full_name\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_full_name\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Claimant\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_rep_organisation\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine1\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine2\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_town\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_county\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_postCode\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine1\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine2\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_town\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_county\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_postCode\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_full_name\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_rep_organisation\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine1\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine2\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_town\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_county\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_postCode\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_full_name\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine1\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine2\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_town\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_county\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_postCode\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Respondent\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"resp_others\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"resp_address\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_date\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_date_time\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_venue\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_duration\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_time\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"t18A\":\"true\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_telephone\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_fax\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_DX\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_Email\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"i18A_enhmcts\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i18A_enhmcts1\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i18A_enhmcts2\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts1\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot_schmcts2\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"Clerk\":\"Mike Jordan\"" + NEW_LINE_WITH_COMMA
-                + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + NEW_LINE_WITH_COMMA
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
-                + NEW_LINE_WITH_COMMA
-                + "\"Case_No\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"submission_reference\":\"\"" + NEW_LINE_WITH_COMMA
-                + "}" + NEW_LINE
-                + "}" + NEW_LINE;
+        String result = "{\n"
+            + "\"accessKey\":\"" + COMMA_NEWLINE
+            + "\"templateName\":\"Part_18.docx" + COMMA_NEWLINE
+            + "\"outputName\":\"document.docx" + COMMA_NEWLINE
+            + "\"data\":{\n"
+            + "\"claimant_or_rep_full_name\":\"" + COMMA_NEWLINE
+            + "\"claimant_full_name\":\"" + COMMA_NEWLINE
+            + "\"Claimant\":\"" + COMMA_NEWLINE
+            + "\"claimant_rep_organisation\":\"" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine1\":\"" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine2\":\"" + COMMA_NEWLINE
+            + "\"claimant_or_rep_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"claimant_or_rep_town\":\"" + COMMA_NEWLINE
+            + "\"claimant_or_rep_county\":\"" + COMMA_NEWLINE
+            + "\"claimant_or_rep_postCode\":\"" + COMMA_NEWLINE
+            + "\"claimant_addressLine1\":\"" + COMMA_NEWLINE
+            + "\"claimant_addressLine2\":\"" + COMMA_NEWLINE
+            + "\"claimant_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"claimant_town\":\"" + COMMA_NEWLINE
+            + "\"claimant_county\":\"" + COMMA_NEWLINE
+            + "\"claimant_postCode\":\"" + COMMA_NEWLINE
+            + "\"respondent_or_rep_full_name\":\"" + COMMA_NEWLINE
+            + "\"respondent_rep_organisation\":\"" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine1\":\"" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine2\":\"" + COMMA_NEWLINE
+            + "\"respondent_or_rep_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"respondent_or_rep_town\":\"" + COMMA_NEWLINE
+            + "\"respondent_or_rep_county\":\"" + COMMA_NEWLINE
+            + "\"respondent_or_rep_postCode\":\"" + COMMA_NEWLINE
+            + "\"respondent_full_name\":\"" + COMMA_NEWLINE
+            + "\"respondent_addressLine1\":\"" + COMMA_NEWLINE
+            + "\"respondent_addressLine2\":\"" + COMMA_NEWLINE
+            + "\"respondent_addressLine3\":\"" + COMMA_NEWLINE
+            + "\"respondent_town\":\"" + COMMA_NEWLINE
+            + "\"respondent_county\":\"" + COMMA_NEWLINE
+            + "\"respondent_postCode\":\"" + COMMA_NEWLINE
+            + "\"Respondent\":\"" + COMMA_NEWLINE
+            + "\"resp_others\":\"" + COMMA_NEWLINE
+            + "\"resp_address\":\"" + COMMA_NEWLINE
+            + "\"Hearing_date\":\"" + COMMA_NEWLINE
+            + "\"Hearing_date_time\":\"" + COMMA_NEWLINE
+            + "\"Hearing_venue\":\"" + COMMA_NEWLINE
+            + "\"Hearing_duration\":\"" + COMMA_NEWLINE
+            + "\"Hearing_time\":\"" + COMMA_NEWLINE
+            + "\"t18A\":\"true" + COMMA_NEWLINE
+            + "\"Court_telephone\":\"" + COMMA_NEWLINE
+            + "\"Court_fax\":\"" + COMMA_NEWLINE
+            + "\"Court_DX\":\"" + COMMA_NEWLINE
+            + "\"Court_Email\":\"" + COMMA_NEWLINE
+            + "\"i18A_enhmcts\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i18A_enhmcts1\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i18A_enhmcts2\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts1\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts2\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"Clerk\":\"Mike Jordan" + COMMA_NEWLINE
+            + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + COMMA_NEWLINE
+            + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + COMMA_NEWLINE
+            + "\"Case_No\":\"" + COMMA_NEWLINE
+            + "\"submission_reference\":\"" + COMMA_NEWLINE
+            + CLOSE_BRACE_NEW_LINE
+            + CLOSE_BRACE_NEW_LINE;
         assertEquals(result, DocumentHelper.buildDocumentContent(caseDetailsTemplates.getCaseData(),
                 "", userDetails, "",
                 caseDetailsTemplates.getCaseData().getCorrespondenceType(),
@@ -2101,69 +2068,68 @@ class DocumentHelperTest {
     }
 
     private String getJson(String topLevel, String part) {
-        return "{" + NEW_LINE
-                + "\"accessKey\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"templateName\":\"" + topLevel + ".docx\"" + NEW_LINE_WITH_COMMA
-                + "\"outputName\":\"document.docx\"" + NEW_LINE_WITH_COMMA
-                + "\"data\":{" + NEW_LINE
-                + "\"claimant_or_rep_full_name\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_full_name\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Claimant\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_rep_organisation\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine1\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine2\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_town\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_county\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_or_rep_postCode\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine1\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine2\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_town\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_county\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"claimant_postCode\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_full_name\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_rep_organisation\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine1\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine2\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_town\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_county\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_or_rep_postCode\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_full_name\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine1\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine2\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_addressLine3\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_town\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_county\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"respondent_postCode\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Respondent\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"resp_others\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"resp_address\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_date\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_date_time\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_venue\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_duration\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Hearing_time\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"t_Scot_" + part + "\":\"true\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_telephone\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_fax\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_DX\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"Court_Email\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"i_enhmcts\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i_enhmcts1\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"i_enhmcts2\":\"[userImage:enhmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot" + part + "_schmcts\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot" + part + "_schmcts1\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"iScot" + part + "_schmcts2\":\"[userImage:schmcts.png]\"" + NEW_LINE_WITH_COMMA
-                + "\"Clerk\":\"Mike Jordan\"" + NEW_LINE_WITH_COMMA
-                + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + "\"" + NEW_LINE_WITH_COMMA
-                + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + "\""
-                + NEW_LINE_WITH_COMMA
-                + "\"Case_No\":\"\"" + NEW_LINE_WITH_COMMA
-                + "\"submission_reference\":\"\"" + NEW_LINE_WITH_COMMA
-                + "}" + NEW_LINE
-                + "}" + NEW_LINE;
+        return "{\n"
+               + "\"accessKey\":\"" + COMMA_NEWLINE
+               + "\"templateName\":\"" + topLevel + ".docx" + COMMA_NEWLINE
+               + "\"outputName\":\"document.docx" + COMMA_NEWLINE
+               + "\"data\":{\n"
+               + "\"claimant_or_rep_full_name\":\"" + COMMA_NEWLINE
+               + "\"claimant_full_name\":\"" + COMMA_NEWLINE
+               + "\"Claimant\":\"" + COMMA_NEWLINE
+               + "\"claimant_rep_organisation\":\"" + COMMA_NEWLINE
+               + "\"claimant_or_rep_addressLine1\":\"" + COMMA_NEWLINE
+               + "\"claimant_or_rep_addressLine2\":\"" + COMMA_NEWLINE
+               + "\"claimant_or_rep_addressLine3\":\"" + COMMA_NEWLINE
+               + "\"claimant_or_rep_town\":\"" + COMMA_NEWLINE
+               + "\"claimant_or_rep_county\":\"" + COMMA_NEWLINE
+               + "\"claimant_or_rep_postCode\":\"" + COMMA_NEWLINE
+               + "\"claimant_addressLine1\":\"" + COMMA_NEWLINE
+               + "\"claimant_addressLine2\":\"" + COMMA_NEWLINE
+               + "\"claimant_addressLine3\":\"" + COMMA_NEWLINE
+               + "\"claimant_town\":\"" + COMMA_NEWLINE
+               + "\"claimant_county\":\"" + COMMA_NEWLINE
+               + "\"claimant_postCode\":\"" + COMMA_NEWLINE
+               + "\"respondent_or_rep_full_name\":\"" + COMMA_NEWLINE
+               + "\"respondent_rep_organisation\":\"" + COMMA_NEWLINE
+               + "\"respondent_or_rep_addressLine1\":\"" + COMMA_NEWLINE
+               + "\"respondent_or_rep_addressLine2\":\"" + COMMA_NEWLINE
+               + "\"respondent_or_rep_addressLine3\":\"" + COMMA_NEWLINE
+               + "\"respondent_or_rep_town\":\"" + COMMA_NEWLINE
+               + "\"respondent_or_rep_county\":\"" + COMMA_NEWLINE
+               + "\"respondent_or_rep_postCode\":\"" + COMMA_NEWLINE
+               + "\"respondent_full_name\":\"" + COMMA_NEWLINE
+               + "\"respondent_addressLine1\":\"" + COMMA_NEWLINE
+               + "\"respondent_addressLine2\":\"" + COMMA_NEWLINE
+               + "\"respondent_addressLine3\":\"" + COMMA_NEWLINE
+               + "\"respondent_town\":\"" + COMMA_NEWLINE
+               + "\"respondent_county\":\"" + COMMA_NEWLINE
+               + "\"respondent_postCode\":\"" + COMMA_NEWLINE
+               + "\"Respondent\":\"" + COMMA_NEWLINE
+               + "\"resp_others\":\"" + COMMA_NEWLINE
+               + "\"resp_address\":\"" + COMMA_NEWLINE
+               + "\"Hearing_date\":\"" + COMMA_NEWLINE
+               + "\"Hearing_date_time\":\"" + COMMA_NEWLINE
+               + "\"Hearing_venue\":\"" + COMMA_NEWLINE
+               + "\"Hearing_duration\":\"" + COMMA_NEWLINE
+               + "\"Hearing_time\":\"" + COMMA_NEWLINE
+               + "\"t_Scot_" + part + "\":\"true" + COMMA_NEWLINE
+               + "\"Court_telephone\":\"" + COMMA_NEWLINE
+               + "\"Court_fax\":\"" + COMMA_NEWLINE
+               + "\"Court_DX\":\"" + COMMA_NEWLINE
+               + "\"Court_Email\":\"" + COMMA_NEWLINE
+               + "\"i_enhmcts\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+               + "\"i_enhmcts1\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+               + "\"i_enhmcts2\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+               + "\"iScot" + part + "_schmcts\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+               + "\"iScot" + part + "_schmcts1\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+               + "\"iScot" + part + "_schmcts2\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+               + "\"Clerk\":\"Mike Jordan" + COMMA_NEWLINE
+               + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + COMMA_NEWLINE
+               + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + COMMA_NEWLINE
+               + "\"Case_No\":\"" + COMMA_NEWLINE
+               + "\"submission_reference\":\"" + COMMA_NEWLINE
+               + CLOSE_BRACE_NEW_LINE
+               + CLOSE_BRACE_NEW_LINE;
     }
 
     @Test
@@ -2217,7 +2183,40 @@ class DocumentHelperTest {
         multipleData.setCorrespondenceType(correspondenceType);
         multipleData.setAddressLabelsAttributesType(addressLabelsAttributesType);
         multipleData.setAddressLabelCollection(MultipleUtil.getAddressLabelTypeItemList());
-        return multipleData;
+        String expected = "{\n"
+            + "\"accessKey\":\"" + COMMA_NEWLINE
+            + "\"templateName\":\"EM-TRB-LET-ENG-00544.docx" + COMMA_NEWLINE
+            + "\"outputName\":\"document.docx" + COMMA_NEWLINE
+            + "\"data\":{\n"
+            + "\"address_labels_page\":[\n"
+            + "{\"Label_02_Entity_Name_01\":\"" + COMMA_NEWLINE
+            + "\"Label_02_Entity_Name_02\":\"" + COMMA_NEWLINE
+            + "\"lbl_02_Eef\":\"" + COMMA_NEWLINE
+            + "\"lbl_02_Cef\":\"" + COMMA_NEWLINE
+            + "\"Label_03_Entity_Name_01\":\"Label Entity1 Name" + COMMA_NEWLINE
+            + "\"Label_03_Entity_Name_02\":\"Label Entity2 Name" + COMMA_NEWLINE
+            + "\"Label_03_Address_Line_01\":\"Address Line1" + COMMA_NEWLINE
+            + "\"Label_03_Address_Line_02\":\"Address Line2" + COMMA_NEWLINE
+            + "\"Label_03_Address_Line_03\":\"M2 45GD" + COMMA_NEWLINE
+            + "\"lbl_03_Eef\":\"" + COMMA_NEWLINE
+            + "\"lbl_03_Cef\":\"Reference01345\"}],\n"
+            + "\"i_enhmcts\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i_enhmcts1\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"i_enhmcts2\":\"[userImage:enhmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts1\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"iScot_schmcts2\":\"[userImage:schmcts.png]" + COMMA_NEWLINE
+            + "\"Clerk\":\"Mike Jordan" + COMMA_NEWLINE
+            + "\"Today_date\":\"" + UtilHelper.formatCurrentDate(LocalDate.now()) + COMMA_NEWLINE
+            + "\"TodayPlus28Days\":\"" + UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28) + COMMA_NEWLINE
+            + "\"Case_No\":\"123456" + COMMA_NEWLINE
+            + "\"submission_reference\":\"12212121" + COMMA_NEWLINE
+            + CLOSE_BRACE_NEW_LINE
+            + CLOSE_BRACE_NEW_LINE;
+        assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails2.getCaseData(), "",
+                userDetails, ENGLANDWALES_CASE_TYPE_ID,
+                multipleData.getCorrespondenceType(), multipleData.getCorrespondenceScotType(),
+                multipleData, null, venueAddressReaderService).toString());
     }
 
     @Test

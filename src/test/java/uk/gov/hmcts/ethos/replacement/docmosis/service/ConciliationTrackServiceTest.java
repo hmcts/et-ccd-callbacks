@@ -9,6 +9,8 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -26,12 +28,12 @@ class ConciliationTrackServiceTest {
     private CaseDetails baseCaseDetails;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() throws URISyntaxException, IOException {
         conciliationTrackService = new ConciliationTrackService();
         baseCaseDetails = generateCaseDetails("caseDetailsTest1.json");
     }
 
-    private CaseDetails generateCaseDetails(String jsonFileName) throws Exception {
+    private CaseDetails generateCaseDetails(String jsonFileName) throws URISyntaxException, IOException {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
             .getContextClassLoader().getResource(jsonFileName)).toURI())));
         ObjectMapper mapper = new ObjectMapper();

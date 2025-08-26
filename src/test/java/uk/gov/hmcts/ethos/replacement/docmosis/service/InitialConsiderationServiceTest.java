@@ -30,6 +30,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
@@ -150,7 +151,7 @@ class InitialConsiderationServiceTest {
     private DocumentManagementService documentManagementService;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() throws URISyntaxException, IOException {
         caseData = generateCaseData("initialConsiderationCase1.json");
         caseDataEmpty = generateCaseData("initialConsiderationCase2.json");
         initialConsiderationService = new InitialConsiderationService(tornadoService);
@@ -562,7 +563,7 @@ class InitialConsiderationServiceTest {
         return jurCodesTypeItem;
     }
 
-    private CaseData generateCaseData(String fileName) throws Exception {
+    private CaseData generateCaseData(String fileName) throws URISyntaxException, IOException {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
             .getContextClassLoader().getResource(fileName)).toURI())));
         ObjectMapper mapper = new ObjectMapper();

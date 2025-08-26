@@ -26,6 +26,7 @@ public class MyHmctsService {
     private final AuthTokenGenerator authTokenGenerator;
     private final OrganisationClient organisationClient;
     private final UserIdamService userIdamService;
+    private final AdminUserService adminUserService;
 
     /**
      * Retrieves the organisation address of the currently authenticated user from the organisation service.
@@ -46,7 +47,7 @@ public class MyHmctsService {
 
         UserDetails userDetails = userIdamService.getUserDetails(userToken);
         ResponseEntity<OrganisationsResponse> response =
-                organisationClient.retrieveOrganisationDetailsByUserId(userToken,
+                organisationClient.retrieveOrganisationDetailsByUserId(adminUserService.getAdminUserToken(),
                         authTokenGenerator.generate(),
                         userDetails.getUid());
         if (ObjectUtils.isEmpty(response)

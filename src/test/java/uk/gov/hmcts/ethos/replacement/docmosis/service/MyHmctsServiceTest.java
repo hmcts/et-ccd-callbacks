@@ -31,6 +31,8 @@ class MyHmctsServiceTest {
     private OrganisationClient organisationClient;
     @Mock
     private UserIdamService userIdamService;
+    @Mock
+    private AdminUserService adminUserService;
 
     private static final String DUMMY_USER_TOKEN = "dummyUserToken";
     private static final String TEST_USER_ID = "12345";
@@ -46,7 +48,8 @@ class MyHmctsServiceTest {
     @BeforeEach
     @SneakyThrows
     void setUp() {
-        myHmctsService = new MyHmctsService(authTokenGenerator, organisationClient, userIdamService);
+        myHmctsService = new MyHmctsService(authTokenGenerator, organisationClient, userIdamService, adminUserService);
+        when(adminUserService.getAdminUserToken()).thenReturn(DUMMY_USER_TOKEN);
     }
 
     @Test
@@ -57,6 +60,7 @@ class MyHmctsServiceTest {
         userDetails.setUid(TEST_USER_ID);
         when(userIdamService.getUserDetails(DUMMY_USER_TOKEN)).thenReturn(userDetails);
         when(authTokenGenerator.generate()).thenReturn(DUMMY_USER_TOKEN);
+        when(adminUserService.getAdminUserToken()).thenReturn(DUMMY_USER_TOKEN);
         // 1: When retrieving organisation details, we expect the organisation client to return a response
         // with contact information.
         when(organisationClient.retrieveOrganisationDetailsByUserId(DUMMY_USER_TOKEN, DUMMY_USER_TOKEN, TEST_USER_ID))

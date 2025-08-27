@@ -13,6 +13,8 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
 class AddAmendClaimantRepresentativeServiceTest {
@@ -26,14 +28,14 @@ class AddAmendClaimantRepresentativeServiceTest {
     }
 
     @Test
-    void setRepresentativeIdWithNoClaimant() {
+    void addAmendClaimantRepresentativeWithNoClaimant() {
         addAmendClaimantRepresentativeService.addAmendClaimantRepresentative(caseData);
 
         assertNull(caseData.getRepresentativeClaimantType());
     }
 
     @Test
-    void setRepresentativeIdWithClaimant() {
+    void addAmendClaimantRepresentativeWithClaimant() {
         RepresentedTypeC representedTypeC = RepresentedTypeC.builder().nameOfRepresentative("Sally").build();
         caseData.setRepresentativeClaimantType(representedTypeC);
 
@@ -44,7 +46,7 @@ class AddAmendClaimantRepresentativeServiceTest {
     }
 
     @Test
-    void setRepresentativeIdWithClaimant_alreadySet() {
+    void addAmendClaimantRepresentativeWithClaimant_alreadySet() {
         String alreadySetId = UUID.randomUUID().toString();
         RepresentedTypeC representedTypeC = RepresentedTypeC.builder()
                 .nameOfRepresentative("Sally")
@@ -57,5 +59,24 @@ class AddAmendClaimantRepresentativeServiceTest {
 
         assertEquals(alreadySetId, caseData.getRepresentativeClaimantType().getRepresentativeId());
         assertEquals(alreadySetId, caseData.getRepresentativeClaimantType().getOrganisationId());
+    }
+
+    @Test
+    void addAmendClaimantRepresentative_removeRep() {
+        String alreadySetId = UUID.randomUUID().toString();
+        RepresentedTypeC representedTypeC = RepresentedTypeC.builder()
+                .nameOfRepresentative("Sally")
+                .organisationId(alreadySetId)
+                .representativeId(alreadySetId)
+                .build();
+
+        caseData.setRepresentativeClaimantType(representedTypeC);
+        caseData.setClaimantRepresentativeRemoved(YES);
+        // trigger remove
+        caseData.setClaimantRepresentedQuestion(NO);
+        addAmendClaimantRepresentativeService.addAmendClaimantRepresentative(caseData);
+
+        assertNull(caseData.getRepresentativeClaimantType());
+        assertEquals(YES, caseData.getClaimantRepresentativeRemoved());
     }
 }

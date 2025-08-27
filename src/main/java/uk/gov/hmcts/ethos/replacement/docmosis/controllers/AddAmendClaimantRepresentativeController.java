@@ -85,7 +85,7 @@ public class AddAmendClaimantRepresentativeController {
             String currentUserEmail = userIdamService.getUserDetails(userToken).getEmail();
             nocClaimantRepresentativeService.updateClaimantRepresentation(caseDetails, currentUserEmail);
         } catch (IOException e) {
-            throw new CcdInputOutputException("Failed to update respondent representatives accesses", e);
+            throw new CcdInputOutputException("Failed to update claimant representatives access", e);
         }
     }
 }

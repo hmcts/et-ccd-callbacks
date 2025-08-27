@@ -27,7 +27,7 @@ class AddAmendClaimantRepresentativeServiceTest {
 
     @Test
     void setRepresentativeIdWithNoClaimant() {
-        addAmendClaimantRepresentativeService.setRepresentativeId(caseData);
+        addAmendClaimantRepresentativeService.addAmendClaimantRepresentative(caseData);
 
         assertNull(caseData.getRepresentativeClaimantType());
     }
@@ -37,7 +37,7 @@ class AddAmendClaimantRepresentativeServiceTest {
         RepresentedTypeC representedTypeC = RepresentedTypeC.builder().nameOfRepresentative("Sally").build();
         caseData.setRepresentativeClaimantType(representedTypeC);
 
-        addAmendClaimantRepresentativeService.setRepresentativeId(caseData);
+        addAmendClaimantRepresentativeService.addAmendClaimantRepresentative(caseData);
 
         assertNotNull(caseData.getRepresentativeClaimantType().getRepresentativeId());
         assertNotNull(caseData.getRepresentativeClaimantType().getOrganisationId());
@@ -53,7 +53,7 @@ class AddAmendClaimantRepresentativeServiceTest {
                 .build();
 
         caseData.setRepresentativeClaimantType(representedTypeC);
-        addAmendClaimantRepresentativeService.setRepresentativeId(caseData);
+        addAmendClaimantRepresentativeService.addAmendClaimantRepresentative(caseData);
 
         assertEquals(alreadySetId, caseData.getRepresentativeClaimantType().getRepresentativeId());
         assertEquals(alreadySetId, caseData.getRepresentativeClaimantType().getOrganisationId());

@@ -12,6 +12,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AddAmendClaimantRepresentativeService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.NocClaimantRepresentativeService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
@@ -38,6 +40,10 @@ class AddAmendClaimantRepresentativeControllerTest {
     private VerifyTokenService verifyTokenService;
     @MockBean
     private AddAmendClaimantRepresentativeService addAmendClaimantRepresentativeService;
+    @MockBean
+    private UserIdamService userIdamService;
+    @MockBean
+    private NocClaimantRepresentativeService nocClaimantRepresentativeService;
 
     @Autowired
     private MockMvc mockMvc;
@@ -70,6 +76,7 @@ class AddAmendClaimantRepresentativeControllerTest {
                 .andExpect(jsonPath("$.errors", nullValue()))
                 .andExpect(jsonPath("$.warnings", nullValue()));
 
-        verify(addAmendClaimantRepresentativeService, times(1)).setRepresentativeId(any());
+        verify(addAmendClaimantRepresentativeService, times(1))
+                .addAmendClaimantRepresentative(any());
     }
 }

@@ -67,7 +67,7 @@ public class NocRespondentRepresentativeService {
 
     private final AuthTokenGenerator authTokenGenerator;
 
-    private final NocService noCService;
+    private final NocService nocService;
 
     /**
      * Add respondent organisation policy and notice of change answer fields to the case data.
@@ -186,7 +186,7 @@ public class NocRespondentRepresentativeService {
             if (changeRequest != null
                     && changeRequest.getOrganisationToRemove() != null) {
                 try {
-                    noCService.removeOrganisationRepresentativeAccess(caseDetails.getCaseId(), changeRequest);
+                    nocService.removeOrganisationRepresentativeAccess(caseDetails.getCaseId(), changeRequest);
                 } catch (IOException e) {
                     throw new CcdInputOutputException("Failed to remove organisation representative access", e);
                 }

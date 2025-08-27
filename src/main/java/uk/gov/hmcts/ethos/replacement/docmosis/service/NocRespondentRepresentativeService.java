@@ -12,8 +12,6 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
-import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
@@ -24,6 +22,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseConverter;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
@@ -38,7 +37,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
@@ -69,6 +67,8 @@ public class NocRespondentRepresentativeService {
     private final OrganisationClient organisationClient;
 
     private final AuthTokenGenerator authTokenGenerator;
+
+    private final NocHelper noCHelper;
 
     /**
      * Add respondent organisation policy and notice of change answer fields to the case data.
@@ -187,7 +187,7 @@ public class NocRespondentRepresentativeService {
             if (changeRequest != null
                     && changeRequest.getOrganisationToRemove() != null) {
                 try {
-                    removeOrganisationRepresentativeAccess(caseDetails.getCaseId(), changeRequest);
+                    noCHelper.removeOrganisationRepresentativeAccess(caseDetails.getCaseId(), changeRequest);
                 } catch (IOException e) {
                     throw new CcdInputOutputException("Failed to remove organisation representative access", e);
                 }
@@ -238,36 +238,6 @@ public class NocRespondentRepresentativeService {
         }
 
         return changeRequests;
-    }
-
-    /**
-     * Revokes access from all users of an organisation being replaced or removed.
-     * @param caseId - case id of case to apply update to
-     * @param changeOrganisationRequest - containing case role and id of organisation to remove
-     * @throws IOException - thrown if no ccd service is inaccessible
-     */
-    public void removeOrganisationRepresentativeAccess(String caseId,
-                                                       ChangeOrganisationRequest changeOrganisationRequest)
-        throws IOException {
-        String roleOfRemovedOrg = changeOrganisationRequest.getCaseRoleId().getSelectedCode();
-        String orgId = changeOrganisationRequest.getOrganisationToRemove().getOrganisationID();
-        CaseUserAssignmentData caseAssignments =
-            nocCcdService.getCaseAssignments(adminUserService.getAdminUserToken(), caseId);
-
-        List<CaseUserAssignment> usersToRevoke = caseAssignments.getCaseUserAssignments().stream()
-            .filter(caseUserAssignment -> caseUserAssignment.getCaseRole().equals(roleOfRemovedOrg))
-            .map(caseUserAssignment ->
-                CaseUserAssignment.builder().userId(caseUserAssignment.getUserId())
-                    .organisationId(orgId)
-                    .caseRole(roleOfRemovedOrg)
-                    .caseId(caseId)
-                    .build()
-            ).toList();
-
-        if (!CollectionUtils.isEmpty(usersToRevoke)) {
-            nocCcdService.revokeCaseAssignments(adminUserService.getAdminUserToken(),
-                CaseUserAssignmentData.builder().caseUserAssignments(usersToRevoke).build());
-        }
     }
 
     /**

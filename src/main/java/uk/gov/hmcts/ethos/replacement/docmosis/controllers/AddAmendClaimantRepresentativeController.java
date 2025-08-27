@@ -5,7 +5,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
-import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -19,11 +18,11 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AddAmendClaimantRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.NocClaimantRepresentativeService;
 
+import java.io.IOException;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
@@ -71,15 +70,14 @@ public class AddAmendClaimantRepresentativeController {
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
-    public void amendRespondentRepSubmitted(
+    public void amendClaimantRepSubmitted(
             @RequestBody CallbackRequest callbackRequest,
             @RequestHeader(HttpHeaders.AUTHORIZATION) String userToken) {
 
-        CaseDetails caseDetails = callbackRequest.getCaseDetails();
-        log.info("AMEND CLAIMANT REPRESENTATIVE SUBMITTED ---> "
-                + LOG_MESSAGE + callbackRequest.getCaseDetails().getCaseId());
+        log.info("AMEND CLAIMANT REPRESENTATIVE SUBMITTED ---> " + LOG_MESSAGE + "{}",
+                callbackRequest.getCaseDetails().getCaseId());
         try {
-            nocClaimantRepresentativeService.updateClaimantRepresentation(caseDetails, userToken);
+            nocClaimantRepresentativeService.updateClaimantRepAccess(callbackRequest, userToken);
         } catch (IOException e) {
             throw new CcdInputOutputException("Failed to update claimant representatives access", e);
         }

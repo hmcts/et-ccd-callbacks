@@ -79,7 +79,7 @@ class AddAmendClaimantRepresentativeControllerTest {
     }
 
     @Test
-    void testAmendRespondentRepSubmitted() throws Exception {
+    void testAmendClaimantRepSubmitted() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(SUBMITTED_URL)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -88,6 +88,6 @@ class AddAmendClaimantRepresentativeControllerTest {
                 .andExpect(status().isOk());
 
         verify(nocClaimantRepresentativeService, times(1))
-                .updateClaimantRepresentation(any(), any());
+                .updateClaimantRepAccess(any(), any());
     }
 }

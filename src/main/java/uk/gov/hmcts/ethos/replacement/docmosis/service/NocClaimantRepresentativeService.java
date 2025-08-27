@@ -3,20 +3,28 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
+import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
+import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocClaimantHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
-
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1ReppedService.getOrganisationAddress;
@@ -31,6 +39,11 @@ public class NocClaimantRepresentativeService {
     private final OrganisationClient organisationClient;
     private final AdminUserService adminUserService;
     private final NocCcdService nocCcdService;
+    private final NocNotificationService nocNotificationService;
+    private final CcdCaseAssignment ccdCaseAssignment;
+    private final CcdClient ccdClient;
+    private final NocHelper noCHelper;
+    private final NocClaimantHelper nocClaimantHelper;
 
     /**
      * Update claimant representation based on NoC request.
@@ -91,5 +104,62 @@ public class NocClaimantRepresentativeService {
                 caseData.setRepresentativeClaimantType(claimantRep);
             }
         }
+    }
+
+    public void updateClaimantRepAccess(CallbackRequest callbackRequest, String currentUserEmail)
+            throws IOException {
+        CaseDetails caseDetails = callbackRequest.getCaseDetails();
+        CaseDetails caseDetailsBefore = callbackRequest.getCaseDetailsBefore();
+        CaseData caseDataBefore = caseDetailsBefore.getCaseData();
+        CaseData caseData = caseDetails.getCaseData();
+
+        ChangeOrganisationRequest changeRequest = identifyRepresentationChanges(caseData,
+                caseDataBefore);
+
+        String accessToken = adminUserService.getAdminUserToken();
+
+        try {
+            nocNotificationService.sendNotificationOfChangeEmails(caseDetailsBefore, caseDetails, changeRequest,
+                    currentUserEmail);
+        } catch (Exception exception) {
+            log.error(exception.getMessage(), exception);
+        }
+
+        if (changeRequest != null
+                && changeRequest.getOrganisationToRemove() != null) {
+            try {
+                noCHelper.removeOrganisationRepresentativeAccess(caseDetails.getCaseId(), changeRequest);
+            } catch (IOException e) {
+                throw new CcdInputOutputException("Failed to remove organisation representative access", e);
+            }
+        }
+
+        CCDRequest ccdRequest = nocCcdService.updateCaseRepresentation(accessToken,
+                caseDetails.getJurisdiction(), caseDetails.getCaseTypeId(), caseDetails.getCaseId());
+        callbackRequest.getCaseDetails().getCaseData().setChangeOrganisationRequestField(changeRequest);
+        ccdRequest.getCaseDetails().setCaseData(ccdCaseAssignment.applyNocAsAdmin(callbackRequest).getData());
+
+        ccdClient.submitUpdateRepEvent(
+                accessToken,
+                    Map.of("changeOrganisationRequestField",
+                            ccdRequest.getCaseDetails().getCaseData().getChangeOrganisationRequestField()),
+                    caseDetails.getCaseTypeId(),
+                    caseDetails.getJurisdiction(),
+                    ccdRequest,
+                    caseDetails.getCaseId());
+    }
+
+    public ChangeOrganisationRequest identifyRepresentationChanges(CaseData  after, CaseData before) {
+        Organisation newRepOrg = after.getRepresentativeClaimantType() != null
+                ? after.getRepresentativeClaimantType().getMyHmctsOrganisation() : null;
+        Organisation oldRepOrg = before.getRepresentativeClaimantType() != null
+                ? before.getRepresentativeClaimantType().getMyHmctsOrganisation() : null;
+        ChangeOrganisationRequest changeRequests = null;
+
+        if (!Objects.equals(newRepOrg, oldRepOrg)) {
+            changeRequests = nocClaimantHelper.createChangeRequest(newRepOrg, oldRepOrg);
+        }
+
+        return changeRequests;
     }
 }

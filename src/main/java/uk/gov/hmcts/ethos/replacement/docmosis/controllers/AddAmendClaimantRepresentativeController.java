@@ -81,7 +81,7 @@ public class AddAmendClaimantRepresentativeController {
         try {
             nocClaimantRepresentativeService.updateClaimantRepresentation(caseDetails, userToken);
         } catch (IOException e) {
-            throw new CcdInputOutputException("Failed to update respondent representatives accesses", e);
+            throw new CcdInputOutputException("Failed to update claimant representatives access", e);
         }
     }
 }

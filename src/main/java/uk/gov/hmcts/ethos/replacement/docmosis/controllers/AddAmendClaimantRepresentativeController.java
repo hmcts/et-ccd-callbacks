@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import java.io.IOException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -22,9 +23,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AddAmendClaimantRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.NocClaimantRepresentativeService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
-
-import java.io.IOException;
 
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
@@ -39,7 +37,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 public class AddAmendClaimantRepresentativeController {
     private static final String LOG_MESSAGE = "received notification request for case reference : ";
     private final AddAmendClaimantRepresentativeService addAmendClaimantRepresentativeService;
-    private final UserIdamService userIdamService;
     private final NocClaimantRepresentativeService nocClaimantRepresentativeService;
 
     /**
@@ -82,8 +79,7 @@ public class AddAmendClaimantRepresentativeController {
         log.info("AMEND CLAIMANT REPRESENTATIVE SUBMITTED ---> "
                 + LOG_MESSAGE + callbackRequest.getCaseDetails().getCaseId());
         try {
-            String currentUserEmail = userIdamService.getUserDetails(userToken).getEmail();
-            nocClaimantRepresentativeService.updateClaimantRepresentation(caseDetails, currentUserEmail);
+            nocClaimantRepresentativeService.updateClaimantRepresentation(caseDetails, userToken);
         } catch (IOException e) {
             throw new CcdInputOutputException("Failed to update respondent representatives accesses", e);
         }

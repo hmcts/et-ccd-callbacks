@@ -9,6 +9,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AddAmendClaimantRepresentativeService;
@@ -35,6 +36,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 class AddAmendClaimantRepresentativeControllerTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String ABOUT_TO_SUBMIT_URL = "/addAmendClaimantRepresentative/aboutToSubmit";
+    private static final String SUBMITTED_URL = "/addAmendClaimantRepresentative/amendClaimantRepSubmitted";
 
     @MockBean
     private VerifyTokenService verifyTokenService;
@@ -78,5 +80,22 @@ class AddAmendClaimantRepresentativeControllerTest {
 
         verify(addAmendClaimantRepresentativeService, times(1))
                 .addAmendClaimantRepresentative(any());
+    }
+
+    @Test
+    void testAmendRespondentRepSubmitted() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        UserDetails userDetails = new UserDetails();
+        userDetails.setEmail("currentUserEmail");
+        when(userIdamService.getUserDetails(AUTH_TOKEN)).thenReturn(userDetails);
+        when(userIdamService.getUserDetails(any())).thenReturn(userDetails);
+        mockMvc.perform(post(SUBMITTED_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(nocClaimantRepresentativeService, times(1))
+                .updateClaimantRepresentation(any(), any());
     }
 }

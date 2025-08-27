@@ -42,7 +42,7 @@ public class NocClaimantRepresentativeService {
     private final NocNotificationService nocNotificationService;
     private final CcdCaseAssignment ccdCaseAssignment;
     private final CcdClient ccdClient;
-    private final NocHelper noCHelper;
+    private final NocHelper nocHelper;
     private final NocClaimantHelper nocClaimantHelper;
 
     /**

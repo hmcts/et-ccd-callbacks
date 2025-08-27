@@ -17,7 +17,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocClaimantHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
@@ -59,7 +58,7 @@ class NocClaimantRepresentativeServiceTest {
     @MockBean
     private NocClaimantHelper nocClaimantHelper;
     @MockBean
-    private NocHelper nocHelper;
+    private NocService nocService;
 
     private CaseData caseData;
     private CaseDetails caseDetails;
@@ -74,7 +73,7 @@ class NocClaimantRepresentativeServiceTest {
                 nocNotificationService,
                 ccdCaseAssignment,
                 ccdClient,
-                nocHelper,
+                nocService,
                 nocClaimantHelper
         );
 

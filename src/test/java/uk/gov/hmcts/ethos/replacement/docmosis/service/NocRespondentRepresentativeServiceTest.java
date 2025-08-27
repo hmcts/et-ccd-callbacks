@@ -30,7 +30,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseConverter;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
@@ -123,7 +122,7 @@ class NocRespondentRepresentativeServiceTest {
     @MockBean
     private AuthTokenGenerator authTokenGenerator;
     @MockBean
-    private NocHelper nocHelper;
+    private NocService nocService;
 
     private NocRespondentHelper nocRespondentHelper;
     private CaseData caseData;
@@ -137,7 +136,7 @@ class NocRespondentRepresentativeServiceTest {
         nocRespondentRepresentativeService =
             new NocRespondentRepresentativeService(noticeOfChangeFieldPopulator, converter, nocCcdService,
                     adminUserService, nocRespondentHelper, nocNotificationService, ccdClient, ccdCaseAssignment,
-                    organisationClient, authTokenGenerator, nocHelper);
+                    organisationClient, authTokenGenerator, nocService);
                     
         // Respondent
         caseData.setRespondentCollection(new ArrayList<>());

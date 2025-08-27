@@ -16,7 +16,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocClaimantHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
@@ -42,7 +41,7 @@ public class NocClaimantRepresentativeService {
     private final NocNotificationService nocNotificationService;
     private final CcdCaseAssignment ccdCaseAssignment;
     private final CcdClient ccdClient;
-    private final NocHelper nocHelper;
+    private final NocService nocService;
     private final NocClaimantHelper nocClaimantHelper;
 
     /**
@@ -128,7 +127,7 @@ public class NocClaimantRepresentativeService {
         if (changeRequest != null
                 && changeRequest.getOrganisationToRemove() != null) {
             try {
-                noCHelper.removeOrganisationRepresentativeAccess(caseDetails.getCaseId(), changeRequest);
+                nocService.removeOrganisationRepresentativeAccess(caseDetails.getCaseId(), changeRequest);
             } catch (IOException e) {
                 throw new CcdInputOutputException("Failed to remove organisation representative access", e);
             }

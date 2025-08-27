@@ -22,7 +22,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseConverter;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
@@ -68,7 +67,7 @@ public class NocRespondentRepresentativeService {
 
     private final AuthTokenGenerator authTokenGenerator;
 
-    private final NocHelper noCHelper;
+    private final NocService noCService;
 
     /**
      * Add respondent organisation policy and notice of change answer fields to the case data.
@@ -187,7 +186,7 @@ public class NocRespondentRepresentativeService {
             if (changeRequest != null
                     && changeRequest.getOrganisationToRemove() != null) {
                 try {
-                    noCHelper.removeOrganisationRepresentativeAccess(caseDetails.getCaseId(), changeRequest);
+                    noCService.removeOrganisationRepresentativeAccess(caseDetails.getCaseId(), changeRequest);
                 } catch (IOException e) {
                     throw new CcdInputOutputException("Failed to remove organisation representative access", e);
                 }

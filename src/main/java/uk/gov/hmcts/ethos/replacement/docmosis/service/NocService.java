@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
+package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.collections.CollectionUtils;
@@ -6,15 +6,13 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.NocCcdService;
 
 import java.io.IOException;
 import java.util.List;
 
 @RequiredArgsConstructor
 @Component
-public class NocHelper {
+public class NocService {
     private final NocCcdService nocCcdService;
     private final AdminUserService adminUserService;
 

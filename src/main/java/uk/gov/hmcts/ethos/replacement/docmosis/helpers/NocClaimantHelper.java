@@ -14,11 +14,8 @@ import static uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationApprovalS
 public class NocClaimantHelper {
     public ChangeOrganisationRequest createChangeRequest(Organisation newOrganisation,
                                                          Organisation oldOrganisation) {
-        DynamicFixedListType roleItem = new DynamicFixedListType();
-        DynamicValueType dynamicValueType = new DynamicValueType();
-        dynamicValueType.setCode(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
-        dynamicValueType.setLabel(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
-        roleItem.setValue(dynamicValueType);
+        DynamicFixedListType roleItem =
+                new DynamicFixedListType(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
 
         return ChangeOrganisationRequest.builder()
                 .approvalStatus(APPROVED)

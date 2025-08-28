@@ -48,6 +48,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
@@ -187,7 +189,7 @@ class Et1ReppedControllerTest {
     private CaseManagementLocationService caseManagementLocationService;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() throws URISyntaxException, IOException {
         caseData = new CaseData();
         caseData.setEt1ReppedSectionOne(NO);
         caseData.setEt1ReppedSectionTwo(NO);
@@ -828,7 +830,7 @@ class Et1ReppedControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
-    private CaseDetails generateCaseDetails(String jsonFileName) throws Exception {
+    private CaseDetails generateCaseDetails(String jsonFileName) throws URISyntaxException, IOException {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
                 .getContextClassLoader().getResource(jsonFileName)).toURI())));
         ObjectMapper mapper = new ObjectMapper();

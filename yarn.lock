@@ -1353,9 +1353,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codeceptjs/ui@npm:1.2.5":
-  version: 1.2.5
-  resolution: "@codeceptjs/ui@npm:1.2.5"
+"@codeceptjs/ui@npm:1.3.0":
+  version: 1.3.0
+  resolution: "@codeceptjs/ui@npm:1.3.0"
   dependencies:
     "@codeceptjs/configure": ^1.0.3
     axios: ^1.10.0
@@ -1366,7 +1366,7 @@ __metadata:
     core-js: 2.6.12
     dayjs: ^1.11.13
     debug: ^4.3.4
-    electron: ^35.1.4
+    electron: ^37.3.0
     express: ^4.21.2
     lodash.clonedeep: ^4.5.0
     nanoid: ^5.1.5
@@ -1376,7 +1376,7 @@ __metadata:
     codeceptjs: ^3.7.3
   bin:
     codecept-ui: bin/codecept-ui.js
-  checksum: 07fd926a74aedee8cb0fbf0df5b61e2f24204667e93a4ff001a46318c982c7a14501cb016fd80816bd9fc0cb2035177814d7147010780ccffd853d94a8c4fbdb
+  checksum: 003591a8ab183c5d037a8a19cc982e1fdb3bd5173bbbf6b40e97da428bacc9e5e335b8d82aded7772f1fc333eeda2819ad49ab87532944185cb2c2732dd0d56f
   languageName: node
   linkType: hard
 
@@ -1734,10 +1734,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eslint/js@npm:9.33.0":
-  version: 9.33.0
-  resolution: "@eslint/js@npm:9.33.0"
-  checksum: b3cd3cd42884059850d73caadf5c28cd3256bd80cf7d85b91b12ba3a7e7711593f3b6594dbd6a9b6212b8d5da6e89dd6c18e1720c15e4468def5e1a9e36cb4fa
+"@eslint/js@npm:9.34.0":
+  version: 9.34.0
+  resolution: "@eslint/js@npm:9.34.0"
+  checksum: 933d4ba321b1abc83eecde40eb703871ce00f133eedec54cf928b7fedb61706174dd526997c3f151776922412e3d95cb3634f97ef7b5861b4908f9992f403a63
   languageName: node
   linkType: hard
 
@@ -2403,9 +2403,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@puppeteer/browsers@npm:2.10.6":
-  version: 2.10.6
-  resolution: "@puppeteer/browsers@npm:2.10.6"
+"@puppeteer/browsers@npm:2.10.7":
+  version: 2.10.7
+  resolution: "@puppeteer/browsers@npm:2.10.7"
   dependencies:
     debug: ^4.4.1
     extract-zip: ^2.0.1
@@ -2416,7 +2416,7 @@ __metadata:
     yargs: ^17.7.2
   bin:
     browsers: lib/cjs/main-cli.js
-  checksum: c3ea191ebc733cbc367328f537974300a05b8d11a8bc5aa58498ab6ee5a6b3b321b0821178298aa13f28264f1937b4fdae732dd903f99d6d8b89b9d6b4071a03
+  checksum: 92314c740802fa368b39e1a0902dda79db064b13f3b0f43d796bd494a986d39faec694949048ae20ebf437b04bda85401a742c790bab177f2c45cdfd6cc1419b
   languageName: node
   linkType: hard
 
@@ -5426,14 +5426,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chai-as-promised@npm:8.0.1":
-  version: 8.0.1
-  resolution: "chai-as-promised@npm:8.0.1"
+"chai-as-promised@npm:8.0.2":
+  version: 8.0.2
+  resolution: "chai-as-promised@npm:8.0.2"
   dependencies:
-    check-error: ^2.0.0
+    check-error: ^2.1.1
   peerDependencies:
-    chai: ">= 2.1.2 < 6"
-  checksum: 7fa517bc70fd355ec91b543c8c1a1cf545355224cf75063f93b3ed32bb562f1f23a850135737d6337fa4e098c8baffbb9c74b05b1fcb3c4d290985a8c3c4890d
+    chai: ">= 2.1.2 < 7"
+  checksum: b3c52e414c5d06b083e46fcc03a7abf8ae24cbd75416413f378c5499056a358c57426c2b26892f251a05bdb43dadaceb5115c0222137d35a4bdaab42eb4acaa0
   languageName: node
   linkType: hard
 
@@ -5565,10 +5565,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"check-error@npm:^2.0.0":
-  version: 2.0.0
-  resolution: "check-error@npm:2.0.0"
-  checksum: 120f252c2e1ad82ef82a616662805345c6c361347bfd6203f8a28c53a158811dd0ea21278f29c8136cc9df12fc7f077d1a07124569d98fb396b3072d08f2f092
+"check-error@npm:^2.1.1":
+  version: 2.1.1
+  resolution: "check-error@npm:2.1.1"
+  checksum: d785ed17b1d4a4796b6e75c765a9a290098cf52ff9728ce0756e8ffd4293d2e419dd30c67200aee34202463b474306913f2fcfaf1890641026d9fc6966fea27a
   languageName: node
   linkType: hard
 
@@ -5717,15 +5717,15 @@ __metadata:
   languageName: node
   linkType: hard
 
-"chromium-bidi@npm:7.3.1":
-  version: 7.3.1
-  resolution: "chromium-bidi@npm:7.3.1"
+"chromium-bidi@npm:8.0.0":
+  version: 8.0.0
+  resolution: "chromium-bidi@npm:8.0.0"
   dependencies:
     mitt: ^3.0.1
     zod: ^3.24.1
   peerDependencies:
     devtools-protocol: "*"
-  checksum: 2b81ce65f33719d9d220da3503fdda92707b1713c646d97414af68bcaf12d65b123d852c3b27601040d24249ac926fa521c0f85da07ffbe736a93d20d485718d
+  checksum: 4241dc4bf44996b01907b940a180ff85c845d59a5a799d6dd9ba5fb64bc719ffff322d7204f57efc3478019fea397fb6c0871c2342f34e30cb1a8d3e017475e7
   languageName: node
   linkType: hard
 
@@ -7275,16 +7275,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"electron@npm:^35.1.4":
-  version: 35.7.2
-  resolution: "electron@npm:35.7.2"
+"electron@npm:^37.3.0":
+  version: 37.3.1
+  resolution: "electron@npm:37.3.1"
   dependencies:
     "@electron/get": ^2.0.0
     "@types/node": ^22.7.7
     extract-zip: ^2.0.1
   bin:
     electron: cli.js
-  checksum: 5bded64ea0a5537eeadb186cef6509f37ea7072e2715b0aab2f783923b7d0edebf330f3a0d58fc3ac7760e0466ba758a60825dd7f50d03179e7a03c3a2d8c08c
+  checksum: ae11c88bbc4b376ca13aedb0eb01ceeb7812b901295704ce09f1d02f9188bae00a07af6882de229855ee031865054969e32c564e7c9c68e13e637912c15673a3
   languageName: node
   linkType: hard
 
@@ -8138,9 +8138,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint@npm:9.33.0":
-  version: 9.33.0
-  resolution: "eslint@npm:9.33.0"
+"eslint@npm:9.34.0":
+  version: 9.34.0
+  resolution: "eslint@npm:9.34.0"
   dependencies:
     "@eslint-community/eslint-utils": ^4.2.0
     "@eslint-community/regexpp": ^4.12.1
@@ -8148,7 +8148,7 @@ __metadata:
     "@eslint/config-helpers": ^0.3.1
     "@eslint/core": ^0.15.2
     "@eslint/eslintrc": ^3.3.1
-    "@eslint/js": 9.33.0
+    "@eslint/js": 9.34.0
     "@eslint/plugin-kit": ^0.3.5
     "@humanfs/node": ^0.16.6
     "@humanwhocodes/module-importer": ^1.0.1
@@ -8184,7 +8184,7 @@ __metadata:
       optional: true
   bin:
     eslint: bin/eslint.js
-  checksum: 1d383c3f294b8f0cedb20d06139b26fb22b80365f093f9ee8d24bc7e4377f6d9ad52478917e9d583f2cccf16cca85eee1624a9dcc7d3bdc0a5fa2b62c044882b
+  checksum: 6de97f6197774821a086783e1bd73b9518c4eb8896165e448a8bb2359142c63cad40faa5dc79bcdc28fab20b57e1376ccbb76a6ae081da5e94baa18d2d3b92fe
   languageName: node
   linkType: hard
 
@@ -8335,7 +8335,7 @@ __metadata:
     "@babel/eslint-parser": ^7.17.0
     "@codeceptjs/configure": 1.0.6
     "@codeceptjs/examples": 1.2.4
-    "@codeceptjs/ui": 1.2.5
+    "@codeceptjs/ui": 1.3.0
     "@hmcts/nodejs-logging": 4.0.4
     "@types/archiver": ^6.0.0
     "@types/chai-as-promised": ^8.0.0
@@ -8358,12 +8358,12 @@ __metadata:
     "@wdio/types": ^9.0.0
     axios: 1.11.0
     chai: 4.5.0
-    chai-as-promised: 8.0.1
+    chai-as-promised: 8.0.2
     chai-http: 5.1.2
     codeceptjs: 3.7.4
     codeceptjs-saucehelper: ^1.4.0
     cross-env: 7.0.3
-    eslint: 9.33.0
+    eslint: 9.34.0
     eslint-config-prettier: ^10.0.0
     eslint-plugin-codeceptjs: ^1.3.0
     eslint-plugin-import: ^2.26.0
@@ -8386,7 +8386,7 @@ __metadata:
     playwright: ^1.35.1
     playwright-core: ^1.35.1
     proxyquire: 2.1.3
-    puppeteer: 24.16.2
+    puppeteer: 24.17.0
     randomstring: 1.3.1
     request: 2.88.2
     request-promise-native: 1.0.9
@@ -8394,7 +8394,7 @@ __metadata:
     rewire: 7.0.0
     selenium-standalone: 10.0.2
     sinon: 19.0.5
-    sinon-chai: 4.0.0
+    sinon-chai: 4.0.1
     sonar-scanner: 3.1.0
     sonarqube-scanner: 4.3.0
     superagent-proxy: 3.0.0
@@ -15342,33 +15342,33 @@ __metadata:
   languageName: node
   linkType: hard
 
-"puppeteer-core@npm:24.16.2":
-  version: 24.16.2
-  resolution: "puppeteer-core@npm:24.16.2"
+"puppeteer-core@npm:24.17.0":
+  version: 24.17.0
+  resolution: "puppeteer-core@npm:24.17.0"
   dependencies:
-    "@puppeteer/browsers": 2.10.6
-    chromium-bidi: 7.3.1
+    "@puppeteer/browsers": 2.10.7
+    chromium-bidi: 8.0.0
     debug: ^4.4.1
     devtools-protocol: 0.0.1475386
     typed-query-selector: ^2.12.0
     ws: ^8.18.3
-  checksum: 68b5e1d6e6163fd2e3249780b67a70c47da8d2bedb1df4e45b8c6e817216e9d2e935cc3673afc5108dfa3185907aa7364999537493e4be368674aaa35190313f
+  checksum: 5097aeb5619b64d2a0238277d4a9f6d8422af6908570d567a8c2048c857edb3cb06a14008b05ed15119bb32670d2da6fc39c38c384ce167a7b6ab4fc35465647
   languageName: node
   linkType: hard
 
-"puppeteer@npm:24.16.2":
-  version: 24.16.2
-  resolution: "puppeteer@npm:24.16.2"
+"puppeteer@npm:24.17.0":
+  version: 24.17.0
+  resolution: "puppeteer@npm:24.17.0"
   dependencies:
-    "@puppeteer/browsers": 2.10.6
-    chromium-bidi: 7.3.1
+    "@puppeteer/browsers": 2.10.7
+    chromium-bidi: 8.0.0
     cosmiconfig: ^9.0.0
     devtools-protocol: 0.0.1475386
-    puppeteer-core: 24.16.2
+    puppeteer-core: 24.17.0
     typed-query-selector: ^2.12.0
   bin:
     puppeteer: lib/cjs/puppeteer/node/cli.js
-  checksum: 1142d8e662db29eb1ae0a361fdd2fc6ce9aadb962bac8b512323a4d8f0684a912ce244be94f88e8ab32d81ef9cb33ccaebbb25fe3dddc3b71c912a1e619bda55
+  checksum: 90a21fb8da28e009046b4e06422919cc95e51e5389dc91da30ba9e60dba56c2bd85a56090bce7628d9789127b1957d742c1a12ae3d3c84590d9635fc3f383321
   languageName: node
   linkType: hard
 
@@ -16882,13 +16882,13 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sinon-chai@npm:4.0.0":
-  version: 4.0.0
-  resolution: "sinon-chai@npm:4.0.0"
+"sinon-chai@npm:4.0.1":
+  version: 4.0.1
+  resolution: "sinon-chai@npm:4.0.1"
   peerDependencies:
-    chai: ^5.0.0
+    chai: ^5.0.0 || ^6.0.0
     sinon: ">=4.0.0"
-  checksum: 3c2f4eddfff44497cb5097673c7cb174b8f05802a75472a8173b0c736db6a376bfbf2fc4eec3153ede85ea4c19ec06cae3df37abbb5c6823441b27e7e88a0e2e
+  checksum: e2aa656f96b071ad26c9af9ccbeb29ef3b2ae78d2db32fae79de79457815b1d5e4b650ed0808bea0c66e41fdb8fc6f4daaa9e2f7834a6d958988dc0ce0ef9188
   languageName: node
   linkType: hard
 

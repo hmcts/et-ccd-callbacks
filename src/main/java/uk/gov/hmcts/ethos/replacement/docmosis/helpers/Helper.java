@@ -177,24 +177,6 @@ public final class Helper {
         return DocumentHelper.getTemplateName(correspondenceType, correspondenceScotType) + "_" + sectionName;
     }
 
-    private static List<DynamicValueType> createDynamicRespondentNameList(
-            List<RespondentSumTypeItem> respondentCollection) {
-        List<DynamicValueType> listItems = new ArrayList<>();
-        if (respondentCollection != null) {
-            for (RespondentSumTypeItem respondentSumTypeItem : respondentCollection) {
-                RespondentSumType respondentSumType = respondentSumTypeItem.getValue();
-                if (respondentSumType.getResponseStruckOut() == null
-                        || respondentSumType.getResponseStruckOut().equals(NO)) {
-                    DynamicValueType dynamicValueType = new DynamicValueType();
-                    dynamicValueType.setCode(respondentSumType.getRespondentName());
-                    dynamicValueType.setLabel(respondentSumType.getRespondentName());
-                    listItems.add(dynamicValueType);
-                }
-            }
-        }
-        return listItems;
-    }
-
     public static List<DynamicValueType> getDefaultBfListItems() {
         return new ArrayList<>(Arrays.asList(
                 DynamicListHelper.getDynamicValue(BF_ACTION_ACAS),
@@ -383,7 +365,7 @@ public final class Helper {
      * @return the last element in the list
      */
     public static <T> T getLast(List<T> list) {
-        return CollectionUtils.isEmpty(list) ? null : list.get(list.size() - 1);
+        return CollectionUtils.isEmpty(list) ? null : list.getLast();
     }
 
     /**

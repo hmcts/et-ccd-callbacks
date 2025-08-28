@@ -10,7 +10,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -43,20 +42,19 @@ public final class DocumentUtils {
     public static List<GenericTypeItem<DocumentType>> generateUploadedDocumentListFromDocumentList(
             List<GenericTypeItem<DocumentType>> documentList) {
 
-        List<GenericTypeItem<DocumentType>> uploadedDocumentList = new ArrayList<>();
-        documentList.forEach(doc -> {
-            GenericTypeItem<DocumentType> genTypeItems = new GenericTypeItem<>();
-            DocumentType docType = new DocumentType();
-            docType.setUploadedDocument(doc.getValue().getUploadedDocument());
-            docType.getUploadedDocument().setDocumentBinaryUrl(
-                    doc.getValue().getUploadedDocument().getDocumentBinaryUrl());
+        return emptyIfNull(documentList).stream()
+                .map(doc -> {
+                    DocumentType docType = new DocumentType();
+                    docType.setUploadedDocument(doc.getValue().getUploadedDocument());
+                    docType.getUploadedDocument().setDocumentBinaryUrl(
+                            doc.getValue().getUploadedDocument().getDocumentBinaryUrl());
 
-            genTypeItems.setId(doc.getId() != null ? doc.getId() : UUID.randomUUID().toString());
-            genTypeItems.setValue(docType);
-            uploadedDocumentList.add(genTypeItems);
-        });
-
-        return uploadedDocumentList;
+                    GenericTypeItem<DocumentType> genTypeItems = new GenericTypeItem<>();
+                    genTypeItems.setId(ObjectUtils.defaultIfNull(doc.getId(), UUID.randomUUID().toString()));
+                    genTypeItems.setValue(docType);
+                    return genTypeItems;
+                })
+                .toList();
     }
 
     public static List<GenericTypeItem<DocumentType>> generateDocumentListFromDocumentList(

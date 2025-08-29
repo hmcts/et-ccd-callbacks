@@ -274,6 +274,7 @@ public final class DocumentUtils {
         source.setStartingClaimDocuments(target.getStartingClaimDocuments());
         source.setInitialConsiderationDocuments(target.getInitialConsiderationDocuments());
         source.setCaseManagementDocuments(target.getCaseManagementDocuments());
+        source.setEccDocuments(target.getEccDocuments());
         source.setWithdrawalSettledDocuments(target.getWithdrawalSettledDocuments());
         source.setHearingsDocuments(target.getHearingsDocuments());
         source.setJudgmentAndReasonsDocuments(target.getJudgmentAndReasonsDocuments());

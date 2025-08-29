@@ -36,7 +36,8 @@ public final class BFHelper {
                 }
 
                 //Clear bf action wa tracker flag if the bf action is expired
-                if (BFHelper.isBfExpired(bfActionType, BFHelper.getEffectiveYesterday(LocalDate.now()))) {
+                if (BFHelper.isBfExpired(bfActionType, BFHelper.getEffectiveYesterday(
+                        LocalDate.of(2025, 5, 1)))) {
                     bfActionType.setIsWaTaskCreated(null);
                 }
             }
@@ -92,9 +93,9 @@ public final class BFHelper {
                     + caseData.getEthosCaseReference());
         }
 
-        String yesterday = BFHelper.getEffectiveYesterday(LocalDate.now());
         List<BFActionTypeItem> expiredBfActions = caseData.getBfActions().stream()
-                .filter(item ->  isBfExpired(item.getValue(), yesterday)).toList();
+                .filter(item ->  isBfExpired(item.getValue(),
+                        BFHelper.getEffectiveYesterday(LocalDate.of(2025, 5, 1)))).toList();
         emptyIfNull(expiredBfActions).stream()
                 .filter(bfActionTypeItem -> bfActionTypeItem.getValue().getIsWaTaskCreated() == null)
                 .forEach(bfActionTypeItem -> bfActionTypeItem.getValue().setIsWaTaskCreated("Yes"));
@@ -112,8 +113,9 @@ public final class BFHelper {
     public static boolean isBfExpired(BFActionType item, String yesterday) {
         LocalDate bfDate = LocalDate.parse(item.getBfDate());
         return bfDate.isAfter(LocalDate.parse(yesterday).minusDays(1))
-                && bfDate.isBefore(LocalDate.now())
-                && isNullOrEmpty(item.getCleared());
+            && bfDate.isBefore(LocalDate.now())
+            && isNullOrEmpty(item.getCleared())
+            && isNullOrEmpty(item.getLetters());
     }
 
     /**

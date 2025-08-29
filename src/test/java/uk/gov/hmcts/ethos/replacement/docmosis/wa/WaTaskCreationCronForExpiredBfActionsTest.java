@@ -99,7 +99,7 @@ class WaTaskCreationCronForExpiredBfActionsTest {
         SubmitEvent submitEvent = new ObjectMapper().readValue(resource, SubmitEvent.class);
         submitEvent.setCaseId(Long.parseLong("1741710954147332"));
         submitEvent.getCaseData().getBfActions().getFirst().getValue().setBfDate(
-                BFHelper.getEffectiveYesterday(LocalDate.now()));
+                BFHelper.getEffectiveYesterday(LocalDate.of(2025, 5, 1)));
         when(ccdClient.buildAndGetElasticSearchRequest(any(), eq(ENGLANDWALES_CASE_TYPE_ID), any()))
                 .thenReturn(List.of(submitEvent)).thenReturn(Collections.emptyList());
 

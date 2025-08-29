@@ -122,7 +122,7 @@ public class BFHelperTest {
         BFActionType bfAction = new BFActionType();
         bfAction.setBfDate(LocalDate.now().minusDays(1).toString());
         bfAction.setCleared(null);
-        String yesterday = BFHelper.getEffectiveYesterday(LocalDate.now());
+        String yesterday = BFHelper.getEffectiveYesterday(LocalDate.of(2025, 5, 1));
         assertTrue(BFHelper.isBfExpired(bfAction, yesterday));
     }
 

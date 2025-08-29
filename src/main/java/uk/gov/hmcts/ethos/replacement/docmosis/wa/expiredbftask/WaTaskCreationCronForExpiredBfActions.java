@@ -110,7 +110,8 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
                 .filter(bfAction -> bfAction != null && bfAction.getValue() != null)
                 .map(BFActionTypeItem::getValue)
                 .anyMatch(bfActionValue -> !isNullOrEmpty(bfActionValue.getBfDate())
-                        && BFHelper.isBfExpired(bfActionValue, BFHelper.getEffectiveYesterday(LocalDate.now()))
+                        && BFHelper.isBfExpired(bfActionValue, BFHelper.getEffectiveYesterday(
+                                LocalDate.of(2025, 5, 1)))
                         && isNullOrEmpty(bfActionValue.getIsWaTaskCreated()));
     }
 
@@ -139,7 +140,7 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
                 .initialSearch(true)
                 .size(maxCasesPerSearch)
                 .build()
-                .getQuery(BFHelper.getEffectiveYesterday(LocalDate.now()));
+                .getQuery(BFHelper.getEffectiveYesterday(LocalDate.of(2025, 5, 1)));
 
         List<SubmitEvent> searchResults = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
         if (CollectionUtils.isEmpty(searchResults)) {
@@ -156,7 +157,7 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
                     .size(maxCasesPerSearch)
                     .searchAfterValue(searchAfterValue)
                     .build()
-                    .getQuery(BFHelper.getEffectiveYesterday(LocalDate.now()));
+                    .getQuery(BFHelper.getEffectiveYesterday(LocalDate.of(2025, 5, 1)));
 
             List<SubmitEvent> nextResults = ccdClient.buildAndGetElasticSearchRequest(
                     adminUserToken, caseTypeId, query);

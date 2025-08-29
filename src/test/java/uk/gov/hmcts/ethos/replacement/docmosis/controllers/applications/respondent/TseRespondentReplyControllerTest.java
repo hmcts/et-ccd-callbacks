@@ -21,6 +21,9 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
+
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
@@ -61,7 +64,7 @@ class TseRespondentReplyControllerTest extends BaseControllerTest {
 
     @BeforeEach
     @Override
-    protected void setUp() throws Exception {
+    protected void setUp() throws IOException, URISyntaxException {
         super.setUp();
         CaseData caseData = CaseDataBuilder.builder()
             .withEthosCaseReference("9876")

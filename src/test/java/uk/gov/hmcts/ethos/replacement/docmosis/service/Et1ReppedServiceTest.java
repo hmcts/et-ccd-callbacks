@@ -227,7 +227,7 @@ class Et1ReppedServiceTest {
         assertDoesNotThrow(() -> et1ReppedService.createDraftEt1(caseDetails, "authToken"));
         assertNotNull(caseDetails.getCaseData().getDocMarkUp());
     }
-
+  
     private CaseDetails generateCaseDetails(String jsonFileName) throws IOException,
             URISyntaxException, NullPointerException {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()

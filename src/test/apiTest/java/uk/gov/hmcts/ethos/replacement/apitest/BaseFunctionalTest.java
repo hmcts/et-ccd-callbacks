@@ -28,6 +28,7 @@ import org.springframework.core.io.ResourceLoader;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.ethos.replacement.apitest.config.TestCacheConfig;
 import uk.gov.hmcts.ethos.replacement.apitest.model.CreateUser;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
@@ -52,7 +53,7 @@ import static org.apache.http.client.methods.RequestBuilder.get;
 import static org.apache.http.client.methods.RequestBuilder.post;
 
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes = {DocmosisApplication.class})
+@SpringBootTest(classes = {DocmosisApplication.class, TestCacheConfig.class})
 @Slf4j
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class})

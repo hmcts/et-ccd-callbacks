@@ -231,6 +231,7 @@ class NocRespondentRepresentativeServiceTest {
                 .approvalStatus(null)
                 .build());
         when(authTokenGenerator.generate()).thenReturn("s2sToken");
+        when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
     }
 
     @Test
@@ -264,7 +265,8 @@ class NocRespondentRepresentativeServiceTest {
         caseData.setChangeOrganisationRequestField(changeOrganisationRequest);
 
         UserDetails mockUser = getMockUser();
-        when(adminUserService.getUserDetails(any())).thenReturn(mockUser);
+
+        when(adminUserService.getUserDetails(anyString(), any())).thenReturn(mockUser);
         caseDetails.setCaseId("111-222-111-333");
         caseDetails.setCaseData(caseData);
         when(nocCcdService.getLatestAuditEventByName(any(), any(), any())).thenReturn(
@@ -587,7 +589,7 @@ class NocRespondentRepresentativeServiceTest {
     @Test
     void removeOrganisationRepresentativeAccess() throws IOException {
         UserDetails mockUser = getMockUser();
-        when(adminUserService.getUserDetails(any())).thenReturn(mockUser);
+        when(adminUserService.getUserDetails(anyString(), any())).thenReturn(mockUser);
         when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
         when(nocCcdService.getCaseAssignments(any(), any())).thenReturn(
             mockCaseAssignmentData());

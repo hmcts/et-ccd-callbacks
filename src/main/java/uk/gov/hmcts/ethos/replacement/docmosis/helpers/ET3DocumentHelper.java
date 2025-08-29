@@ -65,7 +65,7 @@ public final class ET3DocumentHelper {
      *
      * @param caseData the {@link CaseData} object containing respondents and the document collection to update
      */
-    public static void addOrRemoveET3Documents(CaseData caseData) {
+    public static void addOrRemoveET3Documents(CaseData caseData) throws JsonProcessingException {
         if (CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
             return;
         }
@@ -111,7 +111,7 @@ public final class ET3DocumentHelper {
         if (CollectionUtils.isEmpty(documentTypeItems)) {
             return false;
         }
-        DocumentTypeItem documentTypeItem = documentTypeItems.get(0);
+        DocumentTypeItem documentTypeItem = documentTypeItems.getFirst();
         if (ObjectUtils.isEmpty(documentTypeItem)
                 || ObjectUtils.isEmpty(documentTypeItem.getValue())
                 || StringUtils.isBlank(documentTypeItem.getValue().getTypeOfDocument())) {
@@ -137,7 +137,7 @@ public final class ET3DocumentHelper {
      *         or an empty list if none are found
      */
     public static List<DocumentTypeItem> findAllET3DocumentsOfRespondent(
-            RespondentSumTypeItem respondentSumTypeItem) {
+            RespondentSumTypeItem respondentSumTypeItem) throws JsonProcessingException {
         List<DocumentTypeItem> documentTypeItems = new ArrayList<>();
         if (hasET3Document(respondentSumTypeItem)) {
             RespondentSumType respondentSumType = respondentSumTypeItem.getValue();
@@ -161,10 +161,12 @@ public final class ET3DocumentHelper {
                     ET3_RESPONDENT_CLAIM_DOCUMENT,
                     responseReceivedDate);
             if (CollectionUtils.isNotEmpty(respondentSumType.getEt3ResponseContestClaimDocument())) {
-                for (DocumentTypeItem documentTypeItem : respondentSumType.getEt3ResponseContestClaimDocument()) {
-                    setDocumentTypeItemLevels(documentTypeItem, RESPONSE_TO_A_CLAIM, ET3_ATTACHMENT);
-                    documentTypeItem.getValue().setShortDescription(ET3_EMPLOYER_CONTEST_CLAIM_DOCUMENT);
-                    documentTypeItems.add(documentTypeItem);
+                for (DocumentTypeItem originalItem : respondentSumType.getEt3ResponseContestClaimDocument()) {
+                    DocumentTypeItem clonedItem = CallbackObjectUtils.cloneObject(originalItem, DocumentTypeItem.class);
+                    setDocumentTypeItemLevels(clonedItem, RESPONSE_TO_A_CLAIM, ET3_ATTACHMENT);
+                    clonedItem.getValue().setShortDescription(ET3_EMPLOYER_CONTEST_CLAIM_DOCUMENT);
+                    clonedItem.getValue().setDateOfCorrespondence(responseReceivedDate);
+                    documentTypeItems.add(clonedItem);
                 }
             }
             addUploadedDocumentTypeToDocumentTypeItems(documentTypeItems,
@@ -264,7 +266,7 @@ public final class ET3DocumentHelper {
         if (isFirstDocumentTypeInvalid(documentTypeItems)) {
             return true;
         }
-        String firstType = documentTypeItems.get(0).getValue().getTypeOfDocument();
+        String firstType = documentTypeItems.getFirst().getValue().getTypeOfDocument();
         boolean isFirstAcceptedType = isAcceptedType(firstType);
         for (int i = 1; i < documentTypeItems.size(); i++) {
             DocumentTypeItem item = documentTypeItems.get(i);
@@ -288,9 +290,9 @@ public final class ET3DocumentHelper {
 
     private static boolean isFirstDocumentTypeInvalid(List<DocumentTypeItem> documentTypeItems) {
         return CollectionUtils.isEmpty(documentTypeItems)
-                || ObjectUtils.isEmpty(documentTypeItems.get(0))
-                || ObjectUtils.isEmpty(documentTypeItems.get(0).getValue())
-                || StringUtils.isBlank(documentTypeItems.get(0).getValue().getTypeOfDocument());
+                || ObjectUtils.isEmpty(documentTypeItems.getFirst())
+                || ObjectUtils.isEmpty(documentTypeItems.getFirst().getValue())
+                || StringUtils.isBlank(documentTypeItems.getFirst().getValue().getTypeOfDocument());
     }
 
     /**

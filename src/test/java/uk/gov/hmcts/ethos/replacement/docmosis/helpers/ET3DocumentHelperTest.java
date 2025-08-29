@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.SneakyThrows;
 import org.apache.commons.collections4.CollectionUtils;
 import org.junit.jupiter.api.Test;
@@ -138,12 +139,12 @@ class ET3DocumentHelperTest {
     }
 
     @Test
-    void findAllET3DocumentsOfRespondent_isEmpty() {
+    void findAllET3DocumentsOfRespondent_isEmpty() throws JsonProcessingException {
         assertThat(ET3DocumentHelper.findAllET3DocumentsOfRespondent(null)).isEmpty();
     }
 
     @Test
-    void findAllET3DocumentsOfRespondent_withEt3ResponseContestClaimDocument() {
+    void findAllET3DocumentsOfRespondent_withEt3ResponseContestClaimDocument() throws JsonProcessingException {
         RespondentSumTypeItem respondentSumTypeItem = ResourceLoader.fromString(
                 TEST_ET3_FORM_CASE_DATA_FILE, CaseData.class).getRespondentCollection().getFirst();
         List<DocumentTypeItem> actual = ET3DocumentHelper.findAllET3DocumentsOfRespondent(respondentSumTypeItem);
@@ -153,7 +154,7 @@ class ET3DocumentHelperTest {
     }
 
     @Test
-    void findAllET3DocumentsOfRespondent_withoutEt3ResponseContestClaimDocument() {
+    void findAllET3DocumentsOfRespondent_withoutEt3ResponseContestClaimDocument() throws JsonProcessingException {
         RespondentSumTypeItem respondentSumTypeItem = ResourceLoader.fromString(
                 TEST_ET3_FORM_CASE_DATA_FILE, CaseData.class).getRespondentCollection().getFirst();
         respondentSumTypeItem.getValue().setEt3ResponseContestClaimDocument(null);
@@ -163,7 +164,7 @@ class ET3DocumentHelperTest {
 
     @ParameterizedTest
     @MethodSource("provideDataForModifyDocumentCollectionForET3FormsTest")
-    void theAddOrRemoveET3Documents(CaseData caseData) {
+    void theAddOrRemoveET3Documents(CaseData caseData) throws JsonProcessingException {
         ET3DocumentHelper.addOrRemoveET3Documents(caseData);
         if (ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_ENGLAND_WALES.equals(
                 caseData.getEt3NotificationDocCollection().getFirst().getValue().getTypeOfDocument())) {

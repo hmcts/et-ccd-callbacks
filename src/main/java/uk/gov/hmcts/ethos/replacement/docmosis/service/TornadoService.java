@@ -47,6 +47,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.LETTER_ADDRESS_ALLO
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OUTPUT_FILE_NAME;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1VettingHelper.ET1_VETTING_OUTPUT_NAME;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationDocumentHelper.buildNotificationDocumentData;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationDocumentHelper.getDocumentName;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters.InvalidCharacterCheck.sanitizePartyName;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService.APPLICATION_DOCX_VALUE;
 
@@ -67,6 +69,7 @@ public class TornadoService {
     public static final String TSE_REPLY = "TSE Reply.pdf";
     public static final String TSE_CLAIMANT_REP_REPLY = "TSE Claimant Rep Reply.pdf";
     public static final String TSE_ADMIN_REPLY = "TSE Admin Reply.pdf";
+    public static final String NOTIFICATION_SUMMARY_PDF = "Notification Summary.pdf";
 
     private static final String DOCUMENT_NAME = SignificantItemType.DOCUMENT.name();
 
@@ -251,7 +254,7 @@ public class TornadoService {
     }
 
     private static boolean isCustomDocName(String documentName) {
-        return documentName.contains("ET3") || documentName.contains("ACAS") || documentName.contains("ET1 Vetting");
+        return documentName.matches(".*(ET3|ACAS|ET1 Vetting|Notification).*");
     }
 
     private byte[] getBytesFromInputStream(ByteArrayOutputStream os, InputStream is) throws IOException {
@@ -296,9 +299,7 @@ public class TornadoService {
         throws IOException {
         HttpURLConnection connection = null;
         try {
-            dmStoreDocumentName = ET3_RESPONSE_PDF.equals(documentName)
-                    ? String.format("%s - " + ET3_RESPONSE_PDF, caseData.getSubmitEt3Respondent().getSelectedLabel())
-                    : documentName;
+            dmStoreDocumentName = getDmStoreDocumentName(caseData, documentName);
             connection = createConnection();
 
             buildDocumentInstruction(connection, caseData, documentName, caseTypeId);
@@ -309,6 +310,16 @@ public class TornadoService {
             throw exception;
         } finally {
             closeConnection(connection);
+        }
+    }
+
+    private static String getDmStoreDocumentName(CaseData caseData, String documentName) {
+        if (ET3_RESPONSE_PDF.equals(documentName)) {
+            return String.format("%s - %s", caseData.getSubmitEt3Respondent().getSelectedLabel(), ET3_RESPONSE_PDF);
+        } else if (NOTIFICATION_SUMMARY_PDF.equals(documentName)) {
+            return getDocumentName(caseData);
+        } else {
+            return documentName;
         }
     }
 
@@ -399,6 +410,9 @@ public class TornadoService {
             }
             case TSE_ADMIN_REPLY -> {
                 return TseAdmReplyHelper.getReplyDocumentRequest(caseData, tornadoConnection.getAccessKey());
+            }
+            case NOTIFICATION_SUMMARY_PDF -> {
+                return buildNotificationDocumentData(caseData, tornadoConnection.getAccessKey());
             }
             default -> throw new IllegalArgumentException("Unexpected document name " + documentName);
         }

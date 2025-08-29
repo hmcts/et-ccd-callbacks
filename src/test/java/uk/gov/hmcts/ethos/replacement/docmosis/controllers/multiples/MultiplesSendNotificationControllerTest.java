@@ -20,6 +20,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import java.io.File;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Objects;
 
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.notNullValue;
@@ -50,12 +51,12 @@ class MultiplesSendNotificationControllerTest extends BaseControllerTest {
 
     private void doRequestSetUp() throws IOException, URISyntaxException {
         ObjectMapper objectMapper = new ObjectMapper();
-        requestContent = objectMapper.readTree(new File(getClass()
-                .getResource("/exampleBulkV1.json").toURI()));
+        requestContent = objectMapper.readTree(new File(Objects.requireNonNull(getClass()
+                .getResource("/exampleBulkV1.json")).toURI()));
     }
 
     @BeforeEach
-    void setUpTests() throws Exception {
+    void setUpTests() throws URISyntaxException, IOException {
         super.setUp();
         mockMvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         doRequestSetUp();

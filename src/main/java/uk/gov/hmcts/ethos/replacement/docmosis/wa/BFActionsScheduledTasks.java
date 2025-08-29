@@ -61,12 +61,13 @@ public class BFActionsScheduledTasks {
         Arrays.stream(caseTypeIds).forEach(caseTypeId -> {
             try {
                 List<SubmitEvent> cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
-                while (CollectionUtils.isNotEmpty(cases)) {
-                    cases.stream()
-                            .filter(o -> !bfActionCronCaseIdsToSkip.contains(String.valueOf(o.getCaseId())))
-                            .forEach(o -> triggerTaskEventForCase(adminUserToken, o, caseTypeId));
-                    cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
+                log.info("Found {} cases for caseTypeId {}", cases.size(), caseTypeId);
+                if (CollectionUtils.isEmpty(cases)) {
+                    return;
                 }
+                cases.stream()
+                    .filter(o -> !bfActionCronCaseIdsToSkip.contains(String.valueOf(o.getCaseId())))
+                    .forEach(o -> triggerTaskEventForCase(adminUserToken, o, caseTypeId));
 
             } catch (Exception e) {
                 log.error(e.getMessage());

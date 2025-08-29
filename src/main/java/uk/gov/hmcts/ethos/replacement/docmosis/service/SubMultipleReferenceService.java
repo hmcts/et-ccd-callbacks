@@ -18,16 +18,13 @@ public class SubMultipleReferenceService {
     private final SubMultipleRefScotlandRepository subMultipleRefScotlandRepository;
 
     public synchronized String createReference(String caseTypeId, String multipleReference, int numberCases) {
-        switch (caseTypeId) {
-            case ENGLANDWALES_BULK_CASE_TYPE_ID:
-                return subMultipleRefEnglandWalesRepository.ethosSubMultipleCaseRefGen(
-                        Integer.parseInt(multipleReference), numberCases);
-            case SCOTLAND_BULK_CASE_TYPE_ID:
-                return subMultipleRefScotlandRepository.ethosSubMultipleCaseRefGen(
-                        Integer.parseInt(multipleReference), numberCases);
-            default:
-                throw new IllegalArgumentException(
-                        String.format("Unable to create case reference: unexpected caseTypeId %s", caseTypeId));
-        }
+        return switch (caseTypeId) {
+            case ENGLANDWALES_BULK_CASE_TYPE_ID -> subMultipleRefEnglandWalesRepository.ethosSubMultipleCaseRefGen(
+                    Integer.parseInt(multipleReference), numberCases);
+            case SCOTLAND_BULK_CASE_TYPE_ID -> subMultipleRefScotlandRepository.ethosSubMultipleCaseRefGen(
+                    Integer.parseInt(multipleReference), numberCases);
+            default -> throw new IllegalArgumentException(
+                    String.format("Unable to create case reference: unexpected caseTypeId %s", caseTypeId));
+        };
     }
 }

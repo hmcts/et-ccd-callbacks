@@ -40,6 +40,10 @@ public class DocmosisApplication implements CommandLineRunner {
         }
     }
 
+    public void setTaskRunner(ScheduledTaskRunner taskRunner) {
+        this.taskRunner = taskRunner;
+    }
+
     @PostConstruct
     public void init() {
         TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));

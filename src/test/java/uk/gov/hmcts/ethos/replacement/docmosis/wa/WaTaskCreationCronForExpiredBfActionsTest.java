@@ -88,7 +88,8 @@ class WaTaskCreationCronForExpiredBfActionsTest {
 
         verify(ccdClient, times(0)).buildAndGetElasticSearchRequest(any(), any(), any());
         verify(ccdClient, times(0)).startEventForCase(any(), any(), any(), any(), any());
-        verify(ccdClient, times(0)).submitEventForCase(any(), any(), any(), any(), any(), any());
+        verify(ccdClient, times(0))
+                .submitEventForCase(any(), any(), any(), any(), any(), any());
     }
 
     @Test
@@ -138,7 +139,8 @@ class WaTaskCreationCronForExpiredBfActionsTest {
         waTaskCreationCronForExpiredBfActions.run();
 
         verify(ccdClient, times(0)).startEventForCase(any(), any(), any(), any(), any());
-        verify(ccdClient, times(0)).submitEventForCase(any(), any(), any(), any(), any(), any());
+        verify(ccdClient, times(0))
+                .submitEventForCase(any(), any(), any(), any(), any(), any());
     }
 
     @Test
@@ -154,7 +156,8 @@ class WaTaskCreationCronForExpiredBfActionsTest {
         waTaskCreationCronForExpiredBfActions.run();
 
         verify(ccdClient, times(0)).startEventForCase(any(), any(), any(), any(), any());
-        verify(ccdClient, times(0)).submitEventForCase(any(), any(), any(), any(), any(), any());
+        verify(ccdClient, times(0))
+                .submitEventForCase(any(), any(), any(), any(), any(), any());
     }
 
     @Test
@@ -188,12 +191,14 @@ class WaTaskCreationCronForExpiredBfActionsTest {
         eventWithNullBfActions.setCaseData(caseData);
 
         when(ccdClient.buildAndGetElasticSearchRequest(any(), eq(ENGLANDWALES_CASE_TYPE_ID), any()))
-                .thenReturn(List.of(eventWithNullCaseData, eventWithNullBfActions)).thenReturn(Collections.emptyList());
+                .thenReturn(List.of(eventWithNullCaseData, eventWithNullBfActions))
+                .thenReturn(Collections.emptyList());
 
         waTaskCreationCronForExpiredBfActions.run();
 
         verify(ccdClient, times(0)).startEventForCase(any(), any(), any(), any(), any());
-        verify(ccdClient, times(0)).submitEventForCase(any(), any(), any(), any(), any(), any());
+        verify(ccdClient, times(0))
+                .submitEventForCase(any(), any(), any(), any(), any(), any());
     }
 
     @Test
@@ -225,6 +230,7 @@ class WaTaskCreationCronForExpiredBfActionsTest {
         waTaskCreationCronForExpiredBfActions.run();
 
         verify(ccdClient, times(1)).startEventForCase(any(), any(), any(), any(), any());
-        verify(ccdClient, times(0)).submitEventForCase(any(), any(), any(), any(), any(), any());
+        verify(ccdClient, times(0))
+                .submitEventForCase(any(), any(), any(), any(), any(), any());
     }
 }

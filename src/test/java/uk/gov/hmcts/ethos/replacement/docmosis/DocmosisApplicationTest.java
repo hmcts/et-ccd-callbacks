@@ -12,7 +12,7 @@ class DocmosisApplicationTest {
     void doesNotRunTaskRunnerWhenTaskRunnerIsNull() {
         System.setProperty("TASK_NAME", "TASK_NAME");
         DocmosisApplication application = new DocmosisApplication();
-        application.taskRunner = null;
+        application.setTaskRunner(null);
         application.run();
 
         // No exception should be thrown, and no task should be run

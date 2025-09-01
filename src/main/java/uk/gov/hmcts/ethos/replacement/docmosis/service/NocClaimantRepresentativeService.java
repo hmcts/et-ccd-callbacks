@@ -141,7 +141,7 @@ public class NocClaimantRepresentativeService {
         ccdClient.submitUpdateRepEvent(
                 accessToken,
                     Map.of("changeOrganisationRequestField",
-                            ccdRequest.getCaseDetails().getCaseData().getChangeOrganisationRequestField()),
+                            callbackRequest.getCaseDetails().getCaseData().getChangeOrganisationRequestField()),
                     caseDetails.getCaseTypeId(),
                     caseDetails.getJurisdiction(),
                     ccdRequest,

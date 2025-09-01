@@ -143,17 +143,17 @@ class NocClaimantRepresentativeServiceTest {
     }
 
     private ChangeOrganisationRequest createChangeOrganisationRequest() {
-        Organisation organisationToRemove =
-                Organisation.builder().organisationID(ORGANISATION_ID_OLD).organisationName(ET_ORG_1).build();
-
-        Organisation organisationToAdd =
-                Organisation.builder().organisationID(ORGANISATION_ID_NEW).organisationName(ET_ORG_2).build();
-
         DynamicFixedListType caseRole = new DynamicFixedListType();
         DynamicValueType dynamicValueType = new DynamicValueType();
         dynamicValueType.setCode(CLAIMANT_SOLICITOR);
         dynamicValueType.setLabel(CLAIMANT_SOLICITOR);
         caseRole.setValue(dynamicValueType);
+
+        Organisation organisationToRemove =
+                Organisation.builder().organisationID(ORGANISATION_ID_OLD).organisationName(ET_ORG_1).build();
+
+        Organisation organisationToAdd =
+                Organisation.builder().organisationID(ORGANISATION_ID_NEW).organisationName(ET_ORG_2).build();
 
         return ChangeOrganisationRequest.builder()
                 .organisationToAdd(organisationToAdd)
@@ -216,7 +216,6 @@ class NocClaimantRepresentativeServiceTest {
         OrganisationPolicy orgPolicy1 =
                 OrganisationPolicy.builder().organisation(org1).orgPolicyCaseAssignedRole(CLAIMANT_SOLICITOR).build();
         caseDataAfter.setRespondentOrganisationPolicy0(orgPolicy1);
-
 
         // Claimant Representative
         RepresentedTypeC representedTypeC = new RepresentedTypeC();

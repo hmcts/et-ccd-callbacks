@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
@@ -15,6 +16,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocClaimantHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
@@ -47,6 +49,16 @@ class NocClaimantRepresentativeServiceTest {
     private AdminUserService adminUserService;
     @MockBean
     private NocCcdService nocCcdService;
+    @MockBean
+    private NocNotificationService nocNotificationService;
+    @MockBean
+    private CcdCaseAssignment ccdCaseAssignment;
+    @MockBean
+    private CcdClient ccdClient;
+    @MockBean
+    private NocClaimantHelper nocClaimantHelper;
+    @MockBean
+    private NocService nocService;
 
     private CaseData caseData;
     private CaseDetails caseDetails;
@@ -57,7 +69,12 @@ class NocClaimantRepresentativeServiceTest {
                 authTokenGenerator,
                 organisationClient,
                 adminUserService,
-                nocCcdService
+                nocCcdService,
+                nocNotificationService,
+                ccdCaseAssignment,
+                ccdClient,
+                nocService,
+                nocClaimantHelper
         );
 
         caseData = new CaseData();

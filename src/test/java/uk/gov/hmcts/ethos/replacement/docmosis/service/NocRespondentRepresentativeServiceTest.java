@@ -42,14 +42,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -123,6 +121,8 @@ class NocRespondentRepresentativeServiceTest {
     private OrganisationClient organisationClient;
     @MockBean
     private AuthTokenGenerator authTokenGenerator;
+    @MockBean
+    private NocService nocService;
 
     private NocRespondentHelper nocRespondentHelper;
     private CaseData caseData;
@@ -136,7 +136,7 @@ class NocRespondentRepresentativeServiceTest {
         nocRespondentRepresentativeService =
             new NocRespondentRepresentativeService(noticeOfChangeFieldPopulator, converter, nocCcdService,
                     adminUserService, nocRespondentHelper, nocNotificationService, ccdClient, ccdCaseAssignment,
-                    organisationClient, authTokenGenerator);
+                    organisationClient, authTokenGenerator, nocService);
                     
         // Respondent
         caseData.setRespondentCollection(new ArrayList<>());
@@ -581,33 +581,6 @@ class NocRespondentRepresentativeServiceTest {
         representedTypeRItem.getValue().setRespondentId(RESPONDENT_ID_THREE);
         caseDataAfter.getRepCollection().add(representedTypeRItem);
         return caseDataAfter;
-    }
-
-    @Test
-    void removeOrganisationRepresentativeAccess() throws IOException {
-        UserDetails mockUser = getMockUser();
-        when(adminUserService.getUserDetails(any())).thenReturn(mockUser);
-        when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
-        when(nocCcdService.getCaseAssignments(any(), any())).thenReturn(
-            mockCaseAssignmentData());
-        doNothing().when(nocCcdService).revokeCaseAssignments(any(), any());
-
-        Organisation oldOrganisation =
-            Organisation.builder().organisationID(ORGANISATION_ID_TWO)
-                .organisationName(ET_ORG_2).build();
-
-        Organisation newOrganisation =
-            Organisation.builder().organisationID(ORGANISATION_ID_NEW)
-                .organisationName(ET_ORG_NEW).build();
-
-        ChangeOrganisationRequest changeOrganisationRequest =
-            createChangeOrganisationRequest(newOrganisation, oldOrganisation);
-
-        nocRespondentRepresentativeService
-            .removeOrganisationRepresentativeAccess(CASE_ID_ONE, changeOrganisationRequest);
-
-        verify(nocCcdService, times(1))
-            .revokeCaseAssignments(any(), any());
     }
 
     @Test

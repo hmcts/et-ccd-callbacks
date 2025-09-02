@@ -139,6 +139,8 @@ public class NocClaimantRepresentativeService {
                 caseDetails.getJurisdiction(), caseDetails.getCaseTypeId(), caseDetails.getCaseId());
         callbackRequest.getCaseDetails().getCaseData().setChangeOrganisationRequestField(changeRequest);
         ccdRequest.getCaseDetails().setCaseData(ccdCaseAssignment.applyNocAsAdmin(callbackRequest).getData());
+        nocService.grantClaimantRepAccess(accessToken, caseData.getRepresentativeClaimantType().getRepresentativeEmailAddress(),
+                caseDetails.getCaseId(), changeRequest.getOrganisationToAdd());
 
         log.info("submitting update representation event {}",
                 callbackRequest.getCaseDetails().getCaseData().getChangeOrganisationRequestField());

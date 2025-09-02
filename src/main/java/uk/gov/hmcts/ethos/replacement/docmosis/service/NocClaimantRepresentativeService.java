@@ -117,7 +117,9 @@ public class NocClaimantRepresentativeService {
 
         String accessToken = adminUserService.getAdminUserToken();
 
+        log.info("changeRequest: {}", changeRequest);
         try {
+            log.info("sending emails");
             nocNotificationService.sendNotificationOfChangeEmails(caseDetailsBefore, caseDetails, changeRequest,
                     currentUserEmail);
         } catch (Exception exception) {
@@ -133,11 +135,14 @@ public class NocClaimantRepresentativeService {
             }
         }
 
+        log.info("updating case representation");
         CCDRequest ccdRequest = nocCcdService.updateCaseRepresentation(accessToken,
                 caseDetails.getJurisdiction(), caseDetails.getCaseTypeId(), caseDetails.getCaseId());
         callbackRequest.getCaseDetails().getCaseData().setChangeOrganisationRequestField(changeRequest);
         ccdRequest.getCaseDetails().setCaseData(ccdCaseAssignment.applyNocAsAdmin(callbackRequest).getData());
 
+        log.info("submitting update representation event {}",
+                callbackRequest.getCaseDetails().getCaseData().getChangeOrganisationRequestField());
         ccdClient.submitUpdateRepEvent(
                 accessToken,
                     Map.of("changeOrganisationRequestField",
@@ -146,6 +151,7 @@ public class NocClaimantRepresentativeService {
                     caseDetails.getJurisdiction(),
                     ccdRequest,
                     caseDetails.getCaseId());
+        log.info("updated representation event {}", callbackRequest.getCaseDetails().getCaseData());
     }
 
     public ChangeOrganisationRequest identifyRepresentationChanges(CaseData  after, CaseData before) {

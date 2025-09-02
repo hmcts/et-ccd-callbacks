@@ -21,6 +21,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AddAmendClaimantRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.NocClaimantRepresentativeService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 
 import java.io.IOException;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
@@ -37,6 +38,7 @@ public class AddAmendClaimantRepresentativeController {
     private static final String LOG_MESSAGE = "received notification request for case reference : ";
     private final AddAmendClaimantRepresentativeService addAmendClaimantRepresentativeService;
     private final NocClaimantRepresentativeService nocClaimantRepresentativeService;
+    private final UserIdamService userIdamService;
 
     /**
      * AboutToSubmit for addAmendClaimantRepresentative. Sets the claimant rep's id.
@@ -77,6 +79,7 @@ public class AddAmendClaimantRepresentativeController {
         log.info("AMEND CLAIMANT REPRESENTATIVE SUBMITTED ---> " + LOG_MESSAGE + "{}",
                 callbackRequest.getCaseDetails().getCaseId());
         try {
+            String currentUserEmail = userIdamService.getUserDetails(userToken).getEmail();
             nocClaimantRepresentativeService.updateClaimantRepAccess(callbackRequest, userToken);
         } catch (IOException e) {
             throw new CcdInputOutputException("Failed to update claimant representatives access", e);

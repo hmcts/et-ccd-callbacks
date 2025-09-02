@@ -9,10 +9,12 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AddAmendClaimantRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.NocClaimantRepresentativeService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
@@ -42,6 +44,8 @@ class AddAmendClaimantRepresentativeControllerTest {
     private AddAmendClaimantRepresentativeService addAmendClaimantRepresentativeService;
     @MockBean
     private NocClaimantRepresentativeService nocClaimantRepresentativeService;
+    @MockBean
+    private UserIdamService userIdamService;
 
     @Autowired
     private MockMvc mockMvc;
@@ -81,6 +85,9 @@ class AddAmendClaimantRepresentativeControllerTest {
     @Test
     void testAmendClaimantRepSubmitted() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        UserDetails userDetails = new UserDetails();
+        userDetails.setEmail("test@test.com");
+        when(userIdamService.getUserDetails(any())).thenReturn(userDetails);
         mockMvc.perform(post(SUBMITTED_URL)
                         .content(jsonMapper.toJson(ccdRequest))
                         .header("Authorization", AUTH_TOKEN)

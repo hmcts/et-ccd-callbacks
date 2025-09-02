@@ -75,7 +75,7 @@ public class NocService {
                 }
             }
         } catch (IOException e) {
-            log.error(e.getMessage(), e);
+            log.error("Representative search failed");
         }
     }
 

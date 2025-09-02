@@ -69,8 +69,8 @@ public class NocService {
                         accessToken, authTokenGenerator.generate(), user.getUid()).getBody();
 
                 if (organisationsResponse != null
-                        && organisationsResponse.getOrganisationIdentifier()
-                        .equals(organisationToAdd.getOrganisationID())) {
+                        && organisationToAdd.getOrganisationID()
+                        .equals(organisationsResponse.getOrganisationIdentifier())) {
                     grantCaseAccess(user.getUid(), caseId, ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
                 }
             }

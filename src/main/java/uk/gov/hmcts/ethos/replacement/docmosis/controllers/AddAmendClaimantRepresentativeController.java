@@ -80,7 +80,7 @@ public class AddAmendClaimantRepresentativeController {
                 callbackRequest.getCaseDetails().getCaseId());
         try {
             String currentUserEmail = userIdamService.getUserDetails(userToken).getEmail();
-            nocClaimantRepresentativeService.updateClaimantRepAccess(callbackRequest, userToken);
+            nocClaimantRepresentativeService.updateClaimantRepAccess(callbackRequest, currentUserEmail);
         } catch (IOException e) {
             throw new CcdInputOutputException("Failed to update claimant representatives access", e);
         }

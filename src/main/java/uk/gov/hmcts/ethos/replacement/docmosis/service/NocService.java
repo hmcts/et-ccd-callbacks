@@ -60,7 +60,8 @@ public class NocService {
         }
     }
 
-    public void grantClaimantRepAccess(String accessToken, String email, String caseId, Organisation organisationToAdd) {
+    public void grantClaimantRepAccess(String accessToken, String email,
+                                       String caseId, Organisation organisationToAdd) {
         try {
             List<UserDetails> users = userIdamService.getUsersByQuery(accessToken, "email:" + email, null, null);
             for (UserDetails user : users) {

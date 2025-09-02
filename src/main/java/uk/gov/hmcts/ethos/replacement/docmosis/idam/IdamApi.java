@@ -32,7 +32,6 @@ public interface IdamApi {
     )
     TokenResponse generateOpenIdToken(@RequestBody TokenRequest tokenRequest);
 
-
     @GetMapping("/api/v1/users")
     List<UserDetails> searchUsersByQuery(
             @RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation,

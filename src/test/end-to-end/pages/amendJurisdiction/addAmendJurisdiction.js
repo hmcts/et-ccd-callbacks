@@ -41,7 +41,7 @@ module.exports = async function (jurisdictionOutcome) {
             I.click('Submit');
             I.waitForText('has been updated with event: Jurisdiction', testConfig.TestTimeToWaitForText);
             verifyJurisdictionTab.verifyJurisdictionTab(1, "BOC",
-                "(a) Claim of an employee for breach of contract of employment (b) Employer contract claim",
+                "Claim of an employee for breach of contract of employment",
                 "Withdrawn or private settlement", true);
             break;
         default:

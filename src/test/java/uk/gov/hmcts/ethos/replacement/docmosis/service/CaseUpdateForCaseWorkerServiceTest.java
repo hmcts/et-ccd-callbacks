@@ -108,7 +108,7 @@ class CaseUpdateForCaseWorkerServiceTest {
     }
 
     @Test
-    void caseCreationEnglandWalesRequest() throws IOException {
+    void caseCreationEnglandWalesRequest() throws Throwable {
         when(ccdClient.startEventForCase(anyString(), anyString(),
                 anyString(), anyString())).thenReturn(englandWalesCcdRequest);
         when(ccdClient.submitEventForCase(anyString(), any(), anyString(),
@@ -122,7 +122,7 @@ class CaseUpdateForCaseWorkerServiceTest {
     }
 
     @Test
-    void caseCreationScotlandRequest() throws IOException {
+    void caseCreationScotlandRequest() throws Throwable {
         when(ccdClient.startEventForCase(anyString(), anyString(),
                 anyString(), anyString())).thenReturn(scotlandCcdRequest);
         when(ccdClient.submitEventForCase(anyString(), any(),

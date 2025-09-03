@@ -11,10 +11,16 @@ import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.AddressLabelsAttributesType;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceScotType;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VenueAddressReaderService;
@@ -25,6 +31,7 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Objects;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -36,6 +43,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADDRESS_LABELS_TEMP
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ACAS_CERTIFICATE;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_ATTACHMENT;
@@ -2142,7 +2150,8 @@ class DocumentHelperTest {
         correspondenceType.setTopLevelDocuments(ADDRESS_LABELS_TEMPLATE);
         multipleData.setCorrespondenceType(correspondenceType);
         multipleData.setAddressLabelsAttributesType(addressLabelsAttributesType);
-        multipleData.setAddressLabelCollection(MultipleUtil.getAddressLabelTypeItemList());
+        multipleData.setAddressLabelCollection(
+                uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil.getAddressLabelTypeItemList());
         String expected = "{\n"
             + "\"accessKey\":\"" + COMMA_NEWLINE
             + "\"templateName\":\"EM-TRB-LET-ENG-00544.docx" + COMMA_NEWLINE
@@ -2249,5 +2258,279 @@ class DocumentHelperTest {
                 .build();
         DocumentHelper.setDocumentNumbers(caseData);
         caseData.getDocumentCollection().forEach(d -> assertThat(d.getValue().getDocNumber()).isNotNull());
+    }
+
+    @Test
+    void testIsEccDocumentTemplate_EnglandWalesEccTemplate_returnsTrue() {
+        boolean result = DocumentHelper.isEccDocumentTemplate(ENGLANDWALES_CASE_TYPE_ID, "EM-TRB-EGW-ENG-00028");
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    void testIsEccDocumentTemplate_ScotlandEccTemplate_returnsTrue() {
+        boolean result = DocumentHelper.isEccDocumentTemplate(SCOTLAND_CASE_TYPE_ID, "EM-TRB-SCO-ENG-00044");
+        assertThat(result).isTrue();
+    }
+
+    @Test
+    void testIsEccDocumentTemplate_NonEccTemplate_returnsFalse() {
+        boolean result = DocumentHelper.isEccDocumentTemplate(ENGLANDWALES_CASE_TYPE_ID, "EM-TRB-EGW-ENG-00026");
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    void testIsEccDocumentTemplate_WrongCaseTypeForTemplate_returnsFalse() {
+        boolean result = DocumentHelper.isEccDocumentTemplate(SCOTLAND_CASE_TYPE_ID, "EM-TRB-SCO-ENG-00045");
+        assertThat(result).isFalse();
+    }
+
+    @Test
+    void testGetRespondentDataInternal_withoutSelectedRespondentId_returnsFirstValidRespondent() {
+        CaseData caseData = createCaseDataWithRespondents();
+        
+        StringBuilder result = DocumentHelper.getRespondentDataInternal(caseData, null);
+        String output = result.toString();
+        
+        assertThat(output).contains("\"respondent_or_rep_full_name\":\"Test Respondent 1\"");
+        assertThat(output).contains("\"respondent_full_name\":\"Test Respondent 1\"");
+        assertThat(output).contains("\"Respondent\":\"1. Test Respondent 1,\"");
+        assertThat(output).contains("resp_others\":\"2. Test Respondent 2\"");
+    }
+
+    @Test
+    void testGetRespondentDataInternal_withSelectedRespondentId_returnsSpecificRespondent() {
+        CaseData caseData = createCaseDataWithRespondents();
+        String selectedRespondentId = "resp-002";
+        
+        StringBuilder result = DocumentHelper.getRespondentDataInternal(caseData, selectedRespondentId);
+        String output = result.toString();
+        
+        assertThat(output).contains("\"respondent_or_rep_full_name\":\"Test Respondent 2\"");
+        assertThat(output).contains("\"respondent_full_name\":\"Test Respondent 2\"");
+    }
+
+    @Test
+    void testGetRespondentDataInternal_withSelectedRespondentIdAndRep_returnsRepresentativeData() {
+        CaseData caseData = createCaseDataWithRespondentsAndReps();
+        String selectedRespondentId = "resp-001";
+        
+        StringBuilder result = DocumentHelper.getRespondentDataInternal(caseData, selectedRespondentId);
+        String output = result.toString();
+        
+        assertThat(output).contains("\"respondent_or_rep_full_name\":\"Rep for Respondent 1\"");
+        assertThat(output).contains("\"respondent_rep_organisation\":\"Rep Org 1\"");
+        assertThat(output).contains("\"respondent_reference\":\"REP-REF-001\"");
+    }
+
+    @Test
+    void testGetRespondentDataInternal_emptyCollection_returnsEmptyFields() {
+        CaseData caseData = new CaseData();
+        
+        StringBuilder result = DocumentHelper.getRespondentDataInternal(caseData, null);
+        String output = result.toString();
+        
+        assertThat(output).contains("\"respondent_or_rep_full_name\":\"\"");
+        assertThat(output).contains("\"respondent_full_name\":\"\"");
+        assertThat(output).contains("\"Respondent\":\"\"");
+    }
+
+    @Test
+    void testGetRespondentDataInternal_struckOutRespondent_skipsStruckOut() {
+        CaseData caseData = createCaseDataWithStruckOutRespondent();
+        
+        StringBuilder result = DocumentHelper.getRespondentDataInternal(caseData, null);
+        String output = result.toString();
+        
+        // Should skip struck out respondent and use the second one
+        assertThat(output).contains("\"respondent_or_rep_full_name\":\"Test Respondent 2\"");
+    }
+
+    @Test
+    void testGetClaimantEccFlippedData_withSelectedRespondentId_returnsRespondentDataInClaimantFields() {
+        CaseData caseData = createCaseDataWithRespondentsAndReps();
+        String selectedRespondentId = "resp-001";
+        
+        StringBuilder result = DocumentHelper.getClaimantEccFlippedData(caseData, selectedRespondentId);
+        String output = result.toString();
+        
+        // Respondent data should appear in claimant fields
+        assertThat(output).contains("\"claimant_or_rep_full_name\":\"Rep for Respondent 1\"");
+        assertThat(output).contains("\"claimant_rep_organisation\":\"Rep Org 1\"");
+        assertThat(output).contains("\"claimant_reference\":\"REP-REF-001\"");
+        assertThat(output).contains("\"claimant_full_name\":\"Test Respondent 1\"");
+        assertThat(output).contains("\"Claimant\":\"Test Respondent 1\"");
+    }
+
+    @Test
+    void testGetClaimantEccFlippedData_noRepresentative_returnsDirectRespondentData() {
+        CaseData caseData = createCaseDataWithRespondents();
+        String selectedRespondentId = "resp-001";
+        
+        StringBuilder result = DocumentHelper.getClaimantEccFlippedData(caseData, selectedRespondentId);
+        String output = result.toString();
+        
+        assertThat(output).contains("\"claimant_or_rep_full_name\":\"Test Respondent 1\"");
+        assertThat(output).contains("\"claimant_full_name\":\"Test Respondent 1\"");
+        assertThat(output).contains("\"Claimant\":\"Test Respondent 1\"");
+    }
+
+    @Test
+    void testGetClaimantEccFlippedData_nullSelectedRespondentId_returnsEmptyData() {
+        CaseData caseData = createCaseDataWithRespondents();
+        
+        StringBuilder result = DocumentHelper.getClaimantEccFlippedData(caseData, null);
+        String output = result.toString();
+        
+        assertThat(output).isEmpty();
+    }
+
+    @Test
+    void testGetRespondentEccFlippedData_withClaimantRepresentative_returnsClaimantDataInRespondentFields() {
+        CaseData caseData = createCaseDataWithClaimantRep();
+        String selectedRespondentId = "resp-001";
+        
+        StringBuilder result = DocumentHelper.getRespondentEccFlippedData(caseData, selectedRespondentId);
+        String output = result.toString();
+        
+        // Claimant data should appear in respondent fields
+        assertThat(output).contains("\"respondent_or_rep_full_name\":\"Claimant Representative\"");
+        assertThat(output).contains("\"respondent_rep_organisation\":\"Claimant Rep Org\"");
+        assertThat(output).contains("\"respondent_reference\":\"CLAIMANT-REP-REF\"");
+    }
+
+    @Test
+    void testGetRespondentEccFlippedData_noClaimantRep_returnsDirectClaimantData() {
+        CaseData caseData = createCaseDataWithClaimantOnly();
+        String selectedRespondentId = "resp-001";
+        
+        StringBuilder result = DocumentHelper.getRespondentEccFlippedData(caseData, selectedRespondentId);
+        String output = result.toString();
+        
+        assertThat(output).contains("\"respondent_or_rep_full_name\":\"John Smith\"");
+        assertThat(output).contains("\"respondent_full_name\":\"John Smith\"");
+        assertThat(output).contains("\"Respondent\":\"John Smith\"");
+    }
+
+    // ==================== HELPER METHODS FOR CREATING TEST DATA ====================
+
+    private CaseData createCaseDataWithRespondents() {
+        RespondentSumTypeItem respondent1 = new RespondentSumTypeItem();
+        respondent1.setId("resp-001");
+        RespondentSumType resp1 = new RespondentSumType();
+        resp1.setRespondentName("Test Respondent 1");
+        resp1.setResponseContinue(YES);
+        resp1.setResponseStruckOut(NO);
+        uk.gov.hmcts.et.common.model.ccd.Address address1 = new uk.gov.hmcts.et.common.model.ccd.Address();
+        address1.setAddressLine1("123 Test Street");
+        address1.setPostTown("Test City");
+        address1.setPostCode("TE1 1ST");
+        resp1.setRespondentAddress(address1);
+        respondent1.setValue(resp1);
+        
+        RespondentSumTypeItem respondent2 = new RespondentSumTypeItem();
+        respondent2.setId("resp-002");
+        RespondentSumType resp2 = new RespondentSumType();
+        resp2.setRespondentName("Test Respondent 2");
+        resp2.setResponseContinue(YES);
+        resp2.setResponseStruckOut(NO);
+        uk.gov.hmcts.et.common.model.ccd.Address address2 = new uk.gov.hmcts.et.common.model.ccd.Address();
+        address2.setAddressLine1("456 Test Avenue");
+        address2.setPostTown("Test Town");
+        address2.setPostCode("TE2 2ND");
+        resp2.setRespondentAddress(address2);
+        respondent2.setValue(resp2);
+
+        CaseData caseData = new CaseData();
+        caseData.setRespondentCollection(List.of(respondent1, respondent2));
+        return caseData;
+    }
+
+    private CaseData createCaseDataWithRespondentsAndReps() {
+        RepresentedTypeR rep = new RepresentedTypeR();
+        rep.setNameOfRepresentative("Rep for Respondent 1");
+        rep.setNameOfOrganisation("Rep Org 1");
+        rep.setRepresentativeReference("REP-REF-001");
+        rep.setRespRepName("Test Respondent 1");
+        uk.gov.hmcts.et.common.model.ccd.Address repAddress = new uk.gov.hmcts.et.common.model.ccd.Address();
+        repAddress.setAddressLine1("789 Rep Street");
+        repAddress.setPostTown("Rep City");
+        repAddress.setPostCode("RE1 1EP");
+        rep.setRepresentativeAddress(repAddress);
+
+        RepresentedTypeRItem repItem = new RepresentedTypeRItem();
+        repItem.setValue(rep);
+
+        CaseData caseData = createCaseDataWithRespondents();
+        caseData.setRepCollection(List.of(repItem));
+        return caseData;
+    }
+
+    private CaseData createCaseDataWithStruckOutRespondent() {
+        RespondentSumTypeItem respondent1 = new RespondentSumTypeItem();
+        respondent1.setId("resp-001");
+        RespondentSumType resp1 = new RespondentSumType();
+        resp1.setRespondentName("Struck Out Respondent");
+        resp1.setResponseContinue(YES);
+        resp1.setResponseStruckOut(YES); // This one is struck out
+        respondent1.setValue(resp1);
+        
+        RespondentSumTypeItem respondent2 = new RespondentSumTypeItem();
+        respondent2.setId("resp-002");
+        RespondentSumType resp2 = new RespondentSumType();
+        resp2.setRespondentName("Test Respondent 2");
+        resp2.setResponseContinue(YES);
+        resp2.setResponseStruckOut(NO);
+        uk.gov.hmcts.et.common.model.ccd.Address address2 = new uk.gov.hmcts.et.common.model.ccd.Address();
+        address2.setAddressLine1("456 Test Avenue");
+        address2.setPostTown("Test Town");
+        address2.setPostCode("TE2 2ND");
+        resp2.setRespondentAddress(address2);
+        respondent2.setValue(resp2);
+
+        CaseData caseData = new CaseData();
+        caseData.setRespondentCollection(List.of(respondent1, respondent2));
+        return caseData;
+    }
+
+    private CaseData createCaseDataWithClaimantRep() {
+        RepresentedTypeC claimantRep = new RepresentedTypeC();
+        claimantRep.setNameOfRepresentative("Claimant Representative");
+        claimantRep.setNameOfOrganisation("Claimant Rep Org");
+        claimantRep.setRepresentativeReference("CLAIMANT-REP-REF");
+        uk.gov.hmcts.et.common.model.ccd.Address repAddress = new uk.gov.hmcts.et.common.model.ccd.Address();
+        repAddress.setAddressLine1("123 Claimant Rep Street");
+        repAddress.setPostTown("Claimant Rep City");
+        repAddress.setPostCode("CR1 1EP");
+        claimantRep.setRepresentativeAddress(repAddress);
+
+        CaseData caseData = new CaseData();
+        caseData.setRepresentativeClaimantType(claimantRep);
+        caseData.setClaimantRepresentedQuestion(YES);
+        
+        ClaimantIndType claimantInd = mock(ClaimantIndType.class);
+        when(claimantInd.claimantFullName()).thenReturn("John Smith");
+        caseData.setClaimantIndType(claimantInd);
+        
+        return caseData;
+    }
+
+    private CaseData createCaseDataWithClaimantOnly() {
+        CaseData caseData = new CaseData();
+        
+        ClaimantIndType claimantInd = mock(ClaimantIndType.class);
+        when(claimantInd.claimantFullName()).thenReturn("John Smith");
+        caseData.setClaimantIndType(claimantInd);
+
+        uk.gov.hmcts.et.common.model.ccd.Address claimantAddress = new uk.gov.hmcts.et.common.model.ccd.Address();
+        claimantAddress.setAddressLine1("456 Claimant Street");
+        claimantAddress.setPostTown("Claimant City");
+        claimantAddress.setPostCode("CL1 1NT");
+
+        uk.gov.hmcts.et.common.model.ccd.types.ClaimantType claimantType =
+                new uk.gov.hmcts.et.common.model.ccd.types.ClaimantType();
+        claimantType.setClaimantAddressUK(claimantAddress);
+        caseData.setClaimantType(claimantType);
+        
+        return caseData;
     }
 }

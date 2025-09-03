@@ -41,8 +41,9 @@ services:
 
   wa-workflow-api:
     image: "hmctspublic.azurecr.io/wa/workflow-api:latest"
-    container_name: workflow-api
+
     environment:
+      container_name: workflow-api
       CAMUNDA_URL: http://camunda-local-bpm:8999/engine-rest
       S2S_URL: "http://localhost:8489"
       S2S_SECRET_WORKFLOW_API: "AAAAAAAAAAAAAAAA"
@@ -68,13 +69,15 @@ services:
   wa-task-management-api:
     image: "hmctspublic.azurecr.io/wa/task-management-api:latest"
     container_name: wa-task-management-api
+
     environment:
       CAMUNDA_URL: http://camunda-local-bpm:8999/engine-rest
-      S2S_URL: "${CFTLIB_HOST-http://localhost}:8489"
-      IDAM_URL: "${CFTLIB_HOST-http://localhost}:5062"
+      S2S_URL: "http://localhost:8489"
       CCD_URL: "${CFTLIB_HOST-http://host.docker.internal}:4452"
       POSTGRES_HOST: host.docker.internal
-      OPEN_ID_IDAM_URL: "${CFTLIB_HOST-http://localhost}:5062"
+      OPEN_ID_IDAM_URL: "http://localhost:5062"
+      IDAM_URL: "http://localhost:5062"
+
       ROLE_ASSIGNMENT_URL: "${CFTLIB_HOST-http://host.docker.internal}:4096"
       POSTGRES_PORT: 6432
       POSTGRES_NAME: cft_task_db
@@ -86,6 +89,7 @@ services:
       LAUNCH_DARKLY_SDK_KEY: "5de6610b23ce5408280f2268"
       WA_SYSTEM_USERNAME: "wa-system-user@fake.hmcts.net"
       WA_SYSTEM_PASSWORD: "System01"
+
       # Uncomment this line to enable JVM debugging and uncomment the port mapping below
       #JAVA_TOOL_OPTIONS: -XX:InitialRAMPercentage=30.0 -XX:MaxRAMPercentage=65.0 -XX:MinRAMPercentage=30.0 -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5006
     ports:
@@ -111,6 +115,7 @@ services:
       WA_WORKFLOW_API_URL: http://wa-workflow-api:8099
       OPEN_ID_IDAM_URL: "http://localhost:5062"
       IDAM_URL: "http://localhost:5062"
+
       ROLE_ASSIGNMENT_URL: "http://host.docker.internal:4096"
       CAMUNDA_URL: http://camunda-local-bpm:8999/engine-rest
       CCD_URL: "http://host.docker.internal:4452"

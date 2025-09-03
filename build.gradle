@@ -536,7 +536,7 @@ bootWithCCD {
     environment 'XUI_DOCUMENTS_API_V2', 'http://host.docker.internal:4455'
     environment 'XUI_LD_ID', System.getenv('XUI_LD_ID')
     // Allows latest XUI image without WA by not specifying EMPLOYMENT. Add EMPLOYMENT to enable WA.
-    environment 'WA_SUPPORTED_JURISDICTIONS', 'IA,CIVIL,PRIVATELAW,PUBLICLAW'
+    environment 'WA_SUPPORTED_JURISDICTIONS', 'EMPLOYMENT,IA,CIVIL,PRIVATELAW,PUBLICLAW'
 
     // xui-manage-org
     environment 'RD_PROFESSIONAL_API_URL', 'http://localhost:8765'
@@ -547,7 +547,7 @@ bootWithCCD {
     environment 'SPRING_PROFILES_ACTIVE', 'cftlib'
     // et-ccd-callbacks
     //environment 'SERVICEBUS_FAKE', 'true'*
-    environment 'CFTLIB_EXTRA_COMPOSE_FILES', ''
+    environment 'CFTLIB_EXTRA_COMPOSE_FILES', 'wa-docker-compose.yml'
 
 }
 

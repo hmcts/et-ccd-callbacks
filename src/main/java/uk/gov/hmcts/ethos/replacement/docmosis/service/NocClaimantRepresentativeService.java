@@ -127,6 +127,7 @@ public class NocClaimantRepresentativeService {
         if (changeRequest != null
                 && changeRequest.getOrganisationToRemove() != null) {
             try {
+                log.info("removing old organisation representative access");
                 nocService.removeOrganisationRepresentativeAccess(caseDetails.getCaseId(), changeRequest);
             } catch (IOException e) {
                 throw new CcdInputOutputException("Failed to remove organisation representative access", e);
@@ -163,14 +164,18 @@ public class NocClaimantRepresentativeService {
     public ChangeOrganisationRequest identifyRepresentationChanges(CaseData  after, CaseData before) {
         Organisation newRepOrg = after.getRepresentativeClaimantType() != null
                 ? after.getRepresentativeClaimantType().getMyHmctsOrganisation() : null;
+        log.info("newRepOrg: {}", newRepOrg);
         Organisation oldRepOrg = before.getRepresentativeClaimantType() != null
                 ? before.getRepresentativeClaimantType().getMyHmctsOrganisation() : null;
+        log.info("oldRepOrg: {}", oldRepOrg);
         ChangeOrganisationRequest changeRequests = null;
 
         if (!Objects.equals(newRepOrg, oldRepOrg)) {
+            log.info("Change in representation detected");
             changeRequests = nocClaimantHelper.createChangeRequest(newRepOrg, oldRepOrg);
         }
 
+        log.info("changeRequests: {}", changeRequests);
         return changeRequests;
     }
 }

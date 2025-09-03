@@ -141,11 +141,14 @@ public class NocClaimantRepresentativeService {
         callbackRequest.getCaseDetails().getCaseData().setChangeOrganisationRequestField(changeRequest);
         ccdRequest.getCaseDetails().setCaseData(ccdCaseAssignment.applyNocAsAdmin(callbackRequest).getData());
 
-        RepresentedTypeC claimantRep = caseData.getRepresentativeClaimantType();
-        if (claimantRep != null && claimantRep.getRepresentativeEmailAddress() != null) {
-            nocService.grantClaimantRepAccess(accessToken,
-                    caseData.getRepresentativeClaimantType().getRepresentativeEmailAddress(), caseDetails.getCaseId(),
-                    changeRequest.getOrganisationToAdd());
+        if (YES.equals(caseData.getClaimantRepresentedQuestion())) {
+            log.info("claimant represented. granting access to new representative");
+            RepresentedTypeC claimantRep = caseData.getRepresentativeClaimantType();
+            if (claimantRep != null && claimantRep.getRepresentativeEmailAddress() != null) {
+                nocService.grantClaimantRepAccess(accessToken,
+                        caseData.getRepresentativeClaimantType().getRepresentativeEmailAddress(), caseDetails.getCaseId(),
+                        changeRequest.getOrganisationToAdd());
+            }
         }
 
         log.info("submitting update representation event {}",

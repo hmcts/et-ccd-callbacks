@@ -30,13 +30,16 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
 class NocClaimantRepresentativeServiceTest {
@@ -187,12 +190,52 @@ class NocClaimantRepresentativeServiceTest {
                 .submitUpdateRepEvent(any(), any(), any(), any(), any(), any());
     }
 
+    @Test
+    void updateClaimantRepAccess_shouldGrantAndRemoveAccessAndSendNotification() throws IOException {
+        // Arrange
+        CallbackRequest callbackRequest = getCallBackCallbackRequest();
+        callbackRequest.getCaseDetails().getCaseData().setClaimantRepresentedQuestion(YES);
+        String accessToken = "AUTH_TOKEN";
+        CCDRequest ccdRequest = getCCDRequest();
+        ChangeOrganisationRequest changeRequest = createChangeOrganisationRequest();
+
+        when(adminUserService.getAdminUserToken()).thenReturn(accessToken);
+        when(nocCcdService.updateCaseRepresentation(any(), any(), any(), any())).thenReturn(ccdRequest);
+        when(ccdCaseAssignment.applyNocAsAdmin(any())).thenReturn(CCDCallbackResponse.builder()
+                .data(getCaseDataAfter()).build());
+        when(nocClaimantHelper.createChangeRequest(any(), any())).thenReturn(changeRequest);
+
+        // Act
+        nocClaimantRepresentativeService.updateClaimantRepAccess(callbackRequest, USER_EMAIL);
+
+        // Assert
+        verify(nocNotificationService, times(1)).sendNotificationOfChangeEmails(
+                any(), any(), any(), anyString());
+        verify(nocService, times(1)).removeOrganisationRepresentativeAccess(
+                anyString(), any(ChangeOrganisationRequest.class));
+        verify(nocService, times(1)).grantClaimantRepAccess(
+                eq(accessToken),
+                eq("claimantrep@test.com"),
+                eq("1234"),
+                eq(changeRequest.getOrganisationToAdd()));
+        verify(ccdClient, times(1)).submitUpdateRepEvent(
+                eq(accessToken),
+                any(Map.class),
+                anyString(),
+                anyString(),
+                eq(ccdRequest),
+                eq("1234"));
+    }
+
     private CallbackRequest getCallBackCallbackRequest() {
         CallbackRequest callbackRequest = new CallbackRequest();
         CaseDetails caseDetailsBefore = new CaseDetails();
         caseDetailsBefore.setCaseData(getCaseDataBefore());
         callbackRequest.setCaseDetailsBefore(caseDetailsBefore);
         CaseDetails caseDetailsAfter = new CaseDetails();
+        caseDetailsAfter.setCaseId("1234");
+        caseDetailsAfter.setCaseTypeId("ET1");
+        caseDetailsAfter.setJurisdiction("EMPLOYMENT");
         caseDetailsAfter.setCaseData(getCaseDataAfter());
         callbackRequest.setCaseDetails(caseDetailsAfter);
         return callbackRequest;

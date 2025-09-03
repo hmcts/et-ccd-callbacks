@@ -146,7 +146,8 @@ public class NocClaimantRepresentativeService {
             RepresentedTypeC claimantRep = caseData.getRepresentativeClaimantType();
             if (claimantRep != null && claimantRep.getRepresentativeEmailAddress() != null) {
                 nocService.grantClaimantRepAccess(accessToken,
-                        caseData.getRepresentativeClaimantType().getRepresentativeEmailAddress(), caseDetails.getCaseId(),
+                        caseData.getRepresentativeClaimantType().getRepresentativeEmailAddress(),
+                        caseDetails.getCaseId(),
                         changeRequest.getOrganisationToAdd());
             }
         }

@@ -8,6 +8,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
@@ -31,15 +33,20 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADDRESS_LABELS_TEMPLATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ECC_DOCUMENT_ENG_TEMPLATE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ECC_DOCUMENT_SCOT_TEMPLATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
@@ -2285,6 +2292,164 @@ class DocumentHelperTest {
     }
 
     @Test
+    void testAddDocumentToCollectionAtIndex_addAtBeginning_insertsAtCorrectPosition() {
+        List<DocumentTypeItem> documentCollection = createDocumentCollection(3);
+        DocumentTypeItem newDocument = createDocumentTypeItem("New Document", "New Type");
+        String indexToAdd = "1";
+        
+        DocumentHelper.addDocumentToCollectionAtIndex(documentCollection, newDocument, indexToAdd);
+        
+        assertThat(documentCollection.size()).isEqualTo(4);
+        assertThat(documentCollection.getFirst()).isEqualTo(newDocument);
+        assertThat(documentCollection.getFirst().getValue().getShortDescription()).isEqualTo("New Document");
+    }
+
+    @Test
+    void testAddDocumentToCollectionAtIndex_addInMiddle_insertsAtCorrectPosition() {
+        List<DocumentTypeItem> documentCollection = createDocumentCollection(3);
+        DocumentTypeItem newDocument = createDocumentTypeItem("New Document", "New Type");
+        String indexToAdd = "2";
+        
+        DocumentHelper.addDocumentToCollectionAtIndex(documentCollection, newDocument, indexToAdd);
+        
+        assertThat(documentCollection.size()).isEqualTo(4);
+        assertThat(documentCollection.get(1)).isEqualTo(newDocument);
+        assertThat(documentCollection.get(1).getValue().getShortDescription()).isEqualTo("New Document");
+    }
+
+    @Test
+    void testAddDocumentToCollectionAtIndex_addAtEnd_insertsAtCorrectPosition() {
+        List<DocumentTypeItem> documentCollection = createDocumentCollection(3);
+        DocumentTypeItem newDocument = createDocumentTypeItem("New Document", "New Type");
+        String indexToAdd = "4"; // Size + 1
+        
+        DocumentHelper.addDocumentToCollectionAtIndex(documentCollection, newDocument, indexToAdd);
+        
+        assertThat(documentCollection.size()).isEqualTo(4);
+        assertThat(documentCollection.get(3)).isEqualTo(newDocument);
+        assertThat(documentCollection.get(3).getValue().getShortDescription()).isEqualTo("New Document");
+    }
+
+    @Test
+    void testAddDocumentToCollectionAtIndex_nullIndex_addsToEnd() {
+        List<DocumentTypeItem> documentCollection = createDocumentCollection(3);
+        DocumentTypeItem newDocument = createDocumentTypeItem("New Document", "New Type");
+        String indexToAdd = null;
+        
+        DocumentHelper.addDocumentToCollectionAtIndex(documentCollection, newDocument, indexToAdd);
+        
+        assertThat(documentCollection.size()).isEqualTo(4);
+        assertThat(documentCollection.get(3)).isEqualTo(newDocument);
+        assertThat(documentCollection.get(3).getValue().getShortDescription()).isEqualTo("New Document");
+    }
+
+    @Test
+    void testAddDocumentToCollectionAtIndex_emptyIndex_addsToEnd() {
+        List<DocumentTypeItem> documentCollection = createDocumentCollection(3);
+        DocumentTypeItem newDocument = createDocumentTypeItem("New Document", "New Type");
+        String indexToAdd = "";
+        
+        DocumentHelper.addDocumentToCollectionAtIndex(documentCollection, newDocument, indexToAdd);
+        
+        assertThat(documentCollection.size()).isEqualTo(4);
+        assertThat(documentCollection.get(3)).isEqualTo(newDocument);
+        assertThat(documentCollection.get(3).getValue().getShortDescription()).isEqualTo("New Document");
+    }
+
+    @Test
+    void testAddDocumentToCollectionAtIndex_indexZero_throwsIllegalArgumentException() {
+        List<DocumentTypeItem> documentCollection = createDocumentCollection(3);
+        DocumentTypeItem newDocument = createDocumentTypeItem("New Document", "New Type");
+        String indexToAdd = "0";
+        
+        assertThatThrownBy(() -> DocumentHelper
+                .addDocumentToCollectionAtIndex(documentCollection, newDocument, indexToAdd))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("The document number is invalid");
+    }
+
+    @Test
+    void testAddDocumentToCollectionAtIndex_indexTooHigh_throwsIllegalArgumentException() {
+        List<DocumentTypeItem> documentCollection = createDocumentCollection(3);
+        DocumentTypeItem newDocument = createDocumentTypeItem("New Document", "New Type");
+        String indexToAdd = "5"; // Size + 2, which is too high
+        
+        assertThatThrownBy(() -> DocumentHelper
+                .addDocumentToCollectionAtIndex(documentCollection, newDocument, indexToAdd))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("The document number is invalid");
+    }
+
+    @Test
+    void testAddDocumentToCollectionAtIndex_negativeIndex_throwsIllegalArgumentException() {
+        List<DocumentTypeItem> documentCollection = createDocumentCollection(3);
+        DocumentTypeItem newDocument = createDocumentTypeItem("New Document", "New Type");
+        String indexToAdd = "-1";
+        
+        assertThatThrownBy(() -> DocumentHelper
+                .addDocumentToCollectionAtIndex(documentCollection, newDocument, indexToAdd))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("The document number is invalid");
+    }
+
+    @Test
+    void testAddDocumentToCollectionAtIndex_emptyCollection_addsFirstDocument() {
+        List<DocumentTypeItem> documentCollection = new ArrayList<>();
+        DocumentTypeItem newDocument = createDocumentTypeItem("First Document", "First Type");
+        String indexToAdd = "1";
+        
+        DocumentHelper.addDocumentToCollectionAtIndex(documentCollection, newDocument, indexToAdd);
+        
+        assertThat(documentCollection.size()).isEqualTo(1);
+        assertThat(documentCollection.getFirst()).isEqualTo(newDocument);
+        assertThat(documentCollection.getFirst().getValue().getShortDescription()).isEqualTo("First Document");
+    }
+
+    @Test
+    void testAddDocumentToCollectionAtIndex_emptyCollectionNullIndex_addsFirstDocument() {
+        List<DocumentTypeItem> documentCollection = new ArrayList<>();
+        DocumentTypeItem newDocument =
+                createDocumentTypeItem("First Document", "First Type");
+        String indexToAdd = null;
+        
+        DocumentHelper.addDocumentToCollectionAtIndex(documentCollection, newDocument, indexToAdd);
+        
+        assertThat(documentCollection.size()).isEqualTo(1);
+        assertThat(documentCollection.getFirst()).isEqualTo(newDocument);
+        assertThat(documentCollection.getFirst().getValue().getShortDescription()).isEqualTo("First Document");
+    }
+
+    @Test
+    void testAddDocumentToCollectionAtIndex_invalidIndexString_throwsNumberFormatException() {
+        List<DocumentTypeItem> documentCollection = createDocumentCollection(3);
+        DocumentTypeItem newDocument = createDocumentTypeItem("New Document", "New Type");
+        String indexToAdd = "not-a-number";
+        
+        assertThatThrownBy(() -> DocumentHelper
+                .addDocumentToCollectionAtIndex(documentCollection, newDocument, indexToAdd))
+                .isInstanceOf(NumberFormatException.class);
+    }
+
+    @Test
+    void testAddDocumentToCollectionAtIndex_preservesOriginalOrder() {
+        List<DocumentTypeItem> documentCollection = createDocumentCollection(3);
+        DocumentTypeItem newDocument = createDocumentTypeItem("New Document", "New Type");
+        String indexToAdd = "2";
+        
+        final DocumentTypeItem originalFirst = documentCollection.get(0);
+        final DocumentTypeItem originalSecond = documentCollection.get(1);
+        final DocumentTypeItem originalThird = documentCollection.get(2);
+        
+        DocumentHelper.addDocumentToCollectionAtIndex(documentCollection, newDocument, indexToAdd);
+        
+        assertThat(documentCollection.size()).isEqualTo(4);
+        assertThat(documentCollection.get(0)).isEqualTo(originalFirst);
+        assertThat(documentCollection.get(1)).isEqualTo(newDocument);
+        assertThat(documentCollection.get(2)).isEqualTo(originalSecond);
+        assertThat(documentCollection.get(3)).isEqualTo(originalThird);
+    }
+
+    @Test
     void testGetRespondentDataInternal_withoutSelectedRespondentId_returnsFirstValidRespondent() {
         CaseData caseData = createCaseDataWithRespondents();
         
@@ -2410,8 +2575,107 @@ class DocumentHelperTest {
         assertThat(output).contains("\"respondent_full_name\":\"John Smith\"");
         assertThat(output).contains("\"Respondent\":\"John Smith\"");
     }
-
-    // ==================== HELPER METHODS FOR CREATING TEST DATA ====================
+    
+    @Test
+    void buildDocumentContent_withEccDocumentAndFlip_returnsFlippedData() {
+        // Arrange
+        CaseData caseData = createCaseDataWithRespondentsAndReps();
+        caseData.setEthosCaseReference("123456");
+        caseData.setFeeGroupReference("12212121");
+        
+        CorrespondenceType correspondenceType = new CorrespondenceType();
+        correspondenceType.setTopLevelDocuments(ECC_DOCUMENT_ENG_TEMPLATE);
+        correspondenceType.setFlipRespondentAndClaimantValues(YES);
+        
+        // Create dynamic respondent selection
+        DynamicFixedListType dynamicRespondentsWithEcc = new DynamicFixedListType();
+        DynamicValueType dynamicValue = new DynamicValueType();
+        dynamicValue.setCode("resp-001");  
+        dynamicValue.setLabel("Test Respondent 1");
+        dynamicRespondentsWithEcc.setValue(dynamicValue);
+        correspondenceType.setDynamicRespondentsWithEcc(dynamicRespondentsWithEcc);
+        
+        caseData.setCorrespondenceType(correspondenceType);
+        UserDetails userDetails = HelperTest.getUserDetails();
+        
+        // Act
+        StringBuilder result = DocumentHelper.buildDocumentContent(
+                caseData, "", userDetails, ENGLANDWALES_CASE_TYPE_ID, 
+                correspondenceType, null, null, null, venueAddressReaderService
+        );
+        String output = result.toString();
+        
+        // Assert
+        assertThat(output).contains("\"templateName\":\"" + ECC_DOCUMENT_ENG_TEMPLATE);
+        // Verify claimant fields contain respondent data
+        assertThat(output).contains("\"claimant_or_rep_full_name\":\"Rep for Respondent 1\"");
+        assertThat(output).contains("\"claimant_full_name\":\"Test Respondent 1\"");
+        // Verify respondent fields contain claimant data (empty in this test case)
+        assertThat(output).contains("\"respondent_or_rep_full_name\":\"\"");
+    }
+    
+    @Test
+    void buildDocumentContent_withEccDocumentAndNoFlip_returnsNormalData() {
+        CaseData caseData = createCaseDataWithRespondentsAndClaimantRep();
+        caseData.setEthosCaseReference("123456");
+        caseData.setFeeGroupReference("12212121");
+        
+        CorrespondenceType correspondenceType = new CorrespondenceType();
+        correspondenceType.setTopLevelDocuments(ECC_DOCUMENT_ENG_TEMPLATE);
+        correspondenceType.setFlipRespondentAndClaimantValues(NO);
+        
+        DynamicFixedListType dynamicRespondentsWithEcc = new DynamicFixedListType();
+        DynamicValueType dynamicValue = new DynamicValueType();  
+        dynamicValue.setCode("resp-001");  
+        dynamicValue.setLabel("Test Respondent 1");
+        dynamicRespondentsWithEcc.setValue(dynamicValue);
+        correspondenceType.setDynamicRespondentsWithEcc(dynamicRespondentsWithEcc);
+        
+        caseData.setCorrespondenceType(correspondenceType);
+        UserDetails userDetails = HelperTest.getUserDetails();
+        
+        StringBuilder result = DocumentHelper.buildDocumentContent(
+                caseData, "", userDetails, ENGLANDWALES_CASE_TYPE_ID, 
+                correspondenceType, null, null, null, venueAddressReaderService
+        );
+        String output = result.toString();
+        
+        assertThat(output).contains("\"templateName\":\"" + ECC_DOCUMENT_ENG_TEMPLATE);
+        assertThat(output).contains("\"claimant_or_rep_full_name\":\"Claimant Representative\"");
+        assertThat(output).contains("\"respondent_or_rep_full_name\":\"Rep for Respondent 1\"");
+    }
+    
+    @Test
+    void buildDocumentContent_withScotlandEccDocument_returnsCorrectData() {
+        CaseData caseData = createCaseDataWithRespondents();
+        caseData.setEthosCaseReference("123456");
+        caseData.setFeeGroupReference("12212121");
+        
+        CorrespondenceScotType correspondenceScotType = new CorrespondenceScotType();
+        correspondenceScotType.setTopLevelScotDocuments(ECC_DOCUMENT_SCOT_TEMPLATE);
+        correspondenceScotType.setFlipRespondentAndClaimantValues(YES);
+        
+        DynamicFixedListType dynamicRespondentsWithEcc = new DynamicFixedListType();
+        DynamicValueType dynamicValue = new DynamicValueType();  
+        dynamicValue.setCode("resp-001");  
+        dynamicValue.setLabel("Test Respondent 1");
+        dynamicRespondentsWithEcc.setValue(dynamicValue);
+        correspondenceScotType.setDynamicRespondentsWithEcc(dynamicRespondentsWithEcc);
+        
+        caseData.setCorrespondenceScotType(correspondenceScotType);
+        UserDetails userDetails = HelperTest.getUserDetails();
+        
+        StringBuilder result = DocumentHelper.buildDocumentContent(
+                caseData, "", userDetails, SCOTLAND_CASE_TYPE_ID, 
+                null, correspondenceScotType, null, null, venueAddressReaderService
+        );
+        String output = result.toString();
+        
+        assertThat(output).contains("\"templateName\":\"" + ECC_DOCUMENT_SCOT_TEMPLATE);
+        assertThat(output).contains("\"claimant_or_rep_full_name\":\"Test Respondent 1\"");
+        assertThat(output).contains("\"Today_date\":\"");
+        assertThat(output).contains("\"Case_No\":\"123456\"");
+    }
 
     private CaseData createCaseDataWithRespondents() {
         RespondentSumTypeItem respondent1 = new RespondentSumTypeItem();
@@ -2532,5 +2796,53 @@ class DocumentHelperTest {
         caseData.setClaimantType(claimantType);
         
         return caseData;
+    }
+
+    private CaseData createCaseDataWithRespondentsAndClaimantRep() {
+        RepresentedTypeC claimantRep = new RepresentedTypeC();
+        claimantRep.setNameOfRepresentative("Claimant Representative");
+        claimantRep.setNameOfOrganisation("Claimant Rep Org");
+        claimantRep.setRepresentativeReference("CLAIMANT-REP-REF");
+        uk.gov.hmcts.et.common.model.ccd.Address repAddress = new uk.gov.hmcts.et.common.model.ccd.Address();
+        repAddress.setAddressLine1("123 Claimant Rep Street");
+        repAddress.setPostTown("Claimant Rep City");
+        repAddress.setPostCode("CR1 1EP");
+        claimantRep.setRepresentativeAddress(repAddress);
+
+        CaseData caseData = createCaseDataWithRespondentsAndReps();
+        caseData.setRepresentativeClaimantType(claimantRep);
+        caseData.setClaimantRepresentedQuestion(YES);
+        
+        if (caseData.getClaimantIndType() == null) {
+            ClaimantIndType claimantInd = mock(ClaimantIndType.class);
+            when(claimantInd.claimantFullName()).thenReturn("John Smith");
+            caseData.setClaimantIndType(claimantInd);
+        }
+        
+        return caseData;
+    }
+
+    private List<DocumentTypeItem> createDocumentCollection(int size) {
+        List<DocumentTypeItem> collection = new ArrayList<>();
+        for (int i = 1; i <= size; i++) {
+            DocumentTypeItem item = createDocumentTypeItem("Document " + i, "Type " + i);
+            collection.add(item);
+        }
+        return collection;
+    }
+
+    private DocumentTypeItem createDocumentTypeItem(String shortDescription, String typeOfDocument) {
+        DocumentType documentType = DocumentType.builder()
+                .typeOfDocument(typeOfDocument)
+                .shortDescription(shortDescription)
+                .dateOfCorrespondence(LocalDate.now().toString())
+                .topLevelDocuments(LEGACY_DOCUMENT_NAMES)
+                .documentType(typeOfDocument)
+                .build();
+        
+        DocumentTypeItem item = new DocumentTypeItem();
+        item.setId(UUID.randomUUID().toString());
+        item.setValue(documentType);
+        return item;
     }
 }

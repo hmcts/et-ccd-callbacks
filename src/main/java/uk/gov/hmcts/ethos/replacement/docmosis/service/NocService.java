@@ -4,7 +4,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRole;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
@@ -12,6 +11,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -63,19 +63,22 @@ public class NocService {
     public void grantClaimantRepAccess(String accessToken, String email,
                                        String caseId, Organisation organisationToAdd) {
         try {
-            List<UserDetails> users = userIdamService.getUsersByQuery(accessToken, "email:" + email, null, null);
-            for (UserDetails user : users) {
+            AccountIdByEmailResponse userResponse =
+                    organisationClient.getAccountIdByEmail(accessToken, authTokenGenerator.generate(), email).getBody();
+
+            if (userResponse != null && userResponse.getUserIdentifier() != null) {
                 OrganisationsResponse organisationsResponse = organisationClient.retrieveOrganisationDetailsByUserId(
-                        accessToken, authTokenGenerator.generate(), user.getUid()).getBody();
+                        accessToken, authTokenGenerator.generate(), userResponse.getUserIdentifier()).getBody();
 
                 if (organisationsResponse != null
                         && organisationToAdd.getOrganisationID()
                         .equals(organisationsResponse.getOrganisationIdentifier())) {
-                    grantCaseAccess(user.getUid(), caseId, ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
+                    grantCaseAccess(userResponse.getUserIdentifier(), caseId,
+                            ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
                 }
             }
         } catch (IOException e) {
-            log.error("Representative search failed");
+            log.error("Failed to fetch org user by email");
         }
     }
 

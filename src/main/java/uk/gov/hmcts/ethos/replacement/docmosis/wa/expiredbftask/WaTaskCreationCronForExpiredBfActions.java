@@ -148,10 +148,11 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
         }
 
         log.info("Found {} cases for case type: {}", searchResults.size(), caseTypeId);
-        Set<SubmitEvent> caseSubmitEvents = searchResults.stream().filter(Objects::nonNull).collect(Collectors.toSet());
+        Set<SubmitEvent> caseSubmitEvents = searchResults.stream().filter(Objects::nonNull)
+                .limit(maxCasesToProcess).collect(Collectors.toSet());
         String searchAfterValue = String.valueOf(searchResults.getLast().getCaseId());
 
-        while (caseSubmitEvents.size() < maxCasesToProcess) {
+        while (caseSubmitEvents.size() <= maxCasesToProcess) {
             query = ElasticSearchQuery.builder()
                     .initialSearch(false)
                     .size(maxCasesPerSearch)

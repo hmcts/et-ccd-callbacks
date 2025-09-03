@@ -103,7 +103,7 @@ public final class BFHelper {
 
     /**
      * Checks if the BF action is expired.
-     * A BF action is considered expired if its date is after one day before yesterday and
+     * A BF action is considered expired if its date is after one day before the effective yesterday and
      * before today, and it has not been cleared yet.
      *
      * @param item BFActionTypeItem
@@ -119,16 +119,16 @@ public final class BFHelper {
     }
 
     /**
-     * Returns the effective "yesterday" based on the current day of the week.
-     * @param today LocalDate
+     * Returns the effective "yesterday" based on the startDate's day of the week.
+     * @param startDate LocalDate
      * @return String formatted date
      */
-    public static String getEffectiveYesterday(LocalDate today) {
-        int daysToSubtract = switch (today.getDayOfWeek()) {
+    public static String getEffectiveYesterday(LocalDate startDate) {
+        int daysToSubtract = switch (startDate.getDayOfWeek()) {
             case MONDAY -> 3; // If today is Monday, go back to Friday
             case SUNDAY -> 2; // If today is Sunday, go back to Friday as well
             default -> 1; // Regular yesterday
         };
-        return UtilHelper.formatCurrentDate2(today.minusDays(daysToSubtract));
+        return UtilHelper.formatCurrentDate2(startDate.minusDays(daysToSubtract));
     }
 }

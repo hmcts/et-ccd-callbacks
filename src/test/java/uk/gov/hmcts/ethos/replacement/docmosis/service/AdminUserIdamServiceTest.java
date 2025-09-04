@@ -41,6 +41,6 @@ class AdminUserIdamServiceTest {
     void shouldReturnUserId() {
         UserDetails userDetails = new UserDetails();
         when(userIdamService.getUserDetailsById(any(), eq(USER_ID))).thenReturn(userDetails);
-        assertThat(adminUserService.getUserDetails(USER_ID)).isEqualTo(userDetails);
+        assertThat(adminUserService.getUserDetails(TOKEN, USER_ID)).isEqualTo(userDetails);
     }
 }

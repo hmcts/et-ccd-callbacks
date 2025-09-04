@@ -223,6 +223,8 @@ public class Et3ResponseController {
         et3ResponseService.sendNotifications(ccdRequest.getCaseDetails());
         Et3ResponseHelper.resetEt3FormFields(caseData);
         caseManagementForCaseWorkerService.setNextListedDate(caseData);
+        caseManagementForCaseWorkerService.updateWorkAllocationField(new ArrayList<>(), caseData);
+
         return getCallbackRespEntityNoErrors(caseData);
     }
 

@@ -61,6 +61,8 @@ class RespondNotificationServiceTest {
     private HearingSelectionService hearingSelectionService;
     @MockBean
     private FeatureToggleService featureToggleService;
+    @Mock
+    private TornadoService tornadoService;
     @MockBean
     private CaseAccessService caseAccessService;
     @MockBean
@@ -76,7 +78,7 @@ class RespondNotificationServiceTest {
 
         SendNotificationService sendNotificationService =
             new SendNotificationService(hearingSelectionService, emailService,
-                    featureToggleService, caseAccessService, adminUserService);
+                    featureToggleService, caseAccessService, adminUserService, tornadoService);
 
         respondNotificationService = new RespondNotificationService(emailService, sendNotificationService);
 

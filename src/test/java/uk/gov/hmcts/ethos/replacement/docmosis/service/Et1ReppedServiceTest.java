@@ -118,7 +118,7 @@ class Et1ReppedServiceTest {
 
     @BeforeEach
     @SneakyThrows
-    void setUp() {
+    void setUp() throws IOException, URISyntaxException, NullPointerException {
         caseDetails = new CaseDetails();
         caseData = new CaseData();
         Address address = new Address();
@@ -127,7 +127,7 @@ class Et1ReppedServiceTest {
         caseDetails.setCaseId("1234567890123456");
         caseDetails.setCaseTypeId("ET_EnglandWales");
 
-        draftCaseDetails = generateCaseDetails();
+        draftCaseDetails = generateCaseDetails("et1ReppedDraftStillWorking.json");
 
         emailService = spy(new EmailUtils());
         PostcodeToOfficeService postcodeToOfficeService = new PostcodeToOfficeService(postcodeToOfficeMappings);
@@ -229,7 +229,7 @@ class Et1ReppedServiceTest {
 
     @Test
     void createDraftEt1() throws Exception {
-        caseDetails =  generateCaseDetails();
+        caseDetails =  generateCaseDetails("et1ReppedDraftStillWorking.json");
         Et1ReppedHelper.setEt1SubmitData(caseDetails.getCaseData());
         et1ReppedService.addDefaultData(caseDetails.getCaseTypeId(), caseDetails.getCaseData());
 
@@ -244,10 +244,10 @@ class Et1ReppedServiceTest {
         assertNotNull(caseDetails.getCaseData().getDocMarkUp());
     }
 
-    @SneakyThrows
-    private CaseDetails generateCaseDetails() {
+    private CaseDetails generateCaseDetails(String jsonFileName) throws IOException,
+            URISyntaxException, NullPointerException {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
-                .getContextClassLoader().getResource("et1ReppedDraftStillWorking.json")).toURI())));
+                .getContextClassLoader().getResource(jsonFileName)).toURI())));
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(json, CaseDetails.class);
     }

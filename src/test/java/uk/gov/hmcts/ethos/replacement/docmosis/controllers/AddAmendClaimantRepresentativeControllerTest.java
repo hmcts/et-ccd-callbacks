@@ -15,6 +15,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AddAmendClaimantRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.NocClaimantRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ScheduledTaskRunner;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
@@ -38,6 +39,8 @@ class AddAmendClaimantRepresentativeControllerTest {
     private static final String ABOUT_TO_SUBMIT_URL = "/addAmendClaimantRepresentative/aboutToSubmit";
     private static final String SUBMITTED_URL = "/addAmendClaimantRepresentative/amendClaimantRepSubmitted";
 
+    @MockBean
+    private ScheduledTaskRunner taskRunner;
     @MockBean
     private VerifyTokenService verifyTokenService;
     @MockBean

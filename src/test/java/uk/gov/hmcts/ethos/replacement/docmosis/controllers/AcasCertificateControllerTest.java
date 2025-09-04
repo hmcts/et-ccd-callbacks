@@ -18,6 +18,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AcasService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ScheduledTaskRunner;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
@@ -47,6 +48,8 @@ class AcasCertificateControllerTest {
     private static final String AUTH_TOKEN = "some-token";
     private CCDRequest ccdRequest;
 
+    @MockBean
+    private ScheduledTaskRunner taskRunner;
     @MockBean
     private VerifyTokenService verifyTokenService;
     @MockBean

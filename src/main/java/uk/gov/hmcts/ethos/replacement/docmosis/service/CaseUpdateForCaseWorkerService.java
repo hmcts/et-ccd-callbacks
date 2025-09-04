@@ -25,7 +25,7 @@ public class CaseUpdateForCaseWorkerService {
         this.defaultValuesReaderService = defaultValuesReaderService;
     }
 
-    public SubmitEvent caseUpdateRequest(CCDRequest ccdRequest, String authToken) {
+    public SubmitEvent caseUpdateRequest(CCDRequest ccdRequest, String authToken) throws Throwable {
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         log.info("EventId: " + ccdRequest.getEventId());
 
@@ -42,7 +42,8 @@ public class CaseUpdateForCaseWorkerService {
             return ccdClient.submitEventForCase(authToken, caseDetails.getCaseData(),
                     caseDetails.getCaseTypeId(), caseDetails.getJurisdiction(), returnedRequest, caseId);
         } catch (Exception ex) {
-            throw new CaseCreationException(MESSAGE + caseDetails.getCaseId() + ex.getMessage());
+            throw new CaseCreationException(
+                    MESSAGE + caseDetails.getCaseId() + ex.getMessage()).initCause(ex);
         }
     }
 }

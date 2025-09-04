@@ -115,11 +115,9 @@ public class NocClaimantRepresentativeService {
         ChangeOrganisationRequest changeRequest = identifyRepresentationChanges(caseData,
                 caseDataBefore);
 
-        log.info("changeRequest: {}", changeRequest);
         try {
             nocNotificationService.sendNotificationOfChangeEmails(caseDetailsBefore, caseDetails, changeRequest,
                     currentUserEmail);
-            log.info("sent emails");
         } catch (Exception exception) {
             log.error(exception.getMessage(), exception);
         }
@@ -127,14 +125,12 @@ public class NocClaimantRepresentativeService {
         if (changeRequest != null
                 && changeRequest.getOrganisationToRemove() != null) {
             try {
-                log.info("removing old organisation representative access");
                 nocService.removeOrganisationRepresentativeAccess(caseDetails.getCaseId(), changeRequest);
             } catch (IOException e) {
                 throw new CcdInputOutputException("Failed to remove organisation representative access", e);
             }
         }
 
-        log.info("updating case representation");
         String accessToken = adminUserService.getAdminUserToken();
         CCDRequest ccdRequest = nocCcdService.updateCaseRepresentation(accessToken,
                 caseDetails.getJurisdiction(), caseDetails.getCaseTypeId(), caseDetails.getCaseId());
@@ -142,7 +138,6 @@ public class NocClaimantRepresentativeService {
         ccdRequest.getCaseDetails().setCaseData(ccdCaseAssignment.applyNocAsAdmin(callbackRequest).getData());
 
         if (YES.equals(caseData.getClaimantRepresentedQuestion())) {
-            log.info("claimant represented. granting access to new representative");
             RepresentedTypeC claimantRep = caseData.getRepresentativeClaimantType();
             if (claimantRep != null && claimantRep.getRepresentativeEmailAddress() != null) {
                 nocService.grantClaimantRepAccess(accessToken,
@@ -152,8 +147,7 @@ public class NocClaimantRepresentativeService {
             }
         }
 
-        log.info("submitting update representation event {}",
-                callbackRequest.getCaseDetails().getCaseData().getChangeOrganisationRequestField());
+        callbackRequest.getCaseDetails().getCaseData().getChangeOrganisationRequestField();
         ccdClient.submitUpdateRepEvent(
                 accessToken,
                     Map.of("changeOrganisationRequestField",
@@ -162,24 +156,19 @@ public class NocClaimantRepresentativeService {
                     caseDetails.getJurisdiction(),
                     ccdRequest,
                     caseDetails.getCaseId());
-        log.info("updated representation event {}", callbackRequest.getCaseDetails().getCaseData());
     }
 
     public ChangeOrganisationRequest identifyRepresentationChanges(CaseData  after, CaseData before) {
         Organisation newRepOrg = after.getRepresentativeClaimantType() != null
                 ? after.getRepresentativeClaimantType().getMyHmctsOrganisation() : null;
-        log.info("newRepOrg: {}", newRepOrg);
         Organisation oldRepOrg = before.getRepresentativeClaimantType() != null
                 ? before.getRepresentativeClaimantType().getMyHmctsOrganisation() : null;
-        log.info("oldRepOrg: {}", oldRepOrg);
         ChangeOrganisationRequest changeRequests = null;
 
         if (!Objects.equals(newRepOrg, oldRepOrg)) {
-            log.info("Change in representation detected");
             changeRequests = nocClaimantHelper.createChangeRequest(newRepOrg, oldRepOrg);
         }
 
-        log.info("changeRequests: {}", changeRequests);
         return changeRequests;
     }
 }

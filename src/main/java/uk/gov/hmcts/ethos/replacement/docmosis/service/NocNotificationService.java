@@ -25,7 +25,6 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantNonSystemUser;
@@ -154,8 +153,10 @@ public class NocNotificationService {
             sendEmailToOldOrgAdmin(previousOrgId, caseDataPrevious);
         }
 
-        String newOrgId = changeRequest.getOrganisationToAdd().getOrganisationID();
-        sendEmailToNewOrgAdmin(newOrgId, caseDetailsNew, partyName);
+        if (changeRequest.getOrganisationToAdd() != null) {
+            String newOrgId = changeRequest.getOrganisationToAdd().getOrganisationID();
+            sendEmailToNewOrgAdmin(newOrgId, caseDetailsNew, partyName);
+        }
 
         // send email to the new legal representative
         Map<String, String> personalisation = buildPersonalisationWithPartyName(caseDetailsNew, partyName,

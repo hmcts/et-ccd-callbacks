@@ -44,6 +44,8 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
     @Value("${cron.maxCasesToProcess}")
     private int maxCasesToProcess;
 
+    private static final int MAX_VALID_CASE_TO_UPDATE = 10;
+
     /**
      * This cron job runs every day at 00:01 to create WA tasks for expired BF actions.
      * It checks for cases with BF actions that have a date of yesterday and are not cleared or
@@ -78,7 +80,7 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
                         return hasAtLeastOneValidBfAction(submitEvent);
                     }
                     return false;
-                }).toList();
+                }).limit(MAX_VALID_CASE_TO_UPDATE).toList();
 
                 if (validSubmitEvents.isEmpty()) {
                     log.info("No valid cases found for case type: {}", caseTypeId);
@@ -149,10 +151,10 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
 
         log.info("Found {} cases for case type: {}", searchResults.size(), caseTypeId);
         Set<SubmitEvent> caseSubmitEvents = searchResults.stream().filter(Objects::nonNull)
-                .limit(maxCasesToProcess).collect(Collectors.toSet());
+                .collect(Collectors.toSet());
         String searchAfterValue = String.valueOf(searchResults.getLast().getCaseId());
 
-        while (caseSubmitEvents.size() <= maxCasesToProcess) {
+        while (caseSubmitEvents.size() < maxCasesToProcess) {
             query = ElasticSearchQuery.builder()
                     .initialSearch(false)
                     .size(maxCasesPerSearch)

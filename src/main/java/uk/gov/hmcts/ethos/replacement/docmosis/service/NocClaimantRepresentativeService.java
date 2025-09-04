@@ -115,11 +115,9 @@ public class NocClaimantRepresentativeService {
         ChangeOrganisationRequest changeRequest = identifyRepresentationChanges(caseData,
                 caseDataBefore);
 
-        log.info("changeRequest: {}", changeRequest);
         try {
             nocNotificationService.sendNotificationOfChangeEmails(caseDetailsBefore, caseDetails, changeRequest,
                     currentUserEmail);
-            log.info("sent emails");
         } catch (Exception exception) {
             log.error(exception.getMessage(), exception);
         }
@@ -133,15 +131,23 @@ public class NocClaimantRepresentativeService {
             }
         }
 
-        log.info("updating case representation");
         String accessToken = adminUserService.getAdminUserToken();
         CCDRequest ccdRequest = nocCcdService.updateCaseRepresentation(accessToken,
                 caseDetails.getJurisdiction(), caseDetails.getCaseTypeId(), caseDetails.getCaseId());
         callbackRequest.getCaseDetails().getCaseData().setChangeOrganisationRequestField(changeRequest);
         ccdRequest.getCaseDetails().setCaseData(ccdCaseAssignment.applyNocAsAdmin(callbackRequest).getData());
 
-        log.info("submitting update representation event {}",
-                callbackRequest.getCaseDetails().getCaseData().getChangeOrganisationRequestField());
+        if (YES.equals(caseData.getClaimantRepresentedQuestion())) {
+            RepresentedTypeC claimantRep = caseData.getRepresentativeClaimantType();
+            if (claimantRep != null && claimantRep.getRepresentativeEmailAddress() != null) {
+                nocService.grantClaimantRepAccess(accessToken,
+                        caseData.getRepresentativeClaimantType().getRepresentativeEmailAddress(),
+                        caseDetails.getCaseId(),
+                        changeRequest.getOrganisationToAdd());
+            }
+        }
+
+        callbackRequest.getCaseDetails().getCaseData().getChangeOrganisationRequestField();
         ccdClient.submitUpdateRepEvent(
                 accessToken,
                     Map.of("changeOrganisationRequestField",
@@ -150,7 +156,6 @@ public class NocClaimantRepresentativeService {
                     caseDetails.getJurisdiction(),
                     ccdRequest,
                     caseDetails.getCaseId());
-        log.info("updated representation event {}", callbackRequest.getCaseDetails().getCaseData());
     }
 
     public ChangeOrganisationRequest identifyRepresentationChanges(CaseData  after, CaseData before) {

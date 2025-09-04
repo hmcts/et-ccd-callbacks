@@ -246,7 +246,7 @@ cron:
   bfActionTask: ${CRON_BFACTION_TASK:0 0 * * * ?}
   bfActionCronCaseIdsToSkip: ${CRON_BFACTION_CRON_CASE_IDS_TO_SKIP:}
   maxCasesPerSearch: ${CRON_MAX_PER_SEARCH:200}
-  maxCasesToProcess: ${CRON_MAX_CASES_PER_SEARCH:10}
+  maxCasesToProcess: ${CRON_MAX_CASES_PER_SEARCH:1000}
   et1DocGen: ${CRON_ACAS_CERT_TASK:0 */2 * * * ?}
   noticeOfChange: ${CRON_NOTICE_OF_CHANGE:0 */10 * * * ?}
   partySpacing: ${CRON_PARTY_SPACING:0 */15 * * * ?}

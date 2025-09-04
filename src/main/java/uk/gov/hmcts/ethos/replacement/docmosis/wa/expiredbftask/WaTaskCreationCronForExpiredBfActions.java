@@ -152,11 +152,16 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
             return new HashSet<>();
         }
 
-        log.info("Found {} cases for case type: {}", searchResults.size(), caseTypeId);
+        log.info("Found {} cases for case type: {} for initial search", searchResults.size(), caseTypeId);
+        log.info("Case ids list: {}", searchResults.stream()
+                        .map(i -> String.valueOf(i.getCaseId()))
+                        .collect(Collectors.joining(", "))
+        );
         Set<SubmitEvent> caseSubmitEvents = searchResults.stream().filter(Objects::nonNull)
                 .collect(Collectors.toSet());
         String searchAfterValue = String.valueOf(searchResults.getLast().getCaseId());
-
+        log.info("The first searchAfterValue is {}", searchAfterValue);
+        int round = 0;
         while (caseSubmitEvents.size() < maxCasesToProcess) {
             query = ElasticSearchQuery.builder()
                     .initialSearch(false)
@@ -173,7 +178,10 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
 
             log.info("Fetched {} additional cases for case type: {}", nextResults.size(), caseTypeId);
             nextResults.stream().filter(Objects::nonNull).forEach(caseSubmitEvents::add);
+            log.info("Updated caseSubmitEvents set now has {} cases of {} type:", nextResults.size(), caseTypeId);
+
             searchAfterValue = String.valueOf(nextResults.getLast().getCaseId());
+            log.info("The {} round/loop searchAfterValue is {}", String.valueOf(++round), searchAfterValue);
         }
 
         log.info("Total cases found: {}", caseSubmitEvents.size());

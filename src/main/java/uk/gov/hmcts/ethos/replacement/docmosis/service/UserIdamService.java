@@ -9,8 +9,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.TokenRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.TokenResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.idam.IdamApi;
 
-import java.util.List;
-
 @Component
 public class UserIdamService implements UserService {
     private final IdamApi idamApi;
@@ -27,10 +25,6 @@ public class UserIdamService implements UserService {
     @Override
     public UserDetails getUserDetails(String authorisation) {
         return idamApi.retrieveUserDetails(authorisation);
-    }
-
-    public List<UserDetails> getUsersByQuery(String authToken, String query, Integer page, Integer size) {
-        return idamApi.searchUsersByQuery(authToken, query, page, size);
     }
 
     @Override

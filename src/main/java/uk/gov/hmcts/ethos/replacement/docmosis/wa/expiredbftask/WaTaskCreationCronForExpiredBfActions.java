@@ -73,6 +73,9 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
                 if (CollectionUtils.isEmpty(caseSubmitEvents)) {
                     log.info("No cases found for case type: {}", caseTypeId);
                     return;
+                } else {
+                    log.info("Total cases fetched from findCasesByCaseType for case type {}: {}",
+                            caseTypeId, caseSubmitEvents.size());
                 }
 
                 List<SubmitEvent> validSubmitEvents = caseSubmitEvents.stream().filter(submitEvent -> {

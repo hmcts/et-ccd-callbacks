@@ -12,8 +12,6 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
-import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
@@ -27,6 +25,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
@@ -37,10 +36,10 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
-
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @Service
@@ -68,6 +67,8 @@ public class NocRespondentRepresentativeService {
 
     private final AuthTokenGenerator authTokenGenerator;
 
+    private final NocService nocService;
+
     /**
      * Add respondent organisation policy and notice of change answer fields to the case data.
      * @param caseData case data
@@ -87,21 +88,33 @@ public class NocRespondentRepresentativeService {
      * @param caseDetails containing case data with change organisation request field
      * @return updated case
      */
-    public CaseData updateRepresentation(CaseDetails caseDetails) throws IOException {
+    public CaseData updateRespondentRepresentation(CaseDetails caseDetails) throws IOException {
         CaseData caseData = caseDetails.getCaseData();
+        resetRespondentRepresentativeRemovedField(caseData);
         Map<String, Object> caseDataAsMap = caseConverter.toMap(caseData);
         Map<String, Object> repCollection = updateRepresentationMap(caseData, caseDetails.getCaseId());
         caseDataAsMap.putAll(repCollection);
         return  caseConverter.convert(caseDataAsMap, CaseData.class);
     }
 
-    private Map<String, Object> updateRepresentationMap(CaseData caseData, String caseId) throws IOException {
+    private static void resetRespondentRepresentativeRemovedField(CaseData caseData) {
+        ChangeOrganisationRequest change = findChangeOrganisationRequest(caseData);
+        SolicitorRole role = SolicitorRole.from(change.getCaseRoleId().getSelectedCode()).orElseThrow();
+        RespondentSumTypeItem respondent = caseData.getRespondentCollection().get(role.getIndex());
+        respondent.getValue().setRepresentativeRemoved(NO);
+    }
 
-        final ChangeOrganisationRequest change = caseData.getChangeOrganisationRequestField();
-
+    private static ChangeOrganisationRequest findChangeOrganisationRequest(CaseData caseData) {
+        ChangeOrganisationRequest change = caseData.getChangeOrganisationRequestField();
         if (isEmpty(change) || isEmpty(change.getCaseRoleId()) || isEmpty(change.getOrganisationToAdd())) {
             throw new IllegalStateException("Invalid or missing ChangeOrganisationRequest: " + change);
         }
+        return change;
+    }
+
+    private Map<String, Object> updateRepresentationMap(CaseData caseData, String caseId) throws IOException {
+
+        final ChangeOrganisationRequest change = findChangeOrganisationRequest(caseData);
 
         String accessToken = adminUserService.getAdminUserToken();
 
@@ -143,7 +156,8 @@ public class NocRespondentRepresentativeService {
      * @throws IOException - exception thrown by ccd
      */
     @SuppressWarnings({"PMD.PrematureDeclaration", "checkstyle:VariableDeclarationUsageDistance"})
-    public void updateRepresentativesAccess(CallbackRequest callbackRequest) throws IOException {
+    public void updateRepresentativesAccess(CallbackRequest callbackRequest, String currentUserEmail)
+            throws IOException {
         CaseDetails caseDetails = callbackRequest.getCaseDetails();
         CaseDetails caseDetailsBefore = callbackRequest.getCaseDetailsBefore();
         CaseData caseDataBefore = caseDetailsBefore.getCaseData();
@@ -163,7 +177,8 @@ public class NocRespondentRepresentativeService {
             log.info("Representation change applied {}", changeRequest);
 
             try {
-                nocNotificationService.sendNotificationOfChangeEmails(caseDetailsBefore, caseDetails, changeRequest);
+                nocNotificationService.sendNotificationOfChangeEmails(caseDetailsBefore, caseDetails, changeRequest,
+                        currentUserEmail);
             } catch (Exception exception) {
                 log.error(exception.getMessage(), exception);
             }
@@ -171,7 +186,7 @@ public class NocRespondentRepresentativeService {
             if (changeRequest != null
                     && changeRequest.getOrganisationToRemove() != null) {
                 try {
-                    removeOrganisationRepresentativeAccess(caseDetails.getCaseId(), changeRequest);
+                    nocService.removeOrganisationRepresentativeAccess(caseDetails.getCaseId(), changeRequest);
                 } catch (IOException e) {
                     throw new CcdInputOutputException("Failed to remove organisation representative access", e);
                 }
@@ -225,36 +240,6 @@ public class NocRespondentRepresentativeService {
     }
 
     /**
-     * Revokes access from all users of an organisation being replaced or removed.
-     * @param caseId - case id of case to apply update to
-     * @param changeOrganisationRequest - containing case role and id of organisation to remove
-     * @throws IOException - thrown if no ccd service is inaccessible
-     */
-    public void removeOrganisationRepresentativeAccess(String caseId,
-                                                       ChangeOrganisationRequest changeOrganisationRequest)
-        throws IOException {
-        String roleOfRemovedOrg = changeOrganisationRequest.getCaseRoleId().getSelectedCode();
-        String orgId = changeOrganisationRequest.getOrganisationToRemove().getOrganisationID();
-        CaseUserAssignmentData caseAssignments =
-            nocCcdService.getCaseAssignments(adminUserService.getAdminUserToken(), caseId);
-
-        List<CaseUserAssignment> usersToRevoke = caseAssignments.getCaseUserAssignments().stream()
-            .filter(caseUserAssignment -> caseUserAssignment.getCaseRole().equals(roleOfRemovedOrg))
-            .map(caseUserAssignment ->
-                CaseUserAssignment.builder().userId(caseUserAssignment.getUserId())
-                    .organisationId(orgId)
-                    .caseRole(roleOfRemovedOrg)
-                    .caseId(caseId)
-                    .build()
-            ).toList();
-
-        if (!CollectionUtils.isEmpty(usersToRevoke)) {
-            nocCcdService.revokeCaseAssignments(adminUserService.getAdminUserToken(),
-                CaseUserAssignmentData.builder().caseUserAssignments(usersToRevoke).build());
-        }
-    }
-
-    /**
      * Add respondent representative organisation address to the case data.
      * @param caseData case data
      * @return modified case data
@@ -299,19 +284,19 @@ public class NocRespondentRepresentativeService {
 
         if (!CollectionUtils.isEmpty(orgRes.getContactInformation())) {
             Address repAddress = repDetails.getRepresentativeAddress();
-            repAddress = repAddress == null ? new Address() : repAddress;
-            OrganisationAddress orgAddress = orgRes.getContactInformation().get(0);
-
-            // update Representative Address with Org Address
-            repAddress.setAddressLine1(orgAddress.getAddressLine1());
-            repAddress.setAddressLine2(orgAddress.getAddressLine2());
-            repAddress.setAddressLine3(orgAddress.getAddressLine3());
-            repAddress.setPostTown(orgAddress.getTownCity());
-            repAddress.setCounty(orgAddress.getCounty());
-            repAddress.setCountry(orgAddress.getCountry());
-            repAddress.setPostCode(orgAddress.getPostCode());
-
-            repDetails.setRepresentativeAddress(repAddress);
+            if (AddressUtils.isNullOrEmpty(repAddress)) {
+                repAddress = AddressUtils.createIfNull(repDetails.getRepresentativeAddress());
+                OrganisationAddress orgAddress = orgRes.getContactInformation().getFirst();
+                // update Representative Address with Org Address
+                repAddress.setAddressLine1(orgAddress.getAddressLine1());
+                repAddress.setAddressLine2(orgAddress.getAddressLine2());
+                repAddress.setAddressLine3(orgAddress.getAddressLine3());
+                repAddress.setPostTown(orgAddress.getTownCity());
+                repAddress.setCounty(orgAddress.getCounty());
+                repAddress.setCountry(orgAddress.getCountry());
+                repAddress.setPostCode(orgAddress.getPostCode());
+                repDetails.setRepresentativeAddress(repAddress);
+            }
         }
     }
 

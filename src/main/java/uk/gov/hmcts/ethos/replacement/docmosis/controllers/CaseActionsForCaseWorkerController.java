@@ -57,6 +57,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.NocRespondentRepresentati
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -65,6 +66,7 @@ import java.util.List;
 
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntity;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
@@ -78,7 +80,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.updatePostp
 @RequiredArgsConstructor
 @RestController
 public class CaseActionsForCaseWorkerController {
-    private static final String AUTHORIZATION = "Authorization";
     private static final String LOG_MESSAGE = "received notification request for case reference :    ";
     private static final String EVENT_FIELDS_VALIDATION = "Event fields validation: ";
     private static final String TWO_HUNDRED = "200";
@@ -115,6 +116,7 @@ public class CaseActionsForCaseWorkerController {
     private final CaseManagementLocationService caseManagementLocationService;
     private final Et1SubmissionService et1SubmissionService;
     private final NocRespondentHelper nocRespondentHelper;
+    private final UserIdamService userIdamService;
 
     @PostMapping(value = "/createCase", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "create a case for a caseWorker.")
@@ -544,11 +546,15 @@ public class CaseActionsForCaseWorkerController {
         @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
         @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
-    public void amendRespondentRepSubmitted(@RequestBody CallbackRequest callbackRequest) {
+    public void amendRespondentRepSubmitted(
+            @RequestBody CallbackRequest callbackRequest,
+            @RequestHeader(AUTHORIZATION) String userToken) {
+
         log.info("AMEND RESPONDENT REPRESENTATIVE SUBMITTED ---> "
             + LOG_MESSAGE + callbackRequest.getCaseDetails().getCaseId());
         try {
-            nocRespondentRepresentativeService.updateRepresentativesAccess(callbackRequest);
+            String currentUserEmail = userIdamService.getUserDetails(userToken).getEmail();
+            nocRespondentRepresentativeService.updateRepresentativesAccess(callbackRequest, currentUserEmail);
         } catch (IOException e) {
             throw new CcdInputOutputException("Failed to update respondent representatives accesses", e);
         }

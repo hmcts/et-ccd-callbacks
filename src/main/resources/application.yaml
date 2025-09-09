@@ -254,3 +254,6 @@ cron:
 
 pdf:
   et3form: "ET3_0224.pdf"
+
+caching:
+  adminUserService: ${CACHING_ADMIN_USER_SERVICE:21600000}

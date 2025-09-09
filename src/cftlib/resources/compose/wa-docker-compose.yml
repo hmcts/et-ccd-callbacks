@@ -75,7 +75,7 @@ services:
       S2S_URL: "http://localhost:8489"
       CCD_URL: "${CFTLIB_HOST-http://host.docker.internal}:4452"
       POSTGRES_HOST: host.docker.internal
-      OPEN_ID_IDAM_URL: "http://localhost:5062"
+      OPEN_ID_IDAM_URL: "http://localhost:5062/o"
       IDAM_URL: "http://localhost:5062"
 
       ROLE_ASSIGNMENT_URL: "${CFTLIB_HOST-http://host.docker.internal}:4096"

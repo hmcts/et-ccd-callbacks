@@ -18,7 +18,7 @@ services:
       ENABLE_POSTGRES_BLOB_STORAGE: "false"
       STORAGEACCOUNT_PRIMARY_CONNECTION_STRING: "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://azure-storage-emulator-azurite:10000/devstoreaccount1"
       STORAGE_CONTAINER_DOCUMENT_CONTAINER_NAME: "hmctstestcontainer"
-      SPRING_PROFILES_ACTIVE: dev
+      SPRING_PROFILES_ACTIVE: cftlib
       IDAM_TESTING_SUPPORT_ENABLED: "true"
       LOGGING_LEVEL_UK_GOV_HMCTS_IDAM: WARN
       IDAM_USER_BASE_URI: http://localhost:5062

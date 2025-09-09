@@ -426,7 +426,7 @@ class CaseTransferControllerTest extends BaseControllerTest {
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isOk());
 
-        verify(caseManagementLocationService, times(1))
+        verify(caseManagementLocationService, times(2))
                 .setCaseManagementLocationCode(any());
     }
 }

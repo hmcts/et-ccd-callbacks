@@ -7,9 +7,11 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.exceptions.CaseCreationException;
+import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.exceptions.OfficeToAssignCaseToNotFoundException;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.io.IOException;
@@ -23,6 +25,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferUtils.BF_ACTIONS_ERROR_MSG;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferUtils.HEARINGS_ERROR_MSG;
@@ -168,7 +171,8 @@ class CaseTransferUtilsTest {
     void testValidateCaseReturnsNoErrors() {
         CaseData caseData = CaseDataBuilder.builder()
                 .withBfAction(YES)
-                .withHearing("1", "HearingType", "Judge", null, null, null, null)
+                .withHearing("1", "HearingType", "Judge", null,
+                        null, null, null)
                 .withHearingSession(0, "2021-12-25", HEARING_STATUS_HEARD, true)
                 .build();
 
@@ -197,7 +201,8 @@ class CaseTransferUtilsTest {
         String ethosCaseReference = "case-ref";
         CaseData caseData = CaseDataBuilder.builder()
                 .withEthosCaseReference(ethosCaseReference)
-                .withHearing("1", "HearingType", "Judge", null, null, null, null)
+                .withHearing("1", "HearingType", "Judge", null,
+                        null, null, null)
                 .withHearingSession(0, "2021-12-25", HEARING_STATUS_LISTED, true)
                 .build();
 
@@ -214,7 +219,8 @@ class CaseTransferUtilsTest {
         CaseData caseData = CaseDataBuilder.builder()
                 .withEthosCaseReference(ethosCaseReference)
                 .withBfAction(null)
-                .withHearing("1", "HearingType", "Judge", null, null, null, null)
+                .withHearing("1", "HearingType", "Judge", null,
+                        null, null, null)
                 .withHearingSession(0, "2021-12-25", HEARING_STATUS_LISTED, true)
                 .build();
 
@@ -225,5 +231,49 @@ class CaseTransferUtilsTest {
         assertEquals(expectedError1, errors.get(0));
         String expectedError2 = String.format(HEARINGS_ERROR_MSG, ethosCaseReference);
         assertEquals(expectedError2, errors.get(1));
+    }
+
+    @Test
+    void setCaseManagingOfficeForEnglandWales() {
+        CaseData caseData = CaseDataBuilder.builder()
+                .withAssignOffice("London")
+                .build();
+
+        CaseTransferUtils.setCaseManagingOffice(caseData, ENGLANDWALES_CASE_TYPE_ID);
+
+        assertEquals("London", caseData.getManagingOffice());
+    }
+
+    @Test
+    void setCaseManagingOfficeForScotland() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+
+        CaseTransferUtils.setCaseManagingOffice(caseData, SCOTLAND_CASE_TYPE_ID);
+
+        assertEquals(TribunalOffice.GLASGOW.getOfficeName(), caseData.getManagingOffice());
+        assertEquals(TribunalOffice.GLASGOW.getOfficeName(), caseData.getAllocatedOffice());
+    }
+
+    @Test
+    void setCaseManagingOfficeThrowsExceptionWhenAssignOfficeIsNullForEnglandWales() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+
+        OfficeToAssignCaseToNotFoundException exception = assertThrows(
+                OfficeToAssignCaseToNotFoundException.class,
+                () -> CaseTransferUtils.setCaseManagingOffice(caseData, ENGLANDWALES_CASE_TYPE_ID)
+        );
+
+        assertEquals("AssignOffice or SelectedCode not found for case type ET_EnglandWales"
+                        + " with EthosCaseReference null", exception.getMessage());
+    }
+
+    @Test
+    void setCaseManagingOfficeWithInvalidCaseTypeId() {
+        CaseData caseData = CaseDataBuilder.builder().build();
+
+        CaseTransferUtils.setCaseManagingOffice(caseData, "INVALID_CASE_TYPE");
+
+        assertEquals(caseData.getManagingOffice(), null);
+        assertEquals(caseData.getAllocatedOffice(), null);
     }
 }

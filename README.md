@@ -71,7 +71,7 @@ To run the application locally, you should follow the instructions above for one
 
 ## Tasks
 
-There are a number of tasks within the project; some make usa of Spring Scheduling and run within the main application, and others are standalone which can be run from the command line.
+There are a number of tasks within the project; some make us of Spring Scheduling and run within the main application, and others are standalone which can be run from the command line.
 
 *Note: the examples below assume you are using the RSE CFT lib environment, but the tasks can be run from any environment.*
 

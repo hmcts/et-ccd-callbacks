@@ -231,3 +231,6 @@ acas:
 
 feature-flags:
   hearings-api: ${HEARINGS_API_FLAG:true}
+
+caching:
+  adminUserService: ${CACHING_ADMIN_USER_SERVICE:21600000}

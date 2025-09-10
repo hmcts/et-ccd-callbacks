@@ -253,11 +253,17 @@ public final class FlagsImageHelper {
     }
 
     public static boolean counterClaimMade(CaseData caseData) {
-        return (!isNullOrEmpty(caseData.getCounterClaim())
-                || isNotEmpty(caseData.getEccCases()))
-                || (isNotEmpty(caseData.getJurCodesCollection()) && caseData.getJurCodesCollection().stream()
-                    .anyMatch(jurCode ->
-                            JurisdictionCode.ECC.toString().equals(jurCode.getValue().getJuridictionCodesList())));
+        boolean hasEccOrCounterClaim = !isNullOrEmpty(caseData.getCounterClaim()) || isNotEmpty(caseData.getEccCases());
+
+        boolean hasBothEccAndBoc = isNotEmpty(caseData.getJurCodesCollection())
+                && caseData.getJurCodesCollection().stream()
+                .anyMatch(jurCode -> JurisdictionCode.ECC.toString()
+                        .equals(jurCode.getValue().getJuridictionCodesList()))
+                && caseData.getJurCodesCollection().stream()
+                .anyMatch(jurCode -> JurisdictionCode.BOC.toString()
+                        .equals(jurCode.getValue().getJuridictionCodesList()));
+
+        return hasEccOrCounterClaim || hasBothEccAndBoc;
     }
 
     private static boolean liveAppeal(CaseData caseData) {

@@ -48,7 +48,6 @@ public class CaseTransferUtils {
                         String.format("AssignOffice or SelectedCode not found for case type %s "
                                 + "with EthosCaseReference %s", caseTypeId, caseData.getEthosCaseReference()));
             }
-
         } else if (SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
             caseData.setManagingOffice(TribunalOffice.GLASGOW.getOfficeName());
             caseData.setAllocatedOffice(TribunalOffice.GLASGOW.getOfficeName());

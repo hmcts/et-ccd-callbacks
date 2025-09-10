@@ -67,7 +67,30 @@ To get the project to build in IntelliJ IDEA, you have to:
 - Enable Annotation Processing: Preferences -> Build, Execution, Deployment -> Compiler -> Annotation Processors
 
 ## Running
-To run the application locally you should follow the instructions above for one of the CCD environments.
+To run the application locally, you should follow the instructions above for one of the CCD environments.
+
+## Tasks
+
+There are a number of tasks within the project; some make use of Spring Scheduling and run within the main application, and others are standalone which can be run from the command line.
+
+*Note: the examples below assume you are using the RSE CFT lib environment, but the tasks can be run from any environment.*
+
+To run the tasks from the command line, you can use the following command as an example:
+```bash
+SERVER_PORT=4551 TASK_NAME=BatchReconfigurationTask SPRING_PROFILES_ACTIVE=cftlib CRON_RECONFIGURATION_CASE_IDS=1756969501994958 ./gradlew bootRun
+```
+
+This will run the `BatchReconfigurationTask` on port 4551 with the cftlib profile active. 
+
+Alternatively, some tasks can be executed if a shell script has been created for them. These can be found in the `./bin/tasks` directory.
+
+An example of this is the `BatchReconfigurationTask` which can be run as follows:
+
+```bash
+./bin/tasks/BatchReconfigurationTask.sh 1756969501994958
+```
+
+When running a task locally, it is important to set the `SERVER_PORT` environment variable to a port that is not already in use.
 
 ## API documentation
 API documentation is provided with SpringDoc OpenAPI

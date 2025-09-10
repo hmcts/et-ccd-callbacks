@@ -4,6 +4,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -67,6 +71,27 @@ class DocumentHelperTest {
     private static final String ABERDEEN_VENUE_ADDRESS = "Ground Floor, AB1, 48 Huntly Street, Aberdeen, AB10 1SH";
     private static final String CLOSE_BRACE_NEW_LINE = "}\n";
     private static final String COMMA_NEWLINE = "\",\n";
+    private static final String ORIGINAL_CLAIMANT = "Original Claimant";
+    private static final String ORIGINAL_RESPONDENT = "Original Respondent";
+    private static final String TEST_CASE_REFERENCE = "123456";
+    private static final String TEST_FEE_GROUP_REFERENCE = "12212121";
+    private static final String RESPONDENT_ID_001 = "resp-001";
+    private static final String NEW_DOCUMENT_DESCRIPTION = "New Document";
+    private static final String NEW_DOCUMENT_TYPE = "New Type";
+
+    private static final String RESPONDENT_OR_REP_FULL_NAME = "respondent_or_rep_full_name";
+    private static final String RESPONDENT_FULL_NAME = "respondent_full_name";
+    private static final String RESPONDENT_FIELD = "Respondent";
+    private static final String CLAIMANT_OR_REP_FULL_NAME = "claimant_or_rep_full_name";
+    private static final String CLAIMANT_FULL_NAME = "claimant_full_name";
+    private static final String CLAIMANT_FIELD = "Claimant";
+    private static final String CLAIMANT_REP_ORGANISATION = "claimant_rep_organisation";
+    private static final String RESPONDENT_REP_ORGANISATION = "respondent_rep_organisation";
+    private static final String CLAIMANT_REFERENCE = "claimant_reference";
+    private static final String RESPONDENT_REFERENCE = "respondent_reference";
+    private static final String TEMPLATE_NAME = "templateName";
+    private static final String TODAY_DATE = "Today_date";
+    private static final String CASE_NO = "Case_No";
     private CaseDetails caseDetails1;
     private CaseDetails caseDetails2;
     private CaseDetails caseDetails3;
@@ -1624,7 +1649,7 @@ class DocumentHelperTest {
             + "\"Hearing_date\":\"" + COMMA_NEWLINE
             + "\"Hearing_date_time\":\"" + COMMA_NEWLINE
             + "\"Hearing_time\":\"" + COMMA_NEWLINE
-            + "\"Hearing_venue\":\"Glasgow Tribunal Centre, Atlantic Quay, 20 York Street, Glasgow, G2 8GT" 
+            + "\"Hearing_venue\":\"Glasgow Tribunal Centre, Atlantic Quay, 20 York Street, Glasgow, G2 8GT"
             + COMMA_NEWLINE
             + "\"Hearing_duration\":\"2 days" + COMMA_NEWLINE
             + "\"t_Scot_7_1\":\"true" + COMMA_NEWLINE
@@ -1701,7 +1726,7 @@ class DocumentHelperTest {
             + "\"Hearing_date\":\"25 November 2019" + COMMA_NEWLINE
             + "\"Hearing_date_time\":\"25 November 2019 at 12:11" + COMMA_NEWLINE
             + "\"Hearing_time\":\"12:11" + COMMA_NEWLINE
-            + "\"Hearing_venue\":\"Glasgow Tribunal Centre, Atlantic Quay, 20 York Street, Glasgow, G2 8GT" 
+            + "\"Hearing_venue\":\"Glasgow Tribunal Centre, Atlantic Quay, 20 York Street, Glasgow, G2 8GT"
             + COMMA_NEWLINE
             + "\"Hearing_duration\":\"2 days" + COMMA_NEWLINE
             + "\"t_Scot_24\":\"true" + COMMA_NEWLINE
@@ -2267,127 +2292,63 @@ class DocumentHelperTest {
         caseData.getDocumentCollection().forEach(d -> assertThat(d.getValue().getDocNumber()).isNotNull());
     }
 
-    @Test
-    void testIsEccDocumentTemplate_EnglandWalesEccTemplate_returnsTrue() {
-        boolean result = DocumentHelper.isEccDocumentTemplate(ENGLANDWALES_CASE_TYPE_ID, "EM-TRB-EGW-ENG-00028");
-        assertThat(result).isTrue();
+    @ParameterizedTest
+    @CsvSource({
+        "EnglandWales, EM-TRB-EGW-ENG-00028, true, 'England Wales ECC template'",
+        "Scotland, EM-TRB-SCO-ENG-00044, true, 'Scotland ECC template'",
+        "EnglandWales, EM-TRB-EGW-ENG-00026, false, 'Non-ECC template'",
+        "Scotland, EM-TRB-SCO-ENG-00045, false, 'Wrong case type for template'"
+    })
+    void testIsEccDocumentTemplate_variousTemplates_returnsExpectedResult(
+            String caseType, String templateName, boolean expectedResult, String description) {
+        String caseTypeId = "EnglandWales".equals(caseType) ? ENGLANDWALES_CASE_TYPE_ID : SCOTLAND_CASE_TYPE_ID;
+
+        boolean result = DocumentHelper.isEccDocumentTemplate(caseTypeId, templateName);
+
+        assertThat(result).isEqualTo(expectedResult);
     }
 
-    @Test
-    void testIsEccDocumentTemplate_ScotlandEccTemplate_returnsTrue() {
-        boolean result = DocumentHelper.isEccDocumentTemplate(SCOTLAND_CASE_TYPE_ID, "EM-TRB-SCO-ENG-00044");
-        assertThat(result).isTrue();
-    }
-
-    @Test
-    void testIsEccDocumentTemplate_NonEccTemplate_returnsFalse() {
-        boolean result = DocumentHelper.isEccDocumentTemplate(ENGLANDWALES_CASE_TYPE_ID, "EM-TRB-EGW-ENG-00026");
-        assertThat(result).isFalse();
-    }
-
-    @Test
-    void testIsEccDocumentTemplate_WrongCaseTypeForTemplate_returnsFalse() {
-        boolean result = DocumentHelper.isEccDocumentTemplate(SCOTLAND_CASE_TYPE_ID, "EM-TRB-SCO-ENG-00045");
-        assertThat(result).isFalse();
-    }
-
-    @Test
-    void testAddDocumentToCollectionAtIndex_addAtBeginning_insertsAtCorrectPosition() {
+    @ParameterizedTest
+    @CsvSource({
+        "1, 0, 'at beginning'",
+        "2, 1, 'in middle'",
+        "3, 2, 'at middle position'",
+        "4, 3, 'at end'"
+    })
+    void testAddDocumentToCollectionAtIndex_validPositions_insertsAtCorrectPosition(
+            String indexToAdd, int expectedPosition, String description) {
         List<DocumentTypeItem> documentCollection = createDocumentCollection(3);
-        DocumentTypeItem newDocument = createDocumentTypeItem("New Document", "New Type");
-        String indexToAdd = "1";
-        
+        DocumentTypeItem newDocument = createDocumentTypeItem(NEW_DOCUMENT_DESCRIPTION, NEW_DOCUMENT_TYPE);
+
         DocumentHelper.addDocumentToCollectionAtIndex(documentCollection, newDocument, indexToAdd);
-        
-        assertThat(documentCollection.size()).isEqualTo(4);
-        assertThat(documentCollection.getFirst()).isEqualTo(newDocument);
-        assertThat(documentCollection.getFirst().getValue().getShortDescription()).isEqualTo("New Document");
+
+        assertThat(documentCollection).hasSize(4);
+        assertThat(documentCollection.get(expectedPosition)).isEqualTo(newDocument);
+        assertThat(documentCollection.get(expectedPosition).getValue()
+                .getShortDescription()).isEqualTo(NEW_DOCUMENT_DESCRIPTION);
     }
 
-    @Test
-    void testAddDocumentToCollectionAtIndex_addInMiddle_insertsAtCorrectPosition() {
-        List<DocumentTypeItem> documentCollection = createDocumentCollection(3);
-        DocumentTypeItem newDocument = createDocumentTypeItem("New Document", "New Type");
-        String indexToAdd = "2";
-        
+    @ParameterizedTest
+    @NullAndEmptySource
+    void testAddDocumentToCollectionAtIndex_nullOrEmptyIndex_addsToEnd(String indexToAdd) {
+        List<DocumentTypeItem> documentCollection = createDocumentCollection(4);
+        DocumentTypeItem newDocument = createDocumentTypeItem(NEW_DOCUMENT_DESCRIPTION, NEW_DOCUMENT_TYPE);
+
         DocumentHelper.addDocumentToCollectionAtIndex(documentCollection, newDocument, indexToAdd);
-        
-        assertThat(documentCollection.size()).isEqualTo(4);
-        assertThat(documentCollection.get(1)).isEqualTo(newDocument);
-        assertThat(documentCollection.get(1).getValue().getShortDescription()).isEqualTo("New Document");
+
+        assertThat(documentCollection).hasSize(5);
+        assertThat(documentCollection.get(4)).isEqualTo(newDocument);
+        assertThat(documentCollection.get(4).getValue().getShortDescription()).isEqualTo(NEW_DOCUMENT_DESCRIPTION);
     }
 
-    @Test
-    void testAddDocumentToCollectionAtIndex_addAtEnd_insertsAtCorrectPosition() {
+    @ParameterizedTest
+    @ValueSource(strings = {"0", "-1", "5", "-10", "100"})
+    void testAddDocumentToCollectionAtIndex_invalidIndices_throwsIllegalArgumentException(String invalidIndex) {
         List<DocumentTypeItem> documentCollection = createDocumentCollection(3);
-        DocumentTypeItem newDocument = createDocumentTypeItem("New Document", "New Type");
-        String indexToAdd = "4"; // Size + 1
-        
-        DocumentHelper.addDocumentToCollectionAtIndex(documentCollection, newDocument, indexToAdd);
-        
-        assertThat(documentCollection.size()).isEqualTo(4);
-        assertThat(documentCollection.get(3)).isEqualTo(newDocument);
-        assertThat(documentCollection.get(3).getValue().getShortDescription()).isEqualTo("New Document");
-    }
-
-    @Test
-    void testAddDocumentToCollectionAtIndex_nullIndex_addsToEnd() {
-        List<DocumentTypeItem> documentCollection = createDocumentCollection(3);
-        DocumentTypeItem newDocument = createDocumentTypeItem("New Document", "New Type");
-        String indexToAdd = null;
-        
-        DocumentHelper.addDocumentToCollectionAtIndex(documentCollection, newDocument, indexToAdd);
-        
-        assertThat(documentCollection.size()).isEqualTo(4);
-        assertThat(documentCollection.get(3)).isEqualTo(newDocument);
-        assertThat(documentCollection.get(3).getValue().getShortDescription()).isEqualTo("New Document");
-    }
-
-    @Test
-    void testAddDocumentToCollectionAtIndex_emptyIndex_addsToEnd() {
-        List<DocumentTypeItem> documentCollection = createDocumentCollection(3);
-        DocumentTypeItem newDocument = createDocumentTypeItem("New Document", "New Type");
-        String indexToAdd = "";
-        
-        DocumentHelper.addDocumentToCollectionAtIndex(documentCollection, newDocument, indexToAdd);
-        
-        assertThat(documentCollection.size()).isEqualTo(4);
-        assertThat(documentCollection.get(3)).isEqualTo(newDocument);
-        assertThat(documentCollection.get(3).getValue().getShortDescription()).isEqualTo("New Document");
-    }
-
-    @Test
-    void testAddDocumentToCollectionAtIndex_indexZero_throwsIllegalArgumentException() {
-        List<DocumentTypeItem> documentCollection = createDocumentCollection(3);
-        DocumentTypeItem newDocument = createDocumentTypeItem("New Document", "New Type");
-        String indexToAdd = "0";
+        DocumentTypeItem newDocument = createDocumentTypeItem(NEW_DOCUMENT_DESCRIPTION, NEW_DOCUMENT_TYPE);
         
         assertThatThrownBy(() -> DocumentHelper
-                .addDocumentToCollectionAtIndex(documentCollection, newDocument, indexToAdd))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("The document number is invalid");
-    }
-
-    @Test
-    void testAddDocumentToCollectionAtIndex_indexTooHigh_throwsIllegalArgumentException() {
-        List<DocumentTypeItem> documentCollection = createDocumentCollection(3);
-        DocumentTypeItem newDocument = createDocumentTypeItem("New Document", "New Type");
-        String indexToAdd = "5"; // Size + 2, which is too high
-        
-        assertThatThrownBy(() -> DocumentHelper
-                .addDocumentToCollectionAtIndex(documentCollection, newDocument, indexToAdd))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessage("The document number is invalid");
-    }
-
-    @Test
-    void testAddDocumentToCollectionAtIndex_negativeIndex_throwsIllegalArgumentException() {
-        List<DocumentTypeItem> documentCollection = createDocumentCollection(3);
-        DocumentTypeItem newDocument = createDocumentTypeItem("New Document", "New Type");
-        String indexToAdd = "-1";
-        
-        assertThatThrownBy(() -> DocumentHelper
-                .addDocumentToCollectionAtIndex(documentCollection, newDocument, indexToAdd))
+                .addDocumentToCollectionAtIndex(documentCollection, newDocument, invalidIndex))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("The document number is invalid");
     }
@@ -2397,10 +2358,10 @@ class DocumentHelperTest {
         List<DocumentTypeItem> documentCollection = new ArrayList<>();
         DocumentTypeItem newDocument = createDocumentTypeItem("First Document", "First Type");
         String indexToAdd = "1";
-        
+
         DocumentHelper.addDocumentToCollectionAtIndex(documentCollection, newDocument, indexToAdd);
-        
-        assertThat(documentCollection.size()).isEqualTo(1);
+
+        assertThat(documentCollection).hasSize(1);
         assertThat(documentCollection.getFirst()).isEqualTo(newDocument);
         assertThat(documentCollection.getFirst().getValue().getShortDescription()).isEqualTo("First Document");
     }
@@ -2411,10 +2372,10 @@ class DocumentHelperTest {
         DocumentTypeItem newDocument =
                 createDocumentTypeItem("First Document", "First Type");
         String indexToAdd = null;
-        
+
         DocumentHelper.addDocumentToCollectionAtIndex(documentCollection, newDocument, indexToAdd);
-        
-        assertThat(documentCollection.size()).isEqualTo(1);
+
+        assertThat(documentCollection).hasSize(1);
         assertThat(documentCollection.getFirst()).isEqualTo(newDocument);
         assertThat(documentCollection.getFirst().getValue().getShortDescription()).isEqualTo("First Document");
     }
@@ -2424,7 +2385,7 @@ class DocumentHelperTest {
         List<DocumentTypeItem> documentCollection = createDocumentCollection(3);
         DocumentTypeItem newDocument = createDocumentTypeItem("New Document", "New Type");
         String indexToAdd = "not-a-number";
-        
+
         assertThatThrownBy(() -> DocumentHelper
                 .addDocumentToCollectionAtIndex(documentCollection, newDocument, indexToAdd))
                 .isInstanceOf(NumberFormatException.class);
@@ -2435,14 +2396,14 @@ class DocumentHelperTest {
         List<DocumentTypeItem> documentCollection = createDocumentCollection(3);
         DocumentTypeItem newDocument = createDocumentTypeItem("New Document", "New Type");
         String indexToAdd = "2";
-        
+
         final DocumentTypeItem originalFirst = documentCollection.get(0);
         final DocumentTypeItem originalSecond = documentCollection.get(1);
         final DocumentTypeItem originalThird = documentCollection.get(2);
-        
+
         DocumentHelper.addDocumentToCollectionAtIndex(documentCollection, newDocument, indexToAdd);
-        
-        assertThat(documentCollection.size()).isEqualTo(4);
+
+        assertThat(documentCollection).hasSize(4);
         assertThat(documentCollection.get(0)).isEqualTo(originalFirst);
         assertThat(documentCollection.get(1)).isEqualTo(newDocument);
         assertThat(documentCollection.get(2)).isEqualTo(originalSecond);
@@ -2452,234 +2413,232 @@ class DocumentHelperTest {
     @Test
     void testGetRespondentDataInternal_withoutSelectedRespondentId_returnsFirstValidRespondent() {
         CaseData caseData = createCaseDataWithRespondents();
-        
+
         StringBuilder result = DocumentHelper.getRespondentDataInternal(caseData, null);
         String output = result.toString();
-        
-        assertThat(output).contains("\"respondent_or_rep_full_name\":\"Test Respondent 1\"");
-        assertThat(output).contains("\"respondent_full_name\":\"Test Respondent 1\"");
-        assertThat(output).contains("\"Respondent\":\"1. Test Respondent 1,\"");
-        assertThat(output).contains("resp_others\":\"2. Test Respondent 2\"");
+
+        assertThat(output).contains(
+                "\"" + RESPONDENT_OR_REP_FULL_NAME + "\":\"Test Respondent 1\"",
+                "\"" + RESPONDENT_FULL_NAME + "\":\"Test Respondent 1\"",
+                "\"" + RESPONDENT_FIELD + "\":\"1. Test Respondent 1,\"",
+                "resp_others\":\"2. Test Respondent 2\""
+        );
     }
 
     @Test
     void testGetRespondentDataInternal_withSelectedRespondentId_returnsSpecificRespondent() {
         CaseData caseData = createCaseDataWithRespondents();
         String selectedRespondentId = "resp-002";
-        
+
         StringBuilder result = DocumentHelper.getRespondentDataInternal(caseData, selectedRespondentId);
         String output = result.toString();
-        
-        assertThat(output).contains("\"respondent_or_rep_full_name\":\"Test Respondent 2\"");
-        assertThat(output).contains("\"respondent_full_name\":\"Test Respondent 2\"");
+
+        assertThat(output).contains(
+                "\"" + RESPONDENT_OR_REP_FULL_NAME + "\":\"Test Respondent 2\"",
+                "\"" + RESPONDENT_FULL_NAME + "\":\"Test Respondent 2\""
+        );
     }
 
     @Test
     void testGetRespondentDataInternal_withSelectedRespondentIdAndRep_returnsRepresentativeData() {
         CaseData caseData = createCaseDataWithRespondentsAndReps();
-        String selectedRespondentId = "resp-001";
-        
-        StringBuilder result = DocumentHelper.getRespondentDataInternal(caseData, selectedRespondentId);
+
+        StringBuilder result = DocumentHelper.getRespondentDataInternal(caseData, RESPONDENT_ID_001);
         String output = result.toString();
-        
-        assertThat(output).contains("\"respondent_or_rep_full_name\":\"Rep for Respondent 1\"");
-        assertThat(output).contains("\"respondent_rep_organisation\":\"Rep Org 1\"");
-        assertThat(output).contains("\"respondent_reference\":\"REP-REF-001\"");
+
+        assertThat(output).contains("\"respondent_or_rep_full_name\":\"Rep for Respondent 1\"",
+                "\"respondent_rep_organisation\":\"Rep Org 1\"",
+                "\"respondent_reference\":\"REP-REF-001\"");
     }
 
     @Test
     void testGetRespondentDataInternal_emptyCollection_returnsEmptyFields() {
         CaseData caseData = new CaseData();
-        
+
         StringBuilder result = DocumentHelper.getRespondentDataInternal(caseData, null);
         String output = result.toString();
-        
-        assertThat(output).contains("\"respondent_or_rep_full_name\":\"\"");
-        assertThat(output).contains("\"respondent_full_name\":\"\"");
-        assertThat(output).contains("\"Respondent\":\"\"");
+
+        assertThat(output).contains(
+                "\"" + RESPONDENT_OR_REP_FULL_NAME + "\":\"\"",
+                "\"" + RESPONDENT_FULL_NAME + "\":\"\"",
+                "\"" + RESPONDENT_FIELD + "\":\"\""
+        );
     }
 
     @Test
     void testGetRespondentDataInternal_struckOutRespondent_skipsStruckOut() {
         CaseData caseData = createCaseDataWithStruckOutRespondent();
-        
+
         StringBuilder result = DocumentHelper.getRespondentDataInternal(caseData, null);
         String output = result.toString();
-        
-        // Should skip struck out respondent and use the second one
+
         assertThat(output).contains("\"respondent_or_rep_full_name\":\"Test Respondent 2\"");
     }
 
     @Test
     void testGetClaimantEccFlippedData_withSelectedRespondentId_returnsRespondentDataInClaimantFields() {
         CaseData caseData = createCaseDataWithRespondentsAndReps();
-        String selectedRespondentId = "resp-001";
-        
-        StringBuilder result = DocumentHelper.getClaimantEccFlippedData(caseData, selectedRespondentId);
+        caseData.setClaimantIndType(createMockClaimantIndType(ORIGINAL_CLAIMANT));
+
+        StringBuilder result = DocumentHelper.getClaimantEccWithRespondentData(caseData, RESPONDENT_ID_001);
         String output = result.toString();
-        
-        // Respondent data should appear in claimant fields
-        assertThat(output).contains("\"claimant_or_rep_full_name\":\"Rep for Respondent 1\"");
-        assertThat(output).contains("\"claimant_rep_organisation\":\"Rep Org 1\"");
-        assertThat(output).contains("\"claimant_reference\":\"REP-REF-001\"");
-        assertThat(output).contains("\"claimant_full_name\":\"Test Respondent 1\"");
-        assertThat(output).contains("\"Claimant\":\"Test Respondent 1\"");
+
+        assertThat(output).contains(
+                "\"" + CLAIMANT_OR_REP_FULL_NAME + "\":\"Rep for Respondent 1\"",
+                "\"" + CLAIMANT_REP_ORGANISATION + "\":\"Rep Org 1\"",
+                "\"" + CLAIMANT_REFERENCE + "\":\"REP-REF-001\"",
+                "\"" + CLAIMANT_FULL_NAME + "\":\"" + ORIGINAL_CLAIMANT + "\"",
+                "\"" + CLAIMANT_FIELD + "\":\"" + ORIGINAL_CLAIMANT + "\""
+        );
     }
 
     @Test
     void testGetClaimantEccFlippedData_noRepresentative_returnsDirectRespondentData() {
         CaseData caseData = createCaseDataWithRespondents();
-        String selectedRespondentId = "resp-001";
-        
-        StringBuilder result = DocumentHelper.getClaimantEccFlippedData(caseData, selectedRespondentId);
+        caseData.setClaimantIndType(createMockClaimantIndType(ORIGINAL_CLAIMANT));
+
+        StringBuilder result = DocumentHelper.getClaimantEccWithRespondentData(caseData, RESPONDENT_ID_001);
         String output = result.toString();
-        
-        assertThat(output).contains("\"claimant_or_rep_full_name\":\"Test Respondent 1\"");
-        assertThat(output).contains("\"claimant_full_name\":\"Test Respondent 1\"");
-        assertThat(output).contains("\"Claimant\":\"Test Respondent 1\"");
+
+        assertThat(output).contains(
+                "\"" + CLAIMANT_OR_REP_FULL_NAME + "\":\"Test Respondent 1\"",
+                "\"" + CLAIMANT_FULL_NAME + "\":\"" + ORIGINAL_CLAIMANT + "\"",
+                "\"" + CLAIMANT_FIELD + "\":\"" + ORIGINAL_CLAIMANT + "\""
+        );
     }
 
     @Test
     void testGetClaimantEccFlippedData_nullSelectedRespondentId_returnsEmptyData() {
         CaseData caseData = createCaseDataWithRespondents();
-        
-        StringBuilder result = DocumentHelper.getClaimantEccFlippedData(caseData, null);
+
+        StringBuilder result = DocumentHelper.getClaimantEccWithRespondentData(caseData, null);
         String output = result.toString();
-        
+
         assertThat(output).isEmpty();
     }
 
     @Test
     void testGetRespondentEccFlippedData_withClaimantRepresentative_returnsClaimantDataInRespondentFields() {
         CaseData caseData = createCaseDataWithClaimantRep();
-        String selectedRespondentId = "resp-001";
-        
-        StringBuilder result = DocumentHelper.getRespondentEccFlippedData(caseData, selectedRespondentId);
+        RespondentSumTypeItem respondent = createRespondentSumTypeItem(RESPONDENT_ID_001, ORIGINAL_RESPONDENT);
+        caseData.setRespondentCollection(List.of(respondent));
+
+        StringBuilder result = DocumentHelper.getRespondentEccWithClaimantData(caseData, RESPONDENT_ID_001);
         String output = result.toString();
-        
-        // Claimant data should appear in respondent fields
-        assertThat(output).contains("\"respondent_or_rep_full_name\":\"Claimant Representative\"");
-        assertThat(output).contains("\"respondent_rep_organisation\":\"Claimant Rep Org\"");
-        assertThat(output).contains("\"respondent_reference\":\"CLAIMANT-REP-REF\"");
+
+        assertThat(output).contains(
+                "\"" + RESPONDENT_OR_REP_FULL_NAME + "\":\"Claimant Representative\"",
+                "\"" + RESPONDENT_REP_ORGANISATION + "\":\"Claimant Rep Org\"",
+                "\"" + RESPONDENT_REFERENCE + "\":\"CLAIMANT-REP-REF\"",
+                "\"" + RESPONDENT_FULL_NAME + "\":\"" + ORIGINAL_RESPONDENT + "\"",
+                "\"" + RESPONDENT_FIELD + "\":\"" + ORIGINAL_RESPONDENT + "\""
+        );
     }
 
     @Test
     void testGetRespondentEccFlippedData_noClaimantRep_returnsDirectClaimantData() {
         CaseData caseData = createCaseDataWithClaimantOnly();
-        String selectedRespondentId = "resp-001";
-        
-        StringBuilder result = DocumentHelper.getRespondentEccFlippedData(caseData, selectedRespondentId);
+        RespondentSumTypeItem respondent = createRespondentSumTypeItem(RESPONDENT_ID_001, ORIGINAL_RESPONDENT);
+        caseData.setRespondentCollection(List.of(respondent));
+
+        StringBuilder result = DocumentHelper.getRespondentEccWithClaimantData(caseData, RESPONDENT_ID_001);
         String output = result.toString();
-        
-        assertThat(output).contains("\"respondent_or_rep_full_name\":\"John Smith\"");
-        assertThat(output).contains("\"respondent_full_name\":\"John Smith\"");
-        assertThat(output).contains("\"Respondent\":\"John Smith\"");
+
+        assertThat(output).contains(
+                "\"" + RESPONDENT_OR_REP_FULL_NAME + "\":\"John Smith\"",
+                "\"" + RESPONDENT_FULL_NAME + "\":\"" + ORIGINAL_RESPONDENT + "\"",
+                "\"" + RESPONDENT_FIELD + "\":\"" + ORIGINAL_RESPONDENT + "\""
+        );
     }
-    
+
     @Test
     void buildDocumentContent_withEccDocumentAndFlip_returnsFlippedData() {
-        // Arrange
         CaseData caseData = createCaseDataWithRespondentsAndReps();
-        caseData.setEthosCaseReference("123456");
-        caseData.setFeeGroupReference("12212121");
-        
-        CorrespondenceType correspondenceType = new CorrespondenceType();
-        correspondenceType.setTopLevelDocuments(ECC_DOCUMENT_ENG_TEMPLATE);
-        correspondenceType.setFlipRespondentAndClaimantValues(YES);
-        
-        // Create dynamic respondent selection
-        DynamicFixedListType dynamicRespondentsWithEcc = new DynamicFixedListType();
-        DynamicValueType dynamicValue = new DynamicValueType();
-        dynamicValue.setCode("resp-001");  
-        dynamicValue.setLabel("Test Respondent 1");
-        dynamicRespondentsWithEcc.setValue(dynamicValue);
-        correspondenceType.setDynamicRespondentsWithEcc(dynamicRespondentsWithEcc);
-        
+        caseData.setClaimantIndType(createMockClaimantIndType(ORIGINAL_CLAIMANT));
+        caseData.setEthosCaseReference(TEST_CASE_REFERENCE);
+        caseData.setFeeGroupReference(TEST_FEE_GROUP_REFERENCE);
+
+        CorrespondenceType correspondenceType = createFlippedCorrespondenceType();
         caseData.setCorrespondenceType(correspondenceType);
-        UserDetails userDetails = HelperTest.getUserDetails();
-        
-        // Act
+        UserDetails usersDetails = HelperTest.getUserDetails();
+
         StringBuilder result = DocumentHelper.buildDocumentContent(
-                caseData, "", userDetails, ENGLANDWALES_CASE_TYPE_ID, 
+                caseData, "", usersDetails, ENGLANDWALES_CASE_TYPE_ID,
                 correspondenceType, null, null, null, venueAddressReaderService
         );
         String output = result.toString();
-        
-        // Assert
-        assertThat(output).contains("\"templateName\":\"" + ECC_DOCUMENT_ENG_TEMPLATE);
-        // Verify claimant fields contain respondent data
-        assertThat(output).contains("\"claimant_or_rep_full_name\":\"Rep for Respondent 1\"");
-        assertThat(output).contains("\"claimant_full_name\":\"Test Respondent 1\"");
-        // Verify respondent fields contain claimant data (empty in this test case)
-        assertThat(output).contains("\"respondent_or_rep_full_name\":\"\"");
+
+        assertThat(output).contains(
+                "\"" + TEMPLATE_NAME + "\":\"" + ECC_DOCUMENT_ENG_TEMPLATE,
+                "\"" + CLAIMANT_OR_REP_FULL_NAME + "\":\"Rep for Respondent 1\"",
+                "\"" + CLAIMANT_FULL_NAME + "\":\"" + ORIGINAL_CLAIMANT + "\"",
+                "\"" + RESPONDENT_OR_REP_FULL_NAME + "\":\"" + ORIGINAL_CLAIMANT + "\"",
+                "\"" + RESPONDENT_FULL_NAME + "\":\"Test Respondent 1\""
+        );
     }
-    
+
     @Test
     void buildDocumentContent_withEccDocumentAndNoFlip_returnsNormalData() {
         CaseData caseData = createCaseDataWithRespondentsAndClaimantRep();
         caseData.setEthosCaseReference("123456");
         caseData.setFeeGroupReference("12212121");
-        
+
         CorrespondenceType correspondenceType = new CorrespondenceType();
         correspondenceType.setTopLevelDocuments(ECC_DOCUMENT_ENG_TEMPLATE);
         correspondenceType.setFlipRespondentAndClaimantValues(NO);
-        
+
         DynamicFixedListType dynamicRespondentsWithEcc = new DynamicFixedListType();
-        DynamicValueType dynamicValue = new DynamicValueType();  
-        dynamicValue.setCode("resp-001");  
+        DynamicValueType dynamicValue = new DynamicValueType();
+        dynamicValue.setCode(RESPONDENT_ID_001);
         dynamicValue.setLabel("Test Respondent 1");
         dynamicRespondentsWithEcc.setValue(dynamicValue);
         correspondenceType.setDynamicRespondentsWithEcc(dynamicRespondentsWithEcc);
-        
+
         caseData.setCorrespondenceType(correspondenceType);
-        UserDetails userDetails = HelperTest.getUserDetails();
-        
+        UserDetails usersDetails = HelperTest.getUserDetails();
+
         StringBuilder result = DocumentHelper.buildDocumentContent(
-                caseData, "", userDetails, ENGLANDWALES_CASE_TYPE_ID, 
+                caseData, "", usersDetails, ENGLANDWALES_CASE_TYPE_ID,
                 correspondenceType, null, null, null, venueAddressReaderService
         );
         String output = result.toString();
-        
-        assertThat(output).contains("\"templateName\":\"" + ECC_DOCUMENT_ENG_TEMPLATE);
-        assertThat(output).contains("\"claimant_or_rep_full_name\":\"Claimant Representative\"");
-        assertThat(output).contains("\"respondent_or_rep_full_name\":\"Rep for Respondent 1\"");
+
+        assertThat(output).contains(
+                "\"" + TEMPLATE_NAME + "\":\"" + ECC_DOCUMENT_ENG_TEMPLATE,
+                "\"" + CLAIMANT_OR_REP_FULL_NAME + "\":\"Claimant Representative\"",
+                "\"" + RESPONDENT_OR_REP_FULL_NAME + "\":\"Rep for Respondent 1\""
+        );
     }
-    
+
     @Test
     void buildDocumentContent_withScotlandEccDocument_returnsCorrectData() {
         CaseData caseData = createCaseDataWithRespondents();
-        caseData.setEthosCaseReference("123456");
-        caseData.setFeeGroupReference("12212121");
-        
-        CorrespondenceScotType correspondenceScotType = new CorrespondenceScotType();
-        correspondenceScotType.setTopLevelScotDocuments(ECC_DOCUMENT_SCOT_TEMPLATE);
-        correspondenceScotType.setFlipRespondentAndClaimantValues(YES);
-        
-        DynamicFixedListType dynamicRespondentsWithEcc = new DynamicFixedListType();
-        DynamicValueType dynamicValue = new DynamicValueType();  
-        dynamicValue.setCode("resp-001");  
-        dynamicValue.setLabel("Test Respondent 1");
-        dynamicRespondentsWithEcc.setValue(dynamicValue);
-        correspondenceScotType.setDynamicRespondentsWithEcc(dynamicRespondentsWithEcc);
-        
+        caseData.setClaimantIndType(createMockClaimantIndType(ORIGINAL_CLAIMANT));
+        caseData.setEthosCaseReference(TEST_CASE_REFERENCE);
+        caseData.setFeeGroupReference(TEST_FEE_GROUP_REFERENCE);
+
+        CorrespondenceScotType correspondenceScotType = createFlippedCorrespondenceScotType();
         caseData.setCorrespondenceScotType(correspondenceScotType);
-        UserDetails userDetails = HelperTest.getUserDetails();
-        
+        UserDetails usersDetails = HelperTest.getUserDetails();
+
         StringBuilder result = DocumentHelper.buildDocumentContent(
-                caseData, "", userDetails, SCOTLAND_CASE_TYPE_ID, 
+                caseData, "", usersDetails, SCOTLAND_CASE_TYPE_ID,
                 null, correspondenceScotType, null, null, venueAddressReaderService
         );
         String output = result.toString();
-        
-        assertThat(output).contains("\"templateName\":\"" + ECC_DOCUMENT_SCOT_TEMPLATE);
-        assertThat(output).contains("\"claimant_or_rep_full_name\":\"Test Respondent 1\"");
-        assertThat(output).contains("\"Today_date\":\"");
-        assertThat(output).contains("\"Case_No\":\"123456\"");
+
+        assertThat(output).contains(
+                "\"" + TEMPLATE_NAME + "\":\"" + ECC_DOCUMENT_SCOT_TEMPLATE,
+                "\"" + CLAIMANT_OR_REP_FULL_NAME + "\":\"Test Respondent 1\"",
+                "\"" + CLAIMANT_FULL_NAME + "\":\"" + ORIGINAL_CLAIMANT + "\"",
+                "\"" + TODAY_DATE + "\":\"",
+                "\"" + CASE_NO + "\":\"" + TEST_CASE_REFERENCE + "\""
+        );
     }
 
     private CaseData createCaseDataWithRespondents() {
         RespondentSumTypeItem respondent1 = new RespondentSumTypeItem();
-        respondent1.setId("resp-001");
+        respondent1.setId(RESPONDENT_ID_001);
         RespondentSumType resp1 = new RespondentSumType();
         resp1.setRespondentName("Test Respondent 1");
         resp1.setResponseContinue(YES);
@@ -2690,7 +2649,7 @@ class DocumentHelperTest {
         address1.setPostCode("TE1 1ST");
         resp1.setRespondentAddress(address1);
         respondent1.setValue(resp1);
-        
+
         RespondentSumTypeItem respondent2 = new RespondentSumTypeItem();
         respondent2.setId("resp-002");
         RespondentSumType resp2 = new RespondentSumType();
@@ -2731,13 +2690,13 @@ class DocumentHelperTest {
 
     private CaseData createCaseDataWithStruckOutRespondent() {
         RespondentSumTypeItem respondent1 = new RespondentSumTypeItem();
-        respondent1.setId("resp-001");
+        respondent1.setId(RESPONDENT_ID_001);
         RespondentSumType resp1 = new RespondentSumType();
         resp1.setRespondentName("Struck Out Respondent");
         resp1.setResponseContinue(YES);
-        resp1.setResponseStruckOut(YES); // This one is struck out
+        resp1.setResponseStruckOut(YES);
         respondent1.setValue(resp1);
-        
+
         RespondentSumTypeItem respondent2 = new RespondentSumTypeItem();
         respondent2.setId("resp-002");
         RespondentSumType resp2 = new RespondentSumType();
@@ -2770,17 +2729,17 @@ class DocumentHelperTest {
         CaseData caseData = new CaseData();
         caseData.setRepresentativeClaimantType(claimantRep);
         caseData.setClaimantRepresentedQuestion(YES);
-        
+
         ClaimantIndType claimantInd = mock(ClaimantIndType.class);
         when(claimantInd.claimantFullName()).thenReturn("John Smith");
         caseData.setClaimantIndType(claimantInd);
-        
+
         return caseData;
     }
 
     private CaseData createCaseDataWithClaimantOnly() {
         CaseData caseData = new CaseData();
-        
+
         ClaimantIndType claimantInd = mock(ClaimantIndType.class);
         when(claimantInd.claimantFullName()).thenReturn("John Smith");
         caseData.setClaimantIndType(claimantInd);
@@ -2794,7 +2753,7 @@ class DocumentHelperTest {
                 new uk.gov.hmcts.et.common.model.ccd.types.ClaimantType();
         claimantType.setClaimantAddressUK(claimantAddress);
         caseData.setClaimantType(claimantType);
-        
+
         return caseData;
     }
 
@@ -2812,14 +2771,59 @@ class DocumentHelperTest {
         CaseData caseData = createCaseDataWithRespondentsAndReps();
         caseData.setRepresentativeClaimantType(claimantRep);
         caseData.setClaimantRepresentedQuestion(YES);
-        
+
         if (caseData.getClaimantIndType() == null) {
-            ClaimantIndType claimantInd = mock(ClaimantIndType.class);
-            when(claimantInd.claimantFullName()).thenReturn("John Smith");
-            caseData.setClaimantIndType(claimantInd);
+            caseData.setClaimantIndType(createMockClaimantIndType("John Smith"));
         }
-        
+
         return caseData;
+    }
+
+    private ClaimantIndType createMockClaimantIndType(String fullName) {
+        ClaimantIndType claimantInd = mock(ClaimantIndType.class);
+        when(claimantInd.claimantFullName()).thenReturn(fullName);
+        return claimantInd;
+    }
+
+    private RespondentSumTypeItem createRespondentSumTypeItem(String id, String name) {
+        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
+        respondent.setId(id);
+        RespondentSumType resp = new RespondentSumType();
+        resp.setRespondentName(name);
+        resp.setResponseContinue(YES);
+        resp.setResponseStruckOut(NO);
+        respondent.setValue(resp);
+        return respondent;
+    }
+
+    private CorrespondenceType createFlippedCorrespondenceType() {
+        CorrespondenceType correspondenceType = new CorrespondenceType();
+        correspondenceType.setTopLevelDocuments(ECC_DOCUMENT_ENG_TEMPLATE);
+        correspondenceType.setFlipRespondentAndClaimantValues(YES);
+
+        DynamicFixedListType dynamicRespondentsWithEcc = new DynamicFixedListType();
+        DynamicValueType dynamicValue = new DynamicValueType();
+        dynamicValue.setCode(RESPONDENT_ID_001);
+        dynamicValue.setLabel("Test Respondent 1");
+        dynamicRespondentsWithEcc.setValue(dynamicValue);
+        correspondenceType.setDynamicRespondentsWithEcc(dynamicRespondentsWithEcc);
+
+        return correspondenceType;
+    }
+
+    private CorrespondenceScotType createFlippedCorrespondenceScotType() {
+        CorrespondenceScotType correspondenceScotType = new CorrespondenceScotType();
+        correspondenceScotType.setTopLevelScotDocuments(ECC_DOCUMENT_SCOT_TEMPLATE);
+        correspondenceScotType.setFlipRespondentAndClaimantValues(YES);
+
+        DynamicFixedListType dynamicRespondentsWithEcc = new DynamicFixedListType();
+        DynamicValueType dynamicValue = new DynamicValueType();
+        dynamicValue.setCode(RESPONDENT_ID_001);
+        dynamicValue.setLabel("Test Respondent 1");
+        dynamicRespondentsWithEcc.setValue(dynamicValue);
+        correspondenceScotType.setDynamicRespondentsWithEcc(dynamicRespondentsWithEcc);
+
+        return correspondenceScotType;
     }
 
     private List<DocumentTypeItem> createDocumentCollection(int size) {

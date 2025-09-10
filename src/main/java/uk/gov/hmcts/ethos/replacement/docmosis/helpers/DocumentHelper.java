@@ -206,23 +206,23 @@ public final class DocumentHelper {
      */
     private static StringBuilder buildAddressFields(Address address, String prefix) {
         StringBuilder sb = new StringBuilder(170);
-        sb.append("\"").append(prefix).append("_addressLine1\":\"")
+        sb.append(prefix).append("addressLine1\":\"")
                 .append(nullCheck(address.getAddressLine1())).append(NEW_LINE)
-                .append("\"").append(prefix).append("_addressLine2\":\"")
+                .append(prefix).append("addressLine2\":\"")
                 .append(nullCheck(address.getAddressLine2())).append(NEW_LINE)
-                .append("\"").append(prefix).append("_addressLine3\":\"")
+                .append(prefix).append("addressLine3\":\"")
                 .append(nullCheck(address.getAddressLine3())).append(NEW_LINE)
-                .append("\"").append(prefix).append("_town\":\"")
+                .append(prefix).append("town\":\"")
                 .append(nullCheck(address.getPostTown())).append(NEW_LINE)
-                .append("\"").append(prefix).append("_county\":\"")
+                .append(prefix).append("county\":\"")
                 .append(nullCheck(address.getCounty())).append(NEW_LINE)
-                .append("\"").append(prefix).append("_postCode\":\"")
+                .append(prefix).append("postCode\":\"")
                 .append(nullCheck(address.getPostCode())).append(NEW_LINE);
         return sb;
     }
 
     private static StringBuilder getClaimantAddressUK(Address address) {
-        return buildAddressFields(address, "claimant");
+        return buildAddressFields(address, "\"claimant_");
     }
 
     /**
@@ -239,7 +239,7 @@ public final class DocumentHelper {
     }
 
     private static StringBuilder getClaimantOrRepAddressUK(Address address) {
-        return buildAddressFields(address, "claimant_or_rep");
+        return buildAddressFields(address, "\"claimant_or_rep_");
     }
 
     private static StringBuilder getClaimantData(CaseData caseData) {
@@ -737,11 +737,11 @@ public final class DocumentHelper {
     }
 
     private static StringBuilder getRespondentAddressUK(Address address) {
-        return buildAddressFields(address, "respondent");
+        return buildAddressFields(address, "\"respondent_");
     }
 
     private static StringBuilder getRespondentOrRepAddressUK(Address address) {
-        return buildAddressFields(address, "respondent_or_rep");
+        return buildAddressFields(address, "\"respondent_or_rep_");
     }
 
     private static StringBuilder getRespOthersName(CaseData caseData, String firstRespondentName) {

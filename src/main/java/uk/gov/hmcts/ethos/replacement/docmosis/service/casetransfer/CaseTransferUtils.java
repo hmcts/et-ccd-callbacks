@@ -96,7 +96,7 @@ public class CaseTransferUtils {
             return submitEvents.get(0).getCaseData();
 
         } catch (Exception ex) {
-            throw(CaseCreationException) new CaseCreationException("Error getting counter claim case for : "
+            throw (CaseCreationException) new CaseCreationException("Error getting counter claim case for : "
                     + caseData.getEthosCaseReference()).initCause(ex);
         }
     }

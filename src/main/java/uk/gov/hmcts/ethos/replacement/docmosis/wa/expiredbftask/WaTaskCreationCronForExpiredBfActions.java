@@ -44,7 +44,7 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
     @Value("${cron.maxCasesToProcess}")
     private int maxCasesToProcess;
 
-    private static final int MAX_VALID_CASE_TO_UPDATE = 10;
+    private static final int MAX_VALID_CASE_TO_UPDATE = 300;
 
     /**
      * This cron job runs every day at 00:01 to create WA tasks for expired BF actions.

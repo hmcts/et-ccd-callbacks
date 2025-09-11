@@ -51,6 +51,7 @@ class NocClaimantRepresentativeServiceTest {
     private static final String ORGANISATION_ID_NEW = "ORG3_NEW";
     private static final String ET_ORG_1 = "ET Org 1";
     private static final String ET_ORG_2 = "ET Org 2";
+    private static final String DUMMY_ADMIN_USER_TOKEN = "DUMMY_ADMIN_USER_TOKEN";
 
     private NocClaimantRepresentativeService nocClaimantRepresentativeService;
 
@@ -113,10 +114,11 @@ class NocClaimantRepresentativeServiceTest {
         when(nocCcdService.getLatestAuditEventByName(any(), any(), any())).thenReturn(
                 Optional.of(mockAuditEvent()));
         UserDetails mockUser = getMockUser();
-        when(adminUserService.getUserDetails(any())).thenReturn(mockUser);
+        when(adminUserService.getAdminUserToken()).thenReturn(DUMMY_ADMIN_USER_TOKEN);
+        when(adminUserService.getUserDetails(eq(DUMMY_ADMIN_USER_TOKEN), anyString())).thenReturn(mockUser);
 
         nocClaimantRepresentativeService.updateClaimantRepresentation(
-                caseDetails, "Some Token"
+                caseDetails, DUMMY_ADMIN_USER_TOKEN
         );
 
         assertThat(caseData.getRepresentativeClaimantType().getNameOfRepresentative())

@@ -83,6 +83,7 @@ class SendNotificationServiceTest {
     private static final String BUNDLES_SUBMITTED_NOTIFICATION_FOR_TRIBUNAL_TEMPLATE_ID =
             "bundlesSubmittedNotificationForTribunalTemplateId";
     private static final String CLAIMANT_ONLY = "Claimant only";
+    private static final String DUMMY_ADMIN_USER_TOKEN = "DUMMY_ADMIN_USER_TOKEN";
 
     @BeforeEach
      void setUp() {
@@ -339,7 +340,8 @@ class SendNotificationServiceTest {
                 List.of(mockAssignment));
 
         UserDetails userDetails = mock(UserDetails.class);
-        when(adminUserService.getUserDetails(anyString())).thenReturn(userDetails);
+        when(adminUserService.getAdminUserToken()).thenReturn(DUMMY_ADMIN_USER_TOKEN);
+        when(adminUserService.getUserDetails(eq(DUMMY_ADMIN_USER_TOKEN), anyString())).thenReturn(userDetails);
         when(userDetails.getEmail()).thenReturn("rep@example.com");
 
         personalisationCaptor.getAllValues().clear();
@@ -385,8 +387,9 @@ class SendNotificationServiceTest {
         when(caseAccessService.getCaseUserAssignmentsById(anyString())).thenReturn(assignments);
 
         UserDetails userDetails = mock(UserDetails.class);
-        when(adminUserService.getUserDetails(anyString())).thenAnswer(invocation -> {
-            String userId = invocation.getArgument(0);
+        when(adminUserService.getAdminUserToken()).thenReturn(DUMMY_ADMIN_USER_TOKEN);
+        when(adminUserService.getUserDetails(eq(DUMMY_ADMIN_USER_TOKEN), anyString())).thenAnswer(invocation -> {
+            String userId = invocation.getArgument(1);
             String email = switch (userId) {
                 case "claimantSolicitorUserId" -> "claimant.rep@example.com";
                 case "sharedListUserId" -> "shared1@example.com";
@@ -470,8 +473,9 @@ class SendNotificationServiceTest {
         when(caseAccessService.getCaseUserAssignmentsById(anyString())).thenReturn(assignments);
 
         UserDetails userDetails = mock(UserDetails.class);
-        when(adminUserService.getUserDetails(anyString())).thenAnswer(invocation -> {
-            String userId = invocation.getArgument(0);
+        when(adminUserService.getAdminUserToken()).thenReturn(DUMMY_ADMIN_USER_TOKEN);
+        when(adminUserService.getUserDetails(eq(DUMMY_ADMIN_USER_TOKEN), anyString())).thenAnswer(invocation -> {
+            String userId = invocation.getArgument(1);
             String email = switch (userId) {
                 case "respondentSolicitorUserId" -> "respondentRep@email.com";
                 case "sharedListUserId" -> "shared1@example.com";

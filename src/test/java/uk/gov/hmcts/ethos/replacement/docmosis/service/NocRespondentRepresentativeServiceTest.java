@@ -48,6 +48,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -586,7 +587,7 @@ class NocRespondentRepresentativeServiceTest {
     }
 
     @Test
-    void removeOrganisationRepresentativeAccess() throws IOException {
+    void removeOrganisationRepresentativeAccess() {
         UserDetails mockUser = getMockUser();
         when(adminUserService.getUserDetails(anyString(), any())).thenReturn(mockUser);
         when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);

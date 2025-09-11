@@ -281,7 +281,8 @@ public class SendNotificationService {
         List<String> emailAddresses = new ArrayList<>();
         for (CaseUserAssignment assignment : assignments) {
             if (ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel().equals(assignment.getCaseRole())) {
-                UserDetails userDetails = adminUserService.getUserDetails(assignment.getUserId());
+                UserDetails userDetails = adminUserService.getUserDetails(adminUserService.getAdminUserToken(),
+                        assignment.getUserId());
                 emailAddresses.add(userDetails.getEmail());
             }
         }
@@ -292,7 +293,8 @@ public class SendNotificationService {
         List<String> emailAddresses = new ArrayList<>();
         for (CaseUserAssignment assignment : assignments) {
             if (SolicitorRole.from(assignment.getCaseRole()).isPresent()) {
-                UserDetails userDetails = adminUserService.getUserDetails(assignment.getUserId());
+                UserDetails userDetails = adminUserService.getUserDetails(adminUserService.getAdminUserToken(),
+                        assignment.getUserId());
                 emailAddresses.add(userDetails.getEmail());
             }
         }

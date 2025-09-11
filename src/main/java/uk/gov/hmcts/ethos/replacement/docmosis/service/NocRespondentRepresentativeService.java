@@ -12,6 +12,8 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
@@ -37,7 +39,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
+import static org.apache.commons.lang3.ObjectUtils.getIfNull;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -130,7 +132,7 @@ public class NocRespondentRepresentativeService {
 
         RepresentedTypeR addedSolicitor = nocRespondentHelper.generateNewRepDetails(change, userDetails, respondent);
 
-        List<RepresentedTypeRItem> repCollection = defaultIfNull(caseData.getRepCollection(), new ArrayList<>());
+        List<RepresentedTypeRItem> repCollection = getIfNull(caseData.getRepCollection(), new ArrayList<>());
 
         int repIndex = nocRespondentHelper.getIndexOfRep(respondent, repCollection);
 
@@ -216,7 +218,7 @@ public class NocRespondentRepresentativeService {
     public List<ChangeOrganisationRequest> identifyRepresentationChanges(CaseData  after,
                                                                          CaseData before) {
         final List<RespondentSumTypeItem> newRespondents =
-            defaultIfNull(after.getRespondentCollection(), new ArrayList<>());
+            getIfNull(after.getRespondentCollection(), new ArrayList<>());
         final Map<String, Organisation> newRespondentsOrganisations =
             nocRespondentHelper.getRespondentOrganisations(after);
         final Map<String, Organisation> oldRespondentsOrganisations =
@@ -237,6 +239,34 @@ public class NocRespondentRepresentativeService {
         }
 
         return changeRequests;
+    }
+
+    /**
+     * Revokes access from all users of an organisation being replaced or removed.
+     * @param caseId - case id of case to apply update to
+     * @param changeOrganisationRequest - containing case role and id of organisation to remove
+     */
+    public void removeOrganisationRepresentativeAccess(String caseId,
+                                                       ChangeOrganisationRequest changeOrganisationRequest) {
+        String roleOfRemovedOrg = changeOrganisationRequest.getCaseRoleId().getSelectedCode();
+        String orgId = changeOrganisationRequest.getOrganisationToRemove().getOrganisationID();
+        CaseUserAssignmentData caseAssignments =
+            nocCcdService.getCaseAssignments(adminUserService.getAdminUserToken(), caseId);
+
+        List<CaseUserAssignment> usersToRevoke = caseAssignments.getCaseUserAssignments().stream()
+            .filter(caseUserAssignment -> caseUserAssignment.getCaseRole().equals(roleOfRemovedOrg))
+            .map(caseUserAssignment ->
+                CaseUserAssignment.builder().userId(caseUserAssignment.getUserId())
+                    .organisationId(orgId)
+                    .caseRole(roleOfRemovedOrg)
+                    .caseId(caseId)
+                    .build()
+            ).toList();
+
+        if (!CollectionUtils.isEmpty(usersToRevoke)) {
+            nocCcdService.revokeCaseAssignments(adminUserService.getAdminUserToken(),
+                CaseUserAssignmentData.builder().caseUserAssignments(usersToRevoke).build());
+        }
     }
 
     /**

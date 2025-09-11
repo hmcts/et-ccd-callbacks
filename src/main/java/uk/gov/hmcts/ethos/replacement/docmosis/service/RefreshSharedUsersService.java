@@ -56,7 +56,7 @@ public class RefreshSharedUsersService {
         caseData.getRepCollection().forEach(item -> item.getValue().setOrganisationUsers(new ArrayList<>()));
 
         respondentSolicitors.forEach((userId, roleLabel) -> {
-            UserDetails userDetails = adminUserService.getUserDetails(userId);
+            UserDetails userDetails = adminUserService.getUserDetails(adminUserService.getAdminUserToken(), userId);
             OrganisationUsersIdamUser organisationUsersIdamUser = OrganisationUsersIdamUser.builder()
                     .email(userDetails.getEmail())
                     .firstName(userDetails.getFirstName())
@@ -89,22 +89,25 @@ public class RefreshSharedUsersService {
             return;
         }
         log.info("{} Claimant solicitors found for case id {}", claimantSolicitors.size(), caseDetails.getCaseId());
-        claimantSolicitors.stream()
-                .map(adminUserService::getUserDetails)
-                .map(userDetails1 -> OrganisationUsersIdamUser.builder()
-                        .email(userDetails1.getEmail())
-                        .firstName(userDetails1.getFirstName())
-                        .lastName(userDetails1.getLastName())
-                        .build())
-                .forEach(organisationUsersIdamUser -> {
-                    GenericTypeItem<OrganisationUsersIdamUser> user = new GenericTypeItem<>();
-                    user.setValue(organisationUsersIdamUser);
-                    user.setId(UUID.randomUUID().toString());
-                    claimantUsers.add(user);
-                });
+        for (String userId : claimantSolicitors) {
+            UserDetails userDetails =  getUserDetailsById(userId);
+            OrganisationUsersIdamUser organisationUsersIdamUser = OrganisationUsersIdamUser.builder()
+                    .email(userDetails.getEmail())
+                    .firstName(userDetails.getFirstName())
+                    .lastName(userDetails.getLastName())
+                    .build();
+            GenericTypeItem<OrganisationUsersIdamUser> user = new GenericTypeItem<>();
+            user.setValue(organisationUsersIdamUser);
+            user.setId(UUID.randomUUID().toString());
+            claimantUsers.add(user);
+        }
         RepresentedTypeC claimantRep = caseDetails.getCaseData().getRepresentativeClaimantType();
         if (claimantRep != null && claimantRep.getMyHmctsOrganisation() != null) {
             claimantRep.setOrganisationUsers(claimantUsers);
         }
+    }
+
+    private UserDetails getUserDetailsById(String userId) {
+        return adminUserService.getUserDetails(adminUserService.getAdminUserToken(), userId);
     }
 }

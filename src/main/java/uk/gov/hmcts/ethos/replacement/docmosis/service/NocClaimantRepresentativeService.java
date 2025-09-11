@@ -73,7 +73,8 @@ public class NocClaimantRepresentativeService {
         Optional<AuditEvent> auditEvent =
                 nocCcdService.getLatestAuditEventByName(accessToken, caseId, NOC_REQUEST);
         Optional<UserDetails> userDetailsOptional = auditEvent
-                .map(event -> adminUserService.getUserDetails(event.getUserId()));
+                .map(event -> adminUserService.getUserDetails(adminUserService.getAdminUserToken(),
+                        event.getUserId()));
 
         UserDetails userDetails = userDetailsOptional.orElseThrow();
 

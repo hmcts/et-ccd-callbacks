@@ -33,6 +33,9 @@ class RefreshSharedUsersServiceTest {
 
     private static final String CASE_ID = "1234123412341234";
     private static final String DUMMY_ORG_ID = "dummyId";
+    private static final String DUMMY_ADMIN_USER_TOKEN = "DUMMY_ADMIN_USER_TOKEN";
+    private static final String USER_ID_1 = "user1";
+    private static final String USER_ID_2 = "user2";
 
     @Mock 
     private AdminUserService adminUserService;
@@ -87,9 +90,9 @@ class RefreshSharedUsersServiceTest {
 
         when(ccdCaseAssignment.getCaseUserRoles(CASE_ID)).thenReturn(mockUserRolesResponse);
         when(mockUserRolesResponse.getCaseUserAssignments()).thenReturn(List.of(assignment1, assignment2));
-
-        when(adminUserService.getUserDetails("user1")).thenReturn(userDetails);
-        when(adminUserService.getUserDetails("user2")).thenReturn(userDetails2);
+        when(adminUserService.getAdminUserToken()).thenReturn(DUMMY_ADMIN_USER_TOKEN);
+        when(adminUserService.getUserDetails(DUMMY_ADMIN_USER_TOKEN, USER_ID_1)).thenReturn(userDetails);
+        when(adminUserService.getUserDetails(DUMMY_ADMIN_USER_TOKEN, USER_ID_2)).thenReturn(userDetails2);
 
         service.refreshSharedUsers(caseDetails);
 
@@ -138,8 +141,9 @@ class RefreshSharedUsersServiceTest {
 
         when(ccdCaseAssignment.getCaseUserRoles(CASE_ID)).thenReturn(mockUserRolesResponse);
         when(mockUserRolesResponse.getCaseUserAssignments()).thenReturn(List.of(assignment1, assignment2));
-        when(adminUserService.getUserDetails("user1")).thenReturn(userDetails1);
-        when(adminUserService.getUserDetails("user2")).thenReturn(userDetails2);
+        when(adminUserService.getAdminUserToken()).thenReturn(DUMMY_ADMIN_USER_TOKEN);
+        when(adminUserService.getUserDetails(DUMMY_ADMIN_USER_TOKEN, USER_ID_1)).thenReturn(userDetails1);
+        when(adminUserService.getUserDetails(DUMMY_ADMIN_USER_TOKEN, USER_ID_2)).thenReturn(userDetails2);
 
         setupRespondentOrganisation(SolicitorRole.SOLICITORA.getIndex());
         setupRespondentOrganisation(SolicitorRole.SOLICITORB.getIndex());
@@ -218,6 +222,7 @@ class RefreshSharedUsersServiceTest {
             throws IOException {
         when(ccdCaseAssignment.getCaseUserRoles(CASE_ID)).thenReturn(mockUserRolesResponse);
         when(mockUserRolesResponse.getCaseUserAssignments()).thenReturn(List.of(assignment));
-        when(adminUserService.getUserDetails("user1")).thenReturn(userDetails);
+        when(adminUserService.getAdminUserToken()).thenReturn(DUMMY_ADMIN_USER_TOKEN);
+        when(adminUserService.getUserDetails(DUMMY_ADMIN_USER_TOKEN, USER_ID_1)).thenReturn(userDetails);
     }
 }

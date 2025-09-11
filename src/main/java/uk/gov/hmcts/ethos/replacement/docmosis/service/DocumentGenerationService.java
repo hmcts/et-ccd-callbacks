@@ -49,6 +49,16 @@ public class DocumentGenerationService {
 
     private final TornadoService tornadoService;
     private static final String MESSAGE = "Failed to generate document for case id : ";
+    private static final String[] ENGLAND_WALES_BF_ACTION_LETTERS = {
+        "2.6", "2.6 Reform", "2.7", "2.8", "2.7 Reform", "2.8 Reform",
+        "2.7A", "2.8A", "2.7A Reform", "2.8A Reform",
+        "3.5", "3.8", "3.10", "3.11"
+    };
+    private static final String[] SCOTLAND_BF_ACTION_LETTERS = {
+        "7", "72", "75", "76", "77.2", "77.2 Reform",
+        "7 Reform", "72 Reform", "76 Reform",
+        "19", "20"
+    };
 
     @Autowired
     public DocumentGenerationService(TornadoService tornadoService) {
@@ -157,37 +167,36 @@ public class DocumentGenerationService {
 
     public void updateBfActions(DocumentInfo documentInfo, CaseData caseData) {
         String sectionName = Strings.split(documentInfo.getDescription(), '_')[1];
+
         if (areBfActionsForEnglandOrWalesToBeUpdated(caseData, sectionName)
             || areBfActionsForScotlandToBeUpdated(caseData, sectionName)) {
-            setBfActions(caseData);
+            
+            setBfActions(caseData, sectionName);
         }
     }
 
     public boolean areBfActionsForEnglandOrWalesToBeUpdated(CaseData caseData, String sectionName) {
         if (caseData.getCorrespondenceType() != null) {
-            String[] values = {"2.6", "2.6 Reform", "2.7", "2.8", "2.7 Reform", "2.8 Reform",
-                "2.7A", "2.8A", "2.7A Reform", "2.8A Reform"};
-            return Arrays.asList(values).contains(sectionName);
+            return Arrays.asList(ENGLAND_WALES_BF_ACTION_LETTERS).contains(sectionName);
         }
         return false;
     }
 
     public boolean areBfActionsForScotlandToBeUpdated(CaseData caseData, String sectionName) {
         if (caseData.getCorrespondenceScotType() != null) {
-            String[] values = {"7", "72", "75", "76", "77.2", "77.2 Reform", "7 Reform", "72 Reform", "76 Reform"};
-            return Arrays.asList(values).contains(sectionName);
+            return Arrays.asList(SCOTLAND_BF_ACTION_LETTERS).contains(sectionName);
         }
         return false;
     }
 
-    public CaseData setBfActions(CaseData caseData) {
+    public CaseData setBfActions(CaseData caseData, String sectionName) {
 
         BFActionType bfActionType = new BFActionType();
         bfActionType.setLetters(YES);
         bfActionType.setDateEntered(LocalDate.now().toString());
         bfActionType.setCwActions("Other action");
-        bfActionType.setAllActions("Claim served");
-        bfActionType.setBfDate(LocalDate.now().plusDays(29).toString());
+        bfActionType.setAllActions(getActionName(caseData, sectionName));
+        bfActionType.setBfDate(LocalDate.now().plusDays(getBfDateDays(caseData, sectionName)).toString());
         BFActionTypeItem bfActionTypeItem = new BFActionTypeItem();
         bfActionTypeItem.setId(UUID.randomUUID().toString());
         bfActionTypeItem.setValue(bfActionType);
@@ -199,7 +208,7 @@ public class DocumentGenerationService {
             List<BFActionTypeItem> tmp = caseData.getBfActions();
             tmp.add(bfActionTypeItem);
             caseData.setBfActions(tmp);
-            String dateEntered = caseData.getBfActions().get(0).getValue().getDateEntered().substring(0, 10);
+            String dateEntered = caseData.getBfActions().getFirst().getValue().getDateEntered().substring(0, 10);
             LocalDate date = LocalDate.parse(dateEntered);
             caseData.setClaimServedDate(String.valueOf(date));
         }
@@ -207,6 +216,33 @@ public class DocumentGenerationService {
             .plusDays(ET3_DUE_DATE_FROM_SERVING_DATE).toString());
 
         return caseData;
+    }
+
+    private static String getActionName(CaseData caseData, String sectionName) {
+        if ((caseData.getCorrespondenceScotType() != null || caseData.getCorrespondenceType() != null)) {
+            return switch (sectionName) {
+                case "3.5", "19" -> "Employer's contract claim rejection";
+                case "3.8", "20" -> "Notice of employer's contract claim";
+                case "3.10", "3.11" -> "Employer's contract claim - response required";
+                case "2.6", "2.6 Reform", "2.7", "2.8", "2.7 Reform", "2.8 Reform",
+                     "2.7A", "2.8A", "2.7A Reform", "2.8A Reform" -> "Claim served";
+                default -> "Letter generation";
+            };
+        }
+        return "Letter generation";
+    }
+
+    private static int getBfDateDays(CaseData caseData, String sectionName) {
+        if ((caseData.getCorrespondenceScotType() != null || caseData.getCorrespondenceType() != null)) {
+            return switch (sectionName) {
+                case "3.5", "19" -> 14;
+                case "3.8", "3.10", "3.11", "20" -> 28;
+                case "2.6", "2.6 Reform", "2.7", "2.8", "2.7 Reform", "2.8 Reform",
+                     "2.7A", "2.8A", "2.7A Reform", "2.8A Reform" -> 29;
+                default -> 0;
+            };
+        }
+        return 0;
     }
 
     private List<AddressLabelTypeItem> customiseSelectedAddresses(CaseData caseData) {
@@ -439,7 +475,5 @@ public class DocumentGenerationService {
         }
 
         return addressLabelTypeItems;
-
     }
-
 }

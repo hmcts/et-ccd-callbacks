@@ -225,7 +225,9 @@ public class DocumentGenerationService {
                 case "3.8", "20" -> "Notice of employer's contract claim";
                 case "3.10", "3.11" -> "Employer's contract claim - response required";
                 case "2.6", "2.6 Reform", "2.7", "2.8", "2.7 Reform", "2.8 Reform",
-                     "2.7A", "2.8A", "2.7A Reform", "2.8A Reform" -> "Claim served";
+                     "2.7A", "2.8A", "2.7A Reform", "2.8A Reform",
+                     "7", "72", "75", "76", "77.2", "77.2 Reform",
+                     "7 Reform", "72 Reform", "76 Reform" -> "Claim served";
                 default -> "Letter generation";
             };
         }
@@ -238,7 +240,9 @@ public class DocumentGenerationService {
                 case "3.5", "19" -> 14;
                 case "3.8", "3.10", "3.11", "20" -> 28;
                 case "2.6", "2.6 Reform", "2.7", "2.8", "2.7 Reform", "2.8 Reform",
-                     "2.7A", "2.8A", "2.7A Reform", "2.8A Reform" -> 29;
+                     "2.7A", "2.8A", "2.7A Reform", "2.8A Reform",
+                     "7", "72", "75", "76", "77.2", "77.2 Reform",
+                     "7 Reform", "72 Reform", "76 Reform" -> 29;
                 default -> 0;
             };
         }

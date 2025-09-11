@@ -122,7 +122,7 @@ public class NocRespondentRepresentativeService {
             nocCcdService.getLatestAuditEventByName(accessToken, caseId, NOC_REQUEST);
 
         Optional<UserDetails> userDetails = auditEvent
-            .map(event -> adminUserService.getUserDetails(event.getUserId()));
+            .map(event -> adminUserService.getUserDetails(accessToken, event.getUserId()));
 
         final SolicitorRole role = SolicitorRole.from(change.getCaseRoleId().getSelectedCode()).orElseThrow();
 

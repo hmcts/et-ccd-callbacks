@@ -122,7 +122,7 @@ public class ClaimantTellSomethingElseController {
         if (Helper.isRespondentSystemUser(caseData)) {
             claimantTseService.sendRespondentsEmail(caseDetails);
         }
-        claimantTseService.sendAcknowledgementEmail(caseDetails, userToken);
+        claimantTseService.sendAcknowledgementEmail(caseDetails);
         claimantTseService.sendAdminEmail(caseDetails);
 
         // clear application data

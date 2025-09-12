@@ -148,7 +148,7 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(tseService).createApplication(ccdRequest.getCaseDetails().getCaseData(), CLAIMANT_REP_TITLE);
-        verify(claimantTseService).sendAcknowledgementEmail(ccdRequest.getCaseDetails(), AUTH_TOKEN);
+        verify(claimantTseService).sendAcknowledgementEmail(ccdRequest.getCaseDetails());
         verify(claimantTseService).sendAdminEmail(ccdRequest.getCaseDetails());
     }
 
@@ -166,7 +166,7 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(tseService).createApplication(ccdRequest.getCaseDetails().getCaseData(), CLAIMANT_REP_TITLE);
         verify(claimantTseService).sendRespondentsEmail(ccdRequest.getCaseDetails());
-        verify(claimantTseService).sendAcknowledgementEmail(ccdRequest.getCaseDetails(), AUTH_TOKEN);
+        verify(claimantTseService).sendAcknowledgementEmail(ccdRequest.getCaseDetails());
         verify(claimantTseService).sendAdminEmail(ccdRequest.getCaseDetails());
     }
 

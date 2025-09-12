@@ -66,6 +66,8 @@ class SendNotificationServiceTest {
     private AdminUserService adminUserService;
     @Mock
     private TornadoService tornadoService;
+    @MockBean
+    private EmailNotificationService emailNotificationService;
     private CaseData caseData;
     private CaseDetails caseDetails;
     private SendNotificationService sendNotificationService;
@@ -89,7 +91,7 @@ class SendNotificationServiceTest {
      void setUp() {
         emailService = spy(new EmailUtils());
         sendNotificationService = new SendNotificationService(hearingSelectionService,
-                emailService, featureToggleService, caseAccessService, adminUserService, tornadoService);
+                emailService, featureToggleService, caseAccessService, tornadoService, emailNotificationService);
         ReflectionTestUtils.setField(sendNotificationService,
                 RESPONDENT_SEND_NOTIFICATION_TEMPLATE_ID,
                 "respondentSendNotificationTemplateId");
@@ -343,6 +345,8 @@ class SendNotificationServiceTest {
         when(adminUserService.getAdminUserToken()).thenReturn(DUMMY_ADMIN_USER_TOKEN);
         when(adminUserService.getUserDetails(eq(DUMMY_ADMIN_USER_TOKEN), anyString())).thenReturn(userDetails);
         when(userDetails.getEmail()).thenReturn("rep@example.com");
+        when(emailNotificationService.getCaseClaimantSolicitorEmails(List.of(mockAssignment)))
+                .thenReturn(List.of("rep@example.com"));
 
         personalisationCaptor.getAllValues().clear();
         sendNotificationService.sendNotifyEmails(caseDetails);
@@ -399,6 +403,11 @@ class SendNotificationServiceTest {
             when(userDetails.getEmail()).thenReturn(email);
             return userDetails;
         });
+        when(emailNotificationService.getCaseClaimantSolicitorEmails(assignments))
+                .thenReturn(List.of("claimant.rep@example.com",
+                        "shared1@example.com",
+                        "shared2@example.com"));
+
         personalisationCaptor.getAllValues().clear();
         sendNotificationService.sendNotifyEmails(caseDetails);
 
@@ -485,6 +494,10 @@ class SendNotificationServiceTest {
             when(userDetails.getEmail()).thenReturn(email);
             return userDetails;
         });
+        when(emailNotificationService.getRespondentSolicitorEmails(assignments))
+                .thenReturn(List.of("respondentRep@email.com",
+                        "shared1@example.com",
+                        "shared2@example.com"));
 
         sendNotificationService.sendNotifyEmails(caseDetails);
 

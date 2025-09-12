@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.SneakyThrows;
 import org.apache.commons.collections4.CollectionUtils;
 import org.junit.jupiter.api.Test;
@@ -51,7 +52,7 @@ class ET3DocumentHelperTest {
         assertThat(ET3DocumentHelper.hasET3Document(respondentSumTypeItemNullValue)).isFalse();
 
         RespondentSumTypeItem respondentSumTypeItem = ResourceLoader.fromString(
-                TEST_ET3_FORM_CASE_DATA_FILE, CaseData.class).getRespondentCollection().get(0);
+                TEST_ET3_FORM_CASE_DATA_FILE, CaseData.class).getRespondentCollection().getFirst();
         // All ET3 Documents Exists
         assertThat(ET3DocumentHelper.hasET3Document(respondentSumTypeItem)).isTrue();
 
@@ -138,26 +139,38 @@ class ET3DocumentHelperTest {
     }
 
     @Test
-    void theFindAllET3DocumentsOfRespondent() {
+    void findAllET3DocumentsOfRespondent_isEmpty() throws JsonProcessingException {
         assertThat(ET3DocumentHelper.findAllET3DocumentsOfRespondent(null)).isEmpty();
+    }
 
+    @Test
+    void findAllET3DocumentsOfRespondent_withEt3ResponseContestClaimDocument() throws JsonProcessingException {
         RespondentSumTypeItem respondentSumTypeItem = ResourceLoader.fromString(
-                TEST_ET3_FORM_CASE_DATA_FILE, CaseData.class).getRespondentCollection().get(0);
-        assertThat(ET3DocumentHelper.findAllET3DocumentsOfRespondent(respondentSumTypeItem)).hasSize(5);
+                TEST_ET3_FORM_CASE_DATA_FILE, CaseData.class).getRespondentCollection().getFirst();
+        List<DocumentTypeItem> actual = ET3DocumentHelper.findAllET3DocumentsOfRespondent(respondentSumTypeItem);
+        assertThat(actual).hasSize(5);
+        assertThat(actual.getFirst().getValue().getDateOfCorrespondence())
+                .isEqualTo(respondentSumTypeItem.getValue().getResponseReceivedDate());
+    }
 
+    @Test
+    void findAllET3DocumentsOfRespondent_withoutEt3ResponseContestClaimDocument() throws JsonProcessingException {
+        RespondentSumTypeItem respondentSumTypeItem = ResourceLoader.fromString(
+                TEST_ET3_FORM_CASE_DATA_FILE, CaseData.class).getRespondentCollection().getFirst();
         respondentSumTypeItem.getValue().setEt3ResponseContestClaimDocument(null);
-        assertThat(ET3DocumentHelper.findAllET3DocumentsOfRespondent(respondentSumTypeItem)).hasSize(4);
+        List<DocumentTypeItem> actual = ET3DocumentHelper.findAllET3DocumentsOfRespondent(respondentSumTypeItem);
+        assertThat(actual).hasSize(4);
     }
 
     @ParameterizedTest
     @MethodSource("provideDataForModifyDocumentCollectionForET3FormsTest")
-    void theAddOrRemoveET3Documents(CaseData caseData) {
+    void theAddOrRemoveET3Documents(CaseData caseData) throws JsonProcessingException {
         ET3DocumentHelper.addOrRemoveET3Documents(caseData);
         if (ET3_ACCEPTED_NOTIFICATION_DOCUMENT_TYPE_ENGLAND_WALES.equals(
-                caseData.getEt3NotificationDocCollection().get(0).getValue().getTypeOfDocument())) {
+                caseData.getEt3NotificationDocCollection().getFirst().getValue().getTypeOfDocument())) {
             if (CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
                 assertThat(caseData.getDocumentCollection()).hasSize(7);
-            } else if (ObjectUtils.isEmpty(caseData.getRespondentCollection().get(0).getValue())) {
+            } else if (ObjectUtils.isEmpty(caseData.getRespondentCollection().getFirst().getValue())) {
                 assertThat(
                         caseData.getDocumentCollection().get(5).getValue().getUploadedDocument().getDocumentFilename())
                         .isEqualTo(ENGLISH_ET3_FORM_NAME);
@@ -165,10 +178,10 @@ class ET3DocumentHelperTest {
                         caseData.getDocumentCollection().get(6).getValue().getUploadedDocument().getDocumentFilename())
                         .isEqualTo(WELSH_ET3_FORM_NAME);
             } else if (RESPONSE_STATUS_REJECTED.equals(
-                    caseData.getRespondentCollection().get(0).getValue().getResponseStatus())) {
+                    caseData.getRespondentCollection().getFirst().getValue().getResponseStatus())) {
                 assertThat(caseData.getDocumentCollection()).hasSize(2);
             } else if (ACCEPTED_STATE.equals(
-                    caseData.getRespondentCollection().get(0).getValue().getResponseStatus())) {
+                    caseData.getRespondentCollection().getFirst().getValue().getResponseStatus())) {
                 assertThat(
                         caseData.getDocumentCollection().get(0).getValue().getUploadedDocument().getDocumentFilename())
                         .isEqualTo(ENGLISH_ET3_FORM_NAME);
@@ -188,23 +201,23 @@ class ET3DocumentHelperTest {
 
         CaseData caseDataRespondentValueNotExists =
                 ResourceLoader.fromString(TEST_ET3_FORM_CASE_DATA_FILE, CaseData.class);
-        caseDataRespondentValueNotExists.getRespondentCollection().get(0).setValue(null);
+        caseDataRespondentValueNotExists.getRespondentCollection().getFirst().setValue(null);
 
         CaseData caseDataResponseNotAccepted =
                 ResourceLoader.fromString(TEST_ET3_FORM_CASE_DATA_FILE, CaseData.class);
         caseDataResponseNotAccepted.getRespondentCollection()
-                .get(0).getValue().setResponseStatus(RESPONSE_STATUS_REJECTED);
+                .getFirst().getValue().setResponseStatus(RESPONSE_STATUS_REJECTED);
 
         CaseData caseDataWithoutDocumentCollectionAndResponseAccepted =
                 ResourceLoader.fromString(TEST_ET3_FORM_CASE_DATA_FILE, CaseData.class);
         caseDataWithoutDocumentCollectionAndResponseAccepted.setDocumentCollection(null);
         caseDataWithoutDocumentCollectionAndResponseAccepted.getRespondentCollection()
-                .get(0).getValue().setResponseStatus(ACCEPTED_STATE);
+                .getFirst().getValue().setResponseStatus(ACCEPTED_STATE);
 
         CaseData caseDataET3NotificationDocCollectionAndResponseNotAccepted =
                 ResourceLoader.fromString(TEST_ET3_FORM_CASE_DATA_FILE, CaseData.class);
         caseDataET3NotificationDocCollectionAndResponseNotAccepted.getEt3NotificationDocCollection()
-                .get(0).getValue().setTypeOfDocument(ET3_REJECTED_NOTIFICATION_DOCUMENT_TYPE_1);
+                .getFirst().getValue().setTypeOfDocument(ET3_REJECTED_NOTIFICATION_DOCUMENT_TYPE_1);
 
         return Stream.of(Arguments.of(caseDataWithoutRespondentCollection),
                 Arguments.of(caseDataRespondentValueNotExists),

@@ -11,12 +11,15 @@ import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.applications.ClaimantTellSomethingElseHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseAccessService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
@@ -87,6 +90,8 @@ public class ClaimantTellSomethingElseService {
     private final EmailService emailService;
     private final FeatureToggleService featureToggleService;
     private final TribunalOfficesService tribunalOfficesService;
+    private final CaseAccessService caseAccessService;
+    private final EmailNotificationService emailNotificationService;
 
     @Value("${template.tse.claimant-rep.application.claimant-rep-a}")
     private String tseClaimantRepAcknowledgeTypeATemplateId;
@@ -181,33 +186,34 @@ public class ClaimantTellSomethingElseService {
         return body;
     }
 
-    public void sendAcknowledgementEmail(CaseDetails caseDetails, String userToken) {
-        String email = userIdamService.getUserDetails(userToken).getEmail();
+    public void sendAcknowledgementEmail(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
         String applicationType = caseData.getClaimantTseSelectApplication();
+        String templateId;
+        Map<String, String> personalisation;
 
         if (CLAIMANT_TSE_ORDER_A_WITNESS_TO_ATTEND.equals(applicationType)) {
-            emailService.sendEmail(
-                    tseClaimantRepAcknowledgeTypeCTemplateId,
-                    email,
-                    prepareEmailContentTypeC(caseDetails));
-            return;
+            templateId = tseClaimantRepAcknowledgeTypeCTemplateId;
+            personalisation = prepareEmailContentTypeC(caseDetails);
+        } else if (NO.equals(caseData.getClaimantTseRule92())) {
+            templateId = tseClaimantRepAcknowledgeNoTemplateId;
+            personalisation = prepareEmailContent(caseDetails);
+        } else {
+            templateId = GROUP_B_TYPES.contains(applicationType)
+                    ? tseClaimantRepAcknowledgeTypeBTemplateId
+                    : tseClaimantRepAcknowledgeTypeATemplateId;
+            personalisation = prepareEmailContent(caseDetails);
         }
 
-        if (NO.equals(caseData.getClaimantTseRule92())) {
-            emailService.sendEmail(
-                    tseClaimantRepAcknowledgeNoTemplateId,
-                    email,
-                    prepareEmailContent(caseDetails));
-            return;
-        }
+        List<CaseUserAssignment> caseUserAssignments =
+                caseAccessService.getCaseUserAssignmentsById(caseDetails.getCaseId());
 
-        emailService.sendEmail(
-                GROUP_B_TYPES.contains(applicationType)
-                        ? tseClaimantRepAcknowledgeTypeBTemplateId
-                        : tseClaimantRepAcknowledgeTypeATemplateId,
-                email,
-                prepareEmailContent(caseDetails));
+        emailNotificationService.getCaseClaimantSolicitorEmails(caseUserAssignments).stream()
+                .filter(email -> email != null && !email.isEmpty())
+                .forEach(email -> emailService.sendEmail(
+                        templateId,
+                        email,
+                        personalisation));
     }
 
     private Map<String, String> prepareEmailContentTypeC(CaseDetails caseDetails) {

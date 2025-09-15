@@ -10,7 +10,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
-import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -21,10 +20,9 @@ import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeItem;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -69,8 +67,8 @@ public class SendNotificationService {
     private final EmailService emailService;
     private final FeatureToggleService featureToggleService;
     private final CaseAccessService caseAccessService;
-    private final AdminUserService adminUserService;
     private final TornadoService tornadoService;
+    private final EmailNotificationService emailNotificationService;
 
     private static final String EMAIL_ADDRESS = "emailAddress";
     @Value("${template.claimantSendNotification}")
@@ -244,7 +242,7 @@ public class SendNotificationService {
                         caseDetails.getCaseId());
                 personalisation = buildPersonalisation(caseDetails, linkEnv);
                 // with shared case there's going to be multiple claimant representatives
-                getCaseClaimantSolicitorEmails(caseUserAssignments).stream()
+                emailNotificationService.getCaseClaimantSolicitorEmails(caseUserAssignments).stream()
                         .filter(email -> email != null && !email.isEmpty())
                         .forEach(email -> emailService.sendEmail(
                                 respondentSendNotificationTemplateId,
@@ -275,30 +273,6 @@ public class SendNotificationService {
                 .stream()
                 .filter(s -> s.getId().equals(caseData.getSelectNotificationDropdown().getSelectedCode()))
                 .findFirst();
-    }
-
-    private List<String> getCaseClaimantSolicitorEmails(List<CaseUserAssignment> assignments) {
-        List<String> emailAddresses = new ArrayList<>();
-        for (CaseUserAssignment assignment : assignments) {
-            if (ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel().equals(assignment.getCaseRole())) {
-                UserDetails userDetails = adminUserService.getUserDetails(adminUserService.getAdminUserToken(),
-                        assignment.getUserId());
-                emailAddresses.add(userDetails.getEmail());
-            }
-        }
-        return emailAddresses;
-    }
-
-    private List<String> getRespondentSolicitorEmails(List<CaseUserAssignment> assignments) {
-        List<String> emailAddresses = new ArrayList<>();
-        for (CaseUserAssignment assignment : assignments) {
-            if (SolicitorRole.from(assignment.getCaseRole()).isPresent()) {
-                UserDetails userDetails = adminUserService.getUserDetails(adminUserService.getAdminUserToken(),
-                        assignment.getUserId());
-                emailAddresses.add(userDetails.getEmail());
-            }
-        }
-        return emailAddresses;
     }
 
     private String getSendNotificationSingleDocumentMarkdown(DocumentType uploadedDocumentType) {
@@ -353,7 +327,7 @@ public class SendNotificationService {
                 .filter(email -> email != null && !email.isEmpty())
                 .forEach(emails::add);
 
-        getRespondentSolicitorEmails(assignments).stream()
+        emailNotificationService.getRespondentSolicitorEmails(assignments).stream()
                 .filter(email -> email != null && !email.isEmpty())
                 .forEach(emails::add);
         emails.forEach(email ->

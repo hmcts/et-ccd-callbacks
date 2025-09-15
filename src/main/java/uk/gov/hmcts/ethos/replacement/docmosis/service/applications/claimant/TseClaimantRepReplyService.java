@@ -271,7 +271,6 @@ public class TseClaimantRepReplyService {
         List<CaseUserAssignment> caseUserAssignments =
                 caseAccessService.getCaseUserAssignmentsById(caseDetails.getCaseId());
         sendEmailToRespondentForRespondingToTrib(caseDetails, caseUserAssignments);
-        // todo: should send claimant rep shared list
         sendAcknowledgementEmailToLR(caseDetails, true, caseUserAssignments);
     }
 

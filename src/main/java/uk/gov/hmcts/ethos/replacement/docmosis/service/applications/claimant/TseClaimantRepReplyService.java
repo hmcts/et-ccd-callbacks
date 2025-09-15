@@ -10,6 +10,7 @@ import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.TseRespondTypeItem;
@@ -17,11 +18,12 @@ import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.applications.TseHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseAccessService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.applications.TseService;
 
 import java.time.LocalDate;
@@ -34,7 +36,6 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
-
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
@@ -56,7 +57,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.cre
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.setDocumentNumbers;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper.createTwoColumnTable;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.applications.ClaimantTellSomethingElseHelper.claimantSelectApplicationToType;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.applications.ClaimantTellSomethingElseHelper.getRespondentsAndRepsEmailAddresses;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.applications.TseHelper.getClaimantRepSelectedApplicationType;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.TSE_CLAIMANT_REP_REPLY;
 
@@ -70,7 +70,8 @@ public class TseClaimantRepReplyService {
     private final FeatureToggleService featureToggleService;
     private final EmailService emailService;
     private final ClaimantTellSomethingElseService claimantTseService;
-    private final UserIdamService userIdamService;
+    private final EmailNotificationService emailNotificationService;
+    private final CaseAccessService caseAccessService;
 
     @Value("${template.tse.claimant-rep.respond.respondent}")
     private String tseClaimantRepResponseTemplateId;
@@ -180,20 +181,19 @@ public class TseClaimantRepReplyService {
     /**
      * Reply to a TSE application as a respondent, including updating app status, saving the reply and sending emails.
      *
-     * @param userToken authorisation token to get claimant's email address
      * @param caseDetails case details
      * @param caseData case data
      */
-    public void claimantReplyToTse(String userToken, CaseDetails caseDetails, CaseData caseData) {
+    public void claimantReplyToTse(CaseDetails caseDetails, CaseData caseData) {
         updateApplicationState(caseData);
 
         boolean isRespondingToTribunal = isRespondingToTribunal(caseData);
         saveReplyToApplication(caseData, isRespondingToTribunal);
 
         if (isRespondingToTribunal) {
-            sendRespondingToTribunalEmails(caseDetails, userToken);
+            sendRespondingToTribunalEmails(caseDetails);
         } else {
-            sendRespondingToApplicationEmails(caseDetails, userToken);
+            sendRespondingToApplicationEmails(caseDetails);
         }
 
         resetReplyToApplicationPage(caseData);
@@ -265,10 +265,14 @@ public class TseClaimantRepReplyService {
     /**
      * Send emails when LR submits response to Tribunal request/order.
      */
-    public void sendRespondingToTribunalEmails(CaseDetails caseDetails, String userToken) {
+    public void sendRespondingToTribunalEmails(CaseDetails caseDetails) {
         sendEmailToTribunal(caseDetails);
-        sendEmailToRespondentForRespondingToTrib(caseDetails);
-        sendAcknowledgementEmailToLR(caseDetails, userToken, true);
+
+        List<CaseUserAssignment> caseUserAssignments =
+                caseAccessService.getCaseUserAssignmentsById(caseDetails.getCaseId());
+        sendEmailToRespondentForRespondingToTrib(caseDetails, caseUserAssignments);
+        // todo: should send claimant rep shared list
+        sendAcknowledgementEmailToLR(caseDetails, true, caseUserAssignments);
     }
 
     private void sendEmailToTribunal(CaseDetails caseDetails) {
@@ -287,14 +291,16 @@ public class TseClaimantRepReplyService {
         emailService.sendEmail(replyToTribunalEmailToTribunalTemplateId, email, personalisation);
     }
 
-    private void sendEmailToRespondentForRespondingToTrib(CaseDetails caseDetails) {
+    private void sendEmailToRespondentForRespondingToTrib(CaseDetails caseDetails,
+                                                          List<CaseUserAssignment> caseUserAssignments) {
         CaseData caseData = caseDetails.getCaseData();
 
         if (!YES.equals(caseData.getTseResponseCopyToOtherParty())) {
             return;
         }
 
-        Map<String, String> respondentEmailAddressMap = getRespondentsAndRepsEmailAddresses(caseData);
+        Map<String, String> respondentEmailAddressMap =
+                emailNotificationService.getRespondentsAndRepsEmailAddresses(caseData, caseUserAssignments);
         if (respondentEmailAddressMap.isEmpty()) {
             return;
         }
@@ -310,23 +316,27 @@ public class TseClaimantRepReplyService {
         });
     }
 
-    private void sendAcknowledgementEmailToLR(CaseDetails caseDetails, String userToken,
-                                              boolean isRespondingToTribunal) {
-        emailService.sendEmail(
-                getAckEmailTemplateId(caseDetails, isRespondingToTribunal),
-                userIdamService.getUserDetails(userToken).getEmail(),
-                TseHelper.getPersonalisationForAcknowledgement(
-                        caseDetails, emailService.getExuiCaseLink(caseDetails.getCaseId()), true));
+    private void sendAcknowledgementEmailToLR(CaseDetails caseDetails, boolean isRespondingToTribunal,
+                                              List<CaseUserAssignment> caseUserAssignments) {
+        emailNotificationService.getCaseClaimantSolicitorEmails(caseUserAssignments).forEach(
+                email -> emailService.sendEmail(
+                        getAckEmailTemplateId(caseDetails, isRespondingToTribunal),
+                        email,
+                        TseHelper.getPersonalisationForAcknowledgement(
+                                caseDetails, emailService.getExuiCaseLink(caseDetails.getCaseId()), true))
+        );
     }
 
     /**
      * Send emails when LR submits response to application.
      */
-    public void sendRespondingToApplicationEmails(CaseDetails caseDetails, String userToken) {
+    public void sendRespondingToApplicationEmails(CaseDetails caseDetails) {
+        List<CaseUserAssignment> caseUserAssignments =
+                caseAccessService.getCaseUserAssignmentsById(caseDetails.getCaseId());
         // should send the email to respondent
-        sendEmailToRespondentForRespondingToApp(caseDetails);
+        sendEmailToRespondentForRespondingToApp(caseDetails, caseUserAssignments);
         // should send the email to claimant rep
-        sendAcknowledgementEmailToLR(caseDetails, userToken, false);
+        sendAcknowledgementEmailToLR(caseDetails, false, caseUserAssignments);
         // send the email to tribunal
         claimantTseService.sendAdminEmail(caseDetails);
     }
@@ -345,13 +355,15 @@ public class TseClaimantRepReplyService {
                 : acknowledgementRule92NoEmailTemplateId;
     }
 
-    private void sendEmailToRespondentForRespondingToApp(CaseDetails caseDetails) {
+    private void sendEmailToRespondentForRespondingToApp(CaseDetails caseDetails,
+                                                         List<CaseUserAssignment> caseUserAssignments) {
         CaseData caseData = caseDetails.getCaseData();
         if (!YES.equals(caseData.getTseResponseCopyToOtherParty())) {
             return;
         }
 
-        Map<String, String> respondentEmailAddressMap = getRespondentsAndRepsEmailAddresses(caseData);
+        Map<String, String> respondentEmailAddressMap =
+                emailNotificationService.getRespondentsAndRepsEmailAddresses(caseData, caseUserAssignments);
         if (respondentEmailAddressMap.isEmpty()) {
             return;
         }

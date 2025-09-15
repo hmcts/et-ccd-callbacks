@@ -11,8 +11,8 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.RetrieveOrgByIdResponse;
-import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
@@ -23,8 +23,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
+import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantNonSystemUser;
@@ -32,7 +32,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isRepresent
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper.buildNoCPersonalisation;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper.buildPersonalisationWithPartyName;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper.getRespondentAndRepEmailAddresses;
 
 /**
  * Service to support the notification of change journey with email notifications.
@@ -46,6 +45,9 @@ public class NocNotificationService {
     private final OrganisationClient organisationClient;
     private final AdminUserService adminUserService;
     private final AuthTokenGenerator authTokenGenerator;
+    private final EmailNotificationService emailNotificationService;
+    private final CaseAccessService caseAccessService;
+
     @Value("${template.nocNotification.respondent}")
     private String respondentTemplateId;
     @Value("${template.nocNotification.claimant}")
@@ -88,19 +90,18 @@ public class NocNotificationService {
     private void handleClaimantNocEmails(CaseDetails caseDetailsNew, String partyName) {
         CaseData caseDataNew = caseDetailsNew.getCaseData();
 
-        // send respondent or respondent solicitor noc change email
-        caseDataNew.getRespondentCollection().forEach(resp -> {
-            Map<String, String> emailAddressesMap =
-                    getRespondentAndRespRepEmailAddressesMap(caseDataNew, resp);
+        List<CaseUserAssignment> caseUserAssignments =
+                caseAccessService.getCaseUserAssignmentsById(caseDetailsNew.getCaseId());
 
-            emailAddressesMap.forEach((email, respondentId) -> {
-                String caseLink = StringUtils.isNotBlank(respondentId)
-                        ? emailService.getSyrCaseLink(caseDetailsNew.getCaseId(), respondentId)
-                        : emailService.getExuiCaseLink(caseDetailsNew.getCaseId());
-                emailService.sendEmail(claimantTemplateId, email,
-                        buildPersonalisationWithPartyName(caseDetailsNew, partyName, caseLink));
-            });
-        });
+        // send respondents or respondent solicitors the claimant noc change email
+        emailNotificationService.getRespondentsAndRepsEmailAddresses(caseDataNew, caseUserAssignments)
+                .forEach((email, respondentId) -> {
+                    String caseLink = StringUtils.isNotBlank(respondentId)
+                            ? emailService.getSyrCaseLink(caseDetailsNew.getCaseId(), respondentId)
+                            : emailService.getExuiCaseLink(caseDetailsNew.getCaseId());
+                    emailService.sendEmail(claimantTemplateId, email,
+                            buildPersonalisationWithPartyName(caseDetailsNew, partyName, caseLink));
+                });
 
         // send claimant noc change email
         String claimantEmail = NotificationHelper.getEmailAddressForClaimant(caseDataNew);
@@ -252,19 +253,5 @@ public class NocNotificationService {
                 adminUserService.getAdminUserToken(),
                 authTokenGenerator.generate(),
                 orgId);
-    }
-
-    /**
-     * Retrieves a list of email addresses for respondents and their representatives from the given case data.
-     *
-     * @param caseData the case data containing respondent and representative information
-     * @return a mapping of email addresses and respondent ids for respondents and their representatives
-     */
-    private Map<String, String> getRespondentAndRespRepEmailAddressesMap(CaseData caseData,
-                                                                          RespondentSumTypeItem respondentSumTypeItem) {
-        Map<String, String> emailAddressesMap = new ConcurrentHashMap<>();
-        getRespondentAndRepEmailAddresses(caseData, respondentSumTypeItem, emailAddressesMap);
-
-        return emailAddressesMap;
     }
 }

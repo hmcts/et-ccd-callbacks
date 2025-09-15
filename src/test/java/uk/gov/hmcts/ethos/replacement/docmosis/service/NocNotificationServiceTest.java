@@ -21,8 +21,10 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -51,6 +53,10 @@ class NocNotificationServiceTest {
     private AdminUserService adminUserService;
     @Mock
     private AuthTokenGenerator authTokenGenerator;
+    @Mock
+    private CaseAccessService caseAccessService;
+    @Mock
+    private EmailNotificationService emailNotificationService;
     private CaseDetails caseDetailsBefore;
     private CaseDetails caseDetailsNew;
 
@@ -272,6 +278,10 @@ class NocNotificationServiceTest {
         when(emailService.getSyrCaseLink(anyString(), anyString())).thenReturn("syrLink");
         when(emailService.getExuiCaseLink(anyString())).thenReturn("exuiLink");
         when(emailService.getCitizenCaseLink(any())).thenReturn("citizenLink");
+        when(caseAccessService.getCaseUserAssignmentsById(anyString())).thenReturn(
+                new ArrayList<>());
+        when(emailNotificationService.getRespondentsAndRepsEmailAddresses(any(), any()))
+                .thenReturn(Map.of("respondent@unrepresented.com", "respondentId"));
 
         nocNotificationService.sendNotificationOfChangeEmails(
                 caseDetailsBefore,

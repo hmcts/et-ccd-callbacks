@@ -25,9 +25,11 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -495,7 +497,7 @@ class SendNotificationServiceTest {
             return userDetails;
         });
         when(emailNotificationService.getRespondentSolicitorEmails(assignments))
-                .thenReturn(List.of("respondentRep@email.com",
+                .thenReturn(Set.of("respondentRep@email.com",
                         "shared1@example.com",
                         "shared2@example.com"));
 

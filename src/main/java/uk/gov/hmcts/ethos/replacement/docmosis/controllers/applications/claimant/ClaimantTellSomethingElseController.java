@@ -118,12 +118,8 @@ public class ClaimantTellSomethingElseController {
         tseService.createApplication(caseData, CLAIMANT_REP_TITLE);
         claimantTseService.generateAndAddApplicationPdf(caseData, userToken, caseDetails.getCaseTypeId());
 
-        // send email notifications
-        if (Helper.isRespondentSystemUser(caseData)) {
-            claimantTseService.sendRespondentsEmail(caseDetails);
-        }
-        claimantTseService.sendAcknowledgementEmail(caseDetails);
-        claimantTseService.sendAdminEmail(caseDetails);
+        // send notification emails
+        claimantTseService.sendEmails(caseDetails);
 
         // clear application data
         tseService.clearApplicationData(caseData);

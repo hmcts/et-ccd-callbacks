@@ -16,6 +16,7 @@ import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.applications.ClaimantTellSomethingElseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseAccessService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
@@ -38,7 +39,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
-
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.springframework.util.CollectionUtils.isEmpty;
@@ -76,7 +76,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.set
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.getNearestHearingToReferral;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.applications.ClaimantTellSomethingElseHelper.claimantSelectApplicationToType;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.applications.ClaimantTellSomethingElseHelper.getRespondentsAndRepsEmailAddresses;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.CLAIMANT_TSE_FILE_NAME;
 
 @Slf4j
@@ -186,7 +185,7 @@ public class ClaimantTellSomethingElseService {
         return body;
     }
 
-    public void sendAcknowledgementEmail(CaseDetails caseDetails) {
+    public void sendAcknowledgementEmail(CaseDetails caseDetails, List<CaseUserAssignment> caseUserAssignments) {
         CaseData caseData = caseDetails.getCaseData();
         String applicationType = caseData.getClaimantTseSelectApplication();
         String templateId;
@@ -204,9 +203,6 @@ public class ClaimantTellSomethingElseService {
                     : tseClaimantRepAcknowledgeTypeATemplateId;
             personalisation = prepareEmailContent(caseDetails);
         }
-
-        List<CaseUserAssignment> caseUserAssignments =
-                caseAccessService.getCaseUserAssignmentsById(caseDetails.getCaseId());
 
         emailNotificationService.getCaseClaimantSolicitorEmails(caseUserAssignments).stream()
                 .filter(email -> email != null && !email.isEmpty())
@@ -240,7 +236,19 @@ public class ClaimantTellSomethingElseService {
         return content;
     }
 
-    public void sendRespondentsEmail(CaseDetails caseDetails) {
+    public void sendEmails(CaseDetails caseDetails) {
+        CaseData caseData = caseDetails.getCaseData();
+        List<CaseUserAssignment> caseUserAssignments =
+                caseAccessService.getCaseUserAssignmentsById(caseDetails.getCaseId());
+
+        if (Helper.isRespondentSystemUser(caseData)) {
+            sendRespondentsEmail(caseDetails, caseUserAssignments);
+        }
+        sendAcknowledgementEmail(caseDetails, caseUserAssignments);
+        sendAdminEmail(caseDetails);
+    }
+
+    public void sendRespondentsEmail(CaseDetails caseDetails, List<CaseUserAssignment> caseUserAssignments) {
         CaseData caseData = caseDetails.getCaseData();
         String applicationType = caseData.getClaimantTseSelectApplication();
 
@@ -250,7 +258,9 @@ public class ClaimantTellSomethingElseService {
             return;
         }
 
-        Map<String, String> respondentEmailAddressList = getRespondentsAndRepsEmailAddresses(caseData);
+        Map<String, String> respondentEmailAddressList =
+                emailNotificationService.getRespondentsAndRepsEmailAddresses(caseData, caseUserAssignments);
+
         if (respondentEmailAddressList.isEmpty()) {
             return;
         }

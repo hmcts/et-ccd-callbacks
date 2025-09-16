@@ -21,6 +21,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
+import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
@@ -29,7 +30,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Stream;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -54,10 +54,13 @@ class CaseAccessServiceTest {
     private AdminUserService adminUserService;
     @MockBean
     private AuthTokenGenerator authTokenGenerator;
+    @MockBean
+    private OrganisationClient organisationClient;
 
     @BeforeEach
     void setUp() {
-        caseAccessService = new CaseAccessService(caseAssignment);
+        caseAccessService = new CaseAccessService(caseAssignment, organisationClient,
+                authTokenGenerator, adminUserService);
         caseData = new CaseData();
         caseData.setLinkedCaseCT("http://example.com/1234567890123456");
         caseDetails = new CaseDetails();

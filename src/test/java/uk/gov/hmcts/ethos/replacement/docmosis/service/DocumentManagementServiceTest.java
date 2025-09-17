@@ -24,8 +24,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.UploadedDocument;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceScotType;
-import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.DocumentDetails;
@@ -60,7 +58,6 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OUTPUT_FILE_NAME;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService.APPLICATION_DOCX_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader.successfulDocStoreUpload;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader.successfulDocumentManagementUploadResponse;
@@ -250,72 +247,12 @@ class DocumentManagementServiceTest {
         caseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
         CaseData caseData = new CaseData();
         caseDetails.setCaseData(caseData);
-        
-        CorrespondenceType correspondenceType = new CorrespondenceType();
-        correspondenceType.setPart0Documents("2.6");
-        caseData.setCorrespondenceType(correspondenceType);
-        
-        documentGenerationService.setBfActions(caseData, "2.6");
+        documentGenerationService.setBfActions(caseData);
 
         LocalDate servingDate = LocalDate.parse(caseData.getClaimServedDate());
         LocalDate et3DueDate = LocalDate.parse(caseData.getEt3DueDate());
-        LocalDate bfDate = LocalDate.parse(caseData.getBfActions().getFirst().getValue().getBfDate());
-        
-        assertThat(et3DueDate).isEqualTo(servingDate.plusDays(28));
-        assertThat(bfDate).isEqualTo(LocalDate.now().plusDays(29));
-        
-        assertThat(caseData.getBfActions()).hasSize(1);
-        assertThat(caseData.getBfActions().getFirst().getValue().getAllActions()).isEqualTo("Claim served");
-    }
-    
-    @Test
-    void setBFActionWithECCDocument() {
-        CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
-        CaseData caseData = new CaseData();
-        caseDetails.setCaseData(caseData);
 
-        CorrespondenceType correspondenceType = new CorrespondenceType();
-        correspondenceType.setPart0Documents("3.5");
-        caseData.setCorrespondenceType(correspondenceType);
-        
-        documentGenerationService.setBfActions(caseData, "3.5");
-
-        LocalDate servingDate = LocalDate.parse(caseData.getClaimServedDate());
-        LocalDate et3DueDate = LocalDate.parse(caseData.getEt3DueDate());
-        LocalDate bfDate = LocalDate.parse(caseData.getBfActions().getFirst().getValue().getBfDate());
-        
         assertThat(et3DueDate).isEqualTo(servingDate.plusDays(28));
-        assertThat(bfDate).isEqualTo(LocalDate.now().plusDays(14));
-        
-        assertThat(caseData.getBfActions()).hasSize(1);
-        assertThat(caseData.getBfActions().getFirst().getValue().getAllActions())
-                .isEqualTo("Employer's contract claim rejection");
-    }
-    
-    @Test
-    void setBFActionWithScotlandECCDocument() {
-        CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setCaseTypeId(SCOTLAND_CASE_TYPE_ID);
-        CaseData caseData = new CaseData();
-        caseDetails.setCaseData(caseData);
-        
-        CorrespondenceScotType correspondenceScotType = new CorrespondenceScotType();
-        correspondenceScotType.setPart0ScotDocuments("20");
-        caseData.setCorrespondenceScotType(correspondenceScotType);
-        
-        documentGenerationService.setBfActions(caseData, "20");
-
-        LocalDate servingDate = LocalDate.parse(caseData.getClaimServedDate());
-        LocalDate et3DueDate = LocalDate.parse(caseData.getEt3DueDate());
-        LocalDate bfDate = LocalDate.parse(caseData.getBfActions().getFirst().getValue().getBfDate());
-        
-        assertThat(et3DueDate).isEqualTo(servingDate.plusDays(28));
-        assertThat(bfDate).isEqualTo(LocalDate.now().plusDays(28));
-        
-        assertThat(caseData.getBfActions()).hasSize(1);
-        assertThat(caseData.getBfActions().getFirst().getValue().getAllActions())
-                .isEqualTo("Notice of employer's contract claim");
     }
 
     @Test

@@ -157,10 +157,8 @@ public class DocumentGenerationService {
 
     public void updateBfActions(DocumentInfo documentInfo, CaseData caseData) {
         String sectionName = Strings.split(documentInfo.getDescription(), '_')[1];
-
         if (areBfActionsForEnglandOrWalesToBeUpdated(caseData, sectionName)
             || areBfActionsForScotlandToBeUpdated(caseData, sectionName)) {
-            
             setBfActions(caseData);
         }
     }
@@ -201,7 +199,7 @@ public class DocumentGenerationService {
             List<BFActionTypeItem> tmp = caseData.getBfActions();
             tmp.add(bfActionTypeItem);
             caseData.setBfActions(tmp);
-            String dateEntered = caseData.getBfActions().getFirst().getValue().getDateEntered().substring(0, 10);
+            String dateEntered = caseData.getBfActions().get(0).getValue().getDateEntered().substring(0, 10);
             LocalDate date = LocalDate.parse(dateEntered);
             caseData.setClaimServedDate(String.valueOf(date));
         }
@@ -441,5 +439,7 @@ public class DocumentGenerationService {
         }
 
         return addressLabelTypeItems;
+
     }
+
 }

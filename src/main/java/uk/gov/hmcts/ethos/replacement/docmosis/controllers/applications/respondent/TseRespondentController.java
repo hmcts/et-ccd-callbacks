@@ -47,6 +47,7 @@ public class TseRespondentController {
 
         if (caseDetails.getCaseData().getRespondentTse() != null) {
             tseService.createApplication(caseDetails.getCaseData(), RESPONDENT_TITLE);
+            tseService.removeStoredRespondentApplication(caseDetails.getCaseData());
             tseService.clearApplicationData(caseDetails.getCaseData());
         }
         setDocumentNumbers(caseDetails.getCaseData());

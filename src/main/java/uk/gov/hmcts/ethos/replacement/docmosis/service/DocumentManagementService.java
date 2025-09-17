@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -299,6 +300,15 @@ public class DocumentManagementService {
                             uploadedDocType.getDocumentIndex());
                 });
         setDocumentNumbers(caseData);
+    }
+
+    public static String createLinkToBinaryDocument(DocumentTypeItem documentTypeItem) {
+        String documentBinaryUrl = documentTypeItem.getValue().getUploadedDocument().getDocumentBinaryUrl();
+        if (!Strings.isNullOrEmpty(documentBinaryUrl) && documentBinaryUrl.contains("/documents/")) {
+            return documentBinaryUrl.substring(documentBinaryUrl.indexOf("/documents/"));
+        } else {
+            return "";
+        }
     }
 
     private HttpHeaders getResponseHeaders() {

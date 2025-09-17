@@ -114,6 +114,7 @@ public class InitialConsiderationController {
         }
 
         if (CollectionUtils.isNotEmpty(caseData.getEtICHearingNotListedList())) {
+
             initialConsiderationService.clearIcHearingNotListedOldValues(caseData);
         }
 

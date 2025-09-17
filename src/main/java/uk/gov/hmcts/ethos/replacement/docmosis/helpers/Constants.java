@@ -4,11 +4,15 @@ public final class Constants {
 
     public static final String ET1_DOC_TYPE = "ET1";
     public static final String ET1_ATTACHMENT_DOC_TYPE = "ET1 Attachment";
+    public static final String ET1_VETTING_DOC_TYPE = "ET1 Vetting";
     public static final String COMPANY = "Company";
     public static final String ACAS_DOC_TYPE = "ACAS Certificate";
     public static final String BEFORE_LABEL_TEMPLATE = "Open these documents to help you complete this form: %s%s%s";
-    public static final String BEFORE_LABEL_ET1 =
-            "<br><a target=\"_blank\" href=\"%s\">ET1 form (opens in new tab)</a>";
+    public static final String BEFORE_LABEL_ET1 = "<br><a target=\"_blank\" href=\"%s\">ET1 form (opens in new tab)</a>";
+    public static final String BEFORE_LABEL_ET1_IC = "<br><a target=\"_blank\" href=\"%s\">ET1</a>";
+    public static final String BEFORE_LABEL_ET1_VETTING_IC = "<br><a target=\"_blank\" href=\"%s\">ET1 Vetting</a>";
+    public static final String TO_HELP_YOU_COMPLETE_IC_EVENT_LABEL = "To help you complete this (opens in new tab)"
+            + "<br>%s%s%s%s%s";
     public static final String BEFORE_LABEL_ACAS =
             "<br><a target=\"_blank\" href=\"%s\">Acas certificate %s (opens in new tab)</a>";
     public static final String BEFORE_LABEL_ET1_ATTACHMENT =

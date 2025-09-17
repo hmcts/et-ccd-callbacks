@@ -158,22 +158,28 @@ public class DocumentGenerationService {
     public void updateBfActions(DocumentInfo documentInfo, CaseData caseData) {
         String sectionName = Strings.split(documentInfo.getDescription(), '_')[1];
 
-        if (areBfActionsForEnglandOrWalesToBeUpdated(sectionName)
-            || areBfActionsForScotlandToBeUpdated(sectionName)) {
+        if (areBfActionsForEnglandOrWalesToBeUpdated(caseData, sectionName)
+            || areBfActionsForScotlandToBeUpdated(caseData, sectionName)) {
             
             setBfActions(caseData);
         }
     }
 
-    public boolean areBfActionsForEnglandOrWalesToBeUpdated(String sectionName) {
-        String[] values = {"2.6", "2.6 Reform", "2.7", "2.8", "2.7 Reform", "2.8 Reform",
-            "2.7A", "2.8A", "2.7A Reform", "2.8A Reform"};
-        return Arrays.asList(values).contains(sectionName);
+    public boolean areBfActionsForEnglandOrWalesToBeUpdated(CaseData caseData, String sectionName) {
+        if (caseData.getCorrespondenceType() != null) {
+            String[] values = {"2.6", "2.6 Reform", "2.7", "2.8", "2.7 Reform", "2.8 Reform",
+                "2.7A", "2.8A", "2.7A Reform", "2.8A Reform"};
+            return Arrays.asList(values).contains(sectionName);
+        }
+        return false;
     }
 
-    public boolean areBfActionsForScotlandToBeUpdated(String sectionName) {
-        String[] values = {"7", "72", "75", "76", "77.2", "77.2 Reform", "7 Reform", "72 Reform", "76 Reform"};
-        return Arrays.asList(values).contains(sectionName);
+    public boolean areBfActionsForScotlandToBeUpdated(CaseData caseData, String sectionName) {
+        if (caseData.getCorrespondenceScotType() != null) {
+            String[] values = {"7", "72", "75", "76", "77.2", "77.2 Reform", "7 Reform", "72 Reform", "76 Reform"};
+            return Arrays.asList(values).contains(sectionName);
+        }
+        return false;
     }
 
     public CaseData setBfActions(CaseData caseData) {

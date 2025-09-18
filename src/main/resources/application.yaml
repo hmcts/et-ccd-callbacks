@@ -21,9 +21,9 @@ spring:
   application:
     name: et-cos
   datasource:
-    password: ${ET_COS_DB_PASSWORD:et_cos}
+    password: ${ET_COS_DB_PASSWORD}
     url: jdbc:postgresql://${ET_COS_DB_HOST:localhost}:${ET_COS_DB_PORT:5432}/${ET_COS_DB_NAME:et_cos}${ET_COS_DB_CONN_OPTIONS:}
-    username: ${ET_COS_DB_USER_NAME:et_cos}
+    username: ${ET_COS_DB_USER_NAME}
   config:
     import: optional:configtree:/mnt/secrets/et-cos/,optional:configtree:/mnt/secrets/et/
 
@@ -35,9 +35,9 @@ feign:
     enabled: 'true'
 
 tornado:
-  accessKey: ${TORNADO_ACCESS_KEY:ZTY0NjBlNGEtYWIyYy00ZTA4LTg0NWItNTU1NDM4OWZjMTM4OjY4MTM4ODM}
+  accessKey: ${TORNADO_ACCESS_KEY}
   # For localhost http://localhost:8080/api/render
-  # accessKey: ${TORNADO_ACCESS_KEY:3MAD-KMTP-JALP-GKIA-EBBH-2ELH-SBKQ-MS07-E7E1-B-3018}
+  # accessKey: ${TORNADO_ACCESS_KEY}
   url: ${TORNADO_URL:https://eu.dws3.docmosis.com/api/render}
   # url: ${TORNADO_URL:http://localhost:8080/api/render}
 
@@ -55,14 +55,14 @@ idam:
   s2s-auth:
     # noinspection SpringBootApplicationYaml
     url: ${SERVICE_AUTH_PROVIDER_URL:http://service-auth-provider-api:8080} # used in ServiceAuthorisationApi
-    totp_secret: ${ET_COS_S2S_SECRET:AAAAAAAAAAAAAAAC}
+    totp_secret: ${ET_COS_S2S_SECRET}
     microservice: ${MICRO_SERVICE:ccd_gw}
   api:
     url: ${IDAM_API_URL:http://sidam-api:5000}
     jwkUrl: ${IDAM_API_JWK_URL:http://sidam-api:5000/jwks}
   client:
     scope: openid profile roles manage-user
-    secret: ${IDAM_CLIENT_SECRET:AAAAAAAAAAAAAAAA}
+    secret: ${IDAM_CLIENT_SECRET}
     id: ${REFORM_SERVICE_NAME:et-cos}
 
 ccd_gateway_base_url: ${CCD_GATEWAY_BASE_URL:http://127.0.0.1:3453}
@@ -80,13 +80,13 @@ queue:
   create-updates:
     queue-name: ${CREATE_UPDATES_QUEUE_NAME:create-updates-tb}
     send:
-      connection-string: ${CREATE_UPDATES_QUEUE_SEND_CONNECTION_STRING:Endpoint=sb://ethos-servicebus-devs.servicebus.windows.net/;SharedAccessKeyName=SendSharedAccessKey;SharedAccessKey=JpyFNVxQTESoFxCdwXtZXbz2MUT1Zlstdx7RLJL/0AA=;EntityPath=create-updates-tb}
+      connection-string: ${CREATE_UPDATES_QUEUE_SEND_CONNECTION_STRING}
 
 springdoc:
   packagesToScan: uk.gov.hmcts.ethos.replacement.docmosis.controllers
   pathsToMatch: /**
 
-gov-notify-api-key: ${GOV_NOTIFY_API_KEY:tensay_test-002d2170-e381-4545-8251-5e87dab724e7-f5323731-417a-4104-987d-52bddf392212}
+gov-notify-api-key: ${GOV_NOTIFY_API_KEY}
 
 template:
   referral: ${REFERRAL_TEMPLATE_ID:f975c1cc-e102-472a-a6cb-84dffa0a6d42}

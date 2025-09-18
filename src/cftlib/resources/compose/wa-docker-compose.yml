@@ -6,7 +6,7 @@ services:
     image: "hmctsprivate.azurecr.io/camunda/bpm:latest"
     environment:
       CAMUNDA_NEXUS_USER: "ministry_of_justice_uk"
-      CAMUNDA_NEXUS_PASSWORD: "AAAAAAAAAAAAAAAA"
+      CAMUNDA_NEXUS_PASSWORD: ""
       CAMUNDA_DB_HOST: host.docker.internal
       CAMUNDA_DB_PORT: 6432
       CAMUNDA_DB_USER_NAME: "postgres"
@@ -34,7 +34,7 @@ services:
       DATA_STORE_DB_USERNAME: postgres
       DATA_STORE_DB_PASSWORD: postgres
       DATA_STORE_DB_NAME: datastore
-      SERVICE_BUS_CONNECTION_STRING: "Endpoint=sb://fake-namespace.servicebus.windows.net/;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=fakeKey"
+      SERVICE_BUS_CONNECTION_STRING: ""
       CCD_CASE_EVENTS_DESTINATION: "${AZURE_SERVICE_BUS_TOPIC_NAME}"
     ports:
       - 4456:4456
@@ -52,7 +52,7 @@ services:
       POSTGRES_NAME: wa_workflow_api
       POSTGRES_USERNAME: postgres
       POSTGRES_PASSWORD: postgres
-      LAUNCH_DARKLY_SDK_KEY: "5de6610b23ce5408280f2268"
+      LAUNCH_DARKLY_SDK_KEY: ""
       WA_SYSTEM_USERNAME: "wa-system-user@fake.hmcts.net"
       WA_SYSTEM_PASSWORD: "System01"
       WA_S2S_AUTHORIZED_SERVICES: wa_workflow_api,wa_case_event_handler,camunda-local-bpm,xui_webapp,wa_task_management_api,wa_task_monitor,wa_case_event_handler
@@ -71,12 +71,12 @@ services:
     container_name: case-event-handler
     environment:
       POSTGRES_HOST: host.docker.internal
-      AZURE_SERVICE_BUS_CONNECTION_STRING: "Endpoint=sb://ccd-servicebus-demo.servicebus.windows.net/;SharedAccessKeyName=SendAndListenSharedAccessKey;SharedAccessKey=B4PezUTfHcKpRPZdIpWd9BUHp47l28NEClBnuIN2S9w="
+      AZURE_SERVICE_BUS_CONNECTION_STRING: ""
       AZURE_SERVICE_BUS_TOPIC_NAME: "et-case-event-handler-topic-sessions-ft"
       AZURE_SERVICE_BUS_SUBSCRIPTION_NAME: "DCD-CNP-DEV"
       AZURE_SERVICE_BUS_CCD_CASE_EVENTS_SUBSCRIPTION_NAME: "et_case_event_handler_topic_session_ft_sub"
       POSTGRES_CONNECTION_OPTIONS: "?stringtype=unspecified&gssEncMode=disable"
-      APPLICATIONINSIGHTS_CONNECTION_STRING: "InstrumentationKey=00000000-0000-0000-0000-000000000000"
+      APPLICATIONINSIGHTS_CONNECTION_STRING: ""
       ENVIRONMENT: "local"
       S2S_URL: "http://localhost:8489"
       WA_WORKFLOW_API_URL: http://wa-workflow-api:8099
@@ -95,7 +95,7 @@ services:
       MESSAGE_PROCESSING_THREAD_POOL_SIZE: 5
       MESSAGE_READINESS_POLL_INTERVAL_MILLISECONDS: 500
       MESSAGE_READINESS_THREAD_POOL_SIZE: 2
-      LAUNCH_DARKLY_SDK_KEY: "5de6610b23ce5408280f2268"
+      LAUNCH_DARKLY_SDK_KEY: ""
       POSTGRES_USERNAME: "postgres"
       POSTGRES_PASSWORD: "postgres"
       POSTGRES_PORT: 6432

@@ -13,10 +13,10 @@ services:
       CAMUNDA_DB_PASSWORD: "postgres"
       camunda.bpm.database.schema-update: "true"
       CAMUNDA_API_AUTH_ENABLED: "false"
-      S2S_URL: "http://localhost:8489"
+      S2S_URL: "${CFTLIB_HOST-http://host.docker.internal}:8489"
       camundaGroups.work-allocation.s2sServiceNames: wa_task_management_api,wa_workflow_api,wa_case_event_handler,wa_camunda_pipeline_upload
       WA_AUTO_CONFIGURE_TASKS_ENABLED: "True"
-      TASK_MANAGEMENT_API_URL: "http://host.docker.internal:8087"
+      TASK_MANAGEMENT_API_URL: "http://localhost:8087"
       TZ: Europe/London
       # Uncomment this line to enable JVM debugging and uncomment the port mapping below
       #JAVA_TOOL_OPTIONS: '-XX:InitialRAMPercentage=30.0 -XX:MaxRAMPercentage=65.0 -XX:MinRAMPercentage=30.0 -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5008'
@@ -35,6 +35,7 @@ services:
       DATA_STORE_DB_PASSWORD: postgres
       DATA_STORE_DB_NAME: datastore
       SERVICE_BUS_CONNECTION_STRING: ""
+
       CCD_CASE_EVENTS_DESTINATION: "${AZURE_SERVICE_BUS_TOPIC_NAME}"
     ports:
       - 4456:4456
@@ -45,17 +46,19 @@ services:
     environment:
       container_name: workflow-api
       CAMUNDA_URL: http://camunda-local-bpm:8999/engine-rest
-      S2S_URL: "http://localhost:8489"
+      S2S_URL: "${CFTLIB_HOST-http://host.docker.internal}:8489"
       S2S_SECRET_WORKFLOW_API: "AAAAAAAAAAAAAAAA"
       POSTGRES_HOST: host.docker.internal
       POSTGRES_PORT: 6432
       POSTGRES_NAME: wa_workflow_api
       POSTGRES_USERNAME: postgres
       POSTGRES_PASSWORD: postgres
+
       LAUNCH_DARKLY_SDK_KEY: ""
-      WA_SYSTEM_USERNAME: "wa-system-user@fake.hmcts.net"
-      WA_SYSTEM_PASSWORD: "System01"
+      WA_SYSTEM_USERNAME: "${WA_SYSTEM_USERNAME}"
+      WA_SYSTEM_PASSWORD: "${WA_SYSTEM_PASSWORD}"
       WA_S2S_AUTHORIZED_SERVICES: wa_workflow_api,wa_case_event_handler,camunda-local-bpm,xui_webapp,wa_task_management_api,wa_task_monitor,wa_case_event_handler
+      LAUNCH_DARKLY_SDK_KEY: "${LAUNCH_DARKLY_SDK_KEY}"
       #JAVA_TOOL_OPTIONS: -XX:InitialRAMPercentage=30.0 -XX:MaxRAMPercentage=65.0 -XX:MinRAMPercentage=30.0 -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5009
       ROOT_LOGGING_LEVEL: debug
     ports:
@@ -66,26 +69,57 @@ services:
     links:
       - camunda-local-bpm
 
+  wa-task-management-api:
+    image: "hmctspublic.azurecr.io/wa/task-management-api:latest"
+    container_name: wa-task-management-api
+    environment:
+      CAMUNDA_URL: http://camunda-local-bpm:8999/engine-rest
+      S2S_URL: "${CFTLIB_HOST-http://host.docker.internal}:8489"
+      IDAM_URL: http://rse-idam-simulator:5062
+      CCD_URL: "${CFTLIB_HOST-http://host.docker.internal}:4452"
+      POSTGRES_HOST: host.docker.internal
+      OPEN_ID_IDAM_URL: http://host.docker.internal:5062
+      ROLE_ASSIGNMENT_URL: "${CFTLIB_HOST-http://host.docker.internal}:4096"
+      POSTGRES_PORT: 6432
+      POSTGRES_NAME: cft_task_db
+      POSTGRES_USERNAME: "postgres"
+      POSTGRES_PASSWORD: "postgres"
+      ALLOWED_JURISDICTIONS: wa,ia,sscs,civil,employment
+      ALLOWED_CASE_TYPES: asylum,wacasetype,sscs,civil,et_englandwales,et_englandwales_listings,et_englandwales_multiple,et_scotland,et_scotland_listings,et_scotland_multiple,et_admin
+      WA_S2S_AUTHORIZED_SERVICES: ccd,ccd_data,ccd_gw,ccd_ps,iac,wa_task_management_api,xui_webapp,wa_task_monitor,camunda_bpm,wa_workflow_api,wa_case_event_handler,xui_manage_cases,et_cos,xui_webapp
+      LAUNCH_DARKLY_SDK_KEY: "${LAUNCH_DARKLY_SDK_KEY}"
+      WA_SYSTEM_USERNAME: "${WA_SYSTEM_USERNAME}"
+      WA_SYSTEM_PASSWORD: "${WA_SYSTEM_PASSWORD}"
+      # Uncomment this line to enable JVM debugging and uncomment the port mapping below
+      #JAVA_TOOL_OPTIONS: -XX:InitialRAMPercentage=30.0 -XX:MaxRAMPercentage=65.0 -XX:MinRAMPercentage=30.0 -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5006
+    ports:
+      - 8087:8087
+      # Uncomment this and the JAVA_TOOL_OPTIONS flag for JVM debugging
+      #- 5006:5006
+    depends_on:
+      - camunda-local-bpm
+
   case-event-handler:
     image: "hmctspublic.azurecr.io/wa/case-event-handler:latest"
     container_name: case-event-handler
     environment:
       POSTGRES_HOST: host.docker.internal
-      AZURE_SERVICE_BUS_CONNECTION_STRING: ""
-      AZURE_SERVICE_BUS_TOPIC_NAME: "et-case-event-handler-topic-sessions-ft"
-      AZURE_SERVICE_BUS_SUBSCRIPTION_NAME: "DCD-CNP-DEV"
-      AZURE_SERVICE_BUS_CCD_CASE_EVENTS_SUBSCRIPTION_NAME: "et_case_event_handler_topic_session_ft_sub"
+      AZURE_SERVICE_BUS_CONNECTION_STRING: "${AZURE_SERVICE_BUS_CONNECTION_STRING}"
+      AZURE_SERVICE_BUS_TOPIC_NAME: "${AZURE_SERVICE_BUS_TOPIC_NAME}"
+      AZURE_SERVICE_BUS_SUBSCRIPTION_NAME: "${AZURE_SERVICE_BUS_SUBSCRIPTION_NAME}"
+      AZURE_SERVICE_BUS_CCD_CASE_EVENTS_SUBSCRIPTION_NAME: "${AZURE_SERVICE_BUS_CCD_CASE_EVENTS_SUBSCRIPTION_NAME}"
       POSTGRES_CONNECTION_OPTIONS: "?stringtype=unspecified&gssEncMode=disable"
       APPLICATIONINSIGHTS_CONNECTION_STRING: ""
       ENVIRONMENT: "local"
-      S2S_URL: "http://localhost:8489"
+      S2S_URL: "${CFTLIB_HOST-http://host.docker.internal}:8489"
       WA_WORKFLOW_API_URL: http://wa-workflow-api:8099
       OPEN_ID_IDAM_URL: "http://localhost:5062"
       IDAM_URL: "http://localhost:5062"
 
       ROLE_ASSIGNMENT_URL: "http://host.docker.internal:4096"
+
       CAMUNDA_URL: http://camunda-local-bpm:8999/engine-rest
-      CCD_URL: "http://host.docker.internal:4452"
+      CCD_URL: "${CFTLIB_HOST-http://host.docker.internal}:4452"
       TASK_MANAGEMENT_SERVICE_URL: http://wa-task-management-api:8087
       WA_TASK_MANAGEMENT_API_URL: http://wa-task-management-api:8087
       AZURE_SERVICE_BUS_FEATURE_TOGGLE: "true"
@@ -95,9 +129,10 @@ services:
       MESSAGE_PROCESSING_THREAD_POOL_SIZE: 5
       MESSAGE_READINESS_POLL_INTERVAL_MILLISECONDS: 500
       MESSAGE_READINESS_THREAD_POOL_SIZE: 2
-      LAUNCH_DARKLY_SDK_KEY: ""
-      POSTGRES_USERNAME: "postgres"
-      POSTGRES_PASSWORD: "postgres"
+      LAUNCH_DARKLY_SDK_KEY: "${LAUNCH_DARKLY_SDK_KEY}"
+
+      POSTGRES_USERNAME: ""
+      POSTGRES_PASSWORD: ""
       POSTGRES_PORT: 6432
       #JAVA_TOOL_OPTIONS: -XX:InitialRAMPercentage=30.0 -XX:MaxRAMPercentage=65.0 -XX:MinRAMPercentage=30.0 -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5007
       #ROOT_LOGGING_LEVEL: debug
@@ -107,6 +142,45 @@ services:
     depends_on:
       - camunda-local-bpm
       - wa-workflow-api
+
+
+  wa-task-monitor:
+    image: "hmctspublic.azurecr.io/wa/task-monitor:latest"
+    container_name: wa-task-monitor
+    environment:
+      S2S_URL: "${CFTLIB_HOST-http://host.docker.internal}:8489"
+      WA_WORKFLOW_API_URL: http://wa-workflow-api:8099
+      OPEN_ID_IDAM_URL: http://rse-idam-simulator:5062
+      IDAM_URL: http://rse-idam-simulator:5062
+      ROLE_ASSIGNMENT_URL: "${CFTLIB_HOST-http://host.docker.internal}:4096"
+      CAMUNDA_URL: http://camunda-local-bpm:8999/engine-rest
+      CCD_URL: "${CFTLIB_HOST-http://host.docker.internal}:4452"
+      TASK_MANAGEMENT_SERVICE_URL: http://wa-task-management-api:8087
+      WA_TASK_MANAGEMENT_API_URL: http://wa-task-management-api:8087
+      CASE_EVENT_HANDLER_SERVICE_URL: http://wa-case-event-handler:8088
+      CCD_SEARCH_URL: http://ccd-elasticsearch:9200
+      CONFIGURATION_CAMUNDA_MAX_RESULTS: 100
+      CONFIGURATION_TIME_LIMIT_FLAG: "true"
+      CONFIGURATION_TIME_LIMIT: 1440
+      INITIATION_CAMUNDA_MAX_RESULTS: 100
+      INITIATION_TIME_LIMIT_FLAG: "true"
+      INITIATION_TIME_LIMIT: 120
+      TERMINATION_CAMUNDA_MAX_RESULTS: 100
+      TERMINATION_TIME_LIMIT_FLAG: "true"
+      TERMINATION_TIME_LIMIT: 120
+      PENDING_TERMINATION_CAMUNDA_MAX_RESULTS: 1
+      WA_SYSTEM_USERNAME: "${WA_SYSTEM_USERNAME}"
+      WA_SYSTEM_PASSWORD: "${WA_SYSTEM_PASSWORD}"
+      # ROOT_LOGGING_LEVEL: debug
+      # Uncomment this line to enable JVM debugging and uncomment the port mapping below
+      #JAVA_TOOL_OPTIONS: -XX:InitialRAMPercentage=30.0 -XX:MaxRAMPercentage=65.0 -XX:MinRAMPercentage=30.0 -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5007
+    ports:
+      - 8077:8077
+      # Uncomment this and the JAVA_TOOL_OPTIONS flag for JVM debugging
+      #- 5007:5007
+    depends_on:
+      - case-event-handler
+      - wa-task-management-api
 
 networks:
   default:

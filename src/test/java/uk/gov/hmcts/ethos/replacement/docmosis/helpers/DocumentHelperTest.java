@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -76,7 +77,8 @@ class DocumentHelperTest {
     private VenueAddressReaderService venueAddressReaderService;
 
     @BeforeEach
-    void setUp() throws URISyntaxException, IOException {
+    @SneakyThrows
+    void setUp() {
         caseDetails1 = generateCaseDetails("caseDetailsTest1.json");
         caseDetails2 = generateCaseDetails("caseDetailsTest2.json");
         caseDetails3 = generateCaseDetails("caseDetailsTest3.json");
@@ -1484,7 +1486,6 @@ class DocumentHelperTest {
             + "\"submission_reference\":\"12212121" + COMMA_NEWLINE
             + CLOSE_BRACE_NEW_LINE
             + CLOSE_BRACE_NEW_LINE;
-
         assertEquals(expected, DocumentHelper.buildDocumentContent(caseDetails20.getCaseData(), "",
                 userDetails, ENGLANDWALES_CASE_TYPE_ID,
                 caseDetails20.getCaseData().getCorrespondenceType(),
@@ -1565,7 +1566,6 @@ class DocumentHelperTest {
     @Test
     void buildDocumentContentScot1() {
         when(venueAddressReaderService.getVenueAddress(any(), any(), any())).thenReturn(GLASGOW_VENUE_ADDRESS);
-
         String expected = "{\n"
             + "\"accessKey\":\"" + COMMA_NEWLINE
             + "\"templateName\":\"EM-TRB-SCO-ENG-00042.docx" + COMMA_NEWLINE

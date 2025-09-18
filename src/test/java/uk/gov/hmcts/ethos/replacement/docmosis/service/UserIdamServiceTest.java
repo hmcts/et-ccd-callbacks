@@ -13,6 +13,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.idam.IdamApi;
 
 import java.util.Collections;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -45,6 +46,12 @@ class UserIdamServiceTest {
             @Override
             public TokenResponse generateOpenIdToken(TokenRequest tokenRequest) {
                 return tokenResponse;
+            }
+
+            @Override
+            public List<UserDetails> searchUsersByQuery(String authorisation, String query,
+                                                        Integer page, Integer size) {
+                return List.of();
             }
         };
 

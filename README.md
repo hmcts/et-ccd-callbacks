@@ -1,6 +1,12 @@
 # Employment Tribunals CCD Callbacks Service
 
+[![Java](https://img.shields.io/badge/Java-21-blue.svg)](https://www.oracle.com/java/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.3.0-brightgreen.svg)](https://spring.io/projects/spring-boot)
+[![Gradle](https://img.shields.io/badge/Gradle-Wrapper-blue.svg)](https://gradle.org/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE.md)
+
 This application is responsible for handling all CCD callback requests for Employment Tribunal cases.
+
 
 ## CCD Definitions
 
@@ -17,11 +23,25 @@ For detailed information about working with the CCD definitions, see [ccd-defini
 - JSON to Excel conversion tools
 - Environment-specific configuration management
 - Automated build and deployment scripts
+=======
+## Supported Versions
+
+| Component | Version | Status |
+|-----------|---------|--------|
+| Java | 21 | ✅ Supported |
+| Spring Boot | 3.3.0 | ✅ Current |
+| Spring Security | 6.x | ✅ Current |
+| Node.js | 18+ | ✅ Supported |
+| Gradle | Wrapper | ✅ Current |
+
+> ⚠️ **Breaking Change**: Java 21 is now required. Java 17 and earlier versions are no longer supported.
 
 ## Prerequisites
 
 ### Java
-- [JDK 17](https://www.oracle.com/java)
+- [JDK 21](https://www.oracle.com/java) (upgraded from JDK 17)
+
+**Note: This application has been upgraded to Spring Boot 3.3.0 and requires Java 21.**
 
 ### CCD Common Components
 The application should be run locally in an environment that includes CCD common components.
@@ -64,12 +84,37 @@ To get the project to build in IntelliJ IDEA, you have to:
 - Enable Annotation Processing: Preferences -> Build, Execution, Deployment -> Compiler -> Annotation Processors
 
 ## Running
-To run the application locally you should follow the instructions above for one of the CCD environments.
+To run the application locally, you should follow the instructions above for one of the CCD environments.
+
+## Tasks
+
+There are a number of tasks within the project; some make use of Spring Scheduling and run within the main application, and others are standalone which can be run from the command line.
+
+*Note: the examples below assume you are using the RSE CFT lib environment, but the tasks can be run from any environment.*
+
+To run the tasks from the command line, you can use the following command as an example:
+```bash
+SERVER_PORT=4551 TASK_NAME=BatchReconfigurationTask SPRING_PROFILES_ACTIVE=cftlib CRON_RECONFIGURATION_CASE_IDS=1756969501994958 ./gradlew bootRun
+```
+
+This will run the `BatchReconfigurationTask` on port 4551 with the cftlib profile active. 
+
+Alternatively, some tasks can be executed if a shell script has been created for them. These can be found in the `./bin/tasks` directory.
+
+An example of this is the `BatchReconfigurationTask` which can be run as follows:
+
+```bash
+./bin/tasks/BatchReconfigurationTask.sh 1756969501994958
+```
+
+When running a task locally, it is important to set the `SERVER_PORT` environment variable to a port that is not already in use.
 
 ## API documentation
-API documentation is provided with Swagger
+API documentation is provided with SpringDoc OpenAPI
 
 http://localhost:8081/swagger-ui.html
+
+**Note:** After the Spring Boot 3 upgrade, the OpenAPI documentation is now provided by SpringDoc OpenAPI 2.5.0. The URL remains the same, but the underlying implementation has been updated.
 
 ## Developing
 

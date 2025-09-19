@@ -19,7 +19,6 @@ import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 
-import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
@@ -62,12 +61,13 @@ public class BFActionsScheduledTasks {
         Arrays.stream(caseTypeIds).forEach(caseTypeId -> {
             try {
                 List<SubmitEvent> cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
-                while (CollectionUtils.isNotEmpty(cases)) {
-                    cases.stream()
-                            .filter(o -> !bfActionCronCaseIdsToSkip.contains(String.valueOf(o.getCaseId())))
-                            .forEach(o -> triggerTaskEventForCase(adminUserToken, o, caseTypeId));
-                    cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
+                log.info("Found {} cases for caseTypeId {}", cases.size(), caseTypeId);
+                if (CollectionUtils.isEmpty(cases)) {
+                    return;
                 }
+                cases.stream()
+                    .filter(o -> !bfActionCronCaseIdsToSkip.contains(String.valueOf(o.getCaseId())))
+                    .forEach(o -> triggerTaskEventForCase(adminUserToken, o, caseTypeId));
 
             } catch (Exception e) {
                 log.error(e.getMessage());
@@ -103,7 +103,7 @@ public class BFActionsScheduledTasks {
             );
 
             log.info("Called WA_REVIEW_RULE21_REFERRAL for {}", submitEvent.getCaseId());
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error(e.getMessage());
         }
     }

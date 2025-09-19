@@ -29,6 +29,7 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -197,6 +198,18 @@ class ServingServiceTest {
         CaseData caseData = caseDetails.getCaseData();
         assertThat(servingService.generateEmailLinkToAcas(caseData, false)).isEqualTo(expectedEt1EmailLinkToAcas);
         assertThat(servingService.generateEmailLinkToAcas(caseData, true)).isEqualTo(expectedEt3EmailLinkToAcas);
+    }
+
+    @Test
+    void generateEmailLinkToAcas_specialCharacters() {
+        CaseData caseData = caseDetails.getCaseData();
+        caseData.setClaimant("Doris & Johnson");
+        caseData.getRespondentCollection().getFirst().getValue().setRespondentName("SpecialCharacters!@£$%^&(");
+
+        String result = assertDoesNotThrow(() -> servingService.generateEmailLinkToAcas(caseData, false));
+        // Should format the name correctly and print out text after the special characters
+        assertThat(result).contains("Doris%20%26%20Johnson", "SpecialCharacters%21%40%C2%A3%24%25%5E%26%28",
+                "The%20tribunal%20has%20completed%20ET1%20serving%20to%20the%20respondent.");
     }
 
     @Test

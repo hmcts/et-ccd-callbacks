@@ -62,7 +62,7 @@ class ReferenceDataControllerTest extends BaseControllerTest {
 
     @BeforeEach
     @Override
-    public void setUp() throws Exception {
+    public void setUp() throws IOException, URISyntaxException {
         super.setUp();
         mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         doRequestSetUp();

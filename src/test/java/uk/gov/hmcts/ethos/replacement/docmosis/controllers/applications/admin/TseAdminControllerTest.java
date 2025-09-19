@@ -23,6 +23,8 @@ import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import uk.gov.hmcts.ethos.utils.TseApplicationBuilder;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.UUID;
 
@@ -70,7 +72,7 @@ class TseAdminControllerTest extends BaseControllerTest {
 
     @BeforeEach
     @Override
-    protected void setUp() throws Exception {
+    protected void setUp() throws IOException, URISyntaxException {
         super.setUp();
         when(featureToggleService.isHmcEnabled()).thenReturn(true);
         CaseDetails caseDetails = CaseDataBuilder.builder()

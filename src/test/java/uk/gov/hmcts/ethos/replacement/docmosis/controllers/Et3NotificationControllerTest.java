@@ -24,6 +24,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.List;
 
 import static org.hamcrest.Matchers.emptyCollectionOf;
@@ -70,7 +72,7 @@ class Et3NotificationControllerTest extends BaseControllerTest {
 
     @BeforeEach
     @Override
-    protected void setUp() throws Exception {
+    protected void setUp() throws IOException, URISyntaxException {
         super.setUp();
         CaseDetails caseDetails = CaseDataBuilder.builder()
             .withEthosCaseReference("12345/6789")
@@ -246,7 +248,7 @@ class Et3NotificationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void submitted_tokenOk() throws Exception {
+    void submitted_tokenOk() throws Throwable {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         SubmitEvent submitEvent = new SubmitEvent();
         submitEvent.setCaseId(1L);

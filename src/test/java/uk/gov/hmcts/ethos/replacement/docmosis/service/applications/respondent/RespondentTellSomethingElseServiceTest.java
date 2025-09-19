@@ -20,6 +20,7 @@ import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
@@ -28,8 +29,12 @@ import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentTse;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseAccessService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
@@ -45,15 +50,16 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
@@ -105,6 +111,10 @@ class RespondentTellSomethingElseServiceTest {
     private DocumentManagementService documentManagementService;
     @Mock
     private FeatureToggleService featureToggleService;
+    @MockBean
+    EmailNotificationService emailNotificationService;
+    @MockBean
+    CaseAccessService caseAccessService;
 
     @Captor
     ArgumentCaptor<Map<String, Object>> personalisationCaptor;
@@ -134,7 +144,8 @@ class RespondentTellSomethingElseServiceTest {
         emailService = spy(new EmailUtils());
         respondentTellSomethingElseService =
                 new RespondentTellSomethingElseService(emailService, userIdamService, tribunalOfficesService,
-                        tornadoService, documentManagementService, featureToggleService);
+                        tornadoService, documentManagementService, featureToggleService, caseAccessService,
+                        emailNotificationService);
         tseService = new TseService(documentManagementService);
 
         ReflectionTestUtils.setField(respondentTellSomethingElseService,
@@ -266,38 +277,71 @@ class RespondentTellSomethingElseServiceTest {
 
         Map<String, String> expectedPersonalisation = createPersonalisation(caseData, selectedApplication);
 
-        respondentTellSomethingElseService.sendAcknowledgeEmail(caseDetails, AUTH_TOKEN);
+        respondentTellSomethingElseService.sendAcknowledgeEmail(caseDetails, AUTH_TOKEN, anyList());
 
         verify(emailService).sendEmail(expectedTemplateId, LEGAL_REP_EMAIL, expectedPersonalisation);
     }
 
     private static Stream<Arguments> sendAcknowledgeEmailAndGeneratePdf() {
         return Stream.of(
-            Arguments.of(TSE_APP_AMEND_RESPONSE, NO, TEMPLATE_ID_NO),
-            Arguments.of(TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM, NO, TEMPLATE_ID_NO),
-            Arguments.of(TSE_APP_CONTACT_THE_TRIBUNAL, NO, TEMPLATE_ID_NO),
-            Arguments.of(TSE_APP_POSTPONE_A_HEARING, NO, TEMPLATE_ID_NO),
-            Arguments.of(TSE_APP_VARY_OR_REVOKE_AN_ORDER, NO, TEMPLATE_ID_NO),
-            Arguments.of(TSE_APP_ORDER_OTHER_PARTY, NO, TEMPLATE_ID_NO),
-            Arguments.of(TSE_APP_CLAIMANT_NOT_COMPLIED, NO, TEMPLATE_ID_NO),
-            Arguments.of(TSE_APP_RESTRICT_PUBLICITY, NO, TEMPLATE_ID_NO),
-            Arguments.of(TSE_APP_CHANGE_PERSONAL_DETAILS, NO, TEMPLATE_ID_NO),
-            Arguments.of(TSE_APP_CONSIDER_A_DECISION_AFRESH, NO, TEMPLATE_ID_NO),
-            Arguments.of(TSE_APP_RECONSIDER_JUDGEMENT, NO, TEMPLATE_ID_NO),
+                Arguments.of(TSE_APP_AMEND_RESPONSE, NO, TEMPLATE_ID_NO),
+                Arguments.of(TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM, NO, TEMPLATE_ID_NO),
+                Arguments.of(TSE_APP_CONTACT_THE_TRIBUNAL, NO, TEMPLATE_ID_NO),
+                Arguments.of(TSE_APP_POSTPONE_A_HEARING, NO, TEMPLATE_ID_NO),
+                Arguments.of(TSE_APP_VARY_OR_REVOKE_AN_ORDER, NO, TEMPLATE_ID_NO),
+                Arguments.of(TSE_APP_ORDER_OTHER_PARTY, NO, TEMPLATE_ID_NO),
+                Arguments.of(TSE_APP_CLAIMANT_NOT_COMPLIED, NO, TEMPLATE_ID_NO),
+                Arguments.of(TSE_APP_RESTRICT_PUBLICITY, NO, TEMPLATE_ID_NO),
+                Arguments.of(TSE_APP_CHANGE_PERSONAL_DETAILS, NO, TEMPLATE_ID_NO),
+                Arguments.of(TSE_APP_CONSIDER_A_DECISION_AFRESH, NO, TEMPLATE_ID_NO),
+                Arguments.of(TSE_APP_RECONSIDER_JUDGEMENT, NO, TEMPLATE_ID_NO),
 
-            Arguments.of(TSE_APP_AMEND_RESPONSE, I_DO_WANT_TO_COPY, TEMPLATE_ID_A),
-            Arguments.of(TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM, I_DO_WANT_TO_COPY, TEMPLATE_ID_A),
-            Arguments.of(TSE_APP_CONTACT_THE_TRIBUNAL, I_DO_WANT_TO_COPY, TEMPLATE_ID_A),
-            Arguments.of(TSE_APP_POSTPONE_A_HEARING, I_DO_WANT_TO_COPY, TEMPLATE_ID_A),
-            Arguments.of(TSE_APP_VARY_OR_REVOKE_AN_ORDER, I_DO_WANT_TO_COPY, TEMPLATE_ID_A),
-            Arguments.of(TSE_APP_ORDER_OTHER_PARTY, I_DO_WANT_TO_COPY, TEMPLATE_ID_A),
-            Arguments.of(TSE_APP_CLAIMANT_NOT_COMPLIED, I_DO_WANT_TO_COPY, TEMPLATE_ID_A),
-            Arguments.of(TSE_APP_RESTRICT_PUBLICITY, I_DO_WANT_TO_COPY, TEMPLATE_ID_A),
+                Arguments.of(TSE_APP_AMEND_RESPONSE, I_DO_WANT_TO_COPY, TEMPLATE_ID_A),
+                Arguments.of(TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM, I_DO_WANT_TO_COPY, TEMPLATE_ID_A),
+                Arguments.of(TSE_APP_CONTACT_THE_TRIBUNAL, I_DO_WANT_TO_COPY, TEMPLATE_ID_A),
+                Arguments.of(TSE_APP_POSTPONE_A_HEARING, I_DO_WANT_TO_COPY, TEMPLATE_ID_A),
+                Arguments.of(TSE_APP_VARY_OR_REVOKE_AN_ORDER, I_DO_WANT_TO_COPY, TEMPLATE_ID_A),
+                Arguments.of(TSE_APP_ORDER_OTHER_PARTY, I_DO_WANT_TO_COPY, TEMPLATE_ID_A),
+                Arguments.of(TSE_APP_CLAIMANT_NOT_COMPLIED, I_DO_WANT_TO_COPY, TEMPLATE_ID_A),
+                Arguments.of(TSE_APP_RESTRICT_PUBLICITY, I_DO_WANT_TO_COPY, TEMPLATE_ID_A),
 
-            Arguments.of(TSE_APP_CHANGE_PERSONAL_DETAILS, I_DO_WANT_TO_COPY, TEMPLATE_ID_B),
-            Arguments.of(TSE_APP_CONSIDER_A_DECISION_AFRESH, I_DO_WANT_TO_COPY, TEMPLATE_ID_B),
-            Arguments.of(TSE_APP_RECONSIDER_JUDGEMENT, I_DO_WANT_TO_COPY, TEMPLATE_ID_B)
+                Arguments.of(TSE_APP_CHANGE_PERSONAL_DETAILS, I_DO_WANT_TO_COPY, TEMPLATE_ID_B),
+                Arguments.of(TSE_APP_CONSIDER_A_DECISION_AFRESH, I_DO_WANT_TO_COPY, TEMPLATE_ID_B),
+                Arguments.of(TSE_APP_RECONSIDER_JUDGEMENT, I_DO_WANT_TO_COPY, TEMPLATE_ID_B)
         );
+    }
+
+    @ParameterizedTest
+    @MethodSource("sendAcknowledgeEmailAndGeneratePdf")
+    void sendAcknowledgeEmailAndGeneratePdfIncludingToSharedList(String selectedApplication, String rule92Selection,
+                                            String expectedTemplateId) {
+        CaseData caseData = createCaseData(selectedApplication, rule92Selection);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+        caseDetails.setCaseId(CASE_ID);
+
+        CaseUserAssignment mockAssignment1 = CaseUserAssignment
+                .builder()
+                .userId("respSolicitorUserId1")
+                .caseRole(SolicitorRole.SOLICITORA.getCaseRoleLabel())
+                .build();
+
+        CaseUserAssignment mockAssignment2 = CaseUserAssignment
+                .builder()
+                .userId("respSolicitorUserId2")
+                .caseRole(SolicitorRole.SOLICITORA.getCaseRoleLabel())
+                .build();
+
+        when(caseAccessService.filterCaseAssignmentsByOrgId(anyList(), any()))
+                .thenReturn(Set.of(mockAssignment1, mockAssignment2));
+        when(emailNotificationService.getRespondentSolicitorEmails(anyList()))
+                .thenReturn(Set.of(LEGAL_REP_EMAIL, "respSolicitor@test.com"));
+        respondentTellSomethingElseService.sendAcknowledgeEmail(caseDetails, AUTH_TOKEN, anyList());
+
+        Map<String, String> expectedPersonalisation = createPersonalisation(caseData, selectedApplication);
+
+        verify(emailService).sendEmail(expectedTemplateId, "respSolicitor@test.com", expectedPersonalisation);
+        verify(emailService).sendEmail(expectedTemplateId, LEGAL_REP_EMAIL, expectedPersonalisation);
     }
 
     @Test
@@ -314,7 +358,7 @@ class RespondentTellSomethingElseServiceTest {
             "exuiCaseDetailsLink", "exuiUrl669718251103419"
         );
 
-        respondentTellSomethingElseService.sendAcknowledgeEmail(caseDetails, AUTH_TOKEN);
+        respondentTellSomethingElseService.sendAcknowledgeEmail(caseDetails, AUTH_TOKEN, anyList());
 
         verify(emailService).sendEmail(TEMPLATE_ID_C, LEGAL_REP_EMAIL, expectedPersonalisation);
     }
@@ -326,7 +370,7 @@ class RespondentTellSomethingElseServiceTest {
         caseDetails.setCaseData(caseData);
         caseDetails.setCaseId(CASE_ID);
 
-        respondentTellSomethingElseService.sendClaimantEmail(caseDetails);
+        respondentTellSomethingElseService.sendClaimantEmail(caseDetails, new ArrayList<>());
         verify(emailService, never()).sendEmail(any(), any(), any());
     }
 
@@ -337,7 +381,7 @@ class RespondentTellSomethingElseServiceTest {
         caseDetails.setCaseData(caseData);
         caseDetails.setCaseId(CASE_ID);
 
-        respondentTellSomethingElseService.sendClaimantEmail(caseDetails);
+        respondentTellSomethingElseService.sendClaimantEmail(caseDetails, new ArrayList<>());
         verify(emailService, never()).sendEmail(any(), any(), any());
     }
 
@@ -359,8 +403,17 @@ class RespondentTellSomethingElseServiceTest {
         caseDetails.setCaseId(CASE_ID);
 
         when(tornadoService.generateEventDocumentBytes(any(), any(), any())).thenReturn(new byte[] {});
-        respondentTellSomethingElseService.sendClaimantEmail(caseDetails);
-        verify(emailService).sendEmail(eq(TEMPLATE_ID_A), any(), personalisationCaptor.capture());
+        CaseUserAssignment mockAssignment = CaseUserAssignment
+                .builder()
+                .userId("claimantSolicitorUserId")
+                .caseRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())
+                .build();
+
+        when(emailNotificationService.getCaseClaimantSolicitorEmails(anyList()))
+                .thenReturn(List.of(LEGAL_REP_EMAIL));
+
+        respondentTellSomethingElseService.sendClaimantEmail(caseDetails, List.of(mockAssignment));
+        verify(emailService, times(2)).sendEmail(eq(TEMPLATE_ID_A), any(), personalisationCaptor.capture());
         Map<String, Object> personalisation = personalisationCaptor.getValue();
 
         assertThat(personalisation.get("claimant"), is("claimant"));
@@ -393,7 +446,7 @@ class RespondentTellSomethingElseServiceTest {
 
         when(featureToggleService.isWelshEnabled()).thenReturn(true);
         when(tornadoService.generateEventDocumentBytes(any(), any(), any())).thenReturn(new byte[]{});
-        respondentTellSomethingElseService.sendClaimantEmail(caseDetails);
+        respondentTellSomethingElseService.sendClaimantEmail(caseDetails, new ArrayList<>());
         verify(emailService).sendEmail(eq(TEMPLATE_ID_A_CY), any(), personalisationCaptor.capture());
         Map<String, Object> personalisation = personalisationCaptor.getValue();
 
@@ -430,7 +483,7 @@ class RespondentTellSomethingElseServiceTest {
         caseDetails.setCaseId(CASE_ID);
 
         when(tornadoService.generateEventDocumentBytes(any(), any(), any())).thenReturn(new byte[] {});
-        respondentTellSomethingElseService.sendClaimantEmail(caseDetails);
+        respondentTellSomethingElseService.sendClaimantEmail(caseDetails, new ArrayList<>());
         verify(emailService).sendEmail(eq(TEMPLATE_ID_B), any(), personalisationCaptor.capture());
         Map<String, Object> personalisation = personalisationCaptor.getValue();
 
@@ -460,7 +513,7 @@ class RespondentTellSomethingElseServiceTest {
 
         when(featureToggleService.isWelshEnabled()).thenReturn(true);
         when(tornadoService.generateEventDocumentBytes(any(), any(), any())).thenReturn(new byte[]{});
-        respondentTellSomethingElseService.sendClaimantEmail(caseDetails);
+        respondentTellSomethingElseService.sendClaimantEmail(caseDetails, new ArrayList<>());
         verify(emailService).sendEmail(eq(TEMPLATE_ID_B_CY), any(), personalisationCaptor.capture());
         Map<String, Object> personalisation = personalisationCaptor.getValue();
 
@@ -485,13 +538,15 @@ class RespondentTellSomethingElseServiceTest {
 
     private CaseData createCaseDataWithHearing(String selectedApplication) {
         CaseData caseData = CaseDataBuilder.builder()
-            .withEthosCaseReference("test")
-            .withClaimant("claimant")
-            .withClaimantType("person@email.com")
-            .withClaimantHearingPreference(ENGLISH_LANGUAGE)
-            .withRespondent("Father Ted", NO, null, false)
-            .withHearing("1", "Hearing", "Judge", "Bodmin", List.of("In person"), "60", "Days", "Sit Alone")
-            .withHearingSession(0, "2069-05-16T01:00:00.000", "Listed", false)
+                .withEthosCaseReference("test")
+                .withClaimant("claimant")
+                .withClaimantType("person@email.com")
+                .withClaimantHearingPreference(ENGLISH_LANGUAGE)
+                .withRespondent("Father Ted", NO, null, false)
+                .withHearing("1", "Hearing", "Judge", "Bodmin", List.of("In person"), "60", "Days", "Sit Alone")
+                .withHearingSession(0, "2069-05-16T01:00:00.000", "Listed", false)
+                .withClaimantRepresentedQuestion(YES)
+                .withRepresentativeClaimantType("claimantSolicitorUserId", LEGAL_REP_EMAIL)
             .build();
         caseData.setResTseSelectApplication(selectedApplication);
         caseData.setResTseCopyToOtherPartyYesOrNo(YES);

@@ -350,12 +350,12 @@ public final class Helper {
      */
     public static boolean isClaimantNonSystemUser(CaseData caseData) {
         if (caseData != null) {
-            // TODO rework this logic when working on Claimant Gaps
             boolean isNotaSystemUser = caseData.getEt1OnlineSubmission() == null
                                        && caseData.getHubLinksStatuses() == null;
 
-            return isNotaSystemUser
-                    || YES.equals(defaultIfNull(caseData.getMigratedFromEcm(), NO));
+            return (isNotaSystemUser
+                    || YES.equals(defaultIfNull(caseData.getMigratedFromEcm(), NO)))
+                    && !isRepresentedClaimantWithMyHmctsCase(caseData);
         }
         return true;
     }

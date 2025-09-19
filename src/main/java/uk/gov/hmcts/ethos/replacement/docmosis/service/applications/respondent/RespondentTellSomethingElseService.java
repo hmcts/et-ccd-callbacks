@@ -8,14 +8,18 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.helpers.DocumentHelper;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
+import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.applications.RespondentTellSomethingElseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.applications.TseViewApplicationHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseAccessService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
@@ -29,13 +33,14 @@ import uk.gov.service.notify.RetentionPeriodDuration;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
-
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
@@ -79,6 +84,8 @@ public class RespondentTellSomethingElseService {
     private final TornadoService tornadoService;
     private final DocumentManagementService documentManagementService;
     private final FeatureToggleService featureToggleService;
+    private final CaseAccessService caseAccessService;
+    private final EmailNotificationService emailNotificationService;
 
     @Value("${template.tse.respondent.application.respondent-no}")
     private String tseRespondentAcknowledgeNoTemplateId;
@@ -127,6 +134,14 @@ public class RespondentTellSomethingElseService {
         return errors;
     }
 
+    public void sendEmails(CaseDetails caseDetails, String userToken) {
+        List<CaseUserAssignment> caseUserAssignments =
+                caseAccessService.getCaseUserAssignmentsById(caseDetails.getCaseId());
+        sendAcknowledgeEmail(caseDetails, userToken, caseUserAssignments);
+        sendClaimantEmail(caseDetails, caseUserAssignments);
+        sendAdminEmail(caseDetails);
+    }
+
     /**
      * Uses {@link EmailService} to generate an email to Respondent.
      * Uses {@link UserIdamService} to get Respondents email address.
@@ -134,33 +149,36 @@ public class RespondentTellSomethingElseService {
      * @param caseDetails in which the case details are extracted from
      * @param userToken   jwt used for authorization
      */
-    public void sendAcknowledgeEmail(CaseDetails caseDetails, String userToken) {
+    public void sendAcknowledgeEmail(CaseDetails caseDetails, String userToken,
+                                     List<CaseUserAssignment> caseUserAssignments) {
         CaseData caseData = caseDetails.getCaseData();
-
-        String email = userIdamService.getUserDetails(userToken).getEmail();
+        String templateId;
+        Map<String, String> personalisation;
 
         if (TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE.equals(caseData.getResTseSelectApplication())) {
-            emailService.sendEmail(
-                tseRespondentAcknowledgeTypeCTemplateId,
-                email,
-                buildPersonalisationTypeC(caseDetails));
-            return;
-        }
-
-        if (NO.equals(caseData.getResTseCopyToOtherPartyYesOrNo())) {
-            emailService.sendEmail(
-                tseRespondentAcknowledgeNoTemplateId,
-                email,
-                buildPersonalisation(caseDetails));
-            return;
-        }
-
-        emailService.sendEmail(
-            GROUP_B_TYPES.contains(caseData.getResTseSelectApplication())
+            templateId = tseRespondentAcknowledgeTypeCTemplateId;
+            personalisation = buildPersonalisationTypeC(caseDetails);
+        } else if (NO.equals(caseData.getResTseCopyToOtherPartyYesOrNo())) {
+            templateId = tseRespondentAcknowledgeNoTemplateId;
+            personalisation = buildPersonalisation(caseDetails);
+        } else {
+            templateId = GROUP_B_TYPES.contains(caseData.getResTseSelectApplication())
                 ? tseRespondentAcknowledgeTypeBTemplateId
-                : tseRespondentAcknowledgeTypeATemplateId,
-            email,
-            buildPersonalisation(caseDetails));
+                : tseRespondentAcknowledgeTypeATemplateId;
+            personalisation = buildPersonalisation(caseDetails);
+        }
+
+        // send email to respondent solicitor and the solicitors on the shared
+        // list that belongs to the same org
+        UserDetails userDetails = userIdamService.getUserDetails(userToken);
+        Set<CaseUserAssignment> assignments =
+                caseAccessService.filterCaseAssignmentsByOrgId(caseUserAssignments, userDetails);
+        if (assignments.isEmpty()) {
+            emailService.sendEmail(templateId, userDetails.getEmail(), personalisation);
+            return;
+        }
+        emailNotificationService.getRespondentSolicitorEmails(assignments.stream().toList())
+                .forEach(email -> emailService.sendEmail(templateId, email, personalisation));
     }
 
     private Map<String, String> buildPersonalisationTypeC(CaseDetails caseDetails) {
@@ -190,33 +208,50 @@ public class RespondentTellSomethingElseService {
      *
      * @param caseDetails in which the case details are extracted from
      */
-    public void sendClaimantEmail(CaseDetails caseDetails) {
+    public void sendClaimantEmail(CaseDetails caseDetails, List<CaseUserAssignment> caseUserAssignments) {
         CaseData caseData = caseDetails.getCaseData();
 
         if (TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE.equals(caseData.getResTseSelectApplication())
                 || NO.equals(caseData.getResTseCopyToOtherPartyYesOrNo())
-                || caseData.getClaimantType().getClaimantEmailAddress() == null
                 || isClaimantNonSystemUser(caseDetails.getCaseData())) {
             return;
         }
-
-        String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();
 
         boolean isWelsh = featureToggleService.isWelshEnabled()
                 && Optional.ofNullable(caseData.getClaimantHearingPreference())
                 .map(preference -> WELSH_LANGUAGE.equals(preference.getContactLanguage()))
                 .orElse(false);
 
+        byte[] bytes;
+        Map<String, Object> personalisation;
         try {
-            byte[] bytes = tornadoService.generateEventDocumentBytes(caseData, "", TSE_FILE_NAME);
-            emailService.sendEmail(
-                getEmailTemplate(isWelsh, caseData.getResTseSelectApplication()),
-                claimantEmail,
-                claimantPersonalisation(caseDetails, bytes, isWelsh)
-            );
+            bytes = tornadoService.generateEventDocumentBytes(caseData, "", TSE_FILE_NAME);
+            personalisation = claimantPersonalisation(caseDetails, bytes, isWelsh);
         } catch (Exception e) {
             throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
         }
+
+        // send email to claimant
+        String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();
+        emailService.sendEmail(
+                getEmailTemplate(isWelsh, caseData.getResTseSelectApplication()),
+                claimantEmail,
+                personalisation
+        );
+
+        // send email to claimant solicitor and the solicitors on the shared list
+        List<String> emailAddresses = emailNotificationService.getCaseClaimantSolicitorEmails(caseUserAssignments);
+        if (emailAddresses.isEmpty()) {
+            return;
+        }
+
+        Map<String, Object> modifiablePersonalisation = new HashMap<>(personalisation);
+        modifiablePersonalisation.put(LINK_TO_CITIZEN_HUB, emailService.getExuiCaseLink(caseDetails.getCaseId()));
+        emailAddresses.forEach(emailAddress -> emailService.sendEmail(
+                getEmailTemplate(isWelsh, caseData.getResTseSelectApplication()),
+                emailAddress,
+                modifiablePersonalisation
+        ));
     }
 
     private String getEmailTemplate(boolean isWelsh, String applicationType) {

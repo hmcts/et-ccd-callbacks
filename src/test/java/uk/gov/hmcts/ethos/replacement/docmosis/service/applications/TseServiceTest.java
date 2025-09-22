@@ -337,6 +337,34 @@ class TseServiceTest {
                 .isEqualTo("22222");
     }
 
+    @Test
+    void removeStoredRespondentApplication_doesNothingWhenApplicationIdIsNull() {
+        CaseData caseData = new CaseData();
+        caseData.setTseRespondentStoredCollection(new ArrayList<>(List.of(
+                GenericTseApplicationTypeItem.builder().id("11111").value(new GenericTseApplicationType()).build()
+        )));
+        caseData.setRespondentTse(new RespondentTse());
+
+        TseService tseService = new TseService(documentManagementService);
+        tseService.removeStoredRespondentApplication(caseData);
+
+        assertThat(caseData.getTseRespondentStoredCollection()).hasSize(1);
+    }
+
+    @Test
+    void removeStoredRespondentApplication_doesNothingWhenStoredCollectionIsNull() {
+        CaseData caseData = new CaseData();
+        RespondentTse respondentTse = new RespondentTse();
+        respondentTse.setStoredApplicationId("11111");
+        caseData.setRespondentTse(respondentTse);
+        caseData.setTseRespondentStoredCollection(null);
+
+        TseService tseService = new TseService(documentManagementService);
+        tseService.removeStoredRespondentApplication(caseData);
+
+        assertThat(caseData.getTseRespondentStoredCollection()).isNull();
+    }
+
     @Nested
     class FormatViewApplication {
         @Test

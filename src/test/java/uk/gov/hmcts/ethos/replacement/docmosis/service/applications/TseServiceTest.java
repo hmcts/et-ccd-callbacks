@@ -309,6 +309,34 @@ class TseServiceTest {
         assertThat(caseData.getTseApplicationStoredCollection().getFirst().getId()).isEqualTo("24680");
     }
 
+    @Test
+    void removeStoredRespondentApplication_removesCorrectItem() {
+        List<GenericTseApplicationTypeItem> storedCollection = new ArrayList<>(List.of(
+                GenericTseApplicationTypeItem.builder()
+                        .id("11111")
+                        .value(new GenericTseApplicationType())
+                        .build(),
+                GenericTseApplicationTypeItem.builder()
+                        .id("22222")
+                        .value(new GenericTseApplicationType())
+                        .build()
+        ));
+        CaseData caseData = new CaseData();
+        caseData.setTseRespondentStoredCollection(storedCollection);
+
+        RespondentTse respondentTse = new RespondentTse();
+        respondentTse.setStoredApplicationId("11111");
+        caseData.setRespondentTse(respondentTse);
+
+        TseService tseService = new TseService(documentManagementService);
+        tseService.removeStoredRespondentApplication(caseData);
+
+        assertThat(caseData.getTseRespondentStoredCollection())
+                .hasSize(1);
+        assertThat(caseData.getTseRespondentStoredCollection().getFirst().getId())
+                .isEqualTo("22222");
+    }
+
     @Nested
     class FormatViewApplication {
         @Test

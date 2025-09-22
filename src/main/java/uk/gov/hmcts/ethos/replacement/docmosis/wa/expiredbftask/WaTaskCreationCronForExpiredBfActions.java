@@ -44,7 +44,7 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
     @Value("${cron.maxCasesToProcess}")
     private int maxCasesToProcess;
 
-    private static final int MAX_VALID_CASE_TO_UPDATE = 10;
+    private static final int MAX_VALID_CASE_TO_UPDATE = 300;
 
     /**
      * This cron job runs every day at 00:01 to create WA tasks for expired BF actions.
@@ -116,7 +116,7 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
                 .map(BFActionTypeItem::getValue)
                 .anyMatch(bfActionValue -> !isNullOrEmpty(bfActionValue.getBfDate())
                         && BFHelper.isBfExpired(bfActionValue, BFHelper.getEffectiveYesterday(
-                                LocalDate.of(2025, 5, 1)))
+                                LocalDate.now().minusDays(90)))
                         && isNullOrEmpty(bfActionValue.getIsWaTaskCreated()));
     }
 
@@ -145,7 +145,7 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
                 .initialSearch(true)
                 .size(maxCasesPerSearch)
                 .build()
-                .getQuery(BFHelper.getEffectiveYesterday(LocalDate.of(2025, 5, 1)));
+                .getQuery(BFHelper.getEffectiveYesterday(LocalDate.now().minusDays(90)));
 
         List<SubmitEvent> searchResults = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
         if (CollectionUtils.isEmpty(searchResults)) {
@@ -168,7 +168,7 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
                     .size(maxCasesPerSearch)
                     .searchAfterValue(searchAfterValue)
                     .build()
-                    .getQuery(BFHelper.getEffectiveYesterday(LocalDate.of(2025, 5, 1)));
+                    .getQuery(BFHelper.getEffectiveYesterday(LocalDate.now().minusDays(90)));
 
             List<SubmitEvent> nextResults = ccdClient.buildAndGetElasticSearchRequest(
                     adminUserToken, caseTypeId, query);

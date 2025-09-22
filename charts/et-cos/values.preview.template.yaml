@@ -107,12 +107,12 @@ et-syr:
         secrets:
           - AppInsightsInstrumentationKey
           - idam-secret
-          - et-syr-redis-access-key
+          - redis-access-key
           - os-places-token
           - pcq-token-key
           - launch-darkly-sdk-key
     environment:
-      REDIS_HOST: et-syr-session-storage-aat.redis.cache.windows.net
+      REDIS_HOST: et-sya-session-storage-aat.redis.cache.windows.net
       ET_SYA_API_HOST: https://et-sya-api-${SERVICE_FQDN}
       PCQ_ENABLED: true
 

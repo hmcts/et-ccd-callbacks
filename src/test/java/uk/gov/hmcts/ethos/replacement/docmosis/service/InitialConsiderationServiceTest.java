@@ -46,6 +46,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ecm.common.constants.PdfMapperConstants.PHONE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
@@ -210,7 +211,7 @@ class InitialConsiderationServiceTest {
         String hearingPanelPreferenceDetails = initialConsiderationService.getIcRespondentHearingPanelPreference(
                 List.of(respondent));
         assertThat(hearingPanelPreferenceDetails).isEqualTo(
-                String.format(RESPONDENT_HEARING_PANEL_PREFERENCE, 1, "judge", "I deserve it"));
+                String.format(RESPONDENT_HEARING_PANEL_PREFERENCE, "judge", "I deserve it"));
     }
 
     @Test
@@ -221,7 +222,7 @@ class InitialConsiderationServiceTest {
         String hearingPanelPreferenceDetails = initialConsiderationService.getIcRespondentHearingPanelPreference(
                 List.of(respondent));
         assertThat(hearingPanelPreferenceDetails).isEqualTo(
-                String.format(RESPONDENT_HEARING_PANEL_PREFERENCE, 1, "-", "-"));
+                String.format(RESPONDENT_HEARING_PANEL_PREFERENCE, "-", "-"));
     }
 
     @Test
@@ -239,8 +240,8 @@ class InitialConsiderationServiceTest {
         String hearingPanelPreferenceDetails = initialConsiderationService.getIcRespondentHearingPanelPreference(
                 List.of(respondent1, respondent2));
         assertThat(hearingPanelPreferenceDetails).isEqualTo(
-                String.format(RESPONDENT_HEARING_PANEL_PREFERENCE, 1, "judge", "I deserve it")
-                        + String.format(RESPONDENT_HEARING_PANEL_PREFERENCE, 2, "panel", "Fair trial"));
+                String.format(RESPONDENT_HEARING_PANEL_PREFERENCE, "judge", "I deserve it")
+                        + String.format(RESPONDENT_HEARING_PANEL_PREFERENCE, "panel", "Fair trial"));
     }
 
     private void setFutureHearingDate(CaseData caseData) {
@@ -644,6 +645,7 @@ class InitialConsiderationServiceTest {
         ClaimantHearingPreference preference = new ClaimantHearingPreference();
         preference.setClaimantHearingPanelPreference("Preference");
         preference.setClaimantHearingPanelPreferenceWhy("Reason");
+        preference.setHearingPreferences(List.of(VIDEO, PHONE));
         caseData.setClaimantHearingPreference(preference);
 
         String result = String.format(initialConsiderationService.getClaimantHearingPanelPreference(
@@ -654,6 +656,27 @@ class InitialConsiderationServiceTest {
             |-------------|:------------|
             |Panel Preference | Preference|
             |Reason for Panel Preference | Reason|
+            """;
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void getClaimantHearingPanelPreferenceTest_No_Video_Hearing() {
+        ClaimantHearingPreference preference = new ClaimantHearingPreference();
+        preference.setClaimantHearingPanelPreference("Preference");
+        preference.setClaimantHearingPanelPreferenceWhy("Reason");
+        caseData.setClaimantHearingPreference(preference);
+
+        String result = String.format(initialConsiderationService.getClaimantHearingPanelPreference(
+                caseData.getClaimantHearingPreference()));
+
+        String expected = """
+            |Claimant's hearing panel preference | |
+            |-------------|:------------|
+            |Panel Preference | Preference|
+            |Reason for Panel Preference | Reason|
+            
+            NOT AVAILABLE FOR VIDEO HEARINGS
             """;
         assertEquals(expected, result);
     }

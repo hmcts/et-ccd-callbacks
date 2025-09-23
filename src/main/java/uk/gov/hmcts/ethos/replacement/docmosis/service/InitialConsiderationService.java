@@ -78,26 +78,31 @@ public class InitialConsiderationService {
         IntWrapper respondentCount = new IntWrapper(0);
         StringBuilder respondentDetailsHtmlFragment = new StringBuilder();
         // For each respondent, set the name details and then panel preference details
-        respondentCollection.forEach(respondentSumType -> {
-            int updatedRespondentCount = respondentCount.incrementAndReturnValue();
-            // Set respondent name details
-            respondentDetailsHtmlFragment.append(getRespondentNameDetails(respondentSumType, updatedRespondentCount));
+        if (respondentCollection != null) {
+            respondentCollection.forEach(respondentSumType -> {
+                int updatedRespondentCount = respondentCount.incrementAndReturnValue();
+                // Set respondent name details
+                respondentDetailsHtmlFragment.append(getRespondentNameDetails(respondentSumType,
+                        updatedRespondentCount));
 
-            // Set respondent panel preference details
-            respondentDetailsHtmlFragment.append(String.format(RESPONDENT_HEARING_PANEL_PREFERENCE,
-                    Optional.ofNullable(respondentSumType.getValue().getRespondentHearingPanelPreference())
-                            .orElse("-"),
-                    Optional.ofNullable(respondentSumType.getValue().getRespondentHearingPanelPreferenceReason())
-                            .orElse("-")
-            ));
+                // Set respondent panel preference details
+                respondentDetailsHtmlFragment.append(String.format(RESPONDENT_HEARING_PANEL_PREFERENCE,
+                        Optional.ofNullable(respondentSumType.getValue().getRespondentHearingPanelPreference())
+                                .orElse("-"),
+                        Optional.ofNullable(respondentSumType.getValue().getRespondentHearingPanelPreferenceReason())
+                                .orElse("-")
+                ));
 
-            // If Respondent is available for video hearing or not
-            boolean isAvailableForVideoHearing = respondentSumType.getValue().getEt3ResponseHearingRespondent()
-                    .stream().anyMatch(pr -> pr.contains(VIDEO));
-            if (!isAvailableForVideoHearing) {
-                respondentDetailsHtmlFragment.append(NOT_AVAILABLE_FOR_VIDEO_HEARINGS.toUpperCase(Locale.UK));
-            }
-        });
+                // If Respondent is available for video hearing or not
+                if (respondentSumType.getValue() != null) {
+                    List<String> hearingRespondent = respondentSumType.getValue().getEt3ResponseHearingRespondent();
+                    if (hearingRespondent == null || hearingRespondent.stream().noneMatch(
+                            pr -> pr.contains(VIDEO))) {
+                        respondentDetailsHtmlFragment.append(NOT_AVAILABLE_FOR_VIDEO_HEARINGS.toUpperCase(Locale.UK));
+                    }
+                }
+            });
+        }
 
         return respondentDetailsHtmlFragment.toString();
     }
@@ -311,6 +316,7 @@ public class InitialConsiderationService {
     /**
      * Sets etICHearingAlreadyListed if the case has a hearing listed.
      * @param caseData data about the current case
+     * @param caseTypeId the case type that is used for applying hearing listed check for Scotland case types only
      */
     public void setIsHearingAlreadyListed(CaseData caseData, String caseTypeId) {
         if (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId)) {

@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -29,6 +30,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.et.common.model.ccd.types.UpdateRespondentRepresentativeRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator;
@@ -136,8 +138,8 @@ class NocRespondentRepresentativeServiceTest {
 
         nocRespondentRepresentativeService =
             new NocRespondentRepresentativeService(noticeOfChangeFieldPopulator, converter, nocCcdService,
-                    adminUserService, nocRespondentHelper, nocNotificationService, ccdClient, ccdCaseAssignment,
-                    organisationClient, authTokenGenerator, nocService);
+                    adminUserService, nocRespondentHelper, nocNotificationService, ccdClient, organisationClient,
+                    authTokenGenerator, nocService);
                     
         // Respondent
         caseData.setRespondentCollection(new ArrayList<>());
@@ -325,21 +327,23 @@ class NocRespondentRepresentativeServiceTest {
     }
 
     @Test
-    void updateRepresentativesAccess() throws IOException {
+    @SneakyThrows
+    void updateRespondentRepresentativesAccess() {
         CCDRequest ccdRequest = getCCDRequest();
 
         when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
-        when(nocCcdService.updateCaseRepresentation(any(), any(), any(), any())).thenReturn(ccdRequest);
+        when(nocCcdService.startEventForUpdateRepresentation(any(), any(), any(), any())).thenReturn(ccdRequest);
         when(nocCcdService.getCaseAssignments(any(), any())).thenReturn(
                 mockCaseAssignmentData());
         when(ccdCaseAssignment.applyNocAsAdmin(any())).thenReturn(CCDCallbackResponse.builder()
                 .data(caseData)
                 .build());
 
-        nocRespondentRepresentativeService.updateRepresentativesAccess(getCallBackCallbackRequest(), "test@test.com");
+        nocRespondentRepresentativeService.updateRespondentRepresentativesAccess(
+                getCallBackCallbackRequest(), "test@test.com");
 
         verify(nocCcdService, times(2))
-            .updateCaseRepresentation(any(), any(), any(), any());
+            .startEventForUpdateRepresentation(any(), any(), any(), any());
 
         verify(nocNotificationService, times(2))
                 .sendNotificationOfChangeEmails(any(), any(), any(), anyString());
@@ -372,16 +376,16 @@ class NocRespondentRepresentativeServiceTest {
         CaseData caseDataBefore = getCaseDataBefore();
         CaseData caseDataAfter = getCaseDataAfter();
 
-        List<ChangeOrganisationRequest> representationChanges =
+        List<UpdateRespondentRepresentativeRequest> representationChanges =
             nocRespondentRepresentativeService.identifyRepresentationChanges(caseDataAfter, caseDataBefore);
 
         assertThat(representationChanges).usingRecursiveComparison()
-            .ignoringFields("requestTimestamp")
-            .isEqualTo(getChangeOrganisationRequestList());
+            .ignoringFields("changeOrganisationRequest.requestTimestamp")
+            .isEqualTo(getUpdateRespondentRepresentativeRequestList());
 
     }
 
-    private List<ChangeOrganisationRequest> getChangeOrganisationRequestList() {
+    private List<UpdateRespondentRepresentativeRequest> getUpdateRespondentRepresentativeRequestList() {
         final Organisation orgNew =
             Organisation.builder().organisationID(ORGANISATION_ID_NEW).organisationName(ET_ORG_NEW).build();
         final Organisation org2 =
@@ -402,17 +406,14 @@ class NocRespondentRepresentativeServiceTest {
             .organisationToRemove(org2)
             .organisationToAdd(orgNew)
             .build();
-
-        List<ChangeOrganisationRequest> changes = new ArrayList<>();
-
-        changes.add(changeOrganisationRequest);
-
+        List<UpdateRespondentRepresentativeRequest> changes = new ArrayList<>();
+        changes.add(UpdateRespondentRepresentativeRequest.builder()
+                .changeOrganisationRequest(changeOrganisationRequest).respondentName(RESPONDENT_NAME_TWO).build());
         DynamicFixedListType roleItem2 = new DynamicFixedListType();
         DynamicValueType dynamicValueType2 = new DynamicValueType();
         dynamicValueType2.setCode(SOLICITORC);
         dynamicValueType2.setLabel(SOLICITORC);
         roleItem2.setValue(dynamicValueType2);
-
         ChangeOrganisationRequest changeOrganisationRequest2 = ChangeOrganisationRequest.builder()
             .approvalStatus(APPROVED)
             .requestTimestamp(LocalDateTime.now())
@@ -420,9 +421,8 @@ class NocRespondentRepresentativeServiceTest {
             .organisationToRemove(org3)
             .organisationToAdd(org2)
             .build();
-
-        changes.add(changeOrganisationRequest2);
-
+        changes.add(UpdateRespondentRepresentativeRequest.builder()
+                .changeOrganisationRequest(changeOrganisationRequest2).respondentName(RESPONDENT_NAME_THREE).build());
         return changes;
     }
 

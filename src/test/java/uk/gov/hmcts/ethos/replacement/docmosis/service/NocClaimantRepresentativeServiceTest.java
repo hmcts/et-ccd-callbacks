@@ -172,7 +172,7 @@ class NocClaimantRepresentativeServiceTest {
         CCDRequest ccdRequest = getCCDRequest();
 
         when(adminUserService.getAdminUserToken()).thenReturn("AUTH_TOKEN");
-        when(nocCcdService.updateCaseRepresentation(any(), any(), any(), any())).thenReturn(ccdRequest);
+        when(nocCcdService.startEventForUpdateRepresentation(any(), any(), any(), any())).thenReturn(ccdRequest);
         when(nocCcdService.getCaseAssignments(any(), any())).thenReturn(
                 mockCaseAssignmentData());
         when(ccdCaseAssignment.applyNocAsAdmin(any())).thenReturn(CCDCallbackResponse.builder()
@@ -183,7 +183,7 @@ class NocClaimantRepresentativeServiceTest {
         nocClaimantRepresentativeService.updateClaimantRepAccess(getCallBackCallbackRequest(), "test@test.com");
 
         verify(nocCcdService, times(1))
-                .updateCaseRepresentation(any(), any(), any(), any());
+                .startEventForUpdateRepresentation(any(), any(), any(), any());
 
         verify(nocNotificationService, times(1))
                 .sendNotificationOfChangeEmails(any(), any(), any(), anyString());
@@ -202,7 +202,7 @@ class NocClaimantRepresentativeServiceTest {
         ChangeOrganisationRequest changeRequest = createChangeOrganisationRequest();
 
         when(adminUserService.getAdminUserToken()).thenReturn(accessToken);
-        when(nocCcdService.updateCaseRepresentation(any(), any(), any(), any())).thenReturn(ccdRequest);
+        when(nocCcdService.startEventForUpdateRepresentation(any(), any(), any(), any())).thenReturn(ccdRequest);
         when(ccdCaseAssignment.applyNocAsAdmin(any())).thenReturn(CCDCallbackResponse.builder()
                 .data(getCaseDataAfter()).build());
         when(nocClaimantHelper.createChangeRequest(any(), any())).thenReturn(changeRequest);

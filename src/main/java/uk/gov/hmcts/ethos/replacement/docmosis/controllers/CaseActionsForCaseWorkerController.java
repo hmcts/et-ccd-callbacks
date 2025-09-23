@@ -22,6 +22,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
@@ -149,8 +150,8 @@ public class CaseActionsForCaseWorkerController {
         @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
         @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
-    /**
-     * @deprecated
+    /*
+      @deprecated
      */
     public ResponseEntity<CCDCallbackResponse> retrieveCase(
             @RequestBody CCDRequest ccdRequest,
@@ -197,8 +198,8 @@ public class CaseActionsForCaseWorkerController {
         @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
         @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
-    /**
-     * @deprecated
+    /*
+      @deprecated
      */
     public ResponseEntity<CCDCallbackResponse> updateCase(
             @RequestBody CCDRequest ccdRequest,
@@ -554,9 +555,11 @@ public class CaseActionsForCaseWorkerController {
             + LOG_MESSAGE + callbackRequest.getCaseDetails().getCaseId());
         try {
             String currentUserEmail = userIdamService.getUserDetails(userToken).getEmail();
-            nocRespondentRepresentativeService.updateRepresentativesAccess(callbackRequest, currentUserEmail);
+            nocRespondentRepresentativeService.updateRespondentRepresentativesAccess(callbackRequest, currentUserEmail);
         } catch (IOException e) {
             throw new CcdInputOutputException("Failed to update respondent representatives accesses", e);
+        } catch (GenericServiceException e) {
+            throw new RuntimeException(e);
         }
     }
 

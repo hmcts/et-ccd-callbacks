@@ -133,7 +133,7 @@ public class NocClaimantRepresentativeService {
         }
 
         String accessToken = adminUserService.getAdminUserToken();
-        CCDRequest ccdRequest = nocCcdService.updateCaseRepresentation(accessToken,
+        CCDRequest ccdRequest = nocCcdService.startEventForUpdateRepresentation(accessToken,
                 caseDetails.getJurisdiction(), caseDetails.getCaseTypeId(), caseDetails.getCaseId());
         callbackRequest.getCaseDetails().getCaseData().setChangeOrganisationRequestField(changeRequest);
         ccdRequest.getCaseDetails().setCaseData(ccdCaseAssignment.applyNocAsAdmin(callbackRequest).getData());
@@ -148,7 +148,6 @@ public class NocClaimantRepresentativeService {
             }
         }
 
-        callbackRequest.getCaseDetails().getCaseData().getChangeOrganisationRequestField();
         ccdClient.submitUpdateRepEvent(
                 accessToken,
                     Map.of("changeOrganisationRequestField",

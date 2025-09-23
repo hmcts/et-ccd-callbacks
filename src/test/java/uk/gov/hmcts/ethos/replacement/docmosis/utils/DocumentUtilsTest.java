@@ -29,7 +29,7 @@ final class DocumentUtilsTest {
     private static final String SECOND_LEVEL_ET3_ATTACHMENT = "ET3 Attachment";
     private static final UploadedDocumentType VALID_UPLOADED_DOCUMENT_TYPE_ET3_FORM =
             ResourceLoader.fromString(TEST_ET3_FORM_CASE_DATA_FILE, CaseData.class)
-                    .getRespondentCollection().get(0).getValue().getEt3Form();
+                    .getRespondentCollection().getFirst().getValue().getEt3Form();
     private static final String UPLOADED_DOCUMENT_FILE_NAME = "Test Company - ET3 Response.pdf";
     private static final String ET3_FORM_ENGLISH_DESCRIPTION = "ET3 form English version";
     private static final String DUMMY_DOCUMENT_BINARY_URL_1 = "dummy_document_binary_url_1";
@@ -38,6 +38,7 @@ final class DocumentUtilsTest {
     private static final String DUMMY_DOCUMENT_BINARY_URL_4 = "dummy_document_binary_url_4";
     private static final String DUMMY_DOCUMENT_BINARY_URL_5 = "dummy_document_binary_url_5";
     private static final String DUMMY_DOCUMENT_BINARY_URL_6 = "dummy_document_binary_url_6";
+    private static final String MOCK_DATE = "2025-01-01";
 
     @Test
     void theConvertUploadedDocumentTypeToDocumentTypeItemWithLevels() {
@@ -75,7 +76,8 @@ final class DocumentUtilsTest {
     void theSetDocumentTypeItemLevels() {
         DocumentTypeItem validDocumentTypeItemContestClaim =
                 ResourceLoader.fromString(TEST_ET3_FORM_CASE_DATA_FILE, CaseData.class)
-                        .getRespondentCollection().get(0).getValue().getEt3ResponseContestClaimDocument().get(0);
+                        .getRespondentCollection().getFirst().getValue()
+                        .getEt3ResponseContestClaimDocument().getFirst();
         assertDoesNotThrow(() -> DocumentUtils.setDocumentTypeItemLevels(null,
                 TOP_LEVEL, SECOND_LEVEL_ET3));
         assertDoesNotThrow(() -> DocumentUtils.setDocumentTypeItemLevels(validDocumentTypeItemContestClaim,
@@ -96,38 +98,68 @@ final class DocumentUtilsTest {
     }
 
     @Test
-    void theAddUploadedDocumentTypeToDocumentTypeItems() {
-
+    void addUploadedDocumentTypeToDocumentTypeItems_shouldNotThrowWhenAnyArgumentIsNull() {
         List<DocumentTypeItem> emptyDocumentTypeItems = new ArrayList<>();
-        assertDoesNotThrow(() -> DocumentUtils.addUploadedDocumentTypeToDocumentTypeItems(null,
-                VALID_UPLOADED_DOCUMENT_TYPE_ET3_FORM, TOP_LEVEL, SECOND_LEVEL_ET3, ET3_FORM_ENGLISH_DESCRIPTION));
-        assertDoesNotThrow(() -> DocumentUtils.addUploadedDocumentTypeToDocumentTypeItems(emptyDocumentTypeItems,
-                null, TOP_LEVEL, SECOND_LEVEL_ET3, ET3_FORM_ENGLISH_DESCRIPTION));
-        assertDoesNotThrow(() -> DocumentUtils.addUploadedDocumentTypeToDocumentTypeItems(emptyDocumentTypeItems,
-                VALID_UPLOADED_DOCUMENT_TYPE_ET3_FORM, null, SECOND_LEVEL_ET3, ET3_FORM_ENGLISH_DESCRIPTION));
-        assertDoesNotThrow(() -> DocumentUtils.addUploadedDocumentTypeToDocumentTypeItems(emptyDocumentTypeItems,
-                VALID_UPLOADED_DOCUMENT_TYPE_ET3_FORM, TOP_LEVEL, null, ET3_FORM_ENGLISH_DESCRIPTION));
-        assertDoesNotThrow(() -> DocumentUtils.addUploadedDocumentTypeToDocumentTypeItems(emptyDocumentTypeItems,
-                VALID_UPLOADED_DOCUMENT_TYPE_ET3_FORM, TOP_LEVEL, SECOND_LEVEL_ET3, null));
+        assertDoesNotThrow(() ->
+                DocumentUtils.addUploadedDocumentTypeToDocumentTypeItems(
+                        null, VALID_UPLOADED_DOCUMENT_TYPE_ET3_FORM,
+                        TOP_LEVEL, SECOND_LEVEL_ET3, ET3_FORM_ENGLISH_DESCRIPTION, MOCK_DATE));
+        assertDoesNotThrow(() ->
+                DocumentUtils.addUploadedDocumentTypeToDocumentTypeItems(
+                        emptyDocumentTypeItems, null,
+                        TOP_LEVEL, SECOND_LEVEL_ET3, ET3_FORM_ENGLISH_DESCRIPTION, MOCK_DATE));
+        assertDoesNotThrow(() ->
+                DocumentUtils.addUploadedDocumentTypeToDocumentTypeItems(
+                        emptyDocumentTypeItems, VALID_UPLOADED_DOCUMENT_TYPE_ET3_FORM,
+                        null, SECOND_LEVEL_ET3, ET3_FORM_ENGLISH_DESCRIPTION, MOCK_DATE));
+        assertDoesNotThrow(() ->
+                DocumentUtils.addUploadedDocumentTypeToDocumentTypeItems(
+                        emptyDocumentTypeItems, VALID_UPLOADED_DOCUMENT_TYPE_ET3_FORM,
+                        TOP_LEVEL, null, ET3_FORM_ENGLISH_DESCRIPTION, MOCK_DATE));
+        assertDoesNotThrow(() ->
+                DocumentUtils.addUploadedDocumentTypeToDocumentTypeItems(
+                        emptyDocumentTypeItems, VALID_UPLOADED_DOCUMENT_TYPE_ET3_FORM,
+                        TOP_LEVEL, SECOND_LEVEL_ET3, null, MOCK_DATE));
+        assertDoesNotThrow(() ->
+                DocumentUtils.addUploadedDocumentTypeToDocumentTypeItems(
+                        emptyDocumentTypeItems, VALID_UPLOADED_DOCUMENT_TYPE_ET3_FORM,
+                        TOP_LEVEL, SECOND_LEVEL_ET3, ET3_FORM_ENGLISH_DESCRIPTION, null));
+    }
 
-        DocumentUtils.addUploadedDocumentTypeToDocumentTypeItems(emptyDocumentTypeItems,
-                VALID_UPLOADED_DOCUMENT_TYPE_ET3_FORM, TOP_LEVEL, SECOND_LEVEL_ET3, ET3_FORM_ENGLISH_DESCRIPTION);
-        assertThat(emptyDocumentTypeItems).isNotEmpty();
-        assertThat(emptyDocumentTypeItems.get(0).getValue().getTopLevelDocuments()).isEqualTo(TOP_LEVEL);
-        assertThat(emptyDocumentTypeItems.get(0).getValue().getResponseClaimDocuments()).isEqualTo(SECOND_LEVEL_ET3);
-        assertThat(emptyDocumentTypeItems.get(0).getValue().getUploadedDocument().getDocumentFilename())
+    @Test
+    void addUploadedDocumentTypeToDocumentTypeItems_shouldAddDocumentTypeItemWhenInputsAreValid() {
+        List<DocumentTypeItem> items = new ArrayList<>();
+
+        DocumentUtils.addUploadedDocumentTypeToDocumentTypeItems(items,
+                VALID_UPLOADED_DOCUMENT_TYPE_ET3_FORM,
+                TOP_LEVEL, SECOND_LEVEL_ET3, ET3_FORM_ENGLISH_DESCRIPTION,  MOCK_DATE);
+
+        assertThat(items).isNotEmpty();
+        DocumentType firstItemValue = items.getFirst().getValue();
+        assertThat(firstItemValue.getDateOfCorrespondence())
+                .isEqualTo(MOCK_DATE);
+        assertThat(firstItemValue.getTopLevelDocuments())
+                .isEqualTo(TOP_LEVEL);
+        assertThat(firstItemValue.getResponseClaimDocuments())
+                .isEqualTo(SECOND_LEVEL_ET3);
+        assertThat(firstItemValue.getUploadedDocument().getDocumentFilename())
                 .isEqualTo(UPLOADED_DOCUMENT_FILE_NAME);
+    }
 
+    @Test
+    void addUploadedDocumentTypeToDocumentTypeItems_shouldNotAddItemWhenConvertReturnsNull() {
         // Tests when static method convertUploadedDocumentTypeToDocumentTypeItemWithLevels returns null.
         try (MockedStatic<DocumentUtils> mocked = mockStatic(DocumentUtils.class)) {
             mocked.when(() -> DocumentUtils.convertUploadedDocumentTypeToDocumentTypeItemWithLevels(
                     VALID_UPLOADED_DOCUMENT_TYPE_ET3_FORM, TOP_LEVEL, SECOND_LEVEL_ET3)).thenReturn(null);
             List<DocumentTypeItem> emptyDocumentTypeItems2 = new ArrayList<>();
             mocked.when(() -> DocumentUtils.addUploadedDocumentTypeToDocumentTypeItems(emptyDocumentTypeItems2,
-                    VALID_UPLOADED_DOCUMENT_TYPE_ET3_FORM, TOP_LEVEL, SECOND_LEVEL_ET3, ET3_FORM_ENGLISH_DESCRIPTION))
+                            VALID_UPLOADED_DOCUMENT_TYPE_ET3_FORM,
+                            TOP_LEVEL, SECOND_LEVEL_ET3, ET3_FORM_ENGLISH_DESCRIPTION, MOCK_DATE))
                     .thenCallRealMethod();
             DocumentUtils.addUploadedDocumentTypeToDocumentTypeItems(emptyDocumentTypeItems2,
-                    VALID_UPLOADED_DOCUMENT_TYPE_ET3_FORM, TOP_LEVEL, SECOND_LEVEL_ET3, ET3_FORM_ENGLISH_DESCRIPTION);
+                    VALID_UPLOADED_DOCUMENT_TYPE_ET3_FORM,
+                    TOP_LEVEL, SECOND_LEVEL_ET3, ET3_FORM_ENGLISH_DESCRIPTION, MOCK_DATE);
             assertThat(emptyDocumentTypeItems2).isEmpty();
         }
     }
@@ -225,7 +257,7 @@ final class DocumentUtilsTest {
         );
         DocumentUtils.removeDocumentsWithMatchingIDs(primary, reference);
         assertEquals(1, primary.size());
-        assertEquals("doc1", primary.get(0).getId());
+        assertEquals("doc1", primary.getFirst().getId());
         // Case 2: No matching IDs, list remains unchanged
         primary = new ArrayList<>(List.of(
                 DocumentTypeItem.builder().id("docA").build(),
@@ -268,7 +300,7 @@ final class DocumentUtilsTest {
         );
         DocumentUtils.removeDocumentsWithMatchingIDs(primary, reference);
         assertEquals(1, primary.size());
-        assertEquals("doc2", primary.get(0).getId());
+        assertEquals("doc2", primary.getFirst().getId());
     }
 
     @Test

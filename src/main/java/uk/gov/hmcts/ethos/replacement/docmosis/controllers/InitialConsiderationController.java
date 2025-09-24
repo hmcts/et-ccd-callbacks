@@ -139,18 +139,15 @@ public class InitialConsiderationController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        //Respondents details
-        caseData.setEtInitialConsiderationRespondent(
-                initialConsiderationService.getRespondentName(caseData.getRespondentCollection()));
-        String icRespondentHearingPanelPreference = initialConsiderationService.getIcRespondentHearingPanelPreference(
-                caseData.getRespondentCollection());
-        caseData.setIcRespondentHearingPanelPreference(icRespondentHearingPanelPreference);
 
-        //Hearings
-        caseData.setEtInitialConsiderationHearing(
-            initialConsiderationService.getHearingDetails(caseData.getHearingCollection()));
+        // Sets the respondent details(respondent ET1 and ET3 names, hearing panel preference, and
+        // availability for video hearing) of all respondents in a concatenated string format
+        caseData.setEtInitialConsiderationRespondent(initialConsiderationService.setRespondentDetails(caseData));
+        //hearing details
+        caseData.setEtInitialConsiderationHearing(initialConsiderationService.getHearingDetails(
+                caseData.getHearingCollection()));
 
-        //Claimant details
+        //claimant hearing panel preference
         caseData.setEtIcHearingPanelPreference(
                 initialConsiderationService.getClaimantHearingPanelPreference(caseData.getClaimantHearingPreference()));
 
@@ -159,9 +156,8 @@ public class InitialConsiderationController {
         caseData.setEtInitialConsiderationJurisdictionCodes(
                 initialConsiderationService.generateJurisdictionCodesHtml(
                         caseData.getJurCodesCollection(), caseTypeId));
-
         initialConsiderationService.setIsHearingAlreadyListed(caseData, caseTypeId);
-
+        initialConsiderationService.initialiseInitialConsideration(ccdRequest.getCaseDetails());
         if (CollectionUtils.isNotEmpty(caseData.getEtICHearingNotListedList())) {
             initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData, caseTypeId);
         }

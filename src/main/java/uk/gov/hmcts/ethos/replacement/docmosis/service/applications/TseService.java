@@ -127,6 +127,9 @@ public class TseService {
      * @param caseData contains all the case data.
      */
     public void removeStoredRespondentApplication(CaseData caseData) {
+        if (caseData.getRespondentTse() == null) {
+            return;
+        }
         String applicationId = caseData.getRespondentTse().getStoredApplicationId();
         if (applicationId == null || caseData.getTseRespondentStoredCollection() == null) {
             return;

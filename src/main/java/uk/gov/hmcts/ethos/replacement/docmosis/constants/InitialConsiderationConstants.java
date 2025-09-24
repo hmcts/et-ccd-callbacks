@@ -14,10 +14,10 @@ public final class InitialConsiderationConstants {
         """;
 
     public static final String RESPONDENT_HEARING_PANEL_PREFERENCE = """
-        | Respondent %s hearing panel preference | |
+        | Hearing panel preference | |
         |-------------|:------------|
-        |Preference | %s|
-        |Reason | %s|
+        |Panel Preference | %s|
+        |Reason for Panel Preference | %s|
         
         """;
 

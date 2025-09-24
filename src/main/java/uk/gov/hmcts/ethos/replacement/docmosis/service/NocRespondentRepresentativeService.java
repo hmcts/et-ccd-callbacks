@@ -33,6 +33,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopula
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.OrganisationUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
@@ -48,31 +49,23 @@ import static org.apache.commons.lang3.ObjectUtils.getIfNull;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EVENT_UPDATE_CASE_SUBMITTED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REQUEST;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class NocRespondentRepresentativeService {
-    public static final String NOC_REQUEST = "nocRequest";
-    private static final String CHANGE_ORGANISATION_REQUEST_FIELD_NAME = "changeOrganisationRequestField";
+
     private final NoticeOfChangeFieldPopulator noticeOfChangeFieldPopulator;
-
     private final CaseConverter caseConverter;
-
     private final NocCcdService nocCcdService;
-
     private final AdminUserService adminUserService;
-
     private final NocRespondentHelper nocRespondentHelper;
-
     private final NocNotificationService nocNotificationService;
-
     private final CcdClient ccdClient;
-
     private final OrganisationClient organisationClient;
-
     private final AuthTokenGenerator authTokenGenerator;
-
     private final NocService nocService;
 
     /**
@@ -186,39 +179,52 @@ public class NocRespondentRepresentativeService {
                     && updateRespondentRepresentativeRequest.getChangeOrganisationRequest()
                     .getOrganisationToRemove() != null) {
                 try {
+                    // this service only removes organisation representative access to the case and removes
+                    // respondent representative from cas_users
                     nocService.removeOrganisationRepresentativeAccess(caseDetails.getCaseId(),
                             updateRespondentRepresentativeRequest.getChangeOrganisationRequest());
                 } catch (IOException e) {
                     throw new CcdInputOutputException("Failed to remove organisation representative access", e);
                 }
             }
-            log.info("Starting respondent representation update event {}", updateRespondentRepresentativeRequest);
-            CCDRequest ccdRequest = nocCcdService.startEventForUpdateRepresentation(
-                    adminUserService.getAdminUserToken(),
-                    caseDetails.getJurisdiction(),
+            log.info("Starting update case submitted event {}", updateRespondentRepresentativeRequest);
+            // We use "update case submitted" instead of an update event for respondent representatives,
+            // because there is not always a direct relationship between organisation ID and representatives.
+            // The updates performed are:
+            //   • Remove changeOrganisationRequestField to prevent re-processing
+            //   • Clears the changeOrganisationRequestField to prevent errors in the existing representative process
+            //     and to allow further changes to be made
+            //   • Mark the respondent as no longer represented, so this is reflected on the respondent page
+            String adminUserToken = adminUserService.getAdminUserToken();
+            CCDRequest ccdRequest = ccdClient.startEventForCase(adminUserToken,
                     caseDetails.getCaseTypeId(),
-                    caseDetails.getCaseId());
+                    caseDetails.getJurisdiction(),
+                    caseDetails.getCaseId(),
+                    EVENT_UPDATE_CASE_SUBMITTED);
+
             log.info("Respondent representation update event started {}", updateRespondentRepresentativeRequest);
+            CaseData ccdRequestCaseData = ccdRequest.getCaseDetails().getCaseData();
 
-            ccdRequest.getCaseDetails().getCaseData().setChangeOrganisationRequestField(
-                    updateRespondentRepresentativeRequest.getChangeOrganisationRequest());
+            // Clears the changeOrganisationRequestField to prevent errors in the existing representative process
+            // and to allow further changes to be made
+            ccdRequestCaseData.setChangeOrganisationRequestField(null);
 
+            // Removes organisation policy for the respondent
             // It is assumed that there is always a notice of change answer for each organisation policy
             OrganisationUtils.removeRespondentOrganisationPolicyByRespondentName(
-                    ccdRequest.getCaseDetails().getCaseData(),
+                    ccdRequestCaseData,
                     updateRespondentRepresentativeRequest
             );
 
-            ccdClient.submitUpdateRepEvent(
-                    adminUserService.getAdminUserToken(),
-                    Map.of(CHANGE_ORGANISATION_REQUEST_FIELD_NAME,
-                            ccdRequest.getCaseDetails().getCaseData().getChangeOrganisationRequestField()),
-                    caseDetails.getCaseTypeId(),
-                    caseDetails.getJurisdiction(),
-                    ccdRequest,
-                    caseDetails.getCaseId());
-        }
+            // Sets representative removed to YES for the respondent
+            // It is assumed that there is always one respondent with the name in the request
+            RespondentUtils.markRespondentRepresentativeRemoved(ccdRequestCaseData,
+                    updateRespondentRepresentativeRequest
+            );
 
+            ccdClient.submitEventForCase(adminUserToken, ccdRequestCaseData, caseDetails.getCaseTypeId(),
+                    caseDetails.getJurisdiction(), ccdRequest, caseDetails.getCaseId());
+        }
     }
 
     /**
@@ -257,6 +263,10 @@ public class NocRespondentRepresentativeService {
                         UpdateRespondentRepresentativeRequest.builder().changeOrganisationRequest(
                                 nocRespondentHelper.createChangeRequest(newOrganisation, oldOrganisation,
                                         solicitorRole)).respondentName(respondentName).build();
+                // Sets representation removed when representative is removed for the respondent
+                if (ObjectUtils.isNotEmpty(oldOrganisation) && ObjectUtils.isEmpty(newOrganisation)) {
+                    updateRespondentRepresentativeOrganisationRequest.setRepresentativeRemoved(YES);
+                }
                 updateRespondentRepresentativeOrganisationRequests
                         .add(updateRespondentRepresentativeOrganisationRequest);
             }
@@ -272,8 +282,8 @@ public class NocRespondentRepresentativeService {
      */
     public void removeOrganisationRepresentativeAccess(String caseId,
                                                        ChangeOrganisationRequest changeOrganisationRequest) {
-        String roleOfRemovedOrg = changeOrganisationRequest.getCaseRoleId().getSelectedCode();
         String orgId = changeOrganisationRequest.getOrganisationToRemove().getOrganisationID();
+        String roleOfRemovedOrg = changeOrganisationRequest.getCaseRoleId().getSelectedCode();
         CaseUserAssignmentData caseAssignments =
             nocCcdService.getCaseAssignments(adminUserService.getAdminUserToken(), caseId);
 

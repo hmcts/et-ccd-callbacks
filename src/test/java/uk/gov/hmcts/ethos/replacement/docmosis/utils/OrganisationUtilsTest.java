@@ -118,7 +118,7 @@ final class OrganisationUtilsTest {
         organisationUtils.close();
         caseData.setRespondentOrganisationPolicy0(OrganisationPolicy.builder().build());
         OrganisationUtils.removeOrganisationPolicyByIndex(caseData, 0);
-        assertThat(caseData.getRespondentOrganisationPolicy0()).isNull();
+        assertThat(caseData.getRespondentOrganisationPolicy0()).isEqualTo(OrganisationPolicy.builder().build());
     }
 
     @Test
@@ -262,6 +262,6 @@ final class OrganisationUtilsTest {
                 .organisation(Organisation.builder().organisationID(TEST_ORGANISATION_ID_1).build()).build());
         OrganisationUtils.removeRespondentOrganisationPolicyByRespondentName(caseData,
                 updateRespondentRepresentativeRequest);
-        assertThat(caseData.getRespondentOrganisationPolicy0()).isNull();
+        assertThat(caseData.getRespondentOrganisationPolicy0()).isEqualTo(OrganisationPolicy.builder().build());
     }
 }

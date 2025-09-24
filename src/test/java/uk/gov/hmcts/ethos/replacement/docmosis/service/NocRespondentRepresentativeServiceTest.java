@@ -9,12 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.testcontainers.shaded.org.apache.commons.lang3.math.NumberUtils;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
-import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -50,11 +50,14 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPLOYMENT;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationApprovalStatus.APPROVED;
@@ -103,6 +106,7 @@ class NocRespondentRepresentativeServiceTest {
     private static final String AUTH_TOKEN = "someToken";
     private static final String USER_ID_ONE = "891-456";
     private static final String USER_ID_TWO = "123-456";
+    private static final String EVENT_UPDATE_CASE_SUBMITTED = "UPDATE_CASE_SUBMITTED";
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -332,24 +336,43 @@ class NocRespondentRepresentativeServiceTest {
         CCDRequest ccdRequest = getCCDRequest();
 
         when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
-        when(nocCcdService.startEventForUpdateRepresentation(any(), any(), any(), any())).thenReturn(ccdRequest);
-        when(nocCcdService.getCaseAssignments(any(), any())).thenReturn(
+        when(ccdClient.startEventForCase(AUTH_TOKEN,
+                ccdRequest.getCaseDetails().getCaseTypeId(),
+                ccdRequest.getCaseDetails().getJurisdiction(),
+                ccdRequest.getCaseDetails().getCaseId(),
+                EVENT_UPDATE_CASE_SUBMITTED)).thenReturn(ccdRequest);
+        when(nocCcdService.getCaseAssignments(AUTH_TOKEN, ccdRequest.getCaseDetails().getCaseId())).thenReturn(
                 mockCaseAssignmentData());
-        when(ccdCaseAssignment.applyNocAsAdmin(any())).thenReturn(CCDCallbackResponse.builder()
-                .data(caseData)
-                .build());
-
+        when(ccdClient.submitEventForCase(eq(AUTH_TOKEN),
+                any(CaseData.class),
+                eq(ccdRequest.getCaseDetails().getCaseTypeId()),
+                eq(ccdRequest.getCaseDetails().getJurisdiction()),
+                any(CCDRequest.class),
+                eq(ccdRequest.getCaseDetails().getCaseId()))).thenReturn(null);
         nocRespondentRepresentativeService.updateRespondentRepresentativesAccess(
-                getCallBackCallbackRequest(), "test@test.com");
+                getCallBackCallbackRequest(), USER_EMAIL);
 
-        verify(nocCcdService, times(2))
-            .startEventForUpdateRepresentation(any(), any(), any(), any());
+        verify(ccdClient, times(NumberUtils.INTEGER_TWO)).startEventForCase(AUTH_TOKEN,
+                ccdRequest.getCaseDetails().getCaseTypeId(),
+                ccdRequest.getCaseDetails().getJurisdiction(),
+                ccdRequest.getCaseDetails().getCaseId(),
+                EVENT_UPDATE_CASE_SUBMITTED
+        );
 
-        verify(nocNotificationService, times(2))
-                .sendNotificationOfChangeEmails(any(), any(), any(), anyString());
+        verify(nocNotificationService, times(NumberUtils.INTEGER_TWO)).sendNotificationOfChangeEmails(
+                any(CaseDetails.class),
+                any(CaseDetails.class),
+                any(ChangeOrganisationRequest.class),
+                eq(USER_EMAIL)
+        );
 
-        verify(ccdClient, times(2))
-                .submitUpdateRepEvent(any(), any(), any(), any(), any(), any());
+        verify(ccdClient, times(NumberUtils.INTEGER_TWO))
+                .submitEventForCase(eq(AUTH_TOKEN),
+                        any(CaseData.class),
+                        eq(ccdRequest.getCaseDetails().getCaseTypeId()),
+                        eq(ccdRequest.getCaseDetails().getJurisdiction()),
+                        any(CCDRequest.class),
+                        eq(ccdRequest.getCaseDetails().getCaseId()));
     }
 
     private CallbackRequest getCallBackCallbackRequest() {
@@ -358,15 +381,21 @@ class NocRespondentRepresentativeServiceTest {
         caseDetailsBefore.setCaseData(getCaseDataBefore());
         callbackRequest.setCaseDetailsBefore(caseDetailsBefore);
         CaseDetails caseDetailsAfter = new CaseDetails();
+        caseDetailsAfter.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
+        caseDetailsAfter.setCaseId(CASE_ID_ONE);
+        caseDetailsAfter.setJurisdiction(EMPLOYMENT);
         caseDetailsAfter.setCaseData(getCaseDataAfter());
         callbackRequest.setCaseDetails(caseDetailsAfter);
         return callbackRequest;
     }
 
     private CCDRequest getCCDRequest() {
-        CCDRequest ccdRequest = new CCDRequest();
         CaseDetails caseDetailsAfter = new CaseDetails();
+        caseDetailsAfter.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
+        caseDetailsAfter.setCaseId(CASE_ID_ONE);
+        caseDetailsAfter.setJurisdiction(EMPLOYMENT);
         caseDetailsAfter.setCaseData(getCaseDataAfter());
+        CCDRequest ccdRequest = new CCDRequest();
         ccdRequest.setCaseDetails(caseDetailsAfter);
         return ccdRequest;
     }

@@ -272,16 +272,16 @@ public final class OrganisationUtils {
             return;
         }
         switch (index) {
-            case 0 -> caseData.setRespondentOrganisationPolicy0(null);
-            case 1 -> caseData.setRespondentOrganisationPolicy1(null);
-            case 2 -> caseData.setRespondentOrganisationPolicy2(null);
-            case 3 -> caseData.setRespondentOrganisationPolicy3(null);
-            case 4 -> caseData.setRespondentOrganisationPolicy4(null);
-            case 5 -> caseData.setRespondentOrganisationPolicy5(null);
-            case 6 -> caseData.setRespondentOrganisationPolicy6(null);
-            case 7 -> caseData.setRespondentOrganisationPolicy7(null);
-            case 8 -> caseData.setRespondentOrganisationPolicy8(null);
-            case 9 -> caseData.setRespondentOrganisationPolicy9(null);
+            case 0 -> caseData.getRespondentOrganisationPolicy0().setOrganisation(null);
+            case 1 -> caseData.getRespondentOrganisationPolicy1().setOrganisation(null);
+            case 2 -> caseData.getRespondentOrganisationPolicy2().setOrganisation(null);
+            case 3 -> caseData.getRespondentOrganisationPolicy3().setOrganisation(null);
+            case 4 -> caseData.getRespondentOrganisationPolicy4().setOrganisation(null);
+            case 5 -> caseData.getRespondentOrganisationPolicy5().setOrganisation(null);
+            case 6 -> caseData.getRespondentOrganisationPolicy6().setOrganisation(null);
+            case 7 -> caseData.getRespondentOrganisationPolicy7().setOrganisation(null);
+            case 8 -> caseData.getRespondentOrganisationPolicy8().setOrganisation(null);
+            case 9 -> caseData.getRespondentOrganisationPolicy9().setOrganisation(null);
             default -> {
                 // This case should never be reached due to the earlier index check.
                 // added to not have any PMD or Checkstyle warnings

@@ -8,6 +8,7 @@ import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
@@ -19,6 +20,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EMPTY_STRING;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper.getRespondentRepresentative;
 
 @Service
 @RequiredArgsConstructor
@@ -52,6 +54,7 @@ public class EmailNotificationService {
 
     /**
      * Retrieves a list of email addresses for respondents and their representatives from the given case data.
+     * this also includes respondent solicitors from the shared list.
      *
      * @param caseData the case data containing respondent and representative information
      * @return a mapping of email addresses and respondent ids for respondents and their representatives
@@ -69,6 +72,29 @@ public class EmailNotificationService {
         getRespondentSolicitorEmails(caseUserAssignments).forEach(email ->
                 emailAddressesMap.put(email, EMPTY_STRING)
         );
+
+        return emailAddressesMap;
+    }
+
+    /**
+     * Retrieves a list of email addresses for respondents and their representatives from the given case data.
+     * This only includes the main legal representative for each respondent,
+     * not respondent solicitors from the shared list.
+     *
+     * @param caseData the case data containing respondent and representative information
+     * @return a mapping of email addresses and respondent ids for respondents and their representatives
+     */
+    public Map<String, String> getRespondentsAndAssignedRepsEmailAddresses(CaseData caseData) {
+        List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
+        Map<String, String> emailAddressesMap = new ConcurrentHashMap<>();
+
+        respondentCollection.forEach(respondentSumTypeItem -> {
+            getRespondentEmailAddress(respondentSumTypeItem, emailAddressesMap);
+            RepresentedTypeR representative = getRespondentRepresentative(caseData, respondentSumTypeItem.getValue());
+            if (representative != null && StringUtils.isNotBlank(representative.getRepresentativeEmailAddress())) {
+                emailAddressesMap.put(representative.getRepresentativeEmailAddress(), "");
+            }
+        });
 
         return emailAddressesMap;
     }

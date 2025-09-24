@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.EtICHearingListedAnswers;
 import uk.gov.hmcts.et.common.model.ccd.EtICListForFinalHearing;
@@ -24,8 +25,10 @@ import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
@@ -163,6 +166,33 @@ class InitialConsiderationServiceTest {
                 .url("https://test.com/documents/random-uuid")
                 .build();
         doCallRealMethod().when(documentManagementService).addDocumentToDocumentField(documentInfo);
+    }
+
+    @Test
+    void initialiseInitialConsideration_shouldSetBeforeYouStart_whenDocumentCollectionIsNotNull() {
+        List<DocumentTypeItem> documentCollection = new ArrayList<>();
+        DocumentTypeItem documentItem = new DocumentTypeItem();
+        documentItem.setValue(DocumentType.from(new UploadedDocumentType()));
+        documentItem.getValue().setDocumentType("ET1");
+        documentCollection.add(documentItem);
+        caseData.setDocumentCollection(documentCollection);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+
+        initialConsiderationService.initialiseInitialConsideration(caseDetails);
+
+        assertThat(caseDetails.getCaseData().getInitialConsiderationBeforeYouStart()).isNotEmpty();
+    }
+
+    @Test
+    void initialiseInitialConsideration_shouldSetEmptyBeforeYouStart_whenDocumentCollectionIsNull() {
+        CaseDetails caseDetails = new CaseDetails();
+        caseData.setDocumentCollection(null);
+        caseDetails.setCaseData(caseData);
+
+        initialConsiderationService.initialiseInitialConsideration(caseDetails);
+
+        assertThat(caseDetails.getCaseData().getInitialConsiderationBeforeYouStart()).isEmpty();
     }
 
     @Test

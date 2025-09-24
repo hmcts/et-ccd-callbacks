@@ -114,6 +114,7 @@ public class InitialConsiderationController {
         }
 
         if (CollectionUtils.isNotEmpty(caseData.getEtICHearingNotListedList())) {
+
             initialConsiderationService.clearIcHearingNotListedOldValues(caseData);
         }
 
@@ -156,7 +157,7 @@ public class InitialConsiderationController {
                 initialConsiderationService.generateJurisdictionCodesHtml(
                         caseData.getJurCodesCollection(), caseTypeId));
         initialConsiderationService.setIsHearingAlreadyListed(caseData, caseTypeId);
-
+        initialConsiderationService.initialiseInitialConsideration(ccdRequest.getCaseDetails());
         if (CollectionUtils.isNotEmpty(caseData.getEtICHearingNotListedList())) {
             initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData, caseTypeId);
         }

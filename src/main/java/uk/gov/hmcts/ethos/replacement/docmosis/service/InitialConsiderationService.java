@@ -1,10 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.EtICListForFinalHearing;
 import uk.gov.hmcts.et.common.model.ccd.EtICListForFinalHearingUpdated;
@@ -34,6 +36,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
@@ -62,16 +65,87 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsidera
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.UDL_HEARING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.VIDEO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.WITH_MEMBERS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_LABEL_ET1_IC;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_LABEL_ET1_VETTING_IC;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_LABEL_ET3_IC;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_LABEL_ET3_PROCESSING_IC;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_LABEL_REFERRALS_IC;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.CASE_DETAILS_URL_PARTIAL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET1_DOC_TYPE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET1_VETTING_DOC_TYPE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET3_DOC_TYPE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET3_PROCESSING_DOC_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.NOT_AVAILABLE_FOR_VIDEO_HEARINGS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.REFERRALS_PAGE_FRAGMENT_ID;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.TO_HELP_YOU_COMPLETE_IC_EVENT_LABEL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.getHearingDuration;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class InitialConsiderationService {
 
     private final TornadoService tornadoService;
+
+    public void initialiseInitialConsideration(CaseDetails caseDetails) {
+        caseDetails.getCaseData().setInitialConsiderationBeforeYouStart(initiateBeforeYouStart(caseDetails));
+    }
+
+    private String initiateBeforeYouStart(CaseDetails caseDetails) {
+        List<DocumentTypeItem> documentCollection = caseDetails.getCaseData().getDocumentCollection();
+
+        String beforeYouStart = "";
+        if (documentCollection != null) {
+            //ET1
+            String et1Form = documentCollection
+                    .stream()
+                    .filter(d -> ET1_DOC_TYPE.equals(
+                            defaultIfEmpty(d.getValue().getDocumentType(), "")))
+                    .map(d -> String.format(BEFORE_LABEL_ET1_IC,
+                            DocumentManagementService.createLinkToBinaryDocument(d)))
+                    .collect(Collectors.joining());
+            //ET1 VETTING
+            String et1Vetting  = documentCollection
+                    .stream()
+                    .filter(d -> ET1_VETTING_DOC_TYPE.equals(
+                            defaultIfEmpty(d.getValue().getDocumentType(), "")))
+                    .map(d -> String.format(BEFORE_LABEL_ET1_VETTING_IC,
+                            DocumentManagementService.createLinkToBinaryDocument(d)))
+                    .collect(Collectors.joining());
+
+            //ET3
+            String et3Form  = documentCollection
+                    .stream()
+                    .filter(d -> ET3_DOC_TYPE.equals(
+                            defaultIfEmpty(d.getValue().getDocumentType(), "")))
+                    .map(d -> String.format(BEFORE_LABEL_ET3_IC,
+                            DocumentManagementService.createLinkToBinaryDocument(d)))
+                    .collect(Collectors.joining());
+
+            //ET3 PROCESSING
+            String et3Processing  = documentCollection
+                    .stream()
+                    .filter(d -> ET3_PROCESSING_DOC_TYPE.equals(
+                            defaultIfEmpty(d.getValue().getDocumentType(), "")))
+                    .map(d -> String.format(BEFORE_LABEL_ET3_PROCESSING_IC,
+                            DocumentManagementService.createLinkToBinaryDocument(d)))
+                    .collect(Collectors.joining());
+
+            //REFERRALS, if any
+            String referralLinks = "";
+            if (caseDetails.getCaseData().getReferralCollection() != null
+                    && !caseDetails.getCaseData().getReferralCollection().isEmpty()) {
+                referralLinks =  String.format(BEFORE_LABEL_REFERRALS_IC, CASE_DETAILS_URL_PARTIAL
+                        + caseDetails.getCaseId() +  REFERRALS_PAGE_FRAGMENT_ID);
+            }
+            beforeYouStart = String.format(TO_HELP_YOU_COMPLETE_IC_EVENT_LABEL, et1Form, et1Vetting, et3Form,
+                    et3Processing, referralLinks);
+        }
+
+        return beforeYouStart;
+    }
 
     public String setRespondentDetails(CaseData caseData) {
         List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();

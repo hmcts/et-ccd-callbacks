@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -138,10 +139,10 @@ public class RespondentTellSomethingElseService {
         return errors;
     }
 
-    public void sendEmails(CaseDetails caseDetails, String userToken, String currentRespondentIdam) {
+    public void sendEmails(CaseDetails caseDetails, String userToken) {
         List<CaseUserAssignment> caseUserAssignments =
                 caseAccessService.getCaseUserAssignmentsById(caseDetails.getCaseId());
-        sendAcknowledgeEmail(caseDetails, userToken, caseUserAssignments, currentRespondentIdam);
+        sendAcknowledgeEmail(caseDetails, userToken, caseUserAssignments);
         sendClaimantEmail(caseDetails, caseUserAssignments);
         sendAdminEmail(caseDetails);
     }
@@ -154,11 +155,11 @@ public class RespondentTellSomethingElseService {
      * @param userToken   jwt used for authorization
      */
     public void sendAcknowledgeEmail(CaseDetails caseDetails, String userToken,
-                                     List<CaseUserAssignment> caseUserAssignments,
-                                     String idamId) {
+                                     List<CaseUserAssignment> caseUserAssignments) {
         CaseData caseData = caseDetails.getCaseData();
         String templateId;
         Map<String, String> personalisation;
+        String idamId = caseData.getRespondentTse().getRespondentIdamId(); // respondent idam id
         String applicantName = getRespondentNameByIdamId(caseData, idamId); // respondent name
 
         if (TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE.equals(caseData.getResTseSelectApplication())) {
@@ -191,10 +192,19 @@ public class RespondentTellSomethingElseService {
 
         if (!TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE.equals(caseData.getResTseSelectApplication())
                 && YES.equals(caseData.getResTseCopyToOtherPartyYesOrNo())) {
-            // send email to other respondents in the case
-            emailNotificationService.getRespondentsAndRepsEmailAddresses(caseData, caseUserAssignments)
-                    .forEach((email, respondentId) ->
-                    {
+            String targetOrgId = assignments.stream()
+                    .map(CaseUserAssignment::getOrganisationId)
+                    .filter(Objects::nonNull)
+                    .findFirst()
+                    .orElse(null);
+
+            // send email to other respondents and reps in the case
+            List<CaseUserAssignment> filteredAssignments = caseUserAssignments.stream()
+                    .filter(assignment -> !assignment.getOrganisationId().equals(targetOrgId))
+                    .toList();
+
+            emailNotificationService.getRespondentsAndRepsEmailAddresses(caseData, filteredAssignments)
+                    .forEach((email, respondentId) -> {
                         if (!idamId.equals(respondentId)) {
                             String link = isNotBlank(idamId)
                                     ? emailService.getSyrCaseLink(caseId, respondentId)

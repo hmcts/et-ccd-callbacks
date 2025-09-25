@@ -86,6 +86,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_AMEN
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.CASE_MANAGEMENT;
 import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_MONTHS_MAP;
 import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_RESPONDENT_APP_TYPE_MAP;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.APPLICANT_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.ENGLISH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE_PARAM;
@@ -276,8 +277,24 @@ class RespondentTellSomethingElseServiceTest {
         caseDetails.setCaseId(CASE_ID);
 
         Map<String, String> expectedPersonalisation = createPersonalisation(caseData, selectedApplication);
+        expectedPersonalisation.put(APPLICANT_NAME, "You");
+        CaseUserAssignment mockAssignment1 = CaseUserAssignment
+                .builder()
+                .userId("respSolicitorUserId1")
+                .caseRole(SolicitorRole.SOLICITORA.getCaseRoleLabel())
+                .build();
 
-        respondentTellSomethingElseService.sendAcknowledgeEmail(caseDetails, AUTH_TOKEN, anyList(), anyString());
+        CaseUserAssignment mockAssignment2 = CaseUserAssignment
+                .builder()
+                .userId("respSolicitorUserId2")
+                .caseRole(SolicitorRole.SOLICITORA.getCaseRoleLabel())
+                .build();
+
+        when(caseAccessService.filterCaseAssignmentsByOrgId(anyList(), any()))
+                .thenReturn(Set.of(mockAssignment1, mockAssignment2));
+        when(emailNotificationService.getRespondentSolicitorEmails(anyList()))
+                .thenReturn(Set.of(LEGAL_REP_EMAIL));
+        respondentTellSomethingElseService.sendAcknowledgeEmail(caseDetails, AUTH_TOKEN, anyList());
 
         verify(emailService).sendEmail(expectedTemplateId, LEGAL_REP_EMAIL, expectedPersonalisation);
     }
@@ -336,9 +353,10 @@ class RespondentTellSomethingElseServiceTest {
                 .thenReturn(Set.of(mockAssignment1, mockAssignment2));
         when(emailNotificationService.getRespondentSolicitorEmails(anyList()))
                 .thenReturn(Set.of(LEGAL_REP_EMAIL, "respSolicitor@test.com"));
-        respondentTellSomethingElseService.sendAcknowledgeEmail(caseDetails, AUTH_TOKEN, anyList(), anyString());
+        respondentTellSomethingElseService.sendAcknowledgeEmail(caseDetails, AUTH_TOKEN, anyList());
 
         Map<String, String> expectedPersonalisation = createPersonalisation(caseData, selectedApplication);
+        expectedPersonalisation.put(APPLICANT_NAME, "You");
 
         verify(emailService).sendEmail(expectedTemplateId, "respSolicitor@test.com", expectedPersonalisation);
         verify(emailService).sendEmail(expectedTemplateId, LEGAL_REP_EMAIL, expectedPersonalisation);
@@ -358,7 +376,7 @@ class RespondentTellSomethingElseServiceTest {
             "exuiCaseDetailsLink", "exuiUrl669718251103419"
         );
 
-        respondentTellSomethingElseService.sendAcknowledgeEmail(caseDetails, AUTH_TOKEN, anyList(), anyString());
+        respondentTellSomethingElseService.sendAcknowledgeEmail(caseDetails, AUTH_TOKEN, anyList());
 
         verify(emailService).sendEmail(TEMPLATE_ID_C, LEGAL_REP_EMAIL, expectedPersonalisation);
     }
@@ -766,6 +784,9 @@ class RespondentTellSomethingElseServiceTest {
         caseData.setResTseSelectApplication(selectedApplication);
         caseData.setResTseCopyToOtherPartyYesOrNo(selectedRule92Answer);
         caseData.setRespondentCollection(new ArrayList<>(Collections.singletonList(createRespondentType())));
+        RespondentTse tse = new RespondentTse();
+        tse.setRespondentIdamId("respondentIdamId");
+        caseData.setRespondentTse(tse);
 
         return caseData;
     }

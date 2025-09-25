@@ -188,8 +188,7 @@ public class RespondentTellSomethingElseController {
         CaseData caseData = caseDetails.getCaseData();
         tseService.createApplication(caseData, RESPONDENT_REP_TITLE);
 
-        String currentRespondentIdam = caseData.getRespondentTse().getRespondentIdamId();
-        resTseService.sendEmails(caseDetails, userToken, currentRespondentIdam);
+        resTseService.sendEmails(caseDetails, userToken);
         resTseService.generateAndAddTsePdf(caseData, userToken, caseDetails.getCaseTypeId());
         tseService.clearApplicationData(caseData);
         caseManagementForCaseWorkerService.setNextListedDate(caseData);

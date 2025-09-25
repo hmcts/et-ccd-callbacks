@@ -158,6 +158,7 @@ public class RespondentTellSomethingElseService {
         CaseData caseData = caseDetails.getCaseData();
         String templateId;
         Map<String, String> personalisation;
+        log.info("case assignments {}", caseUserAssignments);
 
         if (TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE.equals(caseData.getResTseSelectApplication())) {
             templateId = tseRespondentAcknowledgeTypeCTemplateId;

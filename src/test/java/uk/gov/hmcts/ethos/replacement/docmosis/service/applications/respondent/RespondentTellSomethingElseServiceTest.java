@@ -277,7 +277,7 @@ class RespondentTellSomethingElseServiceTest {
 
         Map<String, String> expectedPersonalisation = createPersonalisation(caseData, selectedApplication);
 
-        respondentTellSomethingElseService.sendAcknowledgeEmail(caseDetails, AUTH_TOKEN, anyList());
+        respondentTellSomethingElseService.sendAcknowledgeEmail(caseDetails, AUTH_TOKEN, anyList(), anyString());
 
         verify(emailService).sendEmail(expectedTemplateId, LEGAL_REP_EMAIL, expectedPersonalisation);
     }
@@ -336,7 +336,7 @@ class RespondentTellSomethingElseServiceTest {
                 .thenReturn(Set.of(mockAssignment1, mockAssignment2));
         when(emailNotificationService.getRespondentSolicitorEmails(anyList()))
                 .thenReturn(Set.of(LEGAL_REP_EMAIL, "respSolicitor@test.com"));
-        respondentTellSomethingElseService.sendAcknowledgeEmail(caseDetails, AUTH_TOKEN, anyList());
+        respondentTellSomethingElseService.sendAcknowledgeEmail(caseDetails, AUTH_TOKEN, anyList(), anyString());
 
         Map<String, String> expectedPersonalisation = createPersonalisation(caseData, selectedApplication);
 
@@ -358,7 +358,7 @@ class RespondentTellSomethingElseServiceTest {
             "exuiCaseDetailsLink", "exuiUrl669718251103419"
         );
 
-        respondentTellSomethingElseService.sendAcknowledgeEmail(caseDetails, AUTH_TOKEN, anyList());
+        respondentTellSomethingElseService.sendAcknowledgeEmail(caseDetails, AUTH_TOKEN, anyList(), anyString());
 
         verify(emailService).sendEmail(TEMPLATE_ID_C, LEGAL_REP_EMAIL, expectedPersonalisation);
     }

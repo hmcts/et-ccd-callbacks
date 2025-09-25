@@ -42,6 +42,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.apache.poi.util.StringUtil.isNotBlank;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
@@ -49,8 +50,10 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CHANGE_PERS
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CONSIDER_A_DECISION_AFRESH;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_RECONSIDER_JUDGEMENT;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_MONTHS_MAP;
 import static uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse.CY_RESPONDENT_APP_TYPE_MAP;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.APPLICANT_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.DATE;
@@ -69,6 +72,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE_PARAM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItemFromTopLevel;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.setDocumentNumbers;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNameByIdamId;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantNonSystemUser;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.getNearestHearingToReferral;
@@ -134,10 +138,10 @@ public class RespondentTellSomethingElseService {
         return errors;
     }
 
-    public void sendEmails(CaseDetails caseDetails, String userToken) {
+    public void sendEmails(CaseDetails caseDetails, String userToken, String currentRespondentIdam) {
         List<CaseUserAssignment> caseUserAssignments =
                 caseAccessService.getCaseUserAssignmentsById(caseDetails.getCaseId());
-        sendAcknowledgeEmail(caseDetails, userToken, caseUserAssignments);
+        sendAcknowledgeEmail(caseDetails, userToken, caseUserAssignments, currentRespondentIdam);
         sendClaimantEmail(caseDetails, caseUserAssignments);
         sendAdminEmail(caseDetails);
     }
@@ -150,10 +154,12 @@ public class RespondentTellSomethingElseService {
      * @param userToken   jwt used for authorization
      */
     public void sendAcknowledgeEmail(CaseDetails caseDetails, String userToken,
-                                     List<CaseUserAssignment> caseUserAssignments) {
+                                     List<CaseUserAssignment> caseUserAssignments,
+                                     String idamId) {
         CaseData caseData = caseDetails.getCaseData();
         String templateId;
         Map<String, String> personalisation;
+        String applicantName = getRespondentNameByIdamId(caseData, idamId); // respondent name
 
         if (TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE.equals(caseData.getResTseSelectApplication())) {
             templateId = tseRespondentAcknowledgeTypeCTemplateId;
@@ -179,6 +185,27 @@ public class RespondentTellSomethingElseService {
         }
         emailNotificationService.getRespondentSolicitorEmails(assignments.stream().toList())
                 .forEach(email -> emailService.sendEmail(templateId, email, personalisation));
+
+        Map<String, Object> newPersonalisation = new HashMap<>(personalisation);
+        String caseId = caseDetails.getCaseId();
+
+        if (!TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE.equals(caseData.getResTseSelectApplication())
+                && YES.equals(caseData.getResTseCopyToOtherPartyYesOrNo())) {
+            // send email to other respondents in the case
+            emailNotificationService.getRespondentsAndRepsEmailAddresses(caseData, caseUserAssignments)
+                    .forEach((email, respondentId) ->
+                    {
+                        if (!idamId.equals(respondentId)) {
+                            String link = isNotBlank(idamId)
+                                    ? emailService.getSyrCaseLink(caseId, respondentId)
+                                    : emailService.getExuiCaseLink(caseId);
+
+                            newPersonalisation.put(EXUI_CASE_DETAILS_LINK, link);
+                            newPersonalisation.put(APPLICANT_NAME, applicantName);
+                            emailService.sendEmail(templateId, email, newPersonalisation);
+                        }
+                    });
+        }
     }
 
     private Map<String, String> buildPersonalisationTypeC(CaseDetails caseDetails) {
@@ -199,7 +226,8 @@ public class RespondentTellSomethingElseService {
             RESPONDENT_NAMES, getRespondentNames(caseData),
             HEARING_DATE, getNearestHearingToReferral(caseData, NOT_SET),
             SHORT_TEXT, caseData.getResTseSelectApplication(),
-            EXUI_CASE_DETAILS_LINK, emailService.getExuiCaseLink(detail.getCaseId())
+            EXUI_CASE_DETAILS_LINK, emailService.getExuiCaseLink(detail.getCaseId()),
+            APPLICANT_NAME, "You"
         );
     }
 

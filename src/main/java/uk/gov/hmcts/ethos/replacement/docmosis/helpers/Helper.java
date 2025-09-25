@@ -479,4 +479,16 @@ public final class Helper {
                 && isNullOrEmpty(address.getCountry())
                 && isNullOrEmpty(address.getCounty());
     }
+
+    public static String getRespondentNameByIdamId(CaseData caseData, String idamId) {
+        if (caseData != null && caseData.getRespondentCollection() != null) {
+            for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
+                RespondentSumType respondentSumType = respondentSumTypeItem.getValue();
+                if (respondentSumType != null && idamId.equals(respondentSumType.getIdamId())) {
+                    return respondentSumType.getRespondentName();
+                }
+            }
+        }
+        return "";
+    }
 }

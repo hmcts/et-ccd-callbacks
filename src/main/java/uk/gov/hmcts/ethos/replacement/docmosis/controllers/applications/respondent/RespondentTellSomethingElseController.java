@@ -186,7 +186,6 @@ public class RespondentTellSomethingElseController {
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
-        log.info("creating application");
         tseService.createApplication(caseData, RESPONDENT_REP_TITLE);
 
         resTseService.sendEmails(caseDetails, userToken);

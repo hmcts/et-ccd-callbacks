@@ -85,7 +85,6 @@ public class TseService {
         application.setResponsesCount("0");
         application.setNumber(String.valueOf(getNextApplicationNumber(caseData)));
         if (caseData.getRespondentTse() != null) {
-            log.info("getRespondentTse: {} ", caseData.getRespondentTse());
             application.setApplicantIdamId(caseData.getRespondentTse().getRespondentIdamId());
         }
 
@@ -149,7 +148,6 @@ public class TseService {
         application.setApplicant(RESPONDENT_TITLE);
 
         RespondentTse respondentTse = caseData.getRespondentTse();
-        log.info("respondentTse: {} ", respondentTse);
         application.setType(respondentTse.getContactApplicationType());
         application.setDetails(respondentTse.getContactApplicationText());
         application.setDocumentUpload(respondentTse.getContactApplicationFile());

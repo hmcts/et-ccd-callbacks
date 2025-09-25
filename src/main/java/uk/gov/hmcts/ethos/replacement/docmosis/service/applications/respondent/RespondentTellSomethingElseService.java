@@ -203,13 +203,13 @@ public class RespondentTellSomethingElseService {
             String applicantName = userDetails.getFirstName() + " " + userDetails.getLastName();
             emailNotificationService.getRespondentsAndRepsEmailAddresses(caseData, filteredAssignments)
                     .forEach((email, respondentId) -> {
-                            String link = isNotBlank(respondentId)
-                                    ? emailService.getSyrCaseLink(caseId, respondentId)
-                                    : emailService.getExuiCaseLink(caseId);
+                        String link = isNotBlank(respondentId)
+                                ? emailService.getSyrCaseLink(caseId, respondentId)
+                                : emailService.getExuiCaseLink(caseId);
 
-                            newPersonalisation.put(EXUI_CASE_DETAILS_LINK, link);
-                            newPersonalisation.put(APPLICANT_NAME, applicantName);
-                            emailService.sendEmail(templateId, email, newPersonalisation);
+                        newPersonalisation.put(EXUI_CASE_DETAILS_LINK, link);
+                        newPersonalisation.put(APPLICANT_NAME, applicantName);
+                        emailService.sendEmail(templateId, email, newPersonalisation);
                     });
         }
     }

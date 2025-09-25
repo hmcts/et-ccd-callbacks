@@ -28,6 +28,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.Map;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -138,7 +139,7 @@ public class InitialConsiderationController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseData  caseData = ccdRequest.getCaseDetails().getCaseData();
 
         // Sets the respondent details(respondent ET1 and ET3 names, hearing panel preference, and
         // availability for video hearing) of all respondents in a concatenated string format
@@ -161,6 +162,12 @@ public class InitialConsiderationController {
         if (CollectionUtils.isNotEmpty(caseData.getEtICHearingNotListedList())) {
             initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData, caseTypeId);
         }
+
+        //Vetting Issues
+        caseData.setEt3DoWeHaveRespondentsName(caseData.getEt3ResponseRespondentLegalName() == null ? "No" : "Yes");
+        caseData.setEt3RespondentNameMismatchDetails(!caseData.getRespondentCollection().stream()
+                .anyMatch(r -> r.getValue().getRespondentName().equals(
+                        caseData.getEt3ResponseRespondentLegalName())) ? "No" : "Yes");
 
         return getCallbackRespEntityNoErrors(caseData);
     }

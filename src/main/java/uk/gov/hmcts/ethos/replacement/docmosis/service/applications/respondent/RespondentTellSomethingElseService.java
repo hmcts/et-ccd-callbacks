@@ -73,7 +73,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.WELSH_LANGUAGE_PARAM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItemFromTopLevel;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.setDocumentNumbers;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNameByIdamId;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantNonSystemUser;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.getNearestHearingToReferral;
@@ -159,8 +158,6 @@ public class RespondentTellSomethingElseService {
         CaseData caseData = caseDetails.getCaseData();
         String templateId;
         Map<String, String> personalisation;
-        String idamId = caseData.getRespondentTse().getRespondentIdamId(); // respondent idam id
-        String applicantName = getRespondentNameByIdamId(caseData, idamId); // respondent name
 
         if (TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE.equals(caseData.getResTseSelectApplication())) {
             templateId = tseRespondentAcknowledgeTypeCTemplateId;
@@ -203,17 +200,16 @@ public class RespondentTellSomethingElseService {
                     .filter(assignment -> !assignment.getOrganisationId().equals(targetOrgId))
                     .toList();
 
+            String applicantName = userDetails.getFirstName() + " " + userDetails.getLastName();
             emailNotificationService.getRespondentsAndRepsEmailAddresses(caseData, filteredAssignments)
                     .forEach((email, respondentId) -> {
-                        if (!idamId.equals(respondentId)) {
-                            String link = isNotBlank(idamId)
+                            String link = isNotBlank(respondentId)
                                     ? emailService.getSyrCaseLink(caseId, respondentId)
                                     : emailService.getExuiCaseLink(caseId);
 
                             newPersonalisation.put(EXUI_CASE_DETAILS_LINK, link);
                             newPersonalisation.put(APPLICANT_NAME, applicantName);
                             emailService.sendEmail(templateId, email, newPersonalisation);
-                        }
                     });
         }
     }

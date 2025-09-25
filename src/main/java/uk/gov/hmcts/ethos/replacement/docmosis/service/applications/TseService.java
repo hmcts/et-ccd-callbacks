@@ -78,7 +78,6 @@ public class TseService {
         if (isEmpty(caseData.getGenericTseApplicationCollection())) {
             caseData.setGenericTseApplicationCollection(new ArrayList<>());
         }
-
         GenericTseApplicationType application = new GenericTseApplicationType();
 
         application.setDate(UtilHelper.formatCurrentDate(LocalDate.now()));

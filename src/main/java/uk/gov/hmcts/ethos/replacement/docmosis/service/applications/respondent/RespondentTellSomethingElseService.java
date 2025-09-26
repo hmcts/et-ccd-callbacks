@@ -273,11 +273,13 @@ public class RespondentTellSomethingElseService {
 
         // send email to claimant
         String claimantEmail = caseData.getClaimantType().getClaimantEmailAddress();
-        emailService.sendEmail(
-                getEmailTemplate(isWelsh, caseData.getResTseSelectApplication()),
-                claimantEmail,
-                personalisation
-        );
+        if (!isNullOrEmpty(claimantEmail)) {
+            emailService.sendEmail(
+                    getEmailTemplate(isWelsh, caseData.getResTseSelectApplication()),
+                    claimantEmail,
+                    personalisation
+            );
+        }
 
         // send email to claimant solicitor and the solicitors on the shared list
         List<String> emailAddresses = emailNotificationService.getCaseClaimantSolicitorEmails(caseUserAssignments);

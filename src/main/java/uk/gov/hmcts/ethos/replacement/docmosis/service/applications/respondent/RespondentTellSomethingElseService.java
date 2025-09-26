@@ -139,10 +139,15 @@ public class RespondentTellSomethingElseService {
     }
 
     public void sendEmails(CaseDetails caseDetails, String userToken) {
+        log.info("sending emails for respondent applications");
         List<CaseUserAssignment> caseUserAssignments =
                 caseAccessService.getCaseUserAssignmentsById(caseDetails.getCaseId());
+        log.info("sendAcknowledgeEmail");
         sendAcknowledgeEmail(caseDetails, userToken, caseUserAssignments);
+        log.info("sendAcknowledgeEmail end");
+        log.info("sendClaimantEmail");
         sendClaimantEmail(caseDetails, caseUserAssignments);
+        log.info("sendClaimantEmail end");
         sendAdminEmail(caseDetails);
     }
 

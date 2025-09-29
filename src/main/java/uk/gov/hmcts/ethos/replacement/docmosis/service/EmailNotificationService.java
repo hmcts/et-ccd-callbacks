@@ -49,6 +49,7 @@ public class EmailNotificationService {
                 emailAddresses.add(userDetails.getEmail());
             }
         }
+        log.info("Respondent solicitor emails: {}", emailAddresses);
         return emailAddresses;
     }
 
@@ -77,7 +78,7 @@ public class EmailNotificationService {
     }
 
     /**
-     * Retrieves a list of email addresses for respondents and their representatives from the given case data.
+     * Retrieves a list of email addresses for respondents and their lead representatives from the given case data.
      * This only includes the main legal representative for each respondent,
      * not respondent solicitors from the shared list.
      *

@@ -62,19 +62,6 @@ public class RespondentTellSomethingElseControllerFunctionalTest extends BaseFun
     }
 
     @Test
-    void shouldReceiveSuccessResponseWhenAboutToSubmitRespondentTseInvoked() {
-        RestAssured.given()
-            .spec(spec)
-            .contentType(ContentType.JSON)
-            .header(new Header(AUTHORIZATION, userToken))
-            .body(ccdRequest)
-            .post("/respondentTSE/aboutToSubmit")
-            .then()
-            .statusCode(HttpStatus.SC_OK)
-            .log().all(true);
-    }
-
-    @Test
     void shouldReceiveSuccessResponseWhenDisplayRespondentApplicationsTableInvoked() {
         RestAssured.given()
             .spec(spec)

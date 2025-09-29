@@ -13,7 +13,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.BFActionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.BFActionType;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader;
@@ -99,8 +98,8 @@ class WaTaskCreationCronForExpiredBfActionsTest {
         String resource = ResourceLoader.getResource("bfActionTask_oneExpiredDate.json");
         SubmitEvent submitEvent = new ObjectMapper().readValue(resource, SubmitEvent.class);
         submitEvent.setCaseId(Long.parseLong("1741710954147332"));
-        submitEvent.getCaseData().getBfActions().getFirst().getValue().setBfDate(
-                BFHelper.getEffectiveYesterday(LocalDate.of(2025, 5, 1)));
+        submitEvent.getCaseData().getBfActions().get(1).getValue().setBfDate(
+                LocalDate.now().minusDays(30).toString());
         when(ccdClient.buildAndGetElasticSearchRequest(any(), eq(ENGLANDWALES_CASE_TYPE_ID), any()))
                 .thenReturn(List.of(submitEvent)).thenReturn(Collections.emptyList());
 

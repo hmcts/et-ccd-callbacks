@@ -124,8 +124,8 @@ __metadata:
   linkType: hard
 
 "@babel/eslint-parser@npm:^7.17.0":
-  version: 7.28.0
-  resolution: "@babel/eslint-parser@npm:7.28.0"
+  version: 7.28.4
+  resolution: "@babel/eslint-parser@npm:7.28.4"
   dependencies:
     "@nicolo-ribaudo/eslint-scope-5-internals": 5.1.1-v1
     eslint-visitor-keys: ^2.1.0
@@ -133,7 +133,7 @@ __metadata:
   peerDependencies:
     "@babel/core": ^7.11.0
     eslint: ^7.5.0 || ^8.0.0 || ^9.0.0
-  checksum: ccfc4b9b9fdca2b8df95da3827b70231e9588a71447ff7b2de76c4f36710e4e0a7dc5e2e98623f398a737c2429c46500cb11d4ccdfeb98271e067d0bf0eec9b5
+  checksum: 32fb41c8648e169bc8570e25b4657475e165e1a49b8c6610f9bf86f311bbcc8dfa73f004977015688763aa6af17f48c690720bbc7b7b99695557adb267a9a7ff
   languageName: node
   linkType: hard
 
@@ -1656,6 +1656,17 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@eslint-community/eslint-utils@npm:^4.8.0":
+  version: 4.9.0
+  resolution: "@eslint-community/eslint-utils@npm:4.9.0"
+  dependencies:
+    eslint-visitor-keys: ^3.4.3
+  peerDependencies:
+    eslint: ^6.0.0 || ^7.0.0 || >=8.0.0
+  checksum: ae9b98eea006d1354368804b0116b8b45017a4e47b486d1b9cfa048a8ed3dc69b9b074eb2b2acb14034e6897c24048fd42b6a6816d9dc8bb9daad79db7d478d2
+  languageName: node
+  linkType: hard
+
 "@eslint-community/regexpp@npm:^4.10.0":
   version: 4.10.0
   resolution: "@eslint-community/regexpp@npm:4.10.0"
@@ -1745,10 +1756,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@eslint/js@npm:9.34.0":
-  version: 9.34.0
-  resolution: "@eslint/js@npm:9.34.0"
-  checksum: 933d4ba321b1abc83eecde40eb703871ce00f133eedec54cf928b7fedb61706174dd526997c3f151776922412e3d95cb3634f97ef7b5861b4908f9992f403a63
+"@eslint/js@npm:9.35.0":
+  version: 9.35.0
+  resolution: "@eslint/js@npm:9.35.0"
+  checksum: ea644f0b1abb4da49ba0cb61db4d039492e844d959e7127dd7c501aa27a256348496bce43334ecd3ca990c9a49fb3ea93d6729de0a79d216f63869236c153148
   languageName: node
   linkType: hard
 
@@ -4543,6 +4554,17 @@ __metadata:
     form-data: ^4.0.4
     proxy-from-env: ^1.1.0
   checksum: 0a33dc600b588bfd3111b198d5985527ed89f722817455d7cdb66c1d055e5f8859cc2bebb7320888957fc8458ebe77d5f83af02af9cd260217c91c4e92b6dfb6
+  languageName: node
+  linkType: hard
+
+"axios@npm:1.12.2":
+  version: 1.12.2
+  resolution: "axios@npm:1.12.2"
+  dependencies:
+    follow-redirects: ^1.15.6
+    form-data: ^4.0.4
+    proxy-from-env: ^1.1.0
+  checksum: f0331594fe053a4bbff04104edb073973a3aabfad2e56b0aa18de82428aa63f6f0839ca3d837258ec739cb4528014121793b1649a21e5115ffb2bf8237eadca3
   languageName: node
   linkType: hard
 
@@ -8234,17 +8256,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"eslint@npm:9.34.0":
-  version: 9.34.0
-  resolution: "eslint@npm:9.34.0"
+"eslint@npm:9.35.0":
+  version: 9.35.0
+  resolution: "eslint@npm:9.35.0"
   dependencies:
-    "@eslint-community/eslint-utils": ^4.2.0
+    "@eslint-community/eslint-utils": ^4.8.0
     "@eslint-community/regexpp": ^4.12.1
     "@eslint/config-array": ^0.21.0
     "@eslint/config-helpers": ^0.3.1
     "@eslint/core": ^0.15.2
     "@eslint/eslintrc": ^3.3.1
-    "@eslint/js": 9.34.0
+    "@eslint/js": 9.35.0
     "@eslint/plugin-kit": ^0.3.5
     "@humanfs/node": ^0.16.6
     "@humanwhocodes/module-importer": ^1.0.1
@@ -8280,7 +8302,7 @@ __metadata:
       optional: true
   bin:
     eslint: bin/eslint.js
-  checksum: 6de97f6197774821a086783e1bd73b9518c4eb8896165e448a8bb2359142c63cad40faa5dc79bcdc28fab20b57e1376ccbb76a6ae081da5e94baa18d2d3b92fe
+  checksum: 45b12539f84d7ae474920f279b4a0f1e1074eaff152f6d2b6a5fb112174914853f18071876da6421c11d678319fd78745ea03ed56b6808d77f76397e488cde28
   languageName: node
   linkType: hard
 
@@ -8452,14 +8474,14 @@ __metadata:
     "@wdio/sauce-service": ^9.0.0
     "@wdio/selenium-standalone-service": ^8.0.0
     "@wdio/types": ^9.0.0
-    axios: 1.11.0
+    axios: 1.12.2
     chai: 4.5.0
     chai-as-promised: 8.0.2
     chai-http: 5.1.2
     codeceptjs: 3.7.4
     codeceptjs-saucehelper: ^1.4.0
     cross-env: 7.0.3
-    eslint: 9.34.0
+    eslint: 9.35.0
     eslint-config-prettier: ^10.0.0
     eslint-plugin-codeceptjs: ^1.3.0
     eslint-plugin-import: ^2.26.0
@@ -8473,7 +8495,7 @@ __metadata:
     mocha-jenkins-reporter: 0.4.8
     mocha-junit-reporter: 2.2.1
     mocha-multi: 1.1.7
-    mochawesome: 7.1.3
+    mochawesome: 7.1.4
     nock: 14.0.10
     nodemon: 3.1.10
     nsp: 3.2.1
@@ -13576,9 +13598,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mochawesome-report-generator@npm:^6.2.0":
-  version: 6.2.0
-  resolution: "mochawesome-report-generator@npm:6.2.0"
+"mochawesome-report-generator@npm:^6.3.0":
+  version: 6.3.0
+  resolution: "mochawesome-report-generator@npm:6.3.0"
   dependencies:
     chalk: ^4.1.2
     dateformat: ^4.5.1
@@ -13594,13 +13616,13 @@ __metadata:
     yargs: ^17.2.1
   bin:
     marge: bin/cli.js
-  checksum: bbfafc781a5b5aa39a012e0bed7d50ac929f72a46dee640223e4398b5f2121bd552a58f1dd481c0133678650a2e4730a9f97b8a5f26f2956b66b5c0057eb9391
+  checksum: e8d380516b23160652eecb96392f0545de543676ad4ab4d8cc7ee7bb9c3cd4977a2cc4c781ce6dbfaeeb111edc12936e19b555eeb98e2e0d8e4f162212d7a377
   languageName: node
   linkType: hard
 
-"mochawesome@npm:7.1.3":
-  version: 7.1.3
-  resolution: "mochawesome@npm:7.1.3"
+"mochawesome@npm:7.1.4":
+  version: 7.1.4
+  resolution: "mochawesome@npm:7.1.4"
   dependencies:
     chalk: ^4.1.2
     diff: ^5.0.0
@@ -13609,12 +13631,12 @@ __metadata:
     lodash.isfunction: ^3.0.9
     lodash.isobject: ^3.0.2
     lodash.isstring: ^4.0.1
-    mochawesome-report-generator: ^6.2.0
+    mochawesome-report-generator: ^6.3.0
     strip-ansi: ^6.0.1
     uuid: ^8.3.2
   peerDependencies:
     mocha: ">=7"
-  checksum: 87730026de2a407752088e9baddc105660bfd228d491f9f6588784cd7a200712b40a4987232d3870a353bb5deec61ae6e080686fb2effe099da240067fe619d6
+  checksum: e7ed98f3fda3d779a0474ba2b27faab0a63f1880d8413c49f98b551d262fa693019934769dbc33fbd0a82f8176795862967c6ab5bb8bbbf5e8f92e2b0845eb57
   languageName: node
   linkType: hard
 

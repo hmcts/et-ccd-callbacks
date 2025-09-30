@@ -428,8 +428,8 @@ public class CaseManagementForCaseWorkerService {
         }
         caseData.getHearingCollection().forEach(hearingTypeItem -> {
             HearingType hearingType = hearingTypeItem.getValue();
-            if (isNotEmpty(hearingTypeItem.getValue().getHearingDateCollection())) {
-                hearingTypeItem.getValue().getHearingDateCollection().stream()
+            if (isNotEmpty(hearingType.getHearingDateCollection())) {
+                hearingType.getHearingDateCollection().stream()
                         .map(DateListedTypeItem::getValue)
                         .forEach(dateListedType -> {
                             if (dateListedType.getHearingStatus() == null) {
@@ -439,6 +439,12 @@ public class CaseManagementForCaseWorkerService {
                             }
                             populateHearingVenueFromHearingLevelToDayLevel(dateListedType, hearingType, caseTypeId);
                         });
+
+                hearingType.getHearingDateCollection().sort(
+                        Comparator.comparing(d -> parseListedDate(d.getValue().getListedDate()),
+                                Comparator.nullsLast(Comparator.naturalOrder())
+                        )
+                );
             }
         });
     }
@@ -501,6 +507,21 @@ public class CaseManagementForCaseWorkerService {
             }
         } catch (NumberFormatException e) {
             errors.add(String.format(NEGATIVE_HEARING_LENGTH_MESSAGE, hearingNumber));
+        }
+    }
+
+    private static LocalDateTime parseListedDate(String listedDate) {
+        if (isNullOrEmpty(listedDate)) {
+            return null;
+        }
+        try {
+            return LocalDateTime.parse(listedDate, OLD_DATE_TIME_PATTERN);
+        } catch (Exception e) {
+            try {
+                return LocalDateTime.parse(listedDate);
+            } catch (Exception ex) {
+                return null;
+            }
         }
     }
 
@@ -595,7 +616,7 @@ public class CaseManagementForCaseWorkerService {
             if (response == null) {
                 throw new CaseCreationException(errorMessage);
             }
-            log.info("Http status received from CCD supplementary update API; {}", response.getStatusCodeValue());
+            log.info("Http status received from CCD supplementary update API; {}", response.getStatusCode());
         } catch (RestClientResponseException e) {
             throw new CaseCreationException(String.format("%s with %s", errorMessage, e.getMessage()));
         }

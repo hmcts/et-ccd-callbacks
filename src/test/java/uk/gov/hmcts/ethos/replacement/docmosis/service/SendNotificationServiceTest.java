@@ -481,29 +481,8 @@ class SendNotificationServiceTest {
     }
 
     @Test
-    void testCreateBfActionWhenSubjectContainsEmployerContractClaim() {
-        caseData.setSendNotificationSubject(List.of(EMPLOYER_CONTRACT_CLAIM));
-        caseData.setBfActions(null);
-        
-        sendNotificationService.createBfAction(caseData);
-        
-        assertNotNull(caseData.getBfActions());
-        assertEquals(1, caseData.getBfActions().size());
-        
-        BFActionTypeItem bfActionItem = caseData.getBfActions().getFirst();
-        assertNotNull(bfActionItem.getId());
-        
-        BFActionType bfAction = bfActionItem.getValue();
-        assertNotNull(bfAction);
-        assertEquals(NO, bfAction.getLetters());
-        assertEquals(LocalDate.now().toString(), bfAction.getDateEntered());
-        assertEquals("Other action", bfAction.getCwActions());
-        assertEquals("ECC served", bfAction.getAllActions());
-        assertEquals(LocalDate.now().plusDays(29).toString(), bfAction.getBfDate());
-    }
-
-    @Test
     void testCreateBfActionWhenEccQuestionIsNoticeOfEmployerContractClaim() {
+        caseData.setSendNotificationSubject(List.of(EMPLOYER_CONTRACT_CLAIM));
         caseData.setSendNotificationEccQuestion(NOTICE_OF_EMPLOYER_CONTRACT_CLAIM);
         caseData.setBfActions(null);
         
@@ -548,28 +527,9 @@ class SendNotificationServiceTest {
     }
 
     @Test
-    void testCreateBfActionShouldCreateWhenSubjectIsNullButEccQuestionMatches() {
+    void testCreateBfActionShouldNotCreateWhenSubjectIsNullButEccQuestionMatches() {
         caseData.setSendNotificationSubject(null);
         caseData.setSendNotificationEccQuestion(NOTICE_OF_EMPLOYER_CONTRACT_CLAIM);
-        caseData.setBfActions(null);
-        
-        sendNotificationService.createBfAction(caseData);
-        
-        assertNotNull(caseData.getBfActions());
-        assertEquals(1, caseData.getBfActions().size());
-        
-        BFActionTypeItem bfActionItem = caseData.getBfActions().getFirst();
-        assertNotNull(bfActionItem.getId());
-        
-        BFActionType bfAction = bfActionItem.getValue();
-        assertNotNull(bfAction);
-        assertEquals("ECC served", bfAction.getAllActions());
-    }
-
-    @Test
-    void testCreateBfActionShouldNotCreateWhenSubjectDoesNotContainEcc() {
-        caseData.setSendNotificationSubject(List.of("Hearing", "Judgment"));
-        caseData.setSendNotificationEccQuestion("Other Question");
         caseData.setBfActions(null);
         
         sendNotificationService.createBfAction(caseData);
@@ -578,14 +538,24 @@ class SendNotificationServiceTest {
     }
 
     @Test
-    void testCreateBfActionWithEmptyExistingBfActions() {
-        caseData.setSendNotificationSubject(List.of(EMPLOYER_CONTRACT_CLAIM));
-        caseData.setBfActions(new ArrayList<>());
+    void testCreateBfActionShouldNotCreateWhenSubjectDoesNotContainEcc() {
+        caseData.setSendNotificationSubject(List.of("Hearing", "Judgment"));
+        caseData.setBfActions(null);
         
         sendNotificationService.createBfAction(caseData);
         
-        assertNotNull(caseData.getBfActions());
-        assertEquals(1, caseData.getBfActions().size());
+        assertNull(caseData.getBfActions());
+    }
+
+    @Test
+    void testCreateBfActionShouldNotCreateWhenEccQuestionNotNoticeOFEcc() {
+        caseData.setSendNotificationSubject(List.of(EMPLOYER_CONTRACT_CLAIM));
+        caseData.setSendNotificationEccQuestion("Acceptance of Employer Contract Claim");
+        caseData.setBfActions(null);
+
+        sendNotificationService.createBfAction(caseData);
+
+        assertNull(caseData.getBfActions());
     }
 
     @Test
@@ -599,8 +569,9 @@ class SendNotificationServiceTest {
         
         List<BFActionTypeItem> existingActions = new ArrayList<>();
         existingActions.add(existingBfActionItem);
-        
+
         caseData.setSendNotificationSubject(List.of(EMPLOYER_CONTRACT_CLAIM));
+        caseData.setSendNotificationEccQuestion(NOTICE_OF_EMPLOYER_CONTRACT_CLAIM);
         caseData.setBfActions(existingActions);
         
         sendNotificationService.createBfAction(caseData);
@@ -621,6 +592,7 @@ class SendNotificationServiceTest {
     @Test
     void testCreateBfActionBfActionTypeItemHasValidUuid() {
         caseData.setSendNotificationSubject(List.of(EMPLOYER_CONTRACT_CLAIM));
+        caseData.setSendNotificationEccQuestion(NOTICE_OF_EMPLOYER_CONTRACT_CLAIM);
         caseData.setBfActions(null);
         
         sendNotificationService.createBfAction(caseData);

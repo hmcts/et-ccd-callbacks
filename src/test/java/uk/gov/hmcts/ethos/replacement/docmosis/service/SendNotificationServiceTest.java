@@ -13,6 +13,8 @@ import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
+import uk.gov.hmcts.et.common.model.ccd.items.BFActionTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.BFActionType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
@@ -22,11 +24,13 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelection
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -41,6 +45,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_VIEWED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
@@ -49,6 +54,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SEND_NOTIFICATION_R
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRIBUNAL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.SendNotificationService.CASE_MANAGEMENT_ORDERS_REQUESTS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.SendNotificationService.EMPLOYER_CONTRACT_CLAIM;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.SendNotificationService.NOTICE_OF_EMPLOYER_CONTRACT_CLAIM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.NOTIFICATION_SUMMARY_PDF;
 
 @ExtendWith(SpringExtension.class)
@@ -473,4 +480,126 @@ class SendNotificationServiceTest {
                 caseData, "userToken", SCOTLAND_CASE_TYPE_ID, NOTIFICATION_SUMMARY_PDF);
     }
 
+    @Test
+    void testCreateBfActionWhenEccQuestionIsNoticeOfEmployerContractClaim() {
+        caseData.setSendNotificationSubject(List.of(EMPLOYER_CONTRACT_CLAIM));
+        caseData.setSendNotificationEccQuestion(NOTICE_OF_EMPLOYER_CONTRACT_CLAIM);
+        caseData.setBfActions(null);
+        
+        sendNotificationService.createBfAction(caseData);
+        
+        assertNotNull(caseData.getBfActions());
+        assertEquals(1, caseData.getBfActions().size());
+        
+        BFActionTypeItem bfActionItem = caseData.getBfActions().getFirst();
+        assertNotNull(bfActionItem.getId());
+        
+        BFActionType bfAction = bfActionItem.getValue();
+        assertNotNull(bfAction);
+        assertEquals(NO, bfAction.getLetters());
+        assertEquals(LocalDate.now().toString(), bfAction.getDateEntered());
+        assertEquals("Other action", bfAction.getCwActions());
+        assertEquals("ECC served", bfAction.getAllActions());
+        assertEquals(LocalDate.now().plusDays(29).toString(), bfAction.getBfDate());
+    }
+
+    @Test
+    void testCreateBfActionWhenBothEccConditionsAreMet() {
+        caseData.setSendNotificationSubject(List.of(EMPLOYER_CONTRACT_CLAIM, "Other Subject"));
+        caseData.setSendNotificationEccQuestion(NOTICE_OF_EMPLOYER_CONTRACT_CLAIM);
+        caseData.setBfActions(null);
+        
+        sendNotificationService.createBfAction(caseData);
+        
+        assertNotNull(caseData.getBfActions());
+        assertEquals(1, caseData.getBfActions().size());
+    }
+
+    @Test
+    void testCreateBfActionShouldNotCreateWhenNeitherConditionIsMet() {
+        caseData.setSendNotificationSubject(List.of("Hearing", "Other Subject"));
+        caseData.setSendNotificationEccQuestion("Other Question");
+        caseData.setBfActions(null);
+        
+        sendNotificationService.createBfAction(caseData);
+        
+        assertNull(caseData.getBfActions());
+    }
+
+    @Test
+    void testCreateBfActionShouldNotCreateWhenSubjectIsNullButEccQuestionMatches() {
+        caseData.setSendNotificationSubject(null);
+        caseData.setSendNotificationEccQuestion(NOTICE_OF_EMPLOYER_CONTRACT_CLAIM);
+        caseData.setBfActions(null);
+        
+        sendNotificationService.createBfAction(caseData);
+        
+        assertNull(caseData.getBfActions());
+    }
+
+    @Test
+    void testCreateBfActionShouldNotCreateWhenSubjectDoesNotContainEcc() {
+        caseData.setSendNotificationSubject(List.of("Hearing", "Judgment"));
+        caseData.setBfActions(null);
+        
+        sendNotificationService.createBfAction(caseData);
+        
+        assertNull(caseData.getBfActions());
+    }
+
+    @Test
+    void testCreateBfActionShouldNotCreateWhenEccQuestionNotNoticeOFEcc() {
+        caseData.setSendNotificationSubject(List.of(EMPLOYER_CONTRACT_CLAIM));
+        caseData.setSendNotificationEccQuestion("Acceptance of Employer Contract Claim");
+        caseData.setBfActions(null);
+
+        sendNotificationService.createBfAction(caseData);
+
+        assertNull(caseData.getBfActions());
+    }
+
+    @Test
+    void testCreateBfActionAppendsToExistingBfActions() {
+        BFActionType existingBfAction = new BFActionType();
+        existingBfAction.setCwActions("Existing action");
+        existingBfAction.setAllActions("Existing all action");
+        BFActionTypeItem existingBfActionItem = new BFActionTypeItem();
+        existingBfActionItem.setId("existing-id");
+        existingBfActionItem.setValue(existingBfAction);
+        
+        List<BFActionTypeItem> existingActions = new ArrayList<>();
+        existingActions.add(existingBfActionItem);
+
+        caseData.setSendNotificationSubject(List.of(EMPLOYER_CONTRACT_CLAIM));
+        caseData.setSendNotificationEccQuestion(NOTICE_OF_EMPLOYER_CONTRACT_CLAIM);
+        caseData.setBfActions(existingActions);
+        
+        sendNotificationService.createBfAction(caseData);
+        
+        assertNotNull(caseData.getBfActions());
+        assertEquals(2, caseData.getBfActions().size()); // Should have 2 actions now
+        
+        BFActionTypeItem firstAction = caseData.getBfActions().getFirst();
+        assertEquals("existing-id", firstAction.getId());
+        assertEquals("Existing action", firstAction.getValue().getCwActions());
+        
+        BFActionTypeItem newAction = caseData.getBfActions().get(1);
+        assertNotNull(newAction.getId());
+        assertEquals("Other action", newAction.getValue().getCwActions());
+        assertEquals("ECC served", newAction.getValue().getAllActions());
+    }
+
+    @Test
+    void testCreateBfActionBfActionTypeItemHasValidUuid() {
+        caseData.setSendNotificationSubject(List.of(EMPLOYER_CONTRACT_CLAIM));
+        caseData.setSendNotificationEccQuestion(NOTICE_OF_EMPLOYER_CONTRACT_CLAIM);
+        caseData.setBfActions(null);
+        
+        sendNotificationService.createBfAction(caseData);
+        
+        BFActionTypeItem bfActionItem = caseData.getBfActions().getFirst();
+        assertNotNull(bfActionItem.getId());
+        assertTrue(bfActionItem.getId().matches(
+                "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"));
+    }
 }

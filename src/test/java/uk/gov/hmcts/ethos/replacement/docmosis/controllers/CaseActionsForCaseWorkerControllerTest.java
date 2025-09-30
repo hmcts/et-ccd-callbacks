@@ -108,9 +108,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     private static final String JURISDICTION_VALIDATION_URL = "/jurisdictionValidation";
     private static final String JUDGEMENT_VALIDATION_URL = "/judgmentValidation";
     private static final String DEPOSIT_VALIDATION_URL = "/depositValidation";
-    private static final String MID_RESPONDENT_ECC_URL = "/midRespondentECC";
-    private static final String CREATE_ECC_URL = "/createECC";
-    private static final String LINK_ORIGINAL_CASE_ECC_URL = "/linkOriginalCaseECC";
     private static final String SINGLE_CASE_MULTIPLE_MID_EVENT_VALIDATION_URL = "/singleCaseMultipleMidEventValidation";
     private static final String HEARING_MID_EVENT_VALIDATION_URL = "/hearingMidEventValidation";
     private static final String BF_ACTIONS_URL = "/bfActions";
@@ -764,57 +761,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
 
     @Test
     @SneakyThrows
-    void midRespondentECC() {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(caseManagementForCaseWorkerService.createECC(any(CaseDetails.class),
-                eq(AUTH_TOKEN), anyList(), anyString()))
-                .thenReturn(new CaseData());
-        mvc.perform(post(MID_RESPONDENT_ECC_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
-                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    @SneakyThrows
-    void createECC() {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(caseManagementForCaseWorkerService.createECC(any(CaseDetails.class),
-                eq(AUTH_TOKEN), anyList(), anyString()))
-                .thenReturn(new CaseData());
-        mvc.perform(post(CREATE_ECC_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
-                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    @SneakyThrows
-    void linkOriginalCaseECC() {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(caseManagementForCaseWorkerService.createECC(any(CaseDetails.class),
-                eq(AUTH_TOKEN), anyList(), anyString()))
-                .thenReturn(new CaseData());
-        mvc.perform(post(LINK_ORIGINAL_CASE_ECC_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
-                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    @SneakyThrows
     void singleCaseMultipleMidEventValidation() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mvc.perform(post(SINGLE_CASE_MULTIPLE_MID_EVENT_VALIDATION_URL)
@@ -1189,36 +1135,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     @SneakyThrows
     void depositValidationError400()  {
         mvc.perform(post(DEPOSIT_VALIDATION_URL)
-                .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @SneakyThrows
-    void midRespondentECCError400()  {
-        mvc.perform(post(MID_RESPONDENT_ECC_URL)
-                .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @SneakyThrows
-    void createECCError400()  {
-        mvc.perform(post(CREATE_ECC_URL)
-                .content("error")
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @SneakyThrows
-    void linkOriginalCaseECCError400()  {
-        mvc.perform(post(LINK_ORIGINAL_CASE_ECC_URL)
                 .content("error")
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
@@ -1707,39 +1623,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mvc.perform(post(MID_RESPONDENT_ADDRESS_URL)
                 .content(requestContent.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void midRespondentECCForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(MID_RESPONDENT_ECC_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void createECCForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(CREATE_ECC_URL)
-                .content(requestContent2.toString())
-                .header(AUTHORIZATION, AUTH_TOKEN)
-                .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
-    @SneakyThrows
-    void linkOriginalCaseECCForbidden()  {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mvc.perform(post(LINK_ORIGINAL_CASE_ECC_URL)
-                .content(requestContent2.toString())
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isForbidden());

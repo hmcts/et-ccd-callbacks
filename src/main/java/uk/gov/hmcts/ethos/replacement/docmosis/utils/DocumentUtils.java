@@ -147,8 +147,7 @@ public final class DocumentUtils {
                                                                   UploadedDocumentType uploadedDocumentType,
                                                                   String topLevel,
                                                                   String secondLevel,
-                                                                  String shortDescription,
-                                                                  String dateOfCorrespondence) {
+                                                                  String shortDescription) {
         if (documentTypeItems == null
                 || ObjectUtils.isEmpty(uploadedDocumentType)
                 || StringUtils.isBlank(topLevel)
@@ -159,9 +158,6 @@ public final class DocumentUtils {
                 uploadedDocumentType, topLevel, secondLevel);
         if (documentTypeItem != null && ObjectUtils.isNotEmpty(documentTypeItem.getValue())) {
             documentTypeItem.getValue().setShortDescription(shortDescription);
-            if (StringUtils.isNotBlank(dateOfCorrespondence)) {
-                documentTypeItem.getValue().setDateOfCorrespondence(dateOfCorrespondence);
-            }
             documentTypeItems.add(documentTypeItem);
         }
     }

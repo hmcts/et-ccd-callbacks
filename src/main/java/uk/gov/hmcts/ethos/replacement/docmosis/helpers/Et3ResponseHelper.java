@@ -29,7 +29,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ET3DocumentHelper.isET3NotificationDocumentTypeResponseAccepted;
 
 /**
- * ET3 Response Helper provides methods to help with the ET3 Response Form events.
+ * ET3 Response Helper provides methods to assist with the ET3 Response Form event.
  */
 @Slf4j
 public final class Et3ResponseHelper {
@@ -127,9 +127,6 @@ public final class Et3ResponseHelper {
     }
 
     private static boolean isAllowSubmit(RespondentSumType respondent) {
-        if (NO.equals(respondent.getResponseContinue())) {
-            return false;
-        }
         if (NO.equals(respondent.getResponseReceived())) {
             return true;
         }
@@ -251,7 +248,7 @@ public final class Et3ResponseHelper {
             // caseData.getEt3ResponseContactPreference())
             // replaced with representative.setRepresentativePreference(caseData.getEt3ResponseContactPreference())
             representative.setRepresentativePreference(caseData.getEt3ResponseContactPreference());
-            // There wasn't any mapping of reference for correspondence - representative.
+            // There weren't any mapping of reference for correspondence - representative.
             // mentioned in the ticket https://tools.hmcts.net/jira/browse/RET-5054
             // added this field to representative
             representative.setRepresentativeReference(caseData.getEt3ResponseReference());
@@ -312,7 +309,7 @@ public final class Et3ResponseHelper {
         String selectedRespondent = switch (eventId) {
             case ET3_RESPONSE -> caseData.getSubmitEt3Respondent().getSelectedLabel();
             case ET3_RESPONSE_DETAILS, ET3_RESPONSE_EMPLOYMENT_DETAILS -> caseData.getEt3RepresentingRespondent()
-                    .getFirst().getValue().getDynamicList().getSelectedLabel();
+                    .get(0).getValue().getDynamicList().getSelectedLabel();
 
             default -> throw new IllegalArgumentException(INVALID_EVENT_ID + eventId);
         };

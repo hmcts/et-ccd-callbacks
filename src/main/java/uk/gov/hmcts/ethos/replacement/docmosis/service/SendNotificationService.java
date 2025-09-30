@@ -383,7 +383,7 @@ public class SendNotificationService {
         boolean eccQuestionMatches =
                 NOTICE_OF_EMPLOYER_CONTRACT_CLAIM.equals(caseData.getSendNotificationEccQuestion());
         
-        if (!subjectContainsEcc && !eccQuestionMatches) {
+        if (!subjectContainsEcc || !eccQuestionMatches) {
             return;
         }
 

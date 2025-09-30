@@ -42,6 +42,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -202,7 +203,7 @@ public class CaseManagementForCaseWorkerService {
 
     private void respondentDefaults(CaseData caseData) {
         if (caseData.getRespondentCollection() != null && !caseData.getRespondentCollection().isEmpty()) {
-            RespondentSumType respondentSumType = caseData.getRespondentCollection().get(0).getValue();
+            RespondentSumType respondentSumType = caseData.getRespondentCollection().getFirst().getValue();
             caseData.setRespondent(nullCheck(respondentSumType.getRespondentName()));
             for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
                 checkExtensionRequired(respondentSumTypeItem);
@@ -278,7 +279,7 @@ public class CaseManagementForCaseWorkerService {
     }
 
     private void updateResponseReceivedCounter(List<RespondentSumTypeItem> respondentCollection) {
-        RespondentSumType firstRespondent = respondentCollection.get(0).getValue();
+        RespondentSumType firstRespondent = respondentCollection.getFirst().getValue();
         if (YES.equals(firstRespondent.getResponseReceived())) {
             firstRespondent.setResponseReceivedCount(
                     StringUtils.isBlank(firstRespondent.getResponseReceivedCount())
@@ -362,7 +363,7 @@ public class CaseManagementForCaseWorkerService {
         }
 
         String sourceCaseTypeId = caseRefAndCaseDataPair.getFirst();
-        SubmitEvent submitEvent = caseRefAndCaseDataPair.getSecond().get(0);
+        SubmitEvent submitEvent = caseRefAndCaseDataPair.getSecond().getFirst();
         log.info("SubmitEvent retrieved from ES for the update target case: {} with source case type of {}.",
                 submitEvent.getCaseId(), sourceCaseTypeId);
         String sourceCaseId = String.valueOf(submitEvent.getCaseId());
@@ -435,8 +436,8 @@ public class CaseManagementForCaseWorkerService {
         }
         caseData.getHearingCollection().forEach(hearingTypeItem -> {
             HearingType hearingType = hearingTypeItem.getValue();
-            if (isNotEmpty(hearingTypeItem.getValue().getHearingDateCollection())) {
-                hearingTypeItem.getValue().getHearingDateCollection().stream()
+            if (isNotEmpty(hearingType.getHearingDateCollection())) {
+                hearingType.getHearingDateCollection().stream()
                         .map(DateListedTypeItem::getValue)
                         .forEach(dateListedType -> {
                             if (dateListedType.getHearingStatus() == null) {
@@ -446,6 +447,12 @@ public class CaseManagementForCaseWorkerService {
                             }
                             populateHearingVenueFromHearingLevelToDayLevel(dateListedType, hearingType, caseTypeId);
                         });
+
+                hearingType.getHearingDateCollection().sort(
+                        Comparator.comparing(d -> parseListedDate(d.getValue().getListedDate()),
+                                Comparator.nullsLast(Comparator.naturalOrder())
+                        )
+                );
             }
         });
     }
@@ -511,6 +518,21 @@ public class CaseManagementForCaseWorkerService {
         }
     }
 
+    private static LocalDateTime parseListedDate(String listedDate) {
+        if (isNullOrEmpty(listedDate)) {
+            return null;
+        }
+        try {
+            return LocalDateTime.parse(listedDate, OLD_DATE_TIME_PATTERN);
+        } catch (Exception e) {
+            try {
+                return LocalDateTime.parse(listedDate);
+            } catch (Exception ex) {
+                return null;
+            }
+        }
+    }
+
     private void populateHearingVenueFromHearingLevelToDayLevel(DateListedType dateListedType,
                                                                 HearingType hearingType,
                                                                 String caseTypeId) {
@@ -562,7 +584,7 @@ public class CaseManagementForCaseWorkerService {
         CaseData currentCaseData = caseDetails.getCaseData();
         List<SubmitEvent> submitEvents = getCasesES(caseDetails, authToken);
         if (submitEvents != null && !submitEvents.isEmpty()) {
-            SubmitEvent submitEvent = submitEvents.get(0);
+            SubmitEvent submitEvent = submitEvents.getFirst();
             if (ECCHelper.validCaseForECC(submitEvent, errors)) {
                 switch (callback) {
                     case MID_EVENT_CALLBACK -> {
@@ -663,7 +685,7 @@ public class CaseManagementForCaseWorkerService {
             if (response == null) {
                 throw new CaseCreationException(errorMessage);
             }
-            log.info("Http status received from CCD supplementary update API; {}", response.getStatusCodeValue());
+            log.info("Http status received from CCD supplementary update API; {}", response.getStatusCode());
         } catch (RestClientResponseException e) {
             throw new CaseCreationException(String.format("%s with %s", errorMessage, e.getMessage()));
         }

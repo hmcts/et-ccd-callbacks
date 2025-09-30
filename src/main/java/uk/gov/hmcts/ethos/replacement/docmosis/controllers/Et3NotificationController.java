@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -156,7 +157,7 @@ public class Et3NotificationController {
     })
     public ResponseEntity<CCDCallbackResponse> aboutToSubmit(
             @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestHeader("Authorization") String userToken) throws JsonProcessingException {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>();
         ET3DocumentHelper.addOrRemoveET3Documents(caseData);

@@ -1,0 +1,10 @@
+CREATE INDEX IF NOT EXISTS IX_judge_tribunal_office ON judge(tribunal_office);
+CREATE INDEX IF NOT EXISTS IX_venue_tribunal_office ON venue(tribunal_office);
+CREATE INDEX IF NOT EXISTS IX_court_worker_tribunal_office ON court_worker(tribunal_office);
+CREATE INDEX IF NOT EXISTS IX_file_location_tribunal_office ON file_location(tribunal_office);
+CREATE INDEX IF NOT EXISTS IX_judge_code ON judge(code);
+CREATE INDEX IF NOT EXISTS IX_venue_code ON venue(code);
+CREATE INDEX IF NOT EXISTS IX_room_code ON room(code);
+CREATE INDEX IF NOT EXISTS IX_court_worker_code ON court_worker(code);
+CREATE INDEX IF NOT EXISTS IX_file_location_code ON file_location(code);
+CREATE INDEX IF NOT EXISTS IX_room_venue_code ON room(venue_code);

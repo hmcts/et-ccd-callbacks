@@ -83,12 +83,12 @@ public final class NocNotificationHelper {
         return personalisation;
     }
 
-    public static Map<String, String> buildRespondentPersonalisation(CaseDetails detail, RespondentSumType respondent) {
+    public static Map<String, String> buildNoCPersonalisation(CaseDetails detail, String partyName) {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
 
         CaseData caseData = detail.getCaseData();
         addCommonValues(caseData, personalisation);
-        personalisation.put("respondent_name", respondent.getRespondentName());
+        personalisation.put("respondent_name", partyName);
         personalisation.put("ccdId", detail.getCaseId());
         personalisation.put("date", "Not set");
 

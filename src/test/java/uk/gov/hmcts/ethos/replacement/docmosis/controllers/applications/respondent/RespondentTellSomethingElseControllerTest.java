@@ -32,7 +32,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
@@ -203,7 +202,7 @@ class RespondentTellSomethingElseControllerTest extends BaseControllerTest {
             .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
             .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        verify(resTseService).sendAcknowledgeEmail(ccdRequest.getCaseDetails(), AUTH_TOKEN);
+        verify(resTseService).sendEmails(ccdRequest.getCaseDetails(), AUTH_TOKEN);
         verify(tseService).createApplication(ccdRequest.getCaseDetails().getCaseData(), RESPONDENT_REP_TITLE);
     }
 

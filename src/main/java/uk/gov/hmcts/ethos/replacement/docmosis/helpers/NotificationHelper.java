@@ -17,7 +17,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
-
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.constants.PdfMapperConstants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
@@ -93,7 +92,7 @@ public final class NotificationHelper {
         return name.substring(name.lastIndexOf(' ') + 1);
     }
 
-    private static String getNameForClaimant(CaseData caseData) {
+    public static String getNameForClaimant(CaseData caseData) {
         RepresentedTypeC representativeClaimantType = caseData.getRepresentativeClaimantType();
 
         if (representativeClaimantType == null || representativeClaimantType.getNameOfRepresentative() == null) {

@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -16,6 +18,8 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
@@ -48,8 +52,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
@@ -61,6 +63,8 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -72,10 +76,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.CLAIMANT_REPRESENTATIVE_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.CLAIM_DETAILS_MISSING;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.ERROR_CASE_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.MULTIPLE_OPTION_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.ORGANISATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.TRIAGE_ERROR_MESSAGE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_CASE_DATA_NOT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS;
 import static uk.gov.hmcts.ethos.utils.CaseDataBuilder.createGenericAddress;
 
 @ExtendWith(SpringExtension.class)
@@ -117,11 +125,20 @@ class Et1ReppedControllerTest {
     private static final String VALIDATE_GROUNDS = "/et1Repped/validateGrounds";
     private static final String VALIDATE_HEARING_PREFERENCES = "/et1Repped/sectionOne/validateHearingPreferences";
     private static final String GENERATE_DOCUMENTS = "/et1Repped/generateDocuments";
+    private static final String ABOUT_TO_START_AMEND_CLAIMANT_REPRESENTATIVE_CONTACT =
+            "/et1Repped/aboutToStartAmendClaimantRepresentativeContact";
+    private static final String ABOUT_TO_SUBMIT_AMEND_CLAIMANT_REPRESENTATIVE_CONTACT =
+            "/et1Repped/aboutToSubmitAmendClaimantRepresentativeContact";
+    private static final String MID_EVENT_AMEND_CLAIMANT_REPRESENTATIVE_CONTACT =
+            "/et1Repped/midEventAmendClaimantRepresentativeContact";
 
     private static final String AUTH_TOKEN = "some-token";
     private CCDRequest ccdRequest;
     private CCDRequest ccdRequest2;
     private CaseData caseData;
+    private CCDRequest ccdRequestWithClaimantRepresentative;
+    private CCDRequest ccdRequestWithoutCaseData;
+    private CCDRequest ccdRequestWithoutClaimantRepresentative;
 
     @MockBean
     private VerifyTokenService verifyTokenService;
@@ -189,7 +206,7 @@ class Et1ReppedControllerTest {
     private CaseManagementLocationService caseManagementLocationService;
 
     @BeforeEach
-    void setUp() throws URISyntaxException, IOException {
+    void setUp() {
         caseData = new CaseData();
         caseData.setEt1ReppedSectionOne(NO);
         caseData.setEt1ReppedSectionTwo(NO);
@@ -205,9 +222,54 @@ class Et1ReppedControllerTest {
                 .withCaseData(caseData)
                 .build();
 
-        CaseDetails caseDetails = generateCaseDetails("et1ReppedDraftStillWorking.json");
+        CaseDetails caseDetails = generateCaseDetails();
         ccdRequest2 = CCDRequestBuilder.builder()
                 .withCaseData(caseDetails.getCaseData())
+                .withState(caseDetails.getState())
+                .withCaseTypeId(caseDetails.getCaseTypeId())
+                .withCaseId(caseDetails.getCaseId())
+                .build();
+
+        CaseData caseDataWithClaimantRepresentative = new CaseData();
+        caseDataWithClaimantRepresentative.setEt1ReppedSectionOne(NO);
+        caseDataWithClaimantRepresentative.setEt1ReppedSectionTwo(NO);
+        caseDataWithClaimantRepresentative.setEt1ReppedSectionThree(NO);
+        caseDataWithClaimantRepresentative.setClaimantFirstName("First");
+        caseDataWithClaimantRepresentative.setClaimantLastName("Last");
+        caseDataWithClaimantRepresentative.setRespondentType(ORGANISATION);
+        caseDataWithClaimantRepresentative.setRespondentOrganisationName("Org");
+        caseDataWithClaimantRepresentative.setRespondentAddress(createGenericAddress());
+        caseDataWithClaimantRepresentative.setClaimantRepresentedQuestion("Yes");
+        caseDataWithClaimantRepresentative.setRepresentativeClaimantType(
+                RepresentedTypeC.builder().representativeAddress(createGenericAddress())
+                        .representativePhoneNumber("07444518903").build());
+        ccdRequestWithClaimantRepresentative = CCDRequestBuilder.builder()
+                .withCaseData(caseDataWithClaimantRepresentative)
+                .withState(caseDetails.getState())
+                .withCaseTypeId(caseDetails.getCaseTypeId())
+                .withCaseId(caseDetails.getCaseId())
+                .build();
+
+        CaseData caseDataWithOutClaimantRepresentative = new CaseData();
+        caseDataWithOutClaimantRepresentative.setEt1ReppedSectionOne(NO);
+        caseDataWithOutClaimantRepresentative.setEt1ReppedSectionTwo(NO);
+        caseDataWithOutClaimantRepresentative.setEt1ReppedSectionThree(NO);
+        caseDataWithOutClaimantRepresentative.setClaimantFirstName("First");
+        caseDataWithOutClaimantRepresentative.setClaimantLastName("Last");
+        caseDataWithOutClaimantRepresentative.setRespondentType(ORGANISATION);
+        caseDataWithOutClaimantRepresentative.setRespondentOrganisationName("Org");
+        caseDataWithOutClaimantRepresentative.setRespondentAddress(createGenericAddress());
+        caseDataWithOutClaimantRepresentative.setClaimantRepresentedQuestion("Yes");
+        caseDataWithOutClaimantRepresentative.setRepresentativeClaimantType(null);
+        ccdRequestWithoutClaimantRepresentative = CCDRequestBuilder.builder()
+                .withCaseData(caseDataWithOutClaimantRepresentative)
+                .withState(caseDetails.getState())
+                .withCaseTypeId(caseDetails.getCaseTypeId())
+                .withCaseId(caseDetails.getCaseId())
+                .build();
+
+        ccdRequestWithoutCaseData = CCDRequestBuilder.builder()
+                .withCaseData(null)
                 .withState(caseDetails.getState())
                 .withCaseTypeId(caseDetails.getCaseTypeId())
                 .withCaseId(caseDetails.getCaseId())
@@ -223,7 +285,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void validatePostcode() throws Exception {
+    @SneakyThrows
+    void validatePostcode() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(et1ReppedService.validatePostcode(any(), anyString())).thenReturn(Collections.emptyList());
         mockMvc.perform(post(VALIDATE_POSTCODE)
@@ -238,7 +301,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void validatePostcode_badToken() throws Exception {
+    @SneakyThrows
+    void validatePostcode_badToken() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(VALIDATE_POSTCODE)
                         .contentType(APPLICATION_JSON)
@@ -249,7 +313,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void officeError() throws Exception {
+    @SneakyThrows
+    void officeError() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(OFFICE_ERROR)
                         .contentType(APPLICATION_JSON)
@@ -263,7 +328,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void officeError_badToken() throws Exception {
+    @SneakyThrows
+    void officeError_badToken() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(OFFICE_ERROR)
                         .contentType(APPLICATION_JSON)
@@ -273,7 +339,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void aboutToSubmit() throws Exception {
+    @SneakyThrows
+    void aboutToSubmit() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(CREATE_CASE_ABOUT_TO_SUBMIT)
                         .contentType(APPLICATION_JSON)
@@ -286,7 +353,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void aboutToSubmit_Error() throws Exception {
+    @SneakyThrows
+    void aboutToSubmit_Error() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(CREATE_CASE_ABOUT_TO_SUBMIT)
                         .contentType(APPLICATION_JSON)
@@ -296,7 +364,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void validateClaimantSex() throws Exception {
+    @SneakyThrows
+    void validateClaimantSex() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(VALIDATE_CLAIMANT_SEX)
                         .contentType(APPLICATION_JSON)
@@ -309,7 +378,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void validateClaimantSex_badToken() throws Exception {
+    @SneakyThrows
+    void validateClaimantSex_badToken() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(VALIDATE_CLAIMANT_SEX)
                         .contentType(APPLICATION_JSON)
@@ -319,7 +389,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void validateClaimantSupport() throws Exception {
+    @SneakyThrows
+    void validateClaimantSupport() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(VALIDATE_CLAIMANT_SUPPORT)
                         .contentType(APPLICATION_JSON)
@@ -332,7 +403,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void validateClaimantSupport_shouldReturnErrors() throws Exception {
+    @SneakyThrows
+    void validateClaimantSupport_shouldReturnErrors() {
         caseData.setClaimantSupportQuestion(List.of("Yes", "No"));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(VALIDATE_CLAIMANT_SUPPORT)
@@ -347,7 +419,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void validateClaimantSupport_badToken() throws Exception {
+    @SneakyThrows
+    void validateClaimantSupport_badToken() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(VALIDATE_CLAIMANT_SUPPORT)
                         .contentType(APPLICATION_JSON)
@@ -357,7 +430,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void validateRepresentativeInformation() throws Exception {
+    @SneakyThrows
+    void validateRepresentativeInformation() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(VALIDATE_REPRESENTATIVE_INFORMATION)
                         .contentType(APPLICATION_JSON)
@@ -370,7 +444,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void validateRepresentativeInformation_badToken() throws Exception {
+    @SneakyThrows
+    void validateRepresentativeInformation_badToken() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(VALIDATE_REPRESENTATIVE_INFORMATION)
                         .contentType(APPLICATION_JSON)
@@ -381,7 +456,8 @@ class Et1ReppedControllerTest {
 
     @ParameterizedTest
     @CsvSource({"et1SectionOne", "et1SectionTwo", "et1SectionThree"})
-    void aboutToSubmitSection(String eventId) throws Exception {
+    @SneakyThrows
+    void aboutToSubmitSection(String eventId) {
         ccdRequest.setEventId(eventId);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_SECTION)
@@ -396,7 +472,8 @@ class Et1ReppedControllerTest {
 
     @ParameterizedTest
     @CsvSource({"et1SectionOne", "et1SectionTwo", "et1SectionThree"})
-    void aboutToSubmitSection_badToken(String eventId) throws Exception {
+    @SneakyThrows
+    void aboutToSubmitSection_badToken(String eventId) {
         ccdRequest.setEventId(eventId);
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(ABOUT_TO_SUBMIT_SECTION)
@@ -407,7 +484,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void validateClaimantWorked() throws Exception {
+    @SneakyThrows
+    void validateClaimantWorked() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(VALIDATE_CLAIMANT_WORKED)
                         .contentType(APPLICATION_JSON)
@@ -420,7 +498,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void validateClaimantWorked_badToken() throws Exception {
+    @SneakyThrows
+    void validateClaimantWorked_badToken() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(VALIDATE_CLAIMANT_WORKED)
                         .contentType(APPLICATION_JSON)
@@ -430,7 +509,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void validateClaimantWorking() throws Exception {
+    @SneakyThrows
+    void validateClaimantWorking() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(VALIDATE_CLAIMANT_WORKING)
                         .contentType(APPLICATION_JSON)
@@ -443,7 +523,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void validateClaimantWorking_badToken() throws Exception {
+    @SneakyThrows
+    void validateClaimantWorking_badToken() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(VALIDATE_CLAIMANT_WORKING)
                         .contentType(APPLICATION_JSON)
@@ -453,7 +534,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void validateClaimantWrittenNoticePeriod() throws Exception {
+    @SneakyThrows
+    void validateClaimantWrittenNoticePeriod() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(VALIDATE_CLAIMANT_WRITTEN_NOTICE_PERIOD)
                         .contentType(APPLICATION_JSON)
@@ -466,7 +548,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void validateClaimantWrittenNoticePeriod_badToken() throws Exception {
+    @SneakyThrows
+    void validateClaimantWrittenNoticePeriod_badToken() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(VALIDATE_CLAIMANT_WRITTEN_NOTICE_PERIOD)
                         .contentType(APPLICATION_JSON)
@@ -476,7 +559,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void validateClaimantWorkingNoticePeriod() throws Exception {
+    @SneakyThrows
+    void validateClaimantWorkingNoticePeriod() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(VALIDATE_CLAIMANT_WORKING_NOTICE_PERIOD)
                         .contentType(APPLICATION_JSON)
@@ -489,7 +573,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void validateClaimantWorkingNoticePeriod_badToken() throws Exception {
+    @SneakyThrows
+    void validateClaimantWorkingNoticePeriod_badToken() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(VALIDATE_CLAIMANT_WORKING_NOTICE_PERIOD)
                         .contentType(APPLICATION_JSON)
@@ -499,7 +584,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void validateClaimantNoLongerWorking() throws Exception {
+    @SneakyThrows
+    void validateClaimantNoLongerWorking() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(VALIDATE_CLAIMANT_NO_LONGER_WORKING)
                         .contentType(APPLICATION_JSON)
@@ -512,7 +598,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void validateClaimantNoLongerWorking_badToken() throws Exception {
+    @SneakyThrows
+    void validateClaimantNoLongerWorking_badToken() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(VALIDATE_CLAIMANT_NO_LONGER_WORKING)
                         .contentType(APPLICATION_JSON)
@@ -522,7 +609,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void validateClaimantPay() throws Exception {
+    @SneakyThrows
+    void validateClaimantPay() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(VALIDATE_CLAIMANT_PAY)
                         .contentType(APPLICATION_JSON)
@@ -535,7 +623,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void validateClaimantPay_multipleOptions() throws Exception {
+    @SneakyThrows
+    void validateClaimantPay_multipleOptions() {
         caseData.setClaimantPayType(List.of("Weekly", "Monthly"));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(VALIDATE_CLAIMANT_PAY)
@@ -549,7 +638,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void validateClaimantPay_badToken() throws Exception {
+    @SneakyThrows
+    void validateClaimantPay_badToken() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(VALIDATE_CLAIMANT_PAY)
                         .contentType(APPLICATION_JSON)
@@ -559,7 +649,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void validateClaimantPensionBenefits() throws Exception {
+    @SneakyThrows
+    void validateClaimantPensionBenefits() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(VALIDATE_CLAIMANT_PENSION_BENEFITS)
                         .contentType(APPLICATION_JSON)
@@ -572,7 +663,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void validateClaimantPensionBenefits_multipleOptions() throws Exception {
+    @SneakyThrows
+    void validateClaimantPensionBenefits_multipleOptions() {
         caseData.setClaimantPensionContribution(List.of("Yes", "No"));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(VALIDATE_CLAIMANT_PENSION_BENEFITS)
@@ -586,7 +678,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void validateClaimantPensionBenefits_badToken() throws Exception {
+    @SneakyThrows
+    void validateClaimantPensionBenefits_badToken() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(VALIDATE_CLAIMANT_PENSION_BENEFITS)
                         .contentType(APPLICATION_JSON)
@@ -596,7 +689,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void validateClaimantNewJob() throws Exception {
+    @SneakyThrows
+    void validateClaimantNewJob() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(VALIDATE_CLAIMANT_NEW_JOB)
                         .contentType(APPLICATION_JSON)
@@ -609,7 +703,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void validateClaimantNewJob_multipleOptions() throws Exception {
+    @SneakyThrows
+    void validateClaimantNewJob_multipleOptions() {
         caseData.setClaimantNewJob(List.of("Yes", "No"));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(VALIDATE_CLAIMANT_NEW_JOB)
@@ -623,7 +718,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void validateClaimantNewJob_badToken() throws Exception {
+    @SneakyThrows
+    void validateClaimantNewJob_badToken() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(VALIDATE_CLAIMANT_NEW_JOB)
                         .contentType(APPLICATION_JSON)
@@ -633,7 +729,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void validateClaimantNewJobPay() throws Exception {
+    @SneakyThrows
+    void validateClaimantNewJobPay() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(VALIDATE_CLAIMANT_NEW_JOB_PAY)
                         .contentType(APPLICATION_JSON)
@@ -646,7 +743,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void validateClaimantNewJobPay_badToken() throws Exception {
+    @SneakyThrows
+    void validateClaimantNewJobPay_badToken() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(VALIDATE_CLAIMANT_NEW_JOB_PAY)
                         .contentType(APPLICATION_JSON)
@@ -656,7 +754,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void generateRespondentPreamble() throws Exception {
+    @SneakyThrows
+    void generateRespondentPreamble() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(GENERATE_RESPONDENT_PREAMBLE)
                         .contentType(APPLICATION_JSON)
@@ -669,7 +768,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void generateRespondentPreamble_badToken() throws Exception {
+    @SneakyThrows
+    void generateRespondentPreamble_badToken() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(GENERATE_RESPONDENT_PREAMBLE)
                         .contentType(APPLICATION_JSON)
@@ -679,7 +779,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void generateWorkAddressLabel() throws Exception {
+    @SneakyThrows
+    void generateWorkAddressLabel() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(GENERATE_WORK_ADDRESS_LABEL)
                         .contentType(APPLICATION_JSON)
@@ -692,7 +793,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void generateWorkAddressLabel_badToken() throws Exception {
+    @SneakyThrows
+    void generateWorkAddressLabel_badToken() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(GENERATE_WORK_ADDRESS_LABEL)
                         .contentType(APPLICATION_JSON)
@@ -702,7 +804,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void sectionCompleted() throws Exception {
+    @SneakyThrows
+    void sectionCompleted() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(SECTION_COMPLETED)
                         .contentType(APPLICATION_JSON)
@@ -715,7 +818,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void sectionCompleted_badToken() throws Exception {
+    @SneakyThrows
+    void sectionCompleted_badToken() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(SECTION_COMPLETED)
                         .contentType(APPLICATION_JSON)
@@ -725,7 +829,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void validateWhistleblowing() throws Exception {
+    @SneakyThrows
+    void validateWhistleblowing() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(VALIDATE_WHISTLEBLOWING)
                         .contentType(APPLICATION_JSON)
@@ -738,7 +843,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void validateLinkedCases() throws Exception {
+    @SneakyThrows
+    void validateLinkedCases() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(VALIDATE_LINKED_CASES)
                         .contentType(APPLICATION_JSON)
@@ -751,7 +857,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void createCaseSubmitted() throws Exception {
+    @SneakyThrows
+    void createCaseSubmitted() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(CREATE_CASE_SUBMITTED)
                         .contentType(APPLICATION_JSON)
@@ -764,7 +871,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void createDraftEt1Submitted() throws Exception {
+    @SneakyThrows
+    void createDraftEt1Submitted() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(CREATE_DRAFT_ET1_SUBMITTED)
                         .contentType(APPLICATION_JSON)
@@ -777,7 +885,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void createDraftEt1() throws Exception {
+    @SneakyThrows
+    void createDraftEt1() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(CREATE_DRAFT_ET1)
                         .contentType(APPLICATION_JSON)
@@ -790,7 +899,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void submitted() throws Exception {
+    @SneakyThrows
+    void submitted() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(CLAIM_SUBMITTED)
                         .contentType(APPLICATION_JSON)
@@ -803,7 +913,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void submitClaim() throws Exception {
+    @SneakyThrows
+    void submitClaim() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
         mockMvc.perform(post(SUBMIT_CLAIM)
@@ -817,7 +928,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void submitClaim_toggleOn() throws Exception {
+    @SneakyThrows
+    void submitClaim_toggleOn() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(featureToggleService.isEt1DocGenEnabled()).thenReturn(true);
         mockMvc.perform(post(SUBMIT_CLAIM)
@@ -830,15 +942,17 @@ class Et1ReppedControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
-    private CaseDetails generateCaseDetails(String jsonFileName) throws URISyntaxException, IOException {
+    @SneakyThrows
+    private CaseDetails generateCaseDetails() {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
-                .getContextClassLoader().getResource(jsonFileName)).toURI())));
+                .getContextClassLoader().getResource("et1ReppedDraftStillWorking.json")).toURI())));
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(json, CaseDetails.class);
     }
 
     @Test
-    void submitClaimAboutToStart() throws Exception {
+    @SneakyThrows
+    void submitClaimAboutToStart() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
         mockMvc.perform(post(SUBMIT_CLAIM_ABOUT_TO_START)
@@ -853,7 +967,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void submitClaimAboutToStartErrors() throws Exception {
+    @SneakyThrows
+    void submitClaimAboutToStartErrors() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         ccdRequest2.getCaseDetails().getCaseData().setEt1ReppedSectionTwo(NO);
         mockMvc.perform(post(SUBMIT_CLAIM_ABOUT_TO_START)
@@ -868,7 +983,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void validateGrounds() throws Exception {
+    @SneakyThrows
+    void validateGrounds() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         ccdRequest2.getCaseDetails().getCaseData().setEt1SectionThreeClaimDetails("Grounds");
         mockMvc.perform(post(VALIDATE_GROUNDS)
@@ -882,7 +998,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void validateGroundsError() throws Exception {
+    @SneakyThrows
+    void validateGroundsError() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         ccdRequest2.getCaseDetails().getCaseData().setEt1SectionThreeClaimDetails(null);
         ccdRequest2.getCaseDetails().getCaseData().setEt1SectionThreeDocumentUpload(null);
@@ -898,7 +1015,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void validateHearingPreferences() throws Exception {
+    @SneakyThrows
+    void validateHearingPreferences() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
         mockMvc.perform(post(VALIDATE_HEARING_PREFERENCES)
@@ -913,7 +1031,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void generateDocuments_toggleFalse() throws Exception {
+    @SneakyThrows
+    void generateDocuments_toggleFalse() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
 
         mockMvc.perform(post(GENERATE_DOCUMENTS)
@@ -927,7 +1046,8 @@ class Et1ReppedControllerTest {
     }
 
     @Test
-    void generateDocuments_toggleOn() throws Exception {
+    @SneakyThrows
+    void generateDocuments_toggleOn() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(featureToggleService.isEt1DocGenEnabled()).thenReturn(true);
         mockMvc.perform(post(GENERATE_DOCUMENTS)
@@ -937,6 +1057,139 @@ class Et1ReppedControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    @SneakyThrows
+    void theAboutToStartAmendClaimantRepresentativeContact() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(ABOUT_TO_START_AMEND_CLAIMANT_REPRESENTATIVE_CONTACT)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequestWithClaimantRepresentative)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath("$.errors.size()", is(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        // When there is no representative should have any claimant representative missing error and have data
+        mockMvc.perform(post(ABOUT_TO_START_AMEND_CLAIMANT_REPRESENTATIVE_CONTACT)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequestWithoutClaimantRepresentative)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath("$.errors[0]", is(CLAIMANT_REPRESENTATIVE_NOT_FOUND)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        // When there is no case data should have any claim missing error and have no data
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(ABOUT_TO_START_AMEND_CLAIMANT_REPRESENTATIVE_CONTACT)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequestWithoutCaseData)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, nullValue()))
+                .andExpect(jsonPath("$.errors[0]", is(ERROR_CASE_NOT_FOUND)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+    }
+
+    @Test
+    @SneakyThrows
+    void theMidEventAmendClaimantRepresentativeContact() {
+        // when representative contact change option is not set
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(MID_EVENT_AMEND_CLAIMANT_REPRESENTATIVE_CONTACT)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequestWithClaimantRepresentative)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath("$.errors.size()", is(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        // when representative contact change option is set to use my hmcts details
+        ccdRequestWithClaimantRepresentative.getCaseDetails().getCaseData().setRepresentativeContactChangeOption(
+                REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS
+        );
+        doNothing().when(et1ReppedService).setMyHmctsOrganisationAddress(AUTH_TOKEN,
+                ccdRequestWithClaimantRepresentative.getCaseDetails().getCaseData());
+        mockMvc.perform(post(MID_EVENT_AMEND_CLAIMANT_REPRESENTATIVE_CONTACT)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequestWithClaimantRepresentative)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath("$.errors.size()", is(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+        ccdRequestWithClaimantRepresentative.getCaseDetails().getCaseData().setRepresentativeContactChangeOption(null);
+    }
+
+    @Test
+    @SneakyThrows
+    void theMidEventAmendClaimantRepresentativeContact_ThrowsException() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        ccdRequestWithClaimantRepresentative.getCaseDetails().getCaseData().setRepresentativeContactChangeOption(
+                REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS
+        );
+        doThrow(new GenericServiceException(ERROR_CASE_DATA_NOT_FOUND,
+                new Exception(ERROR_CASE_DATA_NOT_FOUND),
+                ERROR_CASE_DATA_NOT_FOUND,
+                StringUtils.EMPTY,
+                "Et1ReppedService",
+                "checkCaseData")).when(et1ReppedService)
+                .setMyHmctsOrganisationAddress(AUTH_TOKEN,
+                        ccdRequestWithClaimantRepresentative.getCaseDetails().getCaseData());
+        mockMvc.perform(post(MID_EVENT_AMEND_CLAIMANT_REPRESENTATIVE_CONTACT)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequestWithClaimantRepresentative)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath("$.errors.size()", is(1)))
+                .andExpect(jsonPath("$.errors[0]", is(ERROR_CASE_DATA_NOT_FOUND)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+        ccdRequestWithClaimantRepresentative.getCaseDetails().getCaseData().setRepresentativeContactChangeOption(null);
+    }
+
+    @Test
+    @SneakyThrows
+    void theAboutToSubmitAmendClaimantRepresentativeContact() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        doNothing().when(et1ReppedService).setClaimantRepresentativeValues(AUTH_TOKEN,
+                ccdRequestWithClaimantRepresentative.getCaseDetails().getCaseData());
+        mockMvc.perform(post(ABOUT_TO_SUBMIT_AMEND_CLAIMANT_REPRESENTATIVE_CONTACT)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequestWithClaimantRepresentative)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath("$.errors.size()", is(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    @SneakyThrows
+    void theAboutToSubmitAmendClaimantRepresentativeContact_ThrowsException() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        doThrow(new GenericServiceException(ERROR_CASE_DATA_NOT_FOUND,
+                new Exception(ERROR_CASE_DATA_NOT_FOUND),
+                ERROR_CASE_DATA_NOT_FOUND,
+                StringUtils.EMPTY,
+                "Et3ResponseService",
+                "setRespondentRepresentsContactDetails")).when(et1ReppedService)
+                .setClaimantRepresentativeValues(AUTH_TOKEN,
+                        ccdRequestWithClaimantRepresentative.getCaseDetails().getCaseData());
+        mockMvc.perform(post(ABOUT_TO_SUBMIT_AMEND_CLAIMANT_REPRESENTATIVE_CONTACT)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequestWithClaimantRepresentative)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath("$.errors.size()", is(1)))
+                .andExpect(jsonPath("$.errors[0]", is(ERROR_CASE_DATA_NOT_FOUND)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 }

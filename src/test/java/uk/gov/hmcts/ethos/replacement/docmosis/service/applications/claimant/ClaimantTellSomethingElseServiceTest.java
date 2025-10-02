@@ -20,6 +20,7 @@ import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
@@ -33,9 +34,12 @@ import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.applications.ClaimantTellSomethingElseHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseAccessService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
@@ -50,13 +54,13 @@ import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.stream.Stream;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -113,9 +117,12 @@ class ClaimantTellSomethingElseServiceTest {
     private TribunalOfficesService tribunalOfficesService;
     @Mock
     private FeatureToggleService featureToggleService;
+    @MockBean
+    private CaseAccessService caseAccessService;
+    @MockBean
+    private EmailNotificationService emailNotificationService;
     @Captor
     ArgumentCaptor<Map<String, Object>> personalisationCaptor;
-    private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String I_DO_WANT_TO_COPY = "I do want to copy";
     private static final String TEMPLATE_ID_NO = "NoTemplateId";
     private static final String TEMPLATE_ID_A = "TypeATemplateId";
@@ -176,7 +183,8 @@ class ClaimantTellSomethingElseServiceTest {
         emailService = spy(new EmailUtils());
         claimantTellSomethingElseService =
                 new ClaimantTellSomethingElseService(documentManagementService, tornadoService,
-                        userIdamService, emailService, featureToggleService, tribunalOfficesService);
+                        userIdamService, emailService, featureToggleService, tribunalOfficesService, caseAccessService,
+                        emailNotificationService);
 
         ReflectionTestUtils.setField(claimantTellSomethingElseService,
                 "tseClaimantRepAcknowledgeNoTemplateId", TEMPLATE_ID_NO);
@@ -435,10 +443,20 @@ class ClaimantTellSomethingElseServiceTest {
         caseDetails.setCaseData(caseData);
         caseDetails.setCaseId(CASE_ID);
 
+        CaseUserAssignment mockAssignment = CaseUserAssignment
+                .builder()
+                .userId("claimantSolicitorUserId")
+                .caseRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())
+                .build();
+
+        when(caseAccessService.getCaseUserAssignmentsById(anyString())).thenReturn(
+                List.of(mockAssignment));
+        when(emailNotificationService.getCaseClaimantSolicitorEmails(List.of(mockAssignment)))
+                .thenReturn(List.of(LEGAL_REP_EMAIL));
+
+        claimantTellSomethingElseService.sendAcknowledgementEmail(caseDetails, List.of(mockAssignment));
+
         Map<String, String> expectedPersonalisation = createEmailContent(caseData, selectedApplication);
-
-        claimantTellSomethingElseService.sendAcknowledgementEmail(caseDetails, AUTH_TOKEN);
-
         verify(emailService).sendEmail(expectedTemplateId, LEGAL_REP_EMAIL, expectedPersonalisation);
     }
 
@@ -478,10 +496,20 @@ class ClaimantTellSomethingElseServiceTest {
         caseDetails.setCaseData(caseData);
         caseDetails.setCaseId(CASE_ID);
 
+        CaseUserAssignment mockAssignment = CaseUserAssignment
+                .builder()
+                .userId("claimantSolicitorUserId")
+                .caseRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())
+                .build();
+
+        when(caseAccessService.getCaseUserAssignmentsById(anyString())).thenReturn(
+                List.of(mockAssignment));
+        when(emailNotificationService.getCaseClaimantSolicitorEmails(any()))
+                .thenReturn(List.of(LEGAL_REP_EMAIL));
+
+        claimantTellSomethingElseService.sendAcknowledgementEmail(caseDetails, List.of(mockAssignment));
+
         Map<String, String> expectedPersonalisation = createEmailContentTypeC(caseData);
-
-        claimantTellSomethingElseService.sendAcknowledgementEmail(caseDetails, AUTH_TOKEN);
-
         verify(emailService).sendEmail(TEMPLATE_ID_C, LEGAL_REP_EMAIL, expectedPersonalisation);
     }
 
@@ -587,7 +615,15 @@ class ClaimantTellSomethingElseServiceTest {
         caseDetails.setCaseId(CASE_ID);
 
         when(tornadoService.generateEventDocumentBytes(any(), any(), any())).thenReturn(new byte[] {});
-        claimantTellSomethingElseService.sendRespondentsEmail(caseDetails);
+        when(emailNotificationService.getRespondentsAndRepsEmailAddresses(any(), any()))
+                .thenReturn(Map.of("respSolicitor@test.com", ""));
+        CaseUserAssignment mockAssignment = CaseUserAssignment
+                .builder()
+                .userId("respSolicitorUserId")
+                .caseRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())
+                .build();
+
+        claimantTellSomethingElseService.sendRespondentsEmail(caseDetails, List.of(mockAssignment));
         verify(emailService).sendEmail(eq(TEMPLATE_ID_A), any(), personalisationCaptor.capture());
         Map<String, Object> personalisation = personalisationCaptor.getValue();
 
@@ -609,7 +645,23 @@ class ClaimantTellSomethingElseServiceTest {
         caseDetails.setCaseId(CASE_ID);
 
         when(tornadoService.generateEventDocumentBytes(any(), any(), any())).thenReturn(new byte[] {});
-        claimantTellSomethingElseService.sendRespondentsEmail(caseDetails);
+        CaseUserAssignment assignment1 = CaseUserAssignment.builder()
+                .userId("claimantSolicitorUserId")
+                .caseRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())
+                .build();
+
+        CaseUserAssignment assignment2 = CaseUserAssignment.builder()
+                .userId("sharedListUserId")
+                .caseRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())
+                .build();
+
+        CaseUserAssignment assignment3 = CaseUserAssignment.builder()
+                .userId("sharedListUserId2")
+                .caseRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())
+                .build();
+
+        List<CaseUserAssignment> assignments = List.of(assignment1, assignment2, assignment3);
+        claimantTellSomethingElseService.sendRespondentsEmail(caseDetails, assignments);
         assertThat(caseData.getClaimantTseSelectApplication(), is(CLAIMANT_TSE_ORDER_A_WITNESS_TO_ATTEND));
     }
 
@@ -634,8 +686,22 @@ class ClaimantTellSomethingElseServiceTest {
 
         when(featureToggleService.isWelshEnabled()).thenReturn(true);
         when(tornadoService.generateEventDocumentBytes(any(), any(), any())).thenReturn(new byte[]{});
-        claimantTellSomethingElseService.sendRespondentsEmail(caseDetails);
-        verify(emailService).sendEmail(eq(TEMPLATE_ID_A_CY), any(), personalisationCaptor.capture());
+
+        Map<String, String> emailAddresses = new HashMap<>();
+        emailAddresses.put("repSolicitor@test.com", "");
+        emailAddresses.put("sharedListUser@test.com", "");
+        emailAddresses.put("sharedListUser2@test.com", "");
+        when(emailNotificationService.getRespondentsAndRepsEmailAddresses(any(), any()))
+                .thenReturn(emailAddresses);
+        CaseUserAssignment mockAssignment = CaseUserAssignment
+                .builder()
+                .userId("respSolicitorUserId")
+                .caseRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())
+                .build();
+        claimantTellSomethingElseService.sendRespondentsEmail(caseDetails, List.of(mockAssignment));
+
+        verify(emailService, times(3)).sendEmail(eq(TEMPLATE_ID_A_CY), any(),
+                personalisationCaptor.capture());
         Map<String, Object> personalisation = personalisationCaptor.getValue();
 
         String expectedDueDate = UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 7);
@@ -675,7 +741,15 @@ class ClaimantTellSomethingElseServiceTest {
         caseDetails.setCaseId(CASE_ID);
 
         when(tornadoService.generateEventDocumentBytes(any(), any(), any())).thenReturn(new byte[] {});
-        claimantTellSomethingElseService.sendRespondentsEmail(caseDetails);
+        when(emailNotificationService.getRespondentsAndRepsEmailAddresses(any(), any()))
+                .thenReturn(Map.of("respSolicitor@test.com", ""));
+        CaseUserAssignment mockAssignment = CaseUserAssignment
+                .builder()
+                .userId("respSolicitorUserId")
+                .caseRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())
+                .build();
+
+        claimantTellSomethingElseService.sendRespondentsEmail(caseDetails, List.of(mockAssignment));
         verify(emailService).sendEmail(eq(TEMPLATE_ID_B), any(), personalisationCaptor.capture());
         Map<String, Object> personalisation = personalisationCaptor.getValue();
 
@@ -707,7 +781,15 @@ class ClaimantTellSomethingElseServiceTest {
 
         when(featureToggleService.isWelshEnabled()).thenReturn(true);
         when(tornadoService.generateEventDocumentBytes(any(), any(), any())).thenReturn(new byte[]{});
-        claimantTellSomethingElseService.sendRespondentsEmail(caseDetails);
+        when(emailNotificationService.getRespondentsAndRepsEmailAddresses(any(), any()))
+                .thenReturn(Map.of("respSolicitor@test.com", ""));
+        CaseUserAssignment mockAssignment = CaseUserAssignment
+                .builder()
+                .userId("respSolicitorUserId")
+                .caseRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())
+                .build();
+
+        claimantTellSomethingElseService.sendRespondentsEmail(caseDetails, List.of(mockAssignment));
         verify(emailService).sendEmail(eq(TEMPLATE_ID_B_CY), any(), personalisationCaptor.capture());
         Map<String, Object> personalisation = personalisationCaptor.getValue();
 

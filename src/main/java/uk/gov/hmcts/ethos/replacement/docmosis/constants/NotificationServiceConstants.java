@@ -28,6 +28,7 @@ public final class NotificationServiceConstants {
     public static final String ENGLISH_LANGUAGE = "English";
     public static final String EMAIL_ADDRESS = "emailAddress";
     public static final String NAME = "name";
+    public static final String APPLICANT_NAME = "applicantName";
 
     private NotificationServiceConstants() {
         // restrict instantiation

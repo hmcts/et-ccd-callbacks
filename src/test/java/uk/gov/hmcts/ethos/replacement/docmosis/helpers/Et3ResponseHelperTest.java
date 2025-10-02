@@ -134,7 +134,7 @@ class Et3ResponseHelperTest {
         List<String> errors = Et3ResponseHelper.validateEmploymentDates(caseData);
 
         assertThat(errors.size(), is(2));
-        assertThat(errors.get(0), is(START_DATE_MUST_BE_IN_THE_PAST));
+        assertThat(errors.getFirst(), is(START_DATE_MUST_BE_IN_THE_PAST));
         assertThat(errors.get(1), is(END_DATE_MUST_BE_AFTER_THE_START_DATE));
     }
 
@@ -193,6 +193,23 @@ class Et3ResponseHelperTest {
     }
 
     @Test
+    void createDynamicListSelection_responseContinueNo_returnsNoRespondentsRequireEt3() {
+        caseData.getRespondentCollection().getFirst().getValue().setResponseContinue(NO);
+        List<String> errors = Et3ResponseHelper.createDynamicListSelection(caseData);
+        assertThat(errors, hasSize(1));
+        assertThat(errors.getFirst()).isEqualTo("There are no respondents that require an ET3");
+    }
+
+    @Test
+    void createDynamicListSelection_responseContinueYes_allowsSubmissionChoice() {
+        caseData.getRespondentCollection().getFirst().getValue().setResponseContinue(YES);
+        caseData.getRespondentCollection().getFirst().getValue().setResponseReceived(NO);
+        List<String> errors = Et3ResponseHelper.createDynamicListSelection(caseData);
+        assertThat(errors).isEmpty();
+        assertThat(caseData.getEt3RepresentingRespondent(), hasSize(1));
+    }
+
+    @Test
     void createEt3SubmitRespondents_allSectionsCompleted() {
         caseData.getRespondentCollection().getFirst().getValue().setPersonalDetailsSection(YES);
         caseData.getRespondentCollection().getFirst().getValue().setClaimDetailsSection(YES);
@@ -200,6 +217,17 @@ class Et3ResponseHelperTest {
         List<String> errors = Et3ResponseHelper.et3SubmitRespondents(caseData);
         assertThat(errors).isEmpty();
         assertThat(caseData.getSubmitEt3Respondent()).isNotNull();
+    }
+
+    @Test
+    void et3SubmitRespondents_allSectionsCompleted_butResponseContinueNo_returnsError() {
+        caseData.getRespondentCollection().getFirst().getValue().setPersonalDetailsSection(YES);
+        caseData.getRespondentCollection().getFirst().getValue().setClaimDetailsSection(YES);
+        caseData.getRespondentCollection().getFirst().getValue().setEmploymentDetailsSection(YES);
+        caseData.getRespondentCollection().getFirst().getValue().setResponseContinue(NO);
+        List<String> errors = Et3ResponseHelper.et3SubmitRespondents(caseData);
+        assertThat(errors, hasSize(1));
+        assertThat(errors.getFirst()).isEqualTo(ALL_RESPONDENTS_INCOMPLETE_SECTIONS);
     }
 
     @Test

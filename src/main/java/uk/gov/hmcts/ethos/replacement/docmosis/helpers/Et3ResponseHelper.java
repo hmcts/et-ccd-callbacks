@@ -30,7 +30,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ET3DocumentHelper.isET3NotificationDocumentTypeResponseAccepted;
 
 /**
- * ET3 Response Helper provides methods to assist with the ET3 Response Form event.
+ * ET3 Response Helper provides methods to help with the ET3 Response Form events.
  */
 @Slf4j
 public final class Et3ResponseHelper {
@@ -128,6 +128,9 @@ public final class Et3ResponseHelper {
     }
 
     private static boolean isAllowSubmit(RespondentSumType respondent) {
+        if (NO.equals(respondent.getResponseContinue())) {
+            return false;
+        }
         if (NO.equals(respondent.getResponseReceived())) {
             return true;
         }
@@ -249,7 +252,7 @@ public final class Et3ResponseHelper {
             // caseData.getEt3ResponseContactPreference())
             // replaced with representative.setRepresentativePreference(caseData.getEt3ResponseContactPreference())
             representative.setRepresentativePreference(caseData.getEt3ResponseContactPreference());
-            // There weren't any mapping of reference for correspondence - representative.
+            // There wasn't any mapping of reference for correspondence - representative.
             // mentioned in the ticket https://tools.hmcts.net/jira/browse/RET-5054
             // added this field to representative
             representative.setRepresentativeReference(caseData.getEt3ResponseReference());

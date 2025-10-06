@@ -216,8 +216,11 @@ public class CaseManagementForCaseWorkerService {
     }
 
     private void checkRespondentHasEcc(RespondentSumTypeItem respondentSumTypeItem) {
-        if (respondentSumTypeItem.getValue().getRespondentEcc() == null) {
+        if (isNullOrEmpty(respondentSumTypeItem.getValue().getRespondentEcc())) {
             respondentSumTypeItem.getValue().setRespondentEcc(NO);
+        }
+        if (isNullOrEmpty(respondentSumTypeItem.getValue().getRespondentEccReply())) {
+            respondentSumTypeItem.getValue().setRespondentEccReply(NO);
         }
     }
 

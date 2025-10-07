@@ -28,7 +28,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.Map;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -154,6 +153,7 @@ public class InitialConsiderationController {
 
         //JurCodes
         String caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();
+
         caseData.setEtInitialConsiderationJurisdictionCodes(
                 initialConsiderationService.generateJurisdictionCodesHtml(
                         caseData.getJurCodesCollection(), caseTypeId));
@@ -163,11 +163,18 @@ public class InitialConsiderationController {
             initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData, caseTypeId);
         }
 
-        //Vetting Issues
-        caseData.setEt3DoWeHaveRespondentsName(caseData.getEt3ResponseRespondentLegalName() == null ? "No" : "Yes");
-        caseData.setEt3RespondentNameMismatchDetails(!caseData.getRespondentCollection().stream()
-                .anyMatch(r -> r.getValue().getRespondentName().equals(
-                        caseData.getEt3ResponseRespondentLegalName())) ? "No" : "Yes");
+        // ET1 Vetting Issues
+        //caseData.setIcEt1VettingIssuesDetail(initialConsiderationService.composeIcEt1VettingIssuesDetail(caseData));
+        caseData.setIcEt1SubstantiveDefects(initialConsiderationService.composeIcEt1SubstantiveDefectsDetail(caseData));
+        caseData.setIcEt1ReferralToJudgeOrLOListWithDetails(
+                initialConsiderationService.composeIcEt1ReferralToJudgeOrLOListWithDetails(caseData));
+        caseData.setIcEt1ReferralToREJOrVPListWithDetails(
+                initialConsiderationService.composeIcEt1ReferralToREJOrVPListWithDetails(caseData));
+        caseData.setIcEt1OtherReferralListDetails(
+                initialConsiderationService.composeIcEt1OtherReferralListDetails(caseData));
+
+        caseData.setRegionalOffice(caseData.getRegionalOfficeList().getSelectedLabel());
+        caseData.setEt1TribunalRegion(caseData.getEt1HearingVenues().getSelectedLabel());
 
         return getCallbackRespEntityNoErrors(caseData);
     }

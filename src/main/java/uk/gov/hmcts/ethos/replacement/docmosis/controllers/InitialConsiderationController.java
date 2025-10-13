@@ -114,7 +114,6 @@ public class InitialConsiderationController {
         }
 
         if (CollectionUtils.isNotEmpty(caseData.getEtICHearingNotListedList())) {
-
             initialConsiderationService.clearIcHearingNotListedOldValues(caseData);
         }
 
@@ -139,7 +138,7 @@ public class InitialConsiderationController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseData  caseData = ccdRequest.getCaseDetails().getCaseData();
 
         // Sets the respondent details(respondent ET1 and ET3 names, hearing panel preference, and
         // availability for video hearing) of all respondents in a concatenated string format
@@ -152,7 +151,9 @@ public class InitialConsiderationController {
         caseData.setEtIcHearingPanelPreference(
                 initialConsiderationService.getClaimantHearingPanelPreference(caseData.getClaimantHearingPreference()));
 
+        //JurCodes
         String caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();
+
         caseData.setEtInitialConsiderationJurisdictionCodes(
                 initialConsiderationService.generateJurisdictionCodesHtml(
                         caseData.getJurCodesCollection(), caseTypeId));
@@ -161,6 +162,18 @@ public class InitialConsiderationController {
         if (CollectionUtils.isNotEmpty(caseData.getEtICHearingNotListedList())) {
             initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData, caseTypeId);
         }
+
+        // ET1 Vetting Issues
+        caseData.setIcEt1SubstantiveDefects(initialConsiderationService.composeIcEt1SubstantiveDefectsDetail(caseData));
+        caseData.setIcEt1ReferralToJudgeOrLOListWithDetails(
+                initialConsiderationService.composeIcEt1ReferralToJudgeOrLOListWithDetails(caseData));
+        caseData.setIcEt1ReferralToREJOrVPListWithDetails(
+                initialConsiderationService.composeIcEt1ReferralToREJOrVPListWithDetails(caseData));
+        caseData.setIcEt1OtherReferralListDetails(
+                initialConsiderationService.composeIcEt1OtherReferralListDetails(caseData));
+
+        caseData.setRegionalOffice(caseData.getRegionalOfficeList().getSelectedLabel());
+        caseData.setEt1TribunalRegion(caseData.getEt1HearingVenues().getSelectedLabel());
 
         return getCallbackRespEntityNoErrors(caseData);
     }

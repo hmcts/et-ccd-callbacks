@@ -100,6 +100,8 @@ class InitialConsiderationControllerTest extends BaseControllerTest {
             .withClaimServedDate("2022-01-01")
             .withHearing(hearingNumber, HEARING_TYPE_JUDICIAL_HEARING, "Judge", venue, null, null, null, null)
             .withHearingSession(0, "2019-11-25T12:11:00.000", Constants.HEARING_STATUS_LISTED, false)
+            .withRegionalOfficeList("Leeds")
+            .withEt1TribunalRegion("Leeds")
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
         ccdRequest = CCDRequestBuilder.builder()

@@ -164,7 +164,6 @@ public class InitialConsiderationController {
         }
 
         // ET1 Vetting Issues
-        //caseData.setIcEt1VettingIssuesDetail(initialConsiderationService.composeIcEt1VettingIssuesDetail(caseData));
         caseData.setIcEt1SubstantiveDefects(initialConsiderationService.composeIcEt1SubstantiveDefectsDetail(caseData));
         caseData.setIcEt1ReferralToJudgeOrLOListWithDetails(
                 initialConsiderationService.composeIcEt1ReferralToJudgeOrLOListWithDetails(caseData));

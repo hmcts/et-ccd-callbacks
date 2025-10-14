@@ -95,7 +95,7 @@ public class CaseManagementForCaseWorkerService {
     public static final String CASE_MANAGEMENT_LABEL = "Employment Tribunals";
     public static final String CASE_MANAGEMENT_CODE = "Employment";
     private static final String EMPLOYMENT_JURISDICTION = "EMPLOYMENT";
-    public static final String ET3_RESPONSE_RECEIVED_INITIAL_VALUE = "1";
+    public static final String COUNTER_FIELD_INITIAL_VALUE = "1";
     private final String ccdGatewayBaseUrl;
     private final List<String> caseTypeIdsToCheck = List.of("ET_EnglandWales", "ET_Scotland", "Bristol",
             "Leeds", "LondonCentral", "LondonEast", "LondonSouth", "Manchester", "MidlandsEast", "MidlandsWest",
@@ -271,6 +271,7 @@ public class CaseManagementForCaseWorkerService {
                 && featureToggleService.isWorkAllocationEnabled()
                 && !isEmpty(caseData.getRespondentCollection())) {
             updateResponseReceivedCounter(caseData.getRespondentCollection());
+            updateRespondentEccReplyCounter(caseData.getRespondentCollection());
         }
     }
 
@@ -279,8 +280,19 @@ public class CaseManagementForCaseWorkerService {
         if (YES.equals(firstRespondent.getResponseReceived())) {
             firstRespondent.setResponseReceivedCount(
                     StringUtils.isBlank(firstRespondent.getResponseReceivedCount())
-                            ? ET3_RESPONSE_RECEIVED_INITIAL_VALUE
+                            ? COUNTER_FIELD_INITIAL_VALUE
                             : Integer.toString(Integer.parseInt(firstRespondent.getResponseReceivedCount()) + 1)
+            );
+        }
+    }
+
+    private void updateRespondentEccReplyCounter(List<RespondentSumTypeItem> respondentCollection) {
+        RespondentSumType firstRespondent = respondentCollection.getFirst().getValue();
+        if (isNullOrEmpty(firstRespondent.getRespondentEccReply())) {
+            firstRespondent.setRespondentEccReplyCount(
+                    StringUtils.isBlank(firstRespondent.getRespondentEccReplyCount())
+                            ? COUNTER_FIELD_INITIAL_VALUE
+                            : Integer.toString(Integer.parseInt(firstRespondent.getRespondentEccReplyCount()) + 1)
             );
         }
     }

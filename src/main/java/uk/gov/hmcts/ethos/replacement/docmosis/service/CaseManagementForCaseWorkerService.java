@@ -287,13 +287,15 @@ public class CaseManagementForCaseWorkerService {
     }
 
     private void updateRespondentEccReplyCounter(List<RespondentSumTypeItem> respondentCollection) {
-        RespondentSumType firstRespondent = respondentCollection.getFirst().getValue();
-        if (isNullOrEmpty(firstRespondent.getRespondentEccReply())) {
-            firstRespondent.setRespondentEccReplyCount(
-                    StringUtils.isBlank(firstRespondent.getRespondentEccReplyCount())
-                            ? COUNTER_FIELD_INITIAL_VALUE
-                            : Integer.toString(Integer.parseInt(firstRespondent.getRespondentEccReplyCount()) + 1)
-            );
+        for (RespondentSumTypeItem respondentItem : respondentCollection) {
+            RespondentSumType respondent = respondentItem.getValue();
+            if (!isNullOrEmpty(respondent.getRespondentEccReply())) {
+                respondent.setRespondentEccReplyCount(
+                        StringUtils.isBlank(respondent.getRespondentEccReplyCount())
+                                ? COUNTER_FIELD_INITIAL_VALUE
+                                : Integer.toString(Integer.parseInt(respondent.getRespondentEccReplyCount()) + 1)
+                );
+            }
         }
     }
 

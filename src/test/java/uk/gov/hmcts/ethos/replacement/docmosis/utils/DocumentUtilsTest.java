@@ -3,23 +3,32 @@ package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.MockedStatic;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
+import uk.gov.hmcts.ethos.replacement.docmosis.model.TestData;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.function.Function;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mockStatic;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.RoleConstants.CREATOR;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.RoleConstants.DEFENDANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_ET3_FORM_CASE_DATA_FILE;
 
 final class DocumentUtilsTest {
@@ -39,6 +48,7 @@ final class DocumentUtilsTest {
     private static final String DUMMY_DOCUMENT_BINARY_URL_5 = "dummy_document_binary_url_5";
     private static final String DUMMY_DOCUMENT_BINARY_URL_6 = "dummy_document_binary_url_6";
     private static final String MOCK_DATE = "2025-01-01";
+    private static final String DOCUMENT_COLLECTION = "documentCollection";
 
     @Test
     void theConvertUploadedDocumentTypeToDocumentTypeItemWithLevels() {
@@ -364,5 +374,31 @@ final class DocumentUtilsTest {
                                 .documentBinaryUrl(DUMMY_DOCUMENT_BINARY_URL_1).build()).build()).build());
         DocumentUtils.removeDocumentsWithMatchingBinaryURLs(primaryDocumentTypeItems, referenceDocumentTypeItems);
         assertEquals(0, primaryDocumentTypeItems.size());
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {CREATOR, DEFENDANT})
+    @SuppressWarnings("unchecked")
+    void theFilterCasesDocumentsByCaseUserRole(String caseRole) {
+        CaseDetails caseDetailsFull = new TestData().getCaseDetailsWithData();
+        CaseDetails emptyCaseDetails = CaseDetails.builder().build();
+        CaseDetails caseDetailsWithoutId = new TestData().getCaseDetailsWithData();
+        CaseDetails caseDetailsWithoutDataWithId = new TestData().getCaseDetailsWithData();
+        caseDetailsWithoutDataWithId.setId(123_456L);
+        caseDetailsWithoutId.setId(null);
+        List<CaseDetails> caseDetailsList = Arrays.asList(caseDetailsFull,
+                emptyCaseDetails,
+                caseDetailsWithoutId,
+                caseDetailsWithoutDataWithId);
+        DocumentUtils.filterCasesDocumentsByCaseUserRole(caseDetailsList, caseRole);
+        assertAll(
+                () -> assertThat((List<LinkedHashMap<String, Object>>)caseDetailsFull.getData()
+                        .get(DOCUMENT_COLLECTION)).isNotNull().hasSize(2),
+                () -> assertThat(emptyCaseDetails.getData()).isNull(),
+                () -> assertThat((List<LinkedHashMap<String, Object>>)caseDetailsWithoutId.getData()
+                        .get(DOCUMENT_COLLECTION)).isNotNull().hasSize(2),
+                () -> assertThat((List<LinkedHashMap<String, Object>>)caseDetailsWithoutId.getData()
+                        .get(DOCUMENT_COLLECTION)).isNotNull().hasSize(2)
+        );
     }
 }

@@ -6,6 +6,7 @@ public final class RoleConstants {
     // "CaseRoles" reference data set in CCD.
     public static final String CREATOR = "[CREATOR]";
     public static final String DEFENDANT = "[DEFENDANT]";
+    public static final String CLAIMANT_SOLICITOR = "[CLAIMANTSOLICITOR]";
 
     // Role modification types
     public static final String ROLE_MODIFICATION_TYPE_ASSIGNMENT = "Assignment";
@@ -14,6 +15,8 @@ public final class RoleConstants {
 
     // Exception messages
     public static final String EXCEPTION_INVALID_MODIFICATION_TYPE = "Invalid modification type";
+    public static final String EXCEPTION_CASE_USER_ROLE_NOT_FOUND = "Case user role not found for caseId: %s";
+    public static final String EXCEPTION_INVALID_CASE_USER_ROLE = "Invalid case user role: %s";
 
     private RoleConstants() {
         // Final classes should not have a public or default constructor.

@@ -63,8 +63,13 @@ public final class UtilsTestConstants {
     // RespondentServiceUtils test constants
     // *******************************************************************************
     public static final String TEST_INVALID_INTEGER = "abc";
+    public static final String STRING_MINUS_ONE = "-1";
+    public static final String INVALID_INTEGER = "abc";
+    public static final String STRING_NINE = "9";
+    public static final String STRING_ZERO = "0";
     public static final String STRING_TEN = "10";
     public static final String TEST_RESPONDENT_NAME = "Test respondent name";
+    public static final String CASE_USER_ROLE_INVALID = "[INVALID]";
     public static final String EXCEPTION_CASE_DETAILS_NOT_FOUND =
             "java.lang.Exception: Case details not found with the given caseId, ";
     public static final String EXCEPTION_CASE_DETAILS_WITH_ID_123_NOT_HAVE_CASE_DATA =
@@ -87,6 +92,14 @@ public final class UtilsTestConstants {
     public static final String EXCEPTION_RESPONDENT_SOLICITOR_TYPE_NOT_FOUND =
             "java.lang.Exception: Respondent solicitor type not found for case with id, 1646225213651590 and "
                     + "respondent organisation policy index, 10";
+    public static final String EXCEPTION_CASE_DETAILS_NOT_HAVE_CASE_DATA =
+            "java.lang.Exception: Case details with Case Id, CASE-001 doesn't have case data values";
+    public static final String EXCEPTION_CASE_USER_ROLE_NOT_FOUND =
+            "java.lang.Exception: Case user role not found for caseId: CASE-001";
+    public static final String EXCEPTION_INVALID_CASE_USER_ROLE =
+            "java.lang.Exception: Invalid case user role: [INVALID]";
+    public static final String EXCEPTION_RESPONDENT_REPRESENTATIVE_NOT_FOUND =
+            "java.lang.Exception: Respondent representative not found for case: 12345";
 
     private static Map<String, Object> generateDocumentTypeLinkedHashMapByDocumentType() {
         Map<String, Object> object = new ConcurrentHashMap<>();

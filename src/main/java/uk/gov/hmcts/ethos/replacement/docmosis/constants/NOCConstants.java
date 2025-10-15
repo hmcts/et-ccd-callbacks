@@ -12,6 +12,9 @@ public final class NOCConstants {
             "Respondent solicitor type not found for case with id, %s and respondent organisation policy index, %s";
     public static final String EXCEPTION_CASE_USER_ROLES_NOT_FOUND = "Case user roles not found for caseId: %s";
 
+    // Event names
+    public static final String EVENT_NAME_REMOVE_OWN_REPRESENTATIVE = "REMOVE_OWN_REPRESENTATIVE";
+
     private NOCConstants() {
         // Final classes should not have a public or default constructor.
     }

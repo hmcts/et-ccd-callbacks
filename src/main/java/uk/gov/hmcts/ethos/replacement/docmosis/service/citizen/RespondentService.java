@@ -5,12 +5,28 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CallbacksRuntimeException;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseConverter;
+import uk.gov.hmcts.ethos.replacement.docmosis.idam.IdamApi;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.citizen.utils.RespondentServiceUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.MapperUtils;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 
+import java.util.List;
+
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPLOYMENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericServiceConstants.EXCEPTION_CASE_DETAILS_NOT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericServiceConstants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EVENT_NAME_REMOVE_OWN_REPRESENTATIVE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.RoleConstants.DEFENDANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.citizen.RespondentServiceConstants.CLASS_RESPONDENT_SERVICE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.citizen.RespondentServiceConstants.METHOD_REVOKE_SOLICITOR_ROLE;
@@ -26,6 +42,10 @@ public class RespondentService {
 
     private final CaseSearchService caseSearchService;
     private final CaseRoleService caseRoleService;
+    private final CoreCaseDataApi coreCaseDataApi;
+    private final IdamApi idamApi;
+    private final AuthTokenGenerator authTokenGenerator;
+    private final CaseConverter caseConverter;
 
     public CaseDetails revokeRespondentSolicitorRole(String authorization,
                                                      String caseSubmissionReference,
@@ -67,6 +87,56 @@ public class RespondentService {
             }
         }
 
-        return caseDetails;
+        return removeRespondentRepresentativeFromCaseData(authorization,
+                caseDetails.getCaseTypeId(),
+                caseDetails.getId().toString(),
+                respondentIndex,
+                caseUserRole);
     }
+
+    public CaseDetails removeRespondentRepresentativeFromCaseData(String authorisation,
+                                                                  String caseTypeId,
+                                                                  String caseSubmissionReference,
+                                                                  String respondentIndex,
+                                                                  String caseUserRole) {
+        UserDetails userInfo = idamApi.retrieveUserDetails(authorisation);
+        StartEventResponse startEventResponse = coreCaseDataApi.startEventForCitizen(
+                authorisation,
+                authTokenGenerator.generate(),
+                userInfo.getUid(),
+                EMPLOYMENT,
+                caseTypeId,
+                caseSubmissionReference,
+                EVENT_NAME_REMOVE_OWN_REPRESENTATIVE
+        );
+        CaseDetails caseDetails = startEventResponse.getCaseDetails();
+        CaseData caseData = MapperUtils.convertCaseDataMapToCaseDataObject(caseDetails.getData());
+        RespondentSumTypeItem respondentSumTypeItem =
+                RespondentServiceUtils.findRespondentSumTypeItemByIndex(caseData.getRespondentCollection(),
+                        respondentIndex,
+                        caseDetails.getId().toString());
+        if (StringUtils.isNotBlank(caseUserRole)) {
+            RespondentServiceUtils.resetOrganizationPolicy(caseData, caseUserRole, caseDetails.getId().toString());
+        }
+        respondentSumTypeItem.getValue().setRepresentativeRemoved(YES);
+        RepresentedTypeRItem representativeRItem =
+                RespondentServiceUtils.findRespondentRepresentative(respondentSumTypeItem,
+                        caseData.getRepCollection(),
+                        caseDetails.getId().toString());
+        if (ObjectUtils.isNotEmpty(representativeRItem)) {
+            caseData.setRepCollectionToRemove(List.of(representativeRItem));
+        }
+        caseDetails.setData(MapperUtils.mapCaseDataToLinkedHashMap(caseData));
+        CaseDataContent caseDataContent =  caseConverter.caseDataContent(startEventResponse, caseData);
+        return coreCaseDataApi.submitEventForCitizen(
+                authorisation,
+                authTokenGenerator.generate(),
+                userInfo.getUid(),
+                EMPLOYMENT,
+                caseDetails.getCaseTypeId(),
+                caseDetails.getId().toString(),
+                true,
+                caseDataContent);
+    }
+
 }

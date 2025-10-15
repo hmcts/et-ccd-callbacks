@@ -8,6 +8,9 @@ public final class GenericServiceConstants {
     public static final String EXCEPTION_CASE_DETAILS_NOT_HAVE_CASE_DATA =
             "Case details with Case Id, %s doesn't have case data values";
 
+    // Generic constants
+    public static final String YES = "Yes";
+
     private GenericServiceConstants() {
         // Final classes should not have a public or default constructor.
     }

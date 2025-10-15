@@ -10,9 +10,9 @@ import uk.gov.hmcts.et.common.model.ccd.types.UpdateRespondentRepresentativeRequ
 import java.util.List;
 import java.util.Objects;
 
-public final class RespondentUtils {
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericServiceConstants.YES;
 
-    private static final String YES = "Yes";
+public final class RespondentUtils {
 
     private RespondentUtils() {
         // Utility classes should not have a public or default constructor.
@@ -54,7 +54,6 @@ public final class RespondentUtils {
         if (CollectionUtils.isEmpty(respondents)) {
             return;
         }
-
         respondents.stream()
                 .filter(Objects::nonNull)
                 .map(RespondentSumTypeItem::getValue)

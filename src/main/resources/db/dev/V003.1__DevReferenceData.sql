@@ -269,6 +269,7 @@ INSERT INTO venue (tribunal_office, code, name) VALUES ('LEEDS','Wakefield Count
 INSERT INTO venue (tribunal_office, code, name) VALUES ('LONDON_CENTRAL','Field House','Field House');
 INSERT INTO venue (tribunal_office, code, name) VALUES ('LONDON_CENTRAL','Fox Court rm 1','Fox Court rm 1');
 INSERT INTO venue (tribunal_office, code, name) VALUES ('LONDON_CENTRAL','London Central','London Central');
+INSERT INTO venue (tribunal_office, code, name) VALUES ('LONDON_CENTRAL','London Tribunals Centre','London Tribunals Centre');
 INSERT INTO venue (tribunal_office, code, name) VALUES ('LONDON_CENTRAL','RCJ','RCJ');
 INSERT INTO venue (tribunal_office, code, name) VALUES ('LONDON_EAST','Colchester','Colchester');
 INSERT INTO venue (tribunal_office, code, name) VALUES ('LONDON_EAST','East London','East London');
@@ -628,6 +629,7 @@ INSERT INTO room (code, name, venue_code) VALUES ('* Not Allocated','* Not Alloc
 INSERT INTO room (code, name, venue_code) VALUES ('Exeter Mags 3','Exeter Mags 3','Exeter Mags');
 INSERT INTO room (code, name, venue_code) VALUES ('Exeter Mags 4','Exeter Mags 4','Exeter Mags');
 INSERT INTO room (code, name, venue_code) VALUES ('* Not Allocated','* Not Allocated','Exeter Mags');
+INSERT INTO room (code, name, venue_code) VALUES ('* Not Allocated','* Not Allocated','London Tribunals Centre');
 INSERT INTO room (code, name, venue_code) VALUES ('3 - basement','3 - basement','Field House');
 INSERT INTO room (code, name, venue_code) VALUES ('Fox Court rm 3','Fox Court rm 3','Field House');
 INSERT INTO room (code, name, venue_code) VALUES ('* Not Allocated','* Not Allocated','Field House');

@@ -1148,6 +1148,59 @@ class CaseManagementForCaseWorkerServiceTest {
         assertThat(caseData.getRespondentCollection().getFirst().getValue().getResponseReceivedCount()).isEqualTo("2");
     }
 
+    @ParameterizedTest
+    @MethodSource("respondentEccReplyCounterTestCases")
+    void updateWorkAllocationField_RespondentEccReplyCounter(String eccReplyValue,
+                                                             String initialCount, String expectedCount) {
+        List<String> errors = new ArrayList<>();
+        CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
+        caseData.getRespondentCollection().getFirst().getValue().setRespondentEccReply(eccReplyValue);
+        caseData.getRespondentCollection().getFirst().getValue().setRespondentEccReplyCount(initialCount);
+
+        caseManagementForCaseWorkerService.updateWorkAllocationField(errors, caseData);
+
+        assertThat(caseData.getRespondentCollection().getFirst().getValue().getRespondentEccReplyCount())
+                .isEqualTo(expectedCount);
+    }
+
+    private static Stream<Arguments> respondentEccReplyCounterTestCases() {
+        return Stream.of(
+
+                Arguments.of(null, null, null),
+                Arguments.of("", null, null),
+                Arguments.of(null, "1", "1"),
+                Arguments.of("", "1", "1"),
+                Arguments.of(null, "2", "2"),
+                Arguments.of(YES, null, "1"),
+                Arguments.of(NO, null, "1"),
+                Arguments.of(YES, "2", "3"),
+                Arguments.of(NO, "1", "2")
+        );
+    }
+
+    @Test
+    void updateWorkAllocationField_MultipleRespondents_EccReply() {
+        CaseData caseData = scotlandCcdRequest1.getCaseDetails().getCaseData();
+        
+        caseData.getRespondentCollection().get(0).getValue().setRespondentEccReply(null);
+        caseData.getRespondentCollection().get(1).getValue().setRespondentEccReply("");
+        caseData.getRespondentCollection().get(2).getValue().setRespondentEccReply(YES);
+        
+        caseData.getRespondentCollection().get(0).getValue().setRespondentEccReplyCount(null);
+        caseData.getRespondentCollection().get(1).getValue().setRespondentEccReplyCount("1");
+        caseData.getRespondentCollection().get(2).getValue().setRespondentEccReplyCount(null);
+
+        List<String> errors = new ArrayList<>();
+        caseManagementForCaseWorkerService.updateWorkAllocationField(errors, caseData);
+        
+        assertThat(caseData.getRespondentCollection().get(0).getValue().getRespondentEccReplyCount())
+                .isNull();
+        assertThat(caseData.getRespondentCollection().get(1).getValue().getRespondentEccReplyCount())
+                .isEqualTo("1");
+        assertThat(caseData.getRespondentCollection().get(2).getValue().getRespondentEccReplyCount())
+                .isEqualTo("1");
+    }
+
     @Test
     void setNextListedDate() {
         DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();

@@ -10,6 +10,7 @@ import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 
 public final class JurisdictionCodeConstants {
+    public static final String JURISDICTION_EMPLOYMENT = "EMPLOYMENT";
     public static final List<String> JUR_CODE_CONCILIATION_TRACK_OP = List.of(
         "DAG", "DDA", "DRB", "DSO", "EQP", "GRA", "PID", "RRD", "SXD", "MAT", "VIC");
     public static final List<String> JUR_CODE_CONCILIATION_TRACK_ST = List.of(

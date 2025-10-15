@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -8,15 +9,26 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 
 import java.time.LocalDate;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.DocumentConstants.CLAIMANT_APPLICATION_DOC_TYPE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.DocumentConstants.HIDDEN_DOCUMENT_TYPES_FOR_CLAIMANT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.DocumentConstants.HIDDEN_DOCUMENT_TYPES_FOR_RESPONDENT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.DocumentConstants.RESPONDENT_APPLICATION_DOC_TYPE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.RoleConstants.CREATOR;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.RoleConstants.DEFENDANT;
 
 public final class DocumentUtils {
 
@@ -50,7 +62,7 @@ public final class DocumentUtils {
                             doc.getValue().getUploadedDocument().getDocumentBinaryUrl());
 
                     GenericTypeItem<DocumentType> genTypeItems = new GenericTypeItem<>();
-                    genTypeItems.setId(ObjectUtils.defaultIfNull(doc.getId(), UUID.randomUUID().toString()));
+                    genTypeItems.setId(ObjectUtils.getIfNull(doc.getId(), UUID.randomUUID().toString()));
                     genTypeItems.setValue(docType);
                     return genTypeItems;
                 })
@@ -363,4 +375,119 @@ public final class DocumentUtils {
                         && referenceBinaryUrls.contains(item.getValue().getUploadedDocument().getDocumentBinaryUrl())
         );
     }
+
+    /**
+     * Filters the documents associated with each {@link CaseDetails} in the provided list
+     * according to the specified case user role.
+     * <p>
+     * This method iterates through the given list of case details and determines each case’s
+     * unique identifier (either from the <code>ethosCaseReference</code> field in the case data
+     * or, if not available, from the case ID). For each case, it then delegates the filtering
+     * operation to {@link #filterCaseDocumentsByCaseUserRole(CaseDetails, String, String)},
+     * which performs role-based document filtering.
+     * </p>
+     *
+     * @param caseDetailsList the list of {@link CaseDetails} objects to process;
+     *                        may be empty but must not be {@code null}
+     * @param caseUserRole    the user role to filter documents by, e.g. "RESPONDENT", "CLAIMANT";
+     *                        must not be {@code null}
+     *
+     * @see #filterCaseDocumentsByCaseUserRole(CaseDetails, String, String)
+     */
+    public static void filterCasesDocumentsByCaseUserRole(List<CaseDetails> caseDetailsList, String caseUserRole) {
+        for (CaseDetails caseDetails : caseDetailsList) {
+            String caseId;
+            if (ObjectUtils.isNotEmpty(caseDetails.getData())
+                    && ObjectUtils.isNotEmpty(caseDetails.getData().get("ethosCaseReference"))) {
+                caseId = caseDetails.getData().get("ethosCaseReference").toString();
+            } else {
+                caseId = ObjectUtils.isNotEmpty(caseDetails.getId()) ? caseDetails.getId().toString() : "";
+            }
+            filterCaseDocumentsByCaseUserRole(caseDetails, caseId, caseUserRole);
+        }
+    }
+
+    private static void filterCaseDocumentsByCaseUserRole(CaseDetails caseDetails, String caseId, String caseUserRole) {
+        List<LinkedHashMap<String, Object>> documentCollection = getCaseDocumentCollectionFromCaseDetails(caseDetails);
+        if (CollectionUtils.isNotEmpty(documentCollection)) {
+            for (Iterator<LinkedHashMap<String, Object>> iterator = documentCollection.iterator();
+                 iterator.hasNext();) {
+                removeHiddenDocumentFromCollectionByCaseUserRole(iterator, caseId, caseUserRole);
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static  List<LinkedHashMap<String, Object>> getCaseDocumentCollectionFromCaseDetails(
+            CaseDetails caseDetails) {
+        if (ObjectUtils.isNotEmpty(caseDetails.getData())
+                && ObjectUtils.isNotEmpty(caseDetails.getData().get("documentCollection"))) {
+            return (List<LinkedHashMap<String, Object>>) caseDetails.getData().get("documentCollection");
+        }
+        return null;
+    }
+
+    private static void removeHiddenDocumentFromCollectionByCaseUserRole(
+            Iterator<LinkedHashMap<String, Object>> iterator, String caseId, String caseUserRole) {
+        LinkedHashMap<String, Object> documentInfo = iterator.next();
+        if (ObjectUtils.isNotEmpty(documentInfo.get("value"))) {
+            try {
+                DocumentType documentType = MapperUtils
+                        .mapJavaObjectToClass(DocumentType.class, documentInfo.get("value"));
+                if (isDocumentHiddenForCaseUserRole(documentType, caseUserRole)) {
+                    iterator.remove();
+                }
+            } catch (JsonProcessingException jpe) {
+                GenericServiceUtils.logException(
+                        "Exception occurred while processing documents (JSON PARSE PROBLEM)", caseId,
+                        jpe.getMessage(), "filterClaimantDocuments", "DocumentUtil");
+            }
+        }
+    }
+
+    private static boolean isDocumentHiddenForCaseUserRole(DocumentType documentType, String caseUserRole) {
+        return isHiddenDocumentTypeForCaseUserRole(documentType.getTypeOfDocument(), caseUserRole)
+                || isHiddenDocumentTypeForCaseUserRole(documentType.getDocumentType(), caseUserRole);
+    }
+
+    private static boolean isHiddenDocumentTypeForCaseUserRole(String documentType, String caseUserRole) {
+        if (StringUtils.isNotBlank(documentType)) {
+            String lowerCaseDocumentType = documentType.toLowerCase(Locale.UK).trim();
+            List<String> mergedList = getMergedListByCaseUserRole(caseUserRole);
+            return mergedList.stream()
+                    .anyMatch(type -> type.equalsIgnoreCase(lowerCaseDocumentType));
+        }
+        return false;
+    }
+
+    private static List<String> getMergedListByCaseUserRole(String caseUserRole) {
+        if (CREATOR.equals(caseUserRole)) {
+            return Stream.of(
+                            HIDDEN_DOCUMENT_TYPES_FOR_CLAIMANT,
+                            RESPONDENT_APPLICATION_DOC_TYPE,
+                            CLAIMANT_APPLICATION_DOC_TYPE
+                    )
+                    .flatMap(List::stream)
+                    .distinct()
+                    .toList();
+        }
+        if (DEFENDANT.equals(caseUserRole)) {
+            return Stream.of(
+                            HIDDEN_DOCUMENT_TYPES_FOR_RESPONDENT,
+                            RESPONDENT_APPLICATION_DOC_TYPE,
+                            CLAIMANT_APPLICATION_DOC_TYPE
+                    )
+                    .flatMap(List::stream)
+                    .distinct()
+                    .toList();
+        }
+        // If case role not [DEFENDANT] or [CREATOR]
+        return Stream.of(
+                        List.of(StringUtils.EMPTY)
+                )
+                .flatMap(List::stream)
+                .distinct()
+                .toList();
+    }
+
 }

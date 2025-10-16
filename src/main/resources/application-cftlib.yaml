@@ -35,3 +35,7 @@ document_management:
   url: http://localhost:5005
   ccdCaseDocument:
     url: http://localhost:5005
+
+launchdarkly:
+  sdk-key: ${ET_LAUNCH_DARKLY_SDK_KEY:sdk-key}
+  env: test

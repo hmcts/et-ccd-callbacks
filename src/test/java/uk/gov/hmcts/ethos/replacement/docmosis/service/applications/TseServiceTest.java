@@ -309,6 +309,74 @@ class TseServiceTest {
         assertThat(caseData.getTseApplicationStoredCollection().getFirst().getId()).isEqualTo("24680");
     }
 
+    @Test
+    void removeStoredRespondentApplication_removesCorrectItem() {
+        List<GenericTseApplicationTypeItem> storedCollection = new ArrayList<>(List.of(
+                GenericTseApplicationTypeItem.builder()
+                        .id("11111")
+                        .value(new GenericTseApplicationType())
+                        .build(),
+                GenericTseApplicationTypeItem.builder()
+                        .id("22222")
+                        .value(new GenericTseApplicationType())
+                        .build()
+        ));
+        CaseData caseData = new CaseData();
+        caseData.setTseRespondentStoredCollection(storedCollection);
+
+        RespondentTse respondentTse = new RespondentTse();
+        respondentTse.setStoredApplicationId("11111");
+        caseData.setRespondentTse(respondentTse);
+
+        TseService tseService = new TseService(documentManagementService);
+        tseService.removeStoredRespondentApplication(caseData);
+
+        assertThat(caseData.getTseRespondentStoredCollection())
+                .hasSize(1);
+        assertThat(caseData.getTseRespondentStoredCollection().getFirst().getId())
+                .isEqualTo("22222");
+    }
+
+    @Test
+    void removeStoredRespondentApplication_doesNothingWhenApplicationIdIsNull() {
+        CaseData caseData = new CaseData();
+        caseData.setTseRespondentStoredCollection(new ArrayList<>(List.of(
+                GenericTseApplicationTypeItem.builder().id("11111").value(new GenericTseApplicationType()).build()
+        )));
+        caseData.setRespondentTse(new RespondentTse());
+
+        TseService tseService = new TseService(documentManagementService);
+        tseService.removeStoredRespondentApplication(caseData);
+
+        assertThat(caseData.getTseRespondentStoredCollection()).hasSize(1);
+    }
+
+    @Test
+    void removeStoredRespondentApplication_doesNothingWhenStoredCollectionIsNull() {
+        CaseData caseData = new CaseData();
+        RespondentTse respondentTse = new RespondentTse();
+        respondentTse.setStoredApplicationId("11111");
+        caseData.setRespondentTse(respondentTse);
+        caseData.setTseRespondentStoredCollection(null);
+
+        TseService tseService = new TseService(documentManagementService);
+        tseService.removeStoredRespondentApplication(caseData);
+
+        assertThat(caseData.getTseRespondentStoredCollection()).isNull();
+    }
+
+    @Test
+    void removeStoredRespondentApplication_doesNothingWhenRespondentTseIsNull() {
+        CaseData caseData = new CaseData();
+        caseData.setTseRespondentStoredCollection(new ArrayList<>(List.of(
+                GenericTseApplicationTypeItem.builder().id("11111").value(new GenericTseApplicationType()).build()
+        )));
+
+        tseService.removeStoredRespondentApplication(caseData);
+
+        assertThat(caseData.getTseRespondentStoredCollection()).hasSize(1);
+    }
+
     @Nested
     class FormatViewApplication {
         @Test

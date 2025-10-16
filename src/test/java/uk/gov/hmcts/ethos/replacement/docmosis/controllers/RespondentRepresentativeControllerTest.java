@@ -55,6 +55,48 @@ class RespondentRepresentativeControllerTest {
     }
 
     @Test
+    void testRemoveOwnRepresentative_withoutRepCollectionToRemove() throws Exception {
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
+        CaseData caseData = CaseDataBuilder.builder().build();
+        RepresentedTypeRItem representedTypeRItem = RepresentedTypeRItem.builder().id("123").build();
+        caseData.setRepCollection(List.of(representedTypeRItem));
+        String token = "some-token";
+        when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
+
+        mockMvc.perform(post("/respondentRepresentative/removeOwnRepresentative")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", token)
+                        .content(jsonMapper.toJson(ccdRequest)))
+
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    void testRemoveOwnRepresentative_RepCollectionToRemoveNotExistsInRepCollection() throws Exception {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        RepresentedTypeRItem representedTypeRItem = RepresentedTypeRItem.builder().id("123").build();
+        caseData.setRepCollection(List.of(representedTypeRItem));
+        RepresentedTypeRItem representedTypeRItemToRemove = RepresentedTypeRItem.builder().id("1234").build();
+        caseData.setRepCollectionToRemove(List.of(representedTypeRItemToRemove));
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().withCaseData(caseData).build();
+        String token = "some-token";
+        when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
+
+        mockMvc.perform(post("/respondentRepresentative/removeOwnRepresentative")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header("Authorization", token)
+                        .content(jsonMapper.toJson(ccdRequest)))
+
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
     void testRemoveOwnRepresentative_withRepCollection() throws Exception {
         CaseData caseData = CaseDataBuilder.builder().build();
         RepresentedTypeRItem representedTypeRItem = RepresentedTypeRItem.builder().id("123").build();

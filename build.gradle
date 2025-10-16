@@ -510,35 +510,10 @@ wrapper {
     distributionType = Wrapper.DistributionType.ALL
 }
 
-// Load environment variables by executing the script and parsing KEY=VALUE lines it prints
-def loadEnvFromScript(String scriptPath) {
-    def proc = ["bash", "-lc", "\"${scriptPath}\""].execute(null, project.projectDir)
-    proc.waitFor()
-    def envMap = [:]
-    proc.text.eachLine { line ->
-        if (line == null) return
-        int idx = line.indexOf('=')
-        if (idx > 0) {
-            def key = line.substring(0, idx).trim()
-            def value = line.substring(idx + 1)
-            envMap[key] = value
-        }
-    }
-    return envMap
-}
-
 bootWithCCD {
     // Simulates idam and s2s locally.
     // See rse-cft-lib/LibRunnerTask
     authMode = uk.gov.hmcts.rse.AuthMode.Local
-
-    // Invoke set_env.sh at task execution time
-    doFirst {
-        def sourcedEnv = loadEnvFromScript("${rootDir}/bin/set_env.sh")
-        if (!sourcedEnv.isEmpty()) {
-            environment sourcedEnv
-        }
-    }
 
     environment 'RSE_LIB_ADDITIONAL_DATABASES', 'et_cos,et_msg_handler,evidence,ethos,camunda,role_assignment,wa_workflow_api,cft_task_db,wa_case_event_messages_db,ccd_data,emstitch'
     environment 'CCD_S2S_AUTHORISED_SERVICES_CASE_USER_ROLES', 'aac_manage_case_assignment,et_cos,et_sya_api,et_msg_handler'
@@ -572,7 +547,7 @@ bootWithCCD {
 
     environment 'SPRING_PROFILES_ACTIVE', 'cftlib'
     // et-ccd-callbacks
-    //environment 'SERVICEBUS_FAKE', 'true'*
+    environment 'SERVICEBUS_FAKE', 'true'
     environment 'CFTLIB_EXTRA_COMPOSE_FILES', ''
 
 }

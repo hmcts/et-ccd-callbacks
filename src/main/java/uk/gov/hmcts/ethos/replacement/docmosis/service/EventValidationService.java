@@ -23,6 +23,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.RestrictedReportingType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.JurisdictionCode;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 
@@ -46,6 +47,7 @@ import java.util.stream.Collectors;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.time.temporal.ChronoUnit.DAYS;
 import static java.util.stream.Collectors.joining;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CASE_CLOSED_POSITION;
@@ -55,6 +57,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSING_LISTED_CASE
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.DUPLICATED_JURISDICTION_CODES_JUDGEMENT_ERROR;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.DUPLICATE_JURISDICTION_CODE_ERROR_MESSAGE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.EARLY_DATE_RETURNED_FROM_JUDGE_ERROR_MESSAGE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ECC_JURISDICTION_CODE_REQUIRES_BOC_JURISDICTION_CODE_ERROR_MESSAGE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPTY_HEARING_COLLECTION_ERROR_MESSAGE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPTY_RESPONDENT_COLLECTION_ERROR_MESSAGE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.FUTURE_RECEIPT_DATE_ERROR_MESSAGE;
@@ -290,6 +293,7 @@ public class EventValidationService {
         validateDuplicatedJurisdictionCodes(caseData, errors);
         validateJurisdictionCodesExistenceInJudgement(caseData, errors);
         validateDisposalDate(caseData, errors);
+        validateECCCodeNeedsBOCCode(caseData, errors);
     }
 
     /**
@@ -459,6 +463,21 @@ public class EventValidationService {
             }
             if (!duplicateCodes.isEmpty()) {
                 errors.add(DUPLICATE_JURISDICTION_CODE_ERROR_MESSAGE + StringUtils.join(duplicateCodes, '-'));
+            }
+        }
+    }
+
+    private void validateECCCodeNeedsBOCCode(CaseData caseData, List<String> errors) {
+        if (isNotEmpty(caseData.getJurCodesCollection())) {
+            boolean hasEcc = caseData.getJurCodesCollection().stream()
+                    .anyMatch(jurCode -> JurisdictionCode.ECC.toString()
+                            .equals(jurCode.getValue().getJuridictionCodesList()));
+            boolean hasBoc = caseData.getJurCodesCollection().stream()
+                    .anyMatch(jurCode -> JurisdictionCode.BOC.toString()
+                            .equals(jurCode.getValue().getJuridictionCodesList()));
+
+            if (hasEcc && !hasBoc) {
+                errors.add(ECC_JURISDICTION_CODE_REQUIRES_BOC_JURISDICTION_CODE_ERROR_MESSAGE);
             }
         }
     }

@@ -68,8 +68,10 @@ public class RespondentRepresentativeController {
         log.info("REMOVE OWN REPRESENTATIVE ---> {}{}", LOG_MESSAGE, ccdRequest.getCaseDetails().getCaseId());
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
-        if (CollectionUtils.isNotEmpty(caseData.getRepCollection())) {
+        if (CollectionUtils.isNotEmpty(caseData.getRepCollection())
+                && CollectionUtils.isNotEmpty(caseData.getRepCollectionToRemove())) {
             caseData.getRepCollection().removeAll(caseData.getRepCollectionToRemove());
+            caseData.setRepCollectionToRemove(null);
         }
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }

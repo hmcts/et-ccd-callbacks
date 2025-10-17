@@ -29,7 +29,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
@@ -148,8 +147,7 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(tseService).createApplication(ccdRequest.getCaseDetails().getCaseData(), CLAIMANT_REP_TITLE);
-        verify(claimantTseService).sendAcknowledgementEmail(ccdRequest.getCaseDetails(), AUTH_TOKEN);
-        verify(claimantTseService).sendAdminEmail(ccdRequest.getCaseDetails());
+        verify(claimantTseService).sendEmails(ccdRequest.getCaseDetails());
     }
 
     @Test
@@ -165,9 +163,7 @@ class ClaimantTellSomethingElseControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(tseService).createApplication(ccdRequest.getCaseDetails().getCaseData(), CLAIMANT_REP_TITLE);
-        verify(claimantTseService).sendRespondentsEmail(ccdRequest.getCaseDetails());
-        verify(claimantTseService).sendAcknowledgementEmail(ccdRequest.getCaseDetails(), AUTH_TOKEN);
-        verify(claimantTseService).sendAdminEmail(ccdRequest.getCaseDetails());
+        verify(claimantTseService).sendEmails(ccdRequest.getCaseDetails());
     }
 
     @Test

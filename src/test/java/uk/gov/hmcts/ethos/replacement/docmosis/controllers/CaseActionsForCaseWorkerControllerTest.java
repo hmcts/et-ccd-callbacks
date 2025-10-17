@@ -48,6 +48,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.NocRespondentRepresentati
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
@@ -201,6 +202,10 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     private NocRespondentHelper nocRespondentHelper;
     @MockBean
     private CaseManagementLocationService caseManagementLocationService;
+
+    @MockBean
+    private UserIdamService userIdamService;
+
     private MockMvc mvc;
     private JsonNode requestContent;
     private JsonNode requestContent2;

@@ -10,6 +10,8 @@ import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
+import uk.gov.hmcts.et.common.model.ccd.types.OrganisationUsersIdamUser;
+import uk.gov.hmcts.et.common.model.ccd.types.OrganisationUsersResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -119,13 +121,28 @@ public class CaseAccessService {
                                                                 UserDetails userDetails) {
         OrganisationsResponse organisationsResponse = organisationClient.retrieveOrganisationDetailsByUserId(
                 adminUserService.getAdminUserToken(), authTokenGenerator.generate(), userDetails.getUid()).getBody();
-        if (organisationsResponse != null && organisationsResponse.getOrganisationIdentifier() != null) {
-            return caseUserAssignments.stream()
-                    .filter(assignment ->
-                            organisationsResponse.getOrganisationIdentifier().equals(assignment.getOrganisationId()))
-                    .collect(Collectors.toSet());
-        } else {
+
+        if (organisationsResponse == null || organisationsResponse.getOrganisationIdentifier() == null) {
             return new HashSet<>();
         }
+
+        OrganisationUsersResponse orgUsersResponse = organisationClient.getOrganisationUsers(
+                adminUserService.getAdminUserToken(),
+                authTokenGenerator.generate(),
+                organisationsResponse.getOrganisationIdentifier()
+        ).getBody();
+
+        if (orgUsersResponse == null || orgUsersResponse.getUsers() == null) {
+            return new HashSet<>();
+        }
+
+        List<OrganisationUsersIdamUser> orgUsers = orgUsersResponse.getUsers();
+        Set<String> orgUserIds = orgUsers.stream()
+                .map(OrganisationUsersIdamUser::getUserIdentifier)
+                .collect(Collectors.toSet());
+
+        return caseUserAssignments.stream()
+                .filter(assignment -> orgUserIds.contains(assignment.getUserId()))
+                .collect(Collectors.toSet());
     }
 }

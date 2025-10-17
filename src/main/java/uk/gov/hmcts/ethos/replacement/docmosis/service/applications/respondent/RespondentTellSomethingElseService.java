@@ -179,7 +179,7 @@ public class RespondentTellSomethingElseService {
         }
 
         // send email to respondent solicitor and the solicitors on the shared
-        // list that belongs to the same org
+        // the 'shared list' that belongs to the same org
         UserDetails userDetails = userIdamService.getUserDetails(userToken);
         Set<CaseUserAssignment> assignments =
                 caseAccessService.filterCaseAssignmentsByOrgId(caseUserAssignments, userDetails);

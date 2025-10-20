@@ -104,6 +104,8 @@ venue-addresses:
     edinburgh:
       - venue: Edinburgh
         address: 54-56 Melville Street, Edinburgh, EH3 7HF
+      - venue: OET Scotland
+        address: OET 54-56 Melville Street, Edinburgh, EH3 7HF
     glasgow:
       - venue: Campbeltown Sheriff Court
         address: Campbeltown HC, Sheriff Court House, Castle Hill, Campbeltown, PA28 6AN

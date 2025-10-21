@@ -104,6 +104,8 @@ venue-addresses:
     edinburgh:
       - venue: Edinburgh
         address: 54-56 Melville Street, Edinburgh, EH3 7HF
+      - venue: OET Scotland
+        address: OET 54-56 Melville Street, Edinburgh, EH3 7HF
     glasgow:
       - venue: Campbeltown Sheriff Court
         address: Campbeltown HC, Sheriff Court House, Castle Hill, Campbeltown, PA28 6AN
@@ -112,6 +114,8 @@ venue-addresses:
       - venue: Fort William Sheriff Court
         address: Fort William SC, Sheriff Court House, High Street, Fort William, PH33 6EE
       - venue: Glasgow
+        address: Glasgow Tribunal Centre, Atlantic Quay, 20 York Street, Glasgow, G2 8GT
+      - venue: GTC
         address: Glasgow Tribunal Centre, Atlantic Quay, 20 York Street, Glasgow, G2 8GT
       - venue: Kirkcudbright Sheriff Court
         address: Kirkcudbright, Sheriff Court House, High Street, Kirkcudbright, DG6 4JW

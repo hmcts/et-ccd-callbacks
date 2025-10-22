@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
@@ -74,6 +75,8 @@ public class ServingService {
     private String claimantRepTemplateId;
 
     private final EmailService emailService;
+    private final EmailNotificationService emailNotificationService;
+    private final CaseAccessService caseAccessService;
 
     /**
      * Check if only 7.7, 7.8 or 7.8a is uploaded, display an error message
@@ -176,13 +179,18 @@ public class ServingService {
     public void sendNotifications(CaseDetails caseDetails) {
         Map<String, String> personalisation;
 
+        List<CaseUserAssignment> caseUserAssignments =
+                caseAccessService.getCaseUserAssignmentsById(caseDetails.getCaseId());
         if (isRepresentedClaimantWithMyHmctsCase(caseDetails.getCaseData())) {
             personalisation = NotificationHelper.buildMapForClaimantRepresentative(caseDetails.getCaseData());
             personalisation.put(LINK_TO_EXUI, emailService.getExuiCaseLink(caseDetails.getCaseId()));
-            if (isNullOrEmpty(personalisation.get(EMAIL_ADDRESS))) {
-                return;
-            }
-            emailService.sendEmail(claimantRepTemplateId, personalisation.get(EMAIL_ADDRESS), personalisation);
+
+            emailNotificationService.getCaseClaimantSolicitorEmails(caseUserAssignments).stream()
+                    .filter(email -> email != null && !email.isEmpty())
+                    .forEach(email -> emailService.sendEmail(
+                            claimantRepTemplateId,
+                            email,
+                            personalisation));
         } else if (!isClaimantNonSystemUser(caseDetails.getCaseData())) {
             personalisation = NotificationHelper.buildMapForClaimant(caseDetails);
             personalisation.put(LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseDetails.getCaseId()));

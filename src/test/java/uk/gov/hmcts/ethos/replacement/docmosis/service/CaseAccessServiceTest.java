@@ -21,14 +21,15 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
+import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Stream;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -53,10 +54,13 @@ class CaseAccessServiceTest {
     private AdminUserService adminUserService;
     @MockBean
     private AuthTokenGenerator authTokenGenerator;
+    @MockBean
+    private OrganisationClient organisationClient;
 
     @BeforeEach
     void setUp() {
-        caseAccessService = new CaseAccessService(caseAssignment);
+        caseAccessService = new CaseAccessService(caseAssignment, organisationClient,
+                authTokenGenerator, adminUserService);
         caseData = new CaseData();
         caseData.setLinkedCaseCT("http://example.com/1234567890123456");
         caseDetails = new CaseDetails();
@@ -159,6 +163,39 @@ class CaseAccessServiceTest {
         errors = caseAccessService.assignExistingCaseRoles(caseDetails);
         assertEquals("Error assigning case access for case 1234567890123456 on behalf of 1111111111111111",
                 errors.get(0));
+    }
+
+    @Test
+    void getCaseUserAssignmentsById_returnsAssignments() throws IOException {
+        String caseId = "1234567890123456";
+        CaseUserAssignment assignment = CaseUserAssignment.builder()
+                .userId("user1")
+                .caseId(caseId)
+                .caseRole(CREATOR_ROLE)
+                .build();
+        CaseUserAssignmentData assignmentData = CaseUserAssignmentData.builder()
+                .caseUserAssignments(List.of(assignment))
+                .build();
+        when(caseAssignment.getCaseUserRoles(caseId)).thenReturn(assignmentData);
+
+        List<CaseUserAssignment> result = caseAccessService.getCaseUserAssignmentsById(caseId);
+
+        assertEquals(1, result.size());
+        assertEquals("user1", result.get(0).getUserId());
+        assertEquals(CREATOR_ROLE, result.get(0).getCaseRole());
+    }
+
+    @Test
+    void getCaseUserAssignmentsById_throwsExceptionWhenError() throws IOException {
+        String caseId = "1234567890123456";
+        when(caseAssignment.getCaseUserRoles(caseId)).thenThrow(new RuntimeException("Some error"));
+
+        NoSuchElementException exception = org.junit.jupiter.api.Assertions.assertThrows(
+                NoSuchElementException.class,
+                () -> caseAccessService.getCaseUserAssignmentsById(caseId)
+        );
+        assertEquals("No user assignments found for case 1234567890123456", exception.getMessage());
+        assertEquals("Some error", exception.getCause().getMessage());
     }
 
 }

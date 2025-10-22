@@ -1,19 +1,19 @@
 package uk.gov.hmcts.ethos.replacement.apitest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import org.apache.http.HttpStatus;
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
-import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
-
+import java.io.IOException;
 import java.util.List;
-
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 public class SendNotificationControllerFunctionalTest extends BaseFunctionalTest {
     private static final String AUTHORIZATION = "Authorization";
@@ -25,21 +25,22 @@ public class SendNotificationControllerFunctionalTest extends BaseFunctionalTest
     private CCDRequest ccdRequest;
 
     @BeforeAll
-    public void setUpCaseData() {
-        CaseData caseData = CaseDataBuilder.builder()
-                .withEthosCaseReference("1234")
-                .withRespondent("Name", YES, "2020-01-02", "respondent@email.com", false)
-                .withRespondentRepresentative("Name", "Sally", "respondentRep@email.com")
-                .withClaimant("Claimant")
-                .withClaimantType("claimant@email.com")
-                .build();
+    public void setUpCaseData() throws IOException {
+        // Create a real case in CCD
+        JSONObject caseJson = createSinglesCaseDataStore();
 
+        // Map the created case JSON to CaseDetails and CaseData
+        ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
+
+        CaseDetails caseDetails = mapper.readValue(caseJson.toString(), CaseDetails.class);
+        CaseData caseData = caseDetails.getCaseData();
         caseData.setSendNotificationTitle("Test title");
         caseData.setSendNotificationSubject(List.of("Judgment", "Hearing"));
 
+        // Build the CCDRequest using the real case data
         ccdRequest = CCDRequestBuilder.builder()
                 .withCaseData(caseData)
-                .withCaseId("123")
+                .withCaseId(caseDetails.getCaseId())
                 .build();
     }
 

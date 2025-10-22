@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.UpdateRespondentRepresentativeRequest;
 
@@ -14,13 +15,20 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.when;
 
 final class RespondentUtilsTest {
 
     private static final String TEST_RESPONDENT_NAME_1 = "Test respondent name 1";
     private static final String TEST_RESPONDENT_NAME_2 = "Test respondent name 2";
+    private static final String TEST_RESPONDENT_NAME_3 = "Test respondent name 3";
     private static final String YES = "Yes";
 
     private MockedStatic<RespondentUtils> respondentUtils;
@@ -78,5 +86,121 @@ final class RespondentUtilsTest {
         caseData.setRespondentCollection(List.of(respondentSumTypeItem));
         RespondentUtils.markRespondentRepresentativeRemoved(caseData, updateRespondentRepresentativeRequest);
         assertThat(respondentSumTypeItem.getValue().getRepresentativeRemoved()).isEqualTo(YES);
+    }
+
+    @Test
+    void theGetRespondentNamesByNoticeOfChangeIndexes() {
+        respondentUtils.close();
+        // -------- Scenario 1: returns names for provided indexes in order --------
+        CaseData caseData = new CaseData();
+        caseData.setNoticeOfChangeAnswers0(NoticeOfChangeAnswers.builder().respondentName(TEST_RESPONDENT_NAME_1)
+                .build());
+        caseData.setNoticeOfChangeAnswers3(NoticeOfChangeAnswers.builder().respondentName(TEST_RESPONDENT_NAME_2)
+                .build());
+        caseData.setNoticeOfChangeAnswers5(NoticeOfChangeAnswers.builder().respondentName(TEST_RESPONDENT_NAME_3)
+                .build());
+
+        List<String> result = RespondentUtils.getRespondentNamesByNoticeOfChangeIndexes(
+                caseData, List.of(0, 3, 5));
+
+        assertEquals(List.of(TEST_RESPONDENT_NAME_1, TEST_RESPONDENT_NAME_2, TEST_RESPONDENT_NAME_3), result,
+                "Should return names in the same order as the indexes");
+        // -------- Scenario 2: skips null answers --------
+        caseData = mock(CaseData.class);
+        NoticeOfChangeAnswers a2 = mock(NoticeOfChangeAnswers.class);
+
+        when(a2.getRespondentName()).thenReturn("Gamma LLC");
+
+        when(caseData.getNoticeOfChangeAnswers1()).thenReturn(null);
+        when(caseData.getNoticeOfChangeAnswers2()).thenReturn(a2);
+        when(caseData.getNoticeOfChangeAnswers9()).thenReturn(null);
+
+        result = RespondentUtils.getRespondentNamesByNoticeOfChangeIndexes(
+                caseData, List.of(1, 2, 9));
+
+        assertEquals(List.of("Gamma LLC"), result,
+                "Should skip indexes that resolve to null answers");
+
+        // -------- Scenario 3: returns empty list when index list empty --------
+        caseData = mock(CaseData.class);
+
+        result = RespondentUtils.getRespondentNamesByNoticeOfChangeIndexes(
+                caseData, List.of());
+
+        assertEquals(List.of(), result,
+                "Empty input should yield an empty result");
+
+        // -------- Scenario 4: ignores out-of-range indexes --------
+        // Assumes getNoticeOfChangeAnswersByIndex returns null for out-of-range (e.g., -1, 10, 42)
+        caseData = mock(CaseData.class);
+        NoticeOfChangeAnswers a1 = mock(NoticeOfChangeAnswers.class);
+
+        when(a1.getRespondentName()).thenReturn("Delta Inc");
+        when(caseData.getNoticeOfChangeAnswers1()).thenReturn(a1);
+
+        result = RespondentUtils.getRespondentNamesByNoticeOfChangeIndexes(
+                caseData, List.of(-1, 1, 10, 42));
+
+        assertEquals(List.of("Delta Inc"), result,
+                "Only valid index should contribute a name");
+
+        // -------- Scenario 5: allows duplicate indexes and preserves multiplicity --------
+        caseData = mock(CaseData.class);
+        NoticeOfChangeAnswers a4 = mock(NoticeOfChangeAnswers.class);
+
+        when(a4.getRespondentName()).thenReturn("Echo Co");
+        when(caseData.getNoticeOfChangeAnswers4()).thenReturn(a4);
+
+        result = RespondentUtils.getRespondentNamesByNoticeOfChangeIndexes(
+                caseData, List.of(4, 4));
+
+        assertEquals(List.of("Echo Co", "Echo Co"), result,
+                "Duplicate indexes should yield duplicate names in order");
+    }
+
+    @Test
+    void coversAllScenariosInOneMethod() {
+        respondentUtils.close();
+        // --- Arrange
+        CaseData caseData = mock(CaseData.class);
+
+        NoticeOfChangeAnswers a0 = mock(NoticeOfChangeAnswers.class);
+        NoticeOfChangeAnswers a3 = mock(NoticeOfChangeAnswers.class);
+        NoticeOfChangeAnswers a9 = mock(NoticeOfChangeAnswers.class);
+
+        // Populate a few indices; leave others as null to test null-handling
+        when(caseData.getNoticeOfChangeAnswers0()).thenReturn(a0);
+        when(caseData.getNoticeOfChangeAnswers3()).thenReturn(a3);
+        when(caseData.getNoticeOfChangeAnswers4()).thenReturn(null); // explicitly null
+        when(caseData.getNoticeOfChangeAnswers9()).thenReturn(a9);
+
+        // --- Act & Assert
+
+        // 1) Valid indices should return the exact mocked instances
+        assertSame(a0, RespondentUtils.getNoticeOfChangeAnswersByIndex(caseData, 0),
+                "Index 0 should return its mapped instance");
+        assertSame(a3, RespondentUtils.getNoticeOfChangeAnswersByIndex(caseData, 3),
+                "Index 3 should return its mapped instance");
+        assertSame(a9, RespondentUtils.getNoticeOfChangeAnswersByIndex(caseData, 9),
+                "Index 9 should return its mapped instance");
+
+        // 2) Valid index with null field should return null
+        assertNull(RespondentUtils.getNoticeOfChangeAnswersByIndex(caseData, 4),
+                "If the mapped field is null, method should return null");
+
+        // 3) Out-of-range indices should return null
+        assertNull(RespondentUtils.getNoticeOfChangeAnswersByIndex(caseData, -1),
+                "Negative index should return null");
+        assertNull(RespondentUtils.getNoticeOfChangeAnswersByIndex(caseData, 10),
+                "Index beyond supported range should return null");
+
+        // 4) Repeatability: same input -> same output (identity)
+        assertSame(a3, RespondentUtils.getNoticeOfChangeAnswersByIndex(caseData, 3),
+                "Repeated calls with the same index should return the same instance");
+
+        // 5) Null caseData should throw NPE (current implementation dereferences caseData)
+        assertThrows(NullPointerException.class,
+                () -> RespondentUtils.getNoticeOfChangeAnswersByIndex(null, 0),
+                "Null caseData should throw NullPointerException");
     }
 }

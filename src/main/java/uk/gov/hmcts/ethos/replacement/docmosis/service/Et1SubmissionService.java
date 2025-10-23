@@ -1,9 +1,9 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
@@ -29,6 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 import java.util.concurrent.ForkJoinPool;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -56,7 +58,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters.InvalidCha
 
 @Service
 @Slf4j
-@RequiredArgsConstructor
 @SuppressWarnings("PMD.DoNotUseThreads")
 public class Et1SubmissionService {
     private static final String VEXATION_NOTIFICATION_TEMPLATE = """
@@ -72,6 +73,9 @@ public class Et1SubmissionService {
     private final FeatureToggleService featureToggleService;
     private final CcdClient ccdClient;
 
+    @Qualifier("etAsyncExecutor")
+    private final Executor etAsyncExecutor;
+
     @Value("${template.et1.et1ProfessionalSubmission}")
     private String et1ProfessionalSubmissionTemplateId;
     @Value("${template.et1.submitCaseEmailTemplateId}")
@@ -81,6 +85,55 @@ public class Et1SubmissionService {
     private static final String ET1_EN_PDF = "ET1_0224.pdf";
     private static final String ET1_CY_PDF = "CY_ET1_2222.pdf";
 
+    public Et1SubmissionService(AcasService acasService, DocumentManagementService documentManagementService,
+                                PdfService pdfService, TornadoService tornadoService, UserIdamService userIdamService,
+                                EmailService emailService, FeatureToggleService featureToggleService,
+                                CcdClient ccdClient, Executor etAsyncExecutor) {
+        this.acasService = acasService;
+        this.documentManagementService = documentManagementService;
+        this.pdfService = pdfService;
+        this.tornadoService = tornadoService;
+        this.userIdamService = userIdamService;
+        this.emailService = emailService;
+        this.featureToggleService = featureToggleService;
+        this.ccdClient = ccdClient;
+        this.etAsyncExecutor = etAsyncExecutor;
+    }
+
+    /**
+     * Entry point to process ET1 submission tasks (document generation/upload, email, vexation check).
+     * Behind LaunchDarkly toggle 'submissionVirtualThread' it will execute concurrently, else sequentially.
+     */
+    public void submitEt1(CaseDetails caseDetails, String userToken) {
+        if (featureToggleService.isFeatureEnabled("submissionVirtualThread")) {
+            ClassLoader classLoader = Thread.currentThread().getContextClassLoader();
+            CompletableFuture<Void> docsTask = runAsyncWithClassLoader(
+                () -> createAndUploadEt1Docs(caseDetails, userToken), classLoader);
+            CompletableFuture<Void> emailTask = runAsyncWithClassLoader(
+                () -> sendEt1ConfirmationClaimant(caseDetails, userToken), classLoader);
+            CompletableFuture<Void> vexTask = runAsyncWithClassLoader(
+                () -> vexationCheck(caseDetails, userToken), classLoader);
+            CompletableFuture.allOf(docsTask, emailTask, vexTask).join();
+        } else {
+            createAndUploadEt1Docs(caseDetails, userToken);
+            sendEt1ConfirmationClaimant(caseDetails, userToken);
+            vexationCheck(caseDetails, userToken);
+        }
+    }
+
+    private CompletableFuture<Void> runAsyncWithClassLoader(Runnable task, ClassLoader classLoader) {
+        return CompletableFuture.runAsync(() -> {
+            Thread currentThread = Thread.currentThread();
+            ClassLoader originalClassLoader = currentThread.getContextClassLoader();
+            try {
+                currentThread.setContextClassLoader(classLoader);
+                task.run();
+            } finally {
+                currentThread.setContextClassLoader(originalClassLoader);
+            }
+        }, etAsyncExecutor);
+    }
+
     /**
      * Creates the ET1 PDF and calls off to ACAS to retrieve the certificates.
      *
@@ -89,6 +142,7 @@ public class Et1SubmissionService {
      */
     public void createAndUploadEt1Docs(CaseDetails caseDetails, String userToken) {
         try {
+            log.info("Creating and uploading ET1 documents for case {}", caseDetails.getCaseId());
             DocumentTypeItem englishEt1 = createEt1DocumentType(caseDetails, userToken, ET1_EN_PDF);
             DocumentTypeItem welshEt1 = null;
             if (WELSH_LANGUAGE.equals(findLanguagePreference(caseDetails.getCaseData()))) {
@@ -113,8 +167,9 @@ public class Et1SubmissionService {
         try {
             acasCertificates = retrieveAndAddAcasCertificates(caseDetails.getCaseData(),
                     userToken, caseDetails.getCaseTypeId());
-        } catch (Exception e) {
+        } catch (InterruptedException | ExecutionException e) {
             log.error("Failed to retrieve ACAS certificates", e);
+            Thread.currentThread().interrupt();
         }
         return acasCertificates;
     }
@@ -182,7 +237,7 @@ public class Et1SubmissionService {
 
     @SuppressWarnings("PMD.SignatureDeclareThrowsException")
     public List<DocumentTypeItem> retrieveAndAddAcasCertificates(
-            CaseData caseData, String userToken, String caseTypeId) throws Exception {
+            CaseData caseData, String userToken, String caseTypeId) throws ExecutionException, InterruptedException {
         if (isEmpty(caseData.getRespondentCollection())) {
             return new ArrayList<>();
         }
@@ -277,6 +332,7 @@ public class Et1SubmissionService {
         if (!featureToggleService.isFeatureEnabled("vexationCheck")) {
             return;
         }
+        log.info("Checking for vexation for case {}", caseDetails.getCaseId());
         String query = """
             {
               "size": 10000,

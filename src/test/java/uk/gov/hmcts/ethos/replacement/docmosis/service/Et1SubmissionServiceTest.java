@@ -12,7 +12,9 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Bean;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
@@ -38,6 +40,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
+import java.util.concurrent.Executor;
 import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -47,6 +50,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -58,7 +62,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.utils.ResourceUtils.generateCaseDetails;
 
 @SpringBootTest(classes = { Et1SubmissionService.class, Et1ReppedService.class, TribunalOfficesService.class,
-    PostcodeToOfficeService.class, PdfService.class})
+    PostcodeToOfficeService.class, PdfService.class, Et1SubmissionServiceTest.TestExecConfig.class })
 @EnableConfigurationProperties({ CaseDefaultValuesConfiguration.class, TribunalOfficesConfiguration.class,
     PostcodeToOfficeMappings.class })
 class Et1SubmissionServiceTest {
@@ -109,8 +113,9 @@ class Et1SubmissionServiceTest {
         PostcodeToOfficeService postcodeToOfficeService = new PostcodeToOfficeService(postcodeToOfficeMappings);
         TribunalOfficesService tribunalOfficesService = new TribunalOfficesService(new TribunalOfficesConfiguration(),
                 postcodeToOfficeService);
+        Executor direct = Runnable::run;
         et1SubmissionService = new Et1SubmissionService(acasService, documentManagementService,
-                pdfService, tornadoService, userIdamService, emailService, featureToggleService, ccdClient);
+                pdfService, tornadoService, userIdamService, emailService, featureToggleService, ccdClient, direct);
         et1ReppedService = new Et1ReppedService(authTokenGenerator, ccdCaseAssignment,
                 jurisdictionCodesMapperService, organisationClient, postcodeToOfficeService, tribunalOfficesService,
                 userIdamService, adminUserService, et1SubmissionService);
@@ -321,5 +326,69 @@ class Et1SubmissionServiceTest {
         et1SubmissionService.vexationCheck(caseDetails, "authToken");
         assertNull(caseDetails.getCaseData().getCaseNotes());
         assertNull(caseDetails.getCaseData().getAdditionalCaseInfoType());
+    }
+
+    @Test
+    void submitEt1_whenToggleOff_callsMethodsSequentiallyInOrder() {
+        // Arrange
+        when(featureToggleService.isFeatureEnabled("submissionVirtualThread")).thenReturn(false);
+        Et1SubmissionService spyService = spy(et1SubmissionService);
+        // Avoid executing heavy logic inside these methods
+        org.mockito.Mockito.doNothing().when(spyService).createAndUploadEt1Docs(caseDetails, "authToken");
+        org.mockito.Mockito.doNothing().when(spyService).sendEt1ConfirmationClaimant(caseDetails, "authToken");
+        org.mockito.Mockito.doNothing().when(spyService).vexationCheck(caseDetails, "authToken");
+
+        // Act
+        spyService.submitEt1(caseDetails, "authToken");
+
+        // Assert - verify exact order (sequential path)
+        var order = inOrder(spyService);
+        order.verify(spyService).createAndUploadEt1Docs(caseDetails, "authToken");
+        order.verify(spyService).sendEt1ConfirmationClaimant(caseDetails, "authToken");
+        order.verify(spyService).vexationCheck(caseDetails, "authToken");
+    }
+
+    @Test
+    void submitEt1_whenToggleOn_propagatesContextClassLoaderAndCallsAll() {
+        // Arrange
+        when(featureToggleService.isFeatureEnabled("submissionVirtualThread")).thenReturn(true);
+        Et1SubmissionService spyService = spy(et1SubmissionService);
+
+        ClassLoader original = Thread.currentThread().getContextClassLoader();
+        ClassLoader testCl = new ClassLoader() { };
+        Thread.currentThread().setContextClassLoader(testCl);
+        try {
+            final boolean[] clOk = {false, false, false};
+            org.mockito.Mockito.doAnswer(inv -> {
+                clOk[0] = Thread.currentThread().getContextClassLoader().equals(testCl);
+                return null;
+            }).when(spyService).createAndUploadEt1Docs(caseDetails, "authToken");
+            org.mockito.Mockito.doAnswer(inv -> {
+                clOk[1] = Thread.currentThread().getContextClassLoader().equals(testCl);
+                return null;
+            }).when(spyService).sendEt1ConfirmationClaimant(caseDetails, "authToken");
+            org.mockito.Mockito.doAnswer(inv -> {
+                clOk[2] = Thread.currentThread().getContextClassLoader().equals(testCl);
+                return null;
+            }).when(spyService).vexationCheck(caseDetails, "authToken");
+
+            // Act
+            spyService.submitEt1(caseDetails, "authToken");
+
+            // Assert - all tasks ran and saw the captured TCCL
+            assertTrue(clOk[0]);
+            assertTrue(clOk[1]);
+            assertTrue(clOk[2]);
+        } finally {
+            Thread.currentThread().setContextClassLoader(original);
+        }
+    }
+
+    @TestConfiguration
+    static class TestExecConfig {
+        @Bean(name = "etAsyncExecutor")
+        public Executor etAsyncExecutor() {
+            return Runnable::run;
+        }
     }
 }

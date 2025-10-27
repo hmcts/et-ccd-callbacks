@@ -253,8 +253,7 @@ public final class InitialConsiderationHelper {
                 .issuesJurCodesGiveDetails(defaultIfEmpty(caseData.getEtICInvalidDetails(), null))
                 .hearingWithJudgeOrMembers(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
                         .map(EtICHearingListedAnswers::getEtICIsHearingWithJudgeOrMembers).orElse(null))
-                .hearingWithJudgeOrMembersReason(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
-                        .map(EtICHearingListedAnswers::getEtICIsHearingWithJudgeOrMembersReason).orElse(null))
+                .hearingWithJudgeOrMembersReason(List.of(updateHearingWithJudgeOrMembersDetails(caseData)))
                 .hearingWithJudgeOrMembersFurtherDetails(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
                         .map(EtICHearingListedAnswers::getEtICIsHearingWithJudgeOrMembersFurtherDetails)
                         .orElse(null))
@@ -432,6 +431,28 @@ public final class InitialConsiderationHelper {
                 DocumentHelper.createDocumentTypeItemFromTopLevel(caseData.getEtInitialConsiderationDocument(),
                         INITIAL_CONSIDERATION, INITIAL_CONSIDERATION, null);
         caseData.getDocumentCollection().add(documentTypeItem);
+    }
+
+    private static String updateHearingWithJudgeOrMembersDetails(CaseData caseData) {
+        Optional<EtICHearingListedAnswers> answers = Optional.ofNullable(caseData.getEtICHearingListedAnswers());
+        StringBuilder sb = new StringBuilder();
+        if (answers.isPresent()) {
+            // Hearing Listed and Case Management Preliminary Hearing type
+            //set Jsa or With member Options selected with related details
+            if ("JSA".equals(caseData.getEtICHearingListedAnswers().getEtICIsHearingWithJudgeOrMembers())) {
+                if ("Other".equals(caseData.getEtICHearingListedAnswers().getEtICIsHearingWithJsa())) {
+                    sb.append(caseData.getEtICHearingListedAnswers().getEtICIsHearingWithJsa());
+                    sb.append(" - ");
+                    sb.append(caseData.getEtICHearingListedAnswers().getEtICIsHearingWithMembersLabel());
+                } else  { // For other paths (hearing status and type combos, follow the pre-existing logic)
+                    sb.append(caseData.getEtICHearingListedAnswers().getEtICIsHearingWithJsa());
+                }
+            } else if ("With members".equals(
+                    caseData.getEtICHearingListedAnswers().getEtICIsHearingWithJudgeOrMembers())) {
+                sb.append(caseData.getEtICHearingListedAnswers().getEtICIsHearingWithMembers());
+            }
+        }
+        return sb.toString();
     }
 
     private static List<String> getFurtherInformation(List<String> icInformation) {

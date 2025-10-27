@@ -318,6 +318,21 @@ public class InitialConsiderationService {
         .min(Comparator.naturalOrder());
     }
 
+    public HearingType getEarliestListedHearingType(List<HearingTypeItem> hearingCollection) {
+        return hearingCollection.stream()
+                .filter(hearingTypeItem -> hearingTypeItem != null
+                        && hearingTypeItem.getValue() != null)
+                .map(HearingTypeItem::getValue)
+                .filter(hearing -> hearing.getHearingDateCollection() != null
+                        && !hearing.getHearingDateCollection().isEmpty()
+                        && !hearing.getHearingDateCollection().stream().filter(
+                                hd -> "Listed".equals(
+                                        hd.getValue().getHearingStatus())).findAny().isEmpty())
+                .min(Comparator.comparing(hearing ->
+                        getEarliestHearingDateForListedHearings(hearing.getHearingDateCollection())
+                                .orElse(LocalDate.now().plusYears(100)))).orElse(null);
+    }
+
     /**
      * Creates the jurisdiction section for Initial Consideration.
      *

@@ -219,9 +219,6 @@ public class CaseManagementForCaseWorkerService {
         if (isNullOrEmpty(respondentSumTypeItem.getValue().getRespondentEcc())) {
             respondentSumTypeItem.getValue().setRespondentEcc(NO);
         }
-        if (isNullOrEmpty(respondentSumTypeItem.getValue().getRespondentEccReply())) {
-            respondentSumTypeItem.getValue().setRespondentEccReply(NO);
-        }
     }
 
     private void checkExtensionRequired(RespondentSumTypeItem respondentSumTypeItem) {

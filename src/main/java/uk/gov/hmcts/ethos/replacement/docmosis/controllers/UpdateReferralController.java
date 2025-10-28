@@ -138,7 +138,7 @@ public class UpdateReferralController {
         log.info("ABOUT TO SUBMIT UPDATE REFERRAL ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setReferralSubject(setReferralSubject(caseData.getReferralSubject()));
+        caseData.setUpdateReferralSubject(setReferralSubject(caseData.getUpdateReferralSubject()));
         UserDetails userDetails = userIdamService.getUserDetails(userToken);
         String nextHearingDate = getNearestHearingToReferral(caseData, "None");
         String name = String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName());

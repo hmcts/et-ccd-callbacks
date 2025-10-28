@@ -181,7 +181,7 @@ public final class ReferralHelper {
         return switch (referral.getReferralSubject()) {
             case PARTY_NOT_RESPONDED_COMPLIED -> PARTY_NOT_RESPONDED_COMPILED;
             case "Rule 22" -> "Rule 21";
-            case "Rule 49 Application" -> "Rule 50 Application";
+            case "Rule 49 Application" -> "Rule 50 application";
             default -> referral.getReferralSubject();
         };
     }

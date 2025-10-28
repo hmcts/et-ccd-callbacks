@@ -106,7 +106,8 @@
             },
             "responseReceived": "PUBLIC",
             "responseContinue": "PUBLIC",
-            "extensionRequested": "PUBLIC"
+            "extensionRequested": "PUBLIC",
+            "respondentEcc": "PUBLIC"
           },
           "id": "e764f874-e937-4642-ac67-4af2e2fd05f6"
         }

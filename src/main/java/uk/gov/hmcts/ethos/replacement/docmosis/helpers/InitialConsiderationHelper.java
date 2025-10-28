@@ -43,6 +43,9 @@ public final class InitialConsiderationHelper {
     private static final String IC_OUTPUT_NAME = "Initial Consideration.pdf";
     private static final String IC_SUMMARY_EW_TEMPLATE_NAME = "EM-TRB-EGW-ENG-02203.docx";
     private static final String IC_SUMMARY_SC_TEMPLATE_NAME = "EM-TRB-SCO-ENG-02204.docx";
+    private static final String JSA = "JSA";
+    private static final String OTHER = "Other";
+    private static final String WITH_MEMBERS = "With members";
 
     private InitialConsiderationHelper() {
         OBJECT_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
@@ -439,15 +442,15 @@ public final class InitialConsiderationHelper {
         if (answers.isPresent()) {
             // Hearing Listed and Case Management Preliminary Hearing type
             //set Jsa or With member Options selected with related details
-            if ("JSA".equals(caseData.getEtICHearingListedAnswers().getEtICIsHearingWithJudgeOrMembers())) {
-                if ("Other".equals(caseData.getEtICHearingListedAnswers().getEtICIsHearingWithJsa())) {
+            if (JSA.equals(caseData.getEtICHearingListedAnswers().getEtICIsHearingWithJudgeOrMembers())) {
+                if (OTHER.equals(caseData.getEtICHearingListedAnswers().getEtICIsHearingWithJsa())) {
                     sb.append(caseData.getEtICHearingListedAnswers().getEtICIsHearingWithJsa());
                     sb.append(" - ");
                     sb.append(caseData.getEtICHearingListedAnswers().getEtICIsHearingWithMembersLabel());
                 } else  { // For other paths (hearing status and type combos, follow the pre-existing logic)
                     sb.append(caseData.getEtICHearingListedAnswers().getEtICIsHearingWithJsa());
                 }
-            } else if ("With members".equals(
+            } else if (WITH_MEMBERS.equals(
                     caseData.getEtICHearingListedAnswers().getEtICIsHearingWithJudgeOrMembers())) {
                 sb.append(caseData.getEtICHearingListedAnswers().getEtICIsHearingWithMembers());
             }

@@ -299,27 +299,16 @@ public class TornadoService {
         throws IOException {
         HttpURLConnection connection = null;
         try {
-            dmStoreDocumentName = getDmStoreDocumentName(caseData, documentName);
             connection = createConnection();
 
             buildDocumentInstruction(connection, caseData, documentName, caseTypeId);
             byte[] bytes = getDocumentByteArray(connection);
-            return createDocumentInfoFromBytes(userToken, bytes, dmStoreDocumentName, caseTypeId);
+            return createDocumentInfoFromBytes(userToken, bytes, documentName, caseTypeId);
         } catch (IOException exception) {
             log.error(UNABLE_TO_CONNECT_TO_DOCMOSIS, exception);
             throw exception;
         } finally {
             closeConnection(connection);
-        }
-    }
-
-    private static String getDmStoreDocumentName(CaseData caseData, String documentName) {
-        if (ET3_RESPONSE_PDF.equals(documentName)) {
-            return String.format("%s - %s", caseData.getSubmitEt3Respondent().getSelectedLabel(), ET3_RESPONSE_PDF);
-        } else if (NOTIFICATION_SUMMARY_PDF.equals(documentName)) {
-            return getDocumentName(caseData);
-        } else {
-            return documentName;
         }
     }
 
@@ -337,7 +326,6 @@ public class TornadoService {
         throws IOException {
         HttpURLConnection connection = null;
         try {
-            dmStoreDocumentName = documentName;
             connection = createConnection();
             buildDocumentInstruction(connection, caseData, documentName, caseTypeId);
             return getDocumentByteArray(connection);
@@ -376,27 +364,27 @@ public class TornadoService {
             throws JsonProcessingException {
         switch (documentName) {
             case ET1_VETTING_PDF -> {
-                dmStoreDocumentName = String.format(ET1_VETTING_OUTPUT_NAME,
+                String outputName = String.format(ET1_VETTING_OUTPUT_NAME,
                         sanitizePartyName(caseData.getClaimant()));
                 return Et1VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey(),
-                        dmStoreDocumentName);
+                        outputName);
             }
             case ET3_PROCESSING_PDF -> {
-                dmStoreDocumentName = String.format("ET3 Processing - %s.pdf",
+                String outputName = String.format("ET3 Processing - %s.pdf",
                         sanitizePartyName(caseData.getEt3ChooseRespondent().getSelectedLabel()));
                 return Et3VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey(),
-                        dmStoreDocumentName);
+                        outputName);
             }
             case INITIAL_CONSIDERATION_PDF -> {
                 return InitialConsiderationHelper.getDocumentRequest(
                         caseData, tornadoConnection.getAccessKey(), caseTypeId);
             }
             case TSE_FILE_NAME -> {
-                dmStoreDocumentName = tseService.getTseDocumentName(caseData);
+                // TSE document helpers do not require the output name as a parameter
                 return RespondentTellSomethingElseHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             }
             case CLAIMANT_TSE_FILE_NAME -> {
-                dmStoreDocumentName = tseService.getClaimantTseDocumentName(caseData);
+                // TSE document helpers do not require the output name as a parameter
                 return ClaimantTellSomethingElseHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             }
             case REFERRAL_SUMMARY_PDF -> {

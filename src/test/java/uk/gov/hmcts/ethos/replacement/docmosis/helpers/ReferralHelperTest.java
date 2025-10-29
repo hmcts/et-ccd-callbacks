@@ -323,8 +323,8 @@ class ReferralHelperTest {
         return Stream.of(
                 Arguments.of(PARTY_NOT_RESPONDED_COMPLIED, PARTY_NOT_RESPONDED_COMPILED),
                 Arguments.of(PARTY_NOT_RESPONDED_COMPILED, PARTY_NOT_RESPONDED_COMPILED),
-                Arguments.of("Rule 49 Application", "Rule 50 Application"),
-                Arguments.of("Rule 50 Application", "Rule 50 Application"),
+                Arguments.of("Rule 49 Application", "Rule 50 application"),
+                Arguments.of("Rule 50 application", "Rule 50 application"),
                 Arguments.of("Rule 22", "Rule 21"),
                 Arguments.of("Rule 21", "Rule 21"),
                 Arguments.of("Other", "Other"),

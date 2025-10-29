@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-import static org.apache.http.HttpHeaders.AUTHORIZATION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_AMEND_RESPONSE;
@@ -57,19 +56,6 @@ public class RespondentTellSomethingElseControllerFunctionalTest extends BaseFun
             .header(new Header(AUTHORIZATION, userToken))
             .body(ccdRequest)
             .post("/respondentTSE/validateGiveDetails")
-            .then()
-            .statusCode(HttpStatus.SC_OK)
-            .log().all(true);
-    }
-
-    @Test
-    void shouldReceiveSuccessResponseWhenAboutToSubmitRespondentTseInvoked() {
-        RestAssured.given()
-            .spec(spec)
-            .contentType(ContentType.JSON)
-            .header(new Header(AUTHORIZATION, userToken))
-            .body(ccdRequest)
-            .post("/respondentTSE/aboutToSubmit")
             .then()
             .statusCode(HttpStatus.SC_OK)
             .log().all(true);

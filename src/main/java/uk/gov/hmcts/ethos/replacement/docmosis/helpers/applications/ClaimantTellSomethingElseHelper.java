@@ -8,9 +8,6 @@ import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
-import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseApplicationData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.documents.TseApplicationDocument;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.TSEApplicationTypeData;
@@ -23,7 +20,6 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
-
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static org.springframework.util.CollectionUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
@@ -41,7 +37,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLA
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_STRIKE_OUT_ALL_OR_PART;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_VARY_OR_REVOKE_AN_ORDER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_TSE_WITHDRAW_CLAIM;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper.getRespondentRepresentative;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.applications.TseHelper.getRespondentSelectedApplicationType;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.CLAIMANT_TSE_FILE_NAME;
 
@@ -197,36 +192,6 @@ public final class ClaimantTellSomethingElseHelper {
 
         return String.format(TABLE_ROW_MARKDOWN, count.getAndIncrement(), value.getType(), value.getApplicant(),
                 value.getDate(), value.getDueDate(), responses, status);
-    }
-
-    /**
-     * Retrieves a list of email addresses for respondents and their representatives from the given case data.
-     *
-     * @param caseData the case data containing respondent and representative information
-     * @return a mapping of email addresses and respondent ids for respondents and their representatives
-     */
-    public static Map<String, String> getRespondentsAndRepsEmailAddresses(CaseData caseData) {
-        List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
-        Map<String, String> emailAddressesMap = new ConcurrentHashMap<>();
-
-        respondentCollection.forEach(respondentSumTypeItem -> {
-            RespondentSumType respondent = respondentSumTypeItem.getValue();
-            String responseEmail = respondent.getResponseRespondentEmail();
-            String respondentEmail = respondent.getRespondentEmail();
-
-            if (StringUtils.isNotBlank(responseEmail)) {
-                emailAddressesMap.put(responseEmail, respondentSumTypeItem.getId());
-            } else if (StringUtils.isNotBlank(respondentEmail)) {
-                emailAddressesMap.put(respondentEmail, respondentSumTypeItem.getId());
-            }
-
-            RepresentedTypeR representative = getRespondentRepresentative(caseData, respondent);
-            if (representative != null && StringUtils.isNotBlank(representative.getRepresentativeEmailAddress())) {
-                emailAddressesMap.put(representative.getRepresentativeEmailAddress(), "");
-            }
-        });
-
-        return emailAddressesMap;
     }
 
     public static String getApplicantType(CaseData caseData) {

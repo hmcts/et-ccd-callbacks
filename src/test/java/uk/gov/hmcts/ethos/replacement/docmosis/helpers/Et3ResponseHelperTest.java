@@ -305,5 +305,4 @@ class Et3ResponseHelperTest {
         respondentSumTypeItemValueNull.setValue(null);
         assertDoesNotThrow(() -> Et3ResponseHelper.setEt3NotificationAcceptedDates(caseData));
     }
-
 }

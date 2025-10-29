@@ -48,7 +48,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.OUTPUT_FILE_NAME;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1VettingHelper.ET1_VETTING_OUTPUT_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationDocumentHelper.buildNotificationDocumentData;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationDocumentHelper.getDocumentName;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters.InvalidCharacterCheck.sanitizePartyName;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService.APPLICATION_DOCX_VALUE;
 

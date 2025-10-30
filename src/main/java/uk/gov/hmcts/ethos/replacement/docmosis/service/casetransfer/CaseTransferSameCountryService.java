@@ -61,13 +61,13 @@ public class CaseTransferSameCountryService {
     private List<String> transferCases(CaseDetails caseDetails, List<CaseData> caseDataList, String userToken) {
         List<String> errors = new ArrayList<>();
 
-        // Remove source case as we will be updating this directly rather than sending it to the event queue
+        // Remove the source case as we will be updating this directly rather than sending it to the event queue
         CaseData sourceCaseData = caseDetails.getCaseData();
         List<CaseData> casesToSubmitTransferEvent = caseDataList.stream()
                 .filter(caseData -> !caseData.getEthosCaseReference().equals(sourceCaseData.getEthosCaseReference()))
                 .toList();
 
-        String newManagingOffice = caseDetails.getCaseData().getOfficeCT().getSelectedCode();
+        String newManagingOffice = sourceCaseData.getOfficeCT().getSelectedCode();
 
         for (CaseData caseData : casesToSubmitTransferEvent) {
             CaseTransferEventParams params = CaseTransferEventParams.builder()
@@ -77,7 +77,7 @@ public class CaseTransferSameCountryService {
                     .ethosCaseReferences(List.of(caseData.getEthosCaseReference()))
                     .sourceEthosCaseReference(sourceCaseData.getEthosCaseReference())
                     .newManagingOffice(newManagingOffice)
-                    .reason(caseDetails.getCaseData().getReasonForCT())
+                    .reason(sourceCaseData.getReasonForCT())
                     .multipleReference(SINGLE_CASE_TYPE)
                     .confirmationRequired(false)
                     .transferSameCountry(true)
@@ -88,6 +88,13 @@ public class CaseTransferSameCountryService {
             if (!transferErrors.isEmpty()) {
                 errors.addAll(transferErrors);
             }
+        }
+
+        // If transferring to a different office, clear the file location and clerk responsible as offices have
+        // different values
+        if (!newManagingOffice.equals(sourceCaseData.getManagingOffice())) {
+            sourceCaseData.setFileLocation(null);
+            sourceCaseData.setClerkResponsible(null);
         }
 
         sourceCaseData.setManagingOffice(newManagingOffice);

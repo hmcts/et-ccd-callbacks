@@ -8,6 +8,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.BFActionTypeItem;
@@ -19,6 +20,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -61,6 +63,8 @@ class CaseTransferSameCountryServiceTest {
         String officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
         CaseDetails caseDetails = createCaseDetails(TribunalOffice.MANCHESTER.getOfficeName(), officeCT,
             null);
+        caseDetails.getCaseData().setFileLocation(new DynamicFixedListType("Location"));
+        caseDetails.getCaseData().setClerkResponsible(new DynamicFixedListType("Clerk"));
         when(caseTransferUtils.getAllCasesToBeTransferred(caseDetails, USER_TOKEN))
                 .thenReturn(List.of(caseDetails.getCaseData()));
 
@@ -73,6 +77,8 @@ class CaseTransferSameCountryServiceTest {
         assertNull(caseDetails.getCaseData().getOfficeCT());
         assertNull(caseDetails.getCaseData().getPositionTypeCT());
         assertNull(caseDetails.getCaseData().getStateAPI());
+        assertNull(caseDetails.getCaseData().getFileLocation());
+        assertNull(caseDetails.getCaseData().getClerkResponsible());
     }
 
     @Test
@@ -109,7 +115,7 @@ class CaseTransferSameCountryServiceTest {
         List<String> errors = caseTransferSameCountryService.transferCase(caseDetails, USER_TOKEN);
 
         assertEquals(1, errors.size());
-        assertEquals(expectedError, errors.get(0));
+        assertEquals(expectedError, errors.getFirst());
         verify(caseTransferEventService, never()).transfer(isA(CaseTransferEventParams.class));
 
         assertEquals(TribunalOffice.MANCHESTER.getOfficeName(), caseDetails.getCaseData().getManagingOffice());
@@ -129,7 +135,7 @@ class CaseTransferSameCountryServiceTest {
         List<String> errors = caseTransferSameCountryService.transferCase(caseDetails, USER_TOKEN);
 
         assertEquals(1, errors.size());
-        assertEquals(expectedError, errors.get(0));
+        assertEquals(expectedError, errors.getFirst());
         verify(caseTransferEventService, never()).transfer(isA(CaseTransferEventParams.class));
 
         assertEquals(TribunalOffice.MANCHESTER.getOfficeName(), caseDetails.getCaseData().getManagingOffice());
@@ -242,7 +248,7 @@ class CaseTransferSameCountryServiceTest {
         String officeCT = TribunalOffice.NEWCASTLE.getOfficeName();
         List<String> eccCases = List.of("120002/2021");
         CaseDetails caseDetails = createCaseDetails(managingOffice, eccCases, officeCT, null);
-        CaseData eccCaseData = createEccCaseSearchResult(eccCases.get(0), managingOffice);
+        CaseData eccCaseData = createEccCaseSearchResult(eccCases.getFirst(), managingOffice);
         when(caseTransferUtils.getAllCasesToBeTransferred(caseDetails, USER_TOKEN))
                 .thenReturn(List.of(caseDetails.getCaseData(), eccCaseData));
 
@@ -253,7 +259,7 @@ class CaseTransferSameCountryServiceTest {
         List<String> errors = caseTransferSameCountryService.transferCase(caseDetails, USER_TOKEN);
 
         assertEquals(1, errors.size());
-        assertEquals(caseTransferError, errors.get(0));
+        assertEquals(caseTransferError, errors.getFirst());
         assertEquals(officeCT, caseDetails.getCaseData().getManagingOffice());
         assertNull(caseDetails.getCaseData().getOfficeCT());
         assertNull(caseDetails.getCaseData().getPositionTypeCT());
@@ -294,6 +300,8 @@ class CaseTransferSameCountryServiceTest {
     void caseTransferShouldTransferSameOfficeWithBfActionAndHearingListed() {
         String officeCT = TribunalOffice.MANCHESTER.getOfficeName();
         CaseDetails caseDetails = createCaseDetails(officeCT, officeCT, HEARING_STATUS_LISTED);
+        caseDetails.getCaseData().setFileLocation(new DynamicFixedListType("Location"));
+        caseDetails.getCaseData().setClerkResponsible(new DynamicFixedListType("Clerk"));
         addBfAction(caseDetails.getCaseData(), null);
         when(caseTransferUtils.getAllCasesToBeTransferred(caseDetails, USER_TOKEN))
                 .thenReturn(List.of(caseDetails.getCaseData()));
@@ -301,6 +309,8 @@ class CaseTransferSameCountryServiceTest {
 
         assertEquals(0, errors.size());
         verify(caseTransferUtils, never()).validateCase(caseDetails.getCaseData());
+        assertNotNull(caseDetails.getCaseData().getFileLocation());
+        assertNotNull(caseDetails.getCaseData().getClerkResponsible());
     }
 
     private void verifyCaseTransferEventParams(String expectedEthosCaseReference,

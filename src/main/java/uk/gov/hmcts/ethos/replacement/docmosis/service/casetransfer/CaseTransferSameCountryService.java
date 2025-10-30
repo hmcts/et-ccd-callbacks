@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferUtils.getTransferValidationErrors;
 
 @Service("caseTransferService")
 @RequiredArgsConstructor
@@ -32,7 +33,7 @@ public class CaseTransferSameCountryService {
         if (caseData.getOfficeCT().getSelectedCode().equals(caseData.getManagingOffice())) {
             return transferCases(caseDetails, caseDataList, userToken);
         }
-        List<String> errors = validate(caseDataList);
+        List<String> errors = getTransferValidationErrors(caseDataList, caseTransferUtils);
 
         if (!errors.isEmpty()) {
             return errors;
@@ -43,19 +44,6 @@ public class CaseTransferSameCountryService {
 
     public List<String> updateEccLinkedCase(CaseDetails caseDetails, String userToken) {
         return transferCases(caseDetails, Collections.emptyList(), userToken);
-    }
-
-    private List<String> validate(List<CaseData> cases) {
-        List<String> errors = new ArrayList<>();
-
-        for (CaseData caseData : cases) {
-            List<String> validationErrors = caseTransferUtils.validateCase(caseData);
-            if (!validationErrors.isEmpty()) {
-                errors.addAll(validationErrors);
-            }
-        }
-
-        return errors;
     }
 
     private List<String> transferCases(CaseDetails caseDetails, List<CaseData> caseDataList, String userToken) {

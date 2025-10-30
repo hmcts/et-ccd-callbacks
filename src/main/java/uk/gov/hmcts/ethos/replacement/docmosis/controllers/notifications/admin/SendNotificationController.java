@@ -99,7 +99,7 @@ public class SendNotificationController {
         sendNotificationService.createSendNotification(caseData);
         sendNotificationService.sendNotifyEmails(caseDetails);
         sendNotificationService.clearSendNotificationFields(caseData);
-
+        caseData.setDraftAndSignJudgement(null);
         return getCallbackRespEntityNoErrors(caseData);
     }
 

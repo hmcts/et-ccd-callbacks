@@ -52,6 +52,13 @@ The latest version of the RSE CFT lib can be found [here](https://github.com/hmc
 | CFTLIB_IMPORT_CCD_DEFS_ON_BOOT | Optional<br/>Set to `false` to prevent CCD definitions from being imported at startup |
 | ET_LAUNCH_DARKLY_SDK_KEY       | ET Launch Darkly SDK Key - this can be retrieved from the et-aat Key Vault            |
 
+These can be set with the ./bin/set-env.sh script. Edit the script to add your own path to config-repos and any missing variables.
+Run the script with source, so that the environment variables are set in your current shell that you invoke the gradle command from.
+```bash
+source ./bin/set-env.sh
+```
+
+
 ### Azure Service Bus
 You must either provide a connection string in an environment variable to a queue in Azure or
 configure a fake service bus.

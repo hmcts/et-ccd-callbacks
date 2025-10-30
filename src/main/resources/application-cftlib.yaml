@@ -1,8 +1,8 @@
 cftlib:
-  scotland-ccd-config-path: ${SCOTLAND_CCD_CONFIG_PATH}
-  import-ccd-defs-on-boot: ${CFTLIB_IMPORT_CCD_DEFS_ON_BOOT:true}
-  admin-ccd-config-path: ${ADMIN_CCD_CONFIG_PATH}
-  englandwales-ccd-config-path: ${ENGLANDWALES_CCD_CONFIG_PATH}
+  scotland-ccd-config-path: ${SCOTLAND_CCD_CONFIG_PATH:}
+  import-ccd-defs-on-boot: ${CFTLIB_IMPORT_CCD_DEFS_ON_BOOT:false}
+  admin-ccd-config-path: ${ADMIN_CCD_CONFIG_PATH:}
+  englandwales-ccd-config-path: ${ENGLANDWALES_CCD_CONFIG_PATH:}
 
 idam:
   api:

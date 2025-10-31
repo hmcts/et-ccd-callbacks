@@ -44,6 +44,13 @@ public class InitialConsiderationData {
     private String hearingWithJudgeOrMembers;
     @JsonProperty("hearingWithJudgeOrMembersReason")
     private List<String> hearingWithJudgeOrMembersReason;
+    @JsonProperty("hearingWithJsa")
+    private String hearingWithJsa;
+    @JsonProperty("hearingWithMembersLabel")
+    private String hearingWithMembersLabel;
+    @JsonProperty("hearingWithMembers")
+    private String hearingWithMembers;
+
     @JsonProperty("hearingWithJudgeOrMembersFurtherDetails")
     private String hearingWithJudgeOrMembersFurtherDetails;
     @JsonProperty("otherDirections")

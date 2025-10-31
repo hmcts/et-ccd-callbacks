@@ -366,8 +366,10 @@ public class InitialConsiderationService {
                    caseData.getEthosCaseReference());
             return;
         }
-        caseData.getEtICHearingListedAnswers().setEtInitialConsiderationListedHearingType(
-                earliestListedHearing.getHearingType());
+        if (caseData.getEtICHearingListedAnswers() != null) {
+            caseData.getEtICHearingListedAnswers().setEtInitialConsiderationListedHearingType(
+                    earliestListedHearing.getHearingType());
+        }
     }
 
     /**
@@ -455,14 +457,18 @@ public class InitialConsiderationService {
 
     public void clearOldEtICHearingListedAnswersValues(CaseData caseData) {
         //clear old values
-        caseData.getEtICHearingListedAnswers().setEtInitialConsiderationListedHearingType(null);
-        caseData.getEtICHearingListedAnswers().setEtICIsHearingWithMembersLabel(null);
-        caseData.getEtICHearingListedAnswers().setEtICIsHearingWithMembers(null);
-        caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJudgeOrMembersFurtherDetails(null);
-        caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJudgeOrMembersReason(null);
-        caseData.getEtICHearingListedAnswers().setEtICHearingListed(null);
-        caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJudgeOrMembers(null);
+        if (caseData.getEtICHearingListedAnswers() != null) {
+            caseData.getEtICHearingListedAnswers().setEtInitialConsiderationListedHearingType(null);
+            caseData.getEtICHearingListedAnswers().setEtICIsHearingWithMembersLabel(null);
+            caseData.getEtICHearingListedAnswers().setEtICIsHearingWithMembers(null);
+            caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJudgeOrMembersFurtherDetails(null);
+            caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJudgeOrMembersReason(null);
+            caseData.getEtICHearingListedAnswers().setEtICHearingListed(null);
+            caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJudgeOrMembers(null);
+        }
+
     }
+
 
     public void mapOldIcHearingNotListedOptionsToNew(CaseData caseData, String caseTypeId) {
         List<String> etICHearingNotListedList = caseData.getEtICHearingNotListedList();

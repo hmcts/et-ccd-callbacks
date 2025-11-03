@@ -15,6 +15,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.applications.RespondentTellSomethingElseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.applications.TseViewApplicationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseAccessService;
@@ -36,7 +37,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -139,15 +139,10 @@ public class RespondentTellSomethingElseService {
     }
 
     public void sendEmails(CaseDetails caseDetails, String userToken) {
-        log.info("sending emails for respondent applications");
         List<CaseUserAssignment> caseUserAssignments =
                 caseAccessService.getCaseUserAssignmentsById(caseDetails.getCaseId());
-        log.info("sendAcknowledgeEmail");
         sendAcknowledgeEmail(caseDetails, userToken, caseUserAssignments);
-        log.info("sendAcknowledgeEmail end");
-        log.info("sendClaimantEmail");
         sendClaimantEmail(caseDetails, caseUserAssignments);
-        log.info("sendClaimantEmail end");
         sendAdminEmail(caseDetails);
     }
 
@@ -163,7 +158,6 @@ public class RespondentTellSomethingElseService {
         CaseData caseData = caseDetails.getCaseData();
         String templateId;
         Map<String, String> personalisation;
-        log.info("case assignments {}", caseUserAssignments);
 
         if (TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE.equals(caseData.getResTseSelectApplication())) {
             templateId = tseRespondentAcknowledgeTypeCTemplateId;
@@ -195,16 +189,9 @@ public class RespondentTellSomethingElseService {
 
         if (!TSE_APP_ORDER_A_WITNESS_TO_ATTEND_TO_GIVE_EVIDENCE.equals(caseData.getResTseSelectApplication())
                 && YES.equals(caseData.getResTseCopyToOtherPartyYesOrNo())) {
-            String targetOrgId = assignments.stream()
-                    .map(CaseUserAssignment::getOrganisationId)
-                    .filter(Objects::nonNull)
-                    .findFirst()
-                    .orElse(null);
 
-            // send email to other respondents and reps in the case
-            List<CaseUserAssignment> filteredAssignments = caseUserAssignments.stream()
-                    .filter(assignment -> !assignment.getOrganisationId().equals(targetOrgId))
-                    .toList();
+            List<CaseUserAssignment> filteredAssignments =
+                    filterRespRepCaseAssignments(caseUserAssignments, assignments);
 
             String applicantName = userDetails.getFirstName() + " " + userDetails.getLastName();
             emailNotificationService.getRespondentsAndRepsEmailAddresses(caseData, filteredAssignments)
@@ -218,6 +205,17 @@ public class RespondentTellSomethingElseService {
                         emailService.sendEmail(templateId, email, newPersonalisation);
                     });
         }
+    }
+
+    private List<CaseUserAssignment> filterRespRepCaseAssignments(List<CaseUserAssignment> caseUserAssignments,
+                                                                  Set<CaseUserAssignment> assignments) {
+        List<CaseUserAssignment> filteredAssignments = new ArrayList<>();
+        for (CaseUserAssignment assignment : caseUserAssignments) {
+            if (!assignments.contains(assignment) && SolicitorRole.from(assignment.getCaseRole()).isPresent()) {
+                filteredAssignments.add(assignment);
+            }
+        }
+        return filteredAssignments;
     }
 
     private Map<String, String> buildPersonalisationTypeC(CaseDetails caseDetails) {

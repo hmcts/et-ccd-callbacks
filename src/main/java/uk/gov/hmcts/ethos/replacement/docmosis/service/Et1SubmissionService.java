@@ -6,6 +6,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.exceptions.PdfServiceException;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.DocumentCategory;
@@ -13,17 +14,32 @@ import uk.gov.hmcts.ecm.common.service.pdf.PdfService;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
+import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.AdditionalCaseInfoType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 
+import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ForkJoinPool;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.synchronizedList;
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
+import static uk.gov.hmcts.ecm.common.helpers.UtilHelper.listingFormatLocalDate;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ACAS_CERTIFICATE;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1;
@@ -43,6 +59,10 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters.InvalidCha
 @RequiredArgsConstructor
 @SuppressWarnings("PMD.DoNotUseThreads")
 public class Et1SubmissionService {
+    private static final String VEXATION_NOTIFICATION_TEMPLATE = """
+            Due diligence check
+            
+            %s""";
     private final AcasService acasService;
     private final DocumentManagementService documentManagementService;
     private final PdfService pdfService;
@@ -50,6 +70,7 @@ public class Et1SubmissionService {
     private final UserIdamService userIdamService;
     private final EmailService emailService;
     private final FeatureToggleService featureToggleService;
+    private final CcdClient ccdClient;
 
     @Value("${template.et1.et1ProfessionalSubmission}")
     private String et1ProfessionalSubmissionTemplateId;
@@ -162,7 +183,7 @@ public class Et1SubmissionService {
     @SuppressWarnings("PMD.SignatureDeclareThrowsException")
     public List<DocumentTypeItem> retrieveAndAddAcasCertificates(
             CaseData caseData, String userToken, String caseTypeId) throws Exception {
-        if (CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
+        if (isEmpty(caseData.getRespondentCollection())) {
             return new ArrayList<>();
         }
         List<String> acasNumbers = caseData.getRespondentCollection().stream()
@@ -170,30 +191,27 @@ public class Et1SubmissionService {
                 .map(respondent -> respondent.getValue().getRespondentAcas())
                 .toList();
 
-        if (CollectionUtils.isEmpty(acasNumbers)) {
+        if (isEmpty(acasNumbers)) {
             return new ArrayList<>();
         }
 
         List<DocumentInfo> documentInfoList = acasService.getAcasCertificates(caseData, acasNumbers, userToken,
                 caseTypeId);
 
-        if (CollectionUtils.isEmpty(documentInfoList)) {
+        if (isEmpty(documentInfoList)) {
             return new ArrayList<>();
         }
 
         List<DocumentTypeItem> documentTypeItems = synchronizedList(new ArrayList<>());
-        ForkJoinPool customThreadPool = new ForkJoinPool(documentInfoList.size());
-        try {
+        try (ForkJoinPool customThreadPool = new ForkJoinPool(documentInfoList.size())) {
             customThreadPool.submit(() ->
-                documentInfoList.parallelStream()
-                    .map(documentManagementService::addDocumentToDocumentField)
-                    .forEach(doc -> {
-                        doc.setCategoryId(DocumentCategory.ACAS_CERTIFICATE.getCategory());
-                        documentTypeItems.add(createDocumentTypeItem(doc, ACAS_CERTIFICATE));
-                    })
+                    documentInfoList.parallelStream()
+                            .map(documentManagementService::addDocumentToDocumentField)
+                            .forEach(doc -> {
+                                doc.setCategoryId(DocumentCategory.ACAS_CERTIFICATE.getCategory());
+                                documentTypeItems.add(createDocumentTypeItem(doc, ACAS_CERTIFICATE));
+                            })
             ).get();
-        } finally {
-            customThreadPool.shutdown();
         }
 
         return documentTypeItems;
@@ -246,6 +264,106 @@ public class Et1SubmissionService {
                             : ENGLISH_LANGUAGE;
             default -> ENGLISH_LANGUAGE;
         };
+    }
+
+    /**
+     * Checks for vexation by querying ElasticSearch for cases. It checks to see if a claimant has submitted 4 or more
+     * claims in the last 6 months. Note the query is in a String format to allow the usage of _source that works
+     * with CCD's ElasticSearch.
+     * @param caseDetails the case details
+     * @param userToken the user token
+     */
+    public void vexationCheck(CaseDetails caseDetails, String userToken) {
+        if (!featureToggleService.isFeatureEnabled("vexationCheck")) {
+            return;
+        }
+        String query = """
+            {
+              "size": 10000,
+              "query": {
+                "bool": {
+                  "filter": [
+                    {
+                      "range": {
+                        "data.receiptDate": {
+                          "gte": "%s"
+                        }
+                      }
+                    }
+                  ],
+                  "must_not": [
+                    {
+                      "terms": {
+                        "state.keyword": [
+                          "AWAITING_SUBMISSION_TO_HMCTS"
+                        ]
+                      }
+                    }
+                  ]
+                }
+              },
+              "_source": [
+                "data.ethosCaseReference", "data.claimant", "state.keyword", "data.receiptDate", "data.respondent"
+              ]
+            }
+            """.formatted(LocalDate.now().minusMonths(6L));
+
+        List<SubmitEvent> submitEventList = getSubmitEventList(userToken, query);
+
+        if (submitEventList.size() < 4) {
+            return;
+        }
+
+        AdditionalCaseInfoType additionalCaseInfoType = Optional.ofNullable(
+                caseDetails.getCaseData().getAdditionalCaseInfoType()
+        ).orElse(new AdditionalCaseInfoType());
+        additionalCaseInfoType.setInterventionRequired(YES);
+        caseDetails.getCaseData().setAdditionalCaseInfoType(additionalCaseInfoType);
+
+        caseDetails.getCaseData().setCaseNotes(setVexationNotes(submitEventList));
+        FlagsImageHelper.buildFlagsImageFileName(caseDetails);
+
+    }
+
+    private List<SubmitEvent> getSubmitEventList(String userToken, String query) {
+        CompletableFuture<List<SubmitEvent>> englandWalesFuture = CompletableFuture.supplyAsync(
+                () -> fetchSubmitEvents(userToken, ENGLANDWALES_CASE_TYPE_ID, query));
+        CompletableFuture<List<SubmitEvent>> scotlandFuture = CompletableFuture.supplyAsync(
+                () -> fetchSubmitEvents(userToken, SCOTLAND_CASE_TYPE_ID, query));
+
+        return Stream.of(englandWalesFuture, scotlandFuture)
+                .map(CompletableFuture::join)
+                .flatMap(List::stream)
+                .sorted(Comparator.comparing(a -> a.getCaseData().getReceiptDate()))
+                .toList();
+    }
+
+    private List<SubmitEvent> fetchSubmitEvents(String userToken, String caseTypeId, String query) {
+        try {
+            return ccdClient.buildAndGetElasticSearchRequest(userToken, caseTypeId, query);
+        } catch (IOException e) {
+            log.error("Failed to fetch submit events for case type {}: {}", caseTypeId, e.getMessage());
+        }
+        return emptyList();
+    }
+
+    private String setVexationNotes(List<SubmitEvent> submitEventList) {
+        String caseListFormat = "%d - %s - %s - %s v %s - %s\n";
+        StringBuilder cases = new StringBuilder();
+        IntStream.range(0, submitEventList.size())
+                .mapToObj(i -> {
+                    SubmitEvent submitEvent = submitEventList.get(i);
+                    return String.format(caseListFormat,
+                            i + 1,
+                            submitEvent.getCaseData().getEthosCaseReference(),
+                            submitEvent.getState(),
+                            submitEvent.getCaseData().getClaimant(),
+                            submitEvent.getCaseData().getRespondent(),
+                            listingFormatLocalDate(submitEvent.getCaseData().getReceiptDate()));
+                })
+                .forEach(cases::append);
+
+        return String.format(VEXATION_NOTIFICATION_TEMPLATE, cases);
     }
 
 }

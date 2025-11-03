@@ -8,12 +8,16 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
+import uk.gov.hmcts.et.common.model.ccd.items.BFActionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.BFActionType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
@@ -23,6 +27,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelection
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -49,20 +54,24 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.RESPONDENT_NAMES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.DOCGEN_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.createLinkForUploadedDocument;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantNonSystemUser;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isRepresentedClaimantWithMyHmctsCase;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.NOTIFICATION_SUMMARY_PDF;
 
 @Service("sendNotificationService")
 @RequiredArgsConstructor
 @Slf4j
 public class SendNotificationService {
-    private static final String EMPLOYER_CONTRACT_CLAIM = "Employer Contract Claim";
+    public static final String EMPLOYER_CONTRACT_CLAIM = "Employer Contract Claim";
     public static final String CASE_MANAGEMENT_ORDERS_REQUESTS = "Case management orders / requests";
+    public static final String NOTICE_OF_EMPLOYER_CONTRACT_CLAIM = "Notice of Employer Contract Claim";
 
     private final HearingSelectionService hearingSelectionService;
     private final EmailService emailService;
     private final FeatureToggleService featureToggleService;
+    private final TornadoService tornadoService;
     private static final String EMAIL_ADDRESS = "emailAddress";
     @Value("${template.claimantSendNotification}")
     private String claimantSendNotificationTemplateId;
@@ -353,5 +362,47 @@ public class SendNotificationService {
         emailData.put(HEARING_DATE, caseData.getTargetHearingDate());
         emailData.put(LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseId));
         return emailData;
+    }
+
+    public DocumentInfo createNotificationSummary(CaseData caseData, String userToken, String caseTypeId) {
+        try {
+            DocumentInfo documentInfo = tornadoService.generateEventDocument(caseData, userToken,
+                    caseTypeId, NOTIFICATION_SUMMARY_PDF);
+            // Show the custom name of the document in the UI
+            documentInfo.setMarkUp(documentInfo.getMarkUp().replace("Document", documentInfo.getDescription()));
+            return documentInfo;
+        } catch (Exception e) {
+            throw new DocumentManagementException(String.format(DOCGEN_ERROR, caseData.getEthosCaseReference()), e);
+        }
+    }
+
+    public void createBfAction(CaseData caseData) {
+        boolean subjectContainsEcc = caseData.getSendNotificationSubject() != null
+            && caseData.getSendNotificationSubject().contains(EMPLOYER_CONTRACT_CLAIM);
+        
+        boolean eccQuestionMatches =
+                NOTICE_OF_EMPLOYER_CONTRACT_CLAIM.equals(caseData.getSendNotificationEccQuestion());
+        
+        if (!subjectContainsEcc || !eccQuestionMatches) {
+            return;
+        }
+
+        BFActionType bfActionType = new BFActionType();
+        bfActionType.setLetters(NO);
+        bfActionType.setDateEntered(LocalDate.now().toString());
+        bfActionType.setCwActions("Other action");
+        bfActionType.setAllActions("ECC served");
+        bfActionType.setBfDate(LocalDate.now().plusDays(29).toString());
+        BFActionTypeItem bfActionTypeItem = new BFActionTypeItem();
+        bfActionTypeItem.setId(UUID.randomUUID().toString());
+        bfActionTypeItem.setValue(bfActionType);
+
+        if (CollectionUtils.isEmpty(caseData.getBfActions())) {
+            caseData.setBfActions(new ArrayList<>(Collections.singletonList(bfActionTypeItem)));
+        } else {
+            List<BFActionTypeItem> tmp = caseData.getBfActions();
+            tmp.add(bfActionTypeItem);
+            caseData.setBfActions(tmp);
+        }
     }
 }

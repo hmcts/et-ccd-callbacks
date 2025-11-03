@@ -2,17 +2,23 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.AdditionalCaseInfoType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
+import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.util.ArrayList;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -37,14 +43,14 @@ class FlagsImageHelperTest {
             buildFlagsImageFileName(caseDetails);
 
             assertEquals("<font color='DeepPink' size='5'> WITH OUTSTATION </font>", caseData.getFlagsImageAltText());
-            assertEquals("EMP-TRIB-01000000000000.jpg", caseData.getFlagsImageFileName());
+            assertEquals("EMP-TRIB-010000000000000.jpg", caseData.getFlagsImageFileName());
         }
     }
 
     @Test
     void testAddWelshFlag() {
         ArrayList<TribunalOffice> tribunalOffices = new ArrayList<>(TribunalOffice.ENGLANDWALES_OFFICES);
-        for (TribunalOffice tribunalOffice : tribunalOffices) {
+        tribunalOffices.forEach(tribunalOffice -> {
             CaseData caseData = new CaseData();
             caseData.setManagingOffice(tribunalOffice.getOfficeName());
             ClaimantHearingPreference hearingPreference = new ClaimantHearingPreference();
@@ -53,13 +59,13 @@ class FlagsImageHelperTest {
             CaseDetails caseDetails = createCaseDetails(ENGLANDWALES_CASE_TYPE_ID, caseData);
             buildFlagsImageFileName(caseDetails);
             assertEquals("<font color='Red' size='5'> Cymraeg </font>", caseData.getFlagsImageAltText());
-        }
+        });
     }
 
     @Test
     void testAddWelshFlagHearingLang() {
         ArrayList<TribunalOffice> tribunalOffices = new ArrayList<>(TribunalOffice.ENGLANDWALES_OFFICES);
-        for (TribunalOffice tribunalOffice : tribunalOffices) {
+        tribunalOffices.forEach(tribunalOffice -> {
             CaseData caseData = new CaseData();
             caseData.setManagingOffice(tribunalOffice.getOfficeName());
             ClaimantHearingPreference hearingPreference = new ClaimantHearingPreference();
@@ -68,13 +74,13 @@ class FlagsImageHelperTest {
             CaseDetails caseDetails = createCaseDetails(ENGLANDWALES_CASE_TYPE_ID, caseData);
             buildFlagsImageFileName(caseDetails);
             assertEquals("<font color='Red' size='5'> Cymraeg </font>", caseData.getFlagsImageAltText());
-        }
+        });
     }
 
     @Test
     void testAddWelshFlagBothOptions() {
         ArrayList<TribunalOffice> tribunalOffices = new ArrayList<>(TribunalOffice.ENGLANDWALES_OFFICES);
-        for (TribunalOffice tribunalOffice : tribunalOffices) {
+        tribunalOffices.forEach(tribunalOffice -> {
             CaseData caseData = new CaseData();
             caseData.setManagingOffice(tribunalOffice.getOfficeName());
             ClaimantHearingPreference hearingPreference = new ClaimantHearingPreference();
@@ -84,19 +90,19 @@ class FlagsImageHelperTest {
             CaseDetails caseDetails = createCaseDetails(ENGLANDWALES_CASE_TYPE_ID, caseData);
             buildFlagsImageFileName(caseDetails);
             assertEquals("<font color='Red' size='5'> Cymraeg </font>", caseData.getFlagsImageAltText());
-        }
+        });
     }
 
     @Test
     void testAddWelshFlagNoOptions() {
         ArrayList<TribunalOffice> tribunalOffices = new ArrayList<>(TribunalOffice.ENGLANDWALES_OFFICES);
-        for (TribunalOffice tribunalOffice : tribunalOffices) {
+        tribunalOffices.forEach(tribunalOffice -> {
             CaseData caseData = new CaseData();
             caseData.setManagingOffice(tribunalOffice.getOfficeName());
             CaseDetails caseDetails = createCaseDetails(ENGLANDWALES_CASE_TYPE_ID, caseData);
             buildFlagsImageFileName(caseDetails);
             assertEquals("", caseData.getFlagsImageAltText());
-        }
+        });
     }
 
     @Test
@@ -108,22 +114,20 @@ class FlagsImageHelperTest {
         buildFlagsImageFileName(caseDetails);
 
         assertEquals("", caseData.getFlagsImageAltText());
-        assertEquals("EMP-TRIB-00000000000000.jpg", caseData.getFlagsImageFileName());
+        assertEquals("EMP-TRIB-000000000000000.jpg", caseData.getFlagsImageFileName());
     }
 
     @Test
     void testDoesNotAddOutstationForEnglandWales() {
-        for (TribunalOffice tribunalOffice : TribunalOffice.ENGLANDWALES_OFFICES) {
+        TribunalOffice.ENGLANDWALES_OFFICES.forEach(tribunalOffice -> {
             CaseData caseData = new CaseData();
             caseData.setManagingOffice(tribunalOffice.getOfficeName());
             CaseDetails caseDetails = createCaseDetails(ENGLANDWALES_CASE_TYPE_ID, caseData);
-
             buildFlagsImageFileName(caseDetails);
-
             assertEquals("", caseData.getFlagsImageAltText());
 
-            assertEquals("EMP-TRIB-00000000000000.jpg", caseData.getFlagsImageFileName());
-        }
+            assertEquals("EMP-TRIB-000000000000000.jpg", caseData.getFlagsImageFileName());
+        });
     }
 
     @Test
@@ -131,9 +135,9 @@ class FlagsImageHelperTest {
         CaseData caseData = CaseDataBuilder.builder()
                 .withRespondent("Test", NO, null, false)
                 .build();
-        caseData.getRespondentCollection().get(0).getValue().setEt3ResponseRespondentSupportNeeded(YES);
+        caseData.getRespondentCollection().getFirst().getValue().setEt3ResponseRespondentSupportNeeded(YES);
         buildFlagsImageFileName(ENGLANDWALES_CASE_TYPE_ID, caseData);
-        assertEquals("EMP-TRIB-00000000001000.jpg", caseData.getFlagsImageFileName());
+        assertEquals("EMP-TRIB-000000000010000.jpg", caseData.getFlagsImageFileName());
         assertEquals("<font color='DarkSlateBlue' size='5'> REASONABLE ADJUSTMENT </font>",
                 caseData.getFlagsImageAltText());
 
@@ -144,13 +148,13 @@ class FlagsImageHelperTest {
         CaseData caseData = new CaseData();
         caseData.setMigratedFromEcm(YES);
         buildFlagsImageFileName(ENGLANDWALES_CASE_TYPE_ID, caseData);
-        assertEquals("EMP-TRIB-10000000000000.jpg", caseData.getFlagsImageFileName());
+        assertEquals("EMP-TRIB-100000000000000.jpg", caseData.getFlagsImageFileName());
         assertEquals("<font color='#D6292D' size='5'> MIGRATED FROM ECM </font>",
                 caseData.getFlagsImageAltText());
 
         caseData.setMigratedFromEcm(null);
         buildFlagsImageFileName(ENGLANDWALES_CASE_TYPE_ID, caseData);
-        assertEquals("EMP-TRIB-00000000000000.jpg", caseData.getFlagsImageFileName());
+        assertEquals("EMP-TRIB-000000000000000.jpg", caseData.getFlagsImageFileName());
     }
 
     private CaseDetails createCaseDetails(String caseTypeId, CaseData caseData) {
@@ -169,11 +173,94 @@ class FlagsImageHelperTest {
         caseData.setAdditionalCaseInfoType(additionalCaseInfoType);
 
         buildFlagsImageFileName(ENGLANDWALES_CASE_TYPE_ID, caseData);
-        assertEquals("EMP-TRIB-00000000000001.jpg", caseData.getFlagsImageFileName());
+        assertEquals("EMP-TRIB-000000000000010.jpg", caseData.getFlagsImageFileName());
         assertTrue(caseData.getFlagsImageAltText().contains("SPEAK TO REJ"));
 
         buildFlagsImageFileName(SCOTLAND_CASE_TYPE_ID, caseData);
-        assertEquals("EMP-TRIB-01000000000010.jpg", caseData.getFlagsImageFileName());
+        assertEquals("EMP-TRIB-010000000000100.jpg", caseData.getFlagsImageFileName());
         assertTrue(caseData.getFlagsImageAltText().contains("SPEAK TO VP"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("reservedToJudgeFlagsProvider")
+    void reservedToJudgeFlag(String flag, String expectedAltText) {
+        AdditionalCaseInfoType additionalCaseInfoType = new AdditionalCaseInfoType();
+        additionalCaseInfoType.setReservedToJudge(flag);
+        CaseData caseData = new CaseData();
+        caseData.setAdditionalCaseInfoType(additionalCaseInfoType);
+        buildFlagsImageFileName(ENGLANDWALES_CASE_TYPE_ID, caseData);
+        assertEquals(expectedAltText, caseData.getFlagsImageAltText());
+    }
+
+    private static Stream<Arguments> reservedToJudgeFlagsProvider() {
+        return Stream.of(
+            Arguments.of("Yes", "<font color='#85994b' size='5'> RESERVED TO JUDGE </font>"),
+            Arguments.of("No", ""),
+            Arguments.of(null, "")
+        );
+    }
+
+    @Test
+    void eccFlagShownWhenBothBocAndEccJurisdictionCodes() {
+        JurCodesTypeItem bocItem = new JurCodesTypeItem();
+        JurCodesType bocType = new JurCodesType();
+        bocType.setJuridictionCodesList("BOC");
+        bocItem.setValue(bocType);
+        
+        JurCodesTypeItem eccItem = new JurCodesTypeItem();
+        JurCodesType eccType = new JurCodesType();
+        eccType.setJuridictionCodesList("ECC");
+        eccItem.setValue(eccType);
+
+        CaseData caseData = new CaseData();
+        caseData.setJurCodesCollection(java.util.List.of(bocItem, eccItem));
+        
+        buildFlagsImageFileName(ENGLANDWALES_CASE_TYPE_ID, caseData);
+        
+        assertEquals("<font color='Olive' size='5'> ECC </font>", caseData.getFlagsImageAltText());
+        assertEquals("EMP-TRIB-000000001000000.jpg", caseData.getFlagsImageFileName());
+    }
+
+    @Test
+    void eccFlagNotShownWhenOnlyBocJurisdictionCode() {
+        JurCodesTypeItem bocItem = new JurCodesTypeItem();
+        JurCodesType bocType = new JurCodesType();
+        bocType.setJuridictionCodesList("BOC");
+        bocItem.setValue(bocType);
+
+        CaseData caseData = new CaseData();
+        caseData.setJurCodesCollection(java.util.List.of(bocItem));
+        
+        buildFlagsImageFileName(ENGLANDWALES_CASE_TYPE_ID, caseData);
+        
+        assertEquals("", caseData.getFlagsImageAltText());
+        assertEquals("EMP-TRIB-000000000000000.jpg", caseData.getFlagsImageFileName());
+    }
+
+    @Test
+    void eccFlagNotShownWhenOnlyEccJurisdictionCode() {
+        JurCodesTypeItem eccItem = new JurCodesTypeItem();
+        JurCodesType eccType = new JurCodesType();
+        eccType.setJuridictionCodesList("ECC");
+        eccItem.setValue(eccType);
+
+        CaseData caseData = new CaseData();
+        caseData.setJurCodesCollection(java.util.List.of(eccItem));
+        
+        buildFlagsImageFileName(ENGLANDWALES_CASE_TYPE_ID, caseData);
+        
+        assertEquals("", caseData.getFlagsImageAltText());
+        assertEquals("EMP-TRIB-000000000000000.jpg", caseData.getFlagsImageFileName());
+    }
+
+    @Test
+    void eccFlagShownWhenCounterClaimExists() {
+        CaseData caseData = new CaseData();
+        caseData.setCounterClaim("Some counter claim");
+        
+        buildFlagsImageFileName(ENGLANDWALES_CASE_TYPE_ID, caseData);
+        
+        assertEquals("<font color='Olive' size='5'> ECC </font>", caseData.getFlagsImageAltText());
+        assertEquals("EMP-TRIB-000000001000000.jpg", caseData.getFlagsImageFileName());
     }
 }

@@ -21,7 +21,7 @@ import java.util.concurrent.ExecutorService;
  * {@link IQueueClient} implementation for use during development only.
  * To use you would need to add
  * <pre>{@code
- * @Component("create-updates-send-client")
+ * @Component("createUpdatesSendClient)
  * @Profile("dev")
  * }</pre>
  */

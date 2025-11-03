@@ -9,7 +9,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
@@ -21,6 +20,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static java.net.URLEncoder.encode;
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.addressIsEmpty;
@@ -39,7 +41,6 @@ public class ServingService {
             + "%20sent%20are%20attached%20to%20this%20email.%0D%0A%0D%0A";
     private static final String OTHER_TYPE_DOCUMENT_NAME = "**<big>%s</big>**<br/><small><a target=\"_blank\" "
         + "href=\"%s\">%s</a></small><br/>";
-    private static final String CLAIMANT_ADDRESS = "**<big>Claimant</big>**<br/>%s %s%s";
     private static final String RESPONDENT_ADDRESS = "**<big>Respondent %x</big>**<br/>%s%s";
     private static final String ET3_NOTIFICATION = "ET3%20notifications";
     private static final String ET1_SERVING = "ET1%20serving";
@@ -60,6 +61,12 @@ public class ServingService {
     private static final String SERVING_DOC_7_8 = "7.8";
     private static final String SERVING_DOC_7_8A = "7.8a";
 
+    private static final List<String> NOTICE_OF_CASE_MANAGEMENT_DISCUSSION =
+        List.of(SERVING_DOC_7_7, SERVING_DOC_7_8, SERVING_DOC_7_8A);
+
+    private static final String TYPE_OF_DOCUMENT_ERROR_MESSAGE =
+        "You have only uploaded a notice of hearing. Please also upload the relevant service letter.";
+
     @Value("${template.et1Serving.claimant}")
     private String claimantTemplateId;
 
@@ -68,9 +75,30 @@ public class ServingService {
 
     private final EmailService emailService;
 
+    /**
+     * Check if only 7.7, 7.8 or 7.8a is uploaded, display an error message
+     * @param docList ServingDocumentCollection
+     * @return error message if any
+     */
+    public List<String> checkTypeOfDocumentError(List<DocumentTypeItem> docList) {
+        List<String> errors = new ArrayList<>();
+
+        if (CollectionUtils.isEmpty(docList)) {
+            return errors;
+        }
+
+        boolean onlyNoticeUploaded = docList.stream().map(item -> item.getValue().getTypeOfDocument())
+            .allMatch(NOTICE_OF_CASE_MANAGEMENT_DISCUSSION::contains);
+        if (onlyNoticeUploaded) {
+            errors.add(TYPE_OF_DOCUMENT_ERROR_MESSAGE);
+        }
+
+        return errors;
+    }
+
     public String generateOtherTypeDocumentLink(List<DocumentTypeItem> docList) {
         String documentLinks = "";
-        if (CollectionUtils.isNotEmpty(docList)) {
+        if (isNotEmpty(docList)) {
             documentLinks = docList
                 .stream()
                 .filter(d -> SERVING_DOCUMENT_OTHER_TYPE.equals(d.getValue().getTypeOfDocument()))
@@ -88,15 +116,8 @@ public class ServingService {
             documentBinaryUrl.substring(documentBinaryUrl.indexOf("/documents/")), documentName);
     }
 
-    public String generateClaimantAndRespondentAddress(CaseData caseData) {
+    public String generateRespondentAddressList(CaseData caseData) {
         StringBuilder addressStr = new StringBuilder();
-
-        ClaimantIndType claimant = caseData.getClaimantIndType();
-        addressStr.append(String.format(CLAIMANT_ADDRESS, claimant.getClaimantFirstNames(),
-            claimant.getClaimantLastName(),
-            addressIsEmpty(caseData.getClaimantType().getClaimantAddressUK())
-                    ? "<br>" + ADDRESS_NOT_ENTERED + "<br>"
-                    : caseData.getClaimantType().getClaimantAddressUK().toAddressHtml()));
 
         int index = 1;
         for (RespondentSumTypeItem respondentItem : caseData.getRespondentCollection()) {
@@ -112,24 +133,40 @@ public class ServingService {
         return addressStr.toString();
     }
 
+    /**
+     * Generates the email link to the Acas. The claimants and the list of respondent's names are put through a
+     * URL encoder to ensure that special characters are handled correctly when the mailto is clicked.
+     * @param caseData object that holds the case data.
+     * @param isET3 boolean value to indicate if the notification is for ET1 Serving or ET3 Notification.
+     * @return markdown email link containing the claimant's name, respondent's names and case number.
+     */
     public String generateEmailLinkToAcas(CaseData caseData, boolean isET3) {
         StringBuilder respondentList = new StringBuilder();
         List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
-        for (RespondentSumTypeItem respondent : respondentCollection) {
-            if (!respondentList.toString().isEmpty()) {
+        respondentCollection.forEach(respondent -> {
+            if (!respondentList.isEmpty()) {
                 respondentList.append("%2C%20");
             }
-            respondentList.append(respondent.getValue().getRespondentName().replaceAll("\\s+", "%20"));
-        }
+            respondentList.append(encode(respondent.getValue().getRespondentName(), UTF_8));
+        });
 
         String caseNumber = caseData.getEthosCaseReference();
-        String claimantName = caseData.getClaimantIndType().getClaimantFirstNames() + " "
-                + caseData.getClaimantIndType().getClaimantLastName();
+        String claimantName = encode(caseData.getClaimant(), UTF_8);
 
         return MessageFormat.format(ACAS_MAILTO_LINK, caseNumber,
-                claimantName.replaceAll("\\s+", "%20"),
-                respondentList, caseNumber, isET3 ? ET3_NOTIFICATION : ET1_SERVING,
+                formatNameForEmail(claimantName),
+                formatNameForEmail(respondentList.toString()),
+                caseNumber,
+                isET3 ? ET3_NOTIFICATION : ET1_SERVING,
                 isET3 ? ET3_RELEVANT_PARTIES : ET1_RESPONDENT);
+    }
+
+    private String formatNameForEmail(String name) {
+        return isNullOrEmpty(name)
+                ? ""
+                : name.replaceAll("\\s+", "%20")
+                        .replace("+", "%20")
+                        .replace("\\+", "%20");
     }
 
     /**

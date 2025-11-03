@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper.buildFlagsImageFileName;
@@ -52,10 +51,6 @@ public class HearingDetailsService {
         if (isNotEmpty(hearingDetailTypeItemList)) {
             caseData.setHearingDetailsCollection(hearingDetailTypeItemList);
         }
-    }
-
-    private String nonNull(String value) {
-        return isNullOrEmpty(value) ? " " : value;
     }
 
     public void updateCase(CaseDetails caseDetails) {
@@ -135,22 +130,22 @@ public class HearingDetailsService {
     private HearingDetailTypeItem getHearingDetailTypeItem(DateListedType dateListedType) {
         HearingDetailType hearingDetailType = new HearingDetailType();
         hearingDetailType.setHearingDetailsDate(dateListedType.getListedDate());
-        hearingDetailType.setHearingDetailsStatus(nonNull(dateListedType.getHearingStatus()));
-        hearingDetailType.setHearingDetailsPostponedBy(nonNull(dateListedType.getPostponedBy()));
-        hearingDetailType.setHearingDetailsCaseDisposed(nonNull(dateListedType.getHearingCaseDisposed()));
-        hearingDetailType.setHearingDetailsPartHeard(nonNull(dateListedType.getHearingPartHeard()));
-        hearingDetailType.setHearingDetailsReservedJudgment(nonNull(dateListedType.getHearingReservedJudgement()));
-        hearingDetailType.setHearingDetailsAttendeeClaimant(nonNull(dateListedType.getAttendeeClaimant()));
-        hearingDetailType.setHearingDetailsAttendeeNonAttendees(nonNull(dateListedType.getAttendeeNonAttendees()));
-        hearingDetailType.setHearingDetailsAttendeeRespNoRep(nonNull(dateListedType.getAttendeeRespNoRep()));
-        hearingDetailType.setHearingDetailsAttendeeRespAndRep(nonNull(dateListedType.getAttendeeRespAndRep()));
-        hearingDetailType.setHearingDetailsAttendeeRepOnly(nonNull(dateListedType.getAttendeeRepOnly()));
-        hearingDetailType.setHearingDetailsTimingStart(nonNull(dateListedType.getHearingTimingStart()));
+        hearingDetailType.setHearingDetailsStatus(dateListedType.getHearingStatus());
+        hearingDetailType.setHearingDetailsPostponedBy(dateListedType.getPostponedBy());
+        hearingDetailType.setHearingDetailsCaseDisposed(dateListedType.getHearingCaseDisposed());
+        hearingDetailType.setHearingDetailsPartHeard(dateListedType.getHearingPartHeard());
+        hearingDetailType.setHearingDetailsReservedJudgment(dateListedType.getHearingReservedJudgement());
+        hearingDetailType.setHearingDetailsAttendeeClaimant(dateListedType.getAttendeeClaimant());
+        hearingDetailType.setHearingDetailsAttendeeNonAttendees(dateListedType.getAttendeeNonAttendees());
+        hearingDetailType.setHearingDetailsAttendeeRespNoRep(dateListedType.getAttendeeRespNoRep());
+        hearingDetailType.setHearingDetailsAttendeeRespAndRep(dateListedType.getAttendeeRespAndRep());
+        hearingDetailType.setHearingDetailsAttendeeRepOnly(dateListedType.getAttendeeRepOnly());
+        hearingDetailType.setHearingDetailsTimingStart(dateListedType.getHearingTimingStart());
         hearingDetailType.setHearingDetailsTimingBreak(dateListedType.getHearingTimingBreak());
         hearingDetailType.setHearingDetailsTimingResume(dateListedType.getHearingTimingResume());
-        hearingDetailType.setHearingDetailsTimingFinish(nonNull(dateListedType.getHearingTimingFinish()));
-        hearingDetailType.setHearingDetailsTimingDuration(nonNull(dateListedType.getHearingTimingDuration()));
-        hearingDetailType.setHearingDetailsHearingNotes2(nonNull(dateListedType.getHearingNotes2()));
+        hearingDetailType.setHearingDetailsTimingFinish(dateListedType.getHearingTimingFinish());
+        hearingDetailType.setHearingDetailsTimingDuration(dateListedType.getHearingTimingDuration());
+        hearingDetailType.setHearingDetailsHearingNotes2(dateListedType.getHearingNotes2());
 
         HearingDetailTypeItem hearingDetailTypeItem = new HearingDetailTypeItem();
         hearingDetailTypeItem.setId(UUID.randomUUID().toString());

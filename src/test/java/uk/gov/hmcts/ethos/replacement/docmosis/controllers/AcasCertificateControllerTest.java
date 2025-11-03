@@ -18,6 +18,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AcasService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ScheduledTaskRunner;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
@@ -48,6 +49,8 @@ class AcasCertificateControllerTest {
     private CCDRequest ccdRequest;
 
     @MockBean
+    private ScheduledTaskRunner taskRunner;
+    @MockBean
     private VerifyTokenService verifyTokenService;
     @MockBean
     private AcasService acasService;
@@ -57,7 +60,7 @@ class AcasCertificateControllerTest {
     private JsonMapper jsonMapper;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         jsonMapper = new JsonMapper(new ObjectMapper());
         mockMvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
         CaseData caseData = new CaseData();

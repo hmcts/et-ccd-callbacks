@@ -7,6 +7,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.JurisdictionCode;
 
 import java.util.List;
 
@@ -51,10 +52,12 @@ public final class FlagsImageHelper {
     private static final String FLAG_MIGRATED_FROM_ECM = "MIGRATED FROM ECM";
     private static final String SPEAK_TO_VP = "SPEAK TO VP";
     private static final String SPEAK_TO_REJ = "SPEAK TO REJ";
+    private static final String RESERVED_TO_JUDGE = "RESERVED TO JUDGE";
 
     private static final List<String> FLAGS = List.of(FLAG_MIGRATED_FROM_ECM, FLAG_WITH_OUTSTATION,
             FLAG_DO_NOT_POSTPONE, FLAG_LIVE_APPEAL, FLAG_RULE_493B, FLAG_REPORTING, FLAG_SENSITIVE, FLAG_RESERVED,
-            FLAG_ECC, FLAG_DIGITAL_FILE, FLAG_REASONABLE_ADJUSTMENT, FLAG_WELSH_LANGUAGE, SPEAK_TO_VP, SPEAK_TO_REJ);
+            FLAG_ECC, FLAG_DIGITAL_FILE, FLAG_REASONABLE_ADJUSTMENT, FLAG_WELSH_LANGUAGE, SPEAK_TO_VP, SPEAK_TO_REJ,
+            RESERVED_TO_JUDGE);
 
     private FlagsImageHelper() {
     }
@@ -136,6 +139,10 @@ public final class FlagsImageHelper {
                 flagRequired = speakToRej(caseTypeId, caseData);
                 flagColor = "#1D70B8";
             }
+            case RESERVED_TO_JUDGE -> {
+                flagRequired = reservedToJudge(caseData);
+                flagColor = "#85994b";
+            }
             default -> {
                 flagRequired = false;
                 flagColor = COLOR_WHITE;
@@ -145,6 +152,18 @@ public final class FlagsImageHelper {
         flagsImageFileName.append(flagRequired ? ONE : ZERO);
         flagsImageAltText.append(flagRequired && !flagsImageAltText.isEmpty() ? "<font size='5'> - </font>" : "")
                 .append(flagRequired ? "<font color='" + flagColor + "' size='5'> " + flagName + " </font>" : "");
+    }
+
+    private static boolean reservedToJudge(CaseData caseData) {
+        if (caseData.getAdditionalCaseInfoType() != null) {
+            if (isNullOrEmpty(caseData.getAdditionalCaseInfoType().getReservedToJudge())) {
+                return false;
+            } else {
+                return YES.equals(caseData.getAdditionalCaseInfoType().getReservedToJudge());
+            }
+        } else {
+            return false;
+        }
     }
 
     private static boolean speakToRej(String caseTypeId, CaseData caseData) {
@@ -233,10 +252,18 @@ public final class FlagsImageHelper {
         return hearingType != null && isNotEmpty(hearingType.getHearingDateCollection());
     }
 
-    private static boolean counterClaimMade(CaseData caseData) {
-        return !isNullOrEmpty(caseData.getCounterClaim())
-                || caseData.getEccCases() != null
-                && !caseData.getEccCases().isEmpty();
+    public static boolean counterClaimMade(CaseData caseData) {
+        boolean hasEccOrCounterClaim = !isNullOrEmpty(caseData.getCounterClaim()) || isNotEmpty(caseData.getEccCases());
+
+        boolean hasBothEccAndBoc = isNotEmpty(caseData.getJurCodesCollection())
+                && caseData.getJurCodesCollection().stream()
+                .anyMatch(jurCode -> JurisdictionCode.ECC.toString()
+                        .equals(jurCode.getValue().getJuridictionCodesList()))
+                && caseData.getJurCodesCollection().stream()
+                .anyMatch(jurCode -> JurisdictionCode.BOC.toString()
+                        .equals(jurCode.getValue().getJuridictionCodesList()));
+
+        return hasEccOrCounterClaim || hasBothEccAndBoc;
     }
 
     private static boolean liveAppeal(CaseData caseData) {

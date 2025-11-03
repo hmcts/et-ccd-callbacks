@@ -7,6 +7,8 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelperTest;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
@@ -23,7 +25,7 @@ class CaseCloseValidatorTest {
     private CaseData caseData;
 
     @BeforeEach
-    public void setup() throws Exception {
+    void setup() throws URISyntaxException, IOException {
         caseCloseValidator = new CaseCloseValidator();
         CaseDetails caseDetails = generateCaseDetails("caseDetailsTest1.json");
         caseData = caseDetails.getCaseData();
@@ -68,7 +70,7 @@ class CaseCloseValidatorTest {
         assertEquals(0, errors.size());
     }
 
-    private CaseDetails generateCaseDetails(String jsonFileName) throws Exception {
+    private CaseDetails generateCaseDetails(String jsonFileName) throws URISyntaxException, IOException {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
             .getContextClassLoader().getResource(jsonFileName)).toURI())));
         ObjectMapper mapper = new ObjectMapper();

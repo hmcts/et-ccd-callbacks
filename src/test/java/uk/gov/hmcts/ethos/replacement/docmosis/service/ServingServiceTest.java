@@ -18,6 +18,8 @@ import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
@@ -27,6 +29,8 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.spy;
@@ -49,7 +53,7 @@ class ServingServiceTest {
     private ArgumentCaptor<Map<String, Object>> personalisation;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() throws URISyntaxException, IOException {
         emailService = spy(new EmailUtils());
         caseDetails = generateCaseDetails();
         servingService = new ServingService(emailService);
@@ -74,11 +78,73 @@ class ServingServiceTest {
         notifyCaseData.setClaimant("Claimant LastName");
     }
 
-    private static CaseDetails generateCaseDetails() throws Exception {
+    private static CaseDetails generateCaseDetails() throws URISyntaxException, IOException {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
                 .getContextClassLoader().getResource("midServingCaseDetailsTest.json")).toURI())));
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(json, CaseDetails.class);
+    }
+
+    @Test
+    void checkTypeOfDocumentErrorTestEmptyList() {
+        List<String> errors = servingService.checkTypeOfDocumentError(List.of());
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void checkTypeOfDocumentErrorTestNullList() {
+        List<String> errors = servingService.checkTypeOfDocumentError(null);
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void checkTypeOfDocumentErrorTestOnly7() {
+        List<DocumentTypeItem> docList = List.of(createItem("7.8a"));
+        List<String> errors = servingService.checkTypeOfDocumentError(docList);
+        assertThat(errors).hasSize(1);
+    }
+
+    @Test
+    void checkTypeOfDocumentErrorTestAll7() {
+        List<DocumentTypeItem> docList = List.of(
+            createItem("7.7"),
+            createItem("7.8"),
+            createItem("7.8a")
+        );
+        List<String> errors = servingService.checkTypeOfDocumentError(docList);
+        assertThat(errors).hasSize(1);
+    }
+
+    @Test
+    void checkTypeOfDocumentErrorTestIncludes1() {
+        List<DocumentTypeItem> docList = List.of(
+            createItem("7.7"),
+            createItem("1.1")
+        );
+        List<String> errors = servingService.checkTypeOfDocumentError(docList);
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void checkTypeOfDocumentErrorTestOnly1() {
+        List<DocumentTypeItem> docList = List.of(createItem("1.1"));
+        List<String> errors = servingService.checkTypeOfDocumentError(docList);
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void checkTypeOfDocumentErrorTestOnlyUnknownType() {
+        List<DocumentTypeItem> docList = List.of(createItem("999"));
+        List<String> errors = servingService.checkTypeOfDocumentError(docList);
+        assertThat(errors).isEmpty();
+    }
+
+    private DocumentTypeItem createItem(String typeOfDocument) {
+        DocumentType doc = new DocumentType();
+        doc.setTypeOfDocument(typeOfDocument);
+        DocumentTypeItem item = new DocumentTypeItem();
+        item.setValue(doc);
+        return item;
     }
 
     @Test
@@ -91,33 +157,30 @@ class ServingServiceTest {
     }
 
     @Test
-    void generateClaimantAndRespondentAddress() {
-        String expectedClaimantAndRespondentAddress = "**<big>Claimant</big>**<br/>Doris Johnson"
-                + "<br/>232 Petticoat Square<br/>22 House<br/>London<br/>W10 4AG<br/><br/>"
-                + "**<big>Respondent 1</big>**<br/>Antonio Vazquez"
-                + "<br/>11 Small Street<br/>22 House<br/>Manchester<br/>M12 42R<br/><br/>"
-                + "**<big>Respondent 2</big>**<br/>Juan Garcia<br/>12 Small Street<br/>24 House"
-                + "<br/>Manchester<br/>M12 4ED<br/><br/>";
+    void generateRespondentAddressList() {
+        String expectedRespondentAddresses = """
+                **<big>Respondent 1</big>**<br/>Antonio Vazquez\
+                <br/>11 Small Street<br/>22 House<br/>Manchester<br/>M12 42R<br/><br/>\
+                **<big>Respondent 2</big>**<br/>Juan Garcia<br/>12 Small Street<br/>24 House\
+                <br/>Manchester<br/>M12 4ED<br/><br/>""";
 
         CaseData caseData = caseDetails.getCaseData();
-        assertThat(servingService.generateClaimantAndRespondentAddress(caseData))
-            .isEqualTo(expectedClaimantAndRespondentAddress);
+        assertThat(servingService.generateRespondentAddressList(caseData))
+            .isEqualTo(expectedRespondentAddresses);
     }
 
     @Test
-    void generateClaimantAndRespondentAddressNoAddress() {
-        String expectedClaimantAndRespondentAddress = "**<big>Claimant</big>**<br/>Doris Johnson"
-                + "<br>Address not entered<br>"
-                + "**<big>Respondent 1</big>**<br/>Antonio Vazquez"
-                + "<br>Address not entered<br>"
-                + "**<big>Respondent 2</big>**<br/>Juan Garcia<br/>12 Small Street<br/>"
-                + "24 House<br/>Manchester<br/>M12 4ED<br/><br/>";
+    void generateRespondentAddressNoAddressList() {
+        String expectedRespondentAddresses = """
+                **<big>Respondent 1</big>**<br/>Antonio Vazquez\
+                <br>Address not entered<br>\
+                **<big>Respondent 2</big>**<br/>Juan Garcia<br/>12 Small Street<br/>\
+                24 House<br/>Manchester<br/>M12 4ED<br/><br/>""";
 
         CaseData caseData = caseDetails.getCaseData();
-        caseData.getClaimantType().setClaimantAddressUK(null);
-        caseData.getRespondentCollection().get(0).getValue().setRespondentAddress(null);
-        assertThat(servingService.generateClaimantAndRespondentAddress(caseData))
-                .isEqualTo(expectedClaimantAndRespondentAddress);
+        caseData.getRespondentCollection().getFirst().getValue().setRespondentAddress(null);
+        assertThat(servingService.generateRespondentAddressList(caseData))
+                .isEqualTo(expectedRespondentAddresses);
     }
 
     @Test
@@ -135,6 +198,18 @@ class ServingServiceTest {
         CaseData caseData = caseDetails.getCaseData();
         assertThat(servingService.generateEmailLinkToAcas(caseData, false)).isEqualTo(expectedEt1EmailLinkToAcas);
         assertThat(servingService.generateEmailLinkToAcas(caseData, true)).isEqualTo(expectedEt3EmailLinkToAcas);
+    }
+
+    @Test
+    void generateEmailLinkToAcas_specialCharacters() {
+        CaseData caseData = caseDetails.getCaseData();
+        caseData.setClaimant("Doris & Johnson");
+        caseData.getRespondentCollection().getFirst().getValue().setRespondentName("SpecialCharacters!@£$%^&(");
+
+        String result = assertDoesNotThrow(() -> servingService.generateEmailLinkToAcas(caseData, false));
+        // Should format the name correctly and print out text after the special characters
+        assertThat(result).contains("Doris%20%26%20Johnson", "SpecialCharacters%21%40%C2%A3%24%25%5E%26%28",
+                "The%20tribunal%20has%20completed%20ET1%20serving%20to%20the%20respondent.");
     }
 
     @Test
@@ -169,7 +244,7 @@ class ServingServiceTest {
         caseData.setServingDocumentCollection(List.of(documentTypeItem));
 
         servingService.addServingDocToDocumentCollection(caseData);
-        assertThat(caseData.getDocumentCollection().get(0).getValue().getTypeOfDocument()).isEqualTo(resultTypeOfDoc);
+        assertEquals(caseData.getDocumentCollection().getFirst().getValue().getTypeOfDocument(), resultTypeOfDoc);
     }
 
     private static Stream<Arguments> saveServingDocToDocumentCollectionParameter() {

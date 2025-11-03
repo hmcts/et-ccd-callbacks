@@ -95,7 +95,7 @@ public class DocumentManagementService {
         this.restTemplate = restTemplate;
     }
 
-    @Retryable(value = {DocumentManagementException.class}, backoff = @Backoff(delay = 200))
+    @Retryable(retryFor = {DocumentManagementException.class}, backoff = @Backoff(delay = 200))
     public URI uploadDocument(String authToken, byte[] byteArray, String outputFileName, String type,
                               String caseTypeID) {
         try {
@@ -167,8 +167,8 @@ public class DocumentManagementService {
         if (HttpStatus.OK.equals(response.getStatusCode())) {
             return UploadedDocument.builder()
                     .content(response.getBody())
-                    .name(Objects.requireNonNull(response.getHeaders().get("originalfilename")).get(0))
-                    .contentType(Objects.requireNonNull(response.getHeaders().get(HttpHeaders.CONTENT_TYPE)).get(0))
+                    .name(Objects.requireNonNull(response.getHeaders().get("originalfilename")).getFirst())
+                    .contentType(Objects.requireNonNull(response.getHeaders().get(HttpHeaders.CONTENT_TYPE)).getFirst())
                     .build();
         } else {
             throw new IllegalStateException("Cannot download document that is stored in CCD got "

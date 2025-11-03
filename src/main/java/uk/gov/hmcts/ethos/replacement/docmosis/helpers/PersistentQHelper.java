@@ -13,7 +13,6 @@ import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.ResetStateDataModel;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.SendNotificationDataModel;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.TransferToEcmDataModel;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.UpdateDataModel;
-import uk.gov.hmcts.et.common.model.bulk.BulkDetails;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationTypeMultiple;
@@ -28,43 +27,6 @@ import static uk.gov.hmcts.ecm.common.model.servicebus.datamodel.CreationSingleD
 public final class PersistentQHelper {
 
     private PersistentQHelper() {
-    }
-
-    //********************
-    /* BULK DETAILS */
-    //********************
-
-    public static CreateUpdatesDto getCreateUpdatesDto(BulkDetails bulkDetails, List<String> ethosCaseRefCollection,
-                                                       String email, String multipleRef,
-                                                       String multipleRefLinkMarkUp) {
-        return CreateUpdatesDto.builder()
-                .caseTypeId(bulkDetails.getCaseTypeId())
-                .jurisdiction(bulkDetails.getJurisdiction())
-                .multipleRef(multipleRef)
-                .multipleReferenceLinkMarkUp(multipleRefLinkMarkUp)
-                .username(email)
-                .ethosCaseRefCollection(ethosCaseRefCollection)
-                .build();
-    }
-
-    public static void sendUpdatesPersistentQ(BulkDetails bulkDetails, String username,
-                                              List<String> ethosCaseRefCollection,
-                                              DataModelParent dataModelParent, List<String> errors,
-                                              String multipleRef, CreateUpdatesBusSender createUpdatesBusSender,
-                                              String updateSize, String multipleRefLinkMarkUp) {
-        log.info("Case Ref collection: " + ethosCaseRefCollection);
-        if (ethosCaseRefCollection.isEmpty()) {
-            log.info("Case Ref collection is empty");
-        } else {
-            CreateUpdatesDto createUpdatesDto = PersistentQHelper.getCreateUpdatesDto(bulkDetails,
-                    ethosCaseRefCollection, username, multipleRef, multipleRefLinkMarkUp);
-
-            createUpdatesBusSender.sendUpdatesToQueue(
-                    createUpdatesDto,
-                    dataModelParent,
-                    errors,
-                    updateSize);
-        }
     }
 
     //********************

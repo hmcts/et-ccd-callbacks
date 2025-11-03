@@ -22,7 +22,10 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.ResourceLoader;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -59,7 +62,7 @@ class DigitalCaseFileControllerTest extends BaseControllerTest {
 
     @BeforeEach
     @Override
-    protected void setUp() throws Exception {
+    protected void setUp() throws IOException, URISyntaxException {
         super.setUp();
         CaseDetails caseDetails = CaseDataBuilder.builder()
                 .withEthosCaseReference("123456/2021")
@@ -116,7 +119,8 @@ class DigitalCaseFileControllerTest extends BaseControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data.digitalCaseFile.status",
-                        is("DCF Uploaded: " + LocalDateTime.now().format(NEW_DATE_TIME_PATTERN))));
+                        is("DCF Uploaded: " + LocalDateTime.now(ZoneId.of("Europe/London"))
+                                .format(NEW_DATE_TIME_PATTERN))));
     }
 
     @Test

@@ -15,20 +15,19 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ServingService;
 
+import java.util.List;
+
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntity;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @Slf4j
 @RequiredArgsConstructor
 @RestController
 public class ET1ServingController {
-
-    private static final String SUBMITTED_HEADER =
-        "<h1>Documents submitted</h1>\r\n\r\n<h5>We have notified the following parties:</h5>\r\n\r\n<h3>%s</h3>";
 
     private final ServingService servingService;
     private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
@@ -60,12 +59,15 @@ public class ET1ServingController {
             @RequestHeader("Authorization") String userToken) {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setOtherTypeDocumentName(
+        List<String> errors = servingService.checkTypeOfDocumentError(caseData.getServingDocumentCollection());
+        if (errors.isEmpty()) {
+            caseData.setOtherTypeDocumentName(
                 servingService.generateOtherTypeDocumentLink(caseData.getServingDocumentCollection()));
-        caseData.setClaimantAndRespondentAddresses(servingService.generateClaimantAndRespondentAddress(caseData));
-        caseData.setEmailLinkToAcas(servingService.generateEmailLinkToAcas(caseData, false));
+            caseData.setClaimantAndRespondentAddresses(servingService.generateRespondentAddressList(caseData));
+            caseData.setEmailLinkToAcas(servingService.generateEmailLinkToAcas(caseData, false));
 
-        return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
+        }
+        return getCallbackRespEntity(errors, ccdRequest.getCaseDetails());
     }
 
     /**
@@ -118,14 +120,11 @@ public class ET1ServingController {
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
 
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-
         servingService.sendNotifications(ccdRequest.getCaseDetails());
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()
             .data(ccdRequest.getCaseDetails().getCaseData())
-            .confirmation_header(String.format(SUBMITTED_HEADER, NotificationHelper.getParties(caseData)))
-            .confirmation_body("<span></span>")
+            .confirmation_header("<h1>Documents sent</h1>")
             .build());
     }
 }

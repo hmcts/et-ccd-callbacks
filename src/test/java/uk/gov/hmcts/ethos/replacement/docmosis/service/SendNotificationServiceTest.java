@@ -9,8 +9,12 @@ import org.mockito.Mock;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
+import uk.gov.hmcts.et.common.model.ccd.items.BFActionTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.BFActionType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
@@ -20,12 +24,17 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelection
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -36,6 +45,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BOTH_PARTIES;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_VIEWED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
@@ -44,6 +54,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SEND_NOTIFICATION_R
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRIBUNAL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.SendNotificationService.CASE_MANAGEMENT_ORDERS_REQUESTS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.SendNotificationService.EMPLOYER_CONTRACT_CLAIM;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.SendNotificationService.NOTICE_OF_EMPLOYER_CONTRACT_CLAIM;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.NOTIFICATION_SUMMARY_PDF;
 
 @ExtendWith(SpringExtension.class)
 class SendNotificationServiceTest {
@@ -52,6 +65,8 @@ class SendNotificationServiceTest {
     private HearingSelectionService hearingSelectionService;
     @MockBean
     private FeatureToggleService featureToggleService;
+    @Mock
+    private TornadoService tornadoService;
     private CaseData caseData;
     private CaseDetails caseDetails;
     private SendNotificationService sendNotificationService;
@@ -71,10 +86,10 @@ class SendNotificationServiceTest {
     private static final String CLAIMANT_ONLY = "Claimant only";
 
     @BeforeEach
-    public void setUp() {
+     void setUp() {
         emailService = spy(new EmailUtils());
         sendNotificationService = new SendNotificationService(hearingSelectionService,
-                emailService, featureToggleService);
+                emailService, featureToggleService, tornadoService);
         ReflectionTestUtils.setField(sendNotificationService,
                 RESPONDENT_SEND_NOTIFICATION_TEMPLATE_ID,
                 "respondentSendNotificationTemplateId");
@@ -129,7 +144,7 @@ class SendNotificationServiceTest {
     void testCreateSendNotification() {
 
         sendNotificationService.createSendNotification(caseData);
-        SendNotificationType sendNotificationType = caseData.getSendNotificationCollection().get(0).getValue();
+        SendNotificationType sendNotificationType = caseData.getSendNotificationCollection().getFirst().getValue();
 
         assertEquals("title", sendNotificationType.getSendNotificationTitle());
         assertEquals("no", sendNotificationType.getSendNotificationLetter());
@@ -159,7 +174,7 @@ class SendNotificationServiceTest {
     void testCreateSendNotificationWhenRespondentShouldBeNotified() {
         caseData.setSendNotificationSelectParties(RESPONDENT_ONLY);
         sendNotificationService.createSendNotification(caseData);
-        SendNotificationType sendNotificationType = caseData.getSendNotificationCollection().get(0).getValue();
+        SendNotificationType sendNotificationType = caseData.getSendNotificationCollection().getFirst().getValue();
         assertEquals(NOT_VIEWED_YET, sendNotificationType.getNotificationState());
     }
 
@@ -169,7 +184,7 @@ class SendNotificationServiceTest {
         caseData.setSendNotificationSelectParties(CLAIMANT_ONLY);
         caseData.setSendNotificationResponseTribunal(SEND_NOTIFICATION_RESPONSE_REQUIRED);
         sendNotificationService.createSendNotification(caseData);
-        SendNotificationType sendNotificationType = caseData.getSendNotificationCollection().get(0).getValue();
+        SendNotificationType sendNotificationType = caseData.getSendNotificationCollection().getFirst().getValue();
         assertEquals(NOT_STARTED_YET, sendNotificationType.getNotificationState());
     }
 
@@ -179,7 +194,7 @@ class SendNotificationServiceTest {
         caseData.setSendNotificationSelectParties(RESPONDENT_ONLY);
         caseData.setSendNotificationResponseTribunal(SEND_NOTIFICATION_RESPONSE_REQUIRED);
         sendNotificationService.createSendNotification(caseData);
-        SendNotificationType sendNotificationType = caseData.getSendNotificationCollection().get(0).getValue();
+        SendNotificationType sendNotificationType = caseData.getSendNotificationCollection().getFirst().getValue();
         assertEquals(NOT_VIEWED_YET, sendNotificationType.getNotificationState());
     }
 
@@ -188,7 +203,7 @@ class SendNotificationServiceTest {
         caseData.setSendNotificationSubject(List.of(CASE_MANAGEMENT_ORDERS_REQUESTS));
         caseData.setSendNotificationSelectParties(RESPONDENT_ONLY);
         sendNotificationService.createSendNotification(caseData);
-        SendNotificationType sendNotificationType = caseData.getSendNotificationCollection().get(0).getValue();
+        SendNotificationType sendNotificationType = caseData.getSendNotificationCollection().getFirst().getValue();
         assertEquals(NOT_VIEWED_YET, sendNotificationType.getNotificationState());
     }
 
@@ -414,4 +429,177 @@ class SendNotificationServiceTest {
 
     }
 
+    @Test
+    void testCreateNotificationSummarySuccess() throws Exception {
+        DocumentInfo expectedDocumentInfo = new DocumentInfo();
+        expectedDocumentInfo.setDescription("Notification 1 Summary");
+        expectedDocumentInfo.setMarkUp("<a href=\"http://dm-store/documents/123-456-789/binary\">Document</a>");
+        expectedDocumentInfo.setUrl("http://dm-store/documents/123-456-789/binary");
+
+        when(tornadoService.generateEventDocument(caseData, "userToken",
+                SCOTLAND_CASE_TYPE_ID, NOTIFICATION_SUMMARY_PDF))
+                .thenReturn(expectedDocumentInfo);
+        
+        DocumentInfo result = sendNotificationService.createNotificationSummary(
+                caseData, "userToken", SCOTLAND_CASE_TYPE_ID);
+        
+        verify(tornadoService, times(1)).generateEventDocument(
+                caseData, "userToken", SCOTLAND_CASE_TYPE_ID,
+                NOTIFICATION_SUMMARY_PDF);
+        assertSame(expectedDocumentInfo, result);
+        assertEquals("<a href=\"http://dm-store/documents/123-456-789/binary\">Notification 1 Summary</a>",
+                result.getMarkUp());
+    }
+
+    @Test
+    void testCreateNotificationSummaryWithMarkUpReplacement() throws Exception {
+        DocumentInfo documentInfo = new DocumentInfo();
+        documentInfo.setDescription("Notification 1 Summary");
+        documentInfo.setMarkUp("<a href=\"http://dm-store/documents/123-456-789/binary\">Document</a>");
+        
+        when(tornadoService.generateEventDocument(any(), anyString(), anyString(), anyString()))
+                .thenReturn(documentInfo);
+        
+        DocumentInfo result = sendNotificationService.createNotificationSummary(
+                caseData, "userToken", SCOTLAND_CASE_TYPE_ID);
+        
+        assertEquals("<a href=\"http://dm-store/documents/123-456-789/binary\">Notification 1 Summary</a>",
+                result.getMarkUp());
+    }
+
+    @Test
+    void testCreateNotificationSummaryThrowsDocumentManagementException() throws Exception {
+        when(tornadoService.generateEventDocument(any(), anyString(), anyString(), anyString()))
+                .thenThrow(new RuntimeException("Tornado down"));
+        
+        DocumentManagementException exception = assertThrows(DocumentManagementException.class,
+                () -> sendNotificationService.createNotificationSummary(caseData, "userToken", SCOTLAND_CASE_TYPE_ID));
+        
+        assertTrue(exception.getMessage().contains("Failed to generate document for case id: 1234"));
+        verify(tornadoService, times(1)).generateEventDocument(
+                caseData, "userToken", SCOTLAND_CASE_TYPE_ID, NOTIFICATION_SUMMARY_PDF);
+    }
+
+    @Test
+    void testCreateBfActionWhenEccQuestionIsNoticeOfEmployerContractClaim() {
+        caseData.setSendNotificationSubject(List.of(EMPLOYER_CONTRACT_CLAIM));
+        caseData.setSendNotificationEccQuestion(NOTICE_OF_EMPLOYER_CONTRACT_CLAIM);
+        caseData.setBfActions(null);
+        
+        sendNotificationService.createBfAction(caseData);
+        
+        assertNotNull(caseData.getBfActions());
+        assertEquals(1, caseData.getBfActions().size());
+        
+        BFActionTypeItem bfActionItem = caseData.getBfActions().getFirst();
+        assertNotNull(bfActionItem.getId());
+        
+        BFActionType bfAction = bfActionItem.getValue();
+        assertNotNull(bfAction);
+        assertEquals(NO, bfAction.getLetters());
+        assertEquals(LocalDate.now().toString(), bfAction.getDateEntered());
+        assertEquals("Other action", bfAction.getCwActions());
+        assertEquals("ECC served", bfAction.getAllActions());
+        assertEquals(LocalDate.now().plusDays(29).toString(), bfAction.getBfDate());
+    }
+
+    @Test
+    void testCreateBfActionWhenBothEccConditionsAreMet() {
+        caseData.setSendNotificationSubject(List.of(EMPLOYER_CONTRACT_CLAIM, "Other Subject"));
+        caseData.setSendNotificationEccQuestion(NOTICE_OF_EMPLOYER_CONTRACT_CLAIM);
+        caseData.setBfActions(null);
+        
+        sendNotificationService.createBfAction(caseData);
+        
+        assertNotNull(caseData.getBfActions());
+        assertEquals(1, caseData.getBfActions().size());
+    }
+
+    @Test
+    void testCreateBfActionShouldNotCreateWhenNeitherConditionIsMet() {
+        caseData.setSendNotificationSubject(List.of("Hearing", "Other Subject"));
+        caseData.setSendNotificationEccQuestion("Other Question");
+        caseData.setBfActions(null);
+        
+        sendNotificationService.createBfAction(caseData);
+        
+        assertNull(caseData.getBfActions());
+    }
+
+    @Test
+    void testCreateBfActionShouldNotCreateWhenSubjectIsNullButEccQuestionMatches() {
+        caseData.setSendNotificationSubject(null);
+        caseData.setSendNotificationEccQuestion(NOTICE_OF_EMPLOYER_CONTRACT_CLAIM);
+        caseData.setBfActions(null);
+        
+        sendNotificationService.createBfAction(caseData);
+        
+        assertNull(caseData.getBfActions());
+    }
+
+    @Test
+    void testCreateBfActionShouldNotCreateWhenSubjectDoesNotContainEcc() {
+        caseData.setSendNotificationSubject(List.of("Hearing", "Judgment"));
+        caseData.setBfActions(null);
+        
+        sendNotificationService.createBfAction(caseData);
+        
+        assertNull(caseData.getBfActions());
+    }
+
+    @Test
+    void testCreateBfActionShouldNotCreateWhenEccQuestionNotNoticeOFEcc() {
+        caseData.setSendNotificationSubject(List.of(EMPLOYER_CONTRACT_CLAIM));
+        caseData.setSendNotificationEccQuestion("Acceptance of Employer Contract Claim");
+        caseData.setBfActions(null);
+
+        sendNotificationService.createBfAction(caseData);
+
+        assertNull(caseData.getBfActions());
+    }
+
+    @Test
+    void testCreateBfActionAppendsToExistingBfActions() {
+        BFActionType existingBfAction = new BFActionType();
+        existingBfAction.setCwActions("Existing action");
+        existingBfAction.setAllActions("Existing all action");
+        BFActionTypeItem existingBfActionItem = new BFActionTypeItem();
+        existingBfActionItem.setId("existing-id");
+        existingBfActionItem.setValue(existingBfAction);
+        
+        List<BFActionTypeItem> existingActions = new ArrayList<>();
+        existingActions.add(existingBfActionItem);
+
+        caseData.setSendNotificationSubject(List.of(EMPLOYER_CONTRACT_CLAIM));
+        caseData.setSendNotificationEccQuestion(NOTICE_OF_EMPLOYER_CONTRACT_CLAIM);
+        caseData.setBfActions(existingActions);
+        
+        sendNotificationService.createBfAction(caseData);
+        
+        assertNotNull(caseData.getBfActions());
+        assertEquals(2, caseData.getBfActions().size()); // Should have 2 actions now
+        
+        BFActionTypeItem firstAction = caseData.getBfActions().getFirst();
+        assertEquals("existing-id", firstAction.getId());
+        assertEquals("Existing action", firstAction.getValue().getCwActions());
+        
+        BFActionTypeItem newAction = caseData.getBfActions().get(1);
+        assertNotNull(newAction.getId());
+        assertEquals("Other action", newAction.getValue().getCwActions());
+        assertEquals("ECC served", newAction.getValue().getAllActions());
+    }
+
+    @Test
+    void testCreateBfActionBfActionTypeItemHasValidUuid() {
+        caseData.setSendNotificationSubject(List.of(EMPLOYER_CONTRACT_CLAIM));
+        caseData.setSendNotificationEccQuestion(NOTICE_OF_EMPLOYER_CONTRACT_CLAIM);
+        caseData.setBfActions(null);
+        
+        sendNotificationService.createBfAction(caseData);
+        
+        BFActionTypeItem bfActionItem = caseData.getBfActions().getFirst();
+        assertNotNull(bfActionItem.getId());
+        assertTrue(bfActionItem.getId().matches(
+                "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"));
+    }
 }

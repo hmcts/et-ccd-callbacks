@@ -68,6 +68,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.STAFF_CASE_CAUSE_LI
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.STAFF_CASE_CAUSE_LIST_TEMPLATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TIME_TO_FIRST_HEARING_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.JurisdictionCodeConstants.getJurCodesCollectionWithHide;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.getHearingDuration;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.getRespondentAddressET3;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
@@ -116,8 +117,7 @@ public final class ListingHelper {
             listingType.setCauseListDate(getCauseListDate(listedDate));
             listingType.setCauseListTime(getCauseListTime(listedDate));
 
-            listingType.setJurisdictionCodesList(BulkHelper.getJurCodesCollectionWithHide(
-                    caseData.getJurCodesCollection()));
+            listingType.setJurisdictionCodesList(getJurCodesCollectionWithHide(caseData.getJurCodesCollection()));
             listingType.setHearingType(getHearingType(hearingType));
             listingType.setPositionType(getPositionType(caseData));
 
@@ -257,25 +257,25 @@ public final class ListingHelper {
 
     private static String getRespondentRepresentative(CaseData caseData) {
         return isNotEmpty(caseData.getRepCollection())
-                && caseData.getRepCollection().get(0).getValue() != null
-                && caseData.getRepCollection().get(0).getValue().getNameOfOrganisation() != null
-                ? caseData.getRepCollection().get(0).getValue().getNameOfOrganisation()
+                && caseData.getRepCollection().getFirst().getValue() != null
+                && caseData.getRepCollection().getFirst().getValue().getNameOfOrganisation() != null
+                ? caseData.getRepCollection().getFirst().getValue().getNameOfOrganisation()
                 : SPACE;
     }
 
     private static String getRespondentTown(CaseData caseData) {
         return isNotEmpty(caseData.getRespondentCollection())
-            && caseData.getRespondentCollection().get(0).getValue() != null
-            && getRespondentAddressET3(caseData.getRespondentCollection().get(0).getValue()) != null
-            && getRespondentAddressET3(caseData.getRespondentCollection().get(0).getValue()).getPostTown() != null
-            ? getRespondentAddressET3(caseData.getRespondentCollection().get(0).getValue()).getPostTown()
+            && caseData.getRespondentCollection().getFirst().getValue() != null
+            && getRespondentAddressET3(caseData.getRespondentCollection().getFirst().getValue()) != null
+            && getRespondentAddressET3(caseData.getRespondentCollection().getFirst().getValue()).getPostTown() != null
+            ? getRespondentAddressET3(caseData.getRespondentCollection().getFirst().getValue()).getPostTown()
             : SPACE;
     }
 
     private static String getRespondent(CaseData caseData) {
         return isNotEmpty(caseData.getRespondentCollection())
-                && caseData.getRespondentCollection().get(0).getValue() != null
-                ? caseData.getRespondentCollection().get(0).getValue().getRespondentName()
+                && caseData.getRespondentCollection().getFirst().getValue() != null
+                ? caseData.getRespondentCollection().getFirst().getValue().getRespondentName()
                 : SPACE;
     }
 

@@ -40,7 +40,7 @@ class BfActionReportTest {
     private CaseData caseData;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         listingDetails = new ListingDetails();
         listingData = new ListingData();
         listingData.setReportType(BROUGHT_FORWARD_REPORT);
@@ -195,8 +195,8 @@ class BfActionReportTest {
         submitEvent.setCaseData(caseData);
         submitEvents.add(submitEvent);
 
-        BfActionReport bfActionReport = new BfActionReport();
-        ListingData resultListingData = bfActionReport.runReport(listingDetails, submitEvents, "userName");
+        BfActionReport newBfActionReport = new BfActionReport();
+        ListingData resultListingData = newBfActionReport.runReport(listingDetails, submitEvents, "userName");
         // bfActionType3 is added last. But it has the earliest bfDate. As the returned listingData from
         // bfActionReport.runReport method call should be ordered by bfDate, bfActionType3
         // should be the first element
@@ -229,8 +229,8 @@ class BfActionReportTest {
         submitEvent.setCaseData(caseData);
         submitEvents.add(submitEvent);
 
-        BfActionReport bfActionReport = new BfActionReport();
-        ListingData resultListingData = bfActionReport.runReport(listingDetails, submitEvents, "userName");
+        BfActionReport newBfActionReport = new BfActionReport();
+        ListingData resultListingData = newBfActionReport.runReport(listingDetails, submitEvents, "userName");
         //Because the Bf entries are sorted by bf date, bfActionTypeItemFour is the first entry in the
         //result listing data
         BFDateType firstBFDateTypeItem = resultListingData.getBfDateCollection().get(0).getValue();

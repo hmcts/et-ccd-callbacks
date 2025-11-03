@@ -12,6 +12,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AddAmendClaimantRepresentativeService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.ScheduledTaskRunner;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
@@ -35,6 +36,8 @@ class AddAmendClaimantRepresentativeControllerTest {
     private static final String ABOUT_TO_SUBMIT_URL = "/addAmendClaimantRepresentative/aboutToSubmit";
 
     @MockBean
+    private ScheduledTaskRunner taskRunner;
+    @MockBean
     private VerifyTokenService verifyTokenService;
     @MockBean
     private AddAmendClaimantRepresentativeService addAmendClaimantRepresentativeService;
@@ -47,7 +50,7 @@ class AddAmendClaimantRepresentativeControllerTest {
     private CCDRequest ccdRequest;
 
     @BeforeEach
-    void setUp() throws Exception {
+    void setUp() {
         CaseDetails caseDetails = CaseDataBuilder.builder()
                 .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 

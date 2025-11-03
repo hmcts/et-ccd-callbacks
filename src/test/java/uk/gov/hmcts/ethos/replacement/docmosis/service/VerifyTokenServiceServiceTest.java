@@ -16,7 +16,7 @@ class VerifyTokenServiceServiceTest {
     private VerifyTokenService verifyTokenService;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         verifyTokenService = new VerifyTokenService();
         ReflectionTestUtils.setField(verifyTokenService, "idamJwkUrl", "http://idam-api:5000/jwks");
     }

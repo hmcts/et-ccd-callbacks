@@ -16,8 +16,11 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.ServingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 
+import java.io.IOException;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 
+import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
@@ -51,7 +54,7 @@ class ET1ServingControllerTest extends BaseControllerTest {
 
     @BeforeEach
     @Override
-    protected void setUp() throws Exception {
+    protected void setUp() throws IOException, URISyntaxException {
         super.setUp();
         CaseData caseData = new CaseData();
         caseData.setServingDocumentCollection(new ArrayList<>());
@@ -64,7 +67,7 @@ class ET1ServingControllerTest extends BaseControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(servingService.generateOtherTypeDocumentLink(anyList())).thenReturn("expectedDocumentName");
         when(servingService.generateEmailLinkToAcas(any(), anyBoolean())).thenReturn("expectedLink");
-        when(servingService.generateClaimantAndRespondentAddress(any())).thenReturn("expectedAddresses");
+        when(servingService.generateRespondentAddressList(any())).thenReturn("expectedAddresses");
         mvc.perform(post(SERVING_DOCUMENT_OTHER_TYPE_NAMES_URL)
                         .content(jsonMapper.toJson(ccdRequest))
                         .header("Authorization", AUTH_TOKEN)
@@ -73,11 +76,11 @@ class ET1ServingControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath("$.data.otherTypeDocumentName", notNullValue()))
                 .andExpect(jsonPath("$.data.claimantAndRespondentAddresses", notNullValue()))
                 .andExpect(jsonPath("$.data.emailLinkToAcas", notNullValue()))
-                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         verify(servingService, times(1)).generateOtherTypeDocumentLink(anyList());
         verify(servingService, times(1)).generateEmailLinkToAcas(any(), anyBoolean());
-        verify(servingService, times(1)).generateClaimantAndRespondentAddress(any());
+        verify(servingService, times(1)).generateRespondentAddressList(any());
     }
 
     @Test

@@ -23,11 +23,13 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isBlank;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ET3DocumentHelper.isET3NotificationDocumentTypeResponseAccepted;
 
 /**
- * ET3 Response Helper provides methods to assist with the ET3 Response Form event.
+ * ET3 Response Helper provides methods to help with the ET3 Response Form events.
  */
 @Slf4j
 public final class Et3ResponseHelper {
@@ -125,6 +127,9 @@ public final class Et3ResponseHelper {
     }
 
     private static boolean isAllowSubmit(RespondentSumType respondent) {
+        if (NO.equals(respondent.getResponseContinue())) {
+            return false;
+        }
         if (NO.equals(respondent.getResponseReceived())) {
             return true;
         }
@@ -246,7 +251,7 @@ public final class Et3ResponseHelper {
             // caseData.getEt3ResponseContactPreference())
             // replaced with representative.setRepresentativePreference(caseData.getEt3ResponseContactPreference())
             representative.setRepresentativePreference(caseData.getEt3ResponseContactPreference());
-            // There weren't any mapping of reference for correspondence - representative.
+            // There wasn't any mapping of reference for correspondence - representative.
             // mentioned in the ticket https://tools.hmcts.net/jira/browse/RET-5054
             // added this field to representative
             representative.setRepresentativeReference(caseData.getEt3ResponseReference());
@@ -307,7 +312,7 @@ public final class Et3ResponseHelper {
         String selectedRespondent = switch (eventId) {
             case ET3_RESPONSE -> caseData.getSubmitEt3Respondent().getSelectedLabel();
             case ET3_RESPONSE_DETAILS, ET3_RESPONSE_EMPLOYMENT_DETAILS -> caseData.getEt3RepresentingRespondent()
-                    .get(0).getValue().getDynamicList().getSelectedLabel();
+                    .getFirst().getValue().getDynamicList().getSelectedLabel();
 
             default -> throw new IllegalArgumentException(INVALID_EVENT_ID + eventId);
         };
@@ -506,5 +511,21 @@ public final class Et3ResponseHelper {
         return isEmpty(caseData) || CollectionUtils.isEmpty(caseData.getRepCollection())
                 || isEmpty(caseData.getSubmitEt3Respondent())
                 || isBlank(caseData.getSubmitEt3Respondent().getSelectedLabel());
+    }
+
+    public static void setEt3NotificationAcceptedDates(CaseData caseData) {
+        if (CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
+            return;
+        }
+        for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
+            if (isNotEmpty(respondentSumTypeItem.getValue())) {
+                if (isET3NotificationDocumentTypeResponseAccepted(caseData.getEt3NotificationDocCollection())
+                        && ACCEPTED_STATE.equals(respondentSumTypeItem.getValue().getResponseStatus())) {
+                    respondentSumTypeItem.getValue().setEt3NotificationAcceptedDate(LocalDate.now().toString());
+                } else {
+                    respondentSumTypeItem.getValue().setEt3NotificationAcceptedDate(null);
+                }
+            }
+        }
     }
 }

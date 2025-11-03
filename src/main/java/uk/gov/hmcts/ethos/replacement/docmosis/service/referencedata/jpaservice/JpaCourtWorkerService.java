@@ -23,7 +23,7 @@ public class JpaCourtWorkerService implements CourtWorkerService {
     public List<DynamicValueType> getCourtWorkerByTribunalOffice(TribunalOffice tribunalOffice,
                                                                  CourtWorkerType courtWorkerType) {
         return courtWorkerRepository.findByTribunalOfficeAndType(tribunalOffice, courtWorkerType).stream()
-                .map(cw -> DynamicValueType.create(cw.getCode(), cw.getName()))
+                .map(cw -> DynamicValueType.create(cw.getCode(), cw.getName().replace("\u00A0", " ")))
                 .sorted(comparing(dv -> dv.getLabel().toLowerCase(Locale.ROOT)))
                 .collect(partitioningBy(dv -> dv.getLabel().startsWith("z ")))
                 .values()

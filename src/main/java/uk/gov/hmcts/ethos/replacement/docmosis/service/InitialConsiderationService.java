@@ -469,7 +469,6 @@ public class InitialConsiderationService {
 
     }
 
-
     public void mapOldIcHearingNotListedOptionsToNew(CaseData caseData, String caseTypeId) {
         List<String> etICHearingNotListedList = caseData.getEtICHearingNotListedList();
         List<String> etICHearingNotListedListUpdated = new ArrayList<>();

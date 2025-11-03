@@ -24,7 +24,6 @@ import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
@@ -63,13 +62,14 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.apache.commons.collections.CollectionUtils.isEmpty;
+import static org.apache.commons.collections.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntity;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EMPTY_STRING;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper.buildFlagsImageFileName;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.removeSpacesFromPartyNames;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.updatePositionTypeToClosed;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.updatePostponedDate;
@@ -255,7 +255,7 @@ public class CaseActionsForCaseWorkerController {
             defaultValuesReaderService.setCaseData(caseData, defaultValues);
             caseManagementForCaseWorkerService.caseDataDefaults(caseData);
             generateEthosCaseReference(caseData, ccdRequest);
-            FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
+            buildFlagsImageFileName(ccdRequest.getCaseDetails());
             caseData.setMultipleFlag(caseData.getEcmCaseType() != null
                     && Constants.MULTIPLE_CASE_TYPE.equals(caseData.getEcmCaseType()) ? Constants.YES : Constants.NO);
             UploadDocumentHelper.convertLegacyDocsToNewDocNaming(caseData);
@@ -381,7 +381,7 @@ public class CaseActionsForCaseWorkerController {
             caseManagementForCaseWorkerService.dateToCurrentPosition(caseData);
             caseManagementForCaseWorkerService.setEt3ResponseDueDate(caseData);
             caseManagementForCaseWorkerService.setNextListedDate(caseData);
-            FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
+            buildFlagsImageFileName(ccdRequest.getCaseDetails());
             UploadDocumentHelper.convertLegacyDocsToNewDocNaming(caseData);
             UploadDocumentHelper.setDocumentTypeForDocumentCollection(caseData);
             String caseTypeId = caseDetails.getCaseTypeId();
@@ -435,7 +435,7 @@ public class CaseActionsForCaseWorkerController {
         log.info("AMEND CLAIMANT DETAILS ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
+        buildFlagsImageFileName(ccdRequest.getCaseDetails());
         if (featureToggleService.isGlobalSearchEnabled()) {
             caseManagementForCaseWorkerService.setCaseNameHmctsInternal(caseData);
         }
@@ -481,9 +481,13 @@ public class CaseActionsForCaseWorkerController {
 
         eventValidationService.validateMaximumSize(caseData).ifPresent(errors::add);
 
-        if (errors.isEmpty() && !isEmpty(caseData.getRepCollection())) {
+        if (errors.isEmpty() && isNotEmpty(caseData.getRepCollection())) {
             //Needed to keep the respondent names in the rep collection sync
             nocRespondentHelper.amendRespondentNameRepresentativeNames(caseData);
+        }
+
+        if (errors.isEmpty() && isNotEmpty(caseData.getRespondentCollection())) {
+            caseManagementForCaseWorkerService.updateListOfRespondentsWithAnEcc(caseData);
         }
 
         if (featureToggleService.isGlobalSearchEnabled()) {
@@ -592,7 +596,7 @@ public class CaseActionsForCaseWorkerController {
         log.info("UPDATE HEARING ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
-        FlagsImageHelper.buildFlagsImageFileName(caseDetails);
+        buildFlagsImageFileName(caseDetails);
         caseManagementForCaseWorkerService.setNextListedDate(caseDetails.getCaseData());
         return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
     }
@@ -634,7 +638,7 @@ public class CaseActionsForCaseWorkerController {
         log.info("RESTRICTED CASES ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
+        buildFlagsImageFileName(ccdRequest.getCaseDetails());
         eventValidationService.validateRestrictedReportingNames(caseData);
 
         if (featureToggleService.isHmcEnabled()) {
@@ -801,76 +805,10 @@ public class CaseActionsForCaseWorkerController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         conciliationTrackService.populateConciliationTrackForJurisdiction(caseData);
+        buildFlagsImageFileName(ccdRequest.getCaseDetails().getCaseTypeId(), caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
-
-    @PostMapping(value = "/midRespondentECC", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "populates the mid dynamic list with the respondent names.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
-            content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-            }),
-        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
-        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
-    })
-    public ResponseEntity<CCDCallbackResponse> midRespondentECC(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader(AUTHORIZATION) String userToken) {
-        log.info("MID RESPONDENT ECC ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
-
-        List<String> errors = new ArrayList<>();
-        CaseData caseData = caseManagementForCaseWorkerService.createECC(ccdRequest.getCaseDetails(),
-                userToken, errors, Constants.MID_EVENT_CALLBACK);
-
-        return getCallbackRespEntityErrors(errors, caseData);
-    }
-
-    @PostMapping(value = "/createECC", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "create a new Employer Contract Claim.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
-            content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-            }),
-        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
-        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
-    })
-    public ResponseEntity<CCDCallbackResponse> createECC(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader(AUTHORIZATION) String userToken) {
-        log.info("CREATE ECC ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
-
-        List<String> errors = new ArrayList<>();
-        CaseData caseData = caseManagementForCaseWorkerService.createECC(
-                ccdRequest.getCaseDetails(), userToken, errors, Constants.ABOUT_TO_SUBMIT_EVENT_CALLBACK);
-        generateEthosCaseReference(caseData, ccdRequest);
-
-        return getCallbackRespEntityErrors(errors, caseData);
-    }
-
-    @PostMapping(value = "/linkOriginalCaseECC", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "send an update to the original case with the new ECC reference created to link it.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
-            content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-            }),
-        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
-        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
-    })
-    public ResponseEntity<CCDCallbackResponse> linkOriginalCaseECC(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader(AUTHORIZATION) String userToken) {
-        log.info("LINK ORIGINAL CASE ECC ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
-
-        List<String> errors = new ArrayList<>();
-        CaseData caseData = caseManagementForCaseWorkerService.createECC(ccdRequest.getCaseDetails(),
-                userToken, errors, Constants.SUBMITTED_CALLBACK);
-
-        return getCallbackRespEntityErrors(errors, caseData);
-    }
-
+  
     @PostMapping(value = "/singleCaseMultipleMidEventValidation", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "validates the multiple and sub multiple in the single case when moving to a multiple.")
     @ApiResponses(value = {

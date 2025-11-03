@@ -13,7 +13,9 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.JudgementTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.JudgementType;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicDepositOrder;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicJudgements;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicLetters;
@@ -25,6 +27,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -36,6 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_HEARING;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DynamicListHelper.DYNAMIC_HEARING_LABEL_FORMAT;
 
 class DynamicListHelperTest {
@@ -158,21 +162,45 @@ class DynamicListHelperTest {
 
     @Test
     void dynamicLettersEngWales() {
+        List<RespondentSumTypeItem> respondentsWithEcc = createRespondentsWithEccCollection(
+                "EW Respondent 1", "EW Respondent 2");
+        caseDetails1.getCaseData().setRespondentCollection(respondentsWithEcc);
+        
         DynamicLetters.dynamicLetters(caseDetails1.getCaseData(), ENGLANDWALES_CASE_TYPE_ID);
         dynamicValueType.setCode("1");
         dynamicValueType.setLabel("1 - Single - Manchester - 01 Nov 2019");
         assertEquals(dynamicValueType, caseDetails1.getCaseData().getCorrespondenceType()
                 .getDynamicHearingNumber().getListItems().getFirst());
+        assertNotNull(caseDetails1.getCaseData().getCorrespondenceType().getDynamicRespondentsWithEcc());
+        assertEquals(2, caseDetails1.getCaseData().getCorrespondenceType()
+                .getDynamicRespondentsWithEcc().getListItems().size());
+        dynamicValueType.setCode("EW Respondent 1");
+        dynamicValueType.setLabel("EW Respondent 1");
+        assertEquals(dynamicValueType, caseDetails1.getCaseData().getCorrespondenceType()
+                .getDynamicRespondentsWithEcc().getListItems().getFirst());
+                
         assertNull(caseDetails1.getCaseData().getCorrespondenceScotType());
     }
 
     @Test
     void dynamicLettersScotland() {
+        List<RespondentSumTypeItem> respondentsWithEcc = createRespondentsWithEccCollection(
+                "Scot Respondent", "Another Respondent");
+        caseDetailsScotTest1.getCaseData().setRespondentCollection(respondentsWithEcc);
+        
         DynamicLetters.dynamicLetters(caseDetailsScotTest1.getCaseData(), SCOTLAND_CASE_TYPE_ID);
         dynamicValueType.setCode("1");
         dynamicValueType.setLabel("1 - Single - Glasgow - 25 Nov 2019");
         assertEquals(dynamicValueType, caseDetailsScotTest1.getCaseData()
                 .getCorrespondenceScotType().getDynamicHearingNumber().getListItems().getFirst());
+        assertNotNull(caseDetailsScotTest1.getCaseData().getCorrespondenceScotType().getDynamicRespondentsWithEcc());
+        assertEquals(2, caseDetailsScotTest1.getCaseData().getCorrespondenceScotType()
+                .getDynamicRespondentsWithEcc().getListItems().size());
+        dynamicValueType.setCode("Scot Respondent");
+        dynamicValueType.setLabel("Scot Respondent");
+        assertEquals(dynamicValueType, caseDetailsScotTest1.getCaseData().getCorrespondenceScotType()
+                .getDynamicRespondentsWithEcc().getListItems().getFirst());
+        
         assertNull(caseDetailsScotTest1.getCaseData().getCorrespondenceType());
     }
 
@@ -353,5 +381,90 @@ class DynamicListHelperTest {
         String expectedLabel = String.format(DYNAMIC_HEARING_LABEL_FORMAT, hearingNumber, HEARING_TYPE_JUDICIAL_HEARING,
                 null, "25 Nov 2019");
         assertEquals(expectedLabel, hearingList.getFirst().getLabel());
+    }
+    
+    @Test
+    void testCreateDynamicRespondentWithEccList_WithRespondents() {
+        CaseData caseData = new CaseData();
+        List<RespondentSumTypeItem> respondentsWithEcc = createRespondentsWithEccCollection(
+                "Respondent A", "Respondent B", "Respondent C");
+        caseData.setRespondentCollection(respondentsWithEcc);
+        
+        List<DynamicValueType> resultList = DynamicListHelper.createDynamicRespondentWithEccList(caseData);
+        
+        assertEquals(3, resultList.size());
+
+        assertNotNull(resultList.getFirst().getCode()); // ID is auto-generated
+        assertEquals("Respondent A", resultList.getFirst().getLabel());
+        assertEquals("Respondent B", resultList.get(1).getLabel());
+        assertEquals("Respondent C", resultList.get(2).getLabel());
+    }
+    
+    @Test
+    void testCreateDynamicRespondentWithEccList_NoRespondents() {
+        CaseData caseData = new CaseData();
+        caseData.setRespondentCollection(null);
+        
+        List<DynamicValueType> resultList = DynamicListHelper.createDynamicRespondentWithEccList(caseData);
+        
+        assertEquals(0, resultList.size());
+    }
+    
+    @Test
+    void testCreateDynamicRespondentWithEccList_EmptyCollection() {
+        CaseData caseData = new CaseData();
+        caseData.setRespondentCollection(new ArrayList<>());
+        
+        List<DynamicValueType> resultList = DynamicListHelper.createDynamicRespondentWithEccList(caseData);
+        
+        assertEquals(0, resultList.size());
+    }
+    
+    @Test
+    void testCreateDynamicRespondentWithEccList_WithBlankRespondentName() {
+        RespondentSumTypeItem blankItem = new RespondentSumTypeItem();
+        blankItem.setId("blank-id");
+        RespondentSumType blankRespondent = new RespondentSumType();
+        blankRespondent.setRespondentName("");
+        blankRespondent.setRespondentEcc(YES);
+        blankItem.setValue(blankRespondent);
+
+        List<RespondentSumTypeItem> respondentsWithEcc = new ArrayList<>();
+        respondentsWithEcc.add(blankItem);
+        
+        RespondentSumTypeItem validItem = new RespondentSumTypeItem();
+        validItem.setId("valid-id");
+        RespondentSumType validRespondent = new RespondentSumType();
+        validRespondent.setRespondentName("Valid Respondent");
+        validRespondent.setRespondentEcc(YES);
+        validItem.setValue(validRespondent);
+        respondentsWithEcc.add(validItem);
+
+        CaseData caseData = new CaseData();
+        caseData.setRespondentCollection(respondentsWithEcc);
+        
+        List<DynamicValueType> resultList = DynamicListHelper.createDynamicRespondentWithEccList(caseData);
+        
+        assertEquals(2, resultList.size());
+
+        assertNotNull(resultList.getFirst().getCode()); // ID is auto-generated
+        assertEquals("", resultList.getFirst().getLabel());
+
+        assertNotNull(resultList.get(1).getCode()); // ID is auto-generated
+        assertEquals("Valid Respondent", resultList.get(1).getLabel());
+    }
+    
+    private List<RespondentSumTypeItem> createRespondentsWithEccCollection(String... respondentNames) {
+        List<RespondentSumTypeItem> respondentCollection = new ArrayList<>();
+        for (int i = 0; i < respondentNames.length; i++) {
+            RespondentSumType respondentSumType = new RespondentSumType();
+            respondentSumType.setRespondentName(respondentNames[i]);
+            respondentSumType.setRespondentEcc(YES);
+            RespondentSumTypeItem item = new RespondentSumTypeItem();
+            item.setId("id" + (i + 1)); // Set an ID for testing
+            item.setValue(respondentSumType);
+            respondentCollection.add(item);
+        }
+        return respondentCollection;
     }
 }

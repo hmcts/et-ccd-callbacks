@@ -48,6 +48,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.OUTPUT_FILE_NAME;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1VettingHelper.ET1_VETTING_OUTPUT_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationDocumentHelper.buildNotificationDocumentData;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationDocumentHelper.getDocumentName;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters.InvalidCharacterCheck.sanitizePartyName;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService.APPLICATION_DOCX_VALUE;
 
@@ -302,12 +303,23 @@ public class TornadoService {
 
             buildDocumentInstruction(connection, caseData, documentName, caseTypeId);
             byte[] bytes = getDocumentByteArray(connection);
-            return createDocumentInfoFromBytes(userToken, bytes, documentName, caseTypeId);
+            return createDocumentInfoFromBytes(userToken, bytes,
+                    getDmStoreDocumentName(caseData, documentName), caseTypeId);
         } catch (IOException exception) {
             log.error(UNABLE_TO_CONNECT_TO_DOCMOSIS, exception);
             throw exception;
         } finally {
             closeConnection(connection);
+        }
+    }
+
+    private static String getDmStoreDocumentName(CaseData caseData, String documentName) {
+        if (ET3_RESPONSE_PDF.equals(documentName)) {
+            return String.format("%s - %s", caseData.getSubmitEt3Respondent().getSelectedLabel(), ET3_RESPONSE_PDF);
+        } else if (NOTIFICATION_SUMMARY_PDF.equals(documentName)) {
+            return getDocumentName(caseData);
+        } else {
+            return documentName;
         }
     }
 
@@ -365,12 +377,16 @@ public class TornadoService {
             case ET1_VETTING_PDF -> {
                 String outputName = String.format(ET1_VETTING_OUTPUT_NAME,
                         sanitizePartyName(caseData.getClaimant()));
+                log.info(caseData.getClaimant());
+                log.info("Document name is: {}", outputName);
                 return Et1VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey(),
                         outputName);
             }
             case ET3_PROCESSING_PDF -> {
                 String outputName = String.format("ET3 Processing - %s.pdf",
                         sanitizePartyName(caseData.getEt3ChooseRespondent().getSelectedLabel()));
+                log.info(caseData.getEt3ChooseRespondent().getSelectedLabel());
+                log.info("Document name is: {}", outputName);
                 return Et3VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey(),
                         outputName);
             }
@@ -379,9 +395,11 @@ public class TornadoService {
                         caseData, tornadoConnection.getAccessKey(), caseTypeId);
             }
             case TSE_FILE_NAME -> {
+                log.info("TSE_FILE_NAME {}", tseService.getTseDocumentName(caseData));
                 return RespondentTellSomethingElseHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             }
             case CLAIMANT_TSE_FILE_NAME -> {
+                log.info("CLAIMANT_TSE_FILE_NAME {}", tseService.getClaimantTseDocumentName(caseData));
                 return ClaimantTellSomethingElseHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             }
             case REFERRAL_SUMMARY_PDF -> {

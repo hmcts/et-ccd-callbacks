@@ -379,11 +379,9 @@ public class TornadoService {
                         caseData, tornadoConnection.getAccessKey(), caseTypeId);
             }
             case TSE_FILE_NAME -> {
-                // TSE document helpers do not require the output name as a parameter
                 return RespondentTellSomethingElseHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             }
             case CLAIMANT_TSE_FILE_NAME -> {
-                // TSE document helpers do not require the output name as a parameter
                 return ClaimantTellSomethingElseHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             }
             case REFERRAL_SUMMARY_PDF -> {

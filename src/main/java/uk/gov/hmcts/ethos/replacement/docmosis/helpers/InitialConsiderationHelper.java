@@ -43,6 +43,9 @@ public final class InitialConsiderationHelper {
     private static final String IC_OUTPUT_NAME = "Initial Consideration.pdf";
     private static final String IC_SUMMARY_EW_TEMPLATE_NAME = "EM-TRB-EGW-ENG-02203.docx";
     private static final String IC_SUMMARY_SC_TEMPLATE_NAME = "EM-TRB-SCO-ENG-02204.docx";
+    private static final String JSA = "JSA";
+    private static final String OTHER = "Other";
+    private static final String WITH_MEMBERS = "With members";
 
     private InitialConsiderationHelper() {
         OBJECT_MAPPER.setSerializationInclusion(JsonInclude.Include.NON_NULL);
@@ -73,26 +76,32 @@ public final class InitialConsiderationHelper {
 
         InitialConsiderationData data = InitialConsiderationData.builder()
                 .caseNumber(defaultIfEmpty(caseData.getEthosCaseReference(), null))
-                .issuesJurisdiction(defaultIfEmpty(caseData.getEtICJuridictionCodesInvalid(), null))
-                .issuesJurCodesGiveDetails(defaultIfEmpty(caseData.getEtICInvalidDetails(), null))
-
-                .icCanProceed(defaultIfEmpty(caseData.getEtICCanProceed(), null))
-                .hearingAlreadyListed(defaultIfEmpty(caseData.getEtICHearingAlreadyListed(), null))
-
-                .hearingListed(Optional.ofNullable(caseData.getEtICHearingListed()).orElse(null))
                 .hearingPostpone(defaultIfEmpty(caseData.getEtICPostponeGiveDetails(), null))
                 .hearingConvertF2f(defaultIfEmpty(caseData.getEtICConvertF2fGiveDetails(), null))
                 .hearingConvertFinal(defaultIfEmpty(caseData.getEtICConvertPreliminaryGiveDetails(), null))
-                .hearingExtend(defaultIfEmpty(caseData.getEtICExtendDurationGiveDetails(), null))
-                .hearingOther(defaultIfEmpty(caseData.getEtICOtherGiveDetails(), null))
+
+                // New values
+                .issuesJurisdiction(defaultIfEmpty(caseData.getEtICJuridictionCodesInvalid(), null))
+                .issuesJurCodesGiveDetails(defaultIfEmpty(caseData.getEtICInvalidDetails(), null))
+
                 .hearingWithJudgeOrMembers(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
                         .map(EtICHearingListedAnswers::getEtICIsHearingWithJudgeOrMembers).orElse(null))
-                .hearingWithJudgeOrMembersReason(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
-                        .map(EtICHearingListedAnswers::getEtICIsHearingWithJudgeOrMembersReason).orElse(null))
+                .hearingWithJudgeOrMembersReason(List.of(updateHearingWithJudgeOrMembersDetails(caseData)))
                 .hearingWithJudgeOrMembersFurtherDetails(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
                         .map(EtICHearingListedAnswers::getEtICIsHearingWithJudgeOrMembersFurtherDetails)
                         .orElse(null))
-                .otherDirections(defaultIfEmpty(caseData.getEtICHearingAnyOtherDirections(), null))
+                .icCanProceed(defaultIfEmpty(caseData.getEtICCanProceed(), null))
+                .hearingAlreadyListed(defaultIfEmpty(caseData.getEtICHearingAlreadyListed(), null))
+
+                // Hearing Listed
+                .hearingListed(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
+                        .map(EtICHearingListedAnswers::getEtICHearingListed).orElse(null))
+                .hearingExtend(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
+                        .map(EtICHearingListedAnswers::getEtICExtendDurationGiveDetails).orElse(null))
+                .hearingOther(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
+                        .map(EtICHearingListedAnswers::getEtICOtherGiveDetails).orElse(null))
+                .otherDirections(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
+                        .map(EtICHearingListedAnswers::getEtICHearingAnyOtherDirections).orElse(null))
 
                 .hearingNotListed(Optional.ofNullable(caseData.getEtICHearingNotListedListUpdated())
                         .orElse(null))

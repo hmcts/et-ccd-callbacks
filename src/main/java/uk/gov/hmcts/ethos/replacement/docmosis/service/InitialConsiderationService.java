@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
@@ -305,17 +306,70 @@ public class InitialConsiderationService {
      * @return earliest future hearing date
      */
     public Optional<LocalDate> getEarliestHearingDateForListedHearings(List<DateListedTypeItem> hearingDates) {
+        if (CollectionUtils.isEmpty(hearingDates)) {
+            return Optional.empty();
+        }
+
         return hearingDates.stream()
-        .filter(dateListedTypeItem -> dateListedTypeItem != null
-                && dateListedTypeItem.getValue() != null
-                && HEARING_STATUS_LISTED.equals(dateListedTypeItem.getValue().getHearingStatus())
-                && LocalDateTime.parse(dateListedTypeItem.getValue().getListedDate())
-            .toLocalDate().isAfter(LocalDate.now()))
+        .filter(dateListedTypeItem ->
+                isListedHearing(dateListedTypeItem) && isFutureHearingDate(dateListedTypeItem))
         .map(DateListedTypeItem::getValue)
         .filter(hearingDate -> hearingDate.getListedDate() != null
                 && !hearingDate.getListedDate().isEmpty())
         .map(hearingDateItem -> LocalDateTime.parse(hearingDateItem.getListedDate()).toLocalDate())
         .min(Comparator.naturalOrder());
+    }
+
+    private boolean isListedHearing(DateListedTypeItem dateListedTypeItem) {
+        if (dateListedTypeItem == null || dateListedTypeItem.getValue() == null) {
+            return false;
+        }
+
+        return HEARING_STATUS_LISTED.equals(dateListedTypeItem.getValue().getHearingStatus());
+    }
+
+    private boolean isFutureHearingDate(DateListedTypeItem dateListedTypeItem) {
+        if (dateListedTypeItem == null || dateListedTypeItem.getValue() == null
+                || dateListedTypeItem.getValue().getListedDate() == null
+                || dateListedTypeItem.getValue().getListedDate().isEmpty()) {
+            return false;
+        }
+        LocalDate hearingDate = LocalDateTime.parse(dateListedTypeItem.getValue().getListedDate())
+                .toLocalDate();
+        return hearingDate.isAfter(LocalDate.now());
+    }
+
+    public HearingType getEarliestListedHearingType(List<HearingTypeItem> hearingCollection) {
+        if (CollectionUtils.isEmpty(hearingCollection)) {
+            return null;
+        }
+
+        return hearingCollection.stream()
+                .filter(hearingTypeItem -> hearingTypeItem != null
+                        && hearingTypeItem.getValue() != null)
+                .map(HearingTypeItem::getValue)
+                .filter(hearing ->
+                        hearing.getHearingDateCollection() != null
+                        && !hearing.getHearingDateCollection().isEmpty()
+                        && hearing.getHearingDateCollection().stream().anyMatch(
+                                this::isListedHearing))
+                .min(Comparator.comparing(hearing ->
+                        getEarliestHearingDateForListedHearings(hearing.getHearingDateCollection())
+                                .orElse(LocalDate.now().plusYears(100)))).orElse(null);
+    }
+
+    public void setEtInitialConsiderationListedHearingType(CaseData caseData) {
+        HearingType earliestListedHearing = getEarliestListedHearingType(caseData.getHearingCollection());
+
+        if (earliestListedHearing == null) {
+            log.info("No listed hearings found for case: {} to set EtInitialConsiderationListedHearingType",
+                   caseData.getEthosCaseReference());
+            return;
+        }
+        if (caseData.getEtICHearingListedAnswers() != null) {
+            caseData.getEtICHearingListedAnswers().setEtInitialConsiderationListedHearingType(
+                    earliestListedHearing.getHearingType());
+        }
     }
 
     /**
@@ -399,6 +453,20 @@ public class InitialConsiderationService {
         caseData.setEtICHearingAlreadyListed(HEARING_MISSING.equals(caseData.getEtInitialConsiderationHearing())
             ? NO : YES
         );
+    }
+
+    public void clearOldEtICHearingListedAnswersValues(CaseData caseData) {
+        //clear old values
+        if (caseData.getEtICHearingListedAnswers() != null) {
+            caseData.getEtICHearingListedAnswers().setEtInitialConsiderationListedHearingType(null);
+            caseData.getEtICHearingListedAnswers().setEtICIsHearingWithMembersLabel(null);
+            caseData.getEtICHearingListedAnswers().setEtICIsHearingWithMembers(null);
+            caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJudgeOrMembersFurtherDetails(null);
+            caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJudgeOrMembersReason(null);
+            caseData.getEtICHearingListedAnswers().setEtICHearingListed(null);
+            caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJudgeOrMembers(null);
+        }
+
     }
 
     public void mapOldIcHearingNotListedOptionsToNew(CaseData caseData, String caseTypeId) {

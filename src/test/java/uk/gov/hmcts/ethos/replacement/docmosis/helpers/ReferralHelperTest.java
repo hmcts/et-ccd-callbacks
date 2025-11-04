@@ -122,7 +122,8 @@ class ReferralHelperTest {
                 + "ownerDocument=null, creationDate=null, "
                 + "shortDescription=null, topLevelDocuments=null, startingClaimDocuments=null, "
                 + "responseClaimDocuments=null, initialConsiderationDocuments=null, caseManagementDocuments=null, "
-                + "withdrawalSettledDocuments=null, hearingsDocuments=null, judgmentAndReasonsDocuments=null, "
+                + "eccDocuments=null, withdrawalSettledDocuments=null, hearingsDocuments=null, "
+                + "judgmentAndReasonsDocuments=null, "
                 + "reconsiderationDocuments=null, miscDocuments=null, documentType=null, dateOfCorrespondence=null"
                 + ", docNumber=null, tornadoEmbeddedPdfUrl=null, excludeFromDcf=null, documentIndex=null)), "
                 + "GenericTypeItem(id=2, "
@@ -131,8 +132,9 @@ class ReferralHelperTest {
                 + "categoryId=null, uploadTimestamp=null), "
                 + "ownerDocument=null, creationDate=null, shortDescription=null, topLevelDocuments=null, "
                 + "startingClaimDocuments=null, responseClaimDocuments=null, initialConsiderationDocuments=null, "
-                + "caseManagementDocuments=null, withdrawalSettledDocuments=null, hearingsDocuments=null, j"
-                + "udgmentAndReasonsDocuments=null, reconsiderationDocuments=null, miscDocuments=null, "
+                + "caseManagementDocuments=null, eccDocuments=null, withdrawalSettledDocuments=null, "
+                + "hearingsDocuments=null, judgmentAndReasonsDocuments=null, "
+                + "reconsiderationDocuments=null, miscDocuments=null, "
                 + "documentType=null, dateOfCorrespondence=null, docNumber=null, tornadoEmbeddedPdfUrl=null, "
                 + "excludeFromDcf=null, documentIndex=null))], "
                 + "referralInstruction=Custom instructions for judge, "
@@ -141,7 +143,7 @@ class ReferralHelperTest {
                 + "closeReferralGeneralNotes=null, "
                 + "referralReplyCollection=null, updateReferralCollection=null, referralSummaryPdf=null)";
 
-        String actual = caseData.getReferralCollection().get(0).getValue().toString();
+        String actual = caseData.getReferralCollection().getFirst().getValue().toString();
         assertEquals(expected, actual);
     }
 
@@ -157,7 +159,7 @@ class ReferralHelperTest {
     void saveTheUserDetailsOfTheReferrerWithTheReferral() {
         ReferralHelper.createReferral(caseData, "Judge Judy", null);
 
-        String referredBy = caseData.getReferralCollection().get(0).getValue().getReferredBy();
+        String referredBy = caseData.getReferralCollection().getFirst().getValue().getReferredBy();
 
         assertEquals("Judge Judy", referredBy);
     }
@@ -292,7 +294,7 @@ class ReferralHelperTest {
     void populateUpdateReferralDetails() {
         caseData.setSelectReferral(new DynamicFixedListType("1"));
         caseData.setReferralCollection(List.of(createReferralTypeItem()));
-        ReferralType referral = caseData.getReferralCollection().get(0).getValue();
+        ReferralType referral = caseData.getReferralCollection().getFirst().getValue();
         referral.setReferCaseTo("Judge");
         referral.setReferralSubject("Subject");
         referral.setReferralDetails("Details");
@@ -313,7 +315,7 @@ class ReferralHelperTest {
     void handlePartyNotCompliedCorrectly(String subject, String expected) {
         caseData.setSelectReferral(new DynamicFixedListType("1"));
         caseData.setReferralCollection(List.of(createReferralTypeItem()));
-        ReferralType referral = caseData.getReferralCollection().get(0).getValue();
+        ReferralType referral = caseData.getReferralCollection().getFirst().getValue();
         referral.setReferralSubject(subject);
         ReferralHelper.populateUpdateReferralDetails(caseData);
         assertEquals(expected, caseData.getUpdateReferralSubject());
@@ -343,8 +345,8 @@ class ReferralHelperTest {
         caseData.setUpdateReferralInstruction("Instruction");
         caseData.setUpdateReferralSubjectSpecify("Subject Specify");
         ReferralHelper.updateReferral(caseData, "FullName", "None");
-        ReferralType referral = caseData.getReferralCollection().get(0).getValue();
-        UpdateReferralType updateReferralType = referral.getUpdateReferralCollection().get(0).getValue();
+        ReferralType referral = caseData.getReferralCollection().getFirst().getValue();
+        UpdateReferralType updateReferralType = referral.getUpdateReferralCollection().getFirst().getValue();
         assertEquals("Judge", updateReferralType.getUpdateReferCaseTo());
         assertEquals("Subject", updateReferralType.getUpdateReferralSubject());
         assertEquals("Details", updateReferralType.getUpdateReferralDetails());
@@ -383,8 +385,8 @@ class ReferralHelperTest {
         ReferralHelper.createReferralReply(caseData, "Judge Alex", true);
 
         ReferralReplyType testReply = caseData.getReferralCollection()
-                .get(0).getValue().getReferralReplyCollection()
-                .get(0).getValue();
+                .getFirst().getValue().getReferralReplyCollection()
+                .getFirst().getValue();
 
         assertEquals("directionTo", testReply.getDirectionTo());
         assertEquals("replyTo", testReply.getReplyToEmailAddress());
@@ -426,7 +428,7 @@ class ReferralHelperTest {
         caseData.setSelectReferral(selectReferralList);
 
         ReferralHelper.setReferralStatusToClosed(caseData);
-        assertEquals(ReferralStatus.CLOSED, caseData.getReferralCollection().get(0).getValue().getReferralStatus());
+        assertEquals(ReferralStatus.CLOSED, caseData.getReferralCollection().getFirst().getValue().getReferralStatus());
     }
 
     @Test
@@ -499,7 +501,7 @@ class ReferralHelperTest {
         multipleData.setIsUrgentReply("Yes");
         multipleData.setReferralSubject("ET1");
         multipleData.setSelectReferral(new DynamicFixedListType("1"));
-        multipleData.getReferralCollection().get(0).getValue().setReferralSubject("ET1");
+        multipleData.getReferralCollection().getFirst().getValue().setReferralSubject("ET1");
 
         Map<String, String> actual = ReferralHelper.buildPersonalisation(
                 multipleData, caseDetails.getCaseData(), "1", false, "First Last", "linkToExui"
@@ -528,7 +530,7 @@ class ReferralHelperTest {
             + "\"upload_timestamp\":null},\"ownerDocument\":null,"
             + "\"creationDate\":null,\"shortDescription\":null,\"topLevelDocuments\":null,\""
             + "startingClaimDocuments\":null,\"responseClaimDocuments\":null,\""
-            + "initialConsiderationDocuments\":null,\"caseManagementDocuments\":null,\""
+            + "initialConsiderationDocuments\":null,\"caseManagementDocuments\":null,\"eccDocuments\":null,\""
             + "withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\"judgmentAndReasonsDocuments\":null,\""
             + "reconsiderationDocuments\":null,\"miscDocuments\":null,\"documentType\":null,\""
             + "dateOfCorrespondence\":null,\"docNumber\":null,\"tornadoEmbeddedPdfUrl\":null,\"excludeFromDcf\":null,"
@@ -538,7 +540,8 @@ class ReferralHelperTest {
             + ":null},\"ownerDocument\":null,"
             + "\"creationDate\":null,\"shortDescription\":null,\"topLevelDocuments\":null,\""
             + "startingClaimDocuments\":null,\"responseClaimDocuments\":null,\"initialConsiderationDocuments\":null"
-            + ",\"caseManagementDocuments\":null,\"withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\""
+            + ",\"caseManagementDocuments\":null,\"eccDocuments\":null,\""
+            + "withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\""
             + "judgmentAndReasonsDocuments\":null,\"reconsiderationDocuments\":null,\"miscDocuments\":null,\""
             + "documentType\":null,\"dateOfCorrespondence\":null,\"docNumber\":null,\"tornadoEmbeddedPdfUrl\":null,"
             + "\"excludeFromDcf\":null,\"documentIndex\":null}}],"
@@ -566,7 +569,7 @@ class ReferralHelperTest {
             + "\"upload_timestamp\":null},\"ownerDocument\":null,"
             + "\"creationDate\":null,\"shortDescription\":null,\"topLevelDocuments\":null,\""
             + "startingClaimDocuments\":null,\"responseClaimDocuments\":null,\""
-            + "initialConsiderationDocuments\":null,\"caseManagementDocuments\":null,\""
+            + "initialConsiderationDocuments\":null,\"caseManagementDocuments\":null,\"eccDocuments\":null,\""
             + "withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\"judgmentAndReasonsDocuments\":null,\""
             + "reconsiderationDocuments\":null,\"miscDocuments\":null,\"documentType\":null,\""
             + "dateOfCorrespondence\":null,\"docNumber\":null,\"tornadoEmbeddedPdfUrl\":null,\"excludeFromDcf\":null,"
@@ -575,8 +578,9 @@ class ReferralHelperTest {
             + "\"document_filename\":\"testFileName\",\"document_url\":null,\"category_id\":null,\"upload_timestamp\""
             + ":null},\"ownerDocument\":null,"
             + "\"creationDate\":null,\"shortDescription\":null,\"topLevelDocuments\":null,\""
-            + "startingClaimDocuments\":null,\"responseClaimDocuments\":null,\"initialConsiderationDocuments\":null"
-            + ",\"caseManagementDocuments\":null,\"withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\""
+            + "startingClaimDocuments\":null,\"responseClaimDocuments\":null,\"initialConsiderationDocuments\":null,"
+            + "\"caseManagementDocuments\":null,\"eccDocuments\":null,\""
+            + "withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\""
             + "judgmentAndReasonsDocuments\":null,\"reconsiderationDocuments\":null,\"miscDocuments\":null,\""
             + "documentType\":null,\"dateOfCorrespondence\":null,\"docNumber\":null,\"tornadoEmbeddedPdfUrl\":null,"
             + "\"excludeFromDcf\":null,\"documentIndex\":null}}],"
@@ -617,7 +621,8 @@ class ReferralHelperTest {
             + ":null},\"ownerDocument\":null,"
             + "\"creationDate\":null,\"shortDescription\":null,\"topLevelDocuments\":null,\""
             + "startingClaimDocuments\":null,\"responseClaimDocuments\":null,\"initialConsiderationDocuments\":null,"
-            + "\"caseManagementDocuments\":null,\"withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\""
+            + "\"caseManagementDocuments\":null,\"eccDocuments\":null,\""
+            + "withdrawalSettledDocuments\":null,\"hearingsDocuments\":null,\""
             + "judgmentAndReasonsDocuments\":null,\"reconsiderationDocuments\":null,\"miscDocuments\":null,\""
             + "documentType\":null,\"dateOfCorrespondence\":null,\"docNumber\":null,\"tornadoEmbeddedPdfUrl\":null,"
             + "\"excludeFromDcf\":null,\"documentIndex\":null}}],"
@@ -640,7 +645,7 @@ class ReferralHelperTest {
         caseData.setReferralDocument(List.of(documentTypeItem));
         List<String> errors = new ArrayList<>();
         ReferralHelper.addDocumentUploadErrors(caseData.getReferralDocument(), errors);
-        assertEquals("Short description is added but document is not uploaded.", errors.get(0));
+        assertEquals("Short description is added but document is not uploaded.", errors.getFirst());
     }
 
     private Map<String, String> getExpectedPersonalisation() {
@@ -764,7 +769,7 @@ class ReferralHelperTest {
         caseData.setReferralCollection(List.of(createReferralTypeItem()));
         UploadedDocumentType doc = UploadedDocumentType.builder().documentFilename("fileName").documentUrl("url")
                 .documentBinaryUrl("binaryUrl").build();
-        caseData.getReferralCollection().get(0).getValue().setReferralSummaryPdf(doc);
+        caseData.getReferralCollection().getFirst().getValue().setReferralSummaryPdf(doc);
         DynamicFixedListType selectReferralList =
             ReferralHelper.populateSelectReferralDropdown(caseData.getReferralCollection());
         selectReferralList.setValue(new DynamicValueType());

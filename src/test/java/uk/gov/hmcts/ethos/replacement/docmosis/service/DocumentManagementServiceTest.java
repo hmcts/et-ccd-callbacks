@@ -251,6 +251,7 @@ class DocumentManagementServiceTest {
 
         LocalDate servingDate = LocalDate.parse(caseData.getClaimServedDate());
         LocalDate et3DueDate = LocalDate.parse(caseData.getEt3DueDate());
+
         assertThat(et3DueDate).isEqualTo(servingDate.plusDays(28));
     }
 
@@ -383,7 +384,7 @@ class DocumentManagementServiceTest {
 
         assertEquals(1, caseData.getDocumentCollection().size());
         assertNotNull(caseData.getDocumentCollection());
-        assertNull(caseData.getDocumentCollection().get(0).getValue().getDateOfCorrespondence());
+        assertNull(caseData.getDocumentCollection().getFirst().getValue().getDateOfCorrespondence());
     }
 
     @Test

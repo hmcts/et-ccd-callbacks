@@ -10,8 +10,10 @@ import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.AdditionalCaseInfoType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
+import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
@@ -198,4 +200,67 @@ class FlagsImageHelperTest {
         );
     }
 
+    @Test
+    void eccFlagShownWhenBothBocAndEccJurisdictionCodes() {
+        JurCodesTypeItem bocItem = new JurCodesTypeItem();
+        JurCodesType bocType = new JurCodesType();
+        bocType.setJuridictionCodesList("BOC");
+        bocItem.setValue(bocType);
+        
+        JurCodesTypeItem eccItem = new JurCodesTypeItem();
+        JurCodesType eccType = new JurCodesType();
+        eccType.setJuridictionCodesList("ECC");
+        eccItem.setValue(eccType);
+
+        CaseData caseData = new CaseData();
+        caseData.setJurCodesCollection(java.util.List.of(bocItem, eccItem));
+        
+        buildFlagsImageFileName(ENGLANDWALES_CASE_TYPE_ID, caseData);
+        
+        assertEquals("<font color='Olive' size='5'> ECC </font>", caseData.getFlagsImageAltText());
+        assertEquals("EMP-TRIB-000000001000000.jpg", caseData.getFlagsImageFileName());
+    }
+
+    @Test
+    void eccFlagNotShownWhenOnlyBocJurisdictionCode() {
+        JurCodesTypeItem bocItem = new JurCodesTypeItem();
+        JurCodesType bocType = new JurCodesType();
+        bocType.setJuridictionCodesList("BOC");
+        bocItem.setValue(bocType);
+
+        CaseData caseData = new CaseData();
+        caseData.setJurCodesCollection(java.util.List.of(bocItem));
+        
+        buildFlagsImageFileName(ENGLANDWALES_CASE_TYPE_ID, caseData);
+        
+        assertEquals("", caseData.getFlagsImageAltText());
+        assertEquals("EMP-TRIB-000000000000000.jpg", caseData.getFlagsImageFileName());
+    }
+
+    @Test
+    void eccFlagNotShownWhenOnlyEccJurisdictionCode() {
+        JurCodesTypeItem eccItem = new JurCodesTypeItem();
+        JurCodesType eccType = new JurCodesType();
+        eccType.setJuridictionCodesList("ECC");
+        eccItem.setValue(eccType);
+
+        CaseData caseData = new CaseData();
+        caseData.setJurCodesCollection(java.util.List.of(eccItem));
+        
+        buildFlagsImageFileName(ENGLANDWALES_CASE_TYPE_ID, caseData);
+        
+        assertEquals("", caseData.getFlagsImageAltText());
+        assertEquals("EMP-TRIB-000000000000000.jpg", caseData.getFlagsImageFileName());
+    }
+
+    @Test
+    void eccFlagShownWhenCounterClaimExists() {
+        CaseData caseData = new CaseData();
+        caseData.setCounterClaim("Some counter claim");
+        
+        buildFlagsImageFileName(ENGLANDWALES_CASE_TYPE_ID, caseData);
+        
+        assertEquals("<font color='Olive' size='5'> ECC </font>", caseData.getFlagsImageAltText());
+        assertEquals("EMP-TRIB-000000001000000.jpg", caseData.getFlagsImageFileName());
+    }
 }

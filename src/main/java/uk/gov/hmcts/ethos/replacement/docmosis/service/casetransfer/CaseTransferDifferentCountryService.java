@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferUtils.getTransferValidationErrors;
 
 @Service
 @RequiredArgsConstructor
@@ -28,25 +29,12 @@ public class CaseTransferDifferentCountryService {
                     + caseDetails.getCaseData().getEthosCaseReference());
         }
 
-        List<String> errors = validate(caseDataList);
+        List<String> errors = getTransferValidationErrors(caseDataList, caseTransferUtils);
         if (!errors.isEmpty()) {
             return errors;
         }
 
         return transferCases(caseDetails, caseDataList, userToken);
-    }
-
-    private List<String> validate(List<CaseData> cases) {
-        List<String> errors = new ArrayList<>();
-
-        for (CaseData caseData : cases) {
-            List<String> validationErrors = caseTransferUtils.validateCase(caseData);
-            if (!validationErrors.isEmpty()) {
-                errors.addAll(validationErrors);
-            }
-        }
-
-        return errors;
     }
 
     private List<String> transferCases(CaseDetails caseDetails, List<CaseData> caseDataList, String userToken) {

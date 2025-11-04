@@ -11,14 +11,13 @@ import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationAddress;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxService;
@@ -262,11 +261,19 @@ public class Et3ResponseService {
      * @throws GenericServiceException if the user or required data (e.g., user details, case roles)
      *         cannot be found or parsed
      */
-    public List<Integer> getRepresentedRespondentIndexes(String userToken, String caseId)
+    public List<Integer> getRepresentedRespondentIndexes(String userToken, CaseData caseData, String caseId)
             throws GenericServiceException {
+        if (ObjectUtils.isEmpty(caseData) || CollectionUtils.isEmpty(caseData.getRepCollection())) {
+            throw new GenericServiceException(ERROR_CASE_DATA_NOT_FOUND,
+                    new Exception(ERROR_CASE_DATA_NOT_FOUND),
+                    ERROR_CASE_DATA_NOT_FOUND,
+                    caseId,
+                    "ET3ResponseService",
+                    "getRepresentedRespondentIndexes");
+        }
         checkUserTokenAndCaseid(userToken, caseId);
-        UserDetails userDetails = userIdamService.getUserDetails(userToken);
-        if (ObjectUtils.isEmpty(userDetails)) {
+        UserDetails representativeDetails = userIdamService.getUserDetails(userToken);
+        if (ObjectUtils.isEmpty(representativeDetails)) {
             throw new GenericServiceException(ERROR_USER_NOT_FOUND,
                     new Exception(ERROR_USER_NOT_FOUND),
                     ERROR_USER_NOT_FOUND,
@@ -274,7 +281,7 @@ public class Et3ResponseService {
                     "Et3ResponseService",
                     "getRepresentedRespondentIndexes");
         }
-        if (StringUtils.isBlank(userDetails.getUid())) {
+        if (StringUtils.isBlank(representativeDetails.getUid())) {
             throw new GenericServiceException(ERROR_USER_ID_NOT_FOUND,
                     new Exception(ERROR_USER_ID_NOT_FOUND),
                     ERROR_USER_ID_NOT_FOUND,
@@ -301,11 +308,25 @@ public class Et3ResponseService {
                     "getRepresentedRespondentIndexes");
         }
         List<Integer> solicitorIndexList = new ArrayList<>();
-        for (CaseUserAssignment caseUserAssignment : caseUserAssignmentData.getCaseUserAssignments()) {
-            if (userDetails.getUid().equals(caseUserAssignment.getUserId())) {
-                log.info("******* CASE ROLE = {}", caseUserAssignment.getCaseRole());
-                SolicitorRole solicitorRole = SolicitorRole.from(caseUserAssignment.getCaseRole()).orElseThrow();
-                solicitorIndexList.add(solicitorRole.getIndex());
+        for (int i = 0; i < caseData.getRepCollection().size(); i++) {
+            if (ObjectUtils.isEmpty(caseData.getRepCollection().get(i))) {
+                continue;
+            }
+            RepresentedTypeR representedTypeR = caseData.getRepCollection().get(i).getValue();
+            if (ObjectUtils.isEmpty(representedTypeR)
+                    || (StringUtils.isBlank(representedTypeR.getNameOfRepresentative())
+                    && StringUtils.isBlank(representedTypeR.getRepresentativeEmailAddress()))) {
+                continue;
+            }
+            if (StringUtils.isNotBlank(representedTypeR.getRepresentativeEmailAddress())
+                    && representedTypeR.getRepresentativeEmailAddress().equals(representativeDetails.getEmail())
+                    || (StringUtils.isNotBlank(representedTypeR.getNameOfRepresentative())
+                    && representedTypeR.getNameOfRepresentative().contains(representativeDetails.getFirstName()))
+                    || (StringUtils.isNotBlank(representedTypeR.getNameOfRepresentative())
+                    && representedTypeR.getNameOfRepresentative().contains(representativeDetails.getLastName()))
+                    || (StringUtils.isNotBlank(representedTypeR.getNameOfRepresentative())
+                    && representedTypeR.getNameOfRepresentative().contains(representativeDetails.getName()))) {
+                solicitorIndexList.add(i);
             }
         }
         return solicitorIndexList;
@@ -385,7 +406,7 @@ public class Et3ResponseService {
         }
         List<Integer> representedRespondentIndexes;
         try {
-            representedRespondentIndexes = getRepresentedRespondentIndexes(userToken, submissionReference);
+            representedRespondentIndexes = getRepresentedRespondentIndexes(userToken, caseData, submissionReference);
         } catch (GenericServiceException gex) {
             throw new GenericServiceException(gex.getMessage(),
                     new Exception(gex),

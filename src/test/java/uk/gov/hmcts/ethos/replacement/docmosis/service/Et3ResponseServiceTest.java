@@ -1,17 +1,18 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.SneakyThrows;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.assertj.core.api.AssertionsForClassTypes;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.platform.commons.util.StringUtils;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -44,7 +45,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
@@ -101,6 +101,16 @@ class Et3ResponseServiceTest {
     private static final String VALID_USER_TOKEN = "validUserToken";
     private static final String VALID_USER_TOKEN_RETURNS_INVALID_USER = "validUserTokenReturnsInvalidUser";
     private static final String INVALID_CASE_ID = "invalidCaseId";
+    private static final String EXCEPTION_CASE_ID = "exceptionCaseId";
+    private static final String DUMMY_IO_EXCEPTION_MESSAGE = "dummyIOExceptionMessage";
+    private static final String TEST_USER_EMAIL = "testUserEmail";
+    private static final String TEST_USER_EMAIL_2 = "testUserEmail2";
+    private static final String TEST_USER_FULL_NAME = "testValidUserFullName";
+    private static final String TEST_USER_FIRST_NAME = "testUserFirstName";
+    private static final String TEST_USER_LAST_NAME = "testUserLastName";
+    private static final String TEST_INVALID_REPRESENTATIVE_NAME = "testInvalidRepresentativeName";
+    private static final String TEST_VALID_REPRESENTATIVE_FIRST_NAME = "testUserFirstName testInvalidUserLastName";
+    private static final String TEST_VALID_REPRESENTATIVE_LAST_NAME = "testInvalidUserFirstName testUserLastName";
     private static final String INVALID_CASE_ID_FOR_GET_USER_ROLES = "invalidCaseIdForGetUserRoles";
     private static final String VALID_CASE_ID = "validCaseId";
     private static final String VALID_CASE_ID_RETURNS_INVALID_CASE = "validCaseIdReturnsInvalidCase";
@@ -187,21 +197,6 @@ class Et3ResponseServiceTest {
         assertThrows(DocumentManagementException.class,
                 () -> et3ResponseService.generateEt3ResponseDocument(new CaseData(), "userToken",
                 ENGLANDWALES_CASE_TYPE_ID, SUBMIT_ET3));
-    }
-
-    /**
-     * Ignored because ET3 form should not be saved before response is accepted
-     * <a href="https://tools.hmcts.net/jira/browse/RET-5483">RET-5483</a>.
-     */
-    @Disabled("Disabled according to Ticket https://tools.hmcts.net/jira/browse/RET-5483")
-    @Test
-    void assertThatEt3DocumentIsSaved() {
-        et3ResponseService.saveEt3Response(caseData, documentInfo);
-
-        assertThat(caseData.getDocumentCollection()).hasSize(1);
-        assertNotNull(caseData.getRespondentCollection().getFirst().getValue().getEt3Form());
-        assertThat(caseData.getDocumentCollection().getFirst().getValue().getUploadedDocument().getCategoryId())
-                .isEqualTo("C18");
     }
 
     @Test
@@ -297,79 +292,180 @@ class Et3ResponseServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource("generateTestGetDataForRepresentedRespondentIndexes")
+    @MethodSource("generateTestDataForGetRepresentedRespondentIndexes")
     @SneakyThrows
-    void theGetRepresentedRespondentIndexesTest(String userToken, String caseId) {
-        when(userIdamService.getUserDetails(INVALID_USER_TOKEN)).thenReturn(null);
-
-        UserDetails validUserDetails = new UserDetails();
-        validUserDetails.setUid(USER_ID);
-        when(userIdamService.getUserDetails(VALID_USER_TOKEN)).thenReturn(validUserDetails);
-
-        UserDetails invalidUserDetails = new UserDetails();
-        invalidUserDetails.setUid(null);
-        when(userIdamService.getUserDetails(VALID_USER_TOKEN_RETURNS_INVALID_USER)).thenReturn(invalidUserDetails);
-
-        when(ccdCaseAssignment.getCaseUserRoles(INVALID_CASE_ID)).thenReturn(null);
-
-        CaseUserAssignmentData caseUserAssignmentData = getValidCaseUserAssignmentData();
-        when(ccdCaseAssignment.getCaseUserRoles(VALID_CASE_ID)).thenReturn(caseUserAssignmentData);
-
-        CaseUserAssignmentData invalidCaseUserAssignmentData = getInvalidCaseUserAssignmentData();
-        when(ccdCaseAssignment.getCaseUserRoles(VALID_CASE_ID_RETURNS_INVALID_CASE))
-                .thenReturn(invalidCaseUserAssignmentData);
-
-        CaseUserAssignmentData validCaseInvalidUserAssignmentData = getValidCaseInvalidUserAssignmentData();
-        when(ccdCaseAssignment.getCaseUserRoles(VALID_CASE_ID_RETURNS_INVALID_USER))
-                .thenReturn(validCaseInvalidUserAssignmentData);
-
-        when(ccdCaseAssignment.getCaseUserRoles(INVALID_CASE_ID_FOR_GET_USER_ROLES))
-                .thenThrow(new IOException(SYSTEM_ERROR));
-
+    void theGetRepresentedRespondentIndexesTest(String userToken, CaseData caseData, String caseId) {
+        if (ObjectUtils.isEmpty(caseData) || CollectionUtils.isEmpty(caseData.getRepCollection())) {
+            GenericServiceException genericServiceException = assertThrows(GenericServiceException.class,
+                    () -> et3ResponseService.getRepresentedRespondentIndexes(userToken, caseData, caseId));
+            assertThat(genericServiceException.getMessage()).isEqualTo(ERROR_CASE_DATA_NOT_FOUND);
+            return;
+        }
         if (StringUtils.isBlank(userToken)) {
             GenericServiceException genericServiceException = assertThrows(GenericServiceException.class,
-                    () -> et3ResponseService.getRepresentedRespondentIndexes(userToken, caseId));
+                    () -> et3ResponseService.getRepresentedRespondentIndexes(userToken, caseData, caseId));
             assertThat(genericServiceException.getMessage()).isEqualTo(ERROR_INVALID_USER_TOKEN);
             return;
         }
         if (StringUtils.isBlank(caseId)) {
             GenericServiceException genericServiceException = assertThrows(GenericServiceException.class,
-                    () -> et3ResponseService.getRepresentedRespondentIndexes(userToken, caseId));
+                    () -> et3ResponseService.getRepresentedRespondentIndexes(userToken, caseData, caseId));
             assertThat(genericServiceException.getMessage()).isEqualTo(ERROR_INVALID_CASE_ID);
             return;
         }
+        when(userIdamService.getUserDetails(INVALID_USER_TOKEN)).thenReturn(null);
         if (INVALID_USER_TOKEN.equals(userToken)) {
             GenericServiceException genericServiceException = assertThrows(GenericServiceException.class,
-                    () -> et3ResponseService.getRepresentedRespondentIndexes(userToken, caseId));
+                    () -> et3ResponseService.getRepresentedRespondentIndexes(userToken, caseData, caseId));
             assertThat(genericServiceException.getMessage()).isEqualTo(ERROR_USER_NOT_FOUND);
             return;
         }
+        UserDetails invalidUserDetails = new UserDetails();
+        invalidUserDetails.setUid(null);
+        when(userIdamService.getUserDetails(VALID_USER_TOKEN_RETURNS_INVALID_USER)).thenReturn(invalidUserDetails);
         if (VALID_USER_TOKEN_RETURNS_INVALID_USER.equals(userToken)) {
             GenericServiceException genericServiceException = assertThrows(GenericServiceException.class,
-                    () -> et3ResponseService.getRepresentedRespondentIndexes(userToken, caseId));
+                    () -> et3ResponseService.getRepresentedRespondentIndexes(userToken, caseData, caseId));
             assertThat(genericServiceException.getMessage()).isEqualTo(ERROR_USER_ID_NOT_FOUND);
+            return;
         }
+        UserDetails validUserDetails = new UserDetails();
+        validUserDetails.setUid(USER_ID);
+        validUserDetails.setEmail(TEST_USER_EMAIL);
+        validUserDetails.setFirstName(TEST_USER_FIRST_NAME);
+        validUserDetails.setLastName(TEST_USER_LAST_NAME);
+        validUserDetails.setName(TEST_USER_FULL_NAME);
+        when(userIdamService.getUserDetails(VALID_USER_TOKEN)).thenReturn(validUserDetails);
+        when(ccdCaseAssignment.getCaseUserRoles(INVALID_CASE_ID)).thenReturn(null);
         if (VALID_USER_TOKEN.equals(userToken) && INVALID_CASE_ID.equals(caseId)) {
             GenericServiceException genericServiceException = assertThrows(GenericServiceException.class,
-                    () -> et3ResponseService.getRepresentedRespondentIndexes(userToken, caseId));
+                    () -> et3ResponseService.getRepresentedRespondentIndexes(userToken, caseData, caseId));
             assertThat(genericServiceException.getMessage()).isEqualTo(ERROR_CASE_ROLES_NOT_FOUND);
+            return;
         }
-        if (VALID_USER_TOKEN.equals(userToken) && VALID_CASE_ID_RETURNS_INVALID_CASE.equals(caseId)) {
-            assertThrows(NoSuchElementException.class,
-                    () -> et3ResponseService.getRepresentedRespondentIndexes(userToken, caseId));
-        }
-        if (VALID_USER_TOKEN.equals(userToken) && INVALID_CASE_ID_FOR_GET_USER_ROLES.equals(caseId)) {
+        when(ccdCaseAssignment.getCaseUserRoles(EXCEPTION_CASE_ID))
+                .thenThrow(new IOException(DUMMY_IO_EXCEPTION_MESSAGE));
+        if (VALID_USER_TOKEN.equals(userToken) && EXCEPTION_CASE_ID.equals(caseId)) {
             GenericServiceException genericServiceException = assertThrows(GenericServiceException.class,
-                    () -> et3ResponseService.getRepresentedRespondentIndexes(userToken, caseId));
+                    () -> et3ResponseService.getRepresentedRespondentIndexes(userToken, caseData, caseId));
             assertThat(genericServiceException.getMessage()).isEqualTo(SYSTEM_ERROR);
+            return;
         }
-        if (VALID_USER_TOKEN.equals(userToken) && VALID_CASE_ID_RETURNS_INVALID_USER.equals(caseId)) {
-            assertThat(et3ResponseService.getRepresentedRespondentIndexes(userToken, caseId)).isEmpty();
+        CaseUserAssignmentData caseUserAssignmentData = getValidCaseUserAssignmentData();
+        when(ccdCaseAssignment.getCaseUserRoles(VALID_CASE_ID)).thenReturn(caseUserAssignmentData);
+        if (VALID_CASE_ID.equals(caseId)
+                && VALID_USER_TOKEN.equals(userToken)
+                && CollectionUtils.isNotEmpty(caseData.getRepCollection())
+                && ObjectUtils.isEmpty(caseData.getRepCollection().getFirst().getValue())) {
+            assertThat(et3ResponseService.getRepresentedRespondentIndexes(userToken, caseData, caseId)).isEmpty();
+            return;
         }
-        if (VALID_USER_TOKEN.equals(userToken) && VALID_CASE_ID.equals(caseId)) {
-            List<Integer> solicitorIndexList = et3ResponseService.getRepresentedRespondentIndexes(userToken, caseId);
-            assertThat(solicitorIndexList.getFirst()).isZero();
+
+        if (VALID_CASE_ID.equals(caseId)
+                && VALID_USER_TOKEN.equals(userToken)
+                && CollectionUtils.isNotEmpty(caseData.getRepCollection())
+                && ObjectUtils.isNotEmpty(caseData.getRepCollection().getFirst().getValue())
+                && StringUtils.isEmpty(
+                        caseData.getRepCollection().getFirst().getValue().getRepresentativeEmailAddress())
+                && StringUtils.isEmpty(caseData.getRepCollection().getFirst().getValue().getNameOfRepresentative())) {
+            assertThat(et3ResponseService.getRepresentedRespondentIndexes(userToken, caseData, caseId)).isEmpty();
+            return;
         }
+
+        if (VALID_CASE_ID.equals(caseId)
+                && VALID_USER_TOKEN.equals(userToken)
+                && CollectionUtils.isNotEmpty(caseData.getRepCollection())
+                && ObjectUtils.isNotEmpty(caseData.getRepCollection().getFirst().getValue())
+                && StringUtils.isNotEmpty(
+                caseData.getRepCollection().getFirst().getValue().getRepresentativeEmailAddress())
+                && StringUtils.isEmpty(caseData.getRepCollection().getFirst().getValue().getNameOfRepresentative())
+                && !TEST_USER_EMAIL.equals(caseData.getRepCollection().getFirst().getValue()
+                .getRepresentativeEmailAddress())) {
+            assertThat(et3ResponseService.getRepresentedRespondentIndexes(userToken, caseData, caseId)).isEmpty();
+            return;
+        }
+
+        if (VALID_CASE_ID.equals(caseId)
+                && VALID_USER_TOKEN.equals(userToken)
+                && CollectionUtils.isNotEmpty(caseData.getRepCollection())
+                && ObjectUtils.isNotEmpty(caseData.getRepCollection().getFirst().getValue())
+                && StringUtils.isNotEmpty(
+                caseData.getRepCollection().getFirst().getValue().getRepresentativeEmailAddress())
+                && StringUtils.isEmpty(caseData.getRepCollection().getFirst().getValue().getNameOfRepresentative())
+                && TEST_USER_EMAIL.equals(caseData.getRepCollection().getFirst().getValue()
+                .getRepresentativeEmailAddress())) {
+            assertThat(et3ResponseService.getRepresentedRespondentIndexes(userToken, caseData, caseId))
+                    .hasSize(NumberUtils.INTEGER_ONE);
+            return;
+        }
+
+        if (VALID_CASE_ID.equals(caseId)
+                && VALID_USER_TOKEN.equals(userToken)
+                && CollectionUtils.isNotEmpty(caseData.getRepCollection())
+                && ObjectUtils.isNotEmpty(caseData.getRepCollection().getFirst().getValue())
+                && StringUtils.isEmpty(
+                caseData.getRepCollection().getFirst().getValue().getRepresentativeEmailAddress())
+                && StringUtils.isNotEmpty(caseData.getRepCollection().getFirst().getValue().getNameOfRepresentative())
+                && !caseData.getRepCollection().getFirst().getValue().getNameOfRepresentative()
+                .contains(TEST_USER_FIRST_NAME)
+                && !caseData.getRepCollection().getFirst().getValue().getNameOfRepresentative()
+                .contains(TEST_USER_LAST_NAME)
+                && !caseData.getRepCollection().getFirst().getValue().getNameOfRepresentative()
+                .contains(TEST_USER_FULL_NAME)) {
+            assertThat(et3ResponseService.getRepresentedRespondentIndexes(userToken, caseData, caseId)).isEmpty();
+        }
+
+        if (VALID_CASE_ID.equals(caseId)
+                && VALID_USER_TOKEN.equals(userToken)
+                && CollectionUtils.isNotEmpty(caseData.getRepCollection())
+                && ObjectUtils.isNotEmpty(caseData.getRepCollection().getFirst().getValue())
+                && StringUtils.isEmpty(
+                caseData.getRepCollection().getFirst().getValue().getRepresentativeEmailAddress())
+                && StringUtils.isNotEmpty(caseData.getRepCollection().getFirst().getValue().getNameOfRepresentative())
+                && caseData.getRepCollection().getFirst().getValue().getNameOfRepresentative()
+                .contains(TEST_USER_FIRST_NAME)
+                && !caseData.getRepCollection().getFirst().getValue().getNameOfRepresentative()
+                .contains(TEST_USER_LAST_NAME)
+                && !caseData.getRepCollection().getFirst().getValue().getNameOfRepresentative()
+                .contains(TEST_USER_FULL_NAME)) {
+            assertThat(et3ResponseService.getRepresentedRespondentIndexes(userToken, caseData, caseId))
+                    .hasSize(NumberUtils.INTEGER_ONE);
+        }
+
+        if (VALID_CASE_ID.equals(caseId)
+                && VALID_USER_TOKEN.equals(userToken)
+                && CollectionUtils.isNotEmpty(caseData.getRepCollection())
+                && ObjectUtils.isNotEmpty(caseData.getRepCollection().getFirst().getValue())
+                && StringUtils.isEmpty(
+                caseData.getRepCollection().getFirst().getValue().getRepresentativeEmailAddress())
+                && StringUtils.isNotEmpty(caseData.getRepCollection().getFirst().getValue().getNameOfRepresentative())
+                && !caseData.getRepCollection().getFirst().getValue().getNameOfRepresentative()
+                .contains(TEST_USER_FIRST_NAME)
+                && caseData.getRepCollection().getFirst().getValue().getNameOfRepresentative()
+                .contains(TEST_USER_LAST_NAME)
+                && !caseData.getRepCollection().getFirst().getValue().getNameOfRepresentative()
+                .contains(TEST_USER_FULL_NAME)) {
+            assertThat(et3ResponseService.getRepresentedRespondentIndexes(userToken, caseData, caseId))
+                    .hasSize(NumberUtils.INTEGER_ONE);
+        }
+
+        if (VALID_CASE_ID.equals(caseId)
+                && VALID_USER_TOKEN.equals(userToken)
+                && CollectionUtils.isNotEmpty(caseData.getRepCollection())
+                && ObjectUtils.isNotEmpty(caseData.getRepCollection().getFirst().getValue())
+                && StringUtils.isEmpty(
+                caseData.getRepCollection().getFirst().getValue().getRepresentativeEmailAddress())
+                && StringUtils.isNotEmpty(caseData.getRepCollection().getFirst().getValue().getNameOfRepresentative())
+                && !caseData.getRepCollection().getFirst().getValue().getNameOfRepresentative()
+                .contains(TEST_USER_FIRST_NAME)
+                && !caseData.getRepCollection().getFirst().getValue().getNameOfRepresentative()
+                .contains(TEST_USER_LAST_NAME)
+                && caseData.getRepCollection().getFirst().getValue().getNameOfRepresentative()
+                .contains(TEST_USER_FULL_NAME)) {
+            assertThat(et3ResponseService.getRepresentedRespondentIndexes(userToken, caseData, caseId))
+                    .hasSize(NumberUtils.INTEGER_ONE);
+        }
+
     }
 
     private static @NotNull CaseUserAssignmentData getValidCaseInvalidUserAssignmentData() {
@@ -402,19 +498,55 @@ class Et3ResponseServiceTest {
         return caseUserAssignmentData;
     }
 
-    private static Stream<Arguments> generateTestGetDataForRepresentedRespondentIndexes() {
+    private static Stream<Arguments> generateTestDataForGetRepresentedRespondentIndexes() {
+        CaseData caseDataWithRepresentativeCollection = new CaseData();
+        caseDataWithRepresentativeCollection.setRepCollection(List.of(RepresentedTypeRItem.builder().build()));
+        CaseData caseDataWithoutNameAndEmailRepresentative = new CaseData();
+        caseDataWithoutNameAndEmailRepresentative.setRepCollection(List.of(RepresentedTypeRItem.builder().value(
+                        RepresentedTypeR.builder().representativeEmailAddress(StringUtils.EMPTY)
+                                .nameOfRepresentative(StringUtils.EMPTY).build()).build()));
+        CaseData caseDataWithRepresentativeThatHasInvalidEmail = new CaseData();
+        caseDataWithRepresentativeThatHasInvalidEmail.setRepCollection(List.of(RepresentedTypeRItem.builder().value(
+                RepresentedTypeR.builder().representativeEmailAddress(TEST_USER_EMAIL_2)
+                        .nameOfRepresentative(StringUtils.EMPTY).build()).build()));
+        CaseData caseDataWithRepresentativeThatHasValidEmail = new CaseData();
+        caseDataWithRepresentativeThatHasValidEmail.setRepCollection(List.of(RepresentedTypeRItem.builder().value(
+                RepresentedTypeR.builder().representativeEmailAddress(TEST_USER_EMAIL)
+                        .nameOfRepresentative(StringUtils.EMPTY).build()).build()));
+        CaseData caseDataWithRepresentativeThatHasInvalidName = new CaseData();
+        caseDataWithRepresentativeThatHasInvalidName.setRepCollection(List.of(RepresentedTypeRItem.builder().value(
+                RepresentedTypeR.builder().nameOfRepresentative(TEST_INVALID_REPRESENTATIVE_NAME).build()).build()));
+        CaseData caseDataWithRepresentativeThatHasValidFirstName = new CaseData();
+        caseDataWithRepresentativeThatHasValidFirstName.setRepCollection(List.of(RepresentedTypeRItem.builder().value(
+                RepresentedTypeR.builder().nameOfRepresentative(TEST_VALID_REPRESENTATIVE_FIRST_NAME)
+                        .build()).build()));
+        CaseData caseDataWithRepresentativeThatHasValidLastName = new CaseData();
+        caseDataWithRepresentativeThatHasValidLastName.setRepCollection(List.of(RepresentedTypeRItem.builder().value(
+                RepresentedTypeR.builder().nameOfRepresentative(TEST_VALID_REPRESENTATIVE_LAST_NAME)
+                        .build()).build()));
+        CaseData caseDataWithRepresentativeThatHasValidFullName = new CaseData();
+        caseDataWithRepresentativeThatHasValidFullName.setRepCollection(List.of(RepresentedTypeRItem.builder().value(
+                RepresentedTypeR.builder().nameOfRepresentative(TEST_USER_FULL_NAME)
+                        .build()).build()));
+        CaseData caseDataWithoutRepresentativeCollection = new CaseData();
         return Stream.of(
-                Arguments.of(null, null),
-                Arguments.of(null, VALID_CASE_ID),
-                Arguments.of(VALID_USER_TOKEN, null),
-                Arguments.of(INVALID_USER_TOKEN, INVALID_CASE_ID),
-                Arguments.of(INVALID_USER_TOKEN, VALID_CASE_ID),
-                Arguments.of(VALID_USER_TOKEN_RETURNS_INVALID_USER, VALID_CASE_ID),
-                Arguments.of(VALID_USER_TOKEN, INVALID_CASE_ID),
-                Arguments.of(VALID_USER_TOKEN, VALID_CASE_ID_RETURNS_INVALID_CASE),
-                Arguments.of(VALID_USER_TOKEN, INVALID_CASE_ID_FOR_GET_USER_ROLES),
-                Arguments.of(VALID_USER_TOKEN, VALID_CASE_ID_RETURNS_INVALID_USER),
-                Arguments.of(VALID_USER_TOKEN, VALID_CASE_ID)
+                Arguments.of(VALID_USER_TOKEN, null, VALID_CASE_ID),
+                Arguments.of(VALID_USER_TOKEN, caseDataWithoutRepresentativeCollection, VALID_CASE_ID),
+                Arguments.of(null, caseDataWithRepresentativeCollection, VALID_CASE_ID),
+                Arguments.of(VALID_USER_TOKEN, caseDataWithRepresentativeCollection, null),
+                Arguments.of(INVALID_USER_TOKEN, caseDataWithRepresentativeCollection, VALID_CASE_ID),
+                Arguments.of(
+                        VALID_USER_TOKEN_RETURNS_INVALID_USER, caseDataWithRepresentativeCollection, VALID_CASE_ID),
+                Arguments.of(VALID_USER_TOKEN, caseDataWithRepresentativeCollection, INVALID_CASE_ID),
+                Arguments.of(VALID_USER_TOKEN, caseDataWithRepresentativeCollection, EXCEPTION_CASE_ID),
+                Arguments.of(VALID_USER_TOKEN, caseDataWithRepresentativeCollection, VALID_CASE_ID),
+                Arguments.of(VALID_USER_TOKEN, caseDataWithoutNameAndEmailRepresentative, VALID_CASE_ID),
+                Arguments.of(VALID_USER_TOKEN, caseDataWithRepresentativeThatHasInvalidEmail, VALID_CASE_ID),
+                Arguments.of(VALID_USER_TOKEN, caseDataWithRepresentativeThatHasValidEmail, VALID_CASE_ID),
+                Arguments.of(VALID_USER_TOKEN, caseDataWithRepresentativeThatHasInvalidName, VALID_CASE_ID),
+                Arguments.of(VALID_USER_TOKEN, caseDataWithRepresentativeThatHasValidFirstName, VALID_CASE_ID),
+                Arguments.of(VALID_USER_TOKEN, caseDataWithRepresentativeThatHasValidLastName, VALID_CASE_ID),
+                Arguments.of(VALID_USER_TOKEN, caseDataWithRepresentativeThatHasValidFullName, VALID_CASE_ID)
         );
     }
 
@@ -466,7 +598,7 @@ class Et3ResponseServiceTest {
             GenericServiceException gex = assertThrows(GenericServiceException.class,
                     () -> et3ResponseService.setRespondentRepresentsContactDetails(
                             userToken, caseData, caseData.getCcdID()));
-            assertThat(gex.getMessage()).isEqualTo(ERROR_NO_REPRESENTED_RESPONDENT_FOUND);
+            assertThat(gex.getMessage()).isEqualTo(ERROR_CASE_DATA_NOT_FOUND);
         }
 
         // when there is no user role found should throw no represented respondent found exception
@@ -479,7 +611,7 @@ class Et3ResponseServiceTest {
             GenericServiceException gex = assertThrows(GenericServiceException.class,
                     () -> et3ResponseService.setRespondentRepresentsContactDetails(
                             userToken, caseData, caseData.getCcdID()));
-            assertThat(gex.getMessage()).isEqualTo(ERROR_NO_REPRESENTED_RESPONDENT_FOUND);
+            assertThat(gex.getMessage()).isEqualTo(ERROR_CASE_DATA_NOT_FOUND);
         }
 
         // when case data has no representative but representative has no value
@@ -489,16 +621,19 @@ class Et3ResponseServiceTest {
             validUserDetails.setUid(USER_ID);
             when(userIdamService.getUserDetails(VALID_USER_TOKEN)).thenReturn(validUserDetails);
             when(ccdCaseAssignment.getCaseUserRoles(VALID_CASE_ID)).thenReturn(getValidCaseUserAssignmentData());
-            et3ResponseService.setRespondentRepresentsContactDetails(userToken, caseData, caseData.getCcdID());
-            assertThat(caseData.getRepCollection().getFirst().getValue()).isNull();
+            GenericServiceException gex = assertThrows(GenericServiceException.class,
+                    () -> et3ResponseService.setRespondentRepresentsContactDetails(
+                            userToken, caseData, caseData.getCcdID()));
+            assertThat(gex.getMessage()).isEqualTo(ERROR_NO_REPRESENTED_RESPONDENT_FOUND);
         }
 
         // when case data has representative in representative collection
         if (VALID_USER_TOKEN.equals(userToken) && VALID_CASE_ID.equals(caseData.getCcdID())) {
-            RepresentedTypeR representedTypeR = new RepresentedTypeR();
-            caseData.setRepCollection(List.of(RepresentedTypeRItem.builder().value(representedTypeR).build()));
+            caseData.setRepCollection(List.of(RepresentedTypeRItem.builder().value(
+                    RepresentedTypeR.builder().representativeEmailAddress(TEST_USER_EMAIL).build()).build()));
             UserDetails validUserDetails = new UserDetails();
             validUserDetails.setUid(USER_ID);
+            validUserDetails.setEmail(TEST_USER_EMAIL);
             when(userIdamService.getUserDetails(VALID_USER_TOKEN)).thenReturn(validUserDetails);
             when(ccdCaseAssignment.getCaseUserRoles(VALID_CASE_ID)).thenReturn(getValidCaseUserAssignmentData());
             et3ResponseService.setRespondentRepresentsContactDetails(userToken, caseData, caseData.getCcdID());
@@ -565,19 +700,21 @@ class Et3ResponseServiceTest {
     @Test
     @SneakyThrows
     void testSetRepresentativeContactInfo() {
-        String userToken = "mockToken";
-        String submissionReference = "mockRef";
         UserDetails userDetails = new UserDetails();
         userDetails.setUid(USER_ID);
+        userDetails.setEmail(TEST_USER_EMAIL);
+        String userToken = "mockToken";
         when(userIdamService.getUserDetails(userToken)).thenReturn(userDetails);
         CaseUserAssignmentData caseUserAssignmentData = CaseUserAssignmentData.builder()
                 .caseUserAssignments(List.of(CaseUserAssignment.builder().userId(USER_ID)
                         .caseRole(RespondentSolicitorType.SOLICITORA.getLabel()).build())).build();
+        String submissionReference = "mockRef";
         when(ccdCaseAssignment.getCaseUserRoles(submissionReference)).thenReturn(caseUserAssignmentData);
         // Scenario 2: Use MyHMCTS contact details
         CaseData caseData2 = new CaseData();
         caseData2.setRepCollection(
-                List.of(RepresentedTypeRItem.builder().value(RepresentedTypeR.builder().build()).build()));
+                List.of(RepresentedTypeRItem.builder().value(RepresentedTypeR.builder()
+                        .representativeEmailAddress(TEST_USER_EMAIL).build()).build()));
         caseData2.setEt3ResponsePhone(PHONE_NUMBER);
         caseData2.setRepresentativeContactChangeOption(REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS);
         when(userIdamService.getUserDetails(userToken)).thenReturn(userDetails);

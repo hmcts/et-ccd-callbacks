@@ -185,7 +185,7 @@ class NocNotificationServiceTest {
         nocNotificationService.sendNotificationOfChangeEmails(
                 caseDetailsBefore,
                 caseDetailsNew,
-                caseDetailsBefore.getCaseData().getChangeOrganisationRequestField() );
+                caseDetailsBefore.getCaseData().getChangeOrganisationRequestField());
 
         // Claimant Representative
         verify(emailService, times(0)).sendEmail(any(), eq("claimant@represented.com"), any());

@@ -259,7 +259,7 @@ public class InitialConsiderationService {
                     && !hearing.getHearingDateCollection().isEmpty())
             .min(Comparator.comparing(
                     (HearingType hearing) ->
-                        getEarliestHearingDateForListedHearings(hearing.getHearingDateCollection()).orElse(
+                            getEarliestHearingDateForListedHearings(hearing.getHearingDateCollection()).orElse(
                             LocalDate.now().plusYears(100))))
             .map(hearing -> getFormattedHearingDetails(hearing, formatter))
             .orElse(HEARING_MISSING);
@@ -310,14 +310,13 @@ public class InitialConsiderationService {
             return Optional.empty();
         }
 
-        return hearingDates.stream()
-        .filter(dateListedTypeItem ->
-                isListedHearing(dateListedTypeItem) && isFutureHearingDate(dateListedTypeItem))
-        .map(DateListedTypeItem::getValue)
-        .filter(hearingDate -> hearingDate.getListedDate() != null
-                && !hearingDate.getListedDate().isEmpty())
-        .map(hearingDateItem -> LocalDateTime.parse(hearingDateItem.getListedDate()).toLocalDate())
-        .min(Comparator.naturalOrder());
+        return hearingDates.stream().filter(dateListedTypeItem ->
+                        isListedHearing(dateListedTypeItem) && isFutureHearingDate(dateListedTypeItem))
+                .map(DateListedTypeItem::getValue)
+                .filter(hearingDate -> hearingDate.getListedDate() != null
+                        && !hearingDate.getListedDate().isEmpty())
+                .map(hearingDateItem -> LocalDateTime.parse(hearingDateItem.getListedDate()).toLocalDate())
+                .min(Comparator.naturalOrder());
     }
 
     private boolean isListedHearing(DateListedTypeItem dateListedTypeItem) {
@@ -334,9 +333,13 @@ public class InitialConsiderationService {
                 || dateListedTypeItem.getValue().getListedDate().isEmpty()) {
             return false;
         }
-        LocalDate hearingDate = LocalDateTime.parse(dateListedTypeItem.getValue().getListedDate())
-                .toLocalDate();
-        return hearingDate.isAfter(LocalDate.now());
+        try {
+            return LocalDateTime.parse(dateListedTypeItem.getValue().getListedDate())
+                    .toLocalDate().isAfter(LocalDate.now());
+        } catch (Exception e) {
+            log.error("Error parsing listed date: {}", dateListedTypeItem.getValue().getListedDate(), e);
+            return false;
+        }
     }
 
     public HearingType getEarliestListedHearingType(List<HearingTypeItem> hearingCollection) {
@@ -459,14 +462,22 @@ public class InitialConsiderationService {
         //clear old values
         if (caseData.getEtICHearingListedAnswers() != null) {
             caseData.getEtICHearingListedAnswers().setEtInitialConsiderationListedHearingType(null);
-            caseData.getEtICHearingListedAnswers().setEtICIsHearingWithMembersLabel(null);
+            caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJsaReasonOther(null);
             caseData.getEtICHearingListedAnswers().setEtICIsHearingWithMembers(null);
+
+            caseData.getEtICHearingListedAnswers().setEtICJsaFinalHearingReasonOther(null);
+            caseData.getEtICHearingListedAnswers().setEtICMembersFinalHearingReasonOther(null);
+
             caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJudgeOrMembersFurtherDetails(null);
             caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJudgeOrMembersReason(null);
+            caseData.getEtICHearingListedAnswers().setEtICIsFinalHearingWithJudgeOrMembersJsaReason(null);
+            caseData.getEtICHearingListedAnswers().setEtICIsFinalHearingWithJudgeOrMembersReason(null);
+
             caseData.getEtICHearingListedAnswers().setEtICHearingListed(null);
             caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJudgeOrMembers(null);
+            caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJudgeOrMembersReasonOther(null);
+            caseData.setEtInitialConsiderationHearing(null);
         }
-
     }
 
     public void mapOldIcHearingNotListedOptionsToNew(CaseData caseData, String caseTypeId) {

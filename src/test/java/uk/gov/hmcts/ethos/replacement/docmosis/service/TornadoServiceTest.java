@@ -301,6 +301,12 @@ class TornadoServiceTest {
             public TokenResponse generateOpenIdToken(TokenRequest tokenRequest) {
                 return null;
             }
+
+            @Override
+            public List<UserDetails> searchUsersByQuery(String authorisation, String query,
+                                                        Integer page, Integer size) {
+                return List.of();
+            }
         };
 
         mockOauth2Configuration();

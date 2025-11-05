@@ -8,6 +8,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import java.util.Arrays;
 import java.util.List;
@@ -72,6 +73,10 @@ public class NoticeOfChangeFieldPopulator {
             }
         }
 
+        OrganisationPolicy organisationPolicy = OrganisationPolicy.builder()
+                .orgPolicyCaseAssignedRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())
+                .build();
+        data.put(ClaimantSolicitorRole.POLICY_FIELD_TEMPLATE, organisationPolicy);
         return data;
     }
 

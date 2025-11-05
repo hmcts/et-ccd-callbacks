@@ -106,7 +106,7 @@ public class NocClaimantRepresentativeService {
         }
     }
 
-    public void updateClaimantRepAccess(CallbackRequest callbackRequest, String currentUserEmail)
+    public void updateClaimantRepAccess(CallbackRequest callbackRequest)
             throws IOException {
         CaseDetails caseDetails = callbackRequest.getCaseDetails();
         CaseDetails caseDetailsBefore = callbackRequest.getCaseDetailsBefore();
@@ -117,8 +117,9 @@ public class NocClaimantRepresentativeService {
                 caseDataBefore);
 
         try {
+            String newRepEmailAddress = caseData.getRepresentativeClaimantType().getRepresentativeEmailAddress();
             nocNotificationService.sendNotificationOfChangeEmails(caseDetailsBefore, caseDetails, changeRequest,
-                    currentUserEmail);
+                    newRepEmailAddress);
         } catch (Exception exception) {
             log.error(exception.getMessage(), exception);
         }

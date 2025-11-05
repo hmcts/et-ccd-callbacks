@@ -180,7 +180,7 @@ class NocClaimantRepresentativeServiceTest {
                 .build());
         when(nocClaimantHelper.createChangeRequest(any(), any())).thenReturn(createChangeOrganisationRequest());
 
-        nocClaimantRepresentativeService.updateClaimantRepAccess(getCallBackCallbackRequest(), "test@test.com");
+        nocClaimantRepresentativeService.updateClaimantRepAccess(getCallBackCallbackRequest());
 
         verify(nocCcdService, times(1))
                 .startEventForUpdateRepresentation(any(), any(), any(), any());
@@ -208,7 +208,7 @@ class NocClaimantRepresentativeServiceTest {
         when(nocClaimantHelper.createChangeRequest(any(), any())).thenReturn(changeRequest);
 
         // Act
-        nocClaimantRepresentativeService.updateClaimantRepAccess(callbackRequest, USER_EMAIL);
+        nocClaimantRepresentativeService.updateClaimantRepAccess(callbackRequest);
 
         // Assert
         verify(nocNotificationService, times(1)).sendNotificationOfChangeEmails(

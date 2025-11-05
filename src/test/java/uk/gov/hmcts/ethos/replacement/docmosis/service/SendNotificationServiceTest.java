@@ -10,8 +10,10 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
+import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.BFActionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.BFActionType;
@@ -20,6 +22,8 @@ import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.HubLinksStatuses;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -28,7 +32,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
+import java.util.Set;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -65,8 +69,14 @@ class SendNotificationServiceTest {
     private HearingSelectionService hearingSelectionService;
     @MockBean
     private FeatureToggleService featureToggleService;
+    @MockBean
+    private CaseAccessService caseAccessService;
+    @MockBean
+    private AdminUserService adminUserService;
     @Mock
     private TornadoService tornadoService;
+    @MockBean
+    private EmailNotificationService emailNotificationService;
     private CaseData caseData;
     private CaseDetails caseDetails;
     private SendNotificationService sendNotificationService;
@@ -84,12 +94,13 @@ class SendNotificationServiceTest {
     private static final String BUNDLES_SUBMITTED_NOTIFICATION_FOR_TRIBUNAL_TEMPLATE_ID =
             "bundlesSubmittedNotificationForTribunalTemplateId";
     private static final String CLAIMANT_ONLY = "Claimant only";
+    private static final String DUMMY_ADMIN_USER_TOKEN = "DUMMY_ADMIN_USER_TOKEN";
 
     @BeforeEach
      void setUp() {
         emailService = spy(new EmailUtils());
         sendNotificationService = new SendNotificationService(hearingSelectionService,
-                emailService, featureToggleService, tornadoService);
+                emailService, featureToggleService, caseAccessService, tornadoService, emailNotificationService);
         ReflectionTestUtils.setField(sendNotificationService,
                 RESPONDENT_SEND_NOTIFICATION_TEMPLATE_ID,
                 "respondentSendNotificationTemplateId");
@@ -330,10 +341,86 @@ class SendNotificationServiceTest {
         when(emailService.getClaimantRepExuiCaseNotificationsLink(anyString()))
                 .thenReturn("http://localhost:3455/cases/case-details/"
                         + caseDetails.getCaseId() + "#Notifications");
+        CaseUserAssignment mockAssignment = CaseUserAssignment
+                .builder()
+                .userId("claimantSolicitorUserId")
+                .caseRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())
+                .build();
+
+        when(caseAccessService.getCaseUserAssignmentsById(anyString())).thenReturn(
+                List.of(mockAssignment));
+
+        UserDetails userDetails = mock(UserDetails.class);
+        when(adminUserService.getAdminUserToken()).thenReturn(DUMMY_ADMIN_USER_TOKEN);
+        when(adminUserService.getUserDetails(eq(DUMMY_ADMIN_USER_TOKEN), anyString())).thenReturn(userDetails);
+        when(userDetails.getEmail()).thenReturn("rep@example.com");
+        when(emailNotificationService.getCaseClaimantSolicitorEmails(List.of(mockAssignment)))
+                .thenReturn(List.of("rep@example.com"));
+
         personalisationCaptor.getAllValues().clear();
         sendNotificationService.sendNotifyEmails(caseDetails);
 
         verify(emailService, times(1)).sendEmail(any(), any(), anyMap());
+    }
+
+    @Test
+    void sendNotifyEmails_ClaimantRepresented_WithSharedList() {
+        caseDetails.getCaseData().setSendNotificationSubject(List.of("OTHER_SUBJECT"));
+        when(featureToggleService.isEccEnabled()).thenReturn(true);
+        caseDetails.getCaseData().setSendNotificationNotify(CLAIMANT_ONLY);
+        caseDetails.getCaseData().setCaseSource("MyHMCTS");
+        caseDetails.getCaseData().setClaimantRepresentedQuestion("Yes");
+        RepresentedTypeC representedTypeC = new RepresentedTypeC();
+        representedTypeC.setNameOfRepresentative("testRep");
+        representedTypeC.setRepresentativeEmailAddress("rep@example.com");
+        Organisation org = Organisation.builder().organisationID("myHmctsOrgId").organisationName("testOrg").build();
+        representedTypeC.setMyHmctsOrganisation(org);
+        caseDetails.getCaseData().setRepresentativeClaimantType(representedTypeC);
+        when(emailService.getClaimantRepExuiCaseNotificationsLink(anyString()))
+                .thenReturn("http://localhost:3455/cases/case-details/"
+                        + caseDetails.getCaseId() + "#Notifications");
+
+        CaseUserAssignment assignment1 = CaseUserAssignment.builder()
+                .userId("claimantSolicitorUserId")
+                .caseRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())
+                .build();
+
+        CaseUserAssignment assignment2 = CaseUserAssignment.builder()
+                .userId("sharedListUserId")
+                .caseRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())
+                .build();
+
+        CaseUserAssignment assignment3 = CaseUserAssignment.builder()
+                .userId("sharedListUserId2")
+                .caseRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())
+                .build();
+
+        List<CaseUserAssignment> assignments = List.of(assignment1, assignment2, assignment3);
+
+        when(caseAccessService.getCaseUserAssignmentsById(anyString())).thenReturn(assignments);
+
+        UserDetails userDetails = mock(UserDetails.class);
+        when(adminUserService.getAdminUserToken()).thenReturn(DUMMY_ADMIN_USER_TOKEN);
+        when(adminUserService.getUserDetails(eq(DUMMY_ADMIN_USER_TOKEN), anyString())).thenAnswer(invocation -> {
+            String userId = invocation.getArgument(1);
+            String email = switch (userId) {
+                case "claimantSolicitorUserId" -> "claimant.rep@example.com";
+                case "sharedListUserId" -> "shared1@example.com";
+                case "sharedListUserId2" -> "shared2@example.com";
+                default -> "";
+            };
+            when(userDetails.getEmail()).thenReturn(email);
+            return userDetails;
+        });
+        when(emailNotificationService.getCaseClaimantSolicitorEmails(assignments))
+                .thenReturn(List.of("claimant.rep@example.com",
+                        "shared1@example.com",
+                        "shared2@example.com"));
+
+        personalisationCaptor.getAllValues().clear();
+        sendNotificationService.sendNotifyEmails(caseDetails);
+
+        verify(emailService, times(3)).sendEmail(any(), any(), anyMap());
     }
 
     @Test
@@ -374,6 +461,57 @@ class SendNotificationServiceTest {
         caseData.setSendNotificationNotify(RESPONDENT_ONLY);
         sendNotificationService.sendNotifyEmails(caseDetails);
         verify(emailService, times(1))
+                .sendEmail(eq(RESPONDENT_SEND_NOTIFICATION_TEMPLATE_ID), any(), personalisationCaptor.capture());
+        Map<String, String> val = personalisationCaptor.getValue();
+        assertEquals("exuiUrl1234", val.get("environmentUrl"));
+    }
+
+    @Test
+    void sendNotifyEmails_respondentOnly_withSharedList() {
+        caseData.setSendNotificationNotify(RESPONDENT_ONLY);
+        caseData.setCcdID("1234");
+
+        CaseUserAssignment assignment1 = CaseUserAssignment.builder()
+                .userId("respondentSolicitorUserId")
+                .caseRole(SolicitorRole.SOLICITORA.getCaseRoleLabel())
+                .build();
+
+        CaseUserAssignment assignment2 = CaseUserAssignment.builder()
+                .userId("sharedListUserId")
+                .caseRole(SolicitorRole.SOLICITORB.getCaseRoleLabel())
+                .build();
+
+        CaseUserAssignment assignment3 = CaseUserAssignment.builder()
+                .userId("sharedListUserId2")
+                .caseRole(SolicitorRole.SOLICITORC.getCaseRoleLabel())
+                .build();
+
+        List<CaseUserAssignment> assignments = List.of(assignment1, assignment2, assignment3);
+
+        when(caseAccessService.getCaseUserAssignmentsById(anyString())).thenReturn(assignments);
+
+        UserDetails userDetails = mock(UserDetails.class);
+        when(adminUserService.getAdminUserToken()).thenReturn(DUMMY_ADMIN_USER_TOKEN);
+        when(adminUserService.getUserDetails(eq(DUMMY_ADMIN_USER_TOKEN), anyString())).thenAnswer(invocation -> {
+            String userId = invocation.getArgument(1);
+            String email = switch (userId) {
+                case "respondentSolicitorUserId" -> "respondentRep@email.com";
+                case "sharedListUserId" -> "shared1@example.com";
+                case "sharedListUserId2" -> "shared2@example.com";
+                default -> "";
+            };
+            when(userDetails.getEmail()).thenReturn(email);
+            return userDetails;
+        });
+        when(emailNotificationService.getRespondentSolicitorEmails(assignments))
+                .thenReturn(Set.of("respondentRep@email.com",
+                        "shared1@example.com",
+                        "shared2@example.com"));
+
+        sendNotificationService.sendNotifyEmails(caseDetails);
+
+        // Should send to all emails in the shared list
+        verify(emailService, times(3))
                 .sendEmail(eq(RESPONDENT_SEND_NOTIFICATION_TEMPLATE_ID), any(), personalisationCaptor.capture());
         Map<String, String> val = personalisationCaptor.getValue();
         assertEquals("exuiUrl1234", val.get("environmentUrl"));
@@ -439,10 +577,10 @@ class SendNotificationServiceTest {
         when(tornadoService.generateEventDocument(caseData, "userToken",
                 SCOTLAND_CASE_TYPE_ID, NOTIFICATION_SUMMARY_PDF))
                 .thenReturn(expectedDocumentInfo);
-        
+
         DocumentInfo result = sendNotificationService.createNotificationSummary(
                 caseData, "userToken", SCOTLAND_CASE_TYPE_ID);
-        
+
         verify(tornadoService, times(1)).generateEventDocument(
                 caseData, "userToken", SCOTLAND_CASE_TYPE_ID,
                 NOTIFICATION_SUMMARY_PDF);
@@ -456,13 +594,13 @@ class SendNotificationServiceTest {
         DocumentInfo documentInfo = new DocumentInfo();
         documentInfo.setDescription("Notification 1 Summary");
         documentInfo.setMarkUp("<a href=\"http://dm-store/documents/123-456-789/binary\">Document</a>");
-        
+
         when(tornadoService.generateEventDocument(any(), anyString(), anyString(), anyString()))
                 .thenReturn(documentInfo);
-        
+
         DocumentInfo result = sendNotificationService.createNotificationSummary(
                 caseData, "userToken", SCOTLAND_CASE_TYPE_ID);
-        
+
         assertEquals("<a href=\"http://dm-store/documents/123-456-789/binary\">Notification 1 Summary</a>",
                 result.getMarkUp());
     }
@@ -471,10 +609,10 @@ class SendNotificationServiceTest {
     void testCreateNotificationSummaryThrowsDocumentManagementException() throws Exception {
         when(tornadoService.generateEventDocument(any(), anyString(), anyString(), anyString()))
                 .thenThrow(new RuntimeException("Tornado down"));
-        
+
         DocumentManagementException exception = assertThrows(DocumentManagementException.class,
                 () -> sendNotificationService.createNotificationSummary(caseData, "userToken", SCOTLAND_CASE_TYPE_ID));
-        
+
         assertTrue(exception.getMessage().contains("Failed to generate document for case id: 1234"));
         verify(tornadoService, times(1)).generateEventDocument(
                 caseData, "userToken", SCOTLAND_CASE_TYPE_ID, NOTIFICATION_SUMMARY_PDF);

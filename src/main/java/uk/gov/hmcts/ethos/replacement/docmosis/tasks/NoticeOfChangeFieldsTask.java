@@ -120,7 +120,7 @@ public class NoticeOfChangeFieldsTask {
                             ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()).build());
             ccdClient.submitEventForCase(adminUserToken, caseData, caseTypeId,
                     caseDetails.getJurisdiction(), ccdRequest, String.valueOf(submitEvent.getCaseId()));
-            log.info("Added Notice of change fields for case {}", submitEvent.getCaseId());
+            log.info("Added claimant solicitor organisation policy to case with id {}", submitEvent.getCaseId());
         } catch (Exception e) {
             log.error(e.getMessage());
         }

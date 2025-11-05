@@ -1,19 +1,20 @@
 package uk.gov.hmcts.ethos.replacement.apitest;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpStatus;
+import org.json.JSONObject;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
-
 import java.io.IOException;
-import java.net.URISyntaxException;
-
 import static org.hamcrest.Matchers.notNullValue;
 
 @Slf4j
@@ -45,12 +46,27 @@ public class Et1ReppedControllerFunctionalTest extends BaseFunctionalTest {
     private CCDRequest ccdRequest;
 
     @BeforeAll
-    void setUpEt1ReppedData() throws URISyntaxException, IOException {
-        CaseData caseData = generateCaseDetails("et1Repped.json").getCaseData();
+    void setUpEt1ReppedData() throws IOException {
+        // Create a real case in CCD
+        JSONObject caseJson = createSinglesCaseDataStore();
+
+        ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();
+        CaseDetails caseDetails = mapper.readValue(caseJson.toString(), CaseDetails.class);
+        CaseData caseData = caseDetails.getCaseData();
+        caseData.setClaimantFirstName("John");
+        caseData.setClaimantLastName("Doe");
+
+        Address address = new Address();
+        address.setAddressLine1("123 Main Street");
+        address.setAddressLine2("Suite 456");
+        address.setPostCode("SW1A 1AA");
+        address.setCountry("United Kingdom");
+        caseData.setRespondentAddress(address);
+
         ccdRequest = CCDRequestBuilder.builder()
                 .withCaseData(caseData)
-                .withCaseTypeId("ET_EnglandWales")
-                .withCaseId("1234123412341324")
+                .withCaseTypeId(caseDetails.getCaseTypeId())
+                .withCaseId(caseDetails.getCaseId())
                 .build();
     }
 

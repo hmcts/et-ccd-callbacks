@@ -558,8 +558,7 @@ public class CaseActionsForCaseWorkerController {
         log.info("AMEND RESPONDENT REPRESENTATIVE SUBMITTED ---> "
             + LOG_MESSAGE + callbackRequest.getCaseDetails().getCaseId());
         try {
-            String currentUserEmail = userIdamService.getUserDetails(userToken).getEmail();
-            nocRespondentRepresentativeService.updateRespondentRepresentativesAccess(callbackRequest, currentUserEmail);
+            nocRespondentRepresentativeService.updateRespondentRepresentativesAccess(callbackRequest);
         } catch (IOException e) {
             throw new CcdInputOutputException("Failed to update respondent representatives accesses", e);
         } catch (GenericServiceException e) {

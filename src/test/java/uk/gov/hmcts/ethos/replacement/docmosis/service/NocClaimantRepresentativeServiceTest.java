@@ -186,7 +186,7 @@ class NocClaimantRepresentativeServiceTest {
                 .startEventForUpdateRepresentation(any(), any(), any(), any());
 
         verify(nocNotificationService, times(1))
-                .sendNotificationOfChangeEmails(any(), any(), any(), anyString());
+                .sendNotificationOfChangeEmails(any(), any(), any());
 
         verify(ccdClient, times(1))
                 .submitUpdateRepEvent(any(), any(), any(), any(), any(), any());
@@ -212,7 +212,7 @@ class NocClaimantRepresentativeServiceTest {
 
         // Assert
         verify(nocNotificationService, times(1)).sendNotificationOfChangeEmails(
-                any(), any(), any(), anyString());
+                any(), any(), any());
         verify(nocService, times(1)).removeOrganisationRepresentativeAccess(
                 anyString(), any(ChangeOrganisationRequest.class));
         verify(nocService, times(1)).grantClaimantRepAccess(

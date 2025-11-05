@@ -117,9 +117,7 @@ public class NocClaimantRepresentativeService {
                 caseDataBefore);
 
         try {
-            String newRepEmailAddress = caseData.getRepresentativeClaimantType().getRepresentativeEmailAddress();
-            nocNotificationService.sendNotificationOfChangeEmails(caseDetailsBefore, caseDetails, changeRequest,
-                    newRepEmailAddress);
+            nocNotificationService.sendNotificationOfChangeEmails(caseDetailsBefore, caseDetails, changeRequest);
         } catch (Exception exception) {
             log.error(exception.getMessage(), exception);
         }

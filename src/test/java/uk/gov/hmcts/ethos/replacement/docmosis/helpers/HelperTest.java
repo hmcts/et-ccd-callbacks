@@ -249,7 +249,7 @@ public class HelperTest {
             Arguments.of("ET1", NO, null, false),
             Arguments.of("ET1", NO, representedTypeC, false),
             Arguments.of("ET1", YES, null, false),
-            Arguments.of("ET1", YES, representedTypeC, false),
+            Arguments.of("ET1", YES, representedTypeC, true),
             Arguments.of("MyHMCTS", NO, null, false),
             Arguments.of("MyHMCTS", NO, representedTypeC, false),
             Arguments.of("MyHMCTS", YES, null, false),

@@ -166,6 +166,8 @@ public class NocClaimantRepresentativeService {
 
         if (!Objects.equals(newRepOrg, oldRepOrg)) {
             changeRequests = nocClaimantHelper.createChangeRequest(newRepOrg, oldRepOrg);
+        } else {
+            changeRequests = nocClaimantHelper.createChangeRequest(newRepOrg, null);
         }
 
         return changeRequests;

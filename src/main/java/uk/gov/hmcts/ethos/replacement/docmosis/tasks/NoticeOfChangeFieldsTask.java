@@ -73,13 +73,14 @@ public class NoticeOfChangeFieldsTask {
                     return;
                 }
                 updateCases(cases, caseTypeId, adminUserToken);
-            } catch (IOException e) {
+            } catch (IOException | InterruptedException e) {
                 log.error(e.getMessage());
             }
         });
     }
 
-    private void updateCases(List<SubmitEvent> cases, String caseTypeId, String adminUserToken) {
+    private void updateCases(List<SubmitEvent> cases, String caseTypeId, String adminUserToken)
+            throws InterruptedException {
         final int poolSize = Math.min(15, Runtime.getRuntime().availableProcessors() * 2);
         final long awaitTimeoutSeconds = 120;
 
@@ -88,7 +89,7 @@ public class NoticeOfChangeFieldsTask {
                 executor.execute(() -> {
                     try {
                         triggerEventForCase(adminUserToken, submitEvent, caseTypeId);
-                    } catch (Exception ex) {
+                    } catch (GenericServiceException ex) {
                         log.warn("{} - NOC fields task - Failed for case {}: {}",
                                 caseTypeId, findCaseId(submitEvent), ex.getMessage(), ex);
                     }
@@ -100,8 +101,6 @@ public class NoticeOfChangeFieldsTask {
                         caseTypeId, awaitTimeoutSeconds);
                 executor.shutdownNow();
             }
-        } catch (InterruptedException e) {
-            log.error(e.getMessage());
         }
     }
 

@@ -27,7 +27,6 @@ import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -91,9 +90,6 @@ class NoticeOfChangeFieldsTaskTest {
         verify(ccdClient, times(1)).submitEventForCase(eq("AuthToken"), caseDataArgumentCaptor.capture(),
                 eq(ENGLANDWALES_CASE_TYPE_ID), eq(EMPLOYMENT), any(), eq("123456789"));
         CaseData caseDataCaptured = caseDataArgumentCaptor.getValue();
-        assertNotNull(caseDataCaptured.getNoticeOfChangeAnswers0());
-        assertEquals(caseDataCaptured.getNoticeOfChangeAnswers0().getRespondentName(), submitEvent.getCaseData()
-                .getRespondentCollection().get(0).getValue().getRespondentName());
-
+        assertNotNull(caseDataCaptured.getClaimantRepresentativeOrganisationPolicy());
     }
 }

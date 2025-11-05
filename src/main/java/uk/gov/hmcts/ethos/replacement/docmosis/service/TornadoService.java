@@ -395,7 +395,7 @@ public class TornadoService {
                         caseData, tornadoConnection.getAccessKey(), caseTypeId);
             }
             case TSE_FILE_NAME -> {
-                log.info("TSE_FILE_NAME {}", tseService.getTseDocumentName(caseData));
+                log.info("TSE_FILE_NAME  {}", tseService.getTseDocumentName(caseData));
                 return RespondentTellSomethingElseHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             }
             case CLAIMANT_TSE_FILE_NAME -> {

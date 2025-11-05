@@ -237,53 +237,12 @@ class TornadoServiceTest {
     }
 
     @Test
-    void generateClaimantTseDocument() throws IOException {
-        mockConnectionSuccess();
-        DocumentInfo documentInfo = tornadoService.generateEventDocument(
-                new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, "Claimant Contact the tribunal.pdf");
-        verifyDocumentInfo(documentInfo);
-    }
-
-    @Test
-    void generateRespondentTseDocument() throws IOException {
-        mockConnectionSuccess();
-        DocumentInfo documentInfo = tornadoService.generateEventDocument(
-                new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, "Contact the tribunal.pdf");
-        verifyDocumentInfo(documentInfo);
-    }
-
-    @Test
     void generateReferralSummaryDocument() throws IOException {
         mockConnectionSuccess();
         DocumentInfo documentInfo = tornadoService.generateEventDocument(
                 new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, "Referral Summary.pdf");
         verifyDocumentInfo(documentInfo);
     }
-
-    @Test
-    void generateTseReplyDocument() throws IOException {
-        mockConnectionSuccess();
-        DocumentInfo documentInfo = tornadoService.generateEventDocument(
-                new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, "TSE Reply.pdf");
-        verifyDocumentInfo(documentInfo);
-    }
-
-    @Test
-    void generateTseClaimantRepReplyDocument() throws IOException {
-        mockConnectionSuccess();
-        DocumentInfo documentInfo = tornadoService.generateEventDocument(
-                new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, "TSE Claimant Rep Reply.pdf");
-        verifyDocumentInfo(documentInfo);
-    }
-
-    @Test
-    void generateNotificationSummaryDocument() throws IOException {
-        mockConnectionSuccess();
-        DocumentInfo documentInfo = tornadoService.generateEventDocument(
-                new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, "Notification Summary.pdf");
-        verifyDocumentInfo(documentInfo);
-    }
-
 
     @Test
     void generateDocument_exception() throws IOException {

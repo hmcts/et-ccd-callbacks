@@ -114,7 +114,7 @@ public class NoticeOfChangeFieldsTask {
     }
 
     private void triggerEventForCase(String adminUserToken, SubmitEvent submitEvent, String caseTypeId)
-            throws GenericServiceException{
+            throws GenericServiceException {
         try {
             CCDRequest ccdRequest = ccdClient.startEventForCase(adminUserToken, caseTypeId, EMPLOYMENT,
                     String.valueOf(submitEvent.getCaseId()), "UPDATE_CASE_SUBMITTED");

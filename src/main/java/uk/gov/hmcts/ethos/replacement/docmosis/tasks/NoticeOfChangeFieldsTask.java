@@ -17,11 +17,13 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -61,8 +63,6 @@ public class NoticeOfChangeFieldsTask {
         String query = buildQuery();
         String adminUserToken = adminUserService.getAdminUserToken();
         String[] caseTypeIds = caseTypeIdsString.split(",");
-        final int poolSize = Math.min(15, Runtime.getRuntime().availableProcessors() * 2);
-        final long awaitTimeoutSeconds = 120;
 
         Arrays.stream(caseTypeIds).forEach(caseTypeId -> {
             try {
@@ -72,30 +72,37 @@ public class NoticeOfChangeFieldsTask {
                     log.info("{} - NOC fields task - No cases to process", caseTypeId);
                     return;
                 }
-                try (ExecutorService executor = Executors.newFixedThreadPool(poolSize)) {
-                    for (SubmitEvent submitEvent : cases) {
-                        executor.execute(() -> {
-                            try {
-                                triggerEventForCase(adminUserToken, submitEvent, caseTypeId);
-                            } catch (Exception ex) {
-                                log.warn("{} - NOC fields task - Failed for case {}: {}",
-                                        caseTypeId, findCaseId(submitEvent), ex.getMessage(), ex);
-                            }
-                        });
-                    }
-                    executor.shutdown();
-                    if (!executor.awaitTermination(awaitTimeoutSeconds, TimeUnit.SECONDS)) {
-                        log.warn("{} - Executor did not terminate within {}s, forcing shutdown",
-                                caseTypeId, awaitTimeoutSeconds);
-                        executor.shutdownNow();
-                    }
-                } catch (Exception e) {
-                    log.error(e.getMessage());
-                }
-            } catch (Exception e) {
+                updateCases(cases, caseTypeId, adminUserToken);
+            } catch (IOException e) {
                 log.error(e.getMessage());
             }
         });
+    }
+
+    private void updateCases(List<SubmitEvent> cases, String caseTypeId, String adminUserToken) {
+        final int poolSize = Math.min(15, Runtime.getRuntime().availableProcessors() * 2);
+        final long awaitTimeoutSeconds = 120;
+
+        try (ExecutorService executor = Executors.newFixedThreadPool(poolSize)) {
+            for (SubmitEvent submitEvent : cases) {
+                executor.execute(() -> {
+                    try {
+                        triggerEventForCase(adminUserToken, submitEvent, caseTypeId);
+                    } catch (Exception ex) {
+                        log.warn("{} - NOC fields task - Failed for case {}: {}",
+                                caseTypeId, findCaseId(submitEvent), ex.getMessage(), ex);
+                    }
+                });
+            }
+            executor.shutdown();
+            if (!executor.awaitTermination(awaitTimeoutSeconds, TimeUnit.SECONDS)) {
+                log.warn("{} - Executor did not terminate within {}s, forcing shutdown",
+                        caseTypeId, awaitTimeoutSeconds);
+                executor.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            log.error(e.getMessage());
+        }
     }
 
     public static String findCaseId(SubmitEvent se) {
@@ -106,7 +113,8 @@ public class NoticeOfChangeFieldsTask {
         }
     }
 
-    private void triggerEventForCase(String adminUserToken, SubmitEvent submitEvent, String caseTypeId) {
+    private void triggerEventForCase(String adminUserToken, SubmitEvent submitEvent, String caseTypeId)
+            throws GenericServiceException{
         try {
             CCDRequest ccdRequest = ccdClient.startEventForCase(adminUserToken, caseTypeId, EMPLOYMENT,
                     String.valueOf(submitEvent.getCaseId()), "UPDATE_CASE_SUBMITTED");
@@ -121,7 +129,8 @@ public class NoticeOfChangeFieldsTask {
                     caseDetails.getJurisdiction(), ccdRequest, String.valueOf(submitEvent.getCaseId()));
             log.info("Added claimant solicitor organisation policy to case with id {}", submitEvent.getCaseId());
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new GenericServiceException(e.getMessage(), e, e.getMessage(), findCaseId(submitEvent),
+                    "NoticeOfChangeFieldsTask", "triggerEventForCase");
         }
     }
 

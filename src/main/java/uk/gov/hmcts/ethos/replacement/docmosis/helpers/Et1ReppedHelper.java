@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -18,6 +19,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.CreateRespondentType;
 import uk.gov.hmcts.et.common.model.ccd.types.NewEmploymentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -30,8 +32,10 @@ import static uk.gov.hmcts.ecm.common.helpers.UtilHelper.listingFormatLocalDate;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.INDIVIDUAL_TYPE_CLAIMANT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.CLAIMANT_REPRESENTATIVE_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.CLAIM_DETAILS_MISSING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.COMPLETED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.ERROR_CASE_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.INDIVIDUAL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.MONTHS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants.NOTICE;
@@ -113,7 +117,7 @@ public final class Et1ReppedHelper {
 
     /**
      * Sets the ET1 Repped section statuses once each section have been completed.
-     * @param ccdRequest the ccd request
+     * @param ccdRequest the CCD request
      */
     public static void setEt1SectionStatuses(CCDRequest ccdRequest) {
         String eventId = ccdRequest.getEventId();
@@ -342,10 +346,8 @@ public final class Et1ReppedHelper {
     }
 
     private static ClaimantWorkAddressType claimantWorkAddress(CaseData caseData) {
-        ClaimantWorkAddressType claimantWorkAddressType = new ClaimantWorkAddressType();
         if (YES.equals(caseData.getDidClaimantWorkAtSameAddress())) {
             caseData.setClaimantWorkAddressQuestion(YES);
-            claimantWorkAddressType.setClaimantWorkAddress(caseData.getRespondentAddress());
         } else if (NO.equals(caseData.getDidClaimantWorkAtSameAddress())) {
             caseData.setClaimantWorkAddressQuestion(NO);
             return caseData.getClaimantWorkAddress();
@@ -392,15 +394,15 @@ public final class Et1ReppedHelper {
         claimantOtherType.setClaimantPayBeforeTax(formatPay(caseData.getClaimantPayBeforeTax()));
         claimantOtherType.setClaimantPayAfterTax(formatPay(caseData.getClaimantPayAfterTax()));
         claimantOtherType.setClaimantPayCycle(CollectionUtils.isEmpty(caseData.getClaimantPayType())
-                                              || caseData.getClaimantPayType().get(0).equals(
+                                              || caseData.getClaimantPayType().getFirst().equals(
                 NOT_SURE)
                 ? EMPTY_STRING
                 : PAY_PERIODS.get(getFirstListItem(caseData.getClaimantPayType())));
         claimantOtherType.setClaimantPensionContribution(
                 CollectionUtils.isEmpty(caseData.getClaimantPensionContribution())
-                || caseData.getClaimantPensionContribution().get(0).equals(NOT_SURE)
+                || caseData.getClaimantPensionContribution().getFirst().equals(NOT_SURE)
                 ? EMPTY_STRING
-                : caseData.getClaimantPensionContribution().get(0));
+                : caseData.getClaimantPensionContribution().getFirst());
         claimantOtherType.setClaimantPensionWeeklyContribution(formatPay(caseData.getClaimantWeeklyPension()));
         claimantOtherType.setClaimantBenefits(getFirstListItem(caseData.getClaimantEmployeeBenefits()));
         claimantOtherType.setClaimantBenefitsDetail(caseData.getClaimantBenefits());
@@ -413,10 +415,10 @@ public final class Et1ReppedHelper {
         }
         claimantOtherType.setClaimantNoticePeriod(YES);
         if (CollectionUtils.isNotEmpty(caseData.getClaimantNoLongerWorking())) {
-            if (caseData.getClaimantNoLongerWorking().get(0).equals(WEEKS)) {
+            if (caseData.getClaimantNoLongerWorking().getFirst().equals(WEEKS)) {
                 claimantOtherType.setClaimantNoticePeriodUnit(WEEKS);
                 claimantOtherType.setClaimantNoticePeriodDuration(caseData.getClaimantNoLongerWorkingWeeks());
-            } else if (caseData.getClaimantNoLongerWorking().get(0).equals(MONTHS)) {
+            } else if (caseData.getClaimantNoLongerWorking().getFirst().equals(MONTHS)) {
                 claimantOtherType.setClaimantNoticePeriodUnit(MONTHS);
                 claimantOtherType.setClaimantNoticePeriodDuration(caseData.getClaimantNoLongerWorkingMonths());
             }
@@ -428,11 +430,11 @@ public final class Et1ReppedHelper {
         if (CollectionUtils.isEmpty(caseData.getClaimantWorkingNoticePeriod())) {
             return;
         }
-        if (caseData.getClaimantWorkingNoticePeriod().get(0).equals(WEEKS)) {
+        if (caseData.getClaimantWorkingNoticePeriod().getFirst().equals(WEEKS)) {
             claimantOtherType.setClaimantNoticePeriod(YES);
             claimantOtherType.setClaimantNoticePeriodUnit(WEEKS);
             claimantOtherType.setClaimantNoticePeriodDuration(caseData.getClaimantWorkingNoticePeriodWeeks());
-        } else if (caseData.getClaimantWorkingNoticePeriod().get(0).equals(MONTHS)) {
+        } else if (caseData.getClaimantWorkingNoticePeriod().getFirst().equals(MONTHS)) {
             claimantOtherType.setClaimantNoticePeriod(YES);
             claimantOtherType.setClaimantNoticePeriodUnit(MONTHS);
             claimantOtherType.setClaimantNoticePeriodDuration(caseData.getClaimantWorkingNoticePeriodMonths());
@@ -443,15 +445,15 @@ public final class Et1ReppedHelper {
         if (CollectionUtils.isEmpty(caseData.getClaimantStillWorkingNoticePeriod())) {
             return;
         }
-        if (caseData.getClaimantStillWorkingNoticePeriod().get(0).equals(WEEKS)) {
+        if (caseData.getClaimantStillWorkingNoticePeriod().getFirst().equals(WEEKS)) {
             claimantOtherType.setClaimantNoticePeriod(YES);
             claimantOtherType.setClaimantNoticePeriodUnit(WEEKS);
             claimantOtherType.setClaimantNoticePeriodDuration(caseData.getClaimantStillWorkingNoticePeriodWeeks());
-        } else if (caseData.getClaimantStillWorkingNoticePeriod().get(0).equals(MONTHS)) {
+        } else if (caseData.getClaimantStillWorkingNoticePeriod().getFirst().equals(MONTHS)) {
             claimantOtherType.setClaimantNoticePeriod(YES);
             claimantOtherType.setClaimantNoticePeriodUnit(MONTHS);
             claimantOtherType.setClaimantNoticePeriodDuration(caseData.getClaimantStillWorkingNoticePeriodMonths());
-        } else if (caseData.getClaimantStillWorkingNoticePeriod().get(0).equals(NO)) {
+        } else if (caseData.getClaimantStillWorkingNoticePeriod().getFirst().equals(NO)) {
             claimantOtherType.setClaimantNoticePeriod(NO);
         }
     }
@@ -493,10 +495,10 @@ public final class Et1ReppedHelper {
 
     private static String reasonableAdjustmentsMapping(List<String> claimantSupportQuestion) {
         return CollectionUtils.isEmpty(claimantSupportQuestion)
-               || !claimantSupportQuestion.get(0).equals(YES)
-                  && !claimantSupportQuestion.get(0).equals(NO)
+               || !claimantSupportQuestion.getFirst().equals(YES)
+                  && !claimantSupportQuestion.getFirst().equals(NO)
                 ? null
-                : claimantSupportQuestion.get(0);
+                : claimantSupportQuestion.getFirst();
     }
 
     private static List<String> hearingPreferenceMapping(List<String> claimantHearingPreferences) {
@@ -540,6 +542,7 @@ public final class Et1ReppedHelper {
         caseData.setClaimantSupportQuestionReason(null);
         caseData.setRepresentativeContactPreference(null);
         caseData.setContactPreferencePostReason(null);
+        caseData.setRepresentativeAddress(null);
         caseData.setRepresentativePhoneNumber(null);
         caseData.setRepresentativeReferenceNumber(null);
         caseData.setDidClaimantWorkForOrg(null);
@@ -620,5 +623,36 @@ public final class Et1ReppedHelper {
         } else {
             return pay.substring(0, pay.length() - 2);
         }
+    }
+
+    /**
+     * Populates the claimant representative's contact details into the given {@link CaseData} object.
+     * <p>
+     * If the {@code representativeClaimantType} field in the {@code caseData} is not empty,
+     * this method copies the representative's phone number and address into the top-level
+     * {@code caseData} fields {@code representativePhoneNumber} and {@code representativeAddress}.
+     * </p>
+     *
+     * @param caseData the {@link CaseData} instance containing representative details
+     */
+    public static void loadClaimantRepresentativeValues(CaseData caseData) throws GenericServiceException {
+        if (ObjectUtils.isEmpty(caseData)) {
+            throw new GenericServiceException(ERROR_CASE_NOT_FOUND,
+                    new Exception(ERROR_CASE_NOT_FOUND),
+                    ERROR_CASE_NOT_FOUND,
+                    StringUtils.EMPTY,
+                    "Et1ReppedHelper",
+                    "loadClaimantRepresentativeValues");
+        }
+        if (caseData.getRepresentativeClaimantType() == null) {
+            throw new GenericServiceException(CLAIMANT_REPRESENTATIVE_NOT_FOUND,
+                    new Exception(CLAIMANT_REPRESENTATIVE_NOT_FOUND),
+                    CLAIMANT_REPRESENTATIVE_NOT_FOUND,
+                    StringUtils.EMPTY,
+                    "Et1ReppedHelper",
+                    "loadClaimantRepresentativeValues");
+        }
+        caseData.setRepresentativePhoneNumber(caseData.getRepresentativeClaimantType().getRepresentativePhoneNumber());
+        caseData.setRepresentativeAddress(caseData.getRepresentativeClaimantType().getRepresentativeAddress());
     }
 }

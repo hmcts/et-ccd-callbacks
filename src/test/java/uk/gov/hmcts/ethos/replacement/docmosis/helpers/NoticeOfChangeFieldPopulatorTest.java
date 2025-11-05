@@ -120,19 +120,21 @@ class NoticeOfChangeFieldPopulatorTest {
         final Map<String, Object> data = noticeOfChangeFieldPopulator.generate(caseData);
 
         assertThat(data).isEqualTo(Map.ofEntries(
-            entry("noticeOfChangeAnswers0", ANSWERS_1),
-            entry("noticeOfChangeAnswers1", ANSWERS_2),
-            entry("noticeOfChangeAnswers2", ANSWERS_3),
-            entry("respondentOrganisationPolicy0", ORG_POLICY_A),
-            entry("respondentOrganisationPolicy1", ORG_POLICY_B),
-            entry("respondentOrganisationPolicy2", ORG_POLICY_C),
-            entry("respondentOrganisationPolicy3", ORG_POLICY_D),
-            entry("respondentOrganisationPolicy4", ORG_POLICY_E),
-            entry("respondentOrganisationPolicy5", ORG_POLICY_F),
-            entry("respondentOrganisationPolicy6", ORG_POLICY_G),
-            entry("respondentOrganisationPolicy7", ORG_POLICY_H),
-            entry("respondentOrganisationPolicy8", ORG_POLICY_I),
-            entry("respondentOrganisationPolicy9", ORG_POLICY_J)
+                entry("noticeOfChangeAnswers0", ANSWERS_1),
+                entry("noticeOfChangeAnswers1", ANSWERS_2),
+                entry("noticeOfChangeAnswers2", ANSWERS_3),
+                entry("respondentOrganisationPolicy0", ORG_POLICY_A),
+                entry("respondentOrganisationPolicy1", ORG_POLICY_B),
+                entry("respondentOrganisationPolicy2", ORG_POLICY_C),
+                entry("respondentOrganisationPolicy3", ORG_POLICY_D),
+                entry("respondentOrganisationPolicy4", ORG_POLICY_E),
+                entry("respondentOrganisationPolicy5", ORG_POLICY_F),
+                entry("respondentOrganisationPolicy6", ORG_POLICY_G),
+                entry("respondentOrganisationPolicy7", ORG_POLICY_H),
+                entry("respondentOrganisationPolicy8", ORG_POLICY_I),
+                entry("respondentOrganisationPolicy9", ORG_POLICY_J),
+                entry("claimantRepresentativeOrganisationPolicy", OrganisationPolicy.builder()
+                        .orgPolicyCaseAssignedRole("[CLAIMANTSOLICITOR]").build())
         ));
     }
 }

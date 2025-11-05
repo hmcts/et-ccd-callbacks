@@ -96,10 +96,9 @@ public class NoticeOfChangeFieldsTask {
                 log.error(e.getMessage());
             }
         });
-
     }
 
-    private static String findCaseId(SubmitEvent se) {
+    public static String findCaseId(SubmitEvent se) {
         try {
             return ObjectUtils.isNotEmpty(se) && se.getCaseId() != 0 ? String.valueOf(se.getCaseId()) : "<unknown>";
         } catch (Exception ignored) {
@@ -122,7 +121,7 @@ public class NoticeOfChangeFieldsTask {
                     caseDetails.getJurisdiction(), ccdRequest, String.valueOf(submitEvent.getCaseId()));
             log.info("Added claimant solicitor organisation policy to case with id {}", submitEvent.getCaseId());
         } catch (Exception e) {
-            log.error(e.getMessage());
+            throw new RuntimeException(e);
         }
     }
 

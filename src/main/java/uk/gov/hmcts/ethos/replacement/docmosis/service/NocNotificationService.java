@@ -63,25 +63,27 @@ public class NocNotificationService {
 
     public void sendNotificationOfChangeEmails(CaseDetails caseDetailsPrevious,
                              CaseDetails caseDetailsNew,
-                             ChangeOrganisationRequest changeRequest,
-                             String currentUserEmail) {
+                             ChangeOrganisationRequest changeRequest) {
         DynamicFixedListType caseRoleId = changeRequest.getCaseRoleId();
         CaseData caseDataNew = caseDetailsNew.getCaseData();
         CaseData caseDataPrevious = caseDetailsPrevious.getCaseData();
         String partyName;
+        String newRepEmailAddress = null;
 
         if (caseRoleId.getValue().getCode().equals(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())) {
             // send claimant noc change email
             partyName = caseDataPrevious.getClaimant();
+            newRepEmailAddress = caseDataNew.getRepresentativeClaimantType().getRepresentativeEmailAddress();
             handleClaimantNocEmails(caseDetailsNew, partyName);
         } else {
             // send respondent noc change email
             handleRespondentNocEmails(caseDetailsPrevious, caseDetailsNew, changeRequest);
+            // todo: to get the new respondent solicitor email address
             partyName = NocNotificationHelper.getRespondentNameForNewSolicitor(changeRequest, caseDataNew);
         }
 
         // send organisation noc change email
-        handleOrganisationNocEmails(caseDataPrevious, caseDetailsNew, changeRequest, partyName, currentUserEmail);
+        handleOrganisationNocEmails(caseDataPrevious, caseDetailsNew, changeRequest, partyName, newRepEmailAddress);
 
         // send tribunal noc change email
         sendTribunalEmail(caseDataPrevious);
@@ -148,7 +150,7 @@ public class NocNotificationService {
                                             CaseDetails caseDetailsNew,
                                             ChangeOrganisationRequest changeRequest,
                                             String partyName,
-                                            String currentUserEmail) {
+                                            String newRepEmailAddress) {
 
         if (changeRequest.getOrganisationToRemove() != null) {
             log.info("organisationToRemove is {}", changeRequest.getOrganisationToRemove());
@@ -163,10 +165,11 @@ public class NocNotificationService {
         }
 
         // send email to the new legal representative
-        Map<String, String> personalisation = buildPersonalisationWithPartyName(caseDetailsNew, partyName,
-                emailService.getExuiCaseLink(caseDetailsNew.getCaseId()));
-        log.info("currentUserEmail: {}", currentUserEmail);
-        emailService.sendEmail(newRespondentSolicitorTemplateId, currentUserEmail, personalisation);
+        if (StringUtils.isNotBlank(newRepEmailAddress)) {
+            Map<String, String> personalisation = buildPersonalisationWithPartyName(caseDetailsNew, partyName,
+                    emailService.getExuiCaseLink(caseDetailsNew.getCaseId()));
+            emailService.sendEmail(newRespondentSolicitorTemplateId, newRepEmailAddress, personalisation);
+        }
     }
 
     private void sendTribunalEmail(CaseData caseDataPrevious) {

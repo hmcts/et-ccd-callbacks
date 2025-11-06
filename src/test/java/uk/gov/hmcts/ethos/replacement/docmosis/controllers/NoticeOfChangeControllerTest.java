@@ -114,7 +114,7 @@ class NoticeOfChangeControllerTest {
     void nocSubmitted() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         doNothing().when(notificationService).sendNotificationOfChangeEmails(any(),
-            any(), any(), any());
+            any(), any());
 
         mvc.perform(post(SUBMITTED_URL)
                 .content(requestContent.toString())

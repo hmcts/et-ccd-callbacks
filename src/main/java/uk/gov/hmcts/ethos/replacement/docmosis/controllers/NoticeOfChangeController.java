@@ -79,11 +79,9 @@ public class NoticeOfChangeController {
 
             //send emails here
             try {
-                String currentUserEmail = userIdamService.getUserDetails(userToken).getEmail();
                 nocNotificationService.sendNotificationOfChangeEmails(
                         callbackRequest.getCaseDetailsBefore(), caseDetails,
-                        callbackRequest.getCaseDetailsBefore().getCaseData().getChangeOrganisationRequestField(),
-                        currentUserEmail);
+                        callbackRequest.getCaseDetailsBefore().getCaseData().getChangeOrganisationRequestField());
             } catch (Exception exception) {
                 log.error(exception.getMessage(), exception);
             }

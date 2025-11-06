@@ -112,21 +112,23 @@ public class NoticeOfChangeFieldsTask {
         return ObjectUtils.isNotEmpty(se) && se.getCaseId() != 0 ? String.valueOf(se.getCaseId()) : "<unknown>";
     }
 
-    private void triggerEventForCase(String adminUserToken, SubmitEvent submitEvent, String caseTypeId)
+    public void triggerEventForCase(String adminUserToken, SubmitEvent submitEvent, String caseTypeId)
             throws GenericServiceException {
         try {
-            CCDRequest ccdRequest = ccdClient.startEventForCase(adminUserToken, caseTypeId, EMPLOYMENT,
-                    String.valueOf(submitEvent.getCaseId()), "UPDATE_CASE_SUBMITTED");
-            CaseDetails caseDetails = ccdRequest.getCaseDetails();
+            if (ObjectUtils.isEmpty(submitEvent.getCaseData().getClaimantRepresentativeOrganisationPolicy())) {
+                CCDRequest ccdRequest = ccdClient.startEventForCase(adminUserToken, caseTypeId, EMPLOYMENT,
+                        String.valueOf(submitEvent.getCaseId()), "UPDATE_CASE_SUBMITTED");
+                CaseDetails caseDetails = ccdRequest.getCaseDetails();
 
-            Map<String, Object> caseDataAsMap = caseConverter.toMap(caseDetails.getCaseData());
-            CaseData caseData = caseConverter.convert(caseDataAsMap, CaseData.class);
-            caseData.setClaimantRepresentativeOrganisationPolicy(
-                    OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
-                            ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()).build());
-            ccdClient.submitEventForCase(adminUserToken, caseData, caseTypeId,
-                    caseDetails.getJurisdiction(), ccdRequest, String.valueOf(submitEvent.getCaseId()));
-            log.info("Added claimant solicitor organisation policy to case with id {}", submitEvent.getCaseId());
+                Map<String, Object> caseDataAsMap = caseConverter.toMap(caseDetails.getCaseData());
+                CaseData caseData = caseConverter.convert(caseDataAsMap, CaseData.class);
+                caseData.setClaimantRepresentativeOrganisationPolicy(
+                        OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
+                                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()).build());
+                ccdClient.submitEventForCase(adminUserToken, caseData, caseTypeId,
+                        caseDetails.getJurisdiction(), ccdRequest, String.valueOf(submitEvent.getCaseId()));
+                log.info("Added claimant solicitor organisation policy to case with id {}", submitEvent.getCaseId());
+            }
         } catch (Exception e) {
             throw new GenericServiceException(e.getMessage(), e, e.getMessage(), findCaseId(submitEvent),
                     "NoticeOfChangeFieldsTask", "triggerEventForCase");

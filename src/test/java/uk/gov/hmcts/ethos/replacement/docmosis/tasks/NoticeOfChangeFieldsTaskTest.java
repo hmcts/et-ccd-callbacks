@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.tasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -14,6 +15,7 @@ import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeAnswersConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator;
@@ -29,6 +31,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -120,5 +123,35 @@ class NoticeOfChangeFieldsTaskTest {
         // When submit event case id is not 0
         submitEvent.setCaseId(1);
         assertThat(NoticeOfChangeFieldsTask.findCaseId(submitEvent)).isEqualTo(NumberUtils.INTEGER_ONE.toString());
+    }
+
+    @Test
+    @SneakyThrows
+    void theTriggerEventForCase() {
+
+        // When claimant solicitor organisation policy is not null
+        SubmitEvent submitEvent = new ObjectMapper().readValue(ResourceLoader.getResource("caseDetailsTest1.json"),
+                SubmitEvent.class);
+        submitEvent.getCaseData().setClaimantRepresentativeOrganisationPolicy(OrganisationPolicy.builder()
+                .orgPolicyCaseAssignedRole("[CLAIMANTSOLICITOR]").build());
+        noticeOfChangeFieldsTask.triggerEventForCase(DUMMY_ADMIN_TOKEN, submitEvent, "ET_EnglandWales");
+        assertThat(submitEvent.getCaseData().getClaimantRepresentativeOrganisationPolicy()).isNotNull();
+        assertThat(submitEvent.getCaseData().getClaimantRepresentativeOrganisationPolicy()
+                .getOrgPolicyCaseAssignedRole()).isEqualTo("[CLAIMANTSOLICITOR]");
+
+        // when claimant solicitor organisation policy is null
+        submitEvent.getCaseData().setClaimantRepresentativeOrganisationPolicy(null);
+        CCDRequest ccdRequest = CCDRequestBuilder.builder()
+                .withCaseData(submitEvent.getCaseData())
+                .build();
+        when(ccdClient.startEventForCase(
+                eq(DUMMY_ADMIN_TOKEN), anyString(), anyString(), anyString(), eq("UPDATE_CASE_SUBMITTED")))
+                .thenReturn(ccdRequest);
+        when(ccdClient.submitEventForCase(
+                eq(DUMMY_ADMIN_TOKEN), any(CaseData.class), anyString(), anyString(), any(CCDRequest.class),
+                eq("UPDATE_CASE_SUBMITTED")))
+                .thenReturn(submitEvent);
+        assertDoesNotThrow(() -> noticeOfChangeFieldsTask
+                .triggerEventForCase(DUMMY_ADMIN_TOKEN, submitEvent, "ET_EnglandWales"));
     }
 }

@@ -109,11 +109,7 @@ public class NoticeOfChangeFieldsTask {
     }
 
     public static String findCaseId(SubmitEvent se) {
-        try {
-            return ObjectUtils.isNotEmpty(se) && se.getCaseId() != 0 ? String.valueOf(se.getCaseId()) : "<unknown>";
-        } catch (Exception ignored) {
-            return "<unknown>";
-        }
+        return ObjectUtils.isNotEmpty(se) && se.getCaseId() != 0 ? String.valueOf(se.getCaseId()) : "<unknown>";
     }
 
     private void triggerEventForCase(String adminUserToken, SubmitEvent submitEvent, String caseTypeId)

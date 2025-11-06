@@ -98,6 +98,6 @@ class AddAmendClaimantRepresentativeControllerTest {
                 .andExpect(status().isOk());
 
         verify(nocClaimantRepresentativeService, times(1))
-                .updateClaimantRepAccess(any(), any());
+                .updateClaimantRepAccess(any());
     }
 }

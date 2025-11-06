@@ -154,7 +154,7 @@ public class NocRespondentRepresentativeService {
      * @param callbackRequest - containing case details before event and after the event
      * @throws IOException - exception thrown by CCD
      */
-    public void updateRespondentRepresentativesAccess(CallbackRequest callbackRequest, String currentUserEmail)
+    public void updateRespondentRepresentativesAccess(CallbackRequest callbackRequest)
             throws IOException, GenericServiceException {
         CaseDetails caseDetails = callbackRequest.getCaseDetails();
         CaseDetails caseDetailsBefore = callbackRequest.getCaseDetailsBefore();
@@ -169,8 +169,7 @@ public class NocRespondentRepresentativeService {
             try {
                 nocNotificationService.sendNotificationOfChangeEmails(caseDetailsBefore,
                         caseDetails,
-                        updateRespondentRepresentativeRequest.getChangeOrganisationRequest(),
-                        currentUserEmail);
+                        updateRespondentRepresentativeRequest.getChangeOrganisationRequest());
             } catch (Exception exception) {
                 log.error(exception.getMessage(), exception);
             }

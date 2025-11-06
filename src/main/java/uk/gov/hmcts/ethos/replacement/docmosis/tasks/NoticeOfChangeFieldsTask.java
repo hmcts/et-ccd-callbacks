@@ -73,8 +73,12 @@ public class NoticeOfChangeFieldsTask {
                     return;
                 }
                 updateCases(cases, caseTypeId, adminUserToken);
-            } catch (IOException | InterruptedException e) {
+            } catch (IOException e) {
                 log.error(e.getMessage());
+
+            } catch (InterruptedException ie) {
+                log.error(ie.getMessage());
+                Thread.currentThread().interrupt();
             }
         });
     }

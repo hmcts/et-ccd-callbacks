@@ -140,6 +140,7 @@ public class NoticeOfChangeFieldsTask {
                 .size(maxCases)
                 .query(new BoolQueryBuilder()
                         .must(new TermsQueryBuilder("state.keyword", validStates))
+                        .must(new TermsQueryBuilder("jurisdiction.keyword", EMPLOYMENT))
                         .mustNot(new ExistsQueryBuilder("data.claimantRepresentativeOrganisationPolicy"))
                 ).toString();
     }

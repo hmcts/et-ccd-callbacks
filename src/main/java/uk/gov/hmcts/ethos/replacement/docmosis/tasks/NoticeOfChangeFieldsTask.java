@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.tasks;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.ExistsQueryBuilder;
 import org.elasticsearch.index.query.TermsQueryBuilder;
@@ -14,14 +15,21 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 
+import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPLOYMENT;
@@ -60,34 +68,70 @@ public class NoticeOfChangeFieldsTask {
             try {
                 List<SubmitEvent> cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
                 log.info("{} - Notice of change fields task - Retrieved {} cases", caseTypeId, cases.size());
-                while (!cases.isEmpty()) {
-                    cases.forEach(submitEvent -> triggerEventForCase(adminUserToken, submitEvent, caseTypeId));
-                    cases = ccdClient.buildAndGetElasticSearchRequest(adminUserToken, caseTypeId, query);
-                    log.info("{} - Notice of change fields task - Retrieved {} cases", caseTypeId, cases.size());
+                if (cases.isEmpty()) {
+                    log.info("{} - NOC fields task - No cases to process", caseTypeId);
+                    return;
                 }
-            } catch (Exception e) {
+                updateCases(cases, caseTypeId, adminUserToken);
+            } catch (IOException e) {
                 log.error(e.getMessage());
+
+            } catch (InterruptedException ie) {
+                log.error(ie.getMessage());
+                Thread.currentThread().interrupt();
             }
         });
     }
 
-    private void triggerEventForCase(String adminUserToken, SubmitEvent submitEvent, String caseTypeId) {
+    private void updateCases(List<SubmitEvent> cases, String caseTypeId, String adminUserToken)
+            throws InterruptedException {
+        final int poolSize = Math.min(15, Runtime.getRuntime().availableProcessors() * 2);
+        final long awaitTimeoutSeconds = 120;
+
+        try (ExecutorService executor = Executors.newFixedThreadPool(poolSize)) {
+            for (SubmitEvent submitEvent : cases) {
+                executor.execute(() -> {
+                    try {
+                        triggerEventForCase(adminUserToken, submitEvent, caseTypeId);
+                    } catch (GenericServiceException ex) {
+                        log.warn("{} - NOC fields task - Failed for case {}: {}",
+                                caseTypeId, findCaseId(submitEvent), ex.getMessage(), ex);
+                    }
+                });
+            }
+            executor.shutdown();
+            if (!executor.awaitTermination(awaitTimeoutSeconds, TimeUnit.SECONDS)) {
+                log.warn("{} - Executor did not terminate within {}s, forcing shutdown",
+                        caseTypeId, awaitTimeoutSeconds);
+                executor.shutdownNow();
+            }
+        }
+    }
+
+    public static String findCaseId(SubmitEvent se) {
+        return ObjectUtils.isNotEmpty(se) && se.getCaseId() != 0 ? String.valueOf(se.getCaseId()) : "<unknown>";
+    }
+
+    public void triggerEventForCase(String adminUserToken, SubmitEvent submitEvent, String caseTypeId)
+            throws GenericServiceException {
         try {
-            CCDRequest ccdRequest = ccdClient.startEventForCase(adminUserToken, caseTypeId, EMPLOYMENT,
-                    String.valueOf(submitEvent.getCaseId()), "UPDATE_CASE_SUBMITTED");
-            CaseDetails caseDetails = ccdRequest.getCaseDetails();
+            if (ObjectUtils.isEmpty(submitEvent.getCaseData().getClaimantRepresentativeOrganisationPolicy())) {
+                CCDRequest ccdRequest = ccdClient.startEventForCase(adminUserToken, caseTypeId, EMPLOYMENT,
+                        String.valueOf(submitEvent.getCaseId()), "UPDATE_CASE_SUBMITTED");
+                CaseDetails caseDetails = ccdRequest.getCaseDetails();
 
-            Map<String, Object> caseDataAsMap = caseConverter.toMap(caseDetails.getCaseData());
-            Map<String, Object> noticeOfChangeAnswers =
-                    noticeOfChangeFieldPopulator.generate(caseDetails.getCaseData());
-            caseDataAsMap.putAll(noticeOfChangeAnswers);
-            CaseData caseData = caseConverter.convert(caseDataAsMap, CaseData.class);
-
-            ccdClient.submitEventForCase(adminUserToken, caseData, caseTypeId,
-                    caseDetails.getJurisdiction(), ccdRequest, String.valueOf(submitEvent.getCaseId()));
-            log.info("Added Notice of change fields for case {}", submitEvent.getCaseId());
+                Map<String, Object> caseDataAsMap = caseConverter.toMap(caseDetails.getCaseData());
+                CaseData caseData = caseConverter.convert(caseDataAsMap, CaseData.class);
+                caseData.setClaimantRepresentativeOrganisationPolicy(
+                        OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
+                                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()).build());
+                ccdClient.submitEventForCase(adminUserToken, caseData, caseTypeId,
+                        caseDetails.getJurisdiction(), ccdRequest, String.valueOf(submitEvent.getCaseId()));
+                log.info("Added claimant solicitor organisation policy to case with id {}", submitEvent.getCaseId());
+            }
         } catch (Exception e) {
-            log.error(e.getMessage());
+            throw new GenericServiceException(e.getMessage(), e, e.getMessage(), findCaseId(submitEvent),
+                    "NoticeOfChangeFieldsTask", "triggerEventForCase");
         }
     }
 
@@ -96,7 +140,8 @@ public class NoticeOfChangeFieldsTask {
                 .size(maxCases)
                 .query(new BoolQueryBuilder()
                         .must(new TermsQueryBuilder("state.keyword", validStates))
-                        .mustNot(new ExistsQueryBuilder("data.noticeOfChangeAnswers0"))
+                        .must(new TermsQueryBuilder("jurisdiction.keyword", EMPLOYMENT))
+                        .mustNot(new ExistsQueryBuilder("data.claimantRepresentativeOrganisationPolicy"))
                 ).toString();
     }
 }

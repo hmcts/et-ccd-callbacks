@@ -180,13 +180,13 @@ class NocClaimantRepresentativeServiceTest {
                 .build());
         when(nocClaimantHelper.createChangeRequest(any(), any())).thenReturn(createChangeOrganisationRequest());
 
-        nocClaimantRepresentativeService.updateClaimantRepAccess(getCallBackCallbackRequest(), "test@test.com");
+        nocClaimantRepresentativeService.updateClaimantRepAccess(getCallBackCallbackRequest());
 
         verify(nocCcdService, times(1))
                 .startEventForUpdateRepresentation(any(), any(), any(), any());
 
         verify(nocNotificationService, times(1))
-                .sendNotificationOfChangeEmails(any(), any(), any(), anyString());
+                .sendNotificationOfChangeEmails(any(), any(), any());
 
         verify(ccdClient, times(1))
                 .submitUpdateRepEvent(any(), any(), any(), any(), any(), any());
@@ -208,11 +208,11 @@ class NocClaimantRepresentativeServiceTest {
         when(nocClaimantHelper.createChangeRequest(any(), any())).thenReturn(changeRequest);
 
         // Act
-        nocClaimantRepresentativeService.updateClaimantRepAccess(callbackRequest, USER_EMAIL);
+        nocClaimantRepresentativeService.updateClaimantRepAccess(callbackRequest);
 
         // Assert
         verify(nocNotificationService, times(1)).sendNotificationOfChangeEmails(
-                any(), any(), any(), anyString());
+                any(), any(), any());
         verify(nocService, times(1)).removeOrganisationRepresentativeAccess(
                 anyString(), any(ChangeOrganisationRequest.class));
         verify(nocService, times(1)).grantClaimantRepAccess(
@@ -310,5 +310,61 @@ class NocClaimantRepresentativeServiceTest {
                         .build());
 
         return CaseUserAssignmentData.builder().caseUserAssignments(caseUserAssignments).build();
+    }
+
+    @Test
+    void shouldReturnChangeRequestWhenOrganisationChanged() {
+        CaseData after = new CaseData();
+        CaseData before = new CaseData();
+        after.setRepresentativeClaimantType(new uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC());
+        before.setRepresentativeClaimantType(new uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC());
+        Organisation newOrg = Organisation.builder().organisationID("NEW").build();
+        after.getRepresentativeClaimantType().setMyHmctsOrganisation(newOrg);
+        Organisation oldOrg = Organisation.builder().organisationID("OLD").build();
+        before.getRepresentativeClaimantType().setMyHmctsOrganisation(oldOrg);
+
+        ChangeOrganisationRequest expected = ChangeOrganisationRequest.builder().build();
+        when(nocClaimantHelper.createChangeRequest(newOrg, oldOrg)).thenReturn(expected);
+
+        ChangeOrganisationRequest result =
+                nocClaimantRepresentativeService.identifyRepresentationChanges(after, before);
+
+        assertThat(result).isSameAs(expected);
+        verify(nocClaimantHelper).createChangeRequest(newOrg, oldOrg);
+    }
+
+    @Test
+    void shouldReturnChangeRequestWhenOrganisationUnchanged() {
+        Organisation org = Organisation.builder().organisationID("SAME").build();
+        CaseData after = new CaseData();
+        CaseData before = new CaseData();
+        after.setRepresentativeClaimantType(new uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC());
+        before.setRepresentativeClaimantType(new uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC());
+        after.getRepresentativeClaimantType().setMyHmctsOrganisation(org);
+        before.getRepresentativeClaimantType().setMyHmctsOrganisation(org);
+
+        ChangeOrganisationRequest expected = ChangeOrganisationRequest.builder().build();
+        when(nocClaimantHelper.createChangeRequest(org, null)).thenReturn(expected);
+
+        ChangeOrganisationRequest result =
+                nocClaimantRepresentativeService.identifyRepresentationChanges(after, before);
+
+        assertThat(result).isSameAs(expected);
+        verify(nocClaimantHelper).createChangeRequest(org, null);
+    }
+
+    @Test
+    void shouldHandleNullRepresentativeClaimantType() {
+        CaseData after = new CaseData();
+        CaseData before = new CaseData();
+
+        ChangeOrganisationRequest expected = ChangeOrganisationRequest.builder().build();
+        when(nocClaimantHelper.createChangeRequest(null, null)).thenReturn(expected);
+
+        ChangeOrganisationRequest result =
+                nocClaimantRepresentativeService.identifyRepresentationChanges(after, before);
+
+        assertThat(result).isSameAs(expected);
+        verify(nocClaimantHelper).createChangeRequest(null, null);
     }
 }

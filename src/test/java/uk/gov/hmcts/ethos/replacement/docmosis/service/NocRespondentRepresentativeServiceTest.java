@@ -350,7 +350,7 @@ class NocRespondentRepresentativeServiceTest {
                 any(CCDRequest.class),
                 eq(ccdRequest.getCaseDetails().getCaseId()))).thenReturn(null);
         nocRespondentRepresentativeService.updateRespondentRepresentativesAccess(
-                getCallBackCallbackRequest(), USER_EMAIL);
+                getCallBackCallbackRequest());
 
         verify(ccdClient, times(NumberUtils.INTEGER_TWO)).startEventForCase(AUTH_TOKEN,
                 ccdRequest.getCaseDetails().getCaseTypeId(),
@@ -362,9 +362,7 @@ class NocRespondentRepresentativeServiceTest {
         verify(nocNotificationService, times(NumberUtils.INTEGER_TWO)).sendNotificationOfChangeEmails(
                 any(CaseDetails.class),
                 any(CaseDetails.class),
-                any(ChangeOrganisationRequest.class),
-                eq(USER_EMAIL)
-        );
+                any(ChangeOrganisationRequest.class));
 
         verify(ccdClient, times(NumberUtils.INTEGER_TWO))
                 .submitEventForCase(eq(AUTH_TOKEN),

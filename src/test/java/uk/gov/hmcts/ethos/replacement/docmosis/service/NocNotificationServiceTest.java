@@ -151,8 +151,7 @@ class NocNotificationServiceTest {
         nocNotificationService.sendNotificationOfChangeEmails(
                 caseDetailsBefore,
                 caseDetailsNew,
-                caseDetailsBefore.getCaseData().getChangeOrganisationRequestField(),
-                "test@test.com");
+                caseDetailsBefore.getCaseData().getChangeOrganisationRequestField());
 
         // Claimant Representative
         verify(emailService, times(0)).sendEmail(any(), eq("claimant@represented.com"), any());
@@ -186,8 +185,7 @@ class NocNotificationServiceTest {
         nocNotificationService.sendNotificationOfChangeEmails(
                 caseDetailsBefore,
                 caseDetailsNew,
-                caseDetailsBefore.getCaseData().getChangeOrganisationRequestField(),
-                "test@test.com");
+                caseDetailsBefore.getCaseData().getChangeOrganisationRequestField());
 
         // Claimant Representative
         verify(emailService, times(0)).sendEmail(any(), eq("claimant@represented.com"), any());
@@ -227,11 +225,9 @@ class NocNotificationServiceTest {
         nocNotificationService.sendNotificationOfChangeEmails(
                 caseDetailsBefore,
                 caseDetailsNew,
-                caseDetailsBefore.getCaseData().getChangeOrganisationRequestField(),
-                "test@test.com");
+                caseDetailsBefore.getCaseData().getChangeOrganisationRequestField());
 
-        // the email will only be sent to the current user
-        verify(emailService, times(1)).sendEmail(any(), any(), any());
+        verify(emailService, times(0)).sendEmail(any(), any(), any());
     }
 
     @Test
@@ -286,8 +282,7 @@ class NocNotificationServiceTest {
         nocNotificationService.sendNotificationOfChangeEmails(
                 caseDetailsBefore,
                 caseDetailsNew,
-                caseDetailsBefore.getCaseData().getChangeOrganisationRequestField(),
-                "test@test.com");
+                caseDetailsBefore.getCaseData().getChangeOrganisationRequestField());
 
         // Respondent email notification
         verify(emailService, times(1)).sendEmail(any(), eq("respondent@unrepresented.com"), any());

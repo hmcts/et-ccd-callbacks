@@ -140,24 +140,26 @@ public class InitialConsiderationController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-
+        initialConsiderationService.clearOldEtICHearingListedAnswersValues(caseData);
         // Sets the respondent details(respondent ET1 and ET3 names, hearing panel preference, and
         // availability for video hearing) of all respondents in a concatenated string format
         caseData.setEtInitialConsiderationRespondent(initialConsiderationService.setRespondentDetails(caseData));
         //hearing details
+        initialConsiderationService.setEtInitialConsiderationListedHearingType(caseData);
+
         caseData.setEtInitialConsiderationHearing(initialConsiderationService.getHearingDetails(
                 caseData.getHearingCollection()));
 
         //claimant hearing panel preference
-        caseData.setEtIcHearingPanelPreference(
-                initialConsiderationService.getClaimantHearingPanelPreference(caseData.getClaimantHearingPreference()));
+        caseData.setEtIcHearingPanelPreference(initialConsiderationService.getClaimantHearingPanelPreference(
+                caseData.getClaimantHearingPreference()));
 
         String caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();
-        caseData.setEtInitialConsiderationJurisdictionCodes(
-                initialConsiderationService.generateJurisdictionCodesHtml(
+        caseData.setEtInitialConsiderationJurisdictionCodes(initialConsiderationService.generateJurisdictionCodesHtml(
                         caseData.getJurCodesCollection(), caseTypeId));
         initialConsiderationService.setIsHearingAlreadyListed(caseData, caseTypeId);
         initialConsiderationService.initialiseInitialConsideration(ccdRequest.getCaseDetails());
+
         if (CollectionUtils.isNotEmpty(caseData.getEtICHearingNotListedList())) {
             initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData, caseTypeId);
         }

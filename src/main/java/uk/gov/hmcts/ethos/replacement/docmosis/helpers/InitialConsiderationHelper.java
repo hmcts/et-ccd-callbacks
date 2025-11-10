@@ -181,6 +181,7 @@ public final class InitialConsiderationHelper {
                                 .orElse(null))
 
                 //do not list
+                // hearingNotListedDoNotListAnyOtherDirections
                 .hearingNotListedListAnyOtherDirections(defaultIfEmpty(
                         caseData.getEtICHearingNotListedAnyOtherDirections(), null))
 

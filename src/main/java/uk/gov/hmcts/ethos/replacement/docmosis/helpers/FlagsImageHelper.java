@@ -7,6 +7,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.JurisdictionCode;
 
 import java.util.List;
 
@@ -251,10 +252,18 @@ public final class FlagsImageHelper {
         return hearingType != null && isNotEmpty(hearingType.getHearingDateCollection());
     }
 
-    private static boolean counterClaimMade(CaseData caseData) {
-        return !isNullOrEmpty(caseData.getCounterClaim())
-                || caseData.getEccCases() != null
-                && !caseData.getEccCases().isEmpty();
+    public static boolean counterClaimMade(CaseData caseData) {
+        boolean hasEccOrCounterClaim = !isNullOrEmpty(caseData.getCounterClaim()) || isNotEmpty(caseData.getEccCases());
+
+        boolean hasBothEccAndBoc = isNotEmpty(caseData.getJurCodesCollection())
+                && caseData.getJurCodesCollection().stream()
+                .anyMatch(jurCode -> JurisdictionCode.ECC.toString()
+                        .equals(jurCode.getValue().getJuridictionCodesList()))
+                && caseData.getJurCodesCollection().stream()
+                .anyMatch(jurCode -> JurisdictionCode.BOC.toString()
+                        .equals(jurCode.getValue().getJuridictionCodesList()));
+
+        return hasEccOrCounterClaim || hasBothEccAndBoc;
     }
 
     private static boolean liveAppeal(CaseData caseData) {

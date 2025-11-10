@@ -40,8 +40,8 @@ public final class DigitalCaseFileHelper {
     public static final String NO_DOCS_FOR_DCF = "There are no documents available to include in the Digital Case "
                                                  + "File.";
     public static final String DCF_CHARACTER_LIMIT_ERROR =
-        "The following documents have a name which exceeds the character limit which will cause "
-        + "an issue when generating a DCF. Please update the document names and try again.";
+        "The following documents have a name which exceeds the max 200 character limit for filenames which will cause "
+        + "an issue when generating a DCF. Please update the filename and try again.";
 
     private DigitalCaseFileHelper() {
         // access through static methods
@@ -114,14 +114,22 @@ public final class DigitalCaseFileHelper {
         return doc.getDocNumber()  + docType + docFileName + docDate;
     }
 
-    public static boolean isExcludedFromDcf(DocumentType doc) {
+    /**
+     * Checks if a document is included in the Digital Case File (DCF).
+     * A document is considered included in the DCF if the "excludeFromDcf" list is either empty
+     * or the first element in the list is not "YES".
+     *
+     * @param doc the document to check
+     * @return true if the document is included in the DCF, false otherwise
+     */
+    public static boolean isIncludedInDcf(DocumentType doc) {
         return CollectionUtils.isEmpty(doc.getExcludeFromDcf()) || !YES.equals(doc.getExcludeFromDcf().getFirst());
     }
 
     public static List<BundleDocumentDetails> getDocsForDcf(BaseCaseData caseData) {
         return caseData.getDocumentCollection().stream()
                 .map(GenericTypeItem::getValue)
-                .filter(doc -> doc.getUploadedDocument() != null && isExcludedFromDcf(doc))
+                .filter(doc -> doc.getUploadedDocument() != null && isIncludedInDcf(doc))
                 .map(doc -> BundleDocumentDetails.builder()
                         .name(DigitalCaseFileHelper.getDocumentName(doc))
                         .sourceDocument(DocumentLink.builder()
@@ -157,7 +165,7 @@ public final class DigitalCaseFileHelper {
         List<String> errors = caseData.getDocumentCollection().stream()
             .map(DocumentTypeItem::getValue)
             .filter(documentType -> documentType.getUploadedDocument() != null
-                                    && isExcludedFromDcf(documentType)
+                                    && isIncludedInDcf(documentType)
                                     && getDocumentName(documentType).length() > 255)
             .map(documentType -> "Document %s - %s".formatted(documentType.getDocNumber(),
                 documentType.getUploadedDocument().getDocumentFilename()))
@@ -170,6 +178,6 @@ public final class DigitalCaseFileHelper {
 
     private static boolean areThereDocumentsAvailableForDcf(List<DocumentTypeItem> documentCollection) {
         return documentCollection.stream()
-            .anyMatch(doc -> doc.getValue().getUploadedDocument() != null && !isExcludedFromDcf(doc.getValue()));
+            .anyMatch(doc -> doc.getValue().getUploadedDocument() != null && !isIncludedInDcf(doc.getValue()));
     }
 }

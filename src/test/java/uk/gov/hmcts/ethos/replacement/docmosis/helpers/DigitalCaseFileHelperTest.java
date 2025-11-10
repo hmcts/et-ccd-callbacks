@@ -78,8 +78,8 @@ class DigitalCaseFileHelperTest {
 
     @ParameterizedTest
     @MethodSource("getDocumentTypesForExcluded")
-    void isExcludedFromDCF(DocumentType documentType, boolean excluded) {
-        assertEquals(DigitalCaseFileHelper.isExcludedFromDcf(documentType), excluded);
+    void isIncludedInDCF(DocumentType documentType, boolean excluded) {
+        assertEquals(DigitalCaseFileHelper.isIncludedInDcf(documentType), excluded);
     }
 
     private static Stream<Arguments> getDocumentTypesForExcluded() {

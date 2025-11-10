@@ -105,7 +105,7 @@ public final class HearingsHelper {
                 earliestListedHearing.getHearingType());
     }
 
-    private static HearingType getEarliestListedHearingType(List<HearingTypeItem> hearingCollection) {
+    public static HearingType getEarliestListedHearingType(List<HearingTypeItem> hearingCollection) {
         if (CollectionUtils.isEmpty(hearingCollection)) {
             return null;
         }
@@ -114,14 +114,33 @@ public final class HearingsHelper {
                 .filter(hearingTypeItem -> hearingTypeItem != null
                         && hearingTypeItem.getValue() != null)
                 .map(HearingTypeItem::getValue)
-                .filter(hearing ->
-                        hearing.getHearingDateCollection() != null
-                                && !hearing.getHearingDateCollection().isEmpty()
-                                && hearing.getHearingDateCollection().stream().anyMatch(
-                                HearingsHelper::isListedHearing))
-                .min(Comparator.comparing(hearing ->
-                        getEarliestHearingDate(hearing.getHearingDateCollection())
-                                .orElse(LocalDate.now().plusYears(100)))).orElse(null);
+                .filter(hearing -> hearing.getHearingDateCollection() != null
+                        && !hearing.getHearingDateCollection().isEmpty()
+                        && hearing.getHearingDateCollection().stream().anyMatch(HearingsHelper::isListedHearing))
+                .map(hearing -> new Object[] { hearing,
+                        getEarliestListedFutureHearingDate(hearing.getHearingDateCollection()).orElse(null) })
+                .filter(arr -> arr[1] != null)
+                .min(Comparator.comparing(arr -> (java.time.LocalDate) arr[1]))
+                .map(arr -> (HearingType) arr[0])
+                .orElse(null);
+    }
+
+    // Returns the earliest future listed date, or empty if none
+    private static Optional<java.time.LocalDate> getEarliestListedFutureHearingDate(
+            List<DateListedTypeItem> hearingDates) {
+        if (CollectionUtils.isEmpty(hearingDates)) {
+            return Optional.empty();
+        }
+        java.time.LocalDate today = java.time.LocalDate.now();
+        return hearingDates.stream()
+                .filter(HearingsHelper::isListedHearing)
+                .map(DateListedTypeItem::getValue)
+                .filter(hearingDate -> hearingDate.getListedDate() != null
+                        && !hearingDate.getListedDate().isEmpty())
+                .map(hearingDateItem -> java.time.LocalDateTime.parse(
+                        hearingDateItem.getListedDate()).toLocalDate())
+                .filter(date -> date.isAfter(today))
+                .min(java.util.Comparator.naturalOrder());
     }
 
     /**
@@ -140,7 +159,8 @@ public final class HearingsHelper {
                 .map(DateListedTypeItem::getValue)
                 .filter(hearingDate -> hearingDate.getListedDate() != null
                         && !hearingDate.getListedDate().isEmpty())
-                .map(hearingDateItem -> LocalDateTime.parse(hearingDateItem.getListedDate()).toLocalDate())
+                .map(hearingDateItem -> LocalDateTime.parse(
+                        hearingDateItem.getListedDate()).toLocalDate())
                 .min(Comparator.naturalOrder());
     }
 
@@ -285,7 +305,8 @@ public final class HearingsHelper {
     public static HearingType findHearingByListedDate(CaseData caseData, String hearingDate) {
         Optional<HearingTypeItem> hearingTypeItem =
                 caseData.getHearingCollection().stream()
-                        .filter(h -> hearingContainsDate(h.getValue().getHearingDateCollection(), hearingDate))
+                        .filter(h ->
+                                hearingContainsDate(h.getValue().getHearingDateCollection(), hearingDate))
                         .findFirst();
         if (hearingTypeItem.isEmpty()) {
             throw new NotFoundException("Failed to find hearing");
@@ -295,7 +316,8 @@ public final class HearingsHelper {
 
     private static boolean hearingContainsDate(List<DateListedTypeItem> hearingDateCollection, String hearingDate) {
         return hearingDateCollection.stream()
-                .anyMatch(dateListedTypeItem -> hearingDate.equals(dateListedTypeItem.getValue().getListedDate()));
+                .anyMatch(dateListedTypeItem -> hearingDate.equals(
+                        dateListedTypeItem.getValue().getListedDate()));
     }
 
     public static String getEarliestFutureHearingDate(List<HearingTypeItem> hearingCollection) {
@@ -312,7 +334,8 @@ public final class HearingsHelper {
             return null;
         }
 
-        return Collections.min(earliestDatePerHearing, Comparator.comparing(c -> c.getValue().getListedDate()))
+        return Collections.min(earliestDatePerHearing, Comparator.comparing(
+                c -> c.getValue().getListedDate()))
                 .getValue().getListedDate();
     }
 
@@ -322,7 +345,8 @@ public final class HearingsHelper {
         if (futureHearings.isEmpty()) {
             return null;
         }
-        return Collections.min(futureHearings, Comparator.comparing(c -> c.getValue().getListedDate()));
+        return Collections.min(futureHearings,
+                Comparator.comparing(c -> c.getValue().getListedDate()));
     }
 
     private static List<DateListedTypeItem> filterFutureHearings(List<DateListedTypeItem> hearingDateCollection) {
@@ -350,8 +374,8 @@ public final class HearingsHelper {
             && !isNullOrEmpty(caseData.getAllocateHearingAdditionalJudge().getSelectedCode())
             && caseData.getAllocateHearingAdditionalJudge().getSelectedCode()
                     .equals(caseData.getAllocateHearingJudge().getSelectedCode())) {
-            return List.of("Please choose a different judge for the second judge as the same judge has been selected "
-                           + "for both judges");
+            return List.of("Please choose a different judge for the second judge as the same judge has "
+                           + "been selected for both judges");
         }
 
         return new ArrayList<>();

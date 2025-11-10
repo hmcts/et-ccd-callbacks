@@ -1,14 +1,18 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.webjars.NotFoundException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.EtICHearingListedAnswers;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingDetailTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingDetailType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -26,6 +30,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEAR
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EMPTY_STRING;
 
+@Slf4j
 public final class HearingsHelper {
 
     public static final String HEARING_CREATION_NUMBER_ERROR = "A new hearing can only "
@@ -76,6 +81,85 @@ public final class HearingsHelper {
             }
         }
         return errors;
+    }
+
+    public static void setEtInitialConsiderationListedHearingType(CaseData caseData) {
+        HearingType earliestListedHearing = getEarliestListedHearingType(caseData.getHearingCollection());
+
+        if (earliestListedHearing == null) {
+            log.info("No listed hearings found for case: {} to set EtInitialConsiderationListedHearingType",
+                    caseData.getEthosCaseReference());
+            return;
+        }
+
+        if (caseData.getEtICHearingListedAnswers() == null) {
+            caseData.setEtICHearingListedAnswers(new EtICHearingListedAnswers());
+        }
+
+        caseData.getEtICHearingListedAnswers().setEtInitialConsiderationListedHearingType(
+                earliestListedHearing.getHearingType());
+    }
+
+    private static HearingType getEarliestListedHearingType(List<HearingTypeItem> hearingCollection) {
+        if (CollectionUtils.isEmpty(hearingCollection)) {
+            return null;
+        }
+
+        return hearingCollection.stream()
+                .filter(hearingTypeItem -> hearingTypeItem != null
+                        && hearingTypeItem.getValue() != null)
+                .map(HearingTypeItem::getValue)
+                .filter(hearing ->
+                        hearing.getHearingDateCollection() != null
+                                && !hearing.getHearingDateCollection().isEmpty()
+                                && hearing.getHearingDateCollection().stream().anyMatch(
+                                HearingsHelper::isListedHearing))
+                .min(Comparator.comparing(hearing ->
+                        getEarliestHearingDate(hearing.getHearingDateCollection())
+                                .orElse(LocalDate.now().plusYears(100)))).orElse(null);
+    }
+
+    /**
+     * Select and return the earliest future hearings date for Initial Consideration.
+     *
+     * @param hearingDates the list of hearing dates in the case
+     * @return earliest future hearing date
+     */
+    public static Optional<LocalDate> getEarliestHearingDate(List<DateListedTypeItem> hearingDates) {
+        if (CollectionUtils.isEmpty(hearingDates)) {
+            return Optional.empty();
+        }
+
+        return hearingDates.stream().filter(dateListedTypeItem ->
+                        isListedHearing(dateListedTypeItem) && isFutureHearingDate(dateListedTypeItem))
+                .map(DateListedTypeItem::getValue)
+                .filter(hearingDate -> hearingDate.getListedDate() != null
+                        && !hearingDate.getListedDate().isEmpty())
+                .map(hearingDateItem -> LocalDateTime.parse(hearingDateItem.getListedDate()).toLocalDate())
+                .min(Comparator.naturalOrder());
+    }
+
+    private static boolean isListedHearing(DateListedTypeItem dateListedTypeItem) {
+        if (dateListedTypeItem == null || dateListedTypeItem.getValue() == null) {
+            return false;
+        }
+
+        return HEARING_STATUS_LISTED.equals(dateListedTypeItem.getValue().getHearingStatus());
+    }
+
+    private static boolean isFutureHearingDate(DateListedTypeItem dateListedTypeItem) {
+        if (dateListedTypeItem == null || dateListedTypeItem.getValue() == null
+                || dateListedTypeItem.getValue().getListedDate() == null
+                || dateListedTypeItem.getValue().getListedDate().isEmpty()) {
+            return false;
+        }
+        try {
+            return LocalDateTime.parse(dateListedTypeItem.getValue().getListedDate())
+                    .toLocalDate().isAfter(LocalDate.now());
+        } catch (Exception e) {
+            log.error("Error parsing listed date: {}", dateListedTypeItem.getValue().getListedDate(), e);
+            return false;
+        }
     }
 
     private static void findHearingNumberErrors(List<String> errors, HearingTypeItem hearingTypeItem) {

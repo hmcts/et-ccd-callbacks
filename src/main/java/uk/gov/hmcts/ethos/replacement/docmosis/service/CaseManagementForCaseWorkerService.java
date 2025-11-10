@@ -32,6 +32,7 @@ import uk.gov.hmcts.et.common.model.generic.BaseCaseData;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ECCHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCasesSendingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
@@ -286,6 +287,10 @@ public class CaseManagementForCaseWorkerService {
                             : Integer.toString(Integer.parseInt(firstRespondent.getResponseReceivedCount()) + 1)
             );
         }
+    }
+
+    public void setNextEarliestListedHearing(CaseData caseData) {
+        HearingsHelper.setEtInitialConsiderationListedHearingType(caseData);
     }
 
     public void setNextListedDate(CaseData caseData) {

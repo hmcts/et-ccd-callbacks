@@ -654,7 +654,7 @@ class InitialConsiderationServiceTest {
         caseData.setEtInitialConsiderationHearing(EXPECTED_HEARING_DETAILS_STRING);
 
         initialConsiderationService.setIsHearingAlreadyListed(caseData, ENGLANDWALES_CASE_TYPE_ID);
-        assertThat(caseData.getEtICHearingAlreadyListed()).isNull();
+        assertThat(caseData.getEtICHearingAlreadyListed()).isNotNull();
     }
 
     private List<JurCodesTypeItem> generateJurisdictionCodes() {

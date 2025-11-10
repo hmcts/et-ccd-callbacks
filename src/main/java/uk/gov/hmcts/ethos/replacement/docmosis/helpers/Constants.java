@@ -71,6 +71,7 @@ public final class Constants {
     public static final String DIGITAL_CASE_FILE = "Digital case file";
     public static final String DOC_OPENS_IN_NEW_TAB_MARK_UP =
         "<a target=\"_blank\" href=\"%s\">%s (opens in new tab)</a><br>";
+    public static final String EUROPE_LONDON = "Europe/London";
 
     private Constants() {
 

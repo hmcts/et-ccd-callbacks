@@ -2,29 +2,36 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.RetrieveOrgByIdResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
+import java.util.List;
 import java.util.Map;
-
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantNonSystemUser;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isRepresentedClaimantWithMyHmctsCase;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper.buildNoCPersonalisation;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper.buildPersonalisationWithPartyName;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper.buildRespondentPersonalisation;
 
 /**
  * Service to support the notification of change journey with email notifications.
@@ -38,10 +45,15 @@ public class NocNotificationService {
     private final OrganisationClient organisationClient;
     private final AdminUserService adminUserService;
     private final AuthTokenGenerator authTokenGenerator;
+    private final EmailNotificationService emailNotificationService;
+    private final CaseAccessService caseAccessService;
+
     @Value("${template.nocNotification.respondent}")
     private String respondentTemplateId;
     @Value("${template.nocNotification.claimant}")
     private String claimantTemplateId;
+    @Value("${template.nocNotification.claimantRepAssigned}")
+    private String claimantRepAssignedTemplateId;
     @Value("${template.nocNotification.respondent-solicitor.previous}")
     private String previousRespondentSolicitorTemplateId;
     @Value("${template.nocNotification.respondent-solicitor.new}")
@@ -50,25 +62,76 @@ public class NocNotificationService {
     private String tribunalTemplateId;
 
     public void sendNotificationOfChangeEmails(CaseDetails caseDetailsPrevious,
-                                               CaseDetails caseDetailsNew,
-                                               ChangeOrganisationRequest changeRequest) {
+                             CaseDetails caseDetailsNew,
+                             ChangeOrganisationRequest changeRequest) {
+        DynamicFixedListType caseRoleId = changeRequest.getCaseRoleId();
         CaseData caseDataNew = caseDetailsNew.getCaseData();
-        String partyName = NocNotificationHelper.getRespondentNameForNewSolicitor(changeRequest, caseDataNew);
         CaseData caseDataPrevious = caseDetailsPrevious.getCaseData();
-        if (!isClaimantNonSystemUser(caseDataPrevious)) {
+        String partyName;
+        String newRepEmailAddress = null;
+
+        if (caseRoleId.getValue().getCode().equals(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())) {
+            // send claimant noc change email
+            partyName = caseDataPrevious.getClaimant();
+            newRepEmailAddress = caseDataNew.getRepresentativeClaimantType().getRepresentativeEmailAddress();
+            handleClaimantNocEmails(caseDetailsNew, partyName);
+        } else {
+            // send respondent noc change email
+            handleRespondentNocEmails(caseDetailsPrevious, caseDetailsNew, changeRequest);
+            // todo: to get the new respondent solicitor email address
+            partyName = NocNotificationHelper.getRespondentNameForNewSolicitor(changeRequest, caseDataNew);
+        }
+
+        // send organisation noc change email
+        handleOrganisationNocEmails(caseDataPrevious, caseDetailsNew, changeRequest, partyName, newRepEmailAddress);
+
+        // send tribunal noc change email
+        sendTribunalEmail(caseDataPrevious);
+    }
+
+    private void handleClaimantNocEmails(CaseDetails caseDetailsNew, String partyName) {
+        CaseData caseDataNew = caseDetailsNew.getCaseData();
+
+        List<CaseUserAssignment> caseUserAssignments =
+                caseAccessService.getCaseUserAssignmentsById(caseDetailsNew.getCaseId());
+
+        // send respondents or respondent solicitors the claimant noc change email
+        emailNotificationService.getRespondentsAndRepsEmailAddresses(caseDataNew, caseUserAssignments)
+                .forEach((email, respondentId) -> {
+                    log.info("Respondent email address: {}", email);
+                    String caseLink = StringUtils.isNotBlank(respondentId)
+                            ? emailService.getSyrCaseLink(caseDetailsNew.getCaseId(), respondentId)
+                            : emailService.getExuiCaseLink(caseDetailsNew.getCaseId());
+                    emailService.sendEmail(claimantTemplateId, email,
+                            buildPersonalisationWithPartyName(caseDetailsNew, partyName, caseLink));
+                });
+
+        // send claimant noc change email
+        String claimantEmail = NotificationHelper.getEmailAddressForClaimant(caseDataNew);
+        log.info("claimant email address: {}", claimantEmail);
+        if (isNullOrEmpty(claimantEmail)) {
+            log.warn("missing claimantEmail");
+            return;
+        }
+
+        Map<String, String> personalisation = buildNoCPersonalisation(caseDetailsNew, partyName);
+        personalisation.put(LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseDetailsNew.getCaseId()));
+        emailService.sendEmail(claimantRepAssignedTemplateId, claimantEmail, personalisation);
+    }
+
+    private void handleRespondentNocEmails(CaseDetails caseDetailsPrevious,
+                                          CaseDetails caseDetailsNew,
+                                          ChangeOrganisationRequest changeRequest) {
+
+        CaseData caseDataNew = caseDetailsNew.getCaseData();
+        CaseData caseDataPrevious = caseDetailsPrevious.getCaseData();
+        String partyName = NocNotificationHelper.getRespondentNameForNewSolicitor(changeRequest, caseDataNew);
+        // send claimant or claimant solicitor noc change email
+        if (!isClaimantNonSystemUser(caseDataPrevious) || isRepresentedClaimantWithMyHmctsCase(caseDataPrevious)) {
             sendClaimantEmail(caseDetailsPrevious, caseDetailsNew, partyName);
         }
 
-        if (changeRequest.getOrganisationToRemove() != null) {
-            String previousOrgId = changeRequest.getOrganisationToRemove().getOrganisationID();
-            sendEmailToOldOrgAdmin(previousOrgId, caseDataPrevious);
-        }
-
-        String newOrgId = changeRequest.getOrganisationToAdd().getOrganisationID();
-        sendEmailToNewOrgAdmin(newOrgId, caseDetailsNew, partyName);
-
-        sendTribunalEmail(caseDataPrevious);
-
+        // send respondent noc change email
         RespondentSumType respondent =
                 NocNotificationHelper.getRespondent(changeRequest, caseDataPrevious, nocRespondentHelper);
         String respondentEmail = respondent == null ? null : respondent.getRespondentEmail();
@@ -78,8 +141,35 @@ public class NocNotificationService {
             return;
         }
 
-        Map<String, String> personalisation = buildRespondentPersonalisation(caseDetailsPrevious, respondent);
+        Map<String, String> personalisation = buildNoCPersonalisation(caseDetailsPrevious,
+                respondent.getRespondentName());
         emailService.sendEmail(respondentTemplateId, respondentEmail, personalisation);
+    }
+
+    private void handleOrganisationNocEmails(CaseData caseDataPrevious,
+                                            CaseDetails caseDetailsNew,
+                                            ChangeOrganisationRequest changeRequest,
+                                            String partyName,
+                                            String newRepEmailAddress) {
+
+        if (changeRequest.getOrganisationToRemove() != null) {
+            log.info("organisationToRemove is {}", changeRequest.getOrganisationToRemove());
+            String previousOrgId = changeRequest.getOrganisationToRemove().getOrganisationID();
+            sendEmailToOldOrgAdmin(previousOrgId, caseDataPrevious);
+        }
+
+        if (changeRequest.getOrganisationToAdd() != null) {
+            log.info("organisationToAdd is {}", changeRequest.getOrganisationToAdd());
+            String newOrgId = changeRequest.getOrganisationToAdd().getOrganisationID();
+            sendEmailToNewOrgAdmin(newOrgId, caseDetailsNew, partyName);
+        }
+
+        // send email to the new legal representative
+        if (StringUtils.isNotBlank(newRepEmailAddress)) {
+            Map<String, String> personalisation = buildPersonalisationWithPartyName(caseDetailsNew, partyName,
+                    emailService.getExuiCaseLink(caseDetailsNew.getCaseId()));
+            emailService.sendEmail(newRespondentSolicitorTemplateId, newRepEmailAddress, personalisation);
+        }
     }
 
     private void sendTribunalEmail(CaseData caseDataPrevious) {
@@ -94,13 +184,23 @@ public class NocNotificationService {
     }
 
     private void sendClaimantEmail(CaseDetails caseDetailsPrevious, CaseDetails caseDetailsNew, String partyName) {
-        String email = NotificationHelper.getEmailAddressForClaimant(caseDetailsPrevious.getCaseData());
+        String email;
+        RepresentedTypeC claimantRep = caseDetailsPrevious.getCaseData().getRepresentativeClaimantType();
+        if (caseDetailsPrevious.getCaseData().getRepresentativeClaimantType() != null) {
+            email = claimantRep.getRepresentativeEmailAddress();
+        } else {
+            email = NotificationHelper.getEmailAddressForClaimant(caseDetailsPrevious.getCaseData());
+        }
+
         if (isNullOrEmpty(email)) {
             log.warn("missing claimantEmail");
             return;
         }
 
-        String citUILink = emailService.getCitizenCaseLink(caseDetailsNew.getCaseId());
+        String citUILink = claimantRep != null
+                ? emailService.getExuiCaseLink(caseDetailsNew.getCaseId())
+                : emailService.getCitizenCaseLink(caseDetailsNew.getCaseId());
+
         var personalisation = buildPersonalisationWithPartyName(caseDetailsPrevious, partyName, citUILink);
         emailService.sendEmail(claimantTemplateId, email, personalisation);
     }
@@ -125,6 +225,7 @@ public class NocNotificationService {
         }
 
         Map<String, String> personalisation = buildPreviousRespondentSolicitorPersonalisation(caseDataPrevious);
+        log.info("previous org admin email: {}", resBody.getSuperUser().getEmail());
         emailService.sendEmail(
                 previousRespondentSolicitorTemplateId,
                 resBody.getSuperUser().getEmail(),
@@ -152,6 +253,7 @@ public class NocNotificationService {
 
         String citUrl = emailService.getCitizenCaseLink(caseDetailsNew.getCaseId());
         Map<String, String> personalisation = buildPersonalisationWithPartyName(caseDetailsNew, partyName, citUrl);
+        log.info("new org admin email: {}", resBody.getSuperUser().getEmail());
         emailService.sendEmail(newRespondentSolicitorTemplateId, resBody.getSuperUser().getEmail(), personalisation);
     }
 

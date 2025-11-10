@@ -97,7 +97,8 @@ public enum JurisdictionCode {
     VIC("Subjected to a detriment because of a protected act"),
     WTA("Appeal by a person who has been served with an improvement or prohibition notice under the Working "
         + "Time Regulations 1998"),
-    BOC("(a) Claim of an employee for breach of contract of employment (b) Employer contract claim"),
+    BOC("Claim of an employee for breach of contract of employment"),
+    ECC("Employer contract claim"),
     UDL("Unfair dismissal on grounds of capability, conduct or some other general reason including the "
         + "result of a transfer of an undertaking"),
     PID("Suffered a detriment and/or dismissal due to exercising rights under the Public Interest Disclosure"

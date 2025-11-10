@@ -9,10 +9,13 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AddAmendClaimantRepresentativeService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.NocClaimantRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScheduledTaskRunner;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
@@ -34,6 +37,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 class AddAmendClaimantRepresentativeControllerTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String ABOUT_TO_SUBMIT_URL = "/addAmendClaimantRepresentative/aboutToSubmit";
+    private static final String SUBMITTED_URL = "/addAmendClaimantRepresentative/amendClaimantRepSubmitted";
 
     @MockBean
     private ScheduledTaskRunner taskRunner;
@@ -41,6 +45,10 @@ class AddAmendClaimantRepresentativeControllerTest {
     private VerifyTokenService verifyTokenService;
     @MockBean
     private AddAmendClaimantRepresentativeService addAmendClaimantRepresentativeService;
+    @MockBean
+    private NocClaimantRepresentativeService nocClaimantRepresentativeService;
+    @MockBean
+    private UserIdamService userIdamService;
 
     @Autowired
     private MockMvc mockMvc;
@@ -73,6 +81,23 @@ class AddAmendClaimantRepresentativeControllerTest {
                 .andExpect(jsonPath("$.errors", nullValue()))
                 .andExpect(jsonPath("$.warnings", nullValue()));
 
-        verify(addAmendClaimantRepresentativeService, times(1)).setRepresentativeId(any());
+        verify(addAmendClaimantRepresentativeService, times(1))
+                .addAmendClaimantRepresentative(any());
+    }
+
+    @Test
+    void testAmendClaimantRepSubmitted() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        UserDetails userDetails = new UserDetails();
+        userDetails.setEmail("test@test.com");
+        when(userIdamService.getUserDetails(any())).thenReturn(userDetails);
+        mockMvc.perform(post(SUBMITTED_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+
+        verify(nocClaimantRepresentativeService, times(1))
+                .updateClaimantRepAccess(any());
     }
 }

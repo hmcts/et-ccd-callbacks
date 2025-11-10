@@ -47,6 +47,7 @@ public final class Constants {
                     + "<pre>Contact address &#09&#09 %s</pre>"
                     + "<hr><h3>Respondent</h3>"
                     + "<pre>Contact address &#09&#09 %s</pre><hr>";
+
     public static final String RESPONDENT_DETAILS = "<h3>Respondent %s</h3>"
             + "<pre>Name &#09&#09&#09&#09&#09&#09&nbsp; %s"
             + "<br><br>Contact address &#09&#09 %s</pre><hr>";
@@ -87,6 +88,6 @@ public final class Constants {
     public static final String NOT_AVAILABLE_FOR_VIDEO_HEARINGS = "\nNot available for video hearings\n";
 
     private Constants() {
-
+        // Utility classes should not have a public or default constructor.
     }
 }

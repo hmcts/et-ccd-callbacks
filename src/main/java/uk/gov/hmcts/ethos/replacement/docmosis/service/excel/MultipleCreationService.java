@@ -142,7 +142,7 @@ public class MultipleCreationService {
         List<String> orgIds = getUniqueOrganisations(cases);
         List<OrganisationUsersIdamUser> users = orgIds.stream()
                 .map(o -> organisationClient.getOrganisationUsers(token, authTokenGenerator.generate(), o))
-                .flatMap(o -> o.getBody().getUsers().stream())
+                .flatMap(o -> Objects.requireNonNull(o.getBody()).getUsers().stream())
                 .toList();
 
         Map<String, String> legalrepMap = buildEmailIdMap(users);

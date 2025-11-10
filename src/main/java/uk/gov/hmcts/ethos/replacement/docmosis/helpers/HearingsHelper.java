@@ -47,6 +47,11 @@ public final class HearingsHelper {
             + "resume times of 00:00:00. If the hearing had a break then please update the times. If there was no "
             + "break, please remove the hearing date and times from the break and resume fields before continuing.";
     private static final String TWO_JUDGES = "Two Judges";
+    public static final String BREAK_TIME_VALIDATION_MESSAGE =
+            "%s break time must be after the start time and "
+        + "before resume time.";
+    public static final String RESUME_TIME_VALIDATION_MESSAGE =
+            "%s resume time must be after the break time and before finish time.";
 
     private HearingsHelper() {
     }
@@ -193,27 +198,12 @@ public final class HearingsHelper {
         for (HearingDetailTypeItem hearingDetailTypeItem : caseData.getHearingDetailsCollection()) {
             HearingDetailType hearingDetailType = hearingDetailTypeItem.getValue();
             if (HEARING_STATUS_HEARD.equals(hearingDetailType.getHearingDetailsStatus())) {
-                checkStartFinishTimes(errors, hearingDetailType, hearingNumber);
+                checkHearingTimes(errors, hearingDetailType, hearingNumber);
                 checkIfDateInFuture(errors, hearingDetailType);
-                checkBreakResumeTimes(errors, hearingDetailType, hearingNumber);
             }
         }
 
         return errors;
-    }
-
-    private static void checkBreakResumeTimes(List<String> errors, HearingDetailType hearingDetailType,
-                                              String hearingNumber) {
-        String timingBreak = hearingDetailType.getHearingDetailsTimingBreak();
-        LocalTime breakTime = isNullOrEmpty(timingBreak) ? null : LocalDateTime.parse(timingBreak).toLocalTime();
-
-        String timingResume = hearingDetailType.getHearingDetailsTimingResume();
-        LocalTime resumeTime = isNullOrEmpty(timingResume) ? null : LocalDateTime.parse(timingResume).toLocalTime();
-
-        LocalTime invalidTime = LocalTime.of(0, 0, 0, 0);
-        if (invalidTime.equals(breakTime) || invalidTime.equals(resumeTime)) {
-            errors.add(String.format(HEARING_BREAK_RESUME_INVALID, hearingNumber));
-        }
     }
 
     private static void checkIfDateInFuture(List<String> errors, HearingDetailType hearingDetailType) {
@@ -238,15 +228,48 @@ public final class HearingsHelper {
                 .isAfter(now.atZone(ZoneId.of("UTC")));
     }
 
-    private static void checkStartFinishTimes(List<String> errors, HearingDetailType hearingDetailType,
-                                              String hearingNumber) {
-        if (!isNullOrEmpty(hearingDetailType.getHearingDetailsTimingStart())
-                && !isNullOrEmpty(hearingDetailType.getHearingDetailsTimingFinish())) {
-            LocalDateTime startTime = LocalDateTime.parse(hearingDetailType.getHearingDetailsTimingStart());
-            LocalDateTime finishTime = LocalDateTime.parse(hearingDetailType.getHearingDetailsTimingFinish());
-            if (!finishTime.isAfter(startTime)) {
-                errors.add(String.format(HEARING_FINISH_INVALID, hearingNumber));
-            }
+    private static void checkHearingTimes(List<String> errors, HearingDetailType hearingDetailType,
+                                          String hearingNumber) {
+        if (isNullOrEmpty(hearingDetailType.getHearingDetailsTimingStart())
+            || isNullOrEmpty(hearingDetailType.getHearingDetailsTimingFinish())) {
+            return;
+        }
+        LocalDateTime startTime = LocalDateTime.parse(hearingDetailType.getHearingDetailsTimingStart());
+        LocalDateTime finishTime = LocalDateTime.parse(hearingDetailType.getHearingDetailsTimingFinish());
+        if (!finishTime.isAfter(startTime)) {
+            errors.add(String.format(HEARING_FINISH_INVALID, hearingNumber));
+        }
+
+        validateBreakResumeTimes(errors, hearingDetailType, hearingNumber, startTime, finishTime);
+
+    }
+
+    private static void validateBreakResumeTimes(List<String> errors, HearingDetailType hearingDetailType,
+                                                 String hearingNumber, LocalDateTime startTime,
+                                                 LocalDateTime finishTime) {
+        String timingBreak = hearingDetailType.getHearingDetailsTimingBreak();
+        LocalDateTime breakTime = isNullOrEmpty(timingBreak) ? null :
+                LocalDateTime.parse(timingBreak);
+
+        String timingResume = hearingDetailType.getHearingDetailsTimingResume();
+        LocalDateTime resumeTime = isNullOrEmpty(timingResume) ? null :
+                LocalDateTime.parse(timingResume);
+
+        if (breakTime == null || resumeTime == null) {
+            return;
+        }
+
+        LocalTime invalidTime = LocalTime.of(0, 0, 0, 0);
+        if (invalidTime.equals(breakTime.toLocalTime()) || invalidTime.equals(resumeTime.toLocalTime())) {
+            errors.add(String.format(HEARING_BREAK_RESUME_INVALID, hearingNumber));
+            return;
+        }
+
+        if (!breakTime.isAfter(startTime) || !breakTime.isBefore(resumeTime)) {
+            errors.add(String.format(BREAK_TIME_VALIDATION_MESSAGE, hearingNumber));
+        }
+        if (!resumeTime.isAfter(breakTime) || !resumeTime.isBefore(finishTime)) {
+            errors.add(String.format(RESUME_TIME_VALIDATION_MESSAGE, hearingNumber));
         }
 
     }

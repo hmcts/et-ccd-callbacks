@@ -101,13 +101,13 @@ class NocCcdServiceTest {
     }
 
     @Test
-    void shouldCallCcdUpdateCaseRepresentation() throws IOException {
+    void shouldCallCcdStartEventForUpdateRepresentation() throws IOException {
         CCDRequest request = new CCDRequest();
         when(ccdClient.startEventForUpdateRep(AUTH_TOKEN, CASE_TYPE, JURISDICTION, CASE_ID)).thenReturn(request);
         when(ccdClient.submitUpdateRepEvent(eq(AUTH_TOKEN), any(), eq(CASE_TYPE), eq(JURISDICTION),
             eq(request), eq(CASE_ID))).thenReturn(new SubmitEvent());
 
-        nocCcdService.updateCaseRepresentation(AUTH_TOKEN, JURISDICTION, CASE_TYPE,
+        nocCcdService.startEventForUpdateRepresentation(AUTH_TOKEN, JURISDICTION, CASE_TYPE,
             CASE_ID);
 
         verify(ccdClient, times(1)).startEventForUpdateRep(AUTH_TOKEN, CASE_TYPE, JURISDICTION, CASE_ID);

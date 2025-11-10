@@ -459,7 +459,7 @@ public class InitialConsiderationService {
         //clear old values
         if (caseData.getEtICHearingListedAnswers() != null) {
             caseData.getEtICHearingListedAnswers().setEtInitialConsiderationListedHearingType(null);
-            caseData.getEtICHearingListedAnswers().setEtICIsHearingWithMembersLabel(null);
+            caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJsaReasonOther(null);
             caseData.getEtICHearingListedAnswers().setEtICIsHearingWithMembers(null);
             caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJudgeOrMembersFurtherDetails(null);
             caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJudgeOrMembersReason(null);

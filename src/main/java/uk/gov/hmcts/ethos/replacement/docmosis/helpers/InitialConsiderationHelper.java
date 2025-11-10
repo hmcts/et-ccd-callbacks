@@ -452,7 +452,7 @@ public final class InitialConsiderationHelper {
                 if (OTHER.equals(caseData.getEtICHearingListedAnswers().getEtICIsHearingWithJsa())) {
                     sb.append(caseData.getEtICHearingListedAnswers().getEtICIsHearingWithJsa());
                     sb.append(" - ");
-                    sb.append(caseData.getEtICHearingListedAnswers().getEtICIsHearingWithMembersLabel());
+                    sb.append(caseData.getEtICHearingListedAnswers().getEtICIsHearingWithJsaReasonOther());
                 } else  { // For other paths (hearing status and type combos, follow the pre-existing logic)
                     sb.append(caseData.getEtICHearingListedAnswers().getEtICIsHearingWithJsa());
                 }

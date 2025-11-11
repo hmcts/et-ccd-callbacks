@@ -8,13 +8,20 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
+import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -276,6 +283,150 @@ class BatchReconfigurationTaskTest {
         when(caseDetails.getCaseData()).thenReturn(caseData);
         when(caseDetails.getJurisdiction()).thenReturn(EMPLOYMENT);
 
+        CCDRequest ccdRequest = mock(CCDRequest.class);
+        when(ccdRequest.getCaseDetails()).thenReturn(caseDetails);
+        return ccdRequest;
+    }
+
+    @Test
+    void run_updatesVenueForFutureListedLondonCentralHearings() throws Exception {
+        // given
+        ReflectionTestUtils.setField(task, "caseIdsToReconfigure", CASE_ID_1);
+        ReflectionTestUtils.setField(task, "limit", 1);
+
+        DateListedType futureListing = new DateListedType();
+        futureListing.setListedDate(LocalDateTime.now().plusDays(1).toString());
+        futureListing.setHearingStatus("Listed");
+        futureListing.setHearingVenueDay(DynamicFixedListType.from("London Central", "London Central", true));
+
+        DateListedTypeItem dateItem = new DateListedTypeItem();
+        dateItem.setValue(futureListing);
+
+        HearingType hearing = new HearingType();
+        List<DateListedTypeItem> dates = new ArrayList<>();
+        dates.add(dateItem);
+        hearing.setHearingDateCollection(dates);
+
+        HearingTypeItem hearingItem = new HearingTypeItem();
+        hearingItem.setValue(hearing);
+
+        List<HearingTypeItem> hearingCollection = new ArrayList<>();
+        hearingCollection.add(hearingItem);
+
+        CaseData caseData = new CaseData();
+        caseData.setHearingCollection(hearingCollection);
+
+        CCDRequest ccdRequest = buildCcdRequestWithCaseData(caseData);
+
+        when(ccdClient.startEventForCase(
+                TOKEN,
+                ENGLANDWALES_CASE_TYPE_ID,
+                EMPLOYMENT,
+                CASE_ID_1,
+                RECONFIGURE_EVENT)
+        ).thenReturn(ccdRequest);
+        when(ccdClient.submitEventForCase(
+                eq(TOKEN),
+                any(CaseData.class),
+                eq(ENGLANDWALES_CASE_TYPE_ID),
+                anyString(),
+                eq(ccdRequest),
+                eq(CASE_ID_1))
+        ).thenReturn(mock(SubmitEvent.class));
+
+        // when
+        task.run();
+
+        // then
+        ArgumentCaptor<CaseData> caseDataCaptor = ArgumentCaptor.forClass(CaseData.class);
+        verify(ccdClient).submitEventForCase(
+            eq(TOKEN),
+            caseDataCaptor.capture(),
+            eq(ENGLANDWALES_CASE_TYPE_ID),
+            anyString(),
+            eq(ccdRequest),
+            eq(CASE_ID_1));
+
+        CaseData submitted = caseDataCaptor.getValue();
+        HearingType submittedHearing = submitted.getHearingCollection().getFirst().getValue();
+        // Hearing venue updated to London Tribunals Centre
+        assertThat(submittedHearing.getHearingVenue().getSelectedCode()).isEqualTo("London Tribunals Centre");
+        // Date-level venue updated too
+        DynamicFixedListType updatedVenueDay = submittedHearing.getHearingDateCollection().getFirst()
+            .getValue().getHearingVenueDay();
+        assertThat(updatedVenueDay.getSelectedCode()).isEqualTo("London Tribunals Centre");
+    }
+
+    @Test
+    void run_doesNotUpdateVenue_whenHearingNotValid() throws Exception {
+        // given
+        ReflectionTestUtils.setField(task, "caseIdsToReconfigure", CASE_ID_1);
+        ReflectionTestUtils.setField(task, "limit", 1);
+
+        DateListedType listing = new DateListedType();
+        listing.setListedDate(LocalDateTime.now().plusDays(1).toString());
+        listing.setHearingStatus("Listed");
+        listing.setHearingVenueDay(DynamicFixedListType.from("Manchester", "Manchester", true));
+
+        DateListedTypeItem dateItem = new DateListedTypeItem();
+        dateItem.setValue(listing);
+
+        HearingType hearing = new HearingType();
+        List<DateListedTypeItem> dates = new ArrayList<>();
+        dates.add(dateItem);
+        hearing.setHearingDateCollection(dates);
+
+        HearingTypeItem hearingItem = new HearingTypeItem();
+        hearingItem.setValue(hearing);
+
+        List<HearingTypeItem> hearingCollection = new ArrayList<>();
+        hearingCollection.add(hearingItem);
+        CaseData caseData = new CaseData();
+        caseData.setHearingCollection(hearingCollection);
+
+        CCDRequest ccdRequest = buildCcdRequestWithCaseData(caseData);
+
+        when(ccdClient.startEventForCase(
+            TOKEN,
+            ENGLANDWALES_CASE_TYPE_ID,
+            EMPLOYMENT,
+            CASE_ID_1,
+            RECONFIGURE_EVENT)
+        ).thenReturn(ccdRequest);
+        when(ccdClient.submitEventForCase(
+                eq(TOKEN),
+                any(CaseData.class),
+                eq(ENGLANDWALES_CASE_TYPE_ID),
+                anyString(),
+                eq(ccdRequest),
+                eq(CASE_ID_1))
+        ).thenReturn(mock(SubmitEvent.class));
+
+        // when
+        task.run();
+
+        // then - verify venue not updated
+        ArgumentCaptor<CaseData> caseDataCaptor = ArgumentCaptor.forClass(CaseData.class);
+        verify(ccdClient).submitEventForCase(
+            eq(TOKEN),
+            caseDataCaptor.capture(),
+            eq(ENGLANDWALES_CASE_TYPE_ID),
+            anyString(),
+            eq(ccdRequest),
+            eq(CASE_ID_1));
+
+        CaseData submitted = caseDataCaptor.getValue();
+        HearingType submittedHearing = submitted.getHearingCollection().getFirst().getValue();
+        assertThat(submittedHearing.getHearingVenue()).isNull();
+        DynamicFixedListType venueDay = submittedHearing.getHearingDateCollection().getFirst()
+            .getValue().getHearingVenueDay();
+        assertThat(venueDay.getSelectedCode()).isEqualTo("Manchester");
+    }
+
+    private CCDRequest buildCcdRequestWithCaseData(CaseData caseData) {
+        CaseDetails caseDetails = mock(CaseDetails.class);
+        when(caseDetails.getCaseData()).thenReturn(caseData);
+        when(caseDetails.getJurisdiction()).thenReturn(EMPLOYMENT);
         CCDRequest ccdRequest = mock(CCDRequest.class);
         when(ccdRequest.getCaseDetails()).thenReturn(caseDetails);
         return ccdRequest;

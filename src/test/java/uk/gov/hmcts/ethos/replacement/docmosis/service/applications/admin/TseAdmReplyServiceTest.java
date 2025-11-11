@@ -32,7 +32,9 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.applications.TseAdminHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseAccessService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
@@ -87,6 +89,10 @@ class TseAdmReplyServiceTest {
     private TseService tseService;
     @MockBean
     private FeatureToggleService featureToggleService;
+    @MockBean
+    private EmailNotificationService emailNotificationService;
+    @MockBean
+    CaseAccessService caseAccessService;
 
     private CaseData caseData;
 
@@ -113,7 +119,7 @@ class TseAdmReplyServiceTest {
     void setUp() {
         emailService = spy(new EmailUtils());
         tseAdmReplyService = new TseAdmReplyService(documentManagementService, emailService,
-                tornadoService, tseService, featureToggleService);
+                tornadoService, tseService, featureToggleService, caseAccessService, emailNotificationService);
         ReflectionTestUtils.setField(tseAdmReplyService, "tseAdminReplyClaimantTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(tseAdmReplyService, "tseAdminReplyRespondentTemplateId", TEMPLATE_ID);
         ReflectionTestUtils.setField(tseAdmReplyService, "tseAdminReplyRespondentTemplateId", TEMPLATE_ID);
@@ -635,6 +641,9 @@ class TseAdmReplyServiceTest {
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
         caseDetails.setCaseId(CASE_ID);
+
+        when(emailNotificationService.getRespondentsAndRepsEmailAddresses(any(), any()))
+                .thenReturn(Map.of("rep@test.com", "", RESPONDENT_EMAIL_1, RESPONDENT_1));
         Map<String, Object> resultMap = tseAdmReplyService.sendNotifyEmailsToRespondents(caseDetails, AUTH_TOKEN);
 
         // Email is sent to respondent. if representative is present, email is sent to both

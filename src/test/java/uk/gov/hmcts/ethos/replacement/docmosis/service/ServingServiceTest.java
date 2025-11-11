@@ -9,12 +9,15 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
@@ -27,15 +30,16 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Stream;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
@@ -48,6 +52,10 @@ class ServingServiceTest {
 
     private static EmailService emailService;
     private static ServingService servingService;
+    @MockBean
+    private EmailNotificationService emailNotificationService;
+    @MockBean
+    private CaseAccessService caseAccessService;
 
     @Captor
     private ArgumentCaptor<Map<String, Object>> personalisation;
@@ -56,7 +64,8 @@ class ServingServiceTest {
     void setUp() throws URISyntaxException, IOException {
         emailService = spy(new EmailUtils());
         caseDetails = generateCaseDetails();
-        servingService = new ServingService(emailService);
+        servingService =
+                new ServingService(emailService, emailNotificationService, caseAccessService);
         notifyCaseDetails = CaseDataBuilder.builder()
             .withEthosCaseReference("12345/6789")
             .withClaimantType("claimant@unrepresented.com")
@@ -218,6 +227,17 @@ class ServingServiceTest {
         notifyCaseDetails.getCaseData().setCaseSource("MyHMCTS");
         notifyCaseDetails.getCaseData().setClaimantRepresentedQuestion(YES);
         notifyCaseDetails.getCaseData().getRepresentativeClaimantType().setMyHmctsOrganisation(organisation);
+        CaseUserAssignment mockAssignment = CaseUserAssignment
+                .builder()
+                .userId("claimantSolicitorUserId")
+                .caseRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())
+                .build();
+
+        when(caseAccessService.getCaseUserAssignmentsById(anyString())).thenReturn(
+                List.of(mockAssignment));
+        when(emailNotificationService.getCaseClaimantSolicitorEmails(List.of(mockAssignment)))
+                .thenReturn(List.of("claimant@represented.com"));
+
         servingService.sendNotifications(notifyCaseDetails);
         verify(emailService, times(1)).sendEmail(any(), eq("claimant@represented.com"), personalisation.capture());
         assertThat(personalisation.getValue()).containsEntry(LINK_TO_EXUI, "exuiUrl1683646754393041");

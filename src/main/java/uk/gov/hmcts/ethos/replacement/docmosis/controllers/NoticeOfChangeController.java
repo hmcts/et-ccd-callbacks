@@ -20,7 +20,8 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.generic.GenericCallbackResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CcdCaseAssignment;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.NocNotificationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.NocRespondentRepresentativeService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.NocRepresentativeService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import java.io.IOException;
@@ -35,8 +36,10 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class NoticeOfChangeController {
     private final VerifyTokenService verifyTokenService;
     private final NocNotificationService nocNotificationService;
-    private final NocRespondentRepresentativeService nocRespondentRepresentativeService;
+    private final NocRepresentativeService noCRepresentativeService;
     private final CcdCaseAssignment ccdCaseAssignment;
+    private final UserIdamService userIdamService;
+
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String APPLY_NOC_DECISION = "applyNocDecision";
 
@@ -49,9 +52,8 @@ public class NoticeOfChangeController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        CaseData caseData = nocRespondentRepresentativeService.updateRepresentation(callbackRequest.getCaseDetails());
-        caseData = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, userToken);
-
+        CaseData caseData = noCRepresentativeService
+                .updateRepresentation(callbackRequest.getCaseDetails(), userToken);
         callbackRequest.getCaseDetails().setCaseData(caseData);
         return ResponseEntity.ok(ccdCaseAssignment.applyNoc(callbackRequest, userToken));
     }

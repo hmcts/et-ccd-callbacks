@@ -8495,7 +8495,7 @@ __metadata:
     mocha-jenkins-reporter: 0.4.8
     mocha-junit-reporter: 2.2.1
     mocha-multi: 1.1.7
-    mochawesome: 7.1.3
+    mochawesome: 7.1.4
     nock: 14.0.10
     nodemon: 3.1.10
     nsp: 3.2.1
@@ -13598,9 +13598,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"mochawesome-report-generator@npm:^6.2.0":
-  version: 6.2.0
-  resolution: "mochawesome-report-generator@npm:6.2.0"
+"mochawesome-report-generator@npm:^6.3.0":
+  version: 6.3.0
+  resolution: "mochawesome-report-generator@npm:6.3.0"
   dependencies:
     chalk: ^4.1.2
     dateformat: ^4.5.1
@@ -13616,13 +13616,13 @@ __metadata:
     yargs: ^17.2.1
   bin:
     marge: bin/cli.js
-  checksum: bbfafc781a5b5aa39a012e0bed7d50ac929f72a46dee640223e4398b5f2121bd552a58f1dd481c0133678650a2e4730a9f97b8a5f26f2956b66b5c0057eb9391
+  checksum: e8d380516b23160652eecb96392f0545de543676ad4ab4d8cc7ee7bb9c3cd4977a2cc4c781ce6dbfaeeb111edc12936e19b555eeb98e2e0d8e4f162212d7a377
   languageName: node
   linkType: hard
 
-"mochawesome@npm:7.1.3":
-  version: 7.1.3
-  resolution: "mochawesome@npm:7.1.3"
+"mochawesome@npm:7.1.4":
+  version: 7.1.4
+  resolution: "mochawesome@npm:7.1.4"
   dependencies:
     chalk: ^4.1.2
     diff: ^5.0.0
@@ -13631,12 +13631,12 @@ __metadata:
     lodash.isfunction: ^3.0.9
     lodash.isobject: ^3.0.2
     lodash.isstring: ^4.0.1
-    mochawesome-report-generator: ^6.2.0
+    mochawesome-report-generator: ^6.3.0
     strip-ansi: ^6.0.1
     uuid: ^8.3.2
   peerDependencies:
     mocha: ">=7"
-  checksum: 87730026de2a407752088e9baddc105660bfd228d491f9f6588784cd7a200712b40a4987232d3870a353bb5deec61ae6e080686fb2effe099da240067fe619d6
+  checksum: e7ed98f3fda3d779a0474ba2b27faab0a63f1880d8413c49f98b551d262fa693019934769dbc33fbd0a82f8176795862967c6ab5bb8bbbf5e8f92e2b0845eb57
   languageName: node
   linkType: hard
 
@@ -15083,7 +15083,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"playwright-core@npm:1.55.0, playwright-core@npm:^1.35.1":
+"playwright-core@npm:1.56.1":
+  version: 1.56.1
+  resolution: "playwright-core@npm:1.56.1"
+  bin:
+    playwright-core: cli.js
+  checksum: 170dff398b47da140182631ae025190248dabde7a5264335f54e238546a478f522ac9a620b31462e6e31c883273223bff8e883b502a699da490abe9741fb3b71
+  languageName: node
+  linkType: hard
+
+"playwright-core@npm:^1.35.1":
   version: 1.55.0
   resolution: "playwright-core@npm:1.55.0"
   bin:
@@ -15093,17 +15102,17 @@ __metadata:
   linkType: hard
 
 "playwright@npm:^1.35.1":
-  version: 1.55.0
-  resolution: "playwright@npm:1.55.0"
+  version: 1.56.1
+  resolution: "playwright@npm:1.56.1"
   dependencies:
     fsevents: 2.3.2
-    playwright-core: 1.55.0
+    playwright-core: 1.56.1
   dependenciesMeta:
     fsevents:
       optional: true
   bin:
     playwright: cli.js
-  checksum: 6165c649a4923651305957d54203ee9f6c80fb5b7d237848c13a98c168c599041eefb6af493f1dbe5e793aa2e24956a1a7205cb1864a64a97f01c7c7189885b7
+  checksum: e7537e7d5048a1a8544d7675b005196ba9db919edc3b6d46b92273ee6f20e37ada8991774c5df9ef5123ea4610978d582feb141c8a02f4cf256a6c0b224b8793
   languageName: node
   linkType: hard
 

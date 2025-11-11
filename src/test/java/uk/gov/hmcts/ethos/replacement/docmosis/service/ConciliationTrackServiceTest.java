@@ -91,7 +91,7 @@ class ConciliationTrackServiceTest {
     @Test
     void populateConciliationTrack_ShOnly_ReturnSh() {
         CaseData caseData = baseCaseDetails.getCaseData();
-        List<JurCodesTypeItem> jurCodesTypeItems = getJurCodesTypeItems("BOC", "FTO", "PAY"); // SH SH SH
+        List<JurCodesTypeItem> jurCodesTypeItems = getJurCodesTypeItems("BOC", "ECC", "FTO", "PAY"); // SH SH SH
         caseData.setJurCodesCollection(jurCodesTypeItems);
         conciliationTrackService.populateConciliationTrackForJurisdiction(caseData);
         Assertions.assertEquals(CONCILIATION_TRACK_FAST_TRACK, caseData.getConciliationTrack());

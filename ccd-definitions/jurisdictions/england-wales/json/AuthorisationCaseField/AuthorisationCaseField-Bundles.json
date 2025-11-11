@@ -556,5 +556,89 @@
     "CaseFieldID": "bundlesTabTitle",
     "UserRole": "[SOLICITORJ]",
     "CRUD": "CRU"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "uploadHearingDocumentsSelectPastOrFutureHearing",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-employment-englandwales",
+          "caseworker-employment-etjudge-englandwales",
+          "caseworker-employment-api"
+        ],
+        "CRUD": "CRUD"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "uploadHearingDocumentsSelectFutureHearing",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-employment-englandwales",
+          "caseworker-employment-etjudge-englandwales",
+          "caseworker-employment-api"
+        ],
+        "CRUD": "CRUD"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "uploadHearingDocumentsSelectPastHearing",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-employment-englandwales",
+          "caseworker-employment-etjudge-englandwales",
+          "caseworker-employment-api"
+        ],
+        "CRUD": "CRUD"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "uploadHearingDocumentType",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-employment-englandwales",
+          "caseworker-employment-etjudge-englandwales",
+          "caseworker-employment-api"
+        ],
+        "CRUD": "CRUD"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "uploadHearingDocumentsWhoseDocuments",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-employment-englandwales",
+          "caseworker-employment-etjudge-englandwales",
+          "caseworker-employment-api"
+        ],
+        "CRUD": "CRUD"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "uploadHearingDocumentsDateSubmitted",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-employment-englandwales",
+          "caseworker-employment-etjudge-englandwales",
+          "caseworker-employment-api"
+        ],
+        "CRUD": "CRUD"
+      }
+    ]
   }
 ]

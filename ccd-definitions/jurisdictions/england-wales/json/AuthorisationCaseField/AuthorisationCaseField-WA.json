@@ -1,6 +1,12 @@
 [
   {
     "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "ethosCaseReference",
+    "UserRole": "caseworker-wa-task-configuration",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
     "CaseFieldID": "claimantIndType",
     "UserRole": "caseworker-wa-task-configuration",
     "CRUD": "R"
@@ -1072,6 +1078,12 @@
     "CaseFieldID": "draftAndSignJudgement",
     "UserRole": "caseworker-employment-englandwales",
     "CRUD": "R"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "draftAndSignJudgement",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
   },
   {
     "CaseTypeId": "ET_EnglandWales",

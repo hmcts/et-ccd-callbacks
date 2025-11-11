@@ -13,9 +13,20 @@
   {
     "CaseTypeID": "ET_EnglandWales",
     "Channel": "CaseWorker",
+    "TabID": "Telephone Notes",
+    "TabLabel": "Telephone Notes",
+    "TabDisplayOrder": 2,
+    "CaseFieldID": "caseNotesCollection",
+    "TabFieldDisplayOrder": 1,
+    "DisplayContextParameter": "#TABLE(title ,author, date)",
+    "TabShowCondition": "[STATE]!=\"AWAITING_SUBMISSION_TO_HMCTS\""
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "Channel": "CaseWorker",
     "TabID": "CaseClaimant",
     "TabLabel": "Claimant",
-    "TabDisplayOrder": 2,
+    "TabDisplayOrder": 3,
     "CaseFieldID": "claimant_TypeOfClaimant",
     "TabFieldDisplayOrder": 1,
     "FieldShowCondition": "claimant_TypeOfClaimant=\"dummy\"",
@@ -87,7 +98,7 @@
     "Channel": "CaseWorker",
     "TabID": "Et1Vetting",
     "TabLabel": "ET1 Vetting",
-    "TabDisplayOrder": 3,
+    "TabDisplayOrder": 4,
     "CaseFieldID": "et1VettingDocument",
     "TabFieldDisplayOrder": 1,
     "TabShowCondition": "[STATE]!=\"Submitted\" AND [STATE]!=\"AWAITING_SUBMISSION_TO_HMCTS\""
@@ -671,7 +682,7 @@
     "Channel": "CaseWorker",
     "TabID": "CaseRepresentative_Claimant",
     "TabLabel": "Claimant Representative",
-    "TabDisplayOrder": 4,
+    "TabDisplayOrder": 5,
     "CaseFieldID": "claimantRepresentedQuestion",
     "TabFieldDisplayOrder": 1,
     "FieldShowCondition": "caseType=\"dummy\"",
@@ -687,20 +698,63 @@
   {
     "CaseTypeID": "ET_EnglandWales",
     "Channel": "CaseWorker",
-    "TabID": "CaseRespondent",
-    "TabLabel": "Respondent",
+    "TabID": "Respondent",
+    "TabLabel": "Respondents",
     "TabDisplayOrder": 5,
     "CaseFieldID": "respondentCollection",
     "TabFieldDisplayOrder": 1,
+    "DisplayContextParameter": "#TABLE(respondent_name, responseReceived, respondentEcc, respondentEccReply)",
+    "TabShowCondition": "[STATE]!=\"AWAITING_SUBMISSION_TO_HMCTS\" AND respondentsWithEcc =\"*\""
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "Channel": "CaseWorker",
+    "TabID": "Respondent",
+    "CaseFieldID": "respondentsWithEcc",
+    "TabFieldDisplayOrder": 2,
+    "FieldShowCondition": "respondentsWithEcc =\"dummy\""
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "Channel": "CaseWorker",
+    "TabID": "Respondent",
+    "CaseFieldID": "eccCases",
+    "TabFieldDisplayOrder": 3,
+    "FieldShowCondition": "eccCases !=\"\""
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "Channel": "CaseWorker",
+    "TabID": "Respondent",
+    "CaseFieldID": "counterClaim",
+    "TabFieldDisplayOrder": 4,
+    "FieldShowCondition": "counterClaim !=\"\""
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "Channel": "CaseWorker",
+    "TabID": "CaseRespondent",
+    "TabLabel": "Respondent",
+    "TabDisplayOrder": 6,
+    "CaseFieldID": "respondentCollection",
+    "TabFieldDisplayOrder": 1,
     "DisplayContextParameter": "#TABLE(respondent_name, responseReceived)",
-    "TabShowCondition": "[STATE]!=\"AWAITING_SUBMISSION_TO_HMCTS\""
+    "TabShowCondition": "[STATE]!=\"AWAITING_SUBMISSION_TO_HMCTS\" AND respondentsWithEcc !=\"*\""
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "Channel": "CaseWorker",
+    "TabID": "CaseRespondent",
+    "CaseFieldID": "respondentsWithEcc",
+    "TabFieldDisplayOrder": 2,
+    "FieldShowCondition": "respondentsWithEcc =\"dummy\""
   },
   {
     "CaseTypeID": "ET_EnglandWales",
     "Channel": "CaseWorker",
     "TabID": "CaseRespondent",
     "CaseFieldID": "eccCases",
-    "TabFieldDisplayOrder": 2,
+    "TabFieldDisplayOrder": 3,
     "FieldShowCondition": "eccCases !=\"\""
   },
   {
@@ -708,7 +762,7 @@
     "Channel": "CaseWorker",
     "TabID": "CaseRespondent",
     "CaseFieldID": "counterClaim",
-    "TabFieldDisplayOrder": 3,
+    "TabFieldDisplayOrder": 4,
     "FieldShowCondition": "counterClaim !=\"\""
   },
   {
@@ -716,7 +770,7 @@
     "Channel": "CaseWorker",
     "TabID": "CaseRepresentative_Respondent",
     "TabLabel": "Respondent Representative",
-    "TabDisplayOrder": 6,
+    "TabDisplayOrder": 7,
     "CaseFieldID": "repCollection",
     "TabFieldDisplayOrder": 1
   },
@@ -725,7 +779,7 @@
     "Channel": "CaseWorker",
     "TabID": "CaseJurisdictions",
     "TabLabel": "Jurisdictions",
-    "TabDisplayOrder": 8,
+    "TabDisplayOrder": 9,
     "CaseFieldID": "jurCodesCollection",
     "TabFieldDisplayOrder": 1
   },
@@ -734,7 +788,7 @@
     "Channel": "CaseWorker",
     "TabID": "CaseHearingsLegacy",
     "TabLabel": "ECM Hearings",
-    "TabDisplayOrder": 9,
+    "TabDisplayOrder": 10,
     "CaseFieldID": "hearingCollection",
     "TabFieldDisplayOrder": 1,
     "DisplayContextParameter": "#TABLE(hearingNumber, Hearing_type, Hearing_venue)"
@@ -744,7 +798,7 @@
     "Channel": "CaseWorker",
     "TabID": "CaseReferrals",
     "TabLabel": "Referrals",
-    "TabDisplayOrder": 10,
+    "TabDisplayOrder": 11,
     "CaseFieldID": "referralsLabel",
     "TabFieldDisplayOrder": 1,
     "TabShowCondition": "[STATE]!=\"AWAITING_SUBMISSION_TO_HMCTS\""
@@ -769,7 +823,7 @@
     "Channel": "CaseWorker",
     "TabID": "CaseDeposit",
     "TabLabel": "Deposit Order",
-    "TabDisplayOrder": 12,
+    "TabDisplayOrder": 13,
     "CaseFieldID": "depositType",
     "TabFieldDisplayOrder": 1
   },
@@ -778,7 +832,7 @@
     "Channel": "CaseWorker",
     "TabID": "RestrictedReportingTab",
     "TabLabel": "Restricted Reporting",
-    "TabDisplayOrder": 13,
+    "TabDisplayOrder": 14,
     "CaseFieldID": "restrictedReporting",
     "TabFieldDisplayOrder": 1
   },
@@ -787,7 +841,7 @@
     "Channel": "CaseWorker",
     "TabID": "BroughtForwardDate",
     "TabLabel": "BF Actions",
-    "TabDisplayOrder": 14,
+    "TabDisplayOrder": 15,
     "CaseFieldID": "bfActions",
     "TabFieldDisplayOrder": 1,
     "DisplayContextParameter": "#TABLE(bfDate)"
@@ -797,7 +851,7 @@
     "Channel": "CaseWorker",
     "TabID": "CaseHistory",
     "TabLabel": "History",
-    "TabDisplayOrder": 15,
+    "TabDisplayOrder": 16,
     "CaseFieldID": "caseHistory",
     "TabFieldDisplayOrder": 1
   },
@@ -805,8 +859,8 @@
     "CaseTypeID": "ET_EnglandWales",
     "Channel": "CaseWorker",
     "TabID": "Applications",
+    "TabDisplayOrder": 19,
     "TabLabel": "Applications",
-    "TabDisplayOrder": 17,
     "CaseFieldID": "applicationsTab",
     "TabFieldDisplayOrder": 1
   },
@@ -838,7 +892,6 @@
     "Channel": "CaseWorker",
     "TabShowCondition": "[STATE]!=\"AWAITING_SUBMISSION_TO_HMCTS\"",
     "DisplayContextParameter": "#TABLE(number, type, applicant, date, dueDate, responsesCount, status)",
-    "TabDisplayOrder": 18,
     "TabID": "Applications",
     "TabLabel": "Applications",
     "TabFieldDisplayOrder": 4
@@ -847,7 +900,7 @@
     "CaseFieldID": "adrDocumentCollection",
     "CaseTypeID": "ET_EnglandWales",
     "Channel": "CaseWorker",
-    "TabDisplayOrder": 19,
+    "TabDisplayOrder": 20,
     "TabID": "ADR",
     "TabLabel": "ADR/Privileged",
     "TabFieldDisplayOrder": 1
@@ -856,7 +909,7 @@
     "CaseFieldID": "piiDocumentCollection",
     "CaseTypeID": "ET_EnglandWales",
     "Channel": "CaseWorker",
-    "TabDisplayOrder": 20,
+    "TabDisplayOrder": 21,
     "TabID": "PII",
     "TabLabel": "PII",
     "TabFieldDisplayOrder": 1
@@ -865,7 +918,7 @@
     "CaseFieldID": "appealDocumentCollection",
     "CaseTypeID": "ET_EnglandWales",
     "Channel": "CaseWorker",
-    "TabDisplayOrder": 21,
+    "TabDisplayOrder": 22,
     "TabID": "Appeals",
     "TabLabel": "Appeals",
     "TabFieldDisplayOrder": 1

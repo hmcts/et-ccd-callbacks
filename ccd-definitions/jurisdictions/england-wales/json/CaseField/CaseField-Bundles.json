@@ -147,6 +147,74 @@
     "FieldTypeParameter": "RemovedHearingBundle",
     "SecurityClassification": "Public",
     "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "uploadHearingDocumentsSelectPastOrFutureHearing",
+    "Label": "Select if the hearing is in the past or in the future",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "frl_futureOrPastHearing",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "uploadHearingDocumentsSelectFutureHearing",
+    "Label": "Select which hearing these documents are for",
+    "FieldType": "DynamicList",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "uploadHearingDocumentsSelectPastHearing",
+    "Label": "Select which hearing these documents are for",
+    "FieldType": "DynamicList",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "uploadHearingDocumentType",
+    "Label": "Upload Hearing Documents",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "HearingDocumentUpload",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "uploadHearingDocumentsWhatAreDocuments",
+    "Label": "What are these hearing documents?",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "frl_bundleType",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "uploadHearingDocumentsWhatAreDocumentsOther",
+    "Label": "Please specify",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "uploadHearingDocumentsWhoseDocuments",
+    "Label": "Which party has submitted these documents?",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "frl_ClaimantOrRespondents",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "uploadHearingDocumentsDateSubmitted",
+    "Label": "What date were these documents submitted?",
+    "FieldType": "Date",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
   }
 ]
 

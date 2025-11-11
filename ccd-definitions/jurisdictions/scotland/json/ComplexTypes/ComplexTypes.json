@@ -45,6 +45,15 @@
   },
   {
     "ID": "DocumentUpload",
+    "ListElementCode": "eccDocuments",
+    "FieldType": "FixedList",
+    "ElementLabel": "Employer Contract Claim",
+    "FieldTypeParameter": "fl_EmployerContractClaim",
+    "FieldShowCondition": "topLevelDocuments=\"Employer Contract Claim\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "DocumentUpload",
     "ListElementCode": "withdrawalSettledDocuments",
     "FieldType": "FixedList",
     "ElementLabel": "Withdrawal/Settled",
@@ -706,6 +715,43 @@
     "Searchable": "N"
   },
   {
+    "ID": "OrganisationUsersIdamUser",
+    "ListElementCode": "userIdentifier",
+    "FieldType": "Text",
+    "ElementLabel": "User Id",
+    "FieldShowCondition": "firstName=\"dummy\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "OrganisationUsersIdamUser",
+    "ListElementCode": "firstName",
+    "FieldType": "Text",
+    "ElementLabel": "First name",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "OrganisationUsersIdamUser",
+    "ListElementCode": "lastName",
+    "FieldType": "Text",
+    "ElementLabel": "Last name",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "OrganisationUsersIdamUser",
+    "ListElementCode": "email",
+    "FieldType": "Text",
+    "ElementLabel": "Email address",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "OrganisationUsersIdamUser",
+    "ListElementCode": "idamStatus",
+    "FieldType": "Text",
+    "ElementLabel": "Idam Status",
+    "FieldShowCondition": "firstName=\"dummy\"",
+    "SecurityClassification": "Public"
+  },
+  {
     "ID": "ClaimantRepresentative",
     "ListElementCode": "name_of_representative",
     "FieldType": "Text",
@@ -786,6 +832,14 @@
     "FieldTypeParameter": "fl_RepresentativeContact",
     "SecurityClassification": "Public",
     "Searchable": "N"
+  },
+  {
+    "ID": "ClaimantRepresentative",
+    "ListElementCode": "organisationUsers",
+    "FieldType": "Collection",
+    "ElementLabel": "Organisation users",
+    "FieldTypeParameter": "OrganisationUsersIdamUser",
+    "SecurityClassification": "Public"
   },
   {
     "ID": "ET3Vetting",
@@ -1369,6 +1423,31 @@
     "Searchable": "N"
   },
   {
+    "ID": "RespondentRepresentative",
+    "ListElementCode": "representativeContactLanguage",
+    "FieldType": "FixedList",
+    "ElementLabel": "Representative contact language",
+    "FieldTypeParameter": "fl_languages",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "RespondentRepresentative",
+    "ListElementCode": "representative_preference_reason",
+    "FieldType": "Text",
+    "ElementLabel": "Representative contact preference reason",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "RespondentRepresentative",
+    "ListElementCode": "organisationUsers",
+    "FieldType": "Collection",
+    "ElementLabel": "Organisation users",
+    "FieldTypeParameter": "OrganisationUsersIdamUser",
+    "SecurityClassification": "Public"
+  },
+  {
     "ID": "acceptOrRejectCase",
     "ListElementCode": "caseAccepted",
     "FieldType": "YesOrNo",
@@ -1446,6 +1525,13 @@
     "SecurityClassification": "Public"
   },
   {
+    "ID": "AdditionalCaseDetails",
+    "ListElementCode": "reservedToJudge",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Reserved to Judge",
+    "SecurityClassification": "Public"
+  },
+  {
     "ID": "Deposit",
     "ListElementCode": "Deposit_amount",
     "FieldType": "MoneyGBP",
@@ -1460,7 +1546,7 @@
     "ListElementCode": "depositOrderAgainst",
     "FieldType": "FixedList",
     "ElementLabel": "Deposit ordered against",
-    "FieldTypeParameter": "fl_Costs",
+    "FieldTypeParameter": "fl_ClaimantOrRespondent",
     "FieldShowCondition": "deposit_covers=\"dummy\"",
     "RetainHiddenValue": "Yes",
     "SecurityClassification": "Public"
@@ -1573,7 +1659,7 @@
     "ListElementCode": "depositRefundedTo",
     "FieldType": "FixedList",
     "ElementLabel": "Deposit refunded to",
-    "FieldTypeParameter": "fl_Costs",
+    "FieldTypeParameter": "fl_ClaimantOrRespondent",
     "FieldShowCondition": "deposit_covers=\"dummy\"",
     "RetainHiddenValue": "Yes",
     "SecurityClassification": "Public"
@@ -1640,7 +1726,7 @@
     "ListElementCode": "allActions",
     "FieldType": "Text",
     "ElementLabel": "Action",
-    "FieldShowCondition": "imported = \"Yes\" OR letters = \"Yes\"",
+    "FieldShowCondition": "(imported = \"Yes\" OR letters = \"Yes\") OR allActions = \"ECC served\"",
     "RetainHiddenValue": "Yes",
     "SecurityClassification": "Public",
     "DisplayOrder": 2
@@ -1668,6 +1754,14 @@
     "ElementLabel": "Comments",
     "SecurityClassification": "Public",
     "DisplayOrder": 5
+  },
+  {
+    "ID": "BFActions",
+    "ListElementCode": "isWaTaskCreated",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Is wa task created?",
+    "SecurityClassification": "Public",
+    "DisplayOrder": 6
   },
   {
     "ID": "bfReport",
@@ -2306,8 +2400,17 @@
     "ID": "Jurisdiction",
     "ListElementCode": "jurisdictionCodeBOC",
     "FieldType": "Label",
-    "ElementLabel": "(a) Claim of an employee for breach of contract of employment\r\n(b) Employer contract claim",
+    "ElementLabel": "Claim of an employee for breach of contract of employment",
     "FieldShowCondition": "juridictionCodesList = \"BOC\"",
+    "RetainHiddenValue": "Yes",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "Jurisdiction",
+    "ListElementCode": "jurisdictionCodeECC",
+    "FieldType": "Label",
+    "ElementLabel": "Employer contract claim",
+    "FieldShowCondition": "juridictionCodesList = \"ECC\"",
     "RetainHiddenValue": "Yes",
     "SecurityClassification": "Public"
   },
@@ -2810,7 +2913,7 @@
     "ListElementCode": "reconsiderationPartyInitiative",
     "FieldType": "FixedList",
     "ElementLabel": "Who applied for reconsideration?",
-    "FieldTypeParameter": "fl_Costs",
+    "FieldTypeParameter": "fl_ClaimantOrRespondent",
     "FieldShowCondition": "reconsiderationOwnInitiative=\"No\"",
     "RetainHiddenValue": "Yes",
     "SecurityClassification": "Public"
@@ -2978,7 +3081,7 @@
     "ListElementCode": "costs_expenses_awarded_to",
     "FieldType": "FixedList",
     "ElementLabel": "Costs/Expenses awarded to",
-    "FieldTypeParameter": "fl_Costs",
+    "FieldTypeParameter": "fl_ClaimantOrRespondent",
     "FieldShowCondition": "costs_question=\"Yes\"",
     "RetainHiddenValue": "Yes",
     "SecurityClassification": "Public"
@@ -2988,7 +3091,7 @@
     "ListElementCode": "costs_expenses_awarded_against",
     "FieldType": "FixedList",
     "ElementLabel": "Costs/Expenses awarded against",
-    "FieldTypeParameter": "fl_Costs",
+    "FieldTypeParameter": "fl_ClaimantOrRespondent",
     "FieldShowCondition": "costs_question=\"Yes\"",
     "RetainHiddenValue": "Yes",
     "SecurityClassification": "Public"
@@ -3007,7 +3110,7 @@
     "ListElementCode": "preparation_of_time_awarded_to",
     "FieldType": "FixedList",
     "ElementLabel": "Preparation of time awarded to",
-    "FieldTypeParameter": "fl_Costs",
+    "FieldTypeParameter": "fl_ClaimantOrRespondent",
     "FieldShowCondition": "costs_question=\"Yes\"",
     "RetainHiddenValue": "Yes",
     "SecurityClassification": "Public"
@@ -3017,7 +3120,7 @@
     "ListElementCode": "preparation_of_time_awarded_against",
     "FieldType": "FixedList",
     "ElementLabel": "Preparation of time awarded against",
-    "FieldTypeParameter": "fl_Costs",
+    "FieldTypeParameter": "fl_ClaimantOrRespondent",
     "FieldShowCondition": "costs_question=\"Yes\"",
     "RetainHiddenValue": "Yes",
     "SecurityClassification": "Public"
@@ -3036,7 +3139,7 @@
     "ListElementCode": "wasted_cost_awarded_to",
     "FieldType": "FixedList",
     "ElementLabel": "Wasted cost awarded to",
-    "FieldTypeParameter": "fl_Costs",
+    "FieldTypeParameter": "fl_ClaimantOrRespondent",
     "FieldShowCondition": "costs_question=\"Yes\"",
     "RetainHiddenValue": "Yes",
     "SecurityClassification": "Public"
@@ -3046,7 +3149,7 @@
     "ListElementCode": "wasted_cost_awarded_against",
     "FieldType": "FixedList",
     "ElementLabel": "Wasted cost awarded against",
-    "FieldTypeParameter": "fl_Costs",
+    "FieldTypeParameter": "fl_ClaimantOrRespondent",
     "FieldShowCondition": "costs_question=\"Yes\"",
     "RetainHiddenValue": "Yes",
     "SecurityClassification": "Public"
@@ -3407,10 +3510,29 @@
   },
   {
     "ID": "Letters",
+    "ListElementCode": "dynamicRespondentsWithEcc",
+    "FieldType": "DynamicList",
+    "ElementLabel": "Respondents with ECC",
+    "FieldShowCondition": "topLevel_Scot_Documents=\"EM-TRB-SCO-ENG-00044\"",
+    "RetainHiddenValue": "No",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "Letters",
+    "ListElementCode": "flipRespondentAndClaimantValues",
+    "FieldType": "YesOrNo",
+    "ElementLabel": "Address ECC letter to Claimant?",
+    "FieldShowCondition": "topLevel_Scot_Documents=\"EM-TRB-SCO-ENG-00044\" AND dynamicRespondentsWithEcc != \"\" AND dynamicRespondentsWithEcc != \"No respondents with ECC\"",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "Letters",
     "ListElementCode": "dynamicHearingNumber",
     "FieldType": "DynamicList",
     "ElementLabel": "Hearing Number",
-    "FieldShowCondition": "Part_9_Scot_Documents=\"72\" OR  Part_9_Scot_Documents=\"72 Reform\" OR  Part_9_Scot_Documents=\"73\" OR Part_9_Scot_Documents=\"74\" OR Part_9_Scot_Documents=\"75\" OR Part_9_Scot_Documents=\"76\" OR Part_9_Scot_Documents=\"76 Reform\" OR Part_9_Scot_Documents=\"77.1\" OR Part_9_Scot_Documents=\"77.2\" OR Part_9_Scot_Documents=\"77.2 Reform\" OR Part_9_Scot_Documents=\"80\" OR Part_9_Scot_Documents=\"81\" OR Part_9_Scot_Documents=\"82\" OR Part_9_Scot_Documents=\"83\" OR Part_9_Scot_Documents=\"84\" OR Part_9_Scot_Documents=\"85\" OR Part_9_Scot_Documents=\"86\" OR Part_9_Scot_Documents=\"87\" OR Part_9_Scot_Documents=\"90\" OR Part_9_Scot_Documents=\"91\" OR Part_9_Scot_Documents=\"91.A\" OR Part_9_Scot_Documents=\"91.B\" OR Part_9_Scot_Documents=\"195\" OR Part_9_Scot_Documents=\"196\" OR Part_9_Scot_Documents=\"198\" OR Part_9_Scot_Documents=\"199\" OR Part_9_Scot_Documents=\"200\" OR Part_9_Scot_Documents=\"201\" OR Part_9_Scot_Documents=\"202\" OR Part_9_Scot_Documents=\"222\" OR Part_9_Scot_Documents=\"223\" ",
+    "FieldShowCondition": "Part_9_Scot_Documents=\"73\" OR Part_9_Scot_Documents=\"74\" OR Part_9_Scot_Documents=\"75\" OR Part_9_Scot_Documents=\"76\" OR Part_9_Scot_Documents=\"76 Reform\" OR Part_9_Scot_Documents=\"77.1\" OR Part_9_Scot_Documents=\"77.2\" OR Part_9_Scot_Documents=\"80\" OR Part_9_Scot_Documents=\"81\" OR Part_9_Scot_Documents=\"82\" OR Part_9_Scot_Documents=\"83\" OR Part_9_Scot_Documents=\"84\" OR Part_9_Scot_Documents=\"85\" OR Part_9_Scot_Documents=\"86\" OR Part_9_Scot_Documents=\"87\" OR Part_9_Scot_Documents=\"90\" OR Part_9_Scot_Documents=\"91\" OR Part_9_Scot_Documents=\"91.A\" OR Part_9_Scot_Documents=\"91.B\" OR Part_9_Scot_Documents=\"195\" OR Part_9_Scot_Documents=\"196\" OR Part_9_Scot_Documents=\"198\" OR Part_9_Scot_Documents=\"199\" OR Part_9_Scot_Documents=\"200\" OR Part_9_Scot_Documents=\"201\" OR Part_9_Scot_Documents=\"202\" OR Part_9_Scot_Documents=\"222\" OR Part_9_Scot_Documents=\"223\" OR Part_9_Scot_Documents=\"74.2\" OR Part_9_Scot_Documents=\"199.2\" OR Part_9_Scot_Documents=\"201.2\"",
     "RetainHiddenValue": "No",
     "SecurityClassification": "Public",
     "Searchable": "N"
@@ -3605,7 +3727,7 @@
     "ListElementCode": "dynamicHearingNumber",
     "FieldType": "DynamicList",
     "ElementLabel": "Hearing Number",
-    "FieldShowCondition": "Part_9_Scot_Documents=\"72\" OR Part_9_Scot_Documents=\"72 Reform\" OR Part_9_Scot_Documents=\"73\" OR Part_9_Scot_Documents=\"74\" OR Part_9_Scot_Documents=\"75\" OR Part_9_Scot_Documents=\"76\" OR Part_9_Scot_Documents=\"76 Reform\" OR Part_9_Scot_Documents=\"77.1\" OR Part_9_Scot_Documents=\"77.2\" OR Part_9_Scot_Documents=\"80\" OR Part_9_Scot_Documents=\"81\" OR Part_9_Scot_Documents=\"82\" OR Part_9_Scot_Documents=\"83\" OR Part_9_Scot_Documents=\"84\" OR Part_9_Scot_Documents=\"85\" OR Part_9_Scot_Documents=\"86\" OR Part_9_Scot_Documents=\"87\" OR Part_9_Scot_Documents=\"90\" OR Part_9_Scot_Documents=\"91\" OR Part_9_Scot_Documents=\"91.A\" OR Part_9_Scot_Documents=\"91.B\" OR Part_9_Scot_Documents=\"195\" OR Part_9_Scot_Documents=\"196\" OR Part_9_Scot_Documents=\"198\" OR Part_9_Scot_Documents=\"199\" OR Part_9_Scot_Documents=\"200\" OR Part_9_Scot_Documents=\"201\" OR Part_9_Scot_Documents=\"202\" OR Part_9_Scot_Documents=\"222\" OR Part_9_Scot_Documents=\"223\" ",
+    "FieldShowCondition": "Part_9_Scot_Documents=\"73\" OR Part_9_Scot_Documents=\"74\" OR Part_9_Scot_Documents=\"75\" OR Part_9_Scot_Documents=\"76\" OR Part_9_Scot_Documents=\"76 Reform\" OR Part_9_Scot_Documents=\"77.1\" OR Part_9_Scot_Documents=\"77.2\" OR Part_9_Scot_Documents=\"80\" OR Part_9_Scot_Documents=\"81\" OR Part_9_Scot_Documents=\"82\" OR Part_9_Scot_Documents=\"83\" OR Part_9_Scot_Documents=\"84\" OR Part_9_Scot_Documents=\"85\" OR Part_9_Scot_Documents=\"86\" OR Part_9_Scot_Documents=\"87\" OR Part_9_Scot_Documents=\"90\" OR Part_9_Scot_Documents=\"91\" OR Part_9_Scot_Documents=\"91.A\" OR Part_9_Scot_Documents=\"91.B\" OR Part_9_Scot_Documents=\"195\" OR Part_9_Scot_Documents=\"196\" OR Part_9_Scot_Documents=\"198\" OR Part_9_Scot_Documents=\"199\" OR Part_9_Scot_Documents=\"200\" OR Part_9_Scot_Documents=\"201\" OR Part_9_Scot_Documents=\"202\" OR Part_9_Scot_Documents=\"222\" OR Part_9_Scot_Documents=\"223\" OR Part_9_Scot_Documents=\"74.2\" OR Part_9_Scot_Documents=\"199.2\" OR Part_9_Scot_Documents=\"201.2\"",
     "RetainHiddenValue": "No",
     "SecurityClassification": "Public"
   },
@@ -7661,6 +7783,35 @@
     "ListElementCode": "respondentIdamId",
     "FieldType": "Text",
     "ElementLabel": "Respondent id",
+    "SecurityClassification": "Public"
+  }
+,
+  {
+    "ID": "caseNote",
+    "ListElementCode": "title",
+    "ElementLabel": "Title",
+    "FieldType": "Text",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "caseNote",
+    "ListElementCode": "note",
+    "ElementLabel": "Note",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "caseNote",
+    "ListElementCode": "author",
+    "ElementLabel": "Author",
+    "FieldType": "Text",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "caseNote",
+    "ListElementCode": "date",
+    "ElementLabel": "Date",
+    "FieldType": "Text",
     "SecurityClassification": "Public"
   }
 ]

@@ -86,12 +86,6 @@
   {
     "CaseTypeId": "ET_EnglandWales_Multiple",
     "CaseEventID": "sendNotification",
-    "UserRole": "caseworker-employment",
-    "CRUD": "R"
-  },
-  {
-    "CaseTypeId": "ET_EnglandWales_Multiple",
-    "CaseEventID": "sendNotification",
     "UserRole": "caseworker-employment-api",
     "CRUD": "CRUD"
   },

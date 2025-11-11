@@ -106,7 +106,8 @@
     "CallBackURLSubmittedEvent": "${ET_COS_URL}/addServiceId",
     "SecurityClassification": "Public",
     "ShowEventNotes": "N",
-    "ShowSummary": "N"
+    "ShowSummary": "N",
+    "Publish": "Y"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
@@ -132,6 +133,20 @@
     "SecurityClassification": "Public",
     "ShowEventNotes": "N",
     "ShowSummary": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "REMOVE_OWN_REPRESENTATIVE",
+    "Name": "REMOVE_OWN_REPRESENTATIVE",
+    "Description": "Update a submitted case",
+    "DisplayOrder": 6,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/respondentRepresentative/removeOwnRepresentative",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "N",
+    "ShowSummary": "N",
+    "EventEnablingCondition": "caseType =\"dummy\""
   },
   {
     "CaseTypeID": "ET_EnglandWales",
@@ -176,6 +191,20 @@
     "SecurityClassification": "Public",
     "ShowEventNotes": "N",
     "ShowSummary": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "amendRespondentRepresentativeContact",
+    "Name": "Amend contact details",
+    "Description": "Amend contact details",
+    "DisplayOrder": 53,
+    "PreConditionState(s)": "Accepted",
+    "PostConditionState": "*",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/et3Response/aboutToSubmitAmendRepresentativeContact",
+    "EventEnablingCondition": "caseType =\"dummy\"",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "N",
+    "ShowSummary": "Y"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
@@ -344,7 +373,8 @@
     "EventEnablingCondition": "managingOffice !=\"Unassigned\"",
     "SecurityClassification": "Public",
     "ShowEventNotes": "N",
-    "ShowSummary": "N"
+    "ShowSummary": "N",
+    "Publish": "Y"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
@@ -407,19 +437,6 @@
   },
   {
     "CaseTypeID": "ET_EnglandWales",
-    "ID": "createCaseECC",
-    "Name": "Create Employer Contract Claim",
-    "Description": "Create Employer Contract Claim Case",
-    "DisplayOrder": 32,
-    "PostConditionState": "Accepted",
-    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/createECC",
-    "CallBackURLSubmittedEvent": "${ET_COS_URL}/linkOriginalCaseECC",
-    "SecurityClassification": "Public",
-    "ShowEventNotes": "N",
-    "ShowSummary": "N"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
     "ID": "caseTransferSameCountryEccLinkedCase",
     "Name": "Case Transfer (Eng/Wales)",
     "Description": "Transfer ECC linked case to another office within England/Wales (API)",
@@ -467,18 +484,6 @@
     "PreConditionState(s)": "Transferred",
     "PostConditionState": "Accepted(preAcceptCase.caseAccepted=\"Yes\" AND positionType!=\"Case closed\"):1;Rejected(preAcceptCase.caseAccepted=\"No\" AND positionType!=\"Case closed\"):2;Closed(positionType=\"Case closed\"):3;Submitted",
     "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/postDefaultValues",
-    "SecurityClassification": "Public",
-    "ShowEventNotes": "N",
-    "ShowSummary": "N"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "ID": "reinstateClosedCase",
-    "Name": "Reinstate Case",
-    "Description": "Reinstate Case",
-    "DisplayOrder": 41,
-    "PreConditionState(s)": "Closed",
-    "PostConditionState": "Accepted(preAcceptCase.caseAccepted=\"Yes\" AND positionType!=\"Case closed\"):1;Rejected(preAcceptCase.caseAccepted=\"No\" AND positionType!=\"Case closed\"):2;Closed",
     "SecurityClassification": "Public",
     "ShowEventNotes": "N",
     "ShowSummary": "N"
@@ -555,6 +560,20 @@
   },
   {
     "CaseTypeID": "ET_EnglandWales",
+    "ID": "refreshSharedUsers",
+    "Name": "Refresh Shared Users",
+    "Description": "Refresh Shared Users",
+    "DisplayOrder": 72,
+    "PreConditionState(s)": "Submitted;Vetted;Accepted;Rejected;Closed",
+    "PostConditionState": "*",
+    "EventEnablingCondition": "managingOffice !=\"Unassigned\"",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/refreshSharedUsers/aboutToSubmit",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "N",
+    "ShowSummary": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
     "ID": "caseTransferECM",
     "Name": "Case Transfer to ECM",
     "Description": "Transfer case to ECM system",
@@ -574,6 +593,8 @@
     "DisplayOrder": 19,
     "PreConditionState(s)": "Accepted",
     "PostConditionState": "*",
+    "CallBackURLAboutToStartEvent": "${ET_COS_URL}/et3Notification/aboutToStart",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/et3Notification/aboutToSubmit",
     "CallBackURLSubmittedEvent": "${ET_COS_URL}/et3Notification/submitted",
     "SecurityClassification": "Public",
     "ShowEventNotes": "N",
@@ -1103,5 +1124,33 @@
     "EventEnablingCondition": "caseType=\"dummy\"",
     "EndButtonLabel": "Close and return to case details",
     "CallBackURLAboutToStartEvent": "${ET_COS_URL}/claimantTSE/viewApplicationsAboutToStart"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "addCaseNote",
+    "Name": "Add Telephone Note",
+    "Description": "Add telephone note",
+    "DisplayOrder": 56,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "N",
+    "ShowSummary": "N",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/caseNotes/singles/aboutToSubmit"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "generateNotificationSummary",
+    "Name": "Generate Notification Summary",
+    "Description": "Generate Notification Summary",
+    "DisplayOrder": 57,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "N",
+    "ShowSummary": "N",
+    "CallBackURLAboutToStartEvent": "${ET_COS_URL}/notificationDocument/aboutToStart",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/notificationDocument/aboutToSubmit",
+    "CallBackURLSubmittedEvent": "${ET_COS_URL}/notificationDocument/submitted"
   }
 ]

@@ -49,18 +49,6 @@
   },
   {
     "CaseTypeId": "ET_EnglandWales",
-    "CaseEventID": "respondentTSE",
-    "UserRole": "caseworker-wa-task-configuration",
-    "CRUD": "CRU"
-  },
-  {
-    "CaseTypeId": "ET_EnglandWales",
-    "CaseEventID": "tseRespond",
-    "UserRole": "caseworker-wa-task-configuration",
-    "CRUD": "CRU"
-  },
-  {
-    "CaseTypeId": "ET_EnglandWales",
     "CaseEventID": "et3Response",
     "UserRole": "caseworker-wa-task-configuration",
     "CRUD": "CRU"
@@ -133,6 +121,24 @@
   },
   {
     "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "WA_EXPIRED_BF_ACTION_TASK",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "WA_EXPIRED_BF_ACTION_TASK",
+    "UserRole": "caseworker-wa-task-configuration",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "broughtForward",
+    "UserRole": "caseworker-wa-task-configuration",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
     "CaseEventID": "draftAndSignJudgement",
     "UserRole": "caseworker-employment-etjudge-englandwales",
     "CRUD": "CRUD"
@@ -154,5 +160,24 @@
     "CaseEventID": "draftAndSignJudgement",
     "UserRole": "caseworker-employment-api",
     "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "initiateCase",
+    "UserRole": "caseworker-wa-task-configuration",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "RECONFIGURE_WA_TASKS",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-employment-api",
+          "caseworker-wa-task-configuration"
+        ],
+        "CRUD": "CRUD"
+      }
+    ]
   }
 ]

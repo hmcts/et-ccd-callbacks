@@ -85,6 +85,18 @@
   },
   {
     "CaseTypeID": "ET_EnglandWales",
+    "CaseStateID": "Vetted",
+    "UserRole": "caseworker-caa",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseStateID": "Submitted",
+    "UserRole": "caseworker-caa",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
     "CaseStateID": "AWAITING_SUBMISSION_TO_HMCTS",
     "UserRole": "caseworker-employment-api",
     "CRUD": "CRUD"

@@ -1101,6 +1101,13 @@
   {
     "CaseTypeID": "ET_EnglandWales",
     "CaseFieldID": "respondentCollection",
+    "ListElementCode": "respondentEcc",
+    "UserRole": "caseworker-employment-legalrep-solicitor",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "respondentCollection",
     "ListElementCode": "responseToClaim",
     "UserRole": "caseworker-employment-legalrep-solicitor",
     "CRUD": "CRU"

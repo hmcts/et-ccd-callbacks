@@ -2,16 +2,26 @@
   {
     "CaseTypeId": "ET_Scotland",
     "CaseEventID": "SUBMIT_ET3_FORM",
-    "UserRole": "caseworker-wa-task-configuration",
-    "CRUD": "CRUD"
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[DEFENDANT]",
+          "caseworker-wa-task-configuration",
+          "caseworker-employment-api"
+        ],
+        "CRUD": "CRUD"
+      },
+      {
+        "UserRoles": [
+          "caseworker-employment",
+          "caseworker-employment-scotland",
+          "caseworker-employment-etjudge",
+          "caseworker-employment-etjudge-scotland"
+        ],
+        "CRUD": "R"
+      }
+    ]
   },
-  {
-    "CaseTypeId": "ET_Scotland",
-    "CaseEventID": "SUBMIT_ET3_FORM",
-    "UserRole": "citizen",
-    "CRUD": "CRUD"
-  }
-  ,
   {
     "CaseTypeId": "ET_Scotland",
     "CaseEventID": "UPDATE_ET3_FORM",

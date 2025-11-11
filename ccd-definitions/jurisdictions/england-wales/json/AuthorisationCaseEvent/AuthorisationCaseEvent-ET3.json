@@ -2,14 +2,24 @@
   {
     "CaseTypeId": "ET_EnglandWales",
     "CaseEventID": "SUBMIT_ET3_FORM",
-    "UserRole": "caseworker-wa-task-configuration",
-    "CRUD": "CRUD"
-  },
-  {
-    "CaseTypeId": "ET_EnglandWales",
-    "CaseEventID": "SUBMIT_ET3_FORM",
-    "UserRole": "citizen",
-    "CRUD": "CRUD"
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[DEFENDANT]",
+          "caseworker-wa-task-configuration"
+        ],
+        "CRUD": "CRUD"
+      },
+      {
+        "UserRoles": [
+          "caseworker-employment",
+          "caseworker-employment-englandwales",
+          "caseworker-employment-etjudge",
+          "caseworker-employment-etjudge-englandwales"
+        ],
+        "CRUD": "R"
+      }
+    ]
   },
   {
     "CaseTypeId": "ET_EnglandWales",

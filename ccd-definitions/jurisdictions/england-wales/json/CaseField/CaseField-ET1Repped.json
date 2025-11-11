@@ -222,6 +222,14 @@
   },
   {
     "CaseTypeID": "ET_EnglandWales",
+    "ID": "representativeAddress",
+    "Label": "Contact address if different from registered address",
+    "FieldType": "AddressUK",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
     "ID": "representativePhoneNumber",
     "Label": "What is you contact phone number?",
     "HintText": "Where we can contact you during the day. For international numbers include the country code.",

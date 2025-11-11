@@ -11,17 +11,7 @@
   {"CaseTypeId": "ET_EnglandWales", "CaseEventID": "et1SectionThree", "UserRole": "[CLAIMANTSOLICITOR]", "CRUD": "CRU"},
   {"CaseTypeId": "ET_EnglandWales", "CaseEventID": "submitEt1Draft", "UserRole": "[CLAIMANTSOLICITOR]", "CRUD": "CRU"},
   {"CaseTypeId": "ET_EnglandWales", "CaseEventID": "createDraftEt1", "UserRole": "[CLAIMANTSOLICITOR]", "CRUD": "CRU"},
-  {"CaseTypeId": "ET_EnglandWales", "CaseEventID": "et3Response", "UserRole": "[CLAIMANTSOLICITOR]", "CRUD": "D"},
-  {"CaseTypeId": "ET_EnglandWales", "CaseEventID": "et3ResponseEmploymentDetails", "UserRole": "[CLAIMANTSOLICITOR]", "CRUD": "D"},
-  {"CaseTypeId": "ET_EnglandWales", "CaseEventID": "et3ResponseDetails", "UserRole": "[CLAIMANTSOLICITOR]", "CRUD": "D"},
-  {"CaseTypeId": "ET_EnglandWales", "CaseEventID": "submitEt3", "UserRole": "[CLAIMANTSOLICITOR]", "CRUD": "D"},
-  {"CaseTypeId": "ET_EnglandWales", "CaseEventID": "respondentTSE", "UserRole": "[CLAIMANTSOLICITOR]", "CRUD": "D"},
-  {"CaseTypeId": "ET_EnglandWales", "CaseEventID": "respondentTseAllApplications", "UserRole": "[CLAIMANTSOLICITOR]", "CRUD": "D"},
-  {"CaseTypeId": "ET_EnglandWales", "CaseEventID": "viewRespondentTSEApplications", "UserRole": "[CLAIMANTSOLICITOR]", "CRUD": "D"},
   {"CaseTypeId": "ET_EnglandWales", "CaseEventID": "tseClaimantRepResponse", "UserRole": "[CLAIMANTSOLICITOR]", "CRUD": "CRUD"},
-  {"CaseTypeId": "ET_EnglandWales", "CaseEventID": "pseRespondentRespondToTribunal", "UserRole": "[CLAIMANTSOLICITOR]", "CRUD": "D"},
-  {"CaseTypeId": "ET_EnglandWales", "CaseEventID": "pseRespondentViewNotification", "UserRole": "[CLAIMANTSOLICITOR]", "CRUD": "D"},
-  {"CaseTypeId": "ET_EnglandWales", "CaseEventID": "viewAllNotifications", "UserRole": "[CLAIMANTSOLICITOR]", "CRUD": "D"},
   {"CaseTypeId": "ET_EnglandWales", "CaseEventID": "bundlesRespondentPrepareDoc", "UserRole": "[CLAIMANTSOLICITOR]", "CRUD": "D"},
   {
     "CaseTypeId": "ET_EnglandWales",
@@ -40,6 +30,6 @@
   {"CaseTypeId": "ET_EnglandWales", "CaseEventID": "claimantViewAllNotifications", "UserRole": "[CLAIMANTSOLICITOR]", "CRUD": "CRU"},
   {"CaseTypeId": "ET_EnglandWales", "CaseEventID": "claimantViewAllNotifications", "UserRole": "caseworker-employment-api", "CRUD": "CRUD"},
   {"CaseTypeId": "ET_EnglandWales", "CaseEventID": "claimantRespondToNotification", "UserRole": "[CLAIMANTSOLICITOR]", "CRUD": "CRU"},
-  {"CaseTypeId": "ET_EnglandWales", "CaseEventID": "claimantRespondToNotification", "UserRole": "caseworker-employment-api", "CRUD": "CRUD"}
-
+  {"CaseTypeId": "ET_EnglandWales", "CaseEventID": "claimantRespondToNotification", "UserRole": "caseworker-employment-api", "CRUD": "CRUD"},
+  {"CaseTypeId": "ET_EnglandWales", "CaseEventID": "amendClaimantRepresentativeContact", "AccessControl": [{"UserRoles": ["[CLAIMANTSOLICITOR]", "caseworker-employment-api"], "CRUD": "CRUD"}]}
 ]

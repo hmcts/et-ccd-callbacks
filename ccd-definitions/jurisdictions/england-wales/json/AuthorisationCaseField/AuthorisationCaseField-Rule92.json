@@ -14,7 +14,19 @@
   {
     "CaseTypeId": "ET_EnglandWales",
     "CaseFieldID": "tseApplicationStoredCollection",
-    "UserRole": "citizen",
+    "UserRole": "[CREATOR]",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "tseRespondentStoredCollection",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "tseRespondentStoredCollection",
+    "UserRole": "[DEFENDANT]",
     "CRUD": "CRUD"
   }
 ]

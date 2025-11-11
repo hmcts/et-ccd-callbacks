@@ -387,6 +387,14 @@
   },
   {
     "CaseTypeID": "ET_EnglandWales",
+    "ID": "repCollectionToRemove",
+    "Label": "Respondent representative(s) to remove",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "RespondentRepresentative",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
     "ID": "jurCodesCollection",
     "Label": "Jurisdiction",
     "FieldType": "Collection",
@@ -541,6 +549,14 @@
   },
   {
     "CaseTypeID": "ET_EnglandWales",
+    "ID": "respondentsWithEcc",
+    "Label": "Respondents with an ECC",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
     "ID": "counterClaim",
     "Label": "Employer Contract Claim case",
     "FieldType": "Text",
@@ -551,15 +567,6 @@
     "ID": "caseRefECC",
     "Label": "Enter the Case Number that this ECC relates to",
     "FieldType": "Text",
-    "SecurityClassification": "Public",
-    "Searchable": "N"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "ID": "respondentECC",
-    "Label": "Which respondent is raising the Employer Contract Claim?",
-    "FieldType": "DynamicList",
-    "FieldTypeParameter": "Text",
     "SecurityClassification": "Public",
     "Searchable": "N"
   },
@@ -3029,26 +3036,15 @@
   },
   {
     "CaseTypeID": "ET_EnglandWales",
-    "ID": "et3ResponsePhone",
-    "Label": "What is your contact phone number?",
-    "HintText": "Where we can contact you (as the representative) during the day. For international numbers include the country code.",
-    "FieldType": "Text",
-    "SecurityClassification": "Public",
-    "Searchable": "N"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "ID": "et3ResponseReference",
-    "Label": "What is your reference number?",
-    "FieldType": "Text",
-    "SecurityClassification": "Public",
-    "Searchable": "N"
+    "ID": "et3RepresentativeInfoFirstWords",
+    "Label": "In most circumstances the tribunal will communicate with you (as the representative) by email. If you need communication by post, please tell us why.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
     "ID": "et3ResponseContactPreference",
     "Label": "How would you prefer to be contacted?",
-    "HintText": "In most circumstances the tribunal will communicate by email. If you need communication by post, please tell us why.",
     "FieldType": "FixedRadioList",
     "FieldTypeParameter": "frl_et3_contact_preference",
     "SecurityClassification": "Public",
@@ -3058,6 +3054,40 @@
     "CaseTypeID": "ET_EnglandWales",
     "ID": "et3ResponseContactReason",
     "Label": "Provide a reason why you have selected post",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "et3ResponseContactLanguage",
+    "Label": "What language do you want us to use when we contact you?",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "fl_languages",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "et3ResponsePhone",
+    "Label": "What is your contact phone number?",
+    "HintText": "Where we can contact you during the day. For international numbers include the country code.",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "et3ResponseAddress",
+    "Label": "Contact address if different from registered address",
+    "FieldType": "AddressUK",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "et3ResponseReference",
+    "Label": "What is your reference number?",
     "FieldType": "Text",
     "SecurityClassification": "Public",
     "Searchable": "N"
@@ -3508,6 +3538,7 @@
     "ID": "referralSubjectSpecify",
     "Label": "Please specify",
     "FieldType": "Text",
+    "Max": 30,
     "SecurityClassification": "Public",
     "Searchable": "N"
   },
@@ -4455,7 +4486,7 @@
     "ID": "tseAdminSelectPartyRespond",
     "Label": "Select the party or parties who must respond",
     "FieldType": "FixedList",
-    "FieldTypeParameter": "fl_tseAdminSelectPartyRespond",
+    "FieldTypeParameter": "fl_ClaimantRespondentBothParties",
     "SecurityClassification": "Public",
     "Searchable": "N"
   },
@@ -4737,7 +4768,7 @@
     "ID": "tseAdmReplyRequestSelectPartyRespond",
     "Label": "Select the party or parties who must respond",
     "FieldType": "FixedList",
-    "FieldTypeParameter": "fl_tseAdminSelectPartyRespond",
+    "FieldTypeParameter": "fl_ClaimantRespondentBothParties",
     "SecurityClassification": "Public",
     "Searchable": "N"
   },
@@ -4746,7 +4777,7 @@
     "ID": "tseAdmReplyCmoSelectPartyRespond",
     "Label": "Select the party or parties who must respond",
     "FieldType": "FixedList",
-    "FieldTypeParameter": "fl_tseAdminSelectPartyRespond",
+    "FieldTypeParameter": "fl_ClaimantRespondentBothParties",
     "SecurityClassification": "Public",
     "Searchable": "N"
   },
@@ -5207,7 +5238,7 @@
   {
     "CaseTypeID": "ET_EnglandWales",
     "ID": "notificationsTabLinks",
-    "Label": "<a href=\"/cases/case-details/${[CASE_REFERENCE]}/trigger/sendNotification/sendNotification1\">Send a notification</a> <br> <a href=\"/cases/case-details/${[CASE_REFERENCE]}/trigger/respondNotification/respondNotification1\">Respond to a notification</a>",
+    "Label": "<a href=\"/cases/case-details/${[CASE_REFERENCE]}/trigger/sendNotification/sendNotification1\">Send a notification</a> <br> <a href=\"/cases/case-details/${[CASE_REFERENCE]}/trigger/respondNotification/respondNotification1\">Respond to a notification</a><br> <a href=\"/cases/case-details/${[CASE_REFERENCE]}/trigger/generateNotificationSummary/generateNotificationSummary1\">Generate Notification Summary</a>",
     "FieldType": "Label",
     "SecurityClassification": "Public"
   },
@@ -6558,5 +6589,47 @@
     "FieldType": "YesOrNo",
     "SecurityClassification": "Public",
     "Searchable": "Y"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "claimantRepresentativeRemoved",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "caseNotesCollection",
+    "Label": "Telephone notes",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "caseNote",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "addCaseNote",
+    "Label": "Add telephone note",
+    "FieldType": "caseNote",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "representativeContactChangeOption",
+    "Label": " ",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "fl_representativeContactChangeOptions",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "myHmctsAddressText",
+    "Label": "Chosen address",
+    "FieldType": "TextArea",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
   }
 ]

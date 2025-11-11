@@ -519,6 +519,16 @@
     "ID": "ReferralDetails",
     "CaseEventID": "createReferral",
     "CaseFieldID": "referralCollection",
+    "ListElementCode": "referralSubjectSpecify",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "ReferralDetails",
+    "CaseEventID": "createReferral",
+    "CaseFieldID": "referralCollection",
     "ListElementCode": "isUrgent",
     "EventElementLabel": " ",
     "FieldDisplayOrder": 3,
@@ -542,6 +552,16 @@
     "ListElementCode": "referralSubject",
     "EventElementLabel": " ",
     "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "ReferralReplyDetails",
+    "CaseEventID": "replyToReferral",
+    "CaseFieldID": "referralCollection",
+    "ListElementCode": "referralSubjectSpecify",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 2,
     "DisplayContext": "OPTIONAL",
     "Publish": "Y"
   },
@@ -902,6 +922,16 @@
     "ListElementCode": "responseReceivedCount",
     "EventElementLabel": " ",
     "FieldDisplayOrder": 4,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "amendRespondentDetails",
+    "CaseEventID": "amendRespondentDetails",
+    "CaseFieldID": "respondentCollection",
+    "ListElementCode": "respondentEccReplyCount",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 5,
     "DisplayContext": "OPTIONAL",
     "Publish": "Y"
   },

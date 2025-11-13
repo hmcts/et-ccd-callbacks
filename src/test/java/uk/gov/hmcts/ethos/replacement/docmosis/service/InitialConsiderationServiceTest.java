@@ -654,7 +654,7 @@ class InitialConsiderationServiceTest {
         caseData.setEtInitialConsiderationHearing(EXPECTED_HEARING_DETAILS_STRING);
 
         initialConsiderationService.setIsHearingAlreadyListed(caseData, ENGLANDWALES_CASE_TYPE_ID);
-        assertThat(caseData.getEtICHearingAlreadyListed()).isNull();
+        assertThat(caseData.getEtICHearingAlreadyListed()).isNotNull();
     }
 
     private List<JurCodesTypeItem> generateJurisdictionCodes() {
@@ -973,5 +973,72 @@ class InitialConsiderationServiceTest {
         assertThat(caseData1.getEtICHearingNotListedListForFinalHearing()).isNull();
         assertThat(caseData1.getEtICHearingNotListedUDLHearing()).isNull();
         assertThat(caseData1.getEtICHearingNotListedAnyOtherDirections()).isNull();
+    }
+
+    @Test
+    void getEarliestHearingDateForListedHearings_shouldReturnEarliestFutureDate_whenValidListedHearingsExist() {
+        List<DateListedTypeItem> hearingDates = List.of(
+                createDate("2026-10-15T10:00:00.000", "Listed"),
+                createDate("2026-10-10T10:00:00.000", "Listed"),
+                createDate("2026-10-20T10:00:00.000", "Listed")
+        );
+
+        Optional<LocalDate> result = initialConsiderationService.getEarliestHearingDateForListedHearings(hearingDates);
+
+        assertThat(result).isPresent();
+        assertThat(result.get()).isEqualTo(LocalDate.of(2026, 10, 10));
+    }
+
+    @Test
+    void getEarliestHearingDateForListedHearings_shouldReturnEmpty_whenNoListedHearingsExist() {
+        List<DateListedTypeItem> hearingDates = List.of(
+                createDate("2023-10-15T10:00:00.000", "Not Listed"),
+                createDate("2023-10-10T10:00:00.000", "Cancelled")
+        );
+
+        Optional<LocalDate> result = initialConsiderationService.getEarliestHearingDateForListedHearings(hearingDates);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void getEarliestHearingDateForListedHearings_shouldReturnEmpty_whenAllHearingDatesAreInThePast() {
+        List<DateListedTypeItem> hearingDates = List.of(
+                createDate("2022-10-15T10:00:00.000", "Listed"),
+                createDate("2022-10-10T10:00:00.000", "Listed")
+        );
+
+        Optional<LocalDate> result = initialConsiderationService.getEarliestHearingDateForListedHearings(hearingDates);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void getEarliestHearingDateForListedHearings_shouldReturnEmpty_whenHearingDatesListIsEmpty() {
+        List<DateListedTypeItem> hearingDates = new ArrayList<>();
+
+        Optional<LocalDate> result = initialConsiderationService.getEarliestHearingDateForListedHearings(hearingDates);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void getEarliestHearingDateForListedHearings_shouldReturnEmpty_whenHearingDatesListIsNull() {
+        Optional<LocalDate> result = initialConsiderationService.getEarliestHearingDateForListedHearings(null);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void getEarliestHearingDateForListedHearings_shouldIgnoreInvalidDateFormats() {
+        List<DateListedTypeItem> hearingDates = List.of(
+                createDate("InvalidDate", "Listed"),
+                createDate("2026-10-15T10:00:00.000", "Listed")
+        );
+
+        Optional<LocalDate> result = initialConsiderationService.getEarliestHearingDateForListedHearings(hearingDates);
+
+        assertThat(result).isPresent();
+        assertThat(result.get()).isEqualTo(LocalDate.of(2026, 10, 15));
     }
 }

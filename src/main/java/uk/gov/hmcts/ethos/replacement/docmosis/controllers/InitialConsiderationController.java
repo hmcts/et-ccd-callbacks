@@ -17,6 +17,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.InitialConsiderationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
@@ -145,7 +146,7 @@ public class InitialConsiderationController {
         // availability for video hearing) of all respondents in a concatenated string format
         caseData.setEtInitialConsiderationRespondent(initialConsiderationService.setRespondentDetails(caseData));
         //hearing details
-        initialConsiderationService.setEtInitialConsiderationListedHearingType(caseData);
+        HearingsHelper.setEtInitialConsiderationListedHearingType(caseData);
 
         caseData.setEtInitialConsiderationHearing(initialConsiderationService.getHearingDetails(
                 caseData.getHearingCollection()));

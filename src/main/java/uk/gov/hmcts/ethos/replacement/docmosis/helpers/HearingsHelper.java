@@ -126,21 +126,21 @@ public final class HearingsHelper {
     }
 
     // Returns the earliest future listed date, or empty if none
-    private static Optional<java.time.LocalDate> getEarliestListedFutureHearingDate(
+    private static Optional<LocalDate> getEarliestListedFutureHearingDate(
             List<DateListedTypeItem> hearingDates) {
         if (CollectionUtils.isEmpty(hearingDates)) {
             return Optional.empty();
         }
-        java.time.LocalDate today = java.time.LocalDate.now();
+        LocalDate today = LocalDate.now();
         return hearingDates.stream()
-                .filter(HearingsHelper::isListedHearing)
-                .map(DateListedTypeItem::getValue)
-                .filter(hearingDate -> hearingDate.getListedDate() != null
-                        && !hearingDate.getListedDate().isEmpty())
-                .map(hearingDateItem -> java.time.LocalDateTime.parse(
-                        hearingDateItem.getListedDate()).toLocalDate())
-                .filter(date -> date.isAfter(today))
-                .min(java.util.Comparator.naturalOrder());
+            .filter(HearingsHelper::isListedHearing)
+            .map(DateListedTypeItem::getValue)
+            .map(DateListedType::getListedDate)
+            .filter(listedDate -> !isNullOrEmpty(listedDate))
+            .map(listedDate -> LocalDateTime.parse(listedDate).toLocalDate())
+            .filter(date -> date.isAfter(today))
+            .min(Comparator.naturalOrder());
+    }
     }
 
     /**

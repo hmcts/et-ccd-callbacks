@@ -171,9 +171,25 @@ public final class InitialConsiderationHelper {
                         Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
                                 .map(EtICListForFinalHearingUpdated::getEtICFinalHearingIsEJSitAlone)
                                 .orElse(null))
-                .etICFinalHearingIsEJSitAloneReason(
+                .etICFinalHearingIsEJSitAloneReasonYes(
                         Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
-                                .map(EtICListForFinalHearingUpdated::getEtICFinalHearingIsEJSitAloneReason)
+                                .map(reasons -> getSortedEJSitAloneReasons(
+                                        caseData.getEtICHearingNotListedListForFinalHearingUpdated()
+                                                .getEtICFinalHearingIsEJSitAloneReasonYes()))
+                                .orElse(null))
+                .etICFinalHearingIsEJSitAloneReasonYesOther(
+                        Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
+                                .map(EtICListForFinalHearingUpdated::getEtICFinalHearingIsEJSitAloneReasonYesOther)
+                                .orElse(null))
+                .etICFinalHearingIsEJSitAloneReasonNo(
+                        Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
+                                .map(reasons -> getSortedEJSitAloneReasons(
+                                        caseData.getEtICHearingNotListedListForFinalHearingUpdated()
+                                                .getEtICFinalHearingIsEJSitAloneReasonNo()))
+                                .orElse(null))
+                .etICFinalHearingIsEJSitAloneReasonNoOther(
+                        Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
+                                .map(EtICListForFinalHearingUpdated::getEtICFinalHearingIsEJSitAloneReasonNoOther)
                                 .orElse(null))
                 .etICFinalHearingIsEJSitAloneFurtherDetails(
                         Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
@@ -255,6 +271,24 @@ public final class InitialConsiderationHelper {
                 .data(data).build();
 
         return OBJECT_MAPPER.writeValueAsString(document);
+    }
+
+    private static List<String> getSortedEJSitAloneReasons(List<String> ejSitAloneYesReasons) {
+        if (CollectionUtils.isEmpty(ejSitAloneYesReasons)) {
+            return null;
+        }
+
+        List<String> sortedReasons = new ArrayList<>(ejSitAloneYesReasons);
+        sortedReasons.sort((a, b) -> {
+            if (a.equalsIgnoreCase(OTHER)) {
+                return 1;   // "Other" goes last
+            }
+            if (b.equalsIgnoreCase(OTHER)) {
+                return -1;  // "Other" goes last
+            }
+            return a.compareToIgnoreCase(b);  // otherwise normal alphabetical
+        });
+        return sortedReasons;
     }
 
     private static String getDocumentRequestEW(CaseData caseData, String accessKey) throws JsonProcessingException {

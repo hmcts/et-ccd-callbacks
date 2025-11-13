@@ -9,6 +9,7 @@ import uk.gov.hmcts.et.common.model.ccd.EtICHearingListedAnswers;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingDetailTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingDetailType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 
@@ -16,10 +17,13 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -126,42 +130,35 @@ public final class HearingsHelper {
     }
 
     // Returns the earliest future listed date, or empty if none
-    private static Optional<LocalDate> getEarliestListedFutureHearingDate(
+    public static Optional<LocalDate> getEarliestListedFutureHearingDate(
             List<DateListedTypeItem> hearingDates) {
         if (CollectionUtils.isEmpty(hearingDates)) {
             return Optional.empty();
         }
+
+        DateTimeFormatter formatter = new DateTimeFormatterBuilder()
+                .appendPattern("yyyy-MM-dd'T'HH:mm:ss")
+                .optionalStart().appendPattern(".SSS").optionalEnd()
+                .toFormatter();
         LocalDate today = LocalDate.now();
         return hearingDates.stream()
             .filter(HearingsHelper::isListedHearing)
             .map(DateListedTypeItem::getValue)
             .map(DateListedType::getListedDate)
-            .filter(listedDate -> !isNullOrEmpty(listedDate))
-            .map(listedDate -> LocalDateTime.parse(listedDate).toLocalDate())
+            .filter(listedDate -> !isNullOrEmpty(listedDate) && isValidDateFormat(listedDate, formatter))
+            .map(listedDate -> LocalDateTime.parse(listedDate, formatter).toLocalDate())
             .filter(date -> date.isAfter(today))
             .min(Comparator.naturalOrder());
     }
-    }
 
-    /**
-     * Select and return the earliest future hearings date for Initial Consideration.
-     *
-     * @param hearingDates the list of hearing dates in the case
-     * @return earliest future hearing date
-     */
-    public static Optional<LocalDate> getEarliestHearingDate(List<DateListedTypeItem> hearingDates) {
-        if (CollectionUtils.isEmpty(hearingDates)) {
-            return Optional.empty();
+    private static boolean isValidDateFormat(String dateStr, DateTimeFormatter formatter) {
+        try {
+            LocalDateTime.parse(dateStr, formatter);
+            return true;
+        } catch (Exception e) {
+            log.warn("Invalid date format encountered: {}", dateStr);
+            return false;
         }
-
-        return hearingDates.stream().filter(dateListedTypeItem ->
-                        isListedHearing(dateListedTypeItem) && isFutureHearingDate(dateListedTypeItem))
-                .map(DateListedTypeItem::getValue)
-                .filter(hearingDate -> hearingDate.getListedDate() != null
-                        && !hearingDate.getListedDate().isEmpty())
-                .map(hearingDateItem -> LocalDateTime.parse(
-                        hearingDateItem.getListedDate()).toLocalDate())
-                .min(Comparator.naturalOrder());
     }
 
     private static boolean isListedHearing(DateListedTypeItem dateListedTypeItem) {
@@ -170,21 +167,6 @@ public final class HearingsHelper {
         }
 
         return HEARING_STATUS_LISTED.equals(dateListedTypeItem.getValue().getHearingStatus());
-    }
-
-    private static boolean isFutureHearingDate(DateListedTypeItem dateListedTypeItem) {
-        if (dateListedTypeItem == null || dateListedTypeItem.getValue() == null
-                || dateListedTypeItem.getValue().getListedDate() == null
-                || dateListedTypeItem.getValue().getListedDate().isEmpty()) {
-            return false;
-        }
-        try {
-            return LocalDateTime.parse(dateListedTypeItem.getValue().getListedDate())
-                    .toLocalDate().isAfter(LocalDate.now());
-        } catch (Exception e) {
-            log.error("Error parsing listed date: {}", dateListedTypeItem.getValue().getListedDate(), e);
-            return false;
-        }
     }
 
     private static void findHearingNumberErrors(List<String> errors, HearingTypeItem hearingTypeItem) {

@@ -304,7 +304,7 @@ public class InitialConsiderationService {
      * @return earliest future hearing date
      */
     public Optional<LocalDate> getEarliestHearingDateForListedHearings(List<DateListedTypeItem> hearingDates) {
-        return HearingsHelper.getEarliestHearingDate(hearingDates);
+        return HearingsHelper.getEarliestListedFutureHearingDate(hearingDates);
     }
 
     /**

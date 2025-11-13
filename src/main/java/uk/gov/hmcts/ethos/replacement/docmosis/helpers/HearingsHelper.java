@@ -111,18 +111,18 @@ public final class HearingsHelper {
         }
 
         return hearingCollection.stream()
-                .filter(hearingTypeItem -> hearingTypeItem != null
-                        && hearingTypeItem.getValue() != null)
-                .map(HearingTypeItem::getValue)
-                .filter(hearing -> hearing.getHearingDateCollection() != null
-                        && !hearing.getHearingDateCollection().isEmpty()
-                        && hearing.getHearingDateCollection().stream().anyMatch(HearingsHelper::isListedHearing))
-                .map(hearing -> new Object[] { hearing,
-                        getEarliestListedFutureHearingDate(hearing.getHearingDateCollection()).orElse(null) })
-                .filter(arr -> arr[1] != null)
-                .min(Comparator.comparing(arr -> (java.time.LocalDate) arr[1]))
-                .map(arr -> (HearingType) arr[0])
-                .orElse(null);
+            .filter(hearingTypeItem -> hearingTypeItem != null
+                    && hearingTypeItem.getValue() != null)
+            .map(HearingTypeItem::getValue)
+            .filter(hearing -> CollectionUtils.isNotEmpty(hearing.getHearingDateCollection())
+                    && hearing.getHearingDateCollection().stream().anyMatch(HearingsHelper::isListedHearing))
+            .map(hearing -> Map.entry(
+                hearing, 
+                getEarliestListedFutureHearingDate(hearing.getHearingDateCollection())))
+            .filter(entry -> entry.getValue().isPresent())
+            .min(Comparator.comparing(entry -> entry.getValue().orElse(null)))
+            .map(Map.Entry::getKey)
+            .orElse(null);
     }
 
     // Returns the earliest future listed date, or empty if none

@@ -17,6 +17,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.InitialConsiderationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
@@ -138,27 +139,31 @@ public class InitialConsiderationController {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        CaseData  caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        initialConsiderationService.clearOldEtICHearingListedAnswersValues(caseData);
 
         // Sets the respondent details(respondent ET1 and ET3 names, hearing panel preference, and
         // availability for video hearing) of all respondents in a concatenated string format
         caseData.setEtInitialConsiderationRespondent(initialConsiderationService.setRespondentDetails(caseData));
         //hearing details
+        HearingsHelper.setEtInitialConsiderationListedHearingType(caseData);
+
         caseData.setEtInitialConsiderationHearing(initialConsiderationService.getHearingDetails(
                 caseData.getHearingCollection()));
 
         //claimant hearing panel preference
-        caseData.setEtIcHearingPanelPreference(
-                initialConsiderationService.getClaimantHearingPanelPreference(caseData.getClaimantHearingPreference()));
+        caseData.setEtIcHearingPanelPreference(initialConsiderationService.getClaimantHearingPanelPreference(
+                caseData.getClaimantHearingPreference()));
 
         //JurCodes
-        String caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();
-
+        String caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId()
         caseData.setEtInitialConsiderationJurisdictionCodes(
                 initialConsiderationService.generateJurisdictionCodesHtml(
+
                         caseData.getJurCodesCollection(), caseTypeId));
         initialConsiderationService.setIsHearingAlreadyListed(caseData, caseTypeId);
         initialConsiderationService.initialiseInitialConsideration(ccdRequest.getCaseDetails());
+
         if (CollectionUtils.isNotEmpty(caseData.getEtICHearingNotListedList())) {
             initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData, caseTypeId);
         }

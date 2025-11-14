@@ -20,19 +20,15 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.EccCounterClaimTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
-import uk.gov.hmcts.et.common.model.ccd.types.EccCounterClaimType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.generic.BaseCaseData;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ECCHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCasesSendingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
 
@@ -41,7 +37,7 @@ import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -54,16 +50,13 @@ import static java.util.Collections.singletonMap;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ABOUT_TO_SUBMIT_EVENT_CALLBACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.DEFAULT_FLAGS_IMAGE_FILE_NAME;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPLOYMENT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET3_DUE_DATE_FROM_SERVING_DATE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.FLAG_ECC;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.INDIVIDUAL_TYPE_CLAIMANT;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.MID_EVENT_CALLBACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
@@ -82,7 +75,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.TribunalOfficesSer
 public class CaseManagementForCaseWorkerService {
     private final CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
     private final CcdClient ccdClient;
-    private final ClerkService clerkService;
     private final FeatureToggleService featureToggleService;
     private final String hmctsServiceId;
     private final AdminUserService adminUserService;
@@ -92,8 +84,6 @@ public class CaseManagementForCaseWorkerService {
 
     private static final String MISSING_CLAIMANT = "Missing claimant";
     private static final String MISSING_RESPONDENT = "Missing respondent";
-    private static final String MESSAGE = "Failed to link ECC case for case id : ";
-    private static final String CASE_NOT_FOUND_MESSAGE = "Case Reference Number not found.";
     public static final String LISTED_DATE_ON_WEEKEND_MESSAGE = "A hearing date you have entered "
             + "falls on a weekend. You cannot list this case on a weekend. Please amend the date of Hearing ";
     public static final String NEGATIVE_HEARING_LENGTH_MESSAGE = "The estimated hearing length for hearing %s must be "
@@ -106,7 +96,7 @@ public class CaseManagementForCaseWorkerService {
     public static final String CASE_MANAGEMENT_LABEL = "Employment Tribunals";
     public static final String CASE_MANAGEMENT_CODE = "Employment";
     private static final String EMPLOYMENT_JURISDICTION = "EMPLOYMENT";
-    public static final String ET3_RESPONSE_RECEIVED_INITIAL_VALUE = "1";
+    public static final String COUNTER_FIELD_INITIAL_VALUE = "1";
     private final String ccdGatewayBaseUrl;
     private final List<String> caseTypeIdsToCheck = List.of("ET_EnglandWales", "ET_Scotland", "Bristol",
             "Leeds", "LondonCentral", "LondonEast", "LondonSouth", "Manchester", "MidlandsEast", "MidlandsWest",
@@ -115,7 +105,6 @@ public class CaseManagementForCaseWorkerService {
     @Autowired
     public CaseManagementForCaseWorkerService(CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService,
                                               CcdClient ccdClient,
-                                              ClerkService clerkService,
                                               FeatureToggleService featureToggleService,
                                               @Value("${hmcts_service_id}") String hmctsServiceId,
                                               AdminUserService adminUserService,
@@ -125,7 +114,6 @@ public class CaseManagementForCaseWorkerService {
                                               MultipleCasesSendingService multipleCasesSendingService) {
         this.caseRetrievalForCaseWorkerService = caseRetrievalForCaseWorkerService;
         this.ccdClient = ccdClient;
-        this.clerkService = clerkService;
         this.featureToggleService = featureToggleService;
         this.hmctsServiceId = hmctsServiceId;
         this.adminUserService = adminUserService;
@@ -202,12 +190,13 @@ public class CaseManagementForCaseWorkerService {
 
     private void respondentDefaults(CaseData caseData) {
         if (caseData.getRespondentCollection() != null && !caseData.getRespondentCollection().isEmpty()) {
-            RespondentSumType respondentSumType = caseData.getRespondentCollection().get(0).getValue();
+            RespondentSumType respondentSumType = caseData.getRespondentCollection().getFirst().getValue();
             caseData.setRespondent(nullCheck(respondentSumType.getRespondentName()));
             for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
                 checkExtensionRequired(respondentSumTypeItem);
                 checkResponseReceived(respondentSumTypeItem);
                 checkResponseContinue(respondentSumTypeItem);
+                checkRespondentHasEcc(respondentSumTypeItem);
                 clearRespondentTypeFields(respondentSumTypeItem);
             }
         } else {
@@ -224,6 +213,12 @@ public class CaseManagementForCaseWorkerService {
     private void checkResponseReceived(RespondentSumTypeItem respondentSumTypeItem) {
         if (respondentSumTypeItem.getValue().getResponseReceived() == null) {
             respondentSumTypeItem.getValue().setResponseReceived(NO);
+        }
+    }
+
+    private void checkRespondentHasEcc(RespondentSumTypeItem respondentSumTypeItem) {
+        if (isNullOrEmpty(respondentSumTypeItem.getValue().getRespondentEcc())) {
+            respondentSumTypeItem.getValue().setRespondentEcc(NO);
         }
     }
 
@@ -274,17 +269,35 @@ public class CaseManagementForCaseWorkerService {
                 && featureToggleService.isWorkAllocationEnabled()
                 && !isEmpty(caseData.getRespondentCollection())) {
             updateResponseReceivedCounter(caseData.getRespondentCollection());
+            updateRespondentEccReplyCounter(caseData.getRespondentCollection());
         }
     }
 
     private void updateResponseReceivedCounter(List<RespondentSumTypeItem> respondentCollection) {
-        RespondentSumType firstRespondent = respondentCollection.get(0).getValue();
+        RespondentSumType firstRespondent = respondentCollection.getFirst().getValue();
         if (YES.equals(firstRespondent.getResponseReceived())) {
             firstRespondent.setResponseReceivedCount(
                     StringUtils.isBlank(firstRespondent.getResponseReceivedCount())
-                            ? ET3_RESPONSE_RECEIVED_INITIAL_VALUE
+                            ? COUNTER_FIELD_INITIAL_VALUE
                             : Integer.toString(Integer.parseInt(firstRespondent.getResponseReceivedCount()) + 1)
             );
+        }
+    }
+
+    public void setNextEarliestListedHearing(CaseData caseData) {
+        HearingsHelper.setEtInitialConsiderationListedHearingType(caseData);
+    }
+
+    private void updateRespondentEccReplyCounter(List<RespondentSumTypeItem> respondentCollection) {
+        for (RespondentSumTypeItem respondentItem : respondentCollection) {
+            RespondentSumType respondent = respondentItem.getValue();
+            if (!isNullOrEmpty(respondent.getRespondentEccReply())) {
+                respondent.setRespondentEccReplyCount(
+                        StringUtils.isBlank(respondent.getRespondentEccReplyCount())
+                                ? COUNTER_FIELD_INITIAL_VALUE
+                                : Integer.toString(Integer.parseInt(respondent.getRespondentEccReplyCount()) + 1)
+                );
+            }
         }
     }
 
@@ -362,7 +375,7 @@ public class CaseManagementForCaseWorkerService {
         }
 
         String sourceCaseTypeId = caseRefAndCaseDataPair.getFirst();
-        SubmitEvent submitEvent = caseRefAndCaseDataPair.getSecond().get(0);
+        SubmitEvent submitEvent = caseRefAndCaseDataPair.getSecond().getFirst();
         log.info("SubmitEvent retrieved from ES for the update target case: {} with source case type of {}.",
                 submitEvent.getCaseId(), sourceCaseTypeId);
         String sourceCaseId = String.valueOf(submitEvent.getCaseId());
@@ -446,6 +459,12 @@ public class CaseManagementForCaseWorkerService {
                             }
                             populateHearingVenueFromHearingLevelToDayLevel(dateListedType, hearingType, caseTypeId);
                         });
+
+                hearingType.getHearingDateCollection().sort(
+                        Comparator.comparing(d -> parseListedDate(d.getValue().getListedDate()),
+                                Comparator.nullsLast(Comparator.naturalOrder())
+                        )
+                );
             }
         });
     }
@@ -511,6 +530,21 @@ public class CaseManagementForCaseWorkerService {
         }
     }
 
+    private static LocalDateTime parseListedDate(String listedDate) {
+        if (isNullOrEmpty(listedDate)) {
+            return null;
+        }
+        try {
+            return LocalDateTime.parse(listedDate, OLD_DATE_TIME_PATTERN);
+        } catch (Exception e) {
+            try {
+                return LocalDateTime.parse(listedDate);
+            } catch (Exception ex) {
+                return null;
+            }
+        }
+    }
+
     private void populateHearingVenueFromHearingLevelToDayLevel(DateListedType dateListedType,
                                                                 HearingType hearingType,
                                                                 String caseTypeId) {
@@ -558,67 +592,6 @@ public class CaseManagementForCaseWorkerService {
         }
     }
 
-    public CaseData createECC(CaseDetails caseDetails, String authToken, List<String> errors, String callback) {
-        CaseData currentCaseData = caseDetails.getCaseData();
-        List<SubmitEvent> submitEvents = getCasesES(caseDetails, authToken);
-        if (submitEvents != null && !submitEvents.isEmpty()) {
-            SubmitEvent submitEvent = submitEvents.get(0);
-            if (ECCHelper.validCaseForECC(submitEvent, errors)) {
-                switch (callback) {
-                    case MID_EVENT_CALLBACK -> {
-                        Helper.midRespondentECC(currentCaseData, submitEvent.getCaseData());
-                        currentCaseData.setManagingOffice(submitEvent.getCaseData().getManagingOffice());
-                        clerkService.initialiseClerkResponsible(currentCaseData);
-                    }
-                    case ABOUT_TO_SUBMIT_EVENT_CALLBACK -> {
-                        ECCHelper.createECCLogic(caseDetails, submitEvent.getCaseData());
-                        currentCaseData.setRespondentECC(null);
-                        currentCaseData.setCaseSource(FLAG_ECC);
-                    }
-                    default -> sendUpdateSingleCaseECC(authToken, caseDetails, submitEvent.getCaseData(),
-                        String.valueOf(submitEvent.getCaseId()));
-                }
-            }
-        } else {
-            errors.add(CASE_NOT_FOUND_MESSAGE);
-        }
-        log.info("Add claimant and respondent defaults");
-        claimantDefaults(currentCaseData);
-        respondentDefaults(currentCaseData);
-        return currentCaseData;
-    }
-
-    private List<SubmitEvent> getCasesES(CaseDetails caseDetails, String authToken) {
-        return caseRetrievalForCaseWorkerService.casesRetrievalESRequest(caseDetails.getCaseId(), authToken,
-                caseDetails.getCaseTypeId(),
-                new ArrayList<>(Collections.singleton(caseDetails.getCaseData().getCaseRefECC())));
-    }
-
-    private void sendUpdateSingleCaseECC(String authToken, CaseDetails currentCaseDetails,
-                                         CaseData originalCaseData, String caseIdToLink) {
-        try {
-            EccCounterClaimTypeItem eccCounterClaimTypeItem = new EccCounterClaimTypeItem();
-            EccCounterClaimType eccCounterClaimType = new EccCounterClaimType();
-            eccCounterClaimType.setCounterClaim(currentCaseDetails.getCaseData().getEthosCaseReference());
-            eccCounterClaimTypeItem.setId(UUID.randomUUID().toString());
-            eccCounterClaimTypeItem.setValue(eccCounterClaimType);
-            if (originalCaseData.getEccCases() != null) {
-                originalCaseData.getEccCases().add(eccCounterClaimTypeItem);
-            } else {
-                originalCaseData.setEccCases(
-                        new ArrayList<>(Collections.singletonList(eccCounterClaimTypeItem)));
-            }
-            FlagsImageHelper.buildFlagsImageFileName(currentCaseDetails.getCaseTypeId(), originalCaseData);
-            CCDRequest returnedRequest = ccdClient.startEventForCase(authToken, currentCaseDetails.getCaseTypeId(),
-                    currentCaseDetails.getJurisdiction(), caseIdToLink);
-            ccdClient.submitEventForCase(authToken, originalCaseData, currentCaseDetails.getCaseTypeId(),
-                    currentCaseDetails.getJurisdiction(), returnedRequest, caseIdToLink);
-        } catch (Exception e) {
-            throw (CaseCreationException)new CaseCreationException(
-                    MESSAGE + caseIdToLink + e.getMessage()).initCause(e);
-        }
-    }
-
     /**
      * Calls reference data API to add HMCTSServiceId to supplementary_data to a case.
      *
@@ -663,7 +636,7 @@ public class CaseManagementForCaseWorkerService {
             if (response == null) {
                 throw new CaseCreationException(errorMessage);
             }
-            log.info("Http status received from CCD supplementary update API; {}", response.getStatusCodeValue());
+            log.info("Http status received from CCD supplementary update API; {}", response.getStatusCode());
         } catch (RestClientResponseException e) {
             throw new CaseCreationException(String.format("%s with %s", errorMessage, e.getMessage()));
         }
@@ -713,5 +686,16 @@ public class CaseManagementForCaseWorkerService {
                 respondentSumType.setRespondentOrganisation("");
             }
         }
+    }
+
+    public void updateListOfRespondentsWithAnEcc(CaseData caseData) {
+        final List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
+
+        List<String> respondentNames = respondentCollection.stream()
+                .filter(resp -> YES.equals(resp.getValue().getRespondentEcc()))
+                .map(resp -> resp.getValue().getRespondentName())
+                .toList();
+
+        caseData.setRespondentsWithEcc(String.join(", ", respondentNames));
     }
 }

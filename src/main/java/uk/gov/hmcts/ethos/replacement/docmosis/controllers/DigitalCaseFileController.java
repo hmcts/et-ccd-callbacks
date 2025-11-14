@@ -20,8 +20,12 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DigitalCaseFileHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DigitalCaseFileService;
 
+import java.util.List;
+
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DigitalCaseFileHelper.validateDocumentCollectionForDcf;
 
 @Slf4j
 @RestController
@@ -30,6 +34,25 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 public class DigitalCaseFileController {
 
     private final DigitalCaseFileService digitalCaseFileService;
+
+    @PostMapping(path = "/aboutToStart", consumes = APPLICATION_JSON_VALUE)
+    @Operation(description = "About to start DCF process")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = APPLICATION_JSON_VALUE,
+                    schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> aboutToStart(@RequestBody CCDRequest ccdRequest,
+                                                            @RequestHeader(HttpHeaders.AUTHORIZATION)
+                                                            String userToken) {
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        List<String> errors = validateDocumentCollectionForDcf(caseData);
+        return getCallbackRespEntityErrors(errors, caseData);
+    }
 
     @PostMapping(path = "/asyncAboutToSubmit", consumes = APPLICATION_JSON_VALUE)
     @Operation(description = "Submit DCF asynchronously")

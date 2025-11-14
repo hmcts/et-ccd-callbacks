@@ -7,14 +7,17 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.hmcts.et.common.model.bundle.Bundle;
 import uk.gov.hmcts.et.common.model.bundle.BundleDetails;
+import uk.gov.hmcts.et.common.model.bundle.BundleDocumentDetails;
 import uk.gov.hmcts.et.common.model.bundle.DocumentLink;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Stream;
@@ -24,6 +27,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_DATE_TIME_PATTERN;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DigitalCaseFileHelper.DCF_CHARACTER_LIMIT_ERROR;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DigitalCaseFileHelper.NO_DOCS_FOR_DCF;
 
 class DigitalCaseFileHelperTest {
 
@@ -73,8 +78,8 @@ class DigitalCaseFileHelperTest {
 
     @ParameterizedTest
     @MethodSource("getDocumentTypesForExcluded")
-    void isExcludedFromDCF(DocumentType documentType, boolean excluded) {
-        assertEquals(DigitalCaseFileHelper.isExcludedFromDcf(documentType), excluded);
+    void isIncludedInDCF(DocumentType documentType, boolean excluded) {
+        assertEquals(DigitalCaseFileHelper.isIncludedInDcf(documentType), excluded);
     }
 
     private static Stream<Arguments> getDocumentTypesForExcluded() {
@@ -145,5 +150,112 @@ class DigitalCaseFileHelperTest {
         DigitalCaseFileHelper.setUpdatingStatus(caseData);
         assertEquals("DCF Updating: " + LocalDateTime.now(ZoneId.of("Europe/London")).format(NEW_DATE_TIME_PATTERN),
                 caseData.getDigitalCaseFile().getStatus());
+    }
+
+    @Test
+    void validateDocumentCollectionForDcf_noDocuments_returnsError() {
+        List<String> errors = DigitalCaseFileHelper.validateDocumentCollectionForDcf(caseData);
+        assertEquals(List.of(NO_DOCS_FOR_DCF), errors);
+    }
+
+    @Test
+    void validateDocumentCollectionForDcf_allDocumentsExcluded_returnsError() {
+        // Build a single excluded document (excludeFromDcf = Yes)
+        UploadedDocumentType uploaded = UploadedDocumentType.builder()
+                .documentFilename("a.pdf")
+                .documentUrl("http://dm/doc/1")
+                .documentBinaryUrl("http://dm/doc/1/binary")
+                .build();
+        DocumentType excludedDoc = DocumentType.builder()
+                .docNumber("1")
+                .uploadedDocument(uploaded)
+                .excludeFromDcf(List.of("Yes"))
+                .build();
+        DocumentTypeItem item = DocumentTypeItem.builder()
+                .id(UUID.randomUUID().toString())
+                .value(excludedDoc)
+                .build();
+        caseData.setDocumentCollection(new ArrayList<>(List.of(item)));
+
+        List<String> errors = DigitalCaseFileHelper.validateDocumentCollectionForDcf(caseData);
+        assertEquals(List.of(NO_DOCS_FOR_DCF), errors);
+    }
+
+    @Test
+    void getDocsForDcf_filtersExcludedAndNullUploads_andMapsFields() {
+
+        // Included document (no exclude flag)
+        UploadedDocumentType incUpload = UploadedDocumentType.builder()
+                .documentFilename("inc.pdf")
+                .documentUrl("http://dm/doc/inc")
+                .documentBinaryUrl("http://dm/doc/inc/binary")
+                .build();
+        DocumentType included = DocumentType.builder()
+                .docNumber("1")
+                .documentType("TYPE")
+                .dateOfCorrespondence("2025-01-01")
+                .uploadedDocument(incUpload)
+                .build();
+        DocumentTypeItem includedItem = DocumentTypeItem.builder()
+            .id(UUID.randomUUID().toString())
+            .value(included)
+            .build();
+
+        // Excluded document (should be filtered out)
+        UploadedDocumentType excUpload = UploadedDocumentType.builder()
+                .documentFilename("exc.pdf")
+                .documentUrl("http://dm/doc/exc")
+                .documentBinaryUrl("http://dm/doc/exc/binary")
+                .build();
+        DocumentType excluded = DocumentType.builder()
+                .docNumber("2")
+                .uploadedDocument(excUpload)
+                .excludeFromDcf(List.of("Yes"))
+                .build();
+        DocumentTypeItem excludedItem = DocumentTypeItem.builder()
+            .id(UUID.randomUUID().toString())
+            .value(excluded)
+            .build();
+
+        // Null upload (should be filtered out)
+        DocumentType nullUpload = DocumentType.builder()
+                .docNumber("3")
+                .build();
+        DocumentTypeItem nullUploadItem = DocumentTypeItem.builder()
+            .id(UUID.randomUUID().toString())
+            .value(nullUpload)
+            .build();
+
+        caseData.setDocumentCollection(List.of(includedItem, excludedItem, nullUploadItem));
+
+        List<BundleDocumentDetails> docs = DigitalCaseFileHelper.getDocsForDcf(caseData);
+        assertEquals(1, docs.size());
+    }
+
+    @Test
+    void validateDocumentCollectionForDcf_filenameExceeds255_addsHeaderAndEntry() {
+        String longName = "a".repeat(260) + ".pdf";
+        UploadedDocumentType upload = UploadedDocumentType.builder()
+                .documentFilename(longName)
+                .documentUrl("http://dm/doc/long")
+                .documentBinaryUrl("http://dm/doc/long/binary")
+                .build();
+        DocumentType doc = DocumentType.builder()
+                .docNumber("1")
+                .documentType("TYPE")
+                .dateOfCorrespondence("2025-01-01")
+                .uploadedDocument(upload)
+                .build();
+        DocumentTypeItem item = DocumentTypeItem.builder()
+            .id(UUID.randomUUID().toString())
+            .value(doc)
+            .build();
+        caseData.setDocumentCollection(List.of(item));
+
+        List<String> errors = DigitalCaseFileHelper.validateDocumentCollectionForDcf(caseData);
+        assertNotNull(errors);
+        assertEquals(2, errors.size());
+        assertEquals(DCF_CHARACTER_LIMIT_ERROR, errors.getFirst());
+        assertEquals("Document 1 - " + longName, errors.get(1));
     }
 }

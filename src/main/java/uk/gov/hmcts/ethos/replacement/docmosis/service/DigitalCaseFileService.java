@@ -31,6 +31,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.TRIBUNAL_CASE_FILE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.DIGITAL_CASE_FILE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.DOC_OPENS_IN_NEW_TAB_MARK_UP;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EUROPE_LONDON;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DigitalCaseFileHelper.getDocsForDcf;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DigitalCaseFileHelper.setUpdatingStatus;
 
@@ -56,7 +57,7 @@ public class DigitalCaseFileService {
                 DigitalCaseFileType digitalCaseFile = caseData.getDigitalCaseFile();
                 if (isNotEmpty(digitalCaseFile)) {
                     digitalCaseFile.setStatus("DCF Uploaded: "
-                        + LocalDateTime.now(ZoneId.of("Europe/London")).format(NEW_DATE_TIME_PATTERN));
+                        + LocalDateTime.now(ZoneId.of(EUROPE_LONDON)).format(NEW_DATE_TIME_PATTERN));
                     digitalCaseFile.setError(null);
 
                     // Deprecating old field

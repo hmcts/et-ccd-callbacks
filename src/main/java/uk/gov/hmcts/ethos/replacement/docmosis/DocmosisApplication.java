@@ -13,6 +13,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.ScheduledTaskRunner;
 
 import java.util.TimeZone;
 
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EUROPE_LONDON;
+
 @SpringBootApplication(scanBasePackages = {"uk.gov.hmcts.ethos", "uk.gov.hmcts.ecm.common",
     "uk.gov.hmcts.reform.document", "uk.gov.hmcts.reform.authorisation", "uk.gov.hmcts.reform.ccd.document"})
 @EnableFeignClients(basePackages = {"uk.gov.hmcts.ethos.replacement"})
@@ -48,6 +50,6 @@ public class DocmosisApplication implements CommandLineRunner {
 
     @PostConstruct
     public void init() {
-        TimeZone.setDefault(TimeZone.getTimeZone("Europe/London"));
+        TimeZone.setDefault(TimeZone.getTimeZone(EUROPE_LONDON));
     }
 }

@@ -25,6 +25,7 @@ import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EMPTY_STRING;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EUROPE_LONDON;
 
 public final class HearingsHelper {
 
@@ -140,7 +141,7 @@ public final class HearingsHelper {
     public static boolean isDateInFuture(String date, LocalDateTime now) {
         //Azure times are always in UTC and users enter Europe/London Times,
         // so respective zonedDateTimes should be compared.
-        return !isNullOrEmpty(date) && LocalDateTime.parse(date).atZone(ZoneId.of("Europe/London"))
+        return !isNullOrEmpty(date) && LocalDateTime.parse(date).atZone(ZoneId.of(EUROPE_LONDON))
                 .isAfter(now.atZone(ZoneId.of("UTC")));
     }
 

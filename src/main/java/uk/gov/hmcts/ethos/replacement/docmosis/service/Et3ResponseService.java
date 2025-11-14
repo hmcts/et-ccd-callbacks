@@ -410,7 +410,8 @@ public class Et3ResponseService {
                     "setRespondentRepresentsContactDetails - No represented respondents found");
         }
         for (int i : representedRespondentIndexes) {
-            if (ObjectUtils.isEmpty(caseData.getRepCollection().get(i))
+            if (i >= representedRespondentIndexes.size()
+                    || ObjectUtils.isEmpty(caseData.getRepCollection().get(i))
                     || ObjectUtils.isEmpty(caseData.getRepCollection().get(i).getValue())) {
                 continue;
             }

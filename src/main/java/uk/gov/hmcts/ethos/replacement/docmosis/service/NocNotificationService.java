@@ -98,7 +98,6 @@ public class NocNotificationService {
         // send respondents or respondent solicitors the claimant noc change email
         emailNotificationService.getRespondentsAndRepsEmailAddresses(caseDataNew, caseUserAssignments)
                 .forEach((email, respondentId) -> {
-                    log.info("Respondent email address: {}", email);
                     String caseLink = StringUtils.isNotBlank(respondentId)
                             ? emailService.getSyrCaseLink(caseDetailsNew.getCaseId(), respondentId)
                             : emailService.getExuiCaseLink(caseDetailsNew.getCaseId());
@@ -108,7 +107,6 @@ public class NocNotificationService {
 
         // send claimant noc change email
         String claimantEmail = NotificationHelper.getEmailAddressForClaimant(caseDataNew);
-        log.info("claimant email address: {}", claimantEmail);
         if (isNullOrEmpty(claimantEmail)) {
             log.warn("missing claimantEmail");
             return;
@@ -153,13 +151,11 @@ public class NocNotificationService {
                                             String newRepEmailAddress) {
 
         if (changeRequest.getOrganisationToRemove() != null) {
-            log.info("organisationToRemove is {}", changeRequest.getOrganisationToRemove());
             String previousOrgId = changeRequest.getOrganisationToRemove().getOrganisationID();
             sendEmailToOldOrgAdmin(previousOrgId, caseDataPrevious);
         }
 
         if (changeRequest.getOrganisationToAdd() != null) {
-            log.info("organisationToAdd is {}", changeRequest.getOrganisationToAdd());
             String newOrgId = changeRequest.getOrganisationToAdd().getOrganisationID();
             sendEmailToNewOrgAdmin(newOrgId, caseDetailsNew, partyName);
         }
@@ -225,7 +221,6 @@ public class NocNotificationService {
         }
 
         Map<String, String> personalisation = buildPreviousRespondentSolicitorPersonalisation(caseDataPrevious);
-        log.info("previous org admin email: {}", resBody.getSuperUser().getEmail());
         emailService.sendEmail(
                 previousRespondentSolicitorTemplateId,
                 resBody.getSuperUser().getEmail(),
@@ -253,7 +248,6 @@ public class NocNotificationService {
 
         String citUrl = emailService.getCitizenCaseLink(caseDetailsNew.getCaseId());
         Map<String, String> personalisation = buildPersonalisationWithPartyName(caseDetailsNew, partyName, citUrl);
-        log.info("new org admin email: {}", resBody.getSuperUser().getEmail());
         emailService.sendEmail(newRespondentSolicitorTemplateId, resBody.getSuperUser().getEmail(), personalisation);
     }
 

@@ -186,7 +186,6 @@ public class NocRespondentRepresentativeService {
                     throw new CcdInputOutputException("Failed to remove organisation representative access", e);
                 }
             }
-            log.info("Starting update case submitted event {}", updateRespondentRepresentativeRequest);
             // We use "update case submitted" instead of an update event for respondent representatives,
             // because there is not always a direct relationship between organisation ID and representatives.
             // The updates performed are:
@@ -201,7 +200,6 @@ public class NocRespondentRepresentativeService {
                     caseDetails.getCaseId(),
                     EVENT_UPDATE_CASE_SUBMITTED);
 
-            log.info("Respondent representation update event started {}", updateRespondentRepresentativeRequest);
             CaseData ccdRequestCaseData = ccdRequest.getCaseDetails().getCaseData();
 
             // Clears the changeOrganisationRequestField to prevent errors in the existing representative process

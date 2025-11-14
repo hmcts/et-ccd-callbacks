@@ -156,7 +156,7 @@ public class InitialConsiderationController {
                 caseData.getClaimantHearingPreference()));
 
         //JurCodes
-        String caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId()
+        String caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();
         caseData.setEtInitialConsiderationJurisdictionCodes(
                 initialConsiderationService.generateJurisdictionCodesHtml(
 

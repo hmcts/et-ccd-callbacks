@@ -37,6 +37,9 @@
     <suppress>
         <cve>CVE-2024-45772</cve>
     </suppress>
+    <suppress>
+        <cve>CVE-2025-7962</cve>
+    </suppress>
     <!-- Suppressing due to dependency on other services as we use CFTLib-->
     <suppress>
         <cve>CVE-2024-38820</cve>

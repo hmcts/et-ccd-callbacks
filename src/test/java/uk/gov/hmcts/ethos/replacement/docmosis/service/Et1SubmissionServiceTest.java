@@ -93,6 +93,8 @@ class Et1SubmissionServiceTest {
     private FeatureToggleService featureToggleService;
     @MockBean
     private CcdClient ccdClient;
+    @MockBean
+    private MyHmctsService myHmctsService;
 
     private Et1SubmissionService et1SubmissionService;
     private CaseDetails caseDetails;
@@ -113,7 +115,7 @@ class Et1SubmissionServiceTest {
                 pdfService, tornadoService, userIdamService, emailService, featureToggleService, ccdClient);
         et1ReppedService = new Et1ReppedService(authTokenGenerator, ccdCaseAssignment,
                 jurisdictionCodesMapperService, organisationClient, postcodeToOfficeService, tribunalOfficesService,
-                userIdamService, adminUserService, et1SubmissionService);
+                userIdamService, adminUserService, et1SubmissionService, myHmctsService);
         ReflectionTestUtils.setField(et1SubmissionService, "et1ProfessionalSubmissionTemplateId",
                 "ec815e00-39b0-4711-8b24-614ea1f2de89");
         ReflectionTestUtils.setField(et1SubmissionService, "claimantSubmissionTemplateId",

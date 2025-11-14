@@ -34,7 +34,9 @@ import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.applications.TseHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseAccessService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
@@ -101,6 +103,10 @@ class TseClaimantRepReplyServiceTest {
     private TseClaimantRepReplyService tseClaimantRepReplyService;
     @MockBean
     private FeatureToggleService featureToggleService;
+    @MockBean
+    private EmailNotificationService emailNotificationService;
+    @MockBean
+    private CaseAccessService caseAccessService;
 
     private static final String TRIBUNAL_EMAIL = "tribunalOffice@test.com";
     private static final String REPLY_TO_TRIB_ACK_TEMPLATE_YES = "replyToTribAckTemplateYes";
@@ -120,7 +126,8 @@ class TseClaimantRepReplyServiceTest {
     void setUp() throws IOException {
         emailService = spy(new EmailUtils());
         tseClaimantRepReplyService = new TseClaimantRepReplyService(tseService, documentManagementService,
-                tornadoService, featureToggleService, emailService, claimantTellSomethingElseService, userIdamService);
+                tornadoService, featureToggleService, emailService, claimantTellSomethingElseService,
+                emailNotificationService, caseAccessService);
 
         userDetails = HelperTest.getUserDetails();
         when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
@@ -290,7 +297,13 @@ class TseClaimantRepReplyServiceTest {
                 .build();
         respondentSumTypeItem.setValue(respondentSumType);
         caseData.getRespondentCollection().add(respondentSumTypeItem);
-        tseClaimantRepReplyService.sendRespondingToApplicationEmails(caseDetails, "userToken");
+
+        when(emailNotificationService.getRespondentsAndRepsEmailAddresses(any(), any()))
+                .thenReturn(Map.of(respondentSumType.getRespondentEmail(), respondentSumTypeItem.getId()));
+        when(emailNotificationService.getCaseClaimantSolicitorEmails(any()))
+                .thenReturn(List.of(userDetails.getEmail()));
+
+        tseClaimantRepReplyService.sendRespondingToApplicationEmails(caseDetails);
 
         verify(emailService).sendEmail(any(), eq(userDetails.getEmail()), any());
         verify(emailService, isEmailSentToRespondent)
@@ -336,7 +349,11 @@ class TseClaimantRepReplyServiceTest {
                 .build();
         respondentSumTypeItem.setValue(respondentSumType);
         caseData.getRespondentCollection().add(respondentSumTypeItem);
-        tseClaimantRepReplyService.sendRespondingToApplicationEmails(caseDetails, "userToken");
+        when(emailNotificationService.getRespondentsAndRepsEmailAddresses(any(), any()))
+                .thenReturn(Map.of(respondentSumType.getRespondentEmail(), respondentSumTypeItem.getId()));
+        when(emailNotificationService.getCaseClaimantSolicitorEmails(any()))
+                .thenReturn(List.of(userDetails.getEmail()));
+        tseClaimantRepReplyService.sendRespondingToApplicationEmails(caseDetails);
 
         verify(emailService).sendEmail(any(), eq(userDetails.getEmail()), any());
         verify(emailService, isEmailSentToRespondent)
@@ -414,7 +431,7 @@ class TseClaimantRepReplyServiceTest {
                 APPLICATION_TYPE, TSE_APP_CHANGE_PERSONAL_DETAILS,
                 LINK_TO_EXUI, TEST_XUI_URL + "caseId");
 
-        tseClaimantRepReplyService.sendRespondingToTribunalEmails(caseDetails, "token");
+        tseClaimantRepReplyService.sendRespondingToTribunalEmails(caseDetails);
         verify(emailService).sendEmail(any(), eq(TRIBUNAL_EMAIL), eq(tribunalPersonalisation));
     }
 
@@ -447,7 +464,7 @@ class TseClaimantRepReplyServiceTest {
                 APPLICATION_TYPE, TSE_APP_CHANGE_PERSONAL_DETAILS,
                 LINK_TO_EXUI, TEST_XUI_URL + "caseId");
 
-        tseClaimantRepReplyService.sendRespondingToTribunalEmails(caseDetails, "token");
+        tseClaimantRepReplyService.sendRespondingToTribunalEmails(caseDetails);
         verify(emailService).sendEmail(any(), eq(TRIBUNAL_EMAIL), eq(tribunalPersonalisation));
     }
 
@@ -552,7 +569,6 @@ class TseClaimantRepReplyServiceTest {
         GenericTseApplicationTypeItem genericTseApplicationTypeItem = getGenericTseApplicationTypeItem(NO);
         caseData.setGenericTseApplicationCollection(List.of(genericTseApplicationTypeItem));
 
-        String userToken = "userToken";
-        tseClaimantRepReplyService.claimantReplyToTse(userToken, caseDetails, caseData);
+        tseClaimantRepReplyService.claimantReplyToTse(caseDetails, caseData);
     }
 }

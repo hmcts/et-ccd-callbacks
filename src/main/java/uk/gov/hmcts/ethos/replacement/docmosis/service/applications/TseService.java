@@ -78,7 +78,6 @@ public class TseService {
         if (isEmpty(caseData.getGenericTseApplicationCollection())) {
             caseData.setGenericTseApplicationCollection(new ArrayList<>());
         }
-
         GenericTseApplicationType application = new GenericTseApplicationType();
 
         application.setDate(UtilHelper.formatCurrentDate(LocalDate.now()));
@@ -120,6 +119,21 @@ public class TseService {
         if (caseData.getTseApplicationStoredCollection() != null && applicationId != null) {
             caseData.getTseApplicationStoredCollection().removeIf(item -> item.getId().equals(applicationId));
         }
+    }
+
+    /**
+     * Remove item from TseApplicationStoredCollection.
+     * @param caseData contains all the case data.
+     */
+    public void removeStoredRespondentApplication(CaseData caseData) {
+        if (caseData.getRespondentTse() == null) {
+            return;
+        }
+        String applicationId = caseData.getRespondentTse().getStoredApplicationId();
+        if (applicationId == null || caseData.getTseRespondentStoredCollection() == null) {
+            return;
+        }
+        caseData.getTseRespondentStoredCollection().removeIf(item -> item.getId().equals(applicationId));
     }
 
     /**

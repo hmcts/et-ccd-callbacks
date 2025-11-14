@@ -18,6 +18,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.exceptions.OfficeToAssign
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -72,6 +73,14 @@ public class CaseTransferUtils {
         }
     }
 
+    public static List<String> getTransferValidationErrors(List<CaseData> cases, CaseTransferUtils caseTransferUtils) {
+        return cases.stream()
+            .map(caseTransferUtils::validateCase)
+            .filter(validationErrors -> !validationErrors.isEmpty())
+            .flatMap(Collection::stream)
+            .toList();
+    }
+
     public List<String> validateCase(CaseData caseData) {
         List<String> errors = new ArrayList<>();
         if (!checkBfActionsCleared(caseData)) {
@@ -93,7 +102,7 @@ public class CaseTransferUtils {
         try {
             List<SubmitEvent> submitEvents = ccdClient.retrieveCasesElasticSearch(userToken,
                     caseDetails.getCaseTypeId(), List.of(caseData.getCounterClaim()));
-            return submitEvents.get(0).getCaseData();
+            return submitEvents.getFirst().getCaseData();
 
         } catch (Exception ex) {
             throw (CaseCreationException) new CaseCreationException("Error getting counter claim case for : "
@@ -110,7 +119,7 @@ public class CaseTransferUtils {
                 List<SubmitEvent> submitEvents = ccdClient.retrieveCasesElasticSearch(userToken, caseTypeId,
                         new ArrayList<>(Collections.singleton(counterClaim)));
                 if (submitEvents != null && !submitEvents.isEmpty()) {
-                    eccCases.add(submitEvents.get(0).getCaseData());
+                    eccCases.add(submitEvents.getFirst().getCaseData());
                 }
             }
         }

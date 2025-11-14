@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.tasks;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -13,6 +15,7 @@ import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeAnswersConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator;
@@ -27,9 +30,11 @@ import java.net.URISyntaxException;
 import java.util.Collections;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -49,6 +54,8 @@ class NoticeOfChangeFieldsTaskTest {
     private FeatureToggleService featureToggleService;
     @Captor
     private ArgumentCaptor<CaseData> caseDataArgumentCaptor;
+
+    private static final String DUMMY_ADMIN_TOKEN = "dummyAdminToken";
 
     @BeforeEach
     void setUp() {
@@ -91,9 +98,60 @@ class NoticeOfChangeFieldsTaskTest {
         verify(ccdClient, times(1)).submitEventForCase(eq("AuthToken"), caseDataArgumentCaptor.capture(),
                 eq(ENGLANDWALES_CASE_TYPE_ID), eq(EMPLOYMENT), any(), eq("123456789"));
         CaseData caseDataCaptured = caseDataArgumentCaptor.getValue();
-        assertNotNull(caseDataCaptured.getNoticeOfChangeAnswers0());
-        assertEquals(caseDataCaptured.getNoticeOfChangeAnswers0().getRespondentName(), submitEvent.getCaseData()
-                .getRespondentCollection().get(0).getValue().getRespondentName());
+        assertNotNull(caseDataCaptured.getClaimantRepresentativeOrganisationPolicy());
+        // when start event for case throws exception
+        ReflectionTestUtils.setField(noticeOfChangeFieldsTask,
+                "caseTypeIdsString", "ET_EnglandWales,ET_Scotland");
+        when(adminUserService.getAdminUserToken()).thenReturn(DUMMY_ADMIN_TOKEN);
+        SubmitEvent submitEventWithCaseData = new SubmitEvent();
+        submitEventWithCaseData.setCaseData(caseData);
+        when(ccdClient.buildAndGetElasticSearchRequest(eq(DUMMY_ADMIN_TOKEN), anyString(), any()))
+                .thenReturn(List.of(submitEventWithCaseData));
+        when(ccdClient.startEventForCase(any(), any(), any(), any(), any())).thenThrow(new IOException());
+        noticeOfChangeFieldsTask.generateNoticeOfChangeFields();
+        assertNotNull(caseDataCaptured.getClaimantRepresentativeOrganisationPolicy());
+    }
 
+    @Test
+    void tesFindCaseId() {
+        // When submit event is null then return <unknown>
+        assertThat(NoticeOfChangeFieldsTask.findCaseId(null)).isEqualTo("<unknown>");
+        // When submit event is not null but case id is 0
+        SubmitEvent submitEvent = new SubmitEvent();
+        submitEvent.setCaseId(0);
+        assertThat(NoticeOfChangeFieldsTask.findCaseId(submitEvent)).isEqualTo("<unknown>");
+        // When submit event case id is not 0
+        submitEvent.setCaseId(1);
+        assertThat(NoticeOfChangeFieldsTask.findCaseId(submitEvent)).isEqualTo(NumberUtils.INTEGER_ONE.toString());
+    }
+
+    @Test
+    @SneakyThrows
+    void theTriggerEventForCase() {
+
+        // When claimant solicitor organisation policy is not null
+        SubmitEvent submitEvent = new ObjectMapper().readValue(ResourceLoader.getResource("caseDetailsTest1.json"),
+                SubmitEvent.class);
+        submitEvent.getCaseData().setClaimantRepresentativeOrganisationPolicy(OrganisationPolicy.builder()
+                .orgPolicyCaseAssignedRole("[CLAIMANTSOLICITOR]").build());
+        noticeOfChangeFieldsTask.triggerEventForCase(DUMMY_ADMIN_TOKEN, submitEvent, "ET_EnglandWales");
+        assertThat(submitEvent.getCaseData().getClaimantRepresentativeOrganisationPolicy()).isNotNull();
+        assertThat(submitEvent.getCaseData().getClaimantRepresentativeOrganisationPolicy()
+                .getOrgPolicyCaseAssignedRole()).isEqualTo("[CLAIMANTSOLICITOR]");
+
+        // when claimant solicitor organisation policy is null
+        submitEvent.getCaseData().setClaimantRepresentativeOrganisationPolicy(null);
+        CCDRequest ccdRequest = CCDRequestBuilder.builder()
+                .withCaseData(submitEvent.getCaseData())
+                .build();
+        when(ccdClient.startEventForCase(
+                eq(DUMMY_ADMIN_TOKEN), anyString(), anyString(), anyString(), eq("UPDATE_CASE_SUBMITTED")))
+                .thenReturn(ccdRequest);
+        when(ccdClient.submitEventForCase(
+                eq(DUMMY_ADMIN_TOKEN), any(CaseData.class), anyString(), anyString(), any(CCDRequest.class),
+                eq("UPDATE_CASE_SUBMITTED")))
+                .thenReturn(submitEvent);
+        assertDoesNotThrow(() -> noticeOfChangeFieldsTask
+                .triggerEventForCase(DUMMY_ADMIN_TOKEN, submitEvent, "ET_EnglandWales"));
     }
 }

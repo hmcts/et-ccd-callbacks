@@ -237,6 +237,14 @@ class TornadoServiceTest {
     }
 
     @Test
+    void generateReferralSummaryDocument() throws IOException {
+        mockConnectionSuccess();
+        DocumentInfo documentInfo = tornadoService.generateEventDocument(
+                new CaseData(), AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, "Referral Summary.pdf");
+        verifyDocumentInfo(documentInfo);
+    }
+
+    @Test
     void generateDocument_exception() throws IOException {
         when(tornadoConnection.createConnection()).thenThrow(IOException.class);
 

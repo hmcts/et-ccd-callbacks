@@ -231,7 +231,7 @@ class TseClaimantRepReplyControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-        verify(tseClaimantRepReplyService, times(1)).claimantReplyToTse(any(), any(), any());
+        verify(tseClaimantRepReplyService, times(1)).claimantReplyToTse(any(), any());
     }
 
     @Test

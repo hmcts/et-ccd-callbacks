@@ -409,7 +409,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'jakarta.servlet:jakarta.servlet-api:6.1.0'
     implementation 'javax.servlet:javax.servlet-api:4.0.1'
-    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.1.2'
+    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.3.0'
     implementation group: 'org.springframework.retry', name: 'spring-retry', version: '2.0.12'
     // CVE-2022-25857
     implementation group: 'org.yaml', name: 'snakeyaml', version: '2.5'
@@ -477,7 +477,7 @@ dependencies {
     contractTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-commons', version: junitPlatformVersion
     contractTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-launcher', version: junitPlatformVersion
     contractTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-engine', version: junitPlatformVersion
-    contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.1.2'
+    contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.3.0'
     contractTestImplementation sourceSets.main.runtimeClasspath
     contractTestImplementation sourceSets.test.runtimeClasspath
 

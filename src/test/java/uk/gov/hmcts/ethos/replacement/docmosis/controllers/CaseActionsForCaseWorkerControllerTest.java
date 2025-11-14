@@ -23,6 +23,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.et.common.model.ccd.types.DraftAndSignJudgement;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AddSingleCaseToMultipleService;
@@ -81,6 +82,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.INDIVIDUAL_TYPE_CLAIMANT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
 @ExtendWith(SpringExtension.class)
@@ -353,26 +355,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    @SneakyThrows
-    void postDefaultValuesFromET1CreatesCaseAccessPinWhenFeatureToggleEnabled() {
-        when(defaultValuesReaderService.getDefaultValues(anyString())).thenReturn(defaultValues);
-        when(singleReferenceService.createReference(anyString())).thenReturn("5100001/2019");
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(any(CaseData.class)))
-                .thenReturn(ccdRequest.getCaseDetails().getCaseData());
-
-        mvc.perform(post(POST_DEFAULT_VALUES_URL)
-                        .content(requestContent.toString())
-                        .header(AUTHORIZATION, AUTH_TOKEN)
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)))
-                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-
     }
 
     @Test
@@ -1871,4 +1853,23 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .prepopulateOrgPolicyAndNoc(any(CaseData.class));
     }
 
+    @Test
+    @SneakyThrows
+    void judgmentSubmitted_tokenOk()  {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        DraftAndSignJudgement draftAndSignJudgement = DraftAndSignJudgement.builder()
+                .isJudgement(YES)
+                .furtherDirections("Dummy directions")
+                .build();
+        ccdRequest.getCaseDetails().getCaseData().setDraftAndSignJudgement(draftAndSignJudgement);
+        mvc.perform(post(JUDGEMENT_SUBMITTED_URL)
+                        .content(requestContent2.toString())
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", nullValue()))
+                .andExpect(jsonPath("$.warnings", nullValue()))
+                .andExpect(jsonPath("$.data.draftAndSignJudgement", nullValue()));
+    }
 }

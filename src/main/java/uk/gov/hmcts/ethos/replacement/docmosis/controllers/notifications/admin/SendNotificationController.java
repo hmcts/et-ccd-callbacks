@@ -100,7 +100,7 @@ public class SendNotificationController {
         sendNotificationService.sendNotifyEmails(caseDetails);
         sendNotificationService.createBfAction(caseData);
         sendNotificationService.clearSendNotificationFields(caseData);
-
+        caseData.setDraftAndSignJudgement(null);
         return getCallbackRespEntityNoErrors(caseData);
     }
 

@@ -22,11 +22,11 @@ import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.JurisdictionCode;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.JurisdictionCodeHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -38,7 +38,6 @@ import java.util.stream.Stream;
 
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CLAIMANT_HEARING_PANEL_PREFERENCE;
@@ -261,7 +260,7 @@ public class InitialConsiderationService {
                     && !hearing.getHearingDateCollection().isEmpty())
             .min(Comparator.comparing(
                     (HearingType hearing) ->
-                        getEarliestHearingDateForListedHearings(hearing.getHearingDateCollection()).orElse(
+                            getEarliestHearingDateForListedHearings(hearing.getHearingDateCollection()).orElse(
                             LocalDate.now().plusYears(100))))
             .map(hearing -> getFormattedHearingDetails(hearing, formatter))
             .orElse(HEARING_MISSING);
@@ -308,17 +307,7 @@ public class InitialConsiderationService {
      * @return earliest future hearing date
      */
     public Optional<LocalDate> getEarliestHearingDateForListedHearings(List<DateListedTypeItem> hearingDates) {
-        return hearingDates.stream()
-        .filter(dateListedTypeItem -> dateListedTypeItem != null
-                && dateListedTypeItem.getValue() != null
-                && HEARING_STATUS_LISTED.equals(dateListedTypeItem.getValue().getHearingStatus())
-                && LocalDateTime.parse(dateListedTypeItem.getValue().getListedDate())
-            .toLocalDate().isAfter(LocalDate.now()))
-        .map(DateListedTypeItem::getValue)
-        .filter(hearingDate -> hearingDate.getListedDate() != null
-                && !hearingDate.getListedDate().isEmpty())
-        .map(hearingDateItem -> LocalDateTime.parse(hearingDateItem.getListedDate()).toLocalDate())
-        .min(Comparator.naturalOrder());
+        return HearingsHelper.getEarliestListedFutureHearingDate(hearingDates);
     }
 
     /**
@@ -396,12 +385,32 @@ public class InitialConsiderationService {
      * @param caseTypeId the case type that is used for applying hearing listed check for Scotland case types only
      */
     public void setIsHearingAlreadyListed(CaseData caseData, String caseTypeId) {
-        if (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId)) {
-            return;
-        }
         caseData.setEtICHearingAlreadyListed(HEARING_MISSING.equals(caseData.getEtInitialConsiderationHearing())
             ? NO : YES
         );
+    }
+
+    public void clearOldEtICHearingListedAnswersValues(CaseData caseData) {
+        //clear old values
+        if (caseData.getEtICHearingListedAnswers() != null) {
+            caseData.getEtICHearingListedAnswers().setEtInitialConsiderationListedHearingType(null);
+            caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJsaReasonOther(null);
+            caseData.getEtICHearingListedAnswers().setEtICIsHearingWithMembers(null);
+
+            caseData.getEtICHearingListedAnswers().setEtICJsaFinalHearingReasonOther(null);
+            caseData.getEtICHearingListedAnswers().setEtICMembersFinalHearingReasonOther(null);
+
+            caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJudgeOrMembersFurtherDetails(null);
+            caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJudgeOrMembersReason(null);
+            caseData.getEtICHearingListedAnswers().setEtICIsFinalHearingWithJudgeOrMembersJsaReason(null);
+            caseData.getEtICHearingListedAnswers().setEtICIsFinalHearingWithJudgeOrMembersReason(null);
+
+            caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJsa(null);
+            caseData.getEtICHearingListedAnswers().setEtICHearingListed(null);
+            caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJudgeOrMembers(null);
+            caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJudgeOrMembersReasonOther(null);
+            caseData.setEtInitialConsiderationHearing(null);
+        }
     }
 
     public void mapOldIcHearingNotListedOptionsToNew(CaseData caseData, String caseTypeId) {

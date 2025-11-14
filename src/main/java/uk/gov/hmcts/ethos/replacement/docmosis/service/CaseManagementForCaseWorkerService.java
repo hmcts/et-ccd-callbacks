@@ -28,6 +28,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.generic.BaseCaseData;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCasesSendingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
 
@@ -283,6 +284,10 @@ public class CaseManagementForCaseWorkerService {
         }
     }
 
+    public void setNextEarliestListedHearing(CaseData caseData) {
+        HearingsHelper.setEtInitialConsiderationListedHearingType(caseData);
+    }
+
     private void updateRespondentEccReplyCounter(List<RespondentSumTypeItem> respondentCollection) {
         for (RespondentSumTypeItem respondentItem : respondentCollection) {
             RespondentSumType respondent = respondentItem.getValue();
@@ -443,8 +448,8 @@ public class CaseManagementForCaseWorkerService {
         }
         caseData.getHearingCollection().forEach(hearingTypeItem -> {
             HearingType hearingType = hearingTypeItem.getValue();
-            if (isNotEmpty(hearingType.getHearingDateCollection())) {
-                hearingType.getHearingDateCollection().stream()
+            if (isNotEmpty(hearingTypeItem.getValue().getHearingDateCollection())) {
+                hearingTypeItem.getValue().getHearingDateCollection().stream()
                         .map(DateListedTypeItem::getValue)
                         .forEach(dateListedType -> {
                             if (dateListedType.getHearingStatus() == null) {

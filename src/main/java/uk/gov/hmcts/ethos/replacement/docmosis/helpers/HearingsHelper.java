@@ -1,21 +1,29 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.webjars.NotFoundException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.EtICHearingListedAnswers;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingDetailTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingDetailType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -26,6 +34,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEAR
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EMPTY_STRING;
 
+@Slf4j
 public final class HearingsHelper {
 
     public static final String HEARING_CREATION_NUMBER_ERROR = "A new hearing can only "
@@ -81,6 +90,83 @@ public final class HearingsHelper {
             }
         }
         return errors;
+    }
+
+    public static void setEtInitialConsiderationListedHearingType(CaseData caseData) {
+        HearingType earliestListedHearing = getEarliestListedHearingType(caseData.getHearingCollection());
+
+        if (earliestListedHearing == null) {
+            log.info("No listed hearings found for case: {} to set EtInitialConsiderationListedHearingType",
+                    caseData.getEthosCaseReference());
+            return;
+        }
+
+        if (caseData.getEtICHearingListedAnswers() == null) {
+            caseData.setEtICHearingListedAnswers(new EtICHearingListedAnswers());
+        }
+
+        caseData.getEtICHearingListedAnswers().setEtInitialConsiderationListedHearingType(
+                earliestListedHearing.getHearingType());
+    }
+
+    public static HearingType getEarliestListedHearingType(List<HearingTypeItem> hearingCollection) {
+        if (CollectionUtils.isEmpty(hearingCollection)) {
+            return null;
+        }
+
+        return hearingCollection.stream()
+            .filter(hearingTypeItem -> hearingTypeItem != null
+                    && hearingTypeItem.getValue() != null)
+            .map(HearingTypeItem::getValue)
+            .filter(hearing -> CollectionUtils.isNotEmpty(hearing.getHearingDateCollection())
+                    && hearing.getHearingDateCollection().stream().anyMatch(HearingsHelper::isListedHearing))
+            .map(hearing -> Map.entry(
+                hearing, 
+                getEarliestListedFutureHearingDate(hearing.getHearingDateCollection())))
+            .filter(entry -> entry.getValue().isPresent())
+            .min(Comparator.comparing(entry -> entry.getValue().orElse(null)))
+            .map(Map.Entry::getKey)
+            .orElse(null);
+    }
+
+    // Returns the earliest future listed date, or empty if none
+    public static Optional<LocalDate> getEarliestListedFutureHearingDate(
+            List<DateListedTypeItem> hearingDates) {
+        if (CollectionUtils.isEmpty(hearingDates)) {
+            return Optional.empty();
+        }
+
+        DateTimeFormatter formatter = new DateTimeFormatterBuilder()
+                .appendPattern("yyyy-MM-dd'T'HH:mm:ss")
+                .optionalStart().appendPattern(".SSS").optionalEnd()
+                .toFormatter();
+        LocalDate today = LocalDate.now();
+        return hearingDates.stream()
+            .filter(HearingsHelper::isListedHearing)
+            .map(DateListedTypeItem::getValue)
+            .map(DateListedType::getListedDate)
+            .filter(listedDate -> !isNullOrEmpty(listedDate) && isValidDateFormat(listedDate, formatter))
+            .map(listedDate -> LocalDateTime.parse(listedDate, formatter).toLocalDate())
+            .filter(date -> date.isAfter(today))
+            .min(Comparator.naturalOrder());
+    }
+
+    private static boolean isValidDateFormat(String dateStr, DateTimeFormatter formatter) {
+        try {
+            LocalDateTime.parse(dateStr, formatter);
+            return true;
+        } catch (Exception e) {
+            log.warn("Invalid date format encountered: {}", dateStr);
+            return false;
+        }
+    }
+
+    private static boolean isListedHearing(DateListedTypeItem dateListedTypeItem) {
+        if (dateListedTypeItem == null || dateListedTypeItem.getValue() == null) {
+            return false;
+        }
+
+        return HEARING_STATUS_LISTED.equals(dateListedTypeItem.getValue().getHearingStatus());
     }
 
     private static void findHearingNumberErrors(List<String> errors, HearingTypeItem hearingTypeItem) {
@@ -201,7 +287,8 @@ public final class HearingsHelper {
     public static HearingType findHearingByListedDate(CaseData caseData, String hearingDate) {
         Optional<HearingTypeItem> hearingTypeItem =
                 caseData.getHearingCollection().stream()
-                        .filter(h -> hearingContainsDate(h.getValue().getHearingDateCollection(), hearingDate))
+                        .filter(h ->
+                                hearingContainsDate(h.getValue().getHearingDateCollection(), hearingDate))
                         .findFirst();
         if (hearingTypeItem.isEmpty()) {
             throw new NotFoundException("Failed to find hearing");
@@ -211,7 +298,8 @@ public final class HearingsHelper {
 
     private static boolean hearingContainsDate(List<DateListedTypeItem> hearingDateCollection, String hearingDate) {
         return hearingDateCollection.stream()
-                .anyMatch(dateListedTypeItem -> hearingDate.equals(dateListedTypeItem.getValue().getListedDate()));
+                .anyMatch(dateListedTypeItem -> hearingDate.equals(
+                        dateListedTypeItem.getValue().getListedDate()));
     }
 
     public static String getEarliestFutureHearingDate(List<HearingTypeItem> hearingCollection) {
@@ -228,7 +316,8 @@ public final class HearingsHelper {
             return null;
         }
 
-        return Collections.min(earliestDatePerHearing, Comparator.comparing(c -> c.getValue().getListedDate()))
+        return Collections.min(earliestDatePerHearing, Comparator.comparing(
+                c -> c.getValue().getListedDate()))
                 .getValue().getListedDate();
     }
 
@@ -238,7 +327,8 @@ public final class HearingsHelper {
         if (futureHearings.isEmpty()) {
             return null;
         }
-        return Collections.min(futureHearings, Comparator.comparing(c -> c.getValue().getListedDate()));
+        return Collections.min(futureHearings,
+                Comparator.comparing(c -> c.getValue().getListedDate()));
     }
 
     private static List<DateListedTypeItem> filterFutureHearings(List<DateListedTypeItem> hearingDateCollection) {
@@ -266,8 +356,8 @@ public final class HearingsHelper {
             && !isNullOrEmpty(caseData.getAllocateHearingAdditionalJudge().getSelectedCode())
             && caseData.getAllocateHearingAdditionalJudge().getSelectedCode()
                     .equals(caseData.getAllocateHearingJudge().getSelectedCode())) {
-            return List.of("Please choose a different judge for the second judge as the same judge has been selected "
-                           + "for both judges");
+            return List.of("Please choose a different judge for the second judge as the same judge has "
+                           + "been selected for both judges");
         }
 
         return new ArrayList<>();

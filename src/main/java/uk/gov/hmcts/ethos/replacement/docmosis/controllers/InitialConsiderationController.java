@@ -177,10 +177,10 @@ public class InitialConsiderationController {
         caseData.setIcEt1OtherReferralListDetails(
                 initialConsiderationService.composeIcEt1OtherReferralListDetails(caseData));
 
-        caseData.setRegionalOffice(caseData.getRegionalOfficeList() != null ?
-                caseData.getRegionalOfficeList().getSelectedLabel() : null);
-        caseData.setEt1TribunalRegion(caseData.getEt1HearingVenues() != null ?
-                caseData.getEt1HearingVenues().getSelectedLabel() : null);
+        caseData.setRegionalOffice(caseData.getRegionalOfficeList() != null
+                ? caseData.getRegionalOfficeList().getSelectedLabel() : null);
+        caseData.setEt1TribunalRegion(caseData.getEt1HearingVenues() != null
+                ? caseData.getEt1HearingVenues().getSelectedLabel() : null);
 
         return getCallbackRespEntityNoErrors(caseData);
     }

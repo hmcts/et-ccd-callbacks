@@ -87,6 +87,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 public class InitialConsiderationService {
 
     private final TornadoService tornadoService;
+    private static final String BULLET_POINT = "\n -  ";
+    private static final String NEWLINE_FOR_DETAILS = "\n\nDetails: \n";
+    private static final String NEWLINE = "\n";
 
     public void initialiseInitialConsideration(CaseDetails caseDetails) {
         caseDetails.getCaseData().setInitialConsiderationBeforeYouStart(initiateBeforeYouStart(caseDetails));
@@ -540,4 +543,256 @@ public class InitialConsiderationService {
         }
         caseData.setIcAllDocumentCollection(mergedCollection);
     }
+
+    public String composeIcEt1ReferralToJudgeOrLOListWithDetails(CaseData caseData) {
+        StringBuilder icEt1ReferralToJudgeOrLOListText = new StringBuilder();
+
+        if (caseData.getReferralToJudgeOrLOList() != null && !caseData.getReferralToJudgeOrLOList().isEmpty()) {
+            caseData.getReferralToJudgeOrLOList().forEach(listItem -> {
+                icEt1ReferralToJudgeOrLOListText.append(NEWLINE).append(BULLET_POINT);
+
+                switch (listItem) {
+                    case "aClaimOfInterimRelief":
+                        icEt1ReferralToJudgeOrLOListText.append("A claim of interim relief");
+                        if (caseData.getAclaimOfInterimReliefTextArea() != null
+                                && !caseData.getAclaimOfInterimReliefTextArea().isEmpty()) {
+                            icEt1ReferralToJudgeOrLOListText.append(NEWLINE_FOR_DETAILS)
+                                    .append(caseData.getAclaimOfInterimReliefTextArea());
+                        }
+                        icEt1ReferralToJudgeOrLOListText.append(NEWLINE);
+                        break;
+                    case "aStatutoryAppeal":
+                        icEt1ReferralToJudgeOrLOListText.append("A statutory appeal");
+                        if (caseData.getAstatutoryAppealTextArea() != null
+                                && !caseData.getAstatutoryAppealTextArea().isEmpty()) {
+                            icEt1ReferralToJudgeOrLOListText.append(NEWLINE_FOR_DETAILS)
+                                    .append(caseData.getAstatutoryAppealTextArea());
+                        }
+                        icEt1ReferralToJudgeOrLOListText.append(NEWLINE);
+                        break;
+                    case "anAllegationOfCommissionOfSexualOffence":
+                        icEt1ReferralToJudgeOrLOListText.append("An allegation of the commission of a sexual offence");
+                        if (caseData.getAnAllegationOfCommissionOfSexualOffenceTextArea() != null
+                                && !caseData.getAnAllegationOfCommissionOfSexualOffenceTextArea().isEmpty()) {
+                            icEt1ReferralToJudgeOrLOListText.append(NEWLINE_FOR_DETAILS)
+                                    .append(caseData.getAnAllegationOfCommissionOfSexualOffenceTextArea());
+                        }
+                        icEt1ReferralToJudgeOrLOListText.append(NEWLINE);
+                        break;
+                    case "insolvency":
+                        icEt1ReferralToJudgeOrLOListText.append("Insolvency");
+                        if (caseData.getInsolvencyTextArea() != null
+                                && !caseData.getInsolvencyTextArea().isEmpty()) {
+                            icEt1ReferralToJudgeOrLOListText.append(NEWLINE_FOR_DETAILS)
+                                    .append(caseData.getInsolvencyTextArea());
+                        }
+                        icEt1ReferralToJudgeOrLOListText.append(NEWLINE);
+                        break;
+                    case "jurisdictionsUnclear":
+                        icEt1ReferralToJudgeOrLOListText.append("Jurisdictions unclear");
+                        if (caseData.getJurisdictionsUnclearTextArea() != null
+                                && !caseData.getJurisdictionsUnclearTextArea().isEmpty()) {
+                            icEt1ReferralToJudgeOrLOListText.append(NEWLINE_FOR_DETAILS)
+                                    .append(caseData.getJurisdictionsUnclearTextArea());
+                        }
+                        icEt1ReferralToJudgeOrLOListText.append(NEWLINE);
+                        break;
+                    case "lengthOfService":
+                        icEt1ReferralToJudgeOrLOListText.append("Length of service");
+                        if (caseData.getLengthOfServiceTextArea() != null
+                                && !caseData.getLengthOfServiceTextArea().isEmpty()) {
+                            icEt1ReferralToJudgeOrLOListText.append(NEWLINE_FOR_DETAILS)
+                                    .append(caseData.getLengthOfServiceTextArea());
+                        }
+                        icEt1ReferralToJudgeOrLOListText.append(NEWLINE);
+                        break;
+                    case "potentiallyLinkedCasesInTheEcm":
+                        icEt1ReferralToJudgeOrLOListText.append("Potentially linked cases in the ECM");
+                        if (caseData.getPotentiallyLinkedCasesInTheEcmTextArea() != null
+                                && !caseData.getPotentiallyLinkedCasesInTheEcmTextArea().isEmpty()) {
+                            icEt1ReferralToJudgeOrLOListText.append(NEWLINE_FOR_DETAILS)
+                                    .append(caseData.getPotentiallyLinkedCasesInTheEcmTextArea());
+                        }
+                        icEt1ReferralToJudgeOrLOListText.append(NEWLINE);
+                        break;
+                    case "rule50Issues":
+                        icEt1ReferralToJudgeOrLOListText.append("Rule 49 issues");
+                        if (caseData.getRule50IssuesTextArea() != null
+                                && !caseData.getRule50IssuesTextArea().isEmpty()) {
+                            icEt1ReferralToJudgeOrLOListText.append(NEWLINE_FOR_DETAILS)
+                                    .append(caseData.getRule50IssuesTextArea());
+                        }
+                        icEt1ReferralToJudgeOrLOListText.append(NEWLINE);
+                        break;
+                    case "anotherReasonForJudicialReferral":
+                        icEt1ReferralToJudgeOrLOListText.append("Another reason for judicial referral");
+                        if (caseData.getAnotherReasonForJudicialReferralTextArea() != null
+                                && !caseData.getAnotherReasonForJudicialReferralTextArea().isEmpty()) {
+                            icEt1ReferralToJudgeOrLOListText.append(NEWLINE_FOR_DETAILS)
+                                    .append(caseData.getAnotherReasonForJudicialReferralTextArea());
+                        }
+                        icEt1ReferralToJudgeOrLOListText.append(NEWLINE);
+                        break;
+                    default:
+                        // do nothing
+                }
+            });
+        }
+        return icEt1ReferralToJudgeOrLOListText.toString();
+    }
+
+    public String composeIcEt1ReferralToREJOrVPListWithDetails(CaseData caseData) {
+        StringBuilder icEt1ReferralToREJOrVPListText = new StringBuilder();
+
+        if (caseData.getReferralToREJOrVPList() != null && !caseData.getReferralToREJOrVPList().isEmpty()) {
+            caseData.getReferralToREJOrVPList().forEach(referral -> {
+                switch (referral) {
+                    case "vexatiousLitigantOrder":
+                        appendReferralDetails(icEt1ReferralToREJOrVPListText,
+                                "A claimant covered by vexatious litigant order",
+                                caseData.getVexatiousLitigantOrderTextArea());
+                        break;
+                    case "aNationalSecurityIssue":
+                        appendReferralDetails(icEt1ReferralToREJOrVPListText,
+                                "A national security issue",
+                                caseData.getAnationalSecurityIssueTextArea());
+                        break;
+                    case "nationalMultipleOrPresidentialOrder":
+                        appendReferralDetails(icEt1ReferralToREJOrVPListText,
+                                "A part of national multiple / covered by Presidential case management order",
+                                caseData.getNationalMultipleOrPresidentialOrderTextArea());
+                        break;
+                    case "transferToOtherRegion":
+                        appendReferralDetails(icEt1ReferralToREJOrVPListText,
+                                "A request for transfer to another ET region",
+                                caseData.getTransferToOtherRegionTextArea());
+                        break;
+                    case "serviceAbroad":
+                        appendReferralDetails(icEt1ReferralToREJOrVPListText,
+                                "A request for service abroad",
+                                caseData.getServiceAbroadTextArea());
+                        break;
+                    case "aSensitiveIssue":
+                        appendReferralDetails(icEt1ReferralToREJOrVPListText,
+                                "A sensitive issue which may attract publicity or need early allocation "
+                                + "to a specific judge",
+                                caseData.getAsensitiveIssueTextArea());
+                        break;
+                    case "anyPotentialConflict":
+                        appendReferralDetails(icEt1ReferralToREJOrVPListText,
+                                "Any potential conflict involving judge, non-legal member "
+                                + "or HMCTS staff member",
+                                caseData.getAnyPotentialConflictTextArea());
+                        break;
+                    case "anotherReasonREJOrVP":
+                        appendReferralDetails(icEt1ReferralToREJOrVPListText,
+                                "Another reason for Regional Employment Judge / Vice-President referral",
+                                caseData.getAnotherReasonREJOrVPTextArea());
+                        break;
+                    default:
+                        // do nothing
+                }
+            });
+        }
+        return icEt1ReferralToREJOrVPListText.toString();
+    }
+
+    public String composeIcEt1OtherReferralListDetails(CaseData caseData) {
+        StringBuilder icEt1OtherReferralListDetailText = new StringBuilder();
+        if (caseData.getOtherReferralList() != null && !caseData.getOtherReferralList().isEmpty()) {
+            caseData.getOtherReferralList().forEach(
+                    referralToListEntry -> processReferralToREJOrVPListEntries(caseData,
+                            referralToListEntry, icEt1OtherReferralListDetailText));
+        }
+        return  icEt1OtherReferralListDetailText.toString();
+    }
+
+    private void processReferralToREJOrVPListEntries(CaseData caseData, String referralToREJOrVPListEntry,
+                                                       StringBuilder referralListEntryWithDetailsText) {
+        switch (referralToREJOrVPListEntry) {
+            case "claimOutOfTime": appendReferralDetails(referralListEntryWithDetailsText,
+                        "The whole or any part of the claim is out of time",
+                        caseData.getClaimOutOfTimeTextArea());
+                break;
+            case "multipleClaim": appendReferralDetails(referralListEntryWithDetailsText,
+                        "The claim is part of a multiple claim",
+                        caseData.getMultipleClaimTextArea());
+                break;
+            case "employmentStatusIssues": appendReferralDetails(referralListEntryWithDetailsText,
+                        "The claim has a potential issue about employment status",
+                        caseData.getEmploymentStatusIssuesTextArea());
+                break;
+            case "pidJurisdictionRegulator": appendReferralDetails(referralListEntryWithDetailsText,
+                        "The claim has PID jurisdiction and claimant wants it forwarded to "
+                        + "relevant regulator - Box 10.1",
+                        caseData.getPidJurisdictionRegulatorTextArea());
+                break;
+            case "videoHearingPreference": appendReferralDetails(referralListEntryWithDetailsText,
+                        "The claimant prefers a video hearing",
+                        caseData.getVideoHearingPreferenceTextArea());
+                break;
+            case "rule50IssuesOtherFactors": appendReferralDetails(referralListEntryWithDetailsText,
+                        "The claim has Rule 49 issues",
+                        caseData.getRule50IssuesForOtherReferralTextArea());
+                break;
+            case "otherRelevantFactors": appendReferralDetails(referralListEntryWithDetailsText,
+                        "The claim has other relevant factors for judicial referral",
+                        caseData.getAnotherReasonForOtherReferralTextArea());
+                break;
+            default:
+                // do nothing
+        }
+    }
+
+    private void appendReferralDetails(StringBuilder textBuilder, String message, String textAreaContent) {
+        textBuilder.append(BULLET_POINT).append(message);
+        if (textAreaContent != null && !textAreaContent.isBlank()) {
+            textBuilder.append(NEWLINE_FOR_DETAILS).append(textAreaContent);
+        }
+        textBuilder.append(NEWLINE);
+    }
+
+    public String composeIcEt1SubstantiveDefectsDetail(CaseData caseData) {
+        StringBuilder icEt1VettingIssuesDetailText = new StringBuilder();
+        if (caseData.getSubstantiveDefectsList() != null && !caseData.getSubstantiveDefectsList().isEmpty()) {
+            caseData.getSubstantiveDefectsList().forEach(defect -> {
+                icEt1VettingIssuesDetailText.append(NEWLINE).append("- ");
+                switch (defect) {
+                    case "rule121a" :
+                        icEt1VettingIssuesDetailText.append(
+                                "The tribunal has no jurisdiction to consider - Rule 13(1)(a)").append(NEWLINE);
+                        break;
+                    case "rule121b":
+                        icEt1VettingIssuesDetailText.append("Is in a form which cannot sensibly be responded to or "
+                             + "otherwise an abuse of process - Rule 13(1)(b)").append(NEWLINE);
+                        break;
+                    case "rule121c" :
+                        icEt1VettingIssuesDetailText.append("Has neither an EC number nor claims one of the EC "
+                             + "exemptions - Rule 13(1)(c)").append(NEWLINE);
+                        break;
+                    case "rule121d":
+                        icEt1VettingIssuesDetailText.append("States that one of the EC exceptions applies but it "
+                             + "might not - Rule 13(1)(d)").append(NEWLINE);
+                        break;
+                    case "rule121 da":
+                        icEt1VettingIssuesDetailText.append("Institutes relevant proceedings and the EC number on the "
+                             + "claim form does not match the EC number on the Acas certificate - Rule 13(1)(e)"
+                        ).append(NEWLINE);
+                        break;
+                    case "rule121e" :
+                        icEt1VettingIssuesDetailText.append("Has a different claimant name on the ET1 to the claimant "
+                             + "name on the Acas certificate - Rule 13(1)(f)").append(NEWLINE);
+                        break;
+                    case "rule121f":
+                        icEt1VettingIssuesDetailText.append("Has a different respondent name on the ET1 to the "
+                             + "respondent name on the Acas certificate - Rule 13(1)(g)").append(NEWLINE);
+                        break;
+                    default:
+                        // do nothing
+                }
+            });
+        }
+        return icEt1VettingIssuesDetailText.toString();
+    }
+
 }

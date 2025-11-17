@@ -150,6 +150,24 @@ public class CaseDataBuilder {
         return this;
     }
 
+    public CaseDataBuilder withRegionalOfficeList(String officeName) {
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
+        DynamicValueType  dvt = DynamicValueType.create(officeName, officeName);
+        dynamicFixedListType.setListItems(List.of(dvt));
+        dynamicFixedListType.setValue(dvt);
+        caseData.setRegionalOfficeList(dynamicFixedListType);
+        return this;
+    }
+
+    public CaseDataBuilder withEt1TribunalRegion(String officeName) {
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
+        DynamicValueType  dvt = DynamicValueType.create(officeName, officeName);
+        dynamicFixedListType.setListItems(List.of(dvt));
+        dynamicFixedListType.setValue(dvt);
+        caseData.setEt1HearingVenues(dynamicFixedListType);
+        return this;
+    }
+
     private HearingTypeItem createHearing(String hearingNumber, String hearingType, String judge, String venue,
                                           List<String> hearingFormat, String hearingLengthNum, String hearingLengthType,
                                           String hearingSitAlone) {

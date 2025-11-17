@@ -2,7 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -15,7 +14,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
-import uk.gov.hmcts.et.common.model.ccd.types.TriageQuestions;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocClaimantHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
@@ -62,12 +60,8 @@ public class NocClaimantRepresentativeService {
     }
 
     private void updateClaimantRepMap(CaseData caseData, String caseId) throws IOException {
-        if (ObjectUtils.isEmpty(caseData.getTriageQuestions())) {
-            caseData.setTriageQuestions(new TriageQuestions());
-        }
         caseData.setClaimantRepresentedQuestion(YES);
         caseData.setClaimantRepresentativeRemoved(NO);
-        caseData.getTriageQuestions().setClaimantRepresentedQuestion(YES);
         RepresentedTypeC claimantRep = createRepresentedTypeC(caseId, caseData.getChangeOrganisationRequestField());
         caseData.setRepresentativeClaimantType(claimantRep);
     }

@@ -429,7 +429,6 @@ dependencies {
     implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.10.2'
 
     runtimeOnly group: 'com.squareup.okio', name: 'okio-jvm', version: '3.16.0'
-    runtimeOnly group: 'org.eclipse.angus', name: 'angus-activation', version: '2.0.3'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 

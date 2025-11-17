@@ -327,7 +327,7 @@ ext {
     pact_version = '4.3.10'
     reformLoggingVersion = '6.0.1'
     serenity = '3.9.8'
-    tomcatEmbedVersion = '10.1.46'
+    tomcatEmbedVersion = '10.1.49'
     jacksonVersion = '2.18.3'
 }
 
@@ -367,9 +367,10 @@ dependencies {
 
     implementation group: 'com.github.hmcts', name: 'et-common', version: '3.1.2'
     implementation group: 'com.github.hmcts', name: 'et-data-model', version: '4.3.4'
-    
+
     implementation group: 'com.github.hmcts', name: 'ecm-common', version: '3.0.1'
     implementation group: 'com.github.hmcts', name: 'ecm-data-model', version: '2.0.3'
+
     implementation group: 'uk.gov.dwp.regex', name: 'postcode-validation', version: '1.1.0'
     implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.59.2'
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
@@ -433,6 +434,7 @@ dependencies {
     implementation group: 'org.eclipse.angus', name: 'angus-mail', version: '2.0.4'
 
     runtimeOnly group: 'com.squareup.okio', name: 'okio-jvm', version: '3.16.0'
+
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
@@ -470,7 +472,7 @@ dependencies {
     testImplementation group: 'com.squareup.okhttp3', name: 'mockwebserver', version: '4.12.0'
 
     // Contract Tests
-    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.6.17'
+    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.6.18'
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.43'
     contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '3.3.0'
 

@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.EtICListForFinalHearingUpdated;
@@ -24,6 +23,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_ST
 
 class InitialConsiderationHelperTest {
     private CaseData caseData;
+
     @Test
     void getDocumentRequest_EW_preliminaryHearing() throws JsonProcessingException {
         caseData = CaseDataBuilder.builder().build();

@@ -1073,14 +1073,18 @@ class InitialConsiderationServiceTest {
         assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers().getEtICIsHearingWithMembers());
         assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers().getEtICJsaFinalHearingReasonOther());
         assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers().getEtICMembersFinalHearingReasonOther());
-        assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers().getEtICIsHearingWithJudgeOrMembersFurtherDetails());
+        assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers()
+                .getEtICIsHearingWithJudgeOrMembersFurtherDetails());
         assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers().getEtICIsHearingWithJudgeOrMembersReason());
-        assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers().getEtICIsFinalHearingWithJudgeOrMembersJsaReason());
-        assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers().getEtICIsFinalHearingWithJudgeOrMembersReason());
+        assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers()
+                .getEtICIsFinalHearingWithJudgeOrMembersJsaReason());
+        assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers()
+                .getEtICIsFinalHearingWithJudgeOrMembersReason());
         assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers().getEtICIsHearingWithJsa());
         assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers().getEtICHearingListed());
         assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers().getEtICIsHearingWithJudgeOrMembers());
-        assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers().getEtICIsHearingWithJudgeOrMembersReasonOther());
+        assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers()
+                .getEtICIsHearingWithJudgeOrMembersReasonOther());
         assertNull(caseDataForListedAnswers.getEtInitialConsiderationHearing());
     }
 
@@ -1093,6 +1097,6 @@ class InitialConsiderationServiceTest {
         initialConsiderationService.clearOldEtICHearingListedAnswersValues(caseDataLocal);
 
         assertNull(caseDataLocal.getEtICHearingListedAnswers());
-        assertEquals( "SomeHearing", caseDataLocal.getEtInitialConsiderationHearing());
+        assertEquals("SomeHearing", caseDataLocal.getEtInitialConsiderationHearing());
     }
 }

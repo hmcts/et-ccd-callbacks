@@ -194,8 +194,6 @@ class InitialConsiderationControllerTest extends BaseControllerTest {
 
     @Test
     void setRegionalOfficeAndEt1TribunalRegion_BothListsNotNull() {
-        CaseData caseData = new CaseData();
-
         DynamicFixedListType regionalOfficeList = new DynamicFixedListType();
         DynamicValueType dvt = new DynamicValueType();
         dvt.setLabel("Leeds");
@@ -205,7 +203,7 @@ class InitialConsiderationControllerTest extends BaseControllerTest {
         DynamicValueType et1dvt = new DynamicValueType();
         et1dvt.setLabel("Manchester");
         et1HearingVenues.setValue(et1dvt);
-
+        CaseData caseData = new CaseData();
         caseData.setRegionalOfficeList(regionalOfficeList);
         caseData.setEt1HearingVenues(et1HearingVenues);
 

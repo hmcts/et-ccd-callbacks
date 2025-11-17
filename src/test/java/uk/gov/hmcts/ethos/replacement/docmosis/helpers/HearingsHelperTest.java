@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -134,7 +135,8 @@ class HearingsHelperTest {
         HearingsHelper.setEtInitialConsiderationListedHearingType(caseData);
 
         assertNotNull(caseData.getEtICHearingListedAnswers());
-        assertEquals("Preliminary Hearing", caseData.getEtICHearingListedAnswers().getEtInitialConsiderationListedHearingType());
+        assertEquals("Preliminary Hearing",
+                caseData.getEtICHearingListedAnswers().getEtInitialConsiderationListedHearingType());
     }
 
     @Test
@@ -149,16 +151,7 @@ class HearingsHelperTest {
     @Test
     void setEtInitialConsiderationListedHearingType_createsEtICHearingListedAnswersIfNull() {
         HearingTypeItem hearingTypeItem = new HearingTypeItem();
-        DateListedType dateListedType = new DateListedType();
-        dateListedType.setListedDate("2026-08-01T10:00:00.000");
-        dateListedType.setHearingStatus("Listed");
-        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
-        dateListedTypeItem.setValue(dateListedType);
-        
-        HearingType hearingType = new HearingType();
-        hearingType.setHearingType("Full Hearing");
-        hearingType.setHearingDateCollection(List.of(new DateListedTypeItem()));
-        hearingType.setHearingDateCollection(List.of(dateListedTypeItem));
+        HearingType hearingType = getHearingType();
         hearingTypeItem.setValue(hearingType);
         caseData.setHearingCollection(List.of(hearingTypeItem));
         caseData.setEtICHearingListedAnswers(null);
@@ -166,7 +159,22 @@ class HearingsHelperTest {
         HearingsHelper.setEtInitialConsiderationListedHearingType(caseData);
 
         assertNotNull(caseData.getEtICHearingListedAnswers());
-        assertEquals("Full Hearing", caseData.getEtICHearingListedAnswers().getEtInitialConsiderationListedHearingType());
+        assertEquals("Full Hearing",
+                caseData.getEtICHearingListedAnswers().getEtInitialConsiderationListedHearingType());
+    }
+
+    private static @NotNull HearingType getHearingType() {
+        DateListedType dateListedType = new DateListedType();
+        dateListedType.setListedDate("2026-08-01T10:00:00.000");
+        dateListedType.setHearingStatus("Listed");
+        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
+        dateListedTypeItem.setValue(dateListedType);
+
+        HearingType hearingType = new HearingType();
+        hearingType.setHearingType("Full Hearing");
+        hearingType.setHearingDateCollection(List.of(new DateListedTypeItem()));
+        hearingType.setHearingDateCollection(List.of(dateListedTypeItem));
+        return hearingType;
     }
 
     @Test

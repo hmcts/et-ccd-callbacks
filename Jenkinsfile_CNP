@@ -29,7 +29,9 @@ def secrets = [
     secret('cos-system-user', 'ET_COS_SYSTEM_USER'),
     secret('cos-system-user-password', 'ET_COS_SYSTEM_USER_PASSWORD'),
     secret('cos-system-user', 'ET_SYSTEM_USER'),
-    secret('cos-system-user-password', 'ET_SYSTEM_USER_PASSWORD')
+    secret('cos-system-user-password', 'ET_SYSTEM_USER_PASSWORD'),
+    secret('et-staff-user-admin-user-name', 'ET_STAFF_USER_ADMIN_USER_NAME'),
+    secret('et-staff-user-admin-user-name-password', 'ET_STAFF_USER_ADMIN_USER_NAME_PASSWORD')
   ],
   'et-${env}': [
     secret('ccd-admin-username', 'CCD_ADMIN_USERNAME'),
@@ -47,7 +49,8 @@ def secrets = [
     secret('microservicekey-ccd-gw', 'MICROSERVICE_CCD_GW'),
     secret('microservicekey-ccd-ps', 'PRINT_S2S_KEY'),
     secret('microservicekey-ccd-admin', 'ADMIN_S2S_KEY'),
-    secret('microservicekey-et-cos', 'ET_COS_S2S_KEY')
+    secret('microservicekey-et-cos', 'ET_COS_S2S_KEY'),
+    secret('microservicekey-xui-webapp', 'XUI_S2S_KEY')
   ],
   'ccd-${env}': [
     secret('ccd-api-gateway-oauth2-client-secret', 'API_GATEWAY_IDAM_SECRET'),
@@ -127,6 +130,7 @@ withPipeline(type, product, component) {
     env.TEST_MANAGE_CASE_URL = "https://xui-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net/cases"
     env.ET_CASE_API_URL = "https://et-sya-api-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net/cases/initiate-case/"
     env.ET_SUBMIT_DRAFT_CASE_URL = "https://et-sya-api-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net/cases/submit-case/"
+    env.REF_DATA_URL = "https://rd-caseworker-ref-api-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.RUNNING_ENV = "aat"
 
     before('smoketest:preview') {
@@ -140,8 +144,14 @@ withPipeline(type, product, component) {
       steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'ccd-definitions/jurisdictions/scotland/xlsx/et-scotland-ccd-config-preview.xlsx'
 
       sh """
+        echo "Creating CCD roles"
         ./bin/preview/create-ccd-roles.sh
+        echo "Importing CCD definitions"
         ./bin/preview/import-ccd-definitions.sh
+        echo "Adding CTSC User"
+        ./bin/utils/add-new-user.sh "${ET_STAFF_USER_ADMIN_USER_NAME}" "${ET_STAFF_USER_ADMIN_USER_NAME_PASSWORD}" "CTSC" "User" "${ET_CASEWORKER_USER_NAME}
+        echo "Adding LegalOps User" 
+        ./bin/utils/add-new-user.sh "${ET_STAFF_USER_ADMIN_USER_NAME}" "${ET_STAFF_USER_ADMIN_USER_NAME_PASSWORD}" "LegalOps" "User" "${ET_CCD_CASEWORKER_USER_NAME} "" "" "" "" "Legal office"
       """
     }
 

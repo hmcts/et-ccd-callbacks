@@ -20,8 +20,8 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NO;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.YES;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({ClaimantRepresentativeController.class, JsonMapper.class})

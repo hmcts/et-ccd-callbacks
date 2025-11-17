@@ -2,11 +2,9 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
-import uk.gov.hmcts.et.common.model.ccd.types.TriageQuestions;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -20,20 +18,15 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @RequiredArgsConstructor
 public class AddAmendClaimantRepresentativeService {
     public void addAmendClaimantRepresentative(CaseData caseData) {
-        if (ObjectUtils.isEmpty(caseData.getTriageQuestions())) {
-            caseData.setTriageQuestions(new TriageQuestions());
-        }
         // remove
         if (NO.equals(caseData.getClaimantRepresentedQuestion())
                 && caseData.getRepresentativeClaimantType() != null) {
             caseData.setRepresentativeClaimantType(null);
             caseData.setClaimantRepresentativeRemoved(YES);
-            caseData.getTriageQuestions().setClaimantRepresentedQuestion(NO);
             return;
         }
         // add or amend
         caseData.setClaimantRepresentativeRemoved(NO);
-        caseData.getTriageQuestions().setClaimantRepresentedQuestion(YES);
         setRepresentativeId(caseData);
 
     }

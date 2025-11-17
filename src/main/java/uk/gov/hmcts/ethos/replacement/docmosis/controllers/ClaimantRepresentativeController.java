@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,10 +19,10 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
-import uk.gov.hmcts.et.common.model.ccd.types.TriageQuestions;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_CODE_FIVE_HUNDRED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_CODE_FIVE_ZERO_ONE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_CODE_FIVE_ZERO_THREE;
@@ -40,7 +39,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HT
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_MESSAGE_FOUR_ZERO_ONE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_MESSAGE_FOUR_ZERO_THREE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_MESSAGE_TWO_HUNDRED;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole.CLAIMANTSOLICITOR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
@@ -108,10 +106,6 @@ public class ClaimantRepresentativeController {
         if (StringUtils.isNotBlank(caseData.getClaimantRepresentedQuestion())
                 && NO.equals(caseData.getClaimantRepresentedQuestion())) {
             caseData.setRepresentativeClaimantType(null);
-            if (ObjectUtils.isEmpty(caseData.getTriageQuestions())) {
-                caseData.setTriageQuestions(new TriageQuestions());
-            }
-            caseData.getTriageQuestions().setClaimantRepresentedQuestion(NO);
             caseData.setClaimantRepresentativeOrganisationPolicy(
                     OrganisationPolicy.builder().orgPolicyCaseAssignedRole(CLAIMANTSOLICITOR.getCaseRoleLabel()).build()
             );

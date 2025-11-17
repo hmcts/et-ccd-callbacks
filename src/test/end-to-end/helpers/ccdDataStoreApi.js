@@ -1,6 +1,5 @@
 const {Logger} = require('@hmcts/nodejs-logging');
-const requestModule = require('request-promise-native');
-const request = requestModule.defaults();
+const axios = require('axios');
 const fs = require('fs');
 const testConfig = require('../../config.js');
 const idamApi = require('./idamApi');
@@ -12,10 +11,9 @@ const env = testConfig.TestEnv;
 const { I } = inject()
 
 async function createCaseInCcd(dataLocation = 'src/test/end-to-end/data/et-ccd-basic-data.json', location = 'ET_EnglandWales') {
-    const saveCaseResponse = await createECMCase(dataLocation, location).catch(error => {
+    const caseId = await createECMCase(dataLocation, location).catch(error => {
         console.log(error);
     });
-    const caseId = saveCaseResponse;
     logger.info('Created case: %s', caseId);
     return caseId;
 }
@@ -65,8 +63,7 @@ async function createECMCase(dataLocation = 'src/test/end-to-end/data/et-ccd-bas
         let payload = JSON.stringify(body);
 
 
-    let saveCaseResponse = await I.sendPostRequest(url,payload,headers);
-    return saveCaseResponse;
+    return await I.sendPostRequest(url, payload, headers);
 }
 
 async function updateECMCaseInCcd(caseId, dataLocation = 'data/ccd-accept-case.json') {
@@ -80,18 +77,17 @@ async function updateECMCaseInCcd(caseId, dataLocation = 'data/ccd-accept-case.j
     const ccdStartEventPath = `${case_id}/event-triggers/${eventname}?ignore-warning=false`;
     const ccdSaveEventPath = `cases/${case_id}/events`;
 
-    const startEventOptions = {
-        method: 'GET',
-        uri: ccdApiUrl + ccdStartEventPath,
-        headers: {
-            'Authorization': `Bearer ${authToken}`,
-            'ServiceAuthorization': `Bearer ${serviceToken}`,
-            'Content-Type': 'application/json'
+    const startEventResponse = await axios.get(
+        ccdApiUrl + ccdStartEventPath,
+        {
+            headers: {
+                'Authorization': `Bearer ${authToken}`,
+                'ServiceAuthorization': `Bearer ${serviceToken}`,
+                'Content-Type': 'application/json'
+            }
         }
-    };
-
-    const startEventResponse = await request(startEventOptions);
-    const eventToken = JSON.parse(startEventResponse).token;
+    );
+    const eventToken = startEventResponse.data.token;
 
     var data = fs.readFileSync(dataLocation);
     var saveBody = {
@@ -104,18 +100,17 @@ async function updateECMCaseInCcd(caseId, dataLocation = 'data/ccd-accept-case.j
         'event_token': eventToken
     };
 
-    const saveEventOptions = {
-        method: 'POST',
-        uri: ccdApiUrl + ccdSaveEventPath,
-        headers: {
-            'Authorization': `Bearer ${authToken}`,
-            'ServiceAuthorization': `Bearer ${serviceToken}`,
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(saveBody)
-    };
-
-    let saveEventResponse = await request(saveEventOptions);
+    let saveEventResponse = await axios.post(
+        ccdApiUrl + ccdSaveEventPath,
+        saveBody,
+        {
+            headers: {
+                'Authorization': `Bearer ${authToken}`,
+                'ServiceAuthorization': `Bearer ${serviceToken}`,
+                'Content-Type': 'application/json'
+            }
+        }
+    );
     return saveEventResponse;
 }
 

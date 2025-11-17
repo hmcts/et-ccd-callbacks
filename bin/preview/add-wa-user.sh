@@ -20,11 +20,10 @@ SUSPENDED=${14:-false}
 UP_IDAM_STATUS=${15:-"PENDING"}
 REGION=${16:-"National"}
 
-BASEDIR=$(dirname "$0")
-
 echo "Adding new user: ${EMAIL_ID} to XUI with WA roles"
-USER_TOKEN=$("${BASEDIR}/idam-user-token.sh" $USERNAME $PASSWORD)
-SERVICE_TOKEN=$("${BASEDIR}/idam-lease-service-token.sh" xui_webapp)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+USER_TOKEN=$("${SCRIPT_DIR}/idam-user-token.sh" "$USERNAME" "$PASSWORD")
+SERVICE_TOKEN=$("${SCRIPT_DIR}/idam-lease-service-token.sh" xui_webapp)
 
 # Function to check if user exists by name/email/service
 check_user_exists() {

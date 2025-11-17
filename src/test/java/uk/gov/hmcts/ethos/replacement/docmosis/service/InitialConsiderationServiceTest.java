@@ -8,6 +8,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.EtICHearingListedAnswers;
 import uk.gov.hmcts.et.common.model.ccd.EtICListForFinalHearing;
@@ -24,8 +25,10 @@ import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
@@ -36,6 +39,7 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -46,6 +50,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doCallRealMethod;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ecm.common.constants.PdfMapperConstants.PHONE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
@@ -64,6 +69,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsidera
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.TELEPHONE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.UDL_HEARING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.VIDEO;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.NOT_AVAILABLE_FOR_VIDEO_HEARINGS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
 @ExtendWith(SpringExtension.class)
@@ -163,6 +169,33 @@ class InitialConsiderationServiceTest {
     }
 
     @Test
+    void initialiseInitialConsideration_shouldSetBeforeYouStart_whenDocumentCollectionIsNotNull() {
+        List<DocumentTypeItem> documentCollection = new ArrayList<>();
+        DocumentTypeItem documentItem = new DocumentTypeItem();
+        documentItem.setValue(DocumentType.from(new UploadedDocumentType()));
+        documentItem.getValue().setDocumentType("ET1");
+        documentCollection.add(documentItem);
+        caseData.setDocumentCollection(documentCollection);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+
+        initialConsiderationService.initialiseInitialConsideration(caseDetails);
+
+        assertThat(caseDetails.getCaseData().getInitialConsiderationBeforeYouStart()).isNotEmpty();
+    }
+
+    @Test
+    void initialiseInitialConsideration_shouldSetEmptyBeforeYouStart_whenDocumentCollectionIsNull() {
+        CaseDetails caseDetails = new CaseDetails();
+        caseData.setDocumentCollection(null);
+        caseDetails.setCaseData(caseData);
+
+        initialConsiderationService.initialiseInitialConsideration(caseDetails);
+
+        assertThat(caseDetails.getCaseData().getInitialConsiderationBeforeYouStart()).isEmpty();
+    }
+
+    @Test
     void getRespondentNameWithPanelPreference_shouldReturnFormattedDetails_whenRespondentIsValid() {
         RespondentSumTypeItem respondent = new RespondentSumTypeItem();
         respondent.setValue(new RespondentSumType());
@@ -196,7 +229,8 @@ class InitialConsiderationServiceTest {
 
     @Test
     void getIcHearingPanelPreference_shouldReturnNull_whenRespondentCollectionIsNull() {
-        String hearingPanelPreferenceDetails = initialConsiderationService.getIcRespondentHearingPanelPreference(null);
+        String hearingPanelPreferenceDetails = initialConsiderationService.getIcRespondentHearingPanelPreference(
+                null);
         assertThat(hearingPanelPreferenceDetails).isNull();
     }
 
@@ -210,7 +244,7 @@ class InitialConsiderationServiceTest {
         String hearingPanelPreferenceDetails = initialConsiderationService.getIcRespondentHearingPanelPreference(
                 List.of(respondent));
         assertThat(hearingPanelPreferenceDetails).isEqualTo(
-                String.format(RESPONDENT_HEARING_PANEL_PREFERENCE, 1, "judge", "I deserve it"));
+                String.format(RESPONDENT_HEARING_PANEL_PREFERENCE, "judge", "I deserve it"));
     }
 
     @Test
@@ -221,7 +255,7 @@ class InitialConsiderationServiceTest {
         String hearingPanelPreferenceDetails = initialConsiderationService.getIcRespondentHearingPanelPreference(
                 List.of(respondent));
         assertThat(hearingPanelPreferenceDetails).isEqualTo(
-                String.format(RESPONDENT_HEARING_PANEL_PREFERENCE, 1, "-", "-"));
+                String.format(RESPONDENT_HEARING_PANEL_PREFERENCE, "-", "-"));
     }
 
     @Test
@@ -239,21 +273,106 @@ class InitialConsiderationServiceTest {
         String hearingPanelPreferenceDetails = initialConsiderationService.getIcRespondentHearingPanelPreference(
                 List.of(respondent1, respondent2));
         assertThat(hearingPanelPreferenceDetails).isEqualTo(
-                String.format(RESPONDENT_HEARING_PANEL_PREFERENCE, 1, "judge", "I deserve it")
-                        + String.format(RESPONDENT_HEARING_PANEL_PREFERENCE, 2, "panel", "Fair trial"));
+                String.format(RESPONDENT_HEARING_PANEL_PREFERENCE, "judge", "I deserve it")
+                        + String.format(RESPONDENT_HEARING_PANEL_PREFERENCE, "panel", "Fair trial"));
+    }
+
+    @Test
+    void setRespondentDetails_shouldReturnFormattedDetails_whenRespondentCollectionIsValid() {
+        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
+        respondent.setValue(new RespondentSumType());
+        respondent.getValue().setRespondentName("Test Corp");
+        respondent.getValue().setResponseRespondentName("Test Response");
+        respondent.getValue().setRespondentHearingPanelPreference("Judge");
+        respondent.getValue().setRespondentHearingPanelPreferenceReason("Fair trial");
+        respondent.getValue().setEt3ResponseHearingRespondent(List.of("Video"));
+
+        CaseData caseData = new CaseData();
+        caseData.setRespondentCollection(List.of(respondent));
+
+        String result = initialConsiderationService.setRespondentDetails(caseData);
+
+        assertThat(result).isEqualTo(
+                String.format(RESPONDENT_NAME, 1, "Test Corp", "Test Response")
+                        + String.format(RESPONDENT_HEARING_PANEL_PREFERENCE, "Judge", "Fair trial")
+        );
+    }
+
+    @Test
+    void setRespondentDetails_shouldIncludeNotAvailableForVideo_whenRespondentNotAvailableForVideo() {
+        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
+        respondent.setValue(new RespondentSumType());
+        respondent.getValue().setRespondentName("Test Corp");
+        respondent.getValue().setResponseRespondentName("Test Response");
+        respondent.getValue().setRespondentHearingPanelPreference("Judge");
+        respondent.getValue().setRespondentHearingPanelPreferenceReason("Fair trial");
+        respondent.getValue().setEt3ResponseHearingRespondent(List.of("Telephone"));
+
+        CaseData caseData = new CaseData();
+        caseData.setRespondentCollection(List.of(respondent));
+
+        String result = initialConsiderationService.setRespondentDetails(caseData);
+
+        assertThat(result).isEqualTo(
+                String.format(RESPONDENT_NAME, 1, "Test Corp", "Test Response")
+                        + String.format(RESPONDENT_HEARING_PANEL_PREFERENCE, "Judge", "Fair trial")
+                        + NOT_AVAILABLE_FOR_VIDEO_HEARINGS.toUpperCase(Locale.UK)
+        );
+    }
+
+    @Test
+    void setRespondentDetails_shouldReturnEmptyString_whenRespondentCollectionIsEmpty() {
+        CaseData caseData = new CaseData();
+        caseData.setRespondentCollection(new ArrayList<>());
+
+        String result = initialConsiderationService.setRespondentDetails(caseData);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void setRespondentDetails_shouldHandleNullRespondentCollection() {
+        CaseData caseData = new CaseData();
+        caseData.setRespondentCollection(null);
+
+        String result = initialConsiderationService.setRespondentDetails(caseData);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void setRespondentDetails_shouldHandleNullValuesInRespondent() {
+        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
+        respondent.setValue(new RespondentSumType());
+        respondent.getValue().setRespondentName(null);
+        respondent.getValue().setResponseRespondentName(null);
+        respondent.getValue().setRespondentHearingPanelPreference(null);
+        respondent.getValue().setRespondentHearingPanelPreferenceReason(null);
+        respondent.getValue().setEt3ResponseHearingRespondent(null);
+
+        CaseData caseData = new CaseData();
+        caseData.setRespondentCollection(List.of(respondent));
+
+        String result = initialConsiderationService.setRespondentDetails(caseData);
+
+        assertThat(result).isEqualTo(
+                String.format(RESPONDENT_NAME, 1, "", "")
+                        + String.format(RESPONDENT_HEARING_PANEL_PREFERENCE, "-", "-")
+                        + NOT_AVAILABLE_FOR_VIDEO_HEARINGS.toUpperCase(Locale.UK)
+        );
     }
 
     private void setFutureHearingDate(CaseData caseData) {
-        DateListedType dateListed = caseData.getHearingCollection().get(0).getValue().getHearingDateCollection()
-            .get(0).getValue();
+        DateListedType dateListed = caseData.getHearingCollection().getFirst().getValue().getHearingDateCollection()
+            .getFirst().getValue();
         dateListed.setHearingStatus("Listed");
         dateListed.setListedDate(EARLIEST_FUTURE_HEARING_DATE.toString());
         dateListed.setHearingTimingDuration("3.5 Hours");
     }
 
     private void setFutureHearingDateWithSettledHearing(CaseData caseData) {
-        DateListedType dateListed = caseData.getHearingCollection().get(0).getValue().getHearingDateCollection()
-            .get(0).getValue();
+        DateListedType dateListed = caseData.getHearingCollection().getFirst().getValue().getHearingDateCollection()
+            .getFirst().getValue();
         dateListed.setHearingStatus("Settled");
         dateListed.setListedDate(EARLIEST_FUTURE_HEARING_DATE.toString());
         dateListed.setHearingTimingDuration("3.5 Hours");
@@ -398,8 +517,8 @@ class InitialConsiderationServiceTest {
     void generateDocument_Exceptions() throws IOException {
         when(tornadoService.generateEventDocument(any(CaseData.class), anyString(),
                 anyString(), anyString())).thenThrow(new InternalException(ERROR_MESSAGE));
-        assertThrows(Exception.class, () -> initialConsiderationService.generateDocument(new CaseData(), "userToken",
-                ENGLANDWALES_CASE_TYPE_ID));
+        assertThrows(Exception.class, () -> initialConsiderationService.generateDocument(new CaseData(),
+                "userToken", ENGLANDWALES_CASE_TYPE_ID));
     }
 
     @Test
@@ -535,7 +654,7 @@ class InitialConsiderationServiceTest {
         caseData.setEtInitialConsiderationHearing(EXPECTED_HEARING_DETAILS_STRING);
 
         initialConsiderationService.setIsHearingAlreadyListed(caseData, ENGLANDWALES_CASE_TYPE_ID);
-        assertThat(caseData.getEtICHearingAlreadyListed()).isNull();
+        assertThat(caseData.getEtICHearingAlreadyListed()).isNotNull();
     }
 
     private List<JurCodesTypeItem> generateJurisdictionCodes() {
@@ -644,6 +763,7 @@ class InitialConsiderationServiceTest {
         ClaimantHearingPreference preference = new ClaimantHearingPreference();
         preference.setClaimantHearingPanelPreference("Preference");
         preference.setClaimantHearingPanelPreferenceWhy("Reason");
+        preference.setHearingPreferences(List.of(VIDEO, PHONE));
         caseData.setClaimantHearingPreference(preference);
 
         String result = String.format(initialConsiderationService.getClaimantHearingPanelPreference(
@@ -654,6 +774,27 @@ class InitialConsiderationServiceTest {
             |-------------|:------------|
             |Panel Preference | Preference|
             |Reason for Panel Preference | Reason|
+            """;
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void getClaimantHearingPanelPreferenceTest_No_Video_Hearing() {
+        ClaimantHearingPreference preference = new ClaimantHearingPreference();
+        preference.setClaimantHearingPanelPreference("Preference");
+        preference.setClaimantHearingPanelPreferenceWhy("Reason");
+        caseData.setClaimantHearingPreference(preference);
+
+        String result = String.format(initialConsiderationService.getClaimantHearingPanelPreference(
+                caseData.getClaimantHearingPreference()));
+
+        String expected = """
+            |Claimant's hearing panel preference | |
+            |-------------|:------------|
+            |Panel Preference | Preference|
+            |Reason for Panel Preference | Reason|
+            
+            NOT AVAILABLE FOR VIDEO HEARINGS
             """;
         assertEquals(expected, result);
     }
@@ -832,5 +973,72 @@ class InitialConsiderationServiceTest {
         assertThat(caseData1.getEtICHearingNotListedListForFinalHearing()).isNull();
         assertThat(caseData1.getEtICHearingNotListedUDLHearing()).isNull();
         assertThat(caseData1.getEtICHearingNotListedAnyOtherDirections()).isNull();
+    }
+
+    @Test
+    void getEarliestHearingDateForListedHearings_shouldReturnEarliestFutureDate_whenValidListedHearingsExist() {
+        List<DateListedTypeItem> hearingDates = List.of(
+                createDate("2026-10-15T10:00:00.000", "Listed"),
+                createDate("2026-10-10T10:00:00.000", "Listed"),
+                createDate("2026-10-20T10:00:00.000", "Listed")
+        );
+
+        Optional<LocalDate> result = initialConsiderationService.getEarliestHearingDateForListedHearings(hearingDates);
+
+        assertThat(result).isPresent();
+        assertThat(result.get()).isEqualTo(LocalDate.of(2026, 10, 10));
+    }
+
+    @Test
+    void getEarliestHearingDateForListedHearings_shouldReturnEmpty_whenNoListedHearingsExist() {
+        List<DateListedTypeItem> hearingDates = List.of(
+                createDate("2023-10-15T10:00:00.000", "Not Listed"),
+                createDate("2023-10-10T10:00:00.000", "Cancelled")
+        );
+
+        Optional<LocalDate> result = initialConsiderationService.getEarliestHearingDateForListedHearings(hearingDates);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void getEarliestHearingDateForListedHearings_shouldReturnEmpty_whenAllHearingDatesAreInThePast() {
+        List<DateListedTypeItem> hearingDates = List.of(
+                createDate("2022-10-15T10:00:00.000", "Listed"),
+                createDate("2022-10-10T10:00:00.000", "Listed")
+        );
+
+        Optional<LocalDate> result = initialConsiderationService.getEarliestHearingDateForListedHearings(hearingDates);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void getEarliestHearingDateForListedHearings_shouldReturnEmpty_whenHearingDatesListIsEmpty() {
+        List<DateListedTypeItem> hearingDates = new ArrayList<>();
+
+        Optional<LocalDate> result = initialConsiderationService.getEarliestHearingDateForListedHearings(hearingDates);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void getEarliestHearingDateForListedHearings_shouldReturnEmpty_whenHearingDatesListIsNull() {
+        Optional<LocalDate> result = initialConsiderationService.getEarliestHearingDateForListedHearings(null);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void getEarliestHearingDateForListedHearings_shouldIgnoreInvalidDateFormats() {
+        List<DateListedTypeItem> hearingDates = List.of(
+                createDate("InvalidDate", "Listed"),
+                createDate("2026-10-15T10:00:00.000", "Listed")
+        );
+
+        Optional<LocalDate> result = initialConsiderationService.getEarliestHearingDateForListedHearings(hearingDates);
+
+        assertThat(result).isPresent();
+        assertThat(result.get()).isEqualTo(LocalDate.of(2026, 10, 15));
     }
 }

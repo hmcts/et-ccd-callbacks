@@ -44,4 +44,8 @@
     <suppress>
         <cve>CVE-2024-38820</cve>
     </suppress>
+    <!-- Suppressing due to dependency on other services as we use CFTLib and the latest version 2.0.3 doesn't fix the issue-->
+    <suppress until="2025-12-10Z">
+        <cve>CVE-2025-7962</cve>
+    </suppress>
 </suppressions>

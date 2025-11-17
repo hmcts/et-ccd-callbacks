@@ -273,7 +273,7 @@ public final class InitialConsiderationHelper {
         return OBJECT_MAPPER.writeValueAsString(document);
     }
 
-    private static List<String> getSortedEJSitAloneReasons(List<String> ejSitAloneYesReasons) {
+    public static List<String> getSortedEJSitAloneReasons(List<String> ejSitAloneYesReasons) {
         if (CollectionUtils.isEmpty(ejSitAloneYesReasons)) {
             return null;
         }

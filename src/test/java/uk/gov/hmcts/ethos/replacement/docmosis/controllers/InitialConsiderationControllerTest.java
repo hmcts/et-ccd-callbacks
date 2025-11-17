@@ -13,7 +13,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
@@ -32,6 +35,8 @@ import java.net.URISyntaxException;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.times;
@@ -185,5 +190,86 @@ class InitialConsiderationControllerTest extends BaseControllerTest {
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
             .andExpect(jsonPath(JsonMapper.DATA, notNullValue()));
+    }
+
+    @Test
+    void setRegionalOfficeAndEt1TribunalRegion_BothListsNotNull() {
+        CaseData caseData = new CaseData();
+
+        DynamicFixedListType regionalOfficeList = new DynamicFixedListType();
+        DynamicValueType dvt = new DynamicValueType();
+        dvt.setLabel("Leeds");
+        regionalOfficeList.setValue(dvt);
+
+        DynamicFixedListType et1HearingVenues = new DynamicFixedListType();
+        DynamicValueType et1dvt = new DynamicValueType();
+        et1dvt.setLabel("Manchester");
+        et1HearingVenues.setValue(et1dvt);
+
+        caseData.setRegionalOfficeList(regionalOfficeList);
+        caseData.setEt1HearingVenues(et1HearingVenues);
+
+        caseData.setRegionalOffice(caseData.getRegionalOfficeList() != null
+                ? caseData.getRegionalOfficeList().getSelectedLabel() : null);
+        caseData.setEt1TribunalRegion(caseData.getEt1HearingVenues() != null
+                ? caseData.getEt1HearingVenues().getSelectedLabel() : null);
+
+        assertEquals("Leeds", caseData.getRegionalOffice());
+        assertEquals("Manchester", caseData.getEt1TribunalRegion());
+    }
+
+    @Test
+    void setRegionalOfficeAndEt1TribunalRegion_RegionalOfficeListNull() {
+        CaseData caseData = new CaseData();
+        DynamicFixedListType et1HearingVenues = new DynamicFixedListType();
+        DynamicValueType dvt = new DynamicValueType();
+        dvt.setLabel("Manchester");
+        et1HearingVenues.setValue(dvt);
+        caseData.setRegionalOfficeList(null);
+        caseData.setEt1HearingVenues(et1HearingVenues);
+
+        caseData.setRegionalOffice(caseData.getRegionalOfficeList() != null
+                ? caseData.getRegionalOfficeList().getSelectedLabel() : null);
+        caseData.setEt1TribunalRegion(caseData.getEt1HearingVenues() != null
+                ? caseData.getEt1HearingVenues().getSelectedLabel() : null);
+
+        assertNull(caseData.getRegionalOffice());
+        assertEquals("Manchester", caseData.getEt1TribunalRegion());
+    }
+
+    @Test
+    void setRegionalOfficeAndEt1TribunalRegion_Et1HearingVenuesNull() {
+        CaseData caseData = new CaseData();
+        DynamicFixedListType regionalOfficeList = new DynamicFixedListType();
+        DynamicValueType dvt = new DynamicValueType();
+        dvt.setLabel("Leeds");
+        regionalOfficeList.setValue(dvt);
+
+        caseData.setRegionalOfficeList(regionalOfficeList);
+        caseData.setEt1HearingVenues(null);
+
+        caseData.setRegionalOffice(caseData.getRegionalOfficeList() != null
+                ? caseData.getRegionalOfficeList().getSelectedLabel() : null);
+        caseData.setEt1TribunalRegion(caseData.getEt1HearingVenues() != null
+                ? caseData.getEt1HearingVenues().getSelectedLabel() : null);
+
+        assertEquals("Leeds", caseData.getRegionalOffice());
+        assertNull(caseData.getEt1TribunalRegion());
+    }
+
+    @Test
+    void setRegionalOfficeAndEt1TribunalRegion_BothListsNull() {
+        CaseData caseData = new CaseData();
+
+        caseData.setRegionalOfficeList(null);
+        caseData.setEt1HearingVenues(null);
+
+        caseData.setRegionalOffice(caseData.getRegionalOfficeList() != null
+                ? caseData.getRegionalOfficeList().getSelectedLabel() : null);
+        caseData.setEt1TribunalRegion(caseData.getEt1HearingVenues() != null
+                ? caseData.getEt1HearingVenues().getSelectedLabel() : null);
+
+        assertNull(caseData.getRegionalOffice());
+        assertNull(caseData.getEt1TribunalRegion());
     }
 }

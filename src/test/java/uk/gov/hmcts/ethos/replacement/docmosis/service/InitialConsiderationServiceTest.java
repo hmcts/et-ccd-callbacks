@@ -38,6 +38,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -45,6 +46,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -1040,5 +1042,57 @@ class InitialConsiderationServiceTest {
 
         assertThat(result).isPresent();
         assertThat(result.get()).isEqualTo(LocalDate.of(2026, 10, 15));
+    }
+
+    @Test
+    void clearOldEtICHearingListedAnswersValues_clearsAllFieldsWhenAnswersExist() {
+        EtICHearingListedAnswers hearingListedAnswers = new EtICHearingListedAnswers();
+        hearingListedAnswers.setEtInitialConsiderationListedHearingType("SomeType");
+        hearingListedAnswers.setEtICIsHearingWithJsaReasonOther("SomeReason");
+        hearingListedAnswers.setEtICIsHearingWithMembers("Yes");
+        hearingListedAnswers.setEtICJsaFinalHearingReasonOther("SomeFinalReason");
+        hearingListedAnswers.setEtICMembersFinalHearingReasonOther("SomeMemberReason");
+        hearingListedAnswers.setEtICIsHearingWithJudgeOrMembersFurtherDetails("Details");
+        hearingListedAnswers.setEtICIsHearingWithJudgeOrMembersReason(List.of("Reason"));
+        hearingListedAnswers.setEtICIsFinalHearingWithJudgeOrMembersJsaReason(
+                Collections.singletonList("FinalJsaReason"));
+        hearingListedAnswers.setEtICIsFinalHearingWithJudgeOrMembersReason(Collections.singletonList("FinalReason"));
+        hearingListedAnswers.setEtICIsHearingWithJsa("Yes");
+        hearingListedAnswers.setEtICHearingListed(Collections.singletonList("Listed"));
+        hearingListedAnswers.setEtICIsHearingWithJudgeOrMembers("Yes");
+        hearingListedAnswers.setEtICIsHearingWithJudgeOrMembersReasonOther("OtherReason");
+
+        CaseData caseDataForListedAnswers = new CaseData();
+        caseDataForListedAnswers.setEtICHearingListedAnswers(hearingListedAnswers);
+        caseDataForListedAnswers.setEtInitialConsiderationHearing("SomeHearing");
+
+        initialConsiderationService.clearOldEtICHearingListedAnswersValues(caseDataForListedAnswers);
+
+        assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers().getEtInitialConsiderationListedHearingType());
+        assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers().getEtICIsHearingWithJsaReasonOther());
+        assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers().getEtICIsHearingWithMembers());
+        assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers().getEtICJsaFinalHearingReasonOther());
+        assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers().getEtICMembersFinalHearingReasonOther());
+        assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers().getEtICIsHearingWithJudgeOrMembersFurtherDetails());
+        assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers().getEtICIsHearingWithJudgeOrMembersReason());
+        assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers().getEtICIsFinalHearingWithJudgeOrMembersJsaReason());
+        assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers().getEtICIsFinalHearingWithJudgeOrMembersReason());
+        assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers().getEtICIsHearingWithJsa());
+        assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers().getEtICHearingListed());
+        assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers().getEtICIsHearingWithJudgeOrMembers());
+        assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers().getEtICIsHearingWithJudgeOrMembersReasonOther());
+        assertNull(caseDataForListedAnswers.getEtInitialConsiderationHearing());
+    }
+
+    @Test
+    void clearOldEtICHearingListedAnswersValues_doesNothingWhenAnswersAreNull() {
+        CaseData caseDataLocal = new CaseData();
+        caseDataLocal.setEtICHearingListedAnswers(null);
+        caseDataLocal.setEtInitialConsiderationHearing("SomeHearing");
+
+        initialConsiderationService.clearOldEtICHearingListedAnswersValues(caseDataLocal);
+
+        assertNull(caseDataLocal.getEtICHearingListedAnswers());
+        assertEquals( "SomeHearing", caseDataLocal.getEtInitialConsiderationHearing());
     }
 }

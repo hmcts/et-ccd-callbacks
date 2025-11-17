@@ -13,6 +13,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingDetailTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingDetailType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 
@@ -112,6 +113,60 @@ class HearingsHelperTest {
 
         assertEquals(0, HearingsHelper.hearingMidEventValidation(caseData).size());
 
+    }
+
+    @Test
+    void setEtInitialConsiderationListedHearingType_setsHearingTypeWhenEarliestListedHearingExists() {
+        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
+        DateListedType dateListedType = new DateListedType();
+        dateListedType.setListedDate("2025-12-01T10:00:00.000");
+        dateListedType.setHearingStatus("Listed");
+        dateListedTypeItem.setValue(dateListedType);
+
+        HearingType hearingType = new HearingType();
+        hearingType.setHearingType("Preliminary Hearing");
+        hearingType.setHearingDateCollection(List.of(dateListedTypeItem));
+        HearingTypeItem hearingTypeItem = new HearingTypeItem();
+        hearingTypeItem.setValue(hearingType);
+
+        caseData.setHearingCollection(List.of(hearingTypeItem));
+
+        HearingsHelper.setEtInitialConsiderationListedHearingType(caseData);
+
+        assertNotNull(caseData.getEtICHearingListedAnswers());
+        assertEquals("Preliminary Hearing", caseData.getEtICHearingListedAnswers().getEtInitialConsiderationListedHearingType());
+    }
+
+    @Test
+    void setEtInitialConsiderationListedHearingType_doesNotSetHearingTypeWhenNoListedHearingsExist() {
+        caseData.setHearingCollection(new ArrayList<>());
+
+        HearingsHelper.setEtInitialConsiderationListedHearingType(caseData);
+
+        assertNull(caseData.getEtICHearingListedAnswers());
+    }
+
+    @Test
+    void setEtInitialConsiderationListedHearingType_createsEtICHearingListedAnswersIfNull() {
+        HearingTypeItem hearingTypeItem = new HearingTypeItem();
+        DateListedType dateListedType = new DateListedType();
+        dateListedType.setListedDate("2026-08-01T10:00:00.000");
+        dateListedType.setHearingStatus("Listed");
+        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
+        dateListedTypeItem.setValue(dateListedType);
+        
+        HearingType hearingType = new HearingType();
+        hearingType.setHearingType("Full Hearing");
+        hearingType.setHearingDateCollection(List.of(new DateListedTypeItem()));
+        hearingType.setHearingDateCollection(List.of(dateListedTypeItem));
+        hearingTypeItem.setValue(hearingType);
+        caseData.setHearingCollection(List.of(hearingTypeItem));
+        caseData.setEtICHearingListedAnswers(null);
+
+        HearingsHelper.setEtInitialConsiderationListedHearingType(caseData);
+
+        assertNotNull(caseData.getEtICHearingListedAnswers());
+        assertEquals("Full Hearing", caseData.getEtICHearingListedAnswers().getEtInitialConsiderationListedHearingType());
     }
 
     @Test

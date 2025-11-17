@@ -1,18 +1,19 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.EtICListForFinalHearingUpdated;
 import uk.gov.hmcts.et.common.model.ccd.EtICListForPreliminaryHearingUpdated;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.ISSUE_RULE_27_NOTICE_AND_ORDER;
@@ -23,7 +24,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_ST
 
 class InitialConsiderationHelperTest {
     private CaseData caseData;
-
     @Test
     void getDocumentRequest_EW_preliminaryHearing() throws JsonProcessingException {
         caseData = CaseDataBuilder.builder().build();
@@ -127,6 +127,49 @@ class InitialConsiderationHelperTest {
                 + "\"icCompletedBy\":\"A User\",\"icDateCompleted\":\"20 Nov 2024\"}}";
 
         assertEquals(expected, documentRequest);
+    }
+
+    @Test
+    void getSortedEJSitAloneReasons_returnsSortedListWhenOtherIsPresent() {
+        List<String> reasons = List.of("Reason A", "Other", "Reason B");
+
+        List<String> result = InitialConsiderationHelper.getSortedEJSitAloneReasons(reasons);
+
+        assertEquals(List.of("Reason A", "Reason B", "Other"), result);
+    }
+
+    @Test
+    void getSortedEJSitAloneReasons_returnsSortedListWhenOtherIsAbsent() {
+        List<String> reasons = List.of("Reason C", "Reason A", "Reason B");
+
+        List<String> result = InitialConsiderationHelper.getSortedEJSitAloneReasons(reasons);
+
+        assertEquals(List.of("Reason A", "Reason B", "Reason C"), result);
+    }
+
+    @Test
+    void getSortedEJSitAloneReasons_returnsNullWhenInputIsEmpty() {
+        List<String> reasons = Collections.emptyList();
+
+        List<String> result = InitialConsiderationHelper.getSortedEJSitAloneReasons(reasons);
+
+        assertNull(result);
+    }
+
+    @Test
+    void getSortedEJSitAloneReasons_returnsNullWhenInputIsNull() {
+        List<String> result = InitialConsiderationHelper.getSortedEJSitAloneReasons(null);
+
+        assertNull(result);
+    }
+
+    @Test
+    void getSortedEJSitAloneReasons_handlesCaseInsensitivityForOther() {
+        List<String> reasons = List.of("Reason A", "other", "Reason B");
+
+        List<String> result = InitialConsiderationHelper.getSortedEJSitAloneReasons(reasons);
+
+        assertEquals(List.of("Reason A", "Reason B", "other"), result);
     }
 
     public void setCaseDataValues(CaseData caseData) {
@@ -433,4 +476,5 @@ class InitialConsiderationHelperTest {
 
         assertEquals(expected, documentRequest);
     }
+
 }

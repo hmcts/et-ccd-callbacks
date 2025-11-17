@@ -24,8 +24,7 @@ BASEDIR=$(dirname "$0")
 
 echo "Adding new user: ${EMAIL_ID} to XUI with WA roles"
 USER_TOKEN=$("${BASEDIR}/idam-user-token.sh" $USERNAME $PASSWORD)
-SERVICE_TOKEN=$("${BASEDIR}/idam-lease-service-token.sh" xui_webapp \
-  $(docker run --rm toolbelt/oathtool --totp -b ${XUI_S2S_KEY}))
+SERVICE_TOKEN=$("${BASEDIR}/idam-lease-service-token.sh" xui_webapp)
 
 # Function to check if user exists by name/email/service
 check_user_exists() {

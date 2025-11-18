@@ -13,7 +13,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.ISSUE_RULE_27_NOTICE_AND_ORDER;
@@ -154,14 +154,15 @@ class InitialConsiderationHelperTest {
 
         List<String> result = InitialConsiderationHelper.getSortedEJSitAloneReasons(reasons);
 
-        assertNull(result);
+        assertNotNull(result);
+        assertEquals(0, result.size());
     }
 
     @Test
     void getSortedEJSitAloneReasons_returnsNullWhenInputIsNull() {
         List<String> result = InitialConsiderationHelper.getSortedEJSitAloneReasons(null);
-
-        assertNull(result);
+        assertNotNull(result);
+        assertEquals(0, result.size());
     }
 
     @Test
@@ -228,8 +229,8 @@ class InitialConsiderationHelperTest {
                 + "\"etICHearingOrderBUCompliance\":null,"
                 + "\"etICFinalHearingLength\":\"1\","
                 + "\"etICFinalHearingLengthType\":\"Hours\",\"etICFinalHearingIsEJSitAlone\":\"JSA\","
-                + "\"etICFinalHearingIsEJSitAloneReasonYes\":null,\"etICFinalHearingIsEJSitAloneReasonYesOther\":null,"
-                + "\"etICFinalHearingIsEJSitAloneReasonNo\":null,\"etICFinalHearingIsEJSitAloneReasonNoOther\":null,"
+                + "\"etICFinalHearingIsEJSitAloneReasonYes\":[],\"etICFinalHearingIsEJSitAloneReasonYesOther\":null,"
+                + "\"etICFinalHearingIsEJSitAloneReasonNo\":[],\"etICFinalHearingIsEJSitAloneReasonNoOther\":null,"
                 + "\"etICFinalHearingIsEJSitAloneReason\":null,\"etICFinalHearingIsEJSitAloneFurtherDetails\":"
                 + "\"Test SC - EJ Sit Alone Further Details\","
                 + "\"udlSitAlone\":null,\"udlReasons\":null,\"udlDisputeOnFacts\":null,"

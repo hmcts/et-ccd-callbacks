@@ -275,7 +275,7 @@ public final class InitialConsiderationHelper {
 
     public static List<String> getSortedEJSitAloneReasons(List<String> ejSitAloneYesReasons) {
         if (CollectionUtils.isEmpty(ejSitAloneYesReasons)) {
-            return null;
+            return new ArrayList<>();
         }
 
         List<String> sortedReasons = new ArrayList<>(ejSitAloneYesReasons);

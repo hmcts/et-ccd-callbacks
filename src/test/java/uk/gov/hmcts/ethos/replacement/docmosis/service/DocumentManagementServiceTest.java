@@ -17,6 +17,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.multipart.MultipartFile;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -31,8 +32,10 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.document.am.feign.CaseDocumentClient;
+import uk.gov.hmcts.reform.ccd.document.am.util.InMemoryMultipartFile;
 import uk.gov.hmcts.reform.document.DocumentDownloadClientApi;
 import uk.gov.hmcts.reform.document.DocumentUploadClientApi;
+import uk.gov.hmcts.reform.document.domain.UploadResponse;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -488,5 +491,56 @@ class DocumentManagementServiceTest {
         assertEquals(DOC_FILE_NAME_2,
                 caseData.getDocumentCollection().get(2).getValue().getUploadedDocument().getDocumentFilename());
     }
-}
 
+    @Test
+    void uploadDocument_shouldThrowException_whenSecureDocStoreDisabledAndUploadFails() {
+        ReflectionTestUtils.setField(documentManagementService, "secureDocStoreEnabled", false);
+        MultipartFile file = new InMemoryMultipartFile("files", "test.docx",
+                "application/docx", "content".getBytes());
+        UserDetails userDetails = HelperTest.getUserDetails();
+        when(userIdamService.getUserDetails(anyString())).thenReturn(userDetails);
+        when(documentUploadClient.upload(anyString(), anyString(), anyString(), anyList(), any(), anyList()))
+                .thenThrow(new DocumentManagementException("Upload failed"));
+
+        DocumentManagementException exception = assertThrows(DocumentManagementException.class, () ->
+                documentManagementService.uploadDocument("authToken", file.getBytes(),
+                        "test.docx", "application/docx", "caseType")
+        );
+
+        assertEquals("Unable to upload document test.docx to document management", exception.getMessage());
+    }
+
+    @Test
+    void uploadDocument_shouldThrowException_whenSecureDocStoreEnabledAndUploadFails() {
+        ReflectionTestUtils.setField(documentManagementService, "secureDocStoreEnabled", true);
+        MultipartFile file = new InMemoryMultipartFile("files", "test.docx",
+                "application/docx", "content".getBytes());
+        when(caseDocumentClient.uploadDocuments(anyString(), anyString(), anyString(), anyString(), anyList(), any()))
+                .thenThrow(new DocumentManagementException("Upload failed"));
+
+        DocumentManagementException exception = assertThrows(DocumentManagementException.class, () ->
+                documentManagementService.uploadDocument("authToken", file.getBytes(),
+                        "test.docx", "application/docx", "caseType")
+        );
+
+        assertEquals("Unable to upload document test.docx to document management", exception.getMessage());
+    }
+
+    @Test
+    void uploadDocument_shouldReturnUri_whenSecureDocStoreDisabled() throws Exception {
+        ReflectionTestUtils.setField(documentManagementService, "secureDocStoreEnabled", false);
+        MultipartFile file = new InMemoryMultipartFile("files", "test.docx",
+                "application/docx", "content".getBytes());
+        UploadResponse response = successfulDocumentManagementUploadResponse();
+        UserDetails userDetails = HelperTest.getUserDetails();
+        when(userIdamService.getUserDetails(anyString())).thenReturn(userDetails);
+        when(documentUploadClient.upload(anyString(), anyString(), anyString(), anyList(), any(), anyList()))
+                .thenReturn(response);
+
+        URI result = documentManagementService.uploadDocument("authToken", file.getBytes(),
+                "test.docx", "application/docx", "caseType");
+
+        assertEquals("/documents/85d97996-22a5-40d7-882e-3a382c8ae1b4", result.getPath());
+    }
+
+}

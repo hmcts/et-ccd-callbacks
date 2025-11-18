@@ -485,7 +485,7 @@ public final class InitialConsiderationHelper {
         caseData.getDocumentCollection().add(documentTypeItem);
     }
 
-    private static String updateHearingWithJudgeOrMembersDetails(CaseData caseData) {
+    public static String updateHearingWithJudgeOrMembersDetails(CaseData caseData) {
         EtICHearingListedAnswers answers = caseData.getEtICHearingListedAnswers();
         if (answers == null || answers.getEtInitialConsiderationListedHearingType() == null) {
             return "";

@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.EtICHearingListedAnswers;
 import uk.gov.hmcts.et.common.model.ccd.EtICListForFinalHearingUpdated;
 import uk.gov.hmcts.et.common.model.ccd.EtICListForPreliminaryHearingUpdated;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -475,6 +476,97 @@ class InitialConsiderationHelperTest {
                 + "\"icCompletedBy\":\"A User\",\"icDateCompleted\":\"20 Nov 2024\"}}";
 
         assertEquals(expected, documentRequest);
+    }
+
+    @Test
+    void updateHearingWithJudgeOrMembersDetails_returnsEmptyString_whenAnswersAreNull() {
+        CaseData caseDataWithJsaOrMembers = new CaseData();
+        caseDataWithJsaOrMembers.setEtICHearingListedAnswers(null);
+        String result = InitialConsiderationHelper.updateHearingWithJudgeOrMembersDetails(caseDataWithJsaOrMembers);
+
+        assertEquals("", result);
+    }
+
+    @Test
+    void updateHearingWithJudgeOrMembersDetails_returnsEmptyString_whenHearingTypeIsNull() {
+        EtICHearingListedAnswers answers = new EtICHearingListedAnswers();
+        CaseData caseDataWithEmptyHearing = new CaseData();
+        caseDataWithEmptyHearing.setEtICHearingListedAnswers(answers);
+        String result = InitialConsiderationHelper.updateHearingWithJudgeOrMembersDetails(caseDataWithEmptyHearing);
+
+        assertEquals("", result);
+    }
+
+    @Test
+    void updateHearingWithJudgeOrMembersDetails_returnsJsaDetails_whenPreliminaryHearingAndJsa() {
+        EtICHearingListedAnswers answers = new EtICHearingListedAnswers();
+        answers.setEtInitialConsiderationListedHearingType("Preliminary Hearing(CM)");
+        answers.setEtICIsHearingWithJudgeOrMembers("JSA");
+        answers.setEtICIsHearingWithJsa("Other");
+        answers.setEtICIsHearingWithJsaReasonOther("Custom Reason");
+
+        CaseData caseDataWithPhcm = new CaseData();
+        caseDataWithPhcm.setEtICHearingListedAnswers(answers);
+        String result = InitialConsiderationHelper.updateHearingWithJudgeOrMembersDetails(caseDataWithPhcm);
+
+        assertEquals("JSA - Custom Reason", result);
+    }
+
+    @Test
+    void updateHearingWithJudgeOrMembersDetails_returnsWithMembersDetails_whenPreliminaryHearingAndWithMembers() {
+        EtICHearingListedAnswers answers = new EtICHearingListedAnswers();
+        answers.setEtInitialConsiderationListedHearingType("Preliminary Hearing(CM)");
+        answers.setEtICIsHearingWithJudgeOrMembers("With members");
+        answers.setEtICIsHearingWithMembers("Reason A");
+
+        CaseData caseDataWithCmph = new CaseData();
+        caseDataWithCmph.setEtICHearingListedAnswers(answers);
+        String result = InitialConsiderationHelper.updateHearingWithJudgeOrMembersDetails(caseDataWithCmph);
+
+        assertEquals("With members - Reason A", result);
+    }
+
+    @Test
+    void updateHearingWithJudgeOrMembersDetails_returnsFinalHearingDetails_whenFinalHearingAndJsa() {
+        EtICHearingListedAnswers answers = new EtICHearingListedAnswers();
+        answers.setEtInitialConsiderationListedHearingType("Final Hearing");
+        answers.setEtICIsHearingWithJudgeOrMembers("JSA");
+        answers.setEtICIsFinalHearingWithJudgeOrMembersJsaReason(List.of("Reason B", "Other"));
+        answers.setEtICJsaFinalHearingReasonOther("Other Reason");
+
+        CaseData caseDataWithFinalHearing = new CaseData();
+        caseDataWithFinalHearing.setEtICHearingListedAnswers(answers);
+
+        String result = InitialConsiderationHelper.updateHearingWithJudgeOrMembersDetails(caseDataWithFinalHearing);
+
+        String expected = """
+        
+        - Reason B
+        
+        - Other
+        Details: Other Reason
+            """;
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void updateHearingWithJudgeOrMembersDetails_returnsDefaultDetails_whenOtherHearingType() {
+        EtICHearingListedAnswers answers = new EtICHearingListedAnswers();
+        answers.setEtInitialConsiderationListedHearingType("Other Hearing");
+        answers.setEtICIsHearingWithJudgeOrMembersReason(List.of("Default Normal Reason", "Other"));
+        answers.setEtICIsHearingWithJudgeOrMembersReasonOther("Other Default Reason");
+
+        CaseData caseDataWithOtherHearing = new CaseData();
+        caseDataWithOtherHearing.setEtICHearingListedAnswers(answers);
+        String result = InitialConsiderationHelper.updateHearingWithJudgeOrMembersDetails(caseDataWithOtherHearing);
+        String expected = """
+        
+        - Default Normal Reason
+        
+        - Other
+        Details: Other Default Reason
+            """;
+        assertEquals(expected, result);
     }
 
 }

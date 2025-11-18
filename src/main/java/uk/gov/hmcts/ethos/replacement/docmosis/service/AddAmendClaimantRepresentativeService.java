@@ -26,7 +26,9 @@ public class AddAmendClaimantRepresentativeService {
             return;
         }
         // add or amend
+        caseData.setClaimantRepresentativeRemoved(NO);
         setRepresentativeId(caseData);
+
     }
 
     private void setRepresentativeId(CaseData caseData) {

@@ -60,9 +60,9 @@ public class NocClaimantRepresentativeService {
     }
 
     private void updateClaimantRepMap(CaseData caseData, String caseId) throws IOException {
-        RepresentedTypeC claimantRep = createRepresentedTypeC(caseId, caseData.getChangeOrganisationRequestField());
         caseData.setClaimantRepresentedQuestion(YES);
         caseData.setClaimantRepresentativeRemoved(NO);
+        RepresentedTypeC claimantRep = createRepresentedTypeC(caseId, caseData.getChangeOrganisationRequestField());
         caseData.setRepresentativeClaimantType(claimantRep);
     }
 
@@ -162,7 +162,7 @@ public class NocClaimantRepresentativeService {
                 ? after.getRepresentativeClaimantType().getMyHmctsOrganisation() : null;
         Organisation oldRepOrg = before.getRepresentativeClaimantType() != null
                 ? before.getRepresentativeClaimantType().getMyHmctsOrganisation() : null;
-        ChangeOrganisationRequest changeRequests = null;
+        ChangeOrganisationRequest changeRequests;
 
         if (!Objects.equals(newRepOrg, oldRepOrg)) {
             changeRequests = nocClaimantHelper.createChangeRequest(newRepOrg, oldRepOrg);

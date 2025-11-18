@@ -131,62 +131,6 @@ public class InitialConsiderationService {
         return "";
     }
 
-    /*
-    public void initialiseInitialConsideration2(CaseDetails caseDetails) {
-        List<DocumentTypeItem> documentCollection = caseDetails.getCaseData().getDocumentCollection();
-
-        String beforeYouStart = "";
-        if (!CollectionUtils.isEmpty(documentCollection)) {
-            //ET1
-            String et1Form = documentCollection
-                    .stream()
-                    .filter(d -> ET1_DOC_TYPE.equals(
-                            defaultIfEmpty(d.getValue().getDocumentType(), "")))
-                    .map(d -> String.format(BEFORE_LABEL_ET1_IC,
-                            DocumentManagementService.createLinkToBinaryDocument(d)))
-                    .collect(Collectors.joining());
-            //ET1 VETTING
-            String et1Vetting  = documentCollection
-                    .stream()
-                    .filter(d -> ET1_VETTING_DOC_TYPE.equals(
-                            defaultIfEmpty(d.getValue().getDocumentType(), "")))
-                    .map(d -> String.format(BEFORE_LABEL_ET1_VETTING_IC,
-                            DocumentManagementService.createLinkToBinaryDocument(d)))
-                    .collect(Collectors.joining());
-
-            //ET3
-            String et3Form  = documentCollection
-                    .stream()
-                    .filter(d -> ET3_DOC_TYPE.equals(
-                            defaultIfEmpty(d.getValue().getDocumentType(), "")))
-                    .map(d -> String.format(BEFORE_LABEL_ET3_IC,
-                            DocumentManagementService.createLinkToBinaryDocument(d)))
-                    .collect(Collectors.joining());
-
-            //ET3 PROCESSING
-            String et3Processing  = documentCollection
-                    .stream()
-                    .filter(d -> ET3_PROCESSING_DOC_TYPE.equals(
-                            defaultIfEmpty(d.getValue().getDocumentType(), "")))
-                    .map(d -> String.format(BEFORE_LABEL_ET3_PROCESSING_IC,
-                            DocumentManagementService.createLinkToBinaryDocument(d)))
-                    .collect(Collectors.joining());
-
-            //REFERRALS, if any
-            String referralLinks = "";
-            if (caseDetails.getCaseData().getReferralCollection() != null
-                    && !caseDetails.getCaseData().getReferralCollection().isEmpty()) {
-                referralLinks =  String.format(BEFORE_LABEL_REFERRALS_IC, CASE_DETAILS_URL_PARTIAL
-                        + caseDetails.getCaseId() +  REFERRALS_PAGE_FRAGMENT_ID);
-            }
-            beforeYouStart = String.format(TO_HELP_YOU_COMPLETE_IC_EVENT_LABEL, et1Form, et1Vetting, et3Form,
-                    et3Processing, referralLinks);
-        }
-
-        caseDetails.getCaseData().setInitialConsiderationBeforeYouStart(beforeYouStart);
-    }
-    */
-
     public String setRespondentDetails(CaseData caseData) {
         List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
         IntWrapper respondentCount = new IntWrapper(0);

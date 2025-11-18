@@ -64,6 +64,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CLAIMANT_HEARING_PANEL_PREFERENCE_MISSING;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CODES_URL_SCOTLAND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CVP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CVP_HEARING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.HEARING_DETAILS;
@@ -78,8 +79,11 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsidera
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.TELEPHONE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.UDL_HEARING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.VIDEO;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_LABEL_ET1_IC;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_LABEL_ET3_IC;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.CASE_DETAILS_URL_PARTIAL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET1_DOC_TYPE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET3_DOC_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.NOT_AVAILABLE_FOR_VIDEO_HEARINGS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.REFERRALS_PAGE_FRAGMENT_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
@@ -198,13 +202,37 @@ class InitialConsiderationServiceTest {
 
     @Test
     void initialiseInitialConsideration_shouldSetEmptyBeforeYouStart_whenDocumentCollectionIsNull() {
+        CaseData caseDataWithNullDocCollection = new CaseData();
+        caseDataWithNullDocCollection.setDocumentCollection(null);
         CaseDetails caseDetails = new CaseDetails();
-        caseData.setDocumentCollection(null);
-        caseDetails.setCaseData(caseData);
+        caseDetails.setCaseData(caseDataWithNullDocCollection);
 
         initialConsiderationService.initialiseInitialConsideration(caseDetails);
 
         assertThat(caseDetails.getCaseData().getInitialConsiderationBeforeYouStart()).isEmpty();
+    }
+
+    @Test
+    void initialiseInitialConsideration_shouldIncludeAllDocumentLinks_whenDocCollectionHasMultipleValidDocuments() {
+        DocumentTypeItem et1Document = new DocumentTypeItem();
+        et1Document.setValue(DocumentType.from(new UploadedDocumentType()));
+        et1Document.getValue().setDocumentType(ET1_DOC_TYPE);
+        DocumentTypeItem et3Document = new DocumentTypeItem();
+        et3Document.setValue(DocumentType.from(new UploadedDocumentType()));
+        et3Document.getValue().setDocumentType(ET3_DOC_TYPE);
+        List<DocumentTypeItem> documentCollection = new ArrayList<>();
+        documentCollection.add(et1Document);
+        documentCollection.add(et3Document);
+
+        CaseData caseDataWithMultipleDocs = new CaseData();
+        caseDataWithMultipleDocs.setDocumentCollection(documentCollection);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseDataWithMultipleDocs);
+
+        initialConsiderationService.initialiseInitialConsideration(caseDetails);
+        String beforeYouStart = caseDetails.getCaseData().getInitialConsiderationBeforeYouStart();
+        assertThat(beforeYouStart).contains(String.format(BEFORE_LABEL_ET1_IC, ""));
+        assertThat(beforeYouStart).contains(String.format(BEFORE_LABEL_ET3_IC, ""));
     }
 
     @Test
@@ -992,11 +1020,11 @@ class InitialConsiderationServiceTest {
     }
 
     @Test
-    void getEarliestHearingDateForListedHearings_shouldReturnEarliestFutureDate_whenValidListedHearingsExist() {
+    void getEarliestHearingDateForListedHearings_shouldReturnEarliestFutureDate_whenMultipleValidListedHearingsExist() {
         List<DateListedTypeItem> hearingDates = List.of(
-                createDate("2026-10-15T10:00:00.000", "Listed"),
-                createDate("2026-10-10T10:00:00.000", "Listed"),
-                createDate("2026-10-20T10:00:00.000", "Listed")
+                createDateListedTypeItem("2026-10-15T10:00:00", "Listed", "2 Hours"),
+                createDateListedTypeItem("2026-10-10T09:00:00", "Listed", "1 Hour"),
+                createDateListedTypeItem("2026-10-20T11:00:00", "Listed", "3 Hours")
         );
 
         Optional<LocalDate> result = initialConsiderationService.getEarliestHearingDateForListedHearings(hearingDates);
@@ -1008,15 +1036,19 @@ class InitialConsiderationServiceTest {
     }
 
     @Test
-    void getEarliestHearingDateForListedHearings_shouldReturnEmpty_whenNoListedHearingsExist() {
+    void getEarliestHearingDateForListedHearings_shouldIgnoreNonListedHearings() {
         List<DateListedTypeItem> hearingDates = List.of(
-                createDate("2023-10-15T10:00:00.000", "Not Listed"),
-                createDate("2023-10-10T10:00:00.000", "Cancelled")
+                createDateListedTypeItem("2026-10-15T10:00:00", "NotListed", "2 Hours"),
+                createDateListedTypeItem("2026-10-10T09:00:00", "Listed", "1 Hour"),
+                createDateListedTypeItem("2026-10-20T11:00:00", "NotListed", "3 Hours")
         );
 
         Optional<LocalDate> result = initialConsiderationService.getEarliestHearingDateForListedHearings(hearingDates);
 
-        assertThat(result).isEmpty();
+        assertThat(result).isPresent();
+        assertThat(result.get().getYear()).isEqualTo(2026);
+        assertThat(result.get().getMonthValue()).isEqualTo(10);
+        assertThat(result.get().getDayOfMonth()).isEqualTo(10);
     }
 
     @Test
@@ -1061,6 +1093,57 @@ class InitialConsiderationServiceTest {
         assertThat(result.get().getYear()).isEqualTo(2026);
         assertThat(result.get().getMonthValue()).isEqualTo(10);
         assertThat(result.get().getDayOfMonth()).isEqualTo(15);
+    }
+
+    @Test
+    void generateJurisdictionCodesHtml_shouldReturnEmptyString_whenJurisdictionCodesAreNull() {
+        String result = initialConsiderationService.generateJurisdictionCodesHtml(null,
+                ENGLANDWALES_CASE_TYPE_ID);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void generateJurisdictionCodesHtml_shouldReturnEmptyString_whenJurisdictionCodesAreEmpty() {
+        List<JurCodesTypeItem> jurisdictionCodes = new ArrayList<>();
+
+        String result = initialConsiderationService.generateJurisdictionCodesHtml(jurisdictionCodes,
+                ENGLANDWALES_CASE_TYPE_ID);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void generateJurisdictionCodesHtml_shouldReturnFormattedHtml_whenValidJurisdictionCodesExist() {
+        List<JurCodesTypeItem> jurisdictionCodes = generateJurisdictionCodes();
+
+        String result = initialConsiderationService.generateJurisdictionCodesHtml(jurisdictionCodes,
+                ENGLANDWALES_CASE_TYPE_ID);
+
+        assertThat(result).isNotEmpty();
+        assertThat(result).contains("<h2>Jurisdiction codes</h2>");
+    }
+
+    @Test
+    void generateJurisdictionCodesHtml_shouldReturnFormattedHtmlForScotland_whenValidJurisdictionCodesExist() {
+        List<JurCodesTypeItem> jurisdictionCodes = generateJurisdictionCodes();
+
+        String result = initialConsiderationService.generateJurisdictionCodesHtml(jurisdictionCodes,
+                SCOTLAND_CASE_TYPE_ID);
+
+        assertThat(result).isNotEmpty();
+        assertThat(result).contains("<h2>Jurisdiction codes</h2>");
+        assertThat(result).contains(CODES_URL_SCOTLAND);
+    }
+
+    @Test
+    void generateJurisdictionCodesHtml_shouldIgnoreInvalidJurisdictionCodes() {
+        List<JurCodesTypeItem> jurisdictionCodes = generateInvalidJurisdictionCodes();
+
+        String result = initialConsiderationService.generateJurisdictionCodesHtml(jurisdictionCodes,
+                ENGLANDWALES_CASE_TYPE_ID);
+
+        assertThat(result).isEmpty();
     }
 
     @Test
@@ -1290,7 +1373,6 @@ class InitialConsiderationServiceTest {
         assertThat(result).isEqualTo(HEARING_MISSING);
     }
 
-    //getClaimantHearingPanelPreference related tests
     @Test
     void getClaimantHearingPanelPreference_shouldReturnMissing_whenNull() {
         String result = initialConsiderationService.getClaimantHearingPanelPreference(null);

@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.EtICHearingListedAnswers;
 import uk.gov.hmcts.et.common.model.ccd.EtICListForFinalHearingUpdated;
@@ -9,11 +10,13 @@ import uk.gov.hmcts.et.common.model.ccd.EtICListForPreliminaryHearingUpdated;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.ISSUE_RULE_27_NOTICE_AND_ORDER;
@@ -24,6 +27,120 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_ST
 
 class InitialConsiderationHelperTest {
     private CaseData caseData;
+
+    @Test
+    void getDocumentRequest_returnsExpectedJsonForEnglandWales() throws JsonProcessingException {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        setCaseDataValues(caseData);
+        caseData.setEtICHearingNotListedListUpdated(Collections.singletonList("List for preliminary hearing"));
+        caseData.setEtICHearingNotListedListForPrelimHearingUpdated(populatePreliminaryHearingUpdated());
+
+        String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseData, "key",
+                ENGLANDWALES_CASE_TYPE_ID);
+
+        assertNotNull(documentRequest);
+        assertTrue(documentRequest.contains("\"templateName\":\"EM-TRB-EGW-ENG-02203.docx\""));
+        assertTrue(documentRequest.contains("\"caseNumber\":\"6000001/2024\""));
+    }
+
+    @Test
+    void getDocumentRequest_returnsExpectedJsonForScotland() throws JsonProcessingException {
+        CaseData caseData = CaseDataBuilder.builder().build();
+        setCaseDataValues(caseData);
+        caseData.setEtICHearingNotListedListUpdated(Collections.singletonList("List for final hearing"));
+        caseData.setEtICHearingNotListedListForFinalHearingUpdated(populateFinalHearingUpdated());
+
+        String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseData, "key",
+                SCOTLAND_CASE_TYPE_ID);
+
+        assertNotNull(documentRequest);
+        assertTrue(documentRequest.contains("\"templateName\":\"EM-TRB-SCO-ENG-02204.docx\""));
+        assertTrue(documentRequest.contains("\"caseNumber\":\"6000001/2024\""));
+    }
+
+    @Test
+    void getDocumentRequest_returnsEmptyJsonWhenCaseDataIsNull() throws JsonProcessingException {
+        CaseData caseDataEmpty = new CaseData();
+
+        String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseDataEmpty, "key",
+                ENGLANDWALES_CASE_TYPE_ID);
+
+        assertNotNull(documentRequest);
+        assertTrue(documentRequest.contains("\"caseNumber\":null"));
+        assertTrue(documentRequest.contains("\"templateName\":\"EM-TRB-EGW-ENG-02203.docx\""));
+    }
+
+    @Test
+    void addToDocumentCollection_doesNotAddWhenDocumentIsNull() {
+        CaseData caseDataWithNullDoc = new CaseData();
+        caseDataWithNullDoc.setDocumentCollection(new ArrayList<>());
+
+        InitialConsiderationHelper.addToDocumentCollection(caseDataWithNullDoc);
+
+        assertTrue(caseDataWithNullDoc.getDocumentCollection().isEmpty());
+    }
+
+    @Test
+    void addToDocumentCollection_addsDocumentToCollection() {
+        CaseData caseDataWithDoc = new CaseData();
+        caseDataWithDoc.setEtInitialConsiderationDocument(Mockito.mock(
+                uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType.class));
+        caseDataWithDoc.setDocumentCollection(new ArrayList<>());
+
+        InitialConsiderationHelper.addToDocumentCollection(caseDataWithDoc);
+
+        assertEquals(1, caseDataWithDoc.getDocumentCollection().size());
+    }
+
+    @Test
+    void getSortedEJSitAloneReasons_returnsEmptyListWhenInputIsNull() {
+        List<String> result = InitialConsiderationHelper.getSortedEJSitAloneReasons(null);
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void getSortedEJSitAloneReasons_sortsReasonsAlphabeticallyWithOtherLast() {
+        List<String> reasons = List.of("Reason C", "Other", "Reason A");
+
+        List<String> result = InitialConsiderationHelper.getSortedEJSitAloneReasons(reasons);
+
+        assertEquals(List.of("Reason A", "Reason C", "Other"), result);
+    }
+
+    @Test
+    void updateHearingWithJudgeOrMembersDetails_returnsEmptyStringWhenAnswersAreNull() {
+        CaseData caseData = new CaseData();
+        caseData.setEtICHearingListedAnswers(null);
+
+        String result = InitialConsiderationHelper.updateHearingWithJudgeOrMembersDetails(caseData);
+
+        assertEquals("", result);
+    }
+
+    @Test
+    void updateHearingWithJudgeOrMembersDetails_returnsDetailsForFinalHearingWithJsa() {
+        EtICHearingListedAnswers answers = new EtICHearingListedAnswers();
+        answers.setEtInitialConsiderationListedHearingType("Final Hearing");
+        answers.setEtICIsHearingWithJudgeOrMembers("JSA");
+        answers.setEtICIsFinalHearingWithJudgeOrMembersJsaReason(List.of("Reason A", "Other"));
+        answers.setEtICJsaFinalHearingReasonOther("Custom Reason");
+
+        CaseData caseData = new CaseData();
+        caseData.setEtICHearingListedAnswers(answers);
+
+        String result = InitialConsiderationHelper.updateHearingWithJudgeOrMembersDetails(caseData);
+
+        String expected = """
+
+        - Reason A
+
+        - Other
+        Details: Custom Reason
+            """;
+        assertEquals(expected, result);
+    }
 
     @Test
     void getDocumentRequest_EW_preliminaryHearing() throws JsonProcessingException {

@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
@@ -99,7 +100,7 @@ public class InitialConsiderationService {
         List<DocumentTypeItem> documentCollection = caseDetails.getCaseData().getDocumentCollection();
 
         String beforeYouStart = "";
-        if (documentCollection != null) {
+        if (!CollectionUtils.isEmpty(documentCollection)) {
             //ET1
             String et1Form = documentCollection
                     .stream()

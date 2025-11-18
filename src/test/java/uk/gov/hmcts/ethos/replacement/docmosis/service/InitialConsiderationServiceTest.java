@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jetbrains.annotations.NotNull;
 import org.joda.time.LocalDateTime;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -21,11 +22,14 @@ import uk.gov.hmcts.et.common.model.ccd.EtInitialConsiderationRule27;
 import uk.gov.hmcts.et.common.model.ccd.EtInitialConsiderationRule28;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ReferralTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
@@ -71,7 +75,10 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsidera
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.TELEPHONE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.UDL_HEARING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.VIDEO;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.CASE_DETAILS_URL_PARTIAL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET1_DOC_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.NOT_AVAILABLE_FOR_VIDEO_HEARINGS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.REFERRALS_PAGE_FRAGMENT_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
 @ExtendWith(SpringExtension.class)
@@ -1046,21 +1053,7 @@ class InitialConsiderationServiceTest {
 
     @Test
     void clearOldEtICHearingListedAnswersValues_clearsAllFieldsWhenAnswersExist() {
-        EtICHearingListedAnswers hearingListedAnswers = new EtICHearingListedAnswers();
-        hearingListedAnswers.setEtInitialConsiderationListedHearingType("SomeType");
-        hearingListedAnswers.setEtICIsHearingWithJsaReasonOther("SomeReason");
-        hearingListedAnswers.setEtICIsHearingWithMembers("Yes");
-        hearingListedAnswers.setEtICJsaFinalHearingReasonOther("SomeFinalReason");
-        hearingListedAnswers.setEtICMembersFinalHearingReasonOther("SomeMemberReason");
-        hearingListedAnswers.setEtICIsHearingWithJudgeOrMembersFurtherDetails("Details");
-        hearingListedAnswers.setEtICIsHearingWithJudgeOrMembersReason(List.of("Reason"));
-        hearingListedAnswers.setEtICIsFinalHearingWithJudgeOrMembersJsaReason(
-                Collections.singletonList("FinalJsaReason"));
-        hearingListedAnswers.setEtICIsFinalHearingWithJudgeOrMembersReason(Collections.singletonList("FinalReason"));
-        hearingListedAnswers.setEtICIsHearingWithJsa("Yes");
-        hearingListedAnswers.setEtICHearingListed(Collections.singletonList("Listed"));
-        hearingListedAnswers.setEtICIsHearingWithJudgeOrMembers("Yes");
-        hearingListedAnswers.setEtICIsHearingWithJudgeOrMembersReasonOther("OtherReason");
+        EtICHearingListedAnswers hearingListedAnswers = getEtICHearingListedAnswers();
 
         CaseData caseDataForListedAnswers = new CaseData();
         caseDataForListedAnswers.setEtICHearingListedAnswers(hearingListedAnswers);
@@ -1088,6 +1081,96 @@ class InitialConsiderationServiceTest {
         assertNull(caseDataForListedAnswers.getEtInitialConsiderationHearing());
     }
 
+    private static @NotNull EtICHearingListedAnswers getEtICHearingListedAnswers() {
+        EtICHearingListedAnswers hearingListedAnswers = new EtICHearingListedAnswers();
+        hearingListedAnswers.setEtInitialConsiderationListedHearingType("SomeType");
+        hearingListedAnswers.setEtICIsHearingWithJsaReasonOther("SomeReason");
+        hearingListedAnswers.setEtICIsHearingWithMembers("Yes");
+        hearingListedAnswers.setEtICJsaFinalHearingReasonOther("SomeFinalReason");
+        hearingListedAnswers.setEtICMembersFinalHearingReasonOther("SomeMemberReason");
+        hearingListedAnswers.setEtICIsHearingWithJudgeOrMembersFurtherDetails("Details");
+        hearingListedAnswers.setEtICIsHearingWithJudgeOrMembersReason(List.of("Reason"));
+        hearingListedAnswers.setEtICIsFinalHearingWithJudgeOrMembersJsaReason(
+                Collections.singletonList("FinalJsaReason"));
+        hearingListedAnswers.setEtICIsFinalHearingWithJudgeOrMembersReason(Collections.singletonList("FinalReason"));
+        hearingListedAnswers.setEtICIsHearingWithJsa("Yes");
+        hearingListedAnswers.setEtICHearingListed(Collections.singletonList("Listed"));
+        hearingListedAnswers.setEtICIsHearingWithJudgeOrMembers("Yes");
+        hearingListedAnswers.setEtICIsHearingWithJudgeOrMembersReasonOther("OtherReason");
+        return hearingListedAnswers;
+    }
+
+    @Test
+    void initialiseInitialConsideration_shouldSetBeforeYouStart_whenDocumentCollectionHasValidDocuments() {
+        List<DocumentTypeItem> documentCollection = new ArrayList<>();
+        DocumentTypeItem et1Document = new DocumentTypeItem();
+        et1Document.setValue(DocumentType.from(new UploadedDocumentType()));
+        et1Document.getValue().setDocumentType(ET1_DOC_TYPE);
+        documentCollection.add(et1Document);
+
+        CaseData caseDataForEt1DocType = new CaseData();
+        caseDataForEt1DocType.setDocumentCollection(documentCollection);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseDataForEt1DocType);
+
+        initialConsiderationService.initialiseInitialConsideration(caseDetails);
+
+        assertThat(caseDetails.getCaseData().getInitialConsiderationBeforeYouStart()).isNotEmpty();
+    }
+
+    @Test
+    void initialiseInitialConsideration_shouldSetEmptyBeforeYouStart_whenDocumentCollectionIsEmpty() {
+        CaseData caseDataWithEmptyDocCollection = new CaseData();
+        caseDataWithEmptyDocCollection.setDocumentCollection(new ArrayList<>());
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseDataWithEmptyDocCollection);
+
+        initialConsiderationService.initialiseInitialConsideration(caseDetails);
+
+        assertThat(caseDetails.getCaseData().getInitialConsiderationBeforeYouStart()).isEmpty();
+    }
+
+    @Test
+    void initialiseInitialConsideration_shouldIncludeReferralLinks_whenReferralCollectionIsNotEmpty() {
+        List<DocumentTypeItem> documentCollection = new ArrayList<>();
+        DocumentTypeItem et1Document = new DocumentTypeItem();
+        et1Document.setValue(DocumentType.from(new UploadedDocumentType()));
+        et1Document.getValue().setDocumentType(ET1_DOC_TYPE);
+        documentCollection.add(et1Document);
+
+        CaseData caseDataWithReferralLinks = new CaseData();
+        caseDataWithReferralLinks.setDocumentCollection(documentCollection);
+        caseDataWithReferralLinks.setReferralCollection(Collections.singletonList(new ReferralTypeItem()));
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseDataWithReferralLinks);
+        caseDetails.setCaseId("12345");
+
+        initialConsiderationService.initialiseInitialConsideration(caseDetails);
+
+        assertThat(caseDetails.getCaseData().getInitialConsiderationBeforeYouStart())
+                .contains(CASE_DETAILS_URL_PARTIAL + "12345" + REFERRALS_PAGE_FRAGMENT_ID);
+    }
+
+    @Test
+    void initialiseInitialConsideration_shouldNotIncludeReferralLinks_whenReferralCollectionIsNull() {
+        List<DocumentTypeItem> documentCollection = new ArrayList<>();
+        DocumentTypeItem et1Document = new DocumentTypeItem();
+        et1Document.setValue(DocumentType.from(new UploadedDocumentType()));
+        et1Document.getValue().setDocumentType(ET1_DOC_TYPE);
+        documentCollection.add(et1Document);
+
+        CaseData caseDataWithNullReferralList = new CaseData();
+        caseDataWithNullReferralList.setDocumentCollection(documentCollection);
+        caseDataWithNullReferralList.setReferralCollection(null);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseDataWithNullReferralList);
+
+        initialConsiderationService.initialiseInitialConsideration(caseDetails);
+
+        assertThat(caseDetails.getCaseData().getInitialConsiderationBeforeYouStart())
+                .doesNotContain(CASE_DETAILS_URL_PARTIAL);
+    }
+
     @Test
     void clearOldEtICHearingListedAnswersValues_doesNothingWhenAnswersAreNull() {
         CaseData caseDataLocal = new CaseData();
@@ -1098,5 +1181,79 @@ class InitialConsiderationServiceTest {
 
         assertNull(caseDataLocal.getEtICHearingListedAnswers());
         assertEquals("SomeHearing", caseDataLocal.getEtInitialConsiderationHearing());
+    }
+
+    @Test
+    void getHearingDetails_shouldReturnMissingMessage_whenHearingCollectionIsNull() {
+        String result = initialConsiderationService.getHearingDetails(null);
+        assertThat(result).isEqualTo(HEARING_MISSING);
+    }
+
+    @Test
+    void getHearingDetails_shouldReturnMissingMessage_whenHearingCollectionIsEmpty() {
+        List<HearingTypeItem> hearingCollection = new ArrayList<>();
+
+        String result = initialConsiderationService.getHearingDetails(hearingCollection);
+        assertThat(result).isEqualTo(HEARING_MISSING);
+    }
+
+    @Test
+    void getHearingDetails_shouldReturnMissingMessage_whenNoListedHearingsExist() {
+        List<HearingTypeItem> hearingCollection = List.of(
+                createHearingTypeItem("2023-10-15T10:00:00.000", "Not Listed", "Hearing Type 1", "Hours", "3"),
+                createHearingTypeItem("2023-10-10T10:00:00.000", "Cancelled", "Hearing Type 2", "Hours", "2")
+        );
+
+        String result = initialConsiderationService.getHearingDetails(hearingCollection);
+        assertThat(result).isEqualTo(HEARING_MISSING);
+    }
+
+    @Test
+    void getHearingDetails_shouldReturnFormattedDetails_whenValidHearingCollectionExists() {
+        List<HearingTypeItem> hearingCollection = List.of(
+                createHearingTypeItem("2026-10-15T10:00:00.000", "Listed",
+                        "Hearing Type 1", "Hours", "3"),
+                createHearingTypeItem("2026-10-10T10:00:00.000", "Listed",
+                        "Hearing Type 2", "Hours", "2")
+        );
+
+        String result = initialConsiderationService.getHearingDetails(hearingCollection);
+        String detail = String.format(HEARING_DETAILS, "10 Oct 2026", "Hearing Type 2", "2 Hours");
+        assertThat(result).isEqualTo(detail);
+    }
+
+    @Test
+    void getHearingDetails_shouldIgnoreInvalidDateFormats() {
+        List<HearingTypeItem> hearingCollection = List.of(
+                createHearingTypeItem("InvalidDate", "Listed", "Hearing Type 1", "Hours", "3"),
+                createHearingTypeItem("2026-10-15T10:00:00.000", "Listed", "Hearing Type 2", "Hours", "2")
+        );
+
+        String result = initialConsiderationService.getHearingDetails(hearingCollection);
+        String detail = String.format(HEARING_DETAILS, "15 Oct 2026", "Hearing Type 2", "2 Hours");
+        assertThat(result).isEqualTo(detail);
+    }
+
+    private HearingTypeItem createHearingTypeItem(String date, String status, String type, String lengthType, String duration) {
+        HearingType hearing = new HearingType();
+        hearing.setHearingType(type);
+        hearing.setHearingDateCollection(List.of(createDateListedTypeItem(date, status, duration)));
+        hearing.setHearingEstLengthNum(duration);
+        hearing.setHearingEstLengthNumType(lengthType);
+
+        HearingTypeItem hearingTypeItem = new HearingTypeItem();
+        hearingTypeItem.setValue(hearing);
+        return hearingTypeItem;
+    }
+
+    private DateListedTypeItem createDateListedTypeItem(String date, String status, String duration) {
+        DateListedType dateListedType = new DateListedType();
+        dateListedType.setListedDate(date);
+        dateListedType.setHearingStatus(status);
+        dateListedType.setHearingTimingDuration(duration);
+
+        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
+        dateListedTypeItem.setValue(dateListedType);
+        return dateListedTypeItem;
     }
 }

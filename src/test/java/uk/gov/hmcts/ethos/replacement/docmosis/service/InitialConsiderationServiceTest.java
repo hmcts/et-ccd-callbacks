@@ -1033,7 +1033,8 @@ class InitialConsiderationServiceTest {
 
     @Test
     void getEarliestHearingDateForListedHearings_shouldReturnEmpty_whenHearingDatesListIsNull() {
-        Optional<LocalDate> result = initialConsiderationService.getEarliestHearingDateForListedHearings(null);
+        Optional<LocalDate> result = initialConsiderationService.getEarliestHearingDateForListedHearings(
+                null);
 
         assertThat(result).isEmpty();
     }
@@ -1234,7 +1235,8 @@ class InitialConsiderationServiceTest {
         assertThat(result).isEqualTo(detail);
     }
 
-    private HearingTypeItem createHearingTypeItem(String date, String status, String type, String lengthType, String duration) {
+    private HearingTypeItem createHearingTypeItem(String date, String status, String type, String lengthType,
+                                                  String duration) {
         HearingType hearing = new HearingType();
         hearing.setHearingType(type);
         hearing.setHearingDateCollection(List.of(createDateListedTypeItem(date, status, duration)));

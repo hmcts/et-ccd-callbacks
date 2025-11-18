@@ -50,8 +50,10 @@ import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doCallRealMethod;
@@ -61,6 +63,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CLAIMANT_HEARING_PANEL_PREFERENCE_MISSING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CVP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CVP_HEARING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.HEARING_DETAILS;
@@ -304,6 +307,15 @@ class InitialConsiderationServiceTest {
                 String.format(RESPONDENT_NAME, 1, "Test Corp", "Test Response")
                         + String.format(RESPONDENT_HEARING_PANEL_PREFERENCE, "Judge", "Fair trial")
         );
+    }
+
+    @Test
+    void setRespondentDetails_shouldReturnEmptyString_whenRespondentCollectionIsNull() {
+        CaseData caseDataWithNullRespondents = new CaseData();
+        caseDataWithNullRespondents.setRespondentCollection(null);
+        String result = initialConsiderationService.setRespondentDetails(caseDataWithNullRespondents);
+
+        assertThat(result).isEmpty();
     }
 
     @Test
@@ -1232,6 +1244,85 @@ class InitialConsiderationServiceTest {
         String result = initialConsiderationService.getHearingDetails(hearingCollection);
         String detail = String.format(HEARING_DETAILS, "15 Oct 2026", "Hearing Type 2", "2 Hours");
         assertThat(result).isEqualTo(detail);
+    }
+
+    // Add these tests to cover missing cases for getHearingDetails
+    @Test
+    void getHearingDetails_shouldReturnMissingMessage_whenHearingTypeItemIsNull() {
+        List<HearingTypeItem> hearingCollection = new ArrayList<>();
+        hearingCollection.add(null);
+
+        String result = initialConsiderationService.getHearingDetails(hearingCollection);
+        assertThat(result).isEqualTo(HEARING_MISSING);
+    }
+
+    @Test
+    void getHearingDetails_shouldReturnMissingMessage_whenHearingTypeValueIsNull() {
+        HearingTypeItem item = new HearingTypeItem();
+        item.setValue(null);
+        List<HearingTypeItem> hearingCollection = List.of(item);
+
+        String result = initialConsiderationService.getHearingDetails(hearingCollection);
+        assertThat(result).isEqualTo(HEARING_MISSING);
+    }
+
+    @Test
+    void getHearingDetails_shouldReturnMissingMessage_whenHearingDateCollectionIsNull() {
+        HearingType hearing = new HearingType();
+        hearing.setHearingDateCollection(null);
+        HearingTypeItem item = new HearingTypeItem();
+        item.setValue(hearing);
+        List<HearingTypeItem> hearingCollection = List.of(item);
+
+        String result = initialConsiderationService.getHearingDetails(hearingCollection);
+        assertThat(result).isEqualTo(HEARING_MISSING);
+    }
+
+    @Test
+    void getHearingDetails_shouldReturnMissingMessage_whenHearingDateCollectionIsEmpty() {
+        HearingType hearing = new HearingType();
+        hearing.setHearingDateCollection(new ArrayList<>());
+        HearingTypeItem item = new HearingTypeItem();
+        item.setValue(hearing);
+        List<HearingTypeItem> hearingCollection = List.of(item);
+
+        String result = initialConsiderationService.getHearingDetails(hearingCollection);
+        assertThat(result).isEqualTo(HEARING_MISSING);
+    }
+
+    //getClaimantHearingPanelPreference related tests
+    @Test
+    void getClaimantHearingPanelPreference_shouldReturnMissing_whenNull() {
+        String result = initialConsiderationService.getClaimantHearingPanelPreference(null);
+        assertEquals(CLAIMANT_HEARING_PANEL_PREFERENCE_MISSING, result);
+    }
+
+    @Test
+    void getClaimantHearingPanelPreference_shouldReturnDashes_whenFieldsAreNull() {
+        ClaimantHearingPreference pref = new ClaimantHearingPreference();
+        String result = initialConsiderationService.getClaimantHearingPanelPreference(pref);
+        assertTrue(result.contains("-"));
+        assertTrue(result.toUpperCase(Locale.UK).contains(NOT_AVAILABLE_FOR_VIDEO_HEARINGS.toUpperCase(Locale.UK)));
+    }
+
+    @Test
+    void getClaimantHearingPanelPreference_shouldReturnPanelPreference_whenVideoPresent() {
+        ClaimantHearingPreference pref = new ClaimantHearingPreference();
+        pref.setClaimantHearingPanelPreference("Panel");
+        pref.setClaimantHearingPanelPreferenceWhy("Reason");
+        pref.setHearingPreferences(List.of(VIDEO));
+        String result = initialConsiderationService.getClaimantHearingPanelPreference(pref);
+        assertTrue(result.contains("Panel"));
+        assertTrue(result.contains("Reason"));
+        assertFalse(result.toUpperCase(Locale.UK).contains(NOT_AVAILABLE_FOR_VIDEO_HEARINGS.toUpperCase(Locale.UK)));
+    }
+
+    @Test
+    void getClaimantHearingPanelPreference_shouldReturnNotAvailableForVideo_whenVideoNotPresent() {
+        ClaimantHearingPreference pref = new ClaimantHearingPreference();
+        pref.setHearingPreferences(List.of("SomeOtherType"));
+        String result = initialConsiderationService.getClaimantHearingPanelPreference(pref);
+        assertTrue(result.toUpperCase(Locale.UK).contains(NOT_AVAILABLE_FOR_VIDEO_HEARINGS.toUpperCase(Locale.UK)));
     }
 
     private HearingTypeItem createHearingTypeItem(String date, String status, String type, String lengthType,

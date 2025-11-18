@@ -296,10 +296,9 @@ class InitialConsiderationServiceTest {
         respondent.getValue().setRespondentHearingPanelPreferenceReason("Fair trial");
         respondent.getValue().setEt3ResponseHearingRespondent(List.of("Video"));
 
-        CaseData caseData = new CaseData();
-        caseData.setRespondentCollection(List.of(respondent));
-
-        String result = initialConsiderationService.setRespondentDetails(caseData);
+        CaseData caseDataWithRespondents = new CaseData();
+        caseDataWithRespondents.setRespondentCollection(List.of(respondent));
+        String result = initialConsiderationService.setRespondentDetails(caseDataWithRespondents);
 
         assertThat(result).isEqualTo(
                 String.format(RESPONDENT_NAME, 1, "Test Corp", "Test Response")
@@ -317,10 +316,9 @@ class InitialConsiderationServiceTest {
         respondent.getValue().setRespondentHearingPanelPreferenceReason("Fair trial");
         respondent.getValue().setEt3ResponseHearingRespondent(List.of("Telephone"));
 
-        CaseData caseData = new CaseData();
-        caseData.setRespondentCollection(List.of(respondent));
-
-        String result = initialConsiderationService.setRespondentDetails(caseData);
+        CaseData caseDataWithVideoRespondents = new CaseData();
+        caseDataWithVideoRespondents.setRespondentCollection(List.of(respondent));
+        String result = initialConsiderationService.setRespondentDetails(caseDataWithVideoRespondents);
 
         assertThat(result).isEqualTo(
                 String.format(RESPONDENT_NAME, 1, "Test Corp", "Test Response")
@@ -331,20 +329,18 @@ class InitialConsiderationServiceTest {
 
     @Test
     void setRespondentDetails_shouldReturnEmptyString_whenRespondentCollectionIsEmpty() {
-        CaseData caseData = new CaseData();
-        caseData.setRespondentCollection(new ArrayList<>());
-
-        String result = initialConsiderationService.setRespondentDetails(caseData);
+        CaseData caseDataWithEmptyRespoList = new CaseData();
+        caseDataWithEmptyRespoList.setRespondentCollection(new ArrayList<>());
+        String result = initialConsiderationService.setRespondentDetails(caseDataWithEmptyRespoList);
 
         assertThat(result).isEmpty();
     }
 
     @Test
     void setRespondentDetails_shouldHandleNullRespondentCollection() {
-        CaseData caseData = new CaseData();
-        caseData.setRespondentCollection(null);
-
-        String result = initialConsiderationService.setRespondentDetails(caseData);
+        CaseData caseDataWithNoRespondents = new CaseData();
+        caseDataWithNoRespondents.setRespondentCollection(null);
+        String result = initialConsiderationService.setRespondentDetails(caseDataWithNoRespondents);
 
         assertThat(result).isEmpty();
     }
@@ -359,10 +355,9 @@ class InitialConsiderationServiceTest {
         respondent.getValue().setRespondentHearingPanelPreferenceReason(null);
         respondent.getValue().setEt3ResponseHearingRespondent(null);
 
-        CaseData caseData = new CaseData();
-        caseData.setRespondentCollection(List.of(respondent));
-
-        String result = initialConsiderationService.setRespondentDetails(caseData);
+        CaseData caseDataWithRespondentDetails = new CaseData();
+        caseDataWithRespondentDetails.setRespondentCollection(List.of(respondent));
+        String result = initialConsiderationService.setRespondentDetails(caseDataWithRespondentDetails);
 
         assertThat(result).isEqualTo(
                 String.format(RESPONDENT_NAME, 1, "", "")
@@ -995,7 +990,9 @@ class InitialConsiderationServiceTest {
         Optional<LocalDate> result = initialConsiderationService.getEarliestHearingDateForListedHearings(hearingDates);
 
         assertThat(result).isPresent();
-        assertThat(result.get()).isEqualTo(LocalDate.of(2026, 10, 10));
+        assertThat(result.get().getYear()).isEqualTo(2026);
+        assertThat(result.get().getMonthValue()).isEqualTo(10);
+        assertThat(result.get().getDayOfMonth()).isEqualTo(10);
     }
 
     @Test
@@ -1049,7 +1046,9 @@ class InitialConsiderationServiceTest {
         Optional<LocalDate> result = initialConsiderationService.getEarliestHearingDateForListedHearings(hearingDates);
 
         assertThat(result).isPresent();
-        assertThat(result.get()).isEqualTo(LocalDate.of(2026, 10, 15));
+        assertThat(result.get().getYear()).isEqualTo(2026);
+        assertThat(result.get().getMonthValue()).isEqualTo(10);
+        assertThat(result.get().getDayOfMonth()).isEqualTo(15);
     }
 
     @Test

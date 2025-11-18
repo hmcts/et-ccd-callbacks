@@ -93,10 +93,46 @@ public class InitialConsiderationService {
     private static final String NEWLINE = "\n";
 
     public void initialiseInitialConsideration(CaseDetails caseDetails) {
-        caseDetails.getCaseData().setInitialConsiderationBeforeYouStart(initiateBeforeYouStart(caseDetails));
+        List<DocumentTypeItem> documentCollection = caseDetails.getCaseData().getDocumentCollection();
+
+        if (CollectionUtils.isEmpty(documentCollection)) {
+            caseDetails.getCaseData().setInitialConsiderationBeforeYouStart("");
+            return;
+        }
+
+        String et1Form = generateDocumentLinks(documentCollection, ET1_DOC_TYPE, BEFORE_LABEL_ET1_IC);
+        String et1Vetting = generateDocumentLinks(documentCollection,
+                ET1_VETTING_DOC_TYPE, BEFORE_LABEL_ET1_VETTING_IC);
+        String et3Form = generateDocumentLinks(documentCollection, ET3_DOC_TYPE, BEFORE_LABEL_ET3_IC);
+        String et3Processing = generateDocumentLinks(documentCollection,
+                ET3_PROCESSING_DOC_TYPE, BEFORE_LABEL_ET3_PROCESSING_IC);
+        String referralLinks = generateReferralLinks(caseDetails);
+
+        String beforeYouStart = String.format(TO_HELP_YOU_COMPLETE_IC_EVENT_LABEL, et1Form, et1Vetting,
+                et3Form, et3Processing, referralLinks);
+        caseDetails.getCaseData().setInitialConsiderationBeforeYouStart(beforeYouStart);
     }
 
-    private String initiateBeforeYouStart(CaseDetails caseDetails) {
+    private String generateDocumentLinks(List<DocumentTypeItem> documentCollection, String docType, String label) {
+        return documentCollection.stream()
+                .filter(d -> docType.equals(defaultIfEmpty(d.getValue().getDocumentType(),
+                        "")))
+                .map(d -> String.format(label,
+                        DocumentManagementService.createLinkToBinaryDocument(d)))
+                .collect(Collectors.joining());
+    }
+
+    private String generateReferralLinks(CaseDetails caseDetails) {
+        List<?> referralCollection = caseDetails.getCaseData().getReferralCollection();
+        if (CollectionUtils.isNotEmpty(referralCollection)) {
+            return String.format(BEFORE_LABEL_REFERRALS_IC,
+                    CASE_DETAILS_URL_PARTIAL + caseDetails.getCaseId() + REFERRALS_PAGE_FRAGMENT_ID);
+        }
+        return "";
+    }
+
+    /*
+    public void initialiseInitialConsideration2(CaseDetails caseDetails) {
         List<DocumentTypeItem> documentCollection = caseDetails.getCaseData().getDocumentCollection();
 
         String beforeYouStart = "";
@@ -147,8 +183,9 @@ public class InitialConsiderationService {
                     et3Processing, referralLinks);
         }
 
-        return beforeYouStart;
+        caseDetails.getCaseData().setInitialConsiderationBeforeYouStart(beforeYouStart);
     }
+    */
 
     public String setRespondentDetails(CaseData caseData) {
         List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();

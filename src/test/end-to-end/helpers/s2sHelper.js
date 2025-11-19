@@ -1,6 +1,5 @@
 const {Logger} = require('@hmcts/nodejs-logging');
-const requestModule = require('request-promise-native');
-const request = requestModule.defaults();
+const axios = require('axios');
 const testConfig = require('../../config.js');
 const logger = Logger.getLogger('helpers/s2sHelper.js');
 const env = testConfig.TestEnv;
@@ -11,15 +10,17 @@ async function getServiceToken() {
     const s2sAuthPath = '/testing-support/lease';
     const oneTimePassword = testConfig.oneTimePassword
 
-    const serviceToken = await request({
-        method: 'POST',
-        uri: s2sBaseUrl + s2sAuthPath,
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({microservice: 'xui_webapp', oneTimePassword})
-    });
+    const resp = await axios.post(
+        s2sBaseUrl + s2sAuthPath,
+        { microservice: 'xui_webapp', oneTimePassword },
+        {
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        }
+    );
 
+    const serviceToken = resp.data;
     logger.debug(serviceToken);
     return serviceToken;
 }

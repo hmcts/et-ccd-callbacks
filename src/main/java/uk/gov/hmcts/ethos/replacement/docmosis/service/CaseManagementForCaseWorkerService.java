@@ -36,6 +36,8 @@ import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -285,6 +287,10 @@ public class CaseManagementForCaseWorkerService {
     }
 
     public void setNextEarliestListedHearing(CaseData caseData) {
+        if (caseData == null) {
+            return;
+        }
+
         HearingsHelper.setEtInitialConsiderationListedHearingType(caseData);
     }
 
@@ -310,6 +316,10 @@ public class CaseManagementForCaseWorkerService {
                 dates.addAll(getListedDates(hearingTypeItem));
             }
             for (String date : dates) {
+                if (!isValidHearingDateFormate(date)) {
+                    continue;
+                }
+
                 LocalDateTime parsedDate = LocalDateTime.parse(date);
                 if (EMPTY_STRING.equals(nextListedDate) && parsedDate.isAfter(LocalDateTime.now())
                         || parsedDate.isAfter(LocalDateTime.now())
@@ -318,6 +328,19 @@ public class CaseManagementForCaseWorkerService {
                 }
             }
             caseData.setNextListedDate(nextListedDate.split("T")[0]);
+        }
+    }
+
+    private boolean isValidHearingDateFormate(String hearingDate) {
+        DateTimeFormatter formatter = new DateTimeFormatterBuilder()
+                .appendPattern("yyyy-MM-dd'T'HH:mm:ss")
+                .optionalStart().appendPattern(".SSS").optionalEnd()
+                .toFormatter();
+        try {
+            LocalDateTime.parse(hearingDate, formatter);
+            return true;
+        } catch (Exception e) {
+            return false;
         }
     }
 

@@ -93,6 +93,14 @@ public final class HearingsHelper {
     }
 
     public static void setEtInitialConsiderationListedHearingType(CaseData caseData) {
+
+        if (caseData == null || isEmpty(caseData.getHearingCollection())) {
+            log.info("No hearing collection found for case: {} to set EtInitialConsiderationListedHearingType",
+                    caseData != null ? caseData.getEthosCaseReference() : "null");
+            return;
+
+        }
+
         HearingType earliestListedHearing = getEarliestListedHearingType(caseData.getHearingCollection());
 
         if (earliestListedHearing == null) {

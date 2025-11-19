@@ -527,100 +527,45 @@ public class InitialConsiderationService {
     }
 
     public String composeIcEt1ReferralToJudgeOrLOListWithDetails(CaseData caseData) {
-        StringBuilder icEt1ReferralToJudgeOrLOListText = new StringBuilder();
+        StringBuilder referralDetails = new StringBuilder();
 
         if (caseData.getReferralToJudgeOrLOList() != null && !caseData.getReferralToJudgeOrLOList().isEmpty()) {
-            caseData.getReferralToJudgeOrLOList().forEach(listItem -> {
-                icEt1ReferralToJudgeOrLOListText.append(NEWLINE).append(BULLET_POINT);
+            for (String listItem : caseData.getReferralToJudgeOrLOList()) {
+                referralDetails.append(NEWLINE).append(BULLET_POINT);
 
-                switch (listItem) {
-                    case "aClaimOfInterimRelief":
-                        icEt1ReferralToJudgeOrLOListText.append("A claim of interim relief");
-                        if (caseData.getAclaimOfInterimReliefTextArea() != null
-                                && !caseData.getAclaimOfInterimReliefTextArea().isEmpty()) {
-                            icEt1ReferralToJudgeOrLOListText.append(NEWLINE_FOR_DETAILS)
-                                    .append(caseData.getAclaimOfInterimReliefTextArea());
-                        }
-                        icEt1ReferralToJudgeOrLOListText.append(NEWLINE);
-                        break;
-                    case "aStatutoryAppeal":
-                        icEt1ReferralToJudgeOrLOListText.append("A statutory appeal");
-                        if (caseData.getAstatutoryAppealTextArea() != null
-                                && !caseData.getAstatutoryAppealTextArea().isEmpty()) {
-                            icEt1ReferralToJudgeOrLOListText.append(NEWLINE_FOR_DETAILS)
-                                    .append(caseData.getAstatutoryAppealTextArea());
-                        }
-                        icEt1ReferralToJudgeOrLOListText.append(NEWLINE);
-                        break;
-                    case "anAllegationOfCommissionOfSexualOffence":
-                        icEt1ReferralToJudgeOrLOListText.append("An allegation of the commission of a sexual offence");
-                        if (caseData.getAnAllegationOfCommissionOfSexualOffenceTextArea() != null
-                                && !caseData.getAnAllegationOfCommissionOfSexualOffenceTextArea().isEmpty()) {
-                            icEt1ReferralToJudgeOrLOListText.append(NEWLINE_FOR_DETAILS)
-                                    .append(caseData.getAnAllegationOfCommissionOfSexualOffenceTextArea());
-                        }
-                        icEt1ReferralToJudgeOrLOListText.append(NEWLINE);
-                        break;
-                    case "insolvency":
-                        icEt1ReferralToJudgeOrLOListText.append("Insolvency");
-                        if (caseData.getInsolvencyTextArea() != null
-                                && !caseData.getInsolvencyTextArea().isEmpty()) {
-                            icEt1ReferralToJudgeOrLOListText.append(NEWLINE_FOR_DETAILS)
-                                    .append(caseData.getInsolvencyTextArea());
-                        }
-                        icEt1ReferralToJudgeOrLOListText.append(NEWLINE);
-                        break;
-                    case "jurisdictionsUnclear":
-                        icEt1ReferralToJudgeOrLOListText.append("Jurisdictions unclear");
-                        if (caseData.getJurisdictionsUnclearTextArea() != null
-                                && !caseData.getJurisdictionsUnclearTextArea().isEmpty()) {
-                            icEt1ReferralToJudgeOrLOListText.append(NEWLINE_FOR_DETAILS)
-                                    .append(caseData.getJurisdictionsUnclearTextArea());
-                        }
-                        icEt1ReferralToJudgeOrLOListText.append(NEWLINE);
-                        break;
-                    case "lengthOfService":
-                        icEt1ReferralToJudgeOrLOListText.append("Length of service");
-                        if (caseData.getLengthOfServiceTextArea() != null
-                                && !caseData.getLengthOfServiceTextArea().isEmpty()) {
-                            icEt1ReferralToJudgeOrLOListText.append(NEWLINE_FOR_DETAILS)
-                                    .append(caseData.getLengthOfServiceTextArea());
-                        }
-                        icEt1ReferralToJudgeOrLOListText.append(NEWLINE);
-                        break;
-                    case "potentiallyLinkedCasesInTheEcm":
-                        icEt1ReferralToJudgeOrLOListText.append("Potentially linked cases in the ECM");
-                        if (caseData.getPotentiallyLinkedCasesInTheEcmTextArea() != null
-                                && !caseData.getPotentiallyLinkedCasesInTheEcmTextArea().isEmpty()) {
-                            icEt1ReferralToJudgeOrLOListText.append(NEWLINE_FOR_DETAILS)
-                                    .append(caseData.getPotentiallyLinkedCasesInTheEcmTextArea());
-                        }
-                        icEt1ReferralToJudgeOrLOListText.append(NEWLINE);
-                        break;
-                    case "rule50Issues":
-                        icEt1ReferralToJudgeOrLOListText.append("Rule 49 issues");
-                        if (caseData.getRule50IssuesTextArea() != null
-                                && !caseData.getRule50IssuesTextArea().isEmpty()) {
-                            icEt1ReferralToJudgeOrLOListText.append(NEWLINE_FOR_DETAILS)
-                                    .append(caseData.getRule50IssuesTextArea());
-                        }
-                        icEt1ReferralToJudgeOrLOListText.append(NEWLINE);
-                        break;
-                    case "anotherReasonForJudicialReferral":
-                        icEt1ReferralToJudgeOrLOListText.append("Another reason for judicial referral");
-                        if (caseData.getAnotherReasonForJudicialReferralTextArea() != null
-                                && !caseData.getAnotherReasonForJudicialReferralTextArea().isEmpty()) {
-                            icEt1ReferralToJudgeOrLOListText.append(NEWLINE_FOR_DETAILS)
-                                    .append(caseData.getAnotherReasonForJudicialReferralTextArea());
-                        }
-                        icEt1ReferralToJudgeOrLOListText.append(NEWLINE);
-                        break;
-                    default:
-                        // do nothing
-                }
-            });
+                String detailText = switch (listItem) {
+                    case "aClaimOfInterimRelief" -> appendDetail("A claim of interim relief",
+                            caseData.getAclaimOfInterimReliefTextArea());
+                    case "aStatutoryAppeal" -> appendDetail("A statutory appeal",
+                            caseData.getAstatutoryAppealTextArea());
+                    case "anAllegationOfCommissionOfSexualOffence" -> appendDetail(
+                            "An allegation of the commission of a sexual offence",
+                            caseData.getAnAllegationOfCommissionOfSexualOffenceTextArea());
+                    case "insolvency" -> appendDetail("Insolvency", caseData.getInsolvencyTextArea());
+                    case "jurisdictionsUnclear" -> appendDetail("Jurisdictions unclear",
+                            caseData.getJurisdictionsUnclearTextArea());
+                    case "lengthOfService" -> appendDetail("Length of service",
+                            caseData.getLengthOfServiceTextArea());
+                    case "potentiallyLinkedCasesInTheEcm" -> appendDetail("Potentially linked cases in the ECM",
+                            caseData.getPotentiallyLinkedCasesInTheEcmTextArea());
+                    case "rule50Issues" -> appendDetail("Rule 49 issues", caseData.getRule50IssuesTextArea());
+                    case "anotherReasonForJudicialReferral" -> appendDetail(
+                            "Another reason for judicial referral",
+                            caseData.getAnotherReasonForJudicialReferralTextArea());
+                    default -> "";
+                };
+
+                referralDetails.append(detailText).append(NEWLINE);
+            }
         }
-        return icEt1ReferralToJudgeOrLOListText.toString();
+        return referralDetails.toString();
+    }
+
+    private String appendDetail(String label, String textArea) {
+        if (textArea != null && !textArea.isEmpty()) {
+            return label + NEWLINE_FOR_DETAILS + textArea;
+        }
+        return label;
     }
 
     public String composeIcEt1ReferralToREJOrVPListWithDetails(CaseData caseData) {

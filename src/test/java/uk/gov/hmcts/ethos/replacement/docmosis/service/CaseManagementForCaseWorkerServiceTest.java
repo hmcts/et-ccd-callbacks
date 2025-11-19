@@ -1604,7 +1604,6 @@ class CaseManagementForCaseWorkerServiceTest {
         );
     }
 
-
     @ParameterizedTest
     @MethodSource("provideHearingCollectionsForNextListedDate")
     void setNextListedDate_handlesVariousHearingCollections(List<HearingTypeItem> hearingCollection,

@@ -1643,7 +1643,6 @@ class InitialConsiderationServiceTest {
                 .doesNotContain("Details for service abroad");
     }
 
-
     @Test
     void composeIcEt1OtherReferralListDetails_shouldReturnFormattedDetails_whenListIsPopulated() {
         CaseData caseDataWithValidReferralsList = getCaseDataWithValidReferralsList();
@@ -1731,8 +1730,6 @@ class InitialConsiderationServiceTest {
         assertThat(result).doesNotContain("unknownItem");
     }
 
-
-
     @Test
     void composeIcEt1SubstantiveDefectsDetail_shouldReturnEmptyString_whenSubstantiveDefectsListIsNull() {
         CaseData caseDataWithNullSubstantiveDefectsList = new CaseData();
@@ -1773,8 +1770,8 @@ class InitialConsiderationServiceTest {
 
         assertThat(result).contains("Institutes relevant proceedings and the EC number on the "
                  + "claim form does not match the EC number on the Acas certificate - Rule 13(1)(e)");
-        assertThat(result).contains("Has a different claimant name on the ET1 to the claimant " +
-                "name on the Acas certificate - Rule 13(1)(f)");
+        assertThat(result).contains("Has a different claimant name on the ET1 to the claimant "
+                + "name on the Acas certificate - Rule 13(1)(f)");
     }
 
     @Test

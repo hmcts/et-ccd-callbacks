@@ -36,7 +36,6 @@ import java.net.URI;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
 import static java.net.HttpURLConnection.HTTP_INTERNAL_ERROR;
 import static java.net.HttpURLConnection.HTTP_OK;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -262,6 +261,55 @@ class TornadoServiceTest {
                 tornadoService.generateEventDocument(new CaseData(),
                         AUTH_TOKEN, ENGLANDWALES_CASE_TYPE_ID, null)
         );
+    }
+
+    @Test
+    void getDmStoreDocumentName_shouldReturnEt1VettingOutputName() {
+        CaseData caseData = new CaseData();
+        caseData.setClaimant("John Doe");
+        String result = tornadoService.getDmStoreDocumentName(caseData, ET1_VETTING_PDF);
+        assertEquals("ET1 Vetting - John Doe.pdf", result);
+    }
+
+    @Test
+    void getDmStoreDocumentName_shouldReturnEt3ProcessingOutputName() {
+        CaseData caseData = new CaseData();
+        DynamicFixedListType respondent = DynamicFixedListType.from("code", "Jane Smith", true);
+        caseData.setEt3ChooseRespondent(respondent);
+        String result = tornadoService.getDmStoreDocumentName(caseData, ET3_PROCESSING_PDF);
+        assertEquals("ET3 Processing - Jane Smith.pdf", result);
+    }
+
+    @Test
+    void getDmStoreDocumentName_shouldReturnEt3ResponseOutputName() {
+        CaseData caseData = new CaseData();
+        DynamicFixedListType respondent = DynamicFixedListType.from("code", "Acme Ltd", true);
+        caseData.setSubmitEt3Respondent(respondent);
+        String result = tornadoService.getDmStoreDocumentName(caseData, "ET3 Response.pdf");
+        assertEquals("Acme Ltd - ET3 Response.pdf", result);
+    }
+
+    @Test
+    void getDmStoreDocumentName_shouldReturnTseFileName() {
+        CaseData caseData = new CaseData();
+        when(tseService.getTseDocumentName(caseData)).thenReturn("TSE Custom Name.pdf");
+        String result = tornadoService.getDmStoreDocumentName(caseData, TornadoService.TSE_FILE_NAME);
+        assertEquals("TSE Custom Name.pdf", result);
+    }
+
+    @Test
+    void getDmStoreDocumentName_shouldReturnClaimantTseFileName() {
+        CaseData caseData = new CaseData();
+        when(tseService.getClaimantTseDocumentName(caseData)).thenReturn("Claimant TSE Custom Name.pdf");
+        String result = tornadoService.getDmStoreDocumentName(caseData, TornadoService.CLAIMANT_TSE_FILE_NAME);
+        assertEquals("Claimant TSE Custom Name.pdf", result);
+    }
+
+    @Test
+    void getDmStoreDocumentName_shouldReturnDefaultDocumentName() {
+        CaseData caseData = new CaseData();
+        String result = tornadoService.getDmStoreDocumentName(caseData, "Other.pdf");
+        assertEquals("Other.pdf", result);
     }
 
     @Test

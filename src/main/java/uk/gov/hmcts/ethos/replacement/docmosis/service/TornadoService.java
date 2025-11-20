@@ -313,7 +313,7 @@ public class TornadoService {
         }
     }
 
-    private String getDmStoreDocumentName(CaseData caseData, String documentName) {
+    String getDmStoreDocumentName(CaseData caseData, String documentName) {
         switch (documentName) {
             case ET1_VETTING_PDF -> {
                 return String.format(ET1_VETTING_OUTPUT_NAME,
@@ -395,16 +395,12 @@ public class TornadoService {
             case ET1_VETTING_PDF -> {
                 String outputName = String.format(ET1_VETTING_OUTPUT_NAME,
                         sanitizePartyName(caseData.getClaimant()));
-                log.info(caseData.getClaimant());
-                log.info("Document name is: {}", outputName);
                 return Et1VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey(),
                         outputName);
             }
             case ET3_PROCESSING_PDF -> {
                 String outputName = String.format("ET3 Processing - %s.pdf",
                         sanitizePartyName(caseData.getEt3ChooseRespondent().getSelectedLabel()));
-                log.info(caseData.getEt3ChooseRespondent().getSelectedLabel());
-                log.info("Document name is: {}", outputName);
                 return Et3VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey(),
                         outputName);
             }
@@ -413,11 +409,9 @@ public class TornadoService {
                         caseData, tornadoConnection.getAccessKey(), caseTypeId);
             }
             case TSE_FILE_NAME -> {
-                log.info("TSE_FILE_NAME {}", tseService.getTseDocumentName(caseData));
                 return RespondentTellSomethingElseHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             }
             case CLAIMANT_TSE_FILE_NAME -> {
-                log.info("CLAIMANT_TSE_FILE_NAME {}", tseService.getClaimantTseDocumentName(caseData));
                 return ClaimantTellSomethingElseHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             }
             case REFERRAL_SUMMARY_PDF -> {

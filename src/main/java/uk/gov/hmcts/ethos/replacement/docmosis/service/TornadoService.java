@@ -313,13 +313,31 @@ public class TornadoService {
         }
     }
 
-    private static String getDmStoreDocumentName(CaseData caseData, String documentName) {
-        if (ET3_RESPONSE_PDF.equals(documentName)) {
-            return String.format("%s - %s", caseData.getSubmitEt3Respondent().getSelectedLabel(), ET3_RESPONSE_PDF);
-        } else if (NOTIFICATION_SUMMARY_PDF.equals(documentName)) {
-            return getDocumentName(caseData);
-        } else {
-            return documentName;
+    private String getDmStoreDocumentName(CaseData caseData, String documentName) {
+        switch (documentName) {
+            case ET1_VETTING_PDF -> {
+                return String.format(ET1_VETTING_OUTPUT_NAME,
+                        sanitizePartyName(caseData.getClaimant()));
+            }
+            case ET3_PROCESSING_PDF -> {
+                return String.format("ET3 Processing - %s.pdf",
+                        sanitizePartyName(caseData.getEt3ChooseRespondent().getSelectedLabel()));
+            }
+            case ET3_RESPONSE_PDF -> {
+                return String.format("%s - %s", caseData.getSubmitEt3Respondent().getSelectedLabel(), ET3_RESPONSE_PDF);
+            }
+            case TSE_FILE_NAME -> {
+                return tseService.getTseDocumentName(caseData);
+            }
+            case CLAIMANT_TSE_FILE_NAME -> {
+                return tseService.getClaimantTseDocumentName(caseData);
+            }
+            case NOTIFICATION_SUMMARY_PDF -> {
+                return getDocumentName(caseData);
+            }
+            default -> {
+                return documentName;
+            }
         }
     }
 

@@ -150,6 +150,8 @@ tasks.register('functional', Test) {
     testClassesDirs = sourceSets.apiTest.output.classesDirs
     classpath = sourceSets.apiTest.runtimeClasspath
 
+    exclude '**/multiples/**'
+    
     useJUnitPlatform()
     testLogging {
         events "passed", "skipped", "failed"

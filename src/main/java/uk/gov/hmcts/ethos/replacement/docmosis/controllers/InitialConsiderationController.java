@@ -177,6 +177,10 @@ public class InitialConsiderationController {
         caseData.setIcEt1OtherReferralListDetails(
                 initialConsiderationService.composeIcEt1OtherReferralListDetails(caseData));
 
+        // ET3 Vetting Issues
+        caseData.setIcEt3ProcessingIssuesDetail(
+                initialConsiderationService.setIcEt3VettingIssuesDetailsForEachRespondent(caseData));
+
         caseData.setRegionalOffice(caseData.getRegionalOfficeList() != null
                 ? caseData.getRegionalOfficeList().getSelectedLabel() : null);
         caseData.setEt1TribunalRegion(caseData.getEt1HearingVenues() != null

@@ -29,6 +29,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.Et3VettingType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
@@ -51,6 +52,7 @@ import java.util.Optional;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -92,6 +94,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ER
 class InitialConsiderationServiceTest {
     private static final LocalDateTime EARLIEST_FUTURE_HEARING_DATE = LocalDateTime.now().plusDays(5);
     private static final LocalDateTime SECOND_FUTURE_HEARING_DATE = LocalDateTime.now().plusDays(9);
+    private static final String GIVE_DETAILS = "Give Details:";
 
     private static final String EXPECTED_RESPONDENT_NAME = """
         | Respondent 1 name given | |
@@ -1796,5 +1799,160 @@ class InitialConsiderationServiceTest {
         assertThat(result).contains("Has a different respondent name on the ET1 to the respondent name on the "
                 + "Acas certificate - Rule 13(1)(g)");
         assertThat(result).doesNotContain("invalidRule");
+    }
+
+    @Test
+    void setIcEt3VettingIssuesDetailsForEachRespondent_shouldReturnNull_whenRespondentCollectionIsNull() {
+        CaseData caseDataWithNullRespondentCollection = new CaseData();
+        caseDataWithNullRespondentCollection.setRespondentCollection(null);
+        String result = initialConsiderationService.setIcEt3VettingIssuesDetailsForEachRespondent(
+                caseDataWithNullRespondentCollection);
+
+        assertNull(result);
+    }
+
+    @Test
+    void setIcEt3VettingIssuesDetailsForEachRespondent_shouldReturnNull_whenRespondentCollectionIsEmpty() {
+        CaseData caseDataWithEmptyRespondentCollection = new CaseData();
+        caseDataWithEmptyRespondentCollection.setRespondentCollection(new ArrayList<>());
+        String result = initialConsiderationService.setIcEt3VettingIssuesDetailsForEachRespondent(
+                caseDataWithEmptyRespondentCollection);
+
+        assertNull(result);
+    }
+
+    @Test
+    void setIcEt3VettingIssuesDetailsForEachRespondent_shouldSkipRespondentsWithNullEt3Vetting() {
+        CaseData caseDataWithNullEt3Vetting = new CaseData();
+        RespondentSumTypeItem respondent1 = new RespondentSumTypeItem();
+        respondent1.setValue(new RespondentSumType());
+        RespondentSumTypeItem respondent2 = new RespondentSumTypeItem();
+        respondent2.setValue(new RespondentSumType());
+        caseDataWithNullEt3Vetting.setRespondentCollection(List.of(respondent1, respondent2));
+
+        String result = initialConsiderationService.setIcEt3VettingIssuesDetailsForEachRespondent(
+                caseDataWithNullEt3Vetting);
+
+        assertNotNull(result);
+        assertTrue(result.contains("Details of ET3 Vetting Issues"));
+        assertFalse(result.contains("<h3>Respondent"));
+    }
+
+    @Test
+    void setIcEt3VettingIssuesDetailsForEachRespondent_shouldIncludeDetailsForValidRespondents() {
+        CaseData caseDataWithValidRespondents = getCaseData();
+        String result = initialConsiderationService.setIcEt3VettingIssuesDetailsForEachRespondent(
+                caseDataWithValidRespondents);
+
+        assertNotNull(result);
+        assertTrue(result.contains("Details of ET3 Vetting Issues"));
+        assertTrue(result.contains("<h3>Respondent Valid Respondent<h3>"));
+        assertTrue(result.contains("Additional Info"));
+    }
+
+    private static @NotNull CaseData getCaseData() {
+        RespondentSumType respondent = new RespondentSumType();
+        respondent.setRespondentName("Valid Respondent");
+        Et3VettingType et3Vetting = new Et3VettingType();
+        et3Vetting.setEt3AdditionalInformation("Additional Info");
+        respondent.setEt3Vetting(et3Vetting);
+        RespondentSumTypeItem respondentItem = new RespondentSumTypeItem();
+        respondentItem.setValue(respondent);
+        CaseData caseDataWithValidRespondents = new CaseData();
+        caseDataWithValidRespondents.setRespondentCollection(List.of(respondentItem));
+        return caseDataWithValidRespondents;
+    }
+
+    @Test
+    void setIcEt3VettingIssuesDetailsForEachRespondent_shouldHandleMultipleRespondents() {
+        RespondentSumType respondent1 = new RespondentSumType();
+        respondent1.setRespondentName("Respondent 1");
+        Et3VettingType et3Vetting1 = new Et3VettingType();
+        et3Vetting1.setEt3AdditionalInformation("Info 1");
+        respondent1.setEt3Vetting(et3Vetting1);
+        RespondentSumTypeItem respondentItem1 = new RespondentSumTypeItem();
+        respondentItem1.setValue(respondent1);
+
+        CaseData caseDataWithMultipleRespondents = getCaseDataWithMultipleRespondents(respondentItem1);
+
+        String result = initialConsiderationService.setIcEt3VettingIssuesDetailsForEachRespondent(
+                caseDataWithMultipleRespondents);
+
+        assertNotNull(result);
+        assertTrue(result.contains("Details of ET3 Vetting Issues"));
+        assertTrue(result.contains("<h3>Respondent Respondent 1<h3>"));
+        assertTrue(result.contains("Info 1"));
+        assertTrue(result.contains("<h3>Respondent Respondent 2<h3>"));
+        assertTrue(result.contains("Info 2"));
+    }
+
+    private static @NotNull CaseData getCaseDataWithMultipleRespondents(RespondentSumTypeItem respondentItem1) {
+        RespondentSumType respondent2 = new RespondentSumType();
+        respondent2.setRespondentName("Respondent 2");
+        Et3VettingType et3Vetting2 = new Et3VettingType();
+        et3Vetting2.setEt3AdditionalInformation("Info 2");
+        respondent2.setEt3Vetting(et3Vetting2);
+        RespondentSumTypeItem respondentItem2 = new RespondentSumTypeItem();
+        respondentItem2.setValue(respondent2);
+
+        CaseData caseDataWithMultipleRespondents = new CaseData();
+        caseDataWithMultipleRespondents.setRespondentCollection(List.of(respondentItem1, respondentItem2));
+        return caseDataWithMultipleRespondents;
+    }
+
+    @Test
+    void processEt3Response_shouldAddPairForEt3ResponseWhenResponseExists() {
+        Et3VettingType et3Vetting = new Et3VettingType();
+        et3Vetting.setEt3IsThereAnEt3Response(YES);
+        List<String[]> pairsList = new ArrayList<>();
+
+        initialConsiderationService.processEt3Response(et3Vetting, pairsList);
+
+        assertEquals(1, pairsList.size());
+        assertEquals("Is there an ET3 response?", pairsList.get(0)[0]);
+        assertEquals(YES, pairsList.getFirst()[1]);
+    }
+
+    @Test
+    void processEt3Response_shouldAddDetailsWhenNoEt3Response() {
+        Et3VettingType et3Vetting = new Et3VettingType();
+        et3Vetting.setEt3IsThereAnEt3Response(NO);
+        et3Vetting.setEt3NoEt3Response("No response details");
+        et3Vetting.setEt3GeneralNotes("General notes");
+        List<String[]> pairsList = new ArrayList<>();
+
+        initialConsiderationService.processEt3Response(et3Vetting, pairsList);
+
+        assertEquals(3, pairsList.size());
+        assertEquals("Is there an ET3 response?", pairsList.get(0)[0]);
+        assertEquals(NO, pairsList.get(0)[1]);
+        assertEquals(GIVE_DETAILS, pairsList.get(1)[0]);
+        assertEquals("No response details", pairsList.get(1)[1]);
+        assertEquals("General notes (No ET3 Response):", pairsList.get(2)[0]);
+        assertEquals("General notes", pairsList.get(2)[1]);
+    }
+
+    @Test
+    void processEt3Response_shouldHandleNullEt3VettingGracefully() {
+        List<String[]> pairsList = new ArrayList<>();
+
+        initialConsiderationService.processEt3Response(null, pairsList);
+
+        assertTrue(pairsList.isEmpty());
+    }
+
+    @Test
+    void processEt3Response_shouldHandleNullFieldsInEt3Vetting() {
+        Et3VettingType et3Vetting = new Et3VettingType();
+        et3Vetting.setEt3IsThereAnEt3Response(null);
+        et3Vetting.setEt3NoEt3Response(null);
+        et3Vetting.setEt3GeneralNotes(null);
+        List<String[]> pairsList = new ArrayList<>();
+
+        initialConsiderationService.processEt3Response(et3Vetting, pairsList);
+
+        assertEquals(1, pairsList.size());
+        assertEquals("Is there an ET3 response?", pairsList.getFirst()[0]);
+        assertNull(pairsList.getFirst()[1]);
     }
 }

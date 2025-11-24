@@ -32,6 +32,7 @@ import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.List;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
@@ -269,5 +270,16 @@ class InitialConsiderationControllerTest extends BaseControllerTest {
 
         assertNull(caseData.getRegionalOffice());
         assertNull(caseData.getEt1TribunalRegion());
+    }
+
+    @Test
+    void mapOldIcHearingNotListedOptionsToNew_WhenListIsNotEmpty() {
+        CaseData caseData = new CaseData();
+        caseData.setEtICHearingNotListedList(List.of("Option1", "Option2"));
+
+        initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData, ENGLANDWALES_CASE_TYPE_ID);
+
+        verify(initialConsiderationService, times(1))
+                .mapOldIcHearingNotListedOptionsToNew(caseData, ENGLANDWALES_CASE_TYPE_ID);
     }
 }

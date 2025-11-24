@@ -20,11 +20,13 @@ import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
+import uk.gov.hmcts.et.common.model.ccd.types.Et3VettingType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.JurisdictionCode;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.JurisdictionCodeHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 
 import java.time.LocalDate;
@@ -87,10 +89,22 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 @RequiredArgsConstructor
 public class InitialConsiderationService {
 
+    public static final String APPLICATIONS_FOR_STRIKE_OUT_OR_DEPOSIT = "Applications for strike out or deposit";
+    public static final String INTERPRETERS = "Interpreters";
+    public static final String JURISDICTIONAL_ISSUES = "Jurisdictional issues";
+    public static final String REQUEST_FOR_ADJUSTMENTS = "Request for adjustments";
+    public static final String RULE_49 = "Rule 49";
+    public static final String TIME_POINTS = "Time points";
+    public static final String DO_WE_HAVE_THE_RESPONDENT_S_NAME = "Do we have the respondent's name?";
+    public static final String DOES_THE_RESPONDENT_S_NAME_MATCH = "Does the respondent's name match?";
     private final TornadoService tornadoService;
+    private static final String[] HEADER = {"Issue / Question", "Details / Answer"};
     private static final String BULLET_POINT = "\n -  ";
+    private static final String GENERAL_NOTES = "General notes:";
+    private static final String GIVE_DETAILS = "Give Details:";
     private static final String NEWLINE_FOR_DETAILS = "\n\nDetails: \n";
     private static final String NEWLINE = "\n";
+    private static final String NONE_PROVIDED = "None provided.";
 
     public void initialiseInitialConsideration(CaseDetails caseDetails) {
         List<DocumentTypeItem> documentCollection = caseDetails.getCaseData().getDocumentCollection();
@@ -720,6 +734,151 @@ public class InitialConsiderationService {
             });
         }
         return icEt1VettingIssuesDetailText.toString();
+    }
+
+    public String setIcEt3VettingIssuesDetailsForEachRespondent(CaseData caseData) {
+        if (caseData.getRespondentCollection() == null || caseData.getRespondentCollection().isEmpty()) {
+            return null;
+        }
+
+        StringBuilder stringBuilder = new StringBuilder();
+        List<String[]> et3VettingIssuesPairsList = new ArrayList<>();
+
+        for (var respondent : caseData.getRespondentCollection()) {
+            Et3VettingType et3Vetting = respondent.getValue().getEt3Vetting();
+            if (et3Vetting == null) {
+                continue;
+            }
+
+            addPair(et3VettingIssuesPairsList, "<h3>Respondent " + respondent.getValue().getRespondentName()
+                    + "<h3>", "");
+
+            processEt3Response(et3Vetting, et3VettingIssuesPairsList);
+            processRespondentName(et3Vetting, et3VettingIssuesPairsList);
+            processResponseInTime(et3Vetting, et3VettingIssuesPairsList);
+            processAddressMatch(et3Vetting, et3VettingIssuesPairsList);
+            processContestClaim(et3Vetting, et3VettingIssuesPairsList);
+            processContractClaim(et3Vetting, et3VettingIssuesPairsList);
+            processCaseListed(et3Vetting, et3VettingIssuesPairsList);
+            processLocationCorrect(et3Vetting, et3VettingIssuesPairsList);
+            processRule26(et3Vetting, et3VettingIssuesPairsList);
+            processSuggestedIssues(et3Vetting, et3VettingIssuesPairsList);
+
+            addPair(et3VettingIssuesPairsList, "Additional information",
+                    defaultIfNull(et3Vetting.getEt3AdditionalInformation()));
+        }
+
+        stringBuilder.append(MarkdownHelper.createTwoColumnTable(HEADER, et3VettingIssuesPairsList));
+        return MarkdownHelper.detailsWrapper("Details of ET3 Vetting Issues", stringBuilder.toString());
+    }
+
+    public void processEt3Response(Et3VettingType et3Vetting, List<String[]> pairsList) {
+        if (et3Vetting == null) {
+            return;
+        }
+
+        addPair(pairsList, "Is there an ET3 response?", et3Vetting.getEt3IsThereAnEt3Response());
+        if (NO.equals(et3Vetting.getEt3IsThereAnEt3Response())) {
+            addPair(pairsList, GIVE_DETAILS, defaultIfNull(et3Vetting.getEt3NoEt3Response()));
+            addPair(pairsList, "General notes (No ET3 Response):", defaultIfNull(et3Vetting.getEt3GeneralNotes()));
+        }
+    }
+
+    private void processRespondentName(Et3VettingType et3Vetting, List<String[]> pairsList) {
+        addPair(pairsList, DO_WE_HAVE_THE_RESPONDENT_S_NAME, et3Vetting.getEt3DoWeHaveRespondentsName());
+        if (YES.equals(et3Vetting.getEt3DoWeHaveRespondentsName())) {
+            addPair(pairsList, DOES_THE_RESPONDENT_S_NAME_MATCH, et3Vetting.getEt3DoesRespondentsNameMatch());
+            if (NO.equals(et3Vetting.getEt3DoesRespondentsNameMatch())) {
+                addPair(pairsList, GIVE_DETAILS, defaultIfNull(et3Vetting.getEt3RespondentNameMismatchDetails()));
+            }
+        }
+    }
+
+    private void processResponseInTime(Et3VettingType et3Vetting, List<String[]> pairsList) {
+        if (NO.equals(et3Vetting.getEt3ResponseInTime())) {
+            addPair(pairsList, "Did we receive the ET3 response in time?", et3Vetting.getEt3ResponseInTime());
+            addPair(pairsList, GIVE_DETAILS, defaultIfNull(et3Vetting.getEt3ResponseInTimeDetails()));
+        }
+    }
+
+    private void processAddressMatch(Et3VettingType et3Vetting, List<String[]> pairsList) {
+        if (NO.equals(et3Vetting.getEt3DoesRespondentsAddressMatch())) {
+            addPair(pairsList, "Does the respondent's address match?",
+                    et3Vetting.getEt3DoesRespondentsAddressMatch());
+            addPair(pairsList, GIVE_DETAILS, defaultIfNull(et3Vetting.getEt3RespondentAddressMismatchDetails()));
+        }
+    }
+
+    private void processContestClaim(Et3VettingType et3Vetting, List<String[]> pairsList) {
+        if (et3Vetting.getEt3ContestClaim() != null) {
+            addPair(pairsList, "Does the respondent wish to contest any part of the claim?",
+                    et3Vetting.getEt3ContestClaim());
+            addPair(pairsList, GIVE_DETAILS, defaultIfNull(et3Vetting.getEt3ContestClaimGiveDetails()));
+        }
+        addPair(pairsList, "General notes (Contest Claim)",
+                defaultIfNull(et3Vetting.getEt3GeneralNotesContestClaim()));
+    }
+
+    private void processContractClaim(Et3VettingType et3Vetting, List<String[]> pairsList) {
+        if (YES.equals(et3Vetting.getEt3ContractClaimSection7())) {
+            addPair(pairsList, "Is there an Employer's Contract Claim in section 7 of the ET3 response?",
+                    et3Vetting.getEt3ContractClaimSection7());
+            addPair(pairsList, GIVE_DETAILS, defaultIfNull(et3Vetting.getEt3ContractClaimSection7Details()));
+        }
+    }
+
+    private void processCaseListed(Et3VettingType et3Vetting, List<String[]> pairsList) {
+        if (NO.equals(et3Vetting.getEt3IsCaseListedForHearing())) {
+            addPair(pairsList, "Is the case listed for hearing?", et3Vetting.getEt3IsCaseListedForHearing());
+            addPair(pairsList, GIVE_DETAILS, defaultIfNull(et3Vetting.getEt3IsCaseListedForHearingDetails()));
+        }
+    }
+
+    private void processLocationCorrect(Et3VettingType et3Vetting, List<String[]> pairsList) {
+        if (NO.equals(et3Vetting.getEt3IsThisLocationCorrect())) {
+            addPair(pairsList, "Is this location correct?", et3Vetting.getEt3IsThisLocationCorrect());
+            addPair(pairsList, "Regional Office selected:", defaultIfNull(et3Vetting.getEt3RegionalOffice()));
+            addPair(pairsList, "Why should we change the office?",
+                    defaultIfNull(et3Vetting.getEt3WhyWeShouldChangeTheOffice()));
+        }
+        addPair(pairsList, "General notes (Location)",
+                defaultIfNull(et3Vetting.getEt3GeneralNotesTransferApplication()));
+    }
+
+    private void processRule26(Et3VettingType et3Vetting, List<String[]> pairsList) {
+        if (YES.equals(et3Vetting.getEt3Rule26())) {
+            addPair(pairsList, "Are there any issues identified for the judge's initial consideration - prospects "
+                    + "of claim / response arguable? (Rule 27)", et3Vetting.getEt3Rule26());
+            addPair(pairsList, GIVE_DETAILS, defaultIfNull(et3Vetting.getEt3Rule26Details()));
+        }
+    }
+
+    private void processSuggestedIssues(Et3VettingType et3Vetting, List<String[]> pairsList) {
+        if (et3Vetting.getEt3SuggestedIssues() != null && !et3Vetting.getEt3SuggestedIssues().isEmpty()) {
+            addPair(pairsList, "<h3>Are there any other suggested orders, directions or issues?</h3>", "");
+            et3Vetting.getEt3SuggestedIssues().forEach(issue -> addPair(pairsList, issue,
+                    getSuggestedIssueDetails(et3Vetting, issue)));
+        }
+    }
+
+    private void addPair(List<String[]> list, String key, String value) {
+        list.add(new String[]{key, value});
+    }
+
+    private String defaultIfNull(String value) {
+        return value != null ? value : NONE_PROVIDED;
+    }
+
+    private String getSuggestedIssueDetails(Et3VettingType et3Vetting, String issue) {
+        return switch (issue) {
+            case APPLICATIONS_FOR_STRIKE_OUT_OR_DEPOSIT -> et3Vetting.getEt3SuggestedIssuesStrikeOut();
+            case INTERPRETERS -> et3Vetting.getEt3SuggestedIssueInterpreters();
+            case JURISDICTIONAL_ISSUES -> et3Vetting.getEt3SuggestedIssueJurisdictional();
+            case REQUEST_FOR_ADJUSTMENTS -> et3Vetting.getEt3SuggestedIssueAdjustments();
+            case RULE_49 -> et3Vetting.getEt3SuggestedIssueRule50();
+            case TIME_POINTS -> et3Vetting.getEt3SuggestedIssueTimePoints();
+            default -> NONE_PROVIDED;
+        };
     }
 
 }

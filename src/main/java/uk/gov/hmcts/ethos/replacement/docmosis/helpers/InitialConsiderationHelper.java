@@ -372,9 +372,22 @@ public final class InitialConsiderationHelper {
                         Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
                                 .map(EtICListForFinalHearingUpdated::getEtICFinalHearingIsEJSitAlone)
                                 .orElse(null))
-                .etICFinalHearingIsEJSitAloneReason(
+                .etICNoLFinalHearingIsEJSitAloneReasonsJsa(
                         Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
-                                .map(EtICListForFinalHearingUpdated::getEtICFinalHearingIsEJSitAloneReason)
+                                .map(EtICListForFinalHearingUpdated::getEtICNoLFinalHearingIsEJSitAloneReasonsJsa)
+                                .orElse(null))
+                .etICNoLFinalHearingIsEJSitAloneReasonsJsaOther(
+                        Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
+                                .map(EtICListForFinalHearingUpdated::getEtICNoLFinalHearingIsEJSitAloneReasonsJsaOther)
+                                .orElse(null))
+                .etICNoLFinalHearingIsEJSitAloneReasonsMembers(
+                        Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
+                                .map(EtICListForFinalHearingUpdated::getEtICNoLFinalHearingIsEJSitAloneReasonsMembers)
+                                .orElse(null))
+                .etICNoLFinalHearingIsEJSitAloneReasonsMembersOther(
+                        Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
+                                .map(EtICListForFinalHearingUpdated
+                                        ::getEtICNoLFinalHearingIsEJSitAloneReasonsMembersOther)
                                 .orElse(null))
                 .etICFinalHearingIsEJSitAloneFurtherDetails(
                         Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())

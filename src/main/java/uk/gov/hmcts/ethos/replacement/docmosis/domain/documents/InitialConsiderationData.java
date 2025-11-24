@@ -110,8 +110,16 @@ public class InitialConsiderationData {
     @JsonProperty("etICFinalHearingIsEJSitAloneReasonNoOther")
     private String etICFinalHearingIsEJSitAloneReasonNoOther;
 
-    @JsonProperty("etICFinalHearingIsEJSitAloneReason")
-    private String etICFinalHearingIsEJSitAloneReason;
+    @JsonProperty("etICNoLFinalHearingIsEJSitAloneReasonsJsa")
+    private List<String> etICNoLFinalHearingIsEJSitAloneReasonsJsa;
+    @JsonProperty("etICNoLFinalHearingIsEJSitAloneReasonsJsaOther")
+    private String  etICNoLFinalHearingIsEJSitAloneReasonsJsaOther;
+
+    @JsonProperty("etICNoLFinalHearingIsEJSitAloneReasonsMembers")
+    private List<String> etICNoLFinalHearingIsEJSitAloneReasonsMembers;
+    @JsonProperty("etICNoLFinalHearingIsEJSitAloneReasonMembersOther")
+    private String etICNoLFinalHearingIsEJSitAloneReasonsMembersOther;
+
     @JsonProperty("etICFinalHearingIsEJSitAloneFurtherDetails")
     private String etICFinalHearingIsEJSitAloneFurtherDetails;
 

@@ -242,7 +242,7 @@ class NocRespondentHelperTest {
         amendedRespondent.getValue().setRespondentName(AMENDED_RESP_NAME);
         nocRespondentHelper.amendRespondentNameRepresentativeNames(caseData);
 
-        RepresentedTypeR rep = caseData.getRepCollection().get(0).getValue();
+        RepresentedTypeR rep = caseData.getRepCollection().getFirst().getValue();
         assertThat(rep.getDynamicRespRepName().getSelectedCode()).isEqualTo("R: " + AMENDED_RESP_NAME);
         assertThat(rep.getDynamicRespRepName().getSelectedLabel()).isEqualTo(AMENDED_RESP_NAME);
         assertThat(rep.getRespRepName()).isEqualTo(AMENDED_RESP_NAME);
@@ -279,5 +279,11 @@ class NocRespondentHelperTest {
             .respondentId(RESPONDENT_ID_TWO)
             .myHmctsYesNo("Yes")
             .build();
+    }
+
+    @Test
+    void theSetRepresentation() {
+        // when respondent is empty
+
     }
 }

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -12,6 +13,9 @@ import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.RepresentativeUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -23,9 +27,12 @@ import java.util.stream.IntStream;
 
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationApprovalStatus.APPROVED;
 
 @Component
+@Slf4j
 @SuppressWarnings({"PMD.ConfusingTernary"})
 public class NocRespondentHelper {
     public Map<String, Organisation> getRespondentOrganisations(CaseData caseData) {
@@ -98,16 +105,41 @@ public class NocRespondentHelper {
                 .orElse(new RespondentSumType());
     }
 
-    public void updateWithRespondentIds(CaseData caseData) {
-        for (RepresentedTypeRItem respondentRep : caseData.getRepCollection()) {
-            Optional<RespondentSumTypeItem> respondentSumTypeItem = caseData.getRespondentCollection().stream()
-                    .filter(i -> i.getValue()
-                            .getRespondentName()
-                            .equals(respondentRep.getValue().getRespRepName()))
-                    .findFirst();
-            respondentSumTypeItem.ifPresent(
-                    sumTypeItem -> respondentRep.getValue().setRespondentId(sumTypeItem.getId()));
+    public void addRepresentation(CaseData caseData) throws GenericServiceException {
+        for (RepresentedTypeRItem representative : caseData.getRepCollection()) {
+            for (RespondentSumTypeItem respondent : caseData.getRespondentCollection()) {
+                if (respondent.getValue().getRespondentName().equals(representative.getValue().getRespRepName())
+                        || representative.getValue().getRespondentId().equals(respondent.getId())) {
+                    addRepresentation(respondent, representative, caseData.getCcdID());
+                    break;
+                }
+            }
         }
+    }
+
+    public static void addRepresentation(RespondentSumTypeItem respondent,
+                                         RepresentedTypeRItem representative,
+                                         String caseReferenceNumber) throws GenericServiceException {
+        validateRepresentation(respondent, representative, caseReferenceNumber);
+        representative.getValue().setRespondentId(respondent.getId());
+        respondent.getValue().setRepresentativeRemoved(NO);
+        respondent.getValue().setRepresented(YES);
+        respondent.getValue().setRepresentativeId(representative.getId());
+    }
+
+    public static void resetRepresentation(RespondentSumTypeItem respondent,
+                                         String caseReferenceNumber) throws GenericServiceException {
+        RespondentUtils.validateRespondent(respondent, caseReferenceNumber);
+        respondent.getValue().setRepresentativeRemoved(YES);
+        respondent.getValue().setRepresented(NO);
+        respondent.getValue().setRepresentativeId(null);
+    }
+
+    private static void validateRepresentation(RespondentSumTypeItem respondent,
+                                               RepresentedTypeRItem representative,
+                                               String caseReferenceNumber) throws GenericServiceException {
+        RespondentUtils.validateRespondent(respondent, caseReferenceNumber);
+        RepresentativeUtils.validateRepresentative(representative, caseReferenceNumber);
     }
 
     public void amendRespondentNameRepresentativeNames(CaseData caseData) {

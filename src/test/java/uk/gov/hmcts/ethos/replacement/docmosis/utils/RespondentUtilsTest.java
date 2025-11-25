@@ -10,6 +10,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.UpdateRespondentRepresentativeRequest;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +30,17 @@ final class RespondentUtilsTest {
     private static final String TEST_RESPONDENT_NAME_1 = "Test respondent name 1";
     private static final String TEST_RESPONDENT_NAME_2 = "Test respondent name 2";
     private static final String TEST_RESPONDENT_NAME_3 = "Test respondent name 3";
+    private static final String DUMMY_CASE_REFERENCE = "1234567890123456";
+    private static final String DUMMY_RESPONDENT_ID = "dummy12_respondent34_id56";
+    private static final String EXCEPTION_RESPONDENT_NOT_FOUND =
+            "Respondent not found for case ID 1234567890123456.";
+    private static final String EXCEPTION_RESPONDENT_ID_NOT_FOUND =
+            "Respondent ID not found for case ID 1234567890123456.";
+    private static final String EXCEPTION_RESPONDENT_DETAILS_NOT_EXISTS =
+            "Respondent details could not be found for respondent ID dummy12_respondent34_id56 "
+                    + "in case 1234567890123456.";
+    private static final String EXCEPTION_RESPONDENT_NAME_NOT_EXISTS =
+            "Respondent name could not be found for respondent ID dummy12_respondent34_id56 in case 1234567890123456.";
     private static final String YES = "Yes";
 
     private MockedStatic<RespondentUtils> respondentUtils;
@@ -202,5 +214,35 @@ final class RespondentUtilsTest {
         assertThrows(NullPointerException.class,
                 () -> RespondentUtils.getNoticeOfChangeAnswersByIndex(null, 0),
                 "Null caseData should throw NullPointerException");
+    }
+
+    @Test
+    void theValidateRespondent() {
+        respondentUtils.close();
+        // when respondent is null
+        GenericServiceException gse = assertThrows(GenericServiceException.class,
+                () -> RespondentUtils.validateRespondent(null, DUMMY_CASE_REFERENCE));
+        assertThat(gse.getMessage()).isEqualTo(EXCEPTION_RESPONDENT_NOT_FOUND);
+        // when respondent does not have any id
+        RespondentSumTypeItem respondentSumTypeItemWithoutRespondentId = new RespondentSumTypeItem();
+        gse = assertThrows(GenericServiceException.class,
+                () -> RespondentUtils.validateRespondent(respondentSumTypeItemWithoutRespondentId,
+                        DUMMY_CASE_REFERENCE));
+        assertThat(gse.getMessage()).isEqualTo(EXCEPTION_RESPONDENT_ID_NOT_FOUND);
+        // when respondent details not found
+        RespondentSumTypeItem respondentSumTypeItemWithoutRespondentDetails = new RespondentSumTypeItem();
+        respondentSumTypeItemWithoutRespondentDetails.setId(DUMMY_RESPONDENT_ID);
+        gse = assertThrows(GenericServiceException.class,
+                () -> RespondentUtils.validateRespondent(respondentSumTypeItemWithoutRespondentDetails,
+                        DUMMY_CASE_REFERENCE));
+        assertThat(gse.getMessage()).isEqualTo(EXCEPTION_RESPONDENT_DETAILS_NOT_EXISTS);
+        // when respondent name not found
+        RespondentSumTypeItem respondentSumTypeItemWithoutRespondentName = new RespondentSumTypeItem();
+        respondentSumTypeItemWithoutRespondentName.setId(DUMMY_RESPONDENT_ID);
+        respondentSumTypeItemWithoutRespondentName.setValue(RespondentSumType.builder().build());
+        gse = assertThrows(GenericServiceException.class,
+                () -> RespondentUtils.validateRespondent(respondentSumTypeItemWithoutRespondentName,
+                        DUMMY_CASE_REFERENCE));
+        assertThat(gse.getMessage()).isEqualTo(EXCEPTION_RESPONDENT_NAME_NOT_EXISTS);
     }
 }

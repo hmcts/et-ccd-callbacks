@@ -151,8 +151,8 @@ public class EventValidationService {
 
     public boolean validateCaseState(CaseDetails caseDetails) {
         boolean validated = true;
-        log.info("Checking whether the case " + caseDetails.getCaseData().getEthosCaseReference()
-                + " is in accepted state");
+        log.info("Checking whether the case {} is in accepted state",
+                caseDetails.getCaseData().getEthosCaseReference());
         if (caseDetails.getState().equals(SUBMITTED_STATE)
                 && caseDetails.getCaseData().getEcmCaseType().equals(MULTIPLE_CASE_TYPE)) {
             validated = false;
@@ -206,6 +206,12 @@ public class EventValidationService {
         return Optional.empty();
     }
 
+    /**
+     * Checks selected respondent if it exists in the respondent collection and if there is any representative info
+     * entered for that respondent.
+     * @param caseData data to check both respondent and representative collections
+     * @return list of errors. (invalid respondent names)
+     */
     public List<String> validateRespRepNames(CaseData caseData) {
         List<String> errors = new ArrayList<>();
         if (CollectionUtils.isNotEmpty(caseData.getRespondentCollection())
@@ -218,6 +224,7 @@ public class EventValidationService {
             for (int index = repCollectionSize - 1;  index > -1; index--) {
                 String tempCollCurrentName = repCollection.get(index).getValue()
                     .getDynamicRespRepName().getValue().getLabel();
+                // checks if the selected respondent name is in the respondent collection.
                 if (isValidRespondentName(caseData, tempCollCurrentName)) {
                     if (!repCollection.isEmpty()
                         && updatedRepList.stream()
@@ -246,6 +253,12 @@ public class EventValidationService {
         return errors;
     }
 
+    /**
+     * Checks if the selected respondent name is in the respondent collection.
+     * @param caseData case data that has respondent collection to be checked.
+     * @param tempCollCurrentName selected respondent name on respondent representative page.
+     * @return true if respondent exists in the respondent collection and false otherwise.
+     */
     private boolean isValidRespondentName(CaseData caseData, String tempCollCurrentName) {
         boolean isValidName = false;
         if (CollectionUtils.isNotEmpty(caseData.getRespondentCollection())) {
@@ -444,7 +457,7 @@ public class EventValidationService {
                 .collect(Collectors.toSet());
 
         if (!result.isEmpty()) {
-            log.info("jurCodesCollectionWithinJudgement are not in jurCodesCollection: " + result);
+            log.info("jurCodesCollectionWithinJudgement are not in jurCodesCollection: {}", result);
             errors.add(JURISDICTION_CODES_DELETED_ERROR + result);
         }
     }
@@ -594,7 +607,7 @@ public class EventValidationService {
 
     public List<String> validateJudgementDates(CaseData caseData) {
         List<String> errors = new ArrayList<>();
-        log.info("Check if dates are not in future for case: " + caseData.getEthosCaseReference());
+        log.info("Check if dates are not in future for case: {}", caseData.getEthosCaseReference());
         if (CollectionUtils.isNotEmpty(caseData.getJudgementCollection())) {
             for (JudgementTypeItem judgementTypeItem : caseData.getJudgementCollection()) {
                 JudgementType judgementType = judgementTypeItem.getValue();

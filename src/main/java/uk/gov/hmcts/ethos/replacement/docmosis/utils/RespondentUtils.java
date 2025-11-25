@@ -7,14 +7,22 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 import uk.gov.hmcts.et.common.model.ccd.types.UpdateRespondentRepresentativeRequest;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_RESPONDENT_DETAILS_NOT_EXIST;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_RESPONDENT_ID_NOT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_RESPONDENT_NAME_NOT_EXISTS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_RESPONDENT_NOT_FOUND;
+
 public final class RespondentUtils {
 
     private static final String YES = "Yes";
+    private static final String CLASS_NAME = RespondentUtils.class.getSimpleName();
+    private static final String VALIDATE_RESPONDENT_METHOD_NAME = "validateRespondent";
 
     private RespondentUtils() {
         // Utility classes should not have a public or default constructor.
@@ -137,5 +145,61 @@ public final class RespondentUtils {
             case 9 -> caseData.getNoticeOfChangeAnswers9();
             default -> null;
         };
+    }
+
+    /**
+     * Validates that the provided {@link RespondentSumTypeItem} contains all required
+     * respondent information necessary for Notice of Change (NoC) processing.
+     *
+     * <p>The following validations are performed in sequence:</p>
+     * <ul>
+     *     <li>The respondent object is not null or empty</li>
+     *     <li>The respondent has a non-blank identifier</li>
+     *     <li>The respondent contains a populated value object</li>
+     *     <li>The respondent has a non-empty respondent name</li>
+     * </ul>
+     *
+     * <p>If any validation fails, a {@link GenericServiceException} is thrown with a
+     * descriptive message, including the supplied case reference number. The exception
+     * also includes contextual metadata such as the helper class name and method name,
+     * enabling clearer diagnostic logging and tracing.</p>
+     *
+     * @param respondent            the respondent to validate
+     * @param caseReferenceNumber   the case reference number used to enrich error messages
+     *
+     * @throws GenericServiceException if:
+     *     <ul>
+     *      <li>the respondent object is null or empty</li>
+     *      <li>the respondent ID is blank or missing</li>
+     *      <li>the respondent details (value object) are missing</li>
+     *      <li>the respondent name is missing</li>
+     *     </ul>
+     *     A detailed message describing the missing or invalid data will be included
+     *     along with contextual identifiers for troubleshooting.
+     */
+    public static void validateRespondent(RespondentSumTypeItem respondent, String caseReferenceNumber)
+            throws GenericServiceException {
+        if (ObjectUtils.isEmpty(respondent)) {
+            String exceptionMessage = String.format(EXCEPTION_RESPONDENT_NOT_FOUND, caseReferenceNumber);
+            throw new GenericServiceException(exceptionMessage, new Exception(exceptionMessage), exceptionMessage,
+                    caseReferenceNumber, CLASS_NAME, VALIDATE_RESPONDENT_METHOD_NAME);
+        }
+        if (StringUtils.isBlank(respondent.getId())) {
+            String exceptionMessage = String.format(EXCEPTION_RESPONDENT_ID_NOT_FOUND, caseReferenceNumber);
+            throw new GenericServiceException(exceptionMessage, new Exception(exceptionMessage), exceptionMessage,
+                    caseReferenceNumber, CLASS_NAME, VALIDATE_RESPONDENT_METHOD_NAME);
+        }
+        if (ObjectUtils.isEmpty(respondent.getValue())) {
+            String exceptionMessage = String.format(EXCEPTION_RESPONDENT_DETAILS_NOT_EXIST,
+                    respondent.getId(), caseReferenceNumber);
+            throw new GenericServiceException(exceptionMessage, new Exception(exceptionMessage), exceptionMessage,
+                    caseReferenceNumber, CLASS_NAME, VALIDATE_RESPONDENT_METHOD_NAME);
+        }
+        if (ObjectUtils.isEmpty(respondent.getValue().getRespondentName())) {
+            String exceptionMessage = String.format(EXCEPTION_RESPONDENT_NAME_NOT_EXISTS, respondent.getId(),
+                    caseReferenceNumber);
+            throw new GenericServiceException(exceptionMessage, new Exception(exceptionMessage), exceptionMessage,
+                    caseReferenceNumber, CLASS_NAME, VALIDATE_RESPONDENT_METHOD_NAME);
+        }
     }
 }

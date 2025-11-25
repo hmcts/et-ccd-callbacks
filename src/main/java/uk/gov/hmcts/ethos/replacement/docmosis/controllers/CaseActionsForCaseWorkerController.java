@@ -58,6 +58,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelec
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.LoggingUtil;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -82,7 +83,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.updatePostp
 @RestController
 public class CaseActionsForCaseWorkerController {
     private static final String LOG_MESSAGE = "received notification request for case reference :    ";
-    private static final String EVENT_FIELDS_VALIDATION = "Event fields validation: ";
     private static final String TWO_HUNDRED = "200";
     private static final String FOUR_HUNDRED = "400";
     private static final String FIVE_HUNDRED = "500";
@@ -132,10 +132,10 @@ public class CaseActionsForCaseWorkerController {
     public ResponseEntity<CCDCallbackResponse> createCase(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(AUTHORIZATION) String userToken) {
-        log.info("CREATE CASE ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("CREATE CASE ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
 
         SubmitEvent submitEvent = caseCreationForCaseWorkerService.caseCreationRequest(ccdRequest, userToken);
-        log.info("Case created correctly with case Id: " + submitEvent.getCaseId());
+        log.info("Case created correctly with case Id: {}", submitEvent.getCaseId());
 
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }
@@ -156,12 +156,12 @@ public class CaseActionsForCaseWorkerController {
     public ResponseEntity<CCDCallbackResponse> retrieveCase(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(AUTHORIZATION) String userToken) {
-        log.info("RETRIEVE CASE ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("RETRIEVE CASE ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
 
         SubmitEvent submitEvent = caseRetrievalForCaseWorkerService.caseRetrievalRequest(userToken,
                 ccdRequest.getCaseDetails().getCaseTypeId(),
                 ccdRequest.getCaseDetails().getJurisdiction(), "1550576532211563");
-        log.info("Case received correctly with id: " + submitEvent.getCaseId());
+        log.info("Case received correctly with id: {}", submitEvent.getCaseId());
 
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }
@@ -179,10 +179,10 @@ public class CaseActionsForCaseWorkerController {
     public ResponseEntity<CCDCallbackResponse> retrieveCases(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(AUTHORIZATION) String userToken) {
-        log.info("RETRIEVE CASES ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("RETRIEVE CASES ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
 
         List<SubmitEvent> submitEvents = caseRetrievalForCaseWorkerService.casesRetrievalRequest(ccdRequest, userToken);
-        log.info("Cases received: " + submitEvents.size());
+        log.info("Cases received: {}", submitEvents.size());
         submitEvents.forEach(submitEvent -> log.info(String.valueOf(submitEvent.getCaseId())));
 
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
@@ -204,10 +204,10 @@ public class CaseActionsForCaseWorkerController {
     public ResponseEntity<CCDCallbackResponse> updateCase(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(AUTHORIZATION) String userToken) throws Throwable {
-        log.info("UPDATE CASE ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("UPDATE CASE ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
 
         SubmitEvent submitEvent = caseUpdateForCaseWorkerService.caseUpdateRequest(ccdRequest, userToken);
-        log.info("Case updated correctly with id: " + submitEvent.getCaseId());
+        log.info("Case updated correctly with id: {}", submitEvent.getCaseId());
 
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }
@@ -246,7 +246,7 @@ public class CaseActionsForCaseWorkerController {
     public ResponseEntity<CCDCallbackResponse> postDefaultValues(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(AUTHORIZATION) String userToken) {
-        log.info("POST DEFAULT VALUES ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("POST DEFAULT VALUES ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
@@ -362,7 +362,7 @@ public class CaseActionsForCaseWorkerController {
     public ResponseEntity<CCDCallbackResponse> amendCaseDetails(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(AUTHORIZATION) String userToken) {
-        log.info("AMEND CASE DETAILS ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("AMEND CASE DETAILS ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
@@ -379,7 +379,7 @@ public class CaseActionsForCaseWorkerController {
 
         if (errors.isEmpty()) {
             DefaultValues defaultValues = getPostDefaultValues(caseDetails);
-            log.info("Post Default values loaded: " + defaultValues);
+            log.info("Post Default values loaded: {}", defaultValues);
             defaultValuesReaderService.setCaseData(caseData, defaultValues);
             caseManagementForCaseWorkerService.dateToCurrentPosition(caseData);
             caseManagementForCaseWorkerService.setEt3ResponseDueDate(caseData);
@@ -415,7 +415,7 @@ public class CaseActionsForCaseWorkerController {
     public ResponseEntity<CCDCallbackResponse> migrateCaseLinkDetails(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(AUTHORIZATION) String userToken) {
-        log.info("MIGRATE CASE LINK DETAILS ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("MIGRATE CASE LINK DETAILS ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
 
         caseManagementForCaseWorkerService.setMigratedCaseLinkDetails(userToken,
                 ccdRequest.getCaseDetails());
@@ -435,7 +435,7 @@ public class CaseActionsForCaseWorkerController {
     public ResponseEntity<CCDCallbackResponse> amendClaimantDetails(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(AUTHORIZATION) String userToken) {
-        log.info("AMEND CLAIMANT DETAILS ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("AMEND CLAIMANT DETAILS ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         buildFlagsImageFileName(ccdRequest.getCaseDetails());
@@ -467,7 +467,7 @@ public class CaseActionsForCaseWorkerController {
     public ResponseEntity<CCDCallbackResponse> amendRespondentDetails(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(AUTHORIZATION) String userToken) {
-        log.info("AMEND RESPONDENT DETAILS ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("AMEND RESPONDENT DETAILS ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = eventValidationService.validateActiveRespondents(caseData);
@@ -504,9 +504,7 @@ public class CaseActionsForCaseWorkerController {
         caseFlagsService.setupCaseFlags(caseData);
         caseManagementForCaseWorkerService.updateWorkAllocationField(errors, caseData);
         removeSpacesFromPartyNames(caseData);
-
-        log.info(EVENT_FIELDS_VALIDATION + errors);
-
+        LoggingUtil.logErrors(errors);
         return getCallbackRespEntityErrors(errors, caseData);
     }
 
@@ -523,24 +521,25 @@ public class CaseActionsForCaseWorkerController {
     public ResponseEntity<CCDCallbackResponse> amendRespondentRepresentative(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(AUTHORIZATION) String userToken) {
-        log.info("AMEND RESPONDENT REPRESENTATIVE ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("AMEND RESPONDENT REPRESENTATIVE ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 
         List<String> errors = eventValidationService.validateRespRepNames(caseData);
 
         if (errors.isEmpty()) {
-            // add org policy and NOC elements
-            nocRespondentHelper.updateWithRespondentIds(caseData);
-            caseData = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, userToken);
-
-            if (featureToggleService.isHmcEnabled()) {
-                nocRespondentRepresentativeService.updateNonMyHmctsOrgIds(caseData.getRepCollection());
+            try {
+                nocRespondentHelper.addRepresentation(caseData);
+                caseData = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, userToken);
+                if (featureToggleService.isHmcEnabled()) {
+                    // add org policy and NOC elements
+                    nocRespondentRepresentativeService.updateNonMyHmctsOrgIds(caseData.getRepCollection());
+                }
+            } catch (GenericServiceException e) {
+                errors.add(e.getMessage());
             }
         }
-
-        log.info(EVENT_FIELDS_VALIDATION + errors);
-
+        LoggingUtil.logErrors(errors);
         return getCallbackRespEntityErrors(errors, caseData);
     }
 
@@ -555,8 +554,8 @@ public class CaseActionsForCaseWorkerController {
             @RequestBody CallbackRequest callbackRequest,
             @RequestHeader(AUTHORIZATION) String userToken) {
 
-        log.info("AMEND RESPONDENT REPRESENTATIVE SUBMITTED ---> "
-            + LOG_MESSAGE + callbackRequest.getCaseDetails().getCaseId());
+        log.info("AMEND RESPONDENT REPRESENTATIVE SUBMITTED ---> " + LOG_MESSAGE + "{}",
+                callbackRequest.getCaseDetails().getCaseId());
         try {
             nocRespondentRepresentativeService.updateRespondentRepresentativesAccess(callbackRequest);
         } catch (IOException e) {
@@ -579,8 +578,8 @@ public class CaseActionsForCaseWorkerController {
     public ResponseEntity<CCDCallbackResponse> dynamicRespondentRepresentativeNames(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(AUTHORIZATION) String userToken) {
-        log.info("DYNAMIC RESPONDENT REPRESENTATIVE NAMES ---> " + LOG_MESSAGE
-                + ccdRequest.getCaseDetails().getCaseId());
+        log.info("DYNAMIC RESPONDENT REPRESENTATIVE NAMES ---> " + LOG_MESSAGE + "{}",
+                ccdRequest.getCaseDetails().getCaseId());
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         DynamicRespondentRepresentative.dynamicRespondentRepresentativeNames(caseData);
@@ -601,7 +600,7 @@ public class CaseActionsForCaseWorkerController {
     public ResponseEntity<CCDCallbackResponse> updateHearing(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(AUTHORIZATION) String userToken) {
-        log.info("UPDATE HEARING ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("UPDATE HEARING ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         buildFlagsImageFileName(caseDetails);
@@ -622,7 +621,7 @@ public class CaseActionsForCaseWorkerController {
     public ResponseEntity<CCDCallbackResponse> allocateHearing(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(AUTHORIZATION) String userToken) {
-        log.info("ALLOCATE HEARING ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("ALLOCATE HEARING ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         updatePostponedDate(caseData);
@@ -643,7 +642,7 @@ public class CaseActionsForCaseWorkerController {
     public ResponseEntity<CCDCallbackResponse> restrictedCases(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(AUTHORIZATION) String userToken) {
-        log.info("RESTRICTED CASES ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("RESTRICTED CASES ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         buildFlagsImageFileName(ccdRequest.getCaseDetails());
@@ -670,7 +669,7 @@ public class CaseActionsForCaseWorkerController {
     public ResponseEntity<CCDCallbackResponse> dynamicRestrictedReporting(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(AUTHORIZATION) String userToken) {
-        log.info("DYNAMIC RESTRICTED REPORTING ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("DYNAMIC RESTRICTED REPORTING ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         DynamicRestrictedReporting.dynamicRestrictedReporting(caseData);
@@ -691,7 +690,7 @@ public class CaseActionsForCaseWorkerController {
     public ResponseEntity<CCDCallbackResponse> amendHearing(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(AUTHORIZATION) String userToken) throws IOException {
-        log.info("AMEND HEARING ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("AMEND HEARING ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseManagementForCaseWorkerService.amendHearing(caseData, ccdRequest.getCaseDetails().getCaseTypeId());
@@ -716,7 +715,7 @@ public class CaseActionsForCaseWorkerController {
     public ResponseEntity<CCDCallbackResponse> midEventAmendHearing(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(AUTHORIZATION) String userToken) {
-        log.info("MID EVENT AMEND HEARING ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("MID EVENT AMEND HEARING ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>();
@@ -738,7 +737,7 @@ public class CaseActionsForCaseWorkerController {
     public ResponseEntity<CCDCallbackResponse> amendCaseState(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(AUTHORIZATION) String userToken) {
-        log.info("AMEND CASE STATE ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("AMEND CASE STATE ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
 
         List<String> errors = new ArrayList<>();
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
@@ -747,7 +746,7 @@ public class CaseActionsForCaseWorkerController {
             eventValidationService.validateJurisdictionOutcome(caseData,
                     Constants.REJECTED_STATE.equals(ccdRequest.getCaseDetails().getState()),
                     false, errors);
-            log.info(EVENT_FIELDS_VALIDATION + errors);
+            LoggingUtil.logErrors(errors);
         }
 
         return getCallbackRespEntityErrors(errors, caseData);
@@ -766,7 +765,7 @@ public class CaseActionsForCaseWorkerController {
     public ResponseEntity<CCDCallbackResponse> midRespondentAddress(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(AUTHORIZATION) String userToken) {
-        log.info("MID RESPONDENT ADDRESS ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("MID RESPONDENT ADDRESS ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
 
         CaseData caseData = Helper.midRespondentAddress(ccdRequest.getCaseDetails().getCaseData());
 
@@ -786,12 +785,12 @@ public class CaseActionsForCaseWorkerController {
     public ResponseEntity<CCDCallbackResponse> jurisdictionValidation(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(AUTHORIZATION) String userToken) {
-        log.info("JURISDICTION VALIDATION ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("JURISDICTION VALIDATION ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
 
         List<String> errors = new ArrayList<>();
         CaseData caseData =  ccdRequest.getCaseDetails().getCaseData();
         eventValidationService.validateJurisdiction(caseData, errors);
-        log.info(EVENT_FIELDS_VALIDATION + errors);
+        LoggingUtil.logErrors(errors);
 
         return getCallbackRespEntityErrors(errors, caseData);
     }
@@ -809,7 +808,7 @@ public class CaseActionsForCaseWorkerController {
     public ResponseEntity<CCDCallbackResponse> addAmendJurisdiction(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(AUTHORIZATION) String userToken) {
-        log.info("AMEND JURISDICTION ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("AMEND JURISDICTION ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         conciliationTrackService.populateConciliationTrackForJurisdiction(caseData);
@@ -830,8 +829,8 @@ public class CaseActionsForCaseWorkerController {
     public ResponseEntity<CCDCallbackResponse> singleCaseMultipleMidEventValidation(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(AUTHORIZATION) String userToken) {
-        log.info("SINGLE CASE MULTIPLE MID EVENT VALIDATION ---> " + LOG_MESSAGE
-                + ccdRequest.getCaseDetails().getCaseId());
+        log.info("SINGLE CASE MULTIPLE MID EVENT VALIDATION ---> " + LOG_MESSAGE + "{}",
+                ccdRequest.getCaseDetails().getCaseId());
 
         List<String> errors = new ArrayList<>();
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
@@ -857,7 +856,7 @@ public class CaseActionsForCaseWorkerController {
     public ResponseEntity<CCDCallbackResponse> hearingMidEventValidation(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(AUTHORIZATION) String userToken) {
-        log.info("HEARING MID EVENT VALIDATION ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("HEARING MID EVENT VALIDATION ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         List<String> errors = HearingsHelper.hearingMidEventValidation(caseDetails.getCaseData());
@@ -877,7 +876,7 @@ public class CaseActionsForCaseWorkerController {
     public ResponseEntity<CCDCallbackResponse> dynamicListBfActions(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(AUTHORIZATION) String userToken) {
-        log.info("DYNAMIC LIST BF ACTIONS ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("DYNAMIC LIST BF ACTIONS ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         BFHelper.populateDynamicListBfActions(caseData);
@@ -898,7 +897,7 @@ public class CaseActionsForCaseWorkerController {
     public ResponseEntity<CCDCallbackResponse> bfActions(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(AUTHORIZATION) String userToken) {
-        log.info("BF ACTIONS ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("BF ACTIONS ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         BFHelper.updateBfActionItems(caseData);
@@ -919,7 +918,7 @@ public class CaseActionsForCaseWorkerController {
     public ResponseEntity<CCDCallbackResponse> dynamicJudgementList(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(AUTHORIZATION) String userToken) {
-        log.info("DYNAMIC JUDGEMENT LIST ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("DYNAMIC JUDGEMENT LIST ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         DynamicJudgements.dynamicJudgements(caseData);
@@ -960,7 +959,7 @@ public class CaseActionsForCaseWorkerController {
     public ResponseEntity<CCDCallbackResponse> judgmentValidation(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(AUTHORIZATION) String userToken) {
-        log.info("JUDGEMENT VALIDATION ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("JUDGEMENT VALIDATION ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
 
         CaseData caseData =  ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = eventValidationService.validateJurisdictionCodesWithinJudgement(caseData);
@@ -981,7 +980,7 @@ public class CaseActionsForCaseWorkerController {
     public ResponseEntity<CCDCallbackResponse> depositValidation(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(AUTHORIZATION) String userToken) {
-        log.info("DEPOSIT VALIDATION ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("DEPOSIT VALIDATION ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
 
         CaseData caseData =  ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = depositOrderValidationService.validateDepositOrder(caseData);
@@ -1002,8 +1001,7 @@ public class CaseActionsForCaseWorkerController {
     public ResponseEntity<CCDCallbackResponse> dynamicDepositOrder(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(AUTHORIZATION) String userToken) {
-        log.info("DYNAMIC DEPOSIT ORDER ---> " + LOG_MESSAGE
-                + ccdRequest.getCaseDetails().getCaseId());
+        log.info("DYNAMIC DEPOSIT ORDER ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         DynamicDepositOrder.dynamicDepositOrder(caseData);
@@ -1023,7 +1021,7 @@ public class CaseActionsForCaseWorkerController {
     public ResponseEntity<CCDCallbackResponse> aboutToStartDisposal(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(AUTHORIZATION) String userToken) {
-        log.info("ABOUT TO START DISPOSAL ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("ABOUT TO START DISPOSAL ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
 
         List<String> errors = new ArrayList<>();
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
@@ -1044,7 +1042,7 @@ public class CaseActionsForCaseWorkerController {
             return getCallbackRespEntityNoErrors(caseData);
         }
 
-        log.info(EVENT_FIELDS_VALIDATION + errors);
+        LoggingUtil.logErrors(errors);
         return getCallbackRespEntityErrors(errors, caseData);
     }
 
@@ -1061,7 +1059,7 @@ public class CaseActionsForCaseWorkerController {
     public ResponseEntity<CCDCallbackResponse> amendFixCaseAPI(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(AUTHORIZATION) String userToken) {
-        log.info("FIX CASE API VALUE ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("FIX CASE API VALUE ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
 
         fixCaseApiService.checkUpdateMultipleReference(ccdRequest.getCaseDetails(), userToken);
 
@@ -1081,8 +1079,8 @@ public class CaseActionsForCaseWorkerController {
     public ResponseEntity<CCDCallbackResponse> reinstateClosedCaseMidEventValidation(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(AUTHORIZATION) String userToken) {
-        log.info("REINSTATE CLOSED CASE MID EVENT VALIDATION ---> "
-                + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("REINSTATE CLOSED CASE MID EVENT VALIDATION ---> " + LOG_MESSAGE + "{}",
+                ccdRequest.getCaseDetails().getCaseId());
 
         CaseData caseData =  ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = caseCloseValidator.validateReinstateClosedCaseMidEvent(caseData);
@@ -1097,8 +1095,7 @@ public class CaseActionsForCaseWorkerController {
     private void generateEthosCaseReference(CaseData caseData, CCDRequest ccdRequest) {
         if (StringUtils.isBlank(caseData.getEthosCaseReference())) {
             String reference = singleReferenceService.createReference(ccdRequest.getCaseDetails().getCaseTypeId());
-            log.info(String.format("Created reference %s for CCD case %s", reference,
-                    ccdRequest.getCaseDetails().getCaseId()));
+            log.info("Created reference {} for CCD case {}", reference, ccdRequest.getCaseDetails().getCaseId());
             caseData.setEthosCaseReference(reference);
         }
     }

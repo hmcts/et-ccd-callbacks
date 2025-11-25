@@ -1955,4 +1955,47 @@ class InitialConsiderationServiceTest {
         assertEquals("Is there an ET3 response?", pairsList.getFirst()[0]);
         assertNull(pairsList.getFirst()[1]);
     }
+
+    @Test
+    void shouldIncludeSuggestedIssueDetailsInEt3VettingIssues() {
+        InitialConsiderationService service = new InitialConsiderationService(tornadoService);
+
+        Et3VettingType et3Vetting = getEt3VettingType();
+
+        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
+        RespondentSumType respondentValue = new RespondentSumType();
+        respondentValue.setRespondentName("Test Respondent");
+        respondentValue.setEt3Vetting(et3Vetting);
+        respondent.setValue(respondentValue);
+
+        CaseData caseData = new CaseData();
+        caseData.setRespondentCollection(List.of(respondent));
+
+        String result = service.setIcEt3VettingIssuesDetailsForEachRespondent(caseData);
+
+        assertTrue(result.contains("Strike out details"));
+        assertTrue(result.contains("Interpreters"));
+        assertTrue(result.contains("Jurisdictional issues"));
+        assertTrue(result.contains("Rule 49"));
+        assertTrue(result.contains("Request for adjustments"));
+        assertTrue(result.contains("Time points"));
+    }
+
+    private static @NotNull Et3VettingType getEt3VettingType() {
+        Et3VettingType et3Vetting = new Et3VettingType();
+        et3Vetting.setEt3SuggestedIssues(List.of(
+                InitialConsiderationService.APPLICATIONS_FOR_STRIKE_OUT_OR_DEPOSIT,
+                InitialConsiderationService.INTERPRETERS,
+                InitialConsiderationService.JURISDICTIONAL_ISSUES,
+                InitialConsiderationService.RULE_49,
+                InitialConsiderationService.REQUEST_FOR_ADJUSTMENTS,
+                InitialConsiderationService.TIME_POINTS));
+        et3Vetting.setEt3SuggestedIssuesStrikeOut("Strike out details");
+        et3Vetting.setEt3SuggestedIssueInterpreters("Interpreters");
+        et3Vetting.setEt3SuggestedIssueJurisdictional("Jurisdictional issues");
+        et3Vetting.setEt3SuggestedIssueRule50("Rule 49");
+        et3Vetting.setEt3SuggestedIssueAdjustments("Request for adjustments");
+        et3Vetting.setEt3SuggestedIssueTimePoints("Time points");
+        return et3Vetting;
+    }
 }

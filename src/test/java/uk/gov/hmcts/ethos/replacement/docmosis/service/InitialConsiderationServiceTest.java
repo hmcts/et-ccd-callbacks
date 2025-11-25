@@ -1958,10 +1958,8 @@ class InitialConsiderationServiceTest {
 
     @Test
     void shouldIncludeSuggestedIssueDetailsInEt3VettingIssues() {
-        InitialConsiderationService service = new InitialConsiderationService(tornadoService);
 
         Et3VettingType et3Vetting = getEt3VettingType();
-
         RespondentSumTypeItem respondent = new RespondentSumTypeItem();
         RespondentSumType respondentValue = new RespondentSumType();
         respondentValue.setRespondentName("Test Respondent");
@@ -1971,6 +1969,7 @@ class InitialConsiderationServiceTest {
         CaseData caseData = new CaseData();
         caseData.setRespondentCollection(List.of(respondent));
 
+        InitialConsiderationService service = new InitialConsiderationService(tornadoService);
         String result = service.setIcEt3VettingIssuesDetailsForEachRespondent(caseData);
 
         assertTrue(result.contains("Strike out details"));

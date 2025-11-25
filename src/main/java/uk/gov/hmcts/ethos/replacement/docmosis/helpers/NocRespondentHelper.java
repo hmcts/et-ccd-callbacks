@@ -1,6 +1,9 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -105,26 +108,115 @@ public class NocRespondentHelper {
                 .orElse(new RespondentSumType());
     }
 
-    public void addRepresentation(CaseData caseData) throws GenericServiceException {
+    /**
+     * Maps representatives to corresponding respondents within the given {@link CaseData}
+     * and establishes their representation relationship.
+     * <p>
+     * This method performs the following steps:
+     * <ul>
+     *     <li>Validates that the case contains both representatives and respondents.</li>
+     *     <li>Builds lookup maps for respondent IDs and respondent names to allow fast matching.</li>
+     *     <li>Iterates through each representative and attempts to locate the matching respondent
+     *         by respondent ID or respondent name.</li>
+     *     <li>If a matching respondent is found, the representative–respondent relationship is
+     *         established using {@code assignRepresentative}.</li>
+     * </ul>
+     * <p>
+     * Invalid or incomplete representative/respondent entries are safely skipped.
+     * No exceptions are thrown for unmatched representatives.
+     *
+     * @param caseData the case data containing respondent and representative collections
+     * @throws GenericServiceException if representation assignment fails during processing
+     */
+    public void mapRepresentativesToRespondents(CaseData caseData) throws GenericServiceException {
+        if (ObjectUtils.isEmpty(caseData)
+                || CollectionUtils.isEmpty(caseData.getRepCollection())
+                || CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
+            return;
+        }
+        Map<String, RespondentSumTypeItem> respondentsById = new HashMap<>();
+        Map<String, RespondentSumTypeItem> respondentsByName = new HashMap<>();
+        for (RespondentSumTypeItem respondent : caseData.getRespondentCollection()) {
+            if (ObjectUtils.isEmpty(respondent) || ObjectUtils.isEmpty(respondent.getValue())) {
+                continue;
+            }
+            String respondentId = respondent.getId();
+            String respondentName = respondent.getValue().getRespondentName();
+            if (StringUtils.isNotBlank(respondentId)) {
+                respondentsById.put(respondentId, respondent);
+            }
+            if (StringUtils.isNotBlank(respondentName)) {
+                respondentsByName.put(respondentName, respondent);
+            }
+        }
         for (RepresentedTypeRItem representative : caseData.getRepCollection()) {
-            for (RespondentSumTypeItem respondent : caseData.getRespondentCollection()) {
-                if (respondent.getValue().getRespondentName().equals(representative.getValue().getRespRepName())
-                        || representative.getValue().getRespondentId().equals(respondent.getId())) {
-                    addRepresentation(respondent, representative, caseData.getCcdID());
-                    break;
-                }
+            if (representative == null || representative.getValue() == null) {
+                continue;
+            }
+            // respondent id in representative object
+            String repRespondentId = representative.getValue().getRespondentId();
+            // respondent name in representative object
+            String repRespondentName = representative.getValue().getRespRepName();
+            if (StringUtils.isBlank(repRespondentId) && StringUtils.isBlank(repRespondentName)) {
+                continue;
+            }
+            RespondentSumTypeItem matchedRespondent = null;
+            if (StringUtils.isNotBlank(repRespondentId)) {
+                matchedRespondent = respondentsById.get(repRespondentId);
+            }
+            if (ObjectUtils.isEmpty(matchedRespondent) && StringUtils.isNotBlank(repRespondentName)) {
+                matchedRespondent = respondentsByName.get(repRespondentName);
+            }
+            if (ObjectUtils.isNotEmpty(matchedRespondent)) {
+                assignRepresentative(matchedRespondent, representative, caseData.getCcdID());
             }
         }
     }
 
-    public static void addRepresentation(RespondentSumTypeItem respondent,
-                                         RepresentedTypeRItem representative,
-                                         String caseReferenceNumber) throws GenericServiceException {
+    /**
+     * Establishes a representation relationship between a respondent and a representative
+     * within a case.
+     * <p>
+     * This method performs validation on the provided respondent, representative, and
+     * case reference number. If validation succeeds, it links the representative to the
+     * respondent and updates the respondent's representation status to indicate that a
+     * representative is now assigned.
+     * <p>
+     * Specifically, this method:
+     * <ul>
+     *     <li>Validates the input data using {@code validateRepresentation}.</li>
+     *     <li>Sets the respondent's ID on the representative.</li>
+     *     <li>Marks the respondent as currently represented.</li>
+     *     <li>Associates the representative's ID with the respondent.</li>
+     *     <li>Ensures the respondent is not marked as having their representative removed.</li>
+     * </ul>
+     *
+     * @param respondent          the respondent who is being represented
+     * @param representative      the representative assigned to the respondent
+     * @param caseReferenceNumber the CCD case reference number associated with this representation
+     * @throws GenericServiceException if validation fails or if representation cannot be established
+     */
+    public static void assignRepresentative(RespondentSumTypeItem respondent,
+                                            RepresentedTypeRItem representative,
+                                            String caseReferenceNumber) throws GenericServiceException {
         validateRepresentation(respondent, representative, caseReferenceNumber);
         representative.getValue().setRespondentId(respondent.getId());
+        representative.getValue().setRespRepName(respondent.getValue().getRespondentName());
         respondent.getValue().setRepresentativeRemoved(NO);
         respondent.getValue().setRepresented(YES);
         respondent.getValue().setRepresentativeId(representative.getId());
+    }
+
+    public void removeRepresentation(CaseData caseData) throws GenericServiceException {
+        for (RepresentedTypeRItem representative : caseData.getRepCollection()) {
+            for (RespondentSumTypeItem respondent : caseData.getRespondentCollection()) {
+                if (respondent.getValue().getRespondentName().equals(representative.getValue().getRespRepName())
+                        || representative.getValue().getRespondentId().equals(respondent.getId())) {
+                    assignRepresentative(respondent, representative, caseData.getCcdID());
+                    break;
+                }
+            }
+        }
     }
 
     public static void resetRepresentation(RespondentSumTypeItem respondent,

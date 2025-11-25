@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
+import lombok.SneakyThrows;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,10 +19,14 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationApprovalStatus.APPROVED;
 
 class NocRespondentHelperTest {
@@ -56,6 +61,7 @@ class NocRespondentHelperTest {
     private static final String RESPONDENT_ID_ONE = "106001";
     private static final String RESPONDENT_ID_TWO = "106002";
     private static final String RESPONDENT_ID_THREE = "106003";
+    private static final String REPRESENTATIVE_ID_ONE = "106004";
     private static final String UNKNOWN_RESP_ID = "999999";
     private static final Map<String, Organisation> EXPECTED_RESPONDENT_ORGANISATIONS =
         Map.of(RESPONDENT_ID_ONE,
@@ -282,8 +288,65 @@ class NocRespondentHelperTest {
     }
 
     @Test
-    void theSetRepresentation() {
-        // when respondent is empty
-
+    @SneakyThrows
+    void theMapRepresentativesToRespondents() {
+        // when case data is empty should not throw any exception
+        assertDoesNotThrow(() -> nocRespondentHelper.mapRepresentativesToRespondents(null));
+        // when case data representative collection is empty should not throw any exception
+        CaseData caseData = new CaseData();
+        assertDoesNotThrow(() -> nocRespondentHelper.mapRepresentativesToRespondents(caseData));
+        // when case data respondent collection is empty should not throw eny exception
+        caseData.setRepCollection(List.of(RepresentedTypeRItem.builder().value(
+                RepresentedTypeR.builder().build()).build()));
+        assertDoesNotThrow(() -> nocRespondentHelper.mapRepresentativesToRespondents(caseData));
+        // when respondent in respondent collection has no value
+        caseData.setRespondentCollection(List.of(new  RespondentSumTypeItem()));
+        assertDoesNotThrow(() -> nocRespondentHelper.mapRepresentativesToRespondents(caseData));
+        // when respondent in respondent collection has value but both name and id fields are empty
+        // and representative value is empty
+        caseData.getRespondentCollection().getFirst().setValue(RespondentSumType.builder().build());
+        assertDoesNotThrow(() -> nocRespondentHelper.mapRepresentativesToRespondents(caseData));
+        // when respondent in respondent collection has value but both name and id fields are empty
+        // and representative value is not empty
+        caseData.getRepCollection().getFirst().setValue(RepresentedTypeR.builder().build());
+        assertDoesNotThrow(() -> nocRespondentHelper.mapRepresentativesToRespondents(caseData));
+        // when respondent in respondent collection has value and has both name
+        // but representative does not have respondent id and respondent name
+        caseData.getRespondentCollection().getFirst().getValue().setRespondentName(RESPONDENT_NAME);
+        caseData.getRespondentCollection().getFirst().setId(RESPONDENT_ID_ONE);
+        assertDoesNotThrow(() -> nocRespondentHelper.mapRepresentativesToRespondents(caseData));
+        // when respondent in respondent collection has value and has both name
+        // but representative does not have matched respondent id and respondent name
+        caseData.getRespondentCollection().getFirst().getValue().setRespondentName(RESPONDENT_NAME);
+        caseData.getRespondentCollection().getFirst().setId(RESPONDENT_ID_ONE);
+        caseData.getRepCollection().getFirst().getValue().setRespondentId(RESPONDENT_ID_TWO);
+        caseData.getRepCollection().getFirst().getValue().setRespRepName(RESPONDENT_NAME_TWO);
+        assertDoesNotThrow(() -> nocRespondentHelper.mapRepresentativesToRespondents(caseData));
+        // when respondent in respondent collection has value and has both name
+        // and representative has matched respondent name
+        caseData.getRepCollection().getFirst().getValue().setRespRepName(RESPONDENT_NAME);
+        caseData.getRepCollection().getFirst().getValue().setRespRepName(RESPONDENT_ID_ONE);
+        caseData.getRepCollection().getFirst().setId(REPRESENTATIVE_ID_ONE);
+        caseData.getRespondentCollection().getFirst().setId(RESPONDENT_ID_TWO);
+        assertDoesNotThrow(() -> nocRespondentHelper.mapRepresentativesToRespondents(caseData));
+        assertThat(caseData.getRespondentCollection().getFirst().getValue().getRepresentativeRemoved()).isEqualTo(NO);
+        assertThat(caseData.getRespondentCollection().getFirst().getValue().getRepresented()).isEqualTo(YES);
+        assertThat(caseData.getRespondentCollection().getFirst().getValue().getRepresentativeId())
+                .isEqualTo(REPRESENTATIVE_ID_ONE);
+        assertThat(caseData.getRepCollection().getFirst().getValue().getRespondentId()).isEqualTo(RESPONDENT_ID_TWO);
+        assertThat(caseData.getRepCollection().getFirst().getValue().getRespRepName()).isEqualTo(RESPONDENT_NAME);
+        // when respondent in respondent collection has value and has both name
+        // and representative has matched respondent id
+        caseData.getRepCollection().getFirst().getValue().setRespRepName(RESPONDENT_NAME);
+        caseData.getRepCollection().getFirst().getValue().setRespondentId(RESPONDENT_ID_ONE);
+        caseData.getRespondentCollection().getFirst().setId(RESPONDENT_ID_ONE);
+        caseData.getRespondentCollection().getFirst().getValue().setRespondentName(RESPONDENT_NAME_TWO);
+        assertDoesNotThrow(() -> nocRespondentHelper.mapRepresentativesToRespondents(caseData));
+        assertThat(caseData.getRespondentCollection().getFirst().getValue().getRepresentativeRemoved()).isEqualTo(NO);
+        assertThat(caseData.getRespondentCollection().getFirst().getValue().getRepresented()).isEqualTo(YES);
+        assertThat(caseData.getRespondentCollection().getFirst().getValue().getRepresentativeId())
+                .isEqualTo(REPRESENTATIVE_ID_ONE);
+        assertThat(caseData.getRepCollection().getFirst().getValue().getRespondentId()).isEqualTo(RESPONDENT_ID_ONE);
+        assertThat(caseData.getRepCollection().getFirst().getValue().getRespRepName()).isEqualTo(RESPONDENT_NAME_TWO);
     }
 }

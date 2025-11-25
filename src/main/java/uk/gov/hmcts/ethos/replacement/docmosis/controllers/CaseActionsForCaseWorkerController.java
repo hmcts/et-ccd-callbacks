@@ -529,7 +529,7 @@ public class CaseActionsForCaseWorkerController {
 
         if (errors.isEmpty()) {
             try {
-                nocRespondentHelper.addRepresentation(caseData);
+                nocRespondentHelper.mapRepresentativesToRespondents(caseData);
                 caseData = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, userToken);
                 if (featureToggleService.isHmcEnabled()) {
                     // add org policy and NOC elements

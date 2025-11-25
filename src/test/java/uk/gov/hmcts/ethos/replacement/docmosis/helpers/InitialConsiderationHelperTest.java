@@ -30,12 +30,13 @@ class InitialConsiderationHelperTest {
 
     @Test
     void getDocumentRequest_returnsExpectedJsonForEnglandWales() throws JsonProcessingException {
-        CaseData caseData = CaseDataBuilder.builder().build();
-        setCaseDataValues(caseData);
-        caseData.setEtICHearingNotListedListUpdated(Collections.singletonList("List for preliminary hearing"));
-        caseData.setEtICHearingNotListedListForPrelimHearingUpdated(populatePreliminaryHearingUpdated());
+        CaseData caseDataForEnglandWales = CaseDataBuilder.builder().build();
+        setCaseDataValues(caseDataForEnglandWales);
+        caseDataForEnglandWales.setEtICHearingNotListedListUpdated(
+                Collections.singletonList("List for preliminary hearing"));
+        caseDataForEnglandWales.setEtICHearingNotListedListForPrelimHearingUpdated(populatePreliminaryHearingUpdated());
 
-        String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseData, "key",
+        String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseDataForEnglandWales, "key",
                 ENGLANDWALES_CASE_TYPE_ID);
 
         assertNotNull(documentRequest);
@@ -45,12 +46,12 @@ class InitialConsiderationHelperTest {
 
     @Test
     void getDocumentRequest_returnsExpectedJsonForScotland() throws JsonProcessingException {
-        CaseData caseData = CaseDataBuilder.builder().build();
-        setCaseDataValues(caseData);
-        caseData.setEtICHearingNotListedListUpdated(Collections.singletonList("List for final hearing"));
-        caseData.setEtICHearingNotListedListForFinalHearingUpdated(populateFinalHearingUpdated());
+        CaseData caseDataForScotland = CaseDataBuilder.builder().build();
+        setCaseDataValues(caseDataForScotland);
+        caseDataForScotland.setEtICHearingNotListedListUpdated(Collections.singletonList("List for final hearing"));
+        caseDataForScotland.setEtICHearingNotListedListForFinalHearingUpdated(populateFinalHearingUpdated());
 
-        String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseData, "key",
+        String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseDataForScotland, "key",
                 SCOTLAND_CASE_TYPE_ID);
 
         assertNotNull(documentRequest);
@@ -225,8 +226,8 @@ class InitialConsiderationHelperTest {
                 + "\"etICHearingOrderBUCompliance\":null,"
                 + "\"etICFinalHearingLength\":\"1\","
                 + "\"etICFinalHearingLengthType\":\"Hours\",\"etICFinalHearingIsEJSitAlone\":\"JSA\","
-                + "\"etICFinalHearingIsEJSitAloneReasonYes\":null,\"etICFinalHearingIsEJSitAloneReasonYesOther\":null,"
-                + "\"etICFinalHearingIsEJSitAloneReasonNo\":null,\"etICFinalHearingIsEJSitAloneReasonNoOther\":null,"
+                + "\"etICFinalHearingIsEJSitAloneReasonYes\":[],\"etICFinalHearingIsEJSitAloneReasonYesOther\":null,"
+                + "\"etICFinalHearingIsEJSitAloneReasonNo\":[],\"etICFinalHearingIsEJSitAloneReasonNoOther\":null,"
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonsJsa\":[\"Members experience is likely to add significant"
                 + " value to the process of adjudication\"],\"etICNoLFinalHearingIsEJSitAloneReasonsJsaOther\":null,"
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":null,"
@@ -352,7 +353,8 @@ class InitialConsiderationHelperTest {
                 + "\"etICFinalHearingLengthType\":\"Hours\",\"etICFinalHearingIsEJSitAlone\":\"JSA\","
                 + "\"etICFinalHearingIsEJSitAloneReasonYes\":[],\"etICFinalHearingIsEJSitAloneReasonYesOther\":null,"
                 + "\"etICFinalHearingIsEJSitAloneReasonNo\":[],\"etICFinalHearingIsEJSitAloneReasonNoOther\":null,"
-                + "\"etICNoLFinalHearingIsEJSitAloneReasonsJsa\":null,\"etICNoLFinalHearingIsEJSitAloneReasonsJsaOther"
+                + "\"etICNoLFinalHearingIsEJSitAloneReasonsJsa\":[\"Members experience is likely to add significant "
+                + "value to the process of adjudication\"],\"etICNoLFinalHearingIsEJSitAloneReasonsJsaOther"
                 + "\":null,\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":null,"
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonMembersOther\":null,"
                 + "\"etICFinalHearingIsEJSitAloneFurtherDetails\":"

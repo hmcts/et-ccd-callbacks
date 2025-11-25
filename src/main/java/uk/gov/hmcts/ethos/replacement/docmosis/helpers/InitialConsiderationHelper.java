@@ -96,6 +96,7 @@ public final class InitialConsiderationHelper {
                 .hearingWithJudgeOrMembersFurtherDetails(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
                         .map(EtICHearingListedAnswers::getEtICIsHearingWithJudgeOrMembersFurtherDetails)
                         .orElse(null))
+
                 .icCanProceed(defaultIfEmpty(caseData.getEtICCanProceed(), null))
                 .hearingAlreadyListed(defaultIfEmpty(caseData.getEtICHearingAlreadyListed(), null))
 
@@ -194,6 +195,24 @@ public final class InitialConsiderationHelper {
                 .etICFinalHearingIsEJSitAloneFurtherDetails(
                         Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
                                 .map(EtICListForFinalHearingUpdated::getEtICFinalHearingIsEJSitAloneFurtherDetails)
+                                .orElse(null))
+
+                .etICNoLFinalHearingIsEJSitAloneReasonsJsa(
+                        Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
+                                .map(EtICListForFinalHearingUpdated::getEtICNoLFinalHearingIsEJSitAloneReasonsJsa)
+                                .orElse(null))
+                .etICNoLFinalHearingIsEJSitAloneReasonsJsaOther(
+                        Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
+                                .map(EtICListForFinalHearingUpdated::getEtICNoLFinalHearingIsEJSitAloneReasonsJsaOther)
+                                .orElse(null))
+                .etICNoLFinalHearingIsEJSitAloneReasonsMembers(
+                        Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
+                                .map(EtICListForFinalHearingUpdated::getEtICNoLFinalHearingIsEJSitAloneReasonsMembers)
+                                .orElse(null))
+                .etICNoLFinalHearingIsEJSitAloneReasonsMembersOther(
+                        Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
+                                .map(EtICListForFinalHearingUpdated
+                                        ::getEtICNoLFinalHearingIsEJSitAloneReasonsMembersOther)
                                 .orElse(null))
 
                 //do not list
@@ -372,6 +391,32 @@ public final class InitialConsiderationHelper {
                         Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
                                 .map(EtICListForFinalHearingUpdated::getEtICFinalHearingIsEJSitAlone)
                                 .orElse(null))
+
+                .etICFinalHearingIsEJSitAloneReasonYes(
+                        Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
+                                .map(reasons -> getSortedEJSitAloneReasons(
+                                        caseData.getEtICHearingNotListedListForFinalHearingUpdated()
+                                                .getEtICFinalHearingIsEJSitAloneReasonYes()))
+                                .orElse(null))
+                .etICFinalHearingIsEJSitAloneReasonYesOther(
+                        Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
+                                .map(EtICListForFinalHearingUpdated::getEtICFinalHearingIsEJSitAloneReasonYesOther)
+                                .orElse(null))
+                .etICFinalHearingIsEJSitAloneReasonNo(
+                        Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
+                                .map(reasons -> getSortedEJSitAloneReasons(
+                                        caseData.getEtICHearingNotListedListForFinalHearingUpdated()
+                                                .getEtICFinalHearingIsEJSitAloneReasonNo()))
+                                .orElse(null))
+                .etICFinalHearingIsEJSitAloneReasonNoOther(
+                        Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
+                                .map(EtICListForFinalHearingUpdated::getEtICFinalHearingIsEJSitAloneReasonNoOther)
+                                .orElse(null))
+                .etICFinalHearingIsEJSitAloneFurtherDetails(
+                        Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
+                                .map(EtICListForFinalHearingUpdated::getEtICFinalHearingIsEJSitAloneFurtherDetails)
+                                .orElse(null))
+
                 .etICNoLFinalHearingIsEJSitAloneReasonsJsa(
                         Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
                                 .map(EtICListForFinalHearingUpdated::getEtICNoLFinalHearingIsEJSitAloneReasonsJsa)
@@ -389,11 +434,7 @@ public final class InitialConsiderationHelper {
                                 .map(EtICListForFinalHearingUpdated
                                         ::getEtICNoLFinalHearingIsEJSitAloneReasonsMembersOther)
                                 .orElse(null))
-                .etICFinalHearingIsEJSitAloneFurtherDetails(
-                        Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
-                                .map(EtICListForFinalHearingUpdated::getEtICFinalHearingIsEJSitAloneFurtherDetails)
-                                .orElse(null))
-                .hearingNotListedOtherDirections(
+                  .hearingNotListedOtherDirections(
                         defaultIfEmpty(caseData.getEtICHearingNotListedOtherDirections(), null))
 
                 //udl

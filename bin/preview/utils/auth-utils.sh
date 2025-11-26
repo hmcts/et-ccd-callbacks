@@ -28,6 +28,7 @@ get_user_token() {
 
 # Get Staff user token for preview environment
 get_staff_admin_token() {
+      echo "🔐 Getting Staff Admin user token..."
       local username="${ET_STAFF_USER_ADMIN_USER_NAME:-}"
       local password="${ET_STAFF_USER_ADMIN_USER_NAME_PASSWORD:-}"
       local idam_uri="${IDAM_API_URL:-}"
@@ -44,11 +45,12 @@ get_staff_admin_token() {
       --data-urlencode "username=${username}" \
        --data-urlencode "password=${password}" | jq -r .access_token
 
-    echo "${token}"
+    echo "Admin token: ${token}"
 }
 
 # Get service-to-service token
 get_service_token() {
+    echo "🔐 Getting S2S service token for ${microservice}..."
     local microservice="${1:-ccd_gw}"
     local s2s_uri="${SERVICE_AUTH_PROVIDER_URL:-}"
 

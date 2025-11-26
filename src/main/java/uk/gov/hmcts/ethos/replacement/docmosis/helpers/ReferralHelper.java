@@ -49,6 +49,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.apache.commons.lang3.StringUtils.SPACE;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CASE_NUMBER;
@@ -113,11 +114,13 @@ public final class ReferralHelper {
 
     /**
      * Populates Hearing, Referral and Replies details. For judges only hearing and referral details will be displayed.
+     * Logic
      */
     public static String populateHearingReferralDetails(CaseData caseData) {
         String hearingDetails = populateHearingDetails(caseData);
-        String referralDetails = createTwoColumnTable(new String[]{"Referral", EMPTY_STRING}, Stream.of(
-                populateReferralDetails(caseData, caseData)).flatMap(Collection::stream).toList()) + BREAKS;
+        String referralDetails =
+            createTwoColumnTable(new String[]{"Referral%s".formatted(getReferralNumber(caseData)), EMPTY_STRING},
+            Stream.of(populateReferralDetails(caseData, caseData)).flatMap(Collection::stream).toList()) + BREAKS;
         String referralUpdateDetails = populateUpdateDetails(caseData, caseData);
         String referralReplyDetails = populateReplyDetails(caseData, caseData);
         return hearingDetails + referralDetails + referralUpdateDetails + referralReplyDetails;
@@ -128,8 +131,9 @@ public final class ReferralHelper {
      */
     public static String populateHearingReferralDetails(MultipleData caseData, CaseData leadCase) {
         String hearingDetails = populateHearingDetails(leadCase);
-        String referralDetails = createTwoColumnTable(new String[]{"Referral", EMPTY_STRING}, Stream.of(
-                populateReferralDetails(caseData, leadCase)).flatMap(Collection::stream).toList()) + BREAKS;
+        String referralDetails
+            = createTwoColumnTable(new String[]{"Referral%s".formatted(getReferralNumber(leadCase)), EMPTY_STRING},
+            Stream.of(populateReferralDetails(caseData, leadCase)).flatMap(Collection::stream).toList()) + BREAKS;
         String referralUpdateDetails = populateUpdateDetails(caseData, leadCase);
         String referralReplyDetails = populateReplyDetails(caseData, leadCase);
         return hearingDetails + referralDetails + referralUpdateDetails + referralReplyDetails;
@@ -850,6 +854,17 @@ public final class ReferralHelper {
             default -> {
                 return referralSubject;
             }
+        }
+    }
+
+    private static String getReferralNumber(CaseData caseData) {
+        try {
+            String referralNumber = getSelectedReferral(caseData).getReferralNumber();
+            return isNullOrEmpty(referralNumber) ? "" : SPACE + referralNumber;
+        } catch (Exception e) {
+            log.error("Error getting referral number for case {} with exception:",
+                caseData.getEthosCaseReference(), e);
+            return "";
         }
     }
 

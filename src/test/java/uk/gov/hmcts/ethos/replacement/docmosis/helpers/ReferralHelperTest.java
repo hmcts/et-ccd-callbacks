@@ -795,4 +795,37 @@ class ReferralHelperTest {
                 Arguments.of("ET1", "ET1")
         );
     }
+
+    @Test
+    void populateHearingReferralDetails_WithReferralNumber() {
+        caseData.setSelectReferral(new DynamicFixedListType("1"));
+        ReferralType referral = new ReferralType();
+        referral.setReferralNumber("5");
+        referral.setReferralDocument(List.of(createDocumentType("1"), createDocumentType("2")));
+        ReferralTypeItem referralTypeItem = new ReferralTypeItem();
+        referralTypeItem.setId("1");
+        referralTypeItem.setValue(referral);
+        caseData.setReferralCollection(List.of(referralTypeItem));
+        caseData.setConciliationTrack(CONCILIATION_TRACK_NO_CONCILIATION);
+
+        String markdown = ReferralHelper.populateHearingReferralDetails(caseData);
+        assertTrue(markdown.contains("|Referral 5||"));
+    }
+
+    @Test
+    void populateHearingReferralDetails_WithEmptyReferralNumber() {
+        caseData.setSelectReferral(new DynamicFixedListType("1"));
+        ReferralType referral = new ReferralType();
+        referral.setReferralNumber("");
+        referral.setReferralDocument(List.of(createDocumentType("1")));
+        ReferralTypeItem referralTypeItem = new ReferralTypeItem();
+        referralTypeItem.setId("1");
+        referralTypeItem.setValue(referral);
+        caseData.setReferralCollection(List.of(referralTypeItem));
+        caseData.setConciliationTrack(CONCILIATION_TRACK_NO_CONCILIATION);
+
+        String markdown = ReferralHelper.populateHearingReferralDetails(caseData);
+        assertTrue(markdown.contains("|Referral||"));
+    }
+
 }

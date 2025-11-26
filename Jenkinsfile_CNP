@@ -148,10 +148,8 @@ withPipeline(type, product, component) {
         ./bin/preview/create-ccd-roles.sh
         echo "Importing CCD definitions"
         ./bin/preview/import-ccd-definitions.sh
-        echo "Adding CTSC User"
-        ./bin/preview/add-wa-user.sh "${ET_STAFF_USER_ADMIN_USER_NAME}" "${ET_STAFF_USER_ADMIN_USER_NAME_PASSWORD}" "CTSC" "User" "${ET_CASEWORKER_USER_NAME}"
-        echo "Adding LegalOps User" 
-        ./bin/preview/add-wa-user.sh "${ET_STAFF_USER_ADMIN_USER_NAME}" "${ET_STAFF_USER_ADMIN_USER_NAME_PASSWORD}" "LegalOps" "User" "${ET_CCD_CASEWORKER_USER_NAME}" "" "" "" "" "Legal office"
+        echo "Creating Work Allocation users"
+        ./bin/preview/set-up-wa-users.sh
       """
     }
 

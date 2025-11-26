@@ -22,7 +22,9 @@ REGION=${16:-"National"}
 
 echo "Adding new user: ${EMAIL_ID} to XUI with WA roles"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+echo "Getting user token"
 USER_TOKEN=$("${SCRIPT_DIR}/idam-user-token.sh" "$USERNAME" "$PASSWORD")
+echo "Getting service token"
 SERVICE_TOKEN=$("${SCRIPT_DIR}/idam-lease-service-token.sh" xui_webapp)
 
 # Function to check if user exists by name/email/service
@@ -51,9 +53,11 @@ check_user_exists() {
 
 # Check for existing user before creation (by first name/email/service)
 if check_user_exists "$FIRST_NAME" "$EMAIL_ID" "Employment Claims"; then
+  echo "User already exists. Exiting."
   exit 0
 fi
 
+echo "Creating user ${FIRST_NAME} ${LAST_NAME} with email ${EMAIL_ID}"
 curl -v --silent --show-error -X POST "${REF_DATA_URL}/refdata/case-worker/profile" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer ${USER_TOKEN}" \

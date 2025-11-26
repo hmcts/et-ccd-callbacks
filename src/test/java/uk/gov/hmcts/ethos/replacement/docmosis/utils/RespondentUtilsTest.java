@@ -245,4 +245,23 @@ final class RespondentUtilsTest {
                         DUMMY_CASE_REFERENCE));
         assertThat(gse.getMessage()).isEqualTo(EXCEPTION_RESPONDENT_NAME_NOT_EXISTS);
     }
+
+    @Test
+    void theIsValidRespondent() {
+        respondentUtils.close();
+        // when respondent is empty should return false
+        assertThat(RespondentUtils.isValidRespondent(null)).isFalse();
+        // when respondent id is empty should return false
+        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+        assertThat(RespondentUtils.isValidRespondent(respondentSumTypeItem)).isFalse();
+        // when respondent value is empty should return false
+        respondentSumTypeItem.setId(DUMMY_RESPONDENT_ID);
+        assertThat(RespondentUtils.isValidRespondent(respondentSumTypeItem)).isFalse();
+        // when respondent name is empty should return false
+        respondentSumTypeItem.setValue(RespondentSumType.builder().build());
+        assertThat(RespondentUtils.isValidRespondent(respondentSumTypeItem)).isFalse();
+        // when respondent has id, value and name should return true
+        respondentSumTypeItem.getValue().setRespondentName(TEST_RESPONDENT_NAME_1);
+        assertThat(RespondentUtils.isValidRespondent(respondentSumTypeItem)).isTrue();
+    }
 }

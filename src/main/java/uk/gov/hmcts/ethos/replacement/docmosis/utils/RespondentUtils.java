@@ -202,4 +202,30 @@ public final class RespondentUtils {
                     caseReferenceNumber, CLASS_NAME, VALIDATE_RESPONDENT_METHOD_NAME);
         }
     }
+
+    /**
+     * Determines whether the given {@link RespondentSumTypeItem} contains valid and usable
+     * respondent data.
+     * <p>
+     * A respondent is considered <em>valid</em> if all of the following conditions are met:
+     * <ul>
+     *     <li>The {@code respondent} object itself is not {@code null}.</li>
+     *     <li>The respondent has a non-blank identifier ({@code respondent.getId()}).</li>
+     *     <li>The respondent has a non-null {@code value} object.</li>
+     *     <li>The respondent's name ({@code respondent.getValue().getRespondentName()}) is non-blank.</li>
+     * </ul>
+     * <p>
+     * This method performs no side effects and does not throw exceptions. It is intended
+     * for use in pre-validation checks prior to invoking operations that require a fully
+     * populated respondent.
+     *
+     * @param respondent the respondent to validate
+     * @return {@code true} if the respondent contains all mandatory fields; {@code false} otherwise
+     */
+    public static boolean isValidRespondent(RespondentSumTypeItem respondent) {
+        return ObjectUtils.isNotEmpty(respondent)
+                && StringUtils.isNotBlank(respondent.getId())
+                && ObjectUtils.isNotEmpty(respondent.getValue())
+                && StringUtils.isNotBlank(respondent.getValue().getRespondentName());
+    }
 }

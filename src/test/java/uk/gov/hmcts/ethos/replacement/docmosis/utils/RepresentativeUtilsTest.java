@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -20,22 +21,38 @@ final class RepresentativeUtilsTest {
                     + "in case 1234567890123456.";
 
     @Test
-    void theValidateRepresentative() {
+    void theValidateRespondentRepresentative() {
         // when representative is null
         GenericServiceException gse = assertThrows(GenericServiceException.class,
-                () -> RepresentativeUtils.validateRepresentative(null, DUMMY_CASE_REFERENCE));
+                () -> RepresentativeUtils.validateRespondentRepresentative(null, DUMMY_CASE_REFERENCE));
         assertThat(gse.getMessage()).isEqualTo(EXCEPTION_REPRESENTATIVE_NOT_FOUND);
         // when representative does not have id
         RepresentedTypeRItem representativeWithoutId = RepresentedTypeRItem.builder().build();
         gse = assertThrows(GenericServiceException.class,
-                () -> RepresentativeUtils.validateRepresentative(representativeWithoutId, DUMMY_CASE_REFERENCE));
+                () -> RepresentativeUtils.validateRespondentRepresentative(representativeWithoutId,
+                        DUMMY_CASE_REFERENCE));
         assertThat(gse.getMessage()).isEqualTo(EXCEPTION_REPRESENTATIVE_ID_NOT_FOUND);
         // when respondent details not found
         RepresentedTypeRItem representativeWithoutDetails = RepresentedTypeRItem.builder().build();
         representativeWithoutDetails.setId(DUMMY_REPRESENTATIVE_ID);
         gse = assertThrows(GenericServiceException.class,
-                () -> RepresentativeUtils.validateRepresentative(representativeWithoutDetails,
+                () -> RepresentativeUtils.validateRespondentRepresentative(representativeWithoutDetails,
                         DUMMY_CASE_REFERENCE));
         assertThat(gse.getMessage()).isEqualTo(EXCEPTION_REPRESENTATIVE_DETAILS_NOT_EXISTS);
+    }
+
+    @Test
+    void theIsValidRespondentRepresentative() {
+        // when representative is empty should return false
+        assertThat(RepresentativeUtils.isValidRespondentRepresentative(null)).isFalse();
+        // when representative id is empty should return false
+        RepresentedTypeRItem respondentRepresentative = RepresentedTypeRItem.builder().build();
+        assertThat(RepresentativeUtils.isValidRespondentRepresentative(respondentRepresentative)).isFalse();
+        // when representative value is empty should return false
+        respondentRepresentative.setId(DUMMY_REPRESENTATIVE_ID);
+        assertThat(RepresentativeUtils.isValidRespondentRepresentative(respondentRepresentative)).isFalse();
+        // when representative has both id and value should return true
+        respondentRepresentative.setValue(RepresentedTypeR.builder().build());
+        assertThat(RepresentativeUtils.isValidRespondentRepresentative(respondentRepresentative)).isTrue();
     }
 }

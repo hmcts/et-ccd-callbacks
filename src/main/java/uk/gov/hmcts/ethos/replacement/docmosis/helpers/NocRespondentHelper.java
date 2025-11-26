@@ -136,7 +136,7 @@ public class NocRespondentHelper {
         Map<String, RespondentSumTypeItem> respondentsById = new HashMap<>();
         Map<String, RespondentSumTypeItem> respondentsByName = new HashMap<>();
         for (RespondentSumTypeItem respondent : caseData.getRespondentCollection()) {
-            if (ObjectUtils.isEmpty(respondent) || ObjectUtils.isEmpty(respondent.getValue())) {
+            if (!RespondentUtils.isValidRespondent(respondent)) {
                 continue;
             }
             String respondentId = respondent.getId();
@@ -149,7 +149,7 @@ public class NocRespondentHelper {
             }
         }
         for (RepresentedTypeRItem representative : caseData.getRepCollection()) {
-            if (representative == null || representative.getValue() == null) {
+            if (!RepresentativeUtils.isValidRespondentRepresentative(representative)) {
                 continue;
             }
             String repRespondentId = representative.getValue().getRespondentId();
@@ -159,6 +159,12 @@ public class NocRespondentHelper {
                         representative, caseData.getCcdID());
             }
         }
+    }
+
+    private static boolean isCaseDataInvalid(CaseData caseData) {
+        return ObjectUtils.isEmpty(caseData)
+                || CollectionUtils.isEmpty(caseData.getRepCollection())
+                || CollectionUtils.isEmpty(caseData.getRespondentCollection());
     }
 
     private static void setMatchingRespondent(Map<String, RespondentSumTypeItem> respondentsById,
@@ -214,6 +220,13 @@ public class NocRespondentHelper {
         respondent.getValue().setRepresentativeId(representative.getId());
     }
 
+    private static void validateRepresentation(RespondentSumTypeItem respondent,
+                                               RepresentedTypeRItem representative,
+                                               String caseReferenceNumber) throws GenericServiceException {
+        RespondentUtils.validateRespondent(respondent, caseReferenceNumber);
+        RepresentativeUtils.validateRespondentRepresentative(representative, caseReferenceNumber);
+    }
+
     /**
      * Removes representation from respondents who no longer have a matching representative
      * in the provided {@link CaseData}.
@@ -247,7 +260,7 @@ public class NocRespondentHelper {
         }
 
         for (RespondentSumTypeItem respondent : caseData.getRespondentCollection()) {
-            if (ObjectUtils.isEmpty(respondent) || ObjectUtils.isEmpty(respondent.getValue())) {
+            if (!RespondentUtils.isValidRespondent(respondent)) {
                 continue;
             }
 
@@ -307,19 +320,6 @@ public class NocRespondentHelper {
         respondent.getValue().setRepresentativeRemoved(YES);
         respondent.getValue().setRepresented(NO);
         respondent.getValue().setRepresentativeId(null);
-    }
-
-    private static void validateRepresentation(RespondentSumTypeItem respondent,
-                                               RepresentedTypeRItem representative,
-                                               String caseReferenceNumber) throws GenericServiceException {
-        RespondentUtils.validateRespondent(respondent, caseReferenceNumber);
-        RepresentativeUtils.validateRepresentative(representative, caseReferenceNumber);
-    }
-
-    private static boolean isCaseDataInvalid(CaseData caseData) {
-        return ObjectUtils.isEmpty(caseData)
-                || CollectionUtils.isEmpty(caseData.getRepCollection())
-                || CollectionUtils.isEmpty(caseData.getRespondentCollection());
     }
 
     public void amendRespondentNameRepresentativeNames(CaseData caseData) {

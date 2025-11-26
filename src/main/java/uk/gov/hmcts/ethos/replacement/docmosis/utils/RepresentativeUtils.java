@@ -46,8 +46,8 @@ public final class RepresentativeUtils {
      *     The exception includes a descriptive error message and relevant
      *     context for troubleshooting.
      */
-    public static void validateRepresentative(RepresentedTypeRItem representative,
-                                              String caseReferenceNumber)
+    public static void validateRespondentRepresentative(RepresentedTypeRItem representative,
+                                                        String caseReferenceNumber)
             throws GenericServiceException {
         if (ObjectUtils.isEmpty(representative)) {
             String exceptionMessage = String.format(EXCEPTION_REPRESENTATIVE_NOT_FOUND, caseReferenceNumber);
@@ -68,5 +68,31 @@ public final class RepresentativeUtils {
                     caseReferenceNumber, RepresentativeUtils.class.getSimpleName(),
                     VALIDATE_REPRESENTATIVE_METHOD_NAME);
         }
+    }
+
+    /**
+     * Determines whether the given {@link RepresentedTypeRItem} contains valid and usable
+     * representative data.
+     * <p>
+     * A representative is considered <em>valid</em> if all the following conditions are met:
+     * <ul>
+     *     <li>The {@code representative} object itself is not {@code null}.</li>
+     *     <li>The representative has a non-empty identifier ({@code representative.getId()}).</li>
+     *     <li>The representative contains a non-null {@code value} object.</li>
+     * </ul>
+     * <p>
+     * This method performs a lightweight structural validation only and does not verify the
+     * correctness or completeness of individual fields inside the value object. It is intended
+     * for use in pre-validation flows to determine whether a representative record is suitable
+     * for further processing.
+     *
+     * @param representative the representative item to validate
+     * @return {@code true} if the representative has all required fields populated;
+     *         {@code false} otherwise
+     */
+    public static boolean isValidRespondentRepresentative(RepresentedTypeRItem representative) {
+        return ObjectUtils.isNotEmpty(representative)
+                && StringUtils.isNotBlank(representative.getId())
+                && ObjectUtils.isNotEmpty(representative.getValue());
     }
 }

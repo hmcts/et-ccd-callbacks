@@ -20,12 +20,17 @@ SUSPENDED=${14:-false}
 UP_IDAM_STATUS=${15:-"PENDING"}
 REGION=${16:-"National"}
 
-echo "Adding new user: ${EMAIL_ID} to XUI with WA roles"
+# Get the directory of this script
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-echo "Getting user token"
-USER_TOKEN=$("${SCRIPT_DIR}/idam-user-token.sh" "$USERNAME" "$PASSWORD")
-echo "Getting service token"
-SERVICE_TOKEN=$("${SCRIPT_DIR}/idam-lease-service-token.sh" xui_webapp)
+
+# Use preview-specific token utilities
+source "${SCRIPT_DIR}/utils/auth-utils.sh"
+
+echo "🔐 Getting authentication tokens..."
+echo "Retrieving IDAM user token"
+USER_TOKEN=$(get_staff_admin_token)
+echo "Retrieving S2S service token for xui_webapp"
+SERVICE_TOKEN=$(get_service_token "xui_webapp")
 
 # Function to check if user exists by name/email/service
 check_user_exists() {

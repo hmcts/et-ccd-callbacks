@@ -26,6 +26,27 @@ get_user_token() {
     echo "${token}"
 }
 
+# Get Staff user token for preview environment
+get_staff_admin_token() {
+      local username="${ET_STAFF_USER_ADMIN_USER_NAME:-}"
+      local password="${ET_STAFF_USER_ADMIN_USER_NAME_PASSWORD:-}"
+      local idam_uri="${IDAM_API_URL:-}"
+
+    if [[ -z "${username}" || -z "${password}" ]]; then
+        echo "❌ Error: ET_STAFF_USER_ADMIN_USER_NAME and ET_STAFF_USER_ADMIN_USER_NAME_PASSWORD must be set" >&2
+        exit 1
+    fi
+
+    # Get access token
+    local token=
+    curl --silent --location "${idam_uri}/loginUser" \
+    --header 'Content-Type: application/x-www-form-urlencoded' \
+      --data-urlencode "username=${username}" \
+       --data-urlencode "password=${password}" | jq -r .access_token
+
+    echo "${token}"
+}
+
 # Get service-to-service token
 get_service_token() {
     local microservice="${1:-ccd_gw}"
@@ -45,6 +66,9 @@ get_service_token() {
             ;;
         "ccd_admin")
             s2s_secret="${ADMIN_S2S_KEY:-}"
+            ;;
+        "xui_webapp")
+            s2s_secret="${XUI_S2S_KEY:-}"
             ;;
         "et_cos")
             s2s_secret="${ET_COS_S2S_KEY:-}"

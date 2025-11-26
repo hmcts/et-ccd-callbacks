@@ -50,9 +50,9 @@ get_staff_admin_token() {
 
 # Get service-to-service token
 get_service_token() {
-    echo "🔐 Getting S2S service token for ${microservice}..."
     local microservice="${1:-ccd_gw}"
     local s2s_uri="${SERVICE_AUTH_PROVIDER_URL:-}"
+    echo "🔐 Getting S2S service token for ${microservice}..."
 
     # Use appropriate S2S secret based on service
     local s2s_secret

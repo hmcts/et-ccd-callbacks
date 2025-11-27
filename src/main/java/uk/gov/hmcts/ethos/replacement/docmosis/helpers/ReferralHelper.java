@@ -114,7 +114,6 @@ public final class ReferralHelper {
 
     /**
      * Populates Hearing, Referral and Replies details. For judges only hearing and referral details will be displayed.
-     * Logic
      */
     public static String populateHearingReferralDetails(CaseData caseData) {
         String hearingDetails = populateHearingDetails(caseData);

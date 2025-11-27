@@ -1,0 +1,86 @@
+[
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "create",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "importStaffData",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "importVenueData",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "addJudge",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "updateJudge",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "deleteJudge",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "addCourtWorker",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "updateCourtWorker",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "deleteCourtWorker",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "addFileLocation",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "updateFileLocation",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "deleteFileLocation",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseEventID": "importPHRDepositsFromExcelFile",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseEventID": "initiateCase",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  }
+]

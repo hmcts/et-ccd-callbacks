@@ -86,6 +86,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESP_REP_NAME_MISMA
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TARGET_HEARING_DATE_INCREMENT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EUROPE_LONDON;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getActiveRespondents;
 
 @Slf4j
@@ -410,7 +411,7 @@ public class EventValidationService {
         //During daylight saving times, the comparison won't work if we don't consider zones while comparing them
         // Azure has always UTC time but user's times change in summer and winters, we need to use ZonedDateTime.
         ZonedDateTime disposalDateTime = LocalDate.parse(disposalDate).atStartOfDay()
-                .atZone(ZoneId.of("Europe/London"));
+                .atZone(ZoneId.of(EUROPE_LONDON));
         ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
         if (disposalDateTime.isAfter(now)) {
             errors.add(String.format(DISPOSAL_DATE_IN_FUTURE, jurCode));

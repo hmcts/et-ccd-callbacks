@@ -119,7 +119,6 @@ public class InitialConsiderationController {
 
         setDocumentNumbers(caseData);
         caseManagementForCaseWorkerService.setNextListedDate(caseData);
-        initialConsiderationService.clearHiddenValue(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -141,6 +140,7 @@ public class InitialConsiderationController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         initialConsiderationService.clearOldEtICHearingListedAnswersValues(caseData);
+        initialConsiderationService.clearHiddenValue(caseData);
 
         // Sets the respondent details(respondent ET1 and ET3 names, hearing panel preference, and
         // availability for video hearing) of all respondents in a concatenated string format

@@ -12,7 +12,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DigitalCaseFileType;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.client.BundleApiClient;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.UploadDocumentHelperTest;
@@ -26,6 +28,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.List;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -42,11 +45,13 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEW_DATE_TIME_PATTE
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.REJECTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_ATTACHMENT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DigitalCaseFileHelper.NO_DOCS_FOR_DCF;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({DigitalCaseFileController.class, JsonMapper.class})
 class DigitalCaseFileControllerTest extends BaseControllerTest {
 
+    private static final String ABOUT_TO_START_URL = "/dcf/aboutToStart";
     private static final String ASYNC_ABOUT_TO_SUBMIT_URL = "/dcf/asyncAboutToSubmit";
     private static final String ASYNC_COMPLETE_ABOUT_TO_SUBMIT_URL = "/dcf/asyncCompleteAboutToSubmit";
 
@@ -148,5 +153,61 @@ class DigitalCaseFileControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    void aboutToStart_noDocuments_returnsError() throws Exception {
+        CaseDetails caseDetails = CaseDataBuilder.builder()
+                .withEthosCaseReference("765432/2025")
+                .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
+        CCDRequest req = CCDRequestBuilder.builder()
+                .withCaseData(caseDetails.getCaseData())
+                .withCaseId("2222")
+                .build();
+        mockMvc.perform(post(ABOUT_TO_START_URL)
+                        .content(jsonMapper.toJson(req))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
+                .andExpect(jsonPath("$.errors[0]", is(NO_DOCS_FOR_DCF)));
+    }
+
+    @Test
+    void aboutToStart_allDocumentsExcluded_returnsError() throws Exception {
+        CaseDetails caseDetails = CaseDataBuilder.builder()
+                .withEthosCaseReference("123000/2025")
+                .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
+
+        // Add one excluded document to the documentCollection
+        UploadedDocumentType uploaded = UploadedDocumentType.builder()
+                .documentFilename("x.pdf")
+                .documentUrl("http://dm/doc/xyz")
+                .documentBinaryUrl("http://dm/doc/xyz/binary")
+                .build();
+        DocumentType excluded = DocumentType.builder()
+                .docNumber("1")
+                .uploadedDocument(uploaded)
+                .excludeFromDcf(List.of("Yes"))
+                .build();
+        DocumentTypeItem item = new DocumentTypeItem();
+        item.setId("1");
+        item.setValue(excluded);
+        caseDetails.getCaseData().setDocumentCollection(List.of(item));
+
+        CCDRequest req = CCDRequestBuilder.builder()
+                .withCaseData(caseDetails.getCaseData())
+                .withCaseId("3333")
+                .build();
+
+        mockMvc.perform(post(ABOUT_TO_START_URL)
+                        .content(jsonMapper.toJson(req))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
+                .andExpect(jsonPath("$.errors[0]", is(NO_DOCS_FOR_DCF)));
     }
 }

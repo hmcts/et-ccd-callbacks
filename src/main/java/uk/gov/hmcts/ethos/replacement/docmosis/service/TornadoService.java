@@ -83,8 +83,6 @@ public class TornadoService {
     @Value("${ccd_gateway_base_url}")
     private String ccdGatewayBaseUrl;
 
-    private String dmStoreDocumentName = OUTPUT_FILE_NAME_PDF;
-
     public DocumentInfo documentGeneration(String authToken, CaseData caseData, String caseTypeId,
                                            CorrespondenceType correspondenceType,
                                            CorrespondenceScotType correspondenceScotType,
@@ -299,12 +297,12 @@ public class TornadoService {
         throws IOException {
         HttpURLConnection connection = null;
         try {
-            dmStoreDocumentName = getDmStoreDocumentName(caseData, documentName);
             connection = createConnection();
 
             buildDocumentInstruction(connection, caseData, documentName, caseTypeId);
             byte[] bytes = getDocumentByteArray(connection);
-            return createDocumentInfoFromBytes(userToken, bytes, dmStoreDocumentName, caseTypeId);
+            return createDocumentInfoFromBytes(userToken, bytes,
+                    getDmStoreDocumentName(caseData, documentName), caseTypeId);
         } catch (IOException exception) {
             log.error(UNABLE_TO_CONNECT_TO_DOCMOSIS, exception);
             throw exception;
@@ -313,13 +311,31 @@ public class TornadoService {
         }
     }
 
-    private static String getDmStoreDocumentName(CaseData caseData, String documentName) {
-        if (ET3_RESPONSE_PDF.equals(documentName)) {
-            return String.format("%s - %s", caseData.getSubmitEt3Respondent().getSelectedLabel(), ET3_RESPONSE_PDF);
-        } else if (NOTIFICATION_SUMMARY_PDF.equals(documentName)) {
-            return getDocumentName(caseData);
-        } else {
-            return documentName;
+    String getDmStoreDocumentName(CaseData caseData, String documentName) {
+        switch (documentName) {
+            case ET1_VETTING_PDF -> {
+                return String.format(ET1_VETTING_OUTPUT_NAME,
+                        sanitizePartyName(caseData.getClaimant()));
+            }
+            case ET3_PROCESSING_PDF -> {
+                return String.format("ET3 Processing - %s.pdf",
+                        sanitizePartyName(caseData.getEt3ChooseRespondent().getSelectedLabel()));
+            }
+            case ET3_RESPONSE_PDF -> {
+                return String.format("%s - %s", caseData.getSubmitEt3Respondent().getSelectedLabel(), ET3_RESPONSE_PDF);
+            }
+            case TSE_FILE_NAME -> {
+                return tseService.getTseDocumentName(caseData);
+            }
+            case CLAIMANT_TSE_FILE_NAME -> {
+                return tseService.getClaimantTseDocumentName(caseData);
+            }
+            case NOTIFICATION_SUMMARY_PDF -> {
+                return getDocumentName(caseData);
+            }
+            default -> {
+                return documentName;
+            }
         }
     }
 
@@ -337,7 +353,6 @@ public class TornadoService {
         throws IOException {
         HttpURLConnection connection = null;
         try {
-            dmStoreDocumentName = documentName;
             connection = createConnection();
             buildDocumentInstruction(connection, caseData, documentName, caseTypeId);
             return getDocumentByteArray(connection);
@@ -376,27 +391,25 @@ public class TornadoService {
             throws JsonProcessingException {
         switch (documentName) {
             case ET1_VETTING_PDF -> {
-                dmStoreDocumentName = String.format(ET1_VETTING_OUTPUT_NAME,
+                String outputName = String.format(ET1_VETTING_OUTPUT_NAME,
                         sanitizePartyName(caseData.getClaimant()));
                 return Et1VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey(),
-                        dmStoreDocumentName);
+                        outputName);
             }
             case ET3_PROCESSING_PDF -> {
-                dmStoreDocumentName = String.format("ET3 Processing - %s.pdf",
+                String outputName = String.format("ET3 Processing - %s.pdf",
                         sanitizePartyName(caseData.getEt3ChooseRespondent().getSelectedLabel()));
                 return Et3VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey(),
-                        dmStoreDocumentName);
+                        outputName);
             }
             case INITIAL_CONSIDERATION_PDF -> {
                 return InitialConsiderationHelper.getDocumentRequest(
                         caseData, tornadoConnection.getAccessKey(), caseTypeId);
             }
             case TSE_FILE_NAME -> {
-                dmStoreDocumentName = tseService.getTseDocumentName(caseData);
                 return RespondentTellSomethingElseHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             }
             case CLAIMANT_TSE_FILE_NAME -> {
-                dmStoreDocumentName = tseService.getClaimantTseDocumentName(caseData);
                 return ClaimantTellSomethingElseHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey());
             }
             case REFERRAL_SUMMARY_PDF -> {

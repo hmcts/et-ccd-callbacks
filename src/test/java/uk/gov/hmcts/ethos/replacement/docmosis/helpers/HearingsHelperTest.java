@@ -10,9 +10,11 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingDetailTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingDetailType;
+import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -20,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -316,6 +319,86 @@ class HearingsHelperTest {
         caseData.setHearingCollection(new ArrayList<>());
         String actual = HearingsHelper.getEarliestFutureHearingDate(caseData.getHearingCollection());
         assertNull(actual);
+    }
+
+    @Test
+    void returnsNullWhenHearingCollectionIsEmpty() {
+        assertNull(HearingsHelper.getEarliestListedHearingType(Collections.emptyList()));
+    }
+
+    @Test
+    void returnsNullWhenAllHearingsHaveNoFutureDates() {
+        DateListedTypeItem date = new DateListedTypeItem();
+        date.setValue(new uk.gov.hmcts.et.common.model.ccd.types.DateListedType());
+        date.getValue().setListedDate("2020-01-01T10:00:00.000"); // Past date
+        HearingType hearingType = new HearingType();
+        hearingType.setHearingDateCollection(List.of(date));
+        HearingTypeItem item = new HearingTypeItem();
+        item.setValue(hearingType);
+        assertNull(HearingsHelper.getEarliestListedHearingType(List.of(item)));
+    }
+
+    @Test
+    void returnsEarliestFutureHearingWhenMultipleHearingsWithFutureDates() {
+        DateListedTypeItem date1 = new DateListedTypeItem();
+        date1.setValue(new uk.gov.hmcts.et.common.model.ccd.types.DateListedType());
+        date1.getValue().setListedDate("2100-01-01T10:00:00.000");
+        date1.getValue().setHearingStatus("Listed");
+        HearingTypeItem item1 = new HearingTypeItem();
+        HearingType hearingType1 = new HearingType();
+        hearingType1.setHearingDateCollection(List.of(date1));
+        item1.setValue(hearingType1);
+
+        DateListedTypeItem date2 = new DateListedTypeItem();
+        date2.setValue(new uk.gov.hmcts.et.common.model.ccd.types.DateListedType());
+        date2.getValue().setListedDate("2099-12-31T10:00:00.000");
+        date2.getValue().setHearingStatus("Listed");
+        HearingTypeItem item2 = new HearingTypeItem();
+        HearingType hearingType2 = new HearingType();
+        hearingType2.setHearingDateCollection(List.of(date2));
+        item2.setValue(hearingType2);
+
+        HearingType result = HearingsHelper.getEarliestListedHearingType(List.of(item1, item2));
+        assertNotNull(result);
+        assertEquals("2099-12-31T10:00:00.000",
+                result.getHearingDateCollection().getFirst().getValue().getListedDate());
+    }
+
+    @Test
+    void ignoresHearingsWithNoValidFutureDates() {
+        HearingTypeItem item1 = new HearingTypeItem();
+        HearingType hearingType1 = new HearingType();
+        hearingType1.setHearingDateCollection(new ArrayList<>());
+        item1.setValue(hearingType1);
+
+        DateListedTypeItem date2 = new DateListedTypeItem();
+        date2.setValue(new uk.gov.hmcts.et.common.model.ccd.types.DateListedType());
+        date2.getValue().setListedDate("2099-12-31T10:00:00.000");
+        date2.getValue().setHearingStatus("Listed");
+        HearingTypeItem item2 = new HearingTypeItem();
+        HearingType hearingType2 = new HearingType();
+        hearingType2.setHearingDateCollection(List.of(date2));
+        item2.setValue(hearingType2);
+
+        HearingType result = HearingsHelper.getEarliestListedHearingType(List.of(item1, item2));
+        assertNotNull(result);
+        assertEquals("2099-12-31T10:00:00.000",
+                result.getHearingDateCollection().getFirst().getValue().getListedDate());
+    }
+
+    @Test
+    void returnsNullIfNoHearingsHaveListedStatus() {
+        DateListedTypeItem date = new DateListedTypeItem();
+        date.setValue(new uk.gov.hmcts.et.common.model.ccd.types.DateListedType());
+        date.getValue().setListedDate("2099-12-31T10:00:00.000");
+        HearingTypeItem item = new HearingTypeItem();
+        HearingType hearingType = new HearingType();
+        hearingType.setHearingDateCollection(List.of(date));
+        item.setValue(hearingType);
+        // Simulate isListedHearing always returns false
+        // This would require mocking if isListedHearing is not static/final
+        // For now, assume it returns false and test returns null
+        assertNull(HearingsHelper.getEarliestListedHearingType(List.of(item)));
     }
 
     private void setListingDate(List<HearingTypeItem> hearingCollection, int hearingIndex, int dateIndex, String date) {

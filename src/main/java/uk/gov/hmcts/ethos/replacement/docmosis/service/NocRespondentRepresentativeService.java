@@ -371,11 +371,16 @@ public class NocRespondentRepresentativeService {
                 .forEach(this::updateNonMyHmctsOrgId);
     }
 
+    /**
+     * Updates nonMyHmctsOrgId field with a random UUID and sets myHmctsYesNo to No if myHmctsYesNo field is empty or
+     * No.
+     * @param rep representative type R input field to be checked for myHmctsYesNo values.
+     */
     private void updateNonMyHmctsOrgId(RepresentedTypeR rep) {
         if (YES.equals(rep.getMyHmctsYesNo())) {
             return;
         }
-
+        rep.setMyHmctsYesNo(NO);
         if (isNullOrEmpty(rep.getNonMyHmctsOrganisationId())) {
             rep.setNonMyHmctsOrganisationId(UUID.randomUUID().toString());
         }

@@ -283,6 +283,7 @@ public final class InitialConsiderationHelper {
                 .icDateCompleted(defaultIfEmpty(caseData.getIcDateCompleted(), formattedNow))
                 .icCompletedBy(defaultIfEmpty(caseData.getIcCompletedBy(), null))
                 .build();
+
         InitialConsiderationDocument document = InitialConsiderationDocument.builder()
                 .accessKey(accessKey)
                 .outputName(IC_OUTPUT_NAME)
@@ -575,6 +576,9 @@ public final class InitialConsiderationHelper {
 
     private static void addHearingJsaOrMembersReasonDetails(StringBuilder sb,
                                                                  List<String> selectedReasons, String otherDetail) {
+        if (selectedReasons == null || selectedReasons.isEmpty()) {
+            return;
+        }
         selectedReasons.forEach(r -> {
             if (OTHER.equals(r)) {
                 sb.append(NEWLINE_WITH_HYPHEN);

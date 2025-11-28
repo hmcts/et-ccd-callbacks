@@ -119,6 +119,11 @@ public class InitialConsiderationController {
 
         setDocumentNumbers(caseData);
         caseManagementForCaseWorkerService.setNextListedDate(caseData);
+
+        //clear old and hidden values
+        initialConsiderationService.clearOldEtICHearingListedAnswersValues(caseData);
+        initialConsiderationService.clearHiddenValue(caseData);
+
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -150,6 +155,10 @@ public class InitialConsiderationController {
 
         caseData.setEtInitialConsiderationHearing(initialConsiderationService.getHearingDetails(
                 caseData.getHearingCollection()));
+
+        if (caseData.getEtInitialConsiderationHearing() != null) {
+            caseData.setEtICHearingAlreadyListed("Yes");
+        }
 
         //claimant hearing panel preference
         caseData.setEtIcHearingPanelPreference(initialConsiderationService.getClaimantHearingPanelPreference(

@@ -76,7 +76,7 @@ curl -v --silent --show-error -X POST "${REF_DATA_URL}/refdata/case-worker/profi
       "location_id": "'"${LOCATION_ID}"'",
       "location": "'"${LOCATION}"'",
       "is_primary": true,
-      "service_codes": ["'"${SERVICE_CODE}"'"]
+      "service_codes": ["BHA1"]
     }],
     "user_type": "'"${USER_TYPE}"'",
     "task_supervisor": '"${TASK_SUPERVISOR}"',
@@ -86,7 +86,7 @@ curl -v --silent --show-error -X POST "${REF_DATA_URL}/refdata/case-worker/profi
     "up_idam_status": "'"${UP_IDAM_STATUS}"'",
     "services": [{
       "service": "Employment Claims",
-      "service_code": "'"${SERVICE_CODE}"'"
+      "service_code": "BHA1"
     }],
     "roles": [
       {"role_id": "10", "role": "CTSC Administrator", "is_primary": true},

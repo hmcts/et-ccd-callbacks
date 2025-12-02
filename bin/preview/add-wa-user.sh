@@ -60,7 +60,7 @@ if check_user_exists "$FIRST_NAME" "$EMAIL_ID" "Employment Claims"; then
 fi
 
 echo "Creating user ${FIRST_NAME} ${LAST_NAME} with email ${EMAIL_ID}"
-curl -v --silent --show-error -X POST "${REF_DATA_URL}/refdata/case-worker/profile" \
+curl -v --show-error -X POST "${REF_DATA_URL}/refdata/case-worker/profile" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer ${USER_TOKEN}" \
   -H "ServiceAuthorization: Bearer ${SERVICE_TOKEN}" \

@@ -154,3 +154,18 @@ validate_tokens() {
     fi
 }
 
+get_idam_id_from_token() {
+    local user_token="${1:-}"
+
+    if [[ -z "${user_token}" ]]; then
+        echo "❌ Error: User token must be provided to get IDAM user ID" >&2
+        exit 1
+    fi
+
+    local idam_user_id
+    idam_user_id=$(curl --silent -v --show-error -X GET "${IDAM_API_URL}/details" \
+        -H "accept: application/json" \
+        -H "authorization: Bearer ${user_token}" | jq -r .id)
+
+    echo "${idam_user_id}"
+}

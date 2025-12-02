@@ -3,22 +3,19 @@
 # Usage: ./add-new-user.sh <first_name> <last_name> <email_id> <region_id> <location_id> <location> <service_code> <user_type> <task_supervisor> <case_allocator> <staff_admin> <suspended> <up_idam_status> <region>
 # All arguments are optional and have defaults.
 
-USERNAME=${1:-ccd-import@fake.hmcts.net}
-PASSWORD=${2:-London01}
-FIRST_NAME=${3:-"WA-User"}
-LAST_NAME=${4:-"WA-ET"}
-EMAIL_ID=${5:-"et.caseworker.3@hmcts.net"}
-REGION_ID=${6:-12}
-LOCATION_ID=${7:-"819890"}
-LOCATION=${8:-"Bristol"}
-SERVICE_CODE=${9:-"BHA1"}
-USER_TYPE=${10:-"CTSC"}
-TASK_SUPERVISOR=${11:-true}
-CASE_ALLOCATOR=${12:-true}
-STAFF_ADMIN=${13:-true}
-SUSPENDED=${14:-false}
-UP_IDAM_STATUS=${15:-"PENDING"}
-REGION=${16:-"National"}
+FIRST_NAME=${1:-"WA-User"}
+LAST_NAME=${2:-"WA-ET"}
+EMAIL_ID=${3:-"et.caseworker.3@hmcts.net"}
+REGION_ID=${4:-12}
+LOCATION_ID=${5:-"819890"}
+LOCATION=${6:-"Bristol"}
+USER_TYPE=${7:-"CTSC"}
+TASK_SUPERVISOR=${8:-true}
+CASE_ALLOCATOR=${9:-true}
+STAFF_ADMIN=${10:-true}
+SUSPENDED=${11:-false}
+UP_IDAM_STATUS=${12:-"PENDING"}
+REGION=${13:-"National"}
 
 # Get the directory of this script
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

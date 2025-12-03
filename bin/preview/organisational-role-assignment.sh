@@ -23,7 +23,7 @@ source "${SCRIPT_DIR}/utils/auth-utils.sh"
 
 echo "🔐 Getting authentication tokens..."
 echo "Retrieving IDAM user token"
-USER_TOKEN=$(get_staff_admin_token)
+USER_TOKEN=$(get_user_token_from_email_password "$USERNAME" "$PASSWORD")
 echo "Retrieving user ID from token"
 USER_ID=$(get_idam_id_from_token "$USER_TOKEN")
 echo "Retrieving S2S service token for xui_webapp"

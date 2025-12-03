@@ -26,6 +26,26 @@ get_user_token() {
     echo "${token}"
 }
 
+get_user_token_from_email_password() {
+      local username="${1:-}"
+      local password="${2:-}"
+      local idam_uri="${IDAM_API_URL:-}"
+
+    if [[ -z "${username}" || -z "${password}" ]]; then
+        echo "❌ Error: CCD_ADMIN_USERNAME and CCD_ADMIN_PASSWORD must be set" >&2
+        exit 1
+    fi
+
+    # Get access token
+    local token=
+    curl --silent --location "${idam_uri}/loginUser" \
+    --header 'Content-Type: application/x-www-form-urlencoded' \
+      --data-urlencode "username=${username}" \
+       --data-urlencode "password=${password}" | jq -r .access_token
+
+    echo "${token}"
+}
+
 # Get Staff user token for preview environment
 get_staff_admin_token() {
       echo "🔐 Getting Staff Admin user token..."
@@ -155,6 +175,7 @@ validate_tokens() {
 }
 
 get_idam_id_from_token() {
+    echo "🔐 Getting IDAM user ID from token..."
     local user_token="${1:-}"
 
     if [[ -z "${user_token}" ]]; then
@@ -166,6 +187,6 @@ get_idam_id_from_token() {
     idam_user_id=$(curl --silent -v --show-error -X GET "${IDAM_API_URL}/details" \
         -H "accept: application/json" \
         -H "authorization: Bearer ${user_token}" | jq -r .id)
-
     echo "${idam_user_id}"
+    echo "✅ Retrieved IDAM user ID: ${idam_user_id}"
 }

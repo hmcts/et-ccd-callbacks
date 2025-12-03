@@ -228,4 +228,28 @@ public final class RespondentUtils {
                 && ObjectUtils.isNotEmpty(respondent.getValue())
                 && StringUtils.isNotBlank(respondent.getValue().getRespondentName());
     }
+
+    /**
+     * Determines whether the provided {@link CaseData} contains at least one respondent.
+     *
+     * <p>This method performs a simple structural check to verify that:</p>
+     * <ul>
+     *     <li>the {@code caseData} object is not {@code null} or empty, and</li>
+     *     <li>the respondent collection within the case data is present and contains
+     *         at least one respondent entry.</li>
+     * </ul>
+     *
+     * <p>
+     * This method does not validate the contents or structure of individual respondent items;
+     * it only checks for their presence.
+     * </p>
+     *
+     * @param caseData the case data to inspect
+     * @return {@code true} if the case data contains at least one respondent;
+     *         {@code false} otherwise
+     */
+    public static boolean hasRespondents(CaseData caseData) {
+        return ObjectUtils.isNotEmpty(caseData)
+                && org.apache.commons.collections4.CollectionUtils.isNotEmpty(caseData.getRespondentCollection());
+    }
 }

@@ -12,7 +12,6 @@ import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JudgementTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.ReferralTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceScotType;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceType;
@@ -33,7 +32,6 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -82,7 +80,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_ALLOCATED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RECEIPT_DATE_LATER_THAN_ACCEPTED_ERROR_MESSAGE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.REJECTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESP_REP_NAME_MISMATCH_ERROR_MESSAGE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TARGET_HEARING_DATE_INCREMENT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -205,75 +202,6 @@ public class EventValidationService {
             return Optional.of(String.format("Maximum number of respondents is %s", MAX_RESPONDENTS));
         }
         return Optional.empty();
-    }
-
-    /**
-     * Checks selected respondent if it exists in the respondent collection and if there is any representative info
-     * entered for that respondent.
-     * @param caseData data to check both respondent and representative collections
-     * @return list of errors. (invalid respondent names)
-     */
-    public List<String> validateRespRepNames(CaseData caseData) {
-        List<String> errors = new ArrayList<>();
-        if (CollectionUtils.isNotEmpty(caseData.getRespondentCollection())
-            && CollectionUtils.isNotEmpty(caseData.getRepCollection())) {
-            List<RepresentedTypeRItem> repCollection = caseData.getRepCollection();
-            List<RepresentedTypeRItem> updatedRepList = new ArrayList<>();
-            int repCollectionSize = caseData.getRepCollection().size();
-
-            //reverse update it - from the last to the first element by removing repetition
-            for (int index = repCollectionSize - 1;  index > -1; index--) {
-                String tempCollCurrentName = repCollection.get(index).getValue()
-                    .getDynamicRespRepName().getValue().getLabel();
-                // checks if the selected respondent name is in the respondent collection.
-                if (isValidRespondentName(caseData, tempCollCurrentName)) {
-                    if (!repCollection.isEmpty()
-                        && updatedRepList.stream()
-                        .noneMatch(r -> r.getValue().getDynamicRespRepName().getValue().getLabel()
-                            .equals(tempCollCurrentName))) {
-                        repCollection.get(index).getValue().setRespRepName(tempCollCurrentName);
-                        updatedRepList.add(repCollection.get(index));
-                    }
-                } else {
-                    errors.add(RESP_REP_NAME_MISMATCH_ERROR_MESSAGE + " - " + tempCollCurrentName);
-                    return errors;
-                }
-            }
-
-            //clear the old rep collection
-            if (repCollectionSize > 0) {
-                caseData.getRepCollection().subList(0, repCollectionSize).clear();
-            }
-
-            //populate the rep collection with the new & updated rep entries and
-            //sort the collection by respondent name
-            updatedRepList.sort(Comparator.comparing(o -> o.getValue().getRespRepName()));
-            caseData.setRepCollection(updatedRepList);
-        }
-
-        return errors;
-    }
-
-    /**
-     * Checks if the selected respondent name is in the respondent collection.
-     * @param caseData case data that has respondent collection to be checked.
-     * @param tempCollCurrentName selected respondent name on respondent representative page.
-     * @return true if respondent exists in the respondent collection and false otherwise.
-     */
-    private boolean isValidRespondentName(CaseData caseData, String tempCollCurrentName) {
-        boolean isValidName = false;
-        if (CollectionUtils.isNotEmpty(caseData.getRespondentCollection())) {
-            var respRepNames = caseData.getRespondentCollection()
-                .stream()
-                .map(e -> e.getValue().getRespondentName())
-                .toList();
-
-            if (!respRepNames.isEmpty()) {
-                isValidName = respRepNames.contains(tempCollCurrentName);
-            }
-        }
-
-        return isValidName;
     }
 
     public List<String> validateHearingNumber(CaseData caseData, CorrespondenceType correspondenceType,

@@ -22,6 +22,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocClaimantHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -215,11 +216,12 @@ class NocClaimantRepresentativeServiceTest {
                 any(), any(), any());
         verify(nocService, times(1)).removeOrganisationRepresentativeAccess(
                 anyString(), any(ChangeOrganisationRequest.class));
-        verify(nocService, times(1)).grantClaimantRepAccess(
+        verify(nocService, times(1)).grantRepresentativeAccess(
                 eq(accessToken),
                 eq("claimantrep@test.com"),
                 eq("1234"),
-                eq(changeRequest.getOrganisationToAdd()));
+                eq(changeRequest.getOrganisationToAdd()),
+                eq(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()));
         verify(ccdClient, times(1)).submitUpdateRepEvent(
                 eq(accessToken),
                 any(Map.class),

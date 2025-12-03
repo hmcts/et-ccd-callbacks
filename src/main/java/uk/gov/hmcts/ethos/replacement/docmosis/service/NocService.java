@@ -12,7 +12,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
@@ -25,7 +24,6 @@ import java.util.List;
 public class NocService {
     private final NocCcdService nocCcdService;
     private final AdminUserService adminUserService;
-    private final UserIdamService userIdamService;
     private final OrganisationClient organisationClient;
     private final AuthTokenGenerator authTokenGenerator;
     private final CcdCaseAssignment caseAssignment;
@@ -60,8 +58,9 @@ public class NocService {
         }
     }
 
-    public void grantClaimantRepAccess(String accessToken, String email,
-                                       String caseId, Organisation organisationToAdd) {
+    public void grantRepresentativeAccess(String accessToken, String email,
+                                          String caseId, Organisation organisationToAdd,
+                                          String role) {
         try {
             AccountIdByEmailResponse userResponse =
                     organisationClient.getAccountIdByEmail(accessToken, authTokenGenerator.generate(), email).getBody();
@@ -73,8 +72,7 @@ public class NocService {
                 if (organisationsResponse != null
                         && organisationToAdd.getOrganisationID()
                         .equals(organisationsResponse.getOrganisationIdentifier())) {
-                    grantCaseAccess(userResponse.getUserIdentifier(), caseId,
-                            ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
+                    grantCaseAccess(userResponse.getUserIdentifier(), caseId, role);
                 }
             }
         } catch (IOException e) {

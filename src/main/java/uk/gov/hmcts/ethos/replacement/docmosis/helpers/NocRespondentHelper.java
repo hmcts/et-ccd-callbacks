@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
@@ -130,7 +129,7 @@ public class NocRespondentHelper {
      * @throws GenericServiceException if representation assignment fails during processing
      */
     public void mapRepresentativesToRespondents(CaseData caseData) throws GenericServiceException {
-        if (isCaseDataInvalid(caseData)) {
+        if (!RespondentUtils.hasRespondents(caseData)) {
             return;
         }
         Map<String, RespondentSumTypeItem> respondentsById = new HashMap<>();
@@ -155,24 +154,18 @@ public class NocRespondentHelper {
             String repRespondentId = representative.getValue().getRespondentId();
             String repRespondentName = representative.getValue().getRespRepName();
             if  (StringUtils.isNotBlank(repRespondentId) || StringUtils.isNotBlank(repRespondentName)) {
-                setMatchingRespondent(respondentsById, respondentsByName, repRespondentId, repRespondentName,
-                        representative, caseData.getCcdID());
+                setMatchingRespondent(caseData, respondentsById, respondentsByName, repRespondentId, repRespondentName,
+                        representative);
             }
         }
     }
 
-    private static boolean isCaseDataInvalid(CaseData caseData) {
-        return ObjectUtils.isEmpty(caseData)
-                || CollectionUtils.isEmpty(caseData.getRepCollection())
-                || CollectionUtils.isEmpty(caseData.getRespondentCollection());
-    }
-
-    private static void setMatchingRespondent(Map<String, RespondentSumTypeItem> respondentsById,
-                                                                Map<String, RespondentSumTypeItem> respondentsByName,
-                                                                String repRespondentId,
-                                                                String repRespondentName,
-                                                                RepresentedTypeRItem representative,
-                                                                String caseReferenceNumber)
+    private static void setMatchingRespondent(CaseData caseData,
+                                              Map<String, RespondentSumTypeItem> respondentsById,
+                                              Map<String, RespondentSumTypeItem> respondentsByName,
+                                              String repRespondentId,
+                                              String repRespondentName,
+                                              RepresentedTypeRItem representative)
             throws GenericServiceException {
         RespondentSumTypeItem matchedRespondent = null;
         if (StringUtils.isNotBlank(repRespondentId)) {
@@ -182,7 +175,7 @@ public class NocRespondentHelper {
             matchedRespondent = respondentsByName.get(repRespondentName);
         }
         if (ObjectUtils.isNotEmpty(matchedRespondent)) {
-            assignRepresentative(matchedRespondent, representative, caseReferenceNumber);
+            assignRepresentative(matchedRespondent, representative, caseData.getCcdID());
         }
     }
 
@@ -212,19 +205,12 @@ public class NocRespondentHelper {
     public static void assignRepresentative(RespondentSumTypeItem respondent,
                                             RepresentedTypeRItem representative,
                                             String caseReferenceNumber) throws GenericServiceException {
-        validateRepresentation(respondent, representative, caseReferenceNumber);
+        RepresentativeUtils.validateRepresentation(respondent, representative, caseReferenceNumber);
         representative.getValue().setRespondentId(respondent.getId());
         representative.getValue().setRespRepName(respondent.getValue().getRespondentName());
         respondent.getValue().setRepresentativeRemoved(NO);
         respondent.getValue().setRepresented(YES);
         respondent.getValue().setRepresentativeId(representative.getId());
-    }
-
-    private static void validateRepresentation(RespondentSumTypeItem respondent,
-                                               RepresentedTypeRItem representative,
-                                               String caseReferenceNumber) throws GenericServiceException {
-        RespondentUtils.validateRespondent(respondent, caseReferenceNumber);
-        RepresentativeUtils.validateRespondentRepresentative(representative, caseReferenceNumber);
     }
 
     /**
@@ -255,7 +241,7 @@ public class NocRespondentHelper {
      * @throws GenericServiceException if resetting a respondent's representation fails
      */
     public void removeUnmatchedRepresentations(CaseData caseData) throws GenericServiceException {
-        if (isCaseDataInvalid(caseData)) {
+        if (!RespondentUtils.hasRespondents(caseData)) {
             return;
         }
 

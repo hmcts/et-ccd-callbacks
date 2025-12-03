@@ -17,12 +17,9 @@ import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
-import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
-import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
-import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.BFHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
@@ -31,7 +28,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.UploadDocumentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicDepositOrder;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicJudgements;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicRespondentRepresentative;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicRestrictedReporting;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters.InvalidCharacterCheck;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AddSingleCaseToMultipleService;
@@ -57,7 +53,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.NocRespondentRepresentati
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.LoggingUtil;
 
 import java.io.IOException;
@@ -117,7 +112,6 @@ public class CaseActionsForCaseWorkerController {
     private final CaseManagementLocationService caseManagementLocationService;
     private final Et1SubmissionService et1SubmissionService;
     private final NocRespondentHelper nocRespondentHelper;
-    private final UserIdamService userIdamService;
 
     @PostMapping(value = "/createCase", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "create a case for a caseWorker.")
@@ -506,86 +500,6 @@ public class CaseActionsForCaseWorkerController {
         removeSpacesFromPartyNames(caseData);
         LoggingUtil.logErrors(errors);
         return getCallbackRespEntityErrors(errors, caseData);
-    }
-
-    @PostMapping(value = "/amendRespondentRepresentative", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "amend respondent representative for a single case.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
-            content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-            }),
-        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
-        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
-    })
-    public ResponseEntity<CCDCallbackResponse> amendRespondentRepresentative(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader(AUTHORIZATION) String userToken) {
-        log.info("AMEND RESPONDENT REPRESENTATIVE ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
-
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-
-        List<String> errors = eventValidationService.validateRespRepNames(caseData);
-
-        if (errors.isEmpty()) {
-            try {
-                nocRespondentHelper.mapRepresentativesToRespondents(caseData);
-                nocRespondentHelper.removeUnmatchedRepresentations(caseData);
-                caseData = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, userToken);
-                if (featureToggleService.isHmcEnabled()) {
-                    // add org policy and NOC elements
-                    nocRespondentRepresentativeService.updateNonMyHmctsOrgIds(caseData.getRepCollection());
-                }
-            } catch (GenericServiceException e) {
-                errors.add(e.getMessage());
-            }
-        }
-        LoggingUtil.logErrors(errors);
-        return getCallbackRespEntityErrors(errors, caseData);
-    }
-
-    @PostMapping("/amendRespondentRepSubmitted")
-    @Operation(summary = "processes notice of change update after amending respondent representatives")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY),
-        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
-        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
-    })
-    public void amendRespondentRepSubmitted(
-            @RequestBody CallbackRequest callbackRequest,
-            @RequestHeader(AUTHORIZATION) String userToken) {
-
-        log.info("AMEND RESPONDENT REPRESENTATIVE SUBMITTED ---> " + LOG_MESSAGE + "{}",
-                callbackRequest.getCaseDetails().getCaseId());
-        try {
-            nocRespondentRepresentativeService.updateRespondentRepresentativesAccess(callbackRequest);
-        } catch (IOException e) {
-            throw new CcdInputOutputException("Failed to update respondent representatives accesses", e);
-        } catch (GenericServiceException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @PostMapping(value = "/dynamicRespondentRepresentativeNames", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "populates the respondents names into a dynamic list")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
-            content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-            }),
-        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
-        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
-    })
-    public ResponseEntity<CCDCallbackResponse> dynamicRespondentRepresentativeNames(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader(AUTHORIZATION) String userToken) {
-        log.info("DYNAMIC RESPONDENT REPRESENTATIVE NAMES ---> " + LOG_MESSAGE + "{}",
-                ccdRequest.getCaseDetails().getCaseId());
-
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        DynamicRespondentRepresentative.dynamicRespondentRepresentativeNames(caseData);
-
-        return getCallbackRespEntityNoErrors(caseData);
     }
 
     @PostMapping(value = "/updateHearing", consumes = APPLICATION_JSON_VALUE)

@@ -264,4 +264,18 @@ final class RespondentUtilsTest {
         respondentSumTypeItem.getValue().setRespondentName(TEST_RESPONDENT_NAME_1);
         assertThat(RespondentUtils.isValidRespondent(respondentSumTypeItem)).isTrue();
     }
+
+    @Test
+    void theIsCaseDataValidForNoc() {
+        respondentUtils.close();
+        // when case data is null returns false
+        assertThat(RespondentUtils.hasRespondents(null)).isFalse();
+        // when case data not has respondent collection returns false
+        CaseData caseData = new CaseData();
+        assertThat(RespondentUtils.hasRespondents(caseData)).isFalse();
+        // when case data has both respondent collection returns true
+        caseData.setRespondentCollection(List.of(new RespondentSumTypeItem()));
+        assertThat(RespondentUtils.hasRespondents(caseData)).isTrue();
+    }
+
 }

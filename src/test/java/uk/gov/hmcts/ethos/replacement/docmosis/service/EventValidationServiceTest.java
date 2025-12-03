@@ -104,7 +104,6 @@ class EventValidationServiceTest {
     private CaseDetails caseDetails2;
     private CaseDetails caseDetails3;
     private CaseDetails caseDetails4;
-    private CaseDetails caseDetails5;
     private CaseDetails caseDetails23;
     private CaseDetails validHearingStatusCaseCloseEventCaseDetails;
     private CaseDetails invalidHearingStatusCaseCloseEventCaseDetails;
@@ -131,7 +130,6 @@ class EventValidationServiceTest {
         caseDetails2 = generateCaseDetails("caseDetailsTest2.json");
         caseDetails3 = generateCaseDetails("caseDetailsTest3.json");
         caseDetails4 = generateCaseDetails("caseDetailsTest4.json");
-        caseDetails5 = generateCaseDetails("caseDetailsTest5.json");
         caseDetails23 = generateCaseDetails("caseDetailsTest23.json");
         validHearingStatusCaseCloseEventCaseDetails = generateCaseDetails(
                 "CaseCloseEvent_ValidHearingStatusCaseDetails.json");
@@ -317,51 +315,6 @@ class EventValidationServiceTest {
         CaseData caseData = caseDetails3.getCaseData();
 
         List<String> errors = eventValidationService.validateET3ResponseFields(caseData);
-
-        assertEquals(0, errors.size());
-    }
-
-    @Test
-    void shouldValidateRespRepNamesWithEmptyRepCollection() {
-        CaseData caseData = caseDetails1.getCaseData();
-
-        List<String> errors = eventValidationService.validateRespRepNames(caseData);
-
-        assertEquals(0, errors.size());
-    }
-
-    @Test
-    void shouldValidateRespRepNamesWithMismatch() {
-        CaseData caseData = caseDetails2.getCaseData();
-
-        List<String> errors = eventValidationService.validateRespRepNames(caseData);
-
-        assertEquals(1, errors.size());
-    }
-
-    @Test
-    void shouldValidateRespRepNamesWithMatch() {
-        CaseData caseData = caseDetails3.getCaseData();
-
-        List<String> errors = eventValidationService.validateRespRepNames(caseData);
-
-        assertEquals(0, errors.size());
-    }
-
-    @Test
-    void shouldValidateRespRepNamesWithNullRepCollection() {
-        CaseData caseData = caseDetails4.getCaseData();
-
-        List<String> errors = eventValidationService.validateRespRepNames(caseData);
-
-        assertEquals(0, errors.size());
-    }
-
-    @Test
-    void shouldValidateRespRepNamesWithMatchResponseName() {
-        CaseData caseData = caseDetails5.getCaseData();
-
-        List<String> errors = eventValidationService.validateRespRepNames(caseData);
 
         assertEquals(0, errors.size());
     }

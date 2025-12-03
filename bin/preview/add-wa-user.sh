@@ -16,6 +16,7 @@ STAFF_ADMIN=${10:-true}
 SUSPENDED=${11:-false}
 UP_IDAM_STATUS=${12:-"PENDING"}
 REGION=${13:-"National"}
+SERVICE_CODE=${14:-"BHA1"}
 
 # Get the directory of this script
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

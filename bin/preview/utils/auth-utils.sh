@@ -188,5 +188,4 @@ get_idam_id_from_token() {
         -H "accept: application/json" \
         -H "authorization: Bearer ${user_token}" | jq -r .id)
     echo "${idam_user_id}"
-    echo "✅ Retrieved IDAM user ID: ${idam_user_id}"
 }

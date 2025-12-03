@@ -73,7 +73,7 @@ curl -v --show-error -X POST "${REF_DATA_URL}/refdata/case-worker/profile" \
       "location_id": "'"${LOCATION_ID}"'",
       "location": "'"${LOCATION}"'",
       "is_primary": true,
-      "service_codes": ["BHA1"]
+      "service_codes": ["'"${SERVICE_CODE}"'"]
     }],
     "user_type": "'"${USER_TYPE}"'",
     "task_supervisor": '"${TASK_SUPERVISOR}"',
@@ -83,7 +83,7 @@ curl -v --show-error -X POST "${REF_DATA_URL}/refdata/case-worker/profile" \
     "up_idam_status": "'"${UP_IDAM_STATUS}"'",
     "services": [{
       "service": "Employment Claims",
-      "service_code": "BHA1"
+      "service_code": "'"${SERVICE_CODE}"'"
     }],
     "roles": [
       {"role_id": "10", "role": "CTSC Administrator", "is_primary": true},

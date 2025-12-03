@@ -65,7 +65,7 @@ get_staff_admin_token() {
       --data-urlencode "username=${username}" \
        --data-urlencode "password=${password}" | jq -r .access_token
 
-    echo "Admin token: ${token}"
+    echo "${token}"
 }
 
 # Get service-to-service token

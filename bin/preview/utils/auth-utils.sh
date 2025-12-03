@@ -175,7 +175,6 @@ validate_tokens() {
 }
 
 get_idam_id_from_token() {
-    echo "🔐 Getting IDAM user ID from token..."
     local user_token="${1:-}"
 
     if [[ -z "${user_token}" ]]; then

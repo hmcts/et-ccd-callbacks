@@ -1,10 +1,13 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.EtICListForFinalHearing;
 import uk.gov.hmcts.et.common.model.ccd.EtICListForFinalHearingUpdated;
@@ -17,24 +20,28 @@ import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
+import uk.gov.hmcts.et.common.model.ccd.types.Et3VettingType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.JurisdictionCode;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.JurisdictionCodeHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CLAIMANT_HEARING_PANEL_PREFERENCE;
@@ -61,15 +68,128 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsidera
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.UDL_HEARING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.VIDEO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.WITH_MEMBERS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_LABEL_ET1_IC;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_LABEL_ET1_VETTING_IC;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_LABEL_ET3_IC;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_LABEL_ET3_PROCESSING_IC;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_LABEL_REFERRALS_IC;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.CASE_DETAILS_URL_PARTIAL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET1_DOC_TYPE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET1_VETTING_DOC_TYPE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET3_DOC_TYPE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET3_PROCESSING_DOC_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.NOT_AVAILABLE_FOR_VIDEO_HEARINGS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.REFERRALS_PAGE_FRAGMENT_ID;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.TO_HELP_YOU_COMPLETE_IC_EVENT_LABEL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.getHearingDuration;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class InitialConsiderationService {
 
+    public static final String APPLICATIONS_FOR_STRIKE_OUT_OR_DEPOSIT = "Applications for strike out or deposit";
+    public static final String INTERPRETERS = "Interpreters";
+    public static final String JURISDICTIONAL_ISSUES = "Jurisdictional issues";
+    public static final String REQUEST_FOR_ADJUSTMENTS = "Request for adjustments";
+    public static final String RULE_49 = "Rule 49";
+    public static final String TIME_POINTS = "Time points";
+    public static final String DO_WE_HAVE_THE_RESPONDENT_S_NAME = "Do we have the respondent's name?";
+    public static final String DOES_THE_RESPONDENT_S_NAME_MATCH = "Does the respondent's name match?";
     private final TornadoService tornadoService;
+    private static final String[] HEADER = {"Issue / Question", "Details / Answer"};
+    private static final String BULLET_POINT = "\n -  ";
+    private static final String GENERAL_NOTES = "General notes:";
+    private static final String GIVE_DETAILS = "Give Details:";
+    private static final String DETAILS = "Details";
+    private static final String NEWLINE_FOR_DETAILS = "\n\nDetails: \n";
+    private static final String NEWLINE = "\n";
+    private static final String NONE_PROVIDED = "None provided.";
+
+    public void initialiseInitialConsideration(CaseDetails caseDetails) {
+        List<DocumentTypeItem> documentCollection = caseDetails.getCaseData().getDocumentCollection();
+
+        if (CollectionUtils.isEmpty(documentCollection)) {
+            caseDetails.getCaseData().setInitialConsiderationBeforeYouStart("");
+            return;
+        }
+
+        String et1Form = generateDocumentLinks(documentCollection, ET1_DOC_TYPE, BEFORE_LABEL_ET1_IC);
+        String et1Vetting = generateDocumentLinks(documentCollection,
+                ET1_VETTING_DOC_TYPE, BEFORE_LABEL_ET1_VETTING_IC);
+        String et3Form = generateDocumentLinks(documentCollection, ET3_DOC_TYPE, BEFORE_LABEL_ET3_IC);
+        String et3Processing = generateDocumentLinks(documentCollection,
+                ET3_PROCESSING_DOC_TYPE, BEFORE_LABEL_ET3_PROCESSING_IC);
+        String referralLinks = generateReferralLinks(caseDetails);
+
+        String beforeYouStart = String.format(TO_HELP_YOU_COMPLETE_IC_EVENT_LABEL, et1Form, et1Vetting,
+                et3Form, et3Processing, referralLinks);
+        caseDetails.getCaseData().setInitialConsiderationBeforeYouStart(beforeYouStart);
+    }
+
+    private String generateDocumentLinks(List<DocumentTypeItem> documentCollection, String docType, String label) {
+        return documentCollection.stream()
+                .filter(d -> docType.equals(defaultIfEmpty(d.getValue().getDocumentType(),
+                        "")))
+                .map(d -> String.format(label,
+                        DocumentManagementService.createLinkToBinaryDocument(d)))
+                .collect(Collectors.joining());
+    }
+
+    private String generateReferralLinks(CaseDetails caseDetails) {
+        List<?> referralCollection = caseDetails.getCaseData().getReferralCollection();
+        if (CollectionUtils.isNotEmpty(referralCollection)) {
+            return String.format(BEFORE_LABEL_REFERRALS_IC,
+                    CASE_DETAILS_URL_PARTIAL + caseDetails.getCaseId() + REFERRALS_PAGE_FRAGMENT_ID);
+        }
+        return "";
+    }
+
+    public String setRespondentDetails(CaseData caseData) {
+        List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
+        IntWrapper respondentCount = new IntWrapper(0);
+        StringBuilder respondentDetailsHtmlFragment = new StringBuilder();
+        // For each respondent, set the name details and then panel preference details
+        if (respondentCollection != null) {
+            respondentCollection.forEach(respondentSumType -> {
+                int updatedRespondentCount = respondentCount.incrementAndReturnValue();
+                // Set respondent name details
+                respondentDetailsHtmlFragment.append(getRespondentNameDetails(respondentSumType,
+                        updatedRespondentCount));
+
+                // Set respondent panel preference details
+                respondentDetailsHtmlFragment.append(String.format(RESPONDENT_HEARING_PANEL_PREFERENCE,
+                        Optional.ofNullable(respondentSumType.getValue().getRespondentHearingPanelPreference())
+                                .orElse("-"),
+                        Optional.ofNullable(respondentSumType.getValue().getRespondentHearingPanelPreferenceReason())
+                                .orElse("-")
+                ));
+
+                // If Respondent is available for video hearing or not
+                if (respondentSumType.getValue() != null) {
+                    List<String> hearingRespondent = respondentSumType.getValue().getEt3ResponseHearingRespondent();
+                    if (hearingRespondent == null || hearingRespondent.stream().noneMatch(
+                            pr -> pr.contains(VIDEO))) {
+                        respondentDetailsHtmlFragment.append(NOT_AVAILABLE_FOR_VIDEO_HEARINGS.toUpperCase(Locale.UK));
+                    }
+                }
+            });
+        }
+
+        return respondentDetailsHtmlFragment.toString();
+    }
+
+    private String getRespondentNameDetails(RespondentSumTypeItem respondent, int currentRespondentCount) {
+        if (respondent == null) {
+            return RESPONDENT_MISSING;
+        }
+
+        return String.format(RESPONDENT_NAME, currentRespondentCount,
+                nullCheck(respondent.getValue().getRespondentName()),
+                nullCheck(respondent.getValue().getResponseRespondentName()));
+    }
 
     /**
      * Creates the respondent detail section for Initial Consideration.
@@ -105,10 +225,8 @@ public class InitialConsiderationService {
             return null;
         }
 
-        IntWrapper respondentCount = new IntWrapper(0);
         return respondentCollection.stream()
                 .map(respondent -> String.format(RESPONDENT_HEARING_PANEL_PREFERENCE,
-                        respondentCount.incrementAndReturnValue(),
                         Optional.ofNullable(respondent.getValue().getRespondentHearingPanelPreference())
                                 .orElse("-"),
                         Optional.ofNullable(respondent.getValue().getRespondentHearingPanelPreferenceReason())
@@ -140,7 +258,7 @@ public class InitialConsiderationService {
                     && !hearing.getHearingDateCollection().isEmpty())
             .min(Comparator.comparing(
                     (HearingType hearing) ->
-                        getEarliestHearingDateForListedHearings(hearing.getHearingDateCollection()).orElse(
+                            getEarliestHearingDateForListedHearings(hearing.getHearingDateCollection()).orElse(
                             LocalDate.now().plusYears(100))))
             .map(hearing -> getFormattedHearingDetails(hearing, formatter))
             .orElse(HEARING_MISSING);
@@ -161,10 +279,23 @@ public class InitialConsiderationService {
         if (claimantHearingPreference == null) {
             return CLAIMANT_HEARING_PANEL_PREFERENCE_MISSING;
         }
-        return String.format(CLAIMANT_HEARING_PANEL_PREFERENCE,
+
+        StringBuilder claimantPanelPreferenceHtmlFragment = new StringBuilder();
+
+        claimantPanelPreferenceHtmlFragment.append(String.format(CLAIMANT_HEARING_PANEL_PREFERENCE,
                 Optional.ofNullable(claimantHearingPreference.getClaimantHearingPanelPreference()).orElse("-"),
                 Optional.ofNullable(claimantHearingPreference.getClaimantHearingPanelPreferenceWhy()).orElse("-")
-        );
+        ));
+
+        // If Claimant is available for video hearing or not
+        boolean isAvailableForVideoHearing = claimantHearingPreference.getHearingPreferences() != null
+                && claimantHearingPreference.getHearingPreferences().stream()
+                        .anyMatch(hp -> hp != null && hp.contains(VIDEO));
+        if (!isAvailableForVideoHearing) {
+            claimantPanelPreferenceHtmlFragment.append(NOT_AVAILABLE_FOR_VIDEO_HEARINGS.toUpperCase(Locale.UK));
+        }
+
+        return claimantPanelPreferenceHtmlFragment.toString();
     }
 
     /**
@@ -174,15 +305,7 @@ public class InitialConsiderationService {
      * @return earliest future hearing date
      */
     public Optional<LocalDate> getEarliestHearingDateForListedHearings(List<DateListedTypeItem> hearingDates) {
-        return hearingDates.stream()
-        .filter(dateListedTypeItem -> dateListedTypeItem != null && dateListedTypeItem.getValue() != null
-            && HEARING_STATUS_LISTED.equals(dateListedTypeItem.getValue().getHearingStatus())
-            && LocalDateTime.parse(dateListedTypeItem.getValue().getListedDate())
-            .toLocalDate().isAfter(LocalDate.now()))
-        .map(DateListedTypeItem::getValue)
-        .filter(hearingDate -> hearingDate.getListedDate() != null && !hearingDate.getListedDate().isEmpty())
-        .map(hearingDateItem -> LocalDateTime.parse(hearingDateItem.getListedDate()).toLocalDate())
-        .min(Comparator.naturalOrder());
+        return HearingsHelper.getEarliestListedFutureHearingDate(hearingDates);
     }
 
     /**
@@ -257,14 +380,35 @@ public class InitialConsiderationService {
     /**
      * Sets etICHearingAlreadyListed if the case has a hearing listed.
      * @param caseData data about the current case
+     * @param caseTypeId the case type that is used for applying hearing listed check for Scotland case types only
      */
     public void setIsHearingAlreadyListed(CaseData caseData, String caseTypeId) {
-        if (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId)) {
-            return;
-        }
         caseData.setEtICHearingAlreadyListed(HEARING_MISSING.equals(caseData.getEtInitialConsiderationHearing())
             ? NO : YES
         );
+    }
+
+    public void clearOldEtICHearingListedAnswersValues(CaseData caseData) {
+        //clear old values
+        if (caseData.getEtICHearingListedAnswers() != null) {
+            caseData.getEtICHearingListedAnswers().setEtInitialConsiderationListedHearingType(null);
+            caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJsaReasonOther(null);
+            caseData.getEtICHearingListedAnswers().setEtICIsHearingWithMembers(null);
+
+            caseData.getEtICHearingListedAnswers().setEtICJsaFinalHearingReasonOther(null);
+            caseData.getEtICHearingListedAnswers().setEtICMembersFinalHearingReasonOther(null);
+
+            caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJudgeOrMembersFurtherDetails(null);
+            caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJudgeOrMembersReason(null);
+            caseData.getEtICHearingListedAnswers().setEtICIsFinalHearingWithJudgeOrMembersJsaReason(null);
+            caseData.getEtICHearingListedAnswers().setEtICIsFinalHearingWithJudgeOrMembersReason(null);
+
+            caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJsa(null);
+            caseData.getEtICHearingListedAnswers().setEtICHearingListed(null);
+            caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJudgeOrMembers(null);
+            caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJudgeOrMembersReasonOther(null);
+            caseData.setEtInitialConsiderationHearing(null);
+        }
     }
 
     public void mapOldIcHearingNotListedOptionsToNew(CaseData caseData, String caseTypeId) {
@@ -383,7 +527,7 @@ public class InitialConsiderationService {
         caseData.setEtICConvertF2fGiveDetails(null);
         caseData.setEtICHearingListedAnswers(null);
     }
-    
+
     public void processIcDocumentCollections(CaseData caseData) {
         List<DocumentTypeItem> mergedCollection = new ArrayList<>();
         if (caseData.getIcDocumentCollection1() != null) {
@@ -396,5 +540,611 @@ public class InitialConsiderationService {
             mergedCollection.addAll(caseData.getIcDocumentCollection3());
         }
         caseData.setIcAllDocumentCollection(mergedCollection);
+    }
+
+    public String setIcEt3VettingIssuesDetailsForEachRespondent(CaseData caseData) {
+        if (caseData.getRespondentCollection() == null || caseData.getRespondentCollection().isEmpty()) {
+            return null;
+        }
+
+        StringBuilder stringBuilder = new StringBuilder();
+        List<String[]> et3VettingIssuesPairsList = new ArrayList<>();
+
+        for (var respondent : caseData.getRespondentCollection()) {
+            Et3VettingType et3Vetting = respondent.getValue().getEt3Vetting();
+            if (et3Vetting == null) {
+                continue;
+            }
+
+            addPair(et3VettingIssuesPairsList, "<h3>Respondent " + respondent.getValue().getRespondentName()
+                    + "<h3>", "");
+
+            processEt3Response(et3Vetting, et3VettingIssuesPairsList);
+            processRespondentName(et3Vetting, et3VettingIssuesPairsList);
+            processResponseInTime(et3Vetting, et3VettingIssuesPairsList);
+            processAddressMatch(et3Vetting, et3VettingIssuesPairsList);
+            processContestClaim(et3Vetting, et3VettingIssuesPairsList);
+            processContractClaim(et3Vetting, et3VettingIssuesPairsList);
+            processCaseListed(et3Vetting, et3VettingIssuesPairsList);
+            processLocationCorrect(et3Vetting, et3VettingIssuesPairsList);
+            processRule26(et3Vetting, et3VettingIssuesPairsList);
+            processSuggestedIssues(et3Vetting, et3VettingIssuesPairsList);
+
+            addPair(et3VettingIssuesPairsList, "Additional information",
+                    defaultIfNull(et3Vetting.getEt3AdditionalInformation()));
+        }
+
+        stringBuilder.append(MarkdownHelper.createTwoColumnTable(HEADER, et3VettingIssuesPairsList));
+
+        return MarkdownHelper.detailsWrapper("Details of ET3 Vetting Issues", stringBuilder.toString());
+    }
+
+    public void processEt3Response(Et3VettingType et3Vetting, List<String[]> pairsList) {
+        if (et3Vetting == null) {
+            return;
+        }
+
+        addPair(pairsList, "Is there an ET3 response?", et3Vetting.getEt3IsThereAnEt3Response());
+        if (NO.equals(et3Vetting.getEt3IsThereAnEt3Response())) {
+            addPair(pairsList, GIVE_DETAILS, defaultIfNull(et3Vetting.getEt3NoEt3Response()));
+            addPair(pairsList, "General notes (No ET3 Response):", defaultIfNull(et3Vetting.getEt3GeneralNotes()));
+        }
+    }
+
+    private void processRespondentName(Et3VettingType et3Vetting, List<String[]> pairsList) {
+        addPair(pairsList, DO_WE_HAVE_THE_RESPONDENT_S_NAME, et3Vetting.getEt3DoWeHaveRespondentsName());
+        if (YES.equals(et3Vetting.getEt3DoWeHaveRespondentsName())) {
+            addPair(pairsList, DOES_THE_RESPONDENT_S_NAME_MATCH, et3Vetting.getEt3DoesRespondentsNameMatch());
+            if (NO.equals(et3Vetting.getEt3DoesRespondentsNameMatch())) {
+                addPair(pairsList, GIVE_DETAILS, defaultIfNull(et3Vetting.getEt3RespondentNameMismatchDetails()));
+            }
+        }
+    }
+
+    private void processResponseInTime(Et3VettingType et3Vetting, List<String[]> pairsList) {
+        if (NO.equals(et3Vetting.getEt3ResponseInTime())) {
+            addPair(pairsList, "Did we receive the ET3 response in time?", et3Vetting.getEt3ResponseInTime());
+            addPair(pairsList, GIVE_DETAILS, defaultIfNull(et3Vetting.getEt3ResponseInTimeDetails()));
+        }
+    }
+
+    private void processAddressMatch(Et3VettingType et3Vetting, List<String[]> pairsList) {
+        if (NO.equals(et3Vetting.getEt3DoesRespondentsAddressMatch())) {
+            addPair(pairsList, "Does the respondent's address match?",
+                    et3Vetting.getEt3DoesRespondentsAddressMatch());
+            addPair(pairsList, GIVE_DETAILS, defaultIfNull(et3Vetting.getEt3RespondentAddressMismatchDetails()));
+        }
+    }
+
+    private void processContestClaim(Et3VettingType et3Vetting, List<String[]> pairsList) {
+        if (et3Vetting.getEt3ContestClaim() != null) {
+            addPair(pairsList, "Does the respondent wish to contest any part of the claim?",
+                    et3Vetting.getEt3ContestClaim());
+            addPair(pairsList, GIVE_DETAILS, defaultIfNull(et3Vetting.getEt3ContestClaimGiveDetails()));
+        }
+        addPair(pairsList, "General notes (Contest Claim)",
+                defaultIfNull(et3Vetting.getEt3GeneralNotesContestClaim()));
+    }
+
+    private void processContractClaim(Et3VettingType et3Vetting, List<String[]> pairsList) {
+        if (YES.equals(et3Vetting.getEt3ContractClaimSection7())) {
+            addPair(pairsList, "Is there an Employer's Contract Claim in section 7 of the ET3 response?",
+                    et3Vetting.getEt3ContractClaimSection7());
+            addPair(pairsList, GIVE_DETAILS, defaultIfNull(et3Vetting.getEt3ContractClaimSection7Details()));
+        }
+    }
+
+    private void processCaseListed(Et3VettingType et3Vetting, List<String[]> pairsList) {
+        if (NO.equals(et3Vetting.getEt3IsCaseListedForHearing())) {
+            addPair(pairsList, "Is the case listed for hearing?", et3Vetting.getEt3IsCaseListedForHearing());
+            addPair(pairsList, GIVE_DETAILS, defaultIfNull(et3Vetting.getEt3IsCaseListedForHearingDetails()));
+        }
+    }
+
+    private void processLocationCorrect(Et3VettingType et3Vetting, List<String[]> pairsList) {
+        if (NO.equals(et3Vetting.getEt3IsThisLocationCorrect())) {
+            addPair(pairsList, "Is this location correct?", et3Vetting.getEt3IsThisLocationCorrect());
+            addPair(pairsList, "Regional Office selected:", defaultIfNull(et3Vetting.getEt3RegionalOffice()));
+            addPair(pairsList, "Why should we change the office?",
+                    defaultIfNull(et3Vetting.getEt3WhyWeShouldChangeTheOffice()));
+        }
+        addPair(pairsList, "General notes (Location)",
+                defaultIfNull(et3Vetting.getEt3GeneralNotesTransferApplication()));
+    }
+
+    private void processRule26(Et3VettingType et3Vetting, List<String[]> pairsList) {
+        if (YES.equals(et3Vetting.getEt3Rule26())) {
+            addPair(pairsList, "Are there any issues identified for the judge's initial consideration - prospects "
+                    + "of claim / response arguable? (Rule 27)", et3Vetting.getEt3Rule26());
+            addPair(pairsList, GIVE_DETAILS, defaultIfNull(et3Vetting.getEt3Rule26Details()));
+        }
+    }
+
+    private void processSuggestedIssues(Et3VettingType et3Vetting, List<String[]> pairsList) {
+        if (et3Vetting.getEt3SuggestedIssues() != null && !et3Vetting.getEt3SuggestedIssues().isEmpty()) {
+            addPair(pairsList, "<h3>Are there any other suggested orders, directions or issues?</h3>", "");
+            et3Vetting.getEt3SuggestedIssues().forEach(issue -> addPair(pairsList, issue,
+                    getSuggestedIssueDetails(et3Vetting, issue)));
+        }
+    }
+
+    private static void addPair(List<String[]> list, String key, String value) {
+        if (key != null && value != null) {
+            list.add(new String[]{key, value});
+        }
+    }
+
+    private String defaultIfNull(String value) {
+        return value != null ? value : NONE_PROVIDED;
+    }
+
+    private String getSuggestedIssueDetails(Et3VettingType et3Vetting, String issue) {
+        return switch (issue) {
+            case APPLICATIONS_FOR_STRIKE_OUT_OR_DEPOSIT -> et3Vetting.getEt3SuggestedIssuesStrikeOut();
+            case INTERPRETERS -> et3Vetting.getEt3SuggestedIssueInterpreters();
+            case JURISDICTIONAL_ISSUES -> et3Vetting.getEt3SuggestedIssueJurisdictional();
+            case REQUEST_FOR_ADJUSTMENTS -> et3Vetting.getEt3SuggestedIssueAdjustments();
+            case RULE_49 -> et3Vetting.getEt3SuggestedIssueRule50();
+            case TIME_POINTS -> et3Vetting.getEt3SuggestedIssueTimePoints();
+            default -> NONE_PROVIDED;
+        };
+    }
+
+    public String setIcEt1VettingIssuesDetails(CaseData caseData) {
+
+        if (caseData == null) {
+            return null;
+        }
+
+        StringBuilder et1VettingIssuesTablesMarkup = new StringBuilder();
+
+        //serving claims
+        composeServingClaimsTableMarkUp(caseData, et1VettingIssuesTablesMarkup);
+
+        //Substantive Defects
+        composeSubstantiveDefectsTableMarkUp(caseData, et1VettingIssuesTablesMarkup);
+
+        //Is track allocation correct?
+        composeTrackAllocationTableMarkUp(caseData, et1VettingIssuesTablesMarkup);
+
+        //Is this location correct?
+        composeLocationalIssuesTableMarkUp(caseData, et1VettingIssuesTablesMarkup);
+
+        //Do you want to suggest a hearing venue?
+        composeHearingVenueIssuesTableMarkUp(caseData, et1VettingIssuesTablesMarkup);
+
+        //respondet type issues
+
+        //resonable adjustments issues
+
+        //video hearing issues
+
+        //Referral to Judge or LO
+        composeReferralToJudgeOrLoTableMarkUp(caseData, et1VettingIssuesTablesMarkup);
+
+        //Referral to REJ or VP
+        composeReferralToREJOrVPTableMarkUp(caseData, et1VettingIssuesTablesMarkup);
+
+        //Other referrals - commented out as per requirements
+        composeIcEt1OtherReferralTableMarkUp(caseData, et1VettingIssuesTablesMarkup);
+
+        return et1VettingIssuesTablesMarkup.toString();
+    }
+
+    private static void composeHearingVenueIssuesTableMarkUp(CaseData caseData,
+                                                           StringBuilder et1VettingIssuesTablesMarkup) {
+        StringBuilder hearingVenueIssueStringBuilder = new StringBuilder();
+
+        if (caseData.getEt1SuggestHearingVenue() != null
+                && YES.equals(caseData.getEt1SuggestHearingVenue())) {
+            List<String[]> hearingVenueIssuesPairsList = new ArrayList<>();
+
+            addPair(hearingVenueIssuesPairsList, "Do you want to suggest a hearing venue?",
+                    defaultIfEmpty(caseData.getEt1SuggestHearingVenue(), ""));
+
+            //et1HearingVenues
+            if (caseData.getEt1HearingVenues() != null
+                    && !caseData.getEt1HearingVenues().getSelectedCode().isEmpty()) {
+                addPair(hearingVenueIssuesPairsList, "Hearing venue selected",
+                        defaultIfEmpty(caseData.getEt1HearingVenues().getSelectedLabel(), ""));
+            }
+
+            //et1HearingVenues
+            if (caseData.getEt1HearingVenueGeneralNotes() != null
+                    && !caseData.getEt1HearingVenueGeneralNotes().isEmpty()) {
+                addPair(hearingVenueIssuesPairsList, "General Notes (Hearing Venue)",
+                        defaultIfEmpty(caseData.getEt1HearingVenueGeneralNotes(), ""));
+            }
+
+            if (!hearingVenueIssuesPairsList.isEmpty()) {
+                hearingVenueIssueStringBuilder.append(MarkdownHelper.createTwoColumnTable(
+                        new String[]{"Hearing Venue Issue", DETAILS},
+                        hearingVenueIssuesPairsList));
+                et1VettingIssuesTablesMarkup.append(MarkdownHelper.detailsWrapper(
+                        "Details of Hearing Venue Issues",
+                        hearingVenueIssueStringBuilder.toString()));
+                et1VettingIssuesTablesMarkup.append(NEWLINE);
+            }
+        }
+    }
+
+    private static void composeLocationalIssuesTableMarkUp(CaseData caseData,
+                                                        StringBuilder et1VettingIssuesTablesMarkup) {
+        StringBuilder locationIssueStringBuilder = new StringBuilder();
+
+        if (caseData.getIsLocationCorrect() != null
+                && NO.equals(caseData.getIsLocationCorrect())) {
+            List<String[]> locationIssuesPairsList = new ArrayList<>();
+
+            addPair(locationIssuesPairsList, "Is this location correct?",
+                    defaultIfEmpty(caseData.getIsLocationCorrect(), ""));
+            //Newly selected regional office
+            if (caseData.getRegionalOfficeList() != null
+                    && !caseData.getRegionalOfficeList().getSelectedCode().isEmpty()) {
+                addPair(locationIssuesPairsList, "Local or regional office selected",
+                        defaultIfEmpty(caseData.getRegionalOfficeList().getSelectedLabel(), ""));
+            }
+            //Reason for changing regional office
+            if (caseData.getWhyChangeOffice() != null
+                    && !caseData.getWhyChangeOffice().isEmpty()) {
+                addPair(locationIssuesPairsList, "Why should we change the office?",
+                        defaultIfEmpty(caseData.getWhyChangeOffice(), ""));
+            }
+            if (!locationIssuesPairsList.isEmpty()) {
+                locationIssueStringBuilder.append(MarkdownHelper.createTwoColumnTable(
+                        new String[]{"Locational Issue", DETAILS},
+                        locationIssuesPairsList));
+                et1VettingIssuesTablesMarkup.append(MarkdownHelper.detailsWrapper(
+                        "Details of Locational Issues",
+                        locationIssueStringBuilder.toString()));
+                et1VettingIssuesTablesMarkup.append(NEWLINE);
+            }
+        }
+    }
+
+    private static void composeServingClaimsTableMarkUp(CaseData caseData,
+                                                        StringBuilder et1VettingIssuesTablesMarkup) {
+        StringBuilder servingClaimsStringBuilder = new StringBuilder();
+
+        if (caseData.getEt1VettingCanServeClaimYesOrNo() != null
+                && NO.equals(caseData.getEt1VettingCanServeClaimYesOrNo())) {
+            List<String[]> canServeClaimIssuesPairsList = new ArrayList<>();
+
+            addPair(canServeClaimIssuesPairsList, "Can we serve the claim with these contact details?",
+                    defaultIfEmpty(caseData.getEt1VettingCanServeClaimYesOrNo(), ""));
+
+            if (caseData.getEt1VettingCanServeClaimNoReason() != null
+                    && !caseData.getEt1VettingCanServeClaimNoReason().isEmpty()) {
+                addPair(canServeClaimIssuesPairsList, "Reason for not serving",
+                        defaultIfEmpty(caseData.getEt1VettingCanServeClaimNoReason(), ""));
+            }
+
+            if (caseData.getEt1VettingCanServeClaimGeneralNote() != null
+                    && !caseData.getEt1VettingCanServeClaimGeneralNote().isEmpty()) {
+                addPair(canServeClaimIssuesPairsList, "General Note (Serve Claim)",
+                        defaultIfEmpty(caseData.getEt1VettingCanServeClaimGeneralNote(), ""));
+            }
+
+            if (!canServeClaimIssuesPairsList.isEmpty()) {
+                servingClaimsStringBuilder.append(MarkdownHelper.createTwoColumnTable(
+                        new String[]{"Serving Claim Issue", DETAILS},
+                        canServeClaimIssuesPairsList));
+                et1VettingIssuesTablesMarkup.append(MarkdownHelper.detailsWrapper(
+                        "Details of Serving Claims",
+                        servingClaimsStringBuilder.toString()));
+                et1VettingIssuesTablesMarkup.append(NEWLINE);
+            }
+        }
+    }
+
+    private static void composeIcEt1OtherReferralTableMarkUp(CaseData caseData,
+                                                            StringBuilder et1VettingIssuesTablesMarkup) {
+        StringBuilder otherReferralStringBuilder = new StringBuilder();
+        List<List<String>> otherReferralsIssues = composeIcEt1OtherReferralListDetails(caseData);
+        List<String[]> otherReferralIssuesPairsList = new ArrayList<>();
+
+        if (!CollectionUtils.isEmpty(otherReferralsIssues)) {
+            otherReferralsIssues.forEach(referralAndDetailPair ->
+                    addPair(otherReferralIssuesPairsList, referralAndDetailPair.getFirst(),
+                            referralAndDetailPair.get(1)));
+            otherReferralStringBuilder.append(MarkdownHelper.createTwoColumnTable(
+                    new String[]{"Referral Issue", "Detail"},
+                    otherReferralIssuesPairsList));
+            et1VettingIssuesTablesMarkup.append(MarkdownHelper.detailsWrapper(
+                    "Details of Other Referral",
+                    otherReferralStringBuilder.toString()));
+            et1VettingIssuesTablesMarkup.append(NEWLINE);
+        }
+    }
+
+    private static void composeReferralToREJOrVPTableMarkUp(CaseData caseData,
+                                                            StringBuilder et1VettingIssuesTablesMarkup) {
+        StringBuilder referralToJudgeOrLOStringBuilder = new StringBuilder();
+
+        List<List<String>> referralsIssues = composeIcEt1ReferralToREJOrVPListWithDetails(caseData);
+        List<String[]> et1VettingReferralIssuesPairsList = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(referralsIssues)) {
+            referralsIssues.forEach(referralAndDetailPair ->
+                    addPair(et1VettingReferralIssuesPairsList, referralAndDetailPair.getFirst(),
+                            referralAndDetailPair.get(1)));
+            referralToJudgeOrLOStringBuilder.append(MarkdownHelper.createTwoColumnTable(
+                    new String[]{"Referral Issue", "Detail"},
+                    et1VettingReferralIssuesPairsList));
+            et1VettingIssuesTablesMarkup.append(MarkdownHelper.detailsWrapper(
+                    "Details of Referral To REJ or VP",
+                    referralToJudgeOrLOStringBuilder.toString()));
+            et1VettingIssuesTablesMarkup.append(NEWLINE);
+        }
+    }
+
+    private static List<List<String>> composeIcEt1ReferralToREJOrVPListWithDetails(CaseData caseData) {
+        if (caseData == null) {
+            return Collections.emptyList();
+        }
+
+        List<List<String>> referralToREJOrVPDetails = new ArrayList<>();
+
+        if (caseData.getReferralToREJOrVPList() != null && !caseData.getReferralToREJOrVPList().isEmpty()) {
+            caseData.getReferralToREJOrVPList().forEach(referral -> {
+                switch (referral) {
+                    case "vexatiousLitigantOrder":
+                        referralToREJOrVPDetails.add(List.of("A claimant covered by vexatious litigant order",
+                                defaultIfEmpty(caseData.getVexatiousLitigantOrderTextArea(), "")));
+                        break;
+                    case "aNationalSecurityIssue":
+                        referralToREJOrVPDetails.add(List.of("A national security issue",
+                                defaultIfEmpty(caseData.getAnationalSecurityIssueTextArea(), "")));
+                        break;
+                    case "nationalMultipleOrPresidentialOrder":
+                        referralToREJOrVPDetails.add(List.of("A part of national multiple / covered by "
+                                + "Presidential case management order",
+                                defaultIfEmpty(caseData.getNationalMultipleOrPresidentialOrderTextArea(),
+                                        "")));
+                        break;
+                    case "transferToOtherRegion":
+                        referralToREJOrVPDetails.add(List.of("A request for transfer to another ET region",
+                                        defaultIfEmpty(caseData.getTransferToOtherRegionTextArea(),  "")));
+                        break;
+                    case "serviceAbroad":
+                        referralToREJOrVPDetails.add(List.of("A request for service abroad",
+                                defaultIfEmpty(caseData.getServiceAbroadTextArea(), "")));
+                        break;
+                    case "aSensitiveIssue":
+                        referralToREJOrVPDetails.add(List.of("A sensitive issue which may attract publicity "
+                                + "or need early allocation to a specific judge",
+                                defaultIfEmpty(caseData.getAsensitiveIssueTextArea(), "")));
+                        break;
+                    case "anyPotentialConflict":
+                        referralToREJOrVPDetails.add(List.of("Any potential conflict involving judge, "
+                                + "non-legal member or HMCTS staff member",
+                                defaultIfEmpty(caseData.getAnyPotentialConflictTextArea(), "")));
+                        break;
+                    case "anotherReasonREJOrVP":
+                        referralToREJOrVPDetails.add(List.of("Another reason for Regional Employment Judge / "
+                                + "Vice-President referral",
+                                defaultIfEmpty(caseData.getAnotherReasonREJOrVPTextArea(), "")));
+                        break;
+                    default:
+                        // do nothing
+                }
+            });
+        }
+
+        return referralToREJOrVPDetails;
+    }
+
+    private static void composeReferralToJudgeOrLoTableMarkUp(CaseData caseData,
+                                                         StringBuilder et1VettingIssuesTablesMarkup) {
+        StringBuilder referralToJudgeOrLOStringBuilder = new StringBuilder();
+        List<List<String>>  referralsIssues = composeIcEt1ReferralToJudgeOrLOListWithDetails(caseData);
+        List<String[]> et1VettingReferralIssuesPairsList = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(referralsIssues)) {
+            referralsIssues.forEach(referralAndDetailPair ->
+                    addPair(et1VettingReferralIssuesPairsList, referralAndDetailPair.getFirst(),
+                            referralAndDetailPair.get(1)));
+            referralToJudgeOrLOStringBuilder.append(MarkdownHelper.createTwoColumnTable(
+                    new String[]{"Referral Issue", "Detail"},
+                    et1VettingReferralIssuesPairsList));
+            et1VettingIssuesTablesMarkup.append(MarkdownHelper.detailsWrapper(
+                    "Details of Referral To Judge or LO",
+                    referralToJudgeOrLOStringBuilder.toString()));
+            et1VettingIssuesTablesMarkup.append(NEWLINE);
+        }
+    }
+
+    private static void composeSubstantiveDefectsTableMarkUp(CaseData caseData, StringBuilder stringBuilder) {
+        List<List<String>> icEt1SubstantiveDefects = composeIcEt1SubstantiveDefectsDetail(caseData);
+
+        if (CollectionUtils.isNotEmpty(icEt1SubstantiveDefects)) {
+            List<String[]> et1VettingIssuesPairsList = icEt1SubstantiveDefects.stream()
+                    .map(defectAndDetailPair -> new String[]{defectAndDetailPair.getFirst(),
+                            defectAndDetailPair.get(1)})
+                    .toList();
+
+            String table = MarkdownHelper.createTwoColumnTable(
+                    new String[]{"Substantive Defects", "Detail"}, et1VettingIssuesPairsList);
+
+            stringBuilder.append(MarkdownHelper.detailsWrapper("Details of Substantive Defects", table))
+                    .append(NEWLINE);
+        }
+    }
+
+    private void composeTrackAllocationTableMarkUp(CaseData caseData, StringBuilder trackAllocationTableMarkUp) {
+        List<List<String>> icEt1TrackAllocationIssues = composeTrackAllocationDetails(caseData);
+
+        if (CollectionUtils.isNotEmpty(icEt1TrackAllocationIssues)) {
+            List<String[]> trackAllocationIssuePairsList = icEt1TrackAllocationIssues.stream()
+                    .map(defectAndDetailPair -> new String[]{defectAndDetailPair.getFirst(),
+                            defectAndDetailPair.get(1)})
+                    .toList();
+
+            String table = MarkdownHelper.createTwoColumnTable(
+                    new String[]{"Track Allocation Issue", "Detail"}, trackAllocationIssuePairsList);
+
+            trackAllocationTableMarkUp.append(MarkdownHelper.detailsWrapper(
+                    "Details of Track Allocation Issue", table))
+                    .append(NEWLINE);
+        }
+    }
+
+    public List<List<String>> composeTrackAllocationDetails(CaseData caseData) {
+        if (caseData == null) {
+            return Collections.emptyList();
+        }
+
+        List<List<String>> trackAllocationDetails = new ArrayList<>();
+
+        if (caseData.getIsTrackAllocationCorrect() != null && NO.equals(caseData.getIsTrackAllocationCorrect())) {
+            trackAllocationDetails.add(List.of("Is the track allocation correct?",
+                    defaultIfNull(caseData.getIsTrackAllocationCorrect())));
+            trackAllocationDetails.add(List.of("Suggested Track: ",
+                    defaultIfNull(caseData.getSuggestAnotherTrack())));
+            trackAllocationDetails.add(List.of("Why Change Track Allocation?",
+                    defaultIfNull(caseData.getWhyChangeTrackAllocation())));
+            trackAllocationDetails.add(List.of("Track Allocation General Notes",
+                    defaultIfNull(caseData.getTrackAllocationGeneralNotes())));
+        }
+
+        return trackAllocationDetails;
+    }
+
+    private static List<List<String>> composeIcEt1SubstantiveDefectsDetail(CaseData caseData) {
+        List<List<String>> substantiveDefectsDetails = new ArrayList<>();
+
+        if (caseData.getSubstantiveDefectsList() != null && !caseData.getSubstantiveDefectsList().isEmpty()) {
+            caseData.getSubstantiveDefectsList().forEach(defect -> {
+                switch (defect) {
+                    case "rule121a" :
+                        substantiveDefectsDetails.add(List.of("Rule 121a",
+                                "The tribunal has no jurisdiction to consider - Rule 13(1)(a)"));
+                        break;
+                    case "rule121b":
+                        substantiveDefectsDetails.add(List.of("Rule 121b",
+                                "Is in a form which cannot sensibly be responded to or otherwise an abuse of process "
+                                        + "- Rule 13(1)(b)"));
+                        break;
+                    case "rule121c":
+                        substantiveDefectsDetails.add(List.of("Rule 121c",
+                                "Has neither an EC number nor claims one of the EC exemptions - Rule 13(1)(c)"));
+                        break;
+                    case "rule121d":
+                        substantiveDefectsDetails.add(List.of("Rule 121d",
+                                "States that one of the EC exceptions applies but it might not - Rule 13(1)(d)"));
+                        break;
+                    case "rule121 da":
+                        substantiveDefectsDetails.add(List.of("Rule 121 da",
+                                "Institutes relevant proceedings and the EC number on the claim form does not match "
+                                + "the EC number on the Acas certificate - Rule 13(1)(e)"));
+                        break;
+                    case "rule121e":
+                        substantiveDefectsDetails.add(List.of("Rule 121e",
+                                "Has a different claimant name on the ET1 to the claimant name on the Acas certificate "
+                                        + "- Rule 13(1)(f)"));
+                        break;
+                    case "rule121f":
+                        substantiveDefectsDetails.add(List.of("Rule 121f",
+                                "Has a different respondent name on the ET1 to the respondent name on the Acas "
+                                + "certificate - Rule 13(1)(g)"));
+                        break;
+                    default:
+                        // do nothing
+                }
+            });
+        }
+        return substantiveDefectsDetails;
+    }
+
+    private static List<List<String>> composeIcEt1ReferralToJudgeOrLOListWithDetails(CaseData caseData) {
+        List<List<String>> referralToJudgeOrLODetails = new ArrayList<>();
+
+        if (caseData.getReferralToJudgeOrLOList() != null && !caseData.getReferralToJudgeOrLOList().isEmpty()) {
+            for (String listItem : caseData.getReferralToJudgeOrLOList()) {
+                switch (listItem) {
+                    case "aClaimOfInterimRelief" :
+                        referralToJudgeOrLODetails.add(List.of("A claim of interim relief",
+                                    caseData.getAclaimOfInterimReliefTextArea()));
+                        break;
+                    case "aStatutoryAppeal" :
+                        referralToJudgeOrLODetails.add(List.of("A statutory appeal",
+                                caseData.getAstatutoryAppealTextArea()));
+                        break;
+                    case "anAllegationOfCommissionOfSexualOffence" :
+                        referralToJudgeOrLODetails.add(List.of("An allegation of the commission of a sexual offence",
+                                caseData.getAnAllegationOfCommissionOfSexualOffenceTextArea()));
+                        break;
+                    case "insolvency" :
+                        referralToJudgeOrLODetails.add(List.of("Insolvency",
+                                caseData.getInsolvencyTextArea()));
+                        break;
+                    case "jurisdictionsUnclear" :
+                        referralToJudgeOrLODetails.add(List.of("Jurisdictions unclear",
+                                caseData.getJurisdictionsUnclearTextArea()));
+                        break;
+                    case "lengthOfService" :
+                        referralToJudgeOrLODetails.add(List.of("Length of service",
+                                caseData.getLengthOfServiceTextArea()));
+                        break;
+                    case "potentiallyLinkedCasesInTheEcm" :
+                        referralToJudgeOrLODetails.add(List.of("Potentially linked cases in the ECM",
+                                caseData.getPotentiallyLinkedCasesInTheEcmTextArea()));
+                        break;
+                    case "rule50Issues" :
+                        referralToJudgeOrLODetails.add(List.of("Rule 49 issues",
+                                caseData.getRule50IssuesTextArea()));
+                        break;
+                    case "anotherReasonForJudicialReferral" :
+                        referralToJudgeOrLODetails.add(List.of("Another reason for judicial referral",
+                                caseData.getAnotherReasonForJudicialReferralTextArea()));
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        return referralToJudgeOrLODetails;
+    }
+
+    private static List<List<String>>  composeIcEt1OtherReferralListDetails(CaseData caseData) {
+        List<List<String>> otherReferralDetails = new ArrayList<>();
+
+        if (caseData.getOtherReferralList() != null && !caseData.getOtherReferralList().isEmpty()) {
+            for (String referralReason : caseData.getOtherReferralList()) {
+                switch (referralReason) {
+                    case "claimOutOfTime" :
+                        otherReferralDetails.add(List.of("Claim out of time",
+                                "The whole or any part of the claim is out of time"));
+                        break;
+                    case "multipleClaim" :
+                        otherReferralDetails.add(List.of("Multiple claims",
+                                "The claim is part of a multiple claim"));
+                        break;
+                    case "employmentStatusIssues" :
+                        otherReferralDetails.add(List.of("Employment status issues",
+                                "The claim has a potential issue about employment status"));
+                        break;
+                    case "pidJurisdictionRegulator" :
+                        otherReferralDetails.add(List.of("Pid jurisdiction regulator",
+                                "The claim has PID jurisdiction and claimant wants it forwarded to relevant "
+                                + "regulator - Box 10.1"));
+                        break;
+                    case "videoHearingPreference" :
+                        otherReferralDetails.add(List.of("Video hearing preference",
+                                "The claimant prefers a video hearing"));
+                        break;
+                    case "rule50IssuesOtherFactors" :
+                        otherReferralDetails.add(List.of("Rule49 issues - other factors",
+                                "The claim has Rule 49 issues"));
+                        break;
+                    case "otherRelevantFactors" :
+                        otherReferralDetails.add(List.of("Other relevant factors",
+                                "The claim has other relevant factors for judicial referral"));
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        return  otherReferralDetails;
     }
 }

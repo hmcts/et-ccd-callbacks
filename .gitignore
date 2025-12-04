@@ -10,6 +10,7 @@
 .settings
 .springBeans
 .sts4-cache
+.vscode/settings.json
 
 ### IntelliJ IDEA ###
 .idea
@@ -54,3 +55,7 @@ bin/
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+src/test/resources/PreHearingDepositData.xlsx
+src/main/resources/application-cftlib.yaml
+src/main/resources/application-cftlib.yaml
+src/main/resources/application-cftlib.yaml

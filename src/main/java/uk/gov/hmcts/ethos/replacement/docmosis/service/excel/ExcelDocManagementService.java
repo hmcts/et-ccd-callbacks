@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.SortedMap;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.DATE_TIME_USER_FRIENDLY_PATTERN;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EUROPE_LONDON;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -107,7 +108,7 @@ public class ExcelDocManagementService {
     public CaseImporterFile populateCaseImporterFile(String userToken, UploadedDocumentType uploadedDocumentType) {
 
         CaseImporterFile caseImporterFile = new CaseImporterFile();
-        LocalDateTime dateTime = LocalDateTime.now(ZoneId.of("Europe/London"));
+        LocalDateTime dateTime = LocalDateTime.now(ZoneId.of(EUROPE_LONDON));
         UserDetails userDetails = userIdamService.getUserDetails(userToken);
 
         caseImporterFile.setUploadedDocument(uploadedDocumentType);

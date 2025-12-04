@@ -167,9 +167,9 @@ public class PdfBoxService {
         try {
             PDField pdfField = pdfForm.getField(entryKey);
             pdfField.setValue(entryValue.orElse(STRING_EMPTY));
-        } catch (IOException ioe) {
+        } catch (Exception ex) {
             logException(String.format(PDF_SERVICE_EXCEPTION_FIRST_WORD_WHEN_UNABLE_TO_PUT_FIELD_TO_PDF_FILE, entryKey),
-                    caseData.getEthosCaseReference(), ioe.getMessage(),
+                    caseData.getEthosCaseReference(), ex.getMessage(),
                     PDF_SERVICE_CLASS_NAME, PUT_PDF_FIELD_METHOD_NAME);
         }
     }

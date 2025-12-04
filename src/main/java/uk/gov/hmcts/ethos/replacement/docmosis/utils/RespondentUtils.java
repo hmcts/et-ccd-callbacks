@@ -207,7 +207,7 @@ public final class RespondentUtils {
      * Determines whether the given {@link RespondentSumTypeItem} contains valid and usable
      * respondent data.
      * <p>
-     * A respondent is considered <em>valid</em> if all of the following conditions are met:
+     * A respondent is considered <em>valid</em> if all the following conditions are met:
      * <ul>
      *     <li>The {@code respondent} object itself is not {@code null}.</li>
      *     <li>The respondent has a non-blank identifier ({@code respondent.getId()}).</li>
@@ -250,6 +250,6 @@ public final class RespondentUtils {
      */
     public static boolean hasRespondents(CaseData caseData) {
         return ObjectUtils.isNotEmpty(caseData)
-                && org.apache.commons.collections4.CollectionUtils.isNotEmpty(caseData.getRespondentCollection());
+                && CollectionUtils.isNotEmpty(caseData.getRespondentCollection());
     }
 }

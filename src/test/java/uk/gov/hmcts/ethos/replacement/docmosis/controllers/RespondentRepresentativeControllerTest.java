@@ -37,7 +37,6 @@ import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -236,10 +235,6 @@ class RespondentRepresentativeControllerTest {
                 RepresentedTypeR.builder().dynamicRespRepName(dynamicFixedListType).build()).build()));
         CCDRequest ccdRequest = CCDRequestBuilder.builder().withCaseData(caseData).build();
         ccdRequest.getCaseDetails().setCaseId(DUMMY_SUBMISSION_REFERENCE);
-        doThrow(new GenericServiceException(DUMMY_EXCEPTION_MESSAGE, new Exception(DUMMY_EXCEPTION_MESSAGE),
-                DUMMY_EXCEPTION_MESSAGE, DUMMY_SUBMISSION_REFERENCE,
-                RespondentRepresentativeController.class.getSimpleName(), "amendRespondentRepresentativeAboutToSubmit"))
-                .when(nocRespondentHelper).mapRepresentativesToRespondents(any(CaseData.class));
         mockMvc.perform(post(URL_AMEND_RESPONDENT_REPRESENTATIVE_ABOUT_TO_SUBMIT)
                         .content(jsonMapper.toJson(ccdRequest))
                         .header(HEADER_AUTHORIZATION, DUMMY_TOKEN)

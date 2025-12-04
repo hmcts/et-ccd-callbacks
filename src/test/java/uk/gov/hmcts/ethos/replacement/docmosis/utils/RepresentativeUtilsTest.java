@@ -4,6 +4,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
@@ -55,21 +56,6 @@ final class RepresentativeUtilsTest {
     }
 
     @Test
-    void theIsValidRespondentRepresentative() {
-        // when representative is empty should return false
-        assertThat(RepresentativeUtils.isValidRespondentRepresentative(null)).isFalse();
-        // when representative id is empty should return false
-        RepresentedTypeRItem respondentRepresentative = RepresentedTypeRItem.builder().build();
-        assertThat(RepresentativeUtils.isValidRespondentRepresentative(respondentRepresentative)).isFalse();
-        // when representative value is empty should return false
-        respondentRepresentative.setId(DUMMY_REPRESENTATIVE_ID);
-        assertThat(RepresentativeUtils.isValidRespondentRepresentative(respondentRepresentative)).isFalse();
-        // when representative has both id and value should return true
-        respondentRepresentative.setValue(RepresentedTypeR.builder().build());
-        assertThat(RepresentativeUtils.isValidRespondentRepresentative(respondentRepresentative)).isTrue();
-    }
-
-    @Test
     void theHasDuplicateRespondentNames() {
         // when representatives are empty should not return any error.
         List<String> errors = RepresentativeUtils.hasDuplicateRespondentNames(null);
@@ -107,18 +93,20 @@ final class RepresentativeUtilsTest {
         assertThat(errors.getFirst()).isEqualTo(EXPECTED_ERROR_INVALID_REPRESENTATIVE_EXISTS);
         // when representatives have more than one respondent with the same name should return
         // ERROR_RESPONDENT_HAS_MULTIPLE_REPRESENTATIVES.
-        representatives = List.of(RepresentedTypeRItem.builder().value(RepresentedTypeR.builder()
-                .dynamicRespRepName(createDynamicFixedListType(RESPONDENT_NAME_1)).build()).build(),
-                RepresentedTypeRItem.builder().value(RepresentedTypeR.builder().dynamicRespRepName(
-                        createDynamicFixedListType(RESPONDENT_NAME_1)).build()).build());
+        representatives = List.of(RepresentedTypeRItem.builder().id(DUMMY_REPRESENTATIVE_ID).value(
+                RepresentedTypeR.builder().dynamicRespRepName(createDynamicFixedListType(RESPONDENT_NAME_1)).build())
+                        .build(), RepresentedTypeRItem.builder().id(DUMMY_REPRESENTATIVE_ID).value(
+                                RepresentedTypeR.builder().dynamicRespRepName(
+                                        createDynamicFixedListType(RESPONDENT_NAME_1)).build()).build());
         errors = RepresentativeUtils.hasDuplicateRespondentNames(representatives);
         assertThat(errors).isNotEmpty().hasSize(NumberUtils.INTEGER_ONE);
         assertThat(errors.getFirst()).isEqualTo(EXPECTED_ERROR_RESPONDENT_HAS_MULTIPLE_REPRESENTATIVES);
         // when representatives have no duplicated respondent names should not return any error.
-        representatives = List.of(RepresentedTypeRItem.builder().value(RepresentedTypeR.builder()
-                        .dynamicRespRepName(createDynamicFixedListType(RESPONDENT_NAME_1)).build()).build(),
-                RepresentedTypeRItem.builder().value(RepresentedTypeR.builder().dynamicRespRepName(
-                        createDynamicFixedListType(RESPONDENT_NAME_2)).build()).build());
+        representatives = List.of(RepresentedTypeRItem.builder().id(DUMMY_REPRESENTATIVE_ID)
+                        .value(RepresentedTypeR.builder().dynamicRespRepName(
+                                createDynamicFixedListType(RESPONDENT_NAME_1)).build()).build(),
+                RepresentedTypeRItem.builder().id(DUMMY_REPRESENTATIVE_ID).value(RepresentedTypeR.builder()
+                        .dynamicRespRepName(createDynamicFixedListType(RESPONDENT_NAME_2)).build()).build());
         errors = RepresentativeUtils.hasDuplicateRespondentNames(representatives);
         assertThat(errors).isEmpty();
     }
@@ -129,6 +117,18 @@ final class RepresentativeUtilsTest {
         dynamicValueType.setLabel(respondentName);
         dynamicFixedListType.setValue(dynamicValueType);
         return dynamicFixedListType;
+    }
+
+    @Test
+    void theHasRepresentatives() {
+        // when case data is empty then return false
+        assertThat(RepresentativeUtils.hasRepresentatives(null)).isFalse();
+        // when case data not has any representative then return false
+        CaseData caseData = new CaseData();
+        assertThat(RepresentativeUtils.hasRepresentatives(caseData)).isFalse();
+        // when case data has representative then return true
+        caseData.setRepCollection(List.of(RepresentedTypeRItem.builder().build()));
+        assertThat(RepresentativeUtils.hasRepresentatives(caseData)).isTrue();
     }
 
 }

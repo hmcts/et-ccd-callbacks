@@ -85,7 +85,7 @@ public class RespondentRepresentativeController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(AUTHORIZATION) String userToken) {
         CaseDataUtils.validateCCDRequest(ccdRequest);
-        log.info("DYNAMIC RESPONDENT REPRESENTATIVE NAMES ---> " + LOG_MESSAGE + "{}",
+        log.info("AMEND RESPONDENT REPRESENTATIVE ABOUT TO START ---> " + LOG_MESSAGE + "{}",
                 ccdRequest.getCaseDetails().getCaseId());
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         DynamicRespondentRepresentative.dynamicRespondentRepresentativeNames(caseData);
@@ -111,17 +111,17 @@ public class RespondentRepresentativeController {
             @RequestBody @NotNull CCDRequest ccdRequest,
             @RequestHeader(AUTHORIZATION) String userToken) {
         CaseDataUtils.validateCCDRequest(ccdRequest);
-        log.info("AMEND RESPONDENT REPRESENTATIVE ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
+        log.info("AMEND RESPONDENT REPRESENTATIVE ABOUT TO SUBMIT ---> " + LOG_MESSAGE + "{}",
+                ccdRequest.getCaseDetails().getCaseId());
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>(NocUtils.validateNocCaseData(caseData));
         if (errors.isEmpty()) {
             try {
-                nocRespondentHelper.mapRepresentativesToRespondents(caseData);
+                NocUtils.mapRepresentativesToRespondents(caseData);
                 nocRespondentHelper.removeUnmatchedRepresentations(caseData);
                 nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, userToken);
                 // add org policy and NOC elements
                 nocRespondentRepresentativeService.updateNonMyHmctsOrgIds(caseData.getRepCollection());
-
             } catch (GenericRuntimeException | GenericServiceException gse) {
                 errors.addFirst(gse.getMessage());
             }

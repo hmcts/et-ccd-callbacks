@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 import com.nimbusds.oauth2.sdk.util.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
@@ -80,32 +81,6 @@ public final class RepresentativeUtils {
     }
 
     /**
-     * Determines whether the given {@link RepresentedTypeRItem} contains valid and usable
-     * representative data.
-     * <p>
-     * A representative is considered <em>valid</em> if all the following conditions are met:
-     * <ul>
-     *     <li>The {@code representative} object itself is not {@code null}.</li>
-     *     <li>The representative has a non-empty identifier ({@code representative.getId()}).</li>
-     *     <li>The representative contains a non-null {@code value} object.</li>
-     * </ul>
-     * <p>
-     * This method performs a lightweight structural validation only and does not verify the
-     * correctness or completeness of individual fields inside the value object. It is intended
-     * for use in pre-validation flows to determine whether a representative record is suitable
-     * for further processing.
-     *
-     * @param representative the representative item to validate
-     * @return {@code true} if the representative has all required fields populated;
-     *         {@code false} otherwise
-     */
-    public static boolean isValidRespondentRepresentative(RepresentedTypeRItem representative) {
-        return ObjectUtils.isNotEmpty(representative)
-                && StringUtils.isNotBlank(representative.getId())
-                && ObjectUtils.isNotEmpty(representative.getValue());
-    }
-
-    /**
      * Validates that both the specified respondent and representative contain the
      * minimum required data necessary to establish or process a representation
      * relationship within a case.
@@ -174,11 +149,7 @@ public final class RepresentativeUtils {
         }
         Set<String> existingRespondentNames = new HashSet<>();
         for (RepresentedTypeRItem representative : representatives) {
-            if (ObjectUtils.isEmpty(representative)
-                    || ObjectUtils.isEmpty(representative.getValue())
-                    || ObjectUtils.isEmpty(representative.getValue().getDynamicRespRepName())
-                    || ObjectUtils.isEmpty(representative.getValue().getDynamicRespRepName().getValue())
-                    || StringUtils.isBlank(representative.getValue().getDynamicRespRepName().getValue().getLabel())) {
+            if (!NocUtils.isValidNocRepresentative(representative)) {
                 return List.of(ERROR_INVALID_REPRESENTATIVE_EXISTS);
             }
             String respondentName = representative.getValue().getDynamicRespRepName().getValue().getLabel();
@@ -189,4 +160,22 @@ public final class RepresentativeUtils {
         return Collections.emptyList();
     }
 
+    /**
+     * Determines whether the given {@link CaseData} instance contains one or more
+     * representatives in its representative collection.
+     * <p>
+     * The method returns {@code true} only if:
+     * </p>
+     * <ul>
+     *     <li>The {@code caseData} object is not null or empty, and</li>
+     *     <li>The representative collection ({@code repCollection}) is not null and not empty.</li>
+     * </ul>
+     *
+     * @param caseData the case data object to evaluate
+     * @return {@code true} if the case contains at least one representative; {@code false} otherwise
+     */
+    public static boolean hasRepresentatives(CaseData caseData) {
+        return ObjectUtils.isNotEmpty(caseData)
+                && CollectionUtils.isNotEmpty(caseData.getRepCollection());
+    }
 }

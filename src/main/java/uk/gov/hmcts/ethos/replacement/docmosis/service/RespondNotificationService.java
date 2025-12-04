@@ -11,6 +11,7 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.PseStatusTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
@@ -20,6 +21,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -106,10 +108,34 @@ public class RespondNotificationService {
             sendNotificationType.setNotificationState(NOT_VIEWED_YET);
         }
 
+        if (YES.equals(responseRequired) && whoRespond != null && !CLAIMANT_ONLY.equals(whoRespond)) {
+            updateAllRespondentState(sendNotificationType, NOT_STARTED_YET);
+        } else {
+            updateAllRespondentState(sendNotificationType, NOT_VIEWED_YET);
+        }
+
         GenericTypeItem<RespondNotificationType> respondNotificationTypeGenericTypeItem = new GenericTypeItem<>();
         respondNotificationTypeGenericTypeItem.setId(String.valueOf(randomUUID()));
         respondNotificationTypeGenericTypeItem.setValue(respondNotificationType);
         sendNotificationType.getRespondNotificationTypeCollection().add(respondNotificationTypeGenericTypeItem);
+    }
+
+    /**
+     * Updates all respondent states to the new state.
+     * @param item selected notification item
+     * @param newState new respondent state to be set
+     */
+    private void updateAllRespondentState(SendNotificationType item, String newState) {
+        if (item.getRespondentState() == null) {
+            return;
+        }
+
+        for (PseStatusTypeItem statusItem : item.getRespondentState()) {
+            if (statusItem.getValue() != null) {
+                statusItem.getValue().setNotificationState(newState);
+                statusItem.getValue().setDateTime(LocalDateTime.now().toString());
+            }
+        }
     }
 
     /**

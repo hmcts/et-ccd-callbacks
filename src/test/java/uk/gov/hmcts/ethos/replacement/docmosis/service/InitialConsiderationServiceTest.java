@@ -1955,4 +1955,55 @@ class InitialConsiderationServiceTest {
         assertTrue(result.contains("Track Allocation General Notes"));
     }
 
+    @Test
+    void setIcEt1VettingIssuesDetails_shouldIncludeLocationalIssues_whenLocationIsNotCorrect() {
+        CaseData caseDataWithRegionalOffice = new CaseData();
+        caseDataWithRegionalOffice.setIsLocationCorrect("No");
+
+        DynamicFixedListType regionalOfficeList = new DynamicFixedListType();
+        DynamicValueType dynamicValueType = new DynamicValueType();
+        dynamicValueType.setCode("RO1");
+        dynamicValueType.setLabel("London");
+
+        regionalOfficeList.setListItems(List.of(dynamicValueType));
+        regionalOfficeList.setValue(dynamicValueType);
+        regionalOfficeList.setValue(dynamicValueType);
+
+        caseDataWithRegionalOffice.setRegionalOfficeList(regionalOfficeList);
+        caseDataWithRegionalOffice.setWhyChangeOffice("Closer to claimant");
+
+        String result = new InitialConsiderationService(null)
+                .setIcEt1VettingIssuesDetails(caseDataWithRegionalOffice);
+
+        assertTrue(result.contains("Details of Locational Issues"));
+        assertTrue(result.contains("Is this location correct?"));
+        assertTrue(result.contains("Local or regional office selected"));
+        assertTrue(result.contains("Why should we change the office?"));
+        assertTrue(result.contains("London"));
+        assertTrue(result.contains("Closer to claimant"));
+    }
+
+    @Test
+    void setIcEt1VettingIssuesDetails_shouldNotIncludeLocationalIssues_whenLocationIsCorrect() {
+        CaseData caseData = new CaseData();
+        caseData.setIsLocationCorrect("Yes");
+
+        String result = new InitialConsiderationService(null).setIcEt1VettingIssuesDetails(caseData);
+
+        assertFalse(result.contains("Details of Locational Issues"));
+    }
+
+    @Test
+    void setIcEt1VettingIssuesDetails_shouldHandleNullRegionalOfficeListAndWhyChangeOffice() {
+        CaseData caseData = new CaseData();
+        caseData.setIsLocationCorrect("No");
+        // regionalOfficeList and whyChangeOffice are null
+
+        String result = new InitialConsiderationService(null).setIcEt1VettingIssuesDetails(caseData);
+
+        assertTrue(result.contains("Is this location correct?"));
+        assertFalse(result.contains("Local or regional office selected"));
+        assertFalse(result.contains("Why should we change the office?"));
+    }
+
 }

@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
@@ -1435,373 +1437,6 @@ class InitialConsiderationServiceTest {
     }
 
     @Test
-    void composeIcEt1ReferralToJudgeOrLOListWithDetails_shouldReturnFormattedDetails_whenListIsPopulated() {
-        CaseData caseDataWithEt1Referral = getCaseDataWithEt1Referral();
-
-        String result = initialConsiderationService.composeIcEt1ReferralToJudgeOrLOListWithDetails(
-                caseDataWithEt1Referral);
-
-        assertThat(result).contains("A claim of interim relief")
-                .contains("A claim of interim relief details")
-                .contains("A statutory appeal")
-                .contains("A statutory appeal details")
-                .contains("An allegation of the commission of a sexual offence")
-                .contains("An allegation of the commission of a sexual offence details")
-                .contains("Insolvency details")
-                .contains("Jurisdiction unclear")
-                .contains("Jurisdiction unclear details")
-                .contains("Length of service")
-                .contains("Length of service details")
-                .contains("Potentially linked cases in the ECM")
-                .contains("Potentially linked cases in the ECM details")
-                .contains("Rule 50 issues")
-                .contains("Rule 50 issues details")
-                .contains("Another reason for judicial referral")
-                .contains("Another reason for judicial referral details");
-    }
-
-    private static @NotNull CaseData getCaseDataWithEt1Referral() {
-        CaseData caseDataWithEt1Referral = new CaseData();
-        caseDataWithEt1Referral.setReferralToJudgeOrLOList(
-                List.of("aClaimOfInterimRelief", "insolvency", "aStatutoryAppeal",
-                        "anAllegationOfCommissionOfSexualOffence", "jurisdictionsUnclear",
-                        "lengthOfService", "potentiallyLinkedCasesInTheEcm", "rule50Issues",
-                        "anotherReasonForJudicialReferral"));
-        caseDataWithEt1Referral.setAclaimOfInterimReliefTextArea("A claim of interim relief details");
-        caseDataWithEt1Referral.setAstatutoryAppealTextArea("A statutory appeal details");
-        caseDataWithEt1Referral.setAnAllegationOfCommissionOfSexualOffenceTextArea(
-                "An allegation of the commission of a sexual offence details");
-        caseDataWithEt1Referral.setInsolvencyTextArea("Insolvency details");
-        caseDataWithEt1Referral.setJurisdictionsUnclearTextArea("Jurisdiction unclear details");
-        caseDataWithEt1Referral.setLengthOfServiceTextArea("Length of service details");
-        caseDataWithEt1Referral.setPotentiallyLinkedCasesInTheEcmTextArea(
-                "Potentially linked cases in the ECM details");
-        caseDataWithEt1Referral.setRule50IssuesTextArea("Rule 50 issues details");
-        caseDataWithEt1Referral.setAnotherReasonForJudicialReferralTextArea(
-                "Another reason for judicial referral details");
-        return caseDataWithEt1Referral;
-    }
-
-    @Test
-    void composeIcEt1ReferralToJudgeOrLOListWithDetails_shouldReturnEmptyString_whenListIsNull() {
-        CaseData caseDataWithNullEt1Referrals = new CaseData();
-        caseDataWithNullEt1Referrals.setReferralToJudgeOrLOList(null);
-
-        String result = initialConsiderationService.composeIcEt1ReferralToJudgeOrLOListWithDetails(
-                caseDataWithNullEt1Referrals);
-
-        assertThat(result).isEmpty();
-    }
-
-    @Test
-    void composeIcEt1ReferralToJudgeOrLOListWithDetails_shouldReturnEmptyString_whenListIsEmpty() {
-        CaseData caseDataWithEmptyEt1Referrals = new CaseData();
-        caseDataWithEmptyEt1Referrals.setReferralToJudgeOrLOList(new ArrayList<>());
-
-        String result = initialConsiderationService.composeIcEt1ReferralToJudgeOrLOListWithDetails(
-                caseDataWithEmptyEt1Referrals);
-
-        assertThat(result).isEmpty();
-    }
-
-    @Test
-    void composeIcEt1ReferralToJudgeOrLOListWithDetails_shouldHandleUnknownListItemGracefully() {
-        CaseData caseDataWithUnknownListItem = new CaseData();
-        caseDataWithUnknownListItem.setReferralToJudgeOrLOList(List.of("unknownItem"));
-
-        String result = initialConsiderationService.composeIcEt1ReferralToJudgeOrLOListWithDetails(
-                caseDataWithUnknownListItem);
-
-        assertThat(result).doesNotContain("unknownItem");
-    }
-
-    @Test
-    void composeIcEt1ReferralToJudgeOrLOListWithDetails_shouldSkipNullTextAreas() {
-        CaseData caseDataWithNullTextArea = new CaseData();
-        caseDataWithNullTextArea.setReferralToJudgeOrLOList(List.of("aClaimOfInterimRelief", "insolvency"));
-        caseDataWithNullTextArea.setAclaimOfInterimReliefTextArea(null);
-        caseDataWithNullTextArea.setInsolvencyTextArea("");
-
-        String result = initialConsiderationService.composeIcEt1ReferralToJudgeOrLOListWithDetails(
-                caseDataWithNullTextArea);
-
-        assertThat(result).contains("A claim of interim relief")
-                .doesNotContain("Details:")
-                .contains("Insolvency")
-                .doesNotContain("Insolvency details");
-    }
-
-    @Test
-    void composeIcEt1ReferralToREJOrVPListWithDetails_shouldReturnFormattedDetails_whenListIsPopulated() {
-        CaseData caseDataWithEt1ReferralToREJOrVPList = getCaseDataWithEt1ReferralToREJOrVPList();
-
-        String result = initialConsiderationService.composeIcEt1ReferralToREJOrVPListWithDetails(
-                caseDataWithEt1ReferralToREJOrVPList);
-
-        assertThat(result)
-                .contains("A claimant covered by vexatious litigant order")
-                .contains("Details for A claimant covered by vexatious litigant order")
-
-                .contains("A national security issue")
-                .contains("Details for A national security issue")
-
-                .contains("A part of national multiple / covered by Presidential case management order")
-                .contains("Details for A part of national multiple / covered by Presidential case management order")
-
-                .contains("A request for transfer to another ET region")
-                .contains("Details for A request for transfer to another ET region")
-
-                .contains("A request for service abroad")
-                .contains("Details for A request for service abroad")
-
-                .contains("A sensitive issue which may attract publicity or need "
-                        + "early allocation to a specific judge")
-                .contains("Details for A sensitive issue which may attract publicity or need "
-                        + "early allocation to a specific judge")
-
-                .contains("Any potential conflict involving judge, non-legal member or HMCTS staff member")
-                .contains("Details for Any potential conflict involving judge, non-legal member or HMCTS staff member")
-
-                .contains("Another reason for Regional Employment Judge / Vice-President referral")
-                .contains("Details for Another reason for Regional Employment Judge / Vice-President referral");
-    }
-
-    private static @NotNull CaseData getCaseDataWithEt1ReferralToREJOrVPList() {
-        CaseData caseDataWithEt1ReferralToREJOrVPList = new CaseData();
-        caseDataWithEt1ReferralToREJOrVPList.setReferralToREJOrVPList(
-                List.of("vexatiousLitigantOrder", "aNationalSecurityIssue", "nationalMultipleOrPresidentialOrder",
-                        "transferToOtherRegion", "serviceAbroad", "aSensitiveIssue", "anyPotentialConflict",
-                        "anotherReasonREJOrVP"));
-
-        caseDataWithEt1ReferralToREJOrVPList.setVexatiousLitigantOrderTextArea(
-                "Details for A claimant covered by vexatious litigant order");
-
-        caseDataWithEt1ReferralToREJOrVPList.setAnationalSecurityIssueTextArea("Details for A national security issue");
-
-        caseDataWithEt1ReferralToREJOrVPList.setNationalMultipleOrPresidentialOrderTextArea(
-                "Details for A part of national multiple / covered by Presidential case management order");
-
-        caseDataWithEt1ReferralToREJOrVPList.setTransferToOtherRegionTextArea(
-                "Details for A request for transfer to another ET region");
-
-        caseDataWithEt1ReferralToREJOrVPList.setServiceAbroadTextArea("Details for A request for service abroad");
-
-        caseDataWithEt1ReferralToREJOrVPList.setAsensitiveIssueTextArea("Details for A sensitive issue "
-                + "which may attract publicity or need early allocation to a specific judge");
-
-        caseDataWithEt1ReferralToREJOrVPList.setAnyPotentialConflictTextArea("Details for Any potential conflict "
-                + "involving judge, non-legal member or HMCTS staff member");
-
-        caseDataWithEt1ReferralToREJOrVPList.setAnotherReasonREJOrVPTextArea(
-                "Details for Another reason for Regional Employment Judge / Vice-President referral");
-
-        return caseDataWithEt1ReferralToREJOrVPList;
-    }
-
-    @Test
-    void composeIcEt1ReferralToREJOrVPListWithDetails_shouldReturnEmptyString_whenListIsNull() {
-        CaseData caseDataWithEt1ReferralToREJOrVP = new CaseData();
-        caseDataWithEt1ReferralToREJOrVP.setReferralToREJOrVPList(null);
-
-        String result = initialConsiderationService.composeIcEt1ReferralToREJOrVPListWithDetails(
-                caseDataWithEt1ReferralToREJOrVP);
-
-        assertThat(result).isEmpty();
-    }
-
-    @Test
-    void composeIcEt1ReferralToREJOrVPListWithDetails_shouldReturnEmptyString_whenListIsEmpty() {
-        CaseData caseDataWithEt1ReferralToREJOrVPList = new CaseData();
-        caseDataWithEt1ReferralToREJOrVPList.setReferralToREJOrVPList(new ArrayList<>());
-
-        String result = initialConsiderationService.composeIcEt1ReferralToREJOrVPListWithDetails(
-                caseDataWithEt1ReferralToREJOrVPList);
-
-        assertThat(result).isEmpty();
-    }
-
-    @Test
-    void composeIcEt1ReferralToREJOrVPListWithDetails_shouldHandleUnknownListItemGracefully() {
-        CaseData caseDataWithEt1ReferralUnknownList = new CaseData();
-        caseDataWithEt1ReferralUnknownList.setReferralToREJOrVPList(List.of("unknownItem"));
-
-        String result = initialConsiderationService.composeIcEt1ReferralToREJOrVPListWithDetails(
-                caseDataWithEt1ReferralUnknownList);
-
-        assertThat(result).doesNotContain("unknownItem");
-    }
-
-    @Test
-    void composeIcEt1ReferralToREJOrVPListWithDetails_shouldSkipNullTextAreas() {
-        CaseData caseDataWithEt1ReferralNullTextArea = new CaseData();
-        caseDataWithEt1ReferralNullTextArea.setReferralToREJOrVPList(
-                List.of("vexatiousLitigantOrder", "serviceAbroad"));
-        caseDataWithEt1ReferralNullTextArea.setVexatiousLitigantOrderTextArea(null);
-        caseDataWithEt1ReferralNullTextArea.setServiceAbroadTextArea("");
-
-        String result = initialConsiderationService.composeIcEt1ReferralToREJOrVPListWithDetails(
-                caseDataWithEt1ReferralNullTextArea);
-
-        assertThat(result).doesNotContain("Details for vexatious litigant order")
-                .doesNotContain("Details for service abroad");
-    }
-
-    @Test
-    void composeIcEt1OtherReferralListDetails_shouldReturnFormattedDetails_whenListIsPopulated() {
-        CaseData caseDataWithValidReferralsList = getCaseDataWithValidReferralsList();
-
-        String result = initialConsiderationService.composeIcEt1OtherReferralListDetails(
-                caseDataWithValidReferralsList);
-
-        assertThat(result)
-                .contains("The whole or any part of the claim is out of time")
-                .contains("Details for claim out of time")
-                .contains("The claim is part of a multiple claim")
-                .contains("Details for multiple claim")
-                .contains("The claim has a potential issue about employment status")
-                .contains("Details for employment Status Issues")
-                .contains("The claim has PID jurisdiction and claimant wants it forwarded to "
-                        + "relevant regulator - Box 10.1")
-                .contains("Details for pid Jurisdiction Regulator")
-                .contains("The claimant prefers a video hearing")
-                .contains("Details for video Hearing Preference")
-                .contains("The claim has Rule 49 issues")
-                .contains("Details for rule 50 Issues Other Factors")
-                .contains("The claim has other relevant factors for judicial referral")
-                .contains("Details for other Relevant Factors");
-    }
-
-    private static @NotNull CaseData getCaseDataWithValidReferralsList() {
-        CaseData caseDataWithValidReferralsList = new CaseData();
-        caseDataWithValidReferralsList.setOtherReferralList(
-                List.of("claimOutOfTime", "multipleClaim", "employmentStatusIssues", "pidJurisdictionRegulator",
-                        "videoHearingPreference", "rule50IssuesOtherFactors", "otherRelevantFactors"));
-
-        caseDataWithValidReferralsList.setClaimOutOfTimeTextArea("Details for claim out of time");
-        caseDataWithValidReferralsList.setMultipleClaimTextArea("Details for multiple claim");
-        caseDataWithValidReferralsList.setEmploymentStatusIssuesTextArea("Details for employment Status Issues");
-        caseDataWithValidReferralsList.setPidJurisdictionRegulatorTextArea("Details for pid Jurisdiction Regulator");
-        caseDataWithValidReferralsList.setVideoHearingPreferenceTextArea("Details for video Hearing Preference");
-        caseDataWithValidReferralsList.setRule50IssuesForOtherReferralTextArea(
-                "Details for rule 50 Issues Other Factors");
-        caseDataWithValidReferralsList.setAnotherReasonForOtherReferralTextArea("Details for other Relevant Factors");
-        return caseDataWithValidReferralsList;
-    }
-
-    @Test
-    void composeIcEt1OtherReferralListDetails_shouldReturnEmptyString_whenListIsNull() {
-        CaseData caseDataWithIcEt1OtherReferralList = new CaseData();
-        caseDataWithIcEt1OtherReferralList.setOtherReferralList(null);
-
-        String result = initialConsiderationService.composeIcEt1OtherReferralListDetails(
-                caseDataWithIcEt1OtherReferralList);
-
-        assertThat(result).isEmpty();
-    }
-
-    @Test
-    void composeIcEt1OtherReferralListDetails_shouldReturnEmptyString_whenListIsEmpty() {
-        CaseData caseDataWithEt1OtherEmptyReferralList = new CaseData();
-        caseDataWithEt1OtherEmptyReferralList.setOtherReferralList(new ArrayList<>());
-
-        String result = initialConsiderationService.composeIcEt1OtherReferralListDetails(
-                caseDataWithEt1OtherEmptyReferralList);
-
-        assertThat(result).isEmpty();
-    }
-
-    @Test
-    void composeIcEt1OtherReferralListDetails_shouldSkipNullTextAreas() {
-        CaseData caseDataWithNullTextarea = new CaseData();
-        caseDataWithNullTextarea.setOtherReferralList(List.of("claimOutOfTime", "multipleClaim"));
-        caseDataWithNullTextarea.setClaimOutOfTimeTextArea(null);
-        caseDataWithNullTextarea.setMultipleClaimTextArea("");
-
-        String result = initialConsiderationService.composeIcEt1OtherReferralListDetails(caseDataWithNullTextarea);
-
-        assertThat(result).doesNotContain("Details for claim out of time")
-                .doesNotContain("Details for multiple claim");
-    }
-
-    @Test
-    void composeIcEt1OtherReferralListDetails_shouldHandleUnknownListItemGracefully() {
-        CaseData caseDataWithUnknownList = new CaseData();
-        caseDataWithUnknownList.setOtherReferralList(List.of("unknownItem"));
-
-        String result = initialConsiderationService.composeIcEt1OtherReferralListDetails(caseDataWithUnknownList);
-
-        assertThat(result).doesNotContain("unknownItem");
-    }
-
-    @Test
-    void composeIcEt1SubstantiveDefectsDetail_shouldReturnEmptyString_whenSubstantiveDefectsListIsNull() {
-        CaseData caseDataWithNullSubstantiveDefectsList = new CaseData();
-        caseDataWithNullSubstantiveDefectsList.setSubstantiveDefectsList(null);
-
-        String result = initialConsiderationService.composeIcEt1SubstantiveDefectsDetail(
-                caseDataWithNullSubstantiveDefectsList);
-
-        assertThat(result).isEmpty();
-    }
-
-    @Test
-    void composeIcEt1SubstantiveDefectsDetail_shouldReturnEmptyString_whenSubstantiveDefectsListIsEmpty() {
-        CaseData caseDataWithEmptySubstantiveDefectsList = new CaseData();
-        caseDataWithEmptySubstantiveDefectsList.setSubstantiveDefectsList(new ArrayList<>());
-
-        String result = initialConsiderationService.composeIcEt1SubstantiveDefectsDetail(
-                caseDataWithEmptySubstantiveDefectsList);
-
-        assertThat(result).isEmpty();
-    }
-
-    @Test
-    void composeIcEt1SubstantiveDefectsDetail_shouldReturnFormattedDetails_whenValidDefectsExist() {
-        CaseData caseDataWithValidSubstantiveDefects = new CaseData();
-        caseDataWithValidSubstantiveDefects.setSubstantiveDefectsList(
-                List.of("rule121a", "rule121b", "rule121c",
-                        "rule121d", "rule121 da", "rule121e"));
-
-        String result = initialConsiderationService.composeIcEt1SubstantiveDefectsDetail(
-                caseDataWithValidSubstantiveDefects);
-
-        assertThat(result).contains("The tribunal has no jurisdiction to consider - Rule 13(1)(a)");
-        assertThat(result).contains("Is in a form which cannot sensibly be responded to or otherwise "
-                + "an abuse of process - Rule 13(1)(b)");
-        assertThat(result).contains("Has neither an EC number nor claims one of the EC exemptions - Rule 13(1)(c)");
-        assertThat(result).contains("States that one of the EC exceptions applies but it might not - Rule 13(1)(d)");
-
-        assertThat(result).contains("Institutes relevant proceedings and the EC number on the "
-                 + "claim form does not match the EC number on the Acas certificate - Rule 13(1)(e)");
-        assertThat(result).contains("Has a different claimant name on the ET1 to the claimant "
-                + "name on the Acas certificate - Rule 13(1)(f)");
-    }
-
-    @Test
-    void composeIcEt1SubstantiveDefectsDetail_shouldIgnoreUnknownDefects() {
-        CaseData caseDataWithUnknownDefects = new CaseData();
-        caseDataWithUnknownDefects.setSubstantiveDefectsList(List.of("rule121a", "unknownRule"));
-
-        String result = initialConsiderationService.composeIcEt1SubstantiveDefectsDetail(caseDataWithUnknownDefects);
-
-        assertThat(result).contains("The tribunal has no jurisdiction to consider - Rule 13(1)(a)");
-        assertThat(result).doesNotContain("unknownRule");
-    }
-
-    @Test
-    void composeIcEt1SubstantiveDefectsDetail_shouldHandleMixedValidAndInvalidDefects() {
-        CaseData caseDataWithInvalidDefects = new CaseData();
-        caseDataWithInvalidDefects.setSubstantiveDefectsList(List.of("rule121a", "rule121f", "invalidRule"));
-
-        String result = initialConsiderationService.composeIcEt1SubstantiveDefectsDetail(caseDataWithInvalidDefects);
-
-        assertThat(result).contains("The tribunal has no jurisdiction to consider - Rule 13(1)(a)");
-        assertThat(result).contains("Has a different respondent name on the ET1 to the respondent name on the "
-                + "Acas certificate - Rule 13(1)(g)");
-        assertThat(result).doesNotContain("invalidRule");
-    }
-
-    @Test
     void setIcEt3VettingIssuesDetailsForEachRespondent_shouldReturnNull_whenRespondentCollectionIsNull() {
         CaseData caseDataWithNullRespondentCollection = new CaseData();
         caseDataWithNullRespondentCollection.setRespondentCollection(null);
@@ -1942,7 +1577,7 @@ class InitialConsiderationServiceTest {
     }
 
     @Test
-    void processEt3Response_shouldHandleNullFieldsInEt3Vetting() {
+    void processEt3Response_shouldNotAddPairsIfNullFieldsInEt3Vetting() {
         Et3VettingType et3Vetting = new Et3VettingType();
         et3Vetting.setEt3IsThereAnEt3Response(null);
         et3Vetting.setEt3NoEt3Response(null);
@@ -1951,9 +1586,7 @@ class InitialConsiderationServiceTest {
 
         initialConsiderationService.processEt3Response(et3Vetting, pairsList);
 
-        assertEquals(1, pairsList.size());
-        assertEquals("Is there an ET3 response?", pairsList.getFirst()[0]);
-        assertNull(pairsList.getFirst()[1]);
+        assertEquals(0, pairsList.size());
     }
 
     @Test
@@ -1997,4 +1630,329 @@ class InitialConsiderationServiceTest {
         et3Vetting.setEt3SuggestedIssueTimePoints("Time points");
         return et3Vetting;
     }
+
+    @Test
+    void setIcEt3VettingIssuesDetailsForEachRespondent_shouldIncludeRespondentNameDetails() {
+        CaseData caseData = getData();
+
+        InitialConsiderationService service = new InitialConsiderationService(tornadoService);
+
+        // Act
+        String result = service.setIcEt3VettingIssuesDetailsForEachRespondent(caseData);
+
+        // Assert
+        assertNotNull(result);
+        assertTrue(result.contains("Do we have the respondent's name?"));
+        assertTrue(result.contains("Does the respondent's name match?"));
+        assertTrue(result.contains("Mismatch details"));
+    }
+
+    private static @NotNull CaseData getData() {
+        Et3VettingType et3Vetting = new Et3VettingType();
+        et3Vetting.setEt3DoWeHaveRespondentsName(YES);
+        et3Vetting.setEt3DoesRespondentsNameMatch(NO);
+        et3Vetting.setEt3RespondentNameMismatchDetails("Mismatch details");
+
+        RespondentSumType respondent = new RespondentSumType();
+        respondent.setRespondentName("Test Respondent");
+        respondent.setEt3Vetting(et3Vetting);
+
+        RespondentSumTypeItem respondentItem = new RespondentSumTypeItem();
+        respondentItem.setValue(respondent);
+
+        CaseData caseData = new CaseData();
+        caseData.setRespondentCollection(List.of(respondentItem));
+        return caseData;
+    }
+
+    // Add to InitialConsiderationServiceTest.java
+
+    @Test
+    void setIcEt3VettingIssuesDetailsForEachRespondent_shouldIncludeResponseInTimeDetails_whenResponseIsNotInTime() {
+        CaseData caseData = getCaseData1();
+        InitialConsiderationService service = new InitialConsiderationService(tornadoService);
+        String result = service.setIcEt3VettingIssuesDetailsForEachRespondent(caseData);
+
+        assertNotNull(result);
+        assertTrue(result.contains("Did we receive the ET3 response in time?"));
+        assertTrue(result.contains(NO));
+        assertTrue(result.contains("Received late due to postal delay"));
+    }
+
+    private static @NotNull CaseData getCaseData1() {
+        Et3VettingType et3Vetting = new Et3VettingType();
+        et3Vetting.setEt3ResponseInTime(NO);
+        et3Vetting.setEt3ResponseInTimeDetails("Received late due to postal delay");
+        RespondentSumType respondent = new RespondentSumType();
+        respondent.setRespondentName("Late Respondent");
+        respondent.setEt3Vetting(et3Vetting);
+        RespondentSumTypeItem respondentItem = new RespondentSumTypeItem();
+        respondentItem.setValue(respondent);
+        CaseData caseData = new CaseData();
+        caseData.setRespondentCollection(List.of(respondentItem));
+        return caseData;
+    }
+
+    @Test
+    void setIcEt3VettingIssuesDetailsForEachRespondent_shouldNotIncludeResponseInTimeDetails_whenResponseIsInTime() {
+        Et3VettingType et3Vetting = new Et3VettingType();
+        et3Vetting.setEt3ResponseInTime(YES);
+        RespondentSumType respondent = new RespondentSumType();
+        respondent.setRespondentName("On Time Respondent");
+        respondent.setEt3Vetting(et3Vetting);
+        RespondentSumTypeItem respondentItem = new RespondentSumTypeItem();
+        respondentItem.setValue(respondent);
+        CaseData caseData = new CaseData();
+        caseData.setRespondentCollection(List.of(respondentItem));
+
+        InitialConsiderationService service = new InitialConsiderationService(tornadoService);
+        String result = service.setIcEt3VettingIssuesDetailsForEachRespondent(caseData);
+
+        assertNotNull(result);
+        assertFalse(result.contains("Did we receive the ET3 response in time?"));
+    }
+
+    @Test
+    void setIcEt1VettingIssuesDetails_shouldReturnNull_whenCaseDataIsNull() {
+        InitialConsiderationService service = new InitialConsiderationService(tornadoService);
+        String result = service.setIcEt1VettingIssuesDetails(null);
+        assertNull(result);
+    }
+
+    @Test
+    void setIcEt1VettingIssuesDetails_shouldReturnNonEmptyString_whenCaseDataIsValid() {
+        InitialConsiderationService service = new InitialConsiderationService(tornadoService);
+        //No specific fields are set in CaseData, but it is not null
+        CaseData caseData = new CaseData();
+        String result = service.setIcEt1VettingIssuesDetails(caseData);
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void setIcEt1VettingIssuesDetails_shouldIncludeServingClaimsSection_whenAnswerIsNo() {
+        InitialConsiderationService service = new InitialConsiderationService(tornadoService);
+        CaseData caseData = new CaseData();
+        caseData.setEt1VettingCanServeClaimYesOrNo("No");
+        caseData.setEt1VettingCanServeClaimNoReason("Missing address");
+        caseData.setEt1VettingCanServeClaimGeneralNote("serving claims - general notes");
+        String result = service.setIcEt1VettingIssuesDetails(caseData);
+
+        assertTrue(result.contains("serving claims") || result.toLowerCase(Locale.UK).contains("serving"));
+        assertThat(result).contains("Can we serve the claim with these contact details?");
+        assertThat(result).contains("Reason for not serving");
+        assertThat(result).contains("Missing address");
+        assertThat(result).contains("serving claims - general notes");
+    }
+
+    @Test
+    void setIcEt1VettingIssuesDetails_shouldIncludeSubstantiveDefectsSection_whenDefectsReported() {
+        InitialConsiderationService service = new InitialConsiderationService(tornadoService);
+        CaseData caseData = new CaseData();
+        List<String> substantiveDefectsDetails = new ArrayList<>(List.of("rule121a", "rule121a"));
+        caseData.setSubstantiveDefectsList(substantiveDefectsDetails);
+        String result = service.setIcEt1VettingIssuesDetails(caseData);
+        assertTrue(result.toLowerCase(Locale.UK).contains("%rule 121a%")
+                || result.toLowerCase(Locale.UK).contains("substantive defects"));
+    }
+
+    @Test
+    void setIcEt1VettingIssuesDetails_shouldIncludeHearingVenueDetails_whenSuggestHearingVenueIsYes() {
+        CaseData caseData = new CaseData();
+        caseData.setEt1SuggestHearingVenue("Yes");
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
+        DynamicValueType dynamicValueType = new DynamicValueType();
+        dynamicValueType.setCode("VENUE1");
+        dynamicValueType.setLabel("London Venue");
+        dynamicFixedListType.setListItems(List.of(dynamicValueType));
+        dynamicFixedListType.setValue(dynamicValueType);
+
+        caseData.setEt1HearingVenues(dynamicFixedListType);
+        caseData.setEt1HearingVenueGeneralNotes("General notes about venue");
+
+        InitialConsiderationService service = new InitialConsiderationService(null);
+        String result = service.setIcEt1VettingIssuesDetails(caseData);
+
+        assertThat(result).contains("Details of Hearing Venue Issues");
+        assertThat(result).contains("London Venue");
+        assertThat(result).contains("General notes about venue");
+    }
+
+    @Test
+    void setIcEt1VettingIssuesDetails_shouldNotIncludeOtherReferralSection_whenNoOtherReferralsExist() {
+        CaseData caseData = new CaseData();
+        // Ensure no other referral data is set
+
+        InitialConsiderationService service = new InitialConsiderationService(null);
+        String result = service.setIcEt1VettingIssuesDetails(caseData);
+
+        assertThat(result).doesNotContain("Details of Other Referral");
+    }
+
+    @Test
+    void setIcEt1VettingIssuesDetails_shouldIncludeAllOtherReferralReasons() {
+        CaseData caseData = new CaseData();
+        caseData.setOtherReferralList(List.of(
+                "claimOutOfTime",
+                "multipleClaim",
+                "employmentStatusIssues",
+                "pidJurisdictionRegulator",
+                "videoHearingPreference",
+                "rule50IssuesOtherFactors",
+                "otherRelevantFactors"
+        ));
+
+        InitialConsiderationService service = new InitialConsiderationService(null); // provide required dependencies
+        String result = service.setIcEt1VettingIssuesDetails(caseData);
+
+        assertThat(result).contains("Claim out of time");
+        assertThat(result).contains("Multiple claims");
+        assertThat(result).contains("Employment status issues");
+        assertThat(result).contains("Pid jurisdiction regulator");
+        assertThat(result).contains("Video hearing preference");
+        assertThat(result).contains("Rule49 issues - other factors");
+        assertThat(result).contains("Other relevant factors");
+    }
+
+    @Test
+    void setIcEt1VettingIssuesDetails_shouldReturnEmpty_whenOtherReferralListIsNullOrEmpty() {
+        CaseData caseData = new CaseData();
+        caseData.setOtherReferralList(null);
+
+        InitialConsiderationService service = new InitialConsiderationService(null);
+        String result = service.setIcEt1VettingIssuesDetails(caseData);
+
+        assertThat(result).doesNotContain("Details of Other Referral");
+
+        caseData.setOtherReferralList(Collections.emptyList());
+        result = service.setIcEt1VettingIssuesDetails(caseData);
+
+        assertThat(result).doesNotContain("Details of Other Referral");
+    }
+
+    // Add to InitialConsiderationServiceTest.java
+
+    @Test
+    void setIcEt1VettingIssuesDetails_shouldReturnEmpty_whenReferralToJudgeOrLOListIsNullOrEmpty() {
+        CaseData caseData = new CaseData();
+        caseData.setReferralToJudgeOrLOList(null);
+        String result = initialConsiderationService.setIcEt1VettingIssuesDetails(caseData);
+        assertFalse(result.contains("Details of Referral To Judge or LO"));
+
+        caseData.setReferralToJudgeOrLOList(Collections.emptyList());
+        result = initialConsiderationService.setIcEt1VettingIssuesDetails(caseData);
+        assertFalse(result.contains("Details of Referral To Judge or LO"));
+    }
+
+    @Test
+    void setIcEt1VettingIssuesDetails_shouldIncludeAllReferralTypes() {
+        CaseData caseData = getCaseData2();
+
+        String result = initialConsiderationService.setIcEt1VettingIssuesDetails(caseData);
+
+        assertTrue(result.contains("A claim of interim relief"));
+        assertTrue(result.contains("Interim relief details"));
+        assertTrue(result.contains("A statutory appeal"));
+        assertTrue(result.contains("Statutory appeal details"));
+        assertTrue(result.contains("An allegation of the commission of a sexual offence"));
+        assertTrue(result.contains("Sexual offence details"));
+        assertTrue(result.contains("Insolvency"));
+        assertTrue(result.contains("Insolvency details"));
+        assertTrue(result.contains("Jurisdictions unclear"));
+        assertTrue(result.contains("Jurisdictions unclear details"));
+        assertTrue(result.contains("Length of service"));
+        assertTrue(result.contains("Length of service details"));
+        assertTrue(result.contains("Potentially linked cases in the ECM"));
+        assertTrue(result.contains("Linked cases details"));
+        assertTrue(result.contains("Rule 49 issues"));
+        assertTrue(result.contains("Rule 49 issues details"));
+        assertTrue(result.contains("Another reason for judicial referral"));
+        assertTrue(result.contains("Other judicial referral details"));
+    }
+
+    private static @NotNull CaseData getCaseData2() {
+        CaseData caseData = new CaseData();
+        caseData.setReferralToJudgeOrLOList(List.of(
+                "aClaimOfInterimRelief", "aStatutoryAppeal", "anAllegationOfCommissionOfSexualOffence",
+                "insolvency", "jurisdictionsUnclear", "lengthOfService", "potentiallyLinkedCasesInTheEcm",
+                "rule50Issues", "anotherReasonForJudicialReferral"
+        ));
+        caseData.setAclaimOfInterimReliefTextArea("Interim relief details");
+        caseData.setAstatutoryAppealTextArea("Statutory appeal details");
+        caseData.setAnAllegationOfCommissionOfSexualOffenceTextArea("Sexual offence details");
+        caseData.setInsolvencyTextArea("Insolvency details");
+        caseData.setJurisdictionsUnclearTextArea("Jurisdictions unclear details");
+        caseData.setLengthOfServiceTextArea("Length of service details");
+        caseData.setPotentiallyLinkedCasesInTheEcmTextArea("Linked cases details");
+        caseData.setRule50IssuesTextArea("Rule 49 issues details");
+        caseData.setAnotherReasonForJudicialReferralTextArea("Other judicial referral details");
+        return caseData;
+    }
+
+    @Test
+    void setIcEt1VettingIssuesDetails_shouldIncludeAllSubstantiveDefectsDescriptions() {
+        CaseData caseData = new CaseData();
+        caseData.setSubstantiveDefectsList(List.of(
+                "rule121a", "rule121b", "rule121c", "rule121d", "rule121 da", "rule121e", "rule121f"
+        ));
+
+        String result = initialConsiderationService.setIcEt1VettingIssuesDetails(caseData);
+
+        assertThat(result).contains("The tribunal has no jurisdiction to consider - Rule 13(1)(a)");
+        assertThat(result).contains("Is in a form which cannot sensibly be responded to or otherwise an abuse of "
+                + "process - Rule 13(1)(b)");
+        assertThat(result).contains("Has neither an EC number nor claims one of the EC exemptions - Rule 13(1)(c)");
+        assertThat(result).contains("States that one of the EC exceptions applies but it might not - Rule 13(1)(d)");
+        assertThat(result).contains("Institutes relevant proceedings and the EC number on the claim form does not "
+                + "match the EC number on the Acas certificate - Rule 13(1)(e)");
+        assertThat(result).contains("Has a different claimant name on the ET1 to the claimant name on the Acas "
+                + "certificate - Rule 13(1)(f)");
+        assertThat(result).contains("Has a different respondent name on the ET1 to the respondent name on the "
+                + "Acas certificate - Rule 13(1)(g)");
+    }
+
+    @Test
+    void setIcEt1VettingIssuesDetails_shouldReturnEmptyString_whenSubstantiveDefectsListIsNullOrEmpty() {
+        CaseData caseData = new CaseData();
+        caseData.setSubstantiveDefectsList(null);
+
+        String result = initialConsiderationService.setIcEt1VettingIssuesDetails(caseData);
+        assertThat(result).doesNotContain("Details of Substantive Defects");
+
+        caseData.setSubstantiveDefectsList(Collections.emptyList());
+        result = initialConsiderationService.setIcEt1VettingIssuesDetails(caseData);
+        assertThat(result).doesNotContain("Details of Substantive Defects");
+    }
+
+    @Test
+    void setIcEt1VettingIssuesDetails_shouldReturnEmptyString_whenTrackAllocationIsNull() {
+        CaseData caseData = new CaseData();
+        caseData.setIsTrackAllocationCorrect(null);
+        String result = initialConsiderationService.setIcEt1VettingIssuesDetails(caseData);
+        assertFalse(result.contains("Track Allocation Issue"));
+    }
+
+    @Test
+    void setIcEt1VettingIssuesDetails_shouldReturnEmptyString_whenTrackAllocationIsYes() {
+        CaseData caseData = new CaseData();
+        caseData.setIsTrackAllocationCorrect("Yes");
+        String result = initialConsiderationService.setIcEt1VettingIssuesDetails(caseData);
+        assertFalse(result.contains("Track Allocation Issue"));
+    }
+
+    @Test
+    void setIcEt1VettingIssuesDetails_shouldIncludeTrackAllocationDetails_whenTrackAllocationIsNo() {
+        CaseData caseData = new CaseData();
+        caseData.setIsTrackAllocationCorrect("No");
+        caseData.setSuggestAnotherTrack("Fast Track");
+        caseData.setWhyChangeTrackAllocation("Complex case");
+        caseData.setTrackAllocationGeneralNotes("Requires special handling");
+        String result = initialConsiderationService.setIcEt1VettingIssuesDetails(caseData);
+        assertTrue(result.contains("Track Allocation Issue"));
+        assertTrue(result.contains("Is the track allocation correct?"));
+        assertTrue(result.contains("Suggested Track:"));
+        assertTrue(result.contains("Why Change Track Allocation?"));
+        assertTrue(result.contains("Track Allocation General Notes"));
+    }
+
 }

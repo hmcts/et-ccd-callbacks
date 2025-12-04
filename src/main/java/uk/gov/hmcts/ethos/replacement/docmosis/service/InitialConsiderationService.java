@@ -32,6 +32,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.IntWrapper;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
@@ -102,6 +103,7 @@ public class InitialConsiderationService {
     private static final String BULLET_POINT = "\n -  ";
     private static final String GENERAL_NOTES = "General notes:";
     private static final String GIVE_DETAILS = "Give Details:";
+    private static final String DETAILS = "Details";
     private static final String NEWLINE_FOR_DETAILS = "\n\nDetails: \n";
     private static final String NEWLINE = "\n";
     private static final String NONE_PROVIDED = "None provided.";
@@ -525,7 +527,7 @@ public class InitialConsiderationService {
         caseData.setEtICConvertF2fGiveDetails(null);
         caseData.setEtICHearingListedAnswers(null);
     }
-    
+
     public void processIcDocumentCollections(CaseData caseData) {
         List<DocumentTypeItem> mergedCollection = new ArrayList<>();
         if (caseData.getIcDocumentCollection1() != null) {
@@ -538,202 +540,6 @@ public class InitialConsiderationService {
             mergedCollection.addAll(caseData.getIcDocumentCollection3());
         }
         caseData.setIcAllDocumentCollection(mergedCollection);
-    }
-
-    public String composeIcEt1ReferralToJudgeOrLOListWithDetails(CaseData caseData) {
-        StringBuilder referralDetails = new StringBuilder();
-
-        if (caseData.getReferralToJudgeOrLOList() != null && !caseData.getReferralToJudgeOrLOList().isEmpty()) {
-            for (String listItem : caseData.getReferralToJudgeOrLOList()) {
-                referralDetails.append(NEWLINE).append(BULLET_POINT);
-
-                String detailText = switch (listItem) {
-                    case "aClaimOfInterimRelief" -> appendDetail("A claim of interim relief",
-                            caseData.getAclaimOfInterimReliefTextArea());
-                    case "aStatutoryAppeal" -> appendDetail("A statutory appeal",
-                            caseData.getAstatutoryAppealTextArea());
-                    case "anAllegationOfCommissionOfSexualOffence" -> appendDetail(
-                            "An allegation of the commission of a sexual offence",
-                            caseData.getAnAllegationOfCommissionOfSexualOffenceTextArea());
-                    case "insolvency" -> appendDetail("Insolvency", caseData.getInsolvencyTextArea());
-                    case "jurisdictionsUnclear" -> appendDetail("Jurisdictions unclear",
-                            caseData.getJurisdictionsUnclearTextArea());
-                    case "lengthOfService" -> appendDetail("Length of service",
-                            caseData.getLengthOfServiceTextArea());
-                    case "potentiallyLinkedCasesInTheEcm" -> appendDetail("Potentially linked cases in the ECM",
-                            caseData.getPotentiallyLinkedCasesInTheEcmTextArea());
-                    case "rule50Issues" -> appendDetail("Rule 49 issues", caseData.getRule50IssuesTextArea());
-                    case "anotherReasonForJudicialReferral" -> appendDetail(
-                            "Another reason for judicial referral",
-                            caseData.getAnotherReasonForJudicialReferralTextArea());
-                    default -> "";
-                };
-
-                referralDetails.append(detailText).append(NEWLINE);
-            }
-        }
-        return referralDetails.toString();
-    }
-
-    private String appendDetail(String label, String textArea) {
-        if (textArea != null && !textArea.isEmpty()) {
-            return label + NEWLINE_FOR_DETAILS + textArea;
-        }
-        return label;
-    }
-
-    public String composeIcEt1ReferralToREJOrVPListWithDetails(CaseData caseData) {
-        StringBuilder icEt1ReferralToREJOrVPListText = new StringBuilder();
-
-        if (caseData.getReferralToREJOrVPList() != null && !caseData.getReferralToREJOrVPList().isEmpty()) {
-            caseData.getReferralToREJOrVPList().forEach(referral -> {
-                switch (referral) {
-                    case "vexatiousLitigantOrder":
-                        appendReferralDetails(icEt1ReferralToREJOrVPListText,
-                                "A claimant covered by vexatious litigant order",
-                                caseData.getVexatiousLitigantOrderTextArea());
-                        break;
-                    case "aNationalSecurityIssue":
-                        appendReferralDetails(icEt1ReferralToREJOrVPListText,
-                                "A national security issue",
-                                caseData.getAnationalSecurityIssueTextArea());
-                        break;
-                    case "nationalMultipleOrPresidentialOrder":
-                        appendReferralDetails(icEt1ReferralToREJOrVPListText,
-                                "A part of national multiple / covered by Presidential case management order",
-                                caseData.getNationalMultipleOrPresidentialOrderTextArea());
-                        break;
-                    case "transferToOtherRegion":
-                        appendReferralDetails(icEt1ReferralToREJOrVPListText,
-                                "A request for transfer to another ET region",
-                                caseData.getTransferToOtherRegionTextArea());
-                        break;
-                    case "serviceAbroad":
-                        appendReferralDetails(icEt1ReferralToREJOrVPListText,
-                                "A request for service abroad",
-                                caseData.getServiceAbroadTextArea());
-                        break;
-                    case "aSensitiveIssue":
-                        appendReferralDetails(icEt1ReferralToREJOrVPListText,
-                                "A sensitive issue which may attract publicity or need early allocation "
-                                + "to a specific judge",
-                                caseData.getAsensitiveIssueTextArea());
-                        break;
-                    case "anyPotentialConflict":
-                        appendReferralDetails(icEt1ReferralToREJOrVPListText,
-                                "Any potential conflict involving judge, non-legal member "
-                                + "or HMCTS staff member",
-                                caseData.getAnyPotentialConflictTextArea());
-                        break;
-                    case "anotherReasonREJOrVP":
-                        appendReferralDetails(icEt1ReferralToREJOrVPListText,
-                                "Another reason for Regional Employment Judge / Vice-President referral",
-                                caseData.getAnotherReasonREJOrVPTextArea());
-                        break;
-                    default:
-                        // do nothing
-                }
-            });
-        }
-        return icEt1ReferralToREJOrVPListText.toString();
-    }
-
-    public String composeIcEt1OtherReferralListDetails(CaseData caseData) {
-        StringBuilder icEt1OtherReferralListDetailText = new StringBuilder();
-        if (caseData.getOtherReferralList() != null && !caseData.getOtherReferralList().isEmpty()) {
-            caseData.getOtherReferralList().forEach(
-                    referralToListEntry -> processReferralToREJOrVPListEntries(caseData,
-                            referralToListEntry, icEt1OtherReferralListDetailText));
-        }
-        return  icEt1OtherReferralListDetailText.toString();
-    }
-
-    private void processReferralToREJOrVPListEntries(CaseData caseData, String referralToREJOrVPListEntry,
-                                                       StringBuilder referralListEntryWithDetailsText) {
-        switch (referralToREJOrVPListEntry) {
-            case "claimOutOfTime": appendReferralDetails(referralListEntryWithDetailsText,
-                        "The whole or any part of the claim is out of time",
-                        caseData.getClaimOutOfTimeTextArea());
-                break;
-            case "multipleClaim": appendReferralDetails(referralListEntryWithDetailsText,
-                        "The claim is part of a multiple claim",
-                        caseData.getMultipleClaimTextArea());
-                break;
-            case "employmentStatusIssues": appendReferralDetails(referralListEntryWithDetailsText,
-                        "The claim has a potential issue about employment status",
-                        caseData.getEmploymentStatusIssuesTextArea());
-                break;
-            case "pidJurisdictionRegulator": appendReferralDetails(referralListEntryWithDetailsText,
-                        "The claim has PID jurisdiction and claimant wants it forwarded to "
-                        + "relevant regulator - Box 10.1",
-                        caseData.getPidJurisdictionRegulatorTextArea());
-                break;
-            case "videoHearingPreference": appendReferralDetails(referralListEntryWithDetailsText,
-                        "The claimant prefers a video hearing",
-                        caseData.getVideoHearingPreferenceTextArea());
-                break;
-            case "rule50IssuesOtherFactors": appendReferralDetails(referralListEntryWithDetailsText,
-                        "The claim has Rule 49 issues",
-                        caseData.getRule50IssuesForOtherReferralTextArea());
-                break;
-            case "otherRelevantFactors": appendReferralDetails(referralListEntryWithDetailsText,
-                        "The claim has other relevant factors for judicial referral",
-                        caseData.getAnotherReasonForOtherReferralTextArea());
-                break;
-            default:
-                // do nothing
-        }
-    }
-
-    private void appendReferralDetails(StringBuilder textBuilder, String message, String textAreaContent) {
-        textBuilder.append(BULLET_POINT).append(message);
-        if (textAreaContent != null && !textAreaContent.isBlank()) {
-            textBuilder.append(NEWLINE_FOR_DETAILS).append(textAreaContent);
-        }
-        textBuilder.append(NEWLINE);
-    }
-
-    public String composeIcEt1SubstantiveDefectsDetail(CaseData caseData) {
-        StringBuilder icEt1VettingIssuesDetailText = new StringBuilder();
-        if (caseData.getSubstantiveDefectsList() != null && !caseData.getSubstantiveDefectsList().isEmpty()) {
-            caseData.getSubstantiveDefectsList().forEach(defect -> {
-                icEt1VettingIssuesDetailText.append(NEWLINE).append("- ");
-                switch (defect) {
-                    case "rule121a" :
-                        icEt1VettingIssuesDetailText.append(
-                                "The tribunal has no jurisdiction to consider - Rule 13(1)(a)").append(NEWLINE);
-                        break;
-                    case "rule121b":
-                        icEt1VettingIssuesDetailText.append("Is in a form which cannot sensibly be responded to or "
-                             + "otherwise an abuse of process - Rule 13(1)(b)").append(NEWLINE);
-                        break;
-                    case "rule121c" :
-                        icEt1VettingIssuesDetailText.append("Has neither an EC number nor claims one of the EC "
-                             + "exemptions - Rule 13(1)(c)").append(NEWLINE);
-                        break;
-                    case "rule121d":
-                        icEt1VettingIssuesDetailText.append("States that one of the EC exceptions applies but it "
-                             + "might not - Rule 13(1)(d)").append(NEWLINE);
-                        break;
-                    case "rule121 da":
-                        icEt1VettingIssuesDetailText.append("Institutes relevant proceedings and the EC number on the "
-                             + "claim form does not match the EC number on the Acas certificate - Rule 13(1)(e)"
-                        ).append(NEWLINE);
-                        break;
-                    case "rule121e" :
-                        icEt1VettingIssuesDetailText.append("Has a different claimant name on the ET1 to the claimant "
-                             + "name on the Acas certificate - Rule 13(1)(f)").append(NEWLINE);
-                        break;
-                    case "rule121f":
-                        icEt1VettingIssuesDetailText.append("Has a different respondent name on the ET1 to the "
-                             + "respondent name on the Acas certificate - Rule 13(1)(g)").append(NEWLINE);
-                        break;
-                    default:
-                        // do nothing
-                }
-            });
-        }
-        return icEt1VettingIssuesDetailText.toString();
     }
 
     public String setIcEt3VettingIssuesDetailsForEachRespondent(CaseData caseData) {
@@ -769,6 +575,7 @@ public class InitialConsiderationService {
         }
 
         stringBuilder.append(MarkdownHelper.createTwoColumnTable(HEADER, et3VettingIssuesPairsList));
+
         return MarkdownHelper.detailsWrapper("Details of ET3 Vetting Issues", stringBuilder.toString());
     }
 
@@ -861,8 +668,10 @@ public class InitialConsiderationService {
         }
     }
 
-    private void addPair(List<String[]> list, String key, String value) {
-        list.add(new String[]{key, value});
+    private static void addPair(List<String[]> list, String key, String value) {
+        if (key != null && value != null) {
+            list.add(new String[]{key, value});
+        }
     }
 
     private String defaultIfNull(String value) {
@@ -881,4 +690,461 @@ public class InitialConsiderationService {
         };
     }
 
+    public String setIcEt1VettingIssuesDetails(CaseData caseData) {
+
+        if (caseData == null) {
+            return null;
+        }
+
+        StringBuilder et1VettingIssuesTablesMarkup = new StringBuilder();
+
+        //serving claims
+        composeServingClaimsTableMarkUp(caseData, et1VettingIssuesTablesMarkup);
+
+        //Substantive Defects
+        composeSubstantiveDefectsTableMarkUp(caseData, et1VettingIssuesTablesMarkup);
+
+        //Is track allocation correct?
+        composeTrackAllocationTableMarkUp(caseData, et1VettingIssuesTablesMarkup);
+
+        //Is this location correct?
+        composeLocationalIssuesTableMarkUp(caseData, et1VettingIssuesTablesMarkup);
+
+        //Do you want to suggest a hearing venue?
+        composeHearingVenueIssuesTableMarkUp(caseData, et1VettingIssuesTablesMarkup);
+
+        //respondet type issues
+
+        //resonable adjustments issues
+
+        //video hearing issues
+
+        //Referral to Judge or LO
+        composeReferralToJudgeOrLoTableMarkUp(caseData, et1VettingIssuesTablesMarkup);
+
+        //Referral to REJ or VP
+        composeReferralToREJOrVPTableMarkUp(caseData, et1VettingIssuesTablesMarkup);
+
+        //Other referrals - commented out as per requirements
+        composeIcEt1OtherReferralTableMarkUp(caseData, et1VettingIssuesTablesMarkup);
+
+        return et1VettingIssuesTablesMarkup.toString();
+    }
+
+    private static void composeHearingVenueIssuesTableMarkUp(CaseData caseData,
+                                                           StringBuilder et1VettingIssuesTablesMarkup) {
+        StringBuilder hearingVenueIssueStringBuilder = new StringBuilder();
+
+        if (caseData.getEt1SuggestHearingVenue() != null
+                && YES.equals(caseData.getEt1SuggestHearingVenue())) {
+            List<String[]> hearingVenueIssuesPairsList = new ArrayList<>();
+
+            addPair(hearingVenueIssuesPairsList, "Do you want to suggest a hearing venue?",
+                    defaultIfEmpty(caseData.getEt1SuggestHearingVenue(), ""));
+
+            //et1HearingVenues
+            if (caseData.getEt1HearingVenues() != null
+                    && !caseData.getEt1HearingVenues().getSelectedCode().isEmpty()) {
+                addPair(hearingVenueIssuesPairsList, "Hearing venue selected",
+                        defaultIfEmpty(caseData.getEt1HearingVenues().getSelectedLabel(), ""));
+            }
+
+            //et1HearingVenues
+            if (caseData.getEt1HearingVenueGeneralNotes() != null
+                    && !caseData.getEt1HearingVenueGeneralNotes().isEmpty()) {
+                addPair(hearingVenueIssuesPairsList, "General Notes (Hearing Venue)",
+                        defaultIfEmpty(caseData.getEt1HearingVenueGeneralNotes(), ""));
+            }
+
+            if (!hearingVenueIssuesPairsList.isEmpty()) {
+                hearingVenueIssueStringBuilder.append(MarkdownHelper.createTwoColumnTable(
+                        new String[]{"Hearing Venue Issue", DETAILS},
+                        hearingVenueIssuesPairsList));
+                et1VettingIssuesTablesMarkup.append(MarkdownHelper.detailsWrapper(
+                        "Details of Hearing Venue Issues",
+                        hearingVenueIssueStringBuilder.toString()));
+                et1VettingIssuesTablesMarkup.append(NEWLINE);
+            }
+        }
+    }
+
+    private static void composeLocationalIssuesTableMarkUp(CaseData caseData,
+                                                        StringBuilder et1VettingIssuesTablesMarkup) {
+        StringBuilder locationIssueStringBuilder = new StringBuilder();
+
+        if (caseData.getIsLocationCorrect() != null
+                && NO.equals(caseData.getIsLocationCorrect())) {
+            List<String[]> locationIssuesPairsList = new ArrayList<>();
+
+            addPair(locationIssuesPairsList, "Is this location correct?",
+                    defaultIfEmpty(caseData.getIsLocationCorrect(), ""));
+            //Newly selected regional office
+            if (caseData.getRegionalOfficeList() != null
+                    && !caseData.getRegionalOfficeList().getSelectedCode().isEmpty()) {
+                addPair(locationIssuesPairsList, "Local or regional office selected",
+                        defaultIfEmpty(caseData.getRegionalOfficeList().getSelectedLabel(), ""));
+            }
+            //Reason for changing regional office
+            if (caseData.getWhyChangeOffice() != null
+                    && !caseData.getWhyChangeOffice().isEmpty()) {
+                addPair(locationIssuesPairsList, "Why should we change the office?",
+                        defaultIfEmpty(caseData.getWhyChangeOffice(), ""));
+            }
+            if (!locationIssuesPairsList.isEmpty()) {
+                locationIssueStringBuilder.append(MarkdownHelper.createTwoColumnTable(
+                        new String[]{"Locational Issue", DETAILS},
+                        locationIssuesPairsList));
+                et1VettingIssuesTablesMarkup.append(MarkdownHelper.detailsWrapper(
+                        "Details of Locational Issues",
+                        locationIssueStringBuilder.toString()));
+                et1VettingIssuesTablesMarkup.append(NEWLINE);
+            }
+        }
+    }
+
+    private static void composeServingClaimsTableMarkUp(CaseData caseData,
+                                                        StringBuilder et1VettingIssuesTablesMarkup) {
+        StringBuilder servingClaimsStringBuilder = new StringBuilder();
+
+        if (caseData.getEt1VettingCanServeClaimYesOrNo() != null
+                && NO.equals(caseData.getEt1VettingCanServeClaimYesOrNo())) {
+            List<String[]> canServeClaimIssuesPairsList = new ArrayList<>();
+
+            addPair(canServeClaimIssuesPairsList, "Can we serve the claim with these contact details?",
+                    defaultIfEmpty(caseData.getEt1VettingCanServeClaimYesOrNo(), ""));
+
+            if (caseData.getEt1VettingCanServeClaimNoReason() != null
+                    && !caseData.getEt1VettingCanServeClaimNoReason().isEmpty()) {
+                addPair(canServeClaimIssuesPairsList, "Reason for not serving",
+                        defaultIfEmpty(caseData.getEt1VettingCanServeClaimNoReason(), ""));
+            }
+
+            if (caseData.getEt1VettingCanServeClaimGeneralNote() != null
+                    && !caseData.getEt1VettingCanServeClaimGeneralNote().isEmpty()) {
+                addPair(canServeClaimIssuesPairsList, "General Note (Serve Claim)",
+                        defaultIfEmpty(caseData.getEt1VettingCanServeClaimGeneralNote(), ""));
+            }
+
+            if (!canServeClaimIssuesPairsList.isEmpty()) {
+                servingClaimsStringBuilder.append(MarkdownHelper.createTwoColumnTable(
+                        new String[]{"Serving Claim Issue", DETAILS},
+                        canServeClaimIssuesPairsList));
+                et1VettingIssuesTablesMarkup.append(MarkdownHelper.detailsWrapper(
+                        "Details of Serving Claims",
+                        servingClaimsStringBuilder.toString()));
+                et1VettingIssuesTablesMarkup.append(NEWLINE);
+            }
+        }
+    }
+
+    private static void composeIcEt1OtherReferralTableMarkUp(CaseData caseData,
+                                                            StringBuilder et1VettingIssuesTablesMarkup) {
+        StringBuilder otherReferralStringBuilder = new StringBuilder();
+        List<List<String>> otherReferralsIssues = composeIcEt1OtherReferralListDetails(caseData);
+        List<String[]> otherReferralIssuesPairsList = new ArrayList<>();
+
+        if (!CollectionUtils.isEmpty(otherReferralsIssues)) {
+            otherReferralsIssues.forEach(referralAndDetailPair ->
+                    addPair(otherReferralIssuesPairsList, referralAndDetailPair.getFirst(),
+                            referralAndDetailPair.get(1)));
+            otherReferralStringBuilder.append(MarkdownHelper.createTwoColumnTable(
+                    new String[]{"Referral Issue", "Detail"},
+                    otherReferralIssuesPairsList));
+            et1VettingIssuesTablesMarkup.append(MarkdownHelper.detailsWrapper(
+                    "Details of Other Referral",
+                    otherReferralStringBuilder.toString()));
+            et1VettingIssuesTablesMarkup.append(NEWLINE);
+        }
+    }
+
+    private static void composeReferralToREJOrVPTableMarkUp(CaseData caseData,
+                                                            StringBuilder et1VettingIssuesTablesMarkup) {
+        StringBuilder referralToJudgeOrLOStringBuilder = new StringBuilder();
+
+        List<List<String>> referralsIssues = composeIcEt1ReferralToREJOrVPListWithDetails(caseData);
+        List<String[]> et1VettingReferralIssuesPairsList = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(referralsIssues)) {
+            referralsIssues.forEach(referralAndDetailPair ->
+                    addPair(et1VettingReferralIssuesPairsList, referralAndDetailPair.getFirst(),
+                            referralAndDetailPair.get(1)));
+            referralToJudgeOrLOStringBuilder.append(MarkdownHelper.createTwoColumnTable(
+                    new String[]{"Referral Issue", "Detail"},
+                    et1VettingReferralIssuesPairsList));
+            et1VettingIssuesTablesMarkup.append(MarkdownHelper.detailsWrapper(
+                    "Details of Referral To REJ or VP",
+                    referralToJudgeOrLOStringBuilder.toString()));
+            et1VettingIssuesTablesMarkup.append(NEWLINE);
+        }
+    }
+
+    private static List<List<String>> composeIcEt1ReferralToREJOrVPListWithDetails(CaseData caseData) {
+        if (caseData == null) {
+            return Collections.emptyList();
+        }
+
+        List<List<String>> referralToREJOrVPDetails = new ArrayList<>();
+
+        if (caseData.getReferralToREJOrVPList() != null && !caseData.getReferralToREJOrVPList().isEmpty()) {
+            caseData.getReferralToREJOrVPList().forEach(referral -> {
+                switch (referral) {
+                    case "vexatiousLitigantOrder":
+                        referralToREJOrVPDetails.add(List.of("A claimant covered by vexatious litigant order",
+                                defaultIfEmpty(caseData.getVexatiousLitigantOrderTextArea(), "")));
+                        break;
+                    case "aNationalSecurityIssue":
+                        referralToREJOrVPDetails.add(List.of("A national security issue",
+                                defaultIfEmpty(caseData.getAnationalSecurityIssueTextArea(), "")));
+                        break;
+                    case "nationalMultipleOrPresidentialOrder":
+                        referralToREJOrVPDetails.add(List.of("A part of national multiple / covered by "
+                                + "Presidential case management order",
+                                defaultIfEmpty(caseData.getNationalMultipleOrPresidentialOrderTextArea(),
+                                        "")));
+                        break;
+                    case "transferToOtherRegion":
+                        referralToREJOrVPDetails.add(List.of("A request for transfer to another ET region",
+                                        defaultIfEmpty(caseData.getTransferToOtherRegionTextArea(),  "")));
+                        break;
+                    case "serviceAbroad":
+                        referralToREJOrVPDetails.add(List.of("A request for service abroad",
+                                defaultIfEmpty(caseData.getServiceAbroadTextArea(), "")));
+                        break;
+                    case "aSensitiveIssue":
+                        referralToREJOrVPDetails.add(List.of("A sensitive issue which may attract publicity "
+                                + "or need early allocation to a specific judge",
+                                defaultIfEmpty(caseData.getAsensitiveIssueTextArea(), "")));
+                        break;
+                    case "anyPotentialConflict":
+                        referralToREJOrVPDetails.add(List.of("Any potential conflict involving judge, "
+                                + "non-legal member or HMCTS staff member",
+                                defaultIfEmpty(caseData.getAnyPotentialConflictTextArea(), "")));
+                        break;
+                    case "anotherReasonREJOrVP":
+                        referralToREJOrVPDetails.add(List.of("Another reason for Regional Employment Judge / "
+                                + "Vice-President referral",
+                                defaultIfEmpty(caseData.getAnotherReasonREJOrVPTextArea(), "")));
+                        break;
+                    default:
+                        // do nothing
+                }
+            });
+        }
+
+        return referralToREJOrVPDetails;
+    }
+
+    private static void composeReferralToJudgeOrLoTableMarkUp(CaseData caseData,
+                                                         StringBuilder et1VettingIssuesTablesMarkup) {
+        StringBuilder referralToJudgeOrLOStringBuilder = new StringBuilder();
+        List<List<String>>  referralsIssues = composeIcEt1ReferralToJudgeOrLOListWithDetails(caseData);
+        List<String[]> et1VettingReferralIssuesPairsList = new ArrayList<>();
+        if (!CollectionUtils.isEmpty(referralsIssues)) {
+            referralsIssues.forEach(referralAndDetailPair ->
+                    addPair(et1VettingReferralIssuesPairsList, referralAndDetailPair.getFirst(),
+                            referralAndDetailPair.get(1)));
+            referralToJudgeOrLOStringBuilder.append(MarkdownHelper.createTwoColumnTable(
+                    new String[]{"Referral Issue", "Detail"},
+                    et1VettingReferralIssuesPairsList));
+            et1VettingIssuesTablesMarkup.append(MarkdownHelper.detailsWrapper(
+                    "Details of Referral To Judge or LO",
+                    referralToJudgeOrLOStringBuilder.toString()));
+            et1VettingIssuesTablesMarkup.append(NEWLINE);
+        }
+    }
+
+    private static void composeSubstantiveDefectsTableMarkUp(CaseData caseData, StringBuilder stringBuilder) {
+        List<List<String>> icEt1SubstantiveDefects = composeIcEt1SubstantiveDefectsDetail(caseData);
+
+        if (CollectionUtils.isNotEmpty(icEt1SubstantiveDefects)) {
+            List<String[]> et1VettingIssuesPairsList = icEt1SubstantiveDefects.stream()
+                    .map(defectAndDetailPair -> new String[]{defectAndDetailPair.getFirst(),
+                            defectAndDetailPair.get(1)})
+                    .toList();
+
+            String table = MarkdownHelper.createTwoColumnTable(
+                    new String[]{"Substantive Defects", "Detail"}, et1VettingIssuesPairsList);
+
+            stringBuilder.append(MarkdownHelper.detailsWrapper("Details of Substantive Defects", table))
+                    .append(NEWLINE);
+        }
+    }
+
+    private void composeTrackAllocationTableMarkUp(CaseData caseData, StringBuilder trackAllocationTableMarkUp) {
+        List<List<String>> icEt1TrackAllocationIssues = composeTrackAllocationDetails(caseData);
+
+        if (CollectionUtils.isNotEmpty(icEt1TrackAllocationIssues)) {
+            List<String[]> trackAllocationIssuePairsList = icEt1TrackAllocationIssues.stream()
+                    .map(defectAndDetailPair -> new String[]{defectAndDetailPair.getFirst(),
+                            defectAndDetailPair.get(1)})
+                    .toList();
+
+            String table = MarkdownHelper.createTwoColumnTable(
+                    new String[]{"Track Allocation Issue", "Detail"}, trackAllocationIssuePairsList);
+
+            trackAllocationTableMarkUp.append(MarkdownHelper.detailsWrapper(
+                    "Details of Track Allocation Issue", table))
+                    .append(NEWLINE);
+        }
+    }
+
+    public List<List<String>> composeTrackAllocationDetails(CaseData caseData) {
+        if (caseData == null) {
+            return Collections.emptyList();
+        }
+
+        List<List<String>> trackAllocationDetails = new ArrayList<>();
+
+        if (caseData.getIsTrackAllocationCorrect() != null && NO.equals(caseData.getIsTrackAllocationCorrect())) {
+            trackAllocationDetails.add(List.of("Is the track allocation correct?",
+                    defaultIfNull(caseData.getIsTrackAllocationCorrect())));
+            trackAllocationDetails.add(List.of("Suggested Track: ",
+                    defaultIfNull(caseData.getSuggestAnotherTrack())));
+            trackAllocationDetails.add(List.of("Why Change Track Allocation?",
+                    defaultIfNull(caseData.getWhyChangeTrackAllocation())));
+            trackAllocationDetails.add(List.of("Track Allocation General Notes",
+                    defaultIfNull(caseData.getTrackAllocationGeneralNotes())));
+        }
+
+        return trackAllocationDetails;
+    }
+
+    private static List<List<String>> composeIcEt1SubstantiveDefectsDetail(CaseData caseData) {
+        List<List<String>> substantiveDefectsDetails = new ArrayList<>();
+
+        if (caseData.getSubstantiveDefectsList() != null && !caseData.getSubstantiveDefectsList().isEmpty()) {
+            caseData.getSubstantiveDefectsList().forEach(defect -> {
+                switch (defect) {
+                    case "rule121a" :
+                        substantiveDefectsDetails.add(List.of("Rule 121a",
+                                "The tribunal has no jurisdiction to consider - Rule 13(1)(a)"));
+                        break;
+                    case "rule121b":
+                        substantiveDefectsDetails.add(List.of("Rule 121b",
+                                "Is in a form which cannot sensibly be responded to or otherwise an abuse of process "
+                                        + "- Rule 13(1)(b)"));
+                        break;
+                    case "rule121c":
+                        substantiveDefectsDetails.add(List.of("Rule 121c",
+                                "Has neither an EC number nor claims one of the EC exemptions - Rule 13(1)(c)"));
+                        break;
+                    case "rule121d":
+                        substantiveDefectsDetails.add(List.of("Rule 121d",
+                                "States that one of the EC exceptions applies but it might not - Rule 13(1)(d)"));
+                        break;
+                    case "rule121 da":
+                        substantiveDefectsDetails.add(List.of("Rule 121 da",
+                                "Institutes relevant proceedings and the EC number on the claim form does not match "
+                                + "the EC number on the Acas certificate - Rule 13(1)(e)"));
+                        break;
+                    case "rule121e":
+                        substantiveDefectsDetails.add(List.of("Rule 121e",
+                                "Has a different claimant name on the ET1 to the claimant name on the Acas certificate "
+                                        + "- Rule 13(1)(f)"));
+                        break;
+                    case "rule121f":
+                        substantiveDefectsDetails.add(List.of("Rule 121f",
+                                "Has a different respondent name on the ET1 to the respondent name on the Acas "
+                                + "certificate - Rule 13(1)(g)"));
+                        break;
+                    default:
+                        // do nothing
+                }
+            });
+        }
+        return substantiveDefectsDetails;
+    }
+
+    private static List<List<String>> composeIcEt1ReferralToJudgeOrLOListWithDetails(CaseData caseData) {
+        List<List<String>> referralToJudgeOrLODetails = new ArrayList<>();
+
+        if (caseData.getReferralToJudgeOrLOList() != null && !caseData.getReferralToJudgeOrLOList().isEmpty()) {
+            for (String listItem : caseData.getReferralToJudgeOrLOList()) {
+                switch (listItem) {
+                    case "aClaimOfInterimRelief" :
+                        referralToJudgeOrLODetails.add(List.of("A claim of interim relief",
+                                    caseData.getAclaimOfInterimReliefTextArea()));
+                        break;
+                    case "aStatutoryAppeal" :
+                        referralToJudgeOrLODetails.add(List.of("A statutory appeal",
+                                caseData.getAstatutoryAppealTextArea()));
+                        break;
+                    case "anAllegationOfCommissionOfSexualOffence" :
+                        referralToJudgeOrLODetails.add(List.of("An allegation of the commission of a sexual offence",
+                                caseData.getAnAllegationOfCommissionOfSexualOffenceTextArea()));
+                        break;
+                    case "insolvency" :
+                        referralToJudgeOrLODetails.add(List.of("Insolvency",
+                                caseData.getInsolvencyTextArea()));
+                        break;
+                    case "jurisdictionsUnclear" :
+                        referralToJudgeOrLODetails.add(List.of("Jurisdictions unclear",
+                                caseData.getJurisdictionsUnclearTextArea()));
+                        break;
+                    case "lengthOfService" :
+                        referralToJudgeOrLODetails.add(List.of("Length of service",
+                                caseData.getLengthOfServiceTextArea()));
+                        break;
+                    case "potentiallyLinkedCasesInTheEcm" :
+                        referralToJudgeOrLODetails.add(List.of("Potentially linked cases in the ECM",
+                                caseData.getPotentiallyLinkedCasesInTheEcmTextArea()));
+                        break;
+                    case "rule50Issues" :
+                        referralToJudgeOrLODetails.add(List.of("Rule 49 issues",
+                                caseData.getRule50IssuesTextArea()));
+                        break;
+                    case "anotherReasonForJudicialReferral" :
+                        referralToJudgeOrLODetails.add(List.of("Another reason for judicial referral",
+                                caseData.getAnotherReasonForJudicialReferralTextArea()));
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+        return referralToJudgeOrLODetails;
+    }
+
+    private static List<List<String>>  composeIcEt1OtherReferralListDetails(CaseData caseData) {
+        List<List<String>> otherReferralDetails = new ArrayList<>();
+
+        if (caseData.getOtherReferralList() != null && !caseData.getOtherReferralList().isEmpty()) {
+            for (String referralReason : caseData.getOtherReferralList()) {
+                switch (referralReason) {
+                    case "claimOutOfTime" :
+                        otherReferralDetails.add(List.of("Claim out of time",
+                                "The whole or any part of the claim is out of time"));
+                        break;
+                    case "multipleClaim" :
+                        otherReferralDetails.add(List.of("Multiple claims",
+                                "The claim is part of a multiple claim"));
+                        break;
+                    case "employmentStatusIssues" :
+                        otherReferralDetails.add(List.of("Employment status issues",
+                                "The claim has a potential issue about employment status"));
+                        break;
+                    case "pidJurisdictionRegulator" :
+                        otherReferralDetails.add(List.of("Pid jurisdiction regulator",
+                                "The claim has PID jurisdiction and claimant wants it forwarded to relevant "
+                                + "regulator - Box 10.1"));
+                        break;
+                    case "videoHearingPreference" :
+                        otherReferralDetails.add(List.of("Video hearing preference",
+                                "The claimant prefers a video hearing"));
+                        break;
+                    case "rule50IssuesOtherFactors" :
+                        otherReferralDetails.add(List.of("Rule49 issues - other factors",
+                                "The claim has Rule 49 issues"));
+                        break;
+                    case "otherRelevantFactors" :
+                        otherReferralDetails.add(List.of("Other relevant factors",
+                                "The claim has other relevant factors for judicial referral"));
+                        break;
+                    default:
+                        break;
+                }
+            }
+        }
+
+        return  otherReferralDetails;
+    }
 }

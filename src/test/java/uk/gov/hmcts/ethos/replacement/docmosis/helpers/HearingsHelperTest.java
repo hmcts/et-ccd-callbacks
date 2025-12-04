@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -120,7 +121,7 @@ class HearingsHelperTest {
     void setEtInitialConsiderationListedHearingType_setsHearingTypeWhenEarliestListedHearingExists() {
         DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
         DateListedType dateListedType = new DateListedType();
-        dateListedType.setListedDate("2025-12-01T10:00:00.000");
+        dateListedType.setListedDate(LocalDate.now().plusDays(12).toString() + "T10:00:00.000");
         dateListedType.setHearingStatus("Listed");
         dateListedTypeItem.setValue(dateListedType);
 

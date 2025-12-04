@@ -178,13 +178,7 @@ public class InitialConsiderationController {
         }
 
         // ET1 Vetting Issues
-        caseData.setIcEt1SubstantiveDefects(initialConsiderationService.composeIcEt1SubstantiveDefectsDetail(caseData));
-        caseData.setIcEt1ReferralToJudgeOrLOListWithDetails(
-                initialConsiderationService.composeIcEt1ReferralToJudgeOrLOListWithDetails(caseData));
-        caseData.setIcEt1ReferralToREJOrVPListWithDetails(
-                initialConsiderationService.composeIcEt1ReferralToREJOrVPListWithDetails(caseData));
-        caseData.setIcEt1OtherReferralListDetails(
-                initialConsiderationService.composeIcEt1OtherReferralListDetails(caseData));
+        caseData.setIcEt1VettingIssuesDetail(initialConsiderationService.setIcEt1VettingIssuesDetails(caseData));
 
         // ET3 Vetting Issues
         caseData.setIcEt3ProcessingIssuesDetail(

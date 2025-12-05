@@ -17,6 +17,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
@@ -58,8 +59,8 @@ class NocServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        nocService = new NocService(nocCcdService, adminUserService, userIdamService,
-                organisationClient, authTokenGenerator, caseAssignment);
+        nocService = new NocService(nocCcdService, adminUserService,  organisationClient, authTokenGenerator,
+                caseAssignment);
     }
 
     @Test
@@ -135,7 +136,8 @@ class NocServiceTest {
 
         Organisation orgToAdd = Organisation.builder().organisationID(ORGANISATION_ID_NEW).build();
         String caseId = "case123";
-        nocService.grantClaimantRepAccess(accessToken, email, caseId, orgToAdd);
+        nocService.grantRepresentativeAccess(accessToken, email, caseId, orgToAdd,
+                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
 
         verify(caseAssignment, times(1))
                 .addCaseUserRole(any(CaseAssignmentUserRolesRequest.class));
@@ -160,7 +162,8 @@ class NocServiceTest {
 
         String caseId = "case123";
         Organisation orgToAdd = Organisation.builder().organisationID("orgId").build();
-        nocService.grantClaimantRepAccess(accessToken, email, caseId, orgToAdd);
+        nocService.grantRepresentativeAccess(accessToken, email, caseId, orgToAdd,
+                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
 
         verify(caseAssignment, never()).addCaseUserRole(any(CaseAssignmentUserRolesRequest.class));
     }
@@ -180,7 +183,7 @@ class NocServiceTest {
         verify(caseAssignment, times(1)).addCaseUserRole(captor.capture());
         CaseAssignmentUserRolesRequest request = captor.getValue();
         assertEquals(1, request.getCaseAssignmentUserRoles().size());
-        CaseAssignmentUserRole role = request.getCaseAssignmentUserRoles().get(0);
+        CaseAssignmentUserRole role = request.getCaseAssignmentUserRoles().getFirst();
         assertEquals(userId, role.getUserId());
         assertEquals(caseId, role.getCaseDataId());
         assertEquals(caseRole, role.getCaseRole());

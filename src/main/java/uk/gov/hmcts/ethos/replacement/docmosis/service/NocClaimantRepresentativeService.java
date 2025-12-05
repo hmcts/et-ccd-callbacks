@@ -14,6 +14,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocClaimantHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
@@ -140,10 +141,11 @@ public class NocClaimantRepresentativeService {
         if (YES.equals(caseData.getClaimantRepresentedQuestion())) {
             RepresentedTypeC claimantRep = caseData.getRepresentativeClaimantType();
             if (claimantRep != null && claimantRep.getRepresentativeEmailAddress() != null) {
-                nocService.grantClaimantRepAccess(accessToken,
+                nocService.grantRepresentativeAccess(accessToken,
                         caseData.getRepresentativeClaimantType().getRepresentativeEmailAddress(),
                         caseDetails.getCaseId(),
-                        changeRequest.getOrganisationToAdd());
+                        changeRequest.getOrganisationToAdd(),
+                        ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
             }
         }
 

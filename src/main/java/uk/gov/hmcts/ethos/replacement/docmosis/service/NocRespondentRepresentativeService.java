@@ -43,8 +43,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
-import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.ObjectUtils.getIfNull;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
@@ -313,14 +311,11 @@ public class NocRespondentRepresentativeService {
                         .noneMatch(r -> r.getValue() != null && YES.equals(r.getValue().getMyHmctsYesNo()))) {
             return caseData;
         }
-
         // get all Organisation Details
         List<OrganisationsResponse> organisationList = organisationClient.getOrganisations(
                 userToken, authTokenGenerator.generate());
-
         for (RepresentedTypeRItem representative : repCollection) {
             RepresentedTypeR representativeDetails = representative.getValue();
-
             if (representativeDetails != null && YES.equals(representativeDetails.getMyHmctsYesNo())) {
                 Organisation repOrg = representativeDetails.getRespondentOrganisation();
                 if (repOrg != null && repOrg.getOrganisationID() != null) {
@@ -330,18 +325,15 @@ public class NocRespondentRepresentativeService {
                                     .stream()
                                     .filter(o -> o.getOrganisationIdentifier().equals(repOrg.getOrganisationID()))
                                     .findFirst();
-
                     organisation.ifPresent(orgResponse -> updateRepDetails(orgResponse, representativeDetails));
                 }
             }
         }
-
         return caseData;
     }
 
     private void updateRepDetails(OrganisationsResponse orgRes, RepresentedTypeR repDetails) {
         repDetails.setNameOfOrganisation(orgRes.getName());
-
         if (!CollectionUtils.isEmpty(orgRes.getContactInformation())) {
             Address repAddress = repDetails.getRepresentativeAddress();
             if (AddressUtils.isNullOrEmpty(repAddress)) {
@@ -357,31 +349,6 @@ public class NocRespondentRepresentativeService {
                 repAddress.setPostCode(orgAddress.getPostCode());
                 repDetails.setRepresentativeAddress(repAddress);
             }
-        }
-    }
-
-    /**
-     * Assigns an ID to each non myHMCTS legal rep representing their legal firm.
-     * @param repCollection Collection of representatives on the case
-     */
-    public void updateNonMyHmctsOrgIds(List<RepresentedTypeRItem> repCollection) {
-        repCollection.stream()
-                .map(RepresentedTypeRItem::getValue)
-                .forEach(this::updateNonMyHmctsOrgId);
-    }
-
-    /**
-     * Updates nonMyHmctsOrgId field with a random UUID and sets myHmctsYesNo to No if myHmctsYesNo field is empty or
-     * No.
-     * @param rep representative type R input field to be checked for myHmctsYesNo values.
-     */
-    private void updateNonMyHmctsOrgId(RepresentedTypeR rep) {
-        if (YES.equals(rep.getMyHmctsYesNo())) {
-            return;
-        }
-        rep.setMyHmctsYesNo(NO);
-        if (isNullOrEmpty(rep.getNonMyHmctsOrganisationId())) {
-            rep.setNonMyHmctsOrganisationId(UUID.randomUUID().toString());
         }
     }
 }

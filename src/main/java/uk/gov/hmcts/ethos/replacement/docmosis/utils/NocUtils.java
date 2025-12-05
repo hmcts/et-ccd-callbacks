@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -205,7 +206,8 @@ public final class NocUtils {
      * @param caseData the case data containing respondent and representative collections
      * @throws GenericServiceException if representation assignment fails during processing
      */
-    public static void mapRepresentativesToRespondents(CaseData caseData) throws GenericServiceException {
+    public static void mapRepresentativesToRespondents(CaseData caseData, String submissionReference)
+            throws GenericServiceException {
         if (!RespondentUtils.hasRespondents(caseData) || !RepresentativeUtils.hasRepresentatives(caseData)) {
             return;
         }
@@ -225,18 +227,18 @@ public final class NocUtils {
             String repRespondentId = representative.getValue().getRespondentId();
             String repRespondentName = representative.getValue().getDynamicRespRepName().getValue().getLabel();
             if  (StringUtils.isNotBlank(repRespondentId) || StringUtils.isNotBlank(repRespondentName)) {
-                setMatchingRespondent(caseData, respondentsById, respondentsByName, repRespondentId, repRespondentName,
-                        representative);
+                setMatchingRespondent(respondentsById, respondentsByName, repRespondentId,
+                        repRespondentName, representative, submissionReference);
             }
         }
     }
 
-    private static void setMatchingRespondent(CaseData caseData,
-                                              Map<String, RespondentSumTypeItem> respondentsById,
+    private static void setMatchingRespondent(Map<String, RespondentSumTypeItem> respondentsById,
                                               Map<String, RespondentSumTypeItem> respondentsByName,
                                               String repRespondentId,
                                               String repRespondentName,
-                                              RepresentedTypeRItem representative)
+                                              RepresentedTypeRItem representative,
+                                              String submissionReference)
             throws GenericServiceException {
         RespondentSumTypeItem matchedRespondent = null;
         if (StringUtils.isNotBlank(repRespondentId)) {
@@ -246,7 +248,7 @@ public final class NocUtils {
             matchedRespondent = respondentsByName.get(repRespondentName);
         }
         if (ObjectUtils.isNotEmpty(matchedRespondent)) {
-            assignRepresentative(matchedRespondent, representative, caseData.getCcdID());
+            assignRepresentative(matchedRespondent, representative, submissionReference);
         }
     }
 
@@ -270,13 +272,13 @@ public final class NocUtils {
      *
      * @param respondent          the respondent who is being represented
      * @param representative      the representative assigned to the respondent
-     * @param caseReferenceNumber the CCD case reference number associated with this representation
+     * @param submissionReference the CCD case reference number associated with this representation
      * @throws GenericServiceException if validation fails or if representation cannot be established
      */
     public static void assignRepresentative(RespondentSumTypeItem respondent,
                                             RepresentedTypeRItem representative,
-                                            String caseReferenceNumber) throws GenericServiceException {
-        RepresentativeUtils.validateRepresentation(respondent, representative, caseReferenceNumber);
+                                            String submissionReference) throws GenericServiceException {
+        RepresentativeUtils.validateRepresentation(respondent, representative, submissionReference);
         representative.getValue().setRespondentId(respondent.getId());
         representative.getValue().setRespRepName(respondent.getValue().getRespondentName());
         respondent.getValue().setRepresentativeRemoved(NO);
@@ -284,4 +286,44 @@ public final class NocUtils {
         respondent.getValue().setRepresentativeId(representative.getId());
     }
 
+    /**
+     * Updates the given collection of representatives to ensure that all non-MyHMCTS
+     * representatives have a valid non-MyHMCTS organisation identifier.
+     *
+     * <p>This method performs the following logic for each representative in the list:</p>
+     * <ul>
+     *     <li>If the representative or its value object is {@code null}, it is skipped.</li>
+     *     <li>If the representative is marked as a MyHMCTS user ({@code myHmctsYesNo = YES}),
+     *         the method stops processing and returns immediately.</li>
+     *     <li>Otherwise, the representative is explicitly marked as non-MyHMCTS
+     *         ({@code myHmctsYesNo = NO}).</li>
+     *     <li>If the representative does not already have a
+     *         {@code nonMyHmctsOrganisationId}, a new UUID is generated and assigned.</li>
+     * </ul>
+     *
+     * <p>
+     * If the input list is {@code null} or empty, the method performs no action.
+     * </p>
+     *
+     * @param representatives the list of representatives to update;
+     *                                 may be {@code null} or empty
+     */
+    public static void assignNonMyHmctsOrganisationIds(List<RepresentedTypeRItem> representatives) {
+        if (CollectionUtils.isEmpty(representatives)) {
+            return;
+        }
+        for (RepresentedTypeRItem representative : representatives) {
+            if (representative == null || representative.getValue() == null) {
+                continue;
+            }
+            var representativeValue = representative.getValue();
+            if (YES.equals(representativeValue.getMyHmctsYesNo())) {
+                continue;
+            }
+            representativeValue.setMyHmctsYesNo(NO);
+            if (StringUtils.isBlank(representativeValue.getNonMyHmctsOrganisationId())) {
+                representativeValue.setNonMyHmctsOrganisationId(UUID.randomUUID().toString());
+            }
+        }
+    }
 }

@@ -34,6 +34,7 @@ final class NocUtilsTest {
     private static final String RESPONDENT_ID_ONE = "dummy_respondent_id_1";
     private static final String RESPONDENT_ID_TWO = "dummy_respondent_id_2";
     private static final String DUMMY_REPRESENTATIVE_ID = "dummy_representative_id";
+    private static final String DUMMY_CASE_SUBMISSION_REFERENCE = "1234567890123456";
 
     @Test
     void theValidateRepresentativeRespondentMapping() {
@@ -148,16 +149,16 @@ final class NocUtilsTest {
         // when case data respondent collection is empty should not throw any exception
         CaseData caseData = new CaseData();
         caseData.setRespondentCollection(new ArrayList<>());
-        assertDoesNotThrow(() -> NocUtils.mapRepresentativesToRespondents(caseData));
+        assertDoesNotThrow(() -> NocUtils.mapRepresentativesToRespondents(caseData, DUMMY_CASE_SUBMISSION_REFERENCE));
         // when case data respondent collection is not empty but representative collection is empty should not throw
         // any exception
         RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
         caseData.setRespondentCollection(List.of(respondentSumTypeItem));
-        assertDoesNotThrow(() -> NocUtils.mapRepresentativesToRespondents(caseData));
+        assertDoesNotThrow(() -> NocUtils.mapRepresentativesToRespondents(caseData, DUMMY_CASE_SUBMISSION_REFERENCE));
         // when case data both respondent and representative collections are not empty but respondent in
         // respondent collection doesn't have any value should not throw any exception
         caseData.setRepCollection(List.of(RepresentedTypeRItem.builder().build()));
-        assertDoesNotThrow(() -> NocUtils.mapRepresentativesToRespondents(caseData));
+        assertDoesNotThrow(() -> NocUtils.mapRepresentativesToRespondents(caseData, DUMMY_CASE_SUBMISSION_REFERENCE));
         // when both respondent id and name exists but not matches with representative respondent id and
         // selected respondent name(dynamicRespRepName).
         caseData.getRespondentCollection().getFirst().setId(RESPONDENT_ID_ONE);
@@ -170,7 +171,7 @@ final class NocUtilsTest {
         dynamicFixedListType.setValue(dynamicValueType);
         caseData.getRepCollection().getFirst().setValue(RepresentedTypeR.builder().respondentId(RESPONDENT_ID_TWO)
                 .dynamicRespRepName(dynamicFixedListType).build());
-        assertDoesNotThrow(() -> NocUtils.mapRepresentativesToRespondents(caseData));
+        assertDoesNotThrow(() -> NocUtils.mapRepresentativesToRespondents(caseData, DUMMY_CASE_SUBMISSION_REFERENCE));
         assertThat(caseData.getRespondentCollection().getFirst().getValue().getRespondentName())
                 .isEqualTo(RESPONDENT_NAME_ONE);
         assertThat(caseData.getRespondentCollection().getFirst().getValue().getRepresented()).isEqualTo(NO);
@@ -181,7 +182,7 @@ final class NocUtilsTest {
         // when respondent name is equal to selected name in representative collection
         caseData.getRepCollection().getFirst().getValue().getDynamicRespRepName().getValue()
                 .setLabel(RESPONDENT_NAME_ONE);
-        assertDoesNotThrow(() -> NocUtils.mapRepresentativesToRespondents(caseData));
+        assertDoesNotThrow(() -> NocUtils.mapRepresentativesToRespondents(caseData, DUMMY_CASE_SUBMISSION_REFERENCE));
         assertThat(caseData.getRespondentCollection().getFirst().getValue().getRepresented()).isEqualTo(YES);
         assertThat(caseData.getRespondentCollection().getFirst().getValue().getRepresentativeRemoved()).isEqualTo(NO);
         assertThat(caseData.getRespondentCollection().getFirst().getValue().getRepresentativeId())
@@ -199,7 +200,7 @@ final class NocUtilsTest {
         caseData.getRepCollection().getFirst().getValue().setRespondentId(RESPONDENT_ID_ONE);
         caseData.getRepCollection().getFirst().getValue().setRespRepName(StringUtils.EMPTY);
 
-        assertDoesNotThrow(() -> NocUtils.mapRepresentativesToRespondents(caseData));
+        assertDoesNotThrow(() -> NocUtils.mapRepresentativesToRespondents(caseData, DUMMY_CASE_SUBMISSION_REFERENCE));
         assertThat(caseData.getRespondentCollection().getFirst().getValue().getRepresented()).isEqualTo(YES);
         assertThat(caseData.getRespondentCollection().getFirst().getValue().getRepresentativeRemoved()).isEqualTo(NO);
         assertThat(caseData.getRespondentCollection().getFirst().getValue().getRepresentativeId())
@@ -209,7 +210,7 @@ final class NocUtilsTest {
         assertThat(caseData.getRepCollection().getFirst().getId()).isEqualTo(DUMMY_REPRESENTATIVE_ID);
         // when both respondent id and respondent names are equal in respondent collection and representative
         // collection
-        assertDoesNotThrow(() -> NocUtils.mapRepresentativesToRespondents(caseData));
+        assertDoesNotThrow(() -> NocUtils.mapRepresentativesToRespondents(caseData, DUMMY_CASE_SUBMISSION_REFERENCE));
         assertThat(caseData.getRespondentCollection().getFirst().getValue().getRepresented()).isEqualTo(YES);
         assertThat(caseData.getRespondentCollection().getFirst().getValue().getRepresentativeRemoved()).isEqualTo(NO);
         assertThat(caseData.getRespondentCollection().getFirst().getValue().getRepresentativeId())
@@ -217,6 +218,28 @@ final class NocUtilsTest {
         assertThat(caseData.getRepCollection().getFirst().getValue().getRespondentId()).isEqualTo(RESPONDENT_ID_ONE);
         assertThat(caseData.getRepCollection().getFirst().getValue().getRespRepName()).isEqualTo(RESPONDENT_NAME_ONE);
         assertThat(caseData.getRepCollection().getFirst().getId()).isEqualTo(DUMMY_REPRESENTATIVE_ID);
+    }
+
+    @Test
+    void theAssignNonMyHmctsOrganisationIds() {
+        // when representative collection is empty
+        List<RepresentedTypeRItem> representatives = new ArrayList<>();
+        // when a representative is null in a not empty representative collection
+        representatives.add(null);
+        // when a representative does not have value in a non-empty representative collection.
+        representatives.add(RepresentedTypeRItem.builder().build());
+        // when a representative is already an HMCTS representative
+        representatives.add(RepresentedTypeRItem.builder().value(RepresentedTypeR.builder().myHmctsYesNo(YES).build())
+                .build());
+        // when a representative is non HMCTS representative
+        representatives.add(RepresentedTypeRItem.builder().value(RepresentedTypeR.builder().myHmctsYesNo(NO).build())
+                .build());
+        assertDoesNotThrow(() -> NocUtils.assignNonMyHmctsOrganisationIds(representatives));
+        assertThat(representatives.getFirst()).isNull();
+        assertThat(representatives.get(NumberUtils.INTEGER_ONE).getValue()).isNull();
+        assertThat(representatives.get(NumberUtils.INTEGER_TWO).getValue().getMyHmctsYesNo()).isEqualTo(YES);
+        assertThat(representatives.getLast().getValue().getMyHmctsYesNo()).isEqualTo(NO);
+        assertThat(representatives.getLast().getValue().getNonMyHmctsOrganisationId()).isNotEmpty();
     }
 
 }

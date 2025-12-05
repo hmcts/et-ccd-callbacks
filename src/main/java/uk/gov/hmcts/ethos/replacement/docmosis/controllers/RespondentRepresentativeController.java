@@ -117,11 +117,10 @@ public class RespondentRepresentativeController {
         List<String> errors = new ArrayList<>(NocUtils.validateNocCaseData(caseData));
         if (errors.isEmpty()) {
             try {
-                NocUtils.mapRepresentativesToRespondents(caseData);
+                NocUtils.mapRepresentativesToRespondents(caseData, ccdRequest.getCaseDetails().getCaseId());
                 nocRespondentHelper.removeUnmatchedRepresentations(caseData);
                 nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, userToken);
-                // add org policy and NOC elements
-                nocRespondentRepresentativeService.updateNonMyHmctsOrgIds(caseData.getRepCollection());
+                NocUtils.assignNonMyHmctsOrganisationIds(caseData.getRepCollection());
             } catch (GenericRuntimeException | GenericServiceException gse) {
                 errors.addFirst(gse.getMessage());
             }

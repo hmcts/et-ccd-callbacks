@@ -313,16 +313,14 @@ public final class NocUtils {
             return;
         }
         for (RepresentedTypeRItem representative : representatives) {
-            if (representative == null || representative.getValue() == null) {
+            if (representative == null
+                    || representative.getValue() == null
+                    || YES.equals(representative.getValue().getMyHmctsYesNo())) {
                 continue;
             }
-            var representativeValue = representative.getValue();
-            if (YES.equals(representativeValue.getMyHmctsYesNo())) {
-                continue;
-            }
-            representativeValue.setMyHmctsYesNo(NO);
-            if (StringUtils.isBlank(representativeValue.getNonMyHmctsOrganisationId())) {
-                representativeValue.setNonMyHmctsOrganisationId(UUID.randomUUID().toString());
+            representative.getValue().setMyHmctsYesNo(NO);
+            if (StringUtils.isBlank(representative.getValue().getNonMyHmctsOrganisationId())) {
+                representative.getValue().setNonMyHmctsOrganisationId(UUID.randomUUID().toString());
             }
         }
     }

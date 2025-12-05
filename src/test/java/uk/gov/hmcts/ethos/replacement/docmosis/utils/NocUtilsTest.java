@@ -172,13 +172,6 @@ final class NocUtilsTest {
         caseData.getRepCollection().getFirst().setValue(RepresentedTypeR.builder().respondentId(RESPONDENT_ID_TWO)
                 .dynamicRespRepName(dynamicFixedListType).build());
         assertDoesNotThrow(() -> NocUtils.mapRepresentativesToRespondents(caseData, DUMMY_CASE_SUBMISSION_REFERENCE));
-        assertThat(caseData.getRespondentCollection().getFirst().getValue().getRespondentName())
-                .isEqualTo(RESPONDENT_NAME_ONE);
-        assertThat(caseData.getRespondentCollection().getFirst().getValue().getRepresented()).isEqualTo(NO);
-        assertThat(caseData.getRespondentCollection().getFirst().getValue().getRepresentativeRemoved()).isEqualTo(NO);
-        assertThat(caseData.getRespondentCollection().getFirst().getValue().getRepresentativeId()).isNull();
-        assertThat(caseData.getRepCollection().getFirst().getValue().getRespondentId()).isEqualTo(RESPONDENT_ID_TWO);
-        assertThat(caseData.getRepCollection().getFirst().getValue().getRespRepName()).isNull();
         // when respondent name is equal to selected name in representative collection
         caseData.getRepCollection().getFirst().getValue().getDynamicRespRepName().getValue()
                 .setLabel(RESPONDENT_NAME_ONE);

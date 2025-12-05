@@ -152,7 +152,7 @@ public class RespondentRepresentativeController {
         } catch (IOException e) {
             throw new CcdInputOutputException("Failed to update respondent representatives accesses", e);
         } catch (GenericServiceException e) {
-            throw new RuntimeException(e);
+            throw new GenericRuntimeException(e);
         }
     }
 

@@ -149,8 +149,6 @@ withPipeline(type, product, component) {
         ./bin/preview/create-ccd-roles.sh
         echo "Importing CCD definitions"
         ./bin/preview/import-ccd-definitions.sh
-        echo "Creating WA users"
-        ./bin/preview/set-up-wa-users.sh
       """
     }
 

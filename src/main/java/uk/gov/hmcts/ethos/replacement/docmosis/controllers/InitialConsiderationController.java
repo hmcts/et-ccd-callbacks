@@ -113,8 +113,8 @@ public class InitialConsiderationController {
             caseFlagsService.setPrivateHearingFlag(caseData);
         }
 
-        if (CollectionUtils.isNotEmpty(caseData.getEtICHearingNotListedList())) {
-            initialConsiderationService.clearIcHearingNotListedOldValues(caseData);
+        if (Boolean.parseBoolean(caseData.getEtInitialConsiderationHearing())) {
+            caseData.setEtICHearingAlreadyListed("Yes");
         }
 
         setDocumentNumbers(caseData);
@@ -145,6 +145,7 @@ public class InitialConsiderationController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         initialConsiderationService.clearOldEtICHearingListedAnswersValues(caseData);
+        initialConsiderationService.clearIcHearingNotListedOldValues(caseData);
         initialConsiderationService.clearHiddenValue(caseData);
 
         // Sets the respondent details(respondent ET1 and ET3 names, hearing panel preference, and
@@ -152,10 +153,8 @@ public class InitialConsiderationController {
         caseData.setEtInitialConsiderationRespondent(initialConsiderationService.setRespondentDetails(caseData));
         //hearing details
         HearingsHelper.setEtInitialConsiderationListedHearingType(caseData);
-
         caseData.setEtInitialConsiderationHearing(initialConsiderationService.getHearingDetails(
-                caseData.getHearingCollection()));
-
+                    caseData.getHearingCollection()));
         if (caseData.getEtInitialConsiderationHearing() != null) {
             caseData.setEtICHearingAlreadyListed("Yes");
         }
@@ -166,9 +165,7 @@ public class InitialConsiderationController {
 
         //JurCodes
         String caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();
-        caseData.setEtInitialConsiderationJurisdictionCodes(
-                initialConsiderationService.generateJurisdictionCodesHtml(
-
+        caseData.setEtInitialConsiderationJurisdictionCodes(initialConsiderationService.generateJurisdictionCodesHtml(
                         caseData.getJurCodesCollection(), caseTypeId));
         initialConsiderationService.setIsHearingAlreadyListed(caseData, caseTypeId);
         initialConsiderationService.initialiseInitialConsideration(ccdRequest.getCaseDetails());

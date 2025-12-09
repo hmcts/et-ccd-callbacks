@@ -492,6 +492,7 @@ public class InitialConsiderationService {
         caseData.setEtICHearingNotListedListForFinalHearing(null);
         caseData.setEtICHearingNotListedUDLHearing(null);
         caseData.setEtICHearingNotListedAnyOtherDirections(null);
+        caseData.setEtICHearingNotListedListUpdated(null);
     }
 
     private void removeEtIcCanProceedYesValue(CaseData caseData) {

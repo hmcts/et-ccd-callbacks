@@ -319,6 +319,7 @@ public class NocRespondentRepresentativeService {
             if (representativeDetails != null && YES.equals(representativeDetails.getMyHmctsYesNo())) {
                 Organisation repOrg = representativeDetails.getRespondentOrganisation();
                 if (repOrg != null && repOrg.getOrganisationID() != null) {
+                    representativeDetails.setNonMyHmctsOrganisationId(StringUtils.EMPTY);
                     // get organisation details
                     Optional<OrganisationsResponse> organisation =
                             organisationList

@@ -25,6 +25,12 @@ public final class NOCConstants {
             "Invalid representative exists.";
     public static final String ERROR_INVALID_RESPONDENT_EXISTS =
             "Invalid respondent exists.";
+    public static final String ERROR_REPRESENTATIVE_MISSING_EMAIL_ADDRESS =
+            "Representative %s is missing an email address.";
+    public static final String ERROR_REPRESENTATIVE_EMAIL_DOES_NOT_MATCH_ORGANISATION =
+            "The email address %s was not found among the organisation’s users.";
+    public static final String ERROR_REPRESENTATIVE_ORGANISATION_NOT_FOUND =
+            "Organisation not found for representative %s.";
 
     private NOCConstants() {
         // Final classes should not have a public or default constructor.

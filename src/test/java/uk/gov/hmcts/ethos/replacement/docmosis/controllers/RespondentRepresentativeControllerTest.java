@@ -24,11 +24,13 @@ import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericRuntimeExceptio
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.NocRespondentRepresentativeService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.RepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
+import java.util.Collections;
 import java.util.List;
 
 import static org.hamcrest.Matchers.empty;
@@ -72,6 +74,8 @@ class RespondentRepresentativeControllerTest {
     private NocRespondentHelper nocRespondentHelper;
     @MockBean
     private NocRespondentRepresentativeService nocRespondentRepresentativeService;
+    @MockBean
+    private RepresentativeService representativeService;
 
     @Autowired
     private JsonMapper jsonMapper;
@@ -182,6 +186,8 @@ class RespondentRepresentativeControllerTest {
                 RepresentedTypeR.builder().dynamicRespRepName(dynamicFixedListType).build()).build()));
         CCDRequest ccdRequest = CCDRequestBuilder.builder().withCaseData(caseData).build();
         ccdRequest.getCaseDetails().setCaseId(DUMMY_SUBMISSION_REFERENCE);
+        when(representativeService.validateRepresentativeEmailMatchesOrganisationUsers(any(CaseData.class)))
+                .thenReturn(Collections.emptyList());
         mockMvc.perform(post(URL_AMEND_RESPONDENT_REPRESENTATIVE_ABOUT_TO_SUBMIT)
                         .content(jsonMapper.toJson(ccdRequest))
                         .header(HEADER_AUTHORIZATION, DUMMY_TOKEN)
@@ -209,6 +215,8 @@ class RespondentRepresentativeControllerTest {
                 RepresentedTypeR.builder().dynamicRespRepName(dynamicFixedListType).build()).build()));
         CCDRequest ccdRequest = CCDRequestBuilder.builder().withCaseData(caseData).build();
         ccdRequest.getCaseDetails().setCaseId(DUMMY_SUBMISSION_REFERENCE);
+        when(representativeService.validateRepresentativeEmailMatchesOrganisationUsers(any(CaseData.class)))
+                .thenReturn(Collections.emptyList());
         mockMvc.perform(post(URL_AMEND_RESPONDENT_REPRESENTATIVE_ABOUT_TO_SUBMIT)
                         .content(jsonMapper.toJson(ccdRequest))
                         .header(HEADER_AUTHORIZATION, DUMMY_TOKEN)
@@ -235,6 +243,8 @@ class RespondentRepresentativeControllerTest {
                 RepresentedTypeR.builder().dynamicRespRepName(dynamicFixedListType).build()).build()));
         CCDRequest ccdRequest = CCDRequestBuilder.builder().withCaseData(caseData).build();
         ccdRequest.getCaseDetails().setCaseId(DUMMY_SUBMISSION_REFERENCE);
+        when(representativeService.validateRepresentativeEmailMatchesOrganisationUsers(any(CaseData.class)))
+                .thenReturn(Collections.emptyList());
         mockMvc.perform(post(URL_AMEND_RESPONDENT_REPRESENTATIVE_ABOUT_TO_SUBMIT)
                         .content(jsonMapper.toJson(ccdRequest))
                         .header(HEADER_AUTHORIZATION, DUMMY_TOKEN)
@@ -261,6 +271,8 @@ class RespondentRepresentativeControllerTest {
                 RepresentedTypeR.builder().dynamicRespRepName(dynamicFixedListType).build()).build()));
         CCDRequest ccdRequest = CCDRequestBuilder.builder().withCaseData(caseData).build();
         ccdRequest.getCaseDetails().setCaseId(DUMMY_SUBMISSION_REFERENCE);
+        when(representativeService.validateRepresentativeEmailMatchesOrganisationUsers(any(CaseData.class)))
+                .thenReturn(Collections.emptyList());
         when(nocRespondentRepresentativeService.prepopulateOrgAddress(any(CaseData.class), anyString())).thenThrow(
                 new GenericRuntimeException(new GenericServiceException(DUMMY_EXCEPTION_MESSAGE,
                         new Exception(DUMMY_EXCEPTION_MESSAGE), DUMMY_EXCEPTION_MESSAGE, DUMMY_SUBMISSION_REFERENCE,

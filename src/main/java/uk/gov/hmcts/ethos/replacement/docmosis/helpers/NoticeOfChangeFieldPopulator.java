@@ -73,10 +73,11 @@ public class NoticeOfChangeFieldPopulator {
             }
         }
 
-        OrganisationPolicy organisationPolicy = OrganisationPolicy.builder()
+        data.computeIfAbsent(ClaimantSolicitorRole.POLICY_FIELD_TEMPLATE, k ->
+            OrganisationPolicy.builder()
                 .orgPolicyCaseAssignedRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())
-                .build();
-        data.put(ClaimantSolicitorRole.POLICY_FIELD_TEMPLATE, organisationPolicy);
+                .build()
+        );
         return data;
     }
 

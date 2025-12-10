@@ -26,7 +26,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceExceptio
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicRespondentRepresentative;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.NocRespondentRepresentativeService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.RepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.NocUtils;
 
@@ -66,7 +65,6 @@ public class RespondentRepresentativeController {
 
     private final NocRespondentHelper nocRespondentHelper;
     private final NocRespondentRepresentativeService nocRespondentRepresentativeService;
-    private final RepresentativeService representativeService;
 
     @PostMapping(value = "/amendRespondentRepresentativeAboutToStart", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Populates the respondents names into a dynamic list")
@@ -117,7 +115,7 @@ public class RespondentRepresentativeController {
                 ccdRequest.getCaseDetails().getCaseId());
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>(NocUtils.validateNocCaseData(caseData));
-        errors.addAll(representativeService.validateRepresentativeEmailMatchesOrganisationUsers(caseData));
+        errors.addAll(nocRespondentRepresentativeService.validateRepresentativeEmailMatchesOrganisationUsers(caseData));
         if (errors.isEmpty()) {
             try {
                 NocUtils.mapRepresentativesToRespondents(caseData, ccdRequest.getCaseDetails().getCaseId());

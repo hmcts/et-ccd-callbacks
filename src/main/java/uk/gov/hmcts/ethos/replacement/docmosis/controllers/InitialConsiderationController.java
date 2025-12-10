@@ -121,7 +121,6 @@ public class InitialConsiderationController {
         caseManagementForCaseWorkerService.setNextListedDate(caseData);
 
         //clear old and hidden values
-        initialConsiderationService.clearOldEtICHearingListedAnswersValues(caseData);
         initialConsiderationService.clearHiddenValue(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);

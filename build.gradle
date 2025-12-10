@@ -539,7 +539,7 @@ bootWithCCD {
     environment 'WA_SUPPORTED_JURISDICTIONS', 'IA,CIVIL,PRIVATELAW,PUBLICLAW'
 
     // xui-manage-org
-    environment 'RD_PROFESSIONAL_API_URL', 'http://localhost:8765'
+    environment 'RD_PROFESSIONAL_API_URL', 'http://host.docker.internal:8765'
     environment 'RD_PROFESSIONAL_API_SERVICE', 'http://localhost:8765'
     environment 'PRD_HOST', 'http://localhost:8765'
     environment 'XUI_MANAGE_ORGANISATIONS_CASETYPES', 'ET_EnglandWales,ET_Scotland'

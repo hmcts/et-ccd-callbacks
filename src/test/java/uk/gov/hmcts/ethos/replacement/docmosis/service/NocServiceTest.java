@@ -6,7 +6,6 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRole;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesRequest;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -15,11 +14,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
-import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
-import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
-import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
 import java.util.List;
@@ -45,12 +39,6 @@ class NocServiceTest {
     @Mock
     private AdminUserService adminUserService;
     @Mock
-    private UserIdamService userIdamService;
-    @Mock
-    private OrganisationClient organisationClient;
-    @Mock
-    private AuthTokenGenerator authTokenGenerator;
-    @Mock
     private CcdCaseAssignment caseAssignment;
 
     @InjectMocks
@@ -59,8 +47,7 @@ class NocServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        nocService = new NocService(nocCcdService, adminUserService,  organisationClient, authTokenGenerator,
-                caseAssignment);
+        nocService = new NocService(nocCcdService, adminUserService, caseAssignment);
     }
 
     @Test
@@ -114,58 +101,6 @@ class NocServiceTest {
         nocService.removeOrganisationRepresentativeAccess(caseId, changeRequest);
 
         verify(nocCcdService, never()).revokeCaseAssignments(anyString(), any(CaseUserAssignmentData.class));
-    }
-
-    @Test
-    void grantClaimantRepAccess_shouldGrantAccessIfOrgMatches() throws IOException {
-        String accessToken = "access";
-        String email = "user@test.com";
-        AccountIdByEmailResponse userResponse = new AccountIdByEmailResponse();
-        userResponse.setUserIdentifier("userId");
-
-        OrganisationsResponse orgResponse = OrganisationsResponse.builder()
-                .organisationIdentifier(ORGANISATION_ID_NEW)
-                .build();
-
-        when(organisationClient.getAccountIdByEmail(eq(accessToken), anyString(), eq(email)))
-                .thenReturn(ResponseEntity.ok(userResponse));
-        when(organisationClient.retrieveOrganisationDetailsByUserId(eq(accessToken), anyString(), eq("userId")))
-                .thenReturn(ResponseEntity.ok(orgResponse));
-        when(authTokenGenerator.generate()).thenReturn("serviceToken");
-        doNothing().when(caseAssignment).addCaseUserRole(any(CaseAssignmentUserRolesRequest.class));
-
-        Organisation orgToAdd = Organisation.builder().organisationID(ORGANISATION_ID_NEW).build();
-        String caseId = "case123";
-        nocService.grantRepresentativeAccess(accessToken, email, caseId, orgToAdd,
-                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
-
-        verify(caseAssignment, times(1))
-                .addCaseUserRole(any(CaseAssignmentUserRolesRequest.class));
-    }
-
-    @Test
-    void grantClaimantRepAccess_shouldNotGrantAccessIfOrgDoesNotMatch() throws IOException {
-        String accessToken = "access";
-        String email = "user@test.com";
-        AccountIdByEmailResponse userResponse = new AccountIdByEmailResponse();
-        userResponse.setUserIdentifier("userId");
-
-        OrganisationsResponse orgResponse = OrganisationsResponse.builder()
-                .organisationIdentifier("otherOrgId")
-                .build();
-
-        when(organisationClient.getAccountIdByEmail(eq(accessToken), anyString(), eq(email)))
-                .thenReturn(ResponseEntity.ok(userResponse));
-        when(organisationClient.retrieveOrganisationDetailsByUserId(eq(accessToken), anyString(), eq("userId")))
-                .thenReturn(ResponseEntity.ok(orgResponse));
-        when(authTokenGenerator.generate()).thenReturn("serviceToken");
-
-        String caseId = "case123";
-        Organisation orgToAdd = Organisation.builder().organisationID("orgId").build();
-        nocService.grantRepresentativeAccess(accessToken, email, caseId, orgToAdd,
-                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
-
-        verify(caseAssignment, never()).addCaseUserRole(any(CaseAssignmentUserRolesRequest.class));
     }
 
     @Test

@@ -9,11 +9,6 @@ import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
-import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
-import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
-import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
-import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
 import java.util.List;
@@ -24,8 +19,6 @@ import java.util.List;
 public class NocService {
     private final NocCcdService nocCcdService;
     private final AdminUserService adminUserService;
-    private final OrganisationClient organisationClient;
-    private final AuthTokenGenerator authTokenGenerator;
     private final CcdCaseAssignment caseAssignment;
 
     /**
@@ -55,28 +48,6 @@ public class NocService {
         if (!CollectionUtils.isEmpty(usersToRevoke)) {
             nocCcdService.revokeCaseAssignments(adminUserService.getAdminUserToken(),
                     CaseUserAssignmentData.builder().caseUserAssignments(usersToRevoke).build());
-        }
-    }
-
-    public void grantRepresentativeAccess(String accessToken, String email,
-                                          String caseId, Organisation organisationToAdd,
-                                          String role) {
-        try {
-            AccountIdByEmailResponse userResponse =
-                    organisationClient.getAccountIdByEmail(accessToken, authTokenGenerator.generate(), email).getBody();
-
-            if (userResponse != null && userResponse.getUserIdentifier() != null) {
-                OrganisationsResponse organisationsResponse = organisationClient.retrieveOrganisationDetailsByUserId(
-                        accessToken, authTokenGenerator.generate(), userResponse.getUserIdentifier()).getBody();
-
-                if (organisationsResponse != null
-                        && organisationToAdd.getOrganisationID()
-                        .equals(organisationsResponse.getOrganisationIdentifier())) {
-                    grantCaseAccess(userResponse.getUserIdentifier(), caseId, role);
-                }
-            }
-        } catch (IOException e) {
-            log.error("Failed to fetch org user by email");
         }
     }
 

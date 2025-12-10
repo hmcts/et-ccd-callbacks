@@ -1,27 +1,25 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.MockitoAnnotations;
+import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
-import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
-import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
-import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
-import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
-import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
+import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocClaimantHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
@@ -29,57 +27,67 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.test.utils.NocClaimantRepresentativeServiceTestUtils.DUMMY_CASE_ID;
+import static uk.gov.hmcts.ethos.replacement.docmosis.test.utils.NocClaimantRepresentativeServiceTestUtils.REPRESENTATIVE_EMAIL_1;
+import static uk.gov.hmcts.ethos.replacement.docmosis.test.utils.NocClaimantRepresentativeServiceTestUtils.createCaseData;
+import static uk.gov.hmcts.ethos.replacement.docmosis.test.utils.NocClaimantRepresentativeServiceTestUtils.createCaseDetailsWithCaseData;
+import static uk.gov.hmcts.ethos.replacement.docmosis.test.utils.NocClaimantRepresentativeServiceTestUtils.createChangeOrganisationRequest;
+import static uk.gov.hmcts.ethos.replacement.docmosis.test.utils.NocClaimantRepresentativeServiceTestUtils.getCCDRequest;
+import static uk.gov.hmcts.ethos.replacement.docmosis.test.utils.NocClaimantRepresentativeServiceTestUtils.getCallBackCallbackRequest;
+import static uk.gov.hmcts.ethos.replacement.docmosis.test.utils.NocClaimantRepresentativeServiceTestUtils.getCaseDataAfter;
+import static uk.gov.hmcts.ethos.replacement.docmosis.test.utils.NocClaimantRepresentativeServiceTestUtils.mockCaseAssignmentData;
 
-@ExtendWith(SpringExtension.class)
 class NocClaimantRepresentativeServiceTest {
-    private static final String CLAIMANT_SOLICITOR = "[CLAIMANTSOLICITOR]";
     private static final String USER_EMAIL = "test@hmcts.net";
     private static final String USER_FIRST_NAME = "John";
     private static final String USER_LAST_NAME = "Brown";
-    private static final String ORGANISATION_ID_OLD = "ORG_OLD";
+    private static final String DUMMY_ADMIN_USER_TOKEN = "dummyAdminUserToken";
+    private static final String DUMMY_ORGANISATION_USER_ID = "dummyOrganisationUserId";
     private static final String ORGANISATION_ID_NEW = "ORG3_NEW";
-    private static final String ET_ORG_1 = "ET Org 1";
-    private static final String ET_ORG_2 = "ET Org 2";
-    private static final String DUMMY_ADMIN_USER_TOKEN = "DUMMY_ADMIN_USER_TOKEN";
+    private static final String S2S_TOKEN = "s2sToken";
 
-    private NocClaimantRepresentativeService nocClaimantRepresentativeService;
-
-    @MockBean
+    @Mock
     private AuthTokenGenerator authTokenGenerator;
-    @MockBean
+    @Mock
     private OrganisationClient organisationClient;
-    @MockBean
+    @Mock
     private AdminUserService adminUserService;
-    @MockBean
+    @Mock
     private NocCcdService nocCcdService;
-    @MockBean
+    @Mock
     private NocNotificationService nocNotificationService;
-    @MockBean
+    @Mock
     private CcdCaseAssignment ccdCaseAssignment;
-    @MockBean
+    @Mock
     private CcdClient ccdClient;
-    @MockBean
+    @Mock
     private NocClaimantHelper nocClaimantHelper;
-    @MockBean
+    @Mock
     private NocService nocService;
 
     private CaseData caseData;
     private CaseDetails caseDetails;
+    private OrganisationsResponse organisationsResponse;
+
+    @InjectMocks
+    private NocClaimantRepresentativeService nocClaimantRepresentativeService;
 
     @BeforeEach
     void setUp() {
+        MockitoAnnotations.openMocks(this);
         nocClaimantRepresentativeService = new NocClaimantRepresentativeService(
                 authTokenGenerator,
                 organisationClient,
@@ -91,37 +99,24 @@ class NocClaimantRepresentativeServiceTest {
                 nocService,
                 nocClaimantHelper
         );
-
-        caseData = new CaseData();
-        ClaimantType claimantType = new ClaimantType();
-        caseData.setClaimantType(claimantType);
-        caseData.setClaimantFirstName("John");
-        caseData.setClaimantLastName("Doe");
-
-        caseDetails = new CaseDetails();
-        caseDetails.setCaseData(caseData);
-        caseDetails.setCaseId("12345");
+        when(adminUserService.getAdminUserToken()).thenReturn(DUMMY_ADMIN_USER_TOKEN);
+        when(authTokenGenerator.generate()).thenReturn(S2S_TOKEN);
+        organisationsResponse = OrganisationsResponse.builder().organisationIdentifier(ORGANISATION_ID_NEW).build();
+        caseData = createCaseData();
+        caseDetails = createCaseDetailsWithCaseData(caseData);
     }
 
     @Test
     void updateClaimantRepresentation_shouldUpdateClaimantRepresentation() throws IOException {
         RepresentedTypeC claimantRep = new RepresentedTypeC();
         claimantRep.setNameOfRepresentative(USER_FIRST_NAME + " " + USER_LAST_NAME);
-
-        ChangeOrganisationRequest changeOrganisationRequest =
-                createChangeOrganisationRequest();
-
+        ChangeOrganisationRequest changeOrganisationRequest = createChangeOrganisationRequest();
         caseData.setChangeOrganisationRequestField(changeOrganisationRequest);
-        when(nocCcdService.getLatestAuditEventByName(any(), any(), any())).thenReturn(
-                Optional.of(mockAuditEvent()));
+        when(nocCcdService.getLatestAuditEventByName(any(), any(), any())).thenReturn(Optional.of(mockAuditEvent()));
         UserDetails mockUser = getMockUser();
         when(adminUserService.getAdminUserToken()).thenReturn(DUMMY_ADMIN_USER_TOKEN);
         when(adminUserService.getUserDetails(eq(DUMMY_ADMIN_USER_TOKEN), anyString())).thenReturn(mockUser);
-
-        nocClaimantRepresentativeService.updateClaimantRepresentation(
-                caseDetails, DUMMY_ADMIN_USER_TOKEN
-        );
-
+        nocClaimantRepresentativeService.updateClaimantRepresentation(caseDetails, DUMMY_ADMIN_USER_TOKEN);
         assertThat(caseData.getRepresentativeClaimantType().getNameOfRepresentative())
                 .isEqualTo(claimantRep.getNameOfRepresentative());
         assertThat(caseData.getRepresentativeClaimantType().getRepresentativeEmailAddress())
@@ -145,26 +140,6 @@ class NocClaimantRepresentativeServiceTest {
                 .userFirstName(USER_FIRST_NAME)
                 .userLastName(USER_LAST_NAME)
                 .createdDate(LocalDateTime.now())
-                .build();
-    }
-
-    private ChangeOrganisationRequest createChangeOrganisationRequest() {
-        DynamicFixedListType caseRole = new DynamicFixedListType();
-        DynamicValueType dynamicValueType = new DynamicValueType();
-        dynamicValueType.setCode(CLAIMANT_SOLICITOR);
-        dynamicValueType.setLabel(CLAIMANT_SOLICITOR);
-        caseRole.setValue(dynamicValueType);
-
-        Organisation organisationToRemove =
-                Organisation.builder().organisationID(ORGANISATION_ID_OLD).organisationName(ET_ORG_1).build();
-
-        Organisation organisationToAdd =
-                Organisation.builder().organisationID(ORGANISATION_ID_NEW).organisationName(ET_ORG_2).build();
-
-        return ChangeOrganisationRequest.builder()
-                .organisationToAdd(organisationToAdd)
-                .organisationToRemove(organisationToRemove)
-                .caseRoleId(caseRole)
                 .build();
     }
 
@@ -195,123 +170,36 @@ class NocClaimantRepresentativeServiceTest {
 
     @Test
     void updateClaimantRepAccess_shouldGrantAndRemoveAccessAndSendNotification() throws IOException {
-        // Arrange
+        AccountIdByEmailResponse userResponse = new AccountIdByEmailResponse();
+        userResponse.setUserIdentifier(DUMMY_ORGANISATION_USER_ID);
+        userResponse.setIdamStatus(DUMMY_ORGANISATION_USER_ID);
         CallbackRequest callbackRequest = getCallBackCallbackRequest();
         callbackRequest.getCaseDetails().getCaseData().setClaimantRepresentedQuestion(YES);
-        String accessToken = "AUTH_TOKEN";
         CCDRequest ccdRequest = getCCDRequest();
         ChangeOrganisationRequest changeRequest = createChangeOrganisationRequest();
-
-        when(adminUserService.getAdminUserToken()).thenReturn(accessToken);
         when(nocCcdService.startEventForUpdateRepresentation(any(), any(), any(), any())).thenReturn(ccdRequest);
         when(ccdCaseAssignment.applyNocAsAdmin(any())).thenReturn(CCDCallbackResponse.builder()
                 .data(getCaseDataAfter()).build());
         when(nocClaimantHelper.createChangeRequest(any(), any())).thenReturn(changeRequest);
-
+        doReturn(ResponseEntity.ok(userResponse)).when(organisationClient).getAccountIdByEmail(
+                DUMMY_ADMIN_USER_TOKEN, S2S_TOKEN, REPRESENTATIVE_EMAIL_1);
+        doReturn(ResponseEntity.ok(organisationsResponse)).when(organisationClient)
+                .retrieveOrganisationDetailsByUserId(DUMMY_ADMIN_USER_TOKEN, S2S_TOKEN, DUMMY_ORGANISATION_USER_ID);
         // Act
         nocClaimantRepresentativeService.updateClaimantRepAccess(callbackRequest);
 
         // Assert
-        verify(nocNotificationService, times(1)).sendNotificationOfChangeEmails(
+        verify(nocNotificationService, times(NumberUtils.INTEGER_ONE)).sendNotificationOfChangeEmails(
                 any(), any(), any());
-        verify(nocService, times(1)).removeOrganisationRepresentativeAccess(
+        verify(nocService, times(NumberUtils.INTEGER_ONE)).removeOrganisationRepresentativeAccess(
                 anyString(), any(ChangeOrganisationRequest.class));
-        verify(nocService, times(1)).grantRepresentativeAccess(
-                eq(accessToken),
-                eq("claimantrep@test.com"),
-                eq("1234"),
-                eq(changeRequest.getOrganisationToAdd()),
-                eq(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()));
-        verify(ccdClient, times(1)).submitUpdateRepEvent(
-                eq(accessToken),
+        verify(ccdClient, times(NumberUtils.INTEGER_ONE)).submitUpdateRepEvent(
+                eq(DUMMY_ADMIN_USER_TOKEN),
                 any(Map.class),
                 anyString(),
                 anyString(),
                 eq(ccdRequest),
-                eq("1234"));
-    }
-
-    private CallbackRequest getCallBackCallbackRequest() {
-        CallbackRequest callbackRequest = new CallbackRequest();
-        CaseDetails caseDetailsBefore = new CaseDetails();
-        caseDetailsBefore.setCaseData(getCaseDataBefore());
-        callbackRequest.setCaseDetailsBefore(caseDetailsBefore);
-        CaseDetails caseDetailsAfter = new CaseDetails();
-        caseDetailsAfter.setCaseId("1234");
-        caseDetailsAfter.setCaseTypeId("ET1");
-        caseDetailsAfter.setJurisdiction("EMPLOYMENT");
-        caseDetailsAfter.setCaseData(getCaseDataAfter());
-        callbackRequest.setCaseDetails(caseDetailsAfter);
-        return callbackRequest;
-    }
-
-    private CCDRequest getCCDRequest() {
-        CCDRequest ccdRequest = new CCDRequest();
-        CaseDetails caseDetailsAfter = new CaseDetails();
-        caseDetailsAfter.setCaseData(getCaseDataAfter());
-        ccdRequest.setCaseDetails(caseDetailsAfter);
-        return ccdRequest;
-    }
-
-    private CaseData getCaseDataAfter() {
-        CaseData caseDataAfter = new CaseData();
-        caseDataAfter.setRespondentCollection(new ArrayList<>());
-
-        //Organisation
-        Organisation org1 =
-                Organisation.builder().organisationID(ORGANISATION_ID_NEW).organisationName(ET_ORG_2).build();
-        OrganisationPolicy orgPolicy1 =
-                OrganisationPolicy.builder().organisation(org1).orgPolicyCaseAssignedRole(CLAIMANT_SOLICITOR).build();
-        caseDataAfter.setRespondentOrganisationPolicy0(orgPolicy1);
-
-        // Claimant Representative
-        RepresentedTypeC representedTypeC = new RepresentedTypeC();
-        representedTypeC.setNameOfRepresentative("John Brown");
-        representedTypeC.setRepresentativeEmailAddress("claimantrep@test.com");
-        representedTypeC.setMyHmctsOrganisation(org1);
-        caseDataAfter.setRepresentativeClaimantType(representedTypeC);
-
-        caseDataAfter.setChangeOrganisationRequestField(createChangeOrganisationRequest());
-        return caseDataAfter;
-    }
-
-    private CaseData getCaseDataBefore() {
-        CaseData caseDataBefore = new CaseData();
-
-        caseDataBefore.setRespondentCollection(new ArrayList<>());
-        caseDataBefore.setClaimant("claimant");
-        caseDataBefore.setEthosCaseReference("caseRef");
-
-        //Organisation
-        Organisation org1 =
-                Organisation.builder().organisationID(ORGANISATION_ID_OLD).organisationName(ET_ORG_1).build();
-        OrganisationPolicy orgPolicy1 =
-                OrganisationPolicy.builder().organisation(org1).orgPolicyCaseAssignedRole(CLAIMANT_SOLICITOR).build();
-        caseDataBefore.setRespondentOrganisationPolicy0(orgPolicy1);
-
-        // Claimant Representative
-        RepresentedTypeC representedTypeC = new RepresentedTypeC();
-        representedTypeC.setNameOfRepresentative("James Brown");
-        representedTypeC.setRepresentativeEmailAddress("james@test.com");
-        representedTypeC.setMyHmctsOrganisation(org1);
-        caseDataBefore.setRepresentativeClaimantType(representedTypeC);
-
-        return caseDataBefore;
-    }
-
-    private CaseUserAssignmentData mockCaseAssignmentData() {
-        List<CaseUserAssignment> caseUserAssignments = List.of(CaseUserAssignment.builder().userId("USER_ID_ONE")
-                        .organisationId(ET_ORG_1)
-                        .caseRole(CLAIMANT_SOLICITOR)
-                        .caseId("CASE_ID_ONE")
-                        .build(),
-                CaseUserAssignment.builder().userId("USER_ID_TWO")
-                        .organisationId(ET_ORG_2)
-                        .caseRole(CLAIMANT_SOLICITOR)
-                        .caseId("CASE_ID_ONE")
-                        .build());
-
-        return CaseUserAssignmentData.builder().caseUserAssignments(caseUserAssignments).build();
+                eq(DUMMY_CASE_ID));
     }
 
     @Test
@@ -369,4 +257,56 @@ class NocClaimantRepresentativeServiceTest {
         assertThat(result).isSameAs(expected);
         verify(nocClaimantHelper).createChangeRequest(null, null);
     }
+
+    @Test
+    void grantClaimantRepAccess_shouldGrantAccessIfOrgMatches() throws IOException {
+        String accessToken = "access";
+        String email = "user@test.com";
+        AccountIdByEmailResponse userResponse = new AccountIdByEmailResponse();
+        userResponse.setUserIdentifier("userId");
+
+        OrganisationsResponse orgResponse = OrganisationsResponse.builder()
+                .organisationIdentifier(ORGANISATION_ID_NEW)
+                .build();
+
+        when(organisationClient.getAccountIdByEmail(eq(accessToken), anyString(), eq(email)))
+                .thenReturn(ResponseEntity.ok(userResponse));
+        when(organisationClient.retrieveOrganisationDetailsByUserId(eq(accessToken), anyString(), eq("userId")))
+                .thenReturn(ResponseEntity.ok(orgResponse));
+
+        doNothing().when(nocService).grantCaseAccess(anyString(), anyString(), anyString());
+
+        Organisation orgToAdd = Organisation.builder().organisationID(ORGANISATION_ID_NEW).build();
+        String caseId = "case123";
+        nocClaimantRepresentativeService.grantClaimantRepAccess(accessToken, email, caseId, orgToAdd,
+                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
+
+        verify(nocService, times(1)).grantCaseAccess(anyString(), anyString(), anyString());
+    }
+
+    @Test
+    void grantClaimantRepAccess_shouldNotGrantAccessIfOrgDoesNotMatch() throws IOException {
+        String accessToken = "access";
+        String email = "user@test.com";
+        AccountIdByEmailResponse userResponse = new AccountIdByEmailResponse();
+        userResponse.setUserIdentifier("userId");
+
+        OrganisationsResponse orgResponse = OrganisationsResponse.builder()
+                .organisationIdentifier("otherOrgId")
+                .build();
+
+        when(organisationClient.getAccountIdByEmail(eq(accessToken), anyString(), eq(email)))
+                .thenReturn(ResponseEntity.ok(userResponse));
+        when(organisationClient.retrieveOrganisationDetailsByUserId(eq(accessToken), anyString(), eq("userId")))
+                .thenReturn(ResponseEntity.ok(orgResponse));
+        when(authTokenGenerator.generate()).thenReturn("serviceToken");
+
+        String caseId = "case123";
+        Organisation orgToAdd = Organisation.builder().organisationID("orgId").build();
+        nocClaimantRepresentativeService.grantClaimantRepAccess(accessToken, email, caseId, orgToAdd,
+                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
+
+        verify(nocService, never()).grantCaseAccess(anyString(), anyString(), anyString());
+    }
+
 }

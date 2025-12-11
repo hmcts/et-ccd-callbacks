@@ -181,6 +181,7 @@ public final class NocUtils {
         return ObjectUtils.isNotEmpty(representative)
                 && StringUtils.isNotBlank(representative.getId())
                 && ObjectUtils.isNotEmpty(representative.getValue())
+                && StringUtils.isNotBlank(representative.getValue().getNameOfRepresentative())
                 && (ObjectUtils.isNotEmpty(representative.getValue().getDynamicRespRepName())
                 && ObjectUtils.isNotEmpty(representative.getValue().getDynamicRespRepName().getValue())
                 && StringUtils.isNotEmpty(representative.getValue().getDynamicRespRepName().getValue().getLabel()));

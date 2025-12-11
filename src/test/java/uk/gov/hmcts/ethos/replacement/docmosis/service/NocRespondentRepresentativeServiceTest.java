@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,7 +11,6 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.testcontainers.shaded.org.apache.commons.lang3.math.NumberUtils;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -28,12 +28,12 @@ import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationAddress;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
-import uk.gov.hmcts.et.common.model.ccd.types.OrganisationUsersIdamUser;
-import uk.gov.hmcts.et.common.model.ccd.types.OrganisationUsersResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.UpdateRespondentRepresentativeRequest;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator;
@@ -47,6 +47,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -82,6 +83,7 @@ class NocRespondentRepresentativeServiceTest {
     private static final String RESPONDENT_REP_NAME = "Legal One";
     private static final String RESPONDENT_REP_NAME_TWO = "Legal Two";
     private static final String RESPONDENT_REP_NAME_THREE = "Legal Three";
+    private static final String RESPONDENT_REP_EMAIL = "respondent@rep.email.com";
     private static final String SOLICITORA = "[SOLICITORA]";
     private static final String SOLICITORB = "[SOLICITORB]";
     private static final String SOLICITORC = "[SOLICITORC]";
@@ -109,21 +111,13 @@ class NocRespondentRepresentativeServiceTest {
     private static final String USER_ID_TWO = "123-456";
     private static final String EVENT_UPDATE_CASE_SUBMITTED = "UPDATE_CASE_SUBMITTED";
 
-    private static final String VALID_REPRESENTATIVE_ID = "valid_representative_id";
-    private static final String VALID_RESPONDENT_NAME = "valid_respondent_name";
-    private static final String INVALID_REPRESENTATIVE_EMAIL_ADDRESS = "invalid_representative_email_address";
-    private static final String DUMMY_ORGANISATION_ID = "dummy_organisation_id";
-    private static final String VALID_REPRESENTATIVE_EMAIL_ADDRESS = "valid_representative_email_address";
+    private static final String EXPECTED_EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND =
+            "Organisation not found for representative Legal One.";
 
-    private static final String EXPECTED_ERROR_INVALID_REPRESENTATIVE_EXISTS = "Invalid representative exists.";
-    private static final String EXPECTED_ERROR_REPRESENTATIVE_MISSING_EMAIL_ADDRESS =
-            "Representative valid_representative_id is missing an email address.";
-    private static final String EXPECTED_ERROR_REPRESENTATIVE_ORGANISATION_NOT_FOUND =
-            "Organisation not found for representative valid_representative_id.";
-    private static final String EXPECTED_ERROR_ORGANISATION_USERS_NOT_FOUND =
-            "Organisation users for organisation dummy_organisation_id not found.";
-    private static final String EXPECTED_ERROR_REPRESENTATIVE_EMAIL_DOES_NOT_MATCH_ORGANISATION =
-            "The email address invalid_representative_email_address was not found among the organisation’s users.";
+    private static final String EXPECTED_WARNING_REPRESENTATIVE_MISSING_EMAIL_ADDRESS =
+            "Representative Legal One is missing an email address.";
+    private static final String EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL =
+            "Representative 'Legal One' could not be found using respondent@rep.email.com.";
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -139,8 +133,6 @@ class NocRespondentRepresentativeServiceTest {
     private NocNotificationService nocNotificationService;
     @MockBean
     private CcdClient ccdClient;
-    @MockBean
-    private CcdCaseAssignment ccdCaseAssignment;
     @MockBean
     private OrganisationClient organisationClient;
     @MockBean
@@ -809,92 +801,75 @@ class NocRespondentRepresentativeServiceTest {
 
     @Test
     @SneakyThrows
-    void theValidateRepresentativeEmailMatchesOrganisationUsers() {
+    void theValidateRepresentativeOrganisationAndEmail() {
         // when case data is empty should return empty list
         assertThat(nocRespondentRepresentativeService
-                .validateRepresentativeEmailMatchesOrganisationUsers(null)).isEmpty();
-
-        // when case data representative collection is empty should return empty list
-        CaseData caseData = new CaseData();
-        caseData.setRepCollection(new ArrayList<>());
-        assertThat(nocRespondentRepresentativeService
-                .validateRepresentativeEmailMatchesOrganisationUsers(caseData)).isEmpty();
-
-        // when case data has invalid representative should return error ERROR_INVALID_REPRESENTATIVE_EXISTS
-        caseData.getRepCollection().add(RepresentedTypeRItem.builder().build());
-        List<String> errors = nocRespondentRepresentativeService
-                .validateRepresentativeEmailMatchesOrganisationUsers(caseData);
-        assertThat(errors).isNotEmpty();
-        assertThat(errors.getFirst()).isEqualTo(EXPECTED_ERROR_INVALID_REPRESENTATIVE_EXISTS);
+                .validateRepresentativeOrganisationAndEmail(null, CASE_ID_ONE)).isEmpty();
 
         // when representative not exists in hmcts organisation. (my Hmcts is selected as NO) should return empty list
-        caseData.getRepCollection().getFirst().setId(VALID_REPRESENTATIVE_ID);
+        CaseData caseData = new CaseData();
         DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
         DynamicValueType dynamicValueType = new DynamicValueType();
-        dynamicValueType.setLabel(VALID_RESPONDENT_NAME);
+        dynamicValueType.setLabel(RESPONDENT_NAME);
         dynamicFixedListType.setValue(dynamicValueType);
-        caseData.getRepCollection().getFirst().setValue(RepresentedTypeR.builder().myHmctsYesNo(NO)
-                .dynamicRespRepName(dynamicFixedListType).build());
+        caseData.setRepCollection(List.of(RepresentedTypeRItem.builder().id(RESPONDENT_REP_NAME).value(
+                RepresentedTypeR.builder().myHmctsYesNo(NO).dynamicRespRepName(dynamicFixedListType)
+                        .nameOfRepresentative(RESPONDENT_REP_NAME).build()).build()));
         assertThat(nocRespondentRepresentativeService
-                .validateRepresentativeEmailMatchesOrganisationUsers(caseData)).isEmpty();
+                .validateRepresentativeOrganisationAndEmail(caseData, CASE_ID_ONE)).isEmpty();
 
-        // when representative does not have email address should return ERROR_REPRESENTATIVE_MISSING_EMAIL_ADDRESS
+        // when representative my hmctis is yes and does not have organisation should throw exception
         caseData.getRepCollection().getFirst().getValue().setMyHmctsYesNo(YES);
-        errors = nocRespondentRepresentativeService.validateRepresentativeEmailMatchesOrganisationUsers(caseData);
-        assertThat(errors).isNotEmpty();
-        assertThat(errors.getFirst()).isEqualTo(EXPECTED_ERROR_REPRESENTATIVE_MISSING_EMAIL_ADDRESS);
+        GenericServiceException genericServiceException = assertThrows(GenericServiceException.class,
+                () -> nocRespondentRepresentativeService.validateRepresentativeOrganisationAndEmail(caseData,
+                        CASE_ID_ONE));
+        assertThat(genericServiceException.getMessage()).isEqualTo(
+                EXPECTED_EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND);
 
-        // when representative does not have organisation should return ERROR_REPRESENTATIVE_ORGANISATION_NOT_FOUND
-        caseData.getRepCollection().getFirst().getValue().setRepresentativeEmailAddress(
-                INVALID_REPRESENTATIVE_EMAIL_ADDRESS);
-        errors = nocRespondentRepresentativeService.validateRepresentativeEmailMatchesOrganisationUsers(caseData);
-        assertThat(errors).isNotEmpty();
-        assertThat(errors.getFirst()).isEqualTo(EXPECTED_ERROR_REPRESENTATIVE_ORGANISATION_NOT_FOUND);
-
-        // when representative has organisation id is empty should return ERROR_ORGANISATION_USERS_NOT_FOUND
+        // when representative organisation does not have id should throw exception
         caseData.getRepCollection().getFirst().getValue().setRespondentOrganisation(Organisation.builder().build());
-        errors = nocRespondentRepresentativeService.validateRepresentativeEmailMatchesOrganisationUsers(caseData);
-        assertThat(errors).isNotEmpty();
-        assertThat(errors.getFirst()).isEqualTo(EXPECTED_ERROR_REPRESENTATIVE_ORGANISATION_NOT_FOUND);
+        caseData.getRepCollection().getFirst().getValue().setMyHmctsYesNo(YES);
+        genericServiceException = assertThrows(GenericServiceException.class,
+                () -> nocRespondentRepresentativeService.validateRepresentativeOrganisationAndEmail(caseData,
+                        CASE_ID_ONE));
+        assertThat(genericServiceException.getMessage()).isEqualTo(
+                EXPECTED_EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND);
 
-        // when organisation users response is null should return ERROR_ORGANISATION_USERS_NOT_FOUND
-        caseData.getRepCollection().getFirst().getValue().getRespondentOrganisation().setOrganisationID(
-                DUMMY_ORGANISATION_ID);
-        when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
-        when(authTokenGenerator.generate()).thenReturn(S2S_TOKEN);
-        when(organisationClient.getOrganisationUsers(AUTH_TOKEN, S2S_TOKEN, DUMMY_ORGANISATION_ID)).thenReturn(null);
-        errors = nocRespondentRepresentativeService.validateRepresentativeEmailMatchesOrganisationUsers(caseData);
-        assertThat(errors).isNotEmpty();
-        assertThat(errors.getFirst()).isEqualTo(EXPECTED_ERROR_ORGANISATION_USERS_NOT_FOUND);
+        // when representative does not have email address
+        caseData.getRepCollection().getFirst().getValue().getRespondentOrganisation().setOrganisationID(ET_ORG_1);
+        List<String> warnings = nocRespondentRepresentativeService.validateRepresentativeOrganisationAndEmail(caseData,
+                CASE_ID_ONE);
+        assertThat(warnings).isNotEmpty().hasSize(NumberUtils.INTEGER_ONE);
+        assertThat(warnings.getFirst()).isEqualTo(EXPECTED_WARNING_REPRESENTATIVE_MISSING_EMAIL_ADDRESS);
 
-        // when organisation users response body is empty should return ERROR_ORGANISATION_USERS_NOT_FOUND
-        when(organisationClient.getOrganisationUsers(AUTH_TOKEN, S2S_TOKEN,
-                DUMMY_ORGANISATION_ID)).thenReturn(ResponseEntity.ok().body(null));
-        errors = nocRespondentRepresentativeService.validateRepresentativeEmailMatchesOrganisationUsers(caseData);
-        assertThat(errors).isNotEmpty();
-        assertThat(errors.getFirst()).isEqualTo(EXPECTED_ERROR_ORGANISATION_USERS_NOT_FOUND);
+        // when organisation client returns empty response should return warning
+        caseData.getRepCollection().getFirst().getValue().setRepresentativeEmailAddress(RESPONDENT_REP_EMAIL);
+        when(organisationClient.getAccountIdByEmail(AUTH_TOKEN, S2S_TOKEN, RESPONDENT_REP_EMAIL)).thenReturn(null);
+        warnings = nocRespondentRepresentativeService.validateRepresentativeOrganisationAndEmail(caseData, CASE_ID_ONE);
+        assertThat(warnings).isNotEmpty().hasSize(NumberUtils.INTEGER_ONE);
+        assertThat(warnings.getFirst()).isEqualTo(EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL);
 
-        // when organisation users response users collection is empty should return ERROR_ORGANISATION_USERS_NOT_FOUND
-        OrganisationUsersResponse organisationUsersResponse = OrganisationUsersResponse.builder().users(
-                new ArrayList<>()).build();
-        when(organisationClient.getOrganisationUsers(AUTH_TOKEN, S2S_TOKEN,
-                DUMMY_ORGANISATION_ID)).thenReturn(ResponseEntity.ok().body(organisationUsersResponse));
-        errors = nocRespondentRepresentativeService.validateRepresentativeEmailMatchesOrganisationUsers(caseData);
-        assertThat(errors).isNotEmpty();
-        assertThat(errors.getFirst()).isEqualTo(EXPECTED_ERROR_ORGANISATION_USERS_NOT_FOUND);
-
-        // when organisation users response users collection has valid email address but representative has
-        // invalid email address should return EXPECTED_ERROR_REPRESENTATIVE_EMAIL_DOES_NOT_MATCH_ORGANISATION
-        organisationUsersResponse.getUsers().add(OrganisationUsersIdamUser.builder().email(
-                VALID_REPRESENTATIVE_EMAIL_ADDRESS).build());
-        errors = nocRespondentRepresentativeService.validateRepresentativeEmailMatchesOrganisationUsers(caseData);
-        assertThat(errors).isNotEmpty();
-        assertThat(errors.getFirst()).isEqualTo(EXPECTED_ERROR_REPRESENTATIVE_EMAIL_DOES_NOT_MATCH_ORGANISATION);
-
-        // when representative email address is found in organisation users' email addresses should return empty list.
-        caseData.getRepCollection().getFirst().getValue().setRepresentativeEmailAddress(
-                VALID_REPRESENTATIVE_EMAIL_ADDRESS);
-        assertThat(nocRespondentRepresentativeService
-                .validateRepresentativeEmailMatchesOrganisationUsers(caseData)).isEmpty();
+        // when organisation client response body is empty should return warning
+        ResponseEntity<AccountIdByEmailResponse> organisationClientResponse = ResponseEntity.ok(null);
+        when(organisationClient.getAccountIdByEmail(AUTH_TOKEN, S2S_TOKEN, RESPONDENT_REP_EMAIL))
+                .thenReturn(organisationClientResponse);
+        warnings = nocRespondentRepresentativeService.validateRepresentativeOrganisationAndEmail(caseData, CASE_ID_ONE);
+        assertThat(warnings).isNotEmpty().hasSize(NumberUtils.INTEGER_ONE);
+        assertThat(warnings.getFirst()).isEqualTo(EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL);
+        // when organisation client response body not has user identifier
+        AccountIdByEmailResponse accountIdByEmailResponse = new AccountIdByEmailResponse();
+        organisationClientResponse = ResponseEntity.ok(accountIdByEmailResponse);
+        when(organisationClient.getAccountIdByEmail(AUTH_TOKEN, S2S_TOKEN, RESPONDENT_REP_EMAIL))
+                .thenReturn(organisationClientResponse);
+        warnings = nocRespondentRepresentativeService.validateRepresentativeOrganisationAndEmail(caseData, CASE_ID_ONE);
+        assertThat(warnings).isNotEmpty().hasSize(NumberUtils.INTEGER_ONE);
+        assertThat(warnings.getFirst()).isEqualTo(EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL);
+        // when organisation client response body not has user identifier
+        accountIdByEmailResponse.setUserIdentifier(RESPONDENT_REP_EMAIL);
+        organisationClientResponse = ResponseEntity.ok(accountIdByEmailResponse);
+        when(organisationClient.getAccountIdByEmail(AUTH_TOKEN, S2S_TOKEN, RESPONDENT_REP_EMAIL))
+                .thenReturn(organisationClientResponse);
+        warnings = nocRespondentRepresentativeService.validateRepresentativeOrganisationAndEmail(caseData, CASE_ID_ONE);
+        assertThat(warnings).isEmpty();
     }
 }

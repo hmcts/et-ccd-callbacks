@@ -22,11 +22,10 @@ import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationAddress;
-import uk.gov.hmcts.et.common.model.ccd.types.OrganisationUsersIdamUser;
-import uk.gov.hmcts.et.common.model.ccd.types.OrganisationUsersResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.UpdateRespondentRepresentativeRequest;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
@@ -35,7 +34,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.NocUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.OrganisationUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -52,13 +50,11 @@ import static org.apache.commons.lang3.ObjectUtils.getIfNull;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.ERROR_ORGANISATION_USERS_NOT_FOUND;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_INVALID_REPRESENTATIVE_EXISTS;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_REPRESENTATIVE_EMAIL_DOES_NOT_MATCH_ORGANISATION;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_REPRESENTATIVE_MISSING_EMAIL_ADDRESS;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_REPRESENTATIVE_ORGANISATION_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EVENT_UPDATE_CASE_SUBMITTED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REQUEST;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_REPRESENTATIVE_MISSING_EMAIL_ADDRESS;
 
 @Service
 @RequiredArgsConstructor
@@ -164,6 +160,7 @@ public class NocRespondentRepresentativeService {
      */
     public void updateRespondentRepresentativesAccess(CallbackRequest callbackRequest)
             throws IOException, GenericServiceException {
+
         CaseDetails caseDetails = callbackRequest.getCaseDetails();
         CaseDetails caseDetailsBefore = callbackRequest.getCaseDetailsBefore();
         CaseData caseDataBefore = caseDetailsBefore.getCaseData();
@@ -364,64 +361,82 @@ public class NocRespondentRepresentativeService {
     }
 
     /**
-     * Validates that each NOC representative in the given {@link CaseData} has a valid email address
-     * and that the email belongs to a user within the representative's associated organisation.
+     * Validates that each representative marked as a myHMCTS representative has an email address
+     * that corresponds to a user within the selected organisation.
      *
-     * <p>The method performs the following checks for each representative:
+     * <p>The method performs the following validations for each representative in the
+     * {@code repCollection}:</p>
+     *
      * <ul>
-     *     <li>Representative data is valid according to {@code NocUtils#isValidNocRepresentative}.</li>
-     *     <li>If the representative is marked as a MyHMCTS user, an email address must be present.</li>
-     *     <li>The representative must have a valid respondent organisation with a non-blank organisation ID.</li>
-     *     <li>The organisation must contain at least one user.</li>
-     *     <li>The representative's email must match one of the organisation's registered users.</li>
+     *     <li><strong>Organisation selection requirement:</strong>
+     *         If a representative is marked as a myHMCTS representative, an organisation must be selected.
+     *         If no organisation is present, a {@link GenericServiceException} is thrown.</li>
+     *
+     *     <li><strong>Email address presence:</strong>
+     *         If the representative does not have an email address, a warning message is added.</li>
+     *
+     *     <li><strong>Email-to-organisation user match:</strong>
+     *         The representative's email address is checked against the organisation's registered users.
+     *         If the email cannot be matched to any organisation user, a warning is added.</li>
      * </ul>
      *
-     * <p>If any validation fails, the method returns a list containing a single error message
-     * describing the issue. If all representatives are valid, an empty list is returned.
+     * <p><strong>Important:</strong></p>
+     * <ul>
+     *     <li>No validation error is not implemented if the organisation cannot be found in the organisation list, when
+     *     user is a myHmcts organisation user. because all organisations are selected from existing organisation data
+     *     and are therefore assumed valid.</li>
+     *     <li>All representatives included in {@code caseData.getRepCollection()} are assumed to be structurally valid
+     *     and eligible for validation.</li>
+     * </ul>
      *
-     * @param caseData the case data containing representatives to validate
-     * @return a list of validation error messages, or an empty list if all representatives are valid
+     * @param caseData the case data containing the representatives to validate
+     * @param submissionReference a reference identifier used for error tracking during submission
+     * @return a list of warning messages generated during validation; empty if no warnings are produced
+     * @throws GenericServiceException if a myHMCTS representative does not have a selected organisation
      */
-    public List<String> validateRepresentativeEmailMatchesOrganisationUsers(CaseData caseData) {
+    public List<String> validateRepresentativeOrganisationAndEmail(CaseData caseData,
+                                                                   String submissionReference)
+            throws GenericServiceException {
         if (ObjectUtils.isEmpty(caseData)
                 || org.apache.commons.collections4.CollectionUtils.isEmpty(caseData.getRepCollection())) {
             return Collections.emptyList();
         }
+        List<String> warnings = new ArrayList<>();
         for (RepresentedTypeRItem representativeItem :  caseData.getRepCollection()) {
-            if (!NocUtils.isValidNocRepresentative(representativeItem)) {
-                return List.of(ERROR_INVALID_REPRESENTATIVE_EXISTS);
-            }
             RepresentedTypeR representative = representativeItem.getValue();
+            // checking if representative organisation is a hmcts organisation
             if (!YES.equals(representative.getMyHmctsYesNo())) {
                 continue;
             }
-            final String representativeEmail = representative.getRepresentativeEmailAddress();
-            if (StringUtils.isBlank(representativeEmail)) {
-                return List.of(String.format(ERROR_REPRESENTATIVE_MISSING_EMAIL_ADDRESS, representativeItem.getId()));
-            }
+            final String representativeName = representative.getNameOfRepresentative();
+            // Checking if representative has an organisation
             if (ObjectUtils.isEmpty(representative.getRespondentOrganisation())
                     || StringUtils.isBlank(representative.getRespondentOrganisation().getOrganisationID())) {
-                return List.of(String.format(ERROR_REPRESENTATIVE_ORGANISATION_NOT_FOUND,  representativeItem.getId()));
+                String exceptionMessage = String.format(EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND,
+                        representativeName);
+                throw new GenericServiceException(exceptionMessage, new Exception(), exceptionMessage,
+                        submissionReference, "NocRespondentRepresentativeService",
+                        "validateRepresentativeEmailMatchesOrganisationUsers");
             }
-            final String organisationId = representative.getRespondentOrganisation().getOrganisationID();
-            final ResponseEntity<OrganisationUsersResponse> organisationUsersResponse =
-                    organisationClient.getOrganisationUsers(adminUserService.getAdminUserToken(),
-                            authTokenGenerator.generate(), organisationId);
+            // checking if representative has an email address
+            final String representativeEmail = representative.getRepresentativeEmailAddress();
+            if (StringUtils.isBlank(representativeEmail)) {
+                warnings.add(String.format(WARNING_REPRESENTATIVE_MISSING_EMAIL_ADDRESS, representativeName));
+                continue;
+            }
 
-            if (ObjectUtils.isEmpty(organisationUsersResponse)
-                    || ObjectUtils.isEmpty(organisationUsersResponse.getBody())
-                    || org.apache.commons.collections4.CollectionUtils.isEmpty(
-                            organisationUsersResponse.getBody().getUsers())) {
-                return List.of(String.format(ERROR_ORGANISATION_USERS_NOT_FOUND, organisationId));
-            }
-            final List<OrganisationUsersIdamUser> organisationUsers = organisationUsersResponse.getBody().getUsers();
-            boolean representativeExistsInOrganisation = organisationUsers.stream()
-                    .anyMatch(user -> representativeEmail.equals(user.getEmail()));
-            if (!representativeExistsInOrganisation) {
-                return List.of(String.format(
-                        ERROR_REPRESENTATIVE_EMAIL_DOES_NOT_MATCH_ORGANISATION, representativeEmail));
+            String accessToken = adminUserService.getAdminUserToken();
+            ResponseEntity<AccountIdByEmailResponse> userResponse =
+                    organisationClient.getAccountIdByEmail(accessToken, authTokenGenerator.generate(),
+                            representativeEmail);
+            // checking if representative email address exists in organisation users
+            if (ObjectUtils.isEmpty(userResponse)
+                    || ObjectUtils.isEmpty(userResponse.getBody())
+                    || StringUtils.isBlank(userResponse.getBody().getUserIdentifier())) {
+                warnings.add(String.format(WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL, representativeName,
+                        representativeEmail));
             }
         }
-        return Collections.emptyList();
+        return warnings;
     }
 }

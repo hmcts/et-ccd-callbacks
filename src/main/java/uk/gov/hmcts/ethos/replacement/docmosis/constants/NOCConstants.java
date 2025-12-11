@@ -17,6 +17,9 @@ public final class NOCConstants {
             "Representative ID not found for case ID %s.";
     public static final String EXCEPTION_REPRESENTATIVE_DETAILS_NOT_EXIST =
             "Representative details not found for representative ID %s in case %s.";
+    public static final String EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND =
+            "Organisation not found for representative %s.";
+
     public static final String ERROR_RESPONDENT_HAS_MULTIPLE_REPRESENTATIVES =
             "Respondent with name %s has more than one representative";
     public static final String ERROR_SELECTED_RESPONDENT_NOT_FOUND =
@@ -25,12 +28,11 @@ public final class NOCConstants {
             "Invalid representative exists.";
     public static final String ERROR_INVALID_RESPONDENT_EXISTS =
             "Invalid respondent exists.";
-    public static final String ERROR_REPRESENTATIVE_MISSING_EMAIL_ADDRESS =
+
+    public static final String WARNING_REPRESENTATIVE_MISSING_EMAIL_ADDRESS =
             "Representative %s is missing an email address.";
-    public static final String ERROR_REPRESENTATIVE_EMAIL_DOES_NOT_MATCH_ORGANISATION =
-            "The email address %s was not found among the organisation’s users.";
-    public static final String ERROR_REPRESENTATIVE_ORGANISATION_NOT_FOUND =
-            "Organisation not found for representative %s.";
+    public static final String WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL =
+            "Representative '%s' could not be found using %s.";
 
     private NOCConstants() {
         // Final classes should not have a public or default constructor.

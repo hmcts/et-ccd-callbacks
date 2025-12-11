@@ -56,6 +56,7 @@ class RespondentRepresentativeControllerTest {
     private static final String RESPONDENT_NAME_1 = "Respondent Name 1";
     private static final String RESPONDENT_NAME_2 = "Respondent Name 2";
     private static final String DUMMY_EXCEPTION_MESSAGE = "dummy exception message";
+    private static final String REPRESENTATIVE_NAME = "Representative Name";
 
     private static final String URL_REMOVE_OWN_REPRESENTATIVE = "/respondentRepresentative/removeOwnRepresentative";
     private static final String URL_AMEND_RESPONDENT_REPRESENTATIVE_ABOUT_TO_START =
@@ -180,11 +181,12 @@ class RespondentRepresentativeControllerTest {
         dynamicValueType.setLabel(RESPONDENT_NAME_1);
         dynamicFixedListType.setValue(dynamicValueType);
         caseData.setRepCollection(List.of(RepresentedTypeRItem.builder().id(ID_REPRESENTATIVE_1).value(
-                RepresentedTypeR.builder().dynamicRespRepName(dynamicFixedListType).build()).build()));
+                RepresentedTypeR.builder().dynamicRespRepName(dynamicFixedListType)
+                        .nameOfRepresentative(REPRESENTATIVE_NAME).build()).build()));
         CCDRequest ccdRequest = CCDRequestBuilder.builder().withCaseData(caseData).build();
         ccdRequest.getCaseDetails().setCaseId(DUMMY_SUBMISSION_REFERENCE);
         when(nocRespondentRepresentativeService
-                .validateRepresentativeEmailMatchesOrganisationUsers(any(CaseData.class))).thenReturn(
+                .validateRepresentativeOrganisationAndEmail(any(CaseData.class), anyString())).thenReturn(
                         Collections.emptyList());
         mockMvc.perform(post(URL_AMEND_RESPONDENT_REPRESENTATIVE_ABOUT_TO_SUBMIT)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -193,7 +195,7 @@ class RespondentRepresentativeControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, empty()))
-                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+                .andExpect(jsonPath(JsonMapper.WARNINGS, empty()));
 
     }
 
@@ -210,11 +212,12 @@ class RespondentRepresentativeControllerTest {
         dynamicValueType.setLabel(RESPONDENT_NAME_2);
         dynamicFixedListType.setValue(dynamicValueType);
         caseData.setRepCollection(List.of(RepresentedTypeRItem.builder().id(ID_REPRESENTATIVE_1).value(
-                RepresentedTypeR.builder().dynamicRespRepName(dynamicFixedListType).build()).build()));
+                RepresentedTypeR.builder().dynamicRespRepName(dynamicFixedListType)
+                        .nameOfRepresentative(REPRESENTATIVE_NAME).build()).build()));
         CCDRequest ccdRequest = CCDRequestBuilder.builder().withCaseData(caseData).build();
         ccdRequest.getCaseDetails().setCaseId(DUMMY_SUBMISSION_REFERENCE);
         when(nocRespondentRepresentativeService
-                .validateRepresentativeEmailMatchesOrganisationUsers(any(CaseData.class))).thenReturn(
+                .validateRepresentativeOrganisationAndEmail(any(CaseData.class), anyString())).thenReturn(
                         Collections.emptyList());
         mockMvc.perform(post(URL_AMEND_RESPONDENT_REPRESENTATIVE_ABOUT_TO_SUBMIT)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -223,7 +226,7 @@ class RespondentRepresentativeControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
-                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+                .andExpect(jsonPath(JsonMapper.WARNINGS, empty()));
     }
 
     @Test
@@ -242,8 +245,8 @@ class RespondentRepresentativeControllerTest {
                 RepresentedTypeR.builder().dynamicRespRepName(dynamicFixedListType).build()).build()));
         CCDRequest ccdRequest = CCDRequestBuilder.builder().withCaseData(caseData).build();
         ccdRequest.getCaseDetails().setCaseId(DUMMY_SUBMISSION_REFERENCE);
-        when(nocRespondentRepresentativeService.validateRepresentativeEmailMatchesOrganisationUsers(
-                any(CaseData.class))).thenReturn(Collections.emptyList());
+        when(nocRespondentRepresentativeService.validateRepresentativeOrganisationAndEmail(
+                any(CaseData.class), anyString())).thenReturn(Collections.emptyList());
         mockMvc.perform(post(URL_AMEND_RESPONDENT_REPRESENTATIVE_ABOUT_TO_SUBMIT)
                         .content(jsonMapper.toJson(ccdRequest))
                         .header(HEADER_AUTHORIZATION, DUMMY_TOKEN)
@@ -251,7 +254,7 @@ class RespondentRepresentativeControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
-                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+                .andExpect(jsonPath(JsonMapper.WARNINGS, notNullValue()));
     }
 
     @Test
@@ -267,11 +270,12 @@ class RespondentRepresentativeControllerTest {
         dynamicValueType.setLabel(RESPONDENT_NAME_1);
         dynamicFixedListType.setValue(dynamicValueType);
         caseData.setRepCollection(List.of(RepresentedTypeRItem.builder().id(ID_REPRESENTATIVE_1).value(
-                RepresentedTypeR.builder().dynamicRespRepName(dynamicFixedListType).build()).build()));
+                RepresentedTypeR.builder().dynamicRespRepName(dynamicFixedListType)
+                        .nameOfRepresentative(REPRESENTATIVE_NAME).build()).build()));
         CCDRequest ccdRequest = CCDRequestBuilder.builder().withCaseData(caseData).build();
         ccdRequest.getCaseDetails().setCaseId(DUMMY_SUBMISSION_REFERENCE);
-        when(nocRespondentRepresentativeService.validateRepresentativeEmailMatchesOrganisationUsers(
-                any(CaseData.class))).thenReturn(Collections.emptyList());
+        when(nocRespondentRepresentativeService.validateRepresentativeOrganisationAndEmail(
+                any(CaseData.class), anyString())).thenReturn(Collections.emptyList());
         when(nocRespondentRepresentativeService.prepopulateOrgAddress(any(CaseData.class), anyString())).thenThrow(
                 new GenericRuntimeException(new GenericServiceException(DUMMY_EXCEPTION_MESSAGE,
                         new Exception(DUMMY_EXCEPTION_MESSAGE), DUMMY_EXCEPTION_MESSAGE, DUMMY_SUBMISSION_REFERENCE,
@@ -284,7 +288,7 @@ class RespondentRepresentativeControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
-                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+                .andExpect(jsonPath(JsonMapper.WARNINGS, notNullValue()));
     }
 
     @Test

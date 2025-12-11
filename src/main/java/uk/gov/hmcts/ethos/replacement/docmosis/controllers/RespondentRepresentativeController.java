@@ -51,7 +51,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HT
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_MESSAGE_FOUR_ZERO_ONE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_MESSAGE_FOUR_ZERO_THREE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_MESSAGE_TWO_HUNDRED;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrorsAndWarnings;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @Slf4j
@@ -115,9 +115,11 @@ public class RespondentRepresentativeController {
                 ccdRequest.getCaseDetails().getCaseId());
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>(NocUtils.validateNocCaseData(caseData));
-        errors.addAll(nocRespondentRepresentativeService.validateRepresentativeEmailMatchesOrganisationUsers(caseData));
+        List<String> warnings = new ArrayList<>();
         if (errors.isEmpty()) {
             try {
+                warnings.addAll(nocRespondentRepresentativeService.validateRepresentativeOrganisationAndEmail(
+                        caseData, ccdRequest.getCaseDetails().getCaseId()));
                 NocUtils.mapRepresentativesToRespondents(caseData, ccdRequest.getCaseDetails().getCaseId());
                 nocRespondentHelper.removeUnmatchedRepresentations(caseData);
                 nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, userToken);
@@ -128,7 +130,7 @@ public class RespondentRepresentativeController {
         } else {
             log.info(errors.toString());
         }
-        return getCallbackRespEntityErrors(errors, caseData);
+        return getCallbackRespEntityErrorsAndWarnings(warnings, errors, caseData);
     }
 
     @PostMapping("/amendRespondentRepresentativeSubmitted")

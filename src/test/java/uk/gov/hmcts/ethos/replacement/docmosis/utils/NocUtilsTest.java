@@ -29,6 +29,7 @@ final class NocUtilsTest {
     private static final String EXPECTED_ERROR_RESPONDENT_HAS_MULTIPLE_REPRESENTATIVES =
             "Respondent with name Respondent Name One has more than one representative";
 
+    private static final String REPRESENTATIVE_NAME = "Representative Name";
     private static final String RESPONDENT_NAME_ONE = "Respondent Name One";
     private static final String RESPONDENT_NAME_TWO = "Respondent Name Two";
     private static final String RESPONDENT_ID_ONE = "dummy_respondent_id_1";
@@ -112,7 +113,7 @@ final class NocUtilsTest {
         dynamicValueType.setLabel(respondentName);
         dynamicFixedListType.setValue(dynamicValueType);
         return RepresentedTypeRItem.builder().id(DUMMY_REPRESENTATIVE_ID).value(RepresentedTypeR.builder()
-                .dynamicRespRepName(dynamicFixedListType).build()).build();
+                .dynamicRespRepName(dynamicFixedListType).nameOfRepresentative(REPRESENTATIVE_NAME).build()).build();
     }
 
     @Test
@@ -125,8 +126,11 @@ final class NocUtilsTest {
         // when representative value is empty should return false
         respondentRepresentative.setId(DUMMY_REPRESENTATIVE_ID);
         assertThat(NocUtils.isValidNocRepresentative(respondentRepresentative)).isFalse();
-        // when representative dynamic respondent name is empty should return false
+        // when representative does not have name should return false
         respondentRepresentative.setValue(RepresentedTypeR.builder().build());
+        assertThat(NocUtils.isValidNocRepresentative(respondentRepresentative)).isFalse();
+        // when representative dynamic respondent name is empty should return false
+        respondentRepresentative.setValue(RepresentedTypeR.builder().nameOfRepresentative(REPRESENTATIVE_NAME).build());
         assertThat(NocUtils.isValidNocRepresentative(respondentRepresentative)).isFalse();
         // when dynamic respondent name does not have any value should return false
         DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
@@ -169,7 +173,8 @@ final class NocUtilsTest {
         DynamicValueType dynamicValueType = new DynamicValueType();
         dynamicValueType.setLabel(RESPONDENT_NAME_TWO);
         dynamicFixedListType.setValue(dynamicValueType);
-        caseData.getRepCollection().getFirst().setValue(RepresentedTypeR.builder().respondentId(RESPONDENT_ID_TWO)
+        caseData.getRepCollection().getFirst().setValue(RepresentedTypeR.builder()
+                .nameOfRepresentative(REPRESENTATIVE_NAME).respondentId(RESPONDENT_ID_TWO)
                 .dynamicRespRepName(dynamicFixedListType).build());
         assertDoesNotThrow(() -> NocUtils.mapRepresentativesToRespondents(caseData, DUMMY_CASE_SUBMISSION_REFERENCE));
         // when respondent name is equal to selected name in representative collection

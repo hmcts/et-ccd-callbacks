@@ -33,6 +33,8 @@ final class RepresentativeUtilsTest {
 
     private static final String RESPONDENT_NAME_1 = "Respondent name 1";
     private static final String RESPONDENT_NAME_2 = "Respondent name 2";
+    private static final String REPRESENTATIVE_NAME_1 = "Representative name 1";
+    private static final String REPRESENTATIVE_NAME_2 = "Representative name 2";
 
     @Test
     void theValidateRespondentRepresentative() {
@@ -94,19 +96,22 @@ final class RepresentativeUtilsTest {
         // when representatives have more than one respondent with the same name should return
         // ERROR_RESPONDENT_HAS_MULTIPLE_REPRESENTATIVES.
         representatives = List.of(RepresentedTypeRItem.builder().id(DUMMY_REPRESENTATIVE_ID).value(
-                RepresentedTypeR.builder().dynamicRespRepName(createDynamicFixedListType(RESPONDENT_NAME_1)).build())
+                RepresentedTypeR.builder().nameOfRepresentative(REPRESENTATIVE_NAME_1)
+                        .dynamicRespRepName(createDynamicFixedListType(RESPONDENT_NAME_1)).build())
                         .build(), RepresentedTypeRItem.builder().id(DUMMY_REPRESENTATIVE_ID).value(
-                                RepresentedTypeR.builder().dynamicRespRepName(
-                                        createDynamicFixedListType(RESPONDENT_NAME_1)).build()).build());
+                                RepresentedTypeR.builder().nameOfRepresentative(REPRESENTATIVE_NAME_2)
+                                        .dynamicRespRepName(createDynamicFixedListType(RESPONDENT_NAME_1))
+                                        .build()).build());
         errors = RepresentativeUtils.hasDuplicateRespondentNames(representatives);
         assertThat(errors).isNotEmpty().hasSize(NumberUtils.INTEGER_ONE);
         assertThat(errors.getFirst()).isEqualTo(EXPECTED_ERROR_RESPONDENT_HAS_MULTIPLE_REPRESENTATIVES);
         // when representatives have no duplicated respondent names should not return any error.
         representatives = List.of(RepresentedTypeRItem.builder().id(DUMMY_REPRESENTATIVE_ID)
-                        .value(RepresentedTypeR.builder().dynamicRespRepName(
-                                createDynamicFixedListType(RESPONDENT_NAME_1)).build()).build(),
+                        .value(RepresentedTypeR.builder().nameOfRepresentative(REPRESENTATIVE_NAME_1)
+                                .dynamicRespRepName(createDynamicFixedListType(RESPONDENT_NAME_1)).build()).build(),
                 RepresentedTypeRItem.builder().id(DUMMY_REPRESENTATIVE_ID).value(RepresentedTypeR.builder()
-                        .dynamicRespRepName(createDynamicFixedListType(RESPONDENT_NAME_2)).build()).build());
+                        .nameOfRepresentative(REPRESENTATIVE_NAME_2).dynamicRespRepName(
+                                createDynamicFixedListType(RESPONDENT_NAME_2)).build()).build());
         errors = RepresentativeUtils.hasDuplicateRespondentNames(representatives);
         assertThat(errors).isEmpty();
     }

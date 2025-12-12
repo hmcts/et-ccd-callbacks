@@ -157,11 +157,6 @@ public class InitialConsiderationController {
         HearingsHelper.setEtInitialConsiderationListedHearingType(caseData);
         caseData.setEtInitialConsiderationHearing(initialConsiderationService.getHearingDetails(
                     caseData.getHearingCollection()));
-
-        if (HearingsHelper.getEarliestListedHearingType(caseData.getHearingCollection()) != null) {
-            caseData.setEtICHearingAlreadyListed("Yes");
-        }
-
         //claimant hearing panel preference
         caseData.setEtIcHearingPanelPreference(initialConsiderationService.getClaimantHearingPanelPreference(
                 caseData.getClaimantHearingPreference()));

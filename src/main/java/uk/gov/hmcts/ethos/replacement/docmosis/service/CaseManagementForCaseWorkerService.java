@@ -28,6 +28,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.generic.BaseCaseData;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCasesSendingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
 
@@ -35,6 +36,8 @@ import java.io.IOException;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -283,6 +286,14 @@ public class CaseManagementForCaseWorkerService {
         }
     }
 
+    public void setNextEarliestListedHearing(CaseData caseData) {
+        if (caseData == null) {
+            return;
+        }
+
+        HearingsHelper.setEtInitialConsiderationListedHearingType(caseData);
+    }
+
     private void updateRespondentEccReplyCounter(List<RespondentSumTypeItem> respondentCollection) {
         for (RespondentSumTypeItem respondentItem : respondentCollection) {
             RespondentSumType respondent = respondentItem.getValue();
@@ -305,6 +316,10 @@ public class CaseManagementForCaseWorkerService {
                 dates.addAll(getListedDates(hearingTypeItem));
             }
             for (String date : dates) {
+                if (!isValidHearingDateFormate(date)) {
+                    continue;
+                }
+
                 LocalDateTime parsedDate = LocalDateTime.parse(date);
                 if (EMPTY_STRING.equals(nextListedDate) && parsedDate.isAfter(LocalDateTime.now())
                         || parsedDate.isAfter(LocalDateTime.now())
@@ -313,6 +328,19 @@ public class CaseManagementForCaseWorkerService {
                 }
             }
             caseData.setNextListedDate(nextListedDate.split("T")[0]);
+        }
+    }
+
+    private boolean isValidHearingDateFormate(String hearingDate) {
+        DateTimeFormatter formatter = new DateTimeFormatterBuilder()
+                .appendPattern("yyyy-MM-dd'T'HH:mm:ss")
+                .optionalStart().appendPattern(".SSS").optionalEnd()
+                .toFormatter();
+        try {
+            LocalDateTime.parse(hearingDate, formatter);
+            return true;
+        } catch (Exception e) {
+            return false;
         }
     }
 
@@ -443,8 +471,8 @@ public class CaseManagementForCaseWorkerService {
         }
         caseData.getHearingCollection().forEach(hearingTypeItem -> {
             HearingType hearingType = hearingTypeItem.getValue();
-            if (isNotEmpty(hearingType.getHearingDateCollection())) {
-                hearingType.getHearingDateCollection().stream()
+            if (isNotEmpty(hearingTypeItem.getValue().getHearingDateCollection())) {
+                hearingTypeItem.getValue().getHearingDateCollection().stream()
                         .map(DateListedTypeItem::getValue)
                         .forEach(dateListedType -> {
                             if (dateListedType.getHearingStatus() == null) {

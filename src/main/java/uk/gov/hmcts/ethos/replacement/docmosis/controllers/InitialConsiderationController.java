@@ -17,6 +17,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.InitialConsiderationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
@@ -31,6 +32,7 @@ import java.time.format.DateTimeFormatter;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.setDocumentNumbers;
@@ -101,7 +103,6 @@ public class InitialConsiderationController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         initialConsiderationService.processIcDocumentCollections(caseData);
-        initialConsiderationService.clearHiddenValue(caseData);
         caseData.setIcCompletedBy(reportDataService.getUserFullName(userToken));
         caseData.setIcDateCompleted(LocalDate.now().format(DateTimeFormatter.ofPattern(MONTH_STRING_DATE_FORMAT)));
         DocumentInfo documentInfo = initialConsiderationService.generateDocument(caseData, userToken,
@@ -113,12 +114,18 @@ public class InitialConsiderationController {
             caseFlagsService.setPrivateHearingFlag(caseData);
         }
 
-        if (CollectionUtils.isNotEmpty(caseData.getEtICHearingNotListedList())) {
-            initialConsiderationService.clearIcHearingNotListedOldValues(caseData);
+        if (HearingsHelper.getEarliestListedHearingType(caseData.getHearingCollection()) != null) {
+            caseData.setEtICHearingAlreadyListed("Yes");
         }
 
         setDocumentNumbers(caseData);
         caseManagementForCaseWorkerService.setNextListedDate(caseData);
+
+        //clear old and hidden values
+        if (NO.equals(caseData.getEtICHearingAlreadyListed())) {
+            initialConsiderationService.clearHiddenValue(caseData);
+        }
+
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -139,26 +146,43 @@ public class InitialConsiderationController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        initialConsiderationService.clearOldEtICHearingListedAnswersValues(caseData);
+        initialConsiderationService.clearIcHearingNotListedOldValues(caseData);
+        initialConsiderationService.clearHiddenValue(caseData);
 
-        caseData.setEtInitialConsiderationRespondent(
-                initialConsiderationService.getRespondentName(caseData.getRespondentCollection()));
-        caseData.setEtInitialConsiderationHearing(
-            initialConsiderationService.getHearingDetails(caseData.getHearingCollection()));
-        caseData.setEtIcHearingPanelPreference(
-                initialConsiderationService.getClaimantHearingPanelPreference(caseData.getClaimantHearingPreference()));
-        String icRespondentHearingPanelPreference = initialConsiderationService.getIcRespondentHearingPanelPreference(
-                caseData.getRespondentCollection());
-        caseData.setIcRespondentHearingPanelPreference(icRespondentHearingPanelPreference);
+        // Sets the respondent details(respondent ET1 and ET3 names, hearing panel preference, and
+        // availability for video hearing) of all respondents in a concatenated string format
+        caseData.setEtInitialConsiderationRespondent(initialConsiderationService.setRespondentDetails(caseData));
+        //hearing details
+        HearingsHelper.setEtInitialConsiderationListedHearingType(caseData);
+        caseData.setEtInitialConsiderationHearing(initialConsiderationService.getHearingDetails(
+                    caseData.getHearingCollection()));
+        //claimant hearing panel preference
+        caseData.setEtIcHearingPanelPreference(initialConsiderationService.getClaimantHearingPanelPreference(
+                caseData.getClaimantHearingPreference()));
 
+        //JurCodes
         String caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();
-        caseData.setEtInitialConsiderationJurisdictionCodes(
-                initialConsiderationService.generateJurisdictionCodesHtml(
+        caseData.setEtInitialConsiderationJurisdictionCodes(initialConsiderationService.generateJurisdictionCodesHtml(
                         caseData.getJurCodesCollection(), caseTypeId));
         initialConsiderationService.setIsHearingAlreadyListed(caseData, caseTypeId);
+        initialConsiderationService.initialiseInitialConsideration(ccdRequest.getCaseDetails());
 
         if (CollectionUtils.isNotEmpty(caseData.getEtICHearingNotListedList())) {
             initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData, caseTypeId);
         }
+
+        // ET1 Vetting Issues
+        caseData.setIcEt1VettingIssuesDetail(initialConsiderationService.setIcEt1VettingIssuesDetails(caseData));
+
+        // ET3 Vetting Issues
+        caseData.setIcEt3ProcessingIssuesDetail(
+                initialConsiderationService.setIcEt3VettingIssuesDetailsForEachRespondent(caseData));
+
+        caseData.setRegionalOffice(caseData.getRegionalOfficeList() != null
+                ? caseData.getRegionalOfficeList().getSelectedLabel() : null);
+        caseData.setEt1TribunalRegion(caseData.getEt1HearingVenues() != null
+                ? caseData.getEt1HearingVenues().getSelectedLabel() : null);
 
         return getCallbackRespEntityNoErrors(caseData);
     }

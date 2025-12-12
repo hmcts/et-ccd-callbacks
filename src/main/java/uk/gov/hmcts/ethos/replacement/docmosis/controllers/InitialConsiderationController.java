@@ -32,6 +32,7 @@ import java.time.format.DateTimeFormatter;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.setDocumentNumbers;
@@ -113,7 +114,7 @@ public class InitialConsiderationController {
             caseFlagsService.setPrivateHearingFlag(caseData);
         }
 
-        if (Boolean.parseBoolean(caseData.getEtInitialConsiderationHearing())) {
+        if (HearingsHelper.getEarliestListedHearingType(caseData.getHearingCollection()) != null) {
             caseData.setEtICHearingAlreadyListed("Yes");
         }
 
@@ -121,7 +122,9 @@ public class InitialConsiderationController {
         caseManagementForCaseWorkerService.setNextListedDate(caseData);
 
         //clear old and hidden values
-        initialConsiderationService.clearHiddenValue(caseData);
+        if (NO.equals(caseData.getEtICHearingAlreadyListed())) {
+            initialConsiderationService.clearHiddenValue(caseData);
+        }
 
         return getCallbackRespEntityNoErrors(caseData);
     }
@@ -154,7 +157,8 @@ public class InitialConsiderationController {
         HearingsHelper.setEtInitialConsiderationListedHearingType(caseData);
         caseData.setEtInitialConsiderationHearing(initialConsiderationService.getHearingDetails(
                     caseData.getHearingCollection()));
-        if (caseData.getEtInitialConsiderationHearing() != null) {
+
+        if (HearingsHelper.getEarliestListedHearingType(caseData.getHearingCollection()) != null) {
             caseData.setEtICHearingAlreadyListed("Yes");
         }
 

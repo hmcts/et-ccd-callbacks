@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -24,6 +25,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.OrganisationAddress;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.UpdateRespondentRepresentativeRequest;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
@@ -39,18 +41,20 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.UUID;
-import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.lang3.ObjectUtils.getIfNull;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EVENT_UPDATE_CASE_SUBMITTED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REQUEST;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_REPRESENTATIVE_MISSING_EMAIL_ADDRESS;
 
 @Service
 @RequiredArgsConstructor
@@ -156,6 +160,7 @@ public class NocRespondentRepresentativeService {
      */
     public void updateRespondentRepresentativesAccess(CallbackRequest callbackRequest)
             throws IOException, GenericServiceException {
+
         CaseDetails caseDetails = callbackRequest.getCaseDetails();
         CaseDetails caseDetailsBefore = callbackRequest.getCaseDetailsBefore();
         CaseData caseDataBefore = caseDetailsBefore.getCaseData();
@@ -313,36 +318,30 @@ public class NocRespondentRepresentativeService {
                         .noneMatch(r -> r.getValue() != null && YES.equals(r.getValue().getMyHmctsYesNo()))) {
             return caseData;
         }
-
         // get all Organisation Details
         List<OrganisationsResponse> organisationList = organisationClient.getOrganisations(
                 userToken, authTokenGenerator.generate());
-
         for (RepresentedTypeRItem representative : repCollection) {
             RepresentedTypeR representativeDetails = representative.getValue();
-
             if (representativeDetails != null && YES.equals(representativeDetails.getMyHmctsYesNo())) {
                 Organisation repOrg = representativeDetails.getRespondentOrganisation();
-
                 if (repOrg != null && repOrg.getOrganisationID() != null) {
+                    representativeDetails.setNonMyHmctsOrganisationId(StringUtils.EMPTY);
                     // get organisation details
                     Optional<OrganisationsResponse> organisation =
                             organisationList
                                     .stream()
                                     .filter(o -> o.getOrganisationIdentifier().equals(repOrg.getOrganisationID()))
                                     .findFirst();
-
                     organisation.ifPresent(orgResponse -> updateRepDetails(orgResponse, representativeDetails));
                 }
             }
         }
-
         return caseData;
     }
 
     private void updateRepDetails(OrganisationsResponse orgRes, RepresentedTypeR repDetails) {
         repDetails.setNameOfOrganisation(orgRes.getName());
-
         if (!CollectionUtils.isEmpty(orgRes.getContactInformation())) {
             Address repAddress = repDetails.getRepresentativeAddress();
             if (AddressUtils.isNullOrEmpty(repAddress)) {
@@ -362,22 +361,96 @@ public class NocRespondentRepresentativeService {
     }
 
     /**
-     * Assigns an ID to each non myHMCTS legal rep representing their legal firm.
-     * @param repCollection Collection of representatives on the case
+     * Validates that each representative marked as a myHMCTS representative has an email address
+     * that corresponds to a user within the selected organisation.
+     *
+     * <p>The method performs the following validations for each representative in the
+     * {@code repCollection}:</p>
+     *
+     * <ul>
+     *     <li><strong>Organisation selection requirement:</strong>
+     *         If a representative is marked as a myHMCTS representative, an organisation must be selected.
+     *         If no organisation is present, a {@link GenericServiceException} is thrown.</li>
+     *
+     *     <li><strong>Email address presence:</strong>
+     *         If the representative does not have an email address, a warning message is added.</li>
+     *
+     *     <li><strong>Email-to-organisation user match:</strong>
+     *         The representative's email address is checked against the organisation's registered users.
+     *         If the email cannot be matched to any organisation user, a warning is added.</li>
+     * </ul>
+     *
+     * <p><strong>Important:</strong></p>
+     * <ul>
+     *     <li>No validation error is not implemented if the organisation cannot be found in the organisation list, when
+     *     user is a myHmcts organisation user. because all organisations are selected from existing organisation data
+     *     and are therefore assumed valid.</li>
+     *     <li>All representatives included in {@code caseData.getRepCollection()} are assumed to be structurally valid
+     *     and eligible for validation.</li>
+     * </ul>
+     *
+     * @param caseData the case data containing the representatives to validate
+     * @param submissionReference a reference identifier used for error tracking during submission
+     * @return a list of warning messages generated during validation; empty if no warnings are produced
+     * @throws GenericServiceException if a myHMCTS representative does not have a selected organisation
      */
-    public void updateNonMyHmctsOrgIds(List<RepresentedTypeRItem> repCollection) {
-        repCollection.stream()
-                .map(RepresentedTypeRItem::getValue)
-                .forEach(this::updateNonMyHmctsOrgId);
-    }
-
-    private void updateNonMyHmctsOrgId(RepresentedTypeR rep) {
-        if (YES.equals(rep.getMyHmctsYesNo())) {
-            return;
+    public List<String> validateRepresentativeOrganisationAndEmail(CaseData caseData,
+                                                                   String submissionReference)
+            throws GenericServiceException {
+        if (ObjectUtils.isEmpty(caseData)
+                || org.apache.commons.collections4.CollectionUtils.isEmpty(caseData.getRepCollection())) {
+            return Collections.emptyList();
         }
+        List<String> warnings = new ArrayList<>();
+        StringBuilder nocWarnings = new StringBuilder(StringUtils.EMPTY);
+        for (RepresentedTypeRItem representativeItem :  caseData.getRepCollection()) {
+            RepresentedTypeR representative = representativeItem.getValue();
+            // checking if representative organisation is a hmcts organisation
+            if (!YES.equals(representative.getMyHmctsYesNo())) {
+                continue;
+            }
+            final String representativeName = representative.getNameOfRepresentative();
+            // Checking if representative has an organisation
+            if (ObjectUtils.isEmpty(representative.getRespondentOrganisation())
+                    || StringUtils.isBlank(representative.getRespondentOrganisation().getOrganisationID())) {
+                String exceptionMessage = String.format(EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND,
+                        representativeName);
+                throw new GenericServiceException(exceptionMessage, new Exception(), exceptionMessage,
+                        submissionReference, "NocRespondentRepresentativeService",
+                        "validateRepresentativeEmailMatchesOrganisationUsers");
+            }
+            // checking if representative has an email address
+            final String representativeEmail = representative.getRepresentativeEmailAddress();
+            if (StringUtils.isBlank(representativeEmail)) {
+                String warningMessage = String.format(WARNING_REPRESENTATIVE_MISSING_EMAIL_ADDRESS, representativeName);
+                nocWarnings.append(warningMessage).append('\n');
+                warnings.add(warningMessage);
+                continue;
+            }
 
-        if (isNullOrEmpty(rep.getNonMyHmctsOrganisationId())) {
-            rep.setNonMyHmctsOrganisationId(UUID.randomUUID().toString());
+            String accessToken = adminUserService.getAdminUserToken();
+            try {
+                ResponseEntity<AccountIdByEmailResponse> userResponse =
+                        organisationClient.getAccountIdByEmail(accessToken, authTokenGenerator.generate(),
+                                representativeEmail);
+                // checking if representative email address exists in organisation users
+                if (ObjectUtils.isEmpty(userResponse)
+                        || ObjectUtils.isEmpty(userResponse.getBody())
+                        || StringUtils.isBlank(userResponse.getBody().getUserIdentifier())) {
+                    String warningMessage = String.format(WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL,
+                            representativeName, representativeEmail);
+                    nocWarnings.append(warningMessage).append('\n');
+                    warnings.add(warningMessage);
+                }
+            } catch (Exception e) {
+                // for localhost if e-mail is not entered same as wiremock request
+                String warningMessage = String.format(WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL,
+                        representativeName, representativeEmail);
+                nocWarnings.append(warningMessage).append('\n');
+                warnings.add(warningMessage);
+            }
         }
+        caseData.setNocWarning(nocWarnings.toString());
+        return warnings;
     }
 }

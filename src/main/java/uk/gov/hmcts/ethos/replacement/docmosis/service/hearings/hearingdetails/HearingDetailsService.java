@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.hearingdetails;
 
 import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -12,14 +13,17 @@ import uk.gov.hmcts.et.common.model.ccd.types.HearingDetailType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper.buildFlagsImageFileName;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.updatePostponedDate;
 
 @Service
 public class HearingDetailsService {
@@ -64,7 +68,6 @@ public class HearingDetailsService {
         if (isNotEmpty(hearingDetailTypeItemsList) && isNotEmpty(dateListedTypeItems)) {
             updatedMatchingHearing(dateListedTypeItems, hearingDetailTypeItemsList);
             setHearingNotesDocument(caseData);
-            updatePostponedDate(caseData);
         }
         buildFlagsImageFileName(caseDetails);
     }
@@ -83,18 +86,14 @@ public class HearingDetailsService {
 
     private void updatedMatchingHearing(List<DateListedTypeItem> dateListedTypeItems,
                                         List<HearingDetailTypeItem> hearingDetailTypeItemsList) {
-        for (DateListedTypeItem dateListedTypeItem : dateListedTypeItems) {
-            DateListedType dateListedType = dateListedTypeItem.getValue();
-            if (dateListedType != null) {
-                for (HearingDetailTypeItem hearingDetailTypeItem : hearingDetailTypeItemsList) {
-                    HearingDetailType hearingDetailType = hearingDetailTypeItem.getValue();
-                    if (hearingDetailType != null && hearingDetailType.getHearingDetailsDate() != null
-                        && hearingDetailType.getHearingDetailsDate().equals(dateListedType.getListedDate())) {
-                        updateDateListedTypeDetails(dateListedType, hearingDetailType);
-                    }
-                }
-            }
-        }
+        dateListedTypeItems.stream().map(DateListedTypeItem::getValue)
+            .filter(Objects::nonNull)
+            .forEach(dateListedType -> hearingDetailTypeItemsList.stream()
+                .map(HearingDetailTypeItem::getValue)
+                .filter(hearingDetailType -> hearingDetailType != null
+                     && hearingDetailType.getHearingDetailsDate() != null
+                     && hearingDetailType.getHearingDetailsDate().equals(dateListedType.getListedDate()))
+                .forEach(hearingDetailType -> updateDateListedTypeDetails(dateListedType, hearingDetailType)));
     }
 
     private List<DateListedTypeItem> getDateListedItemFromSelectedHearing(CaseData caseData) {
@@ -108,7 +107,15 @@ public class HearingDetailsService {
 
     private void updateDateListedTypeDetails(DateListedType dateListedType, HearingDetailType hearingDetailType) {
         dateListedType.setHearingStatus(hearingDetailType.getHearingDetailsStatus());
-        dateListedType.setPostponedBy(hearingDetailType.getHearingDetailsPostponedBy());
+        if (HEARING_STATUS_POSTPONED.equals(dateListedType.getHearingStatus())) {
+            dateListedType.setPostponedBy(hearingDetailType.getHearingDetailsPostponedBy());
+            if (isNullOrEmpty(dateListedType.getPostponedDate())) {
+                dateListedType.setPostponedDate(UtilHelper.formatCurrentDate2(LocalDate.now()));
+            }
+        } else {
+            dateListedType.setPostponedBy(null);
+            dateListedType.setPostponedDate(null);
+        }
         dateListedType.setHearingCaseDisposed(hearingDetailType.getHearingDetailsCaseDisposed());
         dateListedType.setHearingPartHeard(hearingDetailType.getHearingDetailsPartHeard());
         dateListedType.setHearingReservedJudgement(

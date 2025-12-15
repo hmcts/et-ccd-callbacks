@@ -1616,7 +1616,7 @@
     "CaseTypeID": "ET_EnglandWales",
     "CaseEventID": "allocateHearing",
     "CaseFieldID": "allocateHearingPostponedBy",
-    "DisplayContext": "OPTIONAL",
+    "DisplayContext": "MANDATORY",
     "PageID": 2,
     "PageDisplayOrder": 2,
     "PageFieldDisplayOrder": 6,

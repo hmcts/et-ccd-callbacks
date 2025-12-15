@@ -4664,44 +4664,32 @@
   {
     "ID": "fl_Part_15",
     "ListElementCode": "15.1",
-    "ListElement": "15.1 - Letter refusing judicial mediation",
+    "ListElement": "15.1 - JM by video Notice of hearing and CMOs",
     "DisplayOrder": 1
   },
   {
     "ID": "fl_Part_15",
     "ListElementCode": "15.2",
-    "ListElement": "15.2 - Notice of hearing for telephone preliminary hearing - judicial mediation",
+    "ListElement": "15.2 - Attended JM Notice of hearing and CMOs",
     "DisplayOrder": 2
   },
   {
     "ID": "fl_Part_15",
-    "ListElementCode": "15.2A",
-    "ListElement": "15.2A - Notice of hearing for preliminary hearing - judicial mediation",
+    "ListElementCode": "15.3",
+    "ListElement": "15.3 - DRA by video Notice of Hearing and CMOs",
     "DisplayOrder": 3
   },
   {
     "ID": "fl_Part_15",
-    "ListElementCode": "15.3",
-    "ListElement": "15.3 - Notice of judicial mediation preliminary hearing",
-    "DisplayOrder": 4
-  },
-  {
-    "ID": "fl_Part_15",
     "ListElementCode": "15.4",
-    "ListElement": "15.4 - DRA Notice of Hearing by CVP",
-    "DisplayOrder": 5
+    "ListElement": "15.4 - Attended DRA Notice of Hearing and CMOs",
+    "DisplayOrder": 4
   },
   {
     "ID": "fl_Part_15",
     "ListElementCode": "15.5",
     "ListElement": "15.5 - DRA appointments - Information Sheet",
-    "DisplayOrder": 6
-  },
-  {
-    "ID": "fl_Part_15",
-    "ListElementCode": "15.6",
-    "ListElement": "15.6 - DRA Suggested Directions",
-    "DisplayOrder": 7
+    "DisplayOrder": 5
   },
   {
     "ID": "fl_Part_16",

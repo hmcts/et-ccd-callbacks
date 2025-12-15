@@ -1,0 +1,34 @@
+[
+  {"CaseTypeId": "ET_Scotland", "CaseEventID": "et1ReppedCreateCase", "UserRole": "caseworker-employment-api", "CRUD": "CRUD"},
+  {"CaseTypeId": "ET_Scotland", "CaseEventID": "et1SectionOne", "UserRole": "caseworker-employment-api", "CRUD": "CRUD"},
+  {"CaseTypeId": "ET_Scotland", "CaseEventID": "et1SectionTwo", "UserRole": "caseworker-employment-api", "CRUD": "CRUD"},
+  {"CaseTypeId": "ET_Scotland", "CaseEventID": "et1SectionThree", "UserRole": "caseworker-employment-api", "CRUD": "CRUD"},
+  {"CaseTypeId": "ET_Scotland", "CaseEventID": "submitEt1Draft", "UserRole": "caseworker-employment-api", "CRUD": "CRUD"},
+  {"CaseTypeId": "ET_Scotland", "CaseEventID": "createDraftEt1", "UserRole": "caseworker-employment-api", "CRUD": "CRUD"},
+  {"CaseTypeId": "ET_Scotland", "CaseEventID": "et1ReppedCreateCase", "UserRole": "caseworker-employment-legalrep-solicitor", "CRUD": "CRUD"},
+  {"CaseTypeId": "ET_Scotland", "CaseEventID": "et1SectionOne", "UserRole": "[CLAIMANTSOLICITOR]", "CRUD": "CRU"},
+  {"CaseTypeId": "ET_Scotland", "CaseEventID": "et1SectionTwo", "UserRole": "[CLAIMANTSOLICITOR]", "CRUD": "CRU"},
+  {"CaseTypeId": "ET_Scotland", "CaseEventID": "et1SectionThree", "UserRole": "[CLAIMANTSOLICITOR]", "CRUD": "CRU"},
+  {"CaseTypeId": "ET_Scotland", "CaseEventID": "submitEt1Draft", "UserRole": "[CLAIMANTSOLICITOR]", "CRUD": "CRU"},
+  {"CaseTypeId": "ET_Scotland", "CaseEventID": "createDraftEt1", "UserRole": "[CLAIMANTSOLICITOR]", "CRUD": "CRU"},
+  {"CaseTypeId": "ET_Scotland", "CaseEventID": "tseClaimantRepResponse", "UserRole": "[CLAIMANTSOLICITOR]", "CRUD": "CRUD"},
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseEventID": "submitEt1Draft",
+    "UserRole": "caseworker-wa-task-configuration",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseEventID": "generateEt1Documents",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {"CaseTypeId": "ET_Scotland", "CaseEventID": "claimantViewNotification", "UserRole": "[CLAIMANTSOLICITOR]", "CRUD": "CRU"},
+  {"CaseTypeId": "ET_Scotland", "CaseEventID": "claimantViewNotification", "UserRole": "caseworker-employment-api", "CRUD": "CRUD"},
+  {"CaseTypeId": "ET_Scotland", "CaseEventID": "claimantViewAllNotifications", "UserRole": "[CLAIMANTSOLICITOR]", "CRUD": "CRU"},
+  {"CaseTypeId": "ET_Scotland", "CaseEventID": "claimantViewAllNotifications", "UserRole": "caseworker-employment-api", "CRUD": "CRUD"},
+  {"CaseTypeId": "ET_Scotland", "CaseEventID": "claimantRespondToNotification", "UserRole": "[CLAIMANTSOLICITOR]", "CRUD": "CRU"},
+  {"CaseTypeId": "ET_Scotland", "CaseEventID": "claimantRespondToNotification", "UserRole": "caseworker-employment-api", "CRUD": "CRUD"},
+  {"CaseTypeId": "ET_Scotland", "CaseEventID": "amendClaimantRepresentativeContact", "AccessControl": [{"UserRoles": ["[CLAIMANTSOLICITOR]", "caseworker-employment-api"], "CRUD": "CRUD"}]}
+]

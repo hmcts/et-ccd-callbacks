@@ -98,6 +98,8 @@ public class InitialConsiderationService {
     public static final String TIME_POINTS = "Time points";
     public static final String DO_WE_HAVE_THE_RESPONDENT_S_NAME = "Do we have the respondent's name?";
     public static final String DOES_THE_RESPONDENT_S_NAME_MATCH = "Does the respondent's name match?";
+    public static final String REFERRAL_ISSUE = "Referral Issue";
+    public static final String DETAIL = "Detail";
     private final TornadoService tornadoService;
     private static final String[] HEADER = {"Issue / Question", "Details / Answer"};
     private static final String BULLET_POINT = "\n -  ";
@@ -895,7 +897,7 @@ public class InitialConsiderationService {
                     addPair(otherReferralIssuesPairsList, referralAndDetailPair.getFirst(),
                             referralAndDetailPair.get(1)));
             otherReferralStringBuilder.append(MarkdownHelper.createTwoColumnTable(
-                    new String[]{"Referral Issue", "Detail"},
+                    new String[]{REFERRAL_ISSUE, DETAIL},
                     otherReferralIssuesPairsList));
             et1VettingIssuesTablesMarkup.append(MarkdownHelper.detailsWrapper(
                     "Details of Other Referral",
@@ -915,7 +917,7 @@ public class InitialConsiderationService {
                     addPair(et1VettingReferralIssuesPairsList, referralAndDetailPair.getFirst(),
                             referralAndDetailPair.get(1)));
             referralToJudgeOrLOStringBuilder.append(MarkdownHelper.createTwoColumnTable(
-                    new String[]{"Referral Issue", "Detail"},
+                    new String[]{REFERRAL_ISSUE, DETAIL},
                     et1VettingReferralIssuesPairsList));
             et1VettingIssuesTablesMarkup.append(MarkdownHelper.detailsWrapper(
                     "Details of Referral To REJ or VP",
@@ -990,7 +992,7 @@ public class InitialConsiderationService {
                     addPair(et1VettingReferralIssuesPairsList, referralAndDetailPair.getFirst(),
                             referralAndDetailPair.get(1)));
             referralToJudgeOrLOStringBuilder.append(MarkdownHelper.createTwoColumnTable(
-                    new String[]{"Referral Issue", "Detail"},
+                    new String[]{REFERRAL_ISSUE, DETAIL},
                     et1VettingReferralIssuesPairsList));
             et1VettingIssuesTablesMarkup.append(MarkdownHelper.detailsWrapper(
                     "Details of Referral To Judge or LO",
@@ -1015,7 +1017,7 @@ public class InitialConsiderationService {
                     .toList();
 
             String twoColumnTable = MarkdownHelper.createTwoColumnTable(
-                    new String[]{"Substantive Defects", "Detail"}, et1VettingIssuesPairsList);
+                    new String[]{"Substantive Defects", DETAIL}, et1VettingIssuesPairsList);
 
             stringBuilder.append(MarkdownHelper.detailsWrapper("Details of Substantive Defects",
                             twoColumnTable)).append(NEWLINE);
@@ -1032,7 +1034,7 @@ public class InitialConsiderationService {
                     .toList();
 
             String table = MarkdownHelper.createTwoColumnTable(
-                    new String[]{"Track Allocation Issue", "Detail"}, trackAllocationIssuePairsList);
+                    new String[]{"Track Allocation Issue", DETAIL}, trackAllocationIssuePairsList);
 
             trackAllocationTableMarkUp.append(MarkdownHelper.detailsWrapper(
                     "Details of Track Allocation Issue", table))

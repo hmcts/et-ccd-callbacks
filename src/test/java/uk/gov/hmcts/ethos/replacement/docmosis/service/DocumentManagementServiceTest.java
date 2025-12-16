@@ -495,7 +495,7 @@ class DocumentManagementServiceTest {
     @Test
     void uploadDocument_shouldThrowException_whenSecureDocStoreDisabledAndUploadFails() {
         ReflectionTestUtils.setField(documentManagementService, "secureDocStoreEnabled", false);
-        MultipartFile file = new InMemoryMultipartFile("files", "test.docx",
+        MultipartFile multipartFile = new InMemoryMultipartFile("files", "test.docx",
                 "application/docx", "content".getBytes());
         UserDetails userDetails = HelperTest.getUserDetails();
         when(userIdamService.getUserDetails(anyString())).thenReturn(userDetails);
@@ -503,7 +503,7 @@ class DocumentManagementServiceTest {
                 .thenThrow(new DocumentManagementException("Upload failed"));
 
         DocumentManagementException exception = assertThrows(DocumentManagementException.class, () ->
-                documentManagementService.uploadDocument("authToken", file.getBytes(),
+                documentManagementService.uploadDocument("authToken", multipartFile.getBytes(),
                         "test.docx", "application/docx", "caseType")
         );
 
@@ -513,13 +513,13 @@ class DocumentManagementServiceTest {
     @Test
     void uploadDocument_shouldThrowException_whenSecureDocStoreEnabledAndUploadFails() {
         ReflectionTestUtils.setField(documentManagementService, "secureDocStoreEnabled", true);
-        MultipartFile file = new InMemoryMultipartFile("files", "test.docx",
+        MultipartFile multipartFile = new InMemoryMultipartFile("files", "test.docx",
                 "application/docx", "content".getBytes());
         when(caseDocumentClient.uploadDocuments(anyString(), anyString(), anyString(), anyString(), anyList(), any()))
                 .thenThrow(new DocumentManagementException("Upload failed"));
 
         DocumentManagementException exception = assertThrows(DocumentManagementException.class, () ->
-                documentManagementService.uploadDocument("authToken", file.getBytes(),
+                documentManagementService.uploadDocument("authToken", multipartFile.getBytes(),
                         "test.docx", "application/docx", "caseType")
         );
 
@@ -529,7 +529,7 @@ class DocumentManagementServiceTest {
     @Test
     void uploadDocument_shouldReturnUri_whenSecureDocStoreDisabled() throws Exception {
         ReflectionTestUtils.setField(documentManagementService, "secureDocStoreEnabled", false);
-        MultipartFile file = new InMemoryMultipartFile("files", "test.docx",
+        MultipartFile multipartFile = new InMemoryMultipartFile("files", "test.docx",
                 "application/docx", "content".getBytes());
         UploadResponse response = successfulDocumentManagementUploadResponse();
         UserDetails userDetails = HelperTest.getUserDetails();
@@ -537,10 +537,9 @@ class DocumentManagementServiceTest {
         when(documentUploadClient.upload(anyString(), anyString(), anyString(), anyList(), any(), anyList()))
                 .thenReturn(response);
 
-        URI result = documentManagementService.uploadDocument("authToken", file.getBytes(),
+        URI result = documentManagementService.uploadDocument("authToken", multipartFile.getBytes(),
                 "test.docx", "application/docx", "caseType");
 
         assertEquals("/documents/85d97996-22a5-40d7-882e-3a382c8ae1b4", result.getPath());
     }
-
 }

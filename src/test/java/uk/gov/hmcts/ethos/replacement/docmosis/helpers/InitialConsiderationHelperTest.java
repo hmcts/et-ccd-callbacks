@@ -112,10 +112,11 @@ class InitialConsiderationHelperTest {
 
     @Test
     void updateHearingWithJudgeOrMembersDetails_returnsEmptyStringWhenAnswersAreNull() {
-        CaseData caseData = new CaseData();
-        caseData.setEtICHearingListedAnswers(null);
+        CaseData caseDataWithJudgeOrMembers = new CaseData();
+        caseDataWithJudgeOrMembers.setEtICHearingListedAnswers(null);
 
-        String result = InitialConsiderationHelper.updateHearingWithJudgeOrMembersDetails(caseData);
+        String result = InitialConsiderationHelper.updateHearingWithJudgeOrMembersDetails(
+                caseDataWithJudgeOrMembers);
 
         assertEquals("", result);
     }
@@ -128,10 +129,11 @@ class InitialConsiderationHelperTest {
         answers.setEtICIsFinalHearingWithJudgeOrMembersJsaReason(List.of("Reason A", "Other"));
         answers.setEtICJsaFinalHearingReasonOther("Custom Reason");
 
-        CaseData caseData = new CaseData();
-        caseData.setEtICHearingListedAnswers(answers);
+        CaseData caseDataWithFinalHearingJsa = new CaseData();
+        caseDataWithFinalHearingJsa.setEtICHearingListedAnswers(answers);
 
-        String result = InitialConsiderationHelper.updateHearingWithJudgeOrMembersDetails(caseData);
+        String result = InitialConsiderationHelper.updateHearingWithJudgeOrMembersDetails(
+                caseDataWithFinalHearingJsa);
 
         String expected = """
 

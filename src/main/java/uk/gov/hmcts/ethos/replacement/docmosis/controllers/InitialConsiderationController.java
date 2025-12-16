@@ -121,7 +121,7 @@ public class InitialConsiderationController {
         setDocumentNumbers(caseData);
         caseManagementForCaseWorkerService.setNextListedDate(caseData);
 
-        //clear old and hidden values
+        //clear hidden values
         if (NO.equals(caseData.getEtICHearingAlreadyListed())) {
             initialConsiderationService.clearHiddenValue(caseData);
         }

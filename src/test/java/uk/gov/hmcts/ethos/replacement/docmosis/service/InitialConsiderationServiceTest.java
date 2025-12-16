@@ -1749,6 +1749,9 @@ class InitialConsiderationServiceTest {
     void setIcEt1VettingIssuesDetails_shouldIncludeSubstantiveDefectsSection_whenDefectsReported() {
         InitialConsiderationService service = new InitialConsiderationService(tornadoService);
         CaseData caseData = new CaseData();
+        caseData.setRule121aTextArea("Details for rule 13(1)(a)");
+        caseData.setRule121bTextArea("Details for rule 13(1)(b");
+
         List<String> substantiveDefectsDetails = new ArrayList<>(List.of("rule121a", "rule121a"));
         caseData.setSubstantiveDefectsList(substantiveDefectsDetails);
         String result = service.setIcEt1VettingIssuesDetails(caseData);
@@ -1830,8 +1833,6 @@ class InitialConsiderationServiceTest {
         assertThat(result).doesNotContain("Details of Other Referral");
     }
 
-    // Add to InitialConsiderationServiceTest.java
-
     @Test
     void setIcEt1VettingIssuesDetails_shouldReturnEmpty_whenReferralToJudgeOrLOListIsNullOrEmpty() {
         CaseData caseData = new CaseData();
@@ -1892,6 +1893,13 @@ class InitialConsiderationServiceTest {
     @Test
     void setIcEt1VettingIssuesDetails_shouldIncludeAllSubstantiveDefectsDescriptions() {
         CaseData caseData = new CaseData();
+        caseData.setRule121aTextArea("Details for rule 13(1)(a)");
+        caseData.setRule121bTextArea("Details for rule 13(1)(b");
+        caseData.setRule121cTextArea("Details for rule 13(1)(c)");
+        caseData.setRule121dTextArea("Details for rule 13(1)(d)");
+        caseData.setRule121daTextArea("Details for rule 13(1)(e)");
+        caseData.setRule121eTextArea("Details for rule 13(1)(f)");
+        caseData.setRule121fTextArea("Details for rule 13(1)(g)");
         caseData.setSubstantiveDefectsList(List.of(
                 "rule121a", "rule121b", "rule121c", "rule121d", "rule121 da", "rule121e", "rule121f"
         ));

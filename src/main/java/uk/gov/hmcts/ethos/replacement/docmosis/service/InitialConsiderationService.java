@@ -714,9 +714,9 @@ public class InitialConsiderationService {
         //Do you want to suggest a hearing venue?
         composeHearingVenueIssuesTableMarkUp(caseData, et1VettingIssuesTablesMarkup);
 
-        //respondet type issues
+        //respondent type issues
 
-        //resonable adjustments issues
+        //reasonable adjustments issues
 
         //video hearing issues
 
@@ -957,6 +957,12 @@ public class InitialConsiderationService {
         List<List<String>> icEt1SubstantiveDefects = composeIcEt1SubstantiveDefectsDetail(caseData);
 
         if (CollectionUtils.isNotEmpty(icEt1SubstantiveDefects)) {
+
+            if (caseData.getEt1SubstantiveDefectsGeneralNotes() != null
+                    && !caseData.getEt1SubstantiveDefectsGeneralNotes().isEmpty()) {
+                icEt1SubstantiveDefects.add(List.of("General notes", caseData.getEt1SubstantiveDefectsGeneralNotes()));
+            }
+
             List<String[]> et1VettingIssuesPairsList = icEt1SubstantiveDefects.stream()
                     .map(defectAndDetailPair -> new String[]{defectAndDetailPair.getFirst(),
                             defectAndDetailPair.get(1)})
@@ -1016,36 +1022,42 @@ public class InitialConsiderationService {
             caseData.getSubstantiveDefectsList().forEach(defect -> {
                 switch (defect) {
                     case "rule121a" :
-                        substantiveDefectsDetails.add(List.of("Rule 121a",
-                                "The tribunal has no jurisdiction to consider - Rule 13(1)(a)"));
+                        substantiveDefectsDetails.add(
+                                List.of("The tribunal has no jurisdiction to consider - Rule 13(1)(a)",
+                                caseData.getRule121aTextArea()));
                         break;
                     case "rule121b":
-                        substantiveDefectsDetails.add(List.of("Rule 121b",
-                                "Is in a form which cannot sensibly be responded to or otherwise an abuse of process "
-                                        + "- Rule 13(1)(b)"));
+                        substantiveDefectsDetails.add(
+                                List.of("Is in a form which cannot sensibly be responded to or otherwise an "
+                                        + "abuse of process - Rule 13(1)(b)",
+                                        caseData.getRule121bTextArea()));
                         break;
                     case "rule121c":
-                        substantiveDefectsDetails.add(List.of("Rule 121c",
-                                "Has neither an EC number nor claims one of the EC exemptions - Rule 13(1)(c)"));
+                        substantiveDefectsDetails.add(
+                                List.of("Has neither an EC number nor claims one of the EC exemptions - Rule 13(1)(c)",
+                                        caseData.getRule121cTextArea()));
                         break;
                     case "rule121d":
-                        substantiveDefectsDetails.add(List.of("Rule 121d",
-                                "States that one of the EC exceptions applies but it might not - Rule 13(1)(d)"));
+                        substantiveDefectsDetails.add(
+                                List.of("States that one of the EC exceptions applies but it might not - Rule 13(1)(d)",
+                                caseData.getRule121dTextArea()));
                         break;
                     case "rule121 da":
-                        substantiveDefectsDetails.add(List.of("Rule 121 da",
-                                "Institutes relevant proceedings and the EC number on the claim form does not match "
-                                + "the EC number on the Acas certificate - Rule 13(1)(e)"));
+                        substantiveDefectsDetails.add(
+                                List.of("Institutes relevant proceedings and the EC number on the claim form "
+                                        + "does not match the EC number on the Acas certificate - Rule 13(1)(e)",
+                                caseData.getRule121daTextArea()));
                         break;
                     case "rule121e":
-                        substantiveDefectsDetails.add(List.of("Rule 121e",
-                                "Has a different claimant name on the ET1 to the claimant name on the Acas certificate "
-                                        + "- Rule 13(1)(f)"));
+                        substantiveDefectsDetails.add(List.of("Has a different claimant name on the ET1 to the "
+                                        + "claimant name on the Acas certificate - Rule 13(1)(f)",
+                                caseData.getRule121eTextArea()));
                         break;
                     case "rule121f":
-                        substantiveDefectsDetails.add(List.of("Rule 121f",
-                                "Has a different respondent name on the ET1 to the respondent name on the Acas "
-                                + "certificate - Rule 13(1)(g)"));
+                        substantiveDefectsDetails.add(
+                                List.of("Has a different respondent name on the ET1 to the respondent name on the Acas "
+                                        + "certificate - Rule 13(1)(g)", caseData.getRule121fTextArea()
+                                ));
                         break;
                     default:
                         // do nothing

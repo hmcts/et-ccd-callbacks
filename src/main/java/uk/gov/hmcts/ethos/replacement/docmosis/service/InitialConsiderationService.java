@@ -714,11 +714,8 @@ public class InitialConsiderationService {
         //Do you want to suggest a hearing venue?
         composeHearingVenueIssuesTableMarkUp(caseData, et1VettingIssuesTablesMarkup);
 
-        //respondent type issues
-
-        //reasonable adjustments issues
-
-        //video hearing issues
+        //respondent type, reasonable adjustments and video hearing related issues
+        composeRespondentTypeRelatedIssuesTableMarkUp(caseData, et1VettingIssuesTablesMarkup);
 
         //Referral to Judge or LO
         composeReferralToJudgeOrLoTableMarkUp(caseData, et1VettingIssuesTablesMarkup);
@@ -730,6 +727,55 @@ public class InitialConsiderationService {
         composeIcEt1OtherReferralTableMarkUp(caseData, et1VettingIssuesTablesMarkup);
 
         return et1VettingIssuesTablesMarkup.toString();
+    }
+
+    private static void composeRespondentTypeRelatedIssuesTableMarkUp(CaseData caseData,
+                                                                      StringBuilder et1VettingIssuesTablesMarkup) {
+        List<String[]> respondentTypeIssuesPairsList = new ArrayList<>();
+
+        // Respondent type
+        addPairIfNotNull(respondentTypeIssuesPairsList, "Is the respondent a government agency or a major employer?",
+                caseData.getEt1GovOrMajorQuestion());
+
+        // Reasonable adjustments for respondent
+        if (caseData.getEt1ReasonableAdjustmentsQuestion() != null) {
+            addPair(respondentTypeIssuesPairsList, "Are reasonable adjustments required for the respondent?",
+                    caseData.getEt1ReasonableAdjustmentsQuestion());
+            addPairIfNotEmpty(respondentTypeIssuesPairsList, "Give details (Respondent Type)",
+                    caseData.getEt1ReasonableAdjustmentsTextArea());
+        }
+
+        // Video hearing for respondent
+        if (caseData.getEt1VideoHearingQuestion() != null) {
+
+            addPair(respondentTypeIssuesPairsList, "Is a video hearing required for the respondent?",
+                    caseData.getEt1VideoHearingQuestion());
+            addPairIfNotEmpty(respondentTypeIssuesPairsList, "Give details (Video Hearing)",
+                    caseData.getEt1VideoHearingTextArea());
+        }
+
+        //General notes
+        addPairIfNotEmpty(respondentTypeIssuesPairsList, "General Notes",
+                caseData.getEt1FurtherQuestionsGeneralNotes());
+
+        if (!respondentTypeIssuesPairsList.isEmpty()) {
+            String table = MarkdownHelper.createTwoColumnTable(
+                    new String[]{"Respondent Type Related Issues", DETAILS}, respondentTypeIssuesPairsList);
+            et1VettingIssuesTablesMarkup.append(MarkdownHelper.detailsWrapper(
+                    "Details of Respondent Type Related Issues", table)).append(NEWLINE);
+        }
+    }
+
+    private static void addPairIfNotNull(List<String[]> list, String key, String value) {
+        if (value != null) {
+            addPair(list, key, defaultIfEmpty(value, ""));
+        }
+    }
+
+    private static void addPairIfNotEmpty(List<String[]> list, String key, String value) {
+        if (value != null && !value.isEmpty()) {
+            addPair(list, key, defaultIfEmpty(value, ""));
+        }
     }
 
     private static void composeHearingVenueIssuesTableMarkUp(CaseData caseData,
@@ -968,11 +1014,11 @@ public class InitialConsiderationService {
                             defectAndDetailPair.get(1)})
                     .toList();
 
-            String table = MarkdownHelper.createTwoColumnTable(
+            String twoColumnTable = MarkdownHelper.createTwoColumnTable(
                     new String[]{"Substantive Defects", "Detail"}, et1VettingIssuesPairsList);
 
-            stringBuilder.append(MarkdownHelper.detailsWrapper("Details of Substantive Defects", table))
-                    .append(NEWLINE);
+            stringBuilder.append(MarkdownHelper.detailsWrapper("Details of Substantive Defects",
+                            twoColumnTable)).append(NEWLINE);
         }
     }
 

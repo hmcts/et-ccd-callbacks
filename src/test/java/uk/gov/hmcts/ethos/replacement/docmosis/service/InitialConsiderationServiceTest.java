@@ -1993,25 +1993,48 @@ class InitialConsiderationServiceTest {
 
     @Test
     void setIcEt1VettingIssuesDetails_shouldNotIncludeLocationalIssues_whenLocationIsCorrect() {
-        CaseData caseData = new CaseData();
-        caseData.setIsLocationCorrect("Yes");
+        CaseData caseDataWithLocation = new CaseData();
+        caseDataWithLocation.setIsLocationCorrect("Yes");
 
-        String result = new InitialConsiderationService(null).setIcEt1VettingIssuesDetails(caseData);
+        String result = new InitialConsiderationService(null).setIcEt1VettingIssuesDetails(caseDataWithLocation);
 
         assertFalse(result.contains("Details of Locational Issues"));
     }
 
     @Test
     void setIcEt1VettingIssuesDetails_shouldHandleNullRegionalOfficeListAndWhyChangeOffice() {
-        CaseData caseData = new CaseData();
-        caseData.setIsLocationCorrect("No");
-        // regionalOfficeList and whyChangeOffice are null
+        CaseData caseDataWithChangeOffice = new CaseData();
+        caseDataWithChangeOffice.setIsLocationCorrect("No");
 
-        String result = new InitialConsiderationService(null).setIcEt1VettingIssuesDetails(caseData);
+        // regionalOfficeList and whyChangeOffice are null
+        String result = new InitialConsiderationService(
+                null).setIcEt1VettingIssuesDetails(caseDataWithChangeOffice);
 
         assertTrue(result.contains("Is this location correct?"));
         assertFalse(result.contains("Local or regional office selected"));
         assertFalse(result.contains("Why should we change the office?"));
     }
 
+    @Test
+    void setIcEt1VettingIssuesDetails_shouldGenerateCorrectMarkup() {
+        CaseData caseData = new CaseData();
+        caseData.setEt1GovOrMajorQuestion("Yes");
+        caseData.setEt1ReasonableAdjustmentsQuestion("Yes");
+        caseData.setEt1ReasonableAdjustmentsTextArea("Details about reasonable adjustments.");
+        caseData.setEt1VideoHearingQuestion("No");
+        caseData.setEt1VideoHearingTextArea("Details about video hearing.");
+        caseData.setEt1FurtherQuestionsGeneralNotes("General notes about the respondent.");
+
+        InitialConsiderationService service = new InitialConsiderationService(null);
+
+        String result = service.setIcEt1VettingIssuesDetails(caseData);
+
+        assertNotNull(result);
+        assertTrue(result.contains("Is the respondent a government agency or a major employer?"));
+        assertTrue(result.contains("Are reasonable adjustments required for the respondent?"));
+        assertTrue(result.contains("Details about reasonable adjustments."));
+        assertTrue(result.contains("Is a video hearing required for the respondent?"));
+        assertTrue(result.contains("Details about video hearing."));
+        assertTrue(result.contains("General notes about the respondent."));
+    }
 }

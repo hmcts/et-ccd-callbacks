@@ -51,7 +51,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HT
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_MESSAGE_FOUR_ZERO_ONE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_MESSAGE_FOUR_ZERO_THREE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_MESSAGE_TWO_HUNDRED;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrorsAndWarnings;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @Slf4j
@@ -92,6 +92,38 @@ public class RespondentRepresentativeController {
         return getCallbackRespEntityNoErrors(caseData);
     }
 
+    @PostMapping(value = "/amendRespondentRepresentativeMidEvent", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Checks respondent representative organisation.")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = HTTP_CODE_TWO_HUNDRED, description = HTTP_MESSAGE_TWO_HUNDRED,
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = HTTP_CODE_FOUR_HUNDRED, description = HTTP_MESSAGE_FOUR_HUNDRED),
+        @ApiResponse(responseCode = HTTP_CODE_FOUR_ZERO_ONE, description = HTTP_MESSAGE_FOUR_ZERO_ONE),
+        @ApiResponse(responseCode = HTTP_CODE_FOUR_ZERO_THREE, description = HTTP_MESSAGE_FOUR_ZERO_THREE),
+        @ApiResponse(responseCode = HTTP_CODE_FOUR_ZERO_FOUR, description = HTTP_MESSAGE_FOUR_ZERO_FOUR),
+        @ApiResponse(responseCode = HTTP_CODE_FIVE_HUNDRED, description = HTTP_MESSAGE_FIVE_HUNDRED),
+        @ApiResponse(responseCode = HTTP_CODE_FIVE_ZERO_ONE, description = HTTP_MESSAGE_FIVE_ZERO_ONE),
+        @ApiResponse(responseCode = HTTP_CODE_FIVE_ZERO_THREE, description = HTTP_MESSAGE_FIVE_ZERO_THREE)
+    })
+    public ResponseEntity<CCDCallbackResponse> amendRespondentRepresentativeMidEvent(
+            @RequestBody @NotNull CCDRequest ccdRequest,
+            @RequestHeader(AUTHORIZATION) String userToken) {
+        CaseDataUtils.validateCCDRequest(ccdRequest);
+        log.info("CHECKING RESPONDENT REPRESENTATIVE ORGANISATION ---> " + LOG_MESSAGE + "{}",
+                ccdRequest.getCaseDetails().getCaseId());
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        List<String> errors = new ArrayList<>();
+        try {
+            nocRespondentRepresentativeService.validateRepresentativeOrganisationAndEmail(
+                    caseData, ccdRequest.getCaseDetails().getCaseId());
+        } catch (GenericRuntimeException | GenericServiceException gse) {
+            errors.addFirst(gse.getMessage());
+        }
+        return getCallbackRespEntityErrors(errors, caseData);
+    }
+
     @PostMapping(value = "/amendRespondentRepresentativeAboutToSubmit", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Amends respondent representative for a single case.")
     @ApiResponses(value = {
@@ -115,11 +147,8 @@ public class RespondentRepresentativeController {
                 ccdRequest.getCaseDetails().getCaseId());
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>(NocUtils.validateNocCaseData(caseData));
-        List<String> warnings = new ArrayList<>();
         if (errors.isEmpty()) {
             try {
-                warnings.addAll(nocRespondentRepresentativeService.validateRepresentativeOrganisationAndEmail(
-                        caseData, ccdRequest.getCaseDetails().getCaseId()));
                 NocUtils.mapRepresentativesToRespondents(caseData, ccdRequest.getCaseDetails().getCaseId());
                 nocRespondentHelper.removeUnmatchedRepresentations(caseData);
                 nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, userToken);
@@ -130,7 +159,7 @@ public class RespondentRepresentativeController {
         } else {
             log.info(errors.toString());
         }
-        return getCallbackRespEntityErrorsAndWarnings(warnings, errors, caseData);
+        return getCallbackRespEntityErrors(errors, caseData);
     }
 
     @PostMapping("/amendRespondentRepresentativeSubmitted")

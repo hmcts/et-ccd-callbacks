@@ -41,7 +41,6 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -391,17 +390,15 @@ public class NocRespondentRepresentativeService {
      *
      * @param caseData the case data containing the representatives to validate
      * @param submissionReference a reference identifier used for error tracking during submission
-     * @return a list of warning messages generated during validation; empty if no warnings are produced
      * @throws GenericServiceException if a myHMCTS representative does not have a selected organisation
      */
-    public List<String> validateRepresentativeOrganisationAndEmail(CaseData caseData,
+    public void validateRepresentativeOrganisationAndEmail(CaseData caseData,
                                                                    String submissionReference)
             throws GenericServiceException {
         if (ObjectUtils.isEmpty(caseData)
                 || org.apache.commons.collections4.CollectionUtils.isEmpty(caseData.getRepCollection())) {
-            return Collections.emptyList();
+            return;
         }
-        List<String> warnings = new ArrayList<>();
         StringBuilder nocWarnings = new StringBuilder(StringUtils.EMPTY);
         for (RepresentedTypeRItem representativeItem :  caseData.getRepCollection()) {
             RepresentedTypeR representative = representativeItem.getValue();
@@ -424,7 +421,6 @@ public class NocRespondentRepresentativeService {
             if (StringUtils.isBlank(representativeEmail)) {
                 String warningMessage = String.format(WARNING_REPRESENTATIVE_MISSING_EMAIL_ADDRESS, representativeName);
                 nocWarnings.append(warningMessage).append('\n');
-                warnings.add(warningMessage);
                 continue;
             }
 
@@ -440,17 +436,14 @@ public class NocRespondentRepresentativeService {
                     String warningMessage = String.format(WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL,
                             representativeName, representativeEmail);
                     nocWarnings.append(warningMessage).append('\n');
-                    warnings.add(warningMessage);
                 }
             } catch (Exception e) {
                 // for localhost if e-mail is not entered same as wiremock request
                 String warningMessage = String.format(WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL,
                         representativeName, representativeEmail);
                 nocWarnings.append(warningMessage).append('\n');
-                warnings.add(warningMessage);
             }
         }
         caseData.setNocWarning(nocWarnings.toString());
-        return warnings;
     }
 }

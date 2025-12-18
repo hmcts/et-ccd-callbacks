@@ -414,7 +414,7 @@ public class NocRespondentRepresentativeService {
                         representativeName);
                 throw new GenericServiceException(exceptionMessage, new Exception(), exceptionMessage,
                         submissionReference, "NocRespondentRepresentativeService",
-                        "validateRepresentativeEmailMatchesOrganisationUsers");
+                        "validateRepresentativeOrganisationAndEmail");
             }
             // checking if representative has an email address
             final String representativeEmail = representative.getRepresentativeEmailAddress();

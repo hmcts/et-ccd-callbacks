@@ -363,8 +363,10 @@ class RespondentRepresentativeControllerTest {
                 RepresentedTypeR.builder().dynamicRespRepName(dynamicFixedListType).build()).build()));
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
-        CallbackRequest callbackRequest = CallbackRequest.builder().caseDetails(caseDetails).build();
+        CallbackRequest callbackRequest = CallbackRequest.builder().caseDetails(caseDetails)
+                .caseDetailsBefore(caseDetails).build();
         callbackRequest.getCaseDetails().setCaseId(DUMMY_SUBMISSION_REFERENCE);
+        callbackRequest.getCaseDetailsBefore().setCaseId(DUMMY_SUBMISSION_REFERENCE);
         doNothing().when(nocRespondentRepresentativeService)
                 .updateRespondentRepresentativesAccess(any(CallbackRequest.class));
         mockMvc.perform(post(URL_AMEND_RESPONDENT_REPRESENTATIVE_SUBMITTED)

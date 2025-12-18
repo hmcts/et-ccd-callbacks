@@ -177,6 +177,7 @@ public class RespondentRepresentativeController {
     public void amendRespondentRepresentativeSubmitted(
             @RequestBody CallbackRequest callbackRequest,
             @RequestHeader(AUTHORIZATION) String userToken) {
+        CaseDataUtils.validateCallbackRequest(callbackRequest);
         log.info("AMEND RESPONDENT REPRESENTATIVE SUBMITTED ---> " + LOG_MESSAGE + "{}",
                 callbackRequest.getCaseDetails().getCaseId());
         try {

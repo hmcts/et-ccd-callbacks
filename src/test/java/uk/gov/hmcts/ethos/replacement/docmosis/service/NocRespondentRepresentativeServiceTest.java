@@ -118,7 +118,8 @@ class NocRespondentRepresentativeServiceTest {
     private static final String EXPECTED_WARNING_REPRESENTATIVE_MISSING_EMAIL_ADDRESS =
             "Representative Legal One is missing an email address.\n";
     private static final String EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL =
-            "Representative 'Legal One' could not be found using respondent@rep.email.com.\n";
+            "Representative 'Legal One' could not be found using respondent@rep.email.com. "
+                    + "Case access will not be defined for this representative.\n";
 
     @Autowired
     private ObjectMapper objectMapper;

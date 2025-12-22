@@ -38,7 +38,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ET1_ONLINE_CASE_SOURCE;
@@ -120,7 +119,7 @@ public class MultipleCreationService {
         MultipleData multipleData = multipleDetails.getCaseData();
         List<String> caseIds = multipleData.getCaseIdCollection().stream()
             .map(o -> o.getValue().getEthosCaseReference())
-            .collect(Collectors.toList());
+            .toList();
 
         if (caseIds.isEmpty()) {
             // No cases linked to this multiple means no legal reps to add

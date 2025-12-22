@@ -1,8 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.excel;
 
-import io.micrometer.core.instrument.util.StringUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
@@ -11,6 +11,7 @@ import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.DataModelParent;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.LegalRepDataModel;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
+import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationUsersIdamUser;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
@@ -160,7 +161,7 @@ public class MultipleCreationService {
             }
         }
 
-        var ethosList = List.of(cases.get(0).getCaseData().getEthosCaseReference());
+        var ethosList = List.of(cases.getFirst().getCaseData().getEthosCaseReference());
 
         CreateUpdatesDto createUpdatesDto = CreateUpdatesDto.builder()
             .caseTypeId(multipleCaseTypeId)
@@ -212,7 +213,7 @@ public class MultipleCreationService {
             .filter(Objects::nonNull)
             .map(RepresentedTypeR::getRespondentOrganisation)
             .filter(Objects::nonNull)
-            .map(o -> o.getOrganisationID())
+            .map(Organisation::getOrganisationID)
             .distinct()
             .toList();
     }
@@ -304,7 +305,7 @@ public class MultipleCreationService {
 
                     subMultipleNames.add(multipleObjectType.getSubMultiple());
 
-                    log.info("Generating subMultiple type: " + multipleObjectType.getSubMultiple());
+                    log.info("Generating subMultiple type: {}", multipleObjectType.getSubMultiple());
 
                     subMultipleTypeItems.add(
                             subMultipleUpdateService.createSubMultipleTypeItemWithReference(
@@ -384,7 +385,7 @@ public class MultipleCreationService {
 
         } else {
 
-            log.info("Adding lead case introduced by user: " + multipleData.getLeadCase());
+            log.info("Adding lead case introduced by user: {}", multipleData.getLeadCase());
 
             MultiplesHelper.addLeadToCaseIds(multipleData, multipleData.getLeadCase());
 
@@ -400,7 +401,7 @@ public class MultipleCreationService {
     private void sendUpdatesToSingles(String userToken, MultipleDetails multipleDetails,
                                       List<String> errors, List<String> ethosCaseRefCollection) {
 
-        log.info("Ethos case ref collection: " + ethosCaseRefCollection);
+        log.info("Ethos case ref collection: {}", ethosCaseRefCollection);
 
         String refMarkup = MultiplesHelper.generateMarkUp(ccdGatewayBaseUrl, multipleDetails.getCaseId(),
                 multipleDetails.getCaseData().getMultipleReference());
@@ -417,7 +418,7 @@ public class MultipleCreationService {
                     multipleDetails.getCaseData(),
                     errors,
                     ethosCaseRefCollection,
-                    ethosCaseRefCollection.get(0),
+                    ethosCaseRefCollection.getFirst(),
                     refMarkup);
 
         }

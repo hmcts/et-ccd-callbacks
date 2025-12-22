@@ -11,7 +11,6 @@ import com.nimbusds.jose.jwk.SecretJWK;
 import com.nimbusds.jose.proc.JWSVerifierFactory;
 import com.nimbusds.jwt.SignedJWT;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.exceptions.VerifyTokenServiceException;
@@ -35,7 +34,7 @@ public class VerifyTokenService {
 
     public boolean verifyTokenSignature(String token) {
         try {
-            String tokenTocheck = StringUtils.replace(token, "Bearer ", "");
+            String tokenTocheck = token.replace("Bearer ", "");
             SignedJWT signedJwt = SignedJWT.parse(tokenTocheck);
 
             JWKSet jsonWebKeySet = loadJsonWebKeySet(idamJwkUrl);
@@ -64,16 +63,12 @@ public class VerifyTokenService {
     private Key findKeyById(JWKSet jsonWebKeySet, String keyId) {
         try {
             JWK jsonWebKey = jsonWebKeySet.getKeyByKeyId(keyId);
-            if (jsonWebKey == null) {
-                throw new VerifyTokenServiceException("JWK does not exist in the key set");
-            }
-            if (jsonWebKey instanceof SecretJWK secretJWK) {
-                return secretJWK.toSecretKey();
-            }
-            if (jsonWebKey instanceof AsymmetricJWK asymmetricJWK) {
-                return asymmetricJWK.toPublicKey();
-            }
-            throw new VerifyTokenServiceException("Unsupported JWK " + jsonWebKey.getClass().getName());
+            return switch (jsonWebKey) {
+                case null -> throw new VerifyTokenServiceException("JWK does not exist in the key set");
+                case SecretJWK secretJWK -> secretJWK.toSecretKey();
+                case AsymmetricJWK asymmetricJWK -> asymmetricJWK.toPublicKey();
+                default -> throw new VerifyTokenServiceException("Unsupported JWK " + jsonWebKey.getClass().getName());
+            };
         } catch (JOSEException e) {
             log.error("Invalid JWK key", e);
             throw new VerifyTokenServiceException("Invalid JWK", e);

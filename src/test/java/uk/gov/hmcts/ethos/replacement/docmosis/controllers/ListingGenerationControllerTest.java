@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -153,6 +154,38 @@ class ListingGenerationControllerTest extends BaseControllerTest {
         listingData.setListingDateTo("2021-10-18");
         listingData.setManagingOffice(TribunalOffice.ABERDEEN.getOfficeName());
 
+        List<ListingTypeItem> listingCollection = getListingTypeItems();
+        listingData.setListingCollection(listingCollection);
+
+        listingData = new ListingData();
+        listingData.setTribunalCorrespondenceDX("DX");
+        listingData.setTribunalCorrespondenceEmail("m@m.com");
+        listingData.setTribunalCorrespondenceFax("100300200");
+        listingData.setTribunalCorrespondenceTelephone("077123123");
+
+        Address address = new Address();
+        address.setAddressLine1("AddressLine1");
+        address.setAddressLine2("AddressLine2");
+        address.setAddressLine3("AddressLine3");
+        address.setPostTown("Manchester");
+        address.setCountry("UK");
+        address.setPostCode("L1 122");
+        listingData.setTribunalCorrespondenceAddress(address);
+
+        List<ListingTypeItem> listingTypeItems = new ArrayList<>();
+        listingTypeItems.add(new ListingTypeItem());
+
+        ListingDetails listingDetails1 = new ListingDetails();
+        listingData.setListingCollection(listingTypeItems);
+        listingDetails1.setCaseData(listingData);
+
+        singleListingRequest = new ListingRequest();
+        singleListingRequest.setCaseDetails(listingDetails1);
+
+        return singleListingRequest;
+    }
+
+    private static @NotNull List<ListingTypeItem> getListingTypeItems() {
         ListingTypeItem listingTypeItem1 = new ListingTypeItem();
         listingTypeItem1.setId("97087d19-795a-4886-8cdb-06489b8b2ef5");
 
@@ -183,32 +216,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
         listingCollection.add(listingTypeItem1);
         listingCollection.add(listingTypeItem2);
 
-        listingData.setListingCollection(listingCollection);
-
-        listingData = new ListingData();
-        listingData.setTribunalCorrespondenceDX("DX");
-        listingData.setTribunalCorrespondenceEmail("m@m.com");
-        listingData.setTribunalCorrespondenceFax("100300200");
-        listingData.setTribunalCorrespondenceTelephone("077123123");
-
-        Address address = new Address();
-        address.setAddressLine1("AddressLine1");
-        address.setAddressLine2("AddressLine2");
-        address.setAddressLine3("AddressLine3");
-        address.setPostTown("Manchester");
-        address.setCountry("UK");
-        address.setPostCode("L1 122");
-        listingData.setTribunalCorrespondenceAddress(address);
-
-        List<ListingTypeItem> listingTypeItems = new ArrayList<>();
-        listingTypeItems.add(new ListingTypeItem());
-        ListingDetails listingDetails = new ListingDetails();
-        listingData.setListingCollection(listingTypeItems);
-        listingDetails.setCaseData(listingData);
-        singleListingRequest = new ListingRequest();
-        singleListingRequest.setCaseDetails(listingDetails);
-
-        return singleListingRequest;
+        return listingCollection;
     }
 
     @BeforeEach

@@ -153,13 +153,19 @@ public class InitialConsiderationController {
         // Sets the respondent details(respondent ET1 and ET3 names, hearing panel preference, and
         // availability for video hearing) of all respondents in a concatenated string format
         caseData.setEtInitialConsiderationRespondent(initialConsiderationService.setRespondentDetails(caseData));
+
         //hearing details
         HearingsHelper.setEtInitialConsiderationListedHearingType(caseData);
         caseData.setEtInitialConsiderationHearing(initialConsiderationService.getHearingDetails(
                     caseData.getHearingCollection()));
-        //claimant hearing panel preference
-        caseData.setEtIcHearingPanelPreference(initialConsiderationService.getClaimantHearingPanelPreference(
-                caseData.getClaimantHearingPreference()));
+
+        //Parties' panel preference in a table
+        caseData.setEtIcPartiesHearingPanelPreference(
+                initialConsiderationService.setPartiesHearingPanelPreferenceDetails(caseData));
+
+        //Parties' Hearing Format in a table
+        caseData.setEtIcPartiesHearingFormat(
+                initialConsiderationService.setPartiesHearingFormatDetails(caseData));
 
         //JurCodes
         String caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();

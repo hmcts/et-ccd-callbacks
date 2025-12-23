@@ -35,7 +35,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -44,22 +43,25 @@ import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CLAIMANT_HEARING_PANEL_PREFERENCE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CLAIMANT_HEARING_FORMAT_NEITHER_PREFERENCE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CLAIMANT_HEARING_PANEL_PREFERENCE_MISSING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CODES_URL_ENGLAND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CODES_URL_SCOTLAND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CVP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.DOC_GEN_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.HEARING_DETAILS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.HEARING_FORMAT_PREFERENCE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.HEARING_MISSING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.HEARING_NOT_LISTED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.HEARING_PANEL_PREFERENCE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.HEARING_TYPE_MAPPINGS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.IC_OUTPUT_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.JSA;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.JURISDICTION_HEADER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.LIST_FOR_FINAL_HEARING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.LIST_FOR_PRELIMINARY_HEARING;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.RESPONDENT_HEARING_PANEL_PREFERENCE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.PARTIES_HEARING_FORMAT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.PARTIES_HEARING_PANEL_PREFERENCE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.RESPONDENT_MISSING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.RESPONDENT_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.SEEK_COMMENTS;
@@ -79,7 +81,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET1_VETT
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET3_DOC_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET3_PROCESSING_DOC_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.NOT_AVAILABLE_FOR_VIDEO_HEARINGS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.REFERRALS_PAGE_FRAGMENT_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.TO_HELP_YOU_COMPLETE_IC_EVENT_LABEL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.getHearingDuration;
@@ -100,6 +101,9 @@ public class InitialConsiderationService {
     public static final String DOES_THE_RESPONDENT_S_NAME_MATCH = "Does the respondent's name match?";
     public static final String REFERRAL_ISSUE = "Referral Issue";
     public static final String DETAIL = "Detail";
+    public static final String TABLE_END = """
+            </table>
+            """;
     private final TornadoService tornadoService;
     private static final String[] HEADER = {"Issue / Question", "Details / Answer"};
     private static final String BULLET_POINT = "\n -  ";
@@ -160,23 +164,6 @@ public class InitialConsiderationService {
                 // Set respondent name details
                 respondentDetailsHtmlFragment.append(getRespondentNameDetails(respondentSumType,
                         updatedRespondentCount));
-
-                // Set respondent panel preference details
-                respondentDetailsHtmlFragment.append(String.format(RESPONDENT_HEARING_PANEL_PREFERENCE,
-                        Optional.ofNullable(respondentSumType.getValue().getRespondentHearingPanelPreference())
-                                .orElse("-"),
-                        Optional.ofNullable(respondentSumType.getValue().getRespondentHearingPanelPreferenceReason())
-                                .orElse("-")
-                ));
-
-                // If Respondent is available for video hearing or not
-                if (respondentSumType.getValue() != null) {
-                    List<String> hearingRespondent = respondentSumType.getValue().getEt3ResponseHearingRespondent();
-                    if (hearingRespondent == null || hearingRespondent.stream().noneMatch(
-                            pr -> pr.contains(VIDEO))) {
-                        respondentDetailsHtmlFragment.append(NOT_AVAILABLE_FOR_VIDEO_HEARINGS.toUpperCase(Locale.UK));
-                    }
-                }
             });
         }
 
@@ -227,14 +214,37 @@ public class InitialConsiderationService {
             return null;
         }
 
-        return respondentCollection.stream()
-                .map(respondent -> String.format(RESPONDENT_HEARING_PANEL_PREFERENCE,
+        StringBuilder hearingPreferencesTable = new StringBuilder();
+
+        hearingPreferencesTable.append("""
+               <br/>
+               <table>
+               <tr>
+               <th colspan="3"><h2>Respondents' Panel Preferences</h2></th>
+               </tr>
+               <tr>
+               <th width="25%"><h3>Respondent</h3></th>
+               <th width="20%"><span class="bold">Panel Preference</span></th>
+               <th><span class="bold">Reason</span></th>
+               </tr>
+               """);
+
+        respondentCollection.stream()
+                .filter(respondent -> respondent.getValue() != null
+                        && (respondent.getValue().getRespondentHearingPanelPreference() != null
+                        || respondent.getValue().getRespondentHearingPanelPreferenceReason() != null))
+                .forEach(respondent ->
+                        hearingPreferencesTable.append(String.format(HEARING_PANEL_PREFERENCE,
+                                respondent.getValue().getRespondentName(),
                         Optional.ofNullable(respondent.getValue().getRespondentHearingPanelPreference())
                                 .orElse("-"),
                         Optional.ofNullable(respondent.getValue().getRespondentHearingPanelPreferenceReason())
                                 .orElse("-")
-                        ))
-                .collect(Collectors.joining());
+                        )));
+
+        hearingPreferencesTable.append(TABLE_END);
+
+        return hearingPreferencesTable.toString();
     }
 
     /**
@@ -258,8 +268,7 @@ public class InitialConsiderationService {
             .filter(
                 hearing -> hearing.getHearingDateCollection() != null
                     && !hearing.getHearingDateCollection().isEmpty())
-            .min(Comparator.comparing(
-                    (HearingType hearing) ->
+            .min(Comparator.comparing((HearingType hearing) ->
                             getEarliestHearingDateForListedHearings(hearing.getHearingDateCollection()).orElse(
                             LocalDate.now().plusYears(100))))
             .map(hearing -> getFormattedHearingDetails(hearing, formatter))
@@ -271,33 +280,172 @@ public class InitialConsiderationService {
             hearing.getHearingDateCollection());
         if (earliestHearingDate.isPresent()) {
             return String.format(HEARING_DETAILS, earliestHearingDate.map(formatter::format).orElse(""),
-                hearing.getHearingType(), getHearingDuration(hearing));
+                hearing.getHearingType(), getHearingDuration(hearing),
+                    hearing.getHearingFormat() != null
+                            ? String.join(", ", hearing.getHearingFormat().stream().toList()) : "-",
+                    Optional.ofNullable(hearing.getHearingSitAlone()).orElse("-"),
+                    hearing.getHearingVenue() != null ? hearing.getHearingVenue().getSelectedLabel() : "-");
         } else {
-            return String.format(HEARING_DETAILS, "-", "-", "-");
+            return String.format(HEARING_DETAILS, "-", "-", "-", "-", "-", "-");
         }
     }
 
-    public String getClaimantHearingPanelPreference(ClaimantHearingPreference claimantHearingPreference) {
+    public String setPartiesHearingPanelPreferenceDetails(CaseData caseData) {
+
+        return String.format(PARTIES_HEARING_PANEL_PREFERENCE,
+                getClaimantHearingPanelPreference(caseData.getClaimant(), caseData.getClaimantHearingPreference()),
+                getIcRespondentHearingPanelPreference(caseData.getRespondentCollection()));
+    }
+
+    public String getClaimantHearingPanelPreference(String claimantName,
+                                                    ClaimantHearingPreference claimantHearingPreference) {
         if (claimantHearingPreference == null) {
             return CLAIMANT_HEARING_PANEL_PREFERENCE_MISSING;
         }
 
-        StringBuilder claimantPanelPreferenceHtmlFragment = new StringBuilder();
+        StringBuilder claimantHhearingPreferencesTable = new StringBuilder();
 
-        claimantPanelPreferenceHtmlFragment.append(String.format(CLAIMANT_HEARING_PANEL_PREFERENCE,
-                Optional.ofNullable(claimantHearingPreference.getClaimantHearingPanelPreference()).orElse("-"),
-                Optional.ofNullable(claimantHearingPreference.getClaimantHearingPanelPreferenceWhy()).orElse("-")
-        ));
+        claimantHhearingPreferencesTable.append("""
+               <br/><h1>Parties Hearing Panel Preferences</h1>
+               <table>
+               <tr>
+               <th colspan="3"><h2>Claimant's Panel Preference</h2></th>
+               </tr>
+               <tr>
+               <th width="25%"><h3>Claimant</h3></th>
+               <th width="20%"><span class="bold">Panel Preference</span></th>
+               <th><span class="bold">Reason</span></th>
+               </tr>
+               """);
 
-        // If Claimant is available for video hearing or not
-        boolean isAvailableForVideoHearing = claimantHearingPreference.getHearingPreferences() != null
-                && claimantHearingPreference.getHearingPreferences().stream()
-                        .anyMatch(hp -> hp != null && hp.contains(VIDEO));
-        if (!isAvailableForVideoHearing) {
-            claimantPanelPreferenceHtmlFragment.append(NOT_AVAILABLE_FOR_VIDEO_HEARINGS.toUpperCase(Locale.UK));
+        claimantHhearingPreferencesTable.append(String.format(HEARING_PANEL_PREFERENCE,
+                claimantName,
+                Optional.ofNullable(claimantHearingPreference.getClaimantHearingPanelPreference())
+                        .orElse("-"),
+                Optional.ofNullable(claimantHearingPreference.getClaimantHearingPanelPreferenceWhy())
+                        .orElse("-")));
+
+        claimantHhearingPreferencesTable.append(TABLE_END);
+
+        return claimantHhearingPreferencesTable.toString();
+    }
+
+    public String setPartiesHearingFormatDetails(CaseData caseData) {
+        return String.format(PARTIES_HEARING_FORMAT,
+                getClaimantHearingFormatDetails(caseData),
+                getRespondentHearingFormatDetails(caseData));
+    }
+
+    public String getRespondentHearingFormatDetails(CaseData caseData) {
+        //set Respondent Hearing Format details
+        StringBuilder hearingFormatTable = new StringBuilder();
+
+        hearingFormatTable.append("""
+          <table>
+          <tr>
+            <th colspan="2"><h2>Respondents Hearing Format</h2></th>
+          </tr>
+            """);
+
+        String respondentHeaderRow = """
+                        <tr>
+                        <th width="50%"><h3>Respondent</h3></th>
+                        <th width="50%"><span class="bold">Hearing Format</span></th>
+                        </tr>
+                           """;
+        String respondentRepHeaderRow = """
+                        <tr>
+                        <th width="50%"><h3>Respondent Representative</h3></th>
+                        <th width="50%"><span class="bold">Hearing Format</span></th>
+                        </tr>
+                          """;
+
+        caseData.getRespondentCollection().stream()
+                .filter(respondent -> respondent.getValue() != null)
+                .forEach(respondent -> {
+                    //set respondent rep hearing format preference
+                    if (respondent.getValue().getEt3ResponseHearingRespondent() != null) {
+                        hearingFormatTable.append(respondentHeaderRow);
+
+                        respondent.getValue().getEt3ResponseHearingRespondent().forEach(
+                                hearingFormat ->
+                                        hearingFormatTable.append(String.format(
+                                                HEARING_FORMAT_PREFERENCE,
+                                                respondent.getValue().getRespondentName(),
+                                                Optional.ofNullable(hearingFormat)
+                                                        .orElse("-")
+                                        ))
+                        );
+                    }
+
+                    //set respondent rep hearing format preference
+                    if (respondent.getValue().getEt3ResponseHearingRepresentative() != null) {
+                        hearingFormatTable.append(respondentRepHeaderRow);
+
+                        respondent.getValue().getEt3ResponseHearingRepresentative().forEach(
+                                hearingFormat ->
+                                        hearingFormatTable.append(String.format(
+                                                HEARING_FORMAT_PREFERENCE,
+                                                respondent.getValue().getRespondentName(),
+                                                Optional.ofNullable(hearingFormat)
+                                                        .orElse("-")
+                                        ))
+                        );
+                    }
+                });
+
+        hearingFormatTable.append(TABLE_END);
+
+        return hearingFormatTable.toString();
+    }
+
+    public String getClaimantHearingFormatDetails(CaseData caseData) {
+        //set Claimant Hearing Format details
+        StringBuilder hearingFormatTable = new StringBuilder();
+
+        hearingFormatTable.append("""
+        <br/><h1>Parties Hearing Format Details</h1>
+        <table>
+          <tr>
+            <th colspan="3"><h2>Claimant Hearing Format</h2></th>
+          </tr>
+          <tr>
+            <th width="30%"><h3>Claimant</h3></th>
+            <th width="70%"><span class="bold">Hearing Format</span></th>
+          </tr>
+            """);
+
+        // Concatenate all hearing formats for claimant
+        if (caseData.getClaimantHearingPreference() != null
+                && caseData.getClaimantHearingPreference().getHearingPreferences() != null
+                && ! caseData.getClaimantHearingPreference().getHearingPreferences().isEmpty()
+                &&  caseData.getClaimantHearingPreference().getHearingPreferences().contains("Neither")) {
+
+            String reasonDetails = caseData.getClaimantHearingPreference().getHearingAssistance() != null
+                    ? caseData.getClaimantHearingPreference().getHearingAssistance() : "-";
+            hearingFormatTable.append(String.format(
+                    CLAIMANT_HEARING_FORMAT_NEITHER_PREFERENCE,
+                    caseData.getClaimant(),
+                    "Neither (of Phone or Video)",
+                    Optional.of(reasonDetails)
+                            .orElse("-")
+            ));
+        } else {
+            if (caseData.getClaimantHearingPreference() == null
+                    || caseData.getClaimantHearingPreference().getHearingPreferences() == null
+                    || caseData.getClaimantHearingPreference().getHearingPreferences().isEmpty()) {
+                String hearingFormates = String.join(", ",
+                        caseData.getClaimantHearingPreference().getHearingPreferences());
+                hearingFormatTable.append(String.format(
+                        HEARING_FORMAT_PREFERENCE,
+                        caseData.getClaimant(),
+                        hearingFormates
+                ));
+                return hearingFormatTable.append(TABLE_END).toString();
+            }
         }
 
-        return claimantPanelPreferenceHtmlFragment.toString();
+        return hearingFormatTable.toString();
     }
 
     /**

@@ -27,7 +27,6 @@ public final class InitialConsiderationConstants {
             <td>%s</td>
             <td>%s</td>
           </tr>
-        
         """;
 
     public static final String HEARING_FORMAT_PREFERENCE = """
@@ -35,7 +34,7 @@ public final class InitialConsiderationConstants {
             <td>%s</td>
             <td>%s</td>
           </tr>
-        
+ 
         """;
 
     public static final String CLAIMANT_HEARING_FORMAT_NEITHER_PREFERENCE = """

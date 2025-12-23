@@ -154,16 +154,27 @@ public class InitialConsiderationService {
     }
 
     public String setRespondentDetails(CaseData caseData) {
+
+        if (caseData == null || CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
+            return RESPONDENT_MISSING;
+        }
+
         List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
         IntWrapper respondentCount = new IntWrapper(0);
         StringBuilder respondentDetailsHtmlFragment = new StringBuilder();
         // For each respondent, set the name details and then panel preference details
         if (respondentCollection != null) {
             respondentCollection.forEach(respondentSumType -> {
-                int updatedRespondentCount = respondentCount.incrementAndReturnValue();
-                // Set respondent name details
-                respondentDetailsHtmlFragment.append(getRespondentNameDetails(respondentSumType,
-                        updatedRespondentCount));
+                if (respondentSumType != null && respondentSumType.getValue() != null
+                        && respondentSumType.getValue().getRespondentName() != null
+                        && !respondentSumType.getValue().getRespondentName().isEmpty()
+                        && respondentSumType.getValue().getResponseRespondentName() != null
+                        && !respondentSumType.getValue().getResponseRespondentName().isEmpty()) {
+                    int updatedRespondentCount = respondentCount.incrementAndReturnValue();
+                    // Set respondent name details
+                    respondentDetailsHtmlFragment.append(getRespondentNameDetails(respondentSumType,
+                            updatedRespondentCount));
+                }
             });
         }
 

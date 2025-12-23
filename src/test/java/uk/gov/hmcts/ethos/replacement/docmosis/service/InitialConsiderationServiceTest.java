@@ -292,7 +292,6 @@ class InitialConsiderationServiceTest {
             <td>judge</td>
             <td>I deserve it</td>
           </tr>
-        
         </table>
             """;
         String hearingPanelPreferenceDetails = initialConsiderationService.getIcRespondentHearingPanelPreference(
@@ -323,82 +322,110 @@ class InitialConsiderationServiceTest {
         assertThat(hearingPanelPreferenceDetails).isEqualTo(expectedOutput);
     }
 
-    /*@Test
+    @Test
     void getIcHearingPanelPreference_shouldReturnFormattedDetailsForMultipleRespondents() {
         RespondentSumTypeItem respondent1 = new RespondentSumTypeItem();
         respondent1.setValue(new RespondentSumType());
+        respondent1.getValue().setRespondentName("Respondent1");
         respondent1.getValue().setRespondentHearingPanelPreference("judge");
         respondent1.getValue().setRespondentHearingPanelPreferenceReason("I deserve it");
 
         RespondentSumTypeItem respondent2 = new RespondentSumTypeItem();
         respondent2.setValue(new RespondentSumType());
+        respondent2.getValue().setRespondentName("Respondent2");
         respondent2.getValue().setRespondentHearingPanelPreference("panel");
         respondent2.getValue().setRespondentHearingPanelPreferenceReason("Fair trial");
 
         String hearingPanelPreferenceDetails = initialConsiderationService.getIcRespondentHearingPanelPreference(
                 List.of(respondent1, respondent2));
         assertThat(hearingPanelPreferenceDetails).isEqualTo(
-                String.format(RESPONDENT_HEARING_PANEL_PREFERENCE, "judge", "I deserve it")
-                        + String.format(RESPONDENT_HEARING_PANEL_PREFERENCE, "panel", "Fair trial"));
+                """
+                <br/>
+                <table>
+                <tr>
+                <th colspan="3"><h2>Respondents' Panel Preferences</h2></th>
+                </tr>
+                <tr>
+                <th width="25%"><h3>Respondent</h3></th>
+                <th width="20%"><span class="bold">Panel Preference</span></th>
+                <th><span class="bold">Reason</span></th>
+                </tr>
+                  <tr>
+                    <td>Respondent1</td>
+                    <td>judge</td>
+                    <td>I deserve it</td>
+                  </tr>
+                  <tr>
+                    <td>Respondent2</td>
+                    <td>panel</td>
+                    <td>Fair trial</td>
+                  </tr>
+                </table>
+                """
+        );
     }
 
     @Test
     void setRespondentDetails_shouldReturnFormattedDetails_whenRespondentCollectionIsValid() {
-        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
-        respondent.setValue(new RespondentSumType());
-        respondent.getValue().setRespondentName("Test Corp");
-        respondent.getValue().setResponseRespondentName("Test Response");
-        respondent.getValue().setRespondentHearingPanelPreference("Judge");
-        respondent.getValue().setRespondentHearingPanelPreferenceReason("Fair trial");
-        respondent.getValue().setEt3ResponseHearingRespondent(List.of("Video"));
+        RespondentSumType respondent = new RespondentSumType();
+        respondent.setRespondentName("Test Respondent");
+        respondent.setResponseRespondentName("Test Response");
+        RespondentSumTypeItem respondentItem = new RespondentSumTypeItem();
+        respondentItem.setValue(respondent);
+        CaseData caseDataWithValidRespondentCollection = new CaseData();
+        caseDataWithValidRespondentCollection.setRespondentCollection(Collections.singletonList(respondentItem));
 
-        CaseData caseDataWithRespondents = new CaseData();
-        caseDataWithRespondents.setRespondentCollection(List.of(respondent));
-        String result = initialConsiderationService.setRespondentDetails(caseDataWithRespondents);
+        String result = initialConsiderationService.setRespondentDetails(caseDataWithValidRespondentCollection);
 
-        assertThat(result).isEqualTo(
-                String.format(RESPONDENT_NAME, 1, "Test Corp", "Test Response")
-                        + String.format(RESPONDENT_HEARING_PANEL_PREFERENCE, "Judge", "Fair trial")
-        );
-    }*/
-
-    @Test
-    void setRespondentDetails_shouldReturnEmptyString_whenRespondentCollectionIsNull() {
-        CaseData caseDataWithNullRespondents = new CaseData();
-        caseDataWithNullRespondents.setRespondentCollection(null);
-        String result = initialConsiderationService.setRespondentDetails(caseDataWithNullRespondents);
-
-        assertThat(result).isEmpty();
+        assertThat(result).contains("Test Respondent");
     }
 
-    /*@Test
-    void setRespondentDetails_shouldIncludeNotAvailableForVideo_whenRespondentNotAvailableForVideo() {
-        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
-        respondent.setValue(new RespondentSumType());
-        respondent.getValue().setRespondentName("Test Corp");
-        respondent.getValue().setResponseRespondentName("Test Response");
-        respondent.getValue().setRespondentHearingPanelPreference("Judge");
-        respondent.getValue().setRespondentHearingPanelPreferenceReason("Fair trial");
-        respondent.getValue().setEt3ResponseHearingRespondent(List.of("Telephone"));
+    @Test
+    void setRespondentDetails_shouldHandleNullRespondentInCollection() {
+        CaseData caseDataWithNullRespondentInCollection = new CaseData();
+        caseDataWithNullRespondentInCollection.setRespondentCollection(Collections.singletonList(null));
 
-        CaseData caseDataWithVideoRespondents = new CaseData();
-        caseDataWithVideoRespondents.setRespondentCollection(List.of(respondent));
-        String result = initialConsiderationService.setRespondentDetails(caseDataWithVideoRespondents);
+        String result = initialConsiderationService.setRespondentDetails(caseDataWithNullRespondentInCollection);
 
-        assertThat(result).isEqualTo(
-                String.format(RESPONDENT_NAME, 1, "Test Corp", "Test Response")
-                        + String.format(RESPONDENT_HEARING_PANEL_PREFERENCE, "Judge", "Fair trial")
-                        + NOT_AVAILABLE_FOR_VIDEO_HEARINGS.toUpperCase(Locale.UK)
-        );
-    }*/
+        // Should not throw and should be empty or handle gracefully
+        assertThat(result).isNotNull();
+    }
 
     @Test
-    void setRespondentDetails_shouldReturnEmptyString_whenRespondentCollectionIsEmpty() {
-        CaseData caseDataWithEmptyRespoList = new CaseData();
-        caseDataWithEmptyRespoList.setRespondentCollection(new ArrayList<>());
-        String result = initialConsiderationService.setRespondentDetails(caseDataWithEmptyRespoList);
+    void setRespondentDetails_shouldHandleMultipleRespondents() {
+        RespondentSumType respondent1 = new RespondentSumType();
+        respondent1.setRespondentName("Respondent 1");
+        respondent1.setResponseRespondentName("Response 1");
+        RespondentSumTypeItem item1 = new RespondentSumTypeItem();
+        item1.setValue(respondent1);
 
-        assertThat(result).isEmpty();
+        RespondentSumType respondent2 = new RespondentSumType();
+        respondent2.setRespondentName("Respondent 2");
+        respondent2.setResponseRespondentName("Response 2");
+        RespondentSumTypeItem item2 = new RespondentSumTypeItem();
+        item2.setValue(respondent2);
+        CaseData caseDataWithMultipleRespondents = new CaseData();
+        caseDataWithMultipleRespondents.setRespondentCollection(List.of(item1, item2));
+
+        String result = initialConsiderationService.setRespondentDetails(caseDataWithMultipleRespondents);
+
+        assertThat(result).contains("Respondent 1");
+        assertThat(result).contains("Respondent 2");
+    }
+
+    @Test
+    void setRespondentDetails_shouldReturnDefaultString_whenRespondentCollectionIsEmpty() {
+        CaseData caseDataWithEmptyRespondentList = new CaseData();
+        caseDataWithEmptyRespondentList.setRespondentCollection(new ArrayList<>());
+        String result = initialConsiderationService.setRespondentDetails(caseDataWithEmptyRespondentList);
+        String expected = """
+                | Respondent  name given | |
+                |-------------|:------------|
+                |In ET1 by claimant | |
+                |In ET3 by respondent | |
+                
+                """;
+        assertThat(result).isEqualTo(expected);
     }
 
     @Test
@@ -406,30 +433,15 @@ class InitialConsiderationServiceTest {
         CaseData caseDataWithNoRespondents = new CaseData();
         caseDataWithNoRespondents.setRespondentCollection(null);
         String result = initialConsiderationService.setRespondentDetails(caseDataWithNoRespondents);
-
-        assertThat(result).isEmpty();
+        String expected = """
+                | Respondent  name given | |
+                |-------------|:------------|
+                |In ET1 by claimant | |
+                |In ET3 by respondent | |
+                
+                """;
+        assertThat(result).isEqualTo(expected);
     }
-
-    /*@Test
-    void setRespondentDetails_shouldHandleNullValuesInRespondent() {
-        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
-        respondent.setValue(new RespondentSumType());
-        respondent.getValue().setRespondentName(null);
-        respondent.getValue().setResponseRespondentName(null);
-        respondent.getValue().setRespondentHearingPanelPreference(null);
-        respondent.getValue().setRespondentHearingPanelPreferenceReason(null);
-        respondent.getValue().setEt3ResponseHearingRespondent(null);
-
-        CaseData caseDataWithRespondentDetails = new CaseData();
-        caseDataWithRespondentDetails.setRespondentCollection(List.of(respondent));
-        String result = initialConsiderationService.setRespondentDetails(caseDataWithRespondentDetails);
-
-        assertThat(result).isEqualTo(
-                String.format(RESPONDENT_NAME, 1, "", "")
-                        + String.format(RESPONDENT_HEARING_PANEL_PREFERENCE, "-", "-")
-                        + NOT_AVAILABLE_FOR_VIDEO_HEARINGS.toUpperCase(Locale.UK)
-        );
-    }*/
 
     private void setFutureHearingDate(CaseData caseData) {
         DateListedType dateListed = caseData.getHearingCollection().getFirst().getValue().getHearingDateCollection()
@@ -1452,7 +1464,6 @@ class InitialConsiderationServiceTest {
             <td>-</td>
             <td>-</td>
           </tr>
-    
         </table>
             """;
         assertThat(result).isEqualTo(expected);

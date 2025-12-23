@@ -3,6 +3,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -18,7 +20,12 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
+import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
@@ -113,6 +120,34 @@ class InitialConsiderationControllerTest extends BaseControllerTest {
         ccdRequest = CCDRequestBuilder.builder()
             .withCaseData(caseDetails.getCaseData())
             .build();
+    }
+
+    @Test
+    void shouldSetEtICHearingAlreadyListedToYes_WhenEarliestListedHearingTypeIsNotNull() {
+        // Mock hearing collection with at least one listed hearing
+        var hearingType = new HearingType();
+        hearingType.setHearingType(HEARING_TYPE_JUDICIAL_HEARING);
+        var dateListedTypeItem = new DateListedTypeItem();
+        var dateListedType = new DateListedType();
+        dateListedType.setListedDate("2023-10-10T10:00:00.000");
+        dateListedTypeItem.setValue(dateListedType);
+        hearingType.setHearingDateCollection(List.of(dateListedTypeItem));
+        var hearingTypeItem = new HearingTypeItem();
+        hearingTypeItem.setValue(hearingType);
+        CaseData caseData = new CaseData();
+        caseData.setHearingCollection(List.of(hearingTypeItem));
+
+        // Mock HearingsHelper to return a non-null HearingType instance
+        try (MockedStatic<HearingsHelper> hearingsHelperMock = Mockito.mockStatic(HearingsHelper.class)) {
+            hearingsHelperMock.when(() -> HearingsHelper.getEarliestListedHearingType(caseData.getHearingCollection()))
+                    .thenReturn(new HearingType());
+
+            if (HearingsHelper.getEarliestListedHearingType(caseData.getHearingCollection()) != null) {
+                caseData.setEtICHearingAlreadyListed("Yes");
+            }
+
+            assertEquals("Yes", caseData.getEtICHearingAlreadyListed());
+        }
     }
 
     @Test

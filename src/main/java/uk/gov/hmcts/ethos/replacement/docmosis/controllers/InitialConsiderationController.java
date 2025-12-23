@@ -114,10 +114,6 @@ public class InitialConsiderationController {
             caseFlagsService.setPrivateHearingFlag(caseData);
         }
 
-        if (HearingsHelper.getEarliestListedHearingType(caseData.getHearingCollection()) != null) {
-            caseData.setEtICHearingAlreadyListed("Yes");
-        }
-
         setDocumentNumbers(caseData);
         caseManagementForCaseWorkerService.setNextListedDate(caseData);
 

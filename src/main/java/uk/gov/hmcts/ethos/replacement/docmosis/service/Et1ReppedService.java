@@ -2,10 +2,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.dwp.regex.InvalidPostcodeException;
@@ -14,7 +12,6 @@ import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserWithOrganisationRoles
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.service.JurisdictionCodesMapperService;
 import uk.gov.hmcts.ecm.common.service.PostcodeToOfficeService;
-import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
@@ -26,7 +23,9 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.CcdCaseAssignment;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.OrganisationUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
@@ -181,27 +180,12 @@ public class Et1ReppedService {
                     .build());
             claimantRepresentative.setNameOfOrganisation(organisationDetails.getName());
             claimantRepresentative.setRepresentativeAddress(ObjectUtils.isEmpty(caseData.getRepresentativeAddress())
-                    ? getOrganisationAddress(organisationDetails) : caseData.getRepresentativeAddress());
+                    ? OrganisationUtils.getOrganisationAddress(organisationDetails)
+                    : caseData.getRepresentativeAddress());
             setClaimantRepOrgPolicy(caseData, organisationDetails);
         }
         caseData.setClaimantRepresentedQuestion(YES);
         caseData.setRepresentativeClaimantType(claimantRepresentative);
-    }
-
-    @NotNull
-    static Address getOrganisationAddress(OrganisationsResponse organisationDetails) {
-        Address organisationAddress = new Address();
-        if (CollectionUtils.isEmpty(organisationDetails.getContactInformation())) {
-            return organisationAddress;
-        }
-        organisationAddress.setAddressLine1(organisationDetails.getContactInformation().getFirst().getAddressLine1());
-        organisationAddress.setAddressLine2(organisationDetails.getContactInformation().getFirst().getAddressLine2());
-        organisationAddress.setAddressLine3(organisationDetails.getContactInformation().getFirst().getAddressLine3());
-        organisationAddress.setPostCode(organisationDetails.getContactInformation().getFirst().getPostCode());
-        organisationAddress.setPostTown(organisationDetails.getContactInformation().getFirst().getTownCity());
-        organisationAddress.setCounty(organisationDetails.getContactInformation().getFirst().getCounty());
-        organisationAddress.setCountry(organisationDetails.getContactInformation().getFirst().getCountry());
-        return organisationAddress;
     }
 
     /**

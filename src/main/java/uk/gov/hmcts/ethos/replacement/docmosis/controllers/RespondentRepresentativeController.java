@@ -25,9 +25,9 @@ import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericRuntimeExceptio
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicRespondentRepresentative;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.NocRespondentRepresentativeService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataUtils;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.NocUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.NocUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -177,10 +177,10 @@ public class RespondentRepresentativeController {
     public void amendRespondentRepresentativeSubmitted(
             @RequestBody CallbackRequest callbackRequest,
             @RequestHeader(AUTHORIZATION) String userToken) {
-        CaseDataUtils.validateCallbackRequest(callbackRequest);
         log.info("AMEND RESPONDENT REPRESENTATIVE SUBMITTED ---> " + LOG_MESSAGE + "{}",
                 callbackRequest.getCaseDetails().getCaseId());
         try {
+            NocUtils.validateCallbackRequest(callbackRequest);
             nocRespondentRepresentativeService.updateRespondentRepresentativesAccess(callbackRequest);
         } catch (IOException e) {
             throw new CcdInputOutputException("Failed to update respondent representatives accesses", e);

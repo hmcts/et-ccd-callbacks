@@ -1,12 +1,15 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.utils;
+package uk.gov.hmcts.ethos.replacement.docmosis.utils.noc;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.CallbacksCollectionUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentUtils;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -19,10 +22,23 @@ import java.util.UUID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.ERROR_INVALID_CASE_DATA;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.EXCEPTION_CALLBACK_REQUEST_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_INVALID_RESPONDENT_EXISTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_SELECTED_RESPONDENT_NOT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_NEW_CASE_DATA_NOT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_NEW_CASE_DETAILS_NOT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_NEW_CASE_DETAILS_SUBMISSION_REFERENCE_NOT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_NEW_RESPONDENT_COLLECTION_IS_EMPTY;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_OLD_AND_NEW_RESPONDENTS_ARE_DIFFERENT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_OLD_AND_NEW_SUBMISSION_REFERENCES_NOT_EQUAL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_OLD_CASE_DATA_NOT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_OLD_CASE_DETAILS_NOT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_OLD_CASE_DETAILS_SUBMISSION_REFERENCE_NOT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_OLD_RESPONDENT_COLLECTION_IS_EMPTY;
 
 public final class NocUtils {
+
+    private static final String CLASS_NAME = NocUtils.class.getSimpleName();
 
     private NocUtils() {
         // Utility classes should not have a public or default constructor.
@@ -42,7 +58,7 @@ public final class NocUtils {
      *         If no respondents are found, {@code ERROR_INVALID_CASE_DATA} is returned.</li>
      *
      *     <li><b>Duplicate respondent name validation:</b><br>
-     *         Uses {@link RepresentativeUtils#hasDuplicateRespondentNames(List)} to check that
+     *         Uses {@link RespondentRepresentativeUtils#hasDuplicateRespondentNames(List)} to check that
      *         no respondent name appears more than once across representatives.
      *         If duplicates are detected, the corresponding error list is returned.</li>
      *
@@ -72,7 +88,7 @@ public final class NocUtils {
             return List.of(ERROR_INVALID_CASE_DATA);
         }
         List<String> duplicateRespondentErrors =
-                RepresentativeUtils.hasDuplicateRespondentNames(caseData.getRepCollection());
+                RespondentRepresentativeUtils.hasDuplicateRespondentNames(caseData.getRepCollection());
         if (!duplicateRespondentErrors.isEmpty()) {
             return duplicateRespondentErrors;
         }
@@ -209,7 +225,7 @@ public final class NocUtils {
      */
     public static void mapRepresentativesToRespondents(CaseData caseData, String submissionReference)
             throws GenericServiceException {
-        if (!RespondentUtils.hasRespondents(caseData) || !RepresentativeUtils.hasRepresentatives(caseData)) {
+        if (!RespondentUtils.hasRespondents(caseData) || !RespondentRepresentativeUtils.hasRepresentatives(caseData)) {
             return;
         }
         Map<String, RespondentSumTypeItem> respondentsById = new HashMap<>();
@@ -279,7 +295,7 @@ public final class NocUtils {
     public static void assignRepresentative(RespondentSumTypeItem respondent,
                                             RepresentedTypeRItem representative,
                                             String submissionReference) throws GenericServiceException {
-        RepresentativeUtils.validateRepresentation(respondent, representative, submissionReference);
+        RespondentRepresentativeUtils.validateRepresentation(respondent, representative, submissionReference);
         representative.getValue().setRespondentId(respondent.getId());
         representative.getValue().setRespRepName(respondent.getValue().getRespondentName());
         respondent.getValue().setRepresentativeRemoved(NO);
@@ -323,6 +339,88 @@ public final class NocUtils {
             if (StringUtils.isBlank(representative.getValue().getNonMyHmctsOrganisationId())) {
                 representative.getValue().setNonMyHmctsOrganisationId(UUID.randomUUID().toString());
             }
+        }
+    }
+
+    /**
+     * Validates the integrity and consistency of a {@link CallbackRequest} used to identify
+     * representation changes.
+     *
+     * <p>This method performs a series of defensive checks to ensure that the callback request
+     * and its nested data are present, consistent, and suitable for further processing.
+     * Validation includes:</p>
+     * <ul>
+     *   <li>Presence of the callback request</li>
+     *   <li>Presence of both current and previous case details</li>
+     *   <li>Presence and equality of case identifiers in current and previous case details</li>
+     *   <li>Presence of current and previous {@link CaseData}</li>
+     *   <li>Presence of respondent representative collections in both case states</li>
+     *   <li>Consistency of respondent identities between old and new case data</li>
+     * </ul>
+     *
+     * <p>If any validation step fails, a {@link GenericServiceException} is thrown with a
+     * descriptive error message indicating the cause of the failure.</p>
+     *
+     * @param callbackRequest the callback request to validate
+     * @throws GenericServiceException if the callback request is {@code null}, incomplete,
+     *                                  inconsistent, or contains invalid case data
+     */
+    public static void validateCallbackRequest(CallbackRequest callbackRequest) throws GenericServiceException {
+        String methodName = "validateCallbackRequest";
+        if (ObjectUtils.isEmpty(callbackRequest)) {
+            throw new GenericServiceException(EXCEPTION_CALLBACK_REQUEST_NOT_FOUND,
+                    new Exception(EXCEPTION_CALLBACK_REQUEST_NOT_FOUND), EXCEPTION_CALLBACK_REQUEST_NOT_FOUND,
+                    StringUtils.EMPTY, CLASS_NAME, methodName);
+        }
+        if (ObjectUtils.isEmpty(callbackRequest.getCaseDetails())
+                || ObjectUtils.isEmpty(callbackRequest.getCaseDetailsBefore())) {
+            String exceptionMessage = ObjectUtils.isEmpty(callbackRequest.getCaseDetails())
+                    ? EXCEPTION_NEW_CASE_DETAILS_NOT_FOUND
+                    : EXCEPTION_OLD_CASE_DETAILS_NOT_FOUND;
+            throw new GenericServiceException(exceptionMessage,
+                    new Exception(exceptionMessage), exceptionMessage, StringUtils.EMPTY, CLASS_NAME, methodName);
+        }
+        if (StringUtils.isBlank(callbackRequest.getCaseDetails().getCaseId())
+                || StringUtils.isBlank(callbackRequest.getCaseDetailsBefore().getCaseId())) {
+            String exceptionMessage = ObjectUtils.isEmpty(callbackRequest.getCaseDetails().getCaseId())
+                    ? EXCEPTION_NEW_CASE_DETAILS_SUBMISSION_REFERENCE_NOT_FOUND
+                    : EXCEPTION_OLD_CASE_DETAILS_SUBMISSION_REFERENCE_NOT_FOUND;
+            throw new GenericServiceException(exceptionMessage,
+                    new Exception(exceptionMessage), exceptionMessage, StringUtils.EMPTY, CLASS_NAME, methodName);
+        }
+        if (!callbackRequest.getCaseDetails().getCaseId().equals(callbackRequest.getCaseDetailsBefore().getCaseId())) {
+            String exceptionMessage = String.format(EXCEPTION_OLD_AND_NEW_SUBMISSION_REFERENCES_NOT_EQUAL,
+                    callbackRequest.getCaseDetailsBefore().getCaseId(), callbackRequest.getCaseDetails().getCaseId());
+            throw new GenericServiceException(exceptionMessage, new Exception(exceptionMessage), exceptionMessage,
+                    StringUtils.EMPTY, CLASS_NAME, methodName);
+        }
+        CaseData newCaseData = callbackRequest.getCaseDetails().getCaseData();
+        CaseData oldCaseData = callbackRequest.getCaseDetailsBefore().getCaseData();
+        if (ObjectUtils.isEmpty(newCaseData) || ObjectUtils.isEmpty(oldCaseData)) {
+            String exceptionMessage = ObjectUtils.isEmpty(newCaseData)
+                    ? String.format(EXCEPTION_NEW_CASE_DATA_NOT_FOUND,
+                    callbackRequest.getCaseDetailsBefore().getCaseId())
+                    : String.format(EXCEPTION_OLD_CASE_DATA_NOT_FOUND,
+                    callbackRequest.getCaseDetailsBefore().getCaseId());
+            throw new GenericServiceException(exceptionMessage,
+                    new Exception(exceptionMessage), exceptionMessage, StringUtils.EMPTY, CLASS_NAME, methodName);
+        }
+        if (CollectionUtils.isEmpty(newCaseData.getRespondentCollection())
+                || CollectionUtils.isEmpty(oldCaseData.getRespondentCollection())) {
+            String exceptionMessage = CollectionUtils.isEmpty(newCaseData.getRespondentCollection())
+                    ? String.format(EXCEPTION_NEW_RESPONDENT_COLLECTION_IS_EMPTY,
+                    callbackRequest.getCaseDetailsBefore().getCaseId())
+                    : String.format(EXCEPTION_OLD_RESPONDENT_COLLECTION_IS_EMPTY,
+                    callbackRequest.getCaseDetailsBefore().getCaseId());
+            throw new GenericServiceException(exceptionMessage,
+                    new Exception(exceptionMessage), exceptionMessage, StringUtils.EMPTY, CLASS_NAME, methodName);
+        }
+        if (!CallbacksCollectionUtils.sameByKey(oldCaseData.getRespondentCollection(),
+                newCaseData.getRespondentCollection(), RespondentSumTypeItem::getId)) {
+            String exceptionMessage = String.format(EXCEPTION_OLD_AND_NEW_RESPONDENTS_ARE_DIFFERENT,
+                    callbackRequest.getCaseDetails().getCaseId());
+            throw new GenericServiceException(exceptionMessage, new Exception(exceptionMessage), exceptionMessage,
+                    StringUtils.EMPTY, CLASS_NAME, methodName);
         }
     }
 }

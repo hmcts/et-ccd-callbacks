@@ -3,21 +3,15 @@ package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
-import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericRuntimeException;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.EXCEPTION_CALLBACK_REQUEST_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.EXCEPTION_CASE_DATA_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.EXCEPTION_CASE_DETAILS_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.EXCEPTION_CCD_REQUEST_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.EXCEPTION_SUBMISSION_REFERENCE_NOT_FOUND;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_CASE_DETAILS_BEFORE_CASE_DATA_NOT_FOUND;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_CASE_DETAILS_BEFORE_NOT_FOUND;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_CASE_DETAILS_BEFORE_SUBMISSION_REFERENCE_NOT_FOUND;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NEW;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.OLD;
 
 public final class CaseDataUtils {
 
@@ -28,52 +22,37 @@ public final class CaseDataUtils {
     }
 
     /**
-     * Validates that the provided {@link CaseDetails} object and its mandatory fields
-     * are present either for a "before" submission state or the current state.
-     * <p>
-     * This method performs the following checks in order:
+     * Validates that the supplied {@link CaseDetails} object contains the minimum required
+     * information for processing.
+     *
+     * <p>This method performs defensive validation checks to ensure that:</p>
      * <ul>
-     *   <li>Ensures {@code caseDetails} is not {@code null} or empty</li>
-     *   <li>Ensures the case submission reference (case ID) is present and not blank</li>
-     *   <li>Ensures the case data is present</li>
+     *   <li>The {@code CaseDetails} object is present</li>
+     *   <li>A submission reference (case ID) is provided</li>
+     *   <li>{@link CaseData} is present</li>
      * </ul>
-     * <p>
-     * The validation behaviour and exception messages differ depending on whether
-     * the validation is being performed for the {@code BEFORE} state or the current state,
-     * as indicated by the {@code beforeOrCurrent} parameter.
      *
-     * @param caseDetails     the {@link CaseDetails} object to validate
-     * @param beforeOrCurrent a flag indicating whether the validation is for the
-     *                        "before" submission state or the current state
+     * <p>If any validation fails, a {@link GenericRuntimeException} wrapping a
+     * {@link GenericServiceException} is thrown with a descriptive error message.</p>
      *
-     * @throws GenericRuntimeException if:
-     *      <ul>
-     *          <li>{@code caseDetails} is {@code null} or empty</li>
-     *          <li>the case submission reference (case ID) is {@code null} or blank</li>
-     *          <li>the case data is {@code null} or empty</li>
-     *      </ul>
+     * @param caseDetails the case details to validate
+     * @throws GenericRuntimeException if {@code caseDetails} is {@code null}, the case ID
+     *                                  is missing, or the case data is not present
      */
-    public static void validateCaseDetailsBeforeAndCurrent(CaseDetails caseDetails, String beforeOrCurrent) {
-        String methodName = "checkCaseDetails";
+    public static void validateCaseDetails(CaseDetails caseDetails) {
+        String methodName = "validateCaseDetails";
         if (ObjectUtils.isEmpty(caseDetails)) {
-            String exception = OLD.equals(beforeOrCurrent)
-                    ? EXCEPTION_CASE_DETAILS_BEFORE_NOT_FOUND
-                    : EXCEPTION_CASE_DETAILS_NOT_FOUND;
-            throw new GenericRuntimeException(new GenericServiceException(exception, new Exception(exception),
-                    exception, exception, CLASS_NAME, methodName));
+            throw new GenericRuntimeException(new GenericServiceException(EXCEPTION_CASE_DETAILS_NOT_FOUND,
+                    new Exception(EXCEPTION_CASE_DETAILS_NOT_FOUND), EXCEPTION_CASE_DETAILS_NOT_FOUND,
+                    EXCEPTION_CASE_DETAILS_NOT_FOUND, CLASS_NAME, methodName));
         }
         if (StringUtils.isBlank(caseDetails.getCaseId())) {
-            String exception = OLD.equals(beforeOrCurrent)
-                    ? EXCEPTION_CASE_DETAILS_BEFORE_SUBMISSION_REFERENCE_NOT_FOUND
-                    : EXCEPTION_SUBMISSION_REFERENCE_NOT_FOUND;
-            throw new GenericRuntimeException(new GenericServiceException(exception, new Exception(exception),
-                    exception, exception, CLASS_NAME, methodName));
+            throw new GenericRuntimeException(new GenericServiceException(EXCEPTION_SUBMISSION_REFERENCE_NOT_FOUND,
+                    new Exception(EXCEPTION_SUBMISSION_REFERENCE_NOT_FOUND), EXCEPTION_SUBMISSION_REFERENCE_NOT_FOUND,
+                    EXCEPTION_SUBMISSION_REFERENCE_NOT_FOUND, CLASS_NAME, methodName));
         }
         if (ObjectUtils.isEmpty(caseDetails.getCaseData())) {
-            String exception = OLD.equals(beforeOrCurrent)
-                    ? EXCEPTION_CASE_DETAILS_BEFORE_CASE_DATA_NOT_FOUND
-                    : EXCEPTION_CASE_DATA_NOT_FOUND;
-            String exceptionMessage = String.format(exception, caseDetails.getCaseId());
+            String exceptionMessage = String.format(EXCEPTION_CASE_DATA_NOT_FOUND, caseDetails.getCaseId());
             throw new GenericRuntimeException(new GenericServiceException(exceptionMessage,
                     new Exception(exceptionMessage), exceptionMessage, exceptionMessage, CLASS_NAME, methodName));
         }
@@ -123,17 +102,6 @@ public final class CaseDataUtils {
                     new Exception(EXCEPTION_CCD_REQUEST_NOT_FOUND), EXCEPTION_CCD_REQUEST_NOT_FOUND,
                     EXCEPTION_CCD_REQUEST_NOT_FOUND, CLASS_NAME, methodName));
         }
-        validateCaseDetailsBeforeAndCurrent(ccdRequest.getCaseDetails(), NEW);
-    }
-
-    public static void validateCallbackRequest(CallbackRequest callbackRequest) {
-        final String methodName = "validateCallbackRequest";
-        if (ObjectUtils.isEmpty(callbackRequest)) {
-            throw new GenericRuntimeException(new GenericServiceException(EXCEPTION_CALLBACK_REQUEST_NOT_FOUND,
-                    new Exception(EXCEPTION_CALLBACK_REQUEST_NOT_FOUND), EXCEPTION_CALLBACK_REQUEST_NOT_FOUND,
-                    EXCEPTION_CALLBACK_REQUEST_NOT_FOUND, CLASS_NAME, methodName));
-        }
-        validateCaseDetailsBeforeAndCurrent(callbackRequest.getCaseDetailsBefore(), OLD);
-        validateCaseDetailsBeforeAndCurrent(callbackRequest.getCaseDetails(), NEW);
+        validateCaseDetails(ccdRequest.getCaseDetails());
     }
 }

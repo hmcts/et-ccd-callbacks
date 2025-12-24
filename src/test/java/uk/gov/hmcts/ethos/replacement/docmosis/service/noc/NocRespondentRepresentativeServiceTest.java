@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.service;
+package uk.gov.hmcts.ethos.replacement.docmosis.service.noc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
@@ -38,6 +38,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
@@ -360,8 +361,7 @@ class NocRespondentRepresentativeServiceTest {
                 eq(ccdRequest.getCaseDetails().getJurisdiction()),
                 any(CCDRequest.class),
                 eq(ccdRequest.getCaseDetails().getCaseId()))).thenReturn(null);
-        nocRespondentRepresentativeService.updateRespondentRepresentativesAccess(
-                getCallBackCallbackRequest());
+        nocRespondentRepresentativeService.updateRespondentRepresentativesAccess(getCallBackCallbackRequest());
 
         verify(ccdClient, times(NumberUtils.INTEGER_TWO)).startEventForCase(AUTH_TOKEN,
                 ccdRequest.getCaseDetails().getCaseTypeId(),
@@ -387,6 +387,7 @@ class NocRespondentRepresentativeServiceTest {
     private CallbackRequest getCallBackCallbackRequest() {
         CallbackRequest callbackRequest = new CallbackRequest();
         CaseDetails caseDetailsBefore = new CaseDetails();
+        caseDetailsBefore.setCaseId(CASE_ID_ONE);
         caseDetailsBefore.setCaseData(getCaseDataBefore());
         callbackRequest.setCaseDetailsBefore(caseDetailsBefore);
         CaseDetails caseDetailsAfter = new CaseDetails();
@@ -410,6 +411,7 @@ class NocRespondentRepresentativeServiceTest {
     }
 
     @Test
+    @SneakyThrows
     void shouldReturnRepresentationChanges() {
         CaseData caseDataBefore = getCaseDataBefore();
         CaseData caseDataAfter = getCaseDataAfter();

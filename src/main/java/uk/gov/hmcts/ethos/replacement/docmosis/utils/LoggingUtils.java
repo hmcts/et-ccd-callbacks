@@ -1,6 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 
@@ -9,9 +11,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.STRING_EMPTY;
 
 @Slf4j
-public final class LoggingUtil {
+public final class LoggingUtils {
 
-    private LoggingUtil() {
+    private LoggingUtils() {
         // Utility classes should not have a public or default constructor.
     }
 
@@ -73,5 +75,12 @@ public final class LoggingUtil {
      */
     public static void logErrors(List<String> errors) {
         log.info(EVENT_FIELDS_VALIDATION + "{}", errors);
+    }
+
+    public static void logCCDException(Exception exception) {
+        if (ObjectUtils.isEmpty(exception) || StringUtils.isBlank(exception.getMessage())) {
+            return;
+        }
+        log.info("Error form ccd - {}", exception.getMessage());
     }
 }

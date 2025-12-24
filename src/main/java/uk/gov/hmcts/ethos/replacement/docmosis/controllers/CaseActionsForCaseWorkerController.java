@@ -49,11 +49,11 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FixCaseApiService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.JudgmentValidationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScotlandFileLocationSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEventValidationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.LoggingUtil;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.LoggingUtils;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -498,7 +498,7 @@ public class CaseActionsForCaseWorkerController {
         caseFlagsService.setupCaseFlags(caseData);
         caseManagementForCaseWorkerService.updateWorkAllocationField(errors, caseData);
         removeSpacesFromPartyNames(caseData);
-        LoggingUtil.logErrors(errors);
+        LoggingUtils.logErrors(errors);
         return getCallbackRespEntityErrors(errors, caseData);
     }
 
@@ -661,7 +661,7 @@ public class CaseActionsForCaseWorkerController {
             eventValidationService.validateJurisdictionOutcome(caseData,
                     Constants.REJECTED_STATE.equals(ccdRequest.getCaseDetails().getState()),
                     false, errors);
-            LoggingUtil.logErrors(errors);
+            LoggingUtils.logErrors(errors);
         }
 
         return getCallbackRespEntityErrors(errors, caseData);
@@ -705,7 +705,7 @@ public class CaseActionsForCaseWorkerController {
         List<String> errors = new ArrayList<>();
         CaseData caseData =  ccdRequest.getCaseDetails().getCaseData();
         eventValidationService.validateJurisdiction(caseData, errors);
-        LoggingUtil.logErrors(errors);
+        LoggingUtils.logErrors(errors);
 
         return getCallbackRespEntityErrors(errors, caseData);
     }
@@ -957,7 +957,7 @@ public class CaseActionsForCaseWorkerController {
             return getCallbackRespEntityNoErrors(caseData);
         }
 
-        LoggingUtil.logErrors(errors);
+        LoggingUtils.logErrors(errors);
         return getCallbackRespEntityErrors(errors, caseData);
     }
 

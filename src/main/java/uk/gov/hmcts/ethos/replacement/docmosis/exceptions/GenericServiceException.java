@@ -7,7 +7,7 @@ import java.io.Serial;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.STRING_EMPTY;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.LoggingUtil.logException;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.LoggingUtils.logException;
 
 /**
  * Is thrown when an exception occurs whiles converting case data in pdf in {@link PdfBoxService}.

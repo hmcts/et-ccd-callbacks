@@ -4,7 +4,7 @@
     "urlPath": "/refdata/external/v1/organisations/users/accountId",
     "queryParameters": {
       "email": {
-        "matches": "test@hmcts.com"
+        "matches": "solicitor1@etorganisation1.com"
       }
     }
   },

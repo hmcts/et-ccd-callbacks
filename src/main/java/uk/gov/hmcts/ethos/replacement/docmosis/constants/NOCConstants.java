@@ -4,8 +4,6 @@ public final class NOCConstants {
 
     public static final String NOC_REQUEST = "nocRequest";
     public static final String EVENT_UPDATE_CASE_SUBMITTED = "UPDATE_CASE_SUBMITTED";
-    public static final String OLD = "OLD";
-    public static final String NEW = "NEW";
 
     public static final String EXCEPTION_RESPONDENT_NOT_FOUND = "Respondent not found for case ID %s.";
     public static final String EXCEPTION_RESPONDENT_ID_NOT_FOUND =
@@ -22,12 +20,26 @@ public final class NOCConstants {
             "Representative details not found for representative ID %s in case %s.";
     public static final String EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND =
             "Organisation not found for representative %s.";
-    public static final String EXCEPTION_CASE_DETAILS_BEFORE_NOT_FOUND =
-            "Case details, BEFORE not found.";
-    public static final String EXCEPTION_CASE_DETAILS_BEFORE_SUBMISSION_REFERENCE_NOT_FOUND =
-            "Case details, BEFORE, submission reference not found.";
-    public static final String EXCEPTION_CASE_DETAILS_BEFORE_CASE_DATA_NOT_FOUND =
-            "Case details, BEFORE, case data not found for submission reference, %s.";
+    public static final String EXCEPTION_NEW_CASE_DETAILS_NOT_FOUND =
+            "New case details are missing.";
+    public static final String EXCEPTION_OLD_CASE_DETAILS_NOT_FOUND =
+            "Old case details are missing.";
+    public static final String EXCEPTION_NEW_CASE_DETAILS_SUBMISSION_REFERENCE_NOT_FOUND =
+            "New case details are missing the submission reference.";
+    public static final String EXCEPTION_OLD_CASE_DETAILS_SUBMISSION_REFERENCE_NOT_FOUND =
+            "Old case details are missing the submission reference.";
+    public static final String EXCEPTION_OLD_AND_NEW_SUBMISSION_REFERENCES_NOT_EQUAL =
+            "Old and new submission references do not match (old: %s, new: %s).";
+    public static final String EXCEPTION_NEW_CASE_DATA_NOT_FOUND =
+            "New case data is missing for case ID %s.";
+    public static final String EXCEPTION_OLD_CASE_DATA_NOT_FOUND =
+            "Old case data is missing for case ID %s.";
+    public static final String EXCEPTION_OLD_RESPONDENT_COLLECTION_IS_EMPTY =
+            "Old respondent collection is missing for case ID %s.";
+    public static final String EXCEPTION_NEW_RESPONDENT_COLLECTION_IS_EMPTY =
+            "New respondent collection is missing for case ID %s.";
+    public static final String EXCEPTION_OLD_AND_NEW_RESPONDENTS_ARE_DIFFERENT =
+            "Old and new respondent collections contain different respondents for case ID %s.";
 
     public static final String ERROR_RESPONDENT_HAS_MULTIPLE_REPRESENTATIVES =
             "Respondent with name %s has more than one representative";

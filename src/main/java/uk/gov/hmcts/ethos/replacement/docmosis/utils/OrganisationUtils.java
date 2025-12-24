@@ -1,12 +1,15 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.jetbrains.annotations.NotNull;
+import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
+import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.UpdateRespondentRepresentativeRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 
@@ -288,4 +291,21 @@ public final class OrganisationUtils {
             }
         }
     }
+
+    @NotNull
+    public static Address getOrganisationAddress(OrganisationsResponse organisationDetails) {
+        Address organisationAddress = new Address();
+        if (CollectionUtils.isEmpty(organisationDetails.getContactInformation())) {
+            return organisationAddress;
+        }
+        organisationAddress.setAddressLine1(organisationDetails.getContactInformation().getFirst().getAddressLine1());
+        organisationAddress.setAddressLine2(organisationDetails.getContactInformation().getFirst().getAddressLine2());
+        organisationAddress.setAddressLine3(organisationDetails.getContactInformation().getFirst().getAddressLine3());
+        organisationAddress.setPostCode(organisationDetails.getContactInformation().getFirst().getPostCode());
+        organisationAddress.setPostTown(organisationDetails.getContactInformation().getFirst().getTownCity());
+        organisationAddress.setCounty(organisationDetails.getContactInformation().getFirst().getCounty());
+        organisationAddress.setCountry(organisationDetails.getContactInformation().getFirst().getCountry());
+        return organisationAddress;
+    }
+
 }

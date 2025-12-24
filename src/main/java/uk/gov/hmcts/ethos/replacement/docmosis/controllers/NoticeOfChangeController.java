@@ -18,11 +18,10 @@ import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.generic.GenericCallbackResponse;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CcdCaseAssignment;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.NocNotificationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.NocRepresentativeService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.CcdCaseAssignment;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocNotificationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRepresentativeService;
 
 import java.io.IOException;
 
@@ -38,7 +37,6 @@ public class NoticeOfChangeController {
     private final NocNotificationService nocNotificationService;
     private final NocRepresentativeService noCRepresentativeService;
     private final CcdCaseAssignment ccdCaseAssignment;
-    private final UserIdamService userIdamService;
 
     private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String APPLY_NOC_DECISION = "applyNocDecision";

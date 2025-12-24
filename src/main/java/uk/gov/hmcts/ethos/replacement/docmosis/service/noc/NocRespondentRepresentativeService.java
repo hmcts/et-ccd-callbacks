@@ -1,8 +1,8 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.service;
+package uk.gov.hmcts.ethos.replacement.docmosis.service.noc;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.ResponseEntity;
@@ -33,9 +33,11 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.OrganisationUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.NocUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
@@ -159,20 +161,25 @@ public class NocRespondentRepresentativeService {
      */
     public void updateRespondentRepresentativesAccess(CallbackRequest callbackRequest)
             throws IOException, GenericServiceException {
+        NocUtils.validateCallbackRequest(callbackRequest);
 
-        CaseDetails caseDetails = callbackRequest.getCaseDetails();
-        CaseDetails caseDetailsBefore = callbackRequest.getCaseDetailsBefore();
-        CaseData caseDataBefore = caseDetailsBefore.getCaseData();
-        CaseData caseData = caseDetails.getCaseData();
+        // Find users to remove case assignments
+        CaseUserAssignmentData caseUserAssignments = nocCcdService.getCaseAssignments(
+                adminUserService.getAdminUserToken(), callbackRequest.getCaseDetails().getCaseId());
+
+        findRepresentativesToRemove(callbackRequest, caseUserAssignments);
+
+        CaseDetails newCaseDetails = callbackRequest.getCaseDetails();
+        CaseDetails oldCaseDetails = callbackRequest.getCaseDetailsBefore();
         // Identify changes in representation of respondents
         List<UpdateRespondentRepresentativeRequest> updateRespondentRepresentativeRequests =
-                identifyRepresentationChanges(caseData, caseDataBefore);
+                identifyRepresentationChanges(oldCaseDetails.getCaseData(), newCaseDetails.getCaseData());
 
         for (UpdateRespondentRepresentativeRequest updateRespondentRepresentativeRequest
                 : updateRespondentRepresentativeRequests) {
             try {
-                nocNotificationService.sendNotificationOfChangeEmails(caseDetailsBefore,
-                        caseDetails,
+                nocNotificationService.sendNotificationOfChangeEmails(oldCaseDetails,
+                        newCaseDetails,
                         updateRespondentRepresentativeRequest.getChangeOrganisationRequest());
             } catch (Exception exception) {
                 log.error(exception.getMessage(), exception);
@@ -184,7 +191,7 @@ public class NocRespondentRepresentativeService {
                 try {
                     // this service only removes organisation representative access to the case and removes
                     // respondent representative from cas_users
-                    nocService.removeOrganisationRepresentativeAccess(caseDetails.getCaseId(),
+                    nocService.removeOrganisationRepresentativeAccess(newCaseDetails.getCaseId(),
                             updateRespondentRepresentativeRequest.getChangeOrganisationRequest());
                 } catch (IOException e) {
                     throw new CcdInputOutputException("Failed to remove organisation representative access", e);
@@ -199,9 +206,9 @@ public class NocRespondentRepresentativeService {
             //   • Mark the respondent as no longer represented, so this is reflected on the respondent page
             String adminUserToken = adminUserService.getAdminUserToken();
             CCDRequest ccdRequest = ccdClient.startEventForCase(adminUserToken,
-                    caseDetails.getCaseTypeId(),
-                    caseDetails.getJurisdiction(),
-                    caseDetails.getCaseId(),
+                    newCaseDetails.getCaseTypeId(),
+                    newCaseDetails.getJurisdiction(),
+                    newCaseDetails.getCaseId(),
                     EVENT_UPDATE_CASE_SUBMITTED);
 
             CaseData ccdRequestCaseData = ccdRequest.getCaseDetails().getCaseData();
@@ -223,9 +230,19 @@ public class NocRespondentRepresentativeService {
                     updateRespondentRepresentativeRequest
             );
 
-            ccdClient.submitEventForCase(adminUserToken, ccdRequestCaseData, caseDetails.getCaseTypeId(),
-                    caseDetails.getJurisdiction(), ccdRequest, caseDetails.getCaseId());
+            ccdClient.submitEventForCase(adminUserToken, ccdRequestCaseData, newCaseDetails.getCaseTypeId(),
+                    newCaseDetails.getJurisdiction(), ccdRequest, newCaseDetails.getCaseId());
         }
+    }
+
+    public List<RepresentedTypeRItem> findRepresentativesToRemove(CallbackRequest callbackRequest,
+                                                                  CaseUserAssignmentData caseUserAssignments) {
+        // 1. find representatives to remove and their roles
+        // 2. remove representatives
+        // 3. find representatives to add and their role (will use missing roles in case assignments)
+        // 4. add representatives
+
+        return null;
     }
 
     /**
@@ -396,7 +413,7 @@ public class NocRespondentRepresentativeService {
                                                                    String submissionReference)
             throws GenericServiceException {
         if (ObjectUtils.isEmpty(caseData)
-                || org.apache.commons.collections4.CollectionUtils.isEmpty(caseData.getRepCollection())) {
+                || CollectionUtils.isEmpty(caseData.getRepCollection())) {
             return;
         }
         StringBuilder nocWarnings = new StringBuilder(StringUtils.EMPTY);

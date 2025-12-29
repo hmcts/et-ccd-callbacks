@@ -90,9 +90,8 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
                 } else {
                     try (ExecutorService executorService = Executors.newFixedThreadPool(10)) {
                         log.info("Processing {} valid cases for case type: {}", validSubmitEvents.size(), caseTypeId);
-                        validSubmitEvents.forEach(submitEvent -> executorService.execute(() -> {
-                            triggerTaskEventForCase(adminUserToken, submitEvent, caseTypeId);
-                        }));
+                        validSubmitEvents.forEach(submitEvent -> executorService.execute(() ->
+                                triggerTaskEventForCase(adminUserToken, submitEvent, caseTypeId)));
                     }
                 }
             } catch (Exception e) {
@@ -181,7 +180,7 @@ public class WaTaskCreationCronForExpiredBfActions implements Runnable {
             log.info("Updated caseSubmitEvents set now has {} cases of {} type:", nextResults.size(), caseTypeId);
 
             searchAfterValue = String.valueOf(nextResults.getLast().getCaseId());
-            log.info("The {} round/loop searchAfterValue is {}", String.valueOf(++round), searchAfterValue);
+            log.info("The {} round/loop searchAfterValue is {}", ++round, searchAfterValue);
         }
 
         log.info("Total cases found: {}", caseSubmitEvents.size());

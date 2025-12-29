@@ -67,7 +67,7 @@ class HearingsToJudgmentsReportTest {
     }
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         submitEvents.clear();
 
         hearingsToJudgmentsReportDataSource = mock(HearingsToJudgmentsReportDataSource.class);
@@ -399,7 +399,7 @@ class HearingsToJudgmentsReportTest {
         assertEquals(TribunalOffice.SCOTLAND.getOfficeName(), reportData.getReportSummary().getOffice());
         assertEquals(1, reportData.getReportDetails().size());
 
-        HearingsToJudgmentsReportDetail reportDetail = reportData.getReportDetails().get(0);
+        HearingsToJudgmentsReportDetail reportDetail = reportData.getReportDetails().getFirst();
         assertEquals(TribunalOffice.GLASGOW.getOfficeName(), reportDetail.getReportOffice());
     }
 
@@ -437,8 +437,8 @@ class HearingsToJudgmentsReportTest {
         submitEvents.add(createValidSubmitEventNotWithin4Wks());
 
         // Will set the first cases total days to a number larger than the second cases
-        submitEvents.get(0).getCaseData().getJudgementCollection()
-                .get(0).getValue().setDateJudgmentSent("2021-12-31");
+        submitEvents.getFirst().getCaseData().getJudgementCollection()
+                .getFirst().getValue().setDateJudgmentSent("2021-12-31");
 
         HearingsToJudgmentsReportData reportData = hearingsToJudgmentsReport.runReport(
                 ENGLANDWALES_LISTING_CASE_TYPE_ID,
@@ -488,7 +488,7 @@ class HearingsToJudgmentsReportTest {
         assertCommonValues(reportData);
         assertEquals(1, reportData.getReportDetails().size());
 
-        HearingsToJudgmentsReportDetail reportDetail = reportData.getReportDetails().get(0);
+        HearingsToJudgmentsReportDetail reportDetail = reportData.getReportDetails().getFirst();
         assertEquals(hearingJudge, reportDetail.getHearingJudge());
         assertEquals(TribunalOffice.NEWCASTLE.getOfficeName(), reportDetail.getReportOffice());
         assertEquals(caseReference, reportDetail.getCaseReference());
@@ -530,7 +530,7 @@ class HearingsToJudgmentsReportTest {
         assertCommonValues(reportData);
         assertEquals(1, reportData.getReportDetails().size());
 
-        HearingsToJudgmentsReportDetail reportDetail = reportData.getReportDetails().get(0);
+        HearingsToJudgmentsReportDetail reportDetail = reportData.getReportDetails().getFirst();
         assertEquals("Hugh Garfield", reportDetail.getHearingJudge()); // Should not include the ITCO reference
         assertEquals(TribunalOffice.NEWCASTLE.getOfficeName(), reportDetail.getReportOffice());
         assertEquals(caseReference, reportDetail.getCaseReference());

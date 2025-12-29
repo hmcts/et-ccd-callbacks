@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing;
 
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,6 +23,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.selection.J
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
@@ -212,7 +212,7 @@ class AllocateHearingServiceTest {
         assertEquals(room.getSelectedLabel(), selectedListing.getHearingRoom().getSelectedLabel());
         assertEquals(clerk.getSelectedCode(), selectedListing.getHearingClerk().getSelectedCode());
         assertEquals(clerk.getSelectedLabel(), selectedListing.getHearingClerk().getSelectedLabel());
-        Assertions.assertNotNull(selectedListing.getPostponedDate());
+        assertNotNull(selectedListing.getPostponedDate());
     }
 
     private CaseData createCaseData() {

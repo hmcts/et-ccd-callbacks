@@ -24,7 +24,7 @@ class MultiplesHelperTest {
     private MultipleData multipleData;
 
     @BeforeEach
-    public void setUp()  {
+    void setUp()  {
         multipleData = MultipleUtil.getMultipleData();
     }
 
@@ -33,7 +33,7 @@ class MultiplesHelperTest {
         multipleData.setCaseIdCollection(null);
         MultiplesHelper.addLeadToCaseIds(multipleData, "245003/2020");
         assertEquals(1, multipleData.getCaseIdCollection().size());
-        assertEquals("245003/2020", multipleData.getCaseIdCollection().get(0).getValue().getEthosCaseReference());
+        assertEquals("245003/2020", multipleData.getCaseIdCollection().getFirst().getValue().getEthosCaseReference());
     }
 
     @Test

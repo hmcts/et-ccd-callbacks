@@ -445,7 +445,7 @@ public class InitialConsiderationService {
                     || caseData.getClaimantHearingPreference().getHearingPreferences() == null
                     || caseData.getClaimantHearingPreference().getHearingPreferences().isEmpty()) {
                 String hearingFormates = String.join(", ",
-                        caseData.getClaimantHearingPreference().getHearingPreferences());
+                        "-");
                 hearingFormatTable.append(String.format(
                         HEARING_FORMAT_PREFERENCE,
                         caseData.getClaimant(),

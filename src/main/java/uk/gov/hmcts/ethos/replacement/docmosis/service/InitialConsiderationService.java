@@ -18,6 +18,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
 import uk.gov.hmcts.et.common.model.ccd.types.Et3VettingType;
@@ -374,33 +375,33 @@ public class InitialConsiderationService {
                 .filter(respondent -> respondent.getValue() != null)
                 .forEach(respondent -> {
                     //set respondent rep hearing format preference
-                    if (respondent.getValue().getEt3ResponseHearingRespondent() != null) {
+                    if (respondent.getValue().getEt3ResponseHearingRespondent() != null
+                            && !respondent.getValue().getEt3ResponseHearingRespondent().isEmpty()) {
                         hearingFormatTable.append(respondentHeaderRow);
 
-                        respondent.getValue().getEt3ResponseHearingRespondent().forEach(
-                                hearingFormat ->
-                                        hearingFormatTable.append(String.format(
-                                                HEARING_FORMAT_PREFERENCE,
-                                                respondent.getValue().getRespondentName(),
-                                                Optional.ofNullable(hearingFormat)
-                                                        .orElse("-")
-                                        ))
-                        );
+                        hearingFormatTable.append(String.format(
+                                HEARING_FORMAT_PREFERENCE,
+                                respondent.getValue().getRespondentName(),
+                                String.join(", ",
+                                        respondent.getValue().getEt3ResponseHearingRespondent().stream().toList())
+                        ));
                     }
 
                     //set respondent rep hearing format preference
-                    if (respondent.getValue().getEt3ResponseHearingRepresentative() != null) {
+                    Optional<RepresentedTypeRItem> matchingRespondentRep = caseData.getRepCollection().stream().filter(
+                            r -> r.getValue().getRespRepName().equals(
+                                    respondent.getValue().getRespondentName())).findFirst();
+
+                    if (matchingRespondentRep.isPresent()
+                            && respondent.getValue().getEt3ResponseHearingRepresentative() != null) {
                         hearingFormatTable.append(respondentRepHeaderRow);
 
-                        respondent.getValue().getEt3ResponseHearingRepresentative().forEach(
-                                hearingFormat ->
-                                        hearingFormatTable.append(String.format(
-                                                HEARING_FORMAT_PREFERENCE,
-                                                respondent.getValue().getRespondentName(),
-                                                Optional.ofNullable(hearingFormat)
-                                                        .orElse("-")
-                                        ))
-                        );
+                        hearingFormatTable.append(String.format(
+                                HEARING_FORMAT_PREFERENCE,
+                                matchingRespondentRep.get().getValue().getNameOfRepresentative(),
+                                String.join(", ",
+                                        respondent.getValue().getEt3ResponseHearingRepresentative().stream().toList())
+                        ));
                     }
                 });
 

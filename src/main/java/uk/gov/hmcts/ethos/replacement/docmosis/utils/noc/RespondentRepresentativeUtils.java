@@ -3,20 +3,19 @@ package uk.gov.hmcts.ethos.replacement.docmosis.utils.noc;
 import com.nimbusds.oauth2.sdk.util.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Strings;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentUtils;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_INVALID_REPRESENTATIVE_EXISTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_RESPONDENT_HAS_MULTIPLE_REPRESENTATIVES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_REPRESENTATIVE_DETAILS_NOT_EXIST;
@@ -58,8 +57,8 @@ public final class RespondentRepresentativeUtils {
      *     The exception includes a descriptive error message and relevant
      *     context for troubleshooting.
      */
-    public static void validateRespondentRepresentative(RepresentedTypeRItem representative,
-                                                        String caseReferenceNumber)
+    public static void validateRepresentative(RepresentedTypeRItem representative,
+                                              String caseReferenceNumber)
             throws GenericServiceException {
         final String methodName = "validateRepresentative";
         if (ObjectUtils.isEmpty(representative)) {
@@ -97,7 +96,7 @@ public final class RespondentRepresentativeUtils {
      *         </ul>
      *     </li>
      *     <li>Validates the representative using
-     *         {@link RespondentRepresentativeUtils#validateRespondentRepresentative(RepresentedTypeRItem, String)},
+     *         {@link RespondentRepresentativeUtils#validateRepresentative(RepresentedTypeRItem, String)},
      *         ensuring that the representative record contains the required structural data.</li>
      * </ul>
      * <p>
@@ -115,7 +114,7 @@ public final class RespondentRepresentativeUtils {
                                               RepresentedTypeRItem representative,
                                               String caseReferenceNumber) throws GenericServiceException {
         RespondentUtils.validateRespondent(respondent, caseReferenceNumber);
-        RespondentRepresentativeUtils.validateRespondentRepresentative(representative, caseReferenceNumber);
+        validateRepresentative(representative, caseReferenceNumber);
     }
 
     /**
@@ -174,72 +173,22 @@ public final class RespondentRepresentativeUtils {
      * @param caseData the case data object to evaluate
      * @return {@code true} if the case contains at least one representative; {@code false} otherwise
      */
-    public static boolean hasRepresentatives(CaseData caseData) {
+    public static boolean hasRespondentRepresentative(CaseData caseData) {
         return ObjectUtils.isNotEmpty(caseData)
                 && CollectionUtils.isNotEmpty(caseData.getRepCollection());
     }
 
-    /**
-     * Determines whether the given role represents a valid respondent representative role.
-     *
-     * <p>This method validates the supplied role against the {@link SolicitorRole} enum by
-     * matching it to a known case role label (for example {@code "[SOLICITORA]"}).
-     * The role must be non-blank and correspond to one of the defined solicitor roles.</p>
-     *
-     * <p>If the role is {@code null}, empty, or contains only whitespace, or if it does not
-     * match any known solicitor role, the method returns {@code false}.</p>
-     *
-     * @param role the case role label to validate (e.g. {@code "[SOLICITORA]"}); may be {@code null}
-     * @return {@code true} if the role is non-blank and matches a valid respondent representative role,
-     *         {@code false} otherwise
-     */
-    public static boolean isRespondentRepresentativeRole(String role) {
-        return StringUtils.isNotBlank(role) && SolicitorRole.from(role).isPresent();
-    }
+    public static List<CaseUserAssignment> filterRespondentRepresentativeAssignments(
+            List<CaseUserAssignment> caseUserAssignments) {
 
-    /**
-     * Determines whether two representatives relate to the same respondent but have different
-     * email addresses.
-     *
-     * <p>The representatives are considered to relate to the same respondent if either:</p>
-     * <ul>
-     *   <li>their respondent IDs match, or</li>
-     *   <li>their respondent names match</li>
-     * </ul>
-     *
-     * <p>If the representatives do not relate to the same respondent, the method returns
-     * {@code false}. If they do relate to the same respondent, the method returns {@code true}
-     * only when the first representative has a non-blank email address that differs from the
-     * second representative’s email address.</p>
-     *
-     * <p>If either representative or its value is {@code null}, the method returns
-     * {@code false}.</p>
-     *
-     * @param oldRepresentative the first representative to compare
-     * @param representative2 the second representative to compare
-     * @return {@code true} if both representatives refer to the same respondent (by ID or name)
-     *         and have different email addresses; {@code false} otherwise
-     */
-    public static boolean hasSameRespondentButDifferentEmail(RepresentedTypeRItem oldRepresentative,
-                                                             RepresentedTypeRItem representative2) {
-
-        if (ObjectUtils.isEmpty(oldRepresentative) || ObjectUtils.isEmpty(oldRepresentative.getValue())
-                || ObjectUtils.isEmpty(representative2) || ObjectUtils.isEmpty(representative2.getValue())) {
-            return false;
+        if (CollectionUtils.isEmpty(caseUserAssignments)) {
+            return List.of();
         }
-        var representative1Value = oldRepresentative.getValue();
-        var representative2Value = representative2.getValue();
-        boolean sameRespondentId = StringUtils.isNotBlank(representative1Value.getRespondentId())
-                && Strings.CS.equals(representative1Value.getRespondentId(), representative2Value.getRespondentId());
-        boolean sameRespondentName = StringUtils.isNotBlank(representative1Value.getRespRepName())
-                && Strings.CS.equals(representative1Value.getRespRepName(), representative2Value.getRespRepName());
-        if (!sameRespondentId && !sameRespondentName) {
-            return false;
-        }
-        return YES.equals(oldRepresentative.getValue().getMyHmctsYesNo())
-                && StringUtils.isNotBlank(representative1Value.getRepresentativeEmailAddress())
-                && !Strings.CS.equals(representative1Value.getRepresentativeEmailAddress(),
-                representative2Value.getRepresentativeEmailAddress());
-    }
 
+        return caseUserAssignments.stream()
+                .filter(Objects::nonNull)
+                .filter(assignment -> StringUtils.isNotBlank(assignment.getCaseRole()))
+                .filter(assignment -> RoleUtils.isRespondentRepresentativeRole(assignment.getCaseRole()))
+                .toList();
+    }
 }

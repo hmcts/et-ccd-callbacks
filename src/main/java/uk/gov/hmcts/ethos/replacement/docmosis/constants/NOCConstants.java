@@ -55,6 +55,8 @@ public final class NOCConstants {
     public static final String WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL =
             "Representative '%s' could not be found using %s. Case access will not be defined for this representative.";
 
+    public static final int MAX_NOC_ANSWERS = 10;
+
     private NOCConstants() {
         // Final classes should not have a public or default constructor.
     }

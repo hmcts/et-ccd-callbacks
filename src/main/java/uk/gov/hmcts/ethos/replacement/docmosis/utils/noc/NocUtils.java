@@ -225,7 +225,8 @@ public final class NocUtils {
      */
     public static void mapRepresentativesToRespondents(CaseData caseData, String submissionReference)
             throws GenericServiceException {
-        if (!RespondentUtils.hasRespondents(caseData) || !RespondentRepresentativeUtils.hasRepresentatives(caseData)) {
+        if (!RespondentUtils.hasRespondents(caseData)
+                || !RespondentRepresentativeUtils.hasRespondentRepresentative(caseData)) {
             return;
         }
         Map<String, RespondentSumTypeItem> respondentsById = new HashMap<>();

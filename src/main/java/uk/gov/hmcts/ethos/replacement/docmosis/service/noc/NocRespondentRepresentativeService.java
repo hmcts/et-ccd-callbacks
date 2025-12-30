@@ -38,6 +38,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.OrganisationUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.NocUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.RespondentRepresentativeUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
@@ -163,12 +164,6 @@ public class NocRespondentRepresentativeService {
             throws IOException, GenericServiceException {
         NocUtils.validateCallbackRequest(callbackRequest);
 
-        // Find users to remove case assignments
-        CaseUserAssignmentData caseUserAssignments = nocCcdService.getCaseAssignments(
-                adminUserService.getAdminUserToken(), callbackRequest.getCaseDetails().getCaseId());
-
-        findRepresentativesToRemove(callbackRequest, caseUserAssignments);
-
         CaseDetails newCaseDetails = callbackRequest.getCaseDetails();
         CaseDetails oldCaseDetails = callbackRequest.getCaseDetailsBefore();
         // Identify changes in representation of respondents
@@ -235,14 +230,45 @@ public class NocRespondentRepresentativeService {
         }
     }
 
-    public List<RepresentedTypeRItem> findRepresentativesToRemove(CallbackRequest callbackRequest,
-                                                                  CaseUserAssignmentData caseUserAssignments) {
+    public void removeRespondentRepresentativeAccess(CallbackRequest callbackRequest)
+            throws GenericServiceException {
+        // Find users to remove case assignments
+        CaseUserAssignmentData caseUserAssignments = nocCcdService.getCaseAssignments(
+                adminUserService.getAdminUserToken(), callbackRequest.getCaseDetails().getCaseId());
+        if (ObjectUtils.isEmpty(caseUserAssignments)
+                || CollectionUtils.isEmpty(caseUserAssignments.getCaseUserAssignments())) {
+            return;
+        }
         // 1. find representatives to remove and their roles
         // 2. remove representatives
         // 3. find representatives to add and their role (will use missing roles in case assignments)
         // 4. add representatives
+        List<CaseUserAssignment> usersToRevoke = new ArrayList<>();
 
-        return null;
+        nocCcdService.revokeCaseAssignments(adminUserService.getAdminUserToken(),
+                CaseUserAssignmentData.builder().caseUserAssignments(usersToRevoke).build());
+        String caseId = callbackRequest.getCaseDetails().getCaseId();
+        CaseData oldCaseData = callbackRequest.getCaseDetailsBefore().getCaseData();
+        CaseData newCaseData = callbackRequest.getCaseDetails().getCaseData();
+
+        List<RepresentedTypeRItem> oldRepresentatives = oldCaseData.getRepCollection();
+        List<RepresentedTypeRItem> newRepresentatives = newCaseData.getRepCollection();
+        List<RepresentedTypeRItem> representativesToRemove = new ArrayList<>();
+        for (RepresentedTypeRItem oldRepresentative : oldRepresentatives) {
+            RespondentRepresentativeUtils.validateRepresentative(oldRepresentative, caseId);
+            boolean representativeFound = false;
+            for (RepresentedTypeRItem newRepresentative : newRepresentatives) {
+                if (oldRepresentative.getId().equals(newRepresentative.getId())) {
+                    representativeFound = true;
+                }
+            }
+            if (!representativeFound) {
+                representativesToRemove.add(oldRepresentative);
+            }
+        }
+        if (ObjectUtils.isNotEmpty(representativesToRemove.getFirst())) {
+            representativesToRemove.getFirst().setValue(null);
+        }
     }
 
     /**

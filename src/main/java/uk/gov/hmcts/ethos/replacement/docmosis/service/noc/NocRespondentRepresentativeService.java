@@ -230,45 +230,34 @@ public class NocRespondentRepresentativeService {
         }
     }
 
-    public void removeRespondentRepresentativeAccess(CallbackRequest callbackRequest)
-            throws GenericServiceException {
-        // Find users to remove case assignments
+    /**
+     * Revokes any existing respondent representative case access for the given case.
+     * <p>
+     * This method retrieves all current case user assignments, filters out assignments
+     * associated with respondent representatives, and revokes those assignments using
+     * the CCD NoC service. If the case has no user assignments, no action is taken.
+     * </p>
+     *
+     * @param caseId the CCD case identifier for which respondent representative access
+     *               should be revoked
+     */
+    public void revokeOldRespondentRepresentativeAccess(String caseId) {
+        if (StringUtils.isEmpty(caseId)) {
+            return;
+        }
         CaseUserAssignmentData caseUserAssignments = nocCcdService.getCaseAssignments(
-                adminUserService.getAdminUserToken(), callbackRequest.getCaseDetails().getCaseId());
+                adminUserService.getAdminUserToken(), caseId);
         if (ObjectUtils.isEmpty(caseUserAssignments)
                 || CollectionUtils.isEmpty(caseUserAssignments.getCaseUserAssignments())) {
             return;
         }
-        // 1. find representatives to remove and their roles
-        // 2. remove representatives
-        // 3. find representatives to add and their role (will use missing roles in case assignments)
-        // 4. add representatives
-        List<CaseUserAssignment> usersToRevoke = new ArrayList<>();
-
+        List<CaseUserAssignment> usersToRevoke = RespondentRepresentativeUtils
+                .filterRespondentRepresentativeAssignments(caseUserAssignments.getCaseUserAssignments());
+        if (CollectionUtils.isEmpty(usersToRevoke)) {
+            return;
+        }
         nocCcdService.revokeCaseAssignments(adminUserService.getAdminUserToken(),
                 CaseUserAssignmentData.builder().caseUserAssignments(usersToRevoke).build());
-        String caseId = callbackRequest.getCaseDetails().getCaseId();
-        CaseData oldCaseData = callbackRequest.getCaseDetailsBefore().getCaseData();
-        CaseData newCaseData = callbackRequest.getCaseDetails().getCaseData();
-
-        List<RepresentedTypeRItem> oldRepresentatives = oldCaseData.getRepCollection();
-        List<RepresentedTypeRItem> newRepresentatives = newCaseData.getRepCollection();
-        List<RepresentedTypeRItem> representativesToRemove = new ArrayList<>();
-        for (RepresentedTypeRItem oldRepresentative : oldRepresentatives) {
-            RespondentRepresentativeUtils.validateRepresentative(oldRepresentative, caseId);
-            boolean representativeFound = false;
-            for (RepresentedTypeRItem newRepresentative : newRepresentatives) {
-                if (oldRepresentative.getId().equals(newRepresentative.getId())) {
-                    representativeFound = true;
-                }
-            }
-            if (!representativeFound) {
-                representativesToRemove.add(oldRepresentative);
-            }
-        }
-        if (ObjectUtils.isNotEmpty(representativesToRemove.getFirst())) {
-            representativesToRemove.getFirst().setValue(null);
-        }
     }
 
     /**

@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.noc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -86,9 +87,10 @@ class NocRespondentRepresentativeServiceTest {
     private static final String RESPONDENT_REP_NAME_TWO = "Legal Two";
     private static final String RESPONDENT_REP_NAME_THREE = "Legal Three";
     private static final String RESPONDENT_REP_EMAIL = "respondent@rep.email.com";
-    private static final String SOLICITORA = "[SOLICITORA]";
-    private static final String SOLICITORB = "[SOLICITORB]";
-    private static final String SOLICITORC = "[SOLICITORC]";
+    private static final String ROLE_CLAIMANT_SOLICITOR = "[CLAIMANTSOLICITOR]";
+    private static final String ROLE_SOLICITORA = "[SOLICITORA]";
+    private static final String ROLE_SOLICITORB = "[SOLICITORB]";
+    private static final String ROLE_SOLICITORC = "[SOLICITORC]";
     private static final String ORGANISATION_ID = "ORG1";
     private static final String ORGANISATION_ID_TWO = "ORG2";
     private static final String ORGANISATION_ID_THREE = "ORG3";
@@ -189,15 +191,15 @@ class NocRespondentRepresentativeServiceTest {
         Organisation org1 =
             Organisation.builder().organisationID(ORGANISATION_ID).organisationName(ET_ORG_1).build();
         OrganisationPolicy orgPolicy1 =
-            OrganisationPolicy.builder().organisation(org1).orgPolicyCaseAssignedRole(SOLICITORA).build();
+            OrganisationPolicy.builder().organisation(org1).orgPolicyCaseAssignedRole(ROLE_SOLICITORA).build();
         Organisation org2 =
             Organisation.builder().organisationID(ORGANISATION_ID_TWO).organisationName(ET_ORG_2).build();
         OrganisationPolicy orgPolicy2 =
-            OrganisationPolicy.builder().organisation(org2).orgPolicyCaseAssignedRole(SOLICITORB).build();
+            OrganisationPolicy.builder().organisation(org2).orgPolicyCaseAssignedRole(ROLE_SOLICITORB).build();
         Organisation org3 =
             Organisation.builder().organisationID(ORGANISATION_ID_THREE).organisationName(ET_ORG_3).build();
         OrganisationPolicy orgPolicy3 =
-            OrganisationPolicy.builder().organisation(org3).orgPolicyCaseAssignedRole(SOLICITORC).build();
+            OrganisationPolicy.builder().organisation(org3).orgPolicyCaseAssignedRole(ROLE_SOLICITORC).build();
 
         caseData.setRespondentOrganisationPolicy0(orgPolicy1);
         caseData.setRespondentOrganisationPolicy1(orgPolicy2);
@@ -258,12 +260,12 @@ class NocRespondentRepresentativeServiceTest {
 
         assertThat(caseData.getRespondentOrganisationPolicy0()).isNotNull();
         assertThat(caseData.getRespondentOrganisationPolicy0().getOrgPolicyCaseAssignedRole()).isNotNull()
-            .isEqualTo(SOLICITORA);
+            .isEqualTo(ROLE_SOLICITORA);
         assertThat(caseData.getRespondentOrganisationPolicy0().getOrganisation().getOrganisationID()).isNotNull()
             .isEqualTo(ORGANISATION_ID);
         assertThat(caseData.getRespondentOrganisationPolicy1()).isNotNull();
         assertThat(caseData.getRespondentOrganisationPolicy1().getOrgPolicyCaseAssignedRole()).isNotNull()
-            .isEqualTo(SOLICITORB);
+            .isEqualTo(ROLE_SOLICITORB);
         assertThat(caseData.getRespondentOrganisationPolicy1().getOrganisation().getOrganisationID()).isNotNull()
             .isEqualTo(ORGANISATION_ID_TWO);
     }
@@ -317,8 +319,8 @@ class NocRespondentRepresentativeServiceTest {
                                                                       Organisation organisationToRemove) {
         DynamicFixedListType caseRole = new DynamicFixedListType();
         DynamicValueType dynamicValueType = new DynamicValueType();
-        dynamicValueType.setCode(NocRespondentRepresentativeServiceTest.SOLICITORB);
-        dynamicValueType.setLabel(NocRespondentRepresentativeServiceTest.SOLICITORB);
+        dynamicValueType.setCode(NocRespondentRepresentativeServiceTest.ROLE_SOLICITORB);
+        dynamicValueType.setLabel(NocRespondentRepresentativeServiceTest.ROLE_SOLICITORB);
         caseRole.setValue(dynamicValueType);
 
         return ChangeOrganisationRequest.builder()
@@ -435,8 +437,8 @@ class NocRespondentRepresentativeServiceTest {
 
         DynamicFixedListType roleItem = new DynamicFixedListType();
         DynamicValueType dynamicValueType = new DynamicValueType();
-        dynamicValueType.setCode(SOLICITORB);
-        dynamicValueType.setLabel(SOLICITORB);
+        dynamicValueType.setCode(ROLE_SOLICITORB);
+        dynamicValueType.setLabel(ROLE_SOLICITORB);
         roleItem.setValue(dynamicValueType);
 
         ChangeOrganisationRequest changeOrganisationRequest = ChangeOrganisationRequest.builder()
@@ -451,8 +453,8 @@ class NocRespondentRepresentativeServiceTest {
                 .changeOrganisationRequest(changeOrganisationRequest).respondentName(RESPONDENT_NAME_TWO).build());
         DynamicFixedListType roleItem2 = new DynamicFixedListType();
         DynamicValueType dynamicValueType2 = new DynamicValueType();
-        dynamicValueType2.setCode(SOLICITORC);
-        dynamicValueType2.setLabel(SOLICITORC);
+        dynamicValueType2.setCode(ROLE_SOLICITORC);
+        dynamicValueType2.setLabel(ROLE_SOLICITORC);
         roleItem2.setValue(dynamicValueType2);
         ChangeOrganisationRequest changeOrganisationRequest2 = ChangeOrganisationRequest.builder()
             .approvalStatus(APPROVED)
@@ -495,15 +497,15 @@ class NocRespondentRepresentativeServiceTest {
         Organisation org1 =
             Organisation.builder().organisationID(ORGANISATION_ID).organisationName(ET_ORG_1).build();
         OrganisationPolicy orgPolicy1 =
-            OrganisationPolicy.builder().organisation(org1).orgPolicyCaseAssignedRole(SOLICITORA).build();
+            OrganisationPolicy.builder().organisation(org1).orgPolicyCaseAssignedRole(ROLE_SOLICITORA).build();
         Organisation org2 =
             Organisation.builder().organisationID(ORGANISATION_ID_TWO).organisationName(ET_ORG_2).build();
         OrganisationPolicy orgPolicy2 =
-            OrganisationPolicy.builder().organisation(org2).orgPolicyCaseAssignedRole(SOLICITORB).build();
+            OrganisationPolicy.builder().organisation(org2).orgPolicyCaseAssignedRole(ROLE_SOLICITORB).build();
         Organisation org3 =
             Organisation.builder().organisationID(ORGANISATION_ID_THREE).organisationName(ET_ORG_3).build();
         OrganisationPolicy orgPolicy3 =
-            OrganisationPolicy.builder().organisation(org3).orgPolicyCaseAssignedRole(SOLICITORC).build();
+            OrganisationPolicy.builder().organisation(org3).orgPolicyCaseAssignedRole(ROLE_SOLICITORC).build();
 
         caseDataBefore.setRespondentOrganisationPolicy0(orgPolicy1);
         caseDataBefore.setRespondentOrganisationPolicy1(orgPolicy2);
@@ -575,15 +577,15 @@ class NocRespondentRepresentativeServiceTest {
         Organisation org1 =
             Organisation.builder().organisationID(ORGANISATION_ID).organisationName(ET_ORG_1).build();
         OrganisationPolicy orgPolicy1 =
-            OrganisationPolicy.builder().organisation(org1).orgPolicyCaseAssignedRole(SOLICITORA).build();
+            OrganisationPolicy.builder().organisation(org1).orgPolicyCaseAssignedRole(ROLE_SOLICITORA).build();
         Organisation org2 =
             Organisation.builder().organisationID(ORGANISATION_ID_NEW).organisationName(ET_ORG_NEW).build();
         OrganisationPolicy orgPolicy2 =
-            OrganisationPolicy.builder().organisation(org2).orgPolicyCaseAssignedRole(SOLICITORB).build();
+            OrganisationPolicy.builder().organisation(org2).orgPolicyCaseAssignedRole(ROLE_SOLICITORB).build();
         Organisation org3 =
             Organisation.builder().organisationID(ORGANISATION_ID_TWO).organisationName(ET_ORG_2).build();
         OrganisationPolicy orgPolicy3 =
-            OrganisationPolicy.builder().organisation(org3).orgPolicyCaseAssignedRole(SOLICITORC).build();
+            OrganisationPolicy.builder().organisation(org3).orgPolicyCaseAssignedRole(ROLE_SOLICITORC).build();
 
         caseDataAfter.setRespondentOrganisationPolicy0(orgPolicy1);
         caseDataAfter.setRespondentOrganisationPolicy1(orgPolicy2);
@@ -791,12 +793,12 @@ class NocRespondentRepresentativeServiceTest {
     private CaseUserAssignmentData mockCaseAssignmentData() {
         List<CaseUserAssignment> caseUserAssignments = List.of(CaseUserAssignment.builder().userId(USER_ID_ONE)
                 .organisationId(ET_ORG_2)
-                .caseRole(SOLICITORB)
+                .caseRole(ROLE_SOLICITORB)
                 .caseId(CASE_ID_ONE)
                 .build(),
             CaseUserAssignment.builder().userId(USER_ID_TWO)
                 .organisationId(ET_ORG_2)
-                .caseRole(SOLICITORB)
+                .caseRole(ROLE_SOLICITORB)
                 .caseId(CASE_ID_ONE)
                 .build());
 
@@ -872,5 +874,37 @@ class NocRespondentRepresentativeServiceTest {
                 .thenReturn(organisationClientResponse);
         nocRespondentRepresentativeService.validateRepresentativeOrganisationAndEmail(caseData, CASE_ID_ONE);
         assertThat(caseData.getNocWarning()).isEmpty();
+    }
+
+    @Test
+    public void theRevokeOldRespondentRepresentativeAccess() {
+        // when case id is empty or blank should not throw any exception
+        assertDoesNotThrow(() -> nocRespondentRepresentativeService
+                .revokeOldRespondentRepresentativeAccess(StringUtils.EMPTY));
+
+        // when there is no case user assignment should not throw any exception
+        when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
+        when(nocCcdService.getCaseAssignments(AUTH_TOKEN, CASE_ID_ONE))
+                .thenReturn(CaseUserAssignmentData.builder().build());
+        assertDoesNotThrow(() -> nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(
+                CASE_ID_ONE));
+
+        // when there is no assigned respondent representative roles should not throw any exception
+        when(nocCcdService.getCaseAssignments(AUTH_TOKEN, CASE_ID_ONE))
+                .thenReturn(CaseUserAssignmentData.builder().caseUserAssignments(
+                        List.of(CaseUserAssignment.builder().caseRole(ROLE_CLAIMANT_SOLICITOR).build())).build());
+        assertDoesNotThrow(() -> nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(
+                CASE_ID_ONE));
+
+        // when there is assigned respondent representative role should not throw any exception and remove
+        // that assignment
+        CaseUserAssignment caseUserAssignment = CaseUserAssignment.builder().caseRole(ROLE_SOLICITORA).build();
+        when(nocCcdService.getCaseAssignments(AUTH_TOKEN, CASE_ID_ONE))
+                .thenReturn(CaseUserAssignmentData.builder().caseUserAssignments(
+                        List.of(caseUserAssignment)).build());
+        doNothing().when(nocCcdService).revokeCaseAssignments(AUTH_TOKEN, CaseUserAssignmentData.builder()
+                .caseUserAssignments(List.of(caseUserAssignment)).build());
+        assertDoesNotThrow(() -> nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(
+                CASE_ID_ONE));
     }
 }

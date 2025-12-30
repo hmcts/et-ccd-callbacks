@@ -414,6 +414,76 @@ class InitialConsiderationServiceTest {
     }
 
     @Test
+    void getClaimantHearingFormatDetails_shouldReturnCorrectDetails_whenClaimantHasNeitherPreference() {
+        CaseData caseDataWithClaimantHasNeitherPreference = new CaseData();
+        ClaimantHearingPreference claimantHearingPreference = new ClaimantHearingPreference();
+        claimantHearingPreference.setHearingPreferences(List.of("Neither"));
+        claimantHearingPreference.setHearingAssistance("Requires assistance for hearing");
+        caseDataWithClaimantHasNeitherPreference.setClaimantHearingPreference(claimantHearingPreference);
+        caseDataWithClaimantHasNeitherPreference.setClaimant("John Doe");
+
+        InitialConsiderationService service = new InitialConsiderationService(null);
+
+        String result = service.getClaimantHearingFormatDetails(caseDataWithClaimantHasNeitherPreference);
+
+        assertNotNull(result);
+        assertTrue(result.contains("Parties Hearing Format Details"));
+        assertTrue(result.contains("Claimant Hearing Format"));
+        assertTrue(result.contains("John Doe"));
+        assertTrue(result.contains("Neither (of Phone or Video)"));
+        assertTrue(result.contains("Requires assistance for hearing"));
+    }
+
+    @Test
+    void getClaimantHearingFormatDetails_shouldReturnDefaultDetails_whenClaimantHearingPreferenceIsNull() {
+        CaseData caseDataWithNullClaimantHearingPreference = new CaseData();
+        caseDataWithNullClaimantHearingPreference.setClaimant("Jane Doe");
+        caseDataWithNullClaimantHearingPreference.setClaimantHearingPreference(null);
+
+        InitialConsiderationService service = new InitialConsiderationService(null);
+
+        String result = service.getClaimantHearingFormatDetails(caseDataWithNullClaimantHearingPreference);
+
+        assertNotNull(result);
+        assertTrue(result.contains("Parties Hearing Format Details"));
+        assertTrue(result.contains("Claimant Hearing Format"));
+        assertTrue(result.contains("Jane Doe"));
+        assertTrue(result.contains("-"));
+    }
+
+    @Test
+    void getClaimantHearingFormatDetails_shouldReturnDefaultDetails_whenHearingPreferencesAreEmpty() {
+        CaseData caseDataWithEmptyHearingPreferences = new CaseData();
+        ClaimantHearingPreference claimantHearingPreference = new ClaimantHearingPreference();
+        claimantHearingPreference.setHearingPreferences(Collections.emptyList());
+        caseDataWithEmptyHearingPreferences.setClaimantHearingPreference(claimantHearingPreference);
+        caseDataWithEmptyHearingPreferences.setClaimant("John Smith");
+
+        InitialConsiderationService service = new InitialConsiderationService(null);
+
+        String result = service.getClaimantHearingFormatDetails(caseDataWithEmptyHearingPreferences);
+
+        assertNotNull(result);
+        assertTrue(result.contains("Parties Hearing Format Details"));
+        assertTrue(result.contains("Claimant Hearing Format"));
+        assertTrue(result.contains("John Smith"));
+        assertTrue(result.contains("-"));
+    }
+
+    @Test
+    void getClaimantHearingFormatDetails_shouldReturnEmptyTable_whenCaseDataIsNull() {
+        InitialConsiderationService service = new InitialConsiderationService(null);
+
+        String result = service.getClaimantHearingFormatDetails(null);
+
+        assertNotNull(result);
+        assertTrue(result.contains("Parties Hearing Format Details"));
+        assertTrue(result.contains("Claimant Hearing Format"));
+        assertTrue(result.contains("Claimant"));
+        assertTrue(result.contains("Hearing Format"));
+    }
+
+    @Test
     void setRespondentDetails_shouldReturnDefaultString_whenRespondentCollectionIsEmpty() {
         CaseData caseDataWithEmptyRespondentList = new CaseData();
         caseDataWithEmptyRespondentList.setRespondentCollection(new ArrayList<>());

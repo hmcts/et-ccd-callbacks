@@ -427,32 +427,34 @@ public class InitialConsiderationService {
             """);
 
         // Concatenate all hearing formats for claimant
-        if (caseData.getClaimantHearingPreference() != null
-                && caseData.getClaimantHearingPreference().getHearingPreferences() != null
-                && ! caseData.getClaimantHearingPreference().getHearingPreferences().isEmpty()
-                &&  caseData.getClaimantHearingPreference().getHearingPreferences().contains("Neither")) {
+        if (caseData != null) {
+            if (caseData.getClaimantHearingPreference() != null
+                    && caseData.getClaimantHearingPreference().getHearingPreferences() != null
+                    && ! caseData.getClaimantHearingPreference().getHearingPreferences().isEmpty()
+                    &&  caseData.getClaimantHearingPreference().getHearingPreferences().contains("Neither")) {
 
-            String reasonDetails = caseData.getClaimantHearingPreference().getHearingAssistance() != null
+                String reasonDetails = caseData.getClaimantHearingPreference().getHearingAssistance() != null
                     ? caseData.getClaimantHearingPreference().getHearingAssistance() : "-";
-            hearingFormatTable.append(String.format(
-                    CLAIMANT_HEARING_FORMAT_NEITHER_PREFERENCE,
-                    caseData.getClaimant(),
-                    "Neither (of Phone or Video)",
-                    Optional.of(reasonDetails)
-                            .orElse("-")
-            ));
-        } else {
-            if (caseData.getClaimantHearingPreference() == null
+                hearingFormatTable.append(String.format(
+                        CLAIMANT_HEARING_FORMAT_NEITHER_PREFERENCE,
+                        caseData.getClaimant(),
+                        "Neither (of Phone or Video)",
+                        Optional.of(reasonDetails)
+                                .orElse("-")
+                ));
+            } else {
+                if (caseData.getClaimantHearingPreference() == null
                     || caseData.getClaimantHearingPreference().getHearingPreferences() == null
                     || caseData.getClaimantHearingPreference().getHearingPreferences().isEmpty()) {
-                String hearingFormates = String.join(", ",
+                    String hearingFormates = String.join(", ",
                         "-");
-                hearingFormatTable.append(String.format(
+                    hearingFormatTable.append(String.format(
                         HEARING_FORMAT_PREFERENCE,
                         caseData.getClaimant(),
                         hearingFormates
-                ));
-                return hearingFormatTable.append(TABLE_END).toString();
+                    ));
+                    return hearingFormatTable.append(TABLE_END).toString();
+                }
             }
         }
 

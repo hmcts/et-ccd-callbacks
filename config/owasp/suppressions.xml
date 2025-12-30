@@ -42,7 +42,7 @@
         <cve>CVE-2024-38820</cve>
     </suppress>
     <!-- Suppressing due to dependency on other services as we use CFTLib and the latest version 2.0.3 doesn't fix the issue-->
-    <suppress until="2026-2-20Z">
+    <suppress until="2026-02-20Z">
         <notes><![CDATA[
    file name: angus-activation-2.0.2.jar
    ]]></notes>

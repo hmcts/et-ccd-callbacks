@@ -260,28 +260,49 @@ public class NocRespondentRepresentativeService {
                 CaseUserAssignmentData.builder().caseUserAssignments(usersToRevoke).build());
     }
 
-    public void grantNewRespondentRepresentativeAccess(CaseData caseData, String caseReferenceNumber)
-            throws GenericServiceException {
+    /**
+     * Grants case access to newly added respondent legal representatives.
+     * <p>
+     * The method iterates through the respondent representative collection on the case
+     * and validates each entry against the given submission reference. For each valid
+     * and represented respondent with sufficient details (HMCTS representation flag,
+     * representative email address, and organisation ID), a new solicitor case role is
+     * assigned and access is granted via the Notice of Change service.
+     * <p>
+     * If the {@code caseData}, representative collection, or {@code submissionReference}
+     * is empty, the method exits without performing any action.
+     * <p>
+     * Any {@link GenericServiceException} encountered while granting access is logged
+     * and processing continues for remaining representatives.
+     *
+     * @param caseData the case data containing respondent representative details
+     * @param submissionReference the submission reference used to validate and grant access
+     */
+    public void grantNewRespondentRepresentativeAccess(CaseData caseData, String submissionReference) {
         if (ObjectUtils.isEmpty(caseData)
                 || CollectionUtils.isEmpty(caseData.getRepCollection())
-                || StringUtils.isEmpty(caseReferenceNumber)) {
+                || StringUtils.isEmpty(submissionReference)) {
             return;
         }
         int availableRoleIndex = 0;
         for (RepresentedTypeRItem representedTypeRItem : caseData.getRepCollection()) {
-            RespondentRepresentativeUtils.validateRepresentative(representedTypeRItem, caseReferenceNumber);
-            if (YES.equals(representedTypeRItem.getValue().getMyHmctsYesNo())
-                    && StringUtils.isNotBlank(representedTypeRItem.getValue().getRepresentativeEmailAddress())
-                    && ObjectUtils.isNotEmpty(representedTypeRItem.getValue().getRespondentOrganisation())
-                    && StringUtils.isNotBlank(representedTypeRItem.getValue().getRespondentOrganisation()
-                    .getOrganisationID())) {
-                String role = SolicitorRole.values()[availableRoleIndex].getCaseRoleLabel();
-                nocService.grantRepresentativeAccess(adminUserService.getAdminUserToken(),
-                        representedTypeRItem.getValue().getRepresentativeEmailAddress(), caseReferenceNumber,
-                        representedTypeRItem.getValue().getRespondentOrganisation(),
-                        role);
-                representedTypeRItem.getValue().setRole(role);
-                availableRoleIndex++;
+            try {
+                RespondentRepresentativeUtils.validateRepresentative(representedTypeRItem, submissionReference);
+                if (YES.equals(representedTypeRItem.getValue().getMyHmctsYesNo())
+                        && StringUtils.isNotBlank(representedTypeRItem.getValue().getRepresentativeEmailAddress())
+                        && ObjectUtils.isNotEmpty(representedTypeRItem.getValue().getRespondentOrganisation())
+                        && StringUtils.isNotBlank(representedTypeRItem.getValue().getRespondentOrganisation()
+                        .getOrganisationID())) {
+                    String role = SolicitorRole.values()[availableRoleIndex].getCaseRoleLabel();
+                    nocService.grantRepresentativeAccess(adminUserService.getAdminUserToken(),
+                            representedTypeRItem.getValue().getRepresentativeEmailAddress(), submissionReference,
+                            representedTypeRItem.getValue().getRespondentOrganisation(),
+                            role);
+                    representedTypeRItem.getValue().setRole(role);
+                    availableRoleIndex++;
+                }
+            } catch (GenericServiceException gse) {
+                log.error(gse.getMessage(), gse);
             }
         }
     }

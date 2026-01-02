@@ -41,13 +41,11 @@ public class NocService {
     private final OrganisationClient organisationClient;
     private final AuthTokenGenerator authTokenGenerator;
 
-    private static final String CLASS_NAME = NocService.class.getSimpleName();
-
     /**
      * Revokes access from all users of an organisation being replaced or removed.
      * @param caseId - case id of case to apply update to
      * @param changeOrganisationRequest - containing case role and id of organisation to remove
-     * @throws IOException - thrown if no ccd service is inaccessible
+     * @throws IOException - thrown if no CCD service is inaccessible
      */
     public void removeOrganisationRepresentativeAccess(String caseId,
                                                        ChangeOrganisationRequest changeOrganisationRequest)
@@ -74,26 +72,24 @@ public class NocService {
     }
 
     public void grantRepresentativeAccess(String accessToken, String email,
-                                          String caseId, Organisation organisationToAdd,
+                                          String submissionReference, Organisation organisationToAdd,
                                           String role) throws GenericServiceException {
-        final String methodName = "grantRepresentativeAccess";
         if (StringUtils.isBlank(accessToken)
                 || StringUtils.isBlank(email)
-                || StringUtils.isBlank(caseId)
+                || StringUtils.isBlank(submissionReference)
                 || ObjectUtils.isEmpty(organisationToAdd)
                 || StringUtils.isBlank(organisationToAdd.getOrganisationID())
                 || !RoleUtils.isValidRole(role)) {
             String tmpAccessToken = StringUtils.isEmpty(accessToken) ? EMPTY_LOWERCASE : accessToken;
             String tmpEmail = StringUtils.isEmpty(email) ? EMPTY_LOWERCASE : email;
-            String tmpCaseId = StringUtils.isEmpty(caseId) ? EMPTY_LOWERCASE : caseId;
+            String tmpCaseId = StringUtils.isEmpty(submissionReference) ? EMPTY_LOWERCASE : submissionReference;
             String tmpOrganisationId = ObjectUtils.isEmpty(organisationToAdd) ? EMPTY_LOWERCASE
                     : StringUtils.isBlank(organisationToAdd.getOrganisationID()) ? EMPTY_LOWERCASE
                     : organisationToAdd.getOrganisationID();
             String tmpRole = StringUtils.isBlank(role) ? EMPTY_LOWERCASE : role;
             String exceptionMessage = String.format(EXCEPTION_INVALID_GRANT_ACCESS_PARAMETER, tmpAccessToken, tmpEmail,
                     tmpCaseId, tmpOrganisationId, tmpRole);
-            throw new GenericServiceException(exceptionMessage, new Exception(exceptionMessage), exceptionMessage,
-                    caseId, CLASS_NAME, methodName);
+            throw new GenericServiceException(exceptionMessage);
         }
         try {
             ResponseEntity<AccountIdByEmailResponse> userResponseEntity =
@@ -101,9 +97,9 @@ public class NocService {
             if (ObjectUtils.isEmpty(userResponseEntity)
                     || ObjectUtils.isEmpty(userResponseEntity.getBody())
                     || StringUtils.isBlank(userResponseEntity.getBody().getUserIdentifier())) {
-                String exceptionMessage = String.format(EXCEPTION_UNABLE_TO_GET_ACCOUNT_ID_BY_EMAIL, email, caseId);
-                throw new GenericServiceException(exceptionMessage, new Exception(exceptionMessage), exceptionMessage,
-                        caseId, CLASS_NAME, methodName);
+                String exceptionMessage = String.format(EXCEPTION_UNABLE_TO_GET_ACCOUNT_ID_BY_EMAIL, email,
+                        submissionReference);
+                throw new GenericServiceException(exceptionMessage);
             }
             AccountIdByEmailResponse userResponse = userResponseEntity.getBody();
             ResponseEntity<OrganisationsResponse> organisationsResponseEntity =
@@ -115,15 +111,13 @@ public class NocService {
                     || !Strings.CS.equals(organisationsResponseEntity.getBody().getOrganisationIdentifier(),
                     organisationToAdd.getOrganisationID())) {
                 String exceptionMessage = String.format(EXCEPTION_UNABLE_TO_FIND_ORGANISATION_BY_USER_ID,
-                        userResponse.getUserIdentifier(), caseId);
-                throw new GenericServiceException(exceptionMessage, new Exception(exceptionMessage), exceptionMessage,
-                        caseId, CLASS_NAME, methodName);
+                        userResponse.getUserIdentifier(), submissionReference);
+                throw new GenericServiceException(exceptionMessage);
             }
-            grantCaseAccess(userResponse.getUserIdentifier(), caseId, role);
+            grantCaseAccess(userResponse.getUserIdentifier(), submissionReference, role);
         } catch (IOException e) {
-            String message = String.format(EXCEPTION_FAILED_TO_ASSIGN_ROLE, role,
-                    email, caseId);
-            throw new GenericServiceException(message, new Exception(e), message, caseId, CLASS_NAME, methodName);
+            log.error(EXCEPTION_FAILED_TO_ASSIGN_ROLE, role, email, submissionReference);
+            throw new GenericServiceException(e);
         }
     }
 

@@ -58,24 +58,19 @@ public final class RespondentRepresentativeUtils {
      *     context for troubleshooting.
      */
     public static void validateRepresentative(RepresentedTypeRItem representative,
-                                              String caseReferenceNumber)
-            throws GenericServiceException {
-        final String methodName = "validateRepresentative";
+                                              String caseReferenceNumber) throws GenericServiceException {
         if (ObjectUtils.isEmpty(representative)) {
             String exceptionMessage = String.format(EXCEPTION_REPRESENTATIVE_NOT_FOUND, caseReferenceNumber);
-            throw new GenericServiceException(exceptionMessage, new Exception(exceptionMessage), exceptionMessage,
-                    caseReferenceNumber, RespondentRepresentativeUtils.class.getSimpleName(), methodName);
+            throw new GenericServiceException(exceptionMessage);
         }
         if (StringUtils.isBlank(representative.getId())) {
             String exceptionMessage = String.format(EXCEPTION_REPRESENTATIVE_ID_NOT_FOUND, caseReferenceNumber);
-            throw new GenericServiceException(exceptionMessage, new Exception(exceptionMessage), exceptionMessage,
-                    caseReferenceNumber, RespondentRepresentativeUtils.class.getSimpleName(), methodName);
+            throw new GenericServiceException(exceptionMessage);
         }
         if (ObjectUtils.isEmpty(representative.getValue())) {
             String exceptionMessage = String.format(EXCEPTION_REPRESENTATIVE_DETAILS_NOT_EXIST,
                     representative.getId(), caseReferenceNumber);
-            throw new GenericServiceException(exceptionMessage, new Exception(exceptionMessage), exceptionMessage,
-                    caseReferenceNumber, RespondentRepresentativeUtils.class.getSimpleName(), methodName);
+            throw new GenericServiceException(exceptionMessage);
         }
     }
 

@@ -30,7 +30,6 @@ import java.util.Objects;
 import java.util.Optional;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_GRANT_REPRESENTATIVE_ACCESS;
 
 @Service
 @RequiredArgsConstructor
@@ -151,7 +150,7 @@ public class NocClaimantRepresentativeService {
                             changeRequest.getOrganisationToAdd(),
                             ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
                 } catch (GenericServiceException genericServiceException) {
-                    log.error(ERROR_UNABLE_TO_GRANT_REPRESENTATIVE_ACCESS, caseDetails.getCaseId());
+                    log.error(genericServiceException.getMessage(), genericServiceException);
                 }
             }
         }

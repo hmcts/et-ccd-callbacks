@@ -41,7 +41,7 @@ public final class NOCConstants {
     public static final String EXCEPTION_OLD_AND_NEW_RESPONDENTS_ARE_DIFFERENT =
             "Old and new respondent collections contain different respondents for case ID %s.";
     public static final String EXCEPTION_FAILED_TO_ASSIGN_ROLE =
-            "Failed to assign role %s, to user with email %s, for case %s.";
+            "Failed to assign role {}, to user with email {}, for case {}. ";
     public static final String EXCEPTION_INVALID_GRANT_ACCESS_PARAMETER =
             "There are missing parameters; accessToken: %s, email: %s, submission reference: %s, organisationId: %s, "
                     + "role: %s.";
@@ -55,8 +55,6 @@ public final class NOCConstants {
     public static final String ERROR_SELECTED_RESPONDENT_NOT_FOUND = "Selected respondent with name %s not found.";
     public static final String ERROR_INVALID_REPRESENTATIVE_EXISTS = "Invalid representative exists.";
     public static final String ERROR_INVALID_RESPONDENT_EXISTS = "Invalid respondent exists.";
-    public static final String ERROR_UNABLE_TO_GRANT_REPRESENTATIVE_ACCESS =
-            "Representative access could not be granted for claimant representative for case {}";
 
     public static final String WARNING_REPRESENTATIVE_MISSING_EMAIL_ADDRESS =
             "Representative %s is missing an email address.";

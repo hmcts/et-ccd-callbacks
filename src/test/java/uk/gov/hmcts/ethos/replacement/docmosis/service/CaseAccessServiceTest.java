@@ -6,7 +6,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.junit.jupiter.params.provider.NullSource;
 import org.mockito.Mock;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpEntity;
@@ -22,6 +21,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.CcdCaseAssignment;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
@@ -100,21 +100,18 @@ class CaseAccessServiceTest {
     }
 
     @ParameterizedTest
-    @NullSource
     @MethodSource("invalidCaseId")
     void invalidCaseId(String linkedCaseCT) {
         caseData.setLinkedCaseCT(linkedCaseCT);
         caseDetails.setCaseData(caseData);
         errors = caseAccessService.assignExistingCaseRoles(caseDetails);
-        assertEquals("Error getting original case id", errors.get(0));
+        assertEquals("Error getting original case id", errors.getFirst());
 
     }
 
     private static Stream<Arguments> invalidCaseId() {
-        return Stream.of(
-            Arguments.of(""),
-            Arguments.of("https://example.com/123456789012345") //15 digits
-        );
+        return Stream.of(Arguments.of(""),
+                Arguments.of("https://example.com/123456789012345")); //15 digits
     }
 
     @Test
@@ -124,7 +121,7 @@ class CaseAccessServiceTest {
                 .build();
         when(caseAssignment.getCaseUserRoles("1234567890123456")).thenReturn(caseUserAssignmentData);
         errors = caseAccessService.assignExistingCaseRoles(caseDetails);
-        assertEquals("Case assigned user roles list is empty", errors.get(0));
+        assertEquals("Case assigned user roles list is empty", errors.getFirst());
     }
 
     @Test
@@ -138,7 +135,7 @@ class CaseAccessServiceTest {
                 .build();
         when(caseAssignment.getCaseUserRoles("1234567890123456")).thenReturn(caseUserAssignmentData);
         errors = caseAccessService.assignExistingCaseRoles(caseDetails);
-        assertEquals("User ID is null or empty", errors.get(0));
+        assertEquals("User ID is null or empty", errors.getFirst());
     }
 
     @Test
@@ -162,7 +159,7 @@ class CaseAccessServiceTest {
 
         errors = caseAccessService.assignExistingCaseRoles(caseDetails);
         assertEquals("Error assigning case access for case 1234567890123456 on behalf of 1111111111111111",
-                errors.get(0));
+                errors.getFirst());
     }
 
     @Test
@@ -181,8 +178,8 @@ class CaseAccessServiceTest {
         List<CaseUserAssignment> result = caseAccessService.getCaseUserAssignmentsById(caseId);
 
         assertEquals(1, result.size());
-        assertEquals("user1", result.get(0).getUserId());
-        assertEquals(CREATOR_ROLE, result.get(0).getCaseRole());
+        assertEquals("user1", result.getFirst().getUserId());
+        assertEquals(CREATOR_ROLE, result.getFirst().getCaseRole());
     }
 
     @Test

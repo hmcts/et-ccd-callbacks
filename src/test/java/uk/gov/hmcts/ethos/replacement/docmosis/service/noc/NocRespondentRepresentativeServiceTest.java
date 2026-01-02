@@ -1,15 +1,23 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.service;
+package uk.gov.hmcts.ethos.replacement.docmosis.service.noc;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.testcontainers.shaded.org.apache.commons.lang3.math.NumberUtils;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -31,10 +39,13 @@ import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.UpdateRespondentRepresentativeRequest;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
@@ -43,18 +54,19 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.Assert.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPLOYMENT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
@@ -66,7 +78,7 @@ import static uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationApprovalS
 @ContextConfiguration(classes = {CaseConverter.class, NoticeOfChangeFieldPopulator.class, ObjectMapper.class})
 @SuppressWarnings({"PMD.ExcessiveImports", "PMD.TooManyMethods", "PMD.ExcessiveMethodLength"})
 class NocRespondentRepresentativeServiceTest {
-    private static final String CASE_ID_ONE = "723";
+    private static final String SUBMISSION_REFERENCE_ONE = "1234567890123456";
     private static final String RESPONDENT_NAME = "Harry Johnson";
     private static final String RESPONDENT_NAME_TWO = "Jane Green";
     private static final String RESPONDENT_NAME_THREE = "Bad Company Inc";
@@ -76,15 +88,17 @@ class NocRespondentRepresentativeServiceTest {
     private static final String RESPONDENT_EMAIL = "h.johnson@corp.co.uk";
     private static final String RESPONDENT_EMAIL_TWO = "j.green@corp.co.uk";
     private static final String RESPONDENT_EMAIL_THREE = "info@corp.co.uk";
-    private static final String RESPONDENT_REP_ID = "1111-2222-3333-1111";
-    private static final String RESPONDENT_REP_ID_TWO = "1111-2222-3333-1112";
-    private static final String RESPONDENT_REP_ID_THREE = "1111-2222-3333-1113";
+    private static final String REPRESENTATIVE_ID_ONE = "1111-2222-3333-1111";
+    private static final String REPRESENTATIVE_ID_TWO = "1111-2222-3333-1112";
+    private static final String REPRESENTATIVE_ID_THREE = "1111-2222-3333-1113";
     private static final String RESPONDENT_REP_NAME = "Legal One";
     private static final String RESPONDENT_REP_NAME_TWO = "Legal Two";
     private static final String RESPONDENT_REP_NAME_THREE = "Legal Three";
-    private static final String SOLICITORA = "[SOLICITORA]";
-    private static final String SOLICITORB = "[SOLICITORB]";
-    private static final String SOLICITORC = "[SOLICITORC]";
+    private static final String RESPONDENT_REP_EMAIL = "respondent@rep.email.com";
+    private static final String ROLE_CLAIMANT_SOLICITOR = "[CLAIMANTSOLICITOR]";
+    private static final String ROLE_SOLICITORA = "[SOLICITORA]";
+    private static final String ROLE_SOLICITORB = "[SOLICITORB]";
+    private static final String ROLE_SOLICITORC = "[SOLICITORC]";
     private static final String ORGANISATION_ID = "ORG1";
     private static final String ORGANISATION_ID_TWO = "ORG2";
     private static final String ORGANISATION_ID_THREE = "ORG3";
@@ -104,13 +118,26 @@ class NocRespondentRepresentativeServiceTest {
     private static final String RESPONDENT_REP_NAME_NEW = "New Dawn Solicitors";
     private static final String RESPONDENT_REP_ID_NEW = "1111-5555-8888-1113";
     private static final String AUTH_TOKEN = "someToken";
+    private static final String S2S_TOKEN = "someS2SToken";
     private static final String USER_ID_ONE = "891-456";
     private static final String USER_ID_TWO = "123-456";
     private static final String EVENT_UPDATE_CASE_SUBMITTED = "UPDATE_CASE_SUBMITTED";
 
+    private static final String EXCEPTION_DUMMY_MESSAGE = "Something went wrong";
+
+    private static final String EXPECTED_EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND =
+            "Organisation not found for representative Legal One.";
+
+    private static final String EXPECTED_WARNING_REPRESENTATIVE_MISSING_EMAIL_ADDRESS =
+            "Representative Legal One is missing an email address.\n";
+    private static final String EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL =
+            "Representative 'Legal One' could not be found using respondent@rep.email.com. "
+                    + "Case access will not be defined for this representative.\n";
+    private static final String EXPECTED_ERROR_REPRESENTATIVE_ID_NOT_FOUND =
+            "Representative ID not found for case ID 1234567890123456.";
+
     @Autowired
     private ObjectMapper objectMapper;
-    private NocRespondentRepresentativeService nocRespondentRepresentativeService;
 
     @MockBean
     private NoticeOfChangeFieldPopulator noticeOfChangeFieldPopulator;
@@ -123,13 +150,14 @@ class NocRespondentRepresentativeServiceTest {
     @MockBean
     private CcdClient ccdClient;
     @MockBean
-    private CcdCaseAssignment ccdCaseAssignment;
-    @MockBean
     private OrganisationClient organisationClient;
     @MockBean
     private AuthTokenGenerator authTokenGenerator;
     @MockBean
     private NocService nocService;
+
+    @InjectMocks
+    private NocRespondentRepresentativeService nocRespondentRepresentativeService;
 
     private NocRespondentHelper nocRespondentHelper;
     private CaseData caseData;
@@ -177,15 +205,15 @@ class NocRespondentRepresentativeServiceTest {
         Organisation org1 =
             Organisation.builder().organisationID(ORGANISATION_ID).organisationName(ET_ORG_1).build();
         OrganisationPolicy orgPolicy1 =
-            OrganisationPolicy.builder().organisation(org1).orgPolicyCaseAssignedRole(SOLICITORA).build();
+            OrganisationPolicy.builder().organisation(org1).orgPolicyCaseAssignedRole(ROLE_SOLICITORA).build();
         Organisation org2 =
             Organisation.builder().organisationID(ORGANISATION_ID_TWO).organisationName(ET_ORG_2).build();
         OrganisationPolicy orgPolicy2 =
-            OrganisationPolicy.builder().organisation(org2).orgPolicyCaseAssignedRole(SOLICITORB).build();
+            OrganisationPolicy.builder().organisation(org2).orgPolicyCaseAssignedRole(ROLE_SOLICITORB).build();
         Organisation org3 =
             Organisation.builder().organisationID(ORGANISATION_ID_THREE).organisationName(ET_ORG_3).build();
         OrganisationPolicy orgPolicy3 =
-            OrganisationPolicy.builder().organisation(org3).orgPolicyCaseAssignedRole(SOLICITORC).build();
+            OrganisationPolicy.builder().organisation(org3).orgPolicyCaseAssignedRole(ROLE_SOLICITORC).build();
 
         caseData.setRespondentOrganisationPolicy0(orgPolicy1);
         caseData.setRespondentOrganisationPolicy1(orgPolicy2);
@@ -200,7 +228,7 @@ class NocRespondentRepresentativeServiceTest {
                 .respondentOrganisation(org1)
                 .myHmctsYesNo(YES).build();
         RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
-        representedTypeRItem.setId(RESPONDENT_REP_ID);
+        representedTypeRItem.setId(REPRESENTATIVE_ID_ONE);
         representedTypeRItem.setValue(representedType);
         representedTypeRItem.getValue().setRespondentId(RESPONDENT_ID_ONE);
         caseData.getRepCollection().add(representedTypeRItem);
@@ -212,7 +240,7 @@ class NocRespondentRepresentativeServiceTest {
                 .respondentOrganisation(org2)
                 .myHmctsYesNo(NO).build();
         representedTypeRItem = new RepresentedTypeRItem();
-        representedTypeRItem.setId(RESPONDENT_REP_ID_TWO);
+        representedTypeRItem.setId(REPRESENTATIVE_ID_TWO);
         representedTypeRItem.setValue(representedType);
         representedTypeRItem.getValue().setRespondentId(RESPONDENT_ID_TWO);
         caseData.getRepCollection().add(representedTypeRItem);
@@ -224,7 +252,7 @@ class NocRespondentRepresentativeServiceTest {
                 .respondentOrganisation(org3)
                 .myHmctsYesNo(YES).build();
         representedTypeRItem = new RepresentedTypeRItem();
-        representedTypeRItem.setId(RESPONDENT_REP_ID_THREE);
+        representedTypeRItem.setId(REPRESENTATIVE_ID_THREE);
         representedTypeRItem.setValue(representedType);
         representedTypeRItem.getValue().setRespondentId(RESPONDENT_ID_THREE);
         caseData.getRepCollection().add(representedTypeRItem);
@@ -236,7 +264,7 @@ class NocRespondentRepresentativeServiceTest {
                 .requestTimestamp(null)
                 .approvalStatus(null)
                 .build());
-        when(authTokenGenerator.generate()).thenReturn("s2sToken");
+        when(authTokenGenerator.generate()).thenReturn(S2S_TOKEN);
         when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
     }
 
@@ -246,12 +274,12 @@ class NocRespondentRepresentativeServiceTest {
 
         assertThat(caseData.getRespondentOrganisationPolicy0()).isNotNull();
         assertThat(caseData.getRespondentOrganisationPolicy0().getOrgPolicyCaseAssignedRole()).isNotNull()
-            .isEqualTo(SOLICITORA);
+            .isEqualTo(ROLE_SOLICITORA);
         assertThat(caseData.getRespondentOrganisationPolicy0().getOrganisation().getOrganisationID()).isNotNull()
             .isEqualTo(ORGANISATION_ID);
         assertThat(caseData.getRespondentOrganisationPolicy1()).isNotNull();
         assertThat(caseData.getRespondentOrganisationPolicy1().getOrgPolicyCaseAssignedRole()).isNotNull()
-            .isEqualTo(SOLICITORB);
+            .isEqualTo(ROLE_SOLICITORB);
         assertThat(caseData.getRespondentOrganisationPolicy1().getOrganisation().getOrganisationID()).isNotNull()
             .isEqualTo(ORGANISATION_ID_TWO);
     }
@@ -305,8 +333,8 @@ class NocRespondentRepresentativeServiceTest {
                                                                       Organisation organisationToRemove) {
         DynamicFixedListType caseRole = new DynamicFixedListType();
         DynamicValueType dynamicValueType = new DynamicValueType();
-        dynamicValueType.setCode(NocRespondentRepresentativeServiceTest.SOLICITORB);
-        dynamicValueType.setLabel(NocRespondentRepresentativeServiceTest.SOLICITORB);
+        dynamicValueType.setCode(NocRespondentRepresentativeServiceTest.ROLE_SOLICITORB);
+        dynamicValueType.setLabel(NocRespondentRepresentativeServiceTest.ROLE_SOLICITORB);
         caseRole.setValue(dynamicValueType);
 
         return ChangeOrganisationRequest.builder()
@@ -349,8 +377,7 @@ class NocRespondentRepresentativeServiceTest {
                 eq(ccdRequest.getCaseDetails().getJurisdiction()),
                 any(CCDRequest.class),
                 eq(ccdRequest.getCaseDetails().getCaseId()))).thenReturn(null);
-        nocRespondentRepresentativeService.updateRespondentRepresentativesAccess(
-                getCallBackCallbackRequest());
+        nocRespondentRepresentativeService.updateRespondentRepresentativesAccess(getCallBackCallbackRequest());
 
         verify(ccdClient, times(NumberUtils.INTEGER_TWO)).startEventForCase(AUTH_TOKEN,
                 ccdRequest.getCaseDetails().getCaseTypeId(),
@@ -376,11 +403,12 @@ class NocRespondentRepresentativeServiceTest {
     private CallbackRequest getCallBackCallbackRequest() {
         CallbackRequest callbackRequest = new CallbackRequest();
         CaseDetails caseDetailsBefore = new CaseDetails();
+        caseDetailsBefore.setCaseId(SUBMISSION_REFERENCE_ONE);
         caseDetailsBefore.setCaseData(getCaseDataBefore());
         callbackRequest.setCaseDetailsBefore(caseDetailsBefore);
         CaseDetails caseDetailsAfter = new CaseDetails();
         caseDetailsAfter.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
-        caseDetailsAfter.setCaseId(CASE_ID_ONE);
+        caseDetailsAfter.setCaseId(SUBMISSION_REFERENCE_ONE);
         caseDetailsAfter.setJurisdiction(EMPLOYMENT);
         caseDetailsAfter.setCaseData(getCaseDataAfter());
         callbackRequest.setCaseDetails(caseDetailsAfter);
@@ -390,7 +418,7 @@ class NocRespondentRepresentativeServiceTest {
     private CCDRequest getCCDRequest() {
         CaseDetails caseDetailsAfter = new CaseDetails();
         caseDetailsAfter.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
-        caseDetailsAfter.setCaseId(CASE_ID_ONE);
+        caseDetailsAfter.setCaseId(SUBMISSION_REFERENCE_ONE);
         caseDetailsAfter.setJurisdiction(EMPLOYMENT);
         caseDetailsAfter.setCaseData(getCaseDataAfter());
         CCDRequest ccdRequest = new CCDRequest();
@@ -399,6 +427,7 @@ class NocRespondentRepresentativeServiceTest {
     }
 
     @Test
+    @SneakyThrows
     void shouldReturnRepresentationChanges() {
         CaseData caseDataBefore = getCaseDataBefore();
         CaseData caseDataAfter = getCaseDataAfter();
@@ -422,8 +451,8 @@ class NocRespondentRepresentativeServiceTest {
 
         DynamicFixedListType roleItem = new DynamicFixedListType();
         DynamicValueType dynamicValueType = new DynamicValueType();
-        dynamicValueType.setCode(SOLICITORB);
-        dynamicValueType.setLabel(SOLICITORB);
+        dynamicValueType.setCode(ROLE_SOLICITORB);
+        dynamicValueType.setLabel(ROLE_SOLICITORB);
         roleItem.setValue(dynamicValueType);
 
         ChangeOrganisationRequest changeOrganisationRequest = ChangeOrganisationRequest.builder()
@@ -438,8 +467,8 @@ class NocRespondentRepresentativeServiceTest {
                 .changeOrganisationRequest(changeOrganisationRequest).respondentName(RESPONDENT_NAME_TWO).build());
         DynamicFixedListType roleItem2 = new DynamicFixedListType();
         DynamicValueType dynamicValueType2 = new DynamicValueType();
-        dynamicValueType2.setCode(SOLICITORC);
-        dynamicValueType2.setLabel(SOLICITORC);
+        dynamicValueType2.setCode(ROLE_SOLICITORC);
+        dynamicValueType2.setLabel(ROLE_SOLICITORC);
         roleItem2.setValue(dynamicValueType2);
         ChangeOrganisationRequest changeOrganisationRequest2 = ChangeOrganisationRequest.builder()
             .approvalStatus(APPROVED)
@@ -482,15 +511,15 @@ class NocRespondentRepresentativeServiceTest {
         Organisation org1 =
             Organisation.builder().organisationID(ORGANISATION_ID).organisationName(ET_ORG_1).build();
         OrganisationPolicy orgPolicy1 =
-            OrganisationPolicy.builder().organisation(org1).orgPolicyCaseAssignedRole(SOLICITORA).build();
+            OrganisationPolicy.builder().organisation(org1).orgPolicyCaseAssignedRole(ROLE_SOLICITORA).build();
         Organisation org2 =
             Organisation.builder().organisationID(ORGANISATION_ID_TWO).organisationName(ET_ORG_2).build();
         OrganisationPolicy orgPolicy2 =
-            OrganisationPolicy.builder().organisation(org2).orgPolicyCaseAssignedRole(SOLICITORB).build();
+            OrganisationPolicy.builder().organisation(org2).orgPolicyCaseAssignedRole(ROLE_SOLICITORB).build();
         Organisation org3 =
             Organisation.builder().organisationID(ORGANISATION_ID_THREE).organisationName(ET_ORG_3).build();
         OrganisationPolicy orgPolicy3 =
-            OrganisationPolicy.builder().organisation(org3).orgPolicyCaseAssignedRole(SOLICITORC).build();
+            OrganisationPolicy.builder().organisation(org3).orgPolicyCaseAssignedRole(ROLE_SOLICITORC).build();
 
         caseDataBefore.setRespondentOrganisationPolicy0(orgPolicy1);
         caseDataBefore.setRespondentOrganisationPolicy1(orgPolicy2);
@@ -504,7 +533,7 @@ class NocRespondentRepresentativeServiceTest {
                 .respRepName(RESPONDENT_NAME)
                 .respondentOrganisation(org1).build();
         RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
-        representedTypeRItem.setId(RESPONDENT_REP_ID);
+        representedTypeRItem.setId(REPRESENTATIVE_ID_ONE);
         representedTypeRItem.setValue(representedType);
         representedTypeRItem.getValue().setRespondentId(RESPONDENT_ID_ONE);
         caseDataBefore.getRepCollection().add(representedTypeRItem);
@@ -516,7 +545,7 @@ class NocRespondentRepresentativeServiceTest {
                 .respondentOrganisation(org2)
                 .representativeEmailAddress("oldRep1@test.com").build();
         representedTypeRItem = new RepresentedTypeRItem();
-        representedTypeRItem.setId(RESPONDENT_REP_ID_TWO);
+        representedTypeRItem.setId(REPRESENTATIVE_ID_TWO);
         representedTypeRItem.setValue(representedType);
         representedTypeRItem.getValue().setRespondentId(RESPONDENT_ID_TWO);
         caseDataBefore.getRepCollection().add(representedTypeRItem);
@@ -528,7 +557,7 @@ class NocRespondentRepresentativeServiceTest {
                 .respondentOrganisation(org3)
                 .representativeEmailAddress("oldRep2@test.com").build();
         representedTypeRItem = new RepresentedTypeRItem();
-        representedTypeRItem.setId(RESPONDENT_REP_ID_THREE);
+        representedTypeRItem.setId(REPRESENTATIVE_ID_THREE);
         representedTypeRItem.setValue(representedType);
         representedTypeRItem.getValue().setRespondentId(RESPONDENT_ID_THREE);
         caseDataBefore.getRepCollection().add(representedTypeRItem);
@@ -562,15 +591,15 @@ class NocRespondentRepresentativeServiceTest {
         Organisation org1 =
             Organisation.builder().organisationID(ORGANISATION_ID).organisationName(ET_ORG_1).build();
         OrganisationPolicy orgPolicy1 =
-            OrganisationPolicy.builder().organisation(org1).orgPolicyCaseAssignedRole(SOLICITORA).build();
+            OrganisationPolicy.builder().organisation(org1).orgPolicyCaseAssignedRole(ROLE_SOLICITORA).build();
         Organisation org2 =
             Organisation.builder().organisationID(ORGANISATION_ID_NEW).organisationName(ET_ORG_NEW).build();
         OrganisationPolicy orgPolicy2 =
-            OrganisationPolicy.builder().organisation(org2).orgPolicyCaseAssignedRole(SOLICITORB).build();
+            OrganisationPolicy.builder().organisation(org2).orgPolicyCaseAssignedRole(ROLE_SOLICITORB).build();
         Organisation org3 =
             Organisation.builder().organisationID(ORGANISATION_ID_TWO).organisationName(ET_ORG_2).build();
         OrganisationPolicy orgPolicy3 =
-            OrganisationPolicy.builder().organisation(org3).orgPolicyCaseAssignedRole(SOLICITORC).build();
+            OrganisationPolicy.builder().organisation(org3).orgPolicyCaseAssignedRole(ROLE_SOLICITORC).build();
 
         caseDataAfter.setRespondentOrganisationPolicy0(orgPolicy1);
         caseDataAfter.setRespondentOrganisationPolicy1(orgPolicy2);
@@ -584,7 +613,7 @@ class NocRespondentRepresentativeServiceTest {
                 .respRepName(RESPONDENT_NAME)
                 .respondentOrganisation(org1).build();
         RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
-        representedTypeRItem.setId(RESPONDENT_REP_ID);
+        representedTypeRItem.setId(REPRESENTATIVE_ID_ONE);
         representedTypeRItem.setValue(representedType);
         representedTypeRItem.getValue().setRespondentId(RESPONDENT_ID_ONE);
         caseDataAfter.getRepCollection().add(representedTypeRItem);
@@ -606,7 +635,7 @@ class NocRespondentRepresentativeServiceTest {
                 .respRepName(RESPONDENT_NAME_THREE)
                 .respondentOrganisation(org3).build();
         representedTypeRItem = new RepresentedTypeRItem();
-        representedTypeRItem.setId(RESPONDENT_REP_ID_TWO);
+        representedTypeRItem.setId(REPRESENTATIVE_ID_TWO);
         representedTypeRItem.setValue(representedType);
         representedTypeRItem.getValue().setRespondentId(RESPONDENT_ID_THREE);
         caseDataAfter.getRepCollection().add(representedTypeRItem);
@@ -634,7 +663,7 @@ class NocRespondentRepresentativeServiceTest {
             createChangeOrganisationRequest(newOrganisation, oldOrganisation);
 
         nocRespondentRepresentativeService
-            .removeOrganisationRepresentativeAccess(CASE_ID_ONE, changeOrganisationRequest);
+            .removeOrganisationRepresentativeAccess(SUBMISSION_REFERENCE_ONE, changeOrganisationRequest);
 
         verify(nocCcdService, times(1))
             .revokeCaseAssignments(any(), any());
@@ -761,42 +790,6 @@ class NocRespondentRepresentativeServiceTest {
         assertNull(repCollection.get(2).getValue().getRepresentativeAddress().getAddressLine1());
     }
 
-    @Test
-    void updateNonMyHmctsOrgIds() {
-        RepresentedTypeRItem myHmctsRep = RepresentedTypeRItem.builder()
-                .id(UUID.randomUUID().toString())
-                .value(RepresentedTypeR.builder()
-                        .myHmctsYesNo(YES)
-                        .nameOfRepresentative("Jack")
-                        .build())
-                .build();
-
-        RepresentedTypeRItem nonMyHmctsRep = RepresentedTypeRItem.builder()
-                .id(UUID.randomUUID().toString())
-                .value(RepresentedTypeR.builder()
-                        .myHmctsYesNo(NO)
-                        .nameOfRepresentative("Jill")
-                        .build())
-                .build();
-
-        String alreadySetId = UUID.randomUUID().toString();
-        RepresentedTypeRItem nonMyHmctsRepTwo = RepresentedTypeRItem.builder()
-                .id(UUID.randomUUID().toString())
-                .value(RepresentedTypeR.builder()
-                        .myHmctsYesNo(NO)
-                        .nameOfRepresentative("Jimbo")
-                        .nonMyHmctsOrganisationId(alreadySetId)
-                        .build())
-                .build();
-
-        List<RepresentedTypeRItem> repCollection = List.of(myHmctsRep, nonMyHmctsRep, nonMyHmctsRepTwo);
-        nocRespondentRepresentativeService.updateNonMyHmctsOrgIds(repCollection);
-
-        assertNull(repCollection.get(0).getValue().getNonMyHmctsOrganisationId());
-        assertNotNull(repCollection.get(1).getValue().getNonMyHmctsOrganisationId());
-        assertEquals(alreadySetId, repCollection.get(2).getValue().getNonMyHmctsOrganisationId());
-    }
-
     private OrganisationsResponse createOrganisationsResponse(String orgId, String orgName) {
         OrganisationAddress orgAddress =
                 OrganisationAddress.builder()
@@ -814,15 +807,201 @@ class NocRespondentRepresentativeServiceTest {
     private CaseUserAssignmentData mockCaseAssignmentData() {
         List<CaseUserAssignment> caseUserAssignments = List.of(CaseUserAssignment.builder().userId(USER_ID_ONE)
                 .organisationId(ET_ORG_2)
-                .caseRole(SOLICITORB)
-                .caseId(CASE_ID_ONE)
+                .caseRole(ROLE_SOLICITORB)
+                .caseId(SUBMISSION_REFERENCE_ONE)
                 .build(),
             CaseUserAssignment.builder().userId(USER_ID_TWO)
                 .organisationId(ET_ORG_2)
-                .caseRole(SOLICITORB)
-                .caseId(CASE_ID_ONE)
+                .caseRole(ROLE_SOLICITORB)
+                .caseId(SUBMISSION_REFERENCE_ONE)
                 .build());
 
         return CaseUserAssignmentData.builder().caseUserAssignments(caseUserAssignments).build();
+    }
+
+    @Test
+    @SneakyThrows
+    void theValidateRepresentativeOrganisationAndEmail() {
+        // when case data is empty should return empty list
+        assertDoesNotThrow(() -> nocRespondentRepresentativeService
+                .validateRepresentativeOrganisationAndEmail(null, SUBMISSION_REFERENCE_ONE));
+
+        // when representative not exists in hmcts organisation. (my Hmcts is selected as NO) should return empty list
+        CaseData caseData = new CaseData();
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
+        DynamicValueType dynamicValueType = new DynamicValueType();
+        dynamicValueType.setLabel(RESPONDENT_NAME);
+        dynamicFixedListType.setValue(dynamicValueType);
+        caseData.setRepCollection(List.of(RepresentedTypeRItem.builder().id(RESPONDENT_REP_NAME).value(
+                RepresentedTypeR.builder().myHmctsYesNo(NO).dynamicRespRepName(dynamicFixedListType)
+                        .nameOfRepresentative(RESPONDENT_REP_NAME).build()).build()));
+        nocRespondentRepresentativeService.validateRepresentativeOrganisationAndEmail(caseData,
+                SUBMISSION_REFERENCE_ONE);
+        assertThat(caseData.getNocWarning()).isEmpty();
+
+        // when representative my hmcts is yes and does not have organisation should throw exception
+        caseData.getRepCollection().getFirst().getValue().setMyHmctsYesNo(YES);
+        GenericServiceException genericServiceException = assertThrows(GenericServiceException.class,
+                () -> nocRespondentRepresentativeService.validateRepresentativeOrganisationAndEmail(caseData,
+                        SUBMISSION_REFERENCE_ONE));
+        assertThat(genericServiceException.getMessage()).isEqualTo(
+                EXPECTED_EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND);
+
+        // when representative organisation does not have id should throw exception
+        caseData.getRepCollection().getFirst().getValue().setRespondentOrganisation(Organisation.builder().build());
+        caseData.getRepCollection().getFirst().getValue().setMyHmctsYesNo(YES);
+        genericServiceException = assertThrows(GenericServiceException.class,
+                () -> nocRespondentRepresentativeService.validateRepresentativeOrganisationAndEmail(caseData,
+                        SUBMISSION_REFERENCE_ONE));
+        assertThat(genericServiceException.getMessage()).isEqualTo(
+                EXPECTED_EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND);
+
+        // when representative does not have email address
+        caseData.getRepCollection().getFirst().getValue().getRespondentOrganisation().setOrganisationID(ET_ORG_1);
+        nocRespondentRepresentativeService.validateRepresentativeOrganisationAndEmail(caseData,
+                SUBMISSION_REFERENCE_ONE);
+        assertThat(caseData.getNocWarning()).isNotEmpty();
+        assertThat(caseData.getNocWarning()).isEqualTo(EXPECTED_WARNING_REPRESENTATIVE_MISSING_EMAIL_ADDRESS);
+
+        // when organisation client returns empty response should return warning
+        caseData.getRepCollection().getFirst().getValue().setRepresentativeEmailAddress(RESPONDENT_REP_EMAIL);
+        when(organisationClient.getAccountIdByEmail(AUTH_TOKEN, S2S_TOKEN, RESPONDENT_REP_EMAIL)).thenReturn(null);
+        nocRespondentRepresentativeService.validateRepresentativeOrganisationAndEmail(caseData,
+                SUBMISSION_REFERENCE_ONE);
+        assertThat(caseData.getNocWarning()).isNotEmpty();
+        assertThat(caseData.getNocWarning()).isEqualTo(EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL);
+
+        // when organisation client response body is empty should return warning
+        ResponseEntity<AccountIdByEmailResponse> organisationClientResponse = ResponseEntity.ok(null);
+        when(organisationClient.getAccountIdByEmail(AUTH_TOKEN, S2S_TOKEN, RESPONDENT_REP_EMAIL))
+                .thenReturn(organisationClientResponse);
+        assertThat(caseData.getNocWarning()).isNotEmpty();
+        assertThat(caseData.getNocWarning()).isEqualTo(EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL);
+        // when organisation client response body not has user identifier
+        AccountIdByEmailResponse accountIdByEmailResponse = new AccountIdByEmailResponse();
+        organisationClientResponse = ResponseEntity.ok(accountIdByEmailResponse);
+        when(organisationClient.getAccountIdByEmail(AUTH_TOKEN, S2S_TOKEN, RESPONDENT_REP_EMAIL))
+                .thenReturn(organisationClientResponse);
+        assertThat(caseData.getNocWarning()).isNotEmpty();
+        assertThat(caseData.getNocWarning()).isEqualTo(EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL);
+        // when organisation client response body not has user identifier
+        accountIdByEmailResponse.setUserIdentifier(RESPONDENT_REP_EMAIL);
+        organisationClientResponse = ResponseEntity.ok(accountIdByEmailResponse);
+        when(organisationClient.getAccountIdByEmail(AUTH_TOKEN, S2S_TOKEN, RESPONDENT_REP_EMAIL))
+                .thenReturn(organisationClientResponse);
+        nocRespondentRepresentativeService.validateRepresentativeOrganisationAndEmail(caseData,
+                SUBMISSION_REFERENCE_ONE);
+        assertThat(caseData.getNocWarning()).isEmpty();
+    }
+
+    @Test
+    public void theRevokeOldRespondentRepresentativeAccess() {
+        // when case id is empty or blank should not throw any exception
+        assertDoesNotThrow(() -> nocRespondentRepresentativeService
+                .revokeOldRespondentRepresentativeAccess(StringUtils.EMPTY));
+
+        // when there is no case user assignment should not throw any exception
+        when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
+        when(nocCcdService.getCaseAssignments(AUTH_TOKEN, SUBMISSION_REFERENCE_ONE))
+                .thenReturn(CaseUserAssignmentData.builder().build());
+        assertDoesNotThrow(() -> nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(
+                SUBMISSION_REFERENCE_ONE));
+
+        // when there is no assigned respondent representative roles should not throw any exception
+        when(nocCcdService.getCaseAssignments(AUTH_TOKEN, SUBMISSION_REFERENCE_ONE))
+                .thenReturn(CaseUserAssignmentData.builder().caseUserAssignments(
+                        List.of(CaseUserAssignment.builder().caseRole(ROLE_CLAIMANT_SOLICITOR).build())).build());
+        assertDoesNotThrow(() -> nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(
+                SUBMISSION_REFERENCE_ONE));
+
+        // when there is assigned respondent representative role should not throw any exception and remove
+        // that assignment
+        CaseUserAssignment caseUserAssignment = CaseUserAssignment.builder().caseRole(ROLE_SOLICITORA).build();
+        when(nocCcdService.getCaseAssignments(AUTH_TOKEN, SUBMISSION_REFERENCE_ONE))
+                .thenReturn(CaseUserAssignmentData.builder().caseUserAssignments(
+                        List.of(caseUserAssignment)).build());
+        doNothing().when(nocCcdService).revokeCaseAssignments(AUTH_TOKEN, CaseUserAssignmentData.builder()
+                .caseUserAssignments(List.of(caseUserAssignment)).build());
+        assertDoesNotThrow(() -> nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(
+                SUBMISSION_REFERENCE_ONE));
+    }
+
+    @Test
+    @SneakyThrows
+    void theGrantNewRespondentRepresentativeAccess() {
+        // when case data is empty should not throw any exception
+        assertDoesNotThrow(() -> nocRespondentRepresentativeService.grantNewRespondentRepresentativeAccess(
+                null, SUBMISSION_REFERENCE_ONE));
+        verifyNoInteractions(nocService);
+        // when case data representative collection is empty should not throw any exception
+        CaseData caseData = new CaseData();
+        assertDoesNotThrow(() -> nocRespondentRepresentativeService.grantNewRespondentRepresentativeAccess(
+                caseData, SUBMISSION_REFERENCE_ONE));
+        verifyNoInteractions(nocService);
+        // when submission reference is empty should not throw any exception
+        RepresentedTypeRItem representedTypeRItem = RepresentedTypeRItem.builder().build();
+        caseData.setRepCollection(List.of(representedTypeRItem));
+        assertDoesNotThrow(() -> nocRespondentRepresentativeService.grantNewRespondentRepresentativeAccess(
+                caseData, StringUtils.EMPTY));
+        verifyNoInteractions(nocService);
+        // when representative doesn't have id should log exception
+        Logger logger = (Logger) LoggerFactory.getLogger(NocRespondentRepresentativeService.class);
+        ListAppender<ILoggingEvent> appender = new ListAppender<>();
+        appender.start();
+        logger.addAppender(appender);
+        assertDoesNotThrow(() -> nocRespondentRepresentativeService.grantNewRespondentRepresentativeAccess(
+                caseData, SUBMISSION_REFERENCE_ONE));
+        assertThat(appender.list)
+                .filteredOn(e -> e.getLevel() == Level.ERROR)
+                .extracting(ILoggingEvent::getFormattedMessage)
+                .containsExactly(EXPECTED_ERROR_REPRESENTATIVE_ID_NOT_FOUND);
+        verifyNoInteractions(nocService);
+        // when representative is valid but not a hmcts organisation should not throw any exception
+        caseData.getRepCollection().getFirst().setId(REPRESENTATIVE_ID_ONE);
+        caseData.getRepCollection().getFirst().setValue(RepresentedTypeR.builder().build());
+        assertDoesNotThrow(() -> nocRespondentRepresentativeService.grantNewRespondentRepresentativeAccess(
+                caseData, SUBMISSION_REFERENCE_ONE));
+        verifyNoInteractions(nocService);
+        // when representative email is empty should not throw any exception
+        caseData.getRepCollection().getFirst().getValue().setMyHmctsYesNo(YES);
+        assertDoesNotThrow(() -> nocRespondentRepresentativeService.grantNewRespondentRepresentativeAccess(
+                caseData, SUBMISSION_REFERENCE_ONE));
+        verifyNoInteractions(nocService);
+        // when organisation is empty should not throw any exception
+        caseData.getRepCollection().getFirst().getValue().setRepresentativeEmailAddress(USER_EMAIL);
+        assertDoesNotThrow(() -> nocRespondentRepresentativeService.grantNewRespondentRepresentativeAccess(
+                caseData, SUBMISSION_REFERENCE_ONE));
+        verifyNoInteractions(nocService);
+        // when organisation id is empty should not throw any exception
+        caseData.getRepCollection().getFirst().getValue().setRespondentOrganisation(Organisation.builder().build());
+        assertDoesNotThrow(() -> nocRespondentRepresentativeService.grantNewRespondentRepresentativeAccess(
+                caseData, SUBMISSION_REFERENCE_ONE));
+        verifyNoInteractions(nocService);
+        // when nocService.grantRepresentativeAccess throws exception should log exception in here exception is null
+        caseData.getRepCollection().getFirst().getValue().getRespondentOrganisation()
+                .setOrganisationID(ORGANISATION_ID);
+        when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
+        doThrow(new GenericServiceException(EXCEPTION_DUMMY_MESSAGE)).when(nocService)
+                .grantRepresentativeAccess(AUTH_TOKEN, USER_EMAIL, SUBMISSION_REFERENCE_ONE,
+                        caseData.getRepCollection().getFirst().getValue().getRespondentOrganisation(), ROLE_SOLICITORA);
+        assertDoesNotThrow(() -> nocRespondentRepresentativeService
+                .grantNewRespondentRepresentativeAccess(caseData, SUBMISSION_REFERENCE_ONE));
+        verify(nocService, times(NumberUtils.INTEGER_ONE))
+                .grantRepresentativeAccess(AUTH_TOKEN, USER_EMAIL, SUBMISSION_REFERENCE_ONE,
+                        caseData.getRepCollection().getFirst().getValue().getRespondentOrganisation(), ROLE_SOLICITORA);
+        assertThat(appender.list)
+                .filteredOn(e -> e.getLevel() == Level.ERROR)
+                .extracting(ILoggingEvent::getFormattedMessage)
+                .containsExactly(EXPECTED_ERROR_REPRESENTATIVE_ID_NOT_FOUND, EXCEPTION_DUMMY_MESSAGE);
+        // when nocService.grantRepresentativeAccess not throws any exception should finish successfully and set
+        // representative role as [SOLICITORA]
+        doNothing().when(nocService).grantRepresentativeAccess(AUTH_TOKEN, USER_EMAIL, SUBMISSION_REFERENCE_ONE,
+                caseData.getRepCollection().getFirst().getValue().getRespondentOrganisation(), ROLE_SOLICITORA);
+        assertDoesNotThrow(() -> nocRespondentRepresentativeService
+                .grantNewRespondentRepresentativeAccess(caseData, SUBMISSION_REFERENCE_ONE));
+        verify(nocService, times(NumberUtils.INTEGER_TWO))
+                .grantRepresentativeAccess(AUTH_TOKEN, USER_EMAIL, SUBMISSION_REFERENCE_ONE,
+                        caseData.getRepCollection().getFirst().getValue().getRespondentOrganisation(), ROLE_SOLICITORA);
+        assertThat(caseData.getRepCollection().getFirst().getValue().getRole()).isEqualTo(ROLE_SOLICITORA);
     }
 }

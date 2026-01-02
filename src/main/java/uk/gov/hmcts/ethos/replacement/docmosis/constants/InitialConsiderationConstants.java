@@ -2,23 +2,13 @@ package uk.gov.hmcts.ethos.replacement.docmosis.constants;
 
 import java.util.Map;
 
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.DATE_MARKUP;
-
 public final class InitialConsiderationConstants {
     public static final String RESPONDENT_NAME = """
-        | Respondent %s name given | |
-        |-------------|:------------|
-        |In ET1 by claimant | %s|
-        |In ET3 by respondent | %s|
-        
-        """;
-
-    public static final String RESPONDENT_HEARING_PANEL_PREFERENCE = """
-        | Hearing panel preference | |
-        |-------------|:------------|
-        |Panel Preference | %s|
-        |Reason for Panel Preference | %s|
-        
+            <tr>
+              <td>Respondent %s</td>
+              <td> %s </td>
+              <td> %s </td>
+            </tr>
         """;
 
     public static final String HEARING_PANEL_PREFERENCE = """
@@ -42,7 +32,7 @@ public final class InitialConsiderationConstants {
             <td>%s</td>
             <td>
                 %s
-                <h3>Reason:</h3> 
+                <h3>Reason:</h3>
                 %s
             </td>
           </tr>
@@ -50,15 +40,24 @@ public final class InitialConsiderationConstants {
         """;
 
     public static final String HEARING_DETAILS = """
-        |Hearing details | |
-        |-------------|:------------|
-        """ + DATE_MARKUP + """
-        |Type | %s|
-        |Duration | %s|
-        |Hearing format | %s|
-        |Panel Type | %s|
-        |Venue | %s|
-        
+            <tr>
+                <td>Date</td> <td> %s </td>
+            </tr>
+            <tr>
+                <td>Type</td> <td> %s </td>
+            </tr>
+            <tr>
+                <td>Duration</td> <td> %s </td>
+            </tr>
+            <tr>
+                <td>Hearing format</td> <td> %s </td>
+            </tr>
+            <tr>
+                <td>Panel Type</td> <td> %s </td>
+            </tr>
+            <tr>
+                <td>Venue</td> <td> %s </td>
+            </tr>
         """;
 
     public static final String CLAIMANT_HEARING_PANEL_PREFERENCE = """

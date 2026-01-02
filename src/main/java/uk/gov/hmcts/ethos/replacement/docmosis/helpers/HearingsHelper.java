@@ -95,11 +95,16 @@ public final class HearingsHelper {
 
     public static void setEtInitialConsiderationListedHearingType(CaseData caseData) {
 
-        if (caseData == null || isEmpty(caseData.getHearingCollection())) {
-            log.info("No hearing collection found for case: {} to set EtInitialConsiderationListedHearingType",
-                    caseData != null ? caseData.getEthosCaseReference() : "null");
+        if (caseData == null) {
+            log.info("caseData is null, cannot set EtInitialConsiderationListedHearingType");
             return;
+        }
 
+        if (CollectionUtils.isEmpty(caseData.getHearingCollection())) {
+            log.info("No hearing collection found for case: {} to set EtInitialConsiderationListedHearingType",
+                    caseData.getEthosCaseReference() != null ? caseData.getEthosCaseReference() : "unknown reference");
+            caseData.setEtICHearingAlreadyListed("No");
+            return;
         }
 
         HearingType earliestListedHearing = getEarliestListedHearingType(caseData.getHearingCollection());
@@ -111,11 +116,16 @@ public final class HearingsHelper {
         }
 
         if (caseData.getEtICHearingListedAnswers() == null) {
-            caseData.setEtICHearingListedAnswers(new EtICHearingListedAnswers());
+            initEtICHearingListedAnswers(caseData);
+            caseData.setEtICHearingAlreadyListed("No");
         }
 
         caseData.getEtICHearingListedAnswers().setEtInitialConsiderationListedHearingType(
                 earliestListedHearing.getHearingType());
+    }
+
+    private static void initEtICHearingListedAnswers(CaseData caseData) {
+        caseData.setEtICHearingListedAnswers(new EtICHearingListedAnswers());
     }
 
     public static HearingType getEarliestListedHearingType(List<HearingTypeItem> hearingCollection) {

@@ -32,7 +32,6 @@ import java.time.format.DateTimeFormatter;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.setDocumentNumbers;
@@ -116,11 +115,6 @@ public class InitialConsiderationController {
 
         setDocumentNumbers(caseData);
         caseManagementForCaseWorkerService.setNextListedDate(caseData);
-
-        //clear hidden values
-        if (NO.equals(caseData.getEtICHearingAlreadyListed())) {
-            initialConsiderationService.clearHiddenValue(caseData);
-        }
 
         return getCallbackRespEntityNoErrors(caseData);
     }

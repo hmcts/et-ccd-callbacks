@@ -37,7 +37,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
-import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -76,7 +75,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsidera
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.JSA;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.LIST_FOR_FINAL_HEARING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.LIST_FOR_PRELIMINARY_HEARING;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.RESPONDENT_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.SEEK_COMMENTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.TELEPHONE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.UDL_HEARING;
@@ -131,6 +129,41 @@ class InitialConsiderationServiceTest {
         |Date | 16 May 2022|
         |Type | Hearing|
         |Duration | 60 Days|
+        """;
+
+    private static final String EXPECTED_BLANK_HEARING_DETAILS = """
+       <br/>
+       <table>
+       <thead>
+       <tr>
+       <th colspan="2"><h2>Listed Hearing Details</h2></th>
+       </tr>
+       <tr>
+       <th width="30%">Aspect</th>
+       <th width="70%">Detail</th>
+       </tr>
+       <thead>
+       <tbody>
+          <tr>
+              <td>Date</td> <td> - </td>
+          </tr>
+          <tr>
+              <td>Type</td> <td> - </td>
+          </tr>
+          <tr>
+              <td>Duration</td> <td> - </td>
+          </tr>
+          <tr>
+              <td>Hearing format</td> <td> - </td>
+          </tr>
+          <tr>
+              <td>Panel Type</td> <td> - </td>
+          </tr>
+          <tr>
+              <td>Venue</td> <td> - </td>
+          </tr>
+      </tbody>
+      </table>
         """;
 
     private static final String EXPECTED_HEARING_BLANK = String.format(HEARING_DETAILS, "-", "-", "-", "-", "-", "-");
@@ -229,38 +262,6 @@ class InitialConsiderationServiceTest {
     }
 
     @Test
-    void getRespondentNameWithPanelPreference_shouldReturnFormattedDetails_whenRespondentIsValid() {
-        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
-        respondent.setValue(new RespondentSumType());
-        respondent.getValue().setRespondentName("Test Corp");
-        respondent.getValue().setResponseRespondentName("Test Response");
-
-        String respondentDetails = initialConsiderationService.getRespondentName(List.of(respondent));
-        assertThat(respondentDetails).isEqualTo(String.format(RESPONDENT_NAME, "1",
-                "Test Corp", "Test Response"));
-    }
-
-    @Test
-    void getRespondentNameDetails_shouldReturnFormattedDetails_whenRespondentHasNoResponseName() {
-        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
-        respondent.setValue(new RespondentSumType());
-        respondent.getValue().setRespondentName("Test Corp");
-
-        String respondentDetails = initialConsiderationService.getRespondentName(List.of(respondent));
-        assertThat(respondentDetails).isEqualTo(String.format(RESPONDENT_NAME, 1, "Test Corp", ""));
-    }
-
-    @Test
-    void getRespondentNameDetails_shouldReturnFormattedDetails_whenRespondentHasNoName() {
-        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
-        respondent.setValue(new RespondentSumType());
-        respondent.getValue().setResponseRespondentName("Test Response");
-
-        String respondentDetails = initialConsiderationService.getRespondentName(List.of(respondent));
-        assertThat(respondentDetails).isEqualTo(String.format(RESPONDENT_NAME, 1, "", "Test Response"));
-    }
-
-    @Test
     void getIcHearingPanelPreference_shouldReturnNull_whenRespondentCollectionIsNull() {
         String hearingPanelPreferenceDetails = initialConsiderationService.getIcRespondentHearingPanelPreference(
                 null);
@@ -277,22 +278,25 @@ class InitialConsiderationServiceTest {
         respondent.getValue().setRespondentHearingPanelPreferenceReason("I deserve it");
 
         String expectedOutput = """
-        <br/>
-        <table>
-        <tr>
-        <th colspan="3"><h2>Respondents' Panel Preferences</h2></th>
-        </tr>
-        <tr>
-        <th width="25%"><h3>Respondent</h3></th>
-        <th width="20%"><span class="bold">Panel Preference</span></th>
-        <th><span class="bold">Reason</span></th>
-        </tr>
-          <tr>
-            <td>Test Response</td>
-            <td>judge</td>
-            <td>I deserve it</td>
-          </tr>
-        </table>
+            <table>
+            <thead>
+            <tr>
+            <th colspan="3"><h2>Respondents' Panel Preferences</h2></th>
+            </tr>
+            <tr>
+            <th width="25%">Respondent</th>
+            <th width="25%">Preference</th>
+            <th>Reason</th>
+            </tr>
+            <thead>
+            <tbody>
+              <tr>
+                <td>Test Response</td>
+                <td>judge</td>
+                <td>I deserve it</td>
+              </tr>
+            </tbody>
+            </table>
             """;
         String hearingPanelPreferenceDetails = initialConsiderationService.getIcRespondentHearingPanelPreference(
                 List.of(respondent));
@@ -305,17 +309,25 @@ class InitialConsiderationServiceTest {
         respondent.setValue(new RespondentSumType());
 
         String expectedOutput = """
-        <br/>
-        <table>
-        <tr>
-        <th colspan="3"><h2>Respondents' Panel Preferences</h2></th>
-        </tr>
-        <tr>
-        <th width="25%"><h3>Respondent</h3></th>
-        <th width="20%"><span class="bold">Panel Preference</span></th>
-        <th><span class="bold">Reason</span></th>
-        </tr>
-        </table>
+           <table>
+           <thead>
+           <tr>
+           <th colspan="3"><h2>Respondents' Panel Preferences</h2></th>
+           </tr>
+           <tr>
+           <th width="25%">Respondent</th>
+           <th width="25%">Preference</th>
+           <th>Reason</th>
+           </tr>
+           <thead>
+           <tbody>
+             <tr>
+               <td>-</td>
+               <td>-</td>
+               <td>-</td>
+             </tr>
+           </tbody>
+           </table>
             """;
         String hearingPanelPreferenceDetails = initialConsiderationService.getIcRespondentHearingPanelPreference(
                 List.of(respondent));
@@ -340,16 +352,18 @@ class InitialConsiderationServiceTest {
                 List.of(respondent1, respondent2));
         assertThat(hearingPanelPreferenceDetails).isEqualTo(
                 """
-                <br/>
                 <table>
+                <thead>
                 <tr>
                 <th colspan="3"><h2>Respondents' Panel Preferences</h2></th>
                 </tr>
                 <tr>
-                <th width="25%"><h3>Respondent</h3></th>
-                <th width="20%"><span class="bold">Panel Preference</span></th>
-                <th><span class="bold">Reason</span></th>
+                <th width="25%">Respondent</th>
+                <th width="25%">Preference</th>
+                <th>Reason</th>
                 </tr>
+                <thead>
+                <tbody>
                   <tr>
                     <td>Respondent1</td>
                     <td>judge</td>
@@ -360,6 +374,7 @@ class InitialConsiderationServiceTest {
                     <td>panel</td>
                     <td>Fair trial</td>
                   </tr>
+                </tbody>
                 </table>
                 """
         );
@@ -484,32 +499,32 @@ class InitialConsiderationServiceTest {
     }
 
     @Test
-    void setRespondentDetails_shouldReturnDefaultString_whenRespondentCollectionIsEmpty() {
-        CaseData caseDataWithEmptyRespondentList = new CaseData();
-        caseDataWithEmptyRespondentList.setRespondentCollection(new ArrayList<>());
-        String result = initialConsiderationService.setRespondentDetails(caseDataWithEmptyRespondentList);
-        String expected = """
-                | Respondent  name given | |
-                |-------------|:------------|
-                |In ET1 by claimant | |
-                |In ET3 by respondent | |
-                
-                """;
-        assertThat(result).isEqualTo(expected);
-    }
-
-    @Test
     void setRespondentDetails_shouldHandleNullRespondentCollection() {
         CaseData caseDataWithNoRespondents = new CaseData();
         caseDataWithNoRespondents.setRespondentCollection(null);
         String result = initialConsiderationService.setRespondentDetails(caseDataWithNoRespondents);
         String expected = """
-                | Respondent  name given | |
-                |-------------|:------------|
-                |In ET1 by claimant | |
-                |In ET3 by respondent | |
-                
-                """;
+            <br/>
+            <table>
+              <thead>
+                <tr>
+                    <th colspan="3"><h2>Respondent Name Details</h2></th>
+                </tr>
+                <tr>
+                  <th width="25%">Respondent</th>
+                  <th width="25%">Name given in ET1</th>
+                  <th>Name given in ET3</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Respondent </td>
+                  <td>  </td>
+                  <td>  </td>
+                </tr>
+            </tbody>
+            </table>
+            """;
         assertThat(result).isEqualTo(expected);
     }
 
@@ -558,19 +573,10 @@ class InitialConsiderationServiceTest {
         setFutureHearingDateWithSettledHearing(caseData);
         String hearingDetails = initialConsiderationService.getHearingDetails(caseData.getHearingCollection());
         assertThat(hearingDetails)
-            .isEqualTo(EXPECTED_HEARING_BLANK);
+            .isEqualTo(EXPECTED_BLANK_HEARING_DETAILS);
     }
 
     /*@Test
-    void getHearingDetailsTest() {
-        setFutureHearingDate(caseData);
-        caseData.getRespondentCollection().getFirst().getValue()..
-        String hearingDetails = initialConsiderationService.getHearingDetails(caseData.getHearingCollection());
-        assertThat(hearingDetails)
-            .isEqualTo(EXPECTED_HEARING_STRING);
-    }*/
-
-    @Test
     void getRespondentNameTest() {
         String respondentName = initialConsiderationService.getRespondentName(caseData.getRespondentCollection());
         assertThat(respondentName)
@@ -585,7 +591,7 @@ class InitialConsiderationServiceTest {
                 .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID).getCaseData();
         String respondentName = initialConsiderationService.getRespondentName(caseData.getRespondentCollection());
         assertThat(respondentName).isEqualTo(EXPECTED_RESPONDENT_NAME_2);
-    }
+    }*/
 
     @Test
     void generateJurisdictionCodesHtmlTest() {
@@ -607,9 +613,42 @@ class InitialConsiderationServiceTest {
 
     @Test
     void missingHearingCollectionTest() {
+        String expectedResult = """
+             <br/>
+             <table>
+             <thead>
+             <tr>
+             <th colspan="2"><h2>Listed Hearing Details</h2></th>
+             </tr>
+             <tr>
+             <th width="30%">Aspect</th>
+             <th width="70%">Detail</th>
+             </tr>
+             <thead>
+             <tbody>
+                <tr>
+                    <td>Date</td> <td> - </td>
+                </tr>
+                <tr>
+                    <td>Type</td> <td> - </td>
+                </tr>
+                <tr>
+                    <td>Duration</td> <td> - </td>
+                </tr>
+                <tr>
+                    <td>Hearing format</td> <td> - </td>
+                </tr>
+                <tr>
+                    <td>Panel Type</td> <td> - </td>
+                </tr>
+                <tr>
+                    <td>Venue</td> <td> - </td>
+                </tr>
+            </tbody>
+            </table>
+                """;
         String hearingDetails = initialConsiderationService.getHearingDetails(caseDataEmpty.getHearingCollection());
-        assertThat(hearingDetails)
-            .isEqualTo(EXPECTED_HEARING_BLANK);
+        assertThat(hearingDetails).isEqualTo(expectedResult);
     }
 
     @Test
@@ -637,14 +676,6 @@ class InitialConsiderationServiceTest {
                 ENGLANDWALES_CASE_TYPE_ID);
         assertThat(jurisdictionCodesHtml)
             .isEqualTo(EXPECTED_JURISDICTION_HTML);
-    }
-
-    @Test
-    void missingRespondentCollectionTest() {
-        String respondentName =
-            initialConsiderationService.getRespondentName(caseDataEmpty.getRespondentCollection());
-        assertThat(respondentName)
-            .isEqualTo(EXPECTED_RESPONDENT_NAME_BLANK);
     }
 
     @Test
@@ -909,48 +940,6 @@ class InitialConsiderationServiceTest {
 
         assertEquals(3, caseData.getIcAllDocumentCollection().size());
     }
-
-    /*
-    @Test
-    void getClaimantHearingPanelPreferenceTest() {
-        ClaimantHearingPreference preference = new ClaimantHearingPreference();
-        preference.setClaimantHearingPanelPreference("Preference");
-        preference.setClaimantHearingPanelPreferenceWhy("Reason");
-        preference.setHearingPreferences(List.of(VIDEO, PHONE));
-        caseData.setClaimantHearingPreference(preference);
-
-        String result = String.format(initialConsiderationService.getClaimantHearingPanelPreference(
-                caseData.getClaimantHearingPreference()));
-
-        String expected = """
-            |Claimant's hearing panel preference | |
-            |-------------|:------------|
-            |Panel Preference | Preference|
-            |Reason for Panel Preference | Reason|
-            """;
-        assertEquals(expected, result);
-    }
-
-    @Test
-    void getClaimantHearingPanelPreferenceTest_No_Video_Hearing() {
-        ClaimantHearingPreference preference = new ClaimantHearingPreference();
-        preference.setClaimantHearingPanelPreference("Preference");
-        preference.setClaimantHearingPanelPreferenceWhy("Reason");
-        caseData.setClaimantHearingPreference(preference);
-
-        String result = String.format(initialConsiderationService.getClaimantHearingPanelPreference(
-                caseData.getClaimantHearingPreference()));
-
-        String expected = """
-            |Claimant's hearing panel preference | |
-            |-------------|:------------|
-            |Panel Preference | Preference|
-            |Reason for Panel Preference | Reason|
-            
-            NOT AVAILABLE FOR VIDEO HEARINGS
-            """;
-        assertEquals(expected, result);
-    }*/
 
     @Test
     void getClaimantHearingPanelPreference_NullPreference() {
@@ -1390,8 +1379,42 @@ class InitialConsiderationServiceTest {
 
     @Test
     void getHearingDetails_shouldReturnMissingMessage_whenHearingCollectionIsNull() {
+        String expectedResult = """
+                 <br/>
+                 <table>
+                 <thead>
+                 <tr>
+                 <th colspan="2"><h2>Listed Hearing Details</h2></th>
+                 </tr>
+                 <tr>
+                 <th width="30%">Aspect</th>
+                 <th width="70%">Detail</th>
+                 </tr>
+                 <thead>
+                 <tbody>
+                    <tr>
+                        <td>Date</td> <td> - </td>
+                    </tr>
+                    <tr>
+                        <td>Type</td> <td> - </td>
+                    </tr>
+                    <tr>
+                        <td>Duration</td> <td> - </td>
+                    </tr>
+                    <tr>
+                        <td>Hearing format</td> <td> - </td>
+                    </tr>
+                    <tr>
+                        <td>Panel Type</td> <td> - </td>
+                    </tr>
+                    <tr>
+                        <td>Venue</td> <td> - </td>
+                    </tr>
+                </tbody>
+                </table>
+                """;
         String result = initialConsiderationService.getHearingDetails(null);
-        assertThat(result).isEqualTo(HEARING_MISSING);
+        assertThat(result).isEqualTo(expectedResult);
     }
 
     @Test
@@ -1409,8 +1432,43 @@ class InitialConsiderationServiceTest {
                 createHearingTypeItem("2023-10-10T10:00:00.000", "Cancelled", "Hearing Type 2", "Hours", "2")
         );
 
+        String expectedResult = """
+           <br/>
+           <table>
+           <thead>
+           <tr>
+           <th colspan="2"><h2>Listed Hearing Details</h2></th>
+           </tr>
+           <tr>
+           <th width="30%">Aspect</th>
+           <th width="70%">Detail</th>
+           </tr>
+           <thead>
+           <tbody>
+              <tr>
+                  <td>Date</td> <td> - </td>
+              </tr>
+              <tr>
+                  <td>Type</td> <td> - </td>
+              </tr>
+              <tr>
+                  <td>Duration</td> <td> - </td>
+              </tr>
+              <tr>
+                  <td>Hearing format</td> <td> - </td>
+              </tr>
+              <tr>
+                  <td>Panel Type</td> <td> - </td>
+              </tr>
+              <tr>
+                  <td>Venue</td> <td> - </td>
+              </tr>
+          </tbody>
+          </table>
+            """;
+
         String result = initialConsiderationService.getHearingDetails(hearingCollection);
-        assertThat(result).isEqualTo(HEARING_MISSING);
+        assertThat(result).isEqualTo(expectedResult);
     }
 
     @Test
@@ -1422,9 +1480,42 @@ class InitialConsiderationServiceTest {
                         "Hearing Type 2", "Hours", "2")
         );
 
+        String expectedResult = """
+           <br/>
+           <table>
+           <thead>
+           <tr>
+           <th colspan="2"><h2>Listed Hearing Details</h2></th>
+           </tr>
+           <tr>
+           <th width="30%">Aspect</th>
+           <th width="70%">Detail</th>
+           </tr>
+           <thead>
+           <tbody>
+              <tr>
+                  <td>Date</td> <td> 10 Oct 2026 </td>
+              </tr>
+              <tr>
+                  <td>Type</td> <td> Hearing Type 2 </td>
+              </tr>
+              <tr>
+                  <td>Duration</td> <td> 2 Hours </td>
+              </tr>
+              <tr>
+                  <td>Hearing format</td> <td> - </td>
+              </tr>
+              <tr>
+                  <td>Panel Type</td> <td> - </td>
+              </tr>
+              <tr>
+                  <td>Venue</td> <td> - </td>
+              </tr>
+          </tbody>
+          </table>
+            """;
         String result = initialConsiderationService.getHearingDetails(hearingCollection);
-        String detail = String.format(HEARING_DETAILS, "10 Oct 2026", "Hearing Type 2", "2 Hours", "-", "-", "-");
-        assertThat(result).isEqualTo(detail);
+        assertThat(result).isEqualTo(expectedResult);
     }
 
     @Test
@@ -1435,7 +1526,40 @@ class InitialConsiderationServiceTest {
         );
 
         String result = initialConsiderationService.getHearingDetails(hearingCollection);
-        String detail = String.format(HEARING_DETAILS, "15 Oct 2026", "Hearing Type 2", "2 Hours", "-", "-", "-");
+        String detail = """
+                 <br/>
+                 <table>
+                 <thead>
+                 <tr>
+                 <th colspan="2"><h2>Listed Hearing Details</h2></th>
+                 </tr>
+                 <tr>
+                 <th width="30%">Aspect</th>
+                 <th width="70%">Detail</th>
+                 </tr>
+                 <thead>
+                 <tbody>
+                    <tr>
+                        <td>Date</td> <td> 15 Oct 2026 </td>
+                    </tr>
+                    <tr>
+                        <td>Type</td> <td> Hearing Type 2 </td>
+                    </tr>
+                    <tr>
+                        <td>Duration</td> <td> 2 Hours </td>
+                    </tr>
+                    <tr>
+                        <td>Hearing format</td> <td> - </td>
+                    </tr>
+                    <tr>
+                        <td>Panel Type</td> <td> - </td>
+                    </tr>
+                    <tr>
+                        <td>Venue</td> <td> - </td>
+                    </tr>
+                </tbody>
+                </table>
+                """;
         assertThat(result).isEqualTo(detail);
     }
 
@@ -1519,22 +1643,29 @@ class InitialConsiderationServiceTest {
         ClaimantHearingPreference pref = new ClaimantHearingPreference();
         String result = initialConsiderationService.getClaimantHearingPanelPreference("", pref);
         String expected = """
-        <br/><h1>Parties Hearing Panel Preferences</h1>
-        <table>
-        <tr>
-        <th colspan="3"><h2>Claimant's Panel Preference</h2></th>
-        </tr>
-        <tr>
-        <th width="25%"><h3>Claimant</h3></th>
-        <th width="20%"><span class="bold">Panel Preference</span></th>
-        <th><span class="bold">Reason</span></th>
-        </tr>
-          <tr>
-            <td></td>
-            <td>-</td>
-            <td>-</td>
-          </tr>
-        </table>
+            <br/>
+            <table>
+            <thead>
+            <tr>
+             <th colspan="3"><h1>Parties Hearing Panel Preferences</h1></th>
+            </tr>
+            <tr>
+            <th colspan="3"><h2>Claimant's Panel Preference</h2></th>
+            </tr>
+            <tr>
+            <th width="25%">Claimant</th>
+            <th width="25%">Preference</th>
+            <th>Reason</th>
+            </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td></td>
+                <td>-</td>
+                <td>-</td>
+              </tr>
+            </tbody>
+            </table>
             """;
         assertThat(result).isEqualTo(expected);
     }
@@ -2132,17 +2263,17 @@ class InitialConsiderationServiceTest {
 
     @Test
     void setIcEt1VettingIssuesDetails_shouldGenerateCorrectMarkup() {
-        CaseData caseData = new CaseData();
-        caseData.setEt1GovOrMajorQuestion("Yes");
-        caseData.setEt1ReasonableAdjustmentsQuestion("Yes");
-        caseData.setEt1ReasonableAdjustmentsTextArea("Details about reasonable adjustments.");
-        caseData.setEt1VideoHearingQuestion("No");
-        caseData.setEt1VideoHearingTextArea("Details about video hearing.");
-        caseData.setEt1FurtherQuestionsGeneralNotes("General notes about the respondent.");
+        CaseData caseDataWithMarkUp = new CaseData();
+        caseDataWithMarkUp.setEt1GovOrMajorQuestion("Yes");
+        caseDataWithMarkUp.setEt1ReasonableAdjustmentsQuestion("Yes");
+        caseDataWithMarkUp.setEt1ReasonableAdjustmentsTextArea("Details about reasonable adjustments.");
+        caseDataWithMarkUp.setEt1VideoHearingQuestion("No");
+        caseDataWithMarkUp.setEt1VideoHearingTextArea("Details about video hearing.");
+        caseDataWithMarkUp.setEt1FurtherQuestionsGeneralNotes("General notes about the respondent.");
 
         InitialConsiderationService service = new InitialConsiderationService(null);
 
-        String result = service.setIcEt1VettingIssuesDetails(caseData);
+        String result = service.setIcEt1VettingIssuesDetails(caseDataWithMarkUp);
 
         assertNotNull(result);
         assertTrue(result.contains("Is the respondent a government agency or a major employer?"));

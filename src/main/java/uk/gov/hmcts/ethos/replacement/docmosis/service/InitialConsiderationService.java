@@ -103,6 +103,7 @@ public class InitialConsiderationService {
     public static final String REFERRAL_ISSUE = "Referral Issue";
     public static final String DETAIL = "Detail";
     public static final String TABLE_END = """
+            </tbody>
             </table>
             """;
     private final TornadoService tornadoService;
@@ -155,16 +156,37 @@ public class InitialConsiderationService {
     }
 
     public String setRespondentDetails(CaseData caseData) {
+        // table head section
+        StringBuilder respondentDetailsHtmlFragment = new StringBuilder();
+        String tableHeaderSection = """
+                <br/>
+                <table>
+                  <thead>
+                    <tr>
+                        <th colspan="3"><h2>Respondent Name Details</h2></th>
+                    </tr>
+                    <tr>
+                      <th width="25%">Respondent</th>
+                      <th width="25%">Name given in ET1</th>
+                      <th>Name given in ET3</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                """;
 
         if (caseData == null || CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
-            return RESPONDENT_MISSING;
+            return respondentDetailsHtmlFragment
+                    .append(tableHeaderSection)
+                    .append(RESPONDENT_MISSING)
+                    .append(TABLE_END).toString();
         }
 
         List<RespondentSumTypeItem> respondentCollection = caseData.getRespondentCollection();
         IntWrapper respondentCount = new IntWrapper(0);
-        StringBuilder respondentDetailsHtmlFragment = new StringBuilder();
+
         // For each respondent, set the name details and then panel preference details
-        if (respondentCollection != null) {
+        if (respondentCollection != null && !respondentCollection.isEmpty()) {
+            respondentDetailsHtmlFragment.append(tableHeaderSection);
             respondentCollection.forEach(respondentSumType -> {
                 if (respondentSumType != null && respondentSumType.getValue() != null
                         && respondentSumType.getValue().getRespondentName() != null
@@ -176,6 +198,9 @@ public class InitialConsiderationService {
                             updatedRespondentCount));
                 }
             });
+
+            //close table
+            respondentDetailsHtmlFragment.append(TABLE_END);
         }
 
         return respondentDetailsHtmlFragment.toString();
@@ -198,7 +223,7 @@ public class InitialConsiderationService {
      * @param respondentCollection collection of respondents
      * @return table with respondent details
      */
-    public String getRespondentName(List<RespondentSumTypeItem> respondentCollection) {
+    /*public String getRespondentName(List<RespondentSumTypeItem> respondentCollection) {
         if (respondentCollection == null) {
             return RESPONDENT_MISSING;
         }
@@ -211,7 +236,7 @@ public class InitialConsiderationService {
                         nullCheck(respondent.getValue().getRespondentName()),
                         nullCheck(respondent.getValue().getResponseRespondentName())))
                 .collect(Collectors.joining());
-    }
+    }*/
 
     /**
      * Creates the respondent's hearing panel preference section for Initial Consideration.
@@ -221,40 +246,45 @@ public class InitialConsiderationService {
      * @return table with respondent's hearing panel preference details
      */
     public String getIcRespondentHearingPanelPreference(List<RespondentSumTypeItem> respondentCollection) {
+
         if (respondentCollection == null) {
             return null;
         }
 
         StringBuilder hearingPreferencesTable = new StringBuilder();
 
-        hearingPreferencesTable.append("""
-               <br/>
+        hearingPreferencesTable.append("""            
                <table>
+               <thead>
                <tr>
                <th colspan="3"><h2>Respondents' Panel Preferences</h2></th>
                </tr>
                <tr>
-               <th width="25%"><h3>Respondent</h3></th>
-               <th width="20%"><span class="bold">Panel Preference</span></th>
-               <th><span class="bold">Reason</span></th>
+               <th width="25%">Respondent</th>
+               <th width="25%">Preference</th>
+               <th>Reason</th>
                </tr>
+               <thead>
+               <tbody>
                """);
 
         respondentCollection.stream()
-                .filter(respondent -> respondent.getValue() != null
-                        && (respondent.getValue().getRespondentHearingPanelPreference() != null
-                        || respondent.getValue().getRespondentHearingPanelPreferenceReason() != null))
+                .filter(respondent -> respondent.getValue() != null)
                 .forEach(respondent ->
                         hearingPreferencesTable.append(String.format(HEARING_PANEL_PREFERENCE,
-                                respondent.getValue().getRespondentName(),
-                        Optional.ofNullable(respondent.getValue().getRespondentHearingPanelPreference())
-                                .orElse("-"),
-                        Optional.ofNullable(respondent.getValue().getRespondentHearingPanelPreferenceReason())
-                                .orElse("-")
-                        )));
+                        respondent.getValue().getRespondentName() != null
+                                ? respondent.getValue().getRespondentName() : "-",
+                        respondent.getValue()  != null
+                                && respondent.getValue().getRespondentHearingPanelPreference() != null
+                        ? respondent.getValue().getRespondentHearingPanelPreference() :
+                                "-",
+                        respondent.getValue() != null
+                                && respondent.getValue().getRespondentHearingPanelPreferenceReason() != null
+                                ? respondent.getValue().getRespondentHearingPanelPreferenceReason()
+                                : "-")
+                ));
 
         hearingPreferencesTable.append(TABLE_END);
-
         return hearingPreferencesTable.toString();
     }
 
@@ -267,8 +297,26 @@ public class InitialConsiderationService {
      * @return return table with details of hearing Listed status
      */
     public String getHearingDetails(List<HearingTypeItem> hearingCollection) {
+
+        StringBuilder hearingDetailsTable = new StringBuilder();
+
+        hearingDetailsTable.append("""
+                <br/>
+                <table>
+                <thead>
+                <tr>
+                <th colspan="2"><h2>Listed Hearing Details</h2></th>
+                </tr>
+                <tr>
+                <th width="30%">Aspect</th> 
+                <th width="70%">Detail</th>
+                </tr>
+                <thead>
+                <tbody>
+               """);
+
         if (hearingCollection == null) {
-            return HEARING_MISSING;
+            return hearingDetailsTable.append(HEARING_MISSING).append(TABLE_END).toString();
         }
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(MONTH_STRING_DATE_FORMAT);
@@ -287,18 +335,40 @@ public class InitialConsiderationService {
     }
 
     private String getFormattedHearingDetails(HearingType hearing, DateTimeFormatter formatter) {
+        StringBuilder hearingDetailsTable = new StringBuilder();
+
+        hearingDetailsTable.append("""
+                <br/>
+                <table>
+                <thead>
+                <tr>
+                <th colspan="2"><h2>Listed Hearing Details</h2></th>
+                </tr>
+                <tr>
+                <th width="30%">Aspect</th> 
+                <th width="70%">Detail</th>
+                </tr>
+                <thead>
+                <tbody>
+               """);
+
         Optional<LocalDate> earliestHearingDate = getEarliestHearingDateForListedHearings(
             hearing.getHearingDateCollection());
         if (earliestHearingDate.isPresent()) {
-            return String.format(HEARING_DETAILS, earliestHearingDate.map(formatter::format).orElse(""),
-                hearing.getHearingType(), getHearingDuration(hearing),
+            hearingDetailsTable.append(String.format(HEARING_DETAILS,
+                    earliestHearingDate.map(formatter::format).orElse(""),
+                    hearing.getHearingType(),
+                    getHearingDuration(hearing),
                     hearing.getHearingFormat() != null
                             ? String.join(", ", hearing.getHearingFormat().stream().toList()) : "-",
                     Optional.ofNullable(hearing.getHearingSitAlone()).orElse("-"),
-                    hearing.getHearingVenue() != null ? hearing.getHearingVenue().getSelectedLabel() : "-");
+                    hearing.getHearingVenue() != null ? hearing.getHearingVenue().getSelectedLabel() : "-"));
         } else {
-            return String.format(HEARING_DETAILS, "-", "-", "-", "-", "-", "-");
+            hearingDetailsTable.append(String.format(HEARING_DETAILS, "-", "-", "-", "-", "-", "-"));
         }
+
+        hearingDetailsTable.append(TABLE_END);
+        return hearingDetailsTable.toString();
     }
 
     public String setPartiesHearingPanelPreferenceDetails(CaseData caseData) {
@@ -317,16 +387,22 @@ public class InitialConsiderationService {
         StringBuilder claimantHhearingPreferencesTable = new StringBuilder();
 
         claimantHhearingPreferencesTable.append("""
-               <br/><h1>Parties Hearing Panel Preferences</h1>
+               <br/>
                <table>
+               <thead>
+               <tr>
+                <th colspan="3"><h1>Parties Hearing Panel Preferences</h1></th>
+               </tr>
                <tr>
                <th colspan="3"><h2>Claimant's Panel Preference</h2></th>
                </tr>
                <tr>
-               <th width="25%"><h3>Claimant</h3></th>
-               <th width="20%"><span class="bold">Panel Preference</span></th>
-               <th><span class="bold">Reason</span></th>
+               <th width="25%">Claimant</th>
+               <th width="25%">Preference</th>
+               <th>Reason</th>
                </tr>
+               </thead>
+               <tbody>
                """);
 
         claimantHhearingPreferencesTable.append(String.format(HEARING_PANEL_PREFERENCE,
@@ -348,28 +424,26 @@ public class InitialConsiderationService {
     }
 
     public String getRespondentHearingFormatDetails(CaseData caseData) {
-        //set Respondent Hearing Format details
         StringBuilder hearingFormatTable = new StringBuilder();
-
         hearingFormatTable.append("""
           <table>
           <tr>
-            <th colspan="2"><h2>Respondents Hearing Format</h2></th>
+          <th colspan="2"><h2>Respondents Hearing Format</h2></th>
           </tr>
             """);
 
         String respondentHeaderRow = """
                         <tr>
-                        <th width="50%"><h3>Respondent</h3></th>
-                        <th width="50%"><span class="bold">Hearing Format</span></th>
+                        <th width="30%"><h3>Respondent</h3></th>
+                        <th width="70%"><span class="bold">Hearing Format</span></th>
                         </tr>
-                           """;
+                        """;
         String respondentRepHeaderRow = """
                         <tr>
-                        <th width="50%"><h3>Respondent Representative</h3></th>
-                        <th width="50%"><span class="bold">Hearing Format</span></th>
+                        <th width="30%"><h3>Respondent Representative</h3></th>
+                        <th width="70%"><span class="bold">Hearing Format</span></th>
                         </tr>
-                          """;
+                        """;
 
         caseData.getRespondentCollection().stream()
                 .filter(respondent -> respondent.getValue() != null)
@@ -388,14 +462,14 @@ public class InitialConsiderationService {
                     }
 
                     //set respondent rep hearing format preference
-                    Optional<RepresentedTypeRItem> matchingRespondentRep = caseData.getRepCollection().stream().filter(
-                            r -> r.getValue().getRespRepName().equals(
-                                    respondent.getValue().getRespondentName())).findFirst();
+                    Optional<RepresentedTypeRItem> matchingRespondentRep = caseData.getRepCollection() != null
+                            ? caseData.getRepCollection().stream().filter(
+                                    r -> r.getValue().getRespRepName().equals(
+                                            respondent.getValue().getRespondentName())).findFirst() : Optional.empty();
 
                     if (matchingRespondentRep.isPresent()
                             && respondent.getValue().getEt3ResponseHearingRepresentative() != null) {
                         hearingFormatTable.append(respondentRepHeaderRow);
-
                         hearingFormatTable.append(String.format(
                                 HEARING_FORMAT_PREFERENCE,
                                 matchingRespondentRep.get().getValue().getNameOfRepresentative(),
@@ -415,22 +489,28 @@ public class InitialConsiderationService {
         StringBuilder hearingFormatTable = new StringBuilder();
 
         hearingFormatTable.append("""
-        <br/><h1>Parties Hearing Format Details</h1>
+        <br/>
         <table>
+          <thead>
           <tr>
-            <th colspan="3"><h2>Claimant Hearing Format</h2></th>
+            <th colspan="2"><h1>Parties Hearing Format Details</h1></th>
           </tr>
           <tr>
-            <th width="30%"><h3>Claimant</h3></th>
-            <th width="70%"><span class="bold">Hearing Format</span></th>
+            <th colspan="2"><h2>Claimant Hearing Format</h2></th>
           </tr>
+          <tr>
+            <th width="30%">Claimant</th>
+            <th width="70%">Hearing Format</th>
+          </tr>
+          </thead>
+          <tbody>
             """);
 
         // Concatenate all hearing formats for claimant
         if (caseData != null) {
             if (caseData.getClaimantHearingPreference() != null
                     && caseData.getClaimantHearingPreference().getHearingPreferences() != null
-                    && ! caseData.getClaimantHearingPreference().getHearingPreferences().isEmpty()
+                    && !caseData.getClaimantHearingPreference().getHearingPreferences().isEmpty()
                     &&  caseData.getClaimantHearingPreference().getHearingPreferences().contains("Neither")) {
 
                 String reasonDetails = caseData.getClaimantHearingPreference().getHearingAssistance() != null
@@ -443,17 +523,23 @@ public class InitialConsiderationService {
                                 .orElse("-")
                 ));
             } else {
-                if (caseData.getClaimantHearingPreference() == null
-                    || caseData.getClaimantHearingPreference().getHearingPreferences() == null
-                    || caseData.getClaimantHearingPreference().getHearingPreferences().isEmpty()) {
+                if (caseData.getClaimantHearingPreference() != null
+                        && caseData.getClaimantHearingPreference().getHearingPreferences() != null
+                        && ! caseData.getClaimantHearingPreference().getHearingPreferences().isEmpty()) {
                     String hearingFormates = String.join(", ",
-                        "-");
+                            caseData.getClaimantHearingPreference().getHearingPreferences());
                     hearingFormatTable.append(String.format(
                         HEARING_FORMAT_PREFERENCE,
                         caseData.getClaimant(),
-                        hearingFormates
-                    ));
+                            Optional.of(hearingFormates)
+                                    .orElse("-"))
+                    );
                     return hearingFormatTable.append(TABLE_END).toString();
+                } else {
+                    hearingFormatTable.append(String.format(
+                            HEARING_FORMAT_PREFERENCE,
+                            caseData.getClaimant(),
+                            "-"));
                 }
             }
         }

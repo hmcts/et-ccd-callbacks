@@ -260,6 +260,32 @@ public class NocRespondentRepresentativeService {
                 CaseUserAssignmentData.builder().caseUserAssignments(usersToRevoke).build());
     }
 
+    public void grantNewRespondentRepresentativeAccess(CaseData caseData, String caseReferenceNumber)
+            throws GenericServiceException {
+        if (ObjectUtils.isEmpty(caseData)
+                || CollectionUtils.isEmpty(caseData.getRepCollection())
+                || StringUtils.isEmpty(caseReferenceNumber)) {
+            return;
+        }
+        int availableRoleIndex = 0;
+        for (RepresentedTypeRItem representedTypeRItem : caseData.getRepCollection()) {
+            RespondentRepresentativeUtils.validateRepresentative(representedTypeRItem, caseReferenceNumber);
+            if (YES.equals(representedTypeRItem.getValue().getMyHmctsYesNo())
+                    && StringUtils.isNotBlank(representedTypeRItem.getValue().getRepresentativeEmailAddress())
+                    && ObjectUtils.isNotEmpty(representedTypeRItem.getValue().getRespondentOrganisation())
+                    && StringUtils.isNotBlank(representedTypeRItem.getValue().getRespondentOrganisation()
+                    .getOrganisationID())) {
+                String role = SolicitorRole.values()[availableRoleIndex].getCaseRoleLabel();
+                nocService.grantRepresentativeAccess(adminUserService.getAdminUserToken(),
+                        representedTypeRItem.getValue().getRepresentativeEmailAddress(), caseReferenceNumber,
+                        representedTypeRItem.getValue().getRespondentOrganisation(),
+                        role);
+                representedTypeRItem.getValue().setRole(role);
+                availableRoleIndex++;
+            }
+        }
+    }
+
     /**
      * Identifies differences in representation.
      * @param after - case data after event

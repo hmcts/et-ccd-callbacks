@@ -7,6 +7,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 
 import java.util.List;
@@ -32,6 +33,34 @@ public final class RoleUtils {
      */
     public static boolean isRespondentRepresentativeRole(String role) {
         return StringUtils.isNotBlank(role) && SolicitorRole.from(role).isPresent();
+    }
+
+    /**
+     * Determines whether the given role represents a claimant's legal representative.
+     * <p>
+     * A role is considered a claimant representative role if it is not blank and
+     * matches the case role label defined for {@link ClaimantSolicitorRole#CLAIMANTSOLICITOR}.
+     *
+     * @param role the role string to evaluate; may be {@code null} or blank
+     * @return {@code true} if the role is non-blank and equals the claimant solicitor
+     *         case role label, otherwise {@code false}
+     */
+    public static boolean isClaimantRepresentativeRole(String role) {
+        return StringUtils.isNotBlank(role) && ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel().equals(role);
+    }
+
+    /**
+     * Determines whether the given role is a valid legal representative role.
+     * <p>
+     * A role is considered valid if it represents either a claimant's legal
+     * representative or a respondent's legal representative.
+     *
+     * @param role the role string to evaluate; may be {@code null} or blank
+     * @return {@code true} if the role matches a claimant or respondent
+     *         representative role, otherwise {@code false}
+     */
+    public static boolean isValidRole(String role) {
+        return  isClaimantRepresentativeRole(role) || isRespondentRepresentativeRole(role);
     }
 
     /**

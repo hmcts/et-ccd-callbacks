@@ -34,8 +34,12 @@ final class RoleUtilsTest {
     private static final String ROLE_SOLICITOR_J = "[SOLICITORJ]";
     private static final String ROLE_SOLICITOR_K = "[SOLICITORK]";
     private static final String ROLE_SOLICITOR_L = "[SOLICITORL]";
-    private static final String SOLICITOR_A_LOWERCASE = "[solicitora]";
-    private static final String SOLICITOR_B_LOWERCASE = "[solicitorb]";
+    private static final String ROLE_SOLICITOR_A_LOWERCASE = "[solicitora]";
+    private static final String ROLE_SOLICITOR_B_LOWERCASE = "[solicitorb]";
+    private static final String ROLE_CLAIMANT_SOLICITOR = "[CLAIMANTSOLICITOR]";
+    private static final String ROLE_CLAIMANT_SOLICITOR_LOWERCASE = "[claimantsolicitor]";
+    private static final String ROLE_CLAIMANT_SOLICITOR_INVALID = "[CLAIMANTSOLICITORINVALID]";
+    private static final String ROLE_INVALID = "[INVALIDROLE]";
 
     private static final int INTEGER_THREE = 3;
     private static final int INTEGER_FOUR = 4;
@@ -48,9 +52,9 @@ final class RoleUtilsTest {
 
     @Test
     void theIsRespondentRepresentativeRole() {
-        // null input
+        // null input should return false
         assertThat(RoleUtils.isRespondentRepresentativeRole(null)).isFalse();
-        // valid enum values
+        // valid respondent solicitor roles should return true
         assertThat(RoleUtils.isRespondentRepresentativeRole(ROLE_SOLICITOR_A)).isTrue();
         assertThat(RoleUtils.isRespondentRepresentativeRole(ROLE_SOLICITOR_B)).isTrue();
         assertThat(RoleUtils.isRespondentRepresentativeRole(ROLE_SOLICITOR_C)).isTrue();
@@ -61,12 +65,41 @@ final class RoleUtilsTest {
         assertThat(RoleUtils.isRespondentRepresentativeRole(ROLE_SOLICITOR_H)).isTrue();
         assertThat(RoleUtils.isRespondentRepresentativeRole(ROLE_SOLICITOR_I)).isTrue();
         assertThat(RoleUtils.isRespondentRepresentativeRole(ROLE_SOLICITOR_J)).isTrue();
-        // invalid values
+        // invalid respondent solicitor roles should return false
         assertThat(RoleUtils.isRespondentRepresentativeRole(ROLE_SOLICITOR_K)).isFalse();
         assertThat(RoleUtils.isRespondentRepresentativeRole(ROLE_SOLICITOR_L)).isFalse();
-        // case sensitivity
-        assertThat(RoleUtils.isRespondentRepresentativeRole(SOLICITOR_A_LOWERCASE)).isFalse();
-        assertThat(RoleUtils.isRespondentRepresentativeRole(SOLICITOR_B_LOWERCASE)).isFalse();
+        // lowercase respondent solicitor roles should return false (case-sensitive)
+        assertThat(RoleUtils.isRespondentRepresentativeRole(ROLE_SOLICITOR_A_LOWERCASE)).isFalse();
+        assertThat(RoleUtils.isRespondentRepresentativeRole(ROLE_SOLICITOR_B_LOWERCASE)).isFalse();
+    }
+
+    @Test
+    void theIsClaimantRepresentativeRole() {
+        // null input should return false
+        assertThat(RoleUtils.isClaimantRepresentativeRole(null)).isFalse();
+        // valid claimant solicitor role should return true
+        assertThat(RoleUtils.isClaimantRepresentativeRole(ROLE_CLAIMANT_SOLICITOR)).isTrue();
+        // invalid claimant solicitor role should return false
+        assertThat(RoleUtils.isClaimantRepresentativeRole(ROLE_CLAIMANT_SOLICITOR_INVALID)).isFalse();
+        // lowercase claimant solicitor role should return false (case-sensitive)
+        assertThat(RoleUtils.isClaimantRepresentativeRole(ROLE_CLAIMANT_SOLICITOR_LOWERCASE)).isFalse();
+    }
+
+    @Test
+    void theIsValidRole() {
+        // null input should return false
+        assertThat(RoleUtils.isValidRole(null)).isFalse();
+        // valid claimant solicitor role should return true
+        assertThat(RoleUtils.isValidRole(ROLE_CLAIMANT_SOLICITOR)).isTrue();
+        // valid respondent solicitor role should return true
+        assertThat(RoleUtils.isValidRole(ROLE_SOLICITOR_A)).isTrue();
+        // invalid role should return false
+        assertThat(RoleUtils.isValidRole(ROLE_INVALID)).isFalse();
+        // lowercase claimant solicitor role should return false (case-sensitive)
+        assertThat(RoleUtils.isClaimantRepresentativeRole(ROLE_CLAIMANT_SOLICITOR_LOWERCASE)).isFalse();
+        // lowercase respondent solicitor roles should return false (case-sensitive)
+        assertThat(RoleUtils.isClaimantRepresentativeRole(ROLE_SOLICITOR_A_LOWERCASE)).isFalse();
+        assertThat(RoleUtils.isClaimantRepresentativeRole(ROLE_SOLICITOR_B_LOWERCASE)).isFalse();
     }
 
     @Test

@@ -12,6 +12,8 @@ public final class GenericConstants {
 
     public static final String ERROR_INVALID_CASE_DATA = "Invalid case data";
 
+    public static final String EMPTY_LOWERCASE = "empty";
+
     private GenericConstants() {
         // Final classes should not have a public or default constructor.
     }

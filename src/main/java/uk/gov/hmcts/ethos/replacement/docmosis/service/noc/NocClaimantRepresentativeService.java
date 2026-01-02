@@ -14,9 +14,9 @@ import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocClaimantHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
@@ -30,6 +30,7 @@ import java.util.Objects;
 import java.util.Optional;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_GRANT_REPRESENTATIVE_ACCESS;
 
 @Service
 @RequiredArgsConstructor
@@ -143,11 +144,15 @@ public class NocClaimantRepresentativeService {
         if (YES.equals(caseData.getClaimantRepresentedQuestion())) {
             RepresentedTypeC claimantRep = caseData.getRepresentativeClaimantType();
             if (claimantRep != null && claimantRep.getRepresentativeEmailAddress() != null) {
-                grantClaimantRepAccess(accessToken,
-                        caseData.getRepresentativeClaimantType().getRepresentativeEmailAddress(),
-                        caseDetails.getCaseId(),
-                        changeRequest.getOrganisationToAdd(),
-                        ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
+                try {
+                    nocService.grantRepresentativeAccess(accessToken,
+                            caseData.getRepresentativeClaimantType().getRepresentativeEmailAddress(),
+                            caseDetails.getCaseId(),
+                            changeRequest.getOrganisationToAdd(),
+                            ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
+                } catch (GenericServiceException genericServiceException) {
+                    log.error(ERROR_UNABLE_TO_GRANT_REPRESENTATIVE_ACCESS, caseDetails.getCaseId());
+                }
             }
         }
 
@@ -175,27 +180,5 @@ public class NocClaimantRepresentativeService {
         }
 
         return changeRequests;
-    }
-
-    public void grantClaimantRepAccess(String accessToken, String email,
-                                       String caseId, Organisation organisationToAdd,
-                                       String role) {
-        try {
-            AccountIdByEmailResponse userResponse =
-                    organisationClient.getAccountIdByEmail(accessToken, authTokenGenerator.generate(), email).getBody();
-
-            if (userResponse != null && userResponse.getUserIdentifier() != null) {
-                OrganisationsResponse organisationsResponse = organisationClient.retrieveOrganisationDetailsByUserId(
-                        accessToken, authTokenGenerator.generate(), userResponse.getUserIdentifier()).getBody();
-
-                if (organisationsResponse != null
-                        && organisationToAdd.getOrganisationID()
-                        .equals(organisationsResponse.getOrganisationIdentifier())) {
-                    nocService.grantCaseAccess(userResponse.getUserIdentifier(), caseId, role);
-                }
-            }
-        } catch (IOException e) {
-            log.error("Failed to fetch org user by email");
-        }
     }
 }

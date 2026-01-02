@@ -3,16 +3,33 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.noc;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRole;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
+import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
+import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
+import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.RoleUtils;
+import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
 import java.util.List;
+
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.EMPTY_LOWERCASE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_FAILED_TO_ASSIGN_ROLE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_INVALID_GRANT_ACCESS_PARAMETER;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_UNABLE_TO_FIND_ORGANISATION_BY_USER_ID;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_UNABLE_TO_GET_ACCOUNT_ID_BY_EMAIL;
 
 @RequiredArgsConstructor
 @Component
@@ -21,6 +38,10 @@ public class NocService {
     private final NocCcdService nocCcdService;
     private final AdminUserService adminUserService;
     private final CcdCaseAssignment caseAssignment;
+    private final OrganisationClient organisationClient;
+    private final AuthTokenGenerator authTokenGenerator;
+
+    private static final String CLASS_NAME = NocService.class.getSimpleName();
 
     /**
      * Revokes access from all users of an organisation being replaced or removed.
@@ -49,6 +70,60 @@ public class NocService {
         if (!CollectionUtils.isEmpty(usersToRevoke)) {
             nocCcdService.revokeCaseAssignments(adminUserService.getAdminUserToken(),
                     CaseUserAssignmentData.builder().caseUserAssignments(usersToRevoke).build());
+        }
+    }
+
+    public void grantRepresentativeAccess(String accessToken, String email,
+                                          String caseId, Organisation organisationToAdd,
+                                          String role) throws GenericServiceException {
+        final String methodName = "grantRepresentativeAccess";
+        if (StringUtils.isBlank(accessToken)
+                || StringUtils.isBlank(email)
+                || StringUtils.isBlank(caseId)
+                || ObjectUtils.isEmpty(organisationToAdd)
+                || StringUtils.isBlank(organisationToAdd.getOrganisationID())
+                || !RoleUtils.isValidRole(role)) {
+            String tmpAccessToken = StringUtils.isEmpty(accessToken) ? EMPTY_LOWERCASE : accessToken;
+            String tmpEmail = StringUtils.isEmpty(email) ? EMPTY_LOWERCASE : email;
+            String tmpCaseId = StringUtils.isEmpty(caseId) ? EMPTY_LOWERCASE : caseId;
+            String tmpOrganisationId = ObjectUtils.isEmpty(organisationToAdd) ? EMPTY_LOWERCASE
+                    : StringUtils.isBlank(organisationToAdd.getOrganisationID()) ? EMPTY_LOWERCASE
+                    : organisationToAdd.getOrganisationID();
+            String tmpRole = StringUtils.isBlank(role) ? EMPTY_LOWERCASE : role;
+            String exceptionMessage = String.format(EXCEPTION_INVALID_GRANT_ACCESS_PARAMETER, tmpAccessToken, tmpEmail,
+                    tmpCaseId, tmpOrganisationId, tmpRole);
+            throw new GenericServiceException(exceptionMessage, new Exception(exceptionMessage), exceptionMessage,
+                    caseId, CLASS_NAME, methodName);
+        }
+        try {
+            ResponseEntity<AccountIdByEmailResponse> userResponseEntity =
+                    organisationClient.getAccountIdByEmail(accessToken, authTokenGenerator.generate(), email);
+            if (ObjectUtils.isEmpty(userResponseEntity)
+                    || ObjectUtils.isEmpty(userResponseEntity.getBody())
+                    || StringUtils.isBlank(userResponseEntity.getBody().getUserIdentifier())) {
+                String exceptionMessage = String.format(EXCEPTION_UNABLE_TO_GET_ACCOUNT_ID_BY_EMAIL, email, caseId);
+                throw new GenericServiceException(exceptionMessage, new Exception(exceptionMessage), exceptionMessage,
+                        caseId, CLASS_NAME, methodName);
+            }
+            AccountIdByEmailResponse userResponse = userResponseEntity.getBody();
+            ResponseEntity<OrganisationsResponse> organisationsResponseEntity =
+                    organisationClient.retrieveOrganisationDetailsByUserId(accessToken, authTokenGenerator.generate(),
+                            userResponse.getUserIdentifier());
+            if (ObjectUtils.isEmpty(organisationsResponseEntity)
+                    || ObjectUtils.isEmpty(organisationsResponseEntity.getBody())
+                    || StringUtils.isBlank(organisationsResponseEntity.getBody().getOrganisationIdentifier())
+                    || !Strings.CS.equals(organisationsResponseEntity.getBody().getOrganisationIdentifier(),
+                    organisationToAdd.getOrganisationID())) {
+                String exceptionMessage = String.format(EXCEPTION_UNABLE_TO_FIND_ORGANISATION_BY_USER_ID,
+                        userResponse.getUserIdentifier(), caseId);
+                throw new GenericServiceException(exceptionMessage, new Exception(exceptionMessage), exceptionMessage,
+                        caseId, CLASS_NAME, methodName);
+            }
+            grantCaseAccess(userResponse.getUserIdentifier(), caseId, role);
+        } catch (IOException e) {
+            String message = String.format(EXCEPTION_FAILED_TO_ASSIGN_ROLE, role,
+                    email, caseId);
+            throw new GenericServiceException(message, new Exception(e), message, caseId, CLASS_NAME, methodName);
         }
     }
 

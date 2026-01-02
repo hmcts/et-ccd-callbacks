@@ -1,8 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.noc;
 
+import lombok.SneakyThrows;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -29,15 +32,24 @@ class NocRepresentativeServiceTest {
     @Mock
     private NocClaimantRepresentativeService nocClaimantRepresentativeService;
 
+    @InjectMocks
     private NocRepresentativeService nocRepresentativeService;
+
+    AutoCloseable closeable;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        closeable = MockitoAnnotations.openMocks(this);
         nocRepresentativeService = new NocRepresentativeService(
                 nocRespondentRepresentativeService,
                 nocClaimantRepresentativeService
         );
+    }
+
+    @AfterEach
+    @SneakyThrows
+    void tearDown() {
+        closeable.close();
     }
 
     @Test

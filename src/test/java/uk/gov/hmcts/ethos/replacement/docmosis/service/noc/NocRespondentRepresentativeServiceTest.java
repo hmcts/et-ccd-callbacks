@@ -7,6 +7,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.ResponseEntity;
@@ -126,7 +127,6 @@ class NocRespondentRepresentativeServiceTest {
 
     @Autowired
     private ObjectMapper objectMapper;
-    private NocRespondentRepresentativeService nocRespondentRepresentativeService;
 
     @MockBean
     private NoticeOfChangeFieldPopulator noticeOfChangeFieldPopulator;
@@ -144,6 +144,9 @@ class NocRespondentRepresentativeServiceTest {
     private AuthTokenGenerator authTokenGenerator;
     @MockBean
     private NocService nocService;
+
+    @InjectMocks
+    private NocRespondentRepresentativeService nocRespondentRepresentativeService;
 
     private NocRespondentHelper nocRespondentHelper;
     private CaseData caseData;

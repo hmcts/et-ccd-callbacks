@@ -16,6 +16,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
@@ -71,6 +72,27 @@ public class NocService {
         }
     }
 
+    /**
+     * Grants case access to a legal representative for a given case submission.
+     * <p>
+     * This method validates the provided input parameters and ensures that the user
+     * identified by the given email address exists and belongs to the specified
+     * organisation. If validation succeeds, the appropriate case role is granted
+     * to the user for the case identified by the submission reference.
+     * <p>
+     * The method interacts with external organisation and identity services to
+     * resolve the user and organisation details before assigning the case role.
+     *
+     * @param accessToken the user access token used to authorise downstream service calls
+     * @param email the email address of the legal representative to be granted access
+     * @param submissionReference the submission reference identifying the case
+     * @param organisationToAdd the organisation the representative must belong to
+     * @param role the case role to be assigned to the representative
+     *
+     * @throws GenericServiceException if any input parameter is invalid, the user or
+     *         organisation cannot be resolved, the organisation does not match, or
+     *         if an error occurs while granting case access
+     */
     public void grantRepresentativeAccess(String accessToken, String email,
                                           String submissionReference, Organisation organisationToAdd,
                                           String role) throws GenericServiceException {
@@ -115,12 +137,23 @@ public class NocService {
                 throw new GenericServiceException(exceptionMessage);
             }
             grantCaseAccess(userResponse.getUserIdentifier(), submissionReference, role);
-        } catch (IOException e) {
-            log.error(EXCEPTION_FAILED_TO_ASSIGN_ROLE, role, email, submissionReference);
-            throw new GenericServiceException(e);
+        } catch (IOException exception) {
+            throw new GenericServiceException(new CcdInputOutputException(String.format(EXCEPTION_FAILED_TO_ASSIGN_ROLE,
+                    role, email, submissionReference), exception));
         }
     }
 
+    /**
+     * Grants a case role to a user for the specified case.
+     * <p>
+     * This method creates a case user role assignment for the given user and case,
+     * and submits the assignment to CCD.
+     *
+     * @param userId the unique identifier of the user to be granted access
+     * @param caseId the identifier of the case to which access is being granted
+     * @param caseRole the case role to assign to the user
+     * @throws IOException if an error occurs while communicating with CCD
+     */
     public void grantCaseAccess(String userId, String caseId, String caseRole) throws IOException {
         CaseAssignmentUserRole caseAssignmentUserRole = CaseAssignmentUserRole.builder()
                 .userId(userId)

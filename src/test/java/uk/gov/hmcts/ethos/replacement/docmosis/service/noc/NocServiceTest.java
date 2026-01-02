@@ -89,7 +89,9 @@ class NocServiceTest {
             "Unable to get account id by email representative@email.com for case 1234567890123456.";
     private static final String EXPECTED_EXCEPTION_ORGANISATION_DETAILS_NOT_FOUND_BY_USER_ID =
             "Unable to find organisation by user id 112b0bdd-5e58-32f1-8c51-6e71f5f90bc5 for case 1234567890123456.";
-    private static final String EXPECTED_EXCEPTION_FAILED_TO_ASSIGN_ROLE = "java.io.IOException";
+    private static final String EXPECTED_EXCEPTION_FAILED_TO_ASSIGN_ROLE =
+            "uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException: Failed to assign role "
+                    + "[SOLICITORA], to user with email representative@email.com, for case 1234567890123456.";
 
     @Mock
     private NocCcdService nocCcdService;

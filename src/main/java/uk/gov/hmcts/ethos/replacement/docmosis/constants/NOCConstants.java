@@ -41,7 +41,7 @@ public final class NOCConstants {
     public static final String EXCEPTION_OLD_AND_NEW_RESPONDENTS_ARE_DIFFERENT =
             "Old and new respondent collections contain different respondents for case ID %s.";
     public static final String EXCEPTION_FAILED_TO_ASSIGN_ROLE =
-            "Failed to assign role {}, to user with email {}, for case {}. ";
+            "Failed to assign role %s, to user with email %s, for case %s.";
     public static final String EXCEPTION_INVALID_GRANT_ACCESS_PARAMETER =
             "There are missing parameters; accessToken: %s, email: %s, submission reference: %s, organisationId: %s, "
                     + "role: %s.";

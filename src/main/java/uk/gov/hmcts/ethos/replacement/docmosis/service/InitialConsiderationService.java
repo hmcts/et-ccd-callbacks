@@ -43,6 +43,7 @@ import java.util.stream.Stream;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CLAIMANT_HEARING_FORMAT_NEITHER_PREFERENCE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CLAIMANT_HEARING_PANEL_PREFERENCE_MISSING;
@@ -296,7 +297,7 @@ public class InitialConsiderationService {
      * @param hearingCollection the collection of hearings
      * @return return table with details of hearing Listed status
      */
-    public String getHearingDetails(List<HearingTypeItem> hearingCollection) {
+    public String getHearingDetails(List<HearingTypeItem> hearingCollection, String caseTypeId) {
 
         StringBuilder hearingDetailsTable = new StringBuilder();
 
@@ -330,11 +331,11 @@ public class InitialConsiderationService {
             .min(Comparator.comparing((HearingType hearing) ->
                             getEarliestHearingDateForListedHearings(hearing.getHearingDateCollection()).orElse(
                             LocalDate.now().plusYears(100))))
-            .map(hearing -> getFormattedHearingDetails(hearing, formatter))
+            .map(hearing -> getFormattedHearingDetails(hearing, formatter, caseTypeId))
             .orElse(HEARING_MISSING);
     }
 
-    private String getFormattedHearingDetails(HearingType hearing, DateTimeFormatter formatter) {
+    private String getFormattedHearingDetails(HearingType hearing, DateTimeFormatter formatter, String caseType) {
         StringBuilder hearingDetailsTable = new StringBuilder();
 
         hearingDetailsTable.append("""
@@ -357,18 +358,61 @@ public class InitialConsiderationService {
         if (earliestHearingDate.isPresent()) {
             hearingDetailsTable.append(String.format(HEARING_DETAILS,
                     earliestHearingDate.map(formatter::format).orElse(""),
-                    hearing.getHearingType(),
+                    getAdjustedHearingTypeName(hearing.getHearingType()),
                     getHearingDuration(hearing),
                     hearing.getHearingFormat() != null
                             ? String.join(", ", hearing.getHearingFormat().stream().toList()) : "-",
                     Optional.ofNullable(hearing.getHearingSitAlone()).orElse("-"),
-                    hearing.getHearingVenue() != null ? hearing.getHearingVenue().getSelectedLabel() : "-"));
+                    getHearingVenueDetails(hearing, caseType)));
         } else {
             hearingDetailsTable.append(String.format(HEARING_DETAILS, "-", "-", "-", "-", "-", "-"));
         }
 
         hearingDetailsTable.append(TABLE_END);
         return hearingDetailsTable.toString();
+    }
+
+    private static String getAdjustedHearingTypeName(String hearingTypeName) {
+        return switch (hearingTypeName) {
+            case "Hearing" -> "Final Hearing";
+            case "Reconsideration" -> "Reconsideration Hearing";
+            case "Remedy" -> "Remedy Hearing";
+            default -> hearingTypeName;
+        };
+    }
+
+    private static String getHearingVenueDetails(HearingType hearing, String caseType) {
+        if (hearing == null) {
+            return "-";
+        }
+
+        if (ENGLANDWALES_CASE_TYPE_ID.equals(caseType)) {
+            return hearing.getHearingVenue() != null ? hearing.getHearingVenue().getSelectedLabel() : "-";
+        } else if (SCOTLAND_CASE_TYPE_ID.equals(caseType)) {
+            //Map Scottish hearing venues
+            //Aberdeen, Dundee, Edinburgh, Glasgow, Inverness, Paisley, Stirling
+            String hearingVenueScotland = hearing.getHearingVenueScotland();
+
+            switch (hearingVenueScotland) {
+                case "Aberdeen" -> {
+                    return hearing.getHearingAberdeen().getSelectedLabel();
+                }
+                case "Dundee" -> {
+                    return hearing.getHearingDundee().getSelectedLabel();
+                }
+                case "Edinburgh" -> {
+                    return hearing.getHearingEdinburgh().getSelectedLabel();
+                }
+                case "Glasgow" -> {
+                    return hearing.getHearingGlasgow().getSelectedLabel();
+                }
+                default -> {
+                    return "-";
+                }
+            }
+        } else {
+            return "-";
+        }
     }
 
     public String setPartiesHearingPanelPreferenceDetails(CaseData caseData) {
@@ -657,6 +701,8 @@ public class InitialConsiderationService {
             caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJudgeOrMembers(null);
             caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJudgeOrMembersReasonOther(null);
             caseData.setEtInitialConsiderationHearing(null);
+
+            caseData.setEtICHearingAlreadyListed(null);
         }
     }
 
@@ -988,7 +1034,7 @@ public class InitialConsiderationService {
 
         // Reasonable adjustments for respondent
         if (caseData.getEt1ReasonableAdjustmentsQuestion() != null) {
-            addPair(respondentTypeIssuesPairsList, "Are reasonable adjustments required for the respondent?",
+            addPair(respondentTypeIssuesPairsList, "Are reasonable adjustments required?",
                     caseData.getEt1ReasonableAdjustmentsQuestion());
             addPairIfNotEmpty(respondentTypeIssuesPairsList, "Give details (Respondent Type)",
                     caseData.getEt1ReasonableAdjustmentsTextArea());
@@ -997,7 +1043,7 @@ public class InitialConsiderationService {
         // Video hearing for respondent
         if (caseData.getEt1VideoHearingQuestion() != null) {
 
-            addPair(respondentTypeIssuesPairsList, "Is a video hearing required for the respondent?",
+            addPair(respondentTypeIssuesPairsList, "Can the claimant attend a video hearing?",
                     caseData.getEt1VideoHearingQuestion());
             addPairIfNotEmpty(respondentTypeIssuesPairsList, "Give details (Video Hearing)",
                     caseData.getEt1VideoHearingTextArea());

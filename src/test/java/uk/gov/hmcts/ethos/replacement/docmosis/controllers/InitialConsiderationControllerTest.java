@@ -217,7 +217,7 @@ class InitialConsiderationControllerTest extends BaseControllerTest {
     void startInitialConsiderationTest() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(initialConsiderationService.generateJurisdictionCodesHtml(anyList(), any())).thenReturn("Jurisdictions");
-        when(initialConsiderationService.getHearingDetails(anyList())).thenReturn("hearings");
+        when(initialConsiderationService.getHearingDetails(anyList(), any())).thenReturn("hearings");
 
         mvc.perform(post(START_INITIAL_CONSIDERATION_URL)
                 .content(jsonMapper.toJson(ccdRequest))

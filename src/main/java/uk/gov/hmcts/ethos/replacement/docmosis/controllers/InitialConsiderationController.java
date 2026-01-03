@@ -102,6 +102,7 @@ public class InitialConsiderationController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         initialConsiderationService.processIcDocumentCollections(caseData);
+
         caseData.setIcCompletedBy(reportDataService.getUserFullName(userToken));
         caseData.setIcDateCompleted(LocalDate.now().format(DateTimeFormatter.ofPattern(MONTH_STRING_DATE_FORMAT)));
         DocumentInfo documentInfo = initialConsiderationService.generateDocument(caseData, userToken,
@@ -147,7 +148,7 @@ public class InitialConsiderationController {
         //hearing details
         HearingsHelper.setEtInitialConsiderationListedHearingType(caseData);
         caseData.setEtInitialConsiderationHearing(initialConsiderationService.getHearingDetails(
-                    caseData.getHearingCollection()));
+                    caseData.getHearingCollection(), ccdRequest.getCaseDetails().getCaseTypeId()));
 
         //Parties' panel preference in a table
         caseData.setEtIcPartiesHearingPanelPreference(

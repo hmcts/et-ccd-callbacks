@@ -571,7 +571,8 @@ class InitialConsiderationServiceTest {
     @Test
     void getHearingDetailsForSettledHearing() {
         setFutureHearingDateWithSettledHearing(caseData);
-        String hearingDetails = initialConsiderationService.getHearingDetails(caseData.getHearingCollection());
+        String hearingDetails = initialConsiderationService.getHearingDetails(caseData.getHearingCollection(),
+                ENGLANDWALES_CASE_TYPE_ID);
         assertThat(hearingDetails)
             .isEqualTo(EXPECTED_BLANK_HEARING_DETAILS);
     }
@@ -647,7 +648,8 @@ class InitialConsiderationServiceTest {
             </tbody>
             </table>
                 """;
-        String hearingDetails = initialConsiderationService.getHearingDetails(caseDataEmpty.getHearingCollection());
+        String hearingDetails = initialConsiderationService.getHearingDetails(caseDataEmpty.getHearingCollection(),
+                ENGLANDWALES_CASE_TYPE_ID);
         assertThat(hearingDetails).isEqualTo(expectedResult);
     }
 
@@ -1413,7 +1415,7 @@ class InitialConsiderationServiceTest {
                 </tbody>
                 </table>
                 """;
-        String result = initialConsiderationService.getHearingDetails(null);
+        String result = initialConsiderationService.getHearingDetails(null, null);
         assertThat(result).isEqualTo(expectedResult);
     }
 
@@ -1421,7 +1423,7 @@ class InitialConsiderationServiceTest {
     void getHearingDetails_shouldReturnMissingMessage_whenHearingCollectionIsEmpty() {
         List<HearingTypeItem> hearingCollection = new ArrayList<>();
 
-        String result = initialConsiderationService.getHearingDetails(hearingCollection);
+        String result = initialConsiderationService.getHearingDetails(hearingCollection, ENGLANDWALES_CASE_TYPE_ID);
         assertThat(result).isEqualTo(HEARING_MISSING);
     }
 
@@ -1467,7 +1469,7 @@ class InitialConsiderationServiceTest {
           </table>
             """;
 
-        String result = initialConsiderationService.getHearingDetails(hearingCollection);
+        String result = initialConsiderationService.getHearingDetails(hearingCollection, ENGLANDWALES_CASE_TYPE_ID);
         assertThat(result).isEqualTo(expectedResult);
     }
 
@@ -1514,7 +1516,7 @@ class InitialConsiderationServiceTest {
           </tbody>
           </table>
             """;
-        String result = initialConsiderationService.getHearingDetails(hearingCollection);
+        String result = initialConsiderationService.getHearingDetails(hearingCollection, ENGLANDWALES_CASE_TYPE_ID);
         assertThat(result).isEqualTo(expectedResult);
     }
 
@@ -1525,7 +1527,7 @@ class InitialConsiderationServiceTest {
                 createHearingTypeItem("2026-10-15T10:00:00.000", "Listed", "Hearing Type 2", "Hours", "2")
         );
 
-        String result = initialConsiderationService.getHearingDetails(hearingCollection);
+        String result = initialConsiderationService.getHearingDetails(hearingCollection, ENGLANDWALES_CASE_TYPE_ID);
         String detail = """
                  <br/>
                  <table>
@@ -1593,7 +1595,7 @@ class InitialConsiderationServiceTest {
         List<HearingTypeItem> hearingCollection = new ArrayList<>();
         hearingCollection.add(null);
 
-        String result = initialConsiderationService.getHearingDetails(hearingCollection);
+        String result = initialConsiderationService.getHearingDetails(hearingCollection, ENGLANDWALES_CASE_TYPE_ID);
         assertThat(result).isEqualTo(HEARING_MISSING);
     }
 
@@ -1603,7 +1605,7 @@ class InitialConsiderationServiceTest {
         item.setValue(null);
         List<HearingTypeItem> hearingCollection = List.of(item);
 
-        String result = initialConsiderationService.getHearingDetails(hearingCollection);
+        String result = initialConsiderationService.getHearingDetails(hearingCollection, ENGLANDWALES_CASE_TYPE_ID);
         assertThat(result).isEqualTo(HEARING_MISSING);
     }
 
@@ -1615,7 +1617,7 @@ class InitialConsiderationServiceTest {
         item.setValue(hearing);
         List<HearingTypeItem> hearingCollection = List.of(item);
 
-        String result = initialConsiderationService.getHearingDetails(hearingCollection);
+        String result = initialConsiderationService.getHearingDetails(hearingCollection, ENGLANDWALES_CASE_TYPE_ID);
         assertThat(result).isEqualTo(HEARING_MISSING);
     }
 
@@ -1627,7 +1629,7 @@ class InitialConsiderationServiceTest {
         item.setValue(hearing);
         List<HearingTypeItem> hearingCollection = List.of(item);
 
-        String result = initialConsiderationService.getHearingDetails(hearingCollection);
+        String result = initialConsiderationService.getHearingDetails(hearingCollection, ENGLANDWALES_CASE_TYPE_ID);
         assertThat(result).isEqualTo(HEARING_MISSING);
     }
 
@@ -2277,9 +2279,9 @@ class InitialConsiderationServiceTest {
 
         assertNotNull(result);
         assertTrue(result.contains("Is the respondent a government agency or a major employer?"));
-        assertTrue(result.contains("Are reasonable adjustments required for the respondent?"));
+        assertTrue(result.contains("Are reasonable adjustments required?"));
         assertTrue(result.contains("Details about reasonable adjustments."));
-        assertTrue(result.contains("Is a video hearing required for the respondent?"));
+        assertTrue(result.contains("Can the claimant attend a video hearing?"));
         assertTrue(result.contains("Details about video hearing."));
         assertTrue(result.contains("General notes about the respondent."));
     }

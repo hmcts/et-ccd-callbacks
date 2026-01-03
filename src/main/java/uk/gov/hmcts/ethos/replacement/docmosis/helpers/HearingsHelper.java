@@ -100,24 +100,19 @@ public final class HearingsHelper {
             return;
         }
 
-        if (CollectionUtils.isEmpty(caseData.getHearingCollection())) {
-            log.info("No hearing collection found for case: {} to set EtInitialConsiderationListedHearingType",
-                    caseData.getEthosCaseReference() != null ? caseData.getEthosCaseReference() : "unknown reference");
-            caseData.setEtICHearingAlreadyListed("No");
-            return;
-        }
-
         HearingType earliestListedHearing = getEarliestListedHearingType(caseData.getHearingCollection());
 
         if (earliestListedHearing == null) {
             log.info("No listed hearings found for case: {} to set EtInitialConsiderationListedHearingType",
                     caseData.getEthosCaseReference());
+            caseData.setEtICHearingAlreadyListed("No");
             return;
+        } else {
+            caseData.setEtICHearingAlreadyListed("Yes");
         }
 
         if (caseData.getEtICHearingListedAnswers() == null) {
             initEtICHearingListedAnswers(caseData);
-            caseData.setEtICHearingAlreadyListed("No");
         }
 
         caseData.getEtICHearingListedAnswers().setEtInitialConsiderationListedHearingType(

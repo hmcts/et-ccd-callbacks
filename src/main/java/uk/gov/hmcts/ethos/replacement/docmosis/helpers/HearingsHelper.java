@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.webjars.NotFoundException;
+import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.EtICHearingListedAnswers;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
@@ -32,6 +33,7 @@ import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EMPTY_STRING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EUROPE_LONDON;
 
@@ -375,5 +377,22 @@ public final class HearingsHelper {
         }
 
         return new ArrayList<>();
+    }
+
+    /**
+     * Updates the postponed date and postponed by fields in DateListedType based on the hearing status.
+     * @param caseData the case data
+     * @param dateListedType the hearing day to be updated
+     */
+    public static void updatePostponedDate(CaseData caseData, DateListedType dateListedType) {
+        if (HEARING_STATUS_POSTPONED.equals(caseData.getAllocateHearingStatus())) {
+            dateListedType.setPostponedBy(caseData.getAllocateHearingPostponedBy());
+            if (isNullOrEmpty(dateListedType.getPostponedDate())) {
+                dateListedType.setPostponedDate(UtilHelper.formatCurrentDate2(LocalDate.now()));
+            }
+        } else {
+            dateListedType.setPostponedBy(null);
+            dateListedType.setPostponedDate(null);
+        }
     }
 }

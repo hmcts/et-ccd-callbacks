@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT;
+//import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
 import static uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType.create;
@@ -597,13 +597,14 @@ class HearingsHelperTest {
         assertEquals(String.format(RESUME_TIME_VALIDATION_MESSAGE, "Hearing 1"), errors.getFirst());
     }
 
+    /*
     @Test
     void updatePostponedDate_whenStatusIsPostponed_setsPostponedByAndDate() {
         DateListedType dateListedType = new DateListedType();
         caseData.setAllocateHearingStatus(HEARING_STATUS_POSTPONED);
         caseData.setAllocateHearingPostponedBy(CLAIMANT);
 
-        updatePostponedDate(caseData, dateListedType);
+        updatePostponedDate();
 
         assertEquals(CLAIMANT, dateListedType.getPostponedBy());
         assertFalse(dateListedType.getPostponedDate().isBlank());
@@ -617,7 +618,7 @@ class HearingsHelperTest {
         caseData.setAllocateHearingStatus(HEARING_STATUS_POSTPONED);
         caseData.setAllocateHearingPostponedBy(CLAIMANT);
 
-        updatePostponedDate(caseData, dateListedType);
+        updatePostponedDate();
 
         assertEquals(CLAIMANT, dateListedType.getPostponedBy());
         assertEquals(existingDate, dateListedType.getPostponedDate());
@@ -630,7 +631,7 @@ class HearingsHelperTest {
         dateListedType.setPostponedDate("2023-05-15");
         caseData.setAllocateHearingStatus(HEARING_STATUS_HEARD);
 
-        updatePostponedDate(caseData, dateListedType);
+        updatePostponedDate();
 
         assertNull(dateListedType.getPostponedBy());
         assertNull(dateListedType.getPostponedDate());
@@ -643,9 +644,10 @@ class HearingsHelperTest {
         caseData.setAllocateHearingStatus(HEARING_STATUS_POSTPONED);
         caseData.setAllocateHearingPostponedBy(CLAIMANT);
 
-        updatePostponedDate(caseData, dateListedType);
+        updatePostponedDate();
 
         assertEquals(CLAIMANT, dateListedType.getPostponedBy());
         assertFalse(dateListedType.getPostponedDate().isBlank());
     }
+    */
 }

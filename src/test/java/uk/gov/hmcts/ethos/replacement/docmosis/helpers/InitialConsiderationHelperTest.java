@@ -127,7 +127,7 @@ class InitialConsiderationHelperTest {
         answers.setEtInitialConsiderationListedHearingType("Final Hearing");
         answers.setEtICIsHearingWithJudgeOrMembers("JSA");
         answers.setEtICIsFinalHearingWithJudgeOrMembersJsaReason(List.of("Reason A", "Other"));
-        answers.setEtICJsaFinalHearingReasonOther("Custom Reason");
+        answers.setEtICIsHearingWithJsaReasonOther("Custom Reason");
 
         CaseData caseDataWithFinalHearingJsa = new CaseData();
         caseDataWithFinalHearingJsa.setEtICHearingListedAnswers(answers);
@@ -674,7 +674,7 @@ class InitialConsiderationHelperTest {
         answers.setEtInitialConsiderationListedHearingType("Final Hearing");
         answers.setEtICIsHearingWithJudgeOrMembers("JSA");
         answers.setEtICIsFinalHearingWithJudgeOrMembersJsaReason(List.of("Reason B", "Other"));
-        answers.setEtICJsaFinalHearingReasonOther("Other Reason");
+        answers.setEtICIsHearingWithJsaReasonOther("Other Reason");
 
         CaseData caseDataWithFinalHearing = new CaseData();
         caseDataWithFinalHearing.setEtICHearingListedAnswers(answers);
@@ -695,8 +695,9 @@ class InitialConsiderationHelperTest {
     void updateHearingWithJudgeOrMembersDetails_returnsDefaultDetails_whenOtherHearingType() {
         EtICHearingListedAnswers answers = new EtICHearingListedAnswers();
         answers.setEtInitialConsiderationListedHearingType("Other Hearing");
-        answers.setEtICIsHearingWithJudgeOrMembersReason(List.of("Default Normal Reason", "Other"));
-        answers.setEtICIsHearingWithJudgeOrMembersReasonOther("Other Default Reason");
+        answers.setEtICIsFinalHearingWithJudgeOrMembersJsaReason(List.of("Default Normal Reason", "Other"));
+        answers.setEtICIsHearingWithJsaReasonOther("Other Default Reason");
+        answers.setEtICIsHearingWithJudgeOrMembers("JSA");
 
         CaseData caseDataWithOtherHearing = new CaseData();
         caseDataWithOtherHearing.setEtICHearingListedAnswers(answers);

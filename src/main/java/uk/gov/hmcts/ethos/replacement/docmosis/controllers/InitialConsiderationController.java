@@ -137,6 +137,7 @@ public class InitialConsiderationController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseData.setEtICHearingListedAnswers(null);
         initialConsiderationService.clearOldEtICHearingListedAnswersValues(caseData);
         initialConsiderationService.clearIcHearingNotListedOldValues(caseData);
         initialConsiderationService.clearHiddenValue(caseData);

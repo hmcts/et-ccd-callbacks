@@ -344,6 +344,7 @@ public final class InitialConsiderationHelper {
 
                 // Hearing NOT Listed
                 .hearingNotListed(Optional.ofNullable(caseData.getEtICHearingNotListedListUpdated()).orElse(null))
+
                 //video hearing
                 .cvpHearingType(Optional.ofNullable(caseData.getEtICHearingNotListedSeekComments())
                         .map(EtICSeekComments::getEtICTypeOfCvpHearing).orElse(null))
@@ -557,18 +558,14 @@ public final class InitialConsiderationHelper {
             } else {
                 sb.append(WITH_MEMBERS).append(SPACE_HYPHEN_SPACE).append(answers.getEtICIsHearingWithMembers());
             }
-        } else if (FINAL_HEARING.equals(hearingType)) {
+        } else {
             addHearingJsaOrMembersReasonDetails(sb,
                     JSA.equals(answers.getEtICIsHearingWithJudgeOrMembers())
                             ? answers.getEtICIsFinalHearingWithJudgeOrMembersJsaReason()
                             : answers.getEtICIsFinalHearingWithJudgeOrMembersReason(),
                     JSA.equals(answers.getEtICIsHearingWithJudgeOrMembers())
-                            ? answers.getEtICJsaFinalHearingReasonOther()
-                            : answers.getEtICMembersFinalHearingReasonOther());
-        } else {
-            addHearingJsaOrMembersReasonDetails(sb,
-                    answers.getEtICIsHearingWithJudgeOrMembersReason(),
-                    answers.getEtICIsHearingWithJudgeOrMembersReasonOther());
+                            ? answers.getEtICIsHearingWithJsaReasonOther()
+                            : answers.getEtICIsHearingWithJudgeOrMembersReasonOther());
         }
 
         return sb.toString();

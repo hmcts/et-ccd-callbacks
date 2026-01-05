@@ -309,7 +309,7 @@ public class InitialConsiderationService {
                 <th colspan="2"><h2>Listed Hearing Details</h2></th>
                 </tr>
                 <tr>
-                <th width="30%">Aspect</th> 
+                <th width="30%">Aspect</th>
                 <th width="70%">Detail</th>
                 </tr>
                 <thead>
@@ -346,7 +346,7 @@ public class InitialConsiderationService {
                 <th colspan="2"><h2>Listed Hearing Details</h2></th>
                 </tr>
                 <tr>
-                <th width="30%">Aspect</th> 
+                <th width="30%">Aspect</th>
                 <th width="70%">Detail</th>
                 </tr>
                 <thead>
@@ -700,10 +700,10 @@ public class InitialConsiderationService {
             caseData.getEtICHearingListedAnswers().setEtICHearingListed(null);
             caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJudgeOrMembers(null);
             caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJudgeOrMembersReasonOther(null);
-            caseData.setEtInitialConsiderationHearing(null);
-
-            caseData.setEtICHearingAlreadyListed(null);
         }
+
+        //caseData.setEtInitialConsiderationHearing(null);
+        //caseData.setEtICHearingAlreadyListed(null);
     }
 
     public void mapOldIcHearingNotListedOptionsToNew(CaseData caseData, String caseTypeId) {
@@ -783,8 +783,14 @@ public class InitialConsiderationService {
 
     public void clearIcHearingNotListedOldValues(CaseData caseData) {
         caseData.setEtICHearingNotListedList(null);
+        caseData.setEtICHearingNotListedListUpdated(null);
+
         caseData.setEtICHearingNotListedListForPrelimHearing(null);
+        caseData.setEtICHearingNotListedListForPrelimHearingUpdated(null);
+
         caseData.setEtICHearingNotListedListForFinalHearing(null);
+        caseData.setEtICHearingNotListedListForFinalHearingUpdated(null);
+
         caseData.setEtICHearingNotListedUDLHearing(null);
         caseData.setEtICHearingNotListedAnyOtherDirections(null);
         caseData.setEtICHearingNotListedListUpdated(null);
@@ -856,12 +862,14 @@ public class InitialConsiderationService {
                     + "<h3>", "");
 
             processEt3Response(et3Vetting, et3VettingIssuesPairsList);
-            processRespondentName(et3Vetting, et3VettingIssuesPairsList);
             processResponseInTime(et3Vetting, et3VettingIssuesPairsList);
+
+            processRespondentName(et3Vetting, et3VettingIssuesPairsList);
             processAddressMatch(et3Vetting, et3VettingIssuesPairsList);
             processContestClaim(et3Vetting, et3VettingIssuesPairsList);
             processContractClaim(et3Vetting, et3VettingIssuesPairsList);
             processCaseListed(et3Vetting, et3VettingIssuesPairsList);
+
             processLocationCorrect(et3Vetting, et3VettingIssuesPairsList);
             processRule26(et3Vetting, et3VettingIssuesPairsList);
             processSuggestedIssues(et3Vetting, et3VettingIssuesPairsList);
@@ -888,6 +896,10 @@ public class InitialConsiderationService {
     }
 
     private void processRespondentName(Et3VettingType et3Vetting, List<String[]> pairsList) {
+        if (et3Vetting == null) {
+            return;
+        }
+
         addPair(pairsList, DO_WE_HAVE_THE_RESPONDENT_S_NAME, et3Vetting.getEt3DoWeHaveRespondentsName());
         if (YES.equals(et3Vetting.getEt3DoWeHaveRespondentsName())) {
             addPair(pairsList, DOES_THE_RESPONDENT_S_NAME_MATCH, et3Vetting.getEt3DoesRespondentsNameMatch());
@@ -898,24 +910,36 @@ public class InitialConsiderationService {
     }
 
     private void processResponseInTime(Et3VettingType et3Vetting, List<String[]> pairsList) {
+        if (et3Vetting == null) {
+            return;
+        }
+
+        addPair(pairsList, "Did we receive the ET3 response in time?", et3Vetting.getEt3ResponseInTime());
         if (NO.equals(et3Vetting.getEt3ResponseInTime())) {
-            addPair(pairsList, "Did we receive the ET3 response in time?", et3Vetting.getEt3ResponseInTime());
             addPair(pairsList, GIVE_DETAILS, defaultIfNull(et3Vetting.getEt3ResponseInTimeDetails()));
         }
     }
 
     private void processAddressMatch(Et3VettingType et3Vetting, List<String[]> pairsList) {
+        if (et3Vetting == null) {
+            return;
+        }
+
+        addPair(pairsList, "Does the respondent's address match?",
+                et3Vetting.getEt3DoesRespondentsAddressMatch());
         if (NO.equals(et3Vetting.getEt3DoesRespondentsAddressMatch())) {
-            addPair(pairsList, "Does the respondent's address match?",
-                    et3Vetting.getEt3DoesRespondentsAddressMatch());
             addPair(pairsList, GIVE_DETAILS, defaultIfNull(et3Vetting.getEt3RespondentAddressMismatchDetails()));
         }
     }
 
     private void processContestClaim(Et3VettingType et3Vetting, List<String[]> pairsList) {
+        if (et3Vetting == null) {
+            return;
+        }
+
+        addPair(pairsList, "Does the respondent wish to contest any part of the claim?",
+                et3Vetting.getEt3ContestClaim());
         if (et3Vetting.getEt3ContestClaim() != null) {
-            addPair(pairsList, "Does the respondent wish to contest any part of the claim?",
-                    et3Vetting.getEt3ContestClaim());
             addPair(pairsList, GIVE_DETAILS, defaultIfNull(et3Vetting.getEt3ContestClaimGiveDetails()));
         }
         addPair(pairsList, "General notes (Contest Claim)",
@@ -923,23 +947,34 @@ public class InitialConsiderationService {
     }
 
     private void processContractClaim(Et3VettingType et3Vetting, List<String[]> pairsList) {
+        if (et3Vetting == null) {
+            return;
+        }
+
+        addPair(pairsList, "Is there an Employer's Contract Claim in section 7 of the ET3 response?",
+                et3Vetting.getEt3ContractClaimSection7());
         if (YES.equals(et3Vetting.getEt3ContractClaimSection7())) {
-            addPair(pairsList, "Is there an Employer's Contract Claim in section 7 of the ET3 response?",
-                    et3Vetting.getEt3ContractClaimSection7());
             addPair(pairsList, GIVE_DETAILS, defaultIfNull(et3Vetting.getEt3ContractClaimSection7Details()));
         }
     }
 
     private void processCaseListed(Et3VettingType et3Vetting, List<String[]> pairsList) {
+        if (et3Vetting == null) {
+            return;
+        }
+        addPair(pairsList, "Is the case listed for hearing?", et3Vetting.getEt3IsCaseListedForHearing());
         if (NO.equals(et3Vetting.getEt3IsCaseListedForHearing())) {
-            addPair(pairsList, "Is the case listed for hearing?", et3Vetting.getEt3IsCaseListedForHearing());
             addPair(pairsList, GIVE_DETAILS, defaultIfNull(et3Vetting.getEt3IsCaseListedForHearingDetails()));
         }
     }
 
     private void processLocationCorrect(Et3VettingType et3Vetting, List<String[]> pairsList) {
+        if (et3Vetting == null) {
+            return;
+        }
+
+        addPair(pairsList, "Is this location correct?", et3Vetting.getEt3IsThisLocationCorrect());
         if (NO.equals(et3Vetting.getEt3IsThisLocationCorrect())) {
-            addPair(pairsList, "Is this location correct?", et3Vetting.getEt3IsThisLocationCorrect());
             addPair(pairsList, "Regional Office selected:", defaultIfNull(et3Vetting.getEt3RegionalOffice()));
             addPair(pairsList, "Why should we change the office?",
                     defaultIfNull(et3Vetting.getEt3WhyWeShouldChangeTheOffice()));
@@ -949,16 +984,24 @@ public class InitialConsiderationService {
     }
 
     private void processRule26(Et3VettingType et3Vetting, List<String[]> pairsList) {
+        if (et3Vetting == null) {
+            return;
+        }
+
+        addPair(pairsList, "Are there any issues identified for the judge's initial consideration - prospects "
+                + "of claim / response arguable? (Rule 27)", et3Vetting.getEt3Rule26());
         if (YES.equals(et3Vetting.getEt3Rule26())) {
-            addPair(pairsList, "Are there any issues identified for the judge's initial consideration - prospects "
-                    + "of claim / response arguable? (Rule 27)", et3Vetting.getEt3Rule26());
             addPair(pairsList, GIVE_DETAILS, defaultIfNull(et3Vetting.getEt3Rule26Details()));
         }
     }
 
     private void processSuggestedIssues(Et3VettingType et3Vetting, List<String[]> pairsList) {
+        if (et3Vetting == null) {
+            return;
+        }
+
+        addPair(pairsList, "<h3>Are there any other suggested orders, directions or issues?</h3>", "");
         if (et3Vetting.getEt3SuggestedIssues() != null && !et3Vetting.getEt3SuggestedIssues().isEmpty()) {
-            addPair(pairsList, "<h3>Are there any other suggested orders, directions or issues?</h3>", "");
             et3Vetting.getEt3SuggestedIssues().forEach(issue -> addPair(pairsList, issue,
                     getSuggestedIssueDetails(et3Vetting, issue)));
         }

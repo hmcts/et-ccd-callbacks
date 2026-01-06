@@ -2,35 +2,26 @@ package uk.gov.hmcts.ethos.replacement.docmosis.wa;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
-import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
-import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
+import static org.apache.commons.lang3.ObjectUtils.isEmpty;
+import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPLOYMENT;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
 
 @Component
 @Slf4j
 @RequiredArgsConstructor
 public class BatchReconfigurationTask implements Runnable {
-    private static final String LONDON_CENTRAL_VENUE = "London Central";
-    private static final String LONDON_TRIBUNALS_CENTRE_VENUE = "London Tribunals Centre";
     private static final String ERROR_TRIGGERING_RECONFIGURATION_EVENT_FOR_CASE =
             "Error triggering reconfiguration event for case {}: {}";
     private static final String NO_CASE_IDS_TO_RECONFIGURE_EXITING_JOB = "No case ids to reconfigure, exiting job";
@@ -61,54 +52,45 @@ public class BatchReconfigurationTask implements Runnable {
         String adminUserToken = adminUserService.getAdminUserToken();
         AtomicInteger counter = new AtomicInteger(0);
         AtomicReference<String> reconfiguredCases = new AtomicReference<>();
+        AtomicReference<String> skippedCases = new AtomicReference<>();
         caseIds.stream()
                 .limit(limit)
                 .parallel()
                 .forEach(caseId -> {
                     try {
-                        log.info("Reconfiguring case {}", caseId);
-                        triggerReconfigureEvent(adminUserToken, caseId);
+                        log.info("Updating case {}", caseId);
+                        CCDRequest ccdRequest = ccdClient.startEventForCase(adminUserToken, caseTypeIdsString,
+                            EMPLOYMENT, caseId, "RECONFIGURE_WA_TASKS");
+                        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+                        boolean isValidCase = isValidCase(caseData);
+                        if (!isValidCase) {
+                            log.info("Case {} is not valid, skipping", caseId);
+                            skippedCases.updateAndGet(v -> v == null ? caseId : v + ", " + caseId);
+                            return;
+                        }
+
+                        caseData.getClaimantRepresentativeOrganisationPolicy()
+                            .setOrganisation(caseData.getRepresentativeClaimantType().getMyHmctsOrganisation());
+
+                        ccdClient.submitEventForCase(adminUserToken, caseData, caseTypeIdsString, EMPLOYMENT,
+                            ccdRequest, caseId);
                         counter.incrementAndGet();
                         reconfiguredCases.updateAndGet(v -> v == null ? caseId : v + ", " + caseId);
                     } catch (Exception e) {
                         log.error(ERROR_TRIGGERING_RECONFIGURATION_EVENT_FOR_CASE, caseId, e.getMessage());
                     }
                 });
-        log.info("Completed reconfiguration for {} cases", counter.get());
-        log.info("Reconfigured cases: {}", reconfiguredCases.get());
+        log.info("Completed updates for {} cases", counter.get());
+        log.info("Updated cases: {}", reconfiguredCases.get());
+        log.info("Skipped cases: {}", skippedCases.get());
     }
 
-    private void triggerReconfigureEvent(String adminUserToken, String caseId) {
-        try {
-            DynamicFixedListType venueDay = DynamicFixedListType.from(LONDON_TRIBUNALS_CENTRE_VENUE,
-                LONDON_TRIBUNALS_CENTRE_VENUE, true);
-            CCDRequest returnedRequest = ccdClient.startEventForCase(adminUserToken, caseTypeIdsString, EMPLOYMENT,
-                    caseId, "RECONFIGURE_WA_TASKS");
-            CaseData caseData = returnedRequest.getCaseDetails().getCaseData();
-            emptyIfNull(caseData.getHearingCollection()).stream()
-                .filter(hearing -> !ObjectUtils.isEmpty(hearing))
-                .map(HearingTypeItem::getValue)
-                .forEach(hearingItem -> hearingItem.getHearingDateCollection().stream()
-                    .map(DateListedTypeItem::getValue)
-                    .filter(BatchReconfigurationTask::isValidVenue)
-                    .forEach(hearingDateCollection -> {
-                        hearingDateCollection.setHearingVenueDay(venueDay);
-                        hearingItem.setHearingVenue(venueDay);
-                    }));
-
-            ccdClient.submitEventForCase(adminUserToken, returnedRequest.getCaseDetails().getCaseData(),
-                    caseTypeIdsString, returnedRequest.getCaseDetails().getJurisdiction(), returnedRequest,
-                    caseId);
-            log.info("Reconfiguration event triggered for case {}", caseId);
-        } catch (Exception e) {
-            log.error(ERROR_TRIGGERING_RECONFIGURATION_EVENT_FOR_CASE, caseId, e.getMessage());
-        }
-    }
-
-    private static boolean isValidVenue(DateListedType hearingDateCollection) {
-        return LONDON_CENTRAL_VENUE.equals(
-            defaultIfEmpty(hearingDateCollection.getHearingVenueDay().getSelectedCode(), "venue"))
-               && LocalDateTime.parse(hearingDateCollection.getListedDate()).isAfter(LocalDateTime.now())
-               && HEARING_STATUS_LISTED.equals(hearingDateCollection.getHearingStatus());
+    private boolean isValidCase(CaseData caseData) {
+        return isNotEmpty(caseData)
+               && isNotEmpty(caseData.getClaimantRepresentativeOrganisationPolicy())
+               && isEmpty(caseData.getClaimantRepresentativeOrganisationPolicy().getOrganisation())
+               && isNotEmpty(caseData.getRepresentativeClaimantType())
+               && isNotEmpty(caseData.getRepresentativeClaimantType().getMyHmctsOrganisation())
+               && isNotEmpty(caseData.getRepresentativeClaimantType().getMyHmctsOrganisation().getOrganisationID());
     }
 }

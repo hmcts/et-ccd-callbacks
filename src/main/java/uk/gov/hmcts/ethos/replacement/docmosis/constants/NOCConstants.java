@@ -49,6 +49,9 @@ public final class NOCConstants {
             "Unable to get account id by email %s for case %s.";
     public static final String EXCEPTION_UNABLE_TO_FIND_ORGANISATION_BY_USER_ID =
             "Unable to find organisation by user id %s for case %s.";
+    public static final String EXCEPTION_USER_AND_SELECTED_ORGANISATIONS_NOT_MATCH =
+            "User's organisation and selected organisation does not match user id %s, selected organisation id %s, for "
+                    + "case %s.";
 
     public static final String ERROR_RESPONDENT_HAS_MULTIPLE_REPRESENTATIVES =
             "Respondent with name %s has more than one representative";

@@ -31,6 +31,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXC
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_INVALID_GRANT_ACCESS_PARAMETER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_UNABLE_TO_FIND_ORGANISATION_BY_USER_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_UNABLE_TO_GET_ACCOUNT_ID_BY_EMAIL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_USER_AND_SELECTED_ORGANISATIONS_NOT_MATCH;
 
 @RequiredArgsConstructor
 @Component
@@ -114,26 +115,15 @@ public class NocService {
             throw new GenericServiceException(exceptionMessage);
         }
         try {
-            ResponseEntity<AccountIdByEmailResponse> userResponseEntity =
-                    organisationClient.getAccountIdByEmail(accessToken, authTokenGenerator.generate(), email);
-            if (ObjectUtils.isEmpty(userResponseEntity)
-                    || ObjectUtils.isEmpty(userResponseEntity.getBody())
-                    || StringUtils.isBlank(userResponseEntity.getBody().getUserIdentifier())) {
-                String exceptionMessage = String.format(EXCEPTION_UNABLE_TO_GET_ACCOUNT_ID_BY_EMAIL, email,
-                        submissionReference);
-                throw new GenericServiceException(exceptionMessage);
-            }
-            AccountIdByEmailResponse userResponse = userResponseEntity.getBody();
-            ResponseEntity<OrganisationsResponse> organisationsResponseEntity =
-                    organisationClient.retrieveOrganisationDetailsByUserId(accessToken, authTokenGenerator.generate(),
-                            userResponse.getUserIdentifier());
-            if (ObjectUtils.isEmpty(organisationsResponseEntity)
-                    || ObjectUtils.isEmpty(organisationsResponseEntity.getBody())
-                    || StringUtils.isBlank(organisationsResponseEntity.getBody().getOrganisationIdentifier())
-                    || !Strings.CS.equals(organisationsResponseEntity.getBody().getOrganisationIdentifier(),
+            AccountIdByEmailResponse userResponse = findUserByEmail(accessToken, email,
+                    submissionReference);
+            OrganisationsResponse organisationsResponse = findOrganisationByUserId(accessToken,
+                    userResponse.getUserIdentifier(), submissionReference);
+            if (!Strings.CS.equals(organisationsResponse.getOrganisationIdentifier(),
                     organisationToAdd.getOrganisationID())) {
-                String exceptionMessage = String.format(EXCEPTION_UNABLE_TO_FIND_ORGANISATION_BY_USER_ID,
-                        userResponse.getUserIdentifier(), submissionReference);
+                String exceptionMessage = String.format(EXCEPTION_USER_AND_SELECTED_ORGANISATIONS_NOT_MATCH,
+                        userResponse.getUserIdentifier(), organisationsResponse.getOrganisationIdentifier(),
+                        submissionReference);
                 throw new GenericServiceException(exceptionMessage);
             }
             grantCaseAccess(userResponse.getUserIdentifier(), submissionReference, role);
@@ -141,6 +131,66 @@ public class NocService {
             throw new GenericServiceException(new CcdInputOutputException(String.format(EXCEPTION_FAILED_TO_ASSIGN_ROLE,
                     role, email, submissionReference), exception));
         }
+    }
+
+    /**
+     * Retrieves organisation details associated with a given user identifier.
+     * <p>
+     * Calls the Organisation service to obtain organisation information for the specified user.
+     * If the response is null, contains no-body, or does not include an organisation identifier,
+     * a {@link GenericServiceException} is thrown.
+     *
+     * @param accessToken the access token used to authorise the request to the Organisation service
+     * @param userId the unique identifier of the user whose organisation details are to be retrieved
+     * @param submissionReference the submission reference used to provide context in error messages
+     * @return the {@link OrganisationsResponse} containing the organisation details for the user
+     * @throws GenericServiceException if the organisation cannot be found or the response is invalid
+     */
+    public OrganisationsResponse findOrganisationByUserId(String accessToken,
+                                                          String userId,
+                                                          String submissionReference)
+            throws GenericServiceException {
+        ResponseEntity<OrganisationsResponse> organisationsResponseEntity =
+                organisationClient.retrieveOrganisationDetailsByUserId(accessToken, authTokenGenerator.generate(),
+                        userId);
+        if (ObjectUtils.isEmpty(organisationsResponseEntity)
+                || ObjectUtils.isEmpty(organisationsResponseEntity.getBody())
+                || StringUtils.isBlank(organisationsResponseEntity.getBody().getOrganisationIdentifier())) {
+            String exceptionMessage = String.format(EXCEPTION_UNABLE_TO_FIND_ORGANISATION_BY_USER_ID, userId,
+                    submissionReference);
+            throw new GenericServiceException(exceptionMessage);
+        }
+        return organisationsResponseEntity.getBody();
+    }
+
+    /**
+     * Retrieves a user account by email address.
+     * <p>
+     * Calls the Organisation service to look up a user using the provided email address.
+     * If the response is null, contains no-body, or does not include a user identifier,
+     * a {@link GenericServiceException} is thrown.
+     *
+     * @param accessToken the access token used to authorise the request to the Organisation service
+     * @param email the email address of the user to be looked up
+     * @param submissionReference the submission reference used to provide context in error messages
+     * @return the {@link AccountIdByEmailResponse} containing the user's account identifier
+     * @throws IOException if an I/O error occurs while calling the Organisation service
+     * @throws GenericServiceException if the user cannot be found or the response is invalid
+     */
+    public AccountIdByEmailResponse findUserByEmail(String accessToken,
+                                                    String email,
+                                                    String submissionReference)
+            throws IOException, GenericServiceException {
+        ResponseEntity<AccountIdByEmailResponse> userResponseEntity =
+                organisationClient.getAccountIdByEmail(accessToken, authTokenGenerator.generate(), email);
+        if (ObjectUtils.isEmpty(userResponseEntity)
+                || ObjectUtils.isEmpty(userResponseEntity.getBody())
+                || StringUtils.isBlank(userResponseEntity.getBody().getUserIdentifier())) {
+            String exceptionMessage = String.format(EXCEPTION_UNABLE_TO_GET_ACCOUNT_ID_BY_EMAIL, email,
+                    submissionReference);
+            throw new GenericServiceException(exceptionMessage);
+        }
+        return userResponseEntity.getBody();
     }
 
     /**

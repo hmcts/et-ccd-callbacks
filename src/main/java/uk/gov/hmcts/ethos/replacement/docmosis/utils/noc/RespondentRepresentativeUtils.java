@@ -3,19 +3,23 @@ package uk.gov.hmcts.ethos.replacement.docmosis.utils.noc;
 import com.nimbusds.oauth2.sdk.util.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentUtils;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_INVALID_REPRESENTATIVE_EXISTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_RESPONDENT_HAS_MULTIPLE_REPRESENTATIVES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_REPRESENTATIVE_DETAILS_NOT_EXIST;
@@ -72,6 +76,26 @@ public final class RespondentRepresentativeUtils {
                     representative.getId(), caseReferenceNumber);
             throw new GenericServiceException(exceptionMessage);
         }
+    }
+
+    /**
+     * Checks whether a representative item is valid.
+     * <p>
+     * A representative is considered valid if:
+     * <ul>
+     *   <li>The representative item itself is not {@code null}</li>
+     *   <li>The representative has a non-blank ID</li>
+     *   <li>The representative has a non-null value object</li>
+     * </ul>
+     *
+     * @param representative the representative item to validate
+     * @return {@code true} if the representative is non-null and contains a valid ID and value;
+     *         {@code false} otherwise
+     */
+    public static boolean isValidRepresentative(RepresentedTypeRItem representative) {
+        return ObjectUtils.isNotEmpty(representative)
+                && StringUtils.isNotBlank(representative.getId())
+                && ObjectUtils.isNotEmpty(representative.getValue());
     }
 
     /**
@@ -199,5 +223,158 @@ public final class RespondentRepresentativeUtils {
                 .filter(assignment -> StringUtils.isNotBlank(assignment.getCaseRole()))
                 .filter(assignment -> RoleUtils.isRespondentRepresentativeRole(assignment.getCaseRole()))
                 .toList();
+    }
+
+    /**
+     * Determines whether a representative can be removed from assignments.
+     * <p>
+     * A representative is eligible for removal if:
+     * <ul>
+     *   <li>The representative is valid</li>
+     *   <li>The representative is marked as a MyHMCTS user</li>
+     *   <li>A respondent organisation is present</li>
+     *   <li>The respondent organisation has a non-empty organisation ID</li>
+     *   <li>The representative has a non-empty email address</li>
+     * </ul>
+     *
+     * @param representative the representative to be evaluated
+     * @return {@code true} if the representative meets all criteria required for removal;
+     *         {@code false} otherwise
+     */
+    public static boolean canRemoveRepresentativeFromAssignments(RepresentedTypeRItem representative) {
+        return isValidRepresentative(representative)
+                && YES.equals(representative.getValue().getMyHmctsYesNo())
+                && ObjectUtils.isNotEmpty(representative.getValue().getRespondentOrganisation())
+                && StringUtils.isNotEmpty(representative.getValue().getRespondentOrganisation()
+                .getOrganisationID())
+                && StringUtils.isNotEmpty(representative.getValue().getRepresentativeEmailAddress());
+    }
+
+    /**
+     * Determines whether two representatives refer to the same respondent.
+     * <p>
+     * The representatives are considered to refer to the same respondent if the
+     * respondent ID of the old representative is present and matches the respondent
+     * ID of the new representative.
+     *
+     * <p><strong>Assumptions:</strong>
+     * <ul>
+     *   <li>Both {@code oldRepresentative} and {@code newRepresentative} are non-null</li>
+     *   <li>Both representatives have a non-null value object</li>
+     *   <li>The new representative may or may not have a respondent ID</li>
+     * </ul>
+     *
+     * @param oldRepresentative the existing representative containing the respondent ID
+     * @param newRepresentative the updated representative to compare against
+     * @return {@code true} if both representatives refer to the same respondent;
+     *         {@code false} otherwise
+     */
+    public static boolean representsSameRespondent(RepresentedTypeRItem oldRepresentative,
+                                                   RepresentedTypeRItem newRepresentative) {
+        return StringUtils.isNotBlank(oldRepresentative.getValue().getRespondentId())
+                && oldRepresentative.getValue().getRespondentId()
+                .equals(newRepresentative.getValue().getRespondentId())
+                || StringUtils.isNotBlank(oldRepresentative.getValue().getRespRepName())
+                && oldRepresentative.getValue().getRespRepName().equals(newRepresentative.getValue().getRespRepName());
+    }
+
+    /**
+     * Determines whether a representative’s respondent organisation has changed.
+     * <p>
+     * A change is considered to have occurred if there is any difference between the
+     * old and new representatives in terms of the presence or value of the respondent
+     * organisation or its organisation ID.
+     * <p>
+     * Specifically, this method returns {@code true} if:
+     * <ul>
+     *   <li>One representative has a respondent organisation and the other does not</li>
+     *   <li>One representative has a blank organisation ID and the other has a non-blank organisation ID</li>
+     *   <li>Both representatives have a non-blank organisation ID, but the values differ</li>
+     * </ul>
+     *
+     * <p>If both representatives have no respondent organisation, or both have the same
+     * non-blank organisation ID, the organisation is considered unchanged.
+     *
+     * <p><strong>Assumptions:</strong>
+     * <ul>
+     *   <li>Both {@code oldRepresentative} and {@code newRepresentative} are non-null</li>
+     * </ul>
+     *
+     * @param oldRepresentative the existing representative to compare from
+     * @param newRepresentative the updated representative to compare against
+     * @return {@code true} if the respondent organisation has changed;
+     *         {@code false} otherwise
+     */
+    public static boolean isRepresentativeOrganisationChanged(RepresentedTypeR oldRepresentative,
+                                                              RepresentedTypeR newRepresentative) {
+        if (ObjectUtils.isEmpty(oldRepresentative.getRespondentOrganisation())
+                && ObjectUtils.isEmpty(newRepresentative.getRespondentOrganisation())) {
+            return false;
+        }
+        if (isOrganisationObjectChanged(oldRepresentative, newRepresentative)) {
+            return true;
+        }
+        return isOrganisationIdChanged(oldRepresentative, newRepresentative);
+    }
+
+    private static boolean isOrganisationObjectChanged(RepresentedTypeR oldRepresentative,
+                                                        RepresentedTypeR newRepresentative) {
+        return ObjectUtils.isEmpty(oldRepresentative.getRespondentOrganisation())
+                && ObjectUtils.isNotEmpty(newRepresentative.getRespondentOrganisation())
+                || ObjectUtils.isNotEmpty(oldRepresentative.getRespondentOrganisation())
+                && ObjectUtils.isEmpty(newRepresentative.getRespondentOrganisation())
+                || StringUtils.isNotBlank(oldRepresentative.getRespondentOrganisation().getOrganisationID())
+                && StringUtils.isBlank(newRepresentative.getRespondentOrganisation().getOrganisationID())
+                || StringUtils.isBlank(oldRepresentative.getRespondentOrganisation().getOrganisationID())
+                && StringUtils.isNotBlank(newRepresentative.getRespondentOrganisation().getOrganisationID());
+    }
+
+    private static boolean isOrganisationIdChanged(RepresentedTypeR oldRepresentative,
+                                                   RepresentedTypeR newRepresentative) {
+        return ObjectUtils.isNotEmpty(oldRepresentative.getRespondentOrganisation())
+                && ObjectUtils.isNotEmpty(newRepresentative.getRespondentOrganisation())
+                && StringUtils.isNotBlank(oldRepresentative.getRespondentOrganisation().getOrganisationID())
+                && StringUtils.isNotBlank(newRepresentative.getRespondentOrganisation().getOrganisationID())
+                && !oldRepresentative.getRespondentOrganisation().getOrganisationID().equals(
+                newRepresentative.getRespondentOrganisation().getOrganisationID());
+    }
+
+    public static boolean isRepresentativeEmailChanged(RepresentedTypeR oldRepresentative,
+                                                        RepresentedTypeR newRepresentative) {
+        return !Strings.CI.equals(oldRepresentative.getRepresentativeEmailAddress(), newRepresentative
+                .getRepresentativeEmailAddress());
+    }
+
+    public static List<RepresentedTypeRItem> findRepresentativesToRemove(
+            List<RepresentedTypeRItem> oldRepresentatives, List<RepresentedTypeRItem> newRepresentatives) {
+        if (CollectionUtils.isEmpty(oldRepresentatives)) {
+            return new ArrayList<>();
+        }
+        List<RepresentedTypeRItem> representativesToRemove = new ArrayList<>();
+        for (RepresentedTypeRItem oldRepresentative : oldRepresentatives) {
+            if (!RespondentRepresentativeUtils.isValidRepresentative(oldRepresentative)) {
+                continue;
+            }
+            boolean representativeChanged = false;
+            boolean representativeFound = false;
+            for (RepresentedTypeRItem newRepresentative : newRepresentatives) {
+                if (!RespondentRepresentativeUtils.isValidRepresentative(newRepresentative)
+                        || !RespondentRepresentativeUtils.representsSameRespondent(oldRepresentative,
+                        newRepresentative)) {
+                    continue;
+                }
+                representativeFound = true;
+                if (RespondentRepresentativeUtils.isRepresentativeOrganisationChanged(oldRepresentative.getValue(),
+                        newRepresentative.getValue())
+                        || RespondentRepresentativeUtils.isRepresentativeEmailChanged(oldRepresentative.getValue(),
+                        newRepresentative.getValue())) {
+                    representativeChanged = true;
+                }
+            }
+            if (!representativeFound || representativeChanged) {
+                representativesToRemove.add(oldRepresentative);
+            }
+        }
+        return representativesToRemove;
     }
 }

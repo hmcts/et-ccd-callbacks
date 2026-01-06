@@ -996,12 +996,13 @@ public class InitialConsiderationService {
     }
 
     private void processSuggestedIssues(Et3VettingType et3Vetting, List<String[]> pairsList) {
-        if (et3Vetting == null) {
+        if (et3Vetting == null || et3Vetting.getEt3SuggestedIssues() == null) {
+            addPair(pairsList, "Are there any other suggested orders, directions or issues?", NONE_PROVIDED);
             return;
         }
 
-        addPair(pairsList, "<h3>Are there any other suggested orders, directions or issues?</h3>", "");
         if (et3Vetting.getEt3SuggestedIssues() != null && !et3Vetting.getEt3SuggestedIssues().isEmpty()) {
+            addPair(pairsList, "Are there any other suggested orders, directions or issues?", "");
             et3Vetting.getEt3SuggestedIssues().forEach(issue -> addPair(pairsList, issue,
                     getSuggestedIssueDetails(et3Vetting, issue)));
         }

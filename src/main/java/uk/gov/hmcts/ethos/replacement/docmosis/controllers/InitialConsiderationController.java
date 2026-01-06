@@ -163,7 +163,7 @@ public class InitialConsiderationController {
         String caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();
         caseData.setEtInitialConsiderationJurisdictionCodes(initialConsiderationService.generateJurisdictionCodesHtml(
                         caseData.getJurCodesCollection(), caseTypeId));
-        initialConsiderationService.setIsHearingAlreadyListed(caseData, caseTypeId);
+
         initialConsiderationService.initialiseInitialConsideration(ccdRequest.getCaseDetails());
 
         if (CollectionUtils.isNotEmpty(caseData.getEtICHearingNotListedList())) {

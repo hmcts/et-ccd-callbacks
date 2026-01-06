@@ -95,7 +95,6 @@ class NocRespondentRepresentativeServiceTest {
     private static final String RESPONDENT_REP_NAME_TWO = "Legal Two";
     private static final String RESPONDENT_REP_NAME_THREE = "Legal Three";
     private static final String RESPONDENT_REP_EMAIL = "respondent@rep.email.com";
-    private static final String ROLE_CLAIMANT_SOLICITOR = "[CLAIMANTSOLICITOR]";
     private static final String ROLE_SOLICITORA = "[SOLICITORA]";
     private static final String ROLE_SOLICITORB = "[SOLICITORB]";
     private static final String ROLE_SOLICITORC = "[SOLICITORC]";
@@ -892,38 +891,6 @@ class NocRespondentRepresentativeServiceTest {
         nocRespondentRepresentativeService.validateRepresentativeOrganisationAndEmail(caseData,
                 SUBMISSION_REFERENCE_ONE);
         assertThat(caseData.getNocWarning()).isEmpty();
-    }
-
-    @Test
-    public void theRevokeOldRespondentRepresentativeAccess() {
-        // when case id is empty or blank should not throw any exception
-        assertDoesNotThrow(() -> nocRespondentRepresentativeService
-                .revokeOldRespondentRepresentativeAccess(StringUtils.EMPTY));
-
-        // when there is no case user assignment should not throw any exception
-        when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
-        when(nocCcdService.getCaseAssignments(AUTH_TOKEN, SUBMISSION_REFERENCE_ONE))
-                .thenReturn(CaseUserAssignmentData.builder().build());
-        assertDoesNotThrow(() -> nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(
-                SUBMISSION_REFERENCE_ONE));
-
-        // when there is no assigned respondent representative roles should not throw any exception
-        when(nocCcdService.getCaseAssignments(AUTH_TOKEN, SUBMISSION_REFERENCE_ONE))
-                .thenReturn(CaseUserAssignmentData.builder().caseUserAssignments(
-                        List.of(CaseUserAssignment.builder().caseRole(ROLE_CLAIMANT_SOLICITOR).build())).build());
-        assertDoesNotThrow(() -> nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(
-                SUBMISSION_REFERENCE_ONE));
-
-        // when there is assigned respondent representative role should not throw any exception and remove
-        // that assignment
-        CaseUserAssignment caseUserAssignment = CaseUserAssignment.builder().caseRole(ROLE_SOLICITORA).build();
-        when(nocCcdService.getCaseAssignments(AUTH_TOKEN, SUBMISSION_REFERENCE_ONE))
-                .thenReturn(CaseUserAssignmentData.builder().caseUserAssignments(
-                        List.of(caseUserAssignment)).build());
-        doNothing().when(nocCcdService).revokeCaseAssignments(AUTH_TOKEN, CaseUserAssignmentData.builder()
-                .caseUserAssignments(List.of(caseUserAssignment)).build());
-        assertDoesNotThrow(() -> nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(
-                SUBMISSION_REFERENCE_ONE));
     }
 
     @Test

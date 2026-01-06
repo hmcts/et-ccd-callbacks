@@ -49,6 +49,7 @@ final class RoleUtilsTest {
     private static final int INTEGER_EIGHT = 8;
     private static final int INTEGER_NINE = 9;
     private static final int INTEGER_TEN = 10;
+    private static final int INTEGER_ELEVEN = 11;
 
     @Test
     void theIsRespondentRepresentativeRole() {
@@ -213,4 +214,82 @@ final class RoleUtilsTest {
         assertThat(RoleUtils.findRespondentRepresentativeRole(representative, caseData)).isEqualTo(ROLE_SOLICITOR_D);
     }
 
+    @Test
+    void theFindRoleIndexByRoleLabel() {
+        // when role is null should return minus one
+        assertThat(RoleUtils.findRoleIndexByRoleLabel(StringUtils.EMPTY)).isEqualTo(NumberUtils.INTEGER_MINUS_ONE);
+        // when role is empty should return minus one
+        assertThat(RoleUtils.findRoleIndexByRoleLabel(StringUtils.EMPTY)).isEqualTo(NumberUtils.INTEGER_MINUS_ONE);
+        // when claimant solicitor role should return minus one
+        assertThat(RoleUtils.findRoleIndexByRoleLabel(ROLE_CLAIMANT_SOLICITOR)).isEqualTo(
+                NumberUtils.INTEGER_MINUS_ONE);
+        // when not a valid respondent solicitor role should return minus one
+        assertThat(RoleUtils.findRoleIndexByRoleLabel(ROLE_SOLICITOR_K)).isEqualTo(NumberUtils.INTEGER_MINUS_ONE);
+        //when valid solicitor role should return its index
+        assertThat(RoleUtils.findRoleIndexByRoleLabel(ROLE_SOLICITOR_A)).isEqualTo(NumberUtils.INTEGER_ZERO);
+        assertThat(RoleUtils.findRoleIndexByRoleLabel(ROLE_SOLICITOR_B)).isEqualTo(NumberUtils.INTEGER_ONE);
+        assertThat(RoleUtils.findRoleIndexByRoleLabel(ROLE_SOLICITOR_C)).isEqualTo(NumberUtils.INTEGER_TWO);
+        assertThat(RoleUtils.findRoleIndexByRoleLabel(ROLE_SOLICITOR_D)).isEqualTo(INTEGER_THREE);
+        assertThat(RoleUtils.findRoleIndexByRoleLabel(ROLE_SOLICITOR_E)).isEqualTo(INTEGER_FOUR);
+        assertThat(RoleUtils.findRoleIndexByRoleLabel(ROLE_SOLICITOR_F)).isEqualTo(INTEGER_FIVE);
+        assertThat(RoleUtils.findRoleIndexByRoleLabel(ROLE_SOLICITOR_G)).isEqualTo(INTEGER_SIX);
+        assertThat(RoleUtils.findRoleIndexByRoleLabel(ROLE_SOLICITOR_H)).isEqualTo(INTEGER_SEVEN);
+        assertThat(RoleUtils.findRoleIndexByRoleLabel(ROLE_SOLICITOR_I)).isEqualTo(INTEGER_EIGHT);
+        assertThat(RoleUtils.findRoleIndexByRoleLabel(ROLE_SOLICITOR_J)).isEqualTo(INTEGER_NINE);
+    }
+
+    @Test
+    void theFindRespondentNameByIndex() {
+        CaseData caseData = new CaseData();
+        // when index is less than 0 should return empty string
+        assertThat(RoleUtils.findRespondentNameByIndex(caseData, NumberUtils.INTEGER_MINUS_ONE))
+                .isEqualTo(StringUtils.EMPTY);
+        // when index is equal to 10 should return empty string
+        assertThat(RoleUtils.findRespondentNameByIndex(caseData, INTEGER_TEN)).isEqualTo(StringUtils.EMPTY);
+        // when index is greater than 10 should return empty string
+        assertThat(RoleUtils.findRespondentNameByIndex(caseData, INTEGER_ELEVEN)).isEqualTo(StringUtils.EMPTY);
+        // when index is greater than or equal to 0 and less than 10 and case data notice of change answers are empty
+        // should return empty string
+        assertThat(RoleUtils.findRespondentNameByIndex(caseData, NumberUtils.INTEGER_ONE)).isEqualTo(StringUtils.EMPTY);
+        // when notice of change answers exists should return that respondent name
+        setAllNoticeOfChangeAnswers(caseData);
+        assertThat(RoleUtils.findRespondentNameByIndex(caseData, NumberUtils.INTEGER_ZERO))
+                .isEqualTo(RESPONDENT_NAME_ONE);
+        assertThat(RoleUtils.findRespondentNameByIndex(caseData, NumberUtils.INTEGER_ONE))
+                .isEqualTo(RESPONDENT_NAME_TWO);
+        assertThat(RoleUtils.findRespondentNameByIndex(caseData, NumberUtils.INTEGER_TWO))
+                .isEqualTo(RESPONDENT_NAME_THREE);
+        assertThat(RoleUtils.findRespondentNameByIndex(caseData, INTEGER_THREE)).isEqualTo(RESPONDENT_NAME_FOUR);
+        assertThat(RoleUtils.findRespondentNameByIndex(caseData, INTEGER_FOUR)).isEqualTo(RESPONDENT_NAME_FIVE);
+        assertThat(RoleUtils.findRespondentNameByIndex(caseData, INTEGER_FIVE)).isEqualTo(RESPONDENT_NAME_SIX);
+        assertThat(RoleUtils.findRespondentNameByIndex(caseData, INTEGER_SIX)).isEqualTo(RESPONDENT_NAME_SEVEN);
+        assertThat(RoleUtils.findRespondentNameByIndex(caseData, INTEGER_SEVEN)).isEqualTo(RESPONDENT_NAME_EIGHT);
+        assertThat(RoleUtils.findRespondentNameByIndex(caseData, INTEGER_EIGHT)).isEqualTo(RESPONDENT_NAME_NINE);
+        assertThat(RoleUtils.findRespondentNameByIndex(caseData, INTEGER_NINE)).isEqualTo(RESPONDENT_NAME_TEN);
+    }
+
+    @Test
+    void theFindRespondentNameByRole() {
+        // when case data is empty should return empty string
+        assertThat(RoleUtils.findRespondentNameByRole(null, ROLE_SOLICITOR_A)).isEqualTo(StringUtils.EMPTY);
+        // when role is empty should return empty string
+        CaseData caseData = new CaseData();
+        assertThat(RoleUtils.findRespondentNameByRole(caseData, StringUtils.EMPTY)).isEqualTo(StringUtils.EMPTY);
+        // when case data doesn't have any notice of change answer should return empty string
+        assertThat(RoleUtils.findRespondentNameByRole(caseData, ROLE_SOLICITOR_A)).isEqualTo(StringUtils.EMPTY);
+        // when role is invalid should return empty string
+        setAllNoticeOfChangeAnswers(caseData);
+        assertThat(RoleUtils.findRespondentNameByRole(caseData, ROLE_SOLICITOR_K)).isEqualTo(StringUtils.EMPTY);
+        // when role is valid should return respondent name
+        assertThat(RoleUtils.findRespondentNameByRole(caseData, ROLE_SOLICITOR_A)).isEqualTo(RESPONDENT_NAME_ONE);
+        assertThat(RoleUtils.findRespondentNameByRole(caseData, ROLE_SOLICITOR_B)).isEqualTo(RESPONDENT_NAME_TWO);
+        assertThat(RoleUtils.findRespondentNameByRole(caseData, ROLE_SOLICITOR_C)).isEqualTo(RESPONDENT_NAME_THREE);
+        assertThat(RoleUtils.findRespondentNameByRole(caseData, ROLE_SOLICITOR_D)).isEqualTo(RESPONDENT_NAME_FOUR);
+        assertThat(RoleUtils.findRespondentNameByRole(caseData, ROLE_SOLICITOR_E)).isEqualTo(RESPONDENT_NAME_FIVE);
+        assertThat(RoleUtils.findRespondentNameByRole(caseData, ROLE_SOLICITOR_F)).isEqualTo(RESPONDENT_NAME_SIX);
+        assertThat(RoleUtils.findRespondentNameByRole(caseData, ROLE_SOLICITOR_G)).isEqualTo(RESPONDENT_NAME_SEVEN);
+        assertThat(RoleUtils.findRespondentNameByRole(caseData, ROLE_SOLICITOR_H)).isEqualTo(RESPONDENT_NAME_EIGHT);
+        assertThat(RoleUtils.findRespondentNameByRole(caseData, ROLE_SOLICITOR_I)).isEqualTo(RESPONDENT_NAME_NINE);
+        assertThat(RoleUtils.findRespondentNameByRole(caseData, ROLE_SOLICITOR_J)).isEqualTo(RESPONDENT_NAME_TEN);
+    }
 }

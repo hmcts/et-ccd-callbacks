@@ -181,4 +181,49 @@ public final class RoleUtils {
                 RoleUtils.findSolicitorRoleIndexByRespondentName(caseData, respondentName);
         return RoleUtils.solicitorRoleLabelForIndex(noticeOfChangeAnswerIndex);
     }
+
+    /**
+     * Returns the respondent index associated with the given solicitor case role label.
+     * <p>
+     * The role label is expected to match one of the CCD solicitor role labels
+     * (e.g. {@code "[SOLICITORA]"}, {@code "[SOLICITORB]"}). If the role label does not
+     * correspond to any {@link SolicitorRole}, this method returns {@code -1}.
+     * </p>
+     *
+     * @param role the CCD solicitor case role label
+     * @return the zero-based respondent index for the solicitor role, or {@code -1}
+     *         if the role label is not recognised
+     */
+    public static int findRoleIndexByRoleLabel(String role) {
+        return SolicitorRole.from(role).map(SolicitorRole::getIndex).orElse(NumberUtils.INTEGER_MINUS_ONE);
+    }
+
+    /**
+     * Retrieves the respondent name for the given respondent index from the Notice of Change answers.
+     * <p>
+     * The index is expected to be zero-based and within the valid range of Notice of Change answers.
+     * If the index is out of range, or if the respondent name is {@code null}, empty, or blank,
+     * this method returns an empty string.
+     * </p>
+     *
+     * @param caseData the case data containing the Notice of Change answers
+     * @param index the zero-based index of the respondent
+     * @return the respondent name for the given index, or an empty string if the index is invalid
+     *         or the respondent name is blank
+     */
+    public static String findRespondentNameByIndex(CaseData caseData, int index) {
+        if (index < 0 || index >= MAX_NOC_ANSWERS) {
+            return StringUtils.EMPTY;
+        }
+        String respondentName = getNoticeOfChangeAnswers(caseData).get(index).getRespondentName();
+        return StringUtils.isNotBlank(respondentName) ? respondentName : StringUtils.EMPTY;
+    }
+
+    public static String findRespondentNameByRole(CaseData caseData, String role) {
+        if (ObjectUtils.isEmpty(caseData) || StringUtils.isBlank(role)) {
+            return StringUtils.EMPTY;
+        }
+        int roleIndex = findRoleIndexByRoleLabel(role);
+        return RoleUtils.findRespondentNameByIndex(caseData, roleIndex);
+    }
 }

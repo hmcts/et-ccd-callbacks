@@ -6,11 +6,9 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 
 import java.util.ArrayList;
@@ -45,9 +43,6 @@ final class RespondentRepresentativeUtilsTest {
     private static final String RESPONDENT_NAME_2 = "Respondent name 2";
     private static final String REPRESENTATIVE_NAME_1 = "Representative name 1";
     private static final String REPRESENTATIVE_NAME_2 = "Representative name 2";
-
-    private static final String ROLE_CLAIMANT_SOLICITOR = "[CLAIMANTSOLICITOR]";
-    private static final String ROLE_SOLICITOR_A = "[SOLICITORA]";
 
     private static final String REPRESENTATIVE_EMAIL_1 = "representative1@testmail.com";
     private static final String REPRESENTATIVE_EMAIL_1_CAPITALISED = "REPRESENTATIVE1@TESTMAIL.COM";
@@ -151,33 +146,6 @@ final class RespondentRepresentativeUtilsTest {
         // when case data has representative then return true
         caseData.setRepCollection(List.of(RepresentedTypeRItem.builder().build()));
         assertThat(RespondentRepresentativeUtils.hasRespondentRepresentative(caseData)).isTrue();
-    }
-
-    @Test
-    void theFilterRespondentRepresentativeAssignments() {
-        // when case user assignments are null should return an empty list
-        assertThat(RespondentRepresentativeUtils.filterRespondentRepresentativeAssignments(null)).isEmpty();
-
-        // when case user assignments are empty should return an empty list
-        assertThat(RespondentRepresentativeUtils.filterRespondentRepresentativeAssignments(List.of())).isEmpty();
-
-        // when case user assignments not have any roles defined should return empty list
-        CaseUserAssignment caseUserAssignment = CaseUserAssignment.builder().build();
-        assertThat(RespondentRepresentativeUtils.filterRespondentRepresentativeAssignments(List.of(caseUserAssignment)))
-                .isEmpty();
-
-        // when case user assignments not have any respondent representative role should return an empty list
-        caseUserAssignment.setCaseRole(ROLE_CLAIMANT_SOLICITOR);
-        assertThat(RespondentRepresentativeUtils.filterRespondentRepresentativeAssignments(List.of(caseUserAssignment)))
-                .isEmpty();
-
-        // when case user assignments have respondent representative role should return a non-empty list
-        caseUserAssignment.setCaseRole(ROLE_SOLICITOR_A);
-        List<CaseUserAssignment> expectedCaseUserAssignments =
-                RespondentRepresentativeUtils.filterRespondentRepresentativeAssignments(List.of(caseUserAssignment));
-        assertThat(expectedCaseUserAssignments).isNotEmpty().hasSize(NumberUtils.INTEGER_ONE);
-        assertThat(expectedCaseUserAssignments.getFirst().getCaseRole())
-                .isEqualTo(SolicitorRole.SOLICITORA.getCaseRoleLabel());
     }
 
     @Test

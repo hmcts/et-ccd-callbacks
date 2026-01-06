@@ -39,6 +39,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.OrganisationUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.NocUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.RespondentRepresentativeUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.RoleUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
@@ -230,6 +231,17 @@ public class NocRespondentRepresentativeService {
         }
     }
 
+    public void revokeOldRepresentatives(CallbackRequest callbackRequest) {
+        CaseDetails oldCaseDetails = callbackRequest.getCaseDetailsBefore();
+        CaseDetails newCaseDetails = callbackRequest.getCaseDetails();
+
+        List<RepresentedTypeRItem> oldRepresentatives = oldCaseDetails.getCaseData().getRepCollection();
+        List<RepresentedTypeRItem> newRepresentatives = newCaseDetails.getCaseData().getRepCollection();
+        List<RepresentedTypeRItem> representativesToRemove = RespondentRepresentativeUtils.findRepresentativesToRemove(
+                oldRepresentatives, newRepresentatives);
+        revokeOldRespondentRepresentativeAccess(oldCaseDetails, representativesToRemove);
+    }
+
     /**
      * Revokes any existing respondent representative case access for the given case.
      * <p>
@@ -238,26 +250,45 @@ public class NocRespondentRepresentativeService {
      * the CCD NoC service. If the case has no user assignments, no action is taken.
      * </p>
      *
-     * @param caseId the CCD case identifier for which respondent representative access
+     * @param oldCaseDetails the CCD case identifier for which respondent representative access
      *               should be revoked
      */
-    public void revokeOldRespondentRepresentativeAccess(String caseId) {
-        if (StringUtils.isEmpty(caseId)) {
+    public void revokeOldRespondentRepresentativeAccess(
+            CaseDetails oldCaseDetails, List<RepresentedTypeRItem> representativesToRemove) {
+        if (ObjectUtils.isEmpty(oldCaseDetails)
+                || ObjectUtils.isEmpty(oldCaseDetails.getCaseData())
+                || StringUtils.isEmpty(oldCaseDetails.getCaseId())
+                || CollectionUtils.isEmpty(representativesToRemove)) {
             return;
         }
         CaseUserAssignmentData caseUserAssignments = nocCcdService.getCaseAssignments(
-                adminUserService.getAdminUserToken(), caseId);
+                adminUserService.getAdminUserToken(), oldCaseDetails.getCaseId());
         if (ObjectUtils.isEmpty(caseUserAssignments)
                 || CollectionUtils.isEmpty(caseUserAssignments.getCaseUserAssignments())) {
             return;
         }
-        List<CaseUserAssignment> usersToRevoke = RespondentRepresentativeUtils
-                .filterRespondentRepresentativeAssignments(caseUserAssignments.getCaseUserAssignments());
-        if (CollectionUtils.isEmpty(usersToRevoke)) {
-            return;
+        List<CaseUserAssignment> representativesToRevoke = new ArrayList<>();
+        for (CaseUserAssignment caseUserAssignment : caseUserAssignments.getCaseUserAssignments()) {
+            if (!RoleUtils.isRespondentRepresentativeRole(caseUserAssignment.getCaseRole())) {
+                continue;
+            }
+            String respondentName = RoleUtils.findRespondentNameByRole(oldCaseDetails.getCaseData(),
+                    caseUserAssignment.getCaseRole());
+            for (RepresentedTypeRItem representative : representativesToRemove) {
+                if (!RespondentRepresentativeUtils.isValidRepresentative(representative)) {
+                    continue;
+                }
+                if (RespondentRepresentativeUtils.canRemoveRepresentativeFromAssignments(representative)
+                        && (StringUtils.isNotBlank(respondentName)
+                        && respondentName.equals(representative.getValue().getRespRepName())
+                        || StringUtils.isNotBlank(caseUserAssignment.getCaseRole())
+                        && caseUserAssignment.getCaseRole().equals(representative.getValue().getRole()))) {
+                    representativesToRevoke.add(caseUserAssignment);
+                }
+            }
         }
         nocCcdService.revokeCaseAssignments(adminUserService.getAdminUserToken(),
-                CaseUserAssignmentData.builder().caseUserAssignments(usersToRevoke).build());
+                CaseUserAssignmentData.builder().caseUserAssignments(representativesToRevoke).build());
     }
 
     /**

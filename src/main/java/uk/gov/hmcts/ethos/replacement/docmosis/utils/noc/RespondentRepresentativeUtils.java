@@ -5,7 +5,6 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
@@ -16,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -195,34 +193,6 @@ public final class RespondentRepresentativeUtils {
     public static boolean hasRespondentRepresentative(CaseData caseData) {
         return ObjectUtils.isNotEmpty(caseData)
                 && CollectionUtils.isNotEmpty(caseData.getRepCollection());
-    }
-
-    /**
-     * Filters a list of case user assignments to include only respondent
-     * representative assignments.
-     * <p>
-     * Assignments are retained if they are non-null, have a non-blank case role,
-     * and the role is identified as a respondent representative role.
-     * <p>
-     * If the provided list is {@code null} or empty, an empty list is returned.
-     *
-     * @param caseUserAssignments the list of case user assignments to filter;
-     *                            may be {@code null} or empty
-     * @return a list containing only respondent representative case user assignments;
-     *         never {@code null}
-     */
-    public static List<CaseUserAssignment> filterRespondentRepresentativeAssignments(
-            List<CaseUserAssignment> caseUserAssignments) {
-
-        if (CollectionUtils.isEmpty(caseUserAssignments)) {
-            return List.of();
-        }
-
-        return caseUserAssignments.stream()
-                .filter(Objects::nonNull)
-                .filter(assignment -> StringUtils.isNotBlank(assignment.getCaseRole()))
-                .filter(assignment -> RoleUtils.isRespondentRepresentativeRole(assignment.getCaseRole()))
-                .toList();
     }
 
     /**

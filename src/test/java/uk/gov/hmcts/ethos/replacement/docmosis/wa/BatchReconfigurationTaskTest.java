@@ -8,20 +8,17 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
-import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
-import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
-import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
+import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
+import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -70,21 +67,21 @@ class BatchReconfigurationTaskTest {
 
     @Test
     void run_triggersReconfigureEvent_forFirstNCaseIds() throws Exception {
-        // given
-        CCDRequest ccdRequest = buildCcdRequestMock();
+        // given - create new CCDRequest for each invocation to handle parallel execution
         when(ccdClient.startEventForCase(
                 eq(TOKEN),
                 eq(ENGLANDWALES_CASE_TYPE_ID),
                 eq(EMPLOYMENT),
                 anyString(),
                 eq(RECONFIGURE_EVENT))
-        ).thenReturn(ccdRequest);
+        ).thenAnswer(invocation -> buildCcdRequestWithValidCaseData());
+        
         when(ccdClient.submitEventForCase(
                 eq(TOKEN),
                 any(CaseData.class),
                 eq(ENGLANDWALES_CASE_TYPE_ID),
                 anyString(),
-                eq(ccdRequest),
+                any(CCDRequest.class),
                 anyString())
         ).thenReturn(mock(SubmitEvent.class));
 
@@ -107,18 +104,23 @@ class BatchReconfigurationTaskTest {
         List<String> processedCases = caseIdCaptor.getAllValues();
         assertThat(processedCases).contains(CASE_ID_1, CASE_ID_2);
 
-        // ensure submit was called for each processed case id
-        ArgumentCaptor<String> submittedCaseId = ArgumentCaptor.forClass(String.class);
+        // ensure submit was called for each processed case id and organisation was updated
+        ArgumentCaptor<CaseData> caseDataCaptor = ArgumentCaptor.forClass(CaseData.class);
         verify(ccdClient, times(2))
             .submitEventForCase(
                 eq(TOKEN),
-                any(CaseData.class),
+                caseDataCaptor.capture(),
                 eq(ENGLANDWALES_CASE_TYPE_ID),
                 anyString(),
-                eq(ccdRequest),
-                submittedCaseId.capture());
-        assertThat(submittedCaseId.getAllValues()).contains(CASE_ID_1, CASE_ID_2);
-
+                any(CCDRequest.class),
+                anyString());
+        
+        // verify that organisation policy was updated from representative claimant type
+        for (CaseData submittedCaseData : caseDataCaptor.getAllValues()) {
+            assertThat(submittedCaseData.getClaimantRepresentativeOrganisationPolicy().getOrganisation())
+                .isNotNull()
+                .isEqualTo(submittedCaseData.getRepresentativeClaimantType().getMyHmctsOrganisation());
+        }
     }
 
     @Test
@@ -172,7 +174,7 @@ class BatchReconfigurationTaskTest {
                 CASE_ID_1,
                 RECONFIGURE_EVENT)
         ).thenThrow(new IOException("error"));
-        CCDRequest okReq = buildCcdRequestMock();
+        CCDRequest okReq = buildCcdRequestWithValidCaseData();
         when(ccdClient.startEventForCase(
                 TOKEN,
                 ENGLANDWALES_CASE_TYPE_ID,
@@ -216,8 +218,8 @@ class BatchReconfigurationTaskTest {
         ReflectionTestUtils.setField(task, "caseIdsToReconfigure", String.join(",", CASE_ID_1, CASE_ID_2));
         ReflectionTestUtils.setField(task, "limit", 2);
 
-        CCDRequest ccdRequestCase1 = buildCcdRequestMock();
-        CCDRequest ccdRequestCase2 = buildCcdRequestMock();
+        CCDRequest ccdRequestCase1 = buildCcdRequestWithValidCaseData();
+        CCDRequest ccdRequestCase2 = buildCcdRequestWithValidCaseData();
 
         when(ccdClient.startEventForCase(
                 TOKEN,
@@ -277,46 +279,251 @@ class BatchReconfigurationTaskTest {
             eq(CASE_ID_2));
     }
 
-    private CCDRequest buildCcdRequestMock() {
-        CaseData caseData = mock(CaseData.class);
-        CaseDetails caseDetails = mock(CaseDetails.class);
-        when(caseDetails.getCaseData()).thenReturn(caseData);
-        when(caseDetails.getJurisdiction()).thenReturn(EMPLOYMENT);
+    private CCDRequest buildCcdRequestWithValidCaseData() {
+        // Create valid case data with all required fields
+        CaseData caseData = new CaseData();
+        
+        // Set up organisation policy with no organisation (will be populated)
+        OrganisationPolicy orgPolicy = OrganisationPolicy.builder()
+            .orgPolicyCaseAssignedRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())
+            .organisation(null)
+            .build();
+        caseData.setClaimantRepresentativeOrganisationPolicy(orgPolicy);
+        
+        // Set up representative claimant type with organisation
+        RepresentedTypeC representativeClaimantType = new RepresentedTypeC();
+        Organisation myHmctsOrganisation = Organisation.builder()
+            .organisationID("ORG123")
+            .organisationName("Test Organisation")
+            .build();
+        representativeClaimantType.setMyHmctsOrganisation(myHmctsOrganisation);
+        caseData.setRepresentativeClaimantType(representativeClaimantType);
+        
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+        caseDetails.setJurisdiction(EMPLOYMENT);
 
-        CCDRequest ccdRequest = mock(CCDRequest.class);
-        when(ccdRequest.getCaseDetails()).thenReturn(caseDetails);
+        CCDRequest ccdRequest = new CCDRequest();
+        ccdRequest.setCaseDetails(caseDetails);
         return ccdRequest;
     }
 
     @Test
-    void run_updatesVenueForFutureListedLondonCentralHearings() throws Exception {
+    void run_skipsInvalidCase_whenOrganisationPolicyIsNull() throws Exception {
         // given
         ReflectionTestUtils.setField(task, "caseIdsToReconfigure", CASE_ID_1);
         ReflectionTestUtils.setField(task, "limit", 1);
 
-        DateListedType futureListing = new DateListedType();
-        futureListing.setListedDate(LocalDateTime.now().plusDays(1).toString());
-        futureListing.setHearingStatus("Listed");
-        futureListing.setHearingVenueDay(DynamicFixedListType.from("London Central", "London Central", true));
+        CaseData caseData = new CaseData();
+        caseData.setClaimantRepresentativeOrganisationPolicy(null);
 
-        DateListedTypeItem dateItem = new DateListedTypeItem();
-        dateItem.setValue(futureListing);
+        CCDRequest ccdRequest = new CCDRequest();
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+        caseDetails.setJurisdiction(EMPLOYMENT);
+        ccdRequest.setCaseDetails(caseDetails);
 
-        HearingType hearing = new HearingType();
-        List<DateListedTypeItem> dates = new ArrayList<>();
-        dates.add(dateItem);
-        hearing.setHearingDateCollection(dates);
+        when(ccdClient.startEventForCase(
+                TOKEN,
+                ENGLANDWALES_CASE_TYPE_ID,
+                EMPLOYMENT,
+                CASE_ID_1,
+                RECONFIGURE_EVENT)
+        ).thenReturn(ccdRequest);
 
-        HearingTypeItem hearingItem = new HearingTypeItem();
-        hearingItem.setValue(hearing);
+        // when
+        task.run();
 
-        List<HearingTypeItem> hearingCollection = new ArrayList<>();
-        hearingCollection.add(hearingItem);
+        // then - verify submit was not called since case is invalid
+        verify(ccdClient, never()).submitEventForCase(
+            eq(TOKEN),
+            any(CaseData.class),
+            eq(ENGLANDWALES_CASE_TYPE_ID),
+            anyString(),
+            eq(ccdRequest),
+            eq(CASE_ID_1));
+    }
+
+    @Test
+    void run_skipsInvalidCase_whenOrganisationAlreadyPopulated() throws Exception {
+        // given
+        ReflectionTestUtils.setField(task, "caseIdsToReconfigure", CASE_ID_1);
+        ReflectionTestUtils.setField(task, "limit", 1);
 
         CaseData caseData = new CaseData();
-        caseData.setHearingCollection(hearingCollection);
+        Organisation existingOrg = Organisation.builder()
+            .organisationID("EXISTING_ORG")
+            .organisationName("Existing Organisation")
+            .build();
+        OrganisationPolicy orgPolicy = OrganisationPolicy.builder()
+            .organisation(existingOrg)
+            .build();
+        caseData.setClaimantRepresentativeOrganisationPolicy(orgPolicy);
 
-        CCDRequest ccdRequest = buildCcdRequestWithCaseData(caseData);
+        CCDRequest ccdRequest = new CCDRequest();
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+        caseDetails.setJurisdiction(EMPLOYMENT);
+        ccdRequest.setCaseDetails(caseDetails);
+
+        when(ccdClient.startEventForCase(
+                TOKEN,
+                ENGLANDWALES_CASE_TYPE_ID,
+                EMPLOYMENT,
+                CASE_ID_1,
+                RECONFIGURE_EVENT)
+        ).thenReturn(ccdRequest);
+
+        // when
+        task.run();
+
+        // then - verify submit was not called since organisation is already populated
+        verify(ccdClient, never()).submitEventForCase(
+            eq(TOKEN),
+            any(CaseData.class),
+            eq(ENGLANDWALES_CASE_TYPE_ID),
+            anyString(),
+            eq(ccdRequest),
+            eq(CASE_ID_1));
+    }
+
+    @Test
+    void run_skipsInvalidCase_whenRepresentativeClaimantTypeIsNull() throws Exception {
+        // given
+        ReflectionTestUtils.setField(task, "caseIdsToReconfigure", CASE_ID_1);
+        ReflectionTestUtils.setField(task, "limit", 1);
+
+        CaseData caseData = new CaseData();
+        OrganisationPolicy orgPolicy = OrganisationPolicy.builder()
+            .organisation(null)
+            .build();
+        caseData.setClaimantRepresentativeOrganisationPolicy(orgPolicy);
+        caseData.setRepresentativeClaimantType(null);
+
+        CCDRequest ccdRequest = new CCDRequest();
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+        caseDetails.setJurisdiction(EMPLOYMENT);
+        ccdRequest.setCaseDetails(caseDetails);
+
+        when(ccdClient.startEventForCase(
+                TOKEN,
+                ENGLANDWALES_CASE_TYPE_ID,
+                EMPLOYMENT,
+                CASE_ID_1,
+                RECONFIGURE_EVENT)
+        ).thenReturn(ccdRequest);
+
+        // when
+        task.run();
+
+        // then - verify submit was not called since representative claimant type is null
+        verify(ccdClient, never()).submitEventForCase(
+            eq(TOKEN),
+            any(CaseData.class),
+            eq(ENGLANDWALES_CASE_TYPE_ID),
+            anyString(),
+            eq(ccdRequest),
+            eq(CASE_ID_1));
+    }
+
+    @Test
+    void run_skipsInvalidCase_whenMyHmctsOrganisationIsNull() throws Exception {
+        // given
+        ReflectionTestUtils.setField(task, "caseIdsToReconfigure", CASE_ID_1);
+        ReflectionTestUtils.setField(task, "limit", 1);
+
+        CaseData caseData = new CaseData();
+        OrganisationPolicy orgPolicy = OrganisationPolicy.builder()
+            .organisation(null)
+            .build();
+        caseData.setClaimantRepresentativeOrganisationPolicy(orgPolicy);
+        
+        RepresentedTypeC representativeClaimantType = new RepresentedTypeC();
+        representativeClaimantType.setMyHmctsOrganisation(null);
+        caseData.setRepresentativeClaimantType(representativeClaimantType);
+
+        CCDRequest ccdRequest = new CCDRequest();
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+        caseDetails.setJurisdiction(EMPLOYMENT);
+        ccdRequest.setCaseDetails(caseDetails);
+
+        when(ccdClient.startEventForCase(
+                TOKEN,
+                ENGLANDWALES_CASE_TYPE_ID,
+                EMPLOYMENT,
+                CASE_ID_1,
+                RECONFIGURE_EVENT)
+        ).thenReturn(ccdRequest);
+
+        // when
+        task.run();
+
+        // then - verify submit was not called since MyHmctsOrganisation is null
+        verify(ccdClient, never()).submitEventForCase(
+            eq(TOKEN),
+            any(CaseData.class),
+            eq(ENGLANDWALES_CASE_TYPE_ID),
+            anyString(),
+            eq(ccdRequest),
+            eq(CASE_ID_1));
+    }
+
+    @Test
+    void run_skipsInvalidCase_whenOrganisationIdIsNull() throws Exception {
+        // given
+        ReflectionTestUtils.setField(task, "caseIdsToReconfigure", CASE_ID_1);
+        ReflectionTestUtils.setField(task, "limit", 1);
+
+        CaseData caseData = new CaseData();
+        OrganisationPolicy orgPolicy = OrganisationPolicy.builder()
+            .organisation(null)
+            .build();
+        caseData.setClaimantRepresentativeOrganisationPolicy(orgPolicy);
+        
+        RepresentedTypeC representativeClaimantType = new RepresentedTypeC();
+        Organisation myHmctsOrganisation = Organisation.builder()
+            .organisationID(null)
+            .organisationName("Test Organisation")
+            .build();
+        representativeClaimantType.setMyHmctsOrganisation(myHmctsOrganisation);
+        caseData.setRepresentativeClaimantType(representativeClaimantType);
+
+        CCDRequest ccdRequest = new CCDRequest();
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+        caseDetails.setJurisdiction(EMPLOYMENT);
+        ccdRequest.setCaseDetails(caseDetails);
+
+        when(ccdClient.startEventForCase(
+                TOKEN,
+                ENGLANDWALES_CASE_TYPE_ID,
+                EMPLOYMENT,
+                CASE_ID_1,
+                RECONFIGURE_EVENT)
+        ).thenReturn(ccdRequest);
+
+        // when
+        task.run();
+
+        // then - verify submit was not called since organisation ID is null
+        verify(ccdClient, never()).submitEventForCase(
+            eq(TOKEN),
+            any(CaseData.class),
+            eq(ENGLANDWALES_CASE_TYPE_ID),
+            anyString(),
+            eq(ccdRequest),
+            eq(CASE_ID_1));
+    }
+
+    @Test
+    void run_updatesOrganisationPolicy_whenCaseIsValid() throws Exception {
+        // given
+        ReflectionTestUtils.setField(task, "caseIdsToReconfigure", CASE_ID_1);
+        ReflectionTestUtils.setField(task, "limit", 1);
+
+        CCDRequest ccdRequest = buildCcdRequestWithValidCaseData();
 
         when(ccdClient.startEventForCase(
                 TOKEN,
@@ -348,87 +555,10 @@ class BatchReconfigurationTaskTest {
             eq(CASE_ID_1));
 
         CaseData submitted = caseDataCaptor.getValue();
-        HearingType submittedHearing = submitted.getHearingCollection().getFirst().getValue();
-        // Hearing venue updated to London Tribunals Centre
-        assertThat(submittedHearing.getHearingVenue().getSelectedCode()).isEqualTo("London Tribunals Centre");
-        // Date-level venue updated too
-        DynamicFixedListType updatedVenueDay = submittedHearing.getHearingDateCollection().getFirst()
-            .getValue().getHearingVenueDay();
-        assertThat(updatedVenueDay.getSelectedCode()).isEqualTo("London Tribunals Centre");
-    }
-
-    @Test
-    void run_doesNotUpdateVenue_whenHearingNotValid() throws Exception {
-        // given
-        ReflectionTestUtils.setField(task, "caseIdsToReconfigure", CASE_ID_1);
-        ReflectionTestUtils.setField(task, "limit", 1);
-
-        DateListedType listing = new DateListedType();
-        listing.setListedDate(LocalDateTime.now().plusDays(1).toString());
-        listing.setHearingStatus("Listed");
-        listing.setHearingVenueDay(DynamicFixedListType.from("Manchester", "Manchester", true));
-
-        DateListedTypeItem dateItem = new DateListedTypeItem();
-        dateItem.setValue(listing);
-
-        HearingType hearing = new HearingType();
-        List<DateListedTypeItem> dates = new ArrayList<>();
-        dates.add(dateItem);
-        hearing.setHearingDateCollection(dates);
-
-        HearingTypeItem hearingItem = new HearingTypeItem();
-        hearingItem.setValue(hearing);
-
-        List<HearingTypeItem> hearingCollection = new ArrayList<>();
-        hearingCollection.add(hearingItem);
-        CaseData caseData = new CaseData();
-        caseData.setHearingCollection(hearingCollection);
-
-        CCDRequest ccdRequest = buildCcdRequestWithCaseData(caseData);
-
-        when(ccdClient.startEventForCase(
-            TOKEN,
-            ENGLANDWALES_CASE_TYPE_ID,
-            EMPLOYMENT,
-            CASE_ID_1,
-            RECONFIGURE_EVENT)
-        ).thenReturn(ccdRequest);
-        when(ccdClient.submitEventForCase(
-                eq(TOKEN),
-                any(CaseData.class),
-                eq(ENGLANDWALES_CASE_TYPE_ID),
-                anyString(),
-                eq(ccdRequest),
-                eq(CASE_ID_1))
-        ).thenReturn(mock(SubmitEvent.class));
-
-        // when
-        task.run();
-
-        // then - verify venue not updated
-        ArgumentCaptor<CaseData> caseDataCaptor = ArgumentCaptor.forClass(CaseData.class);
-        verify(ccdClient).submitEventForCase(
-            eq(TOKEN),
-            caseDataCaptor.capture(),
-            eq(ENGLANDWALES_CASE_TYPE_ID),
-            anyString(),
-            eq(ccdRequest),
-            eq(CASE_ID_1));
-
-        CaseData submitted = caseDataCaptor.getValue();
-        HearingType submittedHearing = submitted.getHearingCollection().getFirst().getValue();
-        assertThat(submittedHearing.getHearingVenue()).isNull();
-        DynamicFixedListType venueDay = submittedHearing.getHearingDateCollection().getFirst()
-            .getValue().getHearingVenueDay();
-        assertThat(venueDay.getSelectedCode()).isEqualTo("Manchester");
-    }
-
-    private CCDRequest buildCcdRequestWithCaseData(CaseData caseData) {
-        CaseDetails caseDetails = mock(CaseDetails.class);
-        when(caseDetails.getCaseData()).thenReturn(caseData);
-        when(caseDetails.getJurisdiction()).thenReturn(EMPLOYMENT);
-        CCDRequest ccdRequest = mock(CCDRequest.class);
-        when(ccdRequest.getCaseDetails()).thenReturn(caseDetails);
-        return ccdRequest;
+        assertThat(submitted.getClaimantRepresentativeOrganisationPolicy().getOrganisation())
+            .isNotNull()
+            .isEqualTo(submitted.getRepresentativeClaimantType().getMyHmctsOrganisation());
+        assertThat(submitted.getClaimantRepresentativeOrganisationPolicy().getOrganisation().getOrganisationID())
+            .isEqualTo("ORG123");
     }
 }

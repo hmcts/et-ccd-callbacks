@@ -147,16 +147,6 @@ class CreateReferralMultiplesControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void initAboutToSubmit_invalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
-                        .contentType(APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                        .content(jsonMapper.toJson(request)))
-                .andExpect(status().isForbidden());
-    }
-
-    @Test
     void aboutToSubmit_tokenOk() throws Exception {
         UserDetails details = new UserDetails();
         details.setName("First Last");

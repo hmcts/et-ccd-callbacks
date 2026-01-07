@@ -1,13 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-
-import static org.junit.Assert.assertFalse;
 
 @ExtendWith(SpringExtension.class)
 class VerifyTokenServiceServiceTest {
@@ -23,7 +22,7 @@ class VerifyTokenServiceServiceTest {
 
     @Test
     void verifyTokenSignature() {
-        assertFalse(verifyTokenService.verifyTokenSignature("Bearer "
+        Assertions.assertFalse(verifyTokenService.verifyTokenSignature("Bearer "
                 + "eyJ0eXAiOiJKV1QiLCJ6aXAiOiJOT05FIiwia2lkIjoiYi9PNk92VnYxK3krV2dySDVVa"
                 + "TlXVGlvTHQwPSIsImFsZyI6IlJTMjU2In0"
                 + ".eyJzdWIiOiJzc2NzLWNpdGl6ZW40QGhtY3RzLm5ldCIsImF1dGhfbGV2ZWwiOjAsI"

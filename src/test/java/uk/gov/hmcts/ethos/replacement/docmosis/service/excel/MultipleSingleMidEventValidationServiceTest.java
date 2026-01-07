@@ -58,7 +58,7 @@ class MultipleSingleMidEventValidationServiceTest {
                 multipleDetails.getCaseTypeId(),
                 multipleDetails.getCaseData().getBatchUpdateCase(),
                 multipleDetails.getCaseData().getMultipleSource()))
-                .thenReturn(submitEventList.get(0));
+                .thenReturn(submitEventList.getFirst());
 
         when(multipleHelperService.getEthosCaseRefCollection(userToken,
                 multipleDetails.getCaseData(),
@@ -72,7 +72,7 @@ class MultipleSingleMidEventValidationServiceTest {
 
         assertEquals(0, errors.size());
         assertEquals(SELECT_NONE_VALUE, multipleDetails.getCaseData().getBatchUpdateClaimantRep().getValue().getCode());
-        assertEquals(1, multipleDetails.getCaseData().getBatchUpdateJurisdictionList().get(0).getValue()
+        assertEquals(1, multipleDetails.getCaseData().getBatchUpdateJurisdictionList().getFirst().getValue()
                 .getDynamicList().getListItems().size());
         assertEquals(2, multipleDetails.getCaseData().getBatchUpdateRespondent().getListItems().size());
         assertEquals(SELECT_NONE_VALUE, multipleDetails
@@ -96,7 +96,7 @@ class MultipleSingleMidEventValidationServiceTest {
                 errors);
 
         assertEquals(1, errors.size());
-        assertEquals("Multiple does not have the case: 245010/2020", errors.get(0));
+        assertEquals("Multiple does not have the case: 245010/2020", errors.getFirst());
 
     }
 
@@ -112,7 +112,7 @@ class MultipleSingleMidEventValidationServiceTest {
                 errors);
 
         assertEquals(1, errors.size());
-        assertEquals("Multiple does not have cases", errors.get(0));
+        assertEquals("Multiple does not have cases", errors.getFirst());
 
     }
 
@@ -137,20 +137,20 @@ class MultipleSingleMidEventValidationServiceTest {
 
         RepresentedTypeC representedTypeC = new RepresentedTypeC();
         representedTypeC.setNameOfRepresentative("Rep");
-        submitEventList.get(0).getCaseData().setRepresentativeClaimantType(representedTypeC);
+        submitEventList.getFirst().getCaseData().setRepresentativeClaimantType(representedTypeC);
 
         JurCodesTypeItem jurCodesTypeItem = new JurCodesTypeItem();
         JurCodesType jurCodesType = new JurCodesType();
         jurCodesType.setJuridictionCodesList("AA");
         jurCodesTypeItem.setValue(jurCodesType);
-        submitEventList.get(0).getCaseData().setJurCodesCollection(
+        submitEventList.getFirst().getCaseData().setJurCodesCollection(
                 new ArrayList<>(Collections.singletonList(jurCodesTypeItem)));
 
         when(singleCasesReadingService.retrieveSingleCase(userToken,
                 multipleDetails.getCaseTypeId(),
                 multipleDetails.getCaseData().getBatchUpdateCase(),
                 multipleDetails.getCaseData().getMultipleSource()))
-                .thenReturn(submitEventList.get(0));
+                .thenReturn(submitEventList.getFirst());
 
         when(multipleHelperService.getEthosCaseRefCollection(userToken,
                 multipleDetails.getCaseData(),
@@ -164,7 +164,7 @@ class MultipleSingleMidEventValidationServiceTest {
 
         assertEquals(0, errors.size());
         assertEquals(2, multipleDetails.getCaseData().getBatchUpdateClaimantRep().getListItems().size());
-        assertEquals(2, multipleDetails.getCaseData().getBatchUpdateJurisdictionList().get(0).getValue()
+        assertEquals(2, multipleDetails.getCaseData().getBatchUpdateJurisdictionList().getFirst().getValue()
                 .getDynamicList().getListItems().size());
         assertEquals(2, multipleDetails.getCaseData().getBatchUpdateRespondent().getListItems().size());
         assertEquals(2, multipleDetails.getCaseData().getBatchUpdateRespondentRep().getListItems().size());
@@ -180,20 +180,20 @@ class MultipleSingleMidEventValidationServiceTest {
         multipleDetails.getCaseData().setBatchUpdateCase("245000/2020");
 
         RepresentedTypeC representedTypeC = new RepresentedTypeC();
-        submitEventList.get(0).getCaseData().setRepresentativeClaimantType(representedTypeC);
+        submitEventList.getFirst().getCaseData().setRepresentativeClaimantType(representedTypeC);
 
         JurCodesTypeItem jurCodesTypeItem = new JurCodesTypeItem();
         JurCodesType jurCodesType = new JurCodesType();
         jurCodesType.setJuridictionCodesList("AA");
         jurCodesTypeItem.setValue(jurCodesType);
-        submitEventList.get(0).getCaseData().setJurCodesCollection(
+        submitEventList.getFirst().getCaseData().setJurCodesCollection(
                 new ArrayList<>(Collections.singletonList(jurCodesTypeItem)));
 
         when(singleCasesReadingService.retrieveSingleCase(userToken,
                 multipleDetails.getCaseTypeId(),
                 multipleDetails.getCaseData().getBatchUpdateCase(),
                 multipleDetails.getCaseData().getMultipleSource()))
-                .thenReturn(submitEventList.get(0));
+                .thenReturn(submitEventList.getFirst());
 
         when(multipleHelperService.getEthosCaseRefCollection(userToken,
                 multipleDetails.getCaseData(),
@@ -207,7 +207,7 @@ class MultipleSingleMidEventValidationServiceTest {
 
         assertEquals(0, errors.size());
         assertEquals(1, multipleDetails.getCaseData().getBatchUpdateClaimantRep().getListItems().size());
-        assertEquals(2, multipleDetails.getCaseData().getBatchUpdateJurisdictionList().get(0).getValue()
+        assertEquals(2, multipleDetails.getCaseData().getBatchUpdateJurisdictionList().getFirst().getValue()
                 .getDynamicList().getListItems().size());
         assertEquals(2, multipleDetails.getCaseData().getBatchUpdateRespondent().getListItems().size());
         assertEquals(2, multipleDetails.getCaseData().getBatchUpdateRespondentRep().getListItems().size());

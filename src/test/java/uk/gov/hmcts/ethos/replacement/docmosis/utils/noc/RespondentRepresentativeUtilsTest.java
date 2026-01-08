@@ -295,59 +295,68 @@ final class RespondentRepresentativeUtilsTest {
     }
 
     @Test
-    void theFindRepresentativesToRemove() {
+    void theFindUpdatedRepresentativesForSameRespondent() {
         List<RepresentedTypeRItem> oldRepresentatives = new ArrayList<>();
         List<RepresentedTypeRItem> newRepresentatives = new ArrayList<>();
         // when old respondent collection is empty should return empty list
-        assertThat(RespondentRepresentativeUtils.findRepresentativesToRemove(oldRepresentatives, newRepresentatives))
-                .isEmpty();
+        assertThat(RespondentRepresentativeUtils.findUpdatedRepresentativesForSameRespondent(
+                oldRepresentatives, newRepresentatives)).isEmpty();
         // when old representatives list has invalid representative should return empty list
         oldRepresentatives.add(RepresentedTypeRItem.builder().build());
-        assertThat(RespondentRepresentativeUtils.findRepresentativesToRemove(oldRepresentatives, newRepresentatives))
-                .isEmpty();
+        assertThat(RespondentRepresentativeUtils.findUpdatedRepresentativesForSameRespondent(
+                oldRepresentatives, newRepresentatives)).isEmpty();
         // when old representatives list has valid representative but there is no new representative should return
         // that valid representative in a list
         RepresentedTypeRItem validOldRepresentative = RepresentedTypeRItem.builder().id(REPRESENTATIVE_ID_1).value(
-                RepresentedTypeR.builder().build()).build();
+                RepresentedTypeR.builder().respRepName(RESPONDENT_NAME_1).build()).build();
+        oldRepresentatives.clear();
         oldRepresentatives.add(validOldRepresentative);
-        List<RepresentedTypeRItem> representativesToRemove = RespondentRepresentativeUtils.findRepresentativesToRemove(
+        List<RepresentedTypeRItem> representativesToRemove = RespondentRepresentativeUtils
+                .findUpdatedRepresentativesForSameRespondent(oldRepresentatives, newRepresentatives);
+        assertThat(representativesToRemove).isNotEmpty().hasSize(NumberUtils.INTEGER_ONE);
+        assertThat(representativesToRemove.getFirst()).isEqualTo(validOldRepresentative);
+        assertThat(newRepresentatives).hasSize(NumberUtils.INTEGER_ZERO);
+        // when new representative list has invalid representative should return list of valid old representatives
+        newRepresentatives.add(RepresentedTypeRItem.builder().build());
+        representativesToRemove = RespondentRepresentativeUtils.findUpdatedRepresentativesForSameRespondent(
                 oldRepresentatives, newRepresentatives);
         assertThat(representativesToRemove).isNotEmpty().hasSize(NumberUtils.INTEGER_ONE);
         assertThat(representativesToRemove.getFirst()).isEqualTo(validOldRepresentative);
-        // when new representative list has invalid representative should return list of valid old representatives
-        newRepresentatives.add(RepresentedTypeRItem.builder().build());
-        representativesToRemove = RespondentRepresentativeUtils.findRepresentativesToRemove(oldRepresentatives,
-                newRepresentatives);
-        assertThat(representativesToRemove).isNotEmpty().hasSize(NumberUtils.INTEGER_ONE);
-        assertThat(representativesToRemove.getFirst()).isEqualTo(validOldRepresentative);
+        assertThat(newRepresentatives).hasSize(NumberUtils.INTEGER_ONE);
         // when new representative list has valid representative that doesn't represent same respondent in old
         // representatives should return list of non-representing old representatives
         RepresentedTypeRItem validNewRepresentative = RepresentedTypeRItem.builder().id(REPRESENTATIVE_ID_2).value(
-                RepresentedTypeR.builder().build()).build();
+                RepresentedTypeR.builder().respRepName(RESPONDENT_NAME_2).build()).build();
+        newRepresentatives.clear();
         newRepresentatives.add(validNewRepresentative);
-        representativesToRemove = RespondentRepresentativeUtils.findRepresentativesToRemove(oldRepresentatives,
-                newRepresentatives);
+        representativesToRemove = RespondentRepresentativeUtils.findUpdatedRepresentativesForSameRespondent(
+                oldRepresentatives, newRepresentatives);
         assertThat(representativesToRemove).isNotEmpty().hasSize(NumberUtils.INTEGER_ONE);
         assertThat(representativesToRemove.getFirst()).isEqualTo(validOldRepresentative);
+        assertThat(newRepresentatives).hasSize(NumberUtils.INTEGER_ONE);
         // when both new and old representatives represent the same respondent but old and new representatives not have
         // organisation and email should return empty list
-        validOldRepresentative.getValue().setRespRepName(RESPONDENT_NAME_1);
         validNewRepresentative.getValue().setRespRepName(RESPONDENT_NAME_1);
-        assertThat(RespondentRepresentativeUtils.findRepresentativesToRemove(oldRepresentatives, newRepresentatives))
-                .isEmpty();
+        representativesToRemove = RespondentRepresentativeUtils.findUpdatedRepresentativesForSameRespondent(
+                oldRepresentatives, newRepresentatives);
+        assertThat(representativesToRemove).isEmpty();
+        assertThat(newRepresentatives).hasSize(NumberUtils.INTEGER_ONE);
         // when old representative has organisation but new not should return list of old representative
+        validNewRepresentative.getValue().setRespRepName(RESPONDENT_NAME_2);
         validNewRepresentative.getValue().setRespondentOrganisation(Organisation.builder().build());
-        representativesToRemove = RespondentRepresentativeUtils.findRepresentativesToRemove(oldRepresentatives,
-                newRepresentatives);
+        representativesToRemove = RespondentRepresentativeUtils.findUpdatedRepresentativesForSameRespondent(
+                oldRepresentatives, newRepresentatives);
         assertThat(representativesToRemove).isNotEmpty().hasSize(NumberUtils.INTEGER_ONE);
         assertThat(representativesToRemove.getFirst()).isEqualTo(validOldRepresentative);
+        assertThat(newRepresentatives).hasSize(NumberUtils.INTEGER_ONE);
         // when old representative has email but new not should return list of old representative
         validNewRepresentative.getValue().setRespondentOrganisation(null);
         validNewRepresentative.getValue().setRepresentativeEmailAddress(REPRESENTATIVE_EMAIL_1_CAPITALISED);
-        representativesToRemove = RespondentRepresentativeUtils.findRepresentativesToRemove(oldRepresentatives,
-                newRepresentatives);
+        representativesToRemove = RespondentRepresentativeUtils.findUpdatedRepresentativesForSameRespondent(
+                oldRepresentatives, newRepresentatives);
         assertThat(representativesToRemove).isNotEmpty().hasSize(NumberUtils.INTEGER_ONE);
         assertThat(representativesToRemove.getFirst()).isEqualTo(validOldRepresentative);
+        assertThat(newRepresentatives).hasSize(NumberUtils.INTEGER_ONE);
     }
 
 }

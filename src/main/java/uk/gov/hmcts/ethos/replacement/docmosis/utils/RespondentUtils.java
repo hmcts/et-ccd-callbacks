@@ -252,4 +252,84 @@ public final class RespondentUtils {
         return ObjectUtils.isNotEmpty(caseData)
                 && CollectionUtils.isNotEmpty(caseData.getRespondentCollection());
     }
+
+    /**
+     * Finds and returns the name of a respondent with the given respondent ID.
+     * <p>
+     * The method iterates through the provided list of respondents and returns the
+     * respondent name for the first valid respondent whose ID matches the supplied
+     * {@code respondentId}. If no matching respondent is found, or if the input list
+     * or respondent ID is empty or invalid, an empty string is returned.
+     *
+     * @param respondents the list of respondents to search
+     * @param respondentId the unique identifier of the respondent
+     * @return the respondent name if a matching respondent is found; otherwise,
+     *         an empty string
+     */
+    public static RespondentSumTypeItem findRespondentById(
+            List<RespondentSumTypeItem> respondents,
+            String respondentId) {
+        if (CollectionUtils.isEmpty(respondents) || StringUtils.isBlank(respondentId)) {
+            return null;
+        }
+        for (RespondentSumTypeItem respondent : respondents) {
+            if (isValidRespondent(respondent) && respondentId.equals(respondent.getId())) {
+                return respondent;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Finds and returns a respondent with the given respondent name.
+     * <p>
+     * The method iterates through the provided list of respondents and returns the first
+     * valid respondent whose name exactly matches the supplied {@code respondentName}.
+     * If the respondents list is empty, the respondent name is blank, or no matching
+     * respondent is found, {@code null} is returned.
+     *
+     * @param respondents the list of respondents to search
+     * @param respondentName the name of the respondent to match
+     * @return the matching {@link RespondentSumTypeItem}, or {@code null} if no match is found
+     */
+    public static RespondentSumTypeItem findRespondentByName(
+            List<RespondentSumTypeItem> respondents,
+            String respondentName) {
+        if (CollectionUtils.isEmpty(respondents) || StringUtils.isBlank(respondentName)) {
+            return null;
+        }
+        for (RespondentSumTypeItem respondent : respondents) {
+            if (isValidRespondent(respondent) && respondentName.equals(respondent.getValue().getRespondentName())) {
+                return respondent;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Finds and returns the respondent associated with the given representative ID.
+     * <p>
+     * The method iterates through the provided list of respondents and returns the first
+     * valid respondent whose representative ID matches the supplied {@code representativeId}.
+     * If the respondents list is empty, the representative ID is blank, or no matching
+     * respondent is found, {@code null} is returned.
+     *
+     * @param respondents the list of respondents to search
+     * @param representativeId the identifier of the representative associated with a respondent
+     * @return the matching {@link RespondentSumTypeItem}, or {@code null} if no match is found
+     */
+    public static RespondentSumTypeItem findRespondentByRepresentativeId(
+            List<RespondentSumTypeItem> respondents,
+            String representativeId) {
+        if (CollectionUtils.isEmpty(respondents)
+                || StringUtils.isBlank(representativeId)) {
+            return null;
+        }
+        for (RespondentSumTypeItem respondent : respondents) {
+            if (isValidRespondent(respondent) && representativeId.equals(respondent.getValue().getRepresentativeId())) {
+                return respondent;
+            }
+        }
+        return null;
+    }
 }

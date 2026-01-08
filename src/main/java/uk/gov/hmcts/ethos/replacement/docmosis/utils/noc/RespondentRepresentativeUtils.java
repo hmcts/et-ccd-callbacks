@@ -315,7 +315,26 @@ public final class RespondentRepresentativeUtils {
                 .getRepresentativeEmailAddress());
     }
 
-    public static List<RepresentedTypeRItem> findRepresentativesToRemove(
+    /**
+     * Identifies representatives from the existing list that should be treated as changed
+     * for the same respondent when compared against a new list of representatives.
+     * <p>
+     * A representative from {@code oldRepresentatives} is included in the returned list if:
+     * <ul>
+     *     <li>it is a valid representative, and</li>
+     *     <li>no matching representative exists in {@code newRepresentatives} for the same respondent, or</li>
+     *     <li>a matching representative exists but the organisation or email address has changed</li>
+     * </ul>
+     * <p>
+     * Only valid representatives are considered during the comparison. If
+     * {@code oldRepresentatives} is {@code null} or empty, an empty list is returned.
+     *
+     * @param oldRepresentatives the existing representatives to compare against
+     * @param newRepresentatives the updated representatives to compare with
+     * @return a list of representatives from {@code oldRepresentatives} that are either
+     *         no longer present or have updated organisation or email details
+     */
+    public static List<RepresentedTypeRItem> findUpdatedRepresentativesForSameRespondent(
             List<RepresentedTypeRItem> oldRepresentatives, List<RepresentedTypeRItem> newRepresentatives) {
         if (CollectionUtils.isEmpty(oldRepresentatives)) {
             return new ArrayList<>();
@@ -325,7 +344,9 @@ public final class RespondentRepresentativeUtils {
             if (!RespondentRepresentativeUtils.isValidRepresentative(oldRepresentative)) {
                 continue;
             }
+            // to check if representative exists but its organisation or email is changed or not
             boolean representativeChanged = false;
+            // to check if representative exists or not
             boolean representativeFound = false;
             for (RepresentedTypeRItem newRepresentative : newRepresentatives) {
                 if (!RespondentRepresentativeUtils.isValidRepresentative(newRepresentative)
@@ -338,6 +359,7 @@ public final class RespondentRepresentativeUtils {
                         newRepresentative.getValue())
                         || RespondentRepresentativeUtils.isRepresentativeEmailChanged(oldRepresentative.getValue(),
                         newRepresentative.getValue())) {
+                    // representative already exists but its organisation or email is changed
                     representativeChanged = true;
                 }
             }

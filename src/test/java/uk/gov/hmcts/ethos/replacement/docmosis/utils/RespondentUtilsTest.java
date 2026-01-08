@@ -27,11 +27,14 @@ import static org.mockito.Mockito.when;
 
 final class RespondentUtilsTest {
 
-    private static final String TEST_RESPONDENT_NAME_1 = "Test respondent name 1";
-    private static final String TEST_RESPONDENT_NAME_2 = "Test respondent name 2";
-    private static final String TEST_RESPONDENT_NAME_3 = "Test respondent name 3";
+    private static final String RESPONDENT_NAME_1 = "Test respondent name 1";
+    private static final String RESPONDENT_NAME_2 = "Test respondent name 2";
+    private static final String RESPONDENT_NAME_3 = "Test respondent name 3";
     private static final String DUMMY_CASE_REFERENCE = "1234567890123456";
-    private static final String DUMMY_RESPONDENT_ID = "dummy12_respondent34_id56";
+    private static final String RESPONDENT_ID_1 = "dummy12_respondent34_id56";
+    private static final String RESPONDENT_ID_2 = "dummy65_respondent43_id21";
+    private static final String REPRESENTATIVE_ID_1 = "dummy12_representative34_id56";
+    private static final String REPRESENTATIVE_ID_2 = "dummy65_representative43_id21";
     private static final String EXCEPTION_RESPONDENT_NOT_FOUND =
             "Respondent not found for case ID 1234567890123456.";
     private static final String EXCEPTION_RESPONDENT_ID_NOT_FOUND =
@@ -72,7 +75,7 @@ final class RespondentUtilsTest {
                         updateRespondentRepresentativeRequest), times(NumberUtils.INTEGER_ONE));
         // when respondentCollection in caseData is empty
         respondentUtils.reset();
-        updateRespondentRepresentativeRequest.setRespondentName(TEST_RESPONDENT_NAME_1);
+        updateRespondentRepresentativeRequest.setRespondentName(RESPONDENT_NAME_1);
         caseData.setRespondentCollection(new ArrayList<>());
         RespondentUtils.markRespondentRepresentativeRemoved(caseData, updateRespondentRepresentativeRequest);
         respondentUtils.verify(() -> RespondentUtils.markRespondentRepresentativeRemoved(caseData,
@@ -87,14 +90,14 @@ final class RespondentUtilsTest {
                 updateRespondentRepresentativeRequest), times(NumberUtils.INTEGER_ONE));
         // when respondentName in caseData not matches the respondentName in updateRespondentRepresentativeRequest
         respondentUtils.reset();
-        respondentSumTypeItem.setValue(RespondentSumType.builder().respondentName(TEST_RESPONDENT_NAME_2).build());
+        respondentSumTypeItem.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_2).build());
         caseData.setRespondentCollection(List.of(respondentSumTypeItem));
         RespondentUtils.markRespondentRepresentativeRemoved(caseData, updateRespondentRepresentativeRequest);
         respondentUtils.verify(() -> RespondentUtils.markRespondentRepresentativeRemoved(caseData,
                 updateRespondentRepresentativeRequest), times(NumberUtils.INTEGER_ONE));
         // when respondentName in caseData matches the respondentName in updateRespondentRepresentativeRequest
         respondentUtils.close();
-        respondentSumTypeItem.setValue(RespondentSumType.builder().respondentName(TEST_RESPONDENT_NAME_1).build());
+        respondentSumTypeItem.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_1).build());
         caseData.setRespondentCollection(List.of(respondentSumTypeItem));
         RespondentUtils.markRespondentRepresentativeRemoved(caseData, updateRespondentRepresentativeRequest);
         assertThat(respondentSumTypeItem.getValue().getRepresentativeRemoved()).isEqualTo(YES);
@@ -105,17 +108,17 @@ final class RespondentUtilsTest {
         respondentUtils.close();
         // -------- Scenario 1: returns names for provided indexes in order --------
         CaseData caseData = new CaseData();
-        caseData.setNoticeOfChangeAnswers0(NoticeOfChangeAnswers.builder().respondentName(TEST_RESPONDENT_NAME_1)
+        caseData.setNoticeOfChangeAnswers0(NoticeOfChangeAnswers.builder().respondentName(RESPONDENT_NAME_1)
                 .build());
-        caseData.setNoticeOfChangeAnswers3(NoticeOfChangeAnswers.builder().respondentName(TEST_RESPONDENT_NAME_2)
+        caseData.setNoticeOfChangeAnswers3(NoticeOfChangeAnswers.builder().respondentName(RESPONDENT_NAME_2)
                 .build());
-        caseData.setNoticeOfChangeAnswers5(NoticeOfChangeAnswers.builder().respondentName(TEST_RESPONDENT_NAME_3)
+        caseData.setNoticeOfChangeAnswers5(NoticeOfChangeAnswers.builder().respondentName(RESPONDENT_NAME_3)
                 .build());
 
         List<String> result = RespondentUtils.getRespondentNamesByNoticeOfChangeIndexes(
                 caseData, List.of(0, 3, 5));
 
-        assertEquals(List.of(TEST_RESPONDENT_NAME_1, TEST_RESPONDENT_NAME_2, TEST_RESPONDENT_NAME_3), result,
+        assertEquals(List.of(RESPONDENT_NAME_1, RESPONDENT_NAME_2, RESPONDENT_NAME_3), result,
                 "Should return names in the same order as the indexes");
         // -------- Scenario 2: skips null answers --------
         caseData = mock(CaseData.class);
@@ -231,14 +234,14 @@ final class RespondentUtilsTest {
         assertThat(gse.getMessage()).isEqualTo(EXCEPTION_RESPONDENT_ID_NOT_FOUND);
         // when respondent details not found
         RespondentSumTypeItem respondentSumTypeItemWithoutRespondentDetails = new RespondentSumTypeItem();
-        respondentSumTypeItemWithoutRespondentDetails.setId(DUMMY_RESPONDENT_ID);
+        respondentSumTypeItemWithoutRespondentDetails.setId(RESPONDENT_ID_1);
         gse = assertThrows(GenericServiceException.class,
                 () -> RespondentUtils.validateRespondent(respondentSumTypeItemWithoutRespondentDetails,
                         DUMMY_CASE_REFERENCE));
         assertThat(gse.getMessage()).isEqualTo(EXCEPTION_RESPONDENT_DETAILS_NOT_EXISTS);
         // when respondent name not found
         RespondentSumTypeItem respondentSumTypeItemWithoutRespondentName = new RespondentSumTypeItem();
-        respondentSumTypeItemWithoutRespondentName.setId(DUMMY_RESPONDENT_ID);
+        respondentSumTypeItemWithoutRespondentName.setId(RESPONDENT_ID_1);
         respondentSumTypeItemWithoutRespondentName.setValue(RespondentSumType.builder().build());
         gse = assertThrows(GenericServiceException.class,
                 () -> RespondentUtils.validateRespondent(respondentSumTypeItemWithoutRespondentName,
@@ -255,13 +258,13 @@ final class RespondentUtilsTest {
         RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
         assertThat(RespondentUtils.isValidRespondent(respondentSumTypeItem)).isFalse();
         // when respondent value is empty should return false
-        respondentSumTypeItem.setId(DUMMY_RESPONDENT_ID);
+        respondentSumTypeItem.setId(RESPONDENT_ID_1);
         assertThat(RespondentUtils.isValidRespondent(respondentSumTypeItem)).isFalse();
         // when respondent name is empty should return false
         respondentSumTypeItem.setValue(RespondentSumType.builder().build());
         assertThat(RespondentUtils.isValidRespondent(respondentSumTypeItem)).isFalse();
         // when respondent has id, value and name should return true
-        respondentSumTypeItem.getValue().setRespondentName(TEST_RESPONDENT_NAME_1);
+        respondentSumTypeItem.getValue().setRespondentName(RESPONDENT_NAME_1);
         assertThat(RespondentUtils.isValidRespondent(respondentSumTypeItem)).isTrue();
     }
 
@@ -278,4 +281,78 @@ final class RespondentUtilsTest {
         assertThat(RespondentUtils.hasRespondents(caseData)).isTrue();
     }
 
+    @Test
+    void theFindRespondentById() {
+        respondentUtils.close();
+        // when respondent list is null should return null
+        assertThat(RespondentUtils.findRespondentById(null, RESPONDENT_ID_1)).isNull();
+        // when respondent list is empty should return null
+        List<RespondentSumTypeItem> respondents = new ArrayList<>();
+        assertThat(RespondentUtils.findRespondentById(respondents, RESPONDENT_ID_1)).isNull();
+        // when respondent list is not empty but respondent id is null should return null
+        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+        respondents.add(respondentSumTypeItem);
+        assertThat(RespondentUtils.findRespondentById(respondents, null)).isNull();
+        // when respondent list is not empty but respondent id is empty string should return null
+        assertThat(RespondentUtils.findRespondentById(respondents, StringUtils.EMPTY)).isNull();
+        // when respondent list has invalid respondent should return null
+        assertThat(RespondentUtils.findRespondentById(respondents, RESPONDENT_ID_1)).isNull();
+        // when respondent id not found in respondent list should return null
+        respondentSumTypeItem.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_1).build());
+        respondentSumTypeItem.setId(RESPONDENT_ID_1);
+        assertThat(RespondentUtils.findRespondentById(respondents, RESPONDENT_ID_2)).isNull();
+        // when respondent id found in respondent list should return respondent
+        assertThat(RespondentUtils.findRespondentById(respondents, RESPONDENT_ID_1)).isEqualTo(respondentSumTypeItem);
+    }
+
+    @Test
+    void theFindRespondentByRepresentativeId() {
+        respondentUtils.close();
+        // when respondent list is null should return null
+        assertThat(RespondentUtils.findRespondentByRepresentativeId(null, REPRESENTATIVE_ID_1)).isNull();
+        // when respondent list is empty should return null
+        List<RespondentSumTypeItem> respondents = new ArrayList<>();
+        assertThat(RespondentUtils.findRespondentByRepresentativeId(respondents, REPRESENTATIVE_ID_1)).isNull();
+        // when respondent list is not empty but representative id is null should return null
+        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+        respondents.add(respondentSumTypeItem);
+        assertThat(RespondentUtils.findRespondentByRepresentativeId(respondents, null)).isNull();
+        // when respondent list is not empty but representative id is empty string should return null
+        assertThat(RespondentUtils.findRespondentByRepresentativeId(respondents, StringUtils.EMPTY)).isNull();
+        // when respondent list has invalid respondent should return null
+        assertThat(RespondentUtils.findRespondentByRepresentativeId(respondents, REPRESENTATIVE_ID_1)).isNull();
+        // when representative id not found in respondent list should return null
+        respondentSumTypeItem.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_1)
+                .representativeId(REPRESENTATIVE_ID_1).build());
+        respondentSumTypeItem.setId(RESPONDENT_ID_1);
+        assertThat(RespondentUtils.findRespondentByRepresentativeId(respondents, REPRESENTATIVE_ID_2)).isNull();
+        // when representative id found in respondent list should return the name of the respondent
+        assertThat(RespondentUtils.findRespondentByRepresentativeId(respondents, REPRESENTATIVE_ID_1))
+                .isEqualTo(respondentSumTypeItem);
+    }
+
+    @Test
+    void theFindRespondentByName() {
+        respondentUtils.close();
+        // when respondent list is null should return null
+        assertThat(RespondentUtils.findRespondentByName(null, RESPONDENT_NAME_1)).isNull();
+        // when respondent list is empty should return null
+        List<RespondentSumTypeItem> respondents = new ArrayList<>();
+        assertThat(RespondentUtils.findRespondentByName(respondents, RESPONDENT_NAME_1)).isNull();
+        // when respondent list is not empty but respondent name is null should return null
+        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+        respondents.add(respondentSumTypeItem);
+        assertThat(RespondentUtils.findRespondentByName(respondents, null)).isNull();
+        // when respondent list is not empty but respondent name is empty string should return null
+        assertThat(RespondentUtils.findRespondentByName(respondents, StringUtils.EMPTY)).isNull();
+        // when respondent list has invalid respondent should return null
+        assertThat(RespondentUtils.findRespondentByName(respondents, RESPONDENT_NAME_1)).isNull();
+        // when respondent name not found in respondent list should return null
+        respondentSumTypeItem.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_1).build());
+        respondentSumTypeItem.setId(RESPONDENT_ID_1);
+        assertThat(RespondentUtils.findRespondentByName(respondents, RESPONDENT_NAME_2)).isNull();
+        // when respondent id found in respondent list should return respondent
+        assertThat(RespondentUtils.findRespondentByName(respondents, RESPONDENT_NAME_1))
+                .isEqualTo(respondentSumTypeItem);
+    }
 }

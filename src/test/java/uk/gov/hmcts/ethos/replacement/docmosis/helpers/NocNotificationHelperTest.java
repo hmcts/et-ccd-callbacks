@@ -7,7 +7,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
@@ -15,15 +18,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
 class NocNotificationHelperTest {
-    private static final String RESPONDENT_NAME = "Respondent";
+    private static final String RESPONDENT_NAME_1 = "Respondent Name 1";
+    private static final String RESPONDENT_NAME_2 = "Respondent Name 2";
+    private static final String RESPONDENT_ID_1 = "Respondent Id 1";
+    private static final String RESPONDENT_ID_2 = "Respondent Id 2";
+    private static final String REPRESENTATIVE_ID_1 = "Representative Id 1";
+    private static final String REPRESENTATIVE_ID_2 = "Representative Id 2";
     private static final String NEW_REP_EMAIL = "rep1@test.com";
     private static final String OLD_REP_EMAIL = "rep2@test.com";
     private static final String NEW_ORG_ID = "1";
@@ -38,7 +44,7 @@ class NocNotificationHelperTest {
     void setUp() {
 
         respondentSumType = new RespondentSumType();
-        respondentSumType.setRespondentName(RESPONDENT_NAME);
+        respondentSumType.setRespondentName(RESPONDENT_NAME_1);
         respondentSumType.setRespondentEmail("res@rep.com");
 
         Organisation organisationToAdd = Organisation.builder()
@@ -84,28 +90,27 @@ class NocNotificationHelperTest {
     }
 
     @Test
-    void testbuildClaimantPersonalisation() {
+    void testBuildClaimantPersonalisation() {
         String citLink = "http://domain/citizen-hub/1234";
         Map<String, String> claimantPersonalisation =
             NocNotificationHelper.buildPersonalisationWithPartyName(caseDetails, "test_party", citLink);
-        assertThat(claimantPersonalisation.size(), is(6));
-        assertThat(claimantPersonalisation.get("party_name"), is("test_party"));
-        assertThat(claimantPersonalisation.get("ccdId"), is("1234"));
-        assertThat(claimantPersonalisation.get("claimant"), is("Claimant LastName"));
-        assertThat(claimantPersonalisation.get("list_of_respondents"),
-                is("Respondent Respondent Unrepresented Respondent Represented Respondent")
-        );
-        assertThat(claimantPersonalisation.get("case_number"), is("12345/6789"));
-        assertThat(claimantPersonalisation.get("linkToCitUI"), is(citLink));
+        assertThat(claimantPersonalisation.size()).isEqualTo(6);
+        assertThat(claimantPersonalisation.get("party_name")).isEqualTo("test_party");
+        assertThat(claimantPersonalisation.get("ccdId")).isEqualTo("1234");
+        assertThat(claimantPersonalisation.get("claimant")).isEqualTo("Claimant LastName");
+        assertThat(claimantPersonalisation.get("list_of_respondents")).isEqualTo(
+                "Respondent Name 1 Respondent Unrepresented Respondent Represented Respondent");
+        assertThat(claimantPersonalisation.get("case_number")).isEqualTo("12345/6789");
+        assertThat(claimantPersonalisation.get("linkToCitUI")).isEqualTo(citLink);
     }
 
     @Test
     void testBuildPreviousRespondentSolicitorPersonalisation() {
         Map<String, String> claimantPersonalisation =
             NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation(caseData);
-        assertThat(claimantPersonalisation.size(), is(3));
+        assertThat(claimantPersonalisation.size()).isEqualTo(3);
         for (String value : claimantPersonalisation.values()) {
-            assertThat(value, notNullValue());
+            assertThat(value).isNotNull();
         }
     }
 
@@ -113,19 +118,19 @@ class NocNotificationHelperTest {
     void testBuildRespondentPersonalisation() {
         Map<String, String> claimantPersonalisation =
             NocNotificationHelper.buildNoCPersonalisation(caseDetails, respondentSumType.getRespondentName());
-        assertThat(claimantPersonalisation.size(), is(6));
+        assertThat(claimantPersonalisation.size()).isEqualTo(6);
         for (String value : claimantPersonalisation.values()) {
-            assertThat(value, notNullValue());
+            assertThat(value).isNotNull();
         }
     }
 
     @Test
     void testBuildTribunalPersonalisation() {
         Map<String, String> claimantPersonalisation = NocNotificationHelper.buildTribunalPersonalisation(caseData);
-        assertThat(claimantPersonalisation.size(), is(5));
-        assertThat(claimantPersonalisation.get("date"), is("25 Nov 2029"));
+        assertThat(claimantPersonalisation.size()).isEqualTo(5);
+        assertThat(claimantPersonalisation.get("date")).isEqualTo("25 Nov 2029");
         for (String value : claimantPersonalisation.values()) {
-            assertThat(value, notNullValue());
+            assertThat(value).isNotNull();
         }
     }
 
@@ -133,10 +138,10 @@ class NocNotificationHelperTest {
     void testBuildTribunalPersonalisationWithHearingDate() {
         caseData.setHearingCollection(new ArrayList<>());
         Map<String, String> claimantPersonalisation = NocNotificationHelper.buildTribunalPersonalisation(caseData);
-        assertThat(claimantPersonalisation.size(), is(5));
-        assertThat(claimantPersonalisation.get("date"), is("Not set"));
+        assertThat(claimantPersonalisation.size()).isEqualTo(5);
+        assertThat(claimantPersonalisation.get("date")).isEqualTo("Not set");
         for (String value : claimantPersonalisation.values()) {
-            assertThat(value, notNullValue());
+            assertThat(value).isNotNull();
         }
     }
 
@@ -144,6 +149,46 @@ class NocNotificationHelperTest {
     void testGetRespondentNameForNewSolicitor() {
         String respondentName = NocNotificationHelper
                 .getRespondentNameForNewSolicitor(caseData.getChangeOrganisationRequestField(), caseData);
-        assertThat(respondentName, is(RESPONDENT_NAME));
+        assertThat(respondentName).isEqualTo(RESPONDENT_NAME_1);
+    }
+
+    @Test
+    void theFindRespondentByRepresentative() {
+        // when case data is null should return null
+        RepresentedTypeRItem representative = RepresentedTypeRItem.builder().build();
+        assertThat(NocNotificationHelper.findRespondentByRepresentative(null, representative)).isNull();
+        // when case data respondent collection is empty should return null
+        CaseData tmpCaseData = new CaseData();
+        tmpCaseData.setRespondentCollection(new ArrayList<>());
+        assertThat(NocNotificationHelper.findRespondentByRepresentative(tmpCaseData, representative)).isNull();
+        // when representative is null should return null
+        RespondentSumTypeItem tmpRespondentSumTypeItem = new RespondentSumTypeItem();
+        tmpCaseData.getRespondentCollection().add(tmpRespondentSumTypeItem);
+        assertThat(NocNotificationHelper.findRespondentByRepresentative(caseData, null)).isNull();
+        // when representative not has value should return null
+        assertThat(NocNotificationHelper.findRespondentByRepresentative(tmpCaseData, representative)).isNull();
+        // when representative not has id, respondent name or respondent id should return null
+        representative.setValue(RepresentedTypeR.builder().build());
+        assertThat(NocNotificationHelper.findRespondentByRepresentative(tmpCaseData, representative)).isNull();
+        // When respondent found by id should return that respondent
+        tmpRespondentSumTypeItem.setId(RESPONDENT_ID_1);
+        tmpRespondentSumTypeItem.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_1)
+                .representativeId(REPRESENTATIVE_ID_1).build());
+        representative.getValue().setRespondentId(RESPONDENT_ID_1);
+        assertThat(NocNotificationHelper.findRespondentByRepresentative(tmpCaseData, representative))
+                .isEqualTo(tmpRespondentSumTypeItem);
+        // When respondent found by name should return that respondent
+        representative.getValue().setRespondentId(RESPONDENT_ID_2);
+        representative.getValue().setRespRepName(RESPONDENT_NAME_1);
+        assertThat(NocNotificationHelper.findRespondentByRepresentative(tmpCaseData, representative))
+                .isEqualTo(tmpRespondentSumTypeItem);
+        // when respondent found by representative id should return that respondent.
+        representative.getValue().setRespRepName(RESPONDENT_NAME_2);
+        representative.setId(REPRESENTATIVE_ID_1);
+        assertThat(NocNotificationHelper.findRespondentByRepresentative(tmpCaseData, representative))
+                .isEqualTo(tmpRespondentSumTypeItem);
+        // when respondent not found by id, name and representative id should return null
+        representative.setId(REPRESENTATIVE_ID_2);
+        assertThat(NocNotificationHelper.findRespondentByRepresentative(tmpCaseData, representative)).isNull();
     }
 }

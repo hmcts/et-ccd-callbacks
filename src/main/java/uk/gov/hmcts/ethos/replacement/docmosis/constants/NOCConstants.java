@@ -63,7 +63,8 @@ public final class NOCConstants {
             "Representative %s is missing an email address.";
     public static final String WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL =
             "Representative '%s' could not be found using %s. Case access will not be defined for this representative.";
-
+    public static final String WARNING_MISSING_EMAIL_ADDRESS =
+            "Missing email address for respondent while sending NOC notification email as revoked user for case {}.";
     public static final int MAX_NOC_ANSWERS = 10;
 
     private NOCConstants() {

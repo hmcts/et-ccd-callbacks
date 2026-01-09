@@ -31,6 +31,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.config.TribunalOfficesConfigurati
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1ReppedHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HelperTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.CcdCaseAssignment;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -116,6 +117,7 @@ class Et1ReppedServiceTest {
     private static final String TEST_COUNTRY = "Test Country";
     private static final String DUMMY_USER_TOKEN = "Dummy User Token";
     private static final String DUMMY_PHONE_NUMBER = "Dummy Phone Number";
+    private static final String SAMPLE_CLAIMANT_STILL_WORKING_JSON_FILE = "et1ReppedDraftStillWorking.json";
 
     @BeforeEach
     @SneakyThrows
@@ -128,7 +130,7 @@ class Et1ReppedServiceTest {
         caseDetails.setCaseId("1234567890123456");
         caseDetails.setCaseTypeId("ET_EnglandWales");
 
-        draftCaseDetails = generateCaseDetails("et1ReppedDraftStillWorking.json");
+        draftCaseDetails = generateCaseDetails();
 
         emailService = spy(new EmailUtils());
         PostcodeToOfficeService postcodeToOfficeService = new PostcodeToOfficeService(postcodeToOfficeMappings);
@@ -230,7 +232,7 @@ class Et1ReppedServiceTest {
 
     @Test
     void createDraftEt1() throws Exception {
-        caseDetails =  generateCaseDetails("et1ReppedDraftStillWorking.json");
+        caseDetails =  generateCaseDetails();
         Et1ReppedHelper.setEt1SubmitData(caseDetails.getCaseData());
         et1ReppedService.addDefaultData(caseDetails.getCaseTypeId(), caseDetails.getCaseData());
 
@@ -245,10 +247,10 @@ class Et1ReppedServiceTest {
         assertNotNull(caseDetails.getCaseData().getDocMarkUp());
     }
 
-    private CaseDetails generateCaseDetails(String jsonFileName) throws IOException, NullPointerException,
+    private CaseDetails generateCaseDetails() throws IOException, NullPointerException,
             URISyntaxException {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
-                .getContextClassLoader().getResource(jsonFileName)).toURI())));
+                .getContextClassLoader().getResource(SAMPLE_CLAIMANT_STILL_WORKING_JSON_FILE)).toURI())));
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(json, CaseDetails.class);
     }

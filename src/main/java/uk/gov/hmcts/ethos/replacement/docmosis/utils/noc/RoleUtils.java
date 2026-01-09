@@ -219,11 +219,22 @@ public final class RoleUtils {
         return StringUtils.isNotBlank(respondentName) ? respondentName : StringUtils.EMPTY;
     }
 
+    /**
+     * Finds the respondent name associated with the given role.
+     * <p>
+     * If the {@code caseData} is {@code null} or empty, or if the supplied {@code role}
+     * is {@code null}, empty, or blank, this method returns an empty string.
+     *
+     * @param caseData the case data containing respondent information
+     * @param role the role label used to identify the respondent
+     * @return the respondent name for the given role, or an empty string if the input
+     *         is invalid or no respondent can be resolved
+     */
     public static String findRespondentNameByRole(CaseData caseData, String role) {
         if (ObjectUtils.isEmpty(caseData) || StringUtils.isBlank(role)) {
             return StringUtils.EMPTY;
         }
         int roleIndex = findRoleIndexByRoleLabel(role);
-        return RoleUtils.findRespondentNameByIndex(caseData, roleIndex);
+        return findRespondentNameByIndex(caseData, roleIndex);
     }
 }

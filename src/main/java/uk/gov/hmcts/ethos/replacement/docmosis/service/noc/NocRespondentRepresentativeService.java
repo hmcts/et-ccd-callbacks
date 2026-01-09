@@ -260,8 +260,8 @@ public class NocRespondentRepresentativeService {
     public void revokeOldRespondentRepresentativeAccess(
             CaseDetails oldCaseDetails, List<RepresentedTypeRItem> representativesToRemove) {
         if (ObjectUtils.isEmpty(oldCaseDetails)
-                || ObjectUtils.isEmpty(oldCaseDetails.getCaseData())
                 || StringUtils.isEmpty(oldCaseDetails.getCaseId())
+                || ObjectUtils.isEmpty(oldCaseDetails.getCaseData())
                 || CollectionUtils.isEmpty(representativesToRemove)) {
             return;
         }
@@ -293,8 +293,10 @@ public class NocRespondentRepresentativeService {
                 }
             }
         }
-        nocCcdService.revokeCaseAssignments(adminUserService.getAdminUserToken(),
-                CaseUserAssignmentData.builder().caseUserAssignments(assignmentsToRevoke).build());
+        if (CollectionUtils.isNotEmpty(assignmentsToRevoke)) {
+            nocCcdService.revokeCaseAssignments(adminUserService.getAdminUserToken(),
+                    CaseUserAssignmentData.builder().caseUserAssignments(assignmentsToRevoke).build());
+        }
     }
 
     /**

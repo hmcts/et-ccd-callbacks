@@ -424,4 +424,22 @@ public final class NocUtils {
                     StringUtils.EMPTY, CLASS_NAME, methodName);
         }
     }
+
+    public static void removeOrganisationPoliciesAndNocAnswers(CaseData caseData,
+                                                               List<RepresentedTypeRItem> representatives) {
+        if (ObjectUtils.isEmpty(caseData) || CollectionUtils.isEmpty(representatives)) {
+            return;
+        }
+        for (RepresentedTypeRItem representative : representatives) {
+            String role = RoleUtils.findRespondentRepresentativeRole(representative, caseData);
+            if (StringUtils.isBlank(role)) {
+                continue;
+            }
+            int roleIndex = RoleUtils.findRoleIndexByRoleLabel(role);
+            if (roleIndex == -1) {
+                continue;
+            }
+            RoleUtils.removeOrganisationPolicyAndNocAnswersByRepresentative(caseData, representative);
+        }
+    }
 }

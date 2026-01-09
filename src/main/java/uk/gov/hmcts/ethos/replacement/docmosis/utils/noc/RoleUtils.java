@@ -7,6 +7,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
+import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 
@@ -236,5 +237,98 @@ public final class RoleUtils {
         }
         int roleIndex = findRoleIndexByRoleLabel(role);
         return findRespondentNameByIndex(caseData, roleIndex);
+    }
+
+    /**
+     * Removes the respondent organisation policy and Notice of Change answers
+     * associated with the given representative.
+     * <p>
+     * This method determines the respondent role represented by the supplied
+     * {@link RepresentedTypeRItem}, resolves the corresponding role index, and
+     * clears both the {@link OrganisationPolicy} and {@link NoticeOfChangeAnswers}
+     * entries at that index on the provided {@link CaseData}.
+     * <p>
+     * If the {@code caseData} or {@code representative} is {@code null} or empty,
+     * the method performs no action.
+     *
+     * @param caseData the case data containing respondent organisation policies and
+     *                 Notice of Change answers
+     * @param representative the representative whose associated organisation policy
+     *                       and Notice of Change answers should be removed
+     */
+    public static void removeOrganisationPolicyAndNocAnswersByRepresentative(CaseData caseData,
+                                                                             RepresentedTypeRItem representative) {
+        if (ObjectUtils.isEmpty(caseData) || ObjectUtils.isEmpty(representative)) {
+            return;
+        }
+        int roleIndex = findRoleIndexByRoleLabel(findRespondentRepresentativeRole(representative, caseData));
+        removeOrganisationPolicyByIndex(caseData, roleIndex);
+        removeNocAnswersByIndex(caseData, roleIndex);
+    }
+
+    /**
+     * Removes (clears) the respondent organisation policy at the given index.
+     * <p>
+     * This method resets the corresponding {@link OrganisationPolicy} field on the
+     * supplied {@link CaseData} to an empty instance. If the {@code caseData} is
+     * {@code null} or empty, or if the {@code index} is out of range
+     * ({@code index < 0} or {@code index >= MAX_NOC_ANSWERS}), the method performs
+     * no action.
+     *
+     * @param caseData the case data containing respondent organisation policies
+     * @param index the zero-based index of the respondent organisation policy to remove
+     */
+    public static void removeOrganisationPolicyByIndex(CaseData caseData, int index) {
+        if (ObjectUtils.isEmpty(caseData) || index < 0 || index >= MAX_NOC_ANSWERS) {
+            return;
+        }
+        OrganisationPolicy emptyPolicy = OrganisationPolicy.builder().build();
+
+        switch (index) {
+            case 0 -> caseData.setRespondentOrganisationPolicy0(emptyPolicy);
+            case 1 -> caseData.setRespondentOrganisationPolicy1(emptyPolicy);
+            case 2 -> caseData.setRespondentOrganisationPolicy2(emptyPolicy);
+            case 3 -> caseData.setRespondentOrganisationPolicy3(emptyPolicy);
+            case 4 -> caseData.setRespondentOrganisationPolicy4(emptyPolicy);
+            case 5 -> caseData.setRespondentOrganisationPolicy5(emptyPolicy);
+            case 6 -> caseData.setRespondentOrganisationPolicy6(emptyPolicy);
+            case 7 -> caseData.setRespondentOrganisationPolicy7(emptyPolicy);
+            case 8 -> caseData.setRespondentOrganisationPolicy8(emptyPolicy);
+            case 9 -> caseData.setRespondentOrganisationPolicy9(emptyPolicy);
+            default -> { /* no-op */ }
+        }
+    }
+
+    /**
+     * Removes (clears) the Notice of Change answers at the given index.
+     * <p>
+     * This method resets the corresponding {@link NoticeOfChangeAnswers} field
+     * on the supplied {@link CaseData} to an empty instance. If the {@code caseData}
+     * is {@code null} or empty, or if the {@code index} is out of range
+     * ({@code index < 0} or {@code index >= MAX_NOC_ANSWERS}), the method performs
+     * no action.
+     *
+     * @param caseData the case data containing Notice of Change answers
+     * @param index the zero-based index of the Notice of Change answers to remove
+     */
+    public static void removeNocAnswersByIndex(CaseData caseData, int index) {
+        if (ObjectUtils.isEmpty(caseData) || index < 0 || index >= MAX_NOC_ANSWERS) {
+            return;
+        }
+        NoticeOfChangeAnswers emptyNoticeOfChangeAnswers = NoticeOfChangeAnswers.builder().build();
+
+        switch (index) {
+            case 0 -> caseData.setNoticeOfChangeAnswers0(emptyNoticeOfChangeAnswers);
+            case 1 -> caseData.setNoticeOfChangeAnswers1(emptyNoticeOfChangeAnswers);
+            case 2 -> caseData.setNoticeOfChangeAnswers2(emptyNoticeOfChangeAnswers);
+            case 3 -> caseData.setNoticeOfChangeAnswers3(emptyNoticeOfChangeAnswers);
+            case 4 -> caseData.setNoticeOfChangeAnswers4(emptyNoticeOfChangeAnswers);
+            case 5 -> caseData.setNoticeOfChangeAnswers5(emptyNoticeOfChangeAnswers);
+            case 6 -> caseData.setNoticeOfChangeAnswers6(emptyNoticeOfChangeAnswers);
+            case 7 -> caseData.setNoticeOfChangeAnswers7(emptyNoticeOfChangeAnswers);
+            case 8 -> caseData.setNoticeOfChangeAnswers8(emptyNoticeOfChangeAnswers);
+            case 9 -> caseData.setNoticeOfChangeAnswers9(emptyNoticeOfChangeAnswers);
+            default -> { /* no-op */ }
+        }
     }
 }

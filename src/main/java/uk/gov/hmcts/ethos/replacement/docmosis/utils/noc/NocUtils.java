@@ -425,20 +425,25 @@ public final class NocUtils {
         }
     }
 
+    /**
+     * Removes organisation policies and Notice of Change (NoC) answers from the given
+     * {@link CaseData} for each provided representative.
+     * <p>
+     * If the {@code caseData} is {@code null} or empty, or if the list of representatives
+     * is {@code null} or empty, the method performs no action.
+     * </p>
+     *
+     * @param caseData        the case data from which organisation policies and NoC answers
+     *                        should be removed
+     * @param representatives the list of representatives whose associated organisation
+     *                        policies and NoC answers should be removed
+     */
     public static void removeOrganisationPoliciesAndNocAnswers(CaseData caseData,
                                                                List<RepresentedTypeRItem> representatives) {
         if (ObjectUtils.isEmpty(caseData) || CollectionUtils.isEmpty(representatives)) {
             return;
         }
         for (RepresentedTypeRItem representative : representatives) {
-            String role = RoleUtils.findRespondentRepresentativeRole(representative, caseData);
-            if (StringUtils.isBlank(role)) {
-                continue;
-            }
-            int roleIndex = RoleUtils.findRoleIndexByRoleLabel(role);
-            if (roleIndex == -1) {
-                continue;
-            }
             RoleUtils.removeOrganisationPolicyAndNocAnswersByRepresentative(caseData, representative);
         }
     }

@@ -11,6 +11,9 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
+import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
+import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
@@ -58,11 +61,39 @@ final class NocUtilsTest {
     private static final String REPRESENTATIVE_NAME = "Representative Name";
     private static final String RESPONDENT_NAME_ONE = "Respondent Name One";
     private static final String RESPONDENT_NAME_TWO = "Respondent Name Two";
+    private static final String RESPONDENT_NAME_THREE = "Respondent Name Three";
+    private static final String RESPONDENT_NAME_FOUR = "Respondent Name Four";
+    private static final String RESPONDENT_NAME_FIVE = "Respondent Name Five";
+    private static final String RESPONDENT_NAME_SIX = "Respondent Name Six";
+    private static final String RESPONDENT_NAME_SEVEN = "Respondent Name Seven";
+    private static final String RESPONDENT_NAME_EIGHT = "Respondent Name Eight";
+    private static final String RESPONDENT_NAME_NINE = "Respondent Name Nine";
+    private static final String RESPONDENT_NAME_TEN = "Respondent Name Ten";
     private static final String RESPONDENT_ID_ONE = "dummy_respondent_id_1";
     private static final String RESPONDENT_ID_TWO = "dummy_respondent_id_2";
     private static final String DUMMY_REPRESENTATIVE_ID = "dummy_representative_id";
     private static final String DUMMY_CASE_SUBMISSION_REFERENCE_1 = "1234567890123456";
     private static final String DUMMY_CASE_SUBMISSION_REFERENCE_2 = "9876543210654321";
+    private static final String ORGANISATION_ID_ONE = "Organisation id one";
+    private static final String ORGANISATION_ID_TWO = "Organisation id two";
+    private static final String ORGANISATION_ID_THREE = "Organisation id three";
+    private static final String ORGANISATION_ID_FOUR = "Organisation id four";
+    private static final String ORGANISATION_ID_FIVE = "Organisation id five";
+    private static final String ORGANISATION_ID_SIX = "Organisation id six";
+    private static final String ORGANISATION_ID_SEVEN = "Organisation id seven";
+    private static final String ORGANISATION_ID_EIGHT = "Organisation id eight";
+    private static final String ORGANISATION_ID_NINE = "Organisation id nine";
+    private static final String ORGANISATION_ID_TEN = "Organisation id ten";
+    private static final String ROLE_SOLICITOR_A = "[SOLICITORA]";
+    private static final String ROLE_SOLICITOR_B = "[SOLICITORB]";
+    private static final String ROLE_SOLICITOR_C = "[SOLICITORC]";
+    private static final String ROLE_SOLICITOR_D = "[SOLICITORD]";
+    private static final String ROLE_SOLICITOR_E = "[SOLICITORE]";
+    private static final String ROLE_SOLICITOR_F = "[SOLICITORF]";
+    private static final String ROLE_SOLICITOR_G = "[SOLICITORG]";
+    private static final String ROLE_SOLICITOR_H = "[SOLICITORH]";
+    private static final String ROLE_SOLICITOR_I = "[SOLICITORI]";
+    private static final String ROLE_SOLICITOR_J = "[SOLICITORJ]";
 
     @Test
     void theValidateRepresentativeRespondentMapping() {
@@ -343,5 +374,105 @@ final class NocUtilsTest {
         callbackRequest.getCaseDetailsBefore().getCaseData().getRespondentCollection().getFirst()
                 .setId(RESPONDENT_ID_ONE);
         assertDoesNotThrow(() -> NocUtils.validateCallbackRequest(callbackRequest));
+    }
+
+    @Test
+    void theRemoveOrganisationPoliciesAndNocAnswers() {
+        // when case data is empty should not throw exception
+        RepresentedTypeRItem representative = RepresentedTypeRItem.builder().build();
+        List<RepresentedTypeRItem> representatives = new ArrayList<>(List.of(representative));
+        assertDoesNotThrow(() -> NocUtils.removeOrganisationPoliciesAndNocAnswers(null, representatives));
+        // when representatives are empty should not remove organisation policy or noc answer
+        CaseData caseData = new CaseData();
+        setAllNoticeOfChangeAnswers(caseData);
+        setAllRespondentOrganisationPolicy(caseData);
+        assertDoesNotThrow(() -> NocUtils.removeOrganisationPoliciesAndNocAnswers(caseData, null));
+        // when representatives have all respondent representative roles, should remove all organisation policies and
+        // noc answers
+        representatives.getFirst().setValue(RepresentedTypeR.builder().role(ROLE_SOLICITOR_A).build());
+        representatives.add(RepresentedTypeRItem.builder().value(RepresentedTypeR.builder().role(ROLE_SOLICITOR_B)
+                .build()).build());
+        representatives.add(RepresentedTypeRItem.builder().value(RepresentedTypeR.builder().role(ROLE_SOLICITOR_C)
+                .build()).build());
+        representatives.add(RepresentedTypeRItem.builder().value(RepresentedTypeR.builder().role(ROLE_SOLICITOR_D)
+                .build()).build());
+        representatives.add(RepresentedTypeRItem.builder().value(RepresentedTypeR.builder().role(ROLE_SOLICITOR_E)
+                .build()).build());
+        representatives.add(RepresentedTypeRItem.builder().value(RepresentedTypeR.builder().role(ROLE_SOLICITOR_F)
+                .build()).build());
+        representatives.add(RepresentedTypeRItem.builder().value(RepresentedTypeR.builder().role(ROLE_SOLICITOR_G)
+                .build()).build());
+        representatives.add(RepresentedTypeRItem.builder().value(RepresentedTypeR.builder().role(ROLE_SOLICITOR_H)
+                .build()).build());
+        representatives.add(RepresentedTypeRItem.builder().value(RepresentedTypeR.builder().role(ROLE_SOLICITOR_I)
+                .build()).build());
+        representatives.add(RepresentedTypeRItem.builder().value(RepresentedTypeR.builder().role(ROLE_SOLICITOR_J)
+                .build()).build());
+        NocUtils.removeOrganisationPoliciesAndNocAnswers(caseData, representatives);
+        NoticeOfChangeAnswers emptyNoticeOfChangeAnswers = NoticeOfChangeAnswers.builder().build();
+        assertThat(caseData.getNoticeOfChangeAnswers0()).isEqualTo(emptyNoticeOfChangeAnswers);
+        assertThat(caseData.getNoticeOfChangeAnswers1()).isEqualTo(emptyNoticeOfChangeAnswers);
+        assertThat(caseData.getNoticeOfChangeAnswers2()).isEqualTo(emptyNoticeOfChangeAnswers);
+        assertThat(caseData.getNoticeOfChangeAnswers3()).isEqualTo(emptyNoticeOfChangeAnswers);
+        assertThat(caseData.getNoticeOfChangeAnswers4()).isEqualTo(emptyNoticeOfChangeAnswers);
+        assertThat(caseData.getNoticeOfChangeAnswers5()).isEqualTo(emptyNoticeOfChangeAnswers);
+        assertThat(caseData.getNoticeOfChangeAnswers6()).isEqualTo(emptyNoticeOfChangeAnswers);
+        assertThat(caseData.getNoticeOfChangeAnswers7()).isEqualTo(emptyNoticeOfChangeAnswers);
+        assertThat(caseData.getNoticeOfChangeAnswers8()).isEqualTo(emptyNoticeOfChangeAnswers);
+        assertThat(caseData.getNoticeOfChangeAnswers9()).isEqualTo(emptyNoticeOfChangeAnswers);
+
+        OrganisationPolicy emptyOrganisationPolicy = OrganisationPolicy.builder().build();
+        assertThat(caseData.getRespondentOrganisationPolicy0()).isEqualTo(emptyOrganisationPolicy);
+        assertThat(caseData.getRespondentOrganisationPolicy1()).isEqualTo(emptyOrganisationPolicy);
+        assertThat(caseData.getRespondentOrganisationPolicy2()).isEqualTo(emptyOrganisationPolicy);
+        assertThat(caseData.getRespondentOrganisationPolicy3()).isEqualTo(emptyOrganisationPolicy);
+        assertThat(caseData.getRespondentOrganisationPolicy4()).isEqualTo(emptyOrganisationPolicy);
+        assertThat(caseData.getRespondentOrganisationPolicy5()).isEqualTo(emptyOrganisationPolicy);
+        assertThat(caseData.getRespondentOrganisationPolicy6()).isEqualTo(emptyOrganisationPolicy);
+        assertThat(caseData.getRespondentOrganisationPolicy7()).isEqualTo(emptyOrganisationPolicy);
+        assertThat(caseData.getRespondentOrganisationPolicy8()).isEqualTo(emptyOrganisationPolicy);
+        assertThat(caseData.getRespondentOrganisationPolicy9()).isEqualTo(emptyOrganisationPolicy);
+    }
+
+    private static void setAllRespondentOrganisationPolicy(CaseData caseData) {
+        caseData.setRespondentOrganisationPolicy0(OrganisationPolicy.builder().organisation(Organisation.builder()
+                .organisationID(ORGANISATION_ID_ONE).build()).build());
+        caseData.setRespondentOrganisationPolicy1(OrganisationPolicy.builder().organisation(Organisation.builder()
+                .organisationID(ORGANISATION_ID_TWO).build()).build());
+        caseData.setRespondentOrganisationPolicy2(OrganisationPolicy.builder().organisation(Organisation.builder()
+                .organisationID(ORGANISATION_ID_THREE).build()).build());
+        caseData.setRespondentOrganisationPolicy3(OrganisationPolicy.builder().organisation(Organisation.builder()
+                .organisationID(ORGANISATION_ID_FOUR).build()).build());
+        caseData.setRespondentOrganisationPolicy4(OrganisationPolicy.builder().organisation(Organisation.builder()
+                .organisationID(ORGANISATION_ID_FIVE).build()).build());
+        caseData.setRespondentOrganisationPolicy5(OrganisationPolicy.builder().organisation(Organisation.builder()
+                .organisationID(ORGANISATION_ID_SIX).build()).build());
+        caseData.setRespondentOrganisationPolicy6(OrganisationPolicy.builder().organisation(Organisation.builder()
+                .organisationID(ORGANISATION_ID_SEVEN).build()).build());
+        caseData.setRespondentOrganisationPolicy7(OrganisationPolicy.builder().organisation(Organisation.builder()
+                .organisationID(ORGANISATION_ID_EIGHT).build()).build());
+        caseData.setRespondentOrganisationPolicy8(OrganisationPolicy.builder().organisation(Organisation.builder()
+                .organisationID(ORGANISATION_ID_NINE).build()).build());
+        caseData.setRespondentOrganisationPolicy9(OrganisationPolicy.builder().organisation(Organisation.builder()
+                .organisationID(ORGANISATION_ID_TEN).build()).build());
+    }
+
+    private static void setAllNoticeOfChangeAnswers(CaseData caseData) {
+        caseData.setNoticeOfChangeAnswers0(NoticeOfChangeAnswers.builder().respondentName(RESPONDENT_NAME_ONE).build());
+        caseData.setNoticeOfChangeAnswers1(NoticeOfChangeAnswers.builder().respondentName(RESPONDENT_NAME_TWO).build());
+        caseData.setNoticeOfChangeAnswers2(NoticeOfChangeAnswers.builder()
+                .respondentName(RESPONDENT_NAME_THREE).build());
+        caseData.setNoticeOfChangeAnswers3(NoticeOfChangeAnswers.builder()
+                .respondentName(RESPONDENT_NAME_FOUR).build());
+        caseData.setNoticeOfChangeAnswers4(NoticeOfChangeAnswers.builder()
+                .respondentName(RESPONDENT_NAME_FIVE).build());
+        caseData.setNoticeOfChangeAnswers5(NoticeOfChangeAnswers.builder().respondentName(RESPONDENT_NAME_SIX).build());
+        caseData.setNoticeOfChangeAnswers6(NoticeOfChangeAnswers.builder()
+                .respondentName(RESPONDENT_NAME_SEVEN).build());
+        caseData.setNoticeOfChangeAnswers7(NoticeOfChangeAnswers.builder()
+                .respondentName(RESPONDENT_NAME_EIGHT).build());
+        caseData.setNoticeOfChangeAnswers8(NoticeOfChangeAnswers.builder()
+                .respondentName(RESPONDENT_NAME_NINE).build());
+        caseData.setNoticeOfChangeAnswers9(NoticeOfChangeAnswers.builder().respondentName(RESPONDENT_NAME_TEN).build());
     }
 }

@@ -25,16 +25,16 @@ final class RoleUtilsTest {
     private static final String RESPONDENT_NAME_EIGHT = "Respondent Name Eight";
     private static final String RESPONDENT_NAME_NINE = "Respondent Name Nine";
     private static final String RESPONDENT_NAME_TEN = "Respondent Name Ten";
-    private static final String ORGANISATION_ID_ONE = "Organisation id 1";
-    private static final String ORGANISATION_ID_TWO = "Organisation id 2";
-    private static final String ORGANISATION_ID_THREE = "Organisation id 3";
-    private static final String ORGANISATION_ID_FOUR = "Organisation id 4";
-    private static final String ORGANISATION_ID_FIVE = "Organisation id 5";
-    private static final String ORGANISATION_ID_SIX = "Organisation id 6";
-    private static final String ORGANISATION_ID_SEVEN = "Organisation id 7";
-    private static final String ORGANISATION_ID_EIGHT = "Organisation id 8";
-    private static final String ORGANISATION_ID_NINE = "Organisation id 9";
-    private static final String ORGANISATION_ID_TEN = "Organisation id 10";
+    private static final String ORGANISATION_ID_ONE = "Organisation id one";
+    private static final String ORGANISATION_ID_TWO = "Organisation id two";
+    private static final String ORGANISATION_ID_THREE = "Organisation id three";
+    private static final String ORGANISATION_ID_FOUR = "Organisation id four";
+    private static final String ORGANISATION_ID_FIVE = "Organisation id five";
+    private static final String ORGANISATION_ID_SIX = "Organisation id six";
+    private static final String ORGANISATION_ID_SEVEN = "Organisation id seven";
+    private static final String ORGANISATION_ID_EIGHT = "Organisation id eight";
+    private static final String ORGANISATION_ID_NINE = "Organisation id nine";
+    private static final String ORGANISATION_ID_TEN = "Organisation id ten";
     private static final String ROLE_SOLICITOR_A = "[SOLICITORA]";
     private static final String ROLE_SOLICITOR_B = "[SOLICITORB]";
     private static final String ROLE_SOLICITOR_C = "[SOLICITORC]";
@@ -150,25 +150,6 @@ final class RoleUtilsTest {
                 .isEqualTo(INTEGER_EIGHT);
         assertThat(RoleUtils.findSolicitorRoleIndexByRespondentName(caseData, RESPONDENT_NAME_TEN))
                 .isEqualTo(INTEGER_NINE);
-    }
-
-    private static void setAllNoticeOfChangeAnswers(CaseData caseData) {
-        caseData.setNoticeOfChangeAnswers0(NoticeOfChangeAnswers.builder().respondentName(RESPONDENT_NAME_ONE).build());
-        caseData.setNoticeOfChangeAnswers1(NoticeOfChangeAnswers.builder().respondentName(RESPONDENT_NAME_TWO).build());
-        caseData.setNoticeOfChangeAnswers2(NoticeOfChangeAnswers.builder()
-                .respondentName(RESPONDENT_NAME_THREE).build());
-        caseData.setNoticeOfChangeAnswers3(NoticeOfChangeAnswers.builder()
-                .respondentName(RESPONDENT_NAME_FOUR).build());
-        caseData.setNoticeOfChangeAnswers4(NoticeOfChangeAnswers.builder()
-                .respondentName(RESPONDENT_NAME_FIVE).build());
-        caseData.setNoticeOfChangeAnswers5(NoticeOfChangeAnswers.builder().respondentName(RESPONDENT_NAME_SIX).build());
-        caseData.setNoticeOfChangeAnswers6(NoticeOfChangeAnswers.builder()
-                .respondentName(RESPONDENT_NAME_SEVEN).build());
-        caseData.setNoticeOfChangeAnswers7(NoticeOfChangeAnswers.builder()
-                .respondentName(RESPONDENT_NAME_EIGHT).build());
-        caseData.setNoticeOfChangeAnswers8(NoticeOfChangeAnswers.builder()
-                .respondentName(RESPONDENT_NAME_NINE).build());
-        caseData.setNoticeOfChangeAnswers9(NoticeOfChangeAnswers.builder().respondentName(RESPONDENT_NAME_TEN).build());
     }
 
     @Test
@@ -306,29 +287,6 @@ final class RoleUtilsTest {
         assertThat(RoleUtils.findRespondentNameByRole(caseData, ROLE_SOLICITOR_J)).isEqualTo(RESPONDENT_NAME_TEN);
     }
 
-    private static void setAllRespondentOrganisationPolicy(CaseData caseData) {
-        caseData.setRespondentOrganisationPolicy0(OrganisationPolicy.builder().organisation(Organisation.builder()
-                .organisationID(ORGANISATION_ID_ONE).build()).build());
-        caseData.setRespondentOrganisationPolicy1(OrganisationPolicy.builder().organisation(Organisation.builder()
-                .organisationID(ORGANISATION_ID_TWO).build()).build());
-        caseData.setRespondentOrganisationPolicy2(OrganisationPolicy.builder().organisation(Organisation.builder()
-                .organisationID(ORGANISATION_ID_THREE).build()).build());
-        caseData.setRespondentOrganisationPolicy3(OrganisationPolicy.builder().organisation(Organisation.builder()
-                .organisationID(ORGANISATION_ID_FOUR).build()).build());
-        caseData.setRespondentOrganisationPolicy4(OrganisationPolicy.builder().organisation(Organisation.builder()
-                .organisationID(ORGANISATION_ID_FIVE).build()).build());
-        caseData.setRespondentOrganisationPolicy5(OrganisationPolicy.builder().organisation(Organisation.builder()
-                .organisationID(ORGANISATION_ID_SIX).build()).build());
-        caseData.setRespondentOrganisationPolicy6(OrganisationPolicy.builder().organisation(Organisation.builder()
-                .organisationID(ORGANISATION_ID_SEVEN).build()).build());
-        caseData.setRespondentOrganisationPolicy7(OrganisationPolicy.builder().organisation(Organisation.builder()
-                .organisationID(ORGANISATION_ID_EIGHT).build()).build());
-        caseData.setRespondentOrganisationPolicy8(OrganisationPolicy.builder().organisation(Organisation.builder()
-                .organisationID(ORGANISATION_ID_NINE).build()).build());
-        caseData.setRespondentOrganisationPolicy9(OrganisationPolicy.builder().organisation(Organisation.builder()
-                .organisationID(ORGANISATION_ID_TEN).build()).build());
-    }
-
     @Test
     void theRemoveOrganisationPolicyByIndex() {
         // when case data is empty should not throw any exception
@@ -463,5 +421,47 @@ final class RoleUtilsTest {
         RoleUtils.removeOrganisationPolicyAndNocAnswersByRepresentative(caseData, representative);
         assertThat(caseData.getRespondentOrganisationPolicy9()).isEqualTo(emptyPolicy);
         assertThat(caseData.getNoticeOfChangeAnswers9()).isEqualTo(emptyNoticeOfChangeAnswers);
+    }
+
+    private static void setAllRespondentOrganisationPolicy(CaseData caseData) {
+        caseData.setRespondentOrganisationPolicy0(OrganisationPolicy.builder().organisation(Organisation.builder()
+                .organisationID(ORGANISATION_ID_ONE).build()).build());
+        caseData.setRespondentOrganisationPolicy1(OrganisationPolicy.builder().organisation(Organisation.builder()
+                .organisationID(ORGANISATION_ID_TWO).build()).build());
+        caseData.setRespondentOrganisationPolicy2(OrganisationPolicy.builder().organisation(Organisation.builder()
+                .organisationID(ORGANISATION_ID_THREE).build()).build());
+        caseData.setRespondentOrganisationPolicy3(OrganisationPolicy.builder().organisation(Organisation.builder()
+                .organisationID(ORGANISATION_ID_FOUR).build()).build());
+        caseData.setRespondentOrganisationPolicy4(OrganisationPolicy.builder().organisation(Organisation.builder()
+                .organisationID(ORGANISATION_ID_FIVE).build()).build());
+        caseData.setRespondentOrganisationPolicy5(OrganisationPolicy.builder().organisation(Organisation.builder()
+                .organisationID(ORGANISATION_ID_SIX).build()).build());
+        caseData.setRespondentOrganisationPolicy6(OrganisationPolicy.builder().organisation(Organisation.builder()
+                .organisationID(ORGANISATION_ID_SEVEN).build()).build());
+        caseData.setRespondentOrganisationPolicy7(OrganisationPolicy.builder().organisation(Organisation.builder()
+                .organisationID(ORGANISATION_ID_EIGHT).build()).build());
+        caseData.setRespondentOrganisationPolicy8(OrganisationPolicy.builder().organisation(Organisation.builder()
+                .organisationID(ORGANISATION_ID_NINE).build()).build());
+        caseData.setRespondentOrganisationPolicy9(OrganisationPolicy.builder().organisation(Organisation.builder()
+                .organisationID(ORGANISATION_ID_TEN).build()).build());
+    }
+
+    private static void setAllNoticeOfChangeAnswers(CaseData caseData) {
+        caseData.setNoticeOfChangeAnswers0(NoticeOfChangeAnswers.builder().respondentName(RESPONDENT_NAME_ONE).build());
+        caseData.setNoticeOfChangeAnswers1(NoticeOfChangeAnswers.builder().respondentName(RESPONDENT_NAME_TWO).build());
+        caseData.setNoticeOfChangeAnswers2(NoticeOfChangeAnswers.builder()
+                .respondentName(RESPONDENT_NAME_THREE).build());
+        caseData.setNoticeOfChangeAnswers3(NoticeOfChangeAnswers.builder()
+                .respondentName(RESPONDENT_NAME_FOUR).build());
+        caseData.setNoticeOfChangeAnswers4(NoticeOfChangeAnswers.builder()
+                .respondentName(RESPONDENT_NAME_FIVE).build());
+        caseData.setNoticeOfChangeAnswers5(NoticeOfChangeAnswers.builder().respondentName(RESPONDENT_NAME_SIX).build());
+        caseData.setNoticeOfChangeAnswers6(NoticeOfChangeAnswers.builder()
+                .respondentName(RESPONDENT_NAME_SEVEN).build());
+        caseData.setNoticeOfChangeAnswers7(NoticeOfChangeAnswers.builder()
+                .respondentName(RESPONDENT_NAME_EIGHT).build());
+        caseData.setNoticeOfChangeAnswers8(NoticeOfChangeAnswers.builder()
+                .respondentName(RESPONDENT_NAME_NINE).build());
+        caseData.setNoticeOfChangeAnswers9(NoticeOfChangeAnswers.builder().respondentName(RESPONDENT_NAME_TEN).build());
     }
 }

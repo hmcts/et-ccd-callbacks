@@ -372,7 +372,7 @@ public class InitialConsiderationService {
         return hearingDetailsTable.toString();
     }
 
-    private static String getAdjustedHearingTypeName(String hearingTypeName) {
+    public static String getAdjustedHearingTypeName(String hearingTypeName) {
         return switch (hearingTypeName) {
             case "Hearing" -> "Final Hearing";
             case "Reconsideration" -> "Reconsideration Hearing";
@@ -471,17 +471,18 @@ public class InitialConsiderationService {
         StringBuilder hearingFormatTable = new StringBuilder();
         hearingFormatTable.append("""
           <table>
-          <tr>
-          <th colspan="2"><h2>Respondents Hearing Format</h2></th>
-          </tr>
+           <thead>
+              <tr>
+                <th colspan="2"><h2>Respondents Hearing Format</h2></th>
+              </tr>
+              <tr>
+                <th width="30%"><h3>Respondent</h3></th>
+                <th width="70%"><span class="bold">Hearing Format</span></th>
+              </tr>
+          </thead>
+          <tbody>
             """);
 
-        String respondentHeaderRow = """
-                        <tr>
-                        <th width="30%"><h3>Respondent</h3></th>
-                        <th width="70%"><span class="bold">Hearing Format</span></th>
-                        </tr>
-                        """;
         String respondentRepHeaderRow = """
                         <tr>
                         <th width="30%"><h3>Respondent Representative</h3></th>
@@ -495,7 +496,6 @@ public class InitialConsiderationService {
                     //set respondent rep hearing format preference
                     if (respondent.getValue().getEt3ResponseHearingRespondent() != null
                             && !respondent.getValue().getEt3ResponseHearingRespondent().isEmpty()) {
-                        hearingFormatTable.append(respondentHeaderRow);
 
                         hearingFormatTable.append(String.format(
                                 HEARING_FORMAT_PREFERENCE,
@@ -578,7 +578,6 @@ public class InitialConsiderationService {
                             Optional.of(hearingFormates)
                                     .orElse("-"))
                     );
-                    return hearingFormatTable.append(TABLE_END).toString();
                 } else {
                     hearingFormatTable.append(String.format(
                             HEARING_FORMAT_PREFERENCE,
@@ -588,6 +587,7 @@ public class InitialConsiderationService {
             }
         }
 
+        hearingFormatTable.append(TABLE_END);
         return hearingFormatTable.toString();
     }
 
@@ -653,7 +653,7 @@ public class InitialConsiderationService {
     }
 
     /**
-     * Clear value for hidden fields.
+     * Clear value for hidden fields and old values.
      * @param caseData gets the CaseData
      */
     public void clearHiddenValue(CaseData caseData) {
@@ -702,8 +702,14 @@ public class InitialConsiderationService {
             caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJudgeOrMembersReasonOther(null);
         }
 
-        //caseData.setEtInitialConsiderationHearing(null);
-        //caseData.setEtICHearingAlreadyListed(null);
+        caseData.setEtICHearingNotListedListForPrelimHearingUpdated(null);
+        caseData.setEtICHearingNotListedListForFinalHearingUpdated(null);
+        caseData.setEtICHearingNotListedListUpdated(null);
+        caseData.setEtICHearingNotListedListForPrelimHearing(null);
+        caseData.setEtICHearingNotListedListForPrelimHearingUpdated(null);
+        caseData.setEtICHearingNotListedListForFinalHearing(null);
+        caseData.setEtICHearingNotListedUDLHearing(null);
+        caseData.setEtICHearingNotListedAnyOtherDirections(null);
     }
 
     public void mapOldIcHearingNotListedOptionsToNew(CaseData caseData, String caseTypeId) {

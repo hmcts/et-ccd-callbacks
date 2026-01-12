@@ -36,6 +36,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LIST
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EMPTY_STRING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EUROPE_LONDON;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.InitialConsiderationService.getAdjustedHearingTypeName;
 
 @Slf4j
 public final class HearingsHelper {
@@ -118,7 +119,7 @@ public final class HearingsHelper {
         }
 
         caseData.getEtICHearingListedAnswers().setEtInitialConsiderationListedHearingType(
-                earliestListedHearing.getHearingType());
+                getAdjustedHearingTypeName(earliestListedHearing.getHearingType()));
     }
 
     private static void initEtICHearingListedAnswers(CaseData caseData) {

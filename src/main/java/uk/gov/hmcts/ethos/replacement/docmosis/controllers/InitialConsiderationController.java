@@ -101,6 +101,8 @@ public class InitialConsiderationController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        //clear old values
+        initialConsiderationService.clearHiddenValue(caseData);
         initialConsiderationService.processIcDocumentCollections(caseData);
 
         caseData.setIcCompletedBy(reportDataService.getUserFullName(userToken));
@@ -139,7 +141,6 @@ public class InitialConsiderationController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setEtICHearingListedAnswers(null);
         initialConsiderationService.clearOldEtICHearingListedAnswersValues(caseData);
-        initialConsiderationService.clearIcHearingNotListedOldValues(caseData);
         initialConsiderationService.clearHiddenValue(caseData);
 
         // Sets the respondent details(respondent ET1 and ET3 names, hearing panel preference, and

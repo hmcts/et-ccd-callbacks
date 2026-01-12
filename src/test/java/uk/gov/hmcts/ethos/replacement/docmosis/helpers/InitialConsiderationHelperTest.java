@@ -127,7 +127,7 @@ class InitialConsiderationHelperTest {
         answers.setEtInitialConsiderationListedHearingType("Final Hearing");
         answers.setEtICIsHearingWithJudgeOrMembers("JSA");
         answers.setEtICIsFinalHearingWithJudgeOrMembersJsaReason(List.of("Reason A", "Other"));
-        answers.setEtICIsHearingWithJsaReasonOther("Custom Reason");
+        answers.setEtICJsaFinalHearingReasonOther("Custom Reason");
 
         CaseData caseDataWithFinalHearingJsa = new CaseData();
         caseDataWithFinalHearingJsa.setEtICHearingListedAnswers(answers);
@@ -177,7 +177,7 @@ class InitialConsiderationHelperTest {
                 + "\"etICFinalHearingIsEJSitAloneReasonYes\":null,\"etICFinalHearingIsEJSitAloneReasonYesOther\":null,"
                 + "\"etICFinalHearingIsEJSitAloneReasonNo\":null,\"etICFinalHearingIsEJSitAloneReasonNoOther\":null,"
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonsJsa\":null,\"etICNoLFinalHearingIsEJSitAloneReasonsJsaOther"
-                + "\":null,\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":null,"
+                + "\":null,\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":[null],"
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonMembersOther\":null,"
                 + "\"etICFinalHearingIsEJSitAloneFurtherDetails\":null,"
                 + "\"udlSitAlone\":null,\"udlReasons\":null,\"udlDisputeOnFacts\":null,"
@@ -232,7 +232,7 @@ class InitialConsiderationHelperTest {
                 + "\"etICFinalHearingIsEJSitAloneReasonNo\":[],\"etICFinalHearingIsEJSitAloneReasonNoOther\":null,"
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonsJsa\":[\"Members experience is likely to add significant"
                 + " value to the process of adjudication\"],\"etICNoLFinalHearingIsEJSitAloneReasonsJsaOther\":null,"
-                + "\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":null,"
+                + "\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":[null],"
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonMembersOther\":null,"
                 + "\"etICFinalHearingIsEJSitAloneFurtherDetails\":null,"
                 + "\"udlSitAlone\":null,\"udlReasons\":null,\"udlDisputeOnFacts\":null,"
@@ -357,7 +357,7 @@ class InitialConsiderationHelperTest {
                 + "\"etICFinalHearingIsEJSitAloneReasonNo\":[],\"etICFinalHearingIsEJSitAloneReasonNoOther\":null,"
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonsJsa\":[\"Members experience is likely to add significant "
                 + "value to the process of adjudication\"],\"etICNoLFinalHearingIsEJSitAloneReasonsJsaOther"
-                + "\":null,\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":null,"
+                + "\":null,\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":[null],"
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonMembersOther\":null,"
                 + "\"etICFinalHearingIsEJSitAloneFurtherDetails\":"
                 + "\"Test SC - EJ Sit Alone Further Details\","
@@ -416,7 +416,7 @@ class InitialConsiderationHelperTest {
                 + "\"etICFinalHearingIsEJSitAloneReasonNo\":null,\"etICFinalHearingIsEJSitAloneReasonNoOther\":null,"
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonsJsa\":null,"
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonsJsaOther\":null,"
-                + "\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":null,"
+                + "\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":[null],"
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonMembersOther\":null,"
                 + "\"etICFinalHearingIsEJSitAloneFurtherDetails\":"
                 + "null,\"udlSitAlone\":null,\"udlReasons\":null,\"udlDisputeOnFacts\":null,"
@@ -466,7 +466,7 @@ class InitialConsiderationHelperTest {
                 + "\"etICFinalHearingIsEJSitAloneReasonNoOther\":null,"
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonsJsa\":null,"
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonsJsaOther\":null,"
-                + "\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":null,"
+                + "\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":[null],"
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonMembersOther\":null,"
                 + "\"etICFinalHearingIsEJSitAloneFurtherDetails\":null,\"udlSitAlone\":null,\"udlReasons\":null,"
                 + "\"udlDisputeOnFacts\":null,\"udlLittleOrNoAgreement\":null,\"udlIssueOfLawArising\":null,"
@@ -541,7 +541,7 @@ class InitialConsiderationHelperTest {
                 + "\"etICFinalHearingIsEJSitAloneReasonYes\":null,\"etICFinalHearingIsEJSitAloneReasonYesOther\":null,"
                 + "\"etICFinalHearingIsEJSitAloneReasonNo\":null,\"etICFinalHearingIsEJSitAloneReasonNoOther\":null,"
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonsJsa\":null,\"etICNoLFinalHearingIsEJSitAloneReasonsJsaOther"
-                + "\":null,\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":null,"
+                + "\":null,\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":[null],"
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonMembersOther\":null,"
                 + "\"etICFinalHearingIsEJSitAloneFurtherDetails\":null,"
                 + "\"udlSitAlone\":null,\"udlReasons\":null,\"udlDisputeOnFacts\":null,"
@@ -597,7 +597,7 @@ class InitialConsiderationHelperTest {
                 + "\"etICFinalHearingIsEJSitAloneReasonNo\":null,\"etICFinalHearingIsEJSitAloneReasonNoOther\":null,"
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonsJsa\":null,"
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonsJsaOther"
-                + "\":null,\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":null,"
+                + "\":null,\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":[null],"
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonMembersOther\":null,"
                 + "\"etICFinalHearingIsEJSitAloneFurtherDetails\":null,"
                 + "\"udlSitAlone\":null,\"udlReasons\":null,\"udlDisputeOnFacts\":null,"
@@ -645,7 +645,7 @@ class InitialConsiderationHelperTest {
         answers.setEtInitialConsiderationListedHearingType("Preliminary Hearing(CM)");
         answers.setEtICIsHearingWithJudgeOrMembers("JSA");
         answers.setEtICIsHearingWithJsa("Other");
-        answers.setEtICIsHearingWithJsaReasonOther("Custom Reason");
+        answers.setEtICJsaCmPreliminaryHearingReasonOther("Custom Reason");
 
         CaseData caseDataWithPhcm = new CaseData();
         caseDataWithPhcm.setEtICHearingListedAnswers(answers);
@@ -674,7 +674,7 @@ class InitialConsiderationHelperTest {
         answers.setEtInitialConsiderationListedHearingType("Final Hearing");
         answers.setEtICIsHearingWithJudgeOrMembers("JSA");
         answers.setEtICIsFinalHearingWithJudgeOrMembersJsaReason(List.of("Reason B", "Other"));
-        answers.setEtICIsHearingWithJsaReasonOther("Other Reason");
+        answers.setEtICJsaFinalHearingReasonOther("Other Reason");
 
         CaseData caseDataWithFinalHearing = new CaseData();
         caseDataWithFinalHearing.setEtICHearingListedAnswers(answers);

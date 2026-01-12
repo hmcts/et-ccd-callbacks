@@ -24,15 +24,19 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
 @SuppressWarnings({"PMD.NcssCount"})
-class HearingDetailServiceTest {
+class HearingDetailsServiceTest {
 
     private HearingDetailsService hearingDetailsService;
     private DateListedType selectedListing;
@@ -40,7 +44,7 @@ class HearingDetailServiceTest {
     private static final String TEST_ID = UUID.randomUUID().toString();
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         selectedListing = new DateListedType();
         hearingSelectionService = mock(HearingSelectionService.class);
         hearingDetailsService = new HearingDetailsService(mockHearingSelectionService());
@@ -90,7 +94,7 @@ class HearingDetailServiceTest {
         selectedListing.setHearingNotes2(notes);
         CaseData caseData = createCaseData();
         hearingDetailsService.handleListingSelected(caseData);
-        HearingDetailType hearingDetailType = caseData.getHearingDetailsCollection().get(0).getValue();
+        HearingDetailType hearingDetailType = caseData.getHearingDetailsCollection().getFirst().getValue();
         assertEquals(hearingStatus, hearingDetailType.getHearingDetailsStatus());
         assertEquals(postponedBy, hearingDetailType.getHearingDetailsPostponedBy());
         assertEquals(caseDisposed, hearingDetailType.getHearingDetailsCaseDisposed());
@@ -129,7 +133,7 @@ class HearingDetailServiceTest {
         selectedListing.setListedDate("2022-11-11 11:00:00");
         CaseData caseData = createCaseData();
         hearingDetailsService.handleListingSelected(caseData);
-        HearingDetailType hearingDetailType = caseData.getHearingDetailsCollection().get(0).getValue();
+        HearingDetailType hearingDetailType = caseData.getHearingDetailsCollection().getFirst().getValue();
         assertNull(hearingDetailType.getHearingDetailsStatus());
         assertNull(hearingDetailType.getHearingDetailsPostponedBy());
         assertNull(hearingDetailType.getHearingDetailsCaseDisposed());
@@ -153,8 +157,7 @@ class HearingDetailServiceTest {
         hearingDetailType.setHearingDetailsDate(selectedListing.getListedDate());
         String hearingStatus = Constants.HEARING_STATUS_HEARD;
         hearingDetailType.setHearingDetailsStatus(hearingStatus);
-        String postponedBy = "Arthur";
-        hearingDetailType.setHearingDetailsPostponedBy(postponedBy);
+        hearingDetailType.setHearingDetailsPostponedBy("Arthur");
         String caseDisposed = String.valueOf(Boolean.TRUE);
         hearingDetailType.setHearingDetailsCaseDisposed(caseDisposed);
         String partHeard = String.valueOf(Boolean.TRUE);
@@ -204,7 +207,9 @@ class HearingDetailServiceTest {
         hearingDetailsService.updateCase(caseDetails);
 
         assertEquals(hearingStatus, selectedListing.getHearingStatus());
-        assertEquals(postponedBy, selectedListing.getPostponedBy());
+        // Should be null as the hearingStatus is Heard so any postponement details should be null
+        assertNull(selectedListing.getPostponedBy());
+        assertNull(selectedListing.getPostponedDate());
         assertEquals(caseDisposed, selectedListing.getHearingCaseDisposed());
         assertEquals(partHeard, selectedListing.getHearingPartHeard());
         assertEquals(reservedJudgment, selectedListing.getHearingReservedJudgement());
@@ -220,7 +225,7 @@ class HearingDetailServiceTest {
         assertEquals(duration, selectedListing.getHearingTimingDuration());
         assertEquals(notes, selectedListing.getHearingNotes2());
         assertEquals(hearingNotesDocument,
-                caseDetails.getCaseData().getHearingCollection().get(0).getValue().getHearingNotesDocument());
+                caseDetails.getCaseData().getHearingCollection().getFirst().getValue().getHearingNotesDocument());
         assertNull(caseData.getUploadHearingNotesDocument());
     }
 
@@ -243,21 +248,13 @@ class HearingDetailServiceTest {
 
         hearingDetailsService.updateCase(caseDetails);
         // No updates are made as there are no hearings in the case data.
-        assertEquals(expectedHearingType, caseData.getHearingCollection().get(0).getValue().getHearingType());
+        assertEquals(expectedHearingType, caseData.getHearingCollection().getFirst().getValue().getHearingType());
     }
 
     @Test
     void testUpdateCase_Null_Or_Empty_HearingDateCollection() {
-        HearingTypeItem hearingTypeItem = new HearingTypeItem();
-        hearingTypeItem.setId(TEST_ID);
-        String expectedHearingType =  "Preliminary Hearing";
-        String expectedHearingNotes = "Test hearing notes";
-        HearingType hearingType = new HearingType();
-        hearingType.setHearingType(expectedHearingType);
-        hearingType.setHearingNotes(expectedHearingNotes);
-        hearingTypeItem.setValue(hearingType);
         CaseData caseData2 = createCaseData();
-        caseData2.getHearingCollection().get(0).getValue().getHearingDateCollection().remove(0);
+        caseData2.getHearingCollection().getFirst().getValue().getHearingDateCollection().removeFirst();
         DynamicFixedListType fixedListType = new DynamicFixedListType();
         DynamicValueType dynamicValueType = new DynamicValueType();
         dynamicValueType.setCode(TEST_ID);
@@ -272,7 +269,135 @@ class HearingDetailServiceTest {
             isA(DynamicFixedListType.class))).thenReturn(new ArrayList<>());
 
         hearingDetailsService.updateCase(caseDetails);
-        assertEquals(0, caseData2.getHearingCollection().get(0).getValue().getHearingDateCollection().size());
+        assertEquals(0, caseData2.getHearingCollection().getFirst().getValue().getHearingDateCollection().size());
+    }
+
+    @Test
+    void testUpdateCase_whenStatusIsPostponed_setsPostponedByAndDate() {
+        HearingDetailType hearingDetailType = new HearingDetailType();
+        selectedListing.setListedDate("2024-01-15T10:00:00.000");
+        hearingDetailType.setHearingDetailsDate(selectedListing.getListedDate());
+        hearingDetailType.setHearingDetailsStatus(HEARING_STATUS_POSTPONED);
+        hearingDetailType.setHearingDetailsPostponedBy(CLAIMANT);
+
+        HearingDetailTypeItem hearingDetailTypeItem = new HearingDetailTypeItem();
+        hearingDetailTypeItem.setValue(hearingDetailType);
+        CaseData caseData = createCaseData();
+        caseData.setHearingDetailsCollection(List.of(hearingDetailTypeItem));
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+
+        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
+        dateListedTypeItem.setId(UUID.randomUUID().toString());
+        dateListedTypeItem.setValue(selectedListing);
+        HearingType hearingType = new HearingType();
+        hearingType.setHearingDateCollection(List.of(dateListedTypeItem));
+        when(hearingSelectionService.getSelectedHearing(isA(CaseData.class), isA(DynamicFixedListType.class)))
+            .thenReturn(hearingType);
+
+        hearingDetailsService.updateCase(caseDetails);
+
+        assertEquals(HEARING_STATUS_POSTPONED, selectedListing.getHearingStatus());
+        assertEquals(CLAIMANT, selectedListing.getPostponedBy());
+        assertNotNull(selectedListing.getPostponedDate());
+        assertFalse(selectedListing.getPostponedDate().isEmpty());
+    }
+
+    @Test
+    void testUpdateCase_whenStatusIsPostponedAndDateExists_preservesExistingDate() {
+        HearingDetailType hearingDetailType = new HearingDetailType();
+        String existingDate = "2024-01-10";
+        selectedListing.setListedDate("2024-01-15T10:00:00.000");
+        selectedListing.setPostponedDate(existingDate);
+        hearingDetailType.setHearingDetailsDate(selectedListing.getListedDate());
+        hearingDetailType.setHearingDetailsStatus(HEARING_STATUS_POSTPONED);
+        hearingDetailType.setHearingDetailsPostponedBy(CLAIMANT);
+
+        HearingDetailTypeItem hearingDetailTypeItem = new HearingDetailTypeItem();
+        hearingDetailTypeItem.setValue(hearingDetailType);
+        CaseData caseData = createCaseData();
+        caseData.setHearingDetailsCollection(List.of(hearingDetailTypeItem));
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+
+        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
+        dateListedTypeItem.setId(UUID.randomUUID().toString());
+        dateListedTypeItem.setValue(selectedListing);
+        HearingType hearingType = new HearingType();
+        hearingType.setHearingDateCollection(List.of(dateListedTypeItem));
+        when(hearingSelectionService.getSelectedHearing(isA(CaseData.class), isA(DynamicFixedListType.class)))
+            .thenReturn(hearingType);
+
+        hearingDetailsService.updateCase(caseDetails);
+
+        assertEquals(HEARING_STATUS_POSTPONED, selectedListing.getHearingStatus());
+        assertEquals(CLAIMANT, selectedListing.getPostponedBy());
+        assertEquals(existingDate, selectedListing.getPostponedDate());
+    }
+
+    @Test
+    void testUpdateCase_whenPostponedWithEmptyDate_setsNewDate() {
+        HearingDetailType hearingDetailType = new HearingDetailType();
+        selectedListing.setListedDate("2024-01-15T10:00:00.000");
+        selectedListing.setPostponedDate("");
+        hearingDetailType.setHearingDetailsDate(selectedListing.getListedDate());
+        hearingDetailType.setHearingDetailsStatus(HEARING_STATUS_POSTPONED);
+        hearingDetailType.setHearingDetailsPostponedBy("Clerk");
+
+        HearingDetailTypeItem hearingDetailTypeItem = new HearingDetailTypeItem();
+        hearingDetailTypeItem.setValue(hearingDetailType);
+        CaseData caseData = createCaseData();
+        caseData.setHearingDetailsCollection(List.of(hearingDetailTypeItem));
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+
+        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
+        dateListedTypeItem.setId(UUID.randomUUID().toString());
+        dateListedTypeItem.setValue(selectedListing);
+        HearingType hearingType = new HearingType();
+        hearingType.setHearingDateCollection(List.of(dateListedTypeItem));
+        when(hearingSelectionService.getSelectedHearing(isA(CaseData.class), isA(DynamicFixedListType.class)))
+            .thenReturn(hearingType);
+
+        hearingDetailsService.updateCase(caseDetails);
+
+        assertEquals(HEARING_STATUS_POSTPONED, selectedListing.getHearingStatus());
+        assertEquals("Clerk", selectedListing.getPostponedBy());
+        assertNotNull(selectedListing.getPostponedDate());
+        assertFalse(selectedListing.getPostponedDate().isEmpty());
+    }
+
+    @Test
+    void testUpdateCase_whenStatusChangesFromPostponedToHeard_clearsPostponedFields() {
+
+        selectedListing.setListedDate("2024-01-15T10:00:00.000");
+        selectedListing.setHearingStatus(HEARING_STATUS_POSTPONED);
+        selectedListing.setPostponedBy(CLAIMANT);
+        selectedListing.setPostponedDate("2024-01-05");
+        HearingDetailType hearingDetailType = new HearingDetailType();
+        hearingDetailType.setHearingDetailsDate(selectedListing.getListedDate());
+        hearingDetailType.setHearingDetailsStatus(Constants.HEARING_STATUS_HEARD);
+
+        HearingDetailTypeItem hearingDetailTypeItem = new HearingDetailTypeItem();
+        hearingDetailTypeItem.setValue(hearingDetailType);
+        CaseData caseData = createCaseData();
+        caseData.setHearingDetailsCollection(List.of(hearingDetailTypeItem));
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+
+        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
+        dateListedTypeItem.setId(UUID.randomUUID().toString());
+        dateListedTypeItem.setValue(selectedListing);
+        HearingType hearingType = new HearingType();
+        hearingType.setHearingDateCollection(List.of(dateListedTypeItem));
+        when(hearingSelectionService.getSelectedHearing(isA(CaseData.class), isA(DynamicFixedListType.class)))
+            .thenReturn(hearingType);
+
+        hearingDetailsService.updateCase(caseDetails);
+
+        assertEquals(Constants.HEARING_STATUS_HEARD, selectedListing.getHearingStatus());
+        assertNull(selectedListing.getPostponedBy());
+        assertNull(selectedListing.getPostponedDate());
     }
 
     private HearingSelectionService mockHearingSelectionService() {

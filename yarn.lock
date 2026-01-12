@@ -413,20 +413,20 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@codeceptjs/ui@npm:1.3.7":
-  version: 1.3.7
-  resolution: "@codeceptjs/ui@npm:1.3.7"
+"@codeceptjs/ui@npm:1.3.8":
+  version: 1.3.8
+  resolution: "@codeceptjs/ui@npm:1.3.8"
   dependencies:
     "@codeceptjs/configure": ^1.0.3
     axios: ^1.10.0
     body-parser: ^2.2.0
     cheerio: ^1.1.0
     chokidar: ^4.0.3
-    commander: ^13.1.0
+    commander: ^14.0.1
     core-js: 2.6.12
     dayjs: ^1.11.13
     debug: ^4.3.4
-    electron: ^37.3.1
+    electron: ^38.2.0
     express: ^4.21.2
     lodash.clonedeep: ^4.5.0
     nanoid: ^5.1.5
@@ -436,7 +436,7 @@ __metadata:
     codeceptjs: ^3.7.3
   bin:
     codecept-ui: bin/codecept-ui.js
-  checksum: 0bd7a22004e661029018e1323a8c025dc6f4d48353748f95fc8585f51058eb0ab082993b8aa473100fcad0e62bca93b340a9349245d86ce5b42552f9c68af29c
+  checksum: aa98701c74147e39bbeece0d41879fb578b484b704293f156cc176b1c3a1cd2efe9b45f8eff7bc746f55e9ca9c15b52cdc0ec9f135287847184080b724e15865
   languageName: node
   linkType: hard
 
@@ -4368,7 +4368,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"commander@npm:13.1.0, commander@npm:^13.1.0":
+"commander@npm:13.1.0":
   version: 13.1.0
   resolution: "commander@npm:13.1.0"
   checksum: 8ca2fcb33caf2aa06fba3722d7a9440921331d54019dabf906f3603313e7bf334b009b862257b44083ff65d5a3ab19e83ad73af282bd5319f01dc228bdf87ef0
@@ -4389,7 +4389,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"commander@npm:^14.0.0":
+"commander@npm:^14.0.0, commander@npm:^14.0.1":
   version: 14.0.2
   resolution: "commander@npm:14.0.2"
   checksum: 0a9e549565d368dde2965821833324069b92b099b415c2106996e47db1f0b8c10c77367e9876873c00a52ca627af4c7472eba9b51dc0d6a3ef152ea063d3e9e9
@@ -5315,16 +5315,16 @@ __metadata:
   languageName: node
   linkType: hard
 
-"electron@npm:^37.3.1":
-  version: 37.9.0
-  resolution: "electron@npm:37.9.0"
+"electron@npm:^38.2.0":
+  version: 38.7.0
+  resolution: "electron@npm:38.7.0"
   dependencies:
     "@electron/get": ^2.0.0
     "@types/node": ^22.7.7
     extract-zip: ^2.0.1
   bin:
     electron: cli.js
-  checksum: d044c529237fa24d56b3e88c24e1e6be029a98d1d3e476c862b9d05cf06817492ea6803250faf48689f6ca1e97d013649231034d8c4bb4d9cf3a2f80ae7d8784
+  checksum: 60cb1d272a1b4efba3e5b6897913fd919dca901fb43c0eaf7249bd623d36f0e6e2a20a4e051f5936abb16ce7f3e59f511fd00893c51712d2685876837898d4c1
   languageName: node
   linkType: hard
 
@@ -6191,7 +6191,7 @@ __metadata:
     "@babel/eslint-parser": ^7.17.0
     "@codeceptjs/configure": 1.0.6
     "@codeceptjs/examples": 1.2.4
-    "@codeceptjs/ui": 1.3.7
+    "@codeceptjs/ui": 1.3.8
     "@hmcts/nodejs-logging": 4.0.4
     "@types/archiver": ^6.0.0
     "@types/chai-as-promised": ^8.0.0
@@ -6229,13 +6229,13 @@ __metadata:
     html_codesniffer: 2.5.1
     husky: 9.1.7
     istanbul: ^0.4.5
-    mocha: 11.7.2
+    mocha: 11.7.5
     mocha-jenkins-reporter: 0.4.8
     mocha-junit-reporter: 2.2.1
     mocha-multi: 1.1.7
     mochawesome: 7.1.4
     nock: 14.0.10
-    nodemon: 3.1.10
+    nodemon: 3.1.11
     otp: 1.1.2
     pa11y: 8.0.0
     playwright: ^1.35.1
@@ -9882,6 +9882,38 @@ __metadata:
   languageName: node
   linkType: hard
 
+"mocha@npm:11.7.5":
+  version: 11.7.5
+  resolution: "mocha@npm:11.7.5"
+  dependencies:
+    browser-stdout: ^1.3.1
+    chokidar: ^4.0.1
+    debug: ^4.3.5
+    diff: ^7.0.0
+    escape-string-regexp: ^4.0.0
+    find-up: ^5.0.0
+    glob: ^10.4.5
+    he: ^1.2.0
+    is-path-inside: ^3.0.3
+    js-yaml: ^4.1.0
+    log-symbols: ^4.1.0
+    minimatch: ^9.0.5
+    ms: ^2.1.3
+    picocolors: ^1.1.1
+    serialize-javascript: ^6.0.2
+    strip-json-comments: ^3.1.1
+    supports-color: ^8.1.1
+    workerpool: ^9.2.0
+    yargs: ^17.7.2
+    yargs-parser: ^21.1.1
+    yargs-unparser: ^2.0.0
+  bin:
+    _mocha: bin/_mocha
+    mocha: bin/mocha.js
+  checksum: cdd0c29b4c86472dce7a3e476c3f6ea31e15ce2b11a65aa7e82261512a9b8aaa3f91b6276347d165a7e22361ba45ac535ef8e88bbacd54387cba37ba98a0a0f5
+  languageName: node
+  linkType: hard
+
 "mochawesome-report-generator@npm:^6.3.0":
   version: 6.3.2
   resolution: "mochawesome-report-generator@npm:6.3.2"
@@ -10222,9 +10254,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"nodemon@npm:3.1.10":
-  version: 3.1.10
-  resolution: "nodemon@npm:3.1.10"
+"nodemon@npm:3.1.11":
+  version: 3.1.11
+  resolution: "nodemon@npm:3.1.11"
   dependencies:
     chokidar: ^3.5.2
     debug: ^4
@@ -10238,7 +10270,7 @@ __metadata:
     undefsafe: ^2.0.5
   bin:
     nodemon: bin/nodemon.js
-  checksum: cdd2bcae3ad810fcc0f00a01ed3b0addb76a1328ee024e483cdcadfab7eed2d24964e3feaf7e6c83895ad6154379d5403ffcf762a87841158fd3514c50ea9ef8
+  checksum: 9af4cce5260eee5410151cc887bcf1e6e0c72e607fe77df652da4ad92f866db97b631eb38cf29bdd86c07ddd845916949f9b6478df4b0381497829bb7d9d2d41
   languageName: node
   linkType: hard
 

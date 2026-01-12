@@ -75,7 +75,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EMPTY_ST
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper.buildFlagsImageFileName;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.removeSpacesFromPartyNames;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.updatePositionTypeToClosed;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.updatePostponedDate;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -609,27 +608,6 @@ public class CaseActionsForCaseWorkerController {
         return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
     }
 
-    @PostMapping(value = "/allocateHearing", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "update postponed date when allocating a hearing.")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
-            content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-            }),
-        @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
-        @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
-    })
-    public ResponseEntity<CCDCallbackResponse> allocateHearing(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader(AUTHORIZATION) String userToken) {
-        log.info("ALLOCATE HEARING ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
-
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        updatePostponedDate(caseData);
-        caseManagementForCaseWorkerService.setNextListedDate(caseData);
-        return getCallbackRespEntityNoErrors(caseData);
-    }
-
     @PostMapping(value = "/restrictedCases", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "change restricted reporting for a single case")
     @ApiResponses(value = {
@@ -927,7 +905,7 @@ public class CaseActionsForCaseWorkerController {
     }
 
     @PostMapping(value = "/judgementSubmitted", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "populates the dynamic lists for judgements")
+    @Operation(summary = "About to submit callback for Judgment event")
     @ApiResponses(value = {
         @ApiResponse(responseCode = TWO_HUNDRED, description = ACCESSED_SUCCESSFULLY,
             content = {
@@ -936,13 +914,14 @@ public class CaseActionsForCaseWorkerController {
         @ApiResponse(responseCode = FOUR_HUNDRED, description = BAD_REQUEST),
         @ApiResponse(responseCode = FIVE_HUNDRED, description = INTERNAL_SERVER_ERROR)
     })
-    public ResponseEntity<CCDCallbackResponse> judgementSubmitted(
+    public ResponseEntity<CCDCallbackResponse> judgmentSubmitted(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(AUTHORIZATION) String userToken) throws ParseException {
-        log.info("JUDGEMENT SUBMITTED ---> " + LOG_MESSAGE + ccdRequest.getCaseDetails().getCaseId());
+        log.info("JUDGEMENT SUBMITTED ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         judgmentValidationService.validateJudgments(caseData);
+        caseData.setDraftAndSignJudgement(null);
         return getCallbackRespEntityNoErrors(caseData);
     }
 

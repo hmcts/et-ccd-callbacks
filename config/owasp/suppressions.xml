@@ -41,12 +41,15 @@
     <suppress>
         <cve>CVE-2024-38820</cve>
     </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: angus-activation-2.0.2.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.eclipse\.angus\/angus\-activation@.*$</packageUrl>
-        <cpe>cpe:/a:eclipse:angus_mail</cpe>
+    <!-- Suppressing due to dependency on other services as we use CFTLib and the latest version 2.0.3 doesn't fix the issue-->
+    <suppress until="2025-12-10Z">
         <cve>CVE-2025-7962</cve>
+    </suppress>
+     <suppress>
+       <notes><![CDATA[
+       file name: angus-activation-2.0.2.jar
+       ]]></notes>
+       <packageUrl regex="true">^pkg:maven/org\.eclipse\.angus/angus\-activation@.*$</packageUrl>
+       <cve>CVE-2025-7962</cve>
     </suppress>
 </suppressions>

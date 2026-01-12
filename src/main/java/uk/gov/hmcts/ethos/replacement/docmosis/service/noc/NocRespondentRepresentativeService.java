@@ -239,15 +239,16 @@ public class NocRespondentRepresentativeService {
         List<RepresentedTypeRItem> newRepresentatives = newCaseDetails.getCaseData().getRepCollection();
         List<RepresentedTypeRItem> representativesToRemove = RespondentRepresentativeUtils
                 .findUpdatedRepresentativesForSameRespondent(oldRepresentatives, newRepresentatives);
+        if (CollectionUtils.isEmpty(representativesToRemove)) {
+            return;
+        }
+        nocNotificationService.sendRemovedRepresentationEmails(oldCaseDetails, newCaseDetails, representativesToRemove);
         List<RepresentedTypeRItem> revokedRepresentatives = revokeOldRespondentRepresentativeAccess(oldCaseDetails,
                 representativesToRemove);
-        if (CollectionUtils.isNotEmpty(representativesToRemove)) {
-            nocNotificationService.sendRemovedRepresentationEmails(oldCaseDetails, newCaseDetails,
-                    representativesToRemove);
+        if (CollectionUtils.isEmpty(revokedRepresentatives)) {
+            return;
         }
-        if (CollectionUtils.isNotEmpty(revokedRepresentatives)) {
-            NocUtils.removeOrganisationPoliciesAndNocAnswers(newCaseDetails.getCaseData(), revokedRepresentatives);
-        }
+        NocUtils.removeOrganisationPoliciesAndNocAnswers(newCaseDetails.getCaseData(), revokedRepresentatives);
     }
 
     /**

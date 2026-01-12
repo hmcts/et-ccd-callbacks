@@ -60,6 +60,7 @@ import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
@@ -1107,5 +1108,59 @@ class NocRespondentRepresentativeServiceTest {
         verify(nocCcdService, times(INTEGER_TEN)).getCaseAssignments(AUTH_TOKEN, CASE_ID_1);
         verify(nocCcdService, times(NumberUtils.INTEGER_TWO)).revokeCaseAssignments(eq(AUTH_TOKEN),
                 any(CaseUserAssignmentData.class));
+    }
+
+    @Test
+    void theRemoveOldRepresentatives() {
+        CaseDetails oldCaseDetails = new CaseDetails();
+        oldCaseDetails.setCaseId(CASE_ID_1);
+        oldCaseDetails.setCaseData(new CaseData());
+        CallbackRequest callbackRequest = new CallbackRequest();
+        callbackRequest.setCaseDetailsBefore(oldCaseDetails);
+        CaseDetails newCaseDetails = new CaseDetails();
+        newCaseDetails.setCaseData(new CaseData());
+        callbackRequest.setCaseDetails(newCaseDetails);
+        // when representatives to remove is empty should not send any email
+        nocRespondentRepresentativeService.removeOldRepresentatives(callbackRequest);
+        verify(nocNotificationService, times(NumberUtils.INTEGER_ZERO)).sendRemovedRepresentationEmails(
+                eq(oldCaseDetails), eq(newCaseDetails), anyList());
+        // when representatives to remove is not empty should send email
+        RepresentedTypeRItem representative1 = RepresentedTypeRItem.builder().id(REPRESENTATIVE_ID_ONE).value(
+                RepresentedTypeR.builder().respondentId(RESPONDENT_ID_ONE).build()).build();
+        oldCaseDetails.getCaseData().setRepCollection(List.of(representative1));
+        RepresentedTypeRItem representative2 = RepresentedTypeRItem.builder().id(REPRESENTATIVE_ID_TWO).value(
+                RepresentedTypeR.builder().respondentId(RESPONDENT_ID_TWO).build()).build();
+        newCaseDetails.getCaseData().setRepCollection(List.of(representative2));
+        nocRespondentRepresentativeService.removeOldRepresentatives(callbackRequest);
+        verify(nocNotificationService, times(NumberUtils.INTEGER_ONE)).sendRemovedRepresentationEmails(
+                any(CaseDetails.class), any(CaseDetails.class), anyList());
+        // when representatives revoked is not empty should remove organisation policies and noc answers
+        when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
+        CaseUserAssignmentData caseUserAssignmentData = new CaseUserAssignmentData();
+        caseUserAssignmentData.setCaseUserAssignments(List.of(CaseUserAssignment.builder().caseRole(ROLE_SOLICITORA)
+                .build()));
+        when(nocCcdService.getCaseAssignments(AUTH_TOKEN, CASE_ID_1)).thenReturn(caseUserAssignmentData);
+        oldCaseDetails.getCaseData().setNoticeOfChangeAnswers0(NoticeOfChangeAnswers.builder()
+                .respondentName(RESPONDENT_NAME_ONE).build());
+        oldCaseDetails.getCaseData().setRespondentOrganisationPolicy0(OrganisationPolicy.builder().organisation(
+                Organisation.builder().organisationID(ORGANISATION_ID_ONE).build()).build());
+        newCaseDetails.getCaseData().setNoticeOfChangeAnswers0(NoticeOfChangeAnswers.builder()
+                .respondentName(RESPONDENT_NAME_ONE).build());
+        newCaseDetails.getCaseData().setRespondentOrganisationPolicy0(OrganisationPolicy.builder().organisation(
+                Organisation.builder().organisationID(ORGANISATION_ID_ONE).build()).build());
+        representative1.getValue().setRole(ROLE_SOLICITORA);
+        representative1.getValue().setMyHmctsYesNo(YES);
+        representative1.getValue().setRespRepName(RESPONDENT_NAME_ONE);
+        representative1.getValue().setRespondentOrganisation(Organisation.builder().organisationID(ORGANISATION_ID_ONE)
+                .build());
+        representative1.getValue().setRepresentativeEmailAddress(REPRESENTATIVE_EMAIL);
+        doNothing().when(nocCcdService).revokeCaseAssignments(eq(AUTH_TOKEN), any(CaseUserAssignmentData.class));
+        nocRespondentRepresentativeService.removeOldRepresentatives(callbackRequest);
+        verify(nocNotificationService, times(NumberUtils.INTEGER_TWO)).sendRemovedRepresentationEmails(
+                any(CaseDetails.class), any(CaseDetails.class), anyList());
+        assertThat(newCaseDetails.getCaseData().getRespondentOrganisationPolicy0()).isEqualTo(OrganisationPolicy
+                .builder().build());
+        assertThat(newCaseDetails.getCaseData().getNoticeOfChangeAnswers0()).isEqualTo(NoticeOfChangeAnswers.builder()
+                .build());
     }
 }

@@ -218,28 +218,6 @@ public class InitialConsiderationService {
     }
 
     /**
-     * Creates the respondent detail section for Initial Consideration.
-     * Only shows details from the first record
-     *
-     * @param respondentCollection collection of respondents
-     * @return table with respondent details
-     */
-    /*public String getRespondentName(List<RespondentSumTypeItem> respondentCollection) {
-        if (respondentCollection == null) {
-            return RESPONDENT_MISSING;
-        }
-
-        IntWrapper respondentCount = new IntWrapper(0);
-        return respondentCollection.stream()
-                .map(respondent -> String.format(
-                        RESPONDENT_NAME,
-                         respondentCount.incrementAndReturnValue(),
-                        nullCheck(respondent.getValue().getRespondentName()),
-                        nullCheck(respondent.getValue().getResponseRespondentName())))
-                .collect(Collectors.joining());
-    }*/
-
-    /**
      * Creates the respondent's hearing panel preference section for Initial Consideration.
      * Shows details for each respondent that specified hearing panel preference
      *

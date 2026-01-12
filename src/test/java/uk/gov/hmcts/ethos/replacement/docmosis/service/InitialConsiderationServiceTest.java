@@ -545,23 +545,6 @@ class InitialConsiderationServiceTest {
             .isEqualTo(EXPECTED_BLANK_HEARING_DETAILS);
     }
 
-    /*@Test
-    void getRespondentNameTest() {
-        String respondentName = initialConsiderationService.getRespondentName(caseData.getRespondentCollection());
-        assertThat(respondentName)
-            .isEqualTo(EXPECTED_RESPONDENT_NAME);
-    }
-
-    @Test
-    void getRespondentTwoNameTest() {
-        caseData = CaseDataBuilder.builder()
-                .withRespondent("Test Corp", YES, "2022-03-01", false)
-                .withRespondent("Test Name Two", YES, "2022-03-01", false)
-                .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID).getCaseData();
-        String respondentName = initialConsiderationService.getRespondentName(caseData.getRespondentCollection());
-        assertThat(respondentName).isEqualTo(EXPECTED_RESPONDENT_NAME_2);
-    }*/
-
     @Test
     void generateJurisdictionCodesHtmlTest() {
         String jurisdictionCodesHtml =
@@ -1814,11 +1797,11 @@ class InitialConsiderationServiceTest {
         respondentValue.setEt3Vetting(et3Vetting);
         respondent.setValue(respondentValue);
 
-        CaseData caseData = new CaseData();
-        caseData.setRespondentCollection(List.of(respondent));
+        CaseData caseDataWithSuggestedIssues = new CaseData();
+        caseDataWithSuggestedIssues.setRespondentCollection(List.of(respondent));
 
         InitialConsiderationService service = new InitialConsiderationService(tornadoService);
-        String result = service.setIcEt3VettingIssuesDetailsForEachRespondent(caseData);
+        String result = service.setIcEt3VettingIssuesDetailsForEachRespondent(caseDataWithSuggestedIssues);
 
         assertTrue(result.contains("Strike out details"));
         assertTrue(result.contains("Interpreters"));
@@ -1848,12 +1831,12 @@ class InitialConsiderationServiceTest {
 
     @Test
     void setIcEt3VettingIssuesDetailsForEachRespondent_shouldIncludeRespondentNameDetails() {
-        CaseData caseData = getData();
+        CaseData caseDataWithRespondentNameDetails = getData();
 
         InitialConsiderationService service = new InitialConsiderationService(tornadoService);
 
         // Act
-        String result = service.setIcEt3VettingIssuesDetailsForEachRespondent(caseData);
+        String result = service.setIcEt3VettingIssuesDetailsForEachRespondent(caseDataWithRespondentNameDetails);
 
         // Assert
         assertNotNull(result);
@@ -1875,16 +1858,16 @@ class InitialConsiderationServiceTest {
         RespondentSumTypeItem respondentItem = new RespondentSumTypeItem();
         respondentItem.setValue(respondent);
 
-        CaseData caseData = new CaseData();
-        caseData.setRespondentCollection(List.of(respondentItem));
-        return caseData;
+        CaseData caseDataToReuse = new CaseData();
+        caseDataToReuse.setRespondentCollection(List.of(respondentItem));
+        return caseDataToReuse;
     }
 
     @Test
     void setIcEt3VettingIssuesDetailsForEachRespondent_shouldIncludeResponseInTimeDetails_whenResponseIsNotInTime() {
-        CaseData caseData = getCaseData1();
+        CaseData caseDataWithNoResponseInTime = getCaseData1();
         InitialConsiderationService service = new InitialConsiderationService(tornadoService);
-        String result = service.setIcEt3VettingIssuesDetailsForEachRespondent(caseData);
+        String result = service.setIcEt3VettingIssuesDetailsForEachRespondent(caseDataWithNoResponseInTime);
 
         assertNotNull(result);
         assertTrue(result.contains("Did we receive the ET3 response in time?"));
@@ -1901,9 +1884,9 @@ class InitialConsiderationServiceTest {
         respondent.setEt3Vetting(et3Vetting);
         RespondentSumTypeItem respondentItem = new RespondentSumTypeItem();
         respondentItem.setValue(respondent);
-        CaseData caseData = new CaseData();
-        caseData.setRespondentCollection(List.of(respondentItem));
-        return caseData;
+        CaseData caseDataOne = new CaseData();
+        caseDataOne.setRespondentCollection(List.of(respondentItem));
+        return caseDataOne;
     }
 
     @Test
@@ -1999,7 +1982,6 @@ class InitialConsiderationServiceTest {
     void setIcEt1VettingIssuesDetails_shouldNotIncludeOtherReferralSection_whenNoOtherReferralsExist() {
         CaseData caseDataWithEt1VettingIssuesDetails = new CaseData();
         // Ensure no other referral data is set
-
         InitialConsiderationService service = new InitialConsiderationService(null);
         String result = service.setIcEt1VettingIssuesDetails(caseDataWithEt1VettingIssuesDetails);
 
@@ -2019,7 +2001,7 @@ class InitialConsiderationServiceTest {
                 "otherRelevantFactors"
         ));
 
-        InitialConsiderationService service = new InitialConsiderationService(null); // provide required dependencies
+        InitialConsiderationService service = new InitialConsiderationService(null);
         String result = service.setIcEt1VettingIssuesDetails(caseDataWithEt1VettingIssues);
 
         assertThat(result).contains("Claim out of time");

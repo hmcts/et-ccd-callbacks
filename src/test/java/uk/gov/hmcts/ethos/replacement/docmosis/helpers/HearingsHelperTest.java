@@ -184,15 +184,6 @@ class HearingsHelperTest {
         return hearingType;
     }
 
-    /*@Test
-    void updatePostponedDate() {
-
-        caseData.getHearingCollection().getFirst().getValue()
-                .getHearingDateCollection().getFirst().getValue().setHearingStatus(HEARING_STATUS_POSTPONED);
-        assertEquals(0, hearingMidEventValidation(caseData).size());
-
-    }*/
-
     @Test
     void findDateOfHearingTest() {
         String hearingDate = caseData.getHearingCollection().getFirst().getValue()

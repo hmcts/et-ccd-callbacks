@@ -17,6 +17,7 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
+import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator.NoticeOfChangeAnswersPopulationStrategy.BLANK;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator.NoticeOfChangeAnswersPopulationStrategy.POPULATE;
 
@@ -73,11 +74,20 @@ public class NoticeOfChangeFieldPopulator {
             }
         }
 
-        data.computeIfAbsent(ClaimantSolicitorRole.POLICY_FIELD_TEMPLATE, k ->
-            OrganisationPolicy.builder()
-                .orgPolicyCaseAssignedRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())
-                .build()
-        );
+        if (isNotEmpty(caseData.getRepresentativeClaimantType())
+            && isNotEmpty(caseData.getRepresentativeClaimantType().getMyHmctsOrganisation())) {
+            data.put(ClaimantSolicitorRole.POLICY_FIELD_TEMPLATE,
+                OrganisationPolicy.builder()
+                    .orgPolicyCaseAssignedRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())
+                    .organisation(caseData.getRepresentativeClaimantType().getMyHmctsOrganisation())
+                    .build()
+            );
+        } else {
+            data.put(ClaimantSolicitorRole.POLICY_FIELD_TEMPLATE,
+                OrganisationPolicy.builder()
+                    .orgPolicyCaseAssignedRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())
+                    .build());
+        }
         return data;
     }
 

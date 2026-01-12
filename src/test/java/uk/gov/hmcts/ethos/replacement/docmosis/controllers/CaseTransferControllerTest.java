@@ -444,17 +444,17 @@ class CaseTransferControllerTest extends BaseControllerTest {
 
     @Test
     void assignCase_invokesServicesAndUpdatesCaseData() {
-        CaseData caseData = new CaseData();
-        caseData.setManagingOffice("Unassigned");
+        CaseData caseDataToBeUpdated = new CaseData();
+        caseDataToBeUpdated.setManagingOffice("Unassigned");
         DynamicFixedListType dl = new DynamicFixedListType();
         var dvt = new DynamicValueType();
         dvt.setLabel("Leeds2");
         dl.setValue(dvt);
         dl.getValue().setCode(TribunalOffice.LEEDS.getOfficeName());
         dl.setListItems(List.of(dvt));
-        caseData.setAssignOffice(dl);
+        caseDataToBeUpdated.setAssignOffice(dl);
         CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setCaseData(caseData);
+        caseDetails.setCaseData(caseDataToBeUpdated);
         caseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
         CCDRequest ccdRequest = new CCDRequest();
         ccdRequest.setCaseDetails(caseDetails);
@@ -472,16 +472,17 @@ class CaseTransferControllerTest extends BaseControllerTest {
         DefaultValues defaultValues = mock(DefaultValues.class);
         when(defaultValuesReaderService.getDefaultValues("Unassigned")).thenReturn(defaultValues);
 
-        doNothing().when(caseManagementLocationService).setCaseManagementLocationCode(caseData);
+        doNothing().when(caseManagementLocationService).setCaseManagementLocationCode(caseDataToBeUpdated);
         doAnswer(i -> {
-            caseData.setCaseManagementLocationCode("123");
+            caseDataToBeUpdated.setCaseManagementLocationCode("123");
             return null;
-        }).when(caseManagementLocationService).setCaseManagementLocation(caseData);
+        }).when(caseManagementLocationService).setCaseManagementLocation(caseDataToBeUpdated);
 
         doAnswer(i -> {
-            caseData.setCaseManagementLocation(CaseLocation.builder().baseLocation("Leeds").region("321").build());
+            caseDataToBeUpdated.setCaseManagementLocation(CaseLocation.builder()
+                    .baseLocation("Leeds").region("321").build());
             return null;
-        }).when(caseManagementLocationService).setCaseManagementLocationCode(caseData);
+        }).when(caseManagementLocationService).setCaseManagementLocationCode(caseDataToBeUpdated);
 
         CaseTransferController controller = new CaseTransferController(
                 verifyTokenService, sameCountryService, diffCountryService, toEcmService,
@@ -493,10 +494,10 @@ class CaseTransferControllerTest extends BaseControllerTest {
         // Assert
         assertEquals(200, response.getStatusCodeValue());
         verify(verifyTokenService).verifyTokenSignature("token");
-        verify(caseManagementLocationService, times(2)).setCaseManagementLocationCode(caseData);
-        verify(caseManagementLocationService).setCaseManagementLocation(caseData);
-        assertNotNull(caseData.getManagingOffice());
-        assertNotNull(caseData.getCaseManagementLocation());
-        assertNotNull(caseData.getCaseManagementLocationCode());
+        verify(caseManagementLocationService, times(2)).setCaseManagementLocationCode(caseDataToBeUpdated);
+        verify(caseManagementLocationService).setCaseManagementLocation(caseDataToBeUpdated);
+        assertNotNull(caseDataToBeUpdated.getManagingOffice());
+        assertNotNull(caseDataToBeUpdated.getCaseManagementLocation());
+        assertNotNull(caseDataToBeUpdated.getCaseManagementLocationCode());
     }
 }

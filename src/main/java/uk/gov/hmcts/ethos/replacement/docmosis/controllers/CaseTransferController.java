@@ -248,8 +248,8 @@ public class CaseTransferController {
         CaseTransferUtils.setCaseManagingOffice(caseData, ccdRequest.getCaseDetails().getCaseTypeId());
 
         if (featureToggleService.isHmcEnabled() || featureToggleService.isWorkAllocationEnabled()) {
-            caseManagementLocationService.setCaseManagementLocationCode(ccdRequest.getCaseDetails().getCaseData());
-            caseManagementLocationService.setCaseManagementLocation(ccdRequest.getCaseDetails().getCaseData());
+            caseManagementLocationService.setCaseManagementLocationCode(caseData);
+            caseManagementLocationService.setCaseManagementLocation(caseData);
         }
 
         DefaultValues defaultValues = defaultValuesReaderService.getDefaultValues(caseData.getManagingOffice());
@@ -257,7 +257,7 @@ public class CaseTransferController {
         FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
 
         if (featureToggleService.isHmcEnabled()) {
-            caseManagementLocationService.setCaseManagementLocationCode(ccdRequest.getCaseDetails().getCaseData());
+            caseManagementLocationService.setCaseManagementLocationCode(caseData);
         }
 
         return getCallbackRespEntityNoErrors(caseData);

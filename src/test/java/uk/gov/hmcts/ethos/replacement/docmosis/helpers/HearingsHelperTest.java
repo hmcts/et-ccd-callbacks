@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-//import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
 import static uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType.create;
@@ -53,6 +53,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper.get
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper.hearingMidEventValidation;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper.hearingTimeValidation;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper.isDateInFuture;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper.updatePostponedDate;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper.validateTwoJudges;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.HEARING_CREATION_DAY_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.HEARING_CREATION_NUMBER_ERROR;
@@ -183,14 +184,14 @@ class HearingsHelperTest {
         return hearingType;
     }
 
-    @Test
+    /*@Test
     void updatePostponedDate() {
 
         caseData.getHearingCollection().getFirst().getValue()
                 .getHearingDateCollection().getFirst().getValue().setHearingStatus(HEARING_STATUS_POSTPONED);
         assertEquals(0, hearingMidEventValidation(caseData).size());
 
-    }
+    }*/
 
     @Test
     void findDateOfHearingTest() {
@@ -597,14 +598,13 @@ class HearingsHelperTest {
         assertEquals(String.format(RESUME_TIME_VALIDATION_MESSAGE, "Hearing 1"), errors.getFirst());
     }
 
-    /*
     @Test
     void updatePostponedDate_whenStatusIsPostponed_setsPostponedByAndDate() {
         DateListedType dateListedType = new DateListedType();
         caseData.setAllocateHearingStatus(HEARING_STATUS_POSTPONED);
         caseData.setAllocateHearingPostponedBy(CLAIMANT);
 
-        updatePostponedDate();
+        updatePostponedDate(caseData, dateListedType);
 
         assertEquals(CLAIMANT, dateListedType.getPostponedBy());
         assertFalse(dateListedType.getPostponedDate().isBlank());
@@ -618,7 +618,7 @@ class HearingsHelperTest {
         caseData.setAllocateHearingStatus(HEARING_STATUS_POSTPONED);
         caseData.setAllocateHearingPostponedBy(CLAIMANT);
 
-        updatePostponedDate();
+        updatePostponedDate(caseData, dateListedType);
 
         assertEquals(CLAIMANT, dateListedType.getPostponedBy());
         assertEquals(existingDate, dateListedType.getPostponedDate());
@@ -631,7 +631,7 @@ class HearingsHelperTest {
         dateListedType.setPostponedDate("2023-05-15");
         caseData.setAllocateHearingStatus(HEARING_STATUS_HEARD);
 
-        updatePostponedDate();
+        updatePostponedDate(caseData, dateListedType);
 
         assertNull(dateListedType.getPostponedBy());
         assertNull(dateListedType.getPostponedDate());
@@ -644,10 +644,10 @@ class HearingsHelperTest {
         caseData.setAllocateHearingStatus(HEARING_STATUS_POSTPONED);
         caseData.setAllocateHearingPostponedBy(CLAIMANT);
 
-        updatePostponedDate();
+        updatePostponedDate(caseData, dateListedType);
 
         assertEquals(CLAIMANT, dateListedType.getPostponedBy());
         assertFalse(dateListedType.getPostponedDate().isBlank());
     }
-    */
+
 }

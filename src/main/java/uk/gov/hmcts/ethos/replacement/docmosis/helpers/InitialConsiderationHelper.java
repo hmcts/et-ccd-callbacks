@@ -578,7 +578,7 @@ public final class InitialConsiderationHelper {
     private static void appendFinalOrOtherHearingDetails(StringBuilder sb, EtICHearingListedAnswers answers,
                                                          boolean isFinalHearing) {
         addHearingJsaOrMembersReasonDetails(sb,
-                getReasonDetails(answers, isFinalHearing),
+                getReasonDetails(answers),
                 getOtherReason(answers, isFinalHearing));
     }
 
@@ -603,19 +603,11 @@ public final class InitialConsiderationHelper {
         });
     }
 
-    private static List<String> getReasonDetails(EtICHearingListedAnswers answers, boolean isFinalHearing) {
-        if (isFinalHearing) {
-            if (JSA.equals(answers.getEtICIsHearingWithJudgeOrMembers())) {
-                return answers.getEtICIsFinalHearingWithJudgeOrMembersJsaReason();
-            } else {
-                return answers.getEtICIsFinalHearingWithJudgeOrMembersReason();
-            }
+    private static List<String> getReasonDetails(EtICHearingListedAnswers answers) {
+        if (JSA.equals(answers.getEtICIsHearingWithJudgeOrMembers())) {
+            return answers.getEtICIsFinalHearingWithJudgeOrMembersJsaReason();
         } else {
-            if (JSA.equals(answers.getEtICIsHearingWithJudgeOrMembers())) {
-                return answers.getEtICIsFinalHearingWithJudgeOrMembersJsaReason();
-            } else {
-                return answers.getEtICIsFinalHearingWithJudgeOrMembersReason();
-            }
+            return answers.getEtICIsFinalHearingWithJudgeOrMembersReason();
         }
     }
 

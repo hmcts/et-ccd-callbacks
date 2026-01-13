@@ -78,7 +78,7 @@ public class MultipleSingleMidEventValidationService {
 
         } else {
 
-            log.info("Searching case: " + caseToSearch);
+            log.info("Searching case: {}", caseToSearch);
 
             if (searchCaseInCaseIdCollection(ethosCaseRefCollection, caseToSearch)) {
 
@@ -205,7 +205,7 @@ public class MultipleSingleMidEventValidationService {
 
     private DynamicFixedListType populateDynamicList(List<DynamicValueType> listItems) {
 
-        listItems.add(0, DynamicListHelper.getDynamicValue(SELECT_NONE_VALUE));
+        listItems.addFirst(DynamicListHelper.getDynamicValue(SELECT_NONE_VALUE));
 
         DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
 

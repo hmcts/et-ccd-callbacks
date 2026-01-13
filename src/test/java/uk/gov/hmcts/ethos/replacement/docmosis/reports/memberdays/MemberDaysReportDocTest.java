@@ -24,7 +24,7 @@ class MemberDaysReportDocTest {
     MemberDaysReportDetail detailItem;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         memberDaysReport = new MemberDaysReport();
         detailItem = new MemberDaysReportDetail();
         listingData = new MemberDaysReportData();
@@ -156,30 +156,28 @@ class MemberDaysReportDocTest {
         listingData.setFullDaysTotal("2");
         listingData.setTotalDays("2.0");
         listingData.getMemberDaySummaryItems().add(memberDaySummaryItem);
-        StringBuilder expectedDetailRowContent = new StringBuilder(467);
-        expectedDetailRowContent.append("\"Listed_date\":\"18 September 2021").append(NEW_LINE)
-                .append("\"Report_Office\":\"MukeraCity").append(NEW_LINE)
-                .append("\"Total_Full_Days\":\"2").append(NEW_LINE)
-                .append("\"Total_Half_Days\":\"0").append(NEW_LINE)
-                .append("\"Total_Days\":\"2.0").append(NEW_LINE)
-                .append("\"memberDaySummaryItems\":[\n{\n\"Hearing_Date\":\"15 September 2021")
-                .append(NEW_LINE).append("\"Full_Days\":\"2").append(NEW_LINE)
-                .append("\"Half_Days\":\"0").append(NEW_LINE)
-                .append("\"Total_Days\":\"2\"\n}],\n")
-                .append("\"reportDetails\":[\n{\n\"Detail_Hearing_Date\":\"")
-                .append(nullCheck(detailItem.getHearingDate())).append(NEW_LINE)
-                .append("\"Employee_Member\":\"").append(nullCheck(detailItem.getEmployeeMember())).append(NEW_LINE)
-                .append("\"Employer_Member\":\"").append(nullCheck(detailItem.getEmployerMember())).append(NEW_LINE)
-                .append("\"Case_Reference\":\"").append(nullCheck(detailItem.getCaseReference())).append(NEW_LINE)
-                .append("\"Hearing_Number\":\"").append(nullCheck(detailItem.getHearingNumber())).append(NEW_LINE)
-                .append("\"Hearing_Type\":\"").append(nullCheck(detailItem.getHearingType())).append(NEW_LINE)
-                .append("\"Hearing_Clerk\":\"").append(nullCheck(detailItem.getHearingClerk())).append(NEW_LINE)
-                .append("\"Hearing_Duration\":\"")
-                .append(nullCheck(String.valueOf(new DecimalFormat("#")
-                        .format(Double.parseDouble(detailItem.getHearingDuration())))))
-                .append("\"\n}],\n");
+        String expectedDetailRowContent = "\"Listed_date\":\"18 September 2021" + NEW_LINE
+                + "\"Report_Office\":\"MukeraCity" + NEW_LINE
+                + "\"Total_Full_Days\":\"2" + NEW_LINE
+                + "\"Total_Half_Days\":\"0" + NEW_LINE
+                + "\"Total_Days\":\"2.0" + NEW_LINE
+                + "\"memberDaySummaryItems\":[\n{\n\"Hearing_Date\":\"15 September 2021" + NEW_LINE
+                + "\"Full_Days\":\"2" + NEW_LINE
+                + "\"Half_Days\":\"0" + NEW_LINE
+                + "\"Total_Days\":\"2\"\n}],\n"
+                + "\"reportDetails\":[\n{\n"
+                + "\"Detail_Hearing_Date\":\"" + nullCheck(detailItem.getHearingDate()) + NEW_LINE
+                + "\"Employee_Member\":\"" + nullCheck(detailItem.getEmployeeMember()) + NEW_LINE
+                + "\"Employer_Member\":\"" + nullCheck(detailItem.getEmployerMember()) + NEW_LINE
+                + "\"Case_Reference\":\"" + nullCheck(detailItem.getCaseReference()) + NEW_LINE
+                + "\"Hearing_Number\":\"" + nullCheck(detailItem.getHearingNumber()) + NEW_LINE
+                + "\"Hearing_Type\":\"" + nullCheck(detailItem.getHearingType()) + NEW_LINE
+                + "\"Hearing_Clerk\":\"" + nullCheck(detailItem.getHearingClerk()) + NEW_LINE
+                + "\"Hearing_Duration\":\"" + nullCheck(String.valueOf(new DecimalFormat("#")
+                        .format(Double.parseDouble(detailItem.getHearingDuration()))))
+                + "\"\n}],\n";
         StringBuilder resultListingData = memberDaysReportDoc.getReportDocPart(listingData);
         assertFalse(resultListingData.toString().isEmpty());
-        assertEquals(expectedDetailRowContent.toString(), resultListingData.toString());
+        assertEquals(expectedDetailRowContent, resultListingData.toString());
     }
 }

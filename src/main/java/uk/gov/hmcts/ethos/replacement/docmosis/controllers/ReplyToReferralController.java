@@ -195,8 +195,7 @@ public class ReplyToReferralController {
         DocumentInfo documentInfo = referralService.generateCRDocument(caseData, userToken,
             caseDetails.getCaseTypeId());
 
-        ReferralType referral = caseData.getReferralCollection()
-            .get(Integer.parseInt(caseData.getSelectReferral().getValue().getCode()) - 1).getValue();
+        ReferralType referral = ReferralHelper.getSelectedReferral(caseData);
 
         referral.setReferralSummaryPdf(this.documentManagementService.addDocumentToDocumentField(documentInfo));
         String caseLink = emailService.getExuiCaseLink(caseDetails.getCaseId());
@@ -204,7 +203,8 @@ public class ReplyToReferralController {
             emailService.sendEmail(
                     referralTemplateId,
                     caseData.getReplyToEmailAddress(),
-                    ReferralHelper.buildPersonalisation(caseData, referralCode, false, userDetails.getName(), caseLink)
+                    ReferralHelper.buildPersonalisation(caseData, referralCode, false,
+                            userDetails.getName(), caseLink)
             );
 
             log.info("Event: Referral Reply Email sent. "

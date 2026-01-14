@@ -73,6 +73,9 @@ public class NocNotificationService {
         if (caseRoleId.getValue().getCode().equals(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())) {
             // send claimant noc change email
             partyName = caseDataPrevious.getClaimant();
+            if (caseDataNew.getRepresentativeClaimantType() == null) {
+                throw new IllegalArgumentException("RepresentativeClaimantType is null");
+            }
             newRepEmailAddress = caseDataNew.getRepresentativeClaimantType().getRepresentativeEmailAddress();
             handleClaimantNocEmails(caseDetailsNew, partyName);
         } else {

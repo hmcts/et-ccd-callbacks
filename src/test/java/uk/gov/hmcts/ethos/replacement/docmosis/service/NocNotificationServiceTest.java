@@ -25,6 +25,9 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -214,7 +217,7 @@ class NocNotificationServiceTest {
         oldCaseData.getRepCollection().get(1).getValue().setRepresentativeEmailAddress(null);
         oldCaseData.setTribunalCorrespondenceEmail(null);
 
-        caseDetailsNew.getCaseData().getRepCollection().get(0).getValue().setRepresentativeEmailAddress(null);
+        caseDetailsNew.getCaseData().getRepCollection().getFirst().getValue().setRepresentativeEmailAddress(null);
 
         RespondentSumType respondentSumType = new RespondentSumType();
         respondentSumType.setRespondentName("Respondent");
@@ -227,6 +230,26 @@ class NocNotificationServiceTest {
                 caseDetailsNew,
                 caseDetailsBefore.getCaseData().getChangeOrganisationRequestField());
 
+        verify(emailService, times(0)).sendEmail(any(), any(), any());
+    }
+
+    @Test
+    void handleMissingRepresentativeClaimantType() {
+        DynamicValueType dynamicValueType = new DynamicValueType();
+        dynamicValueType.setCode(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
+        DynamicFixedListType caseRoleId = new DynamicFixedListType();
+        caseRoleId.setValue(dynamicValueType);
+        caseDetailsBefore.getCaseData().getChangeOrganisationRequestField().setCaseRoleId(caseRoleId);
+
+        caseDetailsNew.getCaseData().setRepresentativeClaimantType(null);
+
+        Exception exception = assertThrows(Exception.class,
+                () -> nocNotificationService.sendNotificationOfChangeEmails(
+                        caseDetailsBefore,
+                        caseDetailsNew,
+                        caseDetailsBefore.getCaseData().getChangeOrganisationRequestField())
+        );
+        assertThat(exception.getMessage()).isEqualTo("RepresentativeClaimantType is null");
         verify(emailService, times(0)).sendEmail(any(), any(), any());
     }
 

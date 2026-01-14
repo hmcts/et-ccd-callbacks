@@ -12,6 +12,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 
 import java.util.List;
+import java.util.stream.IntStream;
 
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.MAX_NOC_ANSWERS;
 
@@ -330,5 +331,122 @@ public final class RoleUtils {
             case 9 -> caseData.setNoticeOfChangeAnswers9(emptyNoticeOfChangeAnswers);
             default -> { /* no-op */ }
         }
+    }
+
+    /**
+     * Determines the next available respondent solicitor role label for the given case data.
+     *
+     * <p>The method evaluates respondent organisation policies in order and returns the
+     * case role label of the first respondent solicitor role whose corresponding
+     * organisation policy is missing or incomplete.</p>
+     *
+     * <p>If the case data is {@code null} or empty, or if no available role can be
+     * determined, an empty string is returned.</p>
+     *
+     * <p>The order of evaluation is significant and reflects the predefined allocation
+     * sequence of respondent solicitor roles.</p>
+     *
+     * @param caseData the case data containing respondent organisation policies
+     * @return the next available respondent solicitor case role label, or an empty
+     *         string if none is available
+     */
+    public static String getNextAvailableRespondentSolicitorRoleLabel(CaseData caseData) {
+        if (ObjectUtils.isEmpty(caseData)) {
+            return StringUtils.EMPTY;
+        }
+        List<OrganisationPolicy> organisationPolicies = getAllOrganisationPoliciesByCaseData(caseData);
+        List<SolicitorRole> respondentRepresentativeRoles = getRespondentSolicitorRoles();
+        return IntStream.range(0, organisationPolicies.size())
+                .filter(i -> isOrganisationMissing(organisationPolicies.get(i)))
+                .mapToObj(i -> respondentRepresentativeRoles.get(i).getCaseRoleLabel())
+                .findFirst()
+                .orElse(StringUtils.EMPTY);
+    }
+
+    /**
+     * Determines whether an organisation is missing from the given organisation policy.
+     *
+     * <p>An organisation is considered missing if the policy itself is {@code null} or empty,
+     * if the organisation is {@code null} or empty, or if the organisation identifier is
+     * {@code null}, empty, or blank.</p>
+     *
+     * @param organisationPolicy the organisation policy to evaluate
+     * @return {@code true} if the organisation is missing; {@code false} otherwise
+     */
+    public static boolean isOrganisationMissing(OrganisationPolicy organisationPolicy) {
+        if (ObjectUtils.isEmpty(organisationPolicy) || ObjectUtils.isEmpty(organisationPolicy.getOrganisation())) {
+            return true;
+        }
+        return StringUtils.isBlank(organisationPolicy.getOrganisation().getOrganisationID());
+    }
+
+    /**
+     * Retrieves all respondent organisation policies from the given case data.
+     *
+     * <p>This method returns a list containing all respondent organisation policies
+     * (indices 0 to 9). Each policy is guaranteed to be non-null; if a policy is
+     * missing or empty in the case data, an empty {@link OrganisationPolicy}
+     * instance is returned in its place.</p>
+     *
+     * <p>The order of policies in the returned list corresponds to their index
+     * within the case data.</p>
+     *
+     * @param caseData the case data containing respondent organisation policies
+     * @return a list of ten {@link OrganisationPolicy} instances, never {@code null}
+     */
+    public static List<OrganisationPolicy> getAllOrganisationPoliciesByCaseData(CaseData caseData) {
+        return List.of(
+                ensureOrganisationPolicy(caseData.getRespondentOrganisationPolicy0()),
+                ensureOrganisationPolicy(caseData.getRespondentOrganisationPolicy1()),
+                ensureOrganisationPolicy(caseData.getRespondentOrganisationPolicy2()),
+                ensureOrganisationPolicy(caseData.getRespondentOrganisationPolicy3()),
+                ensureOrganisationPolicy(caseData.getRespondentOrganisationPolicy4()),
+                ensureOrganisationPolicy(caseData.getRespondentOrganisationPolicy5()),
+                ensureOrganisationPolicy(caseData.getRespondentOrganisationPolicy6()),
+                ensureOrganisationPolicy(caseData.getRespondentOrganisationPolicy7()),
+                ensureOrganisationPolicy(caseData.getRespondentOrganisationPolicy8()),
+                ensureOrganisationPolicy(caseData.getRespondentOrganisationPolicy9())
+        );
+    }
+
+    /**
+     * Ensures that an {@link OrganisationPolicy} instance is always returned.
+     *
+     * <p>If the provided organisation policy is {@code null} or empty, a new
+     * empty {@link OrganisationPolicy} instance is created and returned.
+     * Otherwise, the provided instance is returned unchanged.</p>
+     *
+     * @param organisationPolicy the organisation policy to validate
+     * @return a non-null {@link OrganisationPolicy} instance
+     */
+    public static OrganisationPolicy ensureOrganisationPolicy(OrganisationPolicy organisationPolicy) {
+        return ObjectUtils.isEmpty(organisationPolicy) ? OrganisationPolicy.builder().build() : organisationPolicy;
+    }
+
+    /**
+     * Returns all solicitor roles that can represent respondents.
+     *
+     * <p>The returned list contains all respondent representative solicitor roles
+     * in a fixed order (A to J). The list is immutable and will always contain
+     * the same set of roles.</p>
+     *
+     * <p>This method provides a convenient, centralised view of all respondent
+     * representative roles.</p>
+     *
+     * @return an immutable list of respondent representative {@link SolicitorRole}s
+     */
+    public static List<SolicitorRole> getRespondentSolicitorRoles() {
+        return List.of(
+                SolicitorRole.SOLICITORA,
+                SolicitorRole.SOLICITORB,
+                SolicitorRole.SOLICITORC,
+                SolicitorRole.SOLICITORD,
+                SolicitorRole.SOLICITORE,
+                SolicitorRole.SOLICITORF,
+                SolicitorRole.SOLICITORG,
+                SolicitorRole.SOLICITORH,
+                SolicitorRole.SOLICITORI,
+                SolicitorRole.SOLICITORJ
+        );
     }
 }

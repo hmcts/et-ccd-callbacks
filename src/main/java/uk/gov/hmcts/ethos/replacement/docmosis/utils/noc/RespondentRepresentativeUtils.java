@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_INVALID_REPRESENTATIVE_EXISTS;
@@ -211,13 +212,33 @@ public final class RespondentRepresentativeUtils {
      * @return {@code true} if the representative meets all criteria required for removal;
      *         {@code false} otherwise
      */
-    public static boolean canRemoveRepresentativeFromAssignments(RepresentedTypeRItem representative) {
+    public static boolean canModifyAccess(RepresentedTypeRItem representative) {
         return isValidRepresentative(representative)
                 && YES.equals(representative.getValue().getMyHmctsYesNo())
                 && ObjectUtils.isNotEmpty(representative.getValue().getRespondentOrganisation())
                 && StringUtils.isNotEmpty(representative.getValue().getRespondentOrganisation()
                 .getOrganisationID())
                 && StringUtils.isNotEmpty(representative.getValue().getRepresentativeEmailAddress());
+    }
+
+    /**
+     * Filters the given list of representatives and returns only those
+     * for which access modification is permitted.
+     *
+     * <p>The original list is not modified. If the input list is {@code null}
+     * or empty, an empty list is returned.</p>
+     *
+     * @param representatives the list of representatives to evaluate
+     * @return a list containing only representatives that can have their access modified
+     */
+    public static List<RepresentedTypeRItem> filterModifiableRepresentatives(
+            List<RepresentedTypeRItem> representatives) {
+        if (CollectionUtils.isEmpty(representatives)) {
+            return Collections.emptyList();
+        }
+        return representatives.stream()
+                .filter(RespondentRepresentativeUtils::canModifyAccess)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -334,7 +355,7 @@ public final class RespondentRepresentativeUtils {
      * @return a list of representatives from {@code oldRepresentatives} that are either
      *         no longer present or have updated organisation or email details
      */
-    public static List<RepresentedTypeRItem> findUpdatedRepresentativesForSameRespondent(
+    public static List<RepresentedTypeRItem> findRepresentativesToRemove(
             List<RepresentedTypeRItem> oldRepresentatives, List<RepresentedTypeRItem> newRepresentatives) {
         if (CollectionUtils.isEmpty(oldRepresentatives)) {
             return new ArrayList<>();
@@ -349,16 +370,13 @@ public final class RespondentRepresentativeUtils {
             // to check if representative exists or not
             boolean representativeFound = false;
             for (RepresentedTypeRItem newRepresentative : newRepresentatives) {
-                if (!RespondentRepresentativeUtils.isValidRepresentative(newRepresentative)
-                        || !RespondentRepresentativeUtils.representsSameRespondent(oldRepresentative,
-                        newRepresentative)) {
+                if (!isValidRepresentative(newRepresentative)
+                        || !representsSameRespondent(oldRepresentative, newRepresentative)) {
                     continue;
                 }
                 representativeFound = true;
-                if (RespondentRepresentativeUtils.isRepresentativeOrganisationChanged(oldRepresentative.getValue(),
-                        newRepresentative.getValue())
-                        || RespondentRepresentativeUtils.isRepresentativeEmailChanged(oldRepresentative.getValue(),
-                        newRepresentative.getValue())) {
+                if (isRepresentativeOrganisationChanged(oldRepresentative.getValue(), newRepresentative.getValue())
+                        || isRepresentativeEmailChanged(oldRepresentative.getValue(), newRepresentative.getValue())) {
                     // representative already exists but its organisation or email is changed
                     representativeChanged = true;
                 }
@@ -368,5 +386,58 @@ public final class RespondentRepresentativeUtils {
             }
         }
         return representativesToRemove;
+    }
+
+    /**
+     * Identifies representatives that are new or have been updated between two versions
+     * of a case.
+     * <p>
+     * A representative is considered <strong>new or updated</strong> if, when compared
+     * to the previous list:
+     * <ul>
+     *     <li>They represent a respondent that did not previously have a representative, or</li>
+     *     <li>They represent the same respondent but either the representative's
+     *     <strong>organisation</strong> or <strong>email address</strong> has changed</li>
+     * </ul>
+     * </p>
+     * <p>
+     * Representatives are considered unchanged only when they represent the same respondent
+     * and both the organisation and email address remain the same.
+     * </p>
+     * <p>
+     * Any invalid representatives are ignored during the comparison.
+     * </p>
+     *
+     * @param newRepresentatives the list of representatives from the updated case data
+     * @param oldRepresentatives the list of representatives from the previous case data
+     * @return a list of representatives that are either new or have been updated due to
+     *         a change in organisation or email address
+     */
+    public static List<RepresentedTypeRItem> findNewOrUpdatedRepresentatives(
+            List<RepresentedTypeRItem> newRepresentatives, List<RepresentedTypeRItem> oldRepresentatives) {
+        if (CollectionUtils.isEmpty(newRepresentatives)) {
+            return new ArrayList<>();
+        }
+        List<RepresentedTypeRItem> newRepresentativesToReturn = new ArrayList<>();
+        for (RepresentedTypeRItem newRepresentative : newRepresentatives) {
+            if (!isValidRepresentative(newRepresentative)) {
+                continue;
+            }
+            boolean representsSameRespondent = false;
+            for (RepresentedTypeRItem oldRepresentative : oldRepresentatives) {
+                if (isValidRepresentative(oldRepresentative)
+                        && representsSameRespondent(oldRepresentative, newRepresentative)
+                        && !isRepresentativeOrganisationChanged(oldRepresentative.getValue(),
+                        newRepresentative.getValue())
+                        && !isRepresentativeEmailChanged(oldRepresentative.getValue(), newRepresentative.getValue())) {
+                    representsSameRespondent = true;
+                    break;
+                }
+            }
+            if (!representsSameRespondent) {
+                newRepresentativesToReturn.add(newRepresentative);
+            }
+        }
+        return newRepresentativesToReturn;
     }
 }

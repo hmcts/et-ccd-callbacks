@@ -464,4 +464,48 @@ final class RoleUtilsTest {
                 .respondentName(RESPONDENT_NAME_NINE).build());
         caseData.setNoticeOfChangeAnswers9(NoticeOfChangeAnswers.builder().respondentName(RESPONDENT_NAME_TEN).build());
     }
+
+    @Test
+    public void testEnsureOrganisationPolicy() {
+        // when organisation policy is empty should return an empty organisation policy
+        OrganisationPolicy emptyOrganisationPolicy = OrganisationPolicy.builder().build();
+        assertThat(RoleUtils.ensureOrganisationPolicy(null)).isEqualTo(emptyOrganisationPolicy);
+        // when organisation policy is not empty should return the same organisation policy
+        OrganisationPolicy organisationPolicy = OrganisationPolicy.builder().organisation(Organisation.builder()
+                .organisationID(ORGANISATION_ID_ONE).build()).build();
+        assertThat(RoleUtils.ensureOrganisationPolicy(organisationPolicy)).isEqualTo(organisationPolicy);
+    }
+
+    @Test
+    void theIsOrganisationMissing() {
+        // when organisation policy is null should return true
+        assertThat(RoleUtils.isOrganisationMissing(null)).isTrue();
+        // when organisation policy does not have organisation should return true
+        OrganisationPolicy organisationPolicy = OrganisationPolicy.builder().build();
+        assertThat(RoleUtils.isOrganisationMissing(organisationPolicy)).isTrue();
+        // when organisation policy does not have organisation id should return true
+        organisationPolicy.setOrganisation(Organisation.builder().build());
+        assertThat(RoleUtils.isOrganisationMissing(organisationPolicy)).isTrue();
+        // when organisation policy has organisaton id should return false
+        organisationPolicy.getOrganisation().setOrganisationID(ORGANISATION_ID_ONE);
+        assertThat(RoleUtils.isOrganisationMissing(organisationPolicy)).isFalse();
+    }
+
+    @Test
+    void theGetNextAvailableRespondentSolicitorRoleLabel() {
+        // when case data is empty should return an empty string
+        assertThat(RoleUtils.getNextAvailableRespondentSolicitorRoleLabel(null)).isEmpty();
+        // when case data does not have any organisation policy should return role [SOLICITORA]
+        CaseData caseData = new CaseData();
+        assertThat(RoleUtils.getNextAvailableRespondentSolicitorRoleLabel(caseData)).isEqualTo(ROLE_SOLICITOR_A);
+        // when all organisation policies are assigned should return empty string
+        setAllRespondentOrganisationPolicy(caseData);
+        assertThat(RoleUtils.getNextAvailableRespondentSolicitorRoleLabel(caseData)).isEmpty();
+        // when last organisation policy not assigned should return [SOLICITORJ]
+        caseData.setRespondentOrganisationPolicy9(null);
+        assertThat(RoleUtils.getNextAvailableRespondentSolicitorRoleLabel(caseData)).isEqualTo(ROLE_SOLICITOR_J);
+        // when second organisation policy not assigned should return [SOLICITORB]
+        caseData.setRespondentOrganisationPolicy1(null);
+        assertThat(RoleUtils.getNextAvailableRespondentSolicitorRoleLabel(caseData)).isEqualTo(ROLE_SOLICITOR_B);
+    }
 }

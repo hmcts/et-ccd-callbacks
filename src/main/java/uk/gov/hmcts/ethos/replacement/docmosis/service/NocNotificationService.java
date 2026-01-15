@@ -73,11 +73,10 @@ public class NocNotificationService {
         if (caseRoleId.getValue().getCode().equals(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())) {
             // send claimant noc change email
             partyName = caseDataPrevious.getClaimant();
-            if (caseDataNew.getRepresentativeClaimantType() == null) {
-                return;
+            if (caseDataNew.getRepresentativeClaimantType() != null) {
+                newRepEmailAddress = caseDataNew.getRepresentativeClaimantType().getRepresentativeEmailAddress();
+                handleClaimantNocEmails(caseDetailsNew, partyName);
             }
-            newRepEmailAddress = caseDataNew.getRepresentativeClaimantType().getRepresentativeEmailAddress();
-            handleClaimantNocEmails(caseDetailsNew, partyName);
         } else {
             // send respondent noc change email
             handleRespondentNocEmails(caseDetailsPrevious, caseDetailsNew, changeRequest);

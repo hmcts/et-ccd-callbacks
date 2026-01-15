@@ -40,6 +40,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @ExtendWith(SpringExtension.class)
 @SuppressWarnings({"PMD.LawOfDemeter"})
 class NocNotificationServiceTest {
+    private static final String TRIBUNAL_EMAIL = "tribunal@email.com";
     private static final String NEW_ORG_ADMIN_EMAIL = "orgadmin1@test.com";
     private static final String OLD_ORG_ADMIN_EMAIL = "orgadmin2@test.com";
     private static final String NEW_ORG_ID = "1";
@@ -233,11 +234,33 @@ class NocNotificationServiceTest {
 
     @Test
     void handleMissingRepresentativeClaimantType() {
+        when(emailService.getExuiCaseLink(anyString())).thenReturn("exuiLink");
+        when(emailService.getCitizenCaseLink(any())).thenReturn("citizenLink");
+
+        RetrieveOrgByIdResponse oldOrgByIdResponse = RetrieveOrgByIdResponse.builder()
+                .superUser(RetrieveOrgByIdResponse.SuperUser.builder()
+                        .email(OLD_ORG_ADMIN_EMAIL)
+                        .build())
+                .build();
+        when(organisationClient.getOrganisationById(anyString(), anyString(), eq(OLD_ORG_ID)))
+                .thenReturn(ResponseEntity.ok(oldOrgByIdResponse));
+
+        RetrieveOrgByIdResponse newOrgByIdResponse = RetrieveOrgByIdResponse.builder()
+                .superUser(RetrieveOrgByIdResponse.SuperUser.builder()
+                        .email(NEW_ORG_ADMIN_EMAIL)
+                        .build())
+                .build();
+        when(organisationClient.getOrganisationById(anyString(), anyString(), eq(NEW_ORG_ID)))
+                .thenReturn(ResponseEntity.ok(newOrgByIdResponse));
+
         DynamicValueType dynamicValueType = new DynamicValueType();
         dynamicValueType.setCode(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
         DynamicFixedListType caseRoleId = new DynamicFixedListType();
         caseRoleId.setValue(dynamicValueType);
+
         caseDetailsBefore.getCaseData().getChangeOrganisationRequestField().setCaseRoleId(caseRoleId);
+        caseDetailsBefore.getCaseData().setTribunalCorrespondenceEmail(TRIBUNAL_EMAIL);
+
         caseDetailsNew.getCaseData().setRepresentativeClaimantType(null);
 
         nocNotificationService.sendNotificationOfChangeEmails(
@@ -246,7 +269,15 @@ class NocNotificationServiceTest {
                 caseDetailsBefore.getCaseData().getChangeOrganisationRequestField()
         );
 
-        verify(emailService, times(0)).sendEmail(any(), any(), any());
+        verify(emailNotificationService, times(0))
+                .getRespondentsAndRepsEmailAddresses(any(), any());
+        verify(emailService, times(3)).sendEmail(any(), any(), any());
+        verify(emailService, times(1))
+                .sendEmail(any(), eq(OLD_ORG_ADMIN_EMAIL), any());
+        verify(emailService, times(1))
+                .sendEmail(any(), eq(NEW_ORG_ADMIN_EMAIL), any());
+        verify(emailService, times(1))
+                .sendEmail(any(), eq(TRIBUNAL_EMAIL), any());
     }
 
     @Test
@@ -287,7 +318,7 @@ class NocNotificationServiceTest {
         caseDetailsBefore.getCaseData().setRespondentCollection(respondentCollection);
         caseDetailsNew.getCaseData().setRespondentCollection(respondentCollection);
 
-        caseDetailsBefore.getCaseData().setTribunalCorrespondenceEmail("tribunal@email.com");
+        caseDetailsBefore.getCaseData().setTribunalCorrespondenceEmail(TRIBUNAL_EMAIL);
 
         // Mock emailService links
         when(emailService.getSyrCaseLink(anyString(), anyString())).thenReturn("syrLink");
@@ -308,6 +339,6 @@ class NocNotificationServiceTest {
         // Claimant email notification
         verify(emailService, times(1)).sendEmail(any(), eq("claimant@unrepresented.com"), any());
         // Tribunal email notification
-        verify(emailService, times(1)).sendEmail(any(), eq("tribunal@email.com"), any());
+        verify(emailService, times(1)).sendEmail(any(), eq(TRIBUNAL_EMAIL), any());
     }
 }

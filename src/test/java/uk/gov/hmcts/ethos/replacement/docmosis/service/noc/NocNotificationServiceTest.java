@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.service;
+package uk.gov.hmcts.ethos.replacement.docmosis.service.noc;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -19,6 +19,10 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseAccessService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailNotificationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
@@ -214,7 +218,7 @@ class NocNotificationServiceTest {
         oldCaseData.getRepCollection().get(1).getValue().setRepresentativeEmailAddress(null);
         oldCaseData.setTribunalCorrespondenceEmail(null);
 
-        caseDetailsNew.getCaseData().getRepCollection().get(0).getValue().setRepresentativeEmailAddress(null);
+        caseDetailsNew.getCaseData().getRepCollection().getFirst().getValue().setRepresentativeEmailAddress(null);
 
         RespondentSumType respondentSumType = new RespondentSumType();
         respondentSumType.setRespondentName("Respondent");

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.service;
+package uk.gov.hmcts.ethos.replacement.docmosis.service.noc;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,9 +14,13 @@ import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocClaimantHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.OrganisationUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
@@ -26,7 +30,6 @@ import java.util.Objects;
 import java.util.Optional;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1ReppedService.getOrganisationAddress;
 
 @Service
 @RequiredArgsConstructor
@@ -99,7 +102,7 @@ public class NocClaimantRepresentativeService {
 
             if (organisationResponse.isPresent()) {
                 OrganisationsResponse organisation = organisationResponse.get();
-                claimantRep.setRepresentativeAddress(getOrganisationAddress(organisation));
+                claimantRep.setRepresentativeAddress(OrganisationUtils.getOrganisationAddress(organisation));
                 claimantRep.setNameOfOrganisation(organisation.getName());
                 caseData.setRepresentativeClaimantType(claimantRep);
             }
@@ -140,10 +143,15 @@ public class NocClaimantRepresentativeService {
         if (YES.equals(caseData.getClaimantRepresentedQuestion())) {
             RepresentedTypeC claimantRep = caseData.getRepresentativeClaimantType();
             if (claimantRep != null && claimantRep.getRepresentativeEmailAddress() != null) {
-                nocService.grantClaimantRepAccess(accessToken,
-                        caseData.getRepresentativeClaimantType().getRepresentativeEmailAddress(),
-                        caseDetails.getCaseId(),
-                        changeRequest.getOrganisationToAdd());
+                try {
+                    nocService.grantRepresentativeAccess(accessToken,
+                            caseData.getRepresentativeClaimantType().getRepresentativeEmailAddress(),
+                            caseDetails.getCaseId(),
+                            changeRequest.getOrganisationToAdd(),
+                            ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
+                } catch (GenericServiceException genericServiceException) {
+                    log.error(genericServiceException.getMessage(), genericServiceException);
+                }
             }
         }
 

@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.service;
+package uk.gov.hmcts.ethos.replacement.docmosis.service.noc;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +9,7 @@ import uk.gov.hmcts.et.common.model.ccd.AuditEventsResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.LoggingUtils;
 
 import java.io.IOException;
 import java.util.Comparator;
@@ -49,21 +50,27 @@ public class NocCcdService {
         try {
             return ccdClient.retrieveCaseAssignments(userToken, caseId);
         } catch (IOException exception) {
-            log.info("Error form ccd - {}", exception.getMessage());
+            LoggingUtils.logCCDException(exception);
             throw new CcdInputOutputException("Failed to retrieve case assignments", exception);
         }
     }
 
     /**
-     * Revokes access to case for given users.
-     * @param userToken - bearer token
-     * @param caseUserAssignmentData - containing list of user id, case id and role id mappings for removal
+     * Revokes case assignments for a user in CCD.
+     * <p>
+     * This method delegates to the CCD client to revoke the provided case user
+     * assignments. If an I/O error occurs while communicating with CCD, the
+     * exception is logged and rethrown as a {@link CcdInputOutputException}.
+     *
+     * @param userToken the user authentication token used to authorise the CCD request
+     * @param caseUserAssignmentData the case user assignment details to be revoked
+     * @throws CcdInputOutputException if an I/O error occurs while revoking the case assignments
      */
     public void revokeCaseAssignments(String userToken, CaseUserAssignmentData caseUserAssignmentData) {
         try {
             ccdClient.revokeCaseAssignments(userToken, caseUserAssignmentData);
         } catch (IOException exception) {
-            log.info("Error form ccd - {}", exception.getMessage());
+            LoggingUtils.logCCDException(exception);
             throw new CcdInputOutputException("Failed to revoke case assignments", exception);
         }
     }

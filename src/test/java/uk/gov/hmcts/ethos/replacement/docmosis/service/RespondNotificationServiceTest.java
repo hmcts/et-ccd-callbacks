@@ -7,14 +7,17 @@ import org.mockito.Mock;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.PseStatusTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.PseStatusType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondNotificationType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.SendNotificationType;
@@ -24,6 +27,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelection
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.EmailUtils;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -47,6 +52,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_VIEWED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
@@ -128,8 +134,8 @@ class RespondNotificationServiceTest {
         caseDetails.setCaseData(caseData);
 
         respondNotificationService.handleAboutToSubmit(caseDetails);
-        var sendNotificationType = caseDetails.getCaseData().getSendNotificationCollection().get(0).getValue();
-        var respondNotificationType = sendNotificationType.getRespondNotificationTypeCollection().get(0).getValue();
+        var sendNotificationType = caseDetails.getCaseData().getSendNotificationCollection().getFirst().getValue();
+        var respondNotificationType = sendNotificationType.getRespondNotificationTypeCollection().getFirst().getValue();
 
         assertEquals("title", respondNotificationType.getRespondNotificationTitle());
         assertEquals("info", respondNotificationType.getRespondNotificationAdditionalInfo());
@@ -179,8 +185,8 @@ class RespondNotificationServiceTest {
         caseDetails.setCaseData(caseData);
 
         respondNotificationService.handleAboutToSubmit(caseDetails);
-        var sendNotificationType = caseDetails.getCaseData().getSendNotificationCollection().get(0).getValue();
-        var respondNotificationType = sendNotificationType.getRespondNotificationTypeCollection().get(0).getValue();
+        var sendNotificationType = caseDetails.getCaseData().getSendNotificationCollection().getFirst().getValue();
+        var respondNotificationType = sendNotificationType.getRespondNotificationTypeCollection().getFirst().getValue();
 
         assertEquals("title", respondNotificationType.getRespondNotificationTitle());
         assertEquals("info", respondNotificationType.getRespondNotificationAdditionalInfo());
@@ -202,6 +208,79 @@ class RespondNotificationServiceTest {
         assertNull(caseData.getRespondNotificationCaseManagementMadeBy());
         assertNull(caseData.getRespondNotificationFullName());
         assertNull(caseData.getRespondNotificationPartyToNotify());
+    }
+
+    @Test
+    void testCreateAndClearRespondNotification_withRespondentState_RespondRequired() {
+        caseDetails.setCaseData(getCaseDataWithRespondentState());
+        caseDetails.getCaseData().setRespondNotificationResponseRequired(YES);
+        caseDetails.getCaseData().setRespondNotificationWhoRespond(BOTH_PARTIES);
+        caseDetails.getCaseData().setRespondNotificationFullName("John Doe");
+
+        respondNotificationService.handleAboutToSubmit(caseDetails);
+
+        SendNotificationType sendNotificationType =
+                caseDetails.getCaseData().getSendNotificationCollection().getFirst().getValue();
+        PseStatusType pseStatusType = sendNotificationType.getRespondentState().getFirst().getValue();
+        assertEquals(NOT_STARTED_YET, pseStatusType.getNotificationState());
+        assertEquals(
+                UtilHelper.formatCurrentDate(LocalDate.now()),
+                UtilHelper.formatCurrentDate(
+                        LocalDateTime.parse(pseStatusType.getDateTime()).toLocalDate()
+        ));
+    }
+
+    @Test
+    void testCreateAndClearRespondNotification_withRespondentState_ViewOnly() {
+        caseDetails.setCaseData(getCaseDataWithRespondentState());
+        caseDetails.getCaseData().setRespondNotificationResponseRequired(NO);
+
+        respondNotificationService.handleAboutToSubmit(caseDetails);
+
+        SendNotificationType sendNotificationType =
+                caseDetails.getCaseData().getSendNotificationCollection().getFirst().getValue();
+        PseStatusType pseStatusType = sendNotificationType.getRespondentState().getFirst().getValue();
+        assertEquals(NOT_VIEWED_YET, pseStatusType.getNotificationState());
+        assertEquals(
+                UtilHelper.formatCurrentDate(LocalDate.now()),
+                UtilHelper.formatCurrentDate(
+                        LocalDateTime.parse(pseStatusType.getDateTime()).toLocalDate()
+                ));
+    }
+
+    private CaseData getCaseDataWithRespondentState() {
+        caseData = new CaseData();
+        caseData.setRespondNotificationTitle("title");
+        caseData.setRespondNotificationPartyToNotify(BOTH_PARTIES);
+        caseData.setRespondNotificationCmoOrRequest(CASE_MANAGEMENT_ORDER);
+
+        caseData.setClaimantType(new ClaimantType());
+        caseData.setClaimant("Claimant");
+        caseData.setRespondentCollection(new ArrayList<>());
+        caseData.setEthosCaseReference("1234");
+
+        String uuid = String.valueOf(UUID.randomUUID());
+        DynamicValueType dynamicValueType = DynamicValueType.create(uuid, "sendNotification");
+        caseData.setSelectNotificationDropdown(DynamicFixedListType.of(dynamicValueType));
+
+        PseStatusTypeItem pseStatusTypeItem = PseStatusTypeItem.builder()
+                .id(String.valueOf(UUID.randomUUID()))
+                .value(PseStatusType.builder()
+                        .userIdamId("userId")
+                        .notificationState(SUBMITTED)
+                        .dateTime("dateTime")
+                        .build())
+                .build();
+        SendNotificationTypeItem sendNotificationTypeItem = SendNotificationTypeItem.builder()
+                .id(uuid)
+                .value(SendNotificationType.builder()
+                        .sendNotificationTitle("title")
+                        .respondentState(List.of(pseStatusTypeItem))
+                        .build())
+                .build();
+        caseData.setSendNotificationCollection(List.of(sendNotificationTypeItem));
+
+        return caseData;
     }
 
     @Test
@@ -493,7 +572,7 @@ class RespondNotificationServiceTest {
 
         caseData.setRespondNotificationPartyToNotify(RESPONDENT_ONLY);
         caseData.setRespondNotificationResponseRequired(YES);
-        caseData.getRespondentCollection().get(0).getValue().setRespondentEmail(null);
+        caseData.getRespondentCollection().getFirst().getValue().setRespondentEmail(null);
         caseDetails.setCaseData(caseData);
         SendNotificationType sendNotification = SendNotificationType.builder().sendNotificationTitle("TEST").build();
         respondNotificationService.sendNotifyEmails(caseDetails, sendNotification);

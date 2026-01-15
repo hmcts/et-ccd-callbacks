@@ -74,7 +74,7 @@ public class NocNotificationService {
             // send claimant noc change email
             partyName = caseDataPrevious.getClaimant();
             if (caseDataNew.getRepresentativeClaimantType() == null) {
-                throw new IllegalArgumentException("RepresentativeClaimantType is null");
+                return;
             }
             newRepEmailAddress = caseDataNew.getRepresentativeClaimantType().getRepresentativeEmailAddress();
             handleClaimantNocEmails(caseDetailsNew, partyName);

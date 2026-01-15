@@ -26,8 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -240,16 +238,14 @@ class NocNotificationServiceTest {
         DynamicFixedListType caseRoleId = new DynamicFixedListType();
         caseRoleId.setValue(dynamicValueType);
         caseDetailsBefore.getCaseData().getChangeOrganisationRequestField().setCaseRoleId(caseRoleId);
-
         caseDetailsNew.getCaseData().setRepresentativeClaimantType(null);
 
-        Exception exception = assertThrows(Exception.class,
-                () -> nocNotificationService.sendNotificationOfChangeEmails(
-                        caseDetailsBefore,
-                        caseDetailsNew,
-                        caseDetailsBefore.getCaseData().getChangeOrganisationRequestField())
+        nocNotificationService.sendNotificationOfChangeEmails(
+                caseDetailsBefore,
+                caseDetailsNew,
+                caseDetailsBefore.getCaseData().getChangeOrganisationRequestField()
         );
-        assertThat(exception.getMessage()).isEqualTo("RepresentativeClaimantType is null");
+
         verify(emailService, times(0)).sendEmail(any(), any(), any());
     }
 

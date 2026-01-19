@@ -15,6 +15,7 @@ import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
+import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
@@ -2643,7 +2644,7 @@ class DocumentHelperTest {
         resp1.setRespondentName("Test Respondent 1");
         resp1.setResponseContinue(YES);
         resp1.setResponseStruckOut(NO);
-        uk.gov.hmcts.et.common.model.ccd.Address address1 = new uk.gov.hmcts.et.common.model.ccd.Address();
+        Address address1 = new Address();
         address1.setAddressLine1("123 Test Street");
         address1.setPostTown("Test City");
         address1.setPostCode("TE1 1ST");
@@ -2656,7 +2657,7 @@ class DocumentHelperTest {
         resp2.setRespondentName("Test Respondent 2");
         resp2.setResponseContinue(YES);
         resp2.setResponseStruckOut(NO);
-        uk.gov.hmcts.et.common.model.ccd.Address address2 = new uk.gov.hmcts.et.common.model.ccd.Address();
+        Address address2 = new Address();
         address2.setAddressLine1("456 Test Avenue");
         address2.setPostTown("Test Town");
         address2.setPostCode("TE2 2ND");
@@ -2674,7 +2675,7 @@ class DocumentHelperTest {
         rep.setNameOfOrganisation("Rep Org 1");
         rep.setRepresentativeReference("REP-REF-001");
         rep.setRespRepName("Test Respondent 1");
-        uk.gov.hmcts.et.common.model.ccd.Address repAddress = new uk.gov.hmcts.et.common.model.ccd.Address();
+        Address repAddress = new Address();
         repAddress.setAddressLine1("789 Rep Street");
         repAddress.setPostTown("Rep City");
         repAddress.setPostCode("RE1 1EP");
@@ -2703,7 +2704,7 @@ class DocumentHelperTest {
         resp2.setRespondentName("Test Respondent 2");
         resp2.setResponseContinue(YES);
         resp2.setResponseStruckOut(NO);
-        uk.gov.hmcts.et.common.model.ccd.Address address2 = new uk.gov.hmcts.et.common.model.ccd.Address();
+        Address address2 = new Address();
         address2.setAddressLine1("456 Test Avenue");
         address2.setPostTown("Test Town");
         address2.setPostCode("TE2 2ND");
@@ -2720,7 +2721,7 @@ class DocumentHelperTest {
         claimantRep.setNameOfRepresentative("Claimant Representative");
         claimantRep.setNameOfOrganisation("Claimant Rep Org");
         claimantRep.setRepresentativeReference("CLAIMANT-REP-REF");
-        uk.gov.hmcts.et.common.model.ccd.Address repAddress = new uk.gov.hmcts.et.common.model.ccd.Address();
+        Address repAddress = new Address();
         repAddress.setAddressLine1("123 Claimant Rep Street");
         repAddress.setPostTown("Claimant Rep City");
         repAddress.setPostCode("CR1 1EP");
@@ -2744,7 +2745,7 @@ class DocumentHelperTest {
         when(claimantInd.claimantFullName()).thenReturn("John Smith");
         caseData.setClaimantIndType(claimantInd);
 
-        uk.gov.hmcts.et.common.model.ccd.Address claimantAddress = new uk.gov.hmcts.et.common.model.ccd.Address();
+        Address claimantAddress = new Address();
         claimantAddress.setAddressLine1("456 Claimant Street");
         claimantAddress.setPostTown("Claimant City");
         claimantAddress.setPostCode("CL1 1NT");
@@ -2762,7 +2763,7 @@ class DocumentHelperTest {
         claimantRep.setNameOfRepresentative("Claimant Representative");
         claimantRep.setNameOfOrganisation("Claimant Rep Org");
         claimantRep.setRepresentativeReference("CLAIMANT-REP-REF");
-        uk.gov.hmcts.et.common.model.ccd.Address repAddress = new uk.gov.hmcts.et.common.model.ccd.Address();
+        Address repAddress = new Address();
         repAddress.setAddressLine1("123 Claimant Rep Street");
         repAddress.setPostTown("Claimant Rep City");
         repAddress.setPostCode("CR1 1EP");
@@ -2792,6 +2793,14 @@ class DocumentHelperTest {
         resp.setRespondentName(name);
         resp.setResponseContinue(YES);
         resp.setResponseStruckOut(NO);
+        
+        // Add default address to prevent NullPointerException
+        Address address = new Address();
+        address.setAddressLine1("Address Line 1");
+        address.setPostTown("Town");
+        address.setPostCode("PC1 1PC");
+        resp.setRespondentAddress(address);
+        
         respondent.setValue(resp);
         return respondent;
     }
@@ -2848,5 +2857,241 @@ class DocumentHelperTest {
         item.setId(UUID.randomUUID().toString());
         item.setValue(documentType);
         return item;
+    }
+
+    @Test
+    void testGetRespOthersName_withSingleRespondent() {
+        // Given: A case with only one respondent
+        CaseData caseData = new CaseData();
+        List<RespondentSumTypeItem> respondentCollection = new ArrayList<>();
+        respondentCollection.add(createRespondentSumTypeItem("1", "First Respondent"));
+        caseData.setRespondentCollection(respondentCollection);
+
+        // When: Building respondent data
+        StringBuilder result = DocumentHelper.getRespondentDataInternal(caseData, null);
+
+        // Then: resp_others should be empty (no other respondents after the first)
+        assertThat(result.toString()).contains("\"resp_others\":\"\"");
+    }
+
+    @Test
+    void testGetRespOthersName_withMultipleRespondents() {
+        // Given: A case with three respondents, all active
+        List<RespondentSumTypeItem> respondentCollection = new ArrayList<>();
+        respondentCollection.add(createRespondentSumTypeItem("1", "First Respondent"));
+        respondentCollection.add(createRespondentSumTypeItem("2", "Second Respondent"));
+        respondentCollection.add(createRespondentSumTypeItem("3", "Third Respondent"));
+        CaseData caseData = new CaseData();
+        caseData.setRespondentCollection(respondentCollection);
+
+        // When: Building respondent data
+        StringBuilder result = DocumentHelper.getRespondentDataInternal(caseData, null);
+
+        // Then: resp_others should contain the 2nd and 3rd respondents with correct numbering
+        assertThat(result.toString())
+                .contains("\"resp_others\":\"2. Second Respondent, 3. Third Respondent\"");
+    }
+
+    @Test
+    void testGetRespOthersName_withStruckOutRespondent() {
+        // Given: A case with three respondents where the second is struck out
+        List<RespondentSumTypeItem> respondentCollection = new ArrayList<>();
+        respondentCollection.add(createRespondentSumTypeItem("1", "First Respondent"));
+
+        RespondentSumTypeItem struckOutRespondent = createRespondentSumTypeItem("2", "Struck Out Respondent");
+        struckOutRespondent.getValue().setResponseStruckOut(YES);
+        respondentCollection.add(struckOutRespondent);
+
+        respondentCollection.add(createRespondentSumTypeItem("3", "Third Respondent"));
+        CaseData caseData = new CaseData();
+        caseData.setRespondentCollection(respondentCollection);
+
+        // When: Building respondent data
+        StringBuilder result = DocumentHelper.getRespondentDataInternal(caseData, null);
+
+        // Then: resp_others should only contain the third respondent (struck out is filtered)
+        assertThat(result.toString())
+                .contains("\"resp_others\":\"2. Third Respondent\"");
+        assertThat(result.toString()).doesNotContain("Struck Out Respondent");
+    }
+
+    @Test
+    void testGetRespOthersName_withResponseContinueNo() {
+        // Given: A case with three respondents where the second has ResponseContinue = NO
+        List<RespondentSumTypeItem> respondentCollection = new ArrayList<>();
+        respondentCollection.add(createRespondentSumTypeItem("1", "First Respondent"));
+
+        RespondentSumTypeItem discontinuedRespondent = createRespondentSumTypeItem("2", "Discontinued Respondent");
+        discontinuedRespondent.getValue().setResponseContinue(NO);
+        respondentCollection.add(discontinuedRespondent);
+
+        respondentCollection.add(createRespondentSumTypeItem("3", "Third Respondent"));
+        CaseData caseData = new CaseData();
+        caseData.setRespondentCollection(respondentCollection);
+
+        // When: Building respondent data
+        StringBuilder result = DocumentHelper.getRespondentDataInternal(caseData, null);
+
+        // Then: resp_others should only contain the third respondent (discontinued is filtered)
+        assertThat(result.toString())
+                .contains("\"resp_others\":\"2. Third Respondent\"");
+        assertThat(result.toString()).doesNotContain("Discontinued Respondent");
+    }
+
+    @Test
+    void testGetRespOthersName_withMultipleFilteredRespondents() {
+        // Given: A case with 5 respondents, some filtered out
+        List<RespondentSumTypeItem> respondentCollection = new ArrayList<>();
+        respondentCollection.add(createRespondentSumTypeItem("1", "First Respondent"));
+
+        RespondentSumTypeItem struckOut = createRespondentSumTypeItem("2", "Struck Out");
+        struckOut.getValue().setResponseStruckOut(YES);
+        respondentCollection.add(struckOut);
+
+        respondentCollection.add(createRespondentSumTypeItem("3", "Second Active"));
+
+        RespondentSumTypeItem discontinued = createRespondentSumTypeItem("4", "Discontinued");
+        discontinued.getValue().setResponseContinue(NO);
+        respondentCollection.add(discontinued);
+
+        respondentCollection.add(createRespondentSumTypeItem("5", "Third Active"));
+        CaseData caseData = new CaseData();
+        caseData.setRespondentCollection(respondentCollection);
+
+        // When: Building respondent data
+        StringBuilder result = DocumentHelper.getRespondentDataInternal(caseData, null);
+
+        // Then: resp_others should contain only the active respondents (2nd and 4th) with sequential numbering
+        assertThat(result.toString())
+                .contains("\"resp_others\":\"2. Second Active, 3. Third Active\"");
+        assertThat(result.toString()).doesNotContain("Struck Out");
+        assertThat(result.toString()).doesNotContain("Discontinued");
+    }
+
+    @Test
+    void testGetRespOthersName_excludesFirstRespondent() {
+        // Given: A case with multiple respondents
+        List<RespondentSumTypeItem> respondentCollection = new ArrayList<>();
+        respondentCollection.add(createRespondentSumTypeItem("1", "Antonio Vazquez"));
+        respondentCollection.add(createRespondentSumTypeItem("2", "Juan Garcia"));
+        respondentCollection.add(createRespondentSumTypeItem("3", "Mike Jordan"));
+        CaseData caseData = new CaseData();
+        caseData.setRespondentCollection(respondentCollection);
+
+        // When: Building respondent data
+        StringBuilder result = DocumentHelper.getRespondentDataInternal(caseData, null);
+
+        // Then: First respondent should appear in main "Respondent" field as "1. Antonio Vazquez,"
+        // And resp_others should have the remaining respondents
+        assertThat(result.toString()).contains("\"Respondent\":\"1. Antonio Vazquez,\"");
+        assertThat(result.toString()).contains("\"resp_others\":\"2. Juan Garcia, 3. Mike Jordan\"");
+    }
+
+    @Test
+    void testGetRespOthersName_withNullResponseStruckOut() {
+        // Given: A case with respondents where ResponseStruckOut is null (treated as not struck out)
+        List<RespondentSumTypeItem> respondentCollection = new ArrayList<>();
+        respondentCollection.add(createRespondentSumTypeItem("1", "First Respondent"));
+
+        RespondentSumType resp = new RespondentSumType();
+        resp.setRespondentName("Second Respondent");
+        resp.setResponseStruckOut(null); // Explicitly null
+        resp.setResponseContinue(YES);
+        RespondentSumTypeItem nullStruckOut = new RespondentSumTypeItem();
+        nullStruckOut.setValue(resp);
+        respondentCollection.add(nullStruckOut);
+
+        CaseData caseData = new CaseData();
+        caseData.setRespondentCollection(respondentCollection);
+
+        // When: Building respondent data
+        StringBuilder result = DocumentHelper.getRespondentDataInternal(caseData, null);
+
+        // Then: Respondent with null ResponseStruckOut should be included
+        assertThat(result.toString())
+                .contains("\"resp_others\":\"2. Second Respondent\"");
+    }
+
+    @Test
+    void testGetRespOthersName_withNullResponseContinue() {
+        // Given: A case with respondents where ResponseContinue is null (treated as should continue)
+        List<RespondentSumTypeItem> respondentCollection = new ArrayList<>();
+        respondentCollection.add(createRespondentSumTypeItem("1", "First Respondent"));
+
+        RespondentSumType resp = new RespondentSumType();
+        resp.setRespondentName("Second Respondent");
+        resp.setResponseStruckOut(NO);
+        resp.setResponseContinue(null); // Explicitly null
+        RespondentSumTypeItem nullContinue = new RespondentSumTypeItem();
+        nullContinue.setValue(resp);
+        respondentCollection.add(nullContinue);
+
+        CaseData caseData = new CaseData();
+        caseData.setRespondentCollection(respondentCollection);
+
+        // When: Building respondent data
+        StringBuilder result = DocumentHelper.getRespondentDataInternal(caseData, null);
+
+        // Then: Respondent with null ResponseContinue should be included
+        assertThat(result.toString())
+                .contains("\"resp_others\":\"2. Second Respondent\"");
+    }
+
+    @Test
+    void testGetRespAddress_withMultipleRespondents() {
+        // Given: A case with multiple respondents with addresses
+
+        Address addr1 = new Address();
+        addr1.setAddressLine1("11 Small Street");
+        addr1.setPostTown("Manchester");
+        addr1.setPostCode("M12 42R");
+        RespondentSumTypeItem resp1 = createRespondentSumTypeItem("1", "First Respondent");
+        resp1.getValue().setRespondentAddress(addr1);
+        List<RespondentSumTypeItem> respondentCollection = new ArrayList<>();
+        respondentCollection.add(resp1);
+
+        Address addr2 = new Address();
+        addr2.setAddressLine1("22 Large Street");
+        addr2.setPostTown("Liverpool");
+        addr2.setPostCode("L12 42R");
+        RespondentSumTypeItem resp2 = createRespondentSumTypeItem("2", "Second Respondent");
+        resp2.getValue().setRespondentAddress(addr2);
+        respondentCollection.add(resp2);
+
+        CaseData caseData = new CaseData();
+        caseData.setRespondentCollection(respondentCollection);
+
+        // When: Building respondent data
+        StringBuilder result = DocumentHelper.getRespondentDataInternal(caseData, null);
+
+        // Then: resp_address should contain numbered addresses
+        assertThat(result.toString())
+                .contains("\"resp_address\":\"")
+                .contains("1. ")
+                .contains("2. ");
+    }
+
+    @Test
+    void testGetRespAddress_withSingleRespondent() {
+        // Given: A case with a single respondent
+
+        Address addr1 = new Address();
+        addr1.setAddressLine1("11 Small Street");
+        addr1.setPostTown("Manchester");
+        addr1.setPostCode("M12 42R");
+        RespondentSumTypeItem resp1 = createRespondentSumTypeItem("1", "First Respondent");
+        resp1.getValue().setRespondentAddress(addr1);
+        List<RespondentSumTypeItem> respondentCollection = new ArrayList<>();
+        respondentCollection.add(resp1);
+
+        CaseData caseData = new CaseData();
+        caseData.setRespondentCollection(respondentCollection);
+
+        // When: Building respondent data
+        StringBuilder result = DocumentHelper.getRespondentDataInternal(caseData, null);
+
+        // Then: resp_address should NOT be numbered (single respondent)
+        String resultStr = result.toString();
+        assertThat(resultStr).contains("\"resp_address\":\"").doesNotContain("resp_address\":\"1. ");
     }
 }

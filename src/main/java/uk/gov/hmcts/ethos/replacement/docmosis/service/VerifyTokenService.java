@@ -11,7 +11,6 @@ import com.nimbusds.jose.jwk.SecretJWK;
 import com.nimbusds.jose.proc.JWSVerifierFactory;
 import com.nimbusds.jwt.SignedJWT;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.exceptions.VerifyTokenServiceException;
@@ -35,7 +34,7 @@ public class VerifyTokenService {
 
     public boolean verifyTokenSignature(String token) {
         try {
-            String tokenTocheck = StringUtils.replace(token, "Bearer ", "");
+            String tokenTocheck = token.replace("Bearer ", "");
             SignedJWT signedJwt = SignedJWT.parse(tokenTocheck);
 
             JWKSet jsonWebKeySet = loadJsonWebKeySet(idamJwkUrl);

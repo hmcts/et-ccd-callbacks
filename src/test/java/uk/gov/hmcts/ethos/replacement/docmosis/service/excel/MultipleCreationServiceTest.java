@@ -87,7 +87,7 @@ class MultipleCreationServiceTest {
         ethosCaseRefCollection = MultiplesHelper.getCaseIds(multipleDetails.getCaseData());
 
         //Adding lead to the case id collection
-        ethosCaseRefCollection.add(0, "21006/2020");
+        ethosCaseRefCollection.addFirst("21006/2020");
         userToken = "authString";
         when(featureToggleService.isMultiplesEnabled()).thenReturn(true);
     }

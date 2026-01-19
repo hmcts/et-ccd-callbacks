@@ -22,7 +22,7 @@ class NotificationHelperTest {
     private CaseDetails caseDetails;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         caseDetails = CaseDataBuilder.builder()
             .withEthosCaseReference("12345/6789")
             .withClaimantType("claimant@unrepresented.com")
@@ -92,7 +92,7 @@ class NotificationHelperTest {
     @Test
     void buildMapForRespondent_withUnrepresentedRespondent_shouldReturnNull() {
         List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
-        RespondentSumType unrepresentedRespondent = respondents.get(0).getValue();
+        RespondentSumType unrepresentedRespondent = respondents.getFirst().getValue();
         Map<String, String> actual = NotificationHelper.buildMapForRespondent(caseDetails, unrepresentedRespondent);
 
         assertThat(actual).containsEntry("emailAddress", "")
@@ -115,7 +115,7 @@ class NotificationHelperTest {
     void buildMapForRespondent_withRespondentRepresentativeWithNoEmail_shouldReturnRepresentativeDetails() {
         List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
         RespondentSumType representedRespondent = respondents.get(1).getValue();
-        caseData.getRepCollection().get(0).getValue().setRepresentativeEmailAddress(null);
+        caseData.getRepCollection().getFirst().getValue().setRepresentativeEmailAddress(null);
         Map<String, String> actual = NotificationHelper.buildMapForRespondent(caseDetails, representedRespondent);
 
         assertThat(actual).containsEntry("emailAddress", "")
@@ -126,7 +126,7 @@ class NotificationHelperTest {
     @Test
     void buildMapForRespondent_withUnrepresentedRespondentWithNoEmail_shouldReturnRepresentativeDetails() {
         List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
-        RespondentSumType unrepresentedRespondent = respondents.get(0).getValue();
+        RespondentSumType unrepresentedRespondent = respondents.getFirst().getValue();
         unrepresentedRespondent.setRespondentEmail(null);
         Map<String, String> actual = NotificationHelper.buildMapForRespondent(caseDetails, unrepresentedRespondent);
 
@@ -138,7 +138,7 @@ class NotificationHelperTest {
     @Test
     void shouldGetRespondentEmailAddressWhenUnrepresented() {
         List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
-        RespondentSumType unrepresentedRespondent = respondents.get(0).getValue();
+        RespondentSumType unrepresentedRespondent = respondents.getFirst().getValue();
         String result = NotificationHelper.getEmailAddressForUnrepresentedRespondent(caseData, unrepresentedRespondent);
 
         assertThat(result).isEqualTo("respondent@unrepresented.com");
@@ -147,7 +147,7 @@ class NotificationHelperTest {
     @Test
     void shouldReturnNullWhenRepresented() {
         List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
-        RespondentSumType representedRespondent = respondents.get(0).getValue();
+        RespondentSumType representedRespondent = respondents.getFirst().getValue();
         representedRespondent.setRespondentName("Respondent Represented");
         String result = NotificationHelper.getEmailAddressForUnrepresentedRespondent(caseData, representedRespondent);
 

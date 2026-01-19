@@ -294,16 +294,16 @@ class EventValidationServiceTest {
 
     @Test
     void shouldValidateResponseReceivedDateIsFutureDate() {
-        CaseData caseData = caseDetails1.getCaseData();
+        CaseData caseData1 = caseDetails1.getCaseData();
 
-        caseData.getRespondentCollection().getFirst().getValue()
+        caseData1.getRespondentCollection().getFirst().getValue()
                 .setResponseReceivedDate(PAST_RESPONSE_RECEIVED_DATE.toString());
-        caseData.getRespondentCollection().get(1).getValue()
+        caseData1.getRespondentCollection().get(1).getValue()
                 .setResponseReceivedDate(CURRENT_RESPONSE_RECEIVED_DATE.toString());
-        caseData.getRespondentCollection().get(2).getValue()
+        caseData1.getRespondentCollection().get(2).getValue()
                 .setResponseReceivedDate(FUTURE_RESPONSE_RECEIVED_DATE.toString());
 
-        List<String> errors = eventValidationService.validateET3ResponseFields(caseData);
+        List<String> errors = eventValidationService.validateET3ResponseFields(caseData1);
 
         assertEquals(2, errors.size());
         assertEquals(FUTURE_RESPONSE_RECEIVED_DATE_ERROR_MESSAGE
@@ -312,9 +312,54 @@ class EventValidationServiceTest {
 
     @Test
     void shouldValidateResponseReceivedDateForMissingDate() {
-        CaseData caseData = caseDetails3.getCaseData();
+        CaseData caseData3 = caseDetails3.getCaseData();
 
-        List<String> errors = eventValidationService.validateET3ResponseFields(caseData);
+        List<String> errors = eventValidationService.validateET3ResponseFields(caseData3);
+
+        assertEquals(0, errors.size());
+    }
+
+    @Test
+    void shouldValidateRespRepNamesWithEmptyRepCollection() {
+        CaseData caseData1 = caseDetails1.getCaseData();
+
+        List<String> errors = eventValidationService.validateRespRepNames(caseData1);
+
+        assertEquals(0, errors.size());
+    }
+
+    @Test
+    void shouldValidateRespRepNamesWithMismatch() {
+        CaseData caseData2 = caseDetails2.getCaseData();
+
+        List<String> errors = eventValidationService.validateRespRepNames(caseData2);
+
+        assertEquals(1, errors.size());
+    }
+
+    @Test
+    void shouldValidateRespRepNamesWithMatch() {
+        CaseData caseData3 = caseDetails3.getCaseData();
+
+        List<String> errors = eventValidationService.validateRespRepNames(caseData3);
+
+        assertEquals(0, errors.size());
+    }
+
+    @Test
+    void shouldValidateRespRepNamesWithNullRepCollection() {
+        CaseData caseData4 = caseDetails4.getCaseData();
+
+        List<String> errors = eventValidationService.validateRespRepNames(caseData4);
+
+        assertEquals(0, errors.size());
+    }
+
+    @Test
+    void shouldValidateRespRepNamesWithMatchResponseName() {
+        CaseData caseData5 = caseDetails5.getCaseData();
+
+        List<String> errors = eventValidationService.validateRespRepNames(caseData5);
 
         assertEquals(0, errors.size());
     }
@@ -400,9 +445,9 @@ class EventValidationServiceTest {
     void validateCurrentPositionCaseClosed(String state, boolean expected) {
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setState(state);
-        CaseData caseData = new CaseData();
-        caseData.setPositionType(CASE_CLOSED_POSITION);
-        caseDetails.setCaseData(caseData);
+        CaseData caseData1 = new CaseData();
+        caseData1.setPositionType(CASE_CLOSED_POSITION);
+        caseDetails.setCaseData(caseData1);
         boolean validated = eventValidationService.validateCurrentPosition(caseDetails);
         assertEquals(expected, validated);
     }
@@ -442,11 +487,11 @@ class EventValidationServiceTest {
     }
 
     private CaseData setCaseDataForDisposalDateTest(String disposalDate, String disposed, String outcome) {
-        CaseData caseData = new CaseData();
+        CaseData caseData1 = new CaseData();
         HearingTypeItem hearingTypeItem1 = setHearing(HEARING_DATE2, disposed);
         HearingTypeItem hearingTypeItem2 = setHearing(HEARING_DATE, disposed);
-        caseData.setReceiptDate("2019-01-01");
-        caseData.setHearingCollection(Arrays.asList(hearingTypeItem1, hearingTypeItem2));
+        caseData1.setReceiptDate("2019-01-01");
+        caseData1.setHearingCollection(Arrays.asList(hearingTypeItem1, hearingTypeItem2));
         JurCodesTypeItem jurCodesTypeItem = new JurCodesTypeItem();
         jurCodesTypeItem.setId(UUID.randomUUID().toString());
         JurCodesType jurCodesType = new JurCodesType();
@@ -454,8 +499,8 @@ class EventValidationServiceTest {
         jurCodesType.setDisposalDate(disposalDate);
         jurCodesType.setJudgmentOutcome(outcome);
         jurCodesTypeItem.setValue(jurCodesType);
-        caseData.setJurCodesCollection(Collections.singletonList(jurCodesTypeItem));
-        return caseData;
+        caseData1.setJurCodesCollection(Collections.singletonList(jurCodesTypeItem));
+        return caseData1;
     }
 
     @Test
@@ -745,9 +790,9 @@ class EventValidationServiceTest {
         judgementType.setDateJudgmentSent("2777-01-01");
         judgementTypeItem.setValue(judgementType);
 
-        CaseData caseData = new CaseData();
-        caseData.setJudgementCollection(List.of(judgementTypeItem));
-        List<String> errors = eventValidationService.validateJudgementDates(caseData);
+        CaseData caseData1 = new CaseData();
+        caseData1.setJudgementCollection(List.of(judgementTypeItem));
+        List<String> errors = eventValidationService.validateJudgementDates(caseData1);
         assertEquals("Date of Judgement Made can't be in future", errors.getFirst());
         assertEquals("Date of Judgement Sent can't be in future", errors.get(1));
     }
@@ -761,9 +806,9 @@ class EventValidationServiceTest {
         judgementType.setDateJudgmentSent("2021-12-01");
         judgementTypeItem.setValue(judgementType);
 
-        CaseData caseData = new CaseData();
-        caseData.setJudgementCollection(List.of(judgementTypeItem));
-        List<String> errors = eventValidationService.validateJudgementDates(caseData);
+        CaseData caseData1 = new CaseData();
+        caseData1.setJudgementCollection(List.of(judgementTypeItem));
+        List<String> errors = eventValidationService.validateJudgementDates(caseData1);
         assertEquals(0, errors.size());
     }
 

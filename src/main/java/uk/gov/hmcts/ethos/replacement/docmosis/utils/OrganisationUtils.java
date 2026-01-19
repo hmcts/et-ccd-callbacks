@@ -17,7 +17,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EXCEPTION_CASE_DATA_NOT_FOUND;
@@ -170,7 +169,7 @@ public final class OrganisationUtils {
                 caseData.getRespondentOrganisationPolicy7(),
                 caseData.getRespondentOrganisationPolicy8(),
                 caseData.getRespondentOrganisationPolicy9()
-        ).filter(Objects::nonNull).collect(Collectors.toList());
+        ).filter(Objects::nonNull).toList();
     }
 
     /**
@@ -248,7 +247,7 @@ public final class OrganisationUtils {
                     caseData.getNoticeOfChangeAnswers7(),
                     caseData.getNoticeOfChangeAnswers8(),
                     caseData.getNoticeOfChangeAnswers9()
-        ).filter(Objects::nonNull).collect(Collectors.toList());
+        ).filter(Objects::nonNull).toList();
     }
 
     /**

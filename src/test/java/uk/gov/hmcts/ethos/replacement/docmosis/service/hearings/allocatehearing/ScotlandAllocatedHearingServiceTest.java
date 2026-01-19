@@ -22,8 +22,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.selection.J
 
 import java.util.List;
 
-import static org.junit.Assert.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
@@ -109,7 +109,7 @@ class ScotlandAllocatedHearingServiceTest {
 
     @Test
     void testPopulateRoomsInvalidOffice() {
-        caseData.getHearingCollection().get(0).getValue().getHearingDateCollection().get(0).getValue()
+        caseData.getHearingCollection().getFirst().getValue().getHearingDateCollection().getFirst().getValue()
                 .setHearingVenueDayScotland(TribunalOffice.LEEDS.getOfficeName());
         assertThrows(IllegalArgumentException.class, () -> scotlandAllocateHearingService.populateRooms(caseData));
     }

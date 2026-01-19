@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing;
 
-import org.apache.commons.lang3.Strings;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -12,6 +11,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.selection.CourtWorkerSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.selection.JudgeSelectionService;
+
+import java.util.Objects;
 
 @Service
 public class ScotlandAllocateHearingService {
@@ -144,7 +145,7 @@ public class ScotlandAllocateHearingService {
     private boolean isVenueChanged(DynamicFixedListType currentVenue, DynamicFixedListType newVenue) {
         String currentVenueCode = currentVenue != null ? currentVenue.getSelectedCode() : null;
         String newVenueCode = newVenue != null ? newVenue.getSelectedCode() : null;
-        return !Strings.CI.equals(currentVenueCode, newVenueCode);
+        return !Objects.equals(currentVenueCode, newVenueCode);
     }
 
     private DynamicFixedListType getCurrentVenue(DateListedType listing) {

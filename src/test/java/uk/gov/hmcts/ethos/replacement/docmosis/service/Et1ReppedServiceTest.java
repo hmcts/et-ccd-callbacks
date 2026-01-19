@@ -275,9 +275,9 @@ class Et1ReppedServiceTest {
     void theSetClaimantRepresentativeValues() {
         // 1: Sets the representative contact change option to use MyHMCTS details and there is no
         // claimant representative exists.
-        CaseData caseData = caseDetails.getCaseData();
-        caseData.setRepresentativePhoneNumber(DUMMY_PHONE_NUMBER);
-        caseData.setRepresentativeContactChangeOption(REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS);
+        CaseData caseData1 = caseDetails.getCaseData();
+        caseData1.setRepresentativePhoneNumber(DUMMY_PHONE_NUMBER);
+        caseData1.setRepresentativeContactChangeOption(REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS);
         OrganisationAddress organisationAddress = OrganisationAddress.builder()
                 .addressLine1(TEST_ADDRESS_LINE_1)
                 .addressLine2(TEST_ADDRESS_LINE_2)
@@ -287,19 +287,19 @@ class Et1ReppedServiceTest {
                 .county(TEST_COUNTY)
                 .townCity(TEST_TOWN_CITY)
                 .build();
-        caseData.setRepresentativeAddress(AddressUtils.mapOrganisationAddressToAddress(organisationAddress));
+        caseData1.setRepresentativeAddress(AddressUtils.mapOrganisationAddressToAddress(organisationAddress));
         when(myHmctsService.getOrganisationAddress(DUMMY_USER_TOKEN)).thenReturn(organisationAddress);
-        et1ReppedService.setClaimantRepresentativeValues(DUMMY_USER_TOKEN, caseData);
-        assertRepresentativeAddress(organisationAddress, caseData);
+        et1ReppedService.setClaimantRepresentativeValues(DUMMY_USER_TOKEN, caseData1);
+        assertRepresentativeAddress(organisationAddress, caseData1);
         // 2: Sets the representative contact change option to use MyHMCTS details when claimant representative exists.
-        et1ReppedService.setClaimantRepresentativeValues(DUMMY_USER_TOKEN, caseData);
-        assertRepresentativeAddress(organisationAddress, caseData);
+        et1ReppedService.setClaimantRepresentativeValues(DUMMY_USER_TOKEN, caseData1);
+        assertRepresentativeAddress(organisationAddress, caseData1);
         // 3. Set caseData values to representative address when representative contact change option is not
         // REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS.
-        caseData.setRepresentativeContactChangeOption("Use other details");
-        caseData.getRepresentativeClaimantType().setRepresentativeAddress(null);
-        et1ReppedService.setClaimantRepresentativeValues(DUMMY_USER_TOKEN, caseData);
-        assertRepresentativeAddress(organisationAddress, caseData);
+        caseData1.setRepresentativeContactChangeOption("Use other details");
+        caseData1.getRepresentativeClaimantType().setRepresentativeAddress(null);
+        et1ReppedService.setClaimantRepresentativeValues(DUMMY_USER_TOKEN, caseData1);
+        assertRepresentativeAddress(organisationAddress, caseData1);
 
     }
 

@@ -20,7 +20,6 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericRuntimeException;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
@@ -29,7 +28,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresen
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.NocUtils;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -181,9 +179,9 @@ public class RespondentRepresentativeController {
                 callbackRequest.getCaseDetails().getCaseId());
         try {
             NocUtils.validateCallbackRequest(callbackRequest);
-            nocRespondentRepresentativeService.updateRespondentRepresentativesAccess(callbackRequest);
-        } catch (IOException e) {
-            throw new CcdInputOutputException("Failed to update respondent representatives accesses", e);
+            nocRespondentRepresentativeService.removeOldRepresentatives(callbackRequest, userToken);
+            nocRespondentRepresentativeService.addNewRepresentatives(callbackRequest);
+            // nocRespondentRepresentativeService.updateRespondentRepresentativesAccess(callbackRequest);
         } catch (GenericServiceException e) {
             throw new GenericRuntimeException(e);
         }

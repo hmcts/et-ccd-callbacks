@@ -21,6 +21,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.LoggingUtils;
 
 import java.io.IOException;
 import java.util.List;
@@ -223,7 +224,7 @@ public class CcdCaseAssignment {
                     requestEntity,
                     CaseAssignmentUserRolesResponse.class);
         } catch (RestClientResponseException exception) {
-            log.info(ERROR_FROM_CCD, exception.getMessage());
+            LoggingUtils.logCcdErrorMessageAtInfoLevel(exception);
             throw exception;
         }
 

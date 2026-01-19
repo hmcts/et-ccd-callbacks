@@ -1,6 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.utils.noc;
 
-import com.nimbusds.oauth2.sdk.util.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
@@ -360,6 +360,9 @@ public final class RespondentRepresentativeUtils {
         if (CollectionUtils.isEmpty(oldRepresentatives)) {
             return new ArrayList<>();
         }
+        if (CollectionUtils.isEmpty(newRepresentatives)) {
+            return oldRepresentatives;
+        }
         List<RepresentedTypeRItem> representativesToRemove = new ArrayList<>();
         for (RepresentedTypeRItem oldRepresentative : oldRepresentatives) {
             if (!RespondentRepresentativeUtils.isValidRepresentative(oldRepresentative)) {
@@ -417,6 +420,9 @@ public final class RespondentRepresentativeUtils {
             List<RepresentedTypeRItem> newRepresentatives, List<RepresentedTypeRItem> oldRepresentatives) {
         if (CollectionUtils.isEmpty(newRepresentatives)) {
             return new ArrayList<>();
+        }
+        if (CollectionUtils.isEmpty(oldRepresentatives)) {
+            return newRepresentatives;
         }
         List<RepresentedTypeRItem> newRepresentativesToReturn = new ArrayList<>();
         for (RepresentedTypeRItem newRepresentative : newRepresentatives) {

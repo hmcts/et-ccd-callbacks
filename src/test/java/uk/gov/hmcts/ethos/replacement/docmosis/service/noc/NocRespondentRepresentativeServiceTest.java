@@ -1,5 +1,9 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.noc;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
@@ -8,6 +12,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.ResponseEntity;
@@ -59,6 +64,7 @@ import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -98,7 +104,13 @@ class NocRespondentRepresentativeServiceTest {
     private static final String ORGANISATION_ID_ONE = "ORG1";
     private static final String ORGANISATION_ID_TWO = "ORG2";
     private static final String ORGANISATION_ID_THREE = "ORG3";
-    private static final String ORGANISATION_ID_FOUR = "ORG_NEW";
+    private static final String ORGANISATION_ID_FOUR = "ORG4";
+    private static final String ORGANISATION_ID_FIVE = "ORG5";
+    private static final String ORGANISATION_ID_SIX = "ORG6";
+    private static final String ORGANISATION_ID_SEVEN = "ORG7";
+    private static final String ORGANISATION_ID_EIGHT = "ORG8";
+    private static final String ORGANISATION_ID_NINE = "ORG9";
+    private static final String ORGANISATION_ID_TEN = "ORG10";
     private static final String ET_ORG_1 = "ET Org 1";
     private static final String ET_ORG_2 = "ET Org 2";
     private static final String ET_ORG_3 = "ET Org 3";
@@ -113,7 +125,8 @@ class NocRespondentRepresentativeServiceTest {
     private static final String RESPONDENT_ID_THREE = "106003";
     private static final String RESPONDENT_REP_NAME_NEW = "New Dawn Solicitors";
     private static final String RESPONDENT_REP_ID_NEW = "1111-5555-8888-1113";
-    private static final String AUTH_TOKEN = "someToken";
+    private static final String ADMIN_USER_TOKEN = "adminUserToken";
+    private static final String USER_TOKEN = "userToken";
     private static final String S2S_TOKEN = "someS2SToken";
     private static final String USER_ID_ONE = "891-456";
     private static final String USER_ID_TWO = "123-456";
@@ -124,13 +137,20 @@ class NocRespondentRepresentativeServiceTest {
     private static final String EXPECTED_EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND =
             "Organisation not found for representative Legal One.";
 
+    private static final String EXPECTED_ERROR_UNABLE_TO_NOTIFY_REPRESENTATION_REMOVAL =
+            "Unable to send notification for representative removal for case: 1234567890123456. Exception: Something "
+                    + "went wrong";
+
     private static final String EXPECTED_WARNING_REPRESENTATIVE_MISSING_EMAIL_ADDRESS =
             "Representative Legal One is missing an email address.\n";
     private static final String EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL =
             "Representative 'Legal One' could not be found using respondent@rep.email.com. "
                     + "Case access will not be defined for this representative.\n";
-    private static final String EXPECTED_ERROR_REPRESENTATIVE_ID_NOT_FOUND =
-            "Representative ID not found for case ID 1234567890123456.";
+
+    private static final String EXPECTED_ERROR_NO_ORGANISATION_POLICY_LEFT =
+            "There is no empty respondent organisation policy left, case id: 1234567890123456";
+    private static final String EXPECTED_ERROR_UNABLE_TO_SET_ROLE =
+            "Unable to set role [SOLICITORA]. Case Id: 1234567890123456. Error: Something went wrong";
 
     private static final String CASE_ID_1 = "1234567890123456";
     private static final String REPRESENTATIVE_EMAIL = "representative1@gmail.com";
@@ -142,6 +162,8 @@ class NocRespondentRepresentativeServiceTest {
     private static final int INTEGER_EIGHT = 8;
     private static final int INTEGER_NINE = 9;
     private static final int INTEGER_TEN = 10;
+
+    private ListAppender<ILoggingEvent> appender;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -171,6 +193,10 @@ class NocRespondentRepresentativeServiceTest {
 
     @BeforeEach
     void setUp() {
+        Logger logger = (Logger) LoggerFactory.getLogger(NocRespondentRepresentativeService.class);
+        appender = new ListAppender<>();
+        appender.start();
+        logger.addAppender(appender);
         nocRespondentHelper = new NocRespondentHelper();
         caseData = new CaseData();
         CaseConverter converter = new CaseConverter(objectMapper);
@@ -272,7 +298,7 @@ class NocRespondentRepresentativeServiceTest {
                 .approvalStatus(null)
                 .build());
         when(authTokenGenerator.generate()).thenReturn(S2S_TOKEN);
-        when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
+        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
     }
 
     @Test
@@ -370,15 +396,15 @@ class NocRespondentRepresentativeServiceTest {
     void updateRespondentRepresentativesAccess() {
         CCDRequest ccdRequest = getCCDRequest();
 
-        when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
-        when(ccdClient.startEventForCase(AUTH_TOKEN,
+        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
+        when(ccdClient.startEventForCase(ADMIN_USER_TOKEN,
                 ccdRequest.getCaseDetails().getCaseTypeId(),
                 ccdRequest.getCaseDetails().getJurisdiction(),
                 ccdRequest.getCaseDetails().getCaseId(),
                 EVENT_UPDATE_CASE_SUBMITTED)).thenReturn(ccdRequest);
-        when(nocCcdService.getCaseAssignments(AUTH_TOKEN, ccdRequest.getCaseDetails().getCaseId())).thenReturn(
+        when(nocCcdService.getCaseAssignments(ADMIN_USER_TOKEN, ccdRequest.getCaseDetails().getCaseId())).thenReturn(
                 mockCaseAssignmentData());
-        when(ccdClient.submitEventForCase(eq(AUTH_TOKEN),
+        when(ccdClient.submitEventForCase(eq(ADMIN_USER_TOKEN),
                 any(CaseData.class),
                 eq(ccdRequest.getCaseDetails().getCaseTypeId()),
                 eq(ccdRequest.getCaseDetails().getJurisdiction()),
@@ -386,7 +412,7 @@ class NocRespondentRepresentativeServiceTest {
                 eq(ccdRequest.getCaseDetails().getCaseId()))).thenReturn(null);
         nocRespondentRepresentativeService.updateRespondentRepresentativesAccess(getCallBackCallbackRequest());
 
-        verify(ccdClient, times(NumberUtils.INTEGER_TWO)).startEventForCase(AUTH_TOKEN,
+        verify(ccdClient, times(NumberUtils.INTEGER_TWO)).startEventForCase(ADMIN_USER_TOKEN,
                 ccdRequest.getCaseDetails().getCaseTypeId(),
                 ccdRequest.getCaseDetails().getJurisdiction(),
                 ccdRequest.getCaseDetails().getCaseId(),
@@ -399,7 +425,7 @@ class NocRespondentRepresentativeServiceTest {
                 any(ChangeOrganisationRequest.class));
 
         verify(ccdClient, times(NumberUtils.INTEGER_TWO))
-                .submitEventForCase(eq(AUTH_TOKEN),
+                .submitEventForCase(eq(ADMIN_USER_TOKEN),
                         any(CaseData.class),
                         eq(ccdRequest.getCaseDetails().getCaseTypeId()),
                         eq(ccdRequest.getCaseDetails().getJurisdiction()),
@@ -653,7 +679,7 @@ class NocRespondentRepresentativeServiceTest {
     void removeOrganisationRepresentativeAccess() {
         UserDetails mockUser = getMockUser();
         when(adminUserService.getUserDetails(anyString(), any())).thenReturn(mockUser);
-        when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
+        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
         when(nocCcdService.getCaseAssignments(any(), any())).thenReturn(
             mockCaseAssignmentData());
         doNothing().when(nocCcdService).revokeCaseAssignments(any(), any());
@@ -872,7 +898,8 @@ class NocRespondentRepresentativeServiceTest {
 
         // when organisation client returns empty response should return warning
         caseData.getRepCollection().getFirst().getValue().setRepresentativeEmailAddress(RESPONDENT_REP_EMAIL);
-        when(organisationClient.getAccountIdByEmail(AUTH_TOKEN, S2S_TOKEN, RESPONDENT_REP_EMAIL)).thenReturn(null);
+        when(organisationClient.getAccountIdByEmail(ADMIN_USER_TOKEN, S2S_TOKEN, RESPONDENT_REP_EMAIL))
+                .thenReturn(null);
         nocRespondentRepresentativeService.validateRepresentativeOrganisationAndEmail(caseData,
                 SUBMISSION_REFERENCE_ONE);
         assertThat(caseData.getNocWarning()).isNotEmpty();
@@ -880,21 +907,21 @@ class NocRespondentRepresentativeServiceTest {
 
         // when organisation client response body is empty should return warning
         ResponseEntity<AccountIdByEmailResponse> organisationClientResponse = ResponseEntity.ok(null);
-        when(organisationClient.getAccountIdByEmail(AUTH_TOKEN, S2S_TOKEN, RESPONDENT_REP_EMAIL))
+        when(organisationClient.getAccountIdByEmail(ADMIN_USER_TOKEN, S2S_TOKEN, RESPONDENT_REP_EMAIL))
                 .thenReturn(organisationClientResponse);
         assertThat(caseData.getNocWarning()).isNotEmpty();
         assertThat(caseData.getNocWarning()).isEqualTo(EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL);
         // when organisation client response body not has user identifier
         AccountIdByEmailResponse accountIdByEmailResponse = new AccountIdByEmailResponse();
         organisationClientResponse = ResponseEntity.ok(accountIdByEmailResponse);
-        when(organisationClient.getAccountIdByEmail(AUTH_TOKEN, S2S_TOKEN, RESPONDENT_REP_EMAIL))
+        when(organisationClient.getAccountIdByEmail(ADMIN_USER_TOKEN, S2S_TOKEN, RESPONDENT_REP_EMAIL))
                 .thenReturn(organisationClientResponse);
         assertThat(caseData.getNocWarning()).isNotEmpty();
         assertThat(caseData.getNocWarning()).isEqualTo(EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL);
         // when organisation client response body not has user identifier
         accountIdByEmailResponse.setUserIdentifier(RESPONDENT_REP_EMAIL);
         organisationClientResponse = ResponseEntity.ok(accountIdByEmailResponse);
-        when(organisationClient.getAccountIdByEmail(AUTH_TOKEN, S2S_TOKEN, RESPONDENT_REP_EMAIL))
+        when(organisationClient.getAccountIdByEmail(ADMIN_USER_TOKEN, S2S_TOKEN, RESPONDENT_REP_EMAIL))
                 .thenReturn(organisationClientResponse);
         nocRespondentRepresentativeService.validateRepresentativeOrganisationAndEmail(caseData,
                 SUBMISSION_REFERENCE_ONE);
@@ -903,126 +930,138 @@ class NocRespondentRepresentativeServiceTest {
 
     @Test
     void theRevokeOldRespondentRepresentativeAccessTest() {
-        // when old case details is empty should not do anything
+        // when callback request is empty should return empty list
         List<RepresentedTypeRItem> representativesToRemove = new ArrayList<>();
         assertThat(nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(null,
-                representativesToRemove)).isEmpty();
+                USER_TOKEN, representativesToRemove));
+        // when user token is empty should return empty list
+        CallbackRequest callbackRequest = CallbackRequest.builder().build();
+        assertThat(nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(callbackRequest,
+                StringUtils.EMPTY, representativesToRemove));
+        // when old case details is empty should return empty list
+        assertThat(nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(callbackRequest,
+                USER_TOKEN, representativesToRemove)).isEmpty();
         verifyNoInteractions(nocCcdService);
-        verifyNoInteractions(adminUserService);
-        // when old case details does not have case id should do nothing
+        verifyNoInteractions(nocService);
+        // when old case details does not have case id should return empty list
         CaseDetails tmpCaseDetails = new CaseDetails();
-        assertThat(nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(tmpCaseDetails,
-                representativesToRemove)).isEmpty();
+        callbackRequest.setCaseDetailsBefore(tmpCaseDetails);
+        assertThat(nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(callbackRequest,
+                USER_TOKEN, representativesToRemove)).isEmpty();
         verifyNoInteractions(nocCcdService);
-        verifyNoInteractions(adminUserService);
-        // when old case details does not have case data should do nothing
+        verifyNoInteractions(nocService);
+        // when old case details does not have case data should return empty list
         tmpCaseDetails.setCaseId(CASE_ID_1);
-        assertThat(nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(tmpCaseDetails,
-                representativesToRemove)).isEmpty();
+        assertThat(nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(callbackRequest,
+                USER_TOKEN, representativesToRemove)).isEmpty();
         verifyNoInteractions(nocCcdService);
-        verifyNoInteractions(adminUserService);
-        // when representatives to remove is empty should do nothing
+        verifyNoInteractions(nocService);
+        // when representatives to remove is empty should return empty list
         CaseData tmpCaseData = new CaseData();
         tmpCaseDetails.setCaseData(tmpCaseData);
-        assertThat(nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(tmpCaseDetails,
-                representativesToRemove)).isEmpty();
+        assertThat(nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(callbackRequest,
+                USER_TOKEN, representativesToRemove)).isEmpty();
         verifyNoInteractions(nocCcdService);
-        verifyNoInteractions(adminUserService);
-        // when nocCcdService.getCaseAssignments returns null should not revoke case user assignments
+        verifyNoInteractions(nocService);
+        // when nocCcdService.getCaseAssignments returns null should return empty list
         RepresentedTypeRItem tmpRepresentative = RepresentedTypeRItem.builder().id(REPRESENTATIVE_ID_ONE)
                 .value(RepresentedTypeR.builder().build()).build();
         representativesToRemove.add(tmpRepresentative);
-        when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
-        when(nocCcdService.getCaseAssignments(AUTH_TOKEN, CASE_ID_1)).thenReturn(null);
-        assertThat(nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(tmpCaseDetails,
-                representativesToRemove)).isEmpty();
-        verify(nocCcdService, times(NumberUtils.INTEGER_ONE)).getCaseAssignments(AUTH_TOKEN, CASE_ID_1);
-        verify(nocCcdService, times(NumberUtils.INTEGER_ZERO)).revokeCaseAssignments(eq(AUTH_TOKEN),
-                any(CaseUserAssignmentData.class));
+        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
+        when(nocCcdService.getCaseAssignments(ADMIN_USER_TOKEN, CASE_ID_1)).thenReturn(null);
+        assertThat(nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(callbackRequest,
+                USER_TOKEN, representativesToRemove)).isEmpty();
+        verify(nocCcdService, times(NumberUtils.INTEGER_ONE)).getCaseAssignments(ADMIN_USER_TOKEN, CASE_ID_1);
+        verify(nocService, times(NumberUtils.INTEGER_ZERO)).applyNocDecision(callbackRequest, tmpRepresentative
+                        .getValue().getRespondentOrganisation(), null, USER_TOKEN, ROLE_SOLICITORA);
         // when nocCcdService.getCaseAssignments returns case assignments data without any case user assignments should
         // not revoke case user assignments
         CaseUserAssignmentData caseUserAssignmentData = CaseUserAssignmentData.builder().build();
-        when(nocCcdService.getCaseAssignments(AUTH_TOKEN, CASE_ID_1)).thenReturn(caseUserAssignmentData);
-        assertThat(nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(tmpCaseDetails,
-                representativesToRemove)).isEmpty();
-        verify(nocCcdService, times(NumberUtils.INTEGER_TWO)).getCaseAssignments(AUTH_TOKEN, CASE_ID_1);
-        verify(nocCcdService, times(NumberUtils.INTEGER_ZERO)).revokeCaseAssignments(eq(AUTH_TOKEN),
-                any(CaseUserAssignmentData.class));
+        when(nocCcdService.getCaseAssignments(ADMIN_USER_TOKEN, CASE_ID_1)).thenReturn(caseUserAssignmentData);
+        assertThat(nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(callbackRequest,
+                USER_TOKEN, representativesToRemove)).isEmpty();
+        verify(nocCcdService, times(NumberUtils.INTEGER_TWO)).getCaseAssignments(ADMIN_USER_TOKEN, CASE_ID_1);
+        verify(nocService, times(NumberUtils.INTEGER_ZERO)).applyNocDecision(callbackRequest, tmpRepresentative
+                .getValue().getRespondentOrganisation(), null, USER_TOKEN, ROLE_SOLICITORA);
         // when there is no respondent representative role in case user assignments should not revoke case user
         // assignments
         caseUserAssignmentData.setCaseUserAssignments(List.of(CaseUserAssignment.builder().caseRole(
                 ROLE_CLAIMANT_SOLICITOR).build()));
-        when(nocCcdService.getCaseAssignments(AUTH_TOKEN, CASE_ID_1)).thenReturn(caseUserAssignmentData);
-        assertThat(nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(tmpCaseDetails,
-                representativesToRemove)).isEmpty();
-        verify(nocCcdService, times(INTEGER_THREE)).getCaseAssignments(AUTH_TOKEN, CASE_ID_1);
-        verify(nocCcdService, times(NumberUtils.INTEGER_ZERO)).revokeCaseAssignments(eq(AUTH_TOKEN),
-                any(CaseUserAssignmentData.class));
+        when(nocCcdService.getCaseAssignments(ADMIN_USER_TOKEN, CASE_ID_1)).thenReturn(caseUserAssignmentData);
+        assertThat(nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(callbackRequest,
+                USER_TOKEN, representativesToRemove)).isEmpty();
+        verify(nocCcdService, times(INTEGER_THREE)).getCaseAssignments(ADMIN_USER_TOKEN, CASE_ID_1);
+        verify(nocService, times(NumberUtils.INTEGER_ZERO)).applyNocDecision(callbackRequest, tmpRepresentative
+                .getValue().getRespondentOrganisation(), null, USER_TOKEN, ROLE_SOLICITORA);
         // when representative in representative list is not a valid representative should not revoke case user
         // assignments
         caseUserAssignmentData.getCaseUserAssignments().getFirst().setCaseRole(ROLE_SOLICITORA);
         tmpRepresentative.setId(StringUtils.EMPTY);
-        when(nocCcdService.getCaseAssignments(AUTH_TOKEN, CASE_ID_1)).thenReturn(caseUserAssignmentData);
-        assertThat(nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(tmpCaseDetails,
-                representativesToRemove)).isEmpty();
-        verify(nocCcdService, times(INTEGER_FOUR)).getCaseAssignments(AUTH_TOKEN, CASE_ID_1);
-        verify(nocCcdService, times(NumberUtils.INTEGER_ZERO)).revokeCaseAssignments(eq(AUTH_TOKEN),
-                any(CaseUserAssignmentData.class));
+        when(nocCcdService.getCaseAssignments(ADMIN_USER_TOKEN, CASE_ID_1)).thenReturn(caseUserAssignmentData);
+        assertThat(nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(callbackRequest,
+                USER_TOKEN, representativesToRemove)).isEmpty();
+        verify(nocCcdService, times(INTEGER_FOUR)).getCaseAssignments(ADMIN_USER_TOKEN, CASE_ID_1);
+        verify(nocService, times(NumberUtils.INTEGER_ZERO)).applyNocDecision(callbackRequest, tmpRepresentative
+                .getValue().getRespondentOrganisation(), null, USER_TOKEN, ROLE_SOLICITORA);
         // when representative is not able to removed should not revoke case user assignment
         tmpRepresentative.setId(REPRESENTATIVE_ID_ONE);
-        when(nocCcdService.getCaseAssignments(AUTH_TOKEN, CASE_ID_1)).thenReturn(caseUserAssignmentData);
-        assertThat(nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(tmpCaseDetails,
-                representativesToRemove)).isEmpty();
-        verify(nocCcdService, times(INTEGER_FIVE)).getCaseAssignments(AUTH_TOKEN, CASE_ID_1);
-        verify(nocCcdService, times(NumberUtils.INTEGER_ZERO)).revokeCaseAssignments(eq(AUTH_TOKEN),
-                any(CaseUserAssignmentData.class));
+        when(nocCcdService.getCaseAssignments(ADMIN_USER_TOKEN, CASE_ID_1)).thenReturn(caseUserAssignmentData);
+        assertThat(nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(callbackRequest,
+                USER_TOKEN, representativesToRemove)).isEmpty();
+        verify(nocCcdService, times(INTEGER_FIVE)).getCaseAssignments(ADMIN_USER_TOKEN, CASE_ID_1);
+        verify(nocService, times(NumberUtils.INTEGER_ZERO)).applyNocDecision(callbackRequest, tmpRepresentative
+                .getValue().getRespondentOrganisation(), null, USER_TOKEN, ROLE_SOLICITORA);
         // when respondent name not exists should not revoke case user assignment
         tmpRepresentative.getValue().setMyHmctsYesNo(YES);
         tmpRepresentative.getValue().setRespondentOrganisation(Organisation.builder()
                 .organisationID(ORGANISATION_ID_ONE).build());
         tmpRepresentative.getValue().setRepresentativeEmailAddress(REPRESENTATIVE_EMAIL);
-        assertThat(nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(tmpCaseDetails,
-                representativesToRemove)).isEmpty();
-        verify(nocCcdService, times(INTEGER_SIX)).getCaseAssignments(AUTH_TOKEN, CASE_ID_1);
-        verify(nocCcdService, times(NumberUtils.INTEGER_ZERO)).revokeCaseAssignments(eq(AUTH_TOKEN),
+        assertThat(nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(callbackRequest,
+                USER_TOKEN, representativesToRemove)).isEmpty();
+        verify(nocCcdService, times(INTEGER_SIX)).getCaseAssignments(ADMIN_USER_TOKEN, CASE_ID_1);
+        verify(nocCcdService, times(NumberUtils.INTEGER_ZERO)).revokeCaseAssignments(eq(ADMIN_USER_TOKEN),
                 any(CaseUserAssignmentData.class));
         // when respondent name is found but different from the name of the represented respondent should not revoke
         // case user assignment
         tmpCaseDetails.getCaseData().setNoticeOfChangeAnswers0(NoticeOfChangeAnswers.builder()
                 .respondentName(RESPONDENT_NAME_ONE).build());
         tmpRepresentative.getValue().setRespRepName(RESPONDENT_NAME_TWO);
-        assertThat(nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(tmpCaseDetails,
-                representativesToRemove)).isEmpty();
-        verify(nocCcdService, times(INTEGER_SEVEN)).getCaseAssignments(AUTH_TOKEN, CASE_ID_1);
-        verify(nocCcdService, times(NumberUtils.INTEGER_ZERO)).revokeCaseAssignments(eq(AUTH_TOKEN),
+        assertThat(nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(callbackRequest,
+                USER_TOKEN, representativesToRemove)).isEmpty();
+        verify(nocCcdService, times(INTEGER_SEVEN)).getCaseAssignments(ADMIN_USER_TOKEN, CASE_ID_1);
+        verify(nocCcdService, times(NumberUtils.INTEGER_ZERO)).revokeCaseAssignments(eq(ADMIN_USER_TOKEN),
                 any(CaseUserAssignmentData.class));
         // when case user assignment role is not blank but not equal to the role in representative should not revoke
         // case user assignment
         caseUserAssignmentData.getCaseUserAssignments().getFirst().setCaseRole(ROLE_SOLICITORA);
         tmpRepresentative.getValue().setRole(ROLE_SOLICITORB);
-        assertThat(nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(tmpCaseDetails,
-                representativesToRemove)).isEmpty();
-        verify(nocCcdService, times(INTEGER_EIGHT)).getCaseAssignments(AUTH_TOKEN, CASE_ID_1);
-        verify(nocCcdService, times(NumberUtils.INTEGER_ZERO)).revokeCaseAssignments(eq(AUTH_TOKEN),
+        assertThat(nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(callbackRequest,
+                USER_TOKEN, representativesToRemove)).isEmpty();
+        verify(nocCcdService, times(INTEGER_EIGHT)).getCaseAssignments(ADMIN_USER_TOKEN, CASE_ID_1);
+        verify(nocCcdService, times(NumberUtils.INTEGER_ZERO)).revokeCaseAssignments(eq(ADMIN_USER_TOKEN),
                 any(CaseUserAssignmentData.class));
         // when case user assignment role is equal to the role in representative should revoke case user assignment
         tmpRepresentative.getValue().setRole(ROLE_SOLICITORA);
-        doNothing().when(nocCcdService).revokeCaseAssignments(AUTH_TOKEN, caseUserAssignmentData);
-        assertThat(nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(tmpCaseDetails,
-                representativesToRemove)).hasSize(NumberUtils.INTEGER_ONE).isEqualTo(List.of(tmpRepresentative));
-        verify(nocCcdService, times(INTEGER_NINE)).getCaseAssignments(AUTH_TOKEN, CASE_ID_1);
-        verify(nocCcdService, times(NumberUtils.INTEGER_ONE)).revokeCaseAssignments(eq(AUTH_TOKEN),
-                any(CaseUserAssignmentData.class));
+        doNothing().when(nocService).applyNocDecision(any(CallbackRequest.class), any(Organisation.class), any(),
+                anyString(), eq(ROLE_SOLICITORA));
+        assertThat(nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(callbackRequest,
+                USER_TOKEN, representativesToRemove)).hasSize(NumberUtils.INTEGER_ONE)
+                .isEqualTo(List.of(tmpRepresentative));
+        verify(nocCcdService, times(INTEGER_NINE)).getCaseAssignments(ADMIN_USER_TOKEN, CASE_ID_1);
+        verify(nocService, times(NumberUtils.INTEGER_ONE)).applyNocDecision(any(CallbackRequest.class),
+                any(Organisation.class), any(), anyString(), eq(ROLE_SOLICITORA));
         // when respondent name is found and same with the name of the represented respondent should revoke case user
         // assignment
         tmpRepresentative.getValue().setRole(ROLE_SOLICITORB);
         tmpRepresentative.getValue().setRespRepName(RESPONDENT_NAME_ONE);
-        doNothing().when(nocCcdService).revokeCaseAssignments(AUTH_TOKEN, caseUserAssignmentData);
-        assertThat(nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(tmpCaseDetails,
-                representativesToRemove)).hasSize(NumberUtils.INTEGER_ONE).isEqualTo(List.of(tmpRepresentative));
-        verify(nocCcdService, times(INTEGER_TEN)).getCaseAssignments(AUTH_TOKEN, CASE_ID_1);
-        verify(nocCcdService, times(NumberUtils.INTEGER_TWO)).revokeCaseAssignments(eq(AUTH_TOKEN),
-                any(CaseUserAssignmentData.class));
+        doNothing().when(nocService).applyNocDecision(any(CallbackRequest.class), any(Organisation.class), any(),
+                anyString(), eq(ROLE_SOLICITORA));
+        assertThat(nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(callbackRequest,
+                USER_TOKEN, representativesToRemove)).hasSize(NumberUtils.INTEGER_ONE)
+                .isEqualTo(List.of(tmpRepresentative));
+        verify(nocCcdService, times(INTEGER_TEN)).getCaseAssignments(ADMIN_USER_TOKEN, CASE_ID_1);
+        verify(nocService, times(NumberUtils.INTEGER_TWO)).applyNocDecision(any(CallbackRequest.class),
+                any(Organisation.class), any(), anyString(), eq(ROLE_SOLICITORA));
     }
 
     @Test
@@ -1036,7 +1075,7 @@ class NocRespondentRepresentativeServiceTest {
         newCaseDetails.setCaseData(new CaseData());
         callbackRequest.setCaseDetails(newCaseDetails);
         // when representatives to remove is empty should not send any email
-        nocRespondentRepresentativeService.removeOldRepresentatives(callbackRequest);
+        nocRespondentRepresentativeService.removeOldRepresentatives(callbackRequest, USER_TOKEN);
         verify(nocNotificationService, times(NumberUtils.INTEGER_ZERO)).sendRemovedRepresentationEmails(
                 eq(oldCaseDetails), eq(newCaseDetails), anyList());
         // when representatives to remove is not empty should send email
@@ -1046,15 +1085,27 @@ class NocRespondentRepresentativeServiceTest {
         RepresentedTypeRItem representative2 = RepresentedTypeRItem.builder().id(REPRESENTATIVE_ID_TWO).value(
                 RepresentedTypeR.builder().respondentId(RESPONDENT_ID_TWO).build()).build();
         newCaseDetails.getCaseData().setRepCollection(List.of(representative2));
-        nocRespondentRepresentativeService.removeOldRepresentatives(callbackRequest);
+        doNothing().when(nocNotificationService).sendRemovedRepresentationEmails(any(CaseDetails.class),
+                any(CaseDetails.class), anyList());
+        nocRespondentRepresentativeService.removeOldRepresentatives(callbackRequest, USER_TOKEN);
         verify(nocNotificationService, times(NumberUtils.INTEGER_ONE)).sendRemovedRepresentationEmails(
                 any(CaseDetails.class), any(CaseDetails.class), anyList());
+        // when unable to send removed representation emails should log error.
+        doThrow(new RuntimeException(EXCEPTION_DUMMY_MESSAGE)).when(nocNotificationService)
+                .sendRemovedRepresentationEmails(any(CaseDetails.class), any(CaseDetails.class), anyList());
+        nocRespondentRepresentativeService.removeOldRepresentatives(callbackRequest, USER_TOKEN);
+        verify(nocNotificationService, times(NumberUtils.INTEGER_TWO)).sendRemovedRepresentationEmails(
+                any(CaseDetails.class), any(CaseDetails.class), anyList());
+        assertThat(appender.list)
+                .filteredOn(e -> e.getLevel() == Level.INFO)
+                .extracting(ILoggingEvent::getFormattedMessage)
+                .containsExactly(EXPECTED_ERROR_UNABLE_TO_NOTIFY_REPRESENTATION_REMOVAL);
         // when representatives revoked is not empty should remove organisation policies and noc answers
-        when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
+        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
         CaseUserAssignmentData caseUserAssignmentData = new CaseUserAssignmentData();
         caseUserAssignmentData.setCaseUserAssignments(List.of(CaseUserAssignment.builder().caseRole(ROLE_SOLICITORA)
                 .build()));
-        when(nocCcdService.getCaseAssignments(AUTH_TOKEN, CASE_ID_1)).thenReturn(caseUserAssignmentData);
+        when(nocCcdService.getCaseAssignments(ADMIN_USER_TOKEN, CASE_ID_1)).thenReturn(caseUserAssignmentData);
         oldCaseDetails.getCaseData().setNoticeOfChangeAnswers0(NoticeOfChangeAnswers.builder()
                 .respondentName(RESPONDENT_NAME_ONE).build());
         oldCaseDetails.getCaseData().setRespondentOrganisationPolicy0(OrganisationPolicy.builder().organisation(
@@ -1069,9 +1120,8 @@ class NocRespondentRepresentativeServiceTest {
         representative1.getValue().setRespondentOrganisation(Organisation.builder().organisationID(ORGANISATION_ID_ONE)
                 .build());
         representative1.getValue().setRepresentativeEmailAddress(REPRESENTATIVE_EMAIL);
-        doNothing().when(nocCcdService).revokeCaseAssignments(eq(AUTH_TOKEN), any(CaseUserAssignmentData.class));
-        nocRespondentRepresentativeService.removeOldRepresentatives(callbackRequest);
-        verify(nocNotificationService, times(NumberUtils.INTEGER_TWO)).sendRemovedRepresentationEmails(
+        nocRespondentRepresentativeService.removeOldRepresentatives(callbackRequest, USER_TOKEN);
+        verify(nocNotificationService, times(INTEGER_THREE)).sendRemovedRepresentationEmails(
                 any(CaseDetails.class), any(CaseDetails.class), anyList());
         assertThat(newCaseDetails.getCaseData().getRespondentOrganisationPolicy0()).isEqualTo(OrganisationPolicy
                 .builder().build());
@@ -1107,15 +1157,15 @@ class NocRespondentRepresentativeServiceTest {
         assertThat(assignableRepresentatives.getFirst()).isEqualTo(representative);
         // when there case user assignments is null should return assignable representatives
         caseDetails.setCaseId(CASE_ID_1);
-        when(adminUserService.getAdminUserToken()).thenReturn(AUTH_TOKEN);
-        when(nocCcdService.getCaseAssignments(AUTH_TOKEN, CASE_ID_1)).thenReturn(null);
+        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
+        when(nocCcdService.getCaseAssignments(ADMIN_USER_TOKEN, CASE_ID_1)).thenReturn(null);
         assignableRepresentatives = nocRespondentRepresentativeService.findRepresentativesToAssign(caseDetails,
                 representatives);
         assertThat(assignableRepresentatives).isNotEmpty().hasSize(NumberUtils.INTEGER_ONE);
         assertThat(assignableRepresentatives.getFirst()).isEqualTo(representative);
         // when case user assignments doesn't have any assignment should return assignable representatives
         CaseUserAssignmentData caseUserAssignmentData = new CaseUserAssignmentData();
-        when(nocCcdService.getCaseAssignments(AUTH_TOKEN, CASE_ID_1)).thenReturn(caseUserAssignmentData);
+        when(nocCcdService.getCaseAssignments(ADMIN_USER_TOKEN, CASE_ID_1)).thenReturn(caseUserAssignmentData);
         assignableRepresentatives = nocRespondentRepresentativeService.findRepresentativesToAssign(caseDetails,
                 representatives);
         assertThat(assignableRepresentatives).isNotEmpty().hasSize(NumberUtils.INTEGER_ONE);
@@ -1148,5 +1198,82 @@ class NocRespondentRepresentativeServiceTest {
         assignableRepresentatives = nocRespondentRepresentativeService.findRepresentativesToAssign(caseDetails,
                 representatives);
         assertThat(assignableRepresentatives).isEmpty();
+    }
+
+    private static void setAllRespondentOrganisationPolicy(CaseData caseData) {
+        caseData.setRespondentOrganisationPolicy0(OrganisationPolicy.builder().organisation(Organisation.builder()
+                .organisationID(ORGANISATION_ID_ONE).build()).build());
+        caseData.setRespondentOrganisationPolicy1(OrganisationPolicy.builder().organisation(Organisation.builder()
+                .organisationID(ORGANISATION_ID_TWO).build()).build());
+        caseData.setRespondentOrganisationPolicy2(OrganisationPolicy.builder().organisation(Organisation.builder()
+                .organisationID(ORGANISATION_ID_THREE).build()).build());
+        caseData.setRespondentOrganisationPolicy3(OrganisationPolicy.builder().organisation(Organisation.builder()
+                .organisationID(ORGANISATION_ID_FOUR).build()).build());
+        caseData.setRespondentOrganisationPolicy4(OrganisationPolicy.builder().organisation(Organisation.builder()
+                .organisationID(ORGANISATION_ID_FIVE).build()).build());
+        caseData.setRespondentOrganisationPolicy5(OrganisationPolicy.builder().organisation(Organisation.builder()
+                .organisationID(ORGANISATION_ID_SIX).build()).build());
+        caseData.setRespondentOrganisationPolicy6(OrganisationPolicy.builder().organisation(Organisation.builder()
+                .organisationID(ORGANISATION_ID_SEVEN).build()).build());
+        caseData.setRespondentOrganisationPolicy7(OrganisationPolicy.builder().organisation(Organisation.builder()
+                .organisationID(ORGANISATION_ID_EIGHT).build()).build());
+        caseData.setRespondentOrganisationPolicy8(OrganisationPolicy.builder().organisation(Organisation.builder()
+                .organisationID(ORGANISATION_ID_NINE).build()).build());
+        caseData.setRespondentOrganisationPolicy9(OrganisationPolicy.builder().organisation(Organisation.builder()
+                .organisationID(ORGANISATION_ID_TEN).build()).build());
+    }
+
+    @Test
+    @SneakyThrows
+    void theGrantRespondentRepresentativesAccess() {
+        // when case details is empty should do nothing
+        List<RepresentedTypeRItem> representatives = new ArrayList<>();
+        nocRespondentRepresentativeService.grantRespondentRepresentativesAccess(null, representatives);
+        verifyNoInteractions(nocCcdService);
+        // when case details not has case data should do nothing
+        CaseDetails caseDetails = new  CaseDetails();
+        nocRespondentRepresentativeService.grantRespondentRepresentativesAccess(caseDetails, representatives);
+        verifyNoInteractions(nocCcdService);
+        // when case details not has case id should do nothing
+        CaseData caseData = new  CaseData();
+        caseDetails.setCaseData(caseData);
+        nocRespondentRepresentativeService.grantRespondentRepresentativesAccess(caseDetails, representatives);
+        verifyNoInteractions(nocCcdService);
+        // when representative list is empty should do nothing
+        caseDetails.setCaseId(CASE_ID_1);
+        nocRespondentRepresentativeService.grantRespondentRepresentativesAccess(caseDetails, representatives);
+        verifyNoInteractions(nocCcdService);
+        // when representative in representative list is invalid should do nothing
+        representatives.add(RepresentedTypeRItem.builder().build());
+        nocRespondentRepresentativeService.grantRespondentRepresentativesAccess(caseDetails, representatives);
+        verifyNoInteractions(nocCcdService);
+        // when there is no respondent organisation policy left to add should log error
+        representatives.getFirst().setValue(RepresentedTypeR.builder().build());
+        representatives.getFirst().setId(REPRESENTATIVE_ID_ONE);
+        setAllRespondentOrganisationPolicy(caseDetails.getCaseData());
+        nocRespondentRepresentativeService.grantRespondentRepresentativesAccess(caseDetails, representatives);
+        assertThat(appender.list)
+                .filteredOn(e -> e.getLevel() == Level.ERROR)
+                .extracting(ILoggingEvent::getFormattedMessage)
+                .containsExactly(EXPECTED_ERROR_NO_ORGANISATION_POLICY_LEFT);
+        verifyNoInteractions(nocCcdService);
+        // when not able to grant representative access should log error
+        caseDetails.getCaseData().setRespondentOrganisationPolicy0(null);
+        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
+        doThrow(new GenericServiceException(EXCEPTION_DUMMY_MESSAGE)).when(nocService)
+                .grantRepresentativeAccess(eq(ADMIN_USER_TOKEN), any(), any(), any(), any());
+        nocRespondentRepresentativeService.grantRespondentRepresentativesAccess(caseDetails, representatives);
+        verify(nocService, times(NumberUtils.INTEGER_ONE)).grantRepresentativeAccess(eq(ADMIN_USER_TOKEN), any(),
+                any(), any(), any());
+        assertThat(appender.list)
+                .filteredOn(e -> e.getLevel() == Level.INFO)
+                .extracting(ILoggingEvent::getFormattedMessage)
+                .containsExactly(EXPECTED_ERROR_UNABLE_TO_SET_ROLE);
+        // when role successfully assigned should run setRepresentativesAccess without any error
+        doNothing().when(nocService).grantRepresentativeAccess(eq(ADMIN_USER_TOKEN), any(), any(), any(), any());
+        nocRespondentRepresentativeService.grantRespondentRepresentativesAccess(caseDetails, representatives);
+        verify(nocService, times(NumberUtils.INTEGER_TWO)).grantRepresentativeAccess(eq(ADMIN_USER_TOKEN), any(), any(),
+                any(), any());
+        assertThat(representatives.getFirst().getValue().getRole()).isEqualTo(ROLE_SOLICITORA);
     }
 }

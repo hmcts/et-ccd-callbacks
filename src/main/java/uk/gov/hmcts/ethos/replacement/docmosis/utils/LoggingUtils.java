@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import java.util.List;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.ERROR_EMAIL_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.EVENT_FIELDS_VALIDATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.STRING_EMPTY;
 
@@ -77,10 +78,48 @@ public final class LoggingUtils {
         log.info(EVENT_FIELDS_VALIDATION + "{}", errors);
     }
 
-    public static void logCCDException(Exception exception) {
+    /**
+     * Logs a CCD-related exception message at INFO level.
+     * <p>
+     * This method is intentionally non-intrusive: if the supplied exception is
+     * {@code null}, empty, or contains a blank message, no log entry is written.
+     * Only the exception message is logged, not the full stack trace.
+     *
+     * @param exception the exception originating from CCD whose message
+     *                  should be logged at INFO level
+     */
+    public static void logCcdErrorMessageAtInfoLevel(Exception exception) {
         if (ObjectUtils.isEmpty(exception) || StringUtils.isBlank(exception.getMessage())) {
             return;
         }
         log.info("Error form ccd - {}", exception.getMessage());
+    }
+
+    /**
+     * Logs a notification-related issue at INFO level with contextual details.
+     * <p>
+     * If the provided email address is blank, an informational log entry is written
+     * indicating that the email could not be found. The method then proceeds to log
+     * the main message if all required inputs are present.
+     * <p>
+     * The main log entry is written only if the exception, its message, and the
+     * logging text are all non-null and non-blank. Only the exception message is
+     * logged; the stack trace is not included.
+     *
+     * @param loggingText the SLF4J message template used for logging
+     * @param email the email address associated with the notification
+     * @param exception the exception whose message should be logged
+     */
+    public static void logNotificationIssue(String loggingText, String email, Exception exception) {
+        if (StringUtils.isBlank(email)) {
+            log.info(ERROR_EMAIL_NOT_FOUND, exception.getMessage());
+            return;
+        }
+        if (ObjectUtils.isEmpty(exception)
+                || StringUtils.isBlank(exception.getMessage())
+                || StringUtils.isBlank(loggingText)) {
+            return;
+        }
+        log.info(loggingText, email, exception.getMessage());
     }
 }

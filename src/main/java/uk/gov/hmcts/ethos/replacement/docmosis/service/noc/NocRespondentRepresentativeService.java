@@ -28,7 +28,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.UpdateRespondentRepresentativeRequ
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
-import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericRuntimeException;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
@@ -54,6 +53,9 @@ import static org.apache.commons.lang3.ObjectUtils.getIfNull;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_NO_ORGANISATION_POLICY_LEFT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_NOTIFY_REPRESENTATION_REMOVAL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_SET_ROLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EVENT_UPDATE_CASE_SUBMITTED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REQUEST;
@@ -99,7 +101,7 @@ public class NocRespondentRepresentativeService {
      *                        current case details used to determine which representatives
      *                        should be removed
      */
-    public void removeOldRepresentatives(CallbackRequest callbackRequest) {
+    public void removeOldRepresentatives(CallbackRequest callbackRequest, String userToken) {
         CaseDetails oldCaseDetails = callbackRequest.getCaseDetailsBefore();
         CaseDetails newCaseDetails = callbackRequest.getCaseDetails();
 
@@ -110,9 +112,14 @@ public class NocRespondentRepresentativeService {
         if (CollectionUtils.isEmpty(representativesToRemove)) {
             return;
         }
-        nocNotificationService.sendRemovedRepresentationEmails(oldCaseDetails, newCaseDetails, representativesToRemove);
-        List<RepresentedTypeRItem> revokedRepresentatives = revokeOldRespondentRepresentativeAccess(oldCaseDetails,
-                representativesToRemove);
+        try {
+            nocNotificationService.sendRemovedRepresentationEmails(oldCaseDetails, newCaseDetails,
+                    representativesToRemove);
+        } catch (Exception e) {
+            log.info(ERROR_UNABLE_TO_NOTIFY_REPRESENTATION_REMOVAL, oldCaseDetails.getCaseId(), e.getMessage());
+        }
+        List<RepresentedTypeRItem> revokedRepresentatives = revokeOldRespondentRepresentativeAccess(callbackRequest,
+                userToken, representativesToRemove);
         if (CollectionUtils.isEmpty(revokedRepresentatives)) {
             return;
         }
@@ -120,18 +127,43 @@ public class NocRespondentRepresentativeService {
     }
 
     /**
-     * Revokes any existing respondent representative case access for the given case.
+     * Revokes access for respondent representatives who are no longer applicable by
+     * applying a Notice of Change (NoC) decision for each matching representative.
      * <p>
-     * This method retrieves all current case user assignments, filters out assignments
-     * associated with respondent representatives, and revokes those assignments using
-     * the CCD NoC service. If the case has no user assignments, no action is taken.
-     * </p>
+     * The method inspects the case assignments from the previous case state and compares
+     * them against the provided list of representatives to remove. For each respondent
+     * representative whose access can be modified and whose role or respondent name matches,
+     * a NoC decision is applied to revoke their organisation access.
      *
-     * @param oldCaseDetails the CCD case identifier for which respondent representative access
-     *               should be revoked
+     * <p>
+     * If the callback request, user token, previous case details, or representative list
+     * is invalid or empty, no action is taken and an empty list is returned.
+     *
+     * <p>
+     * This method performs the following steps:
+     * <ul>
+     *     <li>Validates the callback request, user token, and previous case details</li>
+     *     <li>Retrieves current case user assignments from CCD</li>
+     *     <li>Identifies respondent representative roles eligible for revocation</li>
+     *     <li>Applies a NoC decision to revoke access for matching representatives</li>
+     * </ul>
+     *
+     * <p>
+     * Any NoC decisions are applied as side effects via {@code nocService.applyNocDecision}.
+     *
+     * @param callbackRequest the callback request containing the previous case details
+     * @param userToken the user authentication token used to apply NoC decisions
+     * @param representativesToRemove the list of respondent representatives whose access
+     *                                  should be considered for revocation
+     * @return a list of {@link RepresentedTypeRItem} instances for which access was successfully
+     *         revoked; returns an empty list if no revocations occur or if input validation fails
      */
     public List<RepresentedTypeRItem> revokeOldRespondentRepresentativeAccess(
-            CaseDetails oldCaseDetails, List<RepresentedTypeRItem> representativesToRemove) {
+            CallbackRequest callbackRequest, String userToken, List<RepresentedTypeRItem> representativesToRemove) {
+        if (ObjectUtils.isEmpty(callbackRequest) || StringUtils.isBlank(userToken)) {
+            return new  ArrayList<>();
+        }
+        CaseDetails oldCaseDetails = callbackRequest.getCaseDetailsBefore();
         if (ObjectUtils.isEmpty(oldCaseDetails)
                 || StringUtils.isEmpty(oldCaseDetails.getCaseId())
                 || ObjectUtils.isEmpty(oldCaseDetails.getCaseData())
@@ -144,8 +176,6 @@ public class NocRespondentRepresentativeService {
                 || CollectionUtils.isEmpty(caseUserAssignments.getCaseUserAssignments())) {
             return new ArrayList<>();
         }
-        // to revoke assignments
-        List<CaseUserAssignment> assignmentsToRevoke = new ArrayList<>();
         // to get list of representatives whose assignment is revoked
         List<RepresentedTypeRItem> representativesToRevoke = new ArrayList<>();
         for (CaseUserAssignment caseUserAssignment : caseUserAssignments.getCaseUserAssignments()) {
@@ -163,14 +193,11 @@ public class NocRespondentRepresentativeService {
                         && respondentName.equals(representative.getValue().getRespRepName())
                         || StringUtils.isNotBlank(caseUserAssignment.getCaseRole())
                         && caseUserAssignment.getCaseRole().equals(representative.getValue().getRole()))) {
-                    assignmentsToRevoke.add(caseUserAssignment);
                     representativesToRevoke.add(representative);
+                    nocService.applyNocDecision(callbackRequest, representative.getValue().getRespondentOrganisation(),
+                            null, userToken, caseUserAssignment.getCaseRole());
                 }
             }
-        }
-        if (CollectionUtils.isNotEmpty(assignmentsToRevoke)) {
-            nocCcdService.revokeCaseAssignments(adminUserService.getAdminUserToken(),
-                    CaseUserAssignmentData.builder().caseUserAssignments(assignmentsToRevoke).build());
         }
         return representativesToRevoke;
     }
@@ -188,20 +215,11 @@ public class NocRespondentRepresentativeService {
         CaseDetails newCaseDetails = callbackRequest.getCaseDetails();
         // finds both new and organisation or e-mail changed representatives
         List<RepresentedTypeRItem> newOrUpdatedRepresentatives = RespondentRepresentativeUtils
-                .findNewOrUpdatedRepresentatives(
-                oldCaseDetails.getCaseData().getRepCollection(), newCaseDetails.getCaseData().getRepCollection());
+                .findNewOrUpdatedRepresentatives(newCaseDetails.getCaseData().getRepCollection(),
+                        oldCaseDetails.getCaseData().getRepCollection());
         List<RepresentedTypeRItem> representativesToAssign = findRepresentativesToAssign(newCaseDetails,
                 newOrUpdatedRepresentatives);
-        for (RepresentedTypeRItem representative : representativesToAssign) {
-            String role = RoleUtils.getNextAvailableRespondentSolicitorRoleLabel(newCaseDetails.getCaseData());
-            try {
-                nocService.grantRepresentativeAccess(adminUserService.getAdminUserToken(),
-                        representative.getValue().getRepresentativeEmailAddress(), newCaseDetails.getCaseId(),
-                        representative.getValue().getRespondentOrganisation(), role);
-            } catch (GenericServiceException gse) {
-                throw new GenericRuntimeException(gse);
-            }
-        }
+        grantRespondentRepresentativesAccess(newCaseDetails, representativesToAssign);
     }
 
     /**
@@ -257,6 +275,61 @@ public class NocRespondentRepresentativeService {
         }
         assignableRepresentatives.removeAll(representativesToRemove);
         return assignableRepresentatives;
+    }
+
+    /**
+     * Grants case access to valid respondent representatives by assigning them the next available
+     * respondent solicitor role via Notice of Change (NoC).
+     * <p>
+     * The method iterates over the provided list of representatives and, for each valid representative:
+     * <ul>
+     *     <li>Determines the next available respondent solicitor role on the case</li>
+     *     <li>Grants access to the case using the representative's email and organisation details</li>
+     * </ul>
+     * </p>
+     * <p>
+     * Processing will stop if no respondent solicitor roles are available on the case.
+     * Invalid representatives are skipped. Any failures when granting access are logged and do not
+     * prevent processing of subsequent representatives.
+     * </p>
+     * <p>
+     * The method performs no action if:
+     * <ul>
+     *     <li>{@code caseDetails} or its case data is {@code null}</li>
+     *     <li>The case ID is blank</li>
+     *     <li>The representatives list is {@code null} or empty</li>
+     * </ul>
+     * </p>
+     *
+     * @param caseDetails     the case details containing the case ID and case data
+     * @param representatives a list of respondent representatives to be granted access
+     */
+    public void grantRespondentRepresentativesAccess(CaseDetails caseDetails,
+                                                     List<RepresentedTypeRItem> representatives) {
+        if (ObjectUtils.isEmpty(caseDetails)
+                || ObjectUtils.isEmpty(caseDetails.getCaseData())
+                || StringUtils.isBlank(caseDetails.getCaseId())
+                || CollectionUtils.isEmpty(representatives)) {
+            return;
+        }
+        for (RepresentedTypeRItem representative : representatives) {
+            if (!RespondentRepresentativeUtils.isValidRepresentative(representative)) {
+                continue;
+            }
+            String role = RoleUtils.getNextAvailableRespondentSolicitorRoleLabel(caseDetails.getCaseData());
+            if (StringUtils.isBlank(role)) {
+                log.error(ERROR_NO_ORGANISATION_POLICY_LEFT, caseDetails.getCaseId());
+                break;
+            }
+            try {
+                nocService.grantRepresentativeAccess(adminUserService.getAdminUserToken(),
+                        representative.getValue().getRepresentativeEmailAddress(), caseDetails.getCaseId(),
+                        representative.getValue().getRespondentOrganisation(), role);
+                representative.getValue().setRole(role);
+            } catch (GenericServiceException gse) {
+                log.info(ERROR_UNABLE_TO_SET_ROLE, role, caseDetails.getCaseId(), gse.getMessage());
+            }
+        }
     }
 
     /**

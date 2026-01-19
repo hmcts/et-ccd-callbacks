@@ -50,7 +50,7 @@ public class NocCcdService {
         try {
             return ccdClient.retrieveCaseAssignments(userToken, caseId);
         } catch (IOException exception) {
-            LoggingUtils.logCCDException(exception);
+            LoggingUtils.logCcdErrorMessageAtInfoLevel(exception);
             throw new CcdInputOutputException("Failed to retrieve case assignments", exception);
         }
     }
@@ -70,7 +70,7 @@ public class NocCcdService {
         try {
             ccdClient.revokeCaseAssignments(userToken, caseUserAssignmentData);
         } catch (IOException exception) {
-            LoggingUtils.logCCDException(exception);
+            LoggingUtils.logCcdErrorMessageAtInfoLevel(exception);
             throw new CcdInputOutputException("Failed to revoke case assignments", exception);
         }
     }

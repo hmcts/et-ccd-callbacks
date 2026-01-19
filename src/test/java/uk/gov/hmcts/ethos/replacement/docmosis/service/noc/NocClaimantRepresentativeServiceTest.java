@@ -7,6 +7,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
@@ -22,9 +24,10 @@ import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocClaimantHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.NocUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
@@ -36,6 +39,7 @@ import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -74,8 +78,6 @@ class NocClaimantRepresentativeServiceTest {
     @Mock
     private CcdClient ccdClient;
     @Mock
-    private NocClaimantHelper nocClaimantHelper;
-    @Mock
     private NocService nocService;
 
     private CaseData caseData;
@@ -86,6 +88,7 @@ class NocClaimantRepresentativeServiceTest {
     private NocClaimantRepresentativeService nocClaimantRepresentativeService;
 
     private AutoCloseable closeable;
+    private MockedStatic<NocUtils> mockedNocUtils;
 
     @BeforeEach
     void setUp() {
@@ -98,20 +101,23 @@ class NocClaimantRepresentativeServiceTest {
                 nocNotificationService,
                 ccdCaseAssignment,
                 ccdClient,
-                nocService,
-                nocClaimantHelper
+                nocService
         );
         when(adminUserService.getAdminUserToken()).thenReturn(DUMMY_ADMIN_USER_TOKEN);
         when(authTokenGenerator.generate()).thenReturn(S2S_TOKEN);
         organisationsResponse = OrganisationsResponse.builder().organisationIdentifier(ORGANISATION_ID_NEW).build();
         caseData = createCaseData();
         caseDetails = createCaseDetailsWithCaseData(caseData);
+        mockedNocUtils = mockStatic(NocUtils.class, Mockito.CALLS_REAL_METHODS);
     }
 
     @AfterEach
     @SneakyThrows
     void tearDown() {
         closeable.close();
+        if (!mockedNocUtils.isClosed()) {
+            mockedNocUtils.close();
+        }
     }
 
     @Test
@@ -162,7 +168,8 @@ class NocClaimantRepresentativeServiceTest {
         when(ccdCaseAssignment.applyNocAsAdmin(any())).thenReturn(CCDCallbackResponse.builder()
                 .data(caseData)
                 .build());
-        when(nocClaimantHelper.createChangeRequest(any(), any())).thenReturn(createChangeOrganisationRequest());
+        when(NocUtils.buildApprovedChangeOrganisationRequest(any(), any(), any()))
+                .thenReturn(createChangeOrganisationRequest());
 
         nocClaimantRepresentativeService.updateClaimantRepAccess(getCallBackCallbackRequest());
 
@@ -188,7 +195,7 @@ class NocClaimantRepresentativeServiceTest {
         when(nocCcdService.startEventForUpdateRepresentation(any(), any(), any(), any())).thenReturn(ccdRequest);
         when(ccdCaseAssignment.applyNocAsAdmin(any())).thenReturn(CCDCallbackResponse.builder()
                 .data(getCaseDataAfter()).build());
-        when(nocClaimantHelper.createChangeRequest(any(), any())).thenReturn(changeRequest);
+        when(NocUtils.buildApprovedChangeOrganisationRequest(any(), any(), any())).thenReturn(changeRequest);
         doReturn(ResponseEntity.ok(userResponse)).when(organisationClient).getAccountIdByEmail(
                 DUMMY_ADMIN_USER_TOKEN, S2S_TOKEN, REPRESENTATIVE_EMAIL_1);
         doReturn(ResponseEntity.ok(organisationsResponse)).when(organisationClient)
@@ -222,13 +229,13 @@ class NocClaimantRepresentativeServiceTest {
         before.getRepresentativeClaimantType().setMyHmctsOrganisation(oldOrg);
 
         ChangeOrganisationRequest expected = ChangeOrganisationRequest.builder().build();
-        when(nocClaimantHelper.createChangeRequest(newOrg, oldOrg)).thenReturn(expected);
+        when(NocUtils.buildApprovedChangeOrganisationRequest(newOrg, oldOrg,
+                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())).thenReturn(expected);
 
         ChangeOrganisationRequest result =
                 nocClaimantRepresentativeService.identifyRepresentationChanges(after, before);
 
         assertThat(result).isSameAs(expected);
-        verify(nocClaimantHelper).createChangeRequest(newOrg, oldOrg);
     }
 
     @Test
@@ -242,13 +249,13 @@ class NocClaimantRepresentativeServiceTest {
         before.getRepresentativeClaimantType().setMyHmctsOrganisation(org);
 
         ChangeOrganisationRequest expected = ChangeOrganisationRequest.builder().build();
-        when(nocClaimantHelper.createChangeRequest(org, null)).thenReturn(expected);
+        when(NocUtils.buildApprovedChangeOrganisationRequest(org, null,
+                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())).thenReturn(expected);
 
         ChangeOrganisationRequest result =
                 nocClaimantRepresentativeService.identifyRepresentationChanges(after, before);
 
         assertThat(result).isSameAs(expected);
-        verify(nocClaimantHelper).createChangeRequest(org, null);
     }
 
     @Test
@@ -257,12 +264,9 @@ class NocClaimantRepresentativeServiceTest {
         CaseData before = new CaseData();
 
         ChangeOrganisationRequest expected = ChangeOrganisationRequest.builder().build();
-        when(nocClaimantHelper.createChangeRequest(null, null)).thenReturn(expected);
-
         ChangeOrganisationRequest result =
                 nocClaimantRepresentativeService.identifyRepresentationChanges(after, before);
 
-        assertThat(result).isSameAs(expected);
-        verify(nocClaimantHelper).createChangeRequest(null, null);
+        assertThat(result).isEqualTo(expected);
     }
 }

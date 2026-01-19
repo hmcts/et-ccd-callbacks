@@ -298,11 +298,16 @@ final class RespondentRepresentativeUtilsTest {
     void theFindRepresentativesToRemove() {
         List<RepresentedTypeRItem> oldRepresentatives = new ArrayList<>();
         List<RepresentedTypeRItem> newRepresentatives = new ArrayList<>();
-        // when old respondent collection is empty should return empty list
+        // when old representatives is empty should return empty list
         assertThat(RespondentRepresentativeUtils.findRepresentativesToRemove(
                 oldRepresentatives, newRepresentatives)).isEmpty();
-        // when old representatives list has invalid representative should return empty list
+        // when new representatives is empty should return old representative list list
         oldRepresentatives.add(RepresentedTypeRItem.builder().build());
+        assertThat(RespondentRepresentativeUtils.findRepresentativesToRemove(
+                oldRepresentatives, newRepresentatives)).isNotEmpty().hasSize(NumberUtils.INTEGER_ONE)
+                .isEqualTo(oldRepresentatives);
+        // when old representatives list has invalid representative should return empty list
+        newRepresentatives.add(RepresentedTypeRItem.builder().build());
         assertThat(RespondentRepresentativeUtils.findRepresentativesToRemove(
                 oldRepresentatives, newRepresentatives)).isEmpty();
         // when old representatives list has valid representative but there is no new representative should return
@@ -315,9 +320,8 @@ final class RespondentRepresentativeUtilsTest {
                 .findRepresentativesToRemove(oldRepresentatives, newRepresentatives);
         assertThat(representativesToRemove).isNotEmpty().hasSize(NumberUtils.INTEGER_ONE);
         assertThat(representativesToRemove.getFirst()).isEqualTo(validOldRepresentative);
-        assertThat(newRepresentatives).hasSize(NumberUtils.INTEGER_ZERO);
+        assertThat(newRepresentatives).hasSize(NumberUtils.INTEGER_ONE);
         // when new representative list has invalid representative should return list of valid old representatives
-        newRepresentatives.add(RepresentedTypeRItem.builder().build());
         representativesToRemove = RespondentRepresentativeUtils.findRepresentativesToRemove(
                 oldRepresentatives, newRepresentatives);
         assertThat(representativesToRemove).isNotEmpty().hasSize(NumberUtils.INTEGER_ONE);
@@ -361,10 +365,15 @@ final class RespondentRepresentativeUtilsTest {
 
     @Test
     void theFindNewOrUpdatedRepresentatives() {
+        List<RepresentedTypeRItem> newRepresentatives = new ArrayList<>();
+        // when old representatives list is empty should return new representative list
+        newRepresentatives.add(RepresentedTypeRItem.builder().id(REPRESENTATIVE_ID_2).build());
+        assertThat(RespondentRepresentativeUtils.findNewOrUpdatedRepresentatives(newRepresentatives,
+                null)).isNotEmpty().hasSize(NumberUtils.INTEGER_ONE).isEqualTo(newRepresentatives);
+        newRepresentatives.clear();
+        // when new representatives list is empty should return empty list
         RepresentedTypeRItem oldRepresentative = RepresentedTypeRItem.builder().build();
         List<RepresentedTypeRItem> oldRepresentatives = List.of(oldRepresentative);
-        List<RepresentedTypeRItem> newRepresentatives = new ArrayList<>();
-        // when new representatives list is empty should return empty list
         assertThat(RespondentRepresentativeUtils.findNewOrUpdatedRepresentatives(newRepresentatives,
                 oldRepresentatives)).isEmpty();
         // when new representatives list has invalid representative should return empty list

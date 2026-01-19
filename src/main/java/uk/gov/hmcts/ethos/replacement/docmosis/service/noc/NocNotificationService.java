@@ -28,6 +28,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseAccessService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.LoggingUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.RespondentRepresentativeUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -35,6 +36,10 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import java.util.List;
 import java.util.Map;
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.ERROR_FAILED_TO_SEND_EMAIL_CLAIMANT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.ERROR_FAILED_TO_SEND_EMAIL_ORGANISATION_ADMIN;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.ERROR_FAILED_TO_SEND_EMAIL_RESPONDENT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.ERROR_FAILED_TO_SEND_EMAIL_TRIBUNAL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_MISSING_EMAIL_ADDRESS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantNonSystemUser;
@@ -92,8 +97,13 @@ public class NocNotificationService {
             } else {
                 Map<String, String> personalisation = buildNoCPersonalisation(oldCaseDetails,
                         respondent.getValue().getRespondentName());
-                emailService.sendEmail(respondentTemplateId, respondent.getValue().getRespondentEmail(),
-                        personalisation);
+                try {
+                    emailService.sendEmail(respondentTemplateId, respondent.getValue().getRespondentEmail(),
+                            personalisation);
+                } catch (Exception e) {
+                    LoggingUtils.logNotificationIssue(ERROR_FAILED_TO_SEND_EMAIL_RESPONDENT,
+                            respondent.getValue().getRespondentEmail(), e);
+                }
             }
             if (ObjectUtils.isNotEmpty(revokedRepresentative.getValue().getRespondentOrganisation())
                     && StringUtils.isNotBlank(revokedRepresentative.getValue().getRespondentOrganisation()
@@ -220,7 +230,11 @@ public class NocNotificationService {
         }
 
         Map<String, String> personalisation = NocNotificationHelper.buildTribunalPersonalisation(caseDataPrevious);
-        emailService.sendEmail(tribunalTemplateId, tribunalEmail, personalisation);
+        try {
+            emailService.sendEmail(tribunalTemplateId, tribunalEmail, personalisation);
+        } catch (Exception e) {
+            LoggingUtils.logNotificationIssue(ERROR_FAILED_TO_SEND_EMAIL_TRIBUNAL, tribunalEmail, e);
+        }
     }
 
     private void sendClaimantEmail(CaseDetails caseDetailsPrevious, CaseDetails caseDetailsNew, String partyName) {
@@ -242,7 +256,11 @@ public class NocNotificationService {
                 : emailService.getCitizenCaseLink(caseDetailsNew.getCaseId());
 
         var personalisation = buildPersonalisationWithPartyName(caseDetailsPrevious, partyName, citUILink);
-        emailService.sendEmail(claimantTemplateId, email, personalisation);
+        try {
+            emailService.sendEmail(claimantTemplateId, email, personalisation);
+        } catch (Exception e) {
+            LoggingUtils.logNotificationIssue(ERROR_FAILED_TO_SEND_EMAIL_CLAIMANT, email, e);
+        }
     }
 
     private void sendEmailToOldOrgAdmin(String orgId, CaseData caseDataPrevious) {
@@ -265,10 +283,14 @@ public class NocNotificationService {
         }
 
         Map<String, String> personalisation = buildPreviousRespondentSolicitorPersonalisation(caseDataPrevious);
-        emailService.sendEmail(
-                previousRespondentSolicitorTemplateId,
-                resBody.getSuperUser().getEmail(),
-                personalisation);
+        try {
+            emailService.sendEmail(
+                    previousRespondentSolicitorTemplateId,
+                    resBody.getSuperUser().getEmail(),
+                    personalisation);
+        } catch (Exception e) {
+            LoggingUtils.logNotificationIssue(ERROR_FAILED_TO_SEND_EMAIL_ORGANISATION_ADMIN, orgId, e);
+        }
     }
 
     private void sendEmailToNewOrgAdmin(String orgId, CaseDetails caseDetailsNew, String partyName) {

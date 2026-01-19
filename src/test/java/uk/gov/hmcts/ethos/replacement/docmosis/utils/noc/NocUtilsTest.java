@@ -11,6 +11,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
@@ -26,6 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationApprovalStatus.APPROVED;
 
 final class NocUtilsTest {
 
@@ -94,6 +96,7 @@ final class NocUtilsTest {
     private static final String ROLE_SOLICITOR_H = "[SOLICITORH]";
     private static final String ROLE_SOLICITOR_I = "[SOLICITORI]";
     private static final String ROLE_SOLICITOR_J = "[SOLICITORJ]";
+    private static final String ROLE_SOLICITOR_K = "[SOLICITORK]";
 
     @Test
     void theValidateRepresentativeRespondentMapping() {
@@ -474,5 +477,29 @@ final class NocUtilsTest {
         caseData.setNoticeOfChangeAnswers8(NoticeOfChangeAnswers.builder()
                 .respondentName(RESPONDENT_NAME_NINE).build());
         caseData.setNoticeOfChangeAnswers9(NoticeOfChangeAnswers.builder().respondentName(RESPONDENT_NAME_TEN).build());
+    }
+
+    @Test
+    void theBuildApprovedChangeOrganisationRequest() {
+        // if both old and new organisations are empty should return empty change organisation request
+        ChangeOrganisationRequest emptyOrganisationRequest = ChangeOrganisationRequest.builder().build();
+        assertThat(NocUtils.buildApprovedChangeOrganisationRequest(null, null, ROLE_SOLICITOR_A))
+                .isEqualTo(emptyOrganisationRequest);
+        // if role is blank should return empty change organisation request
+        Organisation newOrganisation = Organisation.builder().organisationID(ORGANISATION_ID_ONE).build();
+        Organisation oldOrganisation = Organisation.builder().organisationID(ORGANISATION_ID_TWO).build();
+        assertThat(NocUtils.buildApprovedChangeOrganisationRequest(newOrganisation, oldOrganisation, StringUtils.EMPTY))
+                .isEqualTo(emptyOrganisationRequest);
+        // if role is invalid should return empty change organisation request
+        assertThat(NocUtils.buildApprovedChangeOrganisationRequest(newOrganisation, oldOrganisation, ROLE_SOLICITOR_K))
+                .isEqualTo(emptyOrganisationRequest);
+        // if role is valid should return valid change organisation request
+        DynamicFixedListType roleItem = new DynamicFixedListType(ROLE_SOLICITOR_A);
+        ChangeOrganisationRequest changeOrganisationRequest = NocUtils.buildApprovedChangeOrganisationRequest(
+                newOrganisation, oldOrganisation, ROLE_SOLICITOR_A);
+        assertThat(changeOrganisationRequest.getOrganisationToAdd()).isEqualTo(newOrganisation);
+        assertThat(changeOrganisationRequest.getOrganisationToRemove()).isEqualTo(oldOrganisation);
+        assertThat(changeOrganisationRequest.getCaseRoleId()).isEqualTo(roleItem);
+        assertThat(changeOrganisationRequest.getApprovalStatus()).isEqualTo(APPROVED);
     }
 }

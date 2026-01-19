@@ -3,14 +3,18 @@ package uk.gov.hmcts.ethos.replacement.docmosis.utils.noc;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
+import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CallbacksCollectionUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentUtils;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,6 +25,7 @@ import java.util.UUID;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationApprovalStatus.APPROVED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.ERROR_INVALID_CASE_DATA;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.EXCEPTION_CALLBACK_REQUEST_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_INVALID_RESPONDENT_EXISTS;
@@ -446,5 +451,47 @@ public final class NocUtils {
         for (RepresentedTypeRItem representative : representatives) {
             RoleUtils.removeOrganisationPolicyAndNocAnswersByRepresentative(caseData, representative);
         }
+    }
+
+    /**
+     * Builds an approved {@link ChangeOrganisationRequest} for changing an organisation
+     * associated with a specific case role.
+     * <p>
+     * The request is populated with:
+     * <ul>
+     *     <li>{@code APPROVED} approval status</li>
+     *     <li>The current timestamp</li>
+     *     <li>The provided case role</li>
+     *     <li>The organisation to be added and/or removed</li>
+     * </ul>
+     *
+     * <p>
+     * If both organisations are {@code null} or empty, the role is blank, or the role
+     * is not valid, an empty {@link ChangeOrganisationRequest} is returned.
+     *
+     * @param newOrganisation the organisation to be added; may be {@code null}
+     * @param oldOrganisation the organisation to be removed; may be {@code null}
+     * @param role the case role identifier; must be non-blank and valid
+     * @return a fully populated approved {@link ChangeOrganisationRequest}, or an empty
+     *         request if the input parameters are invalid
+     */
+    public static ChangeOrganisationRequest buildApprovedChangeOrganisationRequest(Organisation newOrganisation,
+                                                                                   Organisation oldOrganisation,
+                                                                                   String role) {
+        if (ObjectUtils.isEmpty(newOrganisation) && ObjectUtils.isEmpty(oldOrganisation) || StringUtils.isBlank(role)) {
+            return ChangeOrganisationRequest.builder().build();
+        }
+        if (!RoleUtils.isValidRole(role)) {
+            return ChangeOrganisationRequest.builder().build();
+        }
+        DynamicFixedListType roleItem = new DynamicFixedListType(role);
+
+        return ChangeOrganisationRequest.builder()
+                .approvalStatus(APPROVED)
+                .requestTimestamp(LocalDateTime.now())
+                .caseRoleId(roleItem)
+                .organisationToRemove(oldOrganisation)
+                .organisationToAdd(newOrganisation)
+                .build();
     }
 }

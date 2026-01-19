@@ -10,16 +10,17 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRole;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesRequest;
+import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
-import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.NocUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.RoleUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
@@ -27,6 +28,12 @@ import java.io.IOException;
 import java.util.List;
 
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.EMPTY_LOWERCASE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.ERROR_INVALID_CALLBACK_REQUEST;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_EMPTY_OLD_AND_NEW_ORGANISATIONS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_FAILED_TO_APPLY_NOC_DECISION;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_INVALID_ROLE_FOR_NOC_DECISION;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_INVALID_USER_TOKEN_FOR_NOC_DECISION;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_BUILD_CHANGE_ORGANISATION_REQUEST;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_FAILED_TO_ASSIGN_ROLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_INVALID_GRANT_ACCESS_PARAMETER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_UNABLE_TO_FIND_ORGANISATION_BY_USER_ID;
@@ -42,6 +49,9 @@ public class NocService {
     private final CcdCaseAssignment caseAssignment;
     private final OrganisationClient organisationClient;
     private final AuthTokenGenerator authTokenGenerator;
+    private final CcdCaseAssignment ccdCaseAssignment;
+
+    private static final String CLASS_NAME = "NocService";
 
     /**
      * Revokes access from all users of an organisation being replaced or removed.
@@ -127,9 +137,11 @@ public class NocService {
                 throw new GenericServiceException(exceptionMessage);
             }
             grantCaseAccess(userResponse.getUserIdentifier(), submissionReference, role);
-        } catch (IOException exception) {
-            throw new GenericServiceException(new CcdInputOutputException(String.format(EXCEPTION_FAILED_TO_ASSIGN_ROLE,
-                    role, email, submissionReference), exception));
+        } catch (IOException | GenericServiceException exception) {
+            String exceptionMessage = String.format(EXCEPTION_FAILED_TO_ASSIGN_ROLE, role, email, submissionReference,
+                    exception.getMessage());
+            throw new GenericServiceException(exceptionMessage, new Exception(exception),
+                    EXCEPTION_FAILED_TO_ASSIGN_ROLE, submissionReference, CLASS_NAME, "grantRepresentativeAccess");
         }
     }
 
@@ -202,16 +214,93 @@ public class NocService {
      * @param userId the unique identifier of the user to be granted access
      * @param caseId the identifier of the case to which access is being granted
      * @param caseRole the case role to assign to the user
-     * @throws IOException if an error occurs while communicating with CCD
      */
-    public void grantCaseAccess(String userId, String caseId, String caseRole) throws IOException {
+    public void grantCaseAccess(String userId, String caseId, String caseRole) {
         CaseAssignmentUserRole caseAssignmentUserRole = CaseAssignmentUserRole.builder()
                 .userId(userId)
                 .caseDataId(caseId)
                 .caseRole(caseRole)
                 .build();
-        caseAssignment.addCaseUserRole(CaseAssignmentUserRolesRequest.builder()
-                .caseAssignmentUserRoles(List.of(caseAssignmentUserRole))
-                .build());
+        try {
+            caseAssignment.addCaseUserRole(CaseAssignmentUserRolesRequest.builder()
+                    .caseAssignmentUserRoles(List.of(caseAssignmentUserRole))
+                    .build());
+        } catch (IOException e) {
+            log.error("Failed to add case assignment user role", e);
+        }
+    }
+
+    /**
+     * Applies a Notice of Change (NoC) decision to a case by updating the case data with an
+     * approved {@link ChangeOrganisationRequest} and invoking CCD case assignment.
+     * <p>
+     * This method performs a series of validation checks before applying the NoC decision.
+     * If any validation fails, the method logs an appropriate message and exits without
+     * modifying case data or calling CCD.
+     *
+     * <p>
+     * Validation includes:
+     * <ul>
+     *     <li>Presence of a valid {@link CallbackRequest} and case details</li>
+     *     <li>Non-blank case ID</li>
+     *     <li>A valid case role</li>
+     *     <li>A non-blank user authentication token</li>
+     *     <li>At least one of the old or new organisations being provided</li>
+     *     <li>Successful construction of an approved {@link ChangeOrganisationRequest}</li>
+     * </ul>
+     *
+     * <p>
+     * If all validations pass, the change organisation request is set on the case data and
+     * the NoC decision is applied via CCD case assignment.
+     *
+     * <p>
+     * Any {@link IOException} thrown while applying the NoC decision is caught and logged;
+     * the exception is not propagated to the caller.
+     *
+     * @param callbackRequest the callback request containing case details and case data
+     * @param oldOrganisation the organisation to be removed; may be {@code null}
+     * @param newOrganisation the organisation to be added; may be {@code null}
+     * @param userToken the user authentication token used for CCD operations
+     * @param role the case role for which the NoC decision is applied
+     */
+    public void applyNocDecision(CallbackRequest callbackRequest,
+                                 Organisation oldOrganisation,
+                                 Organisation newOrganisation,
+                                 String userToken,
+                                 String role) {
+        if (ObjectUtils.isEmpty(callbackRequest)
+                || ObjectUtils.isEmpty(callbackRequest.getCaseDetails())
+                || StringUtils.isBlank(callbackRequest.getCaseDetails().getCaseId())
+                || ObjectUtils.isEmpty(callbackRequest.getCaseDetails().getCaseData())) {
+            log.info(ERROR_INVALID_CALLBACK_REQUEST);
+            return;
+        }
+        String caseId = callbackRequest.getCaseDetails().getCaseId();
+        if (!RoleUtils.isValidRole(role)) {
+            log.info(ERROR_INVALID_ROLE_FOR_NOC_DECISION, caseId);
+            return;
+        }
+        if (StringUtils.isBlank(userToken)) {
+            log.info(ERROR_INVALID_USER_TOKEN_FOR_NOC_DECISION, role, caseId);
+            return;
+        }
+        if (ObjectUtils.isEmpty(oldOrganisation) && ObjectUtils.isEmpty(newOrganisation)) {
+            log.info(ERROR_EMPTY_OLD_AND_NEW_ORGANISATIONS, role, caseId);
+            return;
+        }
+        ChangeOrganisationRequest changeOrganisationRequest = NocUtils.buildApprovedChangeOrganisationRequest(
+                newOrganisation, oldOrganisation, role);
+        if (ObjectUtils.isEmpty(changeOrganisationRequest.getApprovalStatus())) {
+            log.info(ERROR_UNABLE_TO_BUILD_CHANGE_ORGANISATION_REQUEST, role, caseId);
+            return;
+        }
+        if (ObjectUtils.isNotEmpty(changeOrganisationRequest)) {
+            callbackRequest.getCaseDetails().getCaseData().setChangeOrganisationRequestField(changeOrganisationRequest);
+            try {
+                ccdCaseAssignment.applyNoc(callbackRequest, userToken);
+            } catch (IOException e) {
+                log.info(ERROR_FAILED_TO_APPLY_NOC_DECISION, role, caseId, e.getMessage());
+            }
+        }
     }
 }

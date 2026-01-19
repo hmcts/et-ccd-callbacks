@@ -319,10 +319,10 @@ public class TornadoService {
             }
             case ET3_PROCESSING_PDF -> {
                 return String.format("ET3 Processing - %s.pdf",
-                        sanitizePartyName(caseData.getEt3ChooseRespondent().getSelectedLabel()));
+                        sanitizePartyName(getSelectedEt3Respondent(caseData)));
             }
             case ET3_RESPONSE_PDF -> {
-                return String.format("%s - %s", caseData.getSubmitEt3Respondent().getSelectedLabel(), ET3_RESPONSE_PDF);
+                return String.format("%s - %s", getSelectedSubmitEt3RespondentLabel(caseData), ET3_RESPONSE_PDF);
             }
             case TSE_FILE_NAME -> {
                 return tseService.getTseDocumentName(caseData);
@@ -364,6 +364,22 @@ public class TornadoService {
         }
     }
 
+    private String getSelectedEt3Respondent(CaseData caseData) {
+        if (caseData.getEt3ChooseRespondent() != null) {
+            return caseData.getEt3ChooseRespondent().getSelectedLabel();
+        } else {
+            return "";
+        }
+    }
+
+    private String getSelectedSubmitEt3RespondentLabel(CaseData caseData) {
+        if (caseData.getSubmitEt3Respondent() != null) {
+            return caseData.getSubmitEt3Respondent().getSelectedLabel();
+        } else {
+            return "";
+        }
+    }
+
     private void buildDocumentInstruction(HttpURLConnection connection, String content) throws IOException {
         OutputStream outputStream = connection.getOutputStream();
         try (OutputStreamWriter writer = new OutputStreamWriter(outputStream, StandardCharsets.UTF_8)) {
@@ -398,7 +414,7 @@ public class TornadoService {
             }
             case ET3_PROCESSING_PDF -> {
                 String outputName = String.format("ET3 Processing - %s.pdf",
-                        sanitizePartyName(caseData.getEt3ChooseRespondent().getSelectedLabel()));
+                        sanitizePartyName(getSelectedEt3Respondent(caseData)));
                 return Et3VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey(),
                         outputName);
             }

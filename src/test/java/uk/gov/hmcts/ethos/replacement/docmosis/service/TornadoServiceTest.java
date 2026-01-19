@@ -333,6 +333,24 @@ class TornadoServiceTest {
         assertEquals(INITIAL_CONSIDERATION_PDF, documentInfo.getDescription());
     }
 
+    @Test
+    void getSelectedEt3Respondent_shouldReturnSelectedLabelWhenNotNull() {
+        CaseData caseData = new CaseData();
+        DynamicFixedListType respondent = DynamicFixedListType.from("code", "Test Respondent", true);
+        caseData.setEt3ChooseRespondent(respondent);
+
+        // Test via public API that uses getSelectedEt3Respondent internally
+        String result = tornadoService.getDmStoreDocumentName(caseData, "ET3 Processing.pdf");
+        assertEquals("ET3 Processing - Test Respondent.pdf", result);
+    }
+
+    @Test
+    void getDmStoreDocumentName_shouldReturnEt3ResponseOutputName_whenSubmitEt3RespondentNull() {
+        CaseData caseData = new CaseData();
+        String result = tornadoService.getDmStoreDocumentName(caseData, "ET3 Response.pdf");
+        assertEquals(" - ET3 Response.pdf", result);
+    }
+
     private void createUserService() {
         IdamApi idamApi = new IdamApi() {
             @Override

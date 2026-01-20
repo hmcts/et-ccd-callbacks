@@ -12,6 +12,7 @@ import uk.gov.hmcts.ecm.common.model.servicebus.UpdateCaseMsg;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.QueueMessageStatus;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.UpdateCaseQueueMessage;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.messagequeue.UpdateCaseQueueRepository;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.messagehandler.UpdateManagementService;
 
 import java.net.InetAddress;
 import java.time.LocalDateTime;
@@ -37,7 +38,7 @@ public class UpdateCaseQueueProcessor {
 
     private final UpdateCaseQueueRepository updateCaseQueueRepository;
     private final ObjectMapper objectMapper;
-    // TODO: Inject UpdateManagementService when migrated
+    private final UpdateManagementService updateManagementService;
 
     @Value("${queue.update-case.batch-size:10}")
     private int batchSize;
@@ -101,15 +102,25 @@ public class UpdateCaseQueueProcessor {
             log.info("Processing update-case message: ethosCaseRef={}, multipleRef={}",
                     updateCaseMsg.getEthosCaseReference(), updateCaseMsg.getMultipleRef());
 
-            // TODO: Call UpdateManagementService.updateLogic(updateCaseMsg) when migrated
-            log.warn("UpdateManagementService not yet migrated - message processing incomplete");
-            
-            // For now, just mark as completed to prevent blocking
-            // In production, this should call the full business logic
-            updateCaseQueueRepository.markAsCompleted(
-                    queueMessage.getMessageId(),
-                    LocalDateTime.now()
-            );
+            // Call business logic (migrated from et-message-handler)
+            // NOTE: This requires all dependent services to be migrated
+            // If dependencies are missing, this will fail during Spring startup
+            try {
+                updateManagementService.updateLogic(updateCaseMsg);
+                
+                // Mark as completed
+                updateCaseQueueRepository.markAsCompleted(
+                        queueMessage.getMessageId(),
+                        LocalDateTime.now()
+                );
+            } catch (javax.naming.NameNotFoundException e) {
+                log.error("Name not found error processing message: {}", queueMessage.getMessageId(), e);
+                throw new RuntimeException("Name not found", e);
+            } catch (InterruptedException e) {
+                log.error("Interrupted while processing message: {}", queueMessage.getMessageId(), e);
+                Thread.currentThread().interrupt();
+                throw new RuntimeException("Processing interrupted", e);
+            }
 
             log.info("Processed update-case message: {}", queueMessage.getMessageId());
 

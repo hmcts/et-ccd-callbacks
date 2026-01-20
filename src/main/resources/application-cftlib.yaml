@@ -16,6 +16,7 @@ idam:
 spring:
   flyway:
     locations: classpath:db/migration,classpath:db/dev
+    enabled: false
   datasource:
     password: ${ET_COS_CFTLIB_DB_PASSWORD}
     username: postgres

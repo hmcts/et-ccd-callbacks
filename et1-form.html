@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ET1 Form - Add Respondent</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "GDS Transport Website", Arial, sans-serif;
+            background-color: #ffffff;
+            color: #0b0c0c;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1140px;
+            margin: 0 auto;
+            padding: 0 140px;
+        }
+
+        .main-content {
+            display: flex;
+            gap: 30px;
+            background-color: #ffffff;
+        }
+
+        .content-area {
+            flex: 1;
+            min-width: 630px;
+        }
+
+        .page-heading {
+            padding-top: 20px;
+            margin-bottom: 0;
+        }
+
+        .caption {
+            font-size: 24px;
+            font-weight: 300;
+            line-height: 30px;
+            color: #505a5f;
+            margin-bottom: 0;
+        }
+
+        .main-heading {
+            font-size: 36px;
+            font-weight: 700;
+            line-height: 40px;
+            color: #0b0c0c;
+            padding-bottom: 20px;
+            margin-top: 0;
+        }
+
+        .section-label {
+            font-size: 19px;
+            font-weight: 700;
+            line-height: 24px;
+            margin-bottom: 10px;
+        }
+
+        .table {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        .table-row {
+            background-color: #ffffff;
+            padding: 10px;
+            border-bottom: 1px solid #b1b4b6;
+        }
+
+        .table-row p {
+            font-size: 19px;
+            font-weight: 300;
+            line-height: 24px;
+        }
+
+        .info-text {
+            font-size: 19px;
+            font-weight: 300;
+            line-height: 24px;
+            margin: 20px 0;
+        }
+
+        .question {
+            font-size: 24px;
+            font-weight: 700;
+            line-height: 30px;
+            margin-bottom: 15px;
+        }
+
+        .radios {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: flex-start;
+            gap: 15px;
+        }
+
+        .radio-input {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #0b0c0c;
+            border-radius: 50%;
+            position: relative;
+            flex-shrink: 0;
+            cursor: pointer;
+            background-color: #ffffff;
+        }
+
+        .radio-input.selected::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #0b0c0c;
+        }
+
+        .radio-label {
+            font-size: 19px;
+            font-weight: 300;
+            line-height: 24px;
+            padding-top: 8px;
+            cursor: pointer;
+        }
+
+        .buttons {
+            padding-top: 20px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 3px;
+            margin-bottom: 20px;
+        }
+
+        .btn {
+            font-size: 19px;
+            font-weight: 300;
+            line-height: 24px;
+            padding: 7px 12px;
+            border: none;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-secondary {
+            background-color: #f3f2f1;
+            color: #0b0c0c;
+            box-shadow: inset 0px -2px 0px 0px #929191;
+        }
+
+        .btn-primary {
+            background-color: #00703c;
+            color: #ffffff;
+            box-shadow: inset 0px -2px 0px 0px #002d18;
+        }
+
+        .btn-secondary:hover {
+            background-color: #dbdad9;
+        }
+
+        .btn-primary:hover {
+            background-color: #005a30;
+        }
+
+        .cancel-link {
+            font-size: 19px;
+            font-weight: 300;
+            line-height: 24px;
+            color: #1d70b8;
+            text-decoration: underline;
+            cursor: pointer;
+        }
+
+        .cancel-link:hover {
+            color: #003078;
+        }
+
+        .sidebar {
+            width: 300px;
+            height: 286px;
+            flex-shrink: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="main-content">
+            <div class="content-area">
+                <div class="page-heading">
+                    <p class="caption">ET1 Section 2 - Employment and respondent details</p>
+                    <h1 class="main-heading">Do you want to add another respondent?</h1>
+                </div>
+
+                <p class="section-label">Respondent added:</p>
+
+                <div class="table">
+                    <div class="table-row">
+                        <p>Charles Montgomery Burns</p>
+                    </div>
+                </div>
+
+                <p class="info-text">
+                    You can amend the details of each respondent before you submit your claim.
+                </p>
+
+                <p class="question">Do you want to add another respondent?</p>
+
+                <div class="radios">
+                    <div class="radio-option">
+                        <div class="radio-input selected" onclick="selectRadio(this)"></div>
+                        <label class="radio-label">Yes</label>
+                    </div>
+                    <div class="radio-option">
+                        <div class="radio-input" onclick="selectRadio(this)"></div>
+                        <label class="radio-label">No</label>
+                    </div>
+                </div>
+
+                <div class="buttons">
+                    <div class="button-group">
+                        <button class="btn btn-secondary">Previous</button>
+                        <button class="btn btn-primary">Continue</button>
+                    </div>
+                    <a class="cancel-link">Cancel</a>
+                </div>
+            </div>
+
+            <div class="sidebar"></div>
+        </div>
+    </div>
+
+    <script>
+        function selectRadio(element) {
+            // Remove selected class from all radio inputs
+            document.querySelectorAll('.radio-input').forEach(radio => {
+                radio.classList.remove('selected');
+            });
+            // Add selected class to clicked element
+            element.classList.add('selected');
+        }
+    </script>
+</body>
+</html>

@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
  * Migrated from et-message-handler.
  */
 @Slf4j
-@Service
+@Service("messageHandlerEmailService")
 public class EmailService {
 
     public static final String MULTIPLE_ERRORS = "multipleErrors";

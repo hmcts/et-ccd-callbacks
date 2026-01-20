@@ -27,7 +27,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRANSFERRED_STATE;
  * Migrated from et-message-handler.
  */
 @Slf4j
-@Service
+@Service("messageHandlerMultipleUpdateService")
 public class MultipleUpdateService {
 
     private final CcdClient ccdClient;

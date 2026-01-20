@@ -27,7 +27,7 @@ This document describes the partial merge of the `et-message-handler` repository
   - Handles TransferToEcm cases (currently stubbed)
 - **UpdateCaseQueueProcessor**: Scheduled task that polls and processes messages from update_case_queue
   - Replaces `UpdateCaseBusReceiverTask` from et-message-handler
-  - **NOTE**: Business logic not yet migrated - currently just marks messages as complete
+  - **NOTE**: Now wired to UpdateManagementService, but dependencies still needed (see SERVICE_MIGRATION_TODO.md)
 - **UpdateCaseQueueSender**: Service to send UpdateCaseMsg to database queue
 
 ### 4. Message Sending ✅
@@ -56,8 +56,11 @@ This document describes the partial merge of the `et-message-handler` repository
 
 ## What Still Needs To Be Done
 
-### 1. Service Layer Migration ⚠️ HIGH PRIORITY
-The following services from et-message-handler need to be migrated to et-ccd-callbacks:
+### 1. Service Layer Migration ⚠️ IN PROGRESS
+**UpdateManagementService** has been migrated but requires its dependencies.
+See `SERVICE_MIGRATION_TODO.md` for detailed tracking.
+
+The following services from et-message-handler still need to be migrated:
 
 **Core Services**:
 - `UpdateManagementService` - Main business logic for update-case processing

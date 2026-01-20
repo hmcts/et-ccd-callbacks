@@ -1,10 +1,9 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.domain;
 
-import lombok.NoArgsConstructor;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.NoArgsConstructor;
 
 /**
  * JPA entity for multiple_counter table.

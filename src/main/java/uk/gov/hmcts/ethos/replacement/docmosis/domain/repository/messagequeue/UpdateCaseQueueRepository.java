@@ -5,8 +5,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.UpdateCaseQueueMessage;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.QueueMessageStatus;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.UpdateCaseQueueMessage;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -17,14 +17,14 @@ public interface UpdateCaseQueueRepository extends JpaRepository<UpdateCaseQueue
     /**
      * Find messages that are ready to be processed (PENDING status and not locked).
      *
-     * @param limit maximum number of messages to fetch
      * @param now current timestamp
+     * @param pageable maximum number of messages to fetch
      * @return list of messages ready for processing
      */
-    @Query("SELECT m FROM UpdateCaseQueueMessage m " +
-           "WHERE m.status = 'PENDING' " +
-           "AND (m.lockedUntil IS NULL OR m.lockedUntil < :now) " +
-           "ORDER BY m.createdAt ASC")
+    @Query("SELECT m FROM UpdateCaseQueueMessage m "
+           + "WHERE m.status = 'PENDING' "
+           + "AND (m.lockedUntil IS NULL OR m.lockedUntil < :now) "
+           + "ORDER BY m.createdAt ASC")
     List<UpdateCaseQueueMessage> findPendingMessages(@Param("now") LocalDateTime now,
                                                       org.springframework.data.domain.Pageable pageable);
 
@@ -38,13 +38,13 @@ public interface UpdateCaseQueueRepository extends JpaRepository<UpdateCaseQueue
      * @return number of rows updated
      */
     @Modifying
-    @Query("UPDATE UpdateCaseQueueMessage m " +
-           "SET m.status = 'PROCESSING', " +
-           "m.lockedBy = :lockedBy, " +
-           "m.lockedUntil = :lockedUntil " +
-           "WHERE m.messageId = :messageId " +
-           "AND m.status = 'PENDING' " +
-           "AND (m.lockedUntil IS NULL OR m.lockedUntil < :now)")
+    @Query("UPDATE UpdateCaseQueueMessage m "
+           + "SET m.status = 'PROCESSING', "
+           + "m.lockedBy = :lockedBy, "
+           + "m.lockedUntil = :lockedUntil "
+           + "WHERE m.messageId = :messageId "
+           + "AND m.status = 'PENDING' "
+           + "AND (m.lockedUntil IS NULL OR m.lockedUntil < :now)")
     int lockMessage(@Param("messageId") String messageId,
                     @Param("lockedBy") String lockedBy,
                     @Param("lockedUntil") LocalDateTime lockedUntil,
@@ -57,12 +57,12 @@ public interface UpdateCaseQueueRepository extends JpaRepository<UpdateCaseQueue
      * @param processedAt timestamp of completion
      */
     @Modifying
-    @Query("UPDATE UpdateCaseQueueMessage m " +
-           "SET m.status = 'COMPLETED', " +
-           "m.processedAt = :processedAt, " +
-           "m.lockedBy = NULL, " +
-           "m.lockedUntil = NULL " +
-           "WHERE m.messageId = :messageId")
+    @Query("UPDATE UpdateCaseQueueMessage m "
+           + "SET m.status = 'COMPLETED', "
+           + "m.processedAt = :processedAt, "
+           + "m.lockedBy = NULL, "
+           + "m.lockedUntil = NULL "
+           + "WHERE m.messageId = :messageId")
     void markAsCompleted(@Param("messageId") String messageId,
                         @Param("processedAt") LocalDateTime processedAt);
 
@@ -75,14 +75,14 @@ public interface UpdateCaseQueueRepository extends JpaRepository<UpdateCaseQueue
      * @param status new status (PENDING for retry, FAILED for permanent failure)
      */
     @Modifying
-    @Query("UPDATE UpdateCaseQueueMessage m " +
-           "SET m.status = :status, " +
-           "m.errorMessage = :errorMessage, " +
-           "m.retryCount = :retryCount, " +
-           "m.lockedBy = NULL, " +
-           "m.lockedUntil = NULL, " +
-           "m.processedAt = CASE WHEN :status = 'FAILED' THEN :processedAt ELSE NULL END " +
-           "WHERE m.messageId = :messageId")
+    @Query("UPDATE UpdateCaseQueueMessage m "
+           + "SET m.status = :status, "
+           + "m.errorMessage = :errorMessage, "
+           + "m.retryCount = :retryCount, "
+           + "m.lockedBy = NULL, "
+           + "m.lockedUntil = NULL, "
+           + "m.processedAt = CASE WHEN :status = 'FAILED' THEN :processedAt ELSE NULL END "
+           + "WHERE m.messageId = :messageId")
     void markAsFailed(@Param("messageId") String messageId,
                      @Param("errorMessage") String errorMessage,
                      @Param("retryCount") int retryCount,

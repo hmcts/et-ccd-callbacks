@@ -1,10 +1,9 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.domain;
 
-import lombok.Data;
-
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Data;
 
 /**
  * JPA entity for multiple_errors table.

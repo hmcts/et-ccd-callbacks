@@ -228,6 +228,8 @@ tasks.register('integration', Test) {
         html.required = true
         html.outputLocation = file("${buildDir}/integration/")
     }
+    // Disable Ryuk container to avoid Docker Desktop timeout issues
+    environment 'TESTCONTAINERS_RYUK_DISABLED', 'true'
 }
 
 project.ext {

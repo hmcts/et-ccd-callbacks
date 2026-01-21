@@ -230,7 +230,8 @@ class PseRespondToTribunalServiceTest {
             |Response from|Claimant|\r
             |Response date|10 Aug 2022|\r
             |What's your response to the tribunal?|Response text entered|\r
-            |Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?|Yes|\r\n
+            |Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?|Yes|\r
+            
             
             </div> </details>
 
@@ -489,13 +490,13 @@ class PseRespondToTribunalServiceTest {
             caseData.setPseRespondentOrdReqUploadDocument(supportingMaterials);
         }
 
-        SendNotificationType notificationType = caseData.getSendNotificationCollection().get(0).getValue();
+        SendNotificationType notificationType = caseData.getSendNotificationCollection().getFirst().getValue();
 
         assertEquals("0", notificationType.getSendNotificationResponsesCount());
 
         pseRespondToTribService.addRespondentResponseToJON(caseData, "token");
 
-        PseResponseType savedResponse = notificationType.getRespondCollection().get(0).getValue();
+        PseResponseType savedResponse = notificationType.getRespondCollection().getFirst().getValue();
 
         assertEquals(RESPONDENT_TITLE, savedResponse.getFrom());
         assertEquals(response, savedResponse.getResponse());
@@ -556,44 +557,44 @@ class PseRespondToTribunalServiceTest {
     @Test
     void sendAcknowledgeEmail_rule92No() {
         CaseDetails caseDetails = CaseDataBuilder.builder()
-            .withEthosCaseReference("6000001/2023")
-            .withClaimant("Claimant Name")
-            .withRespondent("Respondent One", YES, "01-Jan-2023", false)
-            .withRespondent("Respondent Two", YES, "02-Jan-2023", false)
-            .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
+                .withEthosCaseReference("6000001/2023")
+                .withClaimant("Claimant Name")
+                .withRespondent("Respondent One", YES, "01-Jan-2023", false)
+                .withRespondent("Respondent Two", YES, "02-Jan-2023", false)
+                .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
         caseDetails.setCaseId("1677174791076683");
 
         caseDetails.getCaseData().setSendNotificationCollection(List.of(
-            SendNotificationTypeItem.builder()
-                .id(UUID.randomUUID().toString())
-                .value(SendNotificationType.builder()
-                    .number("1")
-                    .sendNotificationTitle("View notice of hearing")
-                    .sendNotificationSelectHearing(DynamicFixedListType.of(
-                        DynamicValueType.create("1", "1: Hearing - Leeds - 25 Dec 2023")))
-                    .build())
-                .build()
+                SendNotificationTypeItem.builder()
+                        .id(UUID.randomUUID().toString())
+                        .value(SendNotificationType.builder()
+                                .number("1")
+                                .sendNotificationTitle("View notice of hearing")
+                                .sendNotificationSelectHearing(DynamicFixedListType.of(
+                                        DynamicValueType.create("1", "1: Hearing - Leeds - 25 Dec 2023")))
+                                .build())
+                        .build()
         ));
 
         caseDetails.getCaseData().setPseRespondentOrdReqCopyToOtherParty(NO);
 
         caseDetails.getCaseData().setPseRespondentSelectOrderOrRequest(
-            DynamicFixedListType.of(DynamicValueType.create("1",
-                "1 View notice of hearing")));
+                DynamicFixedListType.of(DynamicValueType.create("1",
+                        "1 View notice of hearing")));
 
         when(userIdamService.getUserDetails(any())).thenReturn(HelperTest.getUserDetails());
 
         DateListedType selectedListing = new DateListedType();
         selectedListing.setListedDate("2023-12-25T12:00:00.000");
         when(hearingSelectionService.getSelectedListingWithList(isA(CaseData.class),
-            isA(DynamicFixedListType.class))).thenReturn(selectedListing);
+                isA(DynamicFixedListType.class))).thenReturn(selectedListing);
 
         Map<String, String> expectedMap = Map.of(
-            "caseNumber", "6000001/2023",
-            "claimant", "Claimant Name",
-            "respondents", "Respondent One, Respondent Two",
-            "hearingDate", "25 December 2023 12:00",
-            LINK_TO_EXUI, EXUI_URL + "1677174791076683"
+                "caseNumber", "6000001/2023",
+                "claimant", "Claimant Name",
+                "respondents", "Respondent One, Respondent Two",
+                "hearingDate", "25 December 2023 12:00",
+                LINK_TO_EXUI, EXUI_URL + "1677174791076683"
         );
 
         pseRespondToTribService.sendAcknowledgeEmail(caseDetails, AUTH_TOKEN);
@@ -952,5 +953,57 @@ class PseRespondToTribunalServiceTest {
         respondNotificationType.setRespondNotificationDate("10 Aug 2022");
         respondNotificationType.setRespondNotificationResponseRequired(YES);
         return respondNotificationType;
+    }
+
+    @Test
+    void initialOrdReqDetailsTableMarkUp_withRespondentResponseCopyToOtherPartyNo() {
+        PseResponseTypeItem pseResponseTypeItem = PseResponseTypeItem.builder()
+                .value(PseResponseType.builder()
+                        .date("21 January 2026")
+                        .from("Respondent")
+                        .response("Response Test")
+                        .copyToOtherParty(NO)
+                        .copyNoGiveDetails("Details")
+                        .hasSupportingMaterial("No")
+                        .build())
+                .build();
+
+        caseData.setSendNotificationCollection(List.of(
+                SendNotificationTypeItem.builder()
+                        .id(UUID.randomUUID().toString())
+                        .value(SendNotificationType.builder()
+                                .number("1")
+                                .date("5 Aug 2022")
+                                .sendNotificationTitle("Title")
+                                .sendNotificationLetter("No")
+                                .sendNotificationNotify("Both parties")
+                                .sendNotificationSentBy("Tribunal")
+                                .sendNotificationSubject(List.of("Claimant / Respondent details"))
+                                .respondCollection(List.of(pseResponseTypeItem))
+                                .build())
+                        .build()
+        ));
+
+        caseData.setPseRespondentSelectOrderOrRequest(
+                DynamicFixedListType.of(DynamicValueType.create("1", "1 - Title")));
+
+        String expected = """
+            |View Notification||\r
+            |--|--|\r
+            |Notification|Title|\r
+            |Date sent|5 Aug 2022|\r
+            |Sent by|Tribunal|\r
+            |Sent to|Both parties|\r
+            <details class="govuk-details"> <summary class="govuk-details__summary">
+            <span class="govuk-details__summary-text">Responses</span></summary>
+            <div class="govuk-details__text">\n\n
+            
+            </div> </details>
+            
+            """;
+
+        assertThat(pseRespondToTribService.initialOrdReqDetailsTableMarkUp(caseData, RESPONDENT_TITLE),
+                is(expected)
+        );
     }
 }

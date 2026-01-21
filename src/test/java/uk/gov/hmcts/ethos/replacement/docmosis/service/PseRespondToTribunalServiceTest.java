@@ -230,8 +230,7 @@ class PseRespondToTribunalServiceTest {
             |Response from|Claimant|\r
             |Response date|10 Aug 2022|\r
             |What's your response to the tribunal?|Response text entered|\r
-            |Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?|Yes|\r
-            
+            |Do you want to copy this correspondence to the other party to satisfy the Rules of Procedure?|Yes|\r\n
             
             </div> </details>
 

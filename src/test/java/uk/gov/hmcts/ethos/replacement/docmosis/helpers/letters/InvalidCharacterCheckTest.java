@@ -92,7 +92,9 @@ class InvalidCharacterCheckTest {
             Arguments.of("John!Doe", "John Doe"),
             Arguments.of("John Doe/Jr", "John Doe Jr"),
             Arguments.of("", ""),
-            Arguments.of(null, "")
+            Arguments.of(null, ""),
+            Arguments.of("John Doe​", "John Doe"),
+            Arguments.of("John Doe\u200B", "John Doe")
         );
     }
 }

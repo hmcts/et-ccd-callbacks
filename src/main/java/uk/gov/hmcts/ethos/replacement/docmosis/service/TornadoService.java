@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceScotType;
@@ -319,10 +320,10 @@ public class TornadoService {
             }
             case ET3_PROCESSING_PDF -> {
                 return String.format("ET3 Processing - %s.pdf",
-                        sanitizePartyName(getSelectedEt3Respondent(caseData)));
+                        sanitizePartyName(getSelectedET3VettingRespondentLabel(caseData)));
             }
             case ET3_RESPONSE_PDF -> {
-                return String.format("%s - %s", getSelectedSubmitEt3RespondentLabel(caseData), ET3_RESPONSE_PDF);
+                return String.format("%s - %s", getSelectedET3ResponseRespondentLabel(caseData), ET3_RESPONSE_PDF);
             }
             case TSE_FILE_NAME -> {
                 return tseService.getTseDocumentName(caseData);
@@ -364,20 +365,27 @@ public class TornadoService {
         }
     }
 
-    private String getSelectedEt3Respondent(CaseData caseData) {
-        if (caseData.getEt3ChooseRespondent() != null) {
-            return caseData.getEt3ChooseRespondent().getSelectedLabel();
-        } else {
-            return "";
+    //ET3 Vetting event
+    private String getSelectedET3VettingRespondentLabel(CaseData caseData) {
+        DynamicFixedListType respondent = caseData.getEt3ChooseRespondent();
+
+        if (respondent == null) {
+            throw new IllegalStateException(
+                    "ET3 respondent must be selected before retrieving the selected label"
+            );
         }
+        return respondent.getSelectedLabel();
     }
 
-    private String getSelectedSubmitEt3RespondentLabel(CaseData caseData) {
-        if (caseData.getSubmitEt3Respondent() != null) {
-            return caseData.getSubmitEt3Respondent().getSelectedLabel();
-        } else {
-            return "";
+    //ET3 Response event
+    private String getSelectedET3ResponseRespondentLabel(CaseData caseData) {
+        DynamicFixedListType respondent = caseData.getSubmitEt3Respondent();
+        if (respondent == null) {
+            throw new IllegalStateException(
+                    "An ET3 submitting respondent must be selected before retrieving respondent label"
+            );
         }
+        return respondent.getSelectedLabel();
     }
 
     private void buildDocumentInstruction(HttpURLConnection connection, String content) throws IOException {
@@ -414,7 +422,7 @@ public class TornadoService {
             }
             case ET3_PROCESSING_PDF -> {
                 String outputName = String.format("ET3 Processing - %s.pdf",
-                        sanitizePartyName(getSelectedEt3Respondent(caseData)));
+                        sanitizePartyName(getSelectedET3VettingRespondentLabel(caseData)));
                 return Et3VettingHelper.getDocumentRequest(caseData, tornadoConnection.getAccessKey(),
                         outputName);
             }

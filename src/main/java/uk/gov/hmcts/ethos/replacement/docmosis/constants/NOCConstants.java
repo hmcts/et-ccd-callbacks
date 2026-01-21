@@ -63,16 +63,8 @@ public final class NOCConstants {
             "There is no empty respondent organisation policy left, case id: {}";
     public static final String ERROR_UNABLE_TO_NOTIFY_REPRESENTATION_REMOVAL =
             "Unable to send notification for representative removal for case: {}. Exception: {}";
-    public static final String ERROR_INVALID_ROLE_FOR_NOC_DECISION =
-            "Invalid role received to apply noc decision for case {}";
-    public static final String ERROR_INVALID_USER_TOKEN_FOR_NOC_DECISION =
-            "Invalid user token received to apply noc decision for role {}, case {}";
-    public static final String ERROR_EMPTY_OLD_AND_NEW_ORGANISATIONS =
-            "Old and new organisations are empty. Unable to apply noc decision for role {}, case {}";
-    public static final String ERROR_UNABLE_TO_BUILD_CHANGE_ORGANISATION_REQUEST =
-            "Unable to build change organisation request. Failed to apply noc decision for role {}, case {}";
-    public static final String ERROR_FAILED_TO_APPLY_NOC_DECISION =
-            "Failed to apply noc decision for role {}, case {}, error: {}";
+    public static final String ERROR_FAILED_TO_REMOVE_ORGANISATION_POLICIES_AND_NOC_ANSWERS =
+            "Failed to remove organisation policies and noc answers for case {}. Exception: {}";
 
     public static final String WARNING_REPRESENTATIVE_MISSING_EMAIL_ADDRESS =
             "Representative %s is missing an email address.";

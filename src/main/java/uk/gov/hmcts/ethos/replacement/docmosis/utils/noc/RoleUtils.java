@@ -283,19 +283,28 @@ public final class RoleUtils {
         if (ObjectUtils.isEmpty(caseData) || index < 0 || index >= MAX_NOC_ANSWERS) {
             return;
         }
-        OrganisationPolicy emptyPolicy = OrganisationPolicy.builder().build();
 
         switch (index) {
-            case 0 -> caseData.setRespondentOrganisationPolicy0(emptyPolicy);
-            case 1 -> caseData.setRespondentOrganisationPolicy1(emptyPolicy);
-            case 2 -> caseData.setRespondentOrganisationPolicy2(emptyPolicy);
-            case 3 -> caseData.setRespondentOrganisationPolicy3(emptyPolicy);
-            case 4 -> caseData.setRespondentOrganisationPolicy4(emptyPolicy);
-            case 5 -> caseData.setRespondentOrganisationPolicy5(emptyPolicy);
-            case 6 -> caseData.setRespondentOrganisationPolicy6(emptyPolicy);
-            case 7 -> caseData.setRespondentOrganisationPolicy7(emptyPolicy);
-            case 8 -> caseData.setRespondentOrganisationPolicy8(emptyPolicy);
-            case 9 -> caseData.setRespondentOrganisationPolicy9(emptyPolicy);
+            case 0 -> caseData.setRespondentOrganisationPolicy0(OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
+                    SolicitorRole.SOLICITORA.getCaseRoleLabel()).build());
+            case 1 -> caseData.setRespondentOrganisationPolicy1(OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
+                    SolicitorRole.SOLICITORB.getCaseRoleLabel()).build());
+            case 2 -> caseData.setRespondentOrganisationPolicy2(OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
+                    SolicitorRole.SOLICITORC.getCaseRoleLabel()).build());
+            case 3 -> caseData.setRespondentOrganisationPolicy3(OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
+                    SolicitorRole.SOLICITORD.getCaseRoleLabel()).build());
+            case 4 -> caseData.setRespondentOrganisationPolicy4(OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
+                    SolicitorRole.SOLICITORE.getCaseRoleLabel()).build());
+            case 5 -> caseData.setRespondentOrganisationPolicy5(OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
+                    SolicitorRole.SOLICITORF.getCaseRoleLabel()).build());
+            case 6 -> caseData.setRespondentOrganisationPolicy6(OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
+                    SolicitorRole.SOLICITORG.getCaseRoleLabel()).build());
+            case 7 -> caseData.setRespondentOrganisationPolicy7(OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
+                    SolicitorRole.SOLICITORH.getCaseRoleLabel()).build());
+            case 8 -> caseData.setRespondentOrganisationPolicy8(OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
+                    SolicitorRole.SOLICITORI.getCaseRoleLabel()).build());
+            case 9 -> caseData.setRespondentOrganisationPolicy9(OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
+                    SolicitorRole.SOLICITORJ.getCaseRoleLabel()).build());
             default -> { /* no-op */ }
         }
     }
@@ -316,19 +325,18 @@ public final class RoleUtils {
         if (ObjectUtils.isEmpty(caseData) || index < 0 || index >= MAX_NOC_ANSWERS) {
             return;
         }
-        NoticeOfChangeAnswers emptyNoticeOfChangeAnswers = NoticeOfChangeAnswers.builder().build();
 
         switch (index) {
-            case 0 -> caseData.setNoticeOfChangeAnswers0(emptyNoticeOfChangeAnswers);
-            case 1 -> caseData.setNoticeOfChangeAnswers1(emptyNoticeOfChangeAnswers);
-            case 2 -> caseData.setNoticeOfChangeAnswers2(emptyNoticeOfChangeAnswers);
-            case 3 -> caseData.setNoticeOfChangeAnswers3(emptyNoticeOfChangeAnswers);
-            case 4 -> caseData.setNoticeOfChangeAnswers4(emptyNoticeOfChangeAnswers);
-            case 5 -> caseData.setNoticeOfChangeAnswers5(emptyNoticeOfChangeAnswers);
-            case 6 -> caseData.setNoticeOfChangeAnswers6(emptyNoticeOfChangeAnswers);
-            case 7 -> caseData.setNoticeOfChangeAnswers7(emptyNoticeOfChangeAnswers);
-            case 8 -> caseData.setNoticeOfChangeAnswers8(emptyNoticeOfChangeAnswers);
-            case 9 -> caseData.setNoticeOfChangeAnswers9(emptyNoticeOfChangeAnswers);
+            case 0 -> caseData.setNoticeOfChangeAnswers0(null);
+            case 1 -> caseData.setNoticeOfChangeAnswers1(null);
+            case 2 -> caseData.setNoticeOfChangeAnswers2(null);
+            case 3 -> caseData.setNoticeOfChangeAnswers3(null);
+            case 4 -> caseData.setNoticeOfChangeAnswers4(null);
+            case 5 -> caseData.setNoticeOfChangeAnswers5(null);
+            case 6 -> caseData.setNoticeOfChangeAnswers6(null);
+            case 7 -> caseData.setNoticeOfChangeAnswers7(null);
+            case 8 -> caseData.setNoticeOfChangeAnswers8(null);
+            case 9 -> caseData.setNoticeOfChangeAnswers9(null);
             default -> { /* no-op */ }
         }
     }

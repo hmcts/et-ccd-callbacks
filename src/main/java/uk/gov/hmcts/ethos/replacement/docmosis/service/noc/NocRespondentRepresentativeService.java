@@ -53,6 +53,7 @@ import static org.apache.commons.lang3.ObjectUtils.getIfNull;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_FAILED_TO_REMOVE_ORGANISATION_POLICIES_AND_NOC_ANSWERS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_NO_ORGANISATION_POLICY_LEFT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_NOTIFY_REPRESENTATION_REMOVAL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_SET_ROLE;
@@ -79,27 +80,27 @@ public class NocRespondentRepresentativeService {
     private final NocService nocService;
 
     /**
-     * Handles the removal of respondent representatives that have been replaced or
-     * removed between the previous and current versions of a case.
+     * Identifies respondent representatives that have been removed from the case data
+     * and performs the required cleanup actions.
      * <p>
-     * This method compares the representatives in the {@code caseDetailsBefore} and
-     * the current {@code caseDetails} to identify representatives who have been updated
-     * for the same respondent and therefore need to be removed. For any such representatives,
-     * it:
-     * <ul>
-     *     <li>Sends Notice of Change (NoC) notification emails</li>
-     *     <li>Revokes the representatives' access to the case</li>
-     *     <li>Removes associated organisation policies and NoC answers from the current case data</li>
-     * </ul>
+     * The method compares the representative collection from the previous case state
+     * with the updated case state to determine which respondent representatives have
+     * been removed. For each removed representative, it:
      * </p>
+     * <ul>
+     *   <li>Sends notification emails informing parties of the removed representation</li>
+     *   <li>Revokes the corresponding CCD case role assignments</li>
+     *   <li>Removes associated organisation policies and Notice of Change (NoC) answers</li>
+     * </ul>
      * <p>
-     * If no representatives are identified for removal at any stage, the method exits
-     * without performing further actions.
+     * If no representatives have been removed, the method exits without performing
+     * any further processing. Failures to send notification emails are logged but do
+     * not prevent subsequent access revocation and cleanup.
      * </p>
      *
      * @param callbackRequest the callback request containing both the previous and
-     *                        current case details used to determine which representatives
-     *                        should be removed
+     *                        current case details
+     * @param userToken the IDAM user token used to revoke CCD case role assignments
      */
     public void removeOldRepresentatives(CallbackRequest callbackRequest, String userToken) {
         CaseDetails oldCaseDetails = callbackRequest.getCaseDetailsBefore();
@@ -123,40 +124,30 @@ public class NocRespondentRepresentativeService {
         if (CollectionUtils.isEmpty(revokedRepresentatives)) {
             return;
         }
-        NocUtils.removeOrganisationPoliciesAndNocAnswers(newCaseDetails.getCaseData(), revokedRepresentatives);
+        removeOrganisationPoliciesAndNocAnswers(callbackRequest.getCaseDetails(), revokedRepresentatives);
     }
 
     /**
-     * Revokes access for respondent representatives who are no longer applicable by
-     * applying a Notice of Change (NoC) decision for each matching representative.
+     * Revokes CCD case role assignments for respondent representatives that have been removed
+     * from the case data.
      * <p>
-     * The method inspects the case assignments from the previous case state and compares
-     * them against the provided list of representatives to remove. For each respondent
-     * representative whose access can be modified and whose role or respondent name matches,
-     * a NoC decision is applied to revoke their organisation access.
-     *
+     * The method compares the respondent representative roles currently assigned on the
+     * existing (pre-callback) case with the list of representatives marked for removal.
+     * For each matching respondent representative role that is eligible for modification,
+     * the corresponding case role assignment is revoked via the CCD API.
+     * </p>
      * <p>
-     * If the callback request, user token, previous case details, or representative list
-     * is invalid or empty, no action is taken and an empty list is returned.
+     * If any required input data is missing or invalid (for example, callback request,
+     * user token, case details, assignments, or representatives to remove), no action
+     * is taken and an empty list is returned.
+     * </p>
      *
-     * <p>
-     * This method performs the following steps:
-     * <ul>
-     *     <li>Validates the callback request, user token, and previous case details</li>
-     *     <li>Retrieves current case user assignments from CCD</li>
-     *     <li>Identifies respondent representative roles eligible for revocation</li>
-     *     <li>Applies a NoC decision to revoke access for matching representatives</li>
-     * </ul>
-     *
-     * <p>
-     * Any NoC decisions are applied as side effects via {@code nocService.applyNocDecision}.
-     *
-     * @param callbackRequest the callback request containing the previous case details
-     * @param userToken the user authentication token used to apply NoC decisions
+     * @param callbackRequest the callback request containing the case details before the update
+     * @param userToken the IDAM user token used to revoke case assignments
      * @param representativesToRemove the list of respondent representatives whose access
-     *                                  should be considered for revocation
-     * @return a list of {@link RepresentedTypeRItem} instances for which access was successfully
-     *         revoked; returns an empty list if no revocations occur or if input validation fails
+     *                                should be revoked
+     * @return a list of {@link RepresentedTypeRItem} instances for which case role assignments
+     *         were successfully identified and revoked; an empty list if no revocations occur
      */
     public List<RepresentedTypeRItem> revokeOldRespondentRepresentativeAccess(
             CallbackRequest callbackRequest, String userToken, List<RepresentedTypeRItem> representativesToRemove) {
@@ -178,6 +169,7 @@ public class NocRespondentRepresentativeService {
         }
         // to get list of representatives whose assignment is revoked
         List<RepresentedTypeRItem> representativesToRevoke = new ArrayList<>();
+        List<CaseUserAssignment> caseUserAssignmentsToRevoke = new ArrayList<>();
         for (CaseUserAssignment caseUserAssignment : caseUserAssignments.getCaseUserAssignments()) {
             if (!RoleUtils.isRespondentRepresentativeRole(caseUserAssignment.getCaseRole())) {
                 continue;
@@ -194,12 +186,50 @@ public class NocRespondentRepresentativeService {
                         || StringUtils.isNotBlank(caseUserAssignment.getCaseRole())
                         && caseUserAssignment.getCaseRole().equals(representative.getValue().getRole()))) {
                     representativesToRevoke.add(representative);
-                    nocService.applyNocDecision(callbackRequest, representative.getValue().getRespondentOrganisation(),
-                            null, userToken, caseUserAssignment.getCaseRole());
+                    caseUserAssignmentsToRevoke.add(caseUserAssignment);
                 }
             }
         }
+        if (CollectionUtils.isNotEmpty(caseUserAssignmentsToRevoke)) {
+            try {
+                ccdClient.revokeCaseAssignments(userToken, CaseUserAssignmentData.builder().caseUserAssignments(
+                        caseUserAssignmentsToRevoke).build());
+            } catch (IOException exception) {
+                log.info(exception.getMessage(), exception);
+            }
+        }
         return representativesToRevoke;
+    }
+
+    public void removeOrganisationPoliciesAndNocAnswers(CaseDetails caseDetails,
+                                                        List<RepresentedTypeRItem> revokedRepresentatives) {
+        if (ObjectUtils.isEmpty(caseDetails)
+                || ObjectUtils.isEmpty(caseDetails.getCaseData())
+                || StringUtils.isBlank(caseDetails.getCaseTypeId())
+                || StringUtils.isBlank(caseDetails.getJurisdiction())
+                || StringUtils.isEmpty(caseDetails.getCaseId())
+                || CollectionUtils.isEmpty(revokedRepresentatives)) {
+            return;
+        }
+        String adminUserToken = adminUserService.getAdminUserToken();
+        try {
+            CCDRequest ccdRequest = ccdClient.startEventForCase(adminUserToken,
+                    caseDetails.getCaseTypeId(),
+                    caseDetails.getJurisdiction(),
+                    caseDetails.getCaseId(),
+                    EVENT_UPDATE_CASE_SUBMITTED);
+            CaseData ccdRequestCaseData = ccdRequest.getCaseDetails().getCaseData();
+            // Clears the changeOrganisationRequestField to prevent errors in the existing representative process
+            // and to allow further changes to be made
+            ccdRequestCaseData.setChangeOrganisationRequestField(null);
+            // Removes organisation policies & notice of change answers
+            NocUtils.removeOrganisationPoliciesAndNocAnswers(ccdRequestCaseData, revokedRepresentatives);
+            ccdClient.submitEventForCase(adminUserToken, ccdRequestCaseData, caseDetails.getCaseTypeId(),
+                    caseDetails.getJurisdiction(), ccdRequest, caseDetails.getCaseId());
+        } catch (IOException exception) {
+            log.info(ERROR_FAILED_TO_REMOVE_ORGANISATION_POLICIES_AND_NOC_ANSWERS, caseDetails.getCaseId(),
+                    exception.getMessage());
+        }
     }
 
     public void addNewRepresentatives(CallbackRequest callbackRequest) {

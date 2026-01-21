@@ -12,13 +12,15 @@ import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.model.servicebus.CreateUpdatesMsg;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.TransferToEcmDataModel;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.TransferToEcmCaseDataHelper;
 
 import java.io.IOException;
+
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper.generateMarkUp;
 
 /**
  * Service for creating ECM cases during transfer.
  * Migrated from et-message-handler.
- * Note: This is a simplified version - full TransferToEcmCaseDataHelper functionality to be migrated as needed.
  */
 @Slf4j
 @Service
@@ -57,7 +59,7 @@ public class CreateEcmSingleService {
                                                                                                 newEcmCaseDetailsCt,
                                                                                                  returnedEcmCcdRequest);
         if (newCase != null) {
-            String transferredCaseLink = getTransferredCaseLink(
+            String transferredCaseLink = generateMarkUp(
                 ccdGatewayBaseUrl,
                 String.valueOf(newCase.getCaseId()),
                 newCase.getCaseData().getEthosCaseReference());
@@ -95,15 +97,8 @@ public class CreateEcmSingleService {
         String caseId = String.valueOf(oldSubmitEvent.getCaseId());
         log.info("Copying case data for case {}", caseId);
         
-        // TODO: Full implementation requires migrating TransferToEcmCaseDataHelper
-        // For now, create a simple copy with essential fields
-        CaseData newCaseData = new CaseData();
-        newCaseData.setEthosCaseReference(caseData.getEthosCaseReference());
-        newCaseData.setEcmCaseType(caseData.getEcmCaseType());
-        newCaseData.setLinkedCaseCT(generateMarkUp(ccdGatewayBaseUrl, caseId, caseData.getEthosCaseReference()));
-        
-        log.warn("CreateEcmSingleService is using simplified case data copy - full implementation pending");
-        return newCaseData;
+        return TransferToEcmCaseDataHelper.copyCaseData(caseData, new CaseData(), caseId,
+            ccdGatewayBaseUrl, state, caseTypeId);
     }
 
     private static String getCorrectedOfficeName(String oldCaseOfficeName) {
@@ -111,14 +106,5 @@ public class CreateEcmSingleService {
             return oldCaseOfficeName.replace(" ", "");
         }
         return oldCaseOfficeName;
-    }
-    
-    private String generateMarkUp(String ccdGatewayBaseUrl, String caseId, String ethosCaseRef) {
-        String url = ccdGatewayBaseUrl + "/cases/case-details/" + caseId;
-        return "<a target=\"_blank\" href=\"" + url + "\">" + ethosCaseRef + "</a>";
-    }
-    
-    private String getTransferredCaseLink(String ccdGatewayBaseUrl, String caseId, String ethosCaseReference) {
-        return generateMarkUp(ccdGatewayBaseUrl, caseId, ethosCaseReference);
     }
 }

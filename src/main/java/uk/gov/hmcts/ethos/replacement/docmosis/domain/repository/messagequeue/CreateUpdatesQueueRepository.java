@@ -23,7 +23,7 @@ public interface CreateUpdatesQueueRepository extends JpaRepository<CreateUpdate
      * @return list of messages ready for processing
      */
     @Query("SELECT m FROM CreateUpdatesQueueMessage m "
-           + "WHERE m.status = 'PENDING' "
+           + "WHERE m.status = uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.QueueMessageStatus.PENDING "
            + "AND (m.lockedUntil IS NULL OR m.lockedUntil < :now) "
            + "ORDER BY m.createdAt ASC")
     List<CreateUpdatesQueueMessage> findPendingMessages(@Param("now") LocalDateTime now,
@@ -40,11 +40,11 @@ public interface CreateUpdatesQueueRepository extends JpaRepository<CreateUpdate
      */
     @Modifying
     @Query("UPDATE CreateUpdatesQueueMessage m "
-           + "SET m.status = 'PROCESSING', "
+           + "SET m.status = uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.QueueMessageStatus.PROCESSING,"
            + "m.lockedBy = :lockedBy, "
            + "m.lockedUntil = :lockedUntil "
            + "WHERE m.messageId = :messageId "
-           + "AND m.status = 'PENDING' "
+           + "AND m.status = uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.QueueMessageStatus.PENDING "
            + "AND (m.lockedUntil IS NULL OR m.lockedUntil < :now)")
     int lockMessage(@Param("messageId") String messageId,
                     @Param("lockedBy") String lockedBy,
@@ -59,7 +59,7 @@ public interface CreateUpdatesQueueRepository extends JpaRepository<CreateUpdate
      */
     @Modifying
     @Query("UPDATE CreateUpdatesQueueMessage m "
-           + "SET m.status = 'COMPLETED', "
+           + "SET m.status = uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.QueueMessageStatus.COMPLETED, "
            + "m.processedAt = :processedAt, "
            + "m.lockedBy = NULL, "
            + "m.lockedUntil = NULL "
@@ -82,7 +82,9 @@ public interface CreateUpdatesQueueRepository extends JpaRepository<CreateUpdate
            + "m.retryCount = :retryCount, "
            + "m.lockedBy = NULL, "
            + "m.lockedUntil = NULL, "
-           + "m.processedAt = CASE WHEN :status = 'FAILED' THEN :processedAt ELSE NULL END "
+           + "m.processedAt = CASE "
+           + "WHEN :status = uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.QueueMessageStatus.FAILED "
+           + "THEN :processedAt ELSE NULL END "
            + "WHERE m.messageId = :messageId")
     void markAsFailed(@Param("messageId") String messageId,
                      @Param("errorMessage") String errorMessage,

@@ -15,6 +15,7 @@ import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.UpdateDataModel;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper;
 
 import java.io.IOException;
 import java.util.List;
@@ -115,9 +116,9 @@ public class SingleUpdateService {
             List<SubmitMultipleEvent> submitMultipleEvents = retrieveMultipleCase(accessToken, updateCaseMsg);
             if (!submitMultipleEvents.isEmpty()) {
                 submitEvent.getCaseData().setMultipleReferenceLinkMarkUp(
-                    generateMarkUp(
+                    MultiplesHelper.generateMarkUp(
                         ccdGatewayBaseUrl,
-                        String.valueOf(submitMultipleEvents.get(0).getCaseId()),
+                        String.valueOf(submitMultipleEvents.getFirst().getCaseId()),
                         submitEvent.getCaseData().getMultipleReference()
                     ));
             }
@@ -134,9 +135,4 @@ public class SingleUpdateService {
         );
     }
 
-    private String generateMarkUp(String ccdGatewayBaseUrl, String caseId, String ethosCaseRef) {
-
-        String url = ccdGatewayBaseUrl + "/cases/case-details/" + caseId;
-        return "<a target=\"_blank\" href=\"" + url + "\">" + ethosCaseRef + "</a>";
-    }
 }

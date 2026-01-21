@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.List;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLOSED_STATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultiplesHelper.generateMarkUp;
 
 /**
  * Service for creating new cases during case transfer.
@@ -107,7 +108,7 @@ public class SingleCreationService {
                                                            eventSummary);
         if (newCase != null) {
             // On the old case, add a link to the new case
-            String transferredCaseLink = getTransferredCaseLink(ccdGatewayBaseUrl,
+            String transferredCaseLink = generateMarkUp(ccdGatewayBaseUrl,
                                                                    String.valueOf(newCase.getCaseId()),
                                                                    newCase.getCaseData().getEthosCaseReference());
             CCDRequest updateCCDRequest = ccdClient.startEventForCase(accessToken, sourceCaseTypeId, jurisdiction,
@@ -131,7 +132,7 @@ public class SingleCreationService {
                                                    String destinationCaseTypeId) throws IOException {
         List<SubmitEvent> submitEvents = retrieveDestinationCase(accessToken, ethosCaseReference,
                                                                  destinationCaseTypeId);
-        return submitEvents.isEmpty() ? null : submitEvents.get(0);
+        return submitEvents.isEmpty() ? null : submitEvents.getFirst();
     }
 
     private List<SubmitEvent> retrieveDestinationCase(String authToken, String ethosCaseReference,
@@ -250,14 +251,5 @@ public class SingleCreationService {
         newCaseData.setRespondentOrganisationPolicy9(oldCaseData.getRespondentOrganisationPolicy9());
 
         return newCaseData;
-    }
-
-    private String generateMarkUp(String ccdGatewayBaseUrl, String caseId, String ethosCaseRef) {
-        String url = ccdGatewayBaseUrl + "/cases/case-details/" + caseId;
-        return "<a target=\"_blank\" href=\"" + url + "\">" + ethosCaseRef + "</a>";
-    }
-    
-    private String getTransferredCaseLink(String ccdGatewayBaseUrl, String caseId, String ethosCaseRef) {
-        return generateMarkUp(ccdGatewayBaseUrl, caseId, ethosCaseRef);
     }
 }

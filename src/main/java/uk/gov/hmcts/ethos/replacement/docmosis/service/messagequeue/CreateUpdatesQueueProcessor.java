@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -14,6 +15,7 @@ import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.TransferToEcmDataModel
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.CreateUpdatesQueueMessage;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.QueueMessageStatus;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.messagequeue.CreateUpdatesQueueRepository;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.messagehandler.TransferToEcmService;
 
 import java.net.InetAddress;
 import java.time.LocalDateTime;
@@ -37,6 +39,8 @@ public class CreateUpdatesQueueProcessor {
     private final CreateUpdatesQueueRepository createUpdatesQueueRepository;
     private final UpdateCaseQueueSender updateCaseQueueSender;
     private final ObjectMapper objectMapper;
+    private final ApplicationContext applicationContext;
+    private final TransferToEcmService transferToEcmService;
 
     @Value("${queue.create-updates.batch-size:10}")
     private int batchSize;
@@ -60,6 +64,7 @@ public class CreateUpdatesQueueProcessor {
 
     @Scheduled(fixedDelayString = "${queue.create-updates.poll-interval:1000}")
     public void processPendingMessages() {
+        log.info("Polling for create-updates messages...");
         init();
         
         List<CreateUpdatesQueueMessage> messages = createUpdatesQueueRepository.findPendingMessages(
@@ -67,17 +72,24 @@ public class CreateUpdatesQueueProcessor {
                 PageRequest.of(0, batchSize)
         );
 
+        log.info("Found {} messages in create-updates queue", messages.size());
+        
         if (messages.isEmpty()) {
             return;
         }
 
-        log.info("Found {} pending create-updates messages to process", messages.size());
-
-        messages.forEach(message -> executor.submit(() -> processMessage(message)));
+        messages.forEach(message -> {
+            log.info("Submitting message {} to executor", message.getMessageId());
+            // Use self-proxy to ensure @Transactional works
+            CreateUpdatesQueueProcessor self = applicationContext.getBean(CreateUpdatesQueueProcessor.class);
+            executor.submit(() -> self.processMessage(message));
+        });
     }
 
     @Transactional
     public void processMessage(CreateUpdatesQueueMessage queueMessage) {
+        log.info("processMessage called for message: {}", queueMessage.getMessageId());
+        
         // Try to lock the message
         int locked = createUpdatesQueueRepository.lockMessage(
                 queueMessage.getMessageId(),
@@ -86,8 +98,10 @@ public class CreateUpdatesQueueProcessor {
                 LocalDateTime.now()
         );
 
+        log.info("Lock attempt result for message {}: locked={}", queueMessage.getMessageId(), locked);
+        
         if (locked == 0) {
-            log.debug("Message {} already locked by another processor", queueMessage.getMessageId());
+            log.info("Message {} already locked by another processor", queueMessage.getMessageId());
             return;
         }
 
@@ -100,13 +114,13 @@ public class CreateUpdatesQueueProcessor {
             log.info("Processing create-updates message: {}", createUpdatesMsg.getMsgId());
 
             if (createUpdatesMsg.getDataModelParent() instanceof TransferToEcmDataModel) {
-                // TODO: Implement TransferToEcm logic when service is migrated
-                log.warn("TransferToEcm not yet implemented, marking as completed");
+                transferToEcmService.transferToEcm(createUpdatesMsg);
             } else {
                 sendUpdateCaseMessages(createUpdatesMsg);
             }
 
             // Mark as completed
+            log.info("Marking message {} as completed", queueMessage.getMessageId());
             createUpdatesQueueRepository.markAsCompleted(
                     queueMessage.getMessageId(),
                     LocalDateTime.now()

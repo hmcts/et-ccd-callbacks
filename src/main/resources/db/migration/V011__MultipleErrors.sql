@@ -1,4 +1,4 @@
-CREATE TABLE multiple_errors
+CREATE TABLE IF NOT EXISTS multiple_errors
 (
     id           serial PRIMARY KEY,
     multipleRef  varchar(25),
@@ -6,4 +6,4 @@ CREATE TABLE multiple_errors
     description  varchar(250)
 );
 
-CREATE INDEX IX_multipleErrors_multipleRef_ethosCaseRef ON multiple_errors(multipleRef,ethosCaseRef);
+CREATE INDEX IF NOT EXISTS IX_multipleErrors_multipleRef_ethosCaseRef ON multiple_errors(multipleRef,ethosCaseRef);

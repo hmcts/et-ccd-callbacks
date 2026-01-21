@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -24,9 +25,6 @@ import java.util.concurrent.Executors;
 /**
  * Processes messages from the update_case_queue table.
  * Replaces UpdateCaseBusReceiverTask from et-message-handler.
- * 
- * NOTE: This is a basic implementation. Full business logic from UpdateManagementService,
- * SingleReadingService, and related services needs to be migrated.
  */
 @Slf4j
 @Service
@@ -39,6 +37,7 @@ public class UpdateCaseQueueProcessor {
     private final UpdateCaseQueueRepository updateCaseQueueRepository;
     private final ObjectMapper objectMapper;
     private final UpdateManagementService updateManagementService;
+    private final ApplicationContext applicationContext;
 
     @Value("${queue.update-case.batch-size:10}")
     private int batchSize;
@@ -75,7 +74,9 @@ public class UpdateCaseQueueProcessor {
 
         log.info("Found {} pending update-case messages to process", messages.size());
 
-        messages.forEach(message -> executor.submit(() -> processMessage(message)));
+        // Use self-proxy to ensure @Transactional works
+        UpdateCaseQueueProcessor self = applicationContext.getBean(UpdateCaseQueueProcessor.class);
+        messages.forEach(message -> executor.submit(() -> self.processMessage(message)));
     }
 
     @Transactional
@@ -99,12 +100,12 @@ public class UpdateCaseQueueProcessor {
                     UpdateCaseMsg.class
             );
 
-            log.info("Processing update-case message: ethosCaseRef={}, multipleRef={}",
-                    updateCaseMsg.getEthosCaseReference(), updateCaseMsg.getMultipleRef());
+            log.info("RECEIVED 'Update Case' ------> ethosCaseRef {} - multipleRef {} - multipleRefLinkMarkUp {}",
+                    updateCaseMsg.getEthosCaseReference(),
+                    updateCaseMsg.getMultipleRef(),
+                    updateCaseMsg.getMultipleReferenceLinkMarkUp());
 
             // Call business logic (migrated from et-message-handler)
-            // NOTE: This requires all dependent services to be migrated
-            // If dependencies are missing, this will fail during Spring startup
             try {
                 updateManagementService.updateLogic(updateCaseMsg);
                 
@@ -113,16 +114,23 @@ public class UpdateCaseQueueProcessor {
                         queueMessage.getMessageId(),
                         LocalDateTime.now()
                 );
-            } catch (javax.naming.NameNotFoundException e) {
-                log.error("Name not found error processing message: {}", queueMessage.getMessageId(), e);
-                throw new RuntimeException("Name not found", e);
-            } catch (InterruptedException e) {
-                log.error("Interrupted while processing message: {}", queueMessage.getMessageId(), e);
-                Thread.currentThread().interrupt();
-                throw new RuntimeException("Processing interrupted", e);
+                
+                log.info("COMPLETED RECEIVED 'Update Case' ----> message with ID {}", queueMessage.getMessageId());
+                
+            } catch (java.io.IOException e) {
+                // Unrecoverable error - mark as failed immediately
+                log.error("Unrecoverable error occurred when handling 'Update Case' message with ID {}",
+                        queueMessage.getMessageId(), e);
+                handleUnrecoverableError(queueMessage, updateCaseMsg, e);
+            } catch (Exception e) {
+                // Potentially recoverable error - allow retries
+                log.error("Potentially recoverable error occurred when handling 'Update Case' message with ID {}",
+                        queueMessage.getMessageId(), e);
+                if (e instanceof InterruptedException) {
+                    Thread.currentThread().interrupt();
+                }
+                throw e; // Will trigger retry logic in handleError
             }
-
-            log.info("Processed update-case message: {}", queueMessage.getMessageId());
 
         } catch (Exception e) {
             handleError(queueMessage, e);
@@ -135,7 +143,9 @@ public class UpdateCaseQueueProcessor {
                 queueMessage.getMessageId(), e.getMessage(), e);
 
         int newRetryCount = queueMessage.getRetryCount() + 1;
-        QueueMessageStatus newStatus = newRetryCount >= MAX_RETRIES
+        boolean isLastRetry = newRetryCount >= MAX_RETRIES;
+        
+        QueueMessageStatus newStatus = isLastRetry
                 ? QueueMessageStatus.FAILED
                 : QueueMessageStatus.PENDING;
 
@@ -146,5 +156,50 @@ public class UpdateCaseQueueProcessor {
                 newStatus,
                 LocalDateTime.now()
         );
+        
+        // If last retry, check if processing should finish
+        if (isLastRetry) {
+            log.info("RECOVERABLE FAILURE: Last retry checking if finished for message {}",
+                    queueMessage.getMessageId());
+            try {
+                UpdateCaseMsg updateCaseMsg = objectMapper.readValue(
+                        queueMessage.getMessageBody(),
+                        UpdateCaseMsg.class
+                );
+                checkIfFinishWhenError(updateCaseMsg);
+            } catch (Exception ex) {
+                log.error("Error checking if finished after max retries", ex);
+            }
+        }
+    }
+    
+    @Transactional
+    protected void handleUnrecoverableError(UpdateCaseQueueMessage queueMessage,
+                                           UpdateCaseMsg updateCaseMsg,
+                                           Exception e) {
+        log.info("UNRECOVERABLE FAILURE: Check if finished");
+        
+        // Mark as failed immediately (no retries for unrecoverable errors)
+        updateCaseQueueRepository.markAsFailed(
+                queueMessage.getMessageId(),
+                e.getMessage(),
+                queueMessage.getRetryCount() + 1,
+                QueueMessageStatus.FAILED,
+                LocalDateTime.now()
+        );
+        
+        checkIfFinishWhenError(updateCaseMsg);
+    }
+    
+    private void checkIfFinishWhenError(UpdateCaseMsg updateCaseMsg) {
+        try {
+            log.info("Adding unrecoverable error to database");
+            updateManagementService.addUnrecoverableErrorToDatabase(updateCaseMsg);
+            
+            log.info("Checking if finished");
+            updateManagementService.checkIfFinish(updateCaseMsg);
+        } catch (Exception e) {
+            log.error("Error in checkIfFinishWhenError", e);
+        }
     }
 }

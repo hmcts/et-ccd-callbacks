@@ -9,6 +9,7 @@ import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.ecm.common.model.servicebus.UpdateCaseMsg;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.CreationSingleDataModel;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -28,19 +29,19 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 public class SingleReadingService {
 
     private final CcdClient ccdClient;
-    private final UserService userService;
+    private final AdminUserService userService;
     private final SingleUpdateService singleUpdateService;
     private final SingleTransferService singleTransferService;
 
     public void sendUpdateToSingleLogic(UpdateCaseMsg updateCaseMsg) throws IOException {
-        String accessToken = userService.getAccessToken();
+        String accessToken = userService.getAdminUserToken();
         List<SubmitEvent> submitEvents = retrieveSingleCase(accessToken, updateCaseMsg);
 
         if (CollectionUtils.isNotEmpty(submitEvents)) {
             if (updateCaseMsg.getDataModelParent() instanceof CreationSingleDataModel) {
-                singleTransferService.sendTransferred(submitEvents.get(0), accessToken, updateCaseMsg);
+                singleTransferService.sendTransferred(submitEvents.getFirst(), accessToken, updateCaseMsg);
             } else {
-                singleUpdateService.sendUpdate(submitEvents.get(0), accessToken, updateCaseMsg);
+                singleUpdateService.sendUpdate(submitEvents.getFirst(), accessToken, updateCaseMsg);
             }
         } else {
             log.warn("No submit events found for msg id {} with case reference {}", updateCaseMsg.getMsgId(),

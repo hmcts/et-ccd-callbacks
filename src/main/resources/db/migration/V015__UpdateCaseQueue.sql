@@ -1,5 +1,5 @@
 -- Create table for update-case queue messages
-CREATE TABLE update_case_queue (
+CREATE TABLE IF NOT EXISTS update_case_queue (
     id BIGSERIAL PRIMARY KEY,
     message_id VARCHAR(255) UNIQUE NOT NULL,
     message_body TEXT NOT NULL,
@@ -13,10 +13,10 @@ CREATE TABLE update_case_queue (
 );
 
 -- Create indexes for performance
-CREATE INDEX idx_update_case_queue_status ON update_case_queue(status);
-CREATE INDEX idx_update_case_queue_created_at ON update_case_queue(created_at);
-CREATE INDEX idx_update_case_queue_locked_until ON update_case_queue(locked_until);
-CREATE INDEX idx_update_case_queue_status_locked ON update_case_queue(status, locked_until);
+CREATE INDEX IF NOT EXISTS idx_update_case_queue_status ON update_case_queue(status);
+CREATE INDEX IF NOT EXISTS idx_update_case_queue_created_at ON update_case_queue(created_at);
+CREATE INDEX IF NOT EXISTS idx_update_case_queue_locked_until ON update_case_queue(locked_until);
+CREATE INDEX IF NOT EXISTS idx_update_case_queue_status_locked ON update_case_queue(status, locked_until);
 
 COMMENT ON TABLE update_case_queue IS 'Queue table for update case messages, replacing Azure Service Bus';
 COMMENT ON COLUMN update_case_queue.status IS 'Message status: PENDING, PROCESSING, COMPLETED, FAILED';

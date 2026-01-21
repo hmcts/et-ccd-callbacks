@@ -1,45 +1,100 @@
+# GENERAL SPRING BOOT ACTUATOR CONFIG
+# Context path for Spring Boot Actuator endpoints
+management:
+  endpoints:
+    web:
+      base-path: /
+  endpoint:
+    health:
+      show-details: always
+
 spring:
+  jpa:
+    hibernate:
+      ddl-auto: none
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          lob:
+            non_contextual_creation: 'true'
+  application:
+    name: et-cos
   datasource:
     password: ${DB_PASSWORD}
     url: ${DB_URL}
     username: ${DB_USERNAME}
+  task:
+    scheduling:
+      enabled: false
+
+server:
+  port: '8081'
+
+feign:
+  httpclient:
+    enabled: 'true'
+
+tornado:
+  accessKey: ${TORNADO_ACCESS_KEY}
+  url: ${TORNADO_URL:https://eu.dws3.docmosis.com/api/render}
 
 ccd:
   client:
     timeout: '60000'
-  data-store-api-url: http://localhost:4452
+  data-store-api-url: ${CCD_DATA_STORE_API_URL:http://ccd-data-store-api:4452}
 
 document_management:
   ccdCaseDocument:
-    url: http://localhost:8080
-  url: http://localhost:8080
+    url: ${DOCUMENT_MANAGEMENT_URL:http://dm-store:8080}
+  url: ${DOCUMENT_MANAGEMENT_URL:http://dm-store:8080}
 
 idam:
   s2s-auth:
     # noinspection SpringBootApplicationYaml
-    url: http://localhost:8080
-    totp_secret: AAAAAAAAAAAAAAAC
-    microservice: et_cos
+    url: ${SERVICE_AUTH_PROVIDER_URL:http://service-auth-provider-api:8080} # used in ServiceAuthorisationApi
+    totp_secret: ${ET_COS_S2S_SECRET:AAAAAAAAAAAAAAAC}
+    microservice: ${MICRO_SERVICE:ccd_gw}
   api:
-    url: http://localhost:5000
-    jwkUrl: http://localhost:5000/jwks
+    url: ${IDAM_API_URL:http://sidam-api:5000}
+    jwkUrl: ${IDAM_API_JWK_URL:http://sidam-api:5000/jwks}
+  client:
+    scope: openid profile roles manage-user
+    secret: ${IDAM_CLIENT_SECRET:AAAAAAAAAAAAAAAA}
+    id: ${REFORM_SERVICE_NAME:et-cos}
 
-ccd_gateway_base_url: http://127.0.0.1:3453
+ccd_gateway_base_url: ${CCD_GATEWAY_BASE_URL:http://127.0.0.1:3453}
 
 case_document_am:
-  url: http://localhost:4455
+  url: ${CASE_DOCUMENT_AM_URL:http://ccd-case-document-am-api:4455}
 
-rd_professional-api-url: http://localhost:4507
+rd_professional-api-url: ${RD_PROFESSIONAL_API_URL:http://localhost:4507}
 
 feature:
   secure-doc-store:
     enabled: 'false'
 
-gov-notify-api-key: test_api_key
+queue:
+  create-updates:
+    # Database queue configuration (replaces Azure Service Bus)
+    poll-interval: ${CREATE_UPDATES_POLL_INTERVAL:1000}
+    batch-size: ${CREATE_UPDATES_BATCH_SIZE:10}
+    threads: ${CREATE_UPDATES_THREADS:15}
+  update-case:
+    # Database queue configuration (replaces Azure Service Bus)
+    poll-interval: ${UPDATE_CASE_POLL_INTERVAL:1000}
+    batch-size: ${UPDATE_CASE_BATCH_SIZE:10}
+    threads: ${UPDATE_CASE_THREADS:15}
+
+springdoc:
+  packagesToScan: uk.gov.hmcts.ethos.replacement.docmosis.controllers
+  pathsToMatch: /**
+
+gov-notify-api-key: ${GOV_NOTIFY_API_KEY}
 
 template:
-  referral: f975c1cc-e102-472a-a6cb-84dffa0a6d42
-  rejected:  e480e011-ffeb-4adc-9682-8758cf206375
+  referral: ${REFERRAL_TEMPLATE_ID:f975c1cc-e102-472a-a6cb-84dffa0a6d42}
+  rejected:  ${REJECTED_TEMPLATE_ID:e480e011-ffeb-4adc-9682-8758cf206375}
 
   case-links:
     linked: ${CASE_LINKED_TEMPLATE_ID:7e8c6fc1-520a-41cd-a85c-9d3e0b22b282}
@@ -48,98 +103,103 @@ template:
     unlinked-rep: ${CASE_UNLINKED_LEGAL_REP_TEMPLATE_ID:63e550c3-6977-4687-b26d-72b61a266085}
 
   et1Serving:
-    claimant: fa49291f-49cf-4330-8031-c05c101eb32a
-    respondent: 05af8477-7313-4ef1-9a8e-6b2d9d128b50
-    claimantRep: 680a0043-22c2-48e7-8e6a-a9d77b0b21fe
+    claimant: ${ET1SERVING_TEMPLATE_ID:fa49291f-49cf-4330-8031-c05c101eb32a}
+    respondent: ${ET1SERVING_RESPONDENT_TEMPLATE_ID:05af8477-7313-4ef1-9a8e-6b2d9d128b50}
+    claimantRep: ${ET1SERVING_CLAIMANT_REP_TEMPLATE_ID:680a0043-22c2-48e7-8e6a-a9d77b0b21fe}
 
   et3Response:
-    tribunal: d4ced02e-f381-491a-855d-950a283315c0
+    tribunal: ${ET3RESPONSE_NOTIFICATION_TRIBUNAL_TEMPLATE_ID:d4ced02e-f381-491a-855d-950a283315c0}
 
   et3Notification:
-    myhmcts: c47c8dd1-8f36-41e8-a2cc-55e94b95b2d3
-    citizen: 38b2a1e0-be26-47f6-a3a1-e8984a249b80
+    myhmcts: ${ET3_NOTIFICATION_TEMPLATE_MYHMCTS_ID:c47c8dd1-8f36-41e8-a2cc-55e94b95b2d3}
+    citizen: ${ET3_NOTIFICATION_TEMPLATE_CITIZEN_ID:38b2a1e0-be26-47f6-a3a1-e8984a249b80}
 
   tse:
     respondent:
       application:
-        claimant-a: 4585dacf-031d-4cd1-a941-5e1214aa502d
-        claimant-b: fbddc109-52d7-453c-904c-6003b76b17e9
-        cyClaimant-a: d340c60b-111b-41f7-ab9c-6cd34cdebee5
-        cyClaimant-b: 99ec3a75-7371-4b6d-aa5a-9050c1537cf1
-        respondent-no: e8e02ca0-6443-41c4-9064-705f7ab8b39b
-        respondent-type-a: 368b44ed-54ff-4ba6-9f90-cdbe6fab81b9
-        respondent-type-b: eb056a09-72ca-4bf2-b774-016aae1d185c
-        respondent-type-c: 5e75a23b-4a84-415d-8eba-4f10b023ba8b
-        tribunal: bd7addc3-d1ea-47cf-9249-208a7033d454
+        claimant-a: ${TSE_RESPONDENT_TO_CLAIMANT_TYPE_A_TEMPLATE_ID:4585dacf-031d-4cd1-a941-5e1214aa502d}
+        claimant-b: ${TSE_RESPONDENT_TO_CLAIMANT_TYPE_B_TEMPLATE_ID:fbddc109-52d7-453c-904c-6003b76b17e9}
+        cyClaimant-a: ${CY_TSE_RESPONDENT_TO_CLAIMANT_TYPE_A_TEMPLATE_ID:d340c60b-111b-41f7-ab9c-6cd34cdebee5}
+        cyClaimant-b: ${CY_TSE_RESPONDENT_TO_CLAIMANT_TYPE_B_TEMPLATE_ID:99ec3a75-7371-4b6d-aa5a-9050c1537cf1}
+        respondent-no: ${TSE_RESPONDENT_TO_RESPONDENT_NO_TEMPLATE_ID:e8e02ca0-6443-41c4-9064-705f7ab8b39b}
+        respondent-type-a: ${TSE_RESPONDENT_TO_RESPONDENT_TYPE_A_TEMPLATE_ID:368b44ed-54ff-4ba6-9f90-cdbe6fab81b9}
+        respondent-type-b: ${TSE_RESPONDENT_TO_RESPONDENT_TYPE_B_TEMPLATE_ID:eb056a09-72ca-4bf2-b774-016aae1d185c}
+        respondent-type-c: ${TSE_RESPONDENT_TO_RESPONDENT_TYPE_C_TEMPLATE_ID:5e75a23b-4a84-415d-8eba-4f10b023ba8b}
+        tribunal: ${TSE_NEW_APPLICATION_ADMIN_TEMPLATE_ID:bd7addc3-d1ea-47cf-9249-208a7033d454}
       respond:
-        claimant: dec79c11-2c02-481d-aed8-6f013667cdf5
-        cyClaimant: c7fc31e8-9370-405a-8b2e-cf5ce99f39b7
+        claimant: ${TSE_RESPONDENT_RESPONSE_TEMPLATE_ID:dec79c11-2c02-481d-aed8-6f013667cdf5}
+        cyClaimant: ${CY_TSE_RESPONDENT_RESPONSE_TEMPLATE_ID:c7fc31e8-9370-405a-8b2e-cf5ce99f39b7}
         respondent:
-          rule-92-yes: 232f1fbe-3a7f-44cd-926b-bfa192c25ac4
-          rule-92-no: d647a4c5-5859-42f6-96a6-30d57c0e98c2
+          rule-92-yes: ${TSE_RESPONDENT_ACKNOWLEDGEMENT_YES_TEMPLATE_ID:232f1fbe-3a7f-44cd-926b-bfa192c25ac4}
+          rule-92-no: ${TSE_RESPONDENT_ACKNOWLEDGEMENT_NO_TEMPLATE_ID:d647a4c5-5859-42f6-96a6-30d57c0e98c2}
       reply-to-tribunal:
-        claimant: 70aa4caa-f074-4abd-ab22-4f9fe570fb1e
+        claimant: ${TSE_RESPONDENT_REPLY_TO_TRIB_TO_CLAIMANT:70aa4caa-f074-4abd-ab22-4f9fe570fb1e}
         respondent:
-          rule-92-yes: f75316e7-29b4-49e1-b04e-02241f69b649
-          rule-92-no: 376fb37d-d563-42f2-89f0-3165a4777447
-        tribunal: c2f72be8-541c-4bcc-b213-42557976dc39
+          rule-92-yes: ${TSE_RESPONDENT_REPLY_TO_TRIB_TO_RES_RULE92_YES:f75316e7-29b4-49e1-b04e-02241f69b649}
+          rule-92-no: ${TSE_RESPONDENT_REPLY_TO_TRIB_TO_RES_RULE92_NO:376fb37d-d563-42f2-89f0-3165a4777447}
+        tribunal: ${TSE_RESPONDENT_REPLY_TO_TRIB_TO_TRIB:c2f72be8-541c-4bcc-b213-42557976dc39}
     claimant-rep:
       application:
-        claimant-rep-a: 7232eb51-89fc-4fdf-b0a1-2d6c3e28955e
-        claimant-rep-b: 19812581-df03-4bd6-ad0f-907ba90c6603
-        claimant-rep-c: 82744586-f034-4e4d-b5f6-b0aeb23bd582
-        claimant-no: a3621d2d-3cd8-4811-87e7-fcffa676dd3b
-        respondent-type-a: 410270f3-4136-4f3c-99d7-0a564955803f
-        respondent-type-b: 36161401-e4a2-4a98-925c-a65529d23fad
-        cyRespondent-type-a: d340c60b-111b-41f7-ab9c-6cd34cdebee5
-        cyRespondent-type-b: 99ec3a75-7371-4b6d-aa5a-9050c1537cf1
-        tribunal: bd7addc3-d1ea-47cf-9249-208a7033d454
+        claimant-rep-a: ${TSE_CLAIMANT_REP_TO_CLAIMANT_REP_TYPE_A_TEMPLATE_ID:7232eb51-89fc-4fdf-b0a1-2d6c3e28955e}
+        claimant-rep-b: ${TSE_CLAIMANT_REP_TO_CLAIMANT_REP_TYPE_B_TEMPLATE_ID:19812581-df03-4bd6-ad0f-907ba90c6603}
+        claimant-rep-c: ${TSE_CLAIMANT_REP_TO_CLAIMANT_REP_TYPE_C_TEMPLATE_ID:82744586-f034-4e4d-b5f6-b0aeb23bd582}
+        claimant-no: ${TSE_CLAIMANT_REP_TO_CLAIMANT_REP_NO_TEMPLATE_ID:a3621d2d-3cd8-4811-87e7-fcffa676dd3b}
+        respondent-type-a: ${TSE_CLAIMANT_REP_TO_RESPONDENT_TYPE_A_TEMPLATE_ID:410270f3-4136-4f3c-99d7-0a564955803f}
+        respondent-type-b: ${TSE_CLAIMANT_REP_TO_RESPONDENT_TYPE_B_TEMPLATE_ID:36161401-e4a2-4a98-925c-a65529d23fad}
+        cyRespondent-type-a: ${CY_TSE_CLAIMANT_REP_TO_RESPONDENT_TYPE_A_TEMPLATE_ID:d340c60b-111b-41f7-ab9c-6cd34cdebee5}
+        cyRespondent-type-b: ${CY_TSE_CLAIMANT_REP_TO_RESPONDENT_TYPE_B_TEMPLATE_ID:99ec3a75-7371-4b6d-aa5a-9050c1537cf1}
+        tribunal: ${TSE_NEW_APPLICATION_ADMIN_TEMPLATE_ID:bd7addc3-d1ea-47cf-9249-208a7033d454}
       respond:
-        respondent: 88a60473-278f-4e03-8ba2-7e0da7f807dd}
-        cyRespondent: 5d00ecf1-790c-4942-8c39-06f20ac81847}
+        respondent: ${TSE_RESPONDENT_RESPONSE_TO_CLAIMANT_REP_TEMPLATE_ID:88a60473-278f-4e03-8ba2-7e0da7f807dd}
+        cyRespondent: ${CY_TSE_RESPONDENT_RESPONSE_TO_CLAIMANT_REP_TEMPLATE_ID:5d00ecf1-790c-4942-8c39-06f20ac81847}
         claimant-rep:
-          rule-92-yes: dd2c25c5-cb5b-4ddb-984c-a4e7c3a3ddeb}
-          rule-92-no: 83e076fc-1819-4222-9c18-a4c0f8ad06b4}
+          rule-92-yes: ${TSE_CLAIMANT_REP_ACKNOWLEDGEMENT_YES_TEMPLATE_ID:dd2c25c5-cb5b-4ddb-984c-a4e7c3a3ddeb}
+          rule-92-no: ${TSE_CLAIMANT_REP_ACKNOWLEDGEMENT_NO_TEMPLATE_ID:83e076fc-1819-4222-9c18-a4c0f8ad06b4}
       reply-to-tribunal:
-        respondent: 9366acdd-8fb1-4425-9a16-04fbbdaa5f64}
+        respondent: ${TSE_RESPONDENT_REPLY_TO_TRIB_TO_CLAIMANT_REP:9366acdd-8fb1-4425-9a16-04fbbdaa5f64}
         claimant-rep:
-          rule-92-yes: cb40366e-bc50-42ed-ae7b-74edfe344bba}
-          rule-92-no: 078dfb3b-21f3-4386-901d-ce50769a32d1}
-        tribunal: c2f72be8-541c-4bcc-b213-42557976dc39}
+          rule-92-yes: ${TSE_CLAIMANT_REP_REPLY_TO_TRIB_TO_RES_RULE92_YES:cb40366e-bc50-42ed-ae7b-74edfe344bba}
+          rule-92-no: ${TSE_CLAIMANT_REP_REPLY_TO_TRIB_TO_RES_RULE92_NO:078dfb3b-21f3-4386-901d-ce50769a32d1}
+        tribunal: ${TSE_CLAIMANT_REP_REPLY_TO_TRIB_TO_TRIB:c2f72be8-541c-4bcc-b213-42557976dc39}
 
     admin:
       reply:
-        claimant: 52b14d5d-038e-48c7-8f9c-3f1193660608
-        respondent: 46872d50-cb92-4fee-a460-cc35bd836025
+        claimant: ${TSE_ADMIN_REPLY_CLAIMANT_TEMPLATE_ID:52b14d5d-038e-48c7-8f9c-3f1193660608}
+        respondent: ${TSE_ADMIN_REPLY_RESPONDENT_TEMPLATE_ID:46872d50-cb92-4fee-a460-cc35bd836025}
       record-a-decision:
-        claimant: 615827dc-d21b-46ae-8c66-91a635d82504
-        respondent: ca1a1dd2-13c9-435d-b63e-0ca07abe937d
+        claimant: ${TSE_ADMIN_RECORD_A_DECISION_CLAIMANT_TEMPLATE_ID:615827dc-d21b-46ae-8c66-91a635d82504}
+        respondent: ${TSE_ADMIN_RECORD_A_DECISION_RESPONDENT_TEMPLATE_ID:ca1a1dd2-13c9-435d-b63e-0ca07abe937d}
 
   pse:
     claimant-rep:
       acknowledgement-of-response: ${PSE_CLAIMANT_REP_ACKNOWLEDGEMENT_OF_RESPONSE_TEMPLATE_ID:000070c4-5968-4f6b-aca1-095e37988be9}
       new-notification: ${PSE_CLAIMANT_REP_NEW_NOTIFICATION:9352bba3-cdb4-4150-9840-599696147489}
-    claimant: bdf1a2b7-5bb4-45d0-9b71-9d6c024aafff
-    cyClaimant: fcd14cac-5e8e-478e-ab3c-89e394a3c663
+    claimant: ${PSE_RESPONDENT_NOTIFICATION_CLAIMANT_TEMPLATE_ID:bdf1a2b7-5bb4-45d0-9b71-9d6c024aafff}
+    cyClaimant: ${CY_PSE_RESPONDENT_NOTIFICATION_CLAIMANT_TEMPLATE_ID:fcd14cac-5e8e-478e-ab3c-89e394a3c663}
     myhmcts:
-      rule-92-yes: aa114479-e72b-4893-9024-c25aee1be6fc
-      rule-92-no: 3a7ff23d-d49f-4c28-b00b-08ca3f0b38ee
+      rule-92-yes: ${PSE_RESPONDENT_ACKNOWLEDGEMENT_YES_TEMPLATE_ID:aa114479-e72b-4893-9024-c25aee1be6fc}
+      rule-92-no: ${PSE_RESPONDENT_ACKNOWLEDGEMENT_NO_TEMPLATE_ID:3a7ff23d-d49f-4c28-b00b-08ca3f0b38ee}
     respondent-rep:
       response-received: ${PSE_RESPONDENT_REP_RESPONSE_RECEIVED_TEMPLATE_ID:9ea43b1d-7029-48ea-a0bd-b9fc4c3c8b66}
-    admin: 296d3c6e-00d7-4f43-a8bd-260d52b171a7
+    admin: ${PSE_RESPONDENT_NOTIFICATION_ADMIN_TEMPLATE_ID:296d3c6e-00d7-4f43-a8bd-260d52b171a7}
 
   nocNotification:
-    claimant: 3d0c5784-0055-4863-9c03-7d37d9b2ad8d
-    respondent: a3539d79-65c0-491c-b578-b58cf321f83e
+    claimant: ${NOC_NOTIFICATION_TEMPLATE_CLAIMANT_ID:3d0c5784-0055-4863-9c03-7d37d9b2ad8d}
+    respondent: ${NOC_NOTIFICATION_TEMPLATE_RESPONDENT_ID:a3539d79-65c0-491c-b578-b58cf321f83e}
     respondent-solicitor:
-      previous: fe52b39f-852c-43ca-a42a-b9a27c43b130
-      new: 8fe52f24-40b2-4986-8f86-4dd1af311cbd
-    tribunal: 1d5efcbd-1971-4ebe-bfe8-72ba36b5abac
+      previous: ${NOC_NOTIFICATION_TEMPLATE_OLD_REP_ID:fe52b39f-852c-43ca-a42a-b9a27c43b130}
+      new: ${NOC_NOTIFICATION_TEMPLATE_NEW_REP_ID:8fe52f24-40b2-4986-8f86-4dd1af311cbd}
+    tribunal: ${NOC_NOTIFICATION_TEMPLATE_TRIBUNAL_ID:1d5efcbd-1971-4ebe-bfe8-72ba36b5abac}
+    claimantRepAssigned: ${NOC_NOTIFICATION_TEMPLATE_CLAIMANT_REP_ASSIGNED_ID:ddd304c0-9e92-473e-aa96-a0036f59e5ef}
 
-  sendNotification: 1b8299d7-5051-4b78-a870-726b6384d8a8
+  sendNotification: ${SEND_NOTIFICATION_TEMPLATE_ID:1b8299d7-5051-4b78-a870-726b6384d8a8}
+
+  claimantSendNotification: ${CLAIMANT_SEND_NOTIFICATION_TEMPLATE_ID:a71ee3fd-a577-4a11-9bdb-de7fecd81336}
+
+  respondentSendNotification: ${RESPONDENT_SEND_NOTIFICATION_TEMPLATE_ID:6e79a4db-873d-4ea3-85cd-3fdfbdaed38e}
 
   respondNotification:
-    noResponse: d2caad87-2bab-4bc0-b598-01f1a7341f9e
+    noResponse: ${RESPOND_NOTIFICATION_NO_RESPONSE_TEMPLATE_ID:d2caad87-2bab-4bc0-b598-01f1a7341f9e}
 
   bundles:
     respondentSubmittedNotificationForClaimant:
@@ -147,35 +207,42 @@ template:
     respondentSubmittedNotificationForTribunal:
       ${BUNDLES_SUBMITTED_NOTIFICATION_FOR_TRIBUNAL_TEMPLATE_ID:12d604ce-df82-4c64-8544-ebbef66eb8c4}
 
-  claimantSendNotification: ${CLAIMANT_SEND_NOTIFICATION_TEMPLATE_ID:a71ee3fd-a577-4a11-9bdb-de7fecd81336}
-  respondentSendNotification: ${RESPONDENT_SEND_NOTIFICATION_TEMPLATE_ID:6e79a4db-873d-4ea3-85cd-3fdfbdaed38e}
   et1:
     et1ProfessionalSubmission: ${ET1_PROFESSIONAL_SUBMISSION_TEMPLATE_ID:ec815e00-39b0-4711-8b24-614ea1f2de89}
     submitCaseEmailTemplateId: ${SUBMIT_CASE_EMAIL_TEMPLATE_ID:7b1f33eb-31c5-4a00-b1a4-c1bca84bc441}
     cySubmitCaseEmailTemplateId: ${CY_SUBMIT_CASE_EMAIL_TEMPLATE_ID:7b1f33eb-31c5-4a00-b1a4-c1bca84bc441}
-
 etcos:
   system:
-    username: demo@test.com
-    password: PassTest
+    username: ${ET_COS_SYSTEM_USER}
+    password: ${ET_COS_SYSTEM_USER_PASSWORD}
 
-assign_case_access_api_url: http://localhost:4454
+assign_case_access_api_url: ${AAC_URL:http://localhost:4454}
 apply_noc_access_api_assignments_path: /noc/apply-decision
 
 case-details-url:
-  citizen: dummyUrl
-  exui: dummyUrl
-  syr: dummyUrl
+  citizen: ${CITIZEN_CASE_DETAILS_URL:http://localhost:3001/citizen-hub/}
+  exui: ${EXUI_CASE_DETAILS_URL:http://localhost:3455/cases/case-details/}
+  syr: ${RESPONDENT_PORTAL_LINK:http://localhost:3003/case-details/}
+
+feature-flags:
+  # noinspection SpringBootApplicationYaml
+  hearings-api: ${HEARINGS_API_FLAG:true} # will be used in future releases, remove noinspection once in use
+
+em-ccd-orchestrator:
+  api:
+    url: ${EM_CCD_ORCHESTRATOR_URL:http://localhost:8082}
 
 acas:
   api:
     url: ${ACAS_BASE_URL:https://api-dev-acas-01.azure-api.net/ECCLUAT}
     key: ${ACAS_KEY:AAAAAAAAAAAAAAAAA}
+    # This environment variable can be set in your local environment. Do not change this value.
 
 hmcts_service_id: BHA1
 
 launchdarkly:
   sdk-key: ${LAUNCH_DARKLY_SDK_KEY:sdk-key}
+  offline-mode: false
   env: ${LAUNCH_DARKLY_ENV:default}
 
 es:
@@ -183,20 +250,20 @@ es:
     notifications: ${ES_NOTIFICATIONS_PARTITION_SIZE:3000}
 
 cron:
-  bfActionTask: ${CRON_BFACTION_TASK:0 0 * * * ?}
   caseTypeId: ${CRON_CASE_TYPE_ID:ET_EnglandWales,ET_Scotland}
+  bfActionTask: ${CRON_BFACTION_TASK:0 0 * * * ?}
   bfActionCronCaseIdsToSkip: ${CRON_BFACTION_CRON_CASE_IDS_TO_SKIP:}
-  maxCasesPerSearch: ${CRON_MAX_PER_SEARCH:10}
+  maxCasesPerSearch: ${CRON_MAX_PER_SEARCH:500}
+  maxCasesToProcess: ${CRON_MAX_CASES_PER_SEARCH:1500}
   et1DocGen: ${CRON_ACAS_CERT_TASK:0 */2 * * * ?}
-  noticeOfChange: ${CRON_NOTICE_OF_CHANGE:0 10 * * * ?}
-  partySpacing: ${CRON_PARTY_SPACING:0 */30 * * * ?}
+  noticeOfChange: ${CRON_NOTICE_OF_CHANGE:0 */10 * * * ?}
+  partySpacing: ${CRON_PARTY_SPACING:0 */15 * * * ?}
   acasCertSubmission: ${CRON_ACAS_CERT_SUBMISSION_TASK:0 */5 * * * ?}
-
-em-ccd-orchestrator:
-  api:
-    url: ${EM_CCD_ORCHESTRATOR_URL:http://localhost:8082}
-  config:
-    default: et-dcf-2.yaml
+  reconfigurationCaseIds: ${CRON_RECONFIGURATION_CASE_IDS:}
+  reconfigurationLimit: ${CRON_RECONFIGURATION_LIMIT:1000}
 
 pdf:
   et3form: "ET3_0224.pdf"
+
+caching:
+  adminUserService: ${CACHING_ADMIN_USER_SERVICE:21600000}

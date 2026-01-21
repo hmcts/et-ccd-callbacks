@@ -21,7 +21,7 @@ public final class InvalidCharacterCheck {
     public static final String DOUBLE_SPACE_ERROR = "%s contains a double space for case %s. Please correct this before"
             + " for the %s";
     private static final List<String> DOCUMENT_CHARS_TO_REPLACE = List.of("@", "/", "\\", "'", "’", ":", "|", "!", "?",
-            ";", "(", ")");
+            ";", "(", ")", "\u200B");
 
     private InvalidCharacterCheck() {
     }
@@ -120,6 +120,6 @@ public final class InvalidCharacterCheck {
         for (String charToReplace : DOCUMENT_CHARS_TO_REPLACE) {
             sanitizedName = sanitizedName.replace(charToReplace, " ");
         }
-        return sanitizedName;
+        return sanitizedName.trim();
     }
 }

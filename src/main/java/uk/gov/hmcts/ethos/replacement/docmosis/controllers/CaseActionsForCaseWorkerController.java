@@ -260,6 +260,7 @@ public class CaseActionsForCaseWorkerController {
             buildFlagsImageFileName(ccdRequest.getCaseDetails());
             caseData.setMultipleFlag(caseData.getEcmCaseType() != null
                     && Constants.MULTIPLE_CASE_TYPE.equals(caseData.getEcmCaseType()) ? Constants.YES : Constants.NO);
+            caseData.setChangeOrganisationRequestField(null);
             UploadDocumentHelper.convertLegacyDocsToNewDocNaming(caseData);
             UploadDocumentHelper.setDocumentTypeForDocumentCollection(caseData);
             DocumentHelper.setDocumentNumbers(caseData);

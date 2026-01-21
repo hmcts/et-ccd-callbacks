@@ -132,12 +132,15 @@ public final class PseHelper {
             return "";
         }
         IntWrapper respondCount = new IntWrapper(0);
-        return detailsWrapper("Responses", sendNotificationType.getRespondCollection().stream()
+        String notificationToDisplay = sendNotificationType.getRespondCollection().stream()
                 .filter(sn -> shouldDisplayResponse(sn, party))
                 .map(r -> formatPartyReply(r.getValue(),
                         respondCount,
                         sendNotificationType.getSendNotificationSubject()))
-                .collect(Collectors.joining("")));
+                .collect(Collectors.joining(""));
+        return notificationToDisplay.isEmpty()
+                ? ""
+                : detailsWrapper("Responses", notificationToDisplay);
     }
 
     private static boolean shouldDisplayResponse(PseResponseTypeItem sn, String party) {

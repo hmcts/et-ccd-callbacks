@@ -994,12 +994,6 @@ class PseRespondToTribunalServiceTest {
             |Date sent|5 Aug 2022|\r
             |Sent by|Tribunal|\r
             |Sent to|Both parties|\r
-            <details class="govuk-details"> <summary class="govuk-details__summary">
-            <span class="govuk-details__summary-text">Responses</span></summary>
-            <div class="govuk-details__text">\n\n
-            
-            </div> </details>
-            
             """;
 
         assertThat(pseRespondToTribService.initialOrdReqDetailsTableMarkUp(caseData, RESPONDENT_TITLE),

@@ -7,27 +7,27 @@ import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.model.servicebus.CreateUpdatesMsg;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.TransferToEcmDataModel;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 
 import java.io.IOException;
 import java.util.List;
 
 /**
  * Service for transferring cases to ECM (Employment Case Management).
- * Migrated from et-message-handler.
  */
 @Slf4j
 @Service
 public class TransferToEcmService {
     
     private final CcdClient ccdClient;
-    private final UserService userService;
+    private final AdminUserService adminUserService;
     private final CreateEcmSingleService createEcmSingleService;
 
     @Autowired
-    public TransferToEcmService(CcdClient ccdClient, UserService userService, 
+    public TransferToEcmService(CcdClient ccdClient, AdminUserService adminUserService,
                                 CreateEcmSingleService createEcmSingleService) {
         this.ccdClient = ccdClient;
-        this.userService = userService;
+        this.adminUserService = adminUserService;
         this.createEcmSingleService = createEcmSingleService;
     }
 
@@ -39,7 +39,7 @@ public class TransferToEcmService {
             return;
         }
 
-        String accessToken = userService.getAccessToken();
+        String accessToken = adminUserService.getAdminUserToken();
 
         List<SubmitEvent> submitEvents = ccdClient.retrieveCasesElasticSearch(
             accessToken, createUpdatesMsg.getCaseTypeId(), createUpdatesMsg.getEthosCaseRefCollection());
@@ -49,7 +49,7 @@ public class TransferToEcmService {
                      createUpdatesMsg.getEthosCaseRefCollection());
         } else {
             log.info("Transferring cases {} to ECM", createUpdatesMsg.getEthosCaseRefCollection());
-            createEcmSingleService.sendCreation(submitEvents.get(0), accessToken, createUpdatesMsg);
+            createEcmSingleService.sendCreation(submitEvents.getFirst(), accessToken, createUpdatesMsg);
         }
     }
 }

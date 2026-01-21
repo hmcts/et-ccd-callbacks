@@ -2,7 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.messagehandler;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.servicebus.UpdateCaseMsg;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.LegalRepDataModel;
@@ -35,7 +34,6 @@ public class UpdateManagementService {
     private final MultipleErrorsRepository multipleErrorsRepository;
     private final MultipleUpdateService multipleUpdateService;
     private final SingleReadingService singleReadingService;
-    private final EmailService emailService;
     private final LegalRepAccessService legalRepAccessService;
 
     public void updateLogic(UpdateCaseMsg updateCaseMsg) throws IOException, InterruptedException,
@@ -82,9 +80,6 @@ public class UpdateManagementService {
                     multipleErrorsRepository.findByMultipleref(updateCaseMsg.getMultipleRef());
 
                 multipleUpdateService.sendUpdateToMultipleLogic(updateCaseMsg, multipleErrorsList);
-
-                sendEmailToUser(updateCaseMsg, multipleErrorsList);
-
             }
 
             deleteMultipleRefDatabase(updateCaseMsg.getMultipleRef());
@@ -103,31 +98,17 @@ public class UpdateManagementService {
         return multipleCounterRepository.persistentQGetNextMultipleCountVal(multipleRef);
     }
 
-    private void sendEmailToUser(UpdateCaseMsg updateCaseMsg, List<MultipleErrors> multipleErrorsList) {
-        try {
-            if (CollectionUtils.isNotEmpty(multipleErrorsList)) {
-                emailService.sendConfirmationErrorEmail(updateCaseMsg.getUsername(), multipleErrorsList,
-                                                        updateCaseMsg.getMultipleRef());
-            } else {
-                emailService.sendConfirmationEmail(updateCaseMsg.getUsername(), updateCaseMsg.getMultipleRef());
-            }
-        } catch (Exception e) {
-            log.error("Unable to send confirmation email to user {} for multiple {} ", updateCaseMsg.getUsername(),
-                      updateCaseMsg.getMultipleRef(), e);
-        }
-    }
-
     private void deleteMultipleRefDatabase(String multipleRef) {
 
         log.info("Clearing all multipleRef from DBs: " + multipleRef);
 
         log.info("Clearing multiple counter repository");
         List<MultipleCounter> multipleCounters = multipleCounterRepository.findByMultipleref(multipleRef);
-        multipleCounterRepository.deleteInBatch(multipleCounters);
+        multipleCounterRepository.deleteAllInBatch(multipleCounters);
 
         log.info("Clearing multiple errors repository");
         List<MultipleErrors> multipleErrors = multipleErrorsRepository.findByMultipleref(multipleRef);
-        multipleErrorsRepository.deleteInBatch(multipleErrors);
+        multipleErrorsRepository.deleteAllInBatch(multipleErrors);
 
         log.info("Deleted repositories");
     }

@@ -22,7 +22,10 @@ public class MultipleErrors {
 
     @Override
     public String toString() {
-        return "Ethos Case Reference: '" + this.ethoscaseref
-            + "', Description: '" + this.description + "'";
+        return """
+            MultipleRef: %s,
+            EthosCaseRef: %s,
+            Description: %s
+            """.formatted(multipleref, ethoscaseref, description);
     }
 }

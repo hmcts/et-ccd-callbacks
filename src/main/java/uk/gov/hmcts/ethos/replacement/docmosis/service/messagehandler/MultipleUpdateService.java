@@ -13,6 +13,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.MultipleErrors;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 
 import java.io.IOException;
 import java.util.List;
@@ -31,24 +32,24 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.TRANSFERRED_STATE;
 public class MultipleUpdateService {
 
     private final CcdClient ccdClient;
-    private final UserService userService;
+    private final AdminUserService adminUserService;
 
     @Autowired
-    public MultipleUpdateService(CcdClient ccdClient, UserService userService) {
+    public MultipleUpdateService(CcdClient ccdClient, AdminUserService adminUserService) {
         this.ccdClient = ccdClient;
-        this.userService = userService;
+        this.adminUserService = adminUserService;
     }
 
     public void sendUpdateToMultipleLogic(UpdateCaseMsg updateCaseMsg, List<MultipleErrors> multipleErrorsList)
         throws IOException {
-        String accessToken = userService.getAccessToken();
+        String accessToken = adminUserService.getAdminUserToken();
 
         List<SubmitMultipleEvent> submitMultipleEvents = retrieveMultipleCase(accessToken, updateCaseMsg);
         if (CollectionUtils.isNotEmpty(submitMultipleEvents)) {
             if (updateCaseMsg.getDataModelParent() instanceof CreationSingleDataModel) {
-                handleMultipleTransfer(submitMultipleEvents.get(0), updateCaseMsg, accessToken, multipleErrorsList);
+                handleMultipleTransfer(submitMultipleEvents.getFirst(), updateCaseMsg, accessToken, multipleErrorsList);
             } else {
-                sendUpdate(submitMultipleEvents.get(0), accessToken, updateCaseMsg, multipleErrorsList, OPEN_STATE);
+                sendUpdate(submitMultipleEvents.getFirst(), accessToken, updateCaseMsg, multipleErrorsList, OPEN_STATE);
             }
         } else {
             log.warn("No submit events found for {}", updateCaseMsg.getMultipleRef());

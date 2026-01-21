@@ -334,21 +334,34 @@ class TornadoServiceTest {
     }
 
     @Test
-    void getSelectedEt3Respondent_shouldReturnSelectedLabelWhenNotNull() {
+    void getDmStoreDocumentName_shouldReturnEt3ProcessingOutputName_withValidRespondent() {
         CaseData caseData = new CaseData();
-        DynamicFixedListType respondent = DynamicFixedListType.from("code", "Test Respondent", true);
+        DynamicFixedListType respondent = DynamicFixedListType.from("code", "Jane/Smith & Co.",
+                true);
         caseData.setEt3ChooseRespondent(respondent);
 
-        // Test via public API that uses getSelectedEt3Respondent internally
         String result = tornadoService.getDmStoreDocumentName(caseData, "ET3 Processing.pdf");
-        assertEquals("ET3 Processing - Test Respondent.pdf", result);
+        assertEquals("ET3 Processing - Jane Smith & Co..pdf", result);
     }
 
     @Test
-    void getDmStoreDocumentName_shouldReturnEt3ResponseOutputName_whenSubmitEt3RespondentNull() {
+    void getDmStoreDocumentName_shouldThrowException_whenEt3ProcessingRespondentNull() {
         CaseData caseData = new CaseData();
-        String result = tornadoService.getDmStoreDocumentName(caseData, "ET3 Response.pdf");
-        assertEquals(" - ET3 Response.pdf", result);
+        Exception exception = assertThrows(IllegalStateException.class, () ->
+                tornadoService.getDmStoreDocumentName(caseData, "ET3 Processing.pdf")
+        );
+        assertEquals("ET3 respondent must be selected before retrieving the selected label",
+                exception.getMessage());
+    }
+
+    @Test
+    void getDmStoreDocumentName_shouldThrowException_whenEt3ResponseRespondentNull() {
+        CaseData caseData = new CaseData();
+        Exception exception = assertThrows(IllegalStateException.class, () ->
+                tornadoService.getDmStoreDocumentName(caseData, "ET3 Response.pdf")
+        );
+        assertEquals("An ET3 submitting respondent must be selected before retrieving respondent label",
+                exception.getMessage());
     }
 
     private void createUserService() {

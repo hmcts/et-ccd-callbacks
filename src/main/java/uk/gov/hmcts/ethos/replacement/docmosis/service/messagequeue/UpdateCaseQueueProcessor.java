@@ -15,6 +15,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.UpdateCaseQue
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.messagequeue.UpdateCaseQueueRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.messagehandler.UpdateManagementService;
 
+import java.io.IOException;
 import java.net.InetAddress;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -117,19 +118,18 @@ public class UpdateCaseQueueProcessor {
                 
                 log.info("COMPLETED RECEIVED 'Update Case' ----> message with ID {}", queueMessage.getMessageId());
                 
-            } catch (java.io.IOException e) {
+            } catch (IOException e) {
                 // Unrecoverable error - mark as failed immediately
                 log.error("Unrecoverable error occurred when handling 'Update Case' message with ID {}",
                         queueMessage.getMessageId(), e);
                 handleUnrecoverableError(queueMessage, updateCaseMsg, e);
-            } catch (Exception e) {
+            } catch (InterruptedException interruptedException) {
+                Thread.currentThread().interrupt();
+            } catch (Exception exception) {
                 // Potentially recoverable error - allow retries
                 log.error("Potentially recoverable error occurred when handling 'Update Case' message with ID {}",
-                        queueMessage.getMessageId(), e);
-                if (e instanceof InterruptedException) {
-                    Thread.currentThread().interrupt();
-                }
-                throw e; // Will trigger retry logic in handleError
+                        queueMessage.getMessageId(), exception);
+                throw exception; // Will trigger retry logic in handleError
             }
 
         } catch (Exception e) {
@@ -138,9 +138,9 @@ public class UpdateCaseQueueProcessor {
     }
 
     @Transactional
-    protected void handleError(UpdateCaseQueueMessage queueMessage, Exception e) {
+    protected void handleError(UpdateCaseQueueMessage queueMessage, Exception exception) {
         log.error("Error processing update-case message {}: {}",
-                queueMessage.getMessageId(), e.getMessage(), e);
+                queueMessage.getMessageId(), exception.getMessage(), exception);
 
         int newRetryCount = queueMessage.getRetryCount() + 1;
         boolean isLastRetry = newRetryCount >= MAX_RETRIES;
@@ -151,7 +151,7 @@ public class UpdateCaseQueueProcessor {
 
         updateCaseQueueRepository.markAsFailed(
                 queueMessage.getMessageId(),
-                e.getMessage(),
+                exception.getMessage(),
                 newRetryCount,
                 newStatus,
                 LocalDateTime.now()
@@ -176,13 +176,13 @@ public class UpdateCaseQueueProcessor {
     @Transactional
     protected void handleUnrecoverableError(UpdateCaseQueueMessage queueMessage,
                                            UpdateCaseMsg updateCaseMsg,
-                                           Exception e) {
+                                           Exception exception) {
         log.info("UNRECOVERABLE FAILURE: Check if finished");
         
         // Mark as failed immediately (no retries for unrecoverable errors)
         updateCaseQueueRepository.markAsFailed(
                 queueMessage.getMessageId(),
-                e.getMessage(),
+                exception.getMessage(),
                 queueMessage.getRetryCount() + 1,
                 QueueMessageStatus.FAILED,
                 LocalDateTime.now()
@@ -198,8 +198,8 @@ public class UpdateCaseQueueProcessor {
             
             log.info("Checking if finished");
             updateManagementService.checkIfFinish(updateCaseMsg);
-        } catch (Exception e) {
-            log.error("Error in checkIfFinishWhenError", e);
+        } catch (Exception exception) {
+            log.error("Error in checkIfFinishWhenError", exception);
         }
     }
 }

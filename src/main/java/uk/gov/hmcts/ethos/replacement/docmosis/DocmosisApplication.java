@@ -30,10 +30,10 @@ public class DocmosisApplication implements CommandLineRunner {
 
     public static void main(String[] args) {
         final var application = new SpringApplication(DocmosisApplication.class);
-        final var instance = application.run(args);
-
-        if (System.getenv(TASK_NAME) != null) {
-            instance.close();
+        try (var ignored = application.run(args)) {
+            if (System.getenv(TASK_NAME) != null) {
+                log.info("Running task: {}", System.getenv(TASK_NAME));
+            }
         }
     }
 

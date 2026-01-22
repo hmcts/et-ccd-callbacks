@@ -1,3 +1,13 @@
+-- =====================================================
+-- Author: Harpreet Jhita
+-- Migration: V015__UpdateCaseQueue
+-- Created: 2026-01-21
+-- Description: Creates the update_case_queue table for database-backed message queue.
+--              Replaces Azure Service Bus with PostgreSQL-based queue for update-case messages.
+--              This is part of the migration from et-message-handler to et-ccd-callbacks.
+-- Version: 2026-01-21 - 1.0 - Initial version
+-- =====================================================
+
 -- Create table for update-case queue messages
 CREATE TABLE IF NOT EXISTS update_case_queue (
     id BIGSERIAL PRIMARY KEY,

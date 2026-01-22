@@ -158,9 +158,9 @@ public class CreateUpdatesQueueProcessor {
     }
 
     @Transactional
-    protected void handleError(CreateUpdatesQueueMessage queueMessage, Exception e) {
+    protected void handleError(CreateUpdatesQueueMessage queueMessage, Exception ex) {
         log.error("Error processing create-updates message {}: {}",
-                queueMessage.getMessageId(), e.getMessage(), e);
+                queueMessage.getMessageId(), ex.getMessage(), ex);
 
         int newRetryCount = queueMessage.getRetryCount() + 1;
         QueueMessageStatus newStatus = newRetryCount >= MAX_RETRIES
@@ -169,7 +169,7 @@ public class CreateUpdatesQueueProcessor {
 
         createUpdatesQueueRepository.markAsFailed(
                 queueMessage.getMessageId(),
-                e.getMessage(),
+                ex.getMessage(),
                 newRetryCount,
                 newStatus,
                 LocalDateTime.now()

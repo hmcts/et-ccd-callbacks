@@ -1,3 +1,5 @@
+import uk.gov.hmcts.rse.AuthMode
+
 plugins {
     id 'application'
     id 'java'
@@ -519,7 +521,7 @@ wrapper {
 bootWithCCD {
     // Simulates idam and s2s locally.
     // See rse-cft-lib/LibRunnerTask
-    authMode = uk.gov.hmcts.rse.AuthMode.Local
+    authMode = AuthMode.Local
 
     environment 'RSE_LIB_ADDITIONAL_DATABASES', 'et_cos,et_msg_handler,evidence,ethos,camunda,role_assignment,wa_workflow_api,cft_task_db,wa_case_event_messages_db,ccd_data,emstitch'
     environment 'CCD_S2S_AUTHORISED_SERVICES_CASE_USER_ROLES', 'aac_manage_case_assignment,et_cos,et_sya_api,et_msg_handler'
@@ -559,7 +561,7 @@ bootWithCCD {
 
 }
 
-pmdMain.maxFailures = 15
+pmdMain.maxFailures = 14
 pmdTest.maxFailures = 0
 
 pmdTest.ruleSetFiles = files("config/pmd/rulesetTest.xml")

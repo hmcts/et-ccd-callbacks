@@ -75,12 +75,12 @@ class CreateUpdatesQueueProcessorTest {
 
         // Then
         verify(createUpdatesQueueRepository).lockMessage(anyString(), anyString(), any(), any());
-        verify(updateCaseQueueSender, times(2)).sendMessage(any(UpdateCaseMsg.class)); // 2 cases in collection
+        verify(updateCaseQueueSender, times(2)).sendMessage(any(UpdateCaseMsg.class)); // 2 cases in the collection
         verify(createUpdatesQueueRepository).markAsCompleted(eq(queueMessage.getMessageId()), any());
     }
 
     @Test
-    void processMessage_alreadyLocked() throws Exception {
+    void processMessage_alreadyLocked() {
         // Given
         CreateUpdatesMsg msg = generateCreateUpdatesMsg();
         CreateUpdatesQueueMessage queueMessage = createQueueMessage(msg);
@@ -174,7 +174,7 @@ class CreateUpdatesQueueProcessorTest {
         return msg;
     }
 
-    private CreateUpdatesQueueMessage createQueueMessage(CreateUpdatesMsg msg) throws Exception {
+    private CreateUpdatesQueueMessage createQueueMessage(CreateUpdatesMsg msg) {
         return CreateUpdatesQueueMessage.builder()
                 .id(1L)
                 .messageId(msg.getMsgId())

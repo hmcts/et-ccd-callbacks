@@ -71,7 +71,7 @@ class UpdateCaseQueueProcessorTest {
 
         // Then
         verify(updateCaseQueueRepository).lockMessage(anyString(), anyString(), any(), any());
-        verify(updateManagementService).updateLogic(eq(msg));
+        verify(updateManagementService).updateLogic(msg);
         verify(updateCaseQueueRepository).markAsCompleted(eq(queueMessage.getMessageId()), any());
     }
 
@@ -114,7 +114,7 @@ class UpdateCaseQueueProcessorTest {
                 eq(QueueMessageStatus.FAILED),
                 any()
         );
-        verify(updateManagementService).addUnrecoverableErrorToDatabase(eq(msg));
+        verify(updateManagementService).addUnrecoverableErrorToDatabase(msg);
     }
 
     @Test
@@ -165,8 +165,8 @@ class UpdateCaseQueueProcessorTest {
                 eq(QueueMessageStatus.FAILED),
                 any()
         );
-        verify(updateManagementService).addUnrecoverableErrorToDatabase(eq(msg));
-        verify(updateManagementService).checkIfFinish(eq(msg));
+        verify(updateManagementService).addUnrecoverableErrorToDatabase(msg);
+        verify(updateManagementService).checkIfFinish(msg);
     }
 
     @Test
@@ -205,7 +205,7 @@ class UpdateCaseQueueProcessorTest {
         return msg;
     }
 
-    private UpdateCaseQueueMessage createQueueMessage(UpdateCaseMsg msg) throws Exception {
+    private UpdateCaseQueueMessage createQueueMessage(UpdateCaseMsg msg) {
         return UpdateCaseQueueMessage.builder()
                 .id(1L)
                 .messageId(msg.getMsgId())

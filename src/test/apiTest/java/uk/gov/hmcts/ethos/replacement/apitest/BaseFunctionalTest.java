@@ -56,7 +56,6 @@ import static org.apache.http.client.methods.RequestBuilder.post;
 @SpringBootTest(classes = {DocmosisApplication.class, TestCacheConfig.class})
 @Slf4j
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-@EnableAutoConfiguration(exclude = {DataSourceAutoConfiguration.class})
 public abstract class BaseFunctionalTest {
     public static final String AUTHORIZATION = "Authorization";
 

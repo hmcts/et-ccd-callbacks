@@ -371,8 +371,8 @@ public class TornadoService {
 
         if (respondent == null) {
             throw new IllegalStateException(
-                    "ET3 respondent must be selected before retrieving the selected label"
-            );
+                    String.format("ET3 respondent must be selected before retrieving the selected label for case %s",
+                            caseData.getEthosCaseReference()));
         }
         return respondent.getSelectedLabel();
     }
@@ -382,8 +382,9 @@ public class TornadoService {
         DynamicFixedListType respondent = caseData.getSubmitEt3Respondent();
         if (respondent == null) {
             throw new IllegalStateException(
-                    "An ET3 submitting respondent must be selected before retrieving respondent label"
-            );
+                    String.format("An ET3 submitting respondent must be selected before retrieving "
+                            + "respondent label for case %s",
+                            caseData.getEthosCaseReference()));
         }
         return respondent.getSelectedLabel();
     }

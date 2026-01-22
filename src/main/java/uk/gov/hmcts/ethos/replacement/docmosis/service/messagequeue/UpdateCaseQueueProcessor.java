@@ -195,9 +195,12 @@ public class UpdateCaseQueueProcessor {
         try {
             log.info("Adding unrecoverable error to database");
             updateManagementService.addUnrecoverableErrorToDatabase(updateCaseMsg);
-            
+
             log.info("Checking if finished");
             updateManagementService.checkIfFinish(updateCaseMsg);
+        } catch (InterruptedException interruptedException) {
+            log.error("Thread interrupted while checking if finished", interruptedException);
+            Thread.currentThread().interrupt();
         } catch (Exception exception) {
             log.error("Error in checkIfFinishWhenError", exception);
         }

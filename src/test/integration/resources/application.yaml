@@ -36,7 +36,7 @@ feign:
     enabled: 'true'
 
 tornado:
-  accessKey: ${TORNADO_ACCESS_KEY}
+  accessKey: ${TORNADO_ACCESS_KEY:test-key}
   url: ${TORNADO_URL:https://eu.dws3.docmosis.com/api/render}
 
 ccd:
@@ -90,7 +90,7 @@ springdoc:
   packagesToScan: uk.gov.hmcts.ethos.replacement.docmosis.controllers
   pathsToMatch: /**
 
-gov-notify-api-key: ${GOV_NOTIFY_API_KEY}
+gov-notify-api-key: ${GOV_NOTIFY_API_KEY:test-notify-key}
 
 template:
   referral: ${REFERRAL_TEMPLATE_ID:f975c1cc-e102-472a-a6cb-84dffa0a6d42}
@@ -213,8 +213,8 @@ template:
     cySubmitCaseEmailTemplateId: ${CY_SUBMIT_CASE_EMAIL_TEMPLATE_ID:7b1f33eb-31c5-4a00-b1a4-c1bca84bc441}
 etcos:
   system:
-    username: ${ET_COS_SYSTEM_USER}
-    password: ${ET_COS_SYSTEM_USER_PASSWORD}
+    username: ${ET_COS_SYSTEM_USER:test-user}
+    password: ${ET_COS_SYSTEM_USER_PASSWORD:test-password}
 
 assign_case_access_api_url: ${AAC_URL:http://localhost:4454}
 apply_noc_access_api_assignments_path: /noc/apply-decision

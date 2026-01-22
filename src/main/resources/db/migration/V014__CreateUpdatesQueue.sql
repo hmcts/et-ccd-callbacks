@@ -1,3 +1,13 @@
+-- =====================================================
+-- Author: Harpreet Jhita
+-- Migration: V014__CreateUpdatesQueue
+-- Created: 2026-01-21
+-- Description: Creates the create_updates_queue table for database-backed message queue.
+--              Replaces Azure Service Bus with PostgreSQL-based queue for create-updates messages.
+--              This is part of the migration from et-message-handler to et-ccd-callbacks.
+-- Version: 2026-01-21 - 1.0 - Initial version
+-- =====================================================
+
 -- Create table for create-updates queue messages
 CREATE TABLE IF NOT EXISTS create_updates_queue (
     id BIGSERIAL PRIMARY KEY,

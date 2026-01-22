@@ -7,16 +7,20 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.ApplicationContext;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.model.servicebus.CreateUpdatesMsg;
 import uk.gov.hmcts.ecm.common.model.servicebus.UpdateCaseMsg;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.CloseDataModel;
+import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.TransferToEcmDataModel;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.CreateUpdatesQueueMessage;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.QueueMessageStatus;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.messagequeue.CreateUpdatesQueueRepository;
 
 import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -172,6 +176,85 @@ class CreateUpdatesQueueProcessorTest {
         msg.setUsername("test@test.com");
         msg.setDataModelParent(new CloseDataModel());
         return msg;
+    }
+
+    @Test
+    void processMessage_transferToEcmDataModel() throws Exception {
+        // Given
+        CreateUpdatesMsg msg = generateCreateUpdatesMsg();
+        msg.setDataModelParent(new TransferToEcmDataModel());
+        CreateUpdatesQueueMessage queueMessage = createQueueMessage(msg);
+        
+        when(objectMapper.readValue(anyString(), eq(CreateUpdatesMsg.class))).thenReturn(msg);
+        when(createUpdatesQueueRepository.lockMessage(anyString(), anyString(), any(), any())).thenReturn(1);
+
+        // When
+        processor.processMessage(queueMessage);
+
+        // Then
+        verify(createUpdatesQueueRepository).lockMessage(anyString(), anyString(), any(), any());
+        verify(transferToEcmService).transferToEcm(msg);
+        verify(updateCaseQueueSender, never()).sendMessage(any(UpdateCaseMsg.class));
+        verify(createUpdatesQueueRepository).markAsCompleted(eq(queueMessage.getMessageId()), any());
+    }
+
+    @Test
+    void processMessage_maxRetriesReached() throws Exception {
+        // Given
+        CreateUpdatesMsg msg = generateCreateUpdatesMsg();
+        CreateUpdatesQueueMessage queueMessage = createQueueMessage(msg);
+        queueMessage.setRetryCount(9); // MAX_RETRIES = 10, so this is the last retry
+        
+        when(objectMapper.readValue(anyString(), eq(CreateUpdatesMsg.class)))
+                .thenThrow(new RuntimeException("Failed"));
+        when(createUpdatesQueueRepository.lockMessage(anyString(), anyString(), any(), any())).thenReturn(1);
+
+        // When
+        processor.processMessage(queueMessage);
+
+        // Then
+        verify(createUpdatesQueueRepository).markAsFailed(
+                eq(queueMessage.getMessageId()),
+                anyString(),
+                eq(10),
+                eq(QueueMessageStatus.FAILED),
+                any()
+        );
+    }
+
+    @Test
+    void processPendingMessages_emptyQueue() {
+        // Given
+        when(createUpdatesQueueRepository.findPendingMessages(any(LocalDateTime.class), any(PageRequest.class)))
+                .thenReturn(Collections.emptyList());
+
+        // When
+        processor.processPendingMessages();
+
+        // Then
+        verify(createUpdatesQueueRepository).findPendingMessages(any(LocalDateTime.class), any(PageRequest.class));
+        verify(applicationContext, never()).getBean(CreateUpdatesQueueProcessor.class);
+    }
+
+    @Test
+    void processPendingMessages_withMessages() {
+        // Given
+        CreateUpdatesMsg msg = generateCreateUpdatesMsg();
+        CreateUpdatesQueueMessage queueMessage = createQueueMessage(msg);
+        List<CreateUpdatesQueueMessage> messages = Arrays.asList(queueMessage);
+        
+        when(createUpdatesQueueRepository.findPendingMessages(any(LocalDateTime.class), any(PageRequest.class)))
+                .thenReturn(messages);
+        when(applicationContext.getBean(CreateUpdatesQueueProcessor.class))
+                .thenReturn(processor);
+
+        // When
+        processor.processPendingMessages();
+
+        // Then
+        verify(createUpdatesQueueRepository).findPendingMessages(any(LocalDateTime.class), any(PageRequest.class));
+        verify(applicationContext).getBean(CreateUpdatesQueueProcessor.class);
+        // Note: actual message processing happens in executor thread, so we can't verify it directly
     }
 
     private CreateUpdatesQueueMessage createQueueMessage(CreateUpdatesMsg msg) {

@@ -27,6 +27,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
@@ -77,13 +78,17 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OPEN_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_CHANGE_PERSONAL_DETAILS;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.UPDATED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_STRIKE_OUT_ALL_OR_PART_OF_THE_CLAIM;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.CASE_MANAGEMENT;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.CHANGE_OF_PARTYS_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.APPLICATION_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.ENGLISH_LANGUAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.CLAIMANT_REP_TITLE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TSEConstants.RESPONDENT_REP_TITLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentTypeItemUtil.createSupportingMaterial;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.TseApplicationUtil.getGenericTseApplicationTypeItem;
 
@@ -370,18 +375,51 @@ class TseClaimantRepReplyServiceTest {
                 .thenReturn(new DocumentInfo());
         when(documentManagementService.addDocumentToDocumentField(any()))
                 .thenReturn(DocumentFixtures.getUploadedDocumentType());
-        CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setCaseId("caseId");
         caseData.setClaimantRepResSupportingMaterial(createSupportingMaterial());
-        caseDetails.setCaseData(caseData);
-        caseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
 
-        tseClaimantRepReplyService.addTseClaimantRepReplyPdfToDocCollection(caseData, "testUserToken",
-                caseDetails.getCaseTypeId());
+        tseClaimantRepReplyService.addTseClaimantRepReplyPdfToDocCollection(
+                caseData,
+                "testUserToken",
+                ENGLANDWALES_CASE_TYPE_ID
+        );
 
-        MatcherAssert.assertThat(caseData.getDocumentCollection().size(), is(2));
-        MatcherAssert.assertThat(caseData.getDocumentCollection().getFirst().getValue().getTopLevelDocuments(),
-                is(CASE_MANAGEMENT));
+        assertThat(caseData.getDocumentCollection()).hasSize(2);
+        DocumentType actualDoc = caseData.getDocumentCollection().getFirst().getValue();
+        assertThat(actualDoc.getTopLevelDocuments())
+                .isEqualTo(CASE_MANAGEMENT);
+        assertThat(actualDoc.getDocumentType())
+                .isEqualTo(CHANGE_OF_PARTYS_DETAILS);
+    }
+
+    @Test
+    void addTseClaimantRepReplyPdfToDocCollection_ApplicantIsRespondent() throws IOException {
+        when(tornadoService.generateEventDocument(any(), anyString(), anyString(), anyString()))
+                .thenReturn(new DocumentInfo());
+        when(documentManagementService.addDocumentToDocumentField(any()))
+                .thenReturn(DocumentFixtures.getUploadedDocumentType());
+        GenericTseApplicationType mockTse = GenericTseApplicationType.builder()
+                .number("1")
+                .type(TSE_APP_STRIKE_OUT_ALL_OR_PART_OF_A_CLAIM)
+                .applicant(RESPONDENT_REP_TITLE)
+                .date("13 December 2022")
+                .details("Text")
+                .copyToOtherPartyYesOrNo(YES)
+                .build();
+        caseData.setGenericTseApplicationCollection(List.of(
+                GenericTseApplicationTypeItem.builder()
+                        .value(mockTse)
+                        .build()
+        ));
+
+        tseClaimantRepReplyService.addTseClaimantRepReplyPdfToDocCollection(
+                caseData,
+                "testUserToken",
+                ENGLANDWALES_CASE_TYPE_ID
+        );
+
+        assertThat(caseData.getDocumentCollection()).hasSize(1);
+        assertThat(caseData.getDocumentCollection().getFirst().getValue().getDocumentType())
+                .isEqualTo(APP_TO_STRIKE_OUT_ALL_OR_PART_OF_THE_CLAIM);
     }
 
     @ParameterizedTest

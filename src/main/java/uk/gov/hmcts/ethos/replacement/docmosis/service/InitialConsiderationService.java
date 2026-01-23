@@ -586,11 +586,16 @@ public class InitialConsiderationService {
      * @return jurisdiction code section
      */
     public String generateJurisdictionCodesHtml(List<JurCodesTypeItem> jurisdictionCodes, String caseTypeId) {
-        if (jurisdictionCodes == null) {
-            return "";
-        }
+        final String format = String.format(JURISDICTION_HEADER,
+                caseTypeId.startsWith(ENGLANDWALES_CASE_TYPE_ID) ? CODES_URL_ENGLAND : CODES_URL_SCOTLAND);
 
         StringBuilder sb = new StringBuilder();
+        if (jurisdictionCodes == null) {
+            sb.append(format);
+            return sb.toString();
+        }
+
+        sb.append(format);
 
         List<String> validJurisdictionCodes = jurisdictionCodes.stream()
                 .map(JurCodesTypeItem::getValue)
@@ -598,21 +603,14 @@ public class InitialConsiderationService {
                 .filter(jurisdictionCode -> {
                     String codeTxtOnly = jurisdictionCode.replaceAll("[^a-zA-Z]+", "");
                     return EnumUtils.isValidEnum(JurisdictionCode.class, codeTxtOnly);
-                })
-                .toList();
+                }).toList();
 
-        if (validJurisdictionCodes.isEmpty()) {
-            return "";
+        if (!validJurisdictionCodes.isEmpty()) {
+            validJurisdictionCodes.forEach(jurisdictionCode ->
+                    JurisdictionCodeHelper.populateCodeNameAndDescriptionHtml(sb, jurisdictionCode));
         }
 
-        sb.append(String.format(JURISDICTION_HEADER,
-                caseTypeId.startsWith(ENGLANDWALES_CASE_TYPE_ID) ? CODES_URL_ENGLAND : CODES_URL_SCOTLAND));
-
-        validJurisdictionCodes.forEach(
-                jurisdictionCode ->
-                        JurisdictionCodeHelper.populateCodeNameAndDescriptionHtml(sb, jurisdictionCode));
-
-        return sb.append("<hr>").toString();
+        return sb.toString();
     }
 
     /**

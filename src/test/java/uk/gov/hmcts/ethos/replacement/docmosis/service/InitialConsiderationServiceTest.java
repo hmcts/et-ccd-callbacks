@@ -66,12 +66,14 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CLAIMANT_HEARING_PANEL_PREFERENCE_MISSING;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CODES_URL_ENGLAND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CODES_URL_SCOTLAND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CVP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CVP_HEARING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.HEARING_MISSING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.HEARING_NOT_LISTED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.JSA;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.JURISDICTION_HEADER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.LIST_FOR_FINAL_HEARING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.LIST_FOR_PRELIMINARY_HEARING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.SEEK_COMMENTS;
@@ -145,7 +147,7 @@ class InitialConsiderationServiceTest {
             + "</a><br><br><h4>DAG</h4>Discrimination, including harassment or discrimination based on "
             + "association or perception on grounds of age<h4>SXD</h4>Discrimination, including "
             + "indirect discrimination, discrimination based on association or perception, or harassment on "
-            + "grounds of sex, marriage and civil partnership<hr>";
+            + "grounds of sex, marriage and civil partnership";
 
     private static final String EXPECTED_JURISDICTION_SCOTLAND_HTML = "<h2>Jurisdiction codes</h2><a "
         + "target=\"_blank\" href=\"https://judiciary.sharepoint"
@@ -155,7 +157,7 @@ class InitialConsiderationServiceTest {
         + "</a><br><br><h4>DAG</h4>Discrimination, including harassment or discrimination "
         + "based on association or perception on grounds of age<h4>SXD</h4>"
         + "Discrimination, including indirect discrimination, discrimination based on association or perception, "
-        + "or harassment on grounds of sex, marriage and civil partnership<hr>";
+        + "or harassment on grounds of sex, marriage and civil partnership";
 
     private CaseData caseDataEmpty;
     private CaseData caseData;
@@ -606,20 +608,18 @@ class InitialConsiderationServiceTest {
 
     @Test
     void missingJurisdictionCollectionTest() {
-        String jurisdictionCodesHtml =
-            initialConsiderationService.generateJurisdictionCodesHtml(caseDataEmpty.getJurCodesCollection(),
-                ENGLANDWALES_CASE_TYPE_ID);
-        assertThat(jurisdictionCodesHtml)
-            .isEmpty();
+        final String jurisdictionCode = String.format(JURISDICTION_HEADER, CODES_URL_ENGLAND);
+        String jurisdictionCodesHtml = initialConsiderationService.generateJurisdictionCodesHtml(
+                caseDataEmpty.getJurCodesCollection(), ENGLANDWALES_CASE_TYPE_ID);
+        assertEquals(jurisdictionCodesHtml, jurisdictionCode);
     }
 
     @Test
     void invalidJurisdictionCollectionTest() {
-        String jurisdictionCodesHtml =
-            initialConsiderationService.generateJurisdictionCodesHtml(generateInvalidJurisdictionCodes(),
-                ENGLANDWALES_CASE_TYPE_ID);
-        assertThat(jurisdictionCodesHtml)
-            .isEmpty();
+        final String jurisdictionCode = String.format(JURISDICTION_HEADER, CODES_URL_ENGLAND);
+        String jurisdictionCodesHtml = initialConsiderationService.generateJurisdictionCodesHtml(
+                generateInvalidJurisdictionCodes(), ENGLANDWALES_CASE_TYPE_ID);
+        assertEquals(jurisdictionCodesHtml, jurisdictionCode);
     }
 
     @Test
@@ -1152,17 +1152,15 @@ class InitialConsiderationServiceTest {
         String result = initialConsiderationService.generateJurisdictionCodesHtml(null,
                 ENGLANDWALES_CASE_TYPE_ID);
 
-        assertThat(result).isEmpty();
+        assertThat(result).isNotEmpty();
     }
 
     @Test
     void generateJurisdictionCodesHtml_shouldReturnEmptyString_whenJurisdictionCodesAreEmpty() {
         List<JurCodesTypeItem> jurisdictionCodes = new ArrayList<>();
-
         String result = initialConsiderationService.generateJurisdictionCodesHtml(jurisdictionCodes,
                 ENGLANDWALES_CASE_TYPE_ID);
-
-        assertThat(result).isEmpty();
+        assertThat(result).isNotEmpty();
     }
 
     @Test
@@ -1191,11 +1189,11 @@ class InitialConsiderationServiceTest {
     @Test
     void generateJurisdictionCodesHtml_shouldIgnoreInvalidJurisdictionCodes() {
         List<JurCodesTypeItem> jurisdictionCodes = generateInvalidJurisdictionCodes();
-
         String result = initialConsiderationService.generateJurisdictionCodesHtml(jurisdictionCodes,
                 ENGLANDWALES_CASE_TYPE_ID);
 
-        assertThat(result).isEmpty();
+        assertThat(result).isNotEmpty();
+        assertThat(result).contains("<h2>Jurisdiction codes</h2>");
     }
 
     @Test

@@ -146,4 +146,18 @@ class NocNotificationHelperTest {
                 .getRespondentNameForNewSolicitor(caseData.getChangeOrganisationRequestField(), caseData);
         assertThat(respondentName, is(RESPONDENT_NAME));
     }
+
+    @Test
+    void testGetRespondentNameForNewSolicitor_nullChangeRequest() {
+        String respondentName = NocNotificationHelper.getRespondentNameForNewSolicitor(null, caseData);
+        assertThat(respondentName, is("Unknown"));
+    }
+
+    @Test
+    void testGetRespondentNameForNewSolicitor_nullCaseRoleId() {
+        caseData.getChangeOrganisationRequestField().setCaseRoleId(null);
+        String respondentName = NocNotificationHelper
+                .getRespondentNameForNewSolicitor(caseData.getChangeOrganisationRequestField(), caseData);
+        assertThat(respondentName, is("Unknown"));
+    }
 }

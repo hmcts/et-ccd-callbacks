@@ -120,7 +120,7 @@ class HearingsHelperTest {
     void setEtInitialConsiderationListedHearingType_setsHearingTypeWhenEarliestListedHearingExists() {
         DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
         DateListedType dateListedType = new DateListedType();
-        dateListedType.setListedDate("2025-12-01T10:00:00.000");
+        dateListedType.setListedDate("2030-12-01T10:00:00.000");
         dateListedType.setHearingStatus("Listed");
         dateListedTypeItem.setValue(dateListedType);
 
@@ -165,7 +165,7 @@ class HearingsHelperTest {
 
     private static @NotNull HearingType getHearingType() {
         DateListedType dateListedType = new DateListedType();
-        dateListedType.setListedDate("2026-08-01T10:00:00.000");
+        dateListedType.setListedDate("2030-08-01T10:00:00.000");
         dateListedType.setHearingStatus("Listed");
         DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
         dateListedTypeItem.setValue(dateListedType);

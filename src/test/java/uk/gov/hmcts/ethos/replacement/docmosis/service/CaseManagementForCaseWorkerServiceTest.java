@@ -1617,13 +1617,13 @@ class CaseManagementForCaseWorkerServiceTest {
     }
 
     private static Stream<Arguments> provideHearingCollectionsForNextListedDate() {
-        HearingTypeItem hearingWithFutureDate = createHearingTypeItem("2026-01-01T10:00:00");
+        HearingTypeItem hearingWithFutureDate = createHearingTypeItem("2030-11-01T10:00:00");
         HearingTypeItem hearingWithPastDate = createHearingTypeItem("2020-01-01T10:00:00");
         HearingTypeItem hearingWithCurrentDate = createHearingTypeItem(LocalDateTime.now().toString());
         HearingTypeItem hearingWithInvalidDate = createHearingTypeItem("not-a-date");
 
         return Stream.of(
-                Arguments.of(List.of(hearingWithFutureDate, hearingWithPastDate), "2026-01-01"),
+                Arguments.of(List.of(hearingWithFutureDate, hearingWithPastDate), "2030-11-01"),
                 Arguments.of(List.of(hearingWithPastDate, hearingWithCurrentDate), ""),
                 Arguments.of(List.of(hearingWithInvalidDate), ""),
                 Arguments.of(new ArrayList<>(), null),

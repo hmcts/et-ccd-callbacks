@@ -7,10 +7,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
-import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
-import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
@@ -25,11 +22,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @ExtendWith(SpringExtension.class)
 class NocNotificationHelperTest {
     private static final String RESPONDENT_NAME_1 = "Respondent Name 1";
-    private static final String RESPONDENT_NAME_2 = "Respondent Name 2";
-    private static final String RESPONDENT_ID_1 = "Respondent Id 1";
-    private static final String RESPONDENT_ID_2 = "Respondent Id 2";
-    private static final String REPRESENTATIVE_ID_1 = "Representative Id 1";
-    private static final String REPRESENTATIVE_ID_2 = "Representative Id 2";
     private static final String NEW_REP_EMAIL = "rep1@test.com";
     private static final String OLD_REP_EMAIL = "rep2@test.com";
     private static final String NEW_ORG_ID = "1";
@@ -150,45 +142,5 @@ class NocNotificationHelperTest {
         String respondentName = NocNotificationHelper
                 .getRespondentNameForNewSolicitor(caseData.getChangeOrganisationRequestField(), caseData);
         assertThat(respondentName).isEqualTo(RESPONDENT_NAME_1);
-    }
-
-    @Test
-    void theFindRespondentByRepresentative() {
-        // when case data is null should return null
-        RepresentedTypeRItem representative = RepresentedTypeRItem.builder().build();
-        assertThat(NocNotificationHelper.findRespondentByRepresentative(null, representative)).isNull();
-        // when case data respondent collection is empty should return null
-        CaseData tmpCaseData = new CaseData();
-        tmpCaseData.setRespondentCollection(new ArrayList<>());
-        assertThat(NocNotificationHelper.findRespondentByRepresentative(tmpCaseData, representative)).isNull();
-        // when representative is null should return null
-        RespondentSumTypeItem tmpRespondentSumTypeItem = new RespondentSumTypeItem();
-        tmpCaseData.getRespondentCollection().add(tmpRespondentSumTypeItem);
-        assertThat(NocNotificationHelper.findRespondentByRepresentative(caseData, null)).isNull();
-        // when representative not has value should return null
-        assertThat(NocNotificationHelper.findRespondentByRepresentative(tmpCaseData, representative)).isNull();
-        // when representative not has id, respondent name or respondent id should return null
-        representative.setValue(RepresentedTypeR.builder().build());
-        assertThat(NocNotificationHelper.findRespondentByRepresentative(tmpCaseData, representative)).isNull();
-        // When respondent found by id should return that respondent
-        tmpRespondentSumTypeItem.setId(RESPONDENT_ID_1);
-        tmpRespondentSumTypeItem.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_1)
-                .representativeId(REPRESENTATIVE_ID_1).build());
-        representative.getValue().setRespondentId(RESPONDENT_ID_1);
-        assertThat(NocNotificationHelper.findRespondentByRepresentative(tmpCaseData, representative))
-                .isEqualTo(tmpRespondentSumTypeItem);
-        // When respondent found by name should return that respondent
-        representative.getValue().setRespondentId(RESPONDENT_ID_2);
-        representative.getValue().setRespRepName(RESPONDENT_NAME_1);
-        assertThat(NocNotificationHelper.findRespondentByRepresentative(tmpCaseData, representative))
-                .isEqualTo(tmpRespondentSumTypeItem);
-        // when respondent found by representative id should return that respondent.
-        representative.getValue().setRespRepName(RESPONDENT_NAME_2);
-        representative.setId(REPRESENTATIVE_ID_1);
-        assertThat(NocNotificationHelper.findRespondentByRepresentative(tmpCaseData, representative))
-                .isEqualTo(tmpRespondentSumTypeItem);
-        // when respondent not found by id, name and representative id should return null
-        representative.setId(REPRESENTATIVE_ID_2);
-        assertThat(NocNotificationHelper.findRespondentByRepresentative(tmpCaseData, representative)).isNull();
     }
 }

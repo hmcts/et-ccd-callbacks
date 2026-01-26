@@ -7,8 +7,10 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 
 import java.util.ArrayList;
@@ -434,5 +436,47 @@ final class RespondentRepresentativeUtilsTest {
         assertThat(expectedRepresentatives).isNotEmpty().hasSize(NumberUtils.INTEGER_ONE);
         assertThat(expectedRepresentatives.getFirst()).isEqualTo(representative);
 
+    }
+
+    @Test
+    void theFindRespondentByRepresentative() {
+        // when case data is null should return null
+        RepresentedTypeRItem representative = RepresentedTypeRItem.builder().build();
+        assertThat(RespondentRepresentativeUtils.findRespondentByRepresentative(null, representative))
+                .isNull();
+        // when case data respondent collection is empty should return null
+        CaseData tmpCaseData = new CaseData();
+        tmpCaseData.setRespondentCollection(new ArrayList<>());
+        assertThat(RespondentRepresentativeUtils.findRespondentByRepresentative(tmpCaseData, representative)).isNull();
+        // when representative is null should return null
+        RespondentSumTypeItem tmpRespondentSumTypeItem = new RespondentSumTypeItem();
+        tmpCaseData.getRespondentCollection().add(tmpRespondentSumTypeItem);
+        assertThat(RespondentRepresentativeUtils.findRespondentByRepresentative(tmpCaseData, null))
+                .isNull();
+        // when representative not has value should return null
+        assertThat(RespondentRepresentativeUtils.findRespondentByRepresentative(tmpCaseData, representative)).isNull();
+        // when representative not has id, respondent name or respondent id should return null
+        representative.setValue(RepresentedTypeR.builder().build());
+        assertThat(RespondentRepresentativeUtils.findRespondentByRepresentative(tmpCaseData, representative)).isNull();
+        // When respondent found by id should return that respondent
+        tmpRespondentSumTypeItem.setId(RESPONDENT_ID_1);
+        tmpRespondentSumTypeItem.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_1)
+                .representativeId(REPRESENTATIVE_ID_1).build());
+        representative.getValue().setRespondentId(RESPONDENT_ID_1);
+        assertThat(RespondentRepresentativeUtils.findRespondentByRepresentative(tmpCaseData, representative))
+                .isEqualTo(tmpRespondentSumTypeItem);
+        // When respondent found by name should return that respondent
+        representative.getValue().setRespondentId(RESPONDENT_ID_2);
+        representative.getValue().setRespRepName(RESPONDENT_NAME_1);
+        assertThat(RespondentRepresentativeUtils.findRespondentByRepresentative(tmpCaseData, representative))
+                .isEqualTo(tmpRespondentSumTypeItem);
+        // when respondent found by representative id should return that respondent.
+        representative.getValue().setRespRepName(RESPONDENT_NAME_2);
+        representative.setId(REPRESENTATIVE_ID_1);
+        assertThat(RespondentRepresentativeUtils.findRespondentByRepresentative(tmpCaseData, representative))
+                .isEqualTo(tmpRespondentSumTypeItem);
+        // when respondent not found by id, name and representative id should return null
+        representative.setId(REPRESENTATIVE_ID_2);
+        assertThat(RespondentRepresentativeUtils.findRespondentByRepresentative(tmpCaseData, representative)).isNull();
     }
 }

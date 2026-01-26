@@ -37,7 +37,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.createLinkForUploadedDocument;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantNonSystemUser;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isRepresentedClaimantWithMyHmctsCase;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantRepresentedByMyHmctsOrganisation;
 
 @Service
 @RequiredArgsConstructor
@@ -234,10 +234,10 @@ public class RespondNotificationService {
             templateId = responseTemplateId;
         }
 
-        String claimantEmail = isRepresentedClaimantWithMyHmctsCase(caseData)
+        String claimantEmail = isClaimantRepresentedByMyHmctsOrganisation(caseData)
                 ? caseData.getRepresentativeClaimantType().getRepresentativeEmailAddress()
                 : caseData.getClaimantType().getClaimantEmailAddress();
-        String claimantUrl = isRepresentedClaimantWithMyHmctsCase(caseData)
+        String claimantUrl = isClaimantRepresentedByMyHmctsOrganisation(caseData)
                 ? emailService.getExuiCaseLink(caseDetails.getCaseId())
                 : emailService.getCitizenCaseLink(caseDetails.getCaseId());
 

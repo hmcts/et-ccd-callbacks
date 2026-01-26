@@ -1,18 +1,13 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
-import io.micrometer.common.util.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentUtils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -134,41 +129,5 @@ public final class NocNotificationHelper {
         return caseData.getRespondentCollection().stream()
                 .map(respondent -> respondent.getValue().getRespondentName())
                 .collect(Collectors.joining(" "));
-    }
-
-    /**
-     * Resolves the respondent name associated with the given representative.
-     * <p>
-     * If the representative already contains a respondent name, that value is returned.
-     * Otherwise, the method attempts to derive the respondent name using the respondent
-     * ID from the provided {@link CaseData}. If the respondent cannot be resolved, or if
-     * the required data is missing or invalid, {@code UNKNOWN} is returned.
-     *
-     * @param caseData the case data containing the respondent collection
-     * @param representative the representative whose associated respondent name is required
-     * @return the resolved respondent name, or {@code UNKNOWN} if it cannot be determined
-     */
-    public static RespondentSumTypeItem findRespondentByRepresentative(CaseData caseData,
-                                                                       RepresentedTypeRItem representative) {
-        if (ObjectUtils.isEmpty(caseData)
-                || CollectionUtils.isEmpty(caseData.getRespondentCollection())
-                || ObjectUtils.isEmpty(representative)
-                || ObjectUtils.isEmpty(representative.getValue())
-                || StringUtils.isBlank(representative.getValue().getRespondentId())
-                && StringUtils.isBlank(representative.getValue().getRespRepName())
-                && StringUtils.isBlank(representative.getId())) {
-            return null;
-        }
-        RespondentSumTypeItem respondent = RespondentUtils.findRespondentById(caseData.getRespondentCollection(),
-                representative.getValue().getRespondentId());
-        if (ObjectUtils.isEmpty(respondent)) {
-            respondent = RespondentUtils.findRespondentByName(caseData.getRespondentCollection(),
-                    representative.getValue().getRespRepName());
-        }
-        if (ObjectUtils.isEmpty(respondent)) {
-            respondent = RespondentUtils.findRespondentByRepresentativeId(caseData.getRespondentCollection(),
-                    representative.getId());
-        }
-        return respondent;
     }
 }

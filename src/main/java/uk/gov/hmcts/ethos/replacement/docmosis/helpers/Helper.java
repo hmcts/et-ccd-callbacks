@@ -38,7 +38,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static org.apache.commons.lang3.ObjectUtils.defaultIfNull;
+import static org.apache.commons.lang3.ObjectUtils.getIfNull;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_ACAS;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_CASE_LISTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.BF_ACTION_CASE_PAPERS;
@@ -69,7 +69,6 @@ public final class Helper {
             + "be added from the List Hearing menu item";
     public static final String HEARING_CREATION_DAY_ERROR = "A new day for a hearing can "
             + "only be added from the List Hearing menu item";
-    private static final String MY_HMCTS = "MyHMCTS";
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper().registerModule(new JavaTimeModule());
 
     private Helper() {
@@ -321,8 +320,8 @@ public final class Helper {
                                        && caseData.getHubLinksStatuses() == null;
 
             return (isNotaSystemUser
-                    || YES.equals(defaultIfNull(caseData.getMigratedFromEcm(), NO)))
-                    && !isRepresentedClaimantWithMyHmctsCase(caseData);
+                    || YES.equals(getIfNull(caseData.getMigratedFromEcm(), NO)))
+                    && !isClaimantRepresentedByMyHmctsOrganisation(caseData);
         }
         return true;
     }
@@ -377,7 +376,21 @@ public final class Helper {
         return CollectionUtils.isEmpty(list) ? null : list.getFirst();
     }
 
-    public static boolean isRepresentedClaimantWithMyHmctsCase(CaseData caseData) {
+    /**
+     * Determines whether the claimant is represented by a MyHMCTS organisation.
+     * <p>
+     * This returns {@code true} only if:
+     * <ul>
+     *   <li>the claimant has confirmed they are represented,</li>
+     *   <li>a claimant representative type is present, and</li>
+     *   <li>the representative is associated with a MyHMCTS organisation.</li>
+     * </ul>
+     *
+     * @param caseData the case data containing claimant representation details
+     * @return {@code true} if the claimant is represented by a MyHMCTS organisation;
+     *         {@code false} otherwise
+     */
+    public static boolean isClaimantRepresentedByMyHmctsOrganisation(CaseData caseData) {
         return YES.equals(caseData.getClaimantRepresentedQuestion())
                && ObjectUtils.isNotEmpty(caseData.getRepresentativeClaimantType())
                && ObjectUtils.isNotEmpty(caseData.getRepresentativeClaimantType().getMyHmctsOrganisation());

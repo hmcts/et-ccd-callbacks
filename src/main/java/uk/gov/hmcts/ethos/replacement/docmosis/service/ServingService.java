@@ -28,7 +28,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.addressIsEmpty;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantNonSystemUser;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isRepresentedClaimantWithMyHmctsCase;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantRepresentedByMyHmctsOrganisation;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService.ADDRESS_NOT_ENTERED;
 
 @Service
@@ -181,7 +181,7 @@ public class ServingService {
 
         List<CaseUserAssignment> caseUserAssignments =
                 caseAccessService.getCaseUserAssignmentsById(caseDetails.getCaseId());
-        if (isRepresentedClaimantWithMyHmctsCase(caseDetails.getCaseData())) {
+        if (isClaimantRepresentedByMyHmctsOrganisation(caseDetails.getCaseData())) {
             personalisation = NotificationHelper.buildMapForClaimantRepresentative(caseDetails.getCaseData());
             personalisation.put(LINK_TO_EXUI, emailService.getExuiCaseLink(caseDetails.getCaseId()));
 

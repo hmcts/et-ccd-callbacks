@@ -1074,8 +1074,8 @@ class NocRespondentRepresentativeServiceTest {
         callbackRequest.setCaseDetails(newCaseDetails);
         // when representatives to remove is empty should not send any email
         nocRespondentRepresentativeService.removeOldRepresentatives(callbackRequest, USER_TOKEN);
-        verify(nocNotificationService, times(NumberUtils.INTEGER_ZERO)).sendRemovedRepresentationEmails(
-                eq(oldCaseDetails), eq(newCaseDetails), anyList());
+        verify(nocNotificationService, times(NumberUtils.INTEGER_ZERO))
+                .sendRespondentRepresentationRemovalNotifications(eq(oldCaseDetails), eq(newCaseDetails), anyList());
         // when representatives to remove is not empty should send email
         RepresentedTypeRItem representative1 = RepresentedTypeRItem.builder().id(REPRESENTATIVE_ID_ONE).value(
                 RepresentedTypeR.builder().respondentId(RESPONDENT_ID_ONE).build()).build();
@@ -1083,16 +1083,17 @@ class NocRespondentRepresentativeServiceTest {
         RepresentedTypeRItem representative2 = RepresentedTypeRItem.builder().id(REPRESENTATIVE_ID_TWO).value(
                 RepresentedTypeR.builder().respondentId(RESPONDENT_ID_TWO).build()).build();
         newCaseDetails.getCaseData().setRepCollection(List.of(representative2));
-        doNothing().when(nocNotificationService).sendRemovedRepresentationEmails(any(CaseDetails.class),
-                any(CaseDetails.class), anyList());
+        doNothing().when(nocNotificationService).sendRespondentRepresentationRemovalNotifications(
+                any(CaseDetails.class), any(CaseDetails.class), anyList());
         nocRespondentRepresentativeService.removeOldRepresentatives(callbackRequest, USER_TOKEN);
-        verify(nocNotificationService, times(NumberUtils.INTEGER_ONE)).sendRemovedRepresentationEmails(
+        verify(nocNotificationService, times(NumberUtils.INTEGER_ONE)).sendRespondentRepresentationRemovalNotifications(
                 any(CaseDetails.class), any(CaseDetails.class), anyList());
         // when unable to send removed representation emails should log error.
         doThrow(new RuntimeException(EXCEPTION_DUMMY_MESSAGE)).when(nocNotificationService)
-                .sendRemovedRepresentationEmails(any(CaseDetails.class), any(CaseDetails.class), anyList());
+                .sendRespondentRepresentationRemovalNotifications(any(CaseDetails.class), any(CaseDetails.class),
+                        anyList());
         nocRespondentRepresentativeService.removeOldRepresentatives(callbackRequest, USER_TOKEN);
-        verify(nocNotificationService, times(NumberUtils.INTEGER_TWO)).sendRemovedRepresentationEmails(
+        verify(nocNotificationService, times(NumberUtils.INTEGER_TWO)).sendRespondentRepresentationRemovalNotifications(
                 any(CaseDetails.class), any(CaseDetails.class), anyList());
         assertThat(appender.list)
                 .filteredOn(e -> e.getLevel() == Level.INFO)
@@ -1130,7 +1131,7 @@ class NocRespondentRepresentativeServiceTest {
                 eq(CASE_TYPE_ID_ENGLAND_WALES), eq(JURISDICTION_EMPLOYMENT), any(CCDRequest.class), eq(CASE_ID_1)))
                 .thenReturn(new SubmitEvent());
         nocRespondentRepresentativeService.removeOldRepresentatives(callbackRequest, USER_TOKEN);
-        verify(nocNotificationService, times(INTEGER_THREE)).sendRemovedRepresentationEmails(
+        verify(nocNotificationService, times(INTEGER_THREE)).sendRespondentRepresentationRemovalNotifications(
                 any(CaseDetails.class), any(CaseDetails.class), anyList());
         assertThat(newCaseDetails.getCaseData().getRespondentOrganisationPolicy0()).isEqualTo(OrganisationPolicy
                 .builder().orgPolicyCaseAssignedRole(ROLE_SOLICITORA).build());

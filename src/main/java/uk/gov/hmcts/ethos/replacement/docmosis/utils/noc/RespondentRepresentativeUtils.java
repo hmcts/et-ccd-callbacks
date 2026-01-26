@@ -446,4 +446,40 @@ public final class RespondentRepresentativeUtils {
         }
         return newRepresentativesToReturn;
     }
+
+    /**
+     * Resolves the respondent name associated with the given representative.
+     * <p>
+     * If the representative already contains a respondent name, that value is returned.
+     * Otherwise, the method attempts to derive the respondent name using the respondent
+     * ID from the provided {@link CaseData}. If the respondent cannot be resolved, or if
+     * the required data is missing or invalid, {@code UNKNOWN} is returned.
+     *
+     * @param caseData the case data containing the respondent collection
+     * @param representative the representative whose associated respondent name is required
+     * @return the resolved respondent name, or {@code UNKNOWN} if it cannot be determined
+     */
+    public static RespondentSumTypeItem findRespondentByRepresentative(CaseData caseData,
+                                                                       RepresentedTypeRItem representative) {
+        if (ObjectUtils.isEmpty(caseData)
+                || CollectionUtils.isEmpty(caseData.getRespondentCollection())
+                || ObjectUtils.isEmpty(representative)
+                || ObjectUtils.isEmpty(representative.getValue())
+                || StringUtils.isBlank(representative.getValue().getRespondentId())
+                && StringUtils.isBlank(representative.getValue().getRespRepName())
+                && StringUtils.isBlank(representative.getId())) {
+            return null;
+        }
+        RespondentSumTypeItem respondent = RespondentUtils.findRespondentById(caseData.getRespondentCollection(),
+                representative.getValue().getRespondentId());
+        if (org.springframework.util.ObjectUtils.isEmpty(respondent)) {
+            respondent = RespondentUtils.findRespondentByName(caseData.getRespondentCollection(),
+                    representative.getValue().getRespRepName());
+        }
+        if (org.springframework.util.ObjectUtils.isEmpty(respondent)) {
+            respondent = RespondentUtils.findRespondentByRepresentativeId(caseData.getRespondentCollection(),
+                    representative.getId());
+        }
+        return respondent;
+    }
 }

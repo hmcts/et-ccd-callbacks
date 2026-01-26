@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.noc;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,14 +23,15 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseAccessService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.ClaimantUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.LoggingUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.ClaimantRepresentativeUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.RespondentRepresentativeUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
@@ -40,10 +42,12 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.ERROR_FAILED_TO_SEND_EMAIL_ORGANISATION_ADMIN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.ERROR_FAILED_TO_SEND_EMAIL_RESPONDENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.ERROR_FAILED_TO_SEND_EMAIL_TRIBUNAL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.EXCEPTION_CASE_DETAILS_NOT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.WARNING_CLAIMANT_EMAIL_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_MISSING_EMAIL_ADDRESS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantNonSystemUser;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isRepresentedClaimantWithMyHmctsCase;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantRepresentedByMyHmctsOrganisation;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper.buildNoCPersonalisation;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper.buildPersonalisationWithPartyName;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation;
@@ -76,42 +80,56 @@ public class NocNotificationService {
     @Value("${template.nocNotification.tribunal}")
     private String tribunalTemplateId;
 
-    public void sendRemovedRepresentationEmails(CaseDetails oldCaseDetails,
-                                                CaseDetails newCaseDetails,
-                                                List<RepresentedTypeRItem> revokedRepresentatives) {
+    public void sendRespondentRepresentationRemovalNotifications(CaseDetails oldCaseDetails,
+                                                                 CaseDetails newCaseDetails,
+                                                                 List<RepresentedTypeRItem> revokedRepresentatives) {
+        if (CollectionUtils.isEmpty(revokedRepresentatives)) {
+            return;
+        }
         for (RepresentedTypeRItem revokedRepresentative : revokedRepresentatives) {
             if (!RespondentRepresentativeUtils.isValidRepresentative(revokedRepresentative)) {
                 continue;
             }
             CaseData oldCaseData = oldCaseDetails.getCaseData();
-            RespondentSumTypeItem respondent = NocNotificationHelper.findRespondentByRepresentative(oldCaseData,
+            RespondentSumTypeItem respondent = RespondentRepresentativeUtils.findRespondentByRepresentative(oldCaseData,
                     revokedRepresentative);
-            if (respondent == null || !RespondentUtils.isValidRespondent(respondent)) {
+            if (!RespondentUtils.isValidRespondent(respondent)) {
                 continue;
             }
-            if (!isClaimantNonSystemUser(oldCaseData) || isRepresentedClaimantWithMyHmctsCase(oldCaseData)) {
+            assert respondent != null;
+
+            // Sending notification e-mail to claimant
+            if (!isClaimantNonSystemUser(oldCaseData)) {
                 sendClaimantEmail(oldCaseDetails, newCaseDetails, respondent.getValue().getRespondentName());
             }
-            if (StringUtils.isBlank(respondent.getValue().getRespondentEmail())) {
-                log.warn(WARNING_MISSING_EMAIL_ADDRESS, oldCaseDetails.getCaseId());
-            } else {
-                Map<String, String> personalisation = buildNoCPersonalisation(oldCaseDetails,
-                        respondent.getValue().getRespondentName());
-                try {
-                    emailService.sendEmail(respondentTemplateId, respondent.getValue().getRespondentEmail(),
-                            personalisation);
-                } catch (Exception e) {
-                    LoggingUtils.logNotificationIssue(ERROR_FAILED_TO_SEND_EMAIL_RESPONDENT,
-                            respondent.getValue().getRespondentEmail(), e);
-                }
-            }
+
+            // sending notification email to organisation admin of the representative
             if (ObjectUtils.isNotEmpty(revokedRepresentative.getValue().getRespondentOrganisation())
                     && StringUtils.isNotBlank(revokedRepresentative.getValue().getRespondentOrganisation()
                     .getOrganisationID())) {
                 sendEmailToOldOrgAdmin(revokedRepresentative.getValue().getRespondentOrganisation().getOrganisationID(),
                         oldCaseData);
             }
-            sendTribunalEmail(oldCaseData);
+
+            // sending notification e-mail to tribunal
+            if (StringUtils.isNotBlank(oldCaseData.getTribunalCorrespondenceEmail())) {
+                sendTribunalEmail(oldCaseData);
+            }
+
+            // sending notification e-mail to respondent
+            if (StringUtils.isBlank(respondent.getValue().getRespondentEmail())) {
+                log.warn(WARNING_MISSING_EMAIL_ADDRESS, oldCaseDetails.getCaseId());
+                continue;
+            }
+            Map<String, String> personalisation = buildNoCPersonalisation(oldCaseDetails,
+                    respondent.getValue().getRespondentName());
+            try {
+                emailService.sendEmail(respondentTemplateId, respondent.getValue().getRespondentEmail(),
+                        personalisation);
+            } catch (Exception e) {
+                LoggingUtils.logNotificationIssue(ERROR_FAILED_TO_SEND_EMAIL_RESPONDENT,
+                        respondent.getValue().getRespondentEmail(), e);
+            }
         }
     }
 
@@ -160,7 +178,7 @@ public class NocNotificationService {
                 });
 
         // send claimant noc change email
-        String claimantEmail = NotificationHelper.getEmailAddressForClaimant(caseDataNew);
+        String claimantEmail = ClaimantUtils.getClaimantEmailAddress(caseDataNew);
         if (isNullOrEmpty(claimantEmail)) {
             log.warn("missing claimantEmail");
             return;
@@ -179,7 +197,8 @@ public class NocNotificationService {
         CaseData caseDataPrevious = caseDetailsPrevious.getCaseData();
         String partyName = NocNotificationHelper.getRespondentNameForNewSolicitor(changeRequest, caseDataNew);
         // send claimant or claimant solicitor noc change email
-        if (!isClaimantNonSystemUser(caseDataPrevious) || isRepresentedClaimantWithMyHmctsCase(caseDataPrevious)) {
+        if (!isClaimantNonSystemUser(caseDataPrevious)
+                || isClaimantRepresentedByMyHmctsOrganisation(caseDataPrevious)) {
             sendClaimantEmail(caseDetailsPrevious, caseDetailsNew, partyName);
         }
 
@@ -222,14 +241,14 @@ public class NocNotificationService {
         }
     }
 
-    private void sendTribunalEmail(CaseData caseDataPrevious) {
-        String tribunalEmail = caseDataPrevious.getTribunalCorrespondenceEmail();
+    private void sendTribunalEmail(CaseData caseData) {
+        String tribunalEmail = caseData.getTribunalCorrespondenceEmail();
         if (isNullOrEmpty(tribunalEmail)) {
             log.warn("missing tribunalEmail");
             return;
         }
 
-        Map<String, String> personalisation = NocNotificationHelper.buildTribunalPersonalisation(caseDataPrevious);
+        Map<String, String> personalisation = NocNotificationHelper.buildTribunalPersonalisation(caseData);
         try {
             emailService.sendEmail(tribunalTemplateId, tribunalEmail, personalisation);
         } catch (Exception e) {
@@ -237,24 +256,20 @@ public class NocNotificationService {
         }
     }
 
-    private void sendClaimantEmail(CaseDetails caseDetailsPrevious, CaseDetails caseDetailsNew, String partyName) {
-        String email;
-        RepresentedTypeC claimantRep = caseDetailsPrevious.getCaseData().getRepresentativeClaimantType();
-        if (caseDetailsPrevious.getCaseData().getRepresentativeClaimantType() != null) {
-            email = claimantRep.getRepresentativeEmailAddress();
-        } else {
-            email = NotificationHelper.getEmailAddressForClaimant(caseDetailsPrevious.getCaseData());
-        }
-
-        if (isNullOrEmpty(email)) {
-            log.warn("missing claimantEmail");
+    public void sendClaimantEmail(CaseDetails caseDetailsPrevious, CaseDetails caseDetailsNew, String partyName) {
+        if (ObjectUtils.isEmpty(caseDetailsPrevious) || ObjectUtils.isEmpty(caseDetailsNew)) {
+            log.error(EXCEPTION_CASE_DETAILS_NOT_FOUND);
             return;
         }
-
+        RepresentedTypeC claimantRep = caseDetailsPrevious.getCaseData().getRepresentativeClaimantType();
+        String email = ClaimantRepresentativeUtils.getClaimantNocNotificationEmail(caseDetailsPrevious);
+        if (isNullOrEmpty(email)) {
+            log.warn(WARNING_CLAIMANT_EMAIL_NOT_FOUND, caseDetailsPrevious.getCaseId());
+            return;
+        }
         String citUILink = claimantRep != null
                 ? emailService.getExuiCaseLink(caseDetailsNew.getCaseId())
                 : emailService.getCitizenCaseLink(caseDetailsNew.getCaseId());
-
         var personalisation = buildPersonalisationWithPartyName(caseDetailsPrevious, partyName, citUILink);
         try {
             emailService.sendEmail(claimantTemplateId, email, personalisation);

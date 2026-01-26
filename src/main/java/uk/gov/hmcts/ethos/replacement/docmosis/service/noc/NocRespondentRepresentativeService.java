@@ -114,7 +114,7 @@ public class NocRespondentRepresentativeService {
             return;
         }
         try {
-            nocNotificationService.sendRemovedRepresentationEmails(oldCaseDetails, newCaseDetails,
+            nocNotificationService.sendRespondentRepresentationRemovalNotifications(oldCaseDetails, newCaseDetails,
                     representativesToRemove);
         } catch (Exception e) {
             log.info(ERROR_UNABLE_TO_NOTIFY_REPRESENTATION_REMOVAL, oldCaseDetails.getCaseId(), e.getMessage());
@@ -201,6 +201,26 @@ public class NocRespondentRepresentativeService {
         return representativesToRevoke;
     }
 
+    /**
+     * Removes organisation policies and Notice of Change (NoC) answers associated with
+     * respondent representatives whose access has been revoked.
+     * <p>
+     * The method starts a CCD case update event using an admin user token, clears any
+     * existing {@code changeOrganisationRequestField} to avoid conflicts with the
+     * representative update process, and then removes organisation policies and NoC
+     * answers linked to the provided revoked representatives.
+     * </p>
+     * <p>
+     * If the case details are incomplete or the list of revoked representatives is empty,
+     * the method exits without making any CCD updates. Any failures during the CCD update
+     * process are logged and do not propagate further.
+     * </p>
+     *
+     * @param caseDetails the case details for which organisation policies and NoC answers
+     *                    should be removed
+     * @param revokedRepresentatives the list of respondent representatives whose
+     *                               organisation policies and NoC answers are to be cleared
+     */
     public void removeOrganisationPoliciesAndNocAnswers(CaseDetails caseDetails,
                                                         List<RepresentedTypeRItem> revokedRepresentatives) {
         if (ObjectUtils.isEmpty(caseDetails)

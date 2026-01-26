@@ -45,7 +45,11 @@ yarn-error.log
 yarn-error.log*
 
 ### VSCode ###
+.vscode/
 bin/
+
+### DevContainer ###
+.devcontainer/
 
 .pnp.*
 .yarn/*

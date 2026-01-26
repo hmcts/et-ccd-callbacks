@@ -10,7 +10,6 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.PDResources;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
-import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
 import org.apache.pdfbox.pdmodel.interactive.form.PDField;
 import org.springframework.stereotype.Service;
@@ -134,12 +133,9 @@ public class PdfBoxService {
         if (stream != null) {
             try (PDDocument pdfDocument = Loader.loadPDF(Objects.requireNonNull(stream.readAllBytes()))) {
                 PDResources resources = new PDResources();
-                resources.put(COSName.getPDFName(TIMES_NEW_ROMAN_PDFBOX_CHARACTER_CODE),
-                        new PDType1Font(Standard14Fonts.FontName.TIMES_ROMAN));
-                resources.put(COSName.getPDFName(HELVETICA_PDFBOX_CHARACTER_CODE_1),
-                        new PDType1Font(Standard14Fonts.FontName.HELVETICA));
-                resources.put(COSName.getPDFName(HELVETICA_PDFBOX_CHARACTER_CODE_2),
-                        new PDType1Font(Standard14Fonts.FontName.HELVETICA));
+                resources.put(COSName.getPDFName(TIMES_NEW_ROMAN_PDFBOX_CHARACTER_CODE), PDType1Font.TIMES_ROMAN);
+                resources.put(COSName.getPDFName(HELVETICA_PDFBOX_CHARACTER_CODE_1), PDType1Font.HELVETICA);
+                resources.put(COSName.getPDFName(HELVETICA_PDFBOX_CHARACTER_CODE_2), PDType1Font.HELVETICA);
                 PDDocumentCatalog pdDocumentCatalog = pdfDocument.getDocumentCatalog();
                 PDAcroForm pdfForm = pdDocumentCatalog.getAcroForm();
                 pdfForm.setDefaultResources(resources);

@@ -5,6 +5,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
@@ -217,8 +218,7 @@ public class EventValidationService {
 
             //reverse update it - from the last to the first element by removing repetition
             for (int index = repCollectionSize - 1;  index > -1; index--) {
-                String tempCollCurrentName = repCollection.get(index).getValue()
-                    .getDynamicRespRepName().getValue().getLabel();
+                String tempCollCurrentName = getTempCollCurrentName(repCollection, index);
                 if (isValidRespondentName(caseData, tempCollCurrentName)) {
                     if (!repCollection.isEmpty()
                         && updatedRepList.stream()
@@ -245,6 +245,14 @@ public class EventValidationService {
         }
 
         return errors;
+    }
+
+    private String getTempCollCurrentName(List<RepresentedTypeRItem> repCollection, int index) {
+        DynamicFixedListType dynamicRespRepName = repCollection.get(index).getValue().getDynamicRespRepName();
+        if (dynamicRespRepName != null && dynamicRespRepName.getValue() != null) {
+            return dynamicRespRepName.getValue().getLabel();
+        }
+        return null;
     }
 
     private boolean isValidRespondentName(CaseData caseData, String tempCollCurrentName) {

@@ -28,6 +28,7 @@ public class DocmosisApplication implements CommandLineRunner {
     @Autowired(required = false)
     ScheduledTaskRunner taskRunner;
 
+    @SuppressWarnings("PMD.CloseResource") // Context is intentionally closed only when TASK_NAME env var is set
     public static void main(String[] args) {
         final var application = new SpringApplication(DocmosisApplication.class);
         final var instance = application.run(args);

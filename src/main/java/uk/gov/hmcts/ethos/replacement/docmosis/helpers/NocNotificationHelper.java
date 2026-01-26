@@ -4,7 +4,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
@@ -33,35 +32,40 @@ public final class NocNotificationHelper {
 
     public static String getRespondentNameForNewSolicitor(ChangeOrganisationRequest changeRequest,
                                                           CaseData caseDataNew) {
-        String respondentName = null;
-        try {
-            String selectedRole = changeRequest.getCaseRoleId()
-                            .getSelectedCode();
-
-            SolicitorRole solicitorRole = SolicitorRole.from(selectedRole).orElseThrow();
-
-            respondentName =
-                    solicitorRole.getRepresentationItem(caseDataNew).map(respondentSumTypeItem ->
-                            respondentSumTypeItem.getValue().getRespondentName()).orElseThrow();
-        } catch (NullPointerException e) {
-            log.warn("Failed to get RespondentNameForNewSolicitor");
+        if (changeRequest == null || changeRequest.getCaseRoleId() == null) {
+            log.warn("Failed to get RespondentNameForNewSolicitor - changeRequest or caseRoleId is null");
+            return UNKNOWN;
         }
-        return isNullOrEmpty(respondentName) ? UNKNOWN : respondentName;
+
+        String selectedRole = changeRequest.getCaseRoleId().getSelectedCode();
+        if (isNullOrEmpty(selectedRole)) {
+            log.warn("Failed to get RespondentNameForNewSolicitor - selectedRole is null or empty");
+            return UNKNOWN;
+        }
+
+        return SolicitorRole.from(selectedRole)
+                .flatMap(solicitorRole -> solicitorRole.getRepresentationItem(caseDataNew))
+                .map(respondentSumTypeItem -> respondentSumTypeItem.getValue().getRespondentName())
+                .filter(name -> !isNullOrEmpty(name))
+                .orElse(UNKNOWN);
     }
 
     public static RespondentSumType getRespondent(ChangeOrganisationRequest changeRequest, CaseData caseData,
                                                   NocRespondentHelper nocRespondentHelper) {
-
-        try {
-
-            String selectedRole = changeRequest.getCaseRoleId().getSelectedCode();
-            SolicitorRole solicitorRole = SolicitorRole.from(selectedRole).orElseThrow();
-            RespondentSumTypeItem respondentSumTypeItem = solicitorRole.getRepresentationItem(caseData).orElseThrow();
-            return nocRespondentHelper.getRespondent(respondentSumTypeItem.getValue().getRespondentName(), caseData);
-        } catch (NullPointerException e) {
+        if (changeRequest == null || changeRequest.getCaseRoleId() == null) {
             return null;
         }
 
+        String selectedRole = changeRequest.getCaseRoleId().getSelectedCode();
+        if (isNullOrEmpty(selectedRole)) {
+            return null;
+        }
+
+        return SolicitorRole.from(selectedRole)
+                .flatMap(solicitorRole -> solicitorRole.getRepresentationItem(caseData))
+                .map(respondentSumTypeItem -> nocRespondentHelper.getRespondent(
+                        respondentSumTypeItem.getValue().getRespondentName(), caseData))
+                .orElse(null);
     }
 
     public static Map<String, String> buildPersonalisationWithPartyName(CaseDetails caseDetails, String partyName,

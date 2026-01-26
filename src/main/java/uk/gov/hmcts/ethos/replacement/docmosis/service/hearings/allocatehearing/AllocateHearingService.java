@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing;
 
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -8,10 +7,12 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.CourtWorkerType;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.selection.CourtWorkerSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.selection.JudgeSelectionService;
+
+import java.util.Objects;
 
 @Service
 public class AllocateHearingService {
@@ -76,12 +77,10 @@ public class AllocateHearingService {
 
         DateListedType selectedListing = getSelectedListing(caseData);
         selectedListing.setHearingStatus(caseData.getAllocateHearingStatus());
-        selectedListing.setPostponedBy(caseData.getAllocateHearingPostponedBy());
         selectedListing.setHearingVenueDay(caseData.getAllocateHearingVenue());
         selectedListing.setHearingRoom(caseData.getAllocateHearingRoom());
         selectedListing.setHearingClerk(caseData.getAllocateHearingClerk());
-
-        Helper.updatePostponedDate(caseData);
+        HearingsHelper.updatePostponedDate(caseData, selectedListing);
     }
 
     private HearingType getSelectedHearing(CaseData caseData) {
@@ -95,7 +94,7 @@ public class AllocateHearingService {
     private boolean isVenueChanged(DynamicFixedListType currentVenue, DynamicFixedListType newVenue) {
         String currentVenueCode = currentVenue != null ? currentVenue.getSelectedCode() : null;
         String newVenueCode = newVenue != null ? newVenue.getSelectedCode() : null;
-        return !StringUtils.equals(currentVenueCode, newVenueCode);
+        return !Objects.equals(currentVenueCode, newVenueCode);
     }
 
     private void addEmployerMembers(CaseData caseData, HearingType selectedHearing) {

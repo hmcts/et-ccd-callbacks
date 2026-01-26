@@ -71,6 +71,7 @@ public class NocService {
                         accessToken, authTokenGenerator.generate(), userResponse.getUserIdentifier()).getBody();
 
                 if (organisationsResponse != null
+                        && organisationToAdd != null
                         && organisationToAdd.getOrganisationID()
                         .equals(organisationsResponse.getOrganisationIdentifier())) {
                     grantCaseAccess(userResponse.getUserIdentifier(), caseId,

@@ -5,6 +5,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
@@ -86,6 +87,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESP_REP_NAME_MISMA
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SUBMITTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TARGET_HEARING_DATE_INCREMENT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EUROPE_LONDON;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getActiveRespondents;
 
 @Slf4j
@@ -216,8 +218,7 @@ public class EventValidationService {
 
             //reverse update it - from the last to the first element by removing repetition
             for (int index = repCollectionSize - 1;  index > -1; index--) {
-                String tempCollCurrentName = repCollection.get(index).getValue()
-                    .getDynamicRespRepName().getValue().getLabel();
+                String tempCollCurrentName = getTempCollCurrentName(repCollection, index);
                 if (isValidRespondentName(caseData, tempCollCurrentName)) {
                     if (!repCollection.isEmpty()
                         && updatedRepList.stream()
@@ -244,6 +245,14 @@ public class EventValidationService {
         }
 
         return errors;
+    }
+
+    private String getTempCollCurrentName(List<RepresentedTypeRItem> repCollection, int index) {
+        DynamicFixedListType dynamicRespRepName = repCollection.get(index).getValue().getDynamicRespRepName();
+        if (dynamicRespRepName != null && dynamicRespRepName.getValue() != null) {
+            return dynamicRespRepName.getValue().getLabel();
+        }
+        return null;
     }
 
     private boolean isValidRespondentName(CaseData caseData, String tempCollCurrentName) {
@@ -410,7 +419,7 @@ public class EventValidationService {
         //During daylight saving times, the comparison won't work if we don't consider zones while comparing them
         // Azure has always UTC time but user's times change in summer and winters, we need to use ZonedDateTime.
         ZonedDateTime disposalDateTime = LocalDate.parse(disposalDate).atStartOfDay()
-                .atZone(ZoneId.of("Europe/London"));
+                .atZone(ZoneId.of(EUROPE_LONDON));
         ZonedDateTime now = ZonedDateTime.now(ZoneOffset.UTC);
         if (disposalDateTime.isAfter(now)) {
             errors.add(String.format(DISPOSAL_DATE_IN_FUTURE, jurCode));

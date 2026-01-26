@@ -101,7 +101,10 @@ public class InitialConsiderationController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        //clear old values
+        initialConsiderationService.clearHiddenValue(caseData);
         initialConsiderationService.processIcDocumentCollections(caseData);
+
         caseData.setIcCompletedBy(reportDataService.getUserFullName(userToken));
         caseData.setIcDateCompleted(LocalDate.now().format(DateTimeFormatter.ofPattern(MONTH_STRING_DATE_FORMAT)));
         DocumentInfo documentInfo = initialConsiderationService.generateDocument(caseData, userToken,
@@ -113,12 +116,9 @@ public class InitialConsiderationController {
             caseFlagsService.setPrivateHearingFlag(caseData);
         }
 
-        if (CollectionUtils.isNotEmpty(caseData.getEtICHearingNotListedList())) {
-            initialConsiderationService.clearIcHearingNotListedOldValues(caseData);
-        }
-
         setDocumentNumbers(caseData);
         caseManagementForCaseWorkerService.setNextListedDate(caseData);
+
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -139,29 +139,32 @@ public class InitialConsiderationController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseData.setEtICHearingListedAnswers(null);
         initialConsiderationService.clearOldEtICHearingListedAnswersValues(caseData);
         initialConsiderationService.clearHiddenValue(caseData);
 
         // Sets the respondent details(respondent ET1 and ET3 names, hearing panel preference, and
         // availability for video hearing) of all respondents in a concatenated string format
         caseData.setEtInitialConsiderationRespondent(initialConsiderationService.setRespondentDetails(caseData));
+
         //hearing details
         HearingsHelper.setEtInitialConsiderationListedHearingType(caseData);
-
         caseData.setEtInitialConsiderationHearing(initialConsiderationService.getHearingDetails(
-                caseData.getHearingCollection()));
+                    caseData.getHearingCollection(), ccdRequest.getCaseDetails().getCaseTypeId()));
 
-        //claimant hearing panel preference
-        caseData.setEtIcHearingPanelPreference(initialConsiderationService.getClaimantHearingPanelPreference(
-                caseData.getClaimantHearingPreference()));
+        //Parties' panel preference in a table
+        caseData.setEtIcPartiesHearingPanelPreference(
+                initialConsiderationService.setPartiesHearingPanelPreferenceDetails(caseData));
+
+        //Parties' Hearing Format in a table
+        caseData.setEtIcPartiesHearingFormat(
+                initialConsiderationService.setPartiesHearingFormatDetails(caseData));
 
         //JurCodes
         String caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();
-        caseData.setEtInitialConsiderationJurisdictionCodes(
-                initialConsiderationService.generateJurisdictionCodesHtml(
-
+        caseData.setEtInitialConsiderationJurisdictionCodes(initialConsiderationService.generateJurisdictionCodesHtml(
                         caseData.getJurCodesCollection(), caseTypeId));
-        initialConsiderationService.setIsHearingAlreadyListed(caseData, caseTypeId);
+
         initialConsiderationService.initialiseInitialConsideration(ccdRequest.getCaseDetails());
 
         if (CollectionUtils.isNotEmpty(caseData.getEtICHearingNotListedList())) {
@@ -169,13 +172,7 @@ public class InitialConsiderationController {
         }
 
         // ET1 Vetting Issues
-        caseData.setIcEt1SubstantiveDefects(initialConsiderationService.composeIcEt1SubstantiveDefectsDetail(caseData));
-        caseData.setIcEt1ReferralToJudgeOrLOListWithDetails(
-                initialConsiderationService.composeIcEt1ReferralToJudgeOrLOListWithDetails(caseData));
-        caseData.setIcEt1ReferralToREJOrVPListWithDetails(
-                initialConsiderationService.composeIcEt1ReferralToREJOrVPListWithDetails(caseData));
-        caseData.setIcEt1OtherReferralListDetails(
-                initialConsiderationService.composeIcEt1OtherReferralListDetails(caseData));
+        caseData.setIcEt1VettingIssuesDetail(initialConsiderationService.setIcEt1VettingIssuesDetails(caseData));
 
         // ET3 Vetting Issues
         caseData.setIcEt3ProcessingIssuesDetail(

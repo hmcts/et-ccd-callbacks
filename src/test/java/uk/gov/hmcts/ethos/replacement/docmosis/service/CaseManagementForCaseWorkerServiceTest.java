@@ -1618,6 +1618,7 @@ class CaseManagementForCaseWorkerServiceTest {
 
     private static Stream<Arguments> provideHearingCollectionsForNextListedDate() {
         HearingTypeItem hearingWithFutureDate = createHearingTypeItem("2030-11-01T10:00:00");
+
         HearingTypeItem hearingWithPastDate = createHearingTypeItem("2020-01-01T10:00:00");
         HearingTypeItem hearingWithCurrentDate = createHearingTypeItem(LocalDateTime.now().toString());
         HearingTypeItem hearingWithInvalidDate = createHearingTypeItem("not-a-date");

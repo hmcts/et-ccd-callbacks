@@ -6,7 +6,9 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
+import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
@@ -136,5 +138,45 @@ class NoticeOfChangeFieldPopulatorTest {
                 entry("claimantRepresentativeOrganisationPolicy", OrganisationPolicy.builder()
                         .orgPolicyCaseAssignedRole("[CLAIMANTSOLICITOR]").build())
         ));
+    }
+
+    @Test
+    void shouldGenerateClaimantOrganisationPolicyWithOrganisationWhenPresent() {
+        Organisation claimantOrganisation = Organisation.builder()
+            .organisationID("CLAIMANT_ORG_ID")
+            .organisationName("Claimant Organisation Name")
+            .build();
+
+        RepresentedTypeC representedTypeC = RepresentedTypeC.builder()
+            .myHmctsOrganisation(claimantOrganisation)
+            .build();
+        caseData.setRepresentativeClaimantType(representedTypeC);
+
+        when(policyConverter.generate(SolicitorRole.SOLICITORA, Optional.of(respondentRep1))).thenReturn(
+            ORG_POLICY_A);
+        when(policyConverter.generate(SolicitorRole.SOLICITORB, Optional.of(respondentRep2))).thenReturn(
+            ORG_POLICY_B);
+        when(policyConverter.generate(SolicitorRole.SOLICITORC, Optional.of(respondentRep3))).thenReturn(
+            ORG_POLICY_C);
+        when(policyConverter.generate(SolicitorRole.SOLICITORD, Optional.empty())).thenReturn(ORG_POLICY_D);
+        when(policyConverter.generate(SolicitorRole.SOLICITORE, Optional.empty())).thenReturn(ORG_POLICY_E);
+        when(policyConverter.generate(SolicitorRole.SOLICITORF, Optional.empty())).thenReturn(ORG_POLICY_F);
+        when(policyConverter.generate(SolicitorRole.SOLICITORG, Optional.empty())).thenReturn(ORG_POLICY_G);
+        when(policyConverter.generate(SolicitorRole.SOLICITORH, Optional.empty())).thenReturn(ORG_POLICY_H);
+        when(policyConverter.generate(SolicitorRole.SOLICITORI, Optional.empty())).thenReturn(ORG_POLICY_I);
+        when(policyConverter.generate(SolicitorRole.SOLICITORJ, Optional.empty())).thenReturn(ORG_POLICY_J);
+
+        when(answersConverter.generateForSubmission(eq(respondent1), any())).thenReturn(ANSWERS_1);
+        when(answersConverter.generateForSubmission(eq(respondent2), any())).thenReturn(ANSWERS_2);
+        when(answersConverter.generateForSubmission(eq(respondent3), any())).thenReturn(ANSWERS_3);
+
+        final Map<String, Object> data = noticeOfChangeFieldPopulator.generate(caseData);
+
+        OrganisationPolicy claimantPolicy = (OrganisationPolicy) data.get(
+            "claimantRepresentativeOrganisationPolicy"
+        );
+        assertThat(claimantPolicy).isNotNull();
+        assertThat(claimantPolicy.getOrgPolicyCaseAssignedRole()).isEqualTo("[CLAIMANTSOLICITOR]");
+        assertThat(claimantPolicy.getOrganisation()).isEqualTo(claimantOrganisation);
     }
 }

@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.webjars.NotFoundException;
+import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.EtICHearingListedAnswers;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
@@ -32,7 +33,10 @@ import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EMPTY_STRING;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EUROPE_LONDON;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.InitialConsiderationService.getAdjustedHearingTypeName;
 
 @Slf4j
 public final class HearingsHelper {
@@ -94,11 +98,9 @@ public final class HearingsHelper {
 
     public static void setEtInitialConsiderationListedHearingType(CaseData caseData) {
 
-        if (caseData == null || isEmpty(caseData.getHearingCollection())) {
-            log.info("No hearing collection found for case: {} to set EtInitialConsiderationListedHearingType",
-                    caseData != null ? caseData.getEthosCaseReference() : "null");
+        if (caseData == null) {
+            log.info("caseData is null, cannot set EtInitialConsiderationListedHearingType");
             return;
-
         }
 
         HearingType earliestListedHearing = getEarliestListedHearingType(caseData.getHearingCollection());
@@ -106,15 +108,22 @@ public final class HearingsHelper {
         if (earliestListedHearing == null) {
             log.info("No listed hearings found for case: {} to set EtInitialConsiderationListedHearingType",
                     caseData.getEthosCaseReference());
+            caseData.setEtICHearingAlreadyListed("No");
             return;
+        } else {
+            caseData.setEtICHearingAlreadyListed("Yes");
         }
 
         if (caseData.getEtICHearingListedAnswers() == null) {
-            caseData.setEtICHearingListedAnswers(new EtICHearingListedAnswers());
+            initEtICHearingListedAnswers(caseData);
         }
 
         caseData.getEtICHearingListedAnswers().setEtInitialConsiderationListedHearingType(
-                earliestListedHearing.getHearingType());
+                getAdjustedHearingTypeName(earliestListedHearing.getHearingType()));
+    }
+
+    private static void initEtICHearingListedAnswers(CaseData caseData) {
+        caseData.setEtICHearingListedAnswers(new EtICHearingListedAnswers());
     }
 
     public static HearingType getEarliestListedHearingType(List<HearingTypeItem> hearingCollection) {
@@ -234,7 +243,7 @@ public final class HearingsHelper {
     public static boolean isDateInFuture(String date, LocalDateTime now) {
         //Azure times are always in UTC and users enter Europe/London Times,
         // so respective zonedDateTimes should be compared.
-        return !isNullOrEmpty(date) && LocalDateTime.parse(date).atZone(ZoneId.of("Europe/London"))
+        return !isNullOrEmpty(date) && LocalDateTime.parse(date).atZone(ZoneId.of(EUROPE_LONDON))
                 .isAfter(now.atZone(ZoneId.of("UTC")));
     }
 
@@ -369,5 +378,22 @@ public final class HearingsHelper {
         }
 
         return new ArrayList<>();
+    }
+
+    /**
+     * Updates the postponed date and postponed by fields in DateListedType based on the hearing status.
+     * @param caseData the case data
+     * @param dateListedType the hearing day to be updated
+     */
+    public static void updatePostponedDate(CaseData caseData, DateListedType dateListedType) {
+        if (HEARING_STATUS_POSTPONED.equals(caseData.getAllocateHearingStatus())) {
+            dateListedType.setPostponedBy(caseData.getAllocateHearingPostponedBy());
+            if (isNullOrEmpty(dateListedType.getPostponedDate())) {
+                dateListedType.setPostponedDate(UtilHelper.formatCurrentDate2(LocalDate.now()));
+            }
+        } else {
+            dateListedType.setPostponedBy(null);
+            dateListedType.setPostponedDate(null);
+        }
     }
 }

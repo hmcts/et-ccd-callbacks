@@ -206,9 +206,10 @@ public final class InitialConsiderationHelper {
                                 .map(EtICListForFinalHearingUpdated::getEtICNoLFinalHearingIsEJSitAloneReasonsJsaOther)
                                 .orElse(null))
                 .etICNoLFinalHearingIsEJSitAloneReasonsMembers(
-                        Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
-                                .map(EtICListForFinalHearingUpdated::getEtICNoLFinalHearingIsEJSitAloneReasonsMembers)
-                                .orElse(null))
+                        Collections.singletonList(Optional.ofNullable(
+                                caseData.getEtICHearingNotListedListForFinalHearingUpdated())
+                                .map(EtICListForFinalHearingUpdated::getEtICFinalHearingIsEJSitAloneReason)
+                                .orElse(null)))
                 .etICNoLFinalHearingIsEJSitAloneReasonsMembersOther(
                         Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
                                 .map(EtICListForFinalHearingUpdated
@@ -253,7 +254,8 @@ public final class InitialConsiderationHelper {
                 .furtherInformation(getFurtherInformation(caseData.getEtICFurtherInformation()))
 
                 .furtherInfoGiveDetails(defaultIfEmpty(caseData.getEtICFurtherInformationGiveDetails(), null))
-                .furtherInfoTimeToComply(defaultIfEmpty(caseData.getEtICFurtherInformationTimeToComply(), null))
+                .furtherInfoTimeToComply(defaultIfEmpty(
+                        caseData.getEtICFurtherInformationTimeToComply(), null))
 
                 .r27ClaimToBe(Optional.ofNullable(caseData.getEtInitialConsiderationRule27())
                         .map(EtInitialConsiderationRule27::getEtICRule27ClaimToBe).orElse(null))
@@ -283,6 +285,7 @@ public final class InitialConsiderationHelper {
                 .icDateCompleted(defaultIfEmpty(caseData.getIcDateCompleted(), formattedNow))
                 .icCompletedBy(defaultIfEmpty(caseData.getIcCompletedBy(), null))
                 .build();
+
         InitialConsiderationDocument document = InitialConsiderationDocument.builder()
                 .accessKey(accessKey)
                 .outputName(IC_OUTPUT_NAME)
@@ -323,7 +326,6 @@ public final class InitialConsiderationHelper {
                 .hearingWithJudgeOrMembers(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
                         .map(EtICHearingListedAnswers::getEtICIsHearingWithJudgeOrMembers).orElse(null))
                 .hearingWithJudgeOrMembersReason(List.of(updateHearingWithJudgeOrMembersDetails(caseData)))
-
                 .hearingWithJudgeOrMembersFurtherDetails(Optional.ofNullable(caseData.getEtICHearingListedAnswers())
                         .map(EtICHearingListedAnswers::getEtICIsHearingWithJudgeOrMembersFurtherDetails)
                         .orElse(null))
@@ -343,6 +345,7 @@ public final class InitialConsiderationHelper {
 
                 // Hearing NOT Listed
                 .hearingNotListed(Optional.ofNullable(caseData.getEtICHearingNotListedListUpdated()).orElse(null))
+
                 //video hearing
                 .cvpHearingType(Optional.ofNullable(caseData.getEtICHearingNotListedSeekComments())
                         .map(EtICSeekComments::getEtICTypeOfCvpHearing).orElse(null))
@@ -402,6 +405,7 @@ public final class InitialConsiderationHelper {
                         Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
                                 .map(EtICListForFinalHearingUpdated::getEtICFinalHearingIsEJSitAloneReasonYesOther)
                                 .orElse(null))
+
                 .etICFinalHearingIsEJSitAloneReasonNo(
                         Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
                                 .map(reasons -> getSortedEJSitAloneReasons(
@@ -412,6 +416,7 @@ public final class InitialConsiderationHelper {
                         Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
                                 .map(EtICListForFinalHearingUpdated::getEtICFinalHearingIsEJSitAloneReasonNoOther)
                                 .orElse(null))
+
                 .etICFinalHearingIsEJSitAloneFurtherDetails(
                         Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
                                 .map(EtICListForFinalHearingUpdated::getEtICFinalHearingIsEJSitAloneFurtherDetails)
@@ -426,9 +431,10 @@ public final class InitialConsiderationHelper {
                                 .map(EtICListForFinalHearingUpdated::getEtICNoLFinalHearingIsEJSitAloneReasonsJsaOther)
                                 .orElse(null))
                 .etICNoLFinalHearingIsEJSitAloneReasonsMembers(
-                        Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
-                                .map(EtICListForFinalHearingUpdated::getEtICNoLFinalHearingIsEJSitAloneReasonsMembers)
-                                .orElse(null))
+                        Collections.singletonList(Optional.ofNullable(
+                                caseData.getEtICHearingNotListedListForFinalHearingUpdated())
+                                .map(EtICListForFinalHearingUpdated::getEtICFinalHearingIsEJSitAloneReason)
+                                .orElse(null)))
                 .etICNoLFinalHearingIsEJSitAloneReasonsMembersOther(
                         Optional.ofNullable(caseData.getEtICHearingNotListedListForFinalHearingUpdated())
                                 .map(EtICListForFinalHearingUpdated
@@ -547,34 +553,40 @@ public final class InitialConsiderationHelper {
 
         String hearingType = answers.getEtInitialConsiderationListedHearingType();
         StringBuilder sb = new StringBuilder();
+
         if (PRELIMINARY_HEARING_CM.equals(hearingType)) {
-            if (JSA.equals(answers.getEtICIsHearingWithJudgeOrMembers())) {
-                sb.append(JSA).append(SPACE_HYPHEN_SPACE);
-                sb.append(OTHER.equals(answers.getEtICIsHearingWithJsa())
-                        ? answers.getEtICIsHearingWithJsaReasonOther()
-                        : answers.getEtICIsHearingWithJsa());
-            } else {
-                sb.append(WITH_MEMBERS).append(SPACE_HYPHEN_SPACE).append(answers.getEtICIsHearingWithMembers());
-            }
-        } else if (FINAL_HEARING.equals(hearingType)) {
-            addHearingJsaOrMembersReasonDetails(sb,
-                    JSA.equals(answers.getEtICIsHearingWithJudgeOrMembers())
-                            ? answers.getEtICIsFinalHearingWithJudgeOrMembersJsaReason()
-                            : answers.getEtICIsFinalHearingWithJudgeOrMembersReason(),
-                    JSA.equals(answers.getEtICIsHearingWithJudgeOrMembers())
-                            ? answers.getEtICJsaFinalHearingReasonOther()
-                            : answers.getEtICMembersFinalHearingReasonOther());
+            appendPreliminaryHearingDetails(sb, answers);
         } else {
-            addHearingJsaOrMembersReasonDetails(sb,
-                    answers.getEtICIsHearingWithJudgeOrMembersReason(),
-                    answers.getEtICIsHearingWithJudgeOrMembersReasonOther());
+            appendFinalOrOtherHearingDetails(sb, answers, FINAL_HEARING.equals(hearingType));
         }
 
         return sb.toString();
     }
 
+    private static void appendPreliminaryHearingDetails(StringBuilder sb, EtICHearingListedAnswers answers) {
+        if (JSA.equals(answers.getEtICIsHearingWithJudgeOrMembers())) {
+            sb.append(JSA).append(SPACE_HYPHEN_SPACE)
+                    .append(OTHER.equals(answers.getEtICIsHearingWithJsa())
+                            ? answers.getEtICJsaCmPreliminaryHearingReasonOther()
+                            : answers.getEtICIsHearingWithJsa());
+        } else {
+            sb.append(WITH_MEMBERS).append(SPACE_HYPHEN_SPACE)
+                    .append(answers.getEtICIsHearingWithMembers());
+        }
+    }
+
+    private static void appendFinalOrOtherHearingDetails(StringBuilder sb, EtICHearingListedAnswers answers,
+                                                         boolean isFinalHearing) {
+        addHearingJsaOrMembersReasonDetails(sb,
+                getReasonDetails(answers),
+                getOtherReason(answers, isFinalHearing));
+    }
+
     private static void addHearingJsaOrMembersReasonDetails(StringBuilder sb,
                                                                  List<String> selectedReasons, String otherDetail) {
+        if (selectedReasons == null || selectedReasons.isEmpty()) {
+            return;
+        }
         selectedReasons.forEach(r -> {
             if (OTHER.equals(r)) {
                 sb.append(NEWLINE_WITH_HYPHEN);
@@ -589,6 +601,30 @@ public final class InitialConsiderationHelper {
                 sb.append(NEWLINE);
             }
         });
+    }
+
+    private static List<String> getReasonDetails(EtICHearingListedAnswers answers) {
+        if (JSA.equals(answers.getEtICIsHearingWithJudgeOrMembers())) {
+            return answers.getEtICIsFinalHearingWithJudgeOrMembersJsaReason();
+        } else {
+            return answers.getEtICIsFinalHearingWithJudgeOrMembersReason();
+        }
+    }
+
+    private static String getOtherReason(EtICHearingListedAnswers answers, boolean isFinalHearing) {
+        if (isFinalHearing) {
+            if (JSA.equals(answers.getEtICIsHearingWithJudgeOrMembers())) {
+                return answers.getEtICJsaFinalHearingReasonOther();
+            } else {
+                return answers.getEtICMembersFinalHearingReasonOther();
+            }
+        } else {
+            if (JSA.equals(answers.getEtICIsHearingWithJudgeOrMembers())) {
+                return answers.getEtICIsHearingWithJsaReasonOther();
+            } else {
+                return answers.getEtICIsHearingWithJudgeOrMembersReasonOther();
+            }
+        }
     }
 
     private static List<String> getFurtherInformation(List<String> icInformation) {

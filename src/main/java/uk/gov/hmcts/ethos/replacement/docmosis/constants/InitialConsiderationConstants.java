@@ -2,32 +2,62 @@ package uk.gov.hmcts.ethos.replacement.docmosis.constants;
 
 import java.util.Map;
 
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.TableMarkupConstants.DATE_MARKUP;
-
 public final class InitialConsiderationConstants {
     public static final String RESPONDENT_NAME = """
-        | Respondent %s name given | |
-        |-------------|:------------|
-        |In ET1 by claimant | %s|
-        |In ET3 by respondent | %s|
-        
+            <tr>
+              <td>Respondent %s</td>
+              <td> %s </td>
+              <td> %s </td>
+            </tr>
         """;
 
-    public static final String RESPONDENT_HEARING_PANEL_PREFERENCE = """
-        | Hearing panel preference | |
-        |-------------|:------------|
-        |Panel Preference | %s|
-        |Reason for Panel Preference | %s|
-        
+    public static final String HEARING_PANEL_PREFERENCE = """
+          <tr>
+            <td>%s</td>
+            <td>%s</td>
+            <td>%s</td>
+          </tr>
+        """;
+
+    public static final String HEARING_FORMAT_PREFERENCE = """
+          <tr>
+            <td>%s</td>
+            <td>%s</td>
+          </tr>
+ 
+        """;
+
+    public static final String CLAIMANT_HEARING_FORMAT_NEITHER_PREFERENCE = """
+          <tr>
+            <td>%s</td>
+            <td>
+                %s
+                <h3>Reason:</h3>
+                %s
+            </td>
+          </tr>
+
         """;
 
     public static final String HEARING_DETAILS = """
-        |Hearing details | |
-        |-------------|:------------|
-        """ + DATE_MARKUP + """
-        |Type | %s|
-        |Duration | %s|
-        
+            <tr>
+                <td>Date</td> <td> %s </td>
+            </tr>
+            <tr>
+                <td>Type</td> <td> %s </td>
+            </tr>
+            <tr>
+                <td>Duration</td> <td> %s </td>
+            </tr>
+            <tr>
+                <td>Hearing format</td> <td> %s </td>
+            </tr>
+            <tr>
+                <td>Panel Type</td> <td> %s </td>
+            </tr>
+            <tr>
+                <td>Venue</td> <td> %s </td>
+            </tr>
         """;
 
     public static final String CLAIMANT_HEARING_PANEL_PREFERENCE = """
@@ -36,6 +66,18 @@ public final class InitialConsiderationConstants {
             |Panel Preference | %s|
             |Reason for Panel Preference | %s|
             """;
+
+    public static final String PARTIES_HEARING_PANEL_PREFERENCE = """
+        %s
+        %s
+        
+        """;
+
+    public static final String PARTIES_HEARING_FORMAT = """
+        %s
+        %s
+        
+        """;
 
     public static final String CLAIMANT_HEARING_PANEL_PREFERENCE_MISSING =
             String.format(CLAIMANT_HEARING_PANEL_PREFERENCE, "-", "-");
@@ -49,7 +91,7 @@ public final class InitialConsiderationConstants {
     public static final String CODES_URL_SCOTLAND = "https://judiciary.sharepoint"
             + ".com/:w:/r/sites/ScotlandEJs/Shared%20Documents/Jurisdictional%20Codes%20List"
             + "/Jurisdiction%20list%20July%202024%20.doc?d=wfa6ba431b0b941ffa0b82504fd093af0&csf=1&web=1&e=Dm6Hda";
-    public static final String HEARING_MISSING = String.format(HEARING_DETAILS, "-", "-", "-");
+    public static final String HEARING_MISSING = String.format(HEARING_DETAILS, "-", "-", "-", "-", "-", "-");
     public static final String RESPONDENT_MISSING = String.format(RESPONDENT_NAME, "", "", "", "", "");
     public static final String DOC_GEN_ERROR = "Failed to generate document for case id: %s";
     public static final String IC_OUTPUT_NAME = "Initial Consideration.pdf";

@@ -44,7 +44,7 @@ class DefaultValuesReaderServiceTest {
     private CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
 
     @BeforeEach
-    public void setup() {
+    void setup() {
         config = mock(CaseDefaultValuesConfiguration.class);
         tribunalOfficesService = mock(TribunalOfficesService.class);
         ConciliationTrackService conciliationTrackService = mock(ConciliationTrackService.class);

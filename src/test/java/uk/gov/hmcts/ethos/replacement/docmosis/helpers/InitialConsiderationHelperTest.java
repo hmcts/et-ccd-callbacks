@@ -112,10 +112,11 @@ class InitialConsiderationHelperTest {
 
     @Test
     void updateHearingWithJudgeOrMembersDetails_returnsEmptyStringWhenAnswersAreNull() {
-        CaseData caseData = new CaseData();
-        caseData.setEtICHearingListedAnswers(null);
+        CaseData caseDataWithJudgeOrMembers = new CaseData();
+        caseDataWithJudgeOrMembers.setEtICHearingListedAnswers(null);
 
-        String result = InitialConsiderationHelper.updateHearingWithJudgeOrMembersDetails(caseData);
+        String result = InitialConsiderationHelper.updateHearingWithJudgeOrMembersDetails(
+                caseDataWithJudgeOrMembers);
 
         assertEquals("", result);
     }
@@ -128,10 +129,11 @@ class InitialConsiderationHelperTest {
         answers.setEtICIsFinalHearingWithJudgeOrMembersJsaReason(List.of("Reason A", "Other"));
         answers.setEtICJsaFinalHearingReasonOther("Custom Reason");
 
-        CaseData caseData = new CaseData();
-        caseData.setEtICHearingListedAnswers(answers);
+        CaseData caseDataWithFinalHearingJsa = new CaseData();
+        caseDataWithFinalHearingJsa.setEtICHearingListedAnswers(answers);
 
-        String result = InitialConsiderationHelper.updateHearingWithJudgeOrMembersDetails(caseData);
+        String result = InitialConsiderationHelper.updateHearingWithJudgeOrMembersDetails(
+                caseDataWithFinalHearingJsa);
 
         String expected = """
 
@@ -175,7 +177,7 @@ class InitialConsiderationHelperTest {
                 + "\"etICFinalHearingIsEJSitAloneReasonYes\":null,\"etICFinalHearingIsEJSitAloneReasonYesOther\":null,"
                 + "\"etICFinalHearingIsEJSitAloneReasonNo\":null,\"etICFinalHearingIsEJSitAloneReasonNoOther\":null,"
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonsJsa\":null,\"etICNoLFinalHearingIsEJSitAloneReasonsJsaOther"
-                + "\":null,\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":null,"
+                + "\":null,\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":[null],"
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonMembersOther\":null,"
                 + "\"etICFinalHearingIsEJSitAloneFurtherDetails\":null,"
                 + "\"udlSitAlone\":null,\"udlReasons\":null,\"udlDisputeOnFacts\":null,"
@@ -230,7 +232,7 @@ class InitialConsiderationHelperTest {
                 + "\"etICFinalHearingIsEJSitAloneReasonNo\":[],\"etICFinalHearingIsEJSitAloneReasonNoOther\":null,"
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonsJsa\":[\"Members experience is likely to add significant"
                 + " value to the process of adjudication\"],\"etICNoLFinalHearingIsEJSitAloneReasonsJsaOther\":null,"
-                + "\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":null,"
+                + "\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":[null],"
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonMembersOther\":null,"
                 + "\"etICFinalHearingIsEJSitAloneFurtherDetails\":null,"
                 + "\"udlSitAlone\":null,\"udlReasons\":null,\"udlDisputeOnFacts\":null,"
@@ -355,7 +357,7 @@ class InitialConsiderationHelperTest {
                 + "\"etICFinalHearingIsEJSitAloneReasonNo\":[],\"etICFinalHearingIsEJSitAloneReasonNoOther\":null,"
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonsJsa\":[\"Members experience is likely to add significant "
                 + "value to the process of adjudication\"],\"etICNoLFinalHearingIsEJSitAloneReasonsJsaOther"
-                + "\":null,\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":null,"
+                + "\":null,\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":[null],"
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonMembersOther\":null,"
                 + "\"etICFinalHearingIsEJSitAloneFurtherDetails\":"
                 + "\"Test SC - EJ Sit Alone Further Details\","
@@ -414,7 +416,7 @@ class InitialConsiderationHelperTest {
                 + "\"etICFinalHearingIsEJSitAloneReasonNo\":null,\"etICFinalHearingIsEJSitAloneReasonNoOther\":null,"
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonsJsa\":null,"
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonsJsaOther\":null,"
-                + "\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":null,"
+                + "\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":[null],"
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonMembersOther\":null,"
                 + "\"etICFinalHearingIsEJSitAloneFurtherDetails\":"
                 + "null,\"udlSitAlone\":null,\"udlReasons\":null,\"udlDisputeOnFacts\":null,"
@@ -464,7 +466,7 @@ class InitialConsiderationHelperTest {
                 + "\"etICFinalHearingIsEJSitAloneReasonNoOther\":null,"
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonsJsa\":null,"
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonsJsaOther\":null,"
-                + "\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":null,"
+                + "\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":[null],"
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonMembersOther\":null,"
                 + "\"etICFinalHearingIsEJSitAloneFurtherDetails\":null,\"udlSitAlone\":null,\"udlReasons\":null,"
                 + "\"udlDisputeOnFacts\":null,\"udlLittleOrNoAgreement\":null,\"udlIssueOfLawArising\":null,"
@@ -539,7 +541,7 @@ class InitialConsiderationHelperTest {
                 + "\"etICFinalHearingIsEJSitAloneReasonYes\":null,\"etICFinalHearingIsEJSitAloneReasonYesOther\":null,"
                 + "\"etICFinalHearingIsEJSitAloneReasonNo\":null,\"etICFinalHearingIsEJSitAloneReasonNoOther\":null,"
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonsJsa\":null,\"etICNoLFinalHearingIsEJSitAloneReasonsJsaOther"
-                + "\":null,\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":null,"
+                + "\":null,\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":[null],"
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonMembersOther\":null,"
                 + "\"etICFinalHearingIsEJSitAloneFurtherDetails\":null,"
                 + "\"udlSitAlone\":null,\"udlReasons\":null,\"udlDisputeOnFacts\":null,"
@@ -595,7 +597,7 @@ class InitialConsiderationHelperTest {
                 + "\"etICFinalHearingIsEJSitAloneReasonNo\":null,\"etICFinalHearingIsEJSitAloneReasonNoOther\":null,"
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonsJsa\":null,"
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonsJsaOther"
-                + "\":null,\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":null,"
+                + "\":null,\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":[null],"
                 + "\"etICNoLFinalHearingIsEJSitAloneReasonMembersOther\":null,"
                 + "\"etICFinalHearingIsEJSitAloneFurtherDetails\":null,"
                 + "\"udlSitAlone\":null,\"udlReasons\":null,\"udlDisputeOnFacts\":null,"
@@ -643,7 +645,7 @@ class InitialConsiderationHelperTest {
         answers.setEtInitialConsiderationListedHearingType("Preliminary Hearing(CM)");
         answers.setEtICIsHearingWithJudgeOrMembers("JSA");
         answers.setEtICIsHearingWithJsa("Other");
-        answers.setEtICIsHearingWithJsaReasonOther("Custom Reason");
+        answers.setEtICJsaCmPreliminaryHearingReasonOther("Custom Reason");
 
         CaseData caseDataWithPhcm = new CaseData();
         caseDataWithPhcm.setEtICHearingListedAnswers(answers);
@@ -693,8 +695,9 @@ class InitialConsiderationHelperTest {
     void updateHearingWithJudgeOrMembersDetails_returnsDefaultDetails_whenOtherHearingType() {
         EtICHearingListedAnswers answers = new EtICHearingListedAnswers();
         answers.setEtInitialConsiderationListedHearingType("Other Hearing");
-        answers.setEtICIsHearingWithJudgeOrMembersReason(List.of("Default Normal Reason", "Other"));
-        answers.setEtICIsHearingWithJudgeOrMembersReasonOther("Other Default Reason");
+        answers.setEtICIsFinalHearingWithJudgeOrMembersJsaReason(List.of("Default Normal Reason", "Other"));
+        answers.setEtICIsHearingWithJsaReasonOther("Other Default Reason");
+        answers.setEtICIsHearingWithJudgeOrMembers("JSA");
 
         CaseData caseDataWithOtherHearing = new CaseData();
         caseDataWithOtherHearing.setEtICHearingListedAnswers(answers);

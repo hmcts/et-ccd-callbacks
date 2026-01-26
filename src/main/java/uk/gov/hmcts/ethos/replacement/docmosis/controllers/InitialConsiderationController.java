@@ -143,24 +143,26 @@ public class InitialConsiderationController {
         initialConsiderationService.clearOldEtICHearingListedAnswersValues(caseData);
         initialConsiderationService.clearHiddenValue(caseData);
 
-        // Sets the respondent details(respondent ET1 and ET3 names, hearing panel preference, and
-        // availability for video hearing) of all respondents in a concatenated string format
+        // Sets the respondents details(respondent ET1 and ET3 names in a concatenated string format that forms
+        // an HTML table markup and renders as table in ExUI
         caseData.setEtInitialConsiderationRespondent(initialConsiderationService.setRespondentDetails(caseData));
 
-        //hearing details
+        //If there is a hearing with future and earliest date, and it that hearing is of a listed status,
+        // set hearing details
         HearingsHelper.setEtInitialConsiderationListedHearingType(caseData);
+
         caseData.setEtInitialConsiderationHearing(initialConsiderationService.getHearingDetails(
                     caseData.getHearingCollection(), ccdRequest.getCaseDetails().getCaseTypeId()));
 
-        //Parties' panel preference in a table
+        //Parties' panel preference HTML table markup
         caseData.setEtIcPartiesHearingPanelPreference(
                 initialConsiderationService.setPartiesHearingPanelPreferenceDetails(caseData));
 
-        //Parties' Hearing Format in a table
+        //Parties' Hearing Format HTML table markup
         caseData.setEtIcPartiesHearingFormat(
                 initialConsiderationService.setPartiesHearingFormatDetails(caseData));
 
-        //JurCodes
+        //Jurisdiction Codes section HTML table markup
         String caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();
         caseData.setEtInitialConsiderationJurisdictionCodes(initialConsiderationService.generateJurisdictionCodesHtml(
                         caseData.getJurCodesCollection(), caseTypeId));

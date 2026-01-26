@@ -34,6 +34,8 @@ import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EMPTY_STRING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EUROPE_LONDON;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.InitialConsiderationService.getAdjustedHearingTypeName;
@@ -108,10 +110,10 @@ public final class HearingsHelper {
         if (earliestListedHearing == null) {
             log.info("No listed hearings found for case: {} to set EtInitialConsiderationListedHearingType",
                     caseData.getEthosCaseReference());
-            caseData.setEtICHearingAlreadyListed("No");
+            caseData.setEtICHearingAlreadyListed(NO);
             return;
         } else {
-            caseData.setEtICHearingAlreadyListed("Yes");
+            caseData.setEtICHearingAlreadyListed(YES);
         }
 
         if (caseData.getEtICHearingListedAnswers() == null) {
@@ -132,14 +134,12 @@ public final class HearingsHelper {
         }
 
         return hearingCollection.stream()
-            .filter(hearingTypeItem -> hearingTypeItem != null
-                    && hearingTypeItem.getValue() != null)
+            .filter(hearingTypeItem -> hearingTypeItem != null && hearingTypeItem.getValue() != null)
             .map(HearingTypeItem::getValue)
             .filter(hearing -> CollectionUtils.isNotEmpty(hearing.getHearingDateCollection())
                     && hearing.getHearingDateCollection().stream().anyMatch(HearingsHelper::isListedHearing))
             .map(hearing -> Map.entry(
-                hearing, 
-                getEarliestListedFutureHearingDate(hearing.getHearingDateCollection())))
+                hearing, getEarliestListedFutureHearingDate(hearing.getHearingDateCollection())))
             .filter(entry -> entry.getValue().isPresent())
             .min(Comparator.comparing(entry -> entry.getValue().orElse(null)))
             .map(Map.Entry::getKey)

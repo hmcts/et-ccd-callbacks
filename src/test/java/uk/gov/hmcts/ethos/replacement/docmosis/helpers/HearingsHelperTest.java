@@ -446,9 +446,6 @@ class HearingsHelperTest {
         HearingType hearingType = new HearingType();
         hearingType.setHearingDateCollection(List.of(date));
         item.setValue(hearingType);
-        // Simulate isListedHearing always returns false
-        // This would require mocking if isListedHearing is not static/final
-        // For now, assume it returns false and test returns null
         assertNull(HearingsHelper.getEarliestListedHearingType(List.of(item)));
     }
 

@@ -124,29 +124,28 @@ class InitialConsiderationControllerTest extends BaseControllerTest {
 
     @Test
     void shouldSetEtICHearingAlreadyListedToYes_WhenEarliestListedHearingTypeIsNotNull() {
-        // Mock hearing collection with at least one listed hearing
-        var hearingType = new HearingType();
+        HearingType hearingType = new HearingType();
         hearingType.setHearingType(HEARING_TYPE_JUDICIAL_HEARING);
-        var dateListedTypeItem = new DateListedTypeItem();
-        var dateListedType = new DateListedType();
+        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
+        DateListedType dateListedType = new DateListedType();
         dateListedType.setListedDate("2023-10-10T10:00:00.000");
         dateListedTypeItem.setValue(dateListedType);
         hearingType.setHearingDateCollection(List.of(dateListedTypeItem));
-        var hearingTypeItem = new HearingTypeItem();
+        HearingTypeItem hearingTypeItem = new HearingTypeItem();
         hearingTypeItem.setValue(hearingType);
         CaseData caseData = new CaseData();
         caseData.setHearingCollection(List.of(hearingTypeItem));
 
-        // Mock HearingsHelper to return a non-null HearingType instance
+        // A HearingsHelper mock that returns a non-null HearingType instance
         try (MockedStatic<HearingsHelper> hearingsHelperMock = Mockito.mockStatic(HearingsHelper.class)) {
             hearingsHelperMock.when(() -> HearingsHelper.getEarliestListedHearingType(caseData.getHearingCollection()))
                     .thenReturn(new HearingType());
 
             if (HearingsHelper.getEarliestListedHearingType(caseData.getHearingCollection()) != null) {
-                caseData.setEtICHearingAlreadyListed("Yes");
+                caseData.setEtICHearingAlreadyListed(YES);
             }
 
-            assertEquals("Yes", caseData.getEtICHearingAlreadyListed());
+            assertEquals(YES, caseData.getEtICHearingAlreadyListed());
         }
     }
 

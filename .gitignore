@@ -54,3 +54,6 @@ bin/
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+### Claude Code ###
+.claude/settings.local.json

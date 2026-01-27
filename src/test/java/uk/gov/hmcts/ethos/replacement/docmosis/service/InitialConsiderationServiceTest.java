@@ -65,6 +65,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET3;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.APPLICATIONS_FOR_STRIKE_OUT_OR_DEPOSIT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CLAIMANT_HEARING_PANEL_PREFERENCE_MISSING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CODES_URL_ENGLAND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CODES_URL_SCOTLAND;
@@ -72,19 +75,22 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsidera
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CVP_HEARING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.HEARING_MISSING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.HEARING_NOT_LISTED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.INTERPRETERS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.JSA;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.JURISDICTIONAL_ISSUES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.JURISDICTION_HEADER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.LIST_FOR_FINAL_HEARING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.LIST_FOR_PRELIMINARY_HEARING;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.REQUEST_FOR_ADJUSTMENTS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.RULE_49;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.SEEK_COMMENTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.TELEPHONE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.TIME_POINTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.UDL_HEARING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.VIDEO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_LABEL_ET1_IC;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_LABEL_ET3_IC;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.CASE_DETAILS_URL_PARTIAL;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET1_DOC_TYPE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET3_DOC_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.NOT_AVAILABLE_FOR_VIDEO_HEARINGS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.REFERRALS_PAGE_FRAGMENT_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
@@ -212,10 +218,10 @@ class InitialConsiderationServiceTest {
     void initialiseInitialConsideration_shouldIncludeAllDocumentLinks_whenDocCollectionHasMultipleValidDocuments() {
         DocumentTypeItem et1Document = new DocumentTypeItem();
         et1Document.setValue(DocumentType.from(new UploadedDocumentType()));
-        et1Document.getValue().setDocumentType(ET1_DOC_TYPE);
+        et1Document.getValue().setDocumentType(ET1);
         DocumentTypeItem et3Document = new DocumentTypeItem();
         et3Document.setValue(DocumentType.from(new UploadedDocumentType()));
-        et3Document.getValue().setDocumentType(ET3_DOC_TYPE);
+        et3Document.getValue().setDocumentType(ET3);
         List<DocumentTypeItem> documentCollection = new ArrayList<>();
         documentCollection.add(et1Document);
         documentCollection.add(et3Document);
@@ -1249,7 +1255,7 @@ class InitialConsiderationServiceTest {
         List<DocumentTypeItem> documentCollection = new ArrayList<>();
         DocumentTypeItem et1Document = new DocumentTypeItem();
         et1Document.setValue(DocumentType.from(new UploadedDocumentType()));
-        et1Document.getValue().setDocumentType(ET1_DOC_TYPE);
+        et1Document.getValue().setDocumentType(ET1);
         documentCollection.add(et1Document);
 
         CaseData caseDataForEt1DocType = new CaseData();
@@ -1279,7 +1285,7 @@ class InitialConsiderationServiceTest {
         List<DocumentTypeItem> documentCollection = new ArrayList<>();
         DocumentTypeItem et1Document = new DocumentTypeItem();
         et1Document.setValue(DocumentType.from(new UploadedDocumentType()));
-        et1Document.getValue().setDocumentType(ET1_DOC_TYPE);
+        et1Document.getValue().setDocumentType(ET1);
         documentCollection.add(et1Document);
 
         CaseData caseDataWithReferralLinks = new CaseData();
@@ -1300,7 +1306,7 @@ class InitialConsiderationServiceTest {
         List<DocumentTypeItem> documentCollection = new ArrayList<>();
         DocumentTypeItem et1Document = new DocumentTypeItem();
         et1Document.setValue(DocumentType.from(new UploadedDocumentType()));
-        et1Document.getValue().setDocumentType(ET1_DOC_TYPE);
+        et1Document.getValue().setDocumentType(ET1);
         documentCollection.add(et1Document);
 
         CaseData caseDataWithNullReferralList = new CaseData();
@@ -1812,12 +1818,12 @@ class InitialConsiderationServiceTest {
     private static @NotNull Et3VettingType getEt3VettingType() {
         Et3VettingType et3Vetting = new Et3VettingType();
         et3Vetting.setEt3SuggestedIssues(List.of(
-                InitialConsiderationService.APPLICATIONS_FOR_STRIKE_OUT_OR_DEPOSIT,
-                InitialConsiderationService.INTERPRETERS,
-                InitialConsiderationService.JURISDICTIONAL_ISSUES,
-                InitialConsiderationService.RULE_49,
-                InitialConsiderationService.REQUEST_FOR_ADJUSTMENTS,
-                InitialConsiderationService.TIME_POINTS));
+                APPLICATIONS_FOR_STRIKE_OUT_OR_DEPOSIT,
+                INTERPRETERS,
+                JURISDICTIONAL_ISSUES,
+                RULE_49,
+                REQUEST_FOR_ADJUSTMENTS,
+                TIME_POINTS));
         et3Vetting.setEt3SuggestedIssuesStrikeOut("Strike out details");
         et3Vetting.setEt3SuggestedIssueInterpreters("Interpreters");
         et3Vetting.setEt3SuggestedIssueJurisdictional("Jurisdictional issues");

@@ -4,9 +4,6 @@ public final class Constants {
 
     public static final String ET1_DOC_TYPE = "ET1";
     public static final String ET1_ATTACHMENT_DOC_TYPE = "ET1 Attachment";
-    public static final String ET1_VETTING_DOC_TYPE = "ET1 Vetting";
-    public static final String ET3_DOC_TYPE = "ET3";
-    public static final String ET3_PROCESSING_DOC_TYPE = "ET3 Processing";
     public static final String COMPANY = "Company";
     public static final String ACAS_DOC_TYPE = "ACAS Certificate";
     public static final String BEFORE_LABEL_TEMPLATE = "Open these documents to help you complete this form: %s%s%s";

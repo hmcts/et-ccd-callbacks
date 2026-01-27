@@ -168,7 +168,7 @@ public final class HearingsHelper {
             .min(Comparator.naturalOrder());
     }
 
-    private static boolean isValidDateFormat(String dateStr, DateTimeFormatter formatter) {
+    public static boolean isValidDateFormat(String dateStr, DateTimeFormatter formatter) {
         try {
             LocalDateTime.parse(dateStr, formatter);
             return true;

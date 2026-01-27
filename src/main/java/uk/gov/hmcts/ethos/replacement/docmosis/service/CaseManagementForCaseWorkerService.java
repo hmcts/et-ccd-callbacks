@@ -315,8 +315,13 @@ public class CaseManagementForCaseWorkerService {
             for (HearingTypeItem hearingTypeItem : caseData.getHearingCollection()) {
                 dates.addAll(getListedDates(hearingTypeItem));
             }
+            DateTimeFormatter formatter = new DateTimeFormatterBuilder()
+                    .appendPattern("yyyy-MM-dd'T'HH:mm:ss")
+                    .optionalStart().appendPattern(".SSS").optionalEnd()
+                    .toFormatter();
+
             for (String date : dates) {
-                if (!isValidHearingDateFormate(date)) {
+                if (!HearingsHelper.isValidDateFormat(date, formatter)) {
                     continue;
                 }
 
@@ -328,19 +333,6 @@ public class CaseManagementForCaseWorkerService {
                 }
             }
             caseData.setNextListedDate(nextListedDate.split("T")[0]);
-        }
-    }
-
-    private boolean isValidHearingDateFormate(String hearingDate) {
-        DateTimeFormatter formatter = new DateTimeFormatterBuilder()
-                .appendPattern("yyyy-MM-dd'T'HH:mm:ss")
-                .optionalStart().appendPattern(".SSS").optionalEnd()
-                .toFormatter();
-        try {
-            LocalDateTime.parse(hearingDate, formatter);
-            return true;
-        } catch (Exception e) {
-            return false;
         }
     }
 

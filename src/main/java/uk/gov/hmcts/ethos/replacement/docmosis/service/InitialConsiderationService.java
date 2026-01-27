@@ -45,12 +45,22 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_VETTING;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET3;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET3_PROCESSING;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.APPLICATIONS_FOR_STRIKE_OUT_OR_DEPOSIT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CLAIMANT_HEARING_FORMAT_NEITHER_PREFERENCE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CLAIMANT_HEARING_PANEL_PREFERENCE_MISSING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CODES_URL_ENGLAND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CODES_URL_SCOTLAND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CVP;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.DETAIL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.DOC_GEN_ERROR;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.DOES_THE_RESPONDENT_S_NAME_MATCH;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.DO_WE_HAVE_THE_RESPONDENT_S_NAME;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.GIVE_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.HEARING_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.HEARING_FORMAT_PREFERENCE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.HEARING_MISSING;
@@ -58,17 +68,26 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsidera
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.HEARING_PANEL_PREFERENCE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.HEARING_TYPE_MAPPINGS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.IC_OUTPUT_NAME;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.INTERPRETERS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.JSA;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.JURISDICTIONAL_ISSUES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.JURISDICTION_HEADER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.LIST_FOR_FINAL_HEARING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.LIST_FOR_PRELIMINARY_HEARING;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.NEWLINE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.NONE_PROVIDED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.PARTIES_HEARING_FORMAT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.PARTIES_HEARING_PANEL_PREFERENCE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.REFERRAL_ISSUE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.REQUEST_FOR_ADJUSTMENTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.RESPONDENT_MISSING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.RESPONDENT_NAME;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.RULE_49;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.SEEK_COMMENTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.SEEK_COMMENTS_SC;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.TABLE_END;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.TELEPHONE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.TIME_POINTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.UDL_HEARING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.VIDEO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.WITH_MEMBERS;
@@ -78,10 +97,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_L
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_LABEL_ET3_PROCESSING_IC;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_LABEL_REFERRALS_IC;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.CASE_DETAILS_URL_PARTIAL;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET1_DOC_TYPE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET1_VETTING_DOC_TYPE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET3_DOC_TYPE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET3_PROCESSING_DOC_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.REFERRALS_PAGE_FRAGMENT_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.TO_HELP_YOU_COMPLETE_IC_EVENT_LABEL;
@@ -93,29 +108,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 @RequiredArgsConstructor
 public class InitialConsiderationService {
 
-    public static final String APPLICATIONS_FOR_STRIKE_OUT_OR_DEPOSIT = "Applications for strike out or deposit";
-    public static final String INTERPRETERS = "Interpreters";
-    public static final String JURISDICTIONAL_ISSUES = "Jurisdictional issues";
-    public static final String REQUEST_FOR_ADJUSTMENTS = "Request for adjustments";
-    public static final String RULE_49 = "Rule 49";
-    public static final String TIME_POINTS = "Time points";
-    public static final String DO_WE_HAVE_THE_RESPONDENT_S_NAME = "Do we have the respondent's name?";
-    public static final String DOES_THE_RESPONDENT_S_NAME_MATCH = "Does the respondent's name match?";
-    public static final String REFERRAL_ISSUE = "Referral Issue";
-    public static final String DETAIL = "Detail";
-    public static final String TABLE_END = """
-            </tbody>
-            </table>
-            """;
     private final TornadoService tornadoService;
     private static final String[] HEADER = {"Issue / Question", "Details / Answer"};
-    private static final String BULLET_POINT = "\n -  ";
-    private static final String GENERAL_NOTES = "General notes:";
-    private static final String GIVE_DETAILS = "Give Details:";
-    private static final String DETAILS = "Details";
-    private static final String NEWLINE_FOR_DETAILS = "\n\nDetails: \n";
-    private static final String NEWLINE = "\n";
-    private static final String NONE_PROVIDED = "None provided.";
 
     public void initialiseInitialConsideration(CaseDetails caseDetails) {
         List<DocumentTypeItem> documentCollection = caseDetails.getCaseData().getDocumentCollection();
@@ -125,12 +119,12 @@ public class InitialConsiderationService {
             return;
         }
 
-        String et1Form = generateDocumentLinks(documentCollection, ET1_DOC_TYPE, BEFORE_LABEL_ET1_IC);
+        String et1Form = generateDocumentLinks(documentCollection, ET1, BEFORE_LABEL_ET1_IC);
         String et1Vetting = generateDocumentLinks(documentCollection,
-                ET1_VETTING_DOC_TYPE, BEFORE_LABEL_ET1_VETTING_IC);
-        String et3Form = generateDocumentLinks(documentCollection, ET3_DOC_TYPE, BEFORE_LABEL_ET3_IC);
+                ET1_VETTING, BEFORE_LABEL_ET1_VETTING_IC);
+        String et3Form = generateDocumentLinks(documentCollection, ET3, BEFORE_LABEL_ET3_IC);
         String et3Processing = generateDocumentLinks(documentCollection,
-                ET3_PROCESSING_DOC_TYPE, BEFORE_LABEL_ET3_PROCESSING_IC);
+                ET3_PROCESSING, BEFORE_LABEL_ET3_PROCESSING_IC);
         String referralLinks = generateReferralLinks(caseDetails);
 
         String beforeYouStart = String.format(TO_HELP_YOU_COMPLETE_IC_EVENT_LABEL, et1Form, et1Vetting,

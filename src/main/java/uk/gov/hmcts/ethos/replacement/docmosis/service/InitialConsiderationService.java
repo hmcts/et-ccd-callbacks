@@ -187,10 +187,9 @@ public class InitialConsiderationService {
                         && respondentSumType.getValue().getRespondentName() != null
                         && !respondentSumType.getValue().getRespondentName().isEmpty()
                 ) {
-                    int updatedRespondentCount = respondentCount.incrementAndReturnValue();
                     // Set respondent name details
                     respondentDetailsHtmlFragment.append(getRespondentNameDetails(respondentSumType,
-                            updatedRespondentCount));
+                            respondentCount.incrementAndReturnValue()));
                 }
             });
 

@@ -771,6 +771,8 @@ class SendNotificationServiceTest {
         caseData.setSendNotificationNotify(RESPONDENT_ONLY);
         List<String> errors = sendNotificationService.validateInput(caseData);
         assertEquals(1, errors.size());
-        assertEquals("Select the party or parties to notify must include the party or parties who must respond", errors.get(0));
+        assertEquals(
+                "Select the party or parties to notify must include the party or parties who must respond",
+                errors.getFirst());
     }
 }

@@ -33,7 +33,7 @@ class MultipleNotificationsHelperTest {
     List<NotificationSchedulePayload> schedulePayloads;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         schedulePayloads = new ArrayList<>();
         List<NotificationSchedulePayload> list1 = MultipleUtil
                 .getNotificationSchedulePayloadList(ETHOS_CASE_REFERENCE_1, MULTIPLE_REF);
@@ -54,7 +54,7 @@ class MultipleNotificationsHelperTest {
         assertEquals(2, result.size(), "There should be 2 groups of notifications");
 
         // Group 1 assertions
-        var firstGroup = result.get(0);
+        var firstGroup = result.getFirst();
         assertEquals(Pair.of(SUBMIT_HEARING_AGENDA, DATE_6_AUG_2022), firstGroup.getKey(),
                 "First group key should match");
         assertEquals(2, firstGroup.getValue().size(), "First group should have 2 notifications");

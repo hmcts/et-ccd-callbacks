@@ -740,4 +740,37 @@ class SendNotificationServiceTest {
         assertTrue(bfActionItem.getId().matches(
                 "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"));
     }
+
+    @Test
+    void validateInput_shouldReturnNoError_whenSelectPartiesIsNull() {
+        caseData.setSendNotificationSelectParties(null);
+        caseData.setSendNotificationNotify(CLAIMANT_ONLY);
+        List<String> errors = sendNotificationService.validateInput(caseData);
+        assertEquals(0, errors.size());
+    }
+
+    @Test
+    void validateInput_shouldReturnNoError_whenPartyToNotifyIsBothParties() {
+        caseData.setSendNotificationSelectParties(CLAIMANT_ONLY);
+        caseData.setSendNotificationNotify(BOTH_PARTIES);
+        List<String> errors = sendNotificationService.validateInput(caseData);
+        assertEquals(0, errors.size());
+    }
+
+    @Test
+    void validateInput_shouldReturnNoError_whenPartyToNotifyMatchesSelectParties() {
+        caseData.setSendNotificationSelectParties(CLAIMANT_ONLY);
+        caseData.setSendNotificationNotify(CLAIMANT_ONLY);
+        List<String> errors = sendNotificationService.validateInput(caseData);
+        assertEquals(0, errors.size());
+    }
+
+    @Test
+    void validateInput_shouldReturnError_whenPartyToNotifyDoesNotMatchSelectParties() {
+        caseData.setSendNotificationSelectParties(CLAIMANT_ONLY);
+        caseData.setSendNotificationNotify(RESPONDENT_ONLY);
+        List<String> errors = sendNotificationService.validateInput(caseData);
+        assertEquals(1, errors.size());
+        assertEquals("Select the party or parties to notify must include the party or parties who must respond", errors.get(0));
+    }
 }

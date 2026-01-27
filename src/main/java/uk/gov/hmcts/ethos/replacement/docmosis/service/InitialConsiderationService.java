@@ -180,7 +180,7 @@ public class InitialConsiderationService {
         IntWrapper respondentCount = new IntWrapper(0);
 
         // For each respondent, set the name details and then panel preference details
-        if (respondentCollection != null && !respondentCollection.isEmpty()) {
+        if (respondentCollection != null) {
             respondentDetailsHtmlFragment.append(tableHeaderSection);
             respondentCollection.forEach(respondentSumType -> {
                 if (respondentSumType != null && respondentSumType.getValue() != null
@@ -192,11 +192,10 @@ public class InitialConsiderationService {
                             respondentCount.incrementAndReturnValue()));
                 }
             });
-
-            //close table
-            respondentDetailsHtmlFragment.append(TABLE_END);
         }
 
+        //close table
+        respondentDetailsHtmlFragment.append(TABLE_END);
         return respondentDetailsHtmlFragment.toString();
     }
 

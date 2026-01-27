@@ -22,6 +22,9 @@ import java.net.URISyntaxException;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -35,6 +38,7 @@ class SendNotificationControllerTest extends BaseControllerTest {
     private static final String ABOUT_TO_SUBMIT_URL = "/sendNotification/aboutToSubmit";
     private static final String ABOUT_TO_START_URL = "/sendNotification/aboutToStart";
     private static final String SUBMITTED_URL = "/sendNotification/submitted";
+    private static final String MID_VALIDATE_INPUT_URL = "/sendNotification/midValidateInput";
 
     @MockBean
     private SendNotificationService sendNotificationService;
@@ -152,5 +156,38 @@ class SendNotificationControllerTest extends BaseControllerTest {
             .header("Authorization", AUTH_TOKEN)
             .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void midValidateInput_tokenOk_noErrors() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(MID_VALIDATE_INPUT_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+        verify(sendNotificationService, times(1)).validateInput(any());
+    }
+
+    @Test
+    void midValidateInput_tokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mockMvc.perform(post(MID_VALIDATE_INPUT_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void midValidateInput_badRequest() throws Exception {
+        mockMvc.perform(post(MID_VALIDATE_INPUT_URL)
+                        .content("garbage content")
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest());
     }
 }

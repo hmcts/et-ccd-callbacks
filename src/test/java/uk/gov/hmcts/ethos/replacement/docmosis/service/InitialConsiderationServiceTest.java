@@ -1458,6 +1458,21 @@ class InitialConsiderationServiceTest {
     }
 
     @Test
+    void getHearingDetails_shouldReturnFormattedDetails_whenEarliestListedHearingExists() {
+        HearingTypeItem hearingTypeItem = createHearingTypeItem(
+                "2027-02-04T10:00:00.000", "Listed", "Final Hearing", "Full Day", "6");
+
+        List<HearingTypeItem> hearingCollection = List.of(hearingTypeItem);
+
+        String result = initialConsiderationService.getHearingDetails(hearingCollection, ENGLANDWALES_CASE_TYPE_ID);
+
+        assertNotNull(result);
+        assertTrue(result.contains("Listed Hearing Details"));
+        assertTrue(result.contains("2027"));
+        assertTrue(result.contains("Final Hearing"));
+    }
+
+    @Test
     void getHearingDetails_shouldIgnoreInvalidDateFormats() {
         List<HearingTypeItem> hearingCollection = List.of(
                 createHearingTypeItem("InvalidDate", "Listed", "Hearing Type 1", "Hours", "3"),
@@ -2219,5 +2234,65 @@ class InitialConsiderationServiceTest {
         assertTrue(result.contains("Can the claimant attend a video hearing?"));
         assertTrue(result.contains("Details about video hearing."));
         assertTrue(result.contains("General notes about the respondent."));
+    }
+
+    @Test
+    void setHearingRegionAndVenue_shouldSetFieldsCorrectly() {
+        CaseData caseDataWithVenue = new CaseData();
+
+        DynamicFixedListType regionalOfficeList = new DynamicFixedListType();
+        DynamicValueType dynamicValueType = new DynamicValueType();
+        dynamicValueType.setLabel("London");
+        regionalOfficeList.setValue(dynamicValueType);
+        caseDataWithVenue.setRegionalOfficeList(regionalOfficeList);
+
+        DynamicFixedListType hearingVenues = new DynamicFixedListType();
+        DynamicValueType dynamicValueTypeTwo = new DynamicValueType();
+        dynamicValueTypeTwo.setLabel("Manchester");
+        hearingVenues.setValue(dynamicValueTypeTwo);
+        caseDataWithVenue.setEt1HearingVenues(hearingVenues);
+
+        InitialConsiderationService service = new InitialConsiderationService(null);
+
+        service.setHearingRegionAndVenue(caseDataWithVenue);
+
+        assertEquals("London", caseDataWithVenue.getRegionalOffice());
+        assertEquals("Manchester", caseDataWithVenue.getEt1TribunalRegion());
+    }
+
+    @Test
+    void setHearingRegionAndVenue_shouldSetFieldsToNullWhenListsAreNull() {
+        CaseData caseDataWithNullVenue = new CaseData();
+        caseDataWithNullVenue.setRegionalOfficeList(null);
+        caseDataWithNullVenue.setEt1HearingVenues(null);
+
+        InitialConsiderationService service = new InitialConsiderationService(null);
+
+        service.setHearingRegionAndVenue(caseDataWithNullVenue);
+
+        assertNull(caseDataWithNullVenue.getRegionalOffice());
+        assertNull(caseDataWithNullVenue.getEt1TribunalRegion());
+    }
+
+    @Test
+    void shouldReturnFinalHearingForHearing() {
+        assertEquals("Final Hearing", InitialConsiderationService.getAdjustedHearingTypeName("Hearing"));
+    }
+
+    @Test
+    void shouldReturnReconsiderationHearingForReconsideration() {
+        assertEquals("Reconsideration Hearing",
+                InitialConsiderationService.getAdjustedHearingTypeName("Reconsideration"));
+    }
+
+    @Test
+    void shouldReturnRemedyHearingForRemedy() {
+        assertEquals("Remedy Hearing", InitialConsiderationService.getAdjustedHearingTypeName("Remedy"));
+    }
+
+    @Test
+    void shouldReturnOriginalValueForOtherTypes() {
+        assertEquals("Preliminary", InitialConsiderationService.getAdjustedHearingTypeName("Preliminary"));
+        assertEquals("", InitialConsiderationService.getAdjustedHearingTypeName(""));
     }
 }

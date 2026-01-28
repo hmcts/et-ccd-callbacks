@@ -129,10 +129,11 @@ public class InitialConsiderationService {
 
         Map<String, List<String>> linksByType = documents.stream()
                 .filter(item -> item != null && item.getValue() != null)
-                .filter(item -> IC_DOC_TYPES.contains(item.getValue().getDocumentType()))
+                .filter(item ->
+                        IC_DOC_TYPES.contains(defaultIfEmpty(item.getValue().getDocumentType(), "")))
                 .sorted(Comparator.comparingInt(item -> IC_DOC_TYPES.indexOf(
-                        item.getValue().getDocumentType()))).collect(Collectors.groupingBy(
-                                item -> item.getValue().getDocumentType(),
+                        defaultIfEmpty(item.getValue().getDocumentType(), "")))).collect(
+                                Collectors.groupingBy(item -> item.getValue().getDocumentType(),
                         LinkedHashMap::new, // preserve type order
                         Collectors.mapping(DocumentManagementService::createLinkToBinaryDocument, Collectors.toList())
                 ));

@@ -20,6 +20,7 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -56,6 +57,17 @@ public final class HearingsHelper {
     public static final String HEARING_BREAK_RESUME_INVALID = "%s contains a hearing with break and "
             + "resume times of 00:00:00. If the hearing had a break then please update the times. If there was no "
             + "break, please remove the hearing date and times from the break and resume fields before continuing.";
+    public static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
+            .appendPattern("yyyy-MM-dd")
+            .optionalStart()
+            .appendPattern("'T'HH:mm:ss")
+            .optionalStart()
+            .appendPattern(".SSS")
+            .optionalEnd()
+            .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
+            .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
+            .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
+            .toFormatter();
     private static final String TWO_JUDGES = "Two Judges";
     public static final String BREAK_TIME_VALIDATION_MESSAGE =
             "%s break time must be after the start time and "
@@ -147,23 +159,18 @@ public final class HearingsHelper {
     }
 
     // Returns the earliest future listed date, or empty if none
-    public static Optional<LocalDate> getEarliestListedFutureHearingDate(
-            List<DateListedTypeItem> hearingDates) {
+    public static Optional<LocalDate> getEarliestListedFutureHearingDate(List<DateListedTypeItem> hearingDates) {
         if (CollectionUtils.isEmpty(hearingDates)) {
             return Optional.empty();
         }
 
-        DateTimeFormatter formatter = new DateTimeFormatterBuilder()
-                .appendPattern("yyyy-MM-dd'T'HH:mm:ss")
-                .optionalStart().appendPattern(".SSS").optionalEnd()
-                .toFormatter();
         LocalDate today = LocalDate.now();
         return hearingDates.stream()
             .filter(HearingsHelper::isListedHearing)
             .map(DateListedTypeItem::getValue)
             .map(DateListedType::getListedDate)
-            .filter(listedDate -> !isNullOrEmpty(listedDate) && isValidDateFormat(listedDate, formatter))
-            .map(listedDate -> LocalDateTime.parse(listedDate, formatter).toLocalDate())
+            .filter(listedDate -> !isNullOrEmpty(listedDate) && isValidDateFormat(listedDate, FORMATTER))
+            .map(listedDate -> LocalDateTime.parse(listedDate, FORMATTER).toLocalDate())
             .filter(date -> date.isAfter(today))
             .min(Comparator.naturalOrder());
     }

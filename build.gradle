@@ -367,8 +367,8 @@ dependencyManagement {
 
 dependencies {
 
-    implementation group: 'com.github.hmcts', name: 'et-common', version: 'RET-6074-c93a65a'
-    implementation group: 'com.github.hmcts', name: 'et-data-model', version: 'RET-6074-82c7273'
+    implementation group: 'com.github.hmcts', name: 'et-common', version: '3.1.3'
+    implementation group: 'com.github.hmcts', name: 'et-data-model', version: '4.3.8'
     implementation group: 'com.github.hmcts', name: 'ecm-common', version: '3.0.1'
     implementation group: 'com.github.hmcts', name: 'ecm-data-model', version: '2.0.4'
     implementation group: 'uk.gov.dwp.regex', name: 'postcode-validation', version: '1.1.0'
@@ -539,7 +539,7 @@ bootWithCCD {
     environment 'WA_SUPPORTED_JURISDICTIONS', 'IA,CIVIL,PRIVATELAW,PUBLICLAW'
 
     // xui-manage-org
-    environment 'RD_PROFESSIONAL_API_URL', 'http://host.docker.internal:8765'
+    environment 'RD_PROFESSIONAL_API_URL', 'http://localhost:8765'
     environment 'RD_PROFESSIONAL_API_SERVICE', 'http://localhost:8765'
     environment 'PRD_HOST', 'http://localhost:8765'
     environment 'XUI_MANAGE_ORGANISATIONS_CASETYPES', 'ET_EnglandWales,ET_Scotland'

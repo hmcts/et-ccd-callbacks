@@ -35,11 +35,14 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
@@ -110,35 +113,52 @@ public class InitialConsiderationService {
 
     private final TornadoService tornadoService;
     private static final String[] HEADER = {"Issue / Question", "Details / Answer"};
+    private static final List<String> IC_DOC_TYPES = List.of(ET1, ET1_VETTING, ET3, ET3_PROCESSING);
+    private static final Map<String, String> IC_LABELS = Map.of(
+            ET1, BEFORE_LABEL_ET1_IC, ET1_VETTING, BEFORE_LABEL_ET1_VETTING_IC,
+            ET3, BEFORE_LABEL_ET3_IC, ET3_PROCESSING, BEFORE_LABEL_ET3_PROCESSING_IC
+    );
 
     public void initialiseInitialConsideration(CaseDetails caseDetails) {
-        List<DocumentTypeItem> documentCollection = caseDetails.getCaseData().getDocumentCollection();
+        List<DocumentTypeItem> documents = emptyIfNull(caseDetails.getCaseData().getDocumentCollection());
 
-        if (CollectionUtils.isEmpty(documentCollection)) {
+        if (documents.isEmpty()) {
             caseDetails.getCaseData().setInitialConsiderationBeforeYouStart("");
             return;
         }
 
-        String et1Form = generateDocumentLinks(documentCollection, ET1, BEFORE_LABEL_ET1_IC);
-        String et1Vetting = generateDocumentLinks(documentCollection,
-                ET1_VETTING, BEFORE_LABEL_ET1_VETTING_IC);
-        String et3Form = generateDocumentLinks(documentCollection, ET3, BEFORE_LABEL_ET3_IC);
-        String et3Processing = generateDocumentLinks(documentCollection,
-                ET3_PROCESSING, BEFORE_LABEL_ET3_PROCESSING_IC);
-        String referralLinks = generateReferralLinks(caseDetails);
+        Map<String, List<String>> linksByType = documents.stream()
+                .filter(item -> item != null && item.getValue() != null)
+                .filter(item -> IC_DOC_TYPES.contains(item.getValue().getDocumentType()))
+                .sorted(Comparator.comparingInt(item -> IC_DOC_TYPES.indexOf(
+                        item.getValue().getDocumentType()))).collect(Collectors.groupingBy(
+                                item -> item.getValue().getDocumentType(),
+                        LinkedHashMap::new, // preserve type order
+                        Collectors.mapping(DocumentManagementService::createLinkToBinaryDocument, Collectors.toList())
+                ));
 
-        String beforeYouStart = String.format(TO_HELP_YOU_COMPLETE_IC_EVENT_LABEL, et1Form, et1Vetting,
-                et3Form, et3Processing, referralLinks);
+        String docLinksMarkUp = formatDocLinks(linksByType);
+        String referralLinks = generateReferralLinks(caseDetails);
+        String beforeYouStart = String.format(TO_HELP_YOU_COMPLETE_IC_EVENT_LABEL, docLinksMarkUp, referralLinks);
         caseDetails.getCaseData().setInitialConsiderationBeforeYouStart(beforeYouStart);
     }
 
-    private String generateDocumentLinks(List<DocumentTypeItem> documentCollection, String docType, String label) {
-        return documentCollection.stream()
-                .filter(d -> docType.equals(defaultIfEmpty(d.getValue().getDocumentType(),
-                        "")))
-                .map(d -> String.format(label,
-                        DocumentManagementService.createLinkToBinaryDocument(d)))
-                .collect(Collectors.joining());
+    private String formatDocLinks(Map<String, List<String>> linksByType) {
+        if (linksByType == null || linksByType.isEmpty()) {
+            return "";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        for (Map.Entry<String, List<String>> entry : linksByType.entrySet()) {
+            String linkType = entry.getKey();
+            List<String> links = entry.getValue();
+
+            if (linkType != null && !linkType.isEmpty() && IC_LABELS.containsKey(linkType)) {
+                sb.append(String.format(IC_LABELS.get(linkType), String.join("", links)));
+            }
+        }
+
+        return sb.toString();
     }
 
     private String generateReferralLinks(CaseDetails caseDetails) {
@@ -148,6 +168,13 @@ public class InitialConsiderationService {
                     CASE_DETAILS_URL_PARTIAL + caseDetails.getCaseId() + REFERRALS_PAGE_FRAGMENT_ID);
         }
         return "";
+    }
+
+    public void setHearingRegionAndVenue(CaseData caseData) {
+        caseData.setRegionalOffice(caseData.getRegionalOfficeList() != null
+                ? caseData.getRegionalOfficeList().getSelectedLabel() : null);
+        caseData.setEt1TribunalRegion(caseData.getEt1HearingVenues() != null
+                ? caseData.getEt1HearingVenues().getSelectedLabel() : null);
     }
 
     public String setRespondentDetails(CaseData caseData) {
@@ -463,7 +490,7 @@ public class InitialConsiderationService {
         caseData.getRespondentCollection().stream()
                 .filter(respondent -> respondent.getValue() != null)
                 .forEach(respondent -> {
-                    //set respondent rep hearing format preference
+                    //set respondent hearing format preference
                     if (respondent.getValue().getEt3ResponseHearingRespondent() != null
                             && !respondent.getValue().getEt3ResponseHearingRespondent().isEmpty()) {
 
@@ -649,7 +676,9 @@ public class InitialConsiderationService {
         );
     }
 
-    public void clearOldEtICHearingListedAnswersValues(CaseData caseData) {
+    public void clearOldValues(CaseData caseData) {
+        clearHiddenValue(caseData);
+
         //clear old values
         if (caseData.getEtICHearingListedAnswers() != null) {
             caseData.getEtICHearingListedAnswers().setEtInitialConsiderationListedHearingType(null);
@@ -678,28 +707,32 @@ public class InitialConsiderationService {
         caseData.setEtICHearingNotListedListForFinalHearing(null);
         caseData.setEtICHearingNotListedUDLHearing(null);
         caseData.setEtICHearingNotListedAnyOtherDirections(null);
+
     }
 
     public void mapOldIcHearingNotListedOptionsToNew(CaseData caseData, String caseTypeId) {
-        List<String> etICHearingNotListedList = caseData.getEtICHearingNotListedList();
-        List<String> etICHearingNotListedListUpdated = new ArrayList<>();
-        if (etICHearingNotListedList.contains(LIST_FOR_PRELIMINARY_HEARING)) {
-            etICHearingNotListedListUpdated.add(LIST_FOR_PRELIMINARY_HEARING);
-            mapPreliminaryHearingToPreliminaryHearing(caseData);
-        }
-        if (etICHearingNotListedList.contains(LIST_FOR_FINAL_HEARING)) {
-            etICHearingNotListedListUpdated.add(LIST_FOR_FINAL_HEARING);
-            mapFinalHearingToFinalHearing(caseData);
-        }
-        if (etICHearingNotListedList.contains(UDL_HEARING)) {
-            etICHearingNotListedListUpdated.add(LIST_FOR_FINAL_HEARING);
-            mapUdlHearingToFinalHearing(caseData, caseTypeId);
-        }
-        if (etICHearingNotListedList.contains(SEEK_COMMENTS) || etICHearingNotListedList.contains(SEEK_COMMENTS_SC)) {
-            etICHearingNotListedListUpdated.add(HEARING_NOT_LISTED);
-        }
+        if (CollectionUtils.isNotEmpty(caseData.getEtICHearingNotListedList())) {
+            List<String> etICHearingNotListedList = caseData.getEtICHearingNotListedList();
+            List<String> etICHearingNotListedListUpdated = new ArrayList<>();
+            if (etICHearingNotListedList.contains(LIST_FOR_PRELIMINARY_HEARING)) {
+                etICHearingNotListedListUpdated.add(LIST_FOR_PRELIMINARY_HEARING);
+                mapPreliminaryHearingToPreliminaryHearing(caseData);
+            }
+            if (etICHearingNotListedList.contains(LIST_FOR_FINAL_HEARING)) {
+                etICHearingNotListedListUpdated.add(LIST_FOR_FINAL_HEARING);
+                mapFinalHearingToFinalHearing(caseData);
+            }
+            if (etICHearingNotListedList.contains(UDL_HEARING)) {
+                etICHearingNotListedListUpdated.add(LIST_FOR_FINAL_HEARING);
+                mapUdlHearingToFinalHearing(caseData, caseTypeId);
+            }
+            if (etICHearingNotListedList.contains(SEEK_COMMENTS)
+                    || etICHearingNotListedList.contains(SEEK_COMMENTS_SC)) {
+                etICHearingNotListedListUpdated.add(HEARING_NOT_LISTED);
+            }
 
-        caseData.setEtICHearingNotListedListUpdated(etICHearingNotListedListUpdated);
+            caseData.setEtICHearingNotListedListUpdated(etICHearingNotListedListUpdated);
+        }
     }
 
     private void mapPreliminaryHearingToPreliminaryHearing(CaseData caseData) {

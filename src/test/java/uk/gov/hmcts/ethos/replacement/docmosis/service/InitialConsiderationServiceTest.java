@@ -1203,32 +1203,15 @@ class InitialConsiderationServiceTest {
     }
 
     @Test
-    void clearOldEtICHearingListedAnswersValues_clearsAllFieldsWhenAnswersExist() {
+    void clearOldValuesValues_clearsAllFieldsWhenAnswersExist() {
         EtICHearingListedAnswers hearingListedAnswers = getEtICHearingListedAnswers();
 
         CaseData caseDataForListedAnswers = new CaseData();
         caseDataForListedAnswers.setEtICHearingListedAnswers(hearingListedAnswers);
         caseDataForListedAnswers.setEtInitialConsiderationHearing("SomeHearing");
+        initialConsiderationService.clearOldValues(caseDataForListedAnswers);
 
-        initialConsiderationService.clearOldEtICHearingListedAnswersValues(caseDataForListedAnswers);
-
-        assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers().getEtInitialConsiderationListedHearingType());
-        assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers().getEtICIsHearingWithJsaReasonOther());
-        assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers().getEtICIsHearingWithMembers());
-        assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers().getEtICJsaFinalHearingReasonOther());
-        assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers().getEtICMembersFinalHearingReasonOther());
-        assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers()
-                .getEtICIsHearingWithJudgeOrMembersFurtherDetails());
-        assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers().getEtICIsHearingWithJudgeOrMembersReason());
-        assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers()
-                .getEtICIsFinalHearingWithJudgeOrMembersJsaReason());
-        assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers()
-                .getEtICIsFinalHearingWithJudgeOrMembersReason());
-        assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers().getEtICIsHearingWithJsa());
-        assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers().getEtICHearingListed());
-        assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers().getEtICIsHearingWithJudgeOrMembers());
-        assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers()
-                .getEtICIsHearingWithJudgeOrMembersReasonOther());
+        assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers());
     }
 
     private static @NotNull EtICHearingListedAnswers getEtICHearingListedAnswers() {
@@ -1327,7 +1310,7 @@ class InitialConsiderationServiceTest {
         caseDataLocal.setEtICHearingListedAnswers(null);
         caseDataLocal.setEtInitialConsiderationHearing("SomeHearing");
 
-        initialConsiderationService.clearOldEtICHearingListedAnswersValues(caseDataLocal);
+        initialConsiderationService.clearOldValues(caseDataLocal);
 
         assertNull(caseDataLocal.getEtICHearingListedAnswers());
         assertEquals("SomeHearing", caseDataLocal.getEtInitialConsiderationHearing());
@@ -1671,7 +1654,7 @@ class InitialConsiderationServiceTest {
                 caseDataWithNullEt3Vetting);
 
         assertNotNull(result);
-        assertTrue(result.contains("Details of ET3 Vetting Issues"));
+        assertTrue(result.contains("Details of ET3 Processing Issues"));
         assertFalse(result.contains("<h3>Respondent"));
     }
 
@@ -1682,7 +1665,7 @@ class InitialConsiderationServiceTest {
                 caseDataWithValidRespondents);
 
         assertNotNull(result);
-        assertTrue(result.contains("Details of ET3 Vetting Issues"));
+        assertTrue(result.contains("Details of ET3 Processing Issues"));
         assertTrue(result.contains("<h3>Respondent Valid Respondent<h3>"));
         assertTrue(result.contains("Additional Info"));
     }
@@ -1716,7 +1699,7 @@ class InitialConsiderationServiceTest {
                 caseDataWithMultipleRespondents);
 
         assertNotNull(result);
-        assertTrue(result.contains("Details of ET3 Vetting Issues"));
+        assertTrue(result.contains("Details of ET3 Processing Issues"));
         assertTrue(result.contains("<h3>Respondent Respondent 1<h3>"));
         assertTrue(result.contains("Info 1"));
         assertTrue(result.contains("<h3>Respondent Respondent 2<h3>"));

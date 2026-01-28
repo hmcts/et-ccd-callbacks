@@ -18,7 +18,7 @@ public final class Constants {
             + "href=\"%s\">Referrals</a>";
     public static final String REFERRALS_PAGE_FRAGMENT_ID = "#Referrals";
     public static final String TO_HELP_YOU_COMPLETE_IC_EVENT_LABEL = "To help you complete this (opens in new tab)"
-            + "%s%s%s%s%s";
+            + "%s%s";
     public static final String BEFORE_LABEL_ACAS =
             "<br><a target=\"_blank\" href=\"%s\">Acas certificate %s (opens in new tab)</a>";
     public static final String BEFORE_LABEL_ET1_ATTACHMENT =

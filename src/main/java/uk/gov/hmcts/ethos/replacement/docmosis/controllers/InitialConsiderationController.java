@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -139,9 +138,7 @@ public class InitialConsiderationController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setEtICHearingListedAnswers(null);
-        initialConsiderationService.clearOldEtICHearingListedAnswersValues(caseData);
-        initialConsiderationService.clearHiddenValue(caseData);
+        initialConsiderationService.clearOldValues(caseData);
 
         // Sets the respondents details(respondent ET1 and ET3 names in a concatenated string format that forms
         // an HTML table markup and renders as table in ExUI
@@ -169,9 +166,7 @@ public class InitialConsiderationController {
 
         initialConsiderationService.initialiseInitialConsideration(ccdRequest.getCaseDetails());
 
-        if (CollectionUtils.isNotEmpty(caseData.getEtICHearingNotListedList())) {
-            initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData, caseTypeId);
-        }
+        initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData, caseTypeId);
 
         // ET1 Vetting Issues
         caseData.setIcEt1VettingIssuesDetail(initialConsiderationService.setIcEt1VettingIssuesDetails(caseData));
@@ -180,10 +175,7 @@ public class InitialConsiderationController {
         caseData.setIcEt3ProcessingIssuesDetail(
                 initialConsiderationService.setIcEt3VettingIssuesDetailsForEachRespondent(caseData));
 
-        caseData.setRegionalOffice(caseData.getRegionalOfficeList() != null
-                ? caseData.getRegionalOfficeList().getSelectedLabel() : null);
-        caseData.setEt1TribunalRegion(caseData.getEt1HearingVenues() != null
-                ? caseData.getEt1HearingVenues().getSelectedLabel() : null);
+        initialConsiderationService.setHearingRegionAndVenue(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
     }

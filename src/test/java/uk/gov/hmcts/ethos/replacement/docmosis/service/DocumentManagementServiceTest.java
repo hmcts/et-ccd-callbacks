@@ -6,6 +6,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -555,5 +557,42 @@ class DocumentManagementServiceTest {
                 "test.docx", "application/docx", "caseType");
 
         assertEquals("/documents/85d97996-22a5-40d7-882e-3a382c8ae1b4", result.getPath());
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideDocumentTypeItemsForCreateLinkToBinaryDocument")
+    void createLinkToBinaryDocument_parameterized(DocumentTypeItem item, String expected) {
+        String result = DocumentManagementService.createLinkToBinaryDocument(item);
+        org.junit.jupiter.api.Assertions.assertEquals(expected, result);
+    }
+
+    private static java.util.stream.Stream<org.junit.jupiter.params.provider.Arguments>
+        provideDocumentTypeItemsForCreateLinkToBinaryDocument() {
+        UploadedDocumentType docWithUrl = new UploadedDocumentType();
+        docWithUrl.setDocumentBinaryUrl("http://dm-store:8080/documents/abc-123/binary");
+        DocumentType typeWithUrl = new DocumentType();
+        typeWithUrl.setUploadedDocument(docWithUrl);
+        DocumentTypeItem itemWithUrl = new DocumentTypeItem();
+        itemWithUrl.setValue(typeWithUrl);
+
+        UploadedDocumentType docWithNull = new UploadedDocumentType();
+        docWithNull.setDocumentBinaryUrl(null);
+        DocumentType typeWithNull = new DocumentType();
+        typeWithNull.setUploadedDocument(docWithNull);
+        DocumentTypeItem itemWithNull = new DocumentTypeItem();
+        itemWithNull.setValue(typeWithNull);
+
+        UploadedDocumentType docWithNoDocuments = new UploadedDocumentType();
+        docWithNoDocuments.setDocumentBinaryUrl("http://example.com/file.pdf");
+        DocumentType typeWithNoDocuments = new DocumentType();
+        typeWithNoDocuments.setUploadedDocument(docWithNoDocuments);
+        DocumentTypeItem itemWithNoDocuments = new DocumentTypeItem();
+        itemWithNoDocuments.setValue(typeWithNoDocuments);
+
+        return java.util.stream.Stream.of(
+                org.junit.jupiter.params.provider.Arguments.of(itemWithUrl, "/documents/abc-123/binary"),
+                org.junit.jupiter.params.provider.Arguments.of(itemWithNull, ""),
+                org.junit.jupiter.params.provider.Arguments.of(itemWithNoDocuments, "")
+        );
     }
 }

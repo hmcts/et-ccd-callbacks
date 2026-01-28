@@ -97,6 +97,11 @@ public class NocNotificationService {
         List<CaseUserAssignment> caseUserAssignments =
                 caseAccessService.getCaseUserAssignmentsById(caseDetailsNew.getCaseId());
 
+        if (caseUserAssignments == null || caseUserAssignments.isEmpty()) {
+            log.warn("No case user assignments found for caseId {}", caseDetailsNew.getCaseId());
+            return;
+        }
+
         // send respondents or respondent solicitors the claimant noc change email
         emailNotificationService.getRespondentsAndRepsEmailAddresses(caseDataNew, caseUserAssignments)
                 .forEach((email, respondentId) -> {

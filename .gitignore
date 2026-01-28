@@ -56,6 +56,3 @@ bin/
 !.yarn/sdks
 !.yarn/versions
 src/test/resources/PreHearingDepositData.xlsx
-src/main/resources/application-cftlib.yaml
-src/main/resources/application-cftlib.yaml
-src/main/resources/application-cftlib.yaml

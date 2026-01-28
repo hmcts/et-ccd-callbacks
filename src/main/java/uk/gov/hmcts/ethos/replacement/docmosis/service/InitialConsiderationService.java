@@ -854,7 +854,7 @@ public class InitialConsiderationService {
 
         stringBuilder.append(MarkdownHelper.createTwoColumnTable(HEADER, et3VettingIssuesPairsList));
 
-        return MarkdownHelper.detailsWrapper("Details of ET3 Vetting Issues", stringBuilder.toString());
+        return MarkdownHelper.detailsWrapper("Details of ET3 Processing Issues", stringBuilder.toString());
     }
 
     public void processEt3Response(Et3VettingType et3Vetting, List<String[]> pairsList) {

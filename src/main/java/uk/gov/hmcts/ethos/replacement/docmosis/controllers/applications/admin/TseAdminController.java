@@ -128,7 +128,7 @@ public class TseAdminController {
      * @param  userToken        Used for authorisation
      * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse that
      *                          includes caseData which contains the upload document names of
-     *                          type "Another type of document" in a html string format.
+     *                          type "Another type of document" in an HTML string format.
      */
     @PostMapping(value = "/midDetailsTable", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Mid Event for initial Application & Response details")
@@ -162,7 +162,7 @@ public class TseAdminController {
      * @param  userToken        Used for authorisation
      * @return ResponseEntity   It is an HTTPEntity response which has CCDCallbackResponse that
      *                          includes caseData which contains the upload document names of
-     *                          type "Another type of document" in a html string format.
+     *                          type "Another type of document" in an HTML string format.
      */
     @PostMapping(value = "/midValidateInput", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Mid Event for initial Application & Response details")

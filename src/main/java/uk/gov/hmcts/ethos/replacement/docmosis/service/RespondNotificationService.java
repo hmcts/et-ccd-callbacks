@@ -289,6 +289,11 @@ public class RespondNotificationService {
         }
     }
 
+    /**
+     * Validate user input.
+     * @param caseData in which the case details are extracted from
+     * @return Error message list
+     */
     public List<String> validateInput(CaseData caseData) {
         List<String> errors = new ArrayList<>();
 

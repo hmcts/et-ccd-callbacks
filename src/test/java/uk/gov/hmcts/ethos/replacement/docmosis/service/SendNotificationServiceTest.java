@@ -93,6 +93,8 @@ class SendNotificationServiceTest {
             "bundlesSubmittedNotificationForClaimantTemplateId";
     private static final String BUNDLES_SUBMITTED_NOTIFICATION_FOR_TRIBUNAL_TEMPLATE_ID =
             "bundlesSubmittedNotificationForTribunalTemplateId";
+    private static final String ERROR_MSG_PARTY_TO_NOTIFY_MUST_INCLUDE_SELECTED =
+        "Select the party or parties to notify must include the party or parties who must respond";
     private static final String CLAIMANT_ONLY = "Claimant only";
     private static final String DUMMY_ADMIN_USER_TOKEN = "DUMMY_ADMIN_USER_TOKEN";
 
@@ -771,8 +773,6 @@ class SendNotificationServiceTest {
         caseData.setSendNotificationNotify(RESPONDENT_ONLY);
         List<String> errors = sendNotificationService.validateInput(caseData);
         assertEquals(1, errors.size());
-        assertEquals(
-                "Select the party or parties to notify must include the party or parties who must respond",
-                errors.getFirst());
+        assertEquals(ERROR_MSG_PARTY_TO_NOTIFY_MUST_INCLUDE_SELECTED, errors.getFirst());
     }
 }

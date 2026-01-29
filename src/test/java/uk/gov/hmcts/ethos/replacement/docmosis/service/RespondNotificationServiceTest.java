@@ -33,6 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
@@ -59,6 +60,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 class RespondNotificationServiceTest {
     private static final String CLAIMANT_EMAIL = "claimant@test.com";
     private static final String RESPONDENT_EMAIL = "repondent@test.com";
+    private static final String ERROR_MSG_PARTY_TO_NOTIFY_MUST_INCLUDE_SELECTED =
+        "Select the party or parties to notify must include the party or parties who must respond";
 
     private CaseDetails caseDetails;
     private CaseData caseData;
@@ -581,5 +584,30 @@ class RespondNotificationServiceTest {
         verify(emailService, times(0)).sendEmail(eq("responseTemplateId"),
             eq(RESPONDENT_EMAIL), any());
 
+    }
+
+    @Test
+    void validateInput_shouldReturnNoError_whenPartyToRespondIsNull() {
+        caseData.setRespondNotificationWhoRespond(null);
+        caseData.setRespondNotificationPartyToNotify(CLAIMANT_ONLY);
+        List<String> errors = respondNotificationService.validateInput(caseData);
+        assertThat(errors).hasSize(0);
+    }
+
+    @Test
+    void validateInput_shouldReturnNoError_whenPartyToNotifyIsBothParties() {
+        caseData.setRespondNotificationWhoRespond(CLAIMANT_ONLY);
+        caseData.setRespondNotificationPartyToNotify(BOTH_PARTIES);
+        List<String> errors = respondNotificationService.validateInput(caseData);
+        assertThat(errors).hasSize(0);
+    }
+
+    @Test
+    void validateInput_shouldReturnError_whenPartyToNotifyDoesNotMatchRequestPartyToRespond() {
+        caseData.setRespondNotificationWhoRespond(CLAIMANT_ONLY);
+        caseData.setRespondNotificationPartyToNotify(RESPONDENT_ONLY);
+        List<String> errors = respondNotificationService.validateInput(caseData);
+        assertThat(errors).hasSize(1);
+        assertThat(errors.getFirst()).isEqualTo(ERROR_MSG_PARTY_TO_NOTIFY_MUST_INCLUDE_SELECTED);
     }
 }

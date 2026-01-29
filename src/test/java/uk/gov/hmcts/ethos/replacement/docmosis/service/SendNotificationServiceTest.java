@@ -33,6 +33,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -744,11 +746,11 @@ class SendNotificationServiceTest {
     }
 
     @Test
-    void validateInput_shouldReturnNoError_whenSelectPartiesIsNull() {
+    void validateInput_shouldReturnNoError_whenPartyToRespondIsNull() {
         caseData.setSendNotificationSelectParties(null);
         caseData.setSendNotificationNotify(CLAIMANT_ONLY);
         List<String> errors = sendNotificationService.validateInput(caseData);
-        assertEquals(0, errors.size());
+        assertThat(errors).isEmpty();
     }
 
     @Test
@@ -756,23 +758,32 @@ class SendNotificationServiceTest {
         caseData.setSendNotificationSelectParties(CLAIMANT_ONLY);
         caseData.setSendNotificationNotify(BOTH_PARTIES);
         List<String> errors = sendNotificationService.validateInput(caseData);
-        assertEquals(0, errors.size());
+        assertThat(errors).isEmpty();
     }
 
     @Test
-    void validateInput_shouldReturnNoError_whenPartyToNotifyMatchesSelectParties() {
+    void validateInput_shouldReturnNoError_whenPartyToNotifyMatchesPartyToRespond() {
         caseData.setSendNotificationSelectParties(CLAIMANT_ONLY);
         caseData.setSendNotificationNotify(CLAIMANT_ONLY);
         List<String> errors = sendNotificationService.validateInput(caseData);
-        assertEquals(0, errors.size());
+        assertThat(errors).isEmpty();
     }
 
     @Test
-    void validateInput_shouldReturnError_whenPartyToNotifyDoesNotMatchSelectParties() {
+    void validateInput_shouldReturnError_whenPartyToRespondIsBothPartyButPartyToNotifyNot() {
+        caseData.setSendNotificationSelectParties(BOTH_PARTIES);
+        caseData.setSendNotificationNotify(CLAIMANT_ONLY);
+        List<String> errors = sendNotificationService.validateInput(caseData);
+        assertThat(errors).hasSize(1);
+        assertThat(errors.getFirst()).isEqualTo(ERROR_MSG_PARTY_TO_NOTIFY_MUST_INCLUDE_SELECTED);
+    }
+
+    @Test
+    void validateInput_shouldReturnError_whenPartyToNotifyDoesNotMatchPartyToRespond() {
         caseData.setSendNotificationSelectParties(CLAIMANT_ONLY);
         caseData.setSendNotificationNotify(RESPONDENT_ONLY);
         List<String> errors = sendNotificationService.validateInput(caseData);
-        assertEquals(1, errors.size());
-        assertEquals(ERROR_MSG_PARTY_TO_NOTIFY_MUST_INCLUDE_SELECTED, errors.getFirst());
+        assertThat(errors).hasSize(1);
+        assertThat(errors.getFirst()).isEqualTo(ERROR_MSG_PARTY_TO_NOTIFY_MUST_INCLUDE_SELECTED);
     }
 }

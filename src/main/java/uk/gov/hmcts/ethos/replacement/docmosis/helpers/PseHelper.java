@@ -259,6 +259,7 @@ public final class PseHelper {
         }
 
         String partyToRespondMap = switch (partyToRespond) {
+            case BOTH_PARTIES -> BOTH_PARTIES;
             case CLAIMANT_TITLE, CLAIMANT_ONLY -> CLAIMANT_ONLY;
             case RESPONDENT_TITLE, RESPONDENT_ONLY -> RESPONDENT_ONLY;
             default -> null;

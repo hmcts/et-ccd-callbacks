@@ -591,7 +591,7 @@ class RespondNotificationServiceTest {
         caseData.setRespondNotificationWhoRespond(null);
         caseData.setRespondNotificationPartyToNotify(CLAIMANT_ONLY);
         List<String> errors = respondNotificationService.validateInput(caseData);
-        assertThat(errors).hasSize(0);
+        assertThat(errors).isEmpty();
     }
 
     @Test
@@ -599,11 +599,11 @@ class RespondNotificationServiceTest {
         caseData.setRespondNotificationWhoRespond(CLAIMANT_ONLY);
         caseData.setRespondNotificationPartyToNotify(BOTH_PARTIES);
         List<String> errors = respondNotificationService.validateInput(caseData);
-        assertThat(errors).hasSize(0);
+        assertThat(errors).isEmpty();
     }
 
     @Test
-    void validateInput_shouldReturnError_whenPartyToNotifyDoesNotMatchRequestPartyToRespond() {
+    void validateInput_shouldReturnError_whenPartyToNotifyDoesNotMatchPartyToRespond() {
         caseData.setRespondNotificationWhoRespond(CLAIMANT_ONLY);
         caseData.setRespondNotificationPartyToNotify(RESPONDENT_ONLY);
         List<String> errors = respondNotificationService.validateInput(caseData);

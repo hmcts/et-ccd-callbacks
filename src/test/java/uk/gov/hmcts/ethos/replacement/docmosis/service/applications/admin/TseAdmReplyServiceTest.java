@@ -211,20 +211,21 @@ class TseAdmReplyServiceTest {
         caseData.setSendNotificationSelectParties(null);
         caseData.setSendNotificationNotify(CLAIMANT_ONLY);
         List<String> errors = tseAdmReplyService.validateInput(caseData);
-        assertThat(errors).hasSize(0);
+        assertThat(errors).isEmpty();
     }
 
     @Test
     void validateInput_shouldReturnNoError_whenPartyToNotifyIsBothParties() {
-        caseData.setSendNotificationSelectParties(CLAIMANT_ONLY);
+        caseData.setSendNotificationSelectParties(CLAIMANT_TITLE);
         caseData.setSendNotificationNotify(BOTH_PARTIES);
         List<String> errors = tseAdmReplyService.validateInput(caseData);
-        assertThat(errors).hasSize(0);
+        assertThat(errors).isEmpty();
     }
 
     @Test
-    void validateInput_shouldReturnError_whenPartyToNotifyDoesNotMatchRequestPartyToRespond() {
-        caseData.setTseAdmReplyRequestSelectPartyRespond(CLAIMANT_ONLY);
+    void validateInput_shouldReturnError_whenPartyToNotifyDoesNotMatchPartyToRespond_CMO() {
+        caseData.setTseAdmReplyIsCmoOrRequest(CASE_MANAGEMENT_ORDER);
+        caseData.setTseAdmReplyCmoSelectPartyRespond(CLAIMANT_TITLE);
         caseData.setTseAdmReplySelectPartyNotify(RESPONDENT_ONLY);
         List<String> errors = tseAdmReplyService.validateInput(caseData);
         assertThat(errors).hasSize(1);
@@ -232,8 +233,9 @@ class TseAdmReplyServiceTest {
     }
 
     @Test
-    void validateInput_shouldReturnError_whenPartyToNotifyDoesNotMatchCMOPartyToRespond() {
-        caseData.setTseAdmReplyCmoSelectPartyRespond(CLAIMANT_ONLY);
+    void validateInput_shouldReturnError_whenPartyToNotifyDoesNotMatchPartyToRespond_Request() {
+        caseData.setTseAdmReplyIsCmoOrRequest(REQUEST);
+        caseData.setTseAdmReplyRequestSelectPartyRespond(CLAIMANT_TITLE);
         caseData.setTseAdmReplySelectPartyNotify(RESPONDENT_ONLY);
         List<String> errors = tseAdmReplyService.validateInput(caseData);
         assertThat(errors).hasSize(1);

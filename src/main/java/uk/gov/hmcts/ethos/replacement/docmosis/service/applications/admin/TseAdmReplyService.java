@@ -50,6 +50,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEITHER;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.REQUEST;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.UPDATED;
@@ -112,16 +113,18 @@ public class TseAdmReplyService {
         if (addDocumentMissing(caseData)) {
             errors.add(ERROR_MSG_ADD_DOC_MISSING);
         }
-        if (isPartyToNotifyMismatch(
-            caseData.getTseAdmReplyRequestSelectPartyRespond(),
-            caseData.getTseAdmReplySelectPartyNotify()
-        )) {
+        if (CASE_MANAGEMENT_ORDER.equals(caseData.getTseAdmReplyIsCmoOrRequest())
+            && isPartyToNotifyMismatch(
+                caseData.getTseAdmReplyCmoSelectPartyRespond(),
+                caseData.getTseAdmReplySelectPartyNotify())
+        ) {
             errors.add(ERROR_MSG_PARTY_TO_NOTIFY_MUST_INCLUDE_SELECTED);
         }
-        if (isPartyToNotifyMismatch(
-            caseData.getTseAdmReplyCmoSelectPartyRespond(),
-            caseData.getTseAdmReplySelectPartyNotify()
-        )) {
+        if (REQUEST.equals(caseData.getTseAdmReplyIsCmoOrRequest())
+            && isPartyToNotifyMismatch(
+                caseData.getTseAdmReplyRequestSelectPartyRespond(),
+                caseData.getTseAdmReplySelectPartyNotify())
+        ) {
             errors.add(ERROR_MSG_PARTY_TO_NOTIFY_MUST_INCLUDE_SELECTED);
         }
         return errors;

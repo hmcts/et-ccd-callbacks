@@ -46,7 +46,6 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.never;
@@ -221,24 +220,24 @@ class TseAdminServiceTest {
         caseData.setTseAdminSelectPartyRespond(null);
         caseData.setTseAdminSelectPartyNotify(CLAIMANT_ONLY);
         List<String> errors = tseAdminService.validateInput(caseData);
-        assertEquals(0, errors.size());
+        assertThat(errors).isEmpty();
     }
 
     @Test
     void validateInput_shouldReturnNoError_whenPartyToNotifyIsBothParties() {
-        caseData.setTseAdminSelectPartyRespond(CLAIMANT_ONLY);
+        caseData.setTseAdminSelectPartyRespond(RESPONDENT_TITLE);
         caseData.setTseAdminSelectPartyNotify(BOTH_PARTIES);
         List<String> errors = tseAdminService.validateInput(caseData);
-        assertEquals(0, errors.size());
+        assertThat(errors).isEmpty();
     }
 
     @Test
     void validateInput_shouldReturnError_whenPartyToNotifyDoesNotMatchPartyToRespond() {
-        caseData.setTseAdminSelectPartyRespond(CLAIMANT_ONLY);
+        caseData.setTseAdminSelectPartyRespond(CLAIMANT_TITLE);
         caseData.setTseAdminSelectPartyNotify(RESPONDENT_ONLY);
         List<String> errors = tseAdminService.validateInput(caseData);
-        assertEquals(1, errors.size());
-        assertEquals(ERROR_MSG_PARTY_TO_NOTIFY_MUST_INCLUDE_SELECTED, errors.getFirst());
+        assertThat(errors).hasSize(1);
+        assertThat(errors.getFirst()).isEqualTo(ERROR_MSG_PARTY_TO_NOTIFY_MUST_INCLUDE_SELECTED);
     }
 
     @Test

@@ -70,7 +70,8 @@ public class NocNotificationService {
         String partyName;
         String newRepEmailAddress = null;
 
-        if (caseRoleId.getValue().getCode().equals(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())) {
+        if (caseRoleId.getValue() != null && caseRoleId.getValue().getCode().equals(
+                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())) {
             // send claimant noc change email
             partyName = caseDataPrevious.getClaimant();
             if (caseDataNew.getRepresentativeClaimantType() != null) {

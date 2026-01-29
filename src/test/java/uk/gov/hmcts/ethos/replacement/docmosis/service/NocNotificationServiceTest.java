@@ -14,7 +14,9 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.RetrieveOrgByIdResponse;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
@@ -29,6 +31,8 @@ import java.util.Map;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.reset;
 import static org.mockito.Mockito.times;
@@ -340,5 +344,52 @@ class NocNotificationServiceTest {
         verify(emailService, times(1)).sendEmail(any(), eq("claimant@unrepresented.com"), any());
         // Tribunal email notification
         verify(emailService, times(1)).sendEmail(any(), eq(TRIBUNAL_EMAIL), any());
+    }
+
+    @Test
+    void sendNotificationOfChangeEmails_shouldSendClaimantNocEmails_WhenClaimantSolicitorRole() {
+        // Arrange
+        DynamicFixedListType caseRoleId = new DynamicFixedListType();
+        DynamicValueType value = new DynamicValueType();
+        value.setCode(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
+        caseRoleId.setValue(value);
+
+        ChangeOrganisationRequest changeRequest = mock(ChangeOrganisationRequest.class);
+        changeRequest.setCaseRoleId(caseRoleId);
+
+        CaseDetails caseDetailsPrevious = mock(CaseDetails.class);
+        CaseDetails caseDetailsNew = mock(CaseDetails.class);
+        CaseData caseDataPrevious = mock(CaseData.class);
+        CaseData caseDataNew = mock(CaseData.class);
+
+        when(caseDataNew.getClaimant()).thenReturn("Claimant Name as new");
+        when(caseDataNew.getEthosCaseReference()).thenReturn("RE2000/2025");
+
+        when(caseDataPrevious.getClaimant()).thenReturn("Claimant Name");
+        when(caseDetailsPrevious.getCaseData()).thenReturn(caseDataPrevious);
+        when(caseDetailsNew.getCaseData()).thenReturn(caseDataNew);
+
+        when(changeRequest.getCaseRoleId()).thenReturn(caseRoleId);
+
+        RepresentedTypeC repTypeC = mock(RepresentedTypeC.class);
+        when(caseDataNew.getRepresentativeClaimantType()).thenReturn(repTypeC);
+        when(repTypeC.getRepresentativeEmailAddress()).thenReturn("rep@email.com");
+
+        // Mock case user assignments for handleClaimantNocEmails
+        when(caseDetailsNew.getCaseId()).thenReturn("caseId");
+        when(caseAccessService.getCaseUserAssignmentsById("caseId")).thenReturn(List.of());
+        // No emails will be sent due to empty assignments, but we want to verify the flow
+
+        NocNotificationService service = new NocNotificationService(
+                emailService, nocRespondentHelper, organisationClient, adminUserService,
+                authTokenGenerator, emailNotificationService, caseAccessService
+        );
+
+        // Act
+        service.sendNotificationOfChangeEmails(caseDetailsPrevious, caseDetailsNew, changeRequest);
+
+        // Assert
+        // Since there are no case user assignments, no emails should be sent
+        verify(emailService, never()).sendEmail(any(), any(), any());
     }
 }

@@ -99,7 +99,8 @@ public class NocNotificationService {
                 caseAccessService.getCaseUserAssignmentsById(caseDetailsNew.getCaseId());
 
         if (caseUserAssignments == null || caseUserAssignments.isEmpty()) {
-            log.warn("No case user assignments found for caseId {}", caseDetailsNew.getCaseId());
+            log.warn("In NocNotificationService : No case user assignments found for caseId {}",
+                    caseDetailsNew.getCaseId());
             return;
         }
 

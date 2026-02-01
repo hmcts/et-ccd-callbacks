@@ -177,10 +177,16 @@ public class ServingService {
      * @param caseDetails object that holds the case data.
      */
     public void sendNotifications(CaseDetails caseDetails) {
-        Map<String, String> personalisation;
-
         List<CaseUserAssignment> caseUserAssignments =
                 caseAccessService.getCaseUserAssignmentsById(caseDetails.getCaseId());
+
+        if (caseUserAssignments == null || caseUserAssignments.isEmpty()) {
+            log.warn("In ServingService : No case user assignments found for caseId {}",
+                    caseDetails.getCaseId());
+            return;
+        }
+
+        Map<String, String> personalisation;
         if (isRepresentedClaimantWithMyHmctsCase(caseDetails.getCaseData())) {
             personalisation = NotificationHelper.buildMapForClaimantRepresentative(caseDetails.getCaseData());
             personalisation.put(LINK_TO_EXUI, emailService.getExuiCaseLink(caseDetails.getCaseId()));

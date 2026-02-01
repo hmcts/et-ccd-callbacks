@@ -31,22 +31,28 @@ public final class NocNotificationHelper {
         // Access through static methods
     }
 
-    public static String getRespondentNameForNewSolicitor(ChangeOrganisationRequest changeRequest,
-                                                          CaseData caseDataNew) {
-        String respondentName = null;
-        try {
-            String selectedRole = changeRequest.getCaseRoleId()
-                            .getSelectedCode();
+    public static String getRespondentNameForNewSolicitor(
+            ChangeOrganisationRequest changeRequest,
+            CaseData caseDataNew) {
 
-            SolicitorRole solicitorRole = SolicitorRole.from(selectedRole).orElseThrow();
-
-            respondentName =
-                    solicitorRole.getRepresentationItem(caseDataNew).map(respondentSumTypeItem ->
-                            respondentSumTypeItem.getValue().getRespondentName()).orElseThrow();
-        } catch (NullPointerException e) {
-            log.warn("Failed to get RespondentNameForNewSolicitor");
+        if (changeRequest == null
+                || changeRequest.getCaseRoleId() == null
+                || caseDataNew == null) {
+            log.warn("Missing required input for getRespondentNameForNewSolicitor");
+            return UNKNOWN;
         }
-        return isNullOrEmpty(respondentName) ? UNKNOWN : respondentName;
+
+        String selectedRole = changeRequest.getCaseRoleId().getSelectedCode();
+        if (isNullOrEmpty(selectedRole)) {
+            log.warn("Selected role is null or empty");
+            return UNKNOWN;
+        }
+
+        return SolicitorRole.from(selectedRole)
+                .flatMap(role -> role.getRepresentationItem(caseDataNew))
+                .map(item -> item.getValue().getRespondentName())
+                .filter(name -> !isNullOrEmpty(name))
+                .orElse(UNKNOWN);
     }
 
     public static RespondentSumType getRespondent(ChangeOrganisationRequest changeRequest, CaseData caseData,

@@ -179,11 +179,6 @@ public class TseAdminController {
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = tseAdminService.validateInput(caseData);
         return getCallbackRespEntityErrors(errors, caseData);

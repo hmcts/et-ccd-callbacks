@@ -144,10 +144,11 @@ public class RespondentTellSomethingElseService {
         if (caseUserAssignments == null || caseUserAssignments.isEmpty()) {
             log.warn("In RespondentTellSomethingElseService : No case user assignments found for caseId {}",
                     caseDetails.getCaseId());
-            return;
+        } else {
+            sendAcknowledgeEmail(caseDetails, userToken, caseUserAssignments);
+            sendClaimantEmail(caseDetails, caseUserAssignments);
         }
-        sendAcknowledgeEmail(caseDetails, userToken, caseUserAssignments);
-        sendClaimantEmail(caseDetails, caseUserAssignments);
+
         sendAdminEmail(caseDetails);
     }
 

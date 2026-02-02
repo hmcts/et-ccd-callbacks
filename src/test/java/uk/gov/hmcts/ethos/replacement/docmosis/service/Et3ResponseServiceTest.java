@@ -77,6 +77,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConst
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_USER_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.SYSTEM_ERROR;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.NO_RESPONDENTS_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.SUBMIT_ET3;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTestConstants.TEST_ET3_FORM_CASE_DATA_FILE;
 
@@ -629,5 +630,79 @@ class Et3ResponseServiceTest {
         GenericServiceException organisationNotFound = assertThrows(GenericServiceException.class, () ->
                 et3ResponseService.setRespondentRepresentsContactDetails(userToken, caseData4, submissionReference));
         assertThat(organisationNotFound.getMessage()).isEqualTo("Organisation details not found");
+    }
+
+    @Test
+    void createDynamicListSelection_noRespondents() {
+        caseData.setRespondentCollection(null);
+        List<String> errors = et3ResponseService.createDynamicListSelection(
+            caseData,
+            VALID_USER_TOKEN,
+            caseData.getCcdID()
+        );
+        assertThat(errors).hasSize(1);
+        assertThat(errors.getFirst()).isEqualTo(NO_RESPONDENTS_FOUND);
+    }
+
+    @Test
+    void createDynamicListSelection_responseContinueNo_returnsNoRespondentsRequireEt3() throws IOException {
+        UserDetails userDetails = new UserDetails();
+        userDetails.setUid(USER_ID);
+        when(userIdamService.getUserDetails(anyString())).thenReturn(userDetails);
+
+        when(ccdCaseAssignment.getCaseUserRoles(VALID_CASE_ID))
+            .thenReturn(getValidCaseUserAssignmentData());
+
+        caseData.getRespondentCollection().getFirst().getValue().setResponseContinue(NO);
+        List<String> errors = et3ResponseService.createDynamicListSelection(
+            caseData,
+            VALID_USER_TOKEN,
+            caseData.getCcdID()
+        );
+        assertThat(errors).hasSize(1);
+        assertThat(errors.getFirst()).isEqualTo("There are no respondents that require an ET3");
+    }
+
+    @Test
+    void createDynamicListSelection_responseContinueYes_allowsSubmissionChoice() {
+        caseData.getRespondentCollection().getFirst().getValue().setResponseContinue(YES);
+        caseData.getRespondentCollection().getFirst().getValue().setResponseReceived(NO);
+        List<String> errors = et3ResponseService.createDynamicListSelection(
+            caseData,
+            VALID_USER_TOKEN,
+            caseData.getCcdID()
+        );
+        assertThat(errors).isEmpty();
+        assertThat(caseData.getEt3RepresentingRespondent()).hasSize(1);
+    }
+
+    @ParameterizedTest
+    @MethodSource("createDynamicListSelectionExtension")
+    void createDynamicListSelection_extensionRequested(String responseReceived, String extensionRequested,
+                                                       String extensionGranted, String extensionDate,
+                                                       String extensionResubmitted, int count, int errorsSize) {
+        RespondentSumType respondentSumType = caseData.getRespondentCollection().getFirst().getValue();
+        respondentSumType.setResponseReceived(responseReceived);
+        respondentSumType.setExtensionRequested(extensionRequested);
+        respondentSumType.setExtensionGranted(extensionGranted);
+        respondentSumType.setExtensionDate(extensionDate);
+        respondentSumType.setExtensionResubmitted(extensionResubmitted);
+        List<String> errors = et3ResponseService.createDynamicListSelection(
+            caseData,
+            VALID_USER_TOKEN,
+            caseData.getCcdID()
+        );
+        assertThat(errors).hasSize(errorsSize);
+        assertThat(caseData.getEt3RepresentingRespondent().getFirst().getValue().getDynamicList().getListItems())
+            .hasSize(count);
+    }
+
+    private static Stream<Arguments> createDynamicListSelectionExtension() {
+        return Stream.of(
+            Arguments.of(NO, null, null, null, null, 1, 0),
+            Arguments.of(YES, YES, YES, "2000-12-31", null, 1, 1),
+            Arguments.of(YES, YES, YES, "2999-12-31", null, 1, 0),
+            Arguments.of(YES, YES, YES, "2999-12-31", YES, 1, 1)
+        );
     }
 }

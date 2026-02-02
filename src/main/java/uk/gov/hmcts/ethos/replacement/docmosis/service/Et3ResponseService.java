@@ -9,17 +9,22 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.DynamicListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DynamicListType;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationAddress;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.DynamicListHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxService;
 
@@ -418,5 +423,83 @@ public class Et3ResponseService {
             caseData.getRepCollection().get(i).getValue().setRepresentativePhoneNumber(caseData.getEt3ResponsePhone());
             caseData.getRepCollection().get(i).getValue().setRepresentativeAddress(caseData.getEt3ResponseAddress());
         }
+    }
+
+    /**
+     * Create a collection of DynamicLists of respondent names.
+     *
+     * @param caseData  data for the case
+     * @param userToken The authorization token used to authenticate service calls.
+     * @param caseId the ID of the case to check roles against
+     */
+    public List<String> createDynamicListSelection(CaseData caseData, String userToken, String caseId) {
+        if (CollectionUtils.isEmpty(caseData.getRespondentCollection())
+            || CollectionUtils.isEmpty(caseData.getRepCollection())) {
+            return List.of(Et3ResponseHelper.NO_RESPONDENTS_FOUND);
+        }
+
+        List<RespondentSumTypeItem> respondentsByCurrentUser = caseData.getRespondentCollection().stream()
+            .filter(r -> isRespondentRepByCurrentUser(caseData, userToken, caseId, r.getId()))
+            .toList();
+        if (CollectionUtils.isEmpty(respondentsByCurrentUser)) {
+            return List.of("There are no respondents represented by you");
+        }
+
+        // get respondent list for selection
+        List<RespondentSumTypeItem> respondents = respondentsByCurrentUser.stream()
+            .filter(r -> Et3ResponseHelper.isAllowSubmit(r.getValue()))
+            .toList();
+        if (CollectionUtils.isEmpty(respondents)) {
+            return List.of("There are no respondents that require an ET3");
+        }
+
+        // set list as SubmitEt3Respondent
+        DynamicFixedListType dynamicList = DynamicFixedListType.from(
+            DynamicListHelper.createDynamicRespondentName(respondents)
+        );
+        caseData.setSubmitEt3Respondent(dynamicList);
+
+        // set list as Et3RepresentingRespondent
+        DynamicListType dynamicListType = new DynamicListType();
+        dynamicListType.setDynamicList(dynamicList);
+        DynamicListTypeItem dynamicListTypeItem = new DynamicListTypeItem();
+        dynamicListTypeItem.setValue(dynamicListType);
+        caseData.setEt3RepresentingRespondent(List.of(dynamicListTypeItem));
+
+        return new ArrayList<>();
+    }
+
+    private boolean isRespondentRepByCurrentUser(
+        CaseData caseData,
+        String userToken,
+        String caseId,
+        String respondentId
+    ) {
+        if (StringUtils.isBlank(userToken)
+            || CollectionUtils.isEmpty(caseData.getRepCollection())) {
+            return false;
+        }
+
+        // get RepCollection indexes
+        List<Integer> representedRespondentIndexes;
+        try {
+            representedRespondentIndexes = getRepresentedRespondentIndexes(userToken, caseId);
+        } catch (GenericServiceException e) {
+            log.error("isRespondentRepByCurrentUser - getRepresentedRespondentIndexes failed", e);
+            return false;
+        }
+
+        if (representedRespondentIndexes.isEmpty()) {
+            return false;
+        }
+
+        // check if respondentId matches
+        for (int i : representedRespondentIndexes) {
+            if (caseData.getRepCollection().get(i).getValue().getRespondentId().equals(respondentId)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

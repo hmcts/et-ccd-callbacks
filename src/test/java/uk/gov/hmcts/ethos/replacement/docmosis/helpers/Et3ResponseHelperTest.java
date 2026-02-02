@@ -3,9 +3,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 import org.apache.commons.lang3.ObjectUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.Arguments;
-import org.junit.jupiter.params.provider.MethodSource;
 import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -20,7 +17,6 @@ import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -141,12 +137,6 @@ class Et3ResponseHelperTest {
     }
 
     @Test
-    void createDynamicListSelection() {
-        Et3ResponseHelper.createDynamicListSelection(caseData);
-        assertThat(caseData.getEt3RepresentingRespondent(), hasSize(1));
-    }
-
-    @Test
     void validateRespondents_noErrors() {
         List<String> errors = Et3ResponseHelper.validateRespondents(caseData, ET3_RESPONSE_DETAILS);
         assertThat(errors).isEmpty();
@@ -184,31 +174,6 @@ class Et3ResponseHelperTest {
         assertThat(respondentSumType.getClaimDetailsSection()).isEqualTo(YES);
         assertThat(respondentSumType.getEmploymentDetailsSection()).isEqualTo(YES);
 
-    }
-
-    @Test
-    void createDynamicListSelection_noRespondents() {
-        caseData.setRespondentCollection(null);
-        List<String> errors = Et3ResponseHelper.createDynamicListSelection(caseData);
-        assertThat(errors, hasSize(1));
-        assertThat(errors.getFirst()).isEqualTo(NO_RESPONDENTS_FOUND);
-    }
-
-    @Test
-    void createDynamicListSelection_responseContinueNo_returnsNoRespondentsRequireEt3() {
-        caseData.getRespondentCollection().getFirst().getValue().setResponseContinue(NO);
-        List<String> errors = Et3ResponseHelper.createDynamicListSelection(caseData);
-        assertThat(errors, hasSize(1));
-        assertThat(errors.getFirst()).isEqualTo("There are no respondents that require an ET3");
-    }
-
-    @Test
-    void createDynamicListSelection_responseContinueYes_allowsSubmissionChoice() {
-        caseData.getRespondentCollection().getFirst().getValue().setResponseContinue(YES);
-        caseData.getRespondentCollection().getFirst().getValue().setResponseReceived(NO);
-        List<String> errors = Et3ResponseHelper.createDynamicListSelection(caseData);
-        assertThat(errors).isEmpty();
-        assertThat(caseData.getEt3RepresentingRespondent(), hasSize(1));
     }
 
     @Test
@@ -274,32 +239,6 @@ class Et3ResponseHelperTest {
         String invalidEventId = "invalid";
         assertThrows(IllegalArgumentException.class, () ->
                 addEt3DataToRespondent(caseData, invalidEventId)
-        );
-    }
-
-    @ParameterizedTest
-    @MethodSource("createDynamicListSelectionExtension")
-    void createDynamicListSelection_extensionRequested(String responseReceived, String extensionRequested,
-                                                       String extensionGranted, String extensionDate,
-                                                       String extensionResubmitted, int count, int errorsSize) {
-        RespondentSumType respondentSumType = caseData.getRespondentCollection().getFirst().getValue();
-        respondentSumType.setResponseReceived(responseReceived);
-        respondentSumType.setExtensionRequested(extensionRequested);
-        respondentSumType.setExtensionGranted(extensionGranted);
-        respondentSumType.setExtensionDate(extensionDate);
-        respondentSumType.setExtensionResubmitted(extensionResubmitted);
-        List<String> errors = Et3ResponseHelper.createDynamicListSelection(caseData);
-        assertThat(errors, hasSize(errorsSize));
-        assertThat(caseData.getEt3RepresentingRespondent().getFirst().getValue().getDynamicList().getListItems(),
-            hasSize(count));
-    }
-
-    private static Stream<Arguments> createDynamicListSelectionExtension() {
-        return Stream.of(
-            Arguments.of(NO, null, null, null, null, 1, 0),
-            Arguments.of(YES, YES, YES, "2000-12-31", null, 1, 1),
-            Arguments.of(YES, YES, YES, "2999-12-31", null, 1, 0),
-            Arguments.of(YES, YES, YES, "2999-12-31", YES, 1, 1)
         );
     }
 

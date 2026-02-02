@@ -87,7 +87,11 @@ public class Et3ResponseController {
         caseData.setEt3ResponseShowInset(YES);
         caseData.setEt3ResponseNameShowInset(YES);
         caseData.setEt3ResponseClaimantName(Et3ResponseHelper.formatClaimantNameForHtml(caseData));
-        List<String> errors = Et3ResponseHelper.createDynamicListSelection(caseData);
+        List<String> errors = et3ResponseService.createDynamicListSelection(
+            caseData,
+            userToken,
+            ccdRequest.getCaseDetails().getCaseId()
+        );
 
         return getCallbackRespEntityErrors(errors, caseData);
     }
@@ -309,7 +313,11 @@ public class Et3ResponseController {
             @RequestHeader("Authorization") String userToken) {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        List<String> errors = Et3ResponseHelper.createDynamicListSelection(caseData);
+        List<String> errors = et3ResponseService.createDynamicListSelection(
+            caseData,
+            userToken,
+            ccdRequest.getCaseDetails().getCaseId()
+        );
         return getCallbackRespEntityErrors(errors, caseData);
     }
 

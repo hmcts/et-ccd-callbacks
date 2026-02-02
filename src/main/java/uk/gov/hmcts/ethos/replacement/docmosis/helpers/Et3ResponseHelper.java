@@ -98,38 +98,7 @@ public final class Et3ResponseHelper {
         return errors;
     }
 
-    /**
-     * Create a collection of DynamicLists of respondent names.
-     *
-     * @param caseData data for the case
-     */
-    public static List<String> createDynamicListSelection(CaseData caseData) {
-        if (CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
-            return List.of(NO_RESPONDENTS_FOUND);
-        }
-
-        List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection().stream()
-                .filter(r -> isAllowSubmit(r.getValue()))
-                .toList();
-
-        if (CollectionUtils.isEmpty(respondents)) {
-            return List.of("There are no respondents that require an ET3");
-        }
-
-        DynamicFixedListType dynamicList = DynamicFixedListType.from(DynamicListHelper.createDynamicRespondentName(
-                caseData.getRespondentCollection().stream()
-                        .filter(r -> isAllowSubmit(r.getValue()))
-                        .toList()));
-        DynamicListType dynamicListType = new DynamicListType();
-        dynamicListType.setDynamicList(dynamicList);
-        DynamicListTypeItem dynamicListTypeItem = new DynamicListTypeItem();
-        dynamicListTypeItem.setValue(dynamicListType);
-        caseData.setEt3RepresentingRespondent(List.of(dynamicListTypeItem));
-        caseData.setSubmitEt3Respondent(dynamicList);
-        return new ArrayList<>();
-    }
-
-    private static boolean isAllowSubmit(RespondentSumType respondent) {
+    public static boolean isAllowSubmit(RespondentSumType respondent) {
         if (NO.equals(respondent.getResponseContinue())) {
             return false;
         }
@@ -194,7 +163,7 @@ public final class Et3ResponseHelper {
             case ET3_RESPONSE -> addRespondentFromSingleSelection(caseData, respondentSet);
 
             case ET3_RESPONSE_DETAILS, ET3_RESPONSE_EMPLOYMENT_DETAILS ->
-                    addRespondentsFromDynamicList(caseData, respondentSet);
+                addRespondentsFromDynamicList(caseData, respondentSet);
 
             default -> throw new IllegalArgumentException(INVALID_EVENT_ID + eventId);
         }

@@ -113,12 +113,11 @@ public final class ClaimantTellSomethingElseHelper {
     }
 
     public static String claimantSelectApplicationToType(String selectApplication) {
-        String type = APPLICATION_TYPE_MAP.get(selectApplication);
-        if (type != null) {
-            return type;
-        } else {
-            throw new IllegalArgumentException(String.format("Unexpected application type %s", selectApplication));
-        }
+        return Optional.ofNullable(APPLICATION_TYPE_MAP.get(selectApplication))
+                .orElseThrow(() ->
+                        new IllegalArgumentException(
+                                "Unexpected application type: " + selectApplication
+                        ));
     }
 
     public static String getDocumentRequest(CaseData caseData, String accessKey)

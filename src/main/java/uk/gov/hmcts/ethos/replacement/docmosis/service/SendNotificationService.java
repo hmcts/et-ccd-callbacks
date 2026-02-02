@@ -68,7 +68,7 @@ public class SendNotificationService {
     public static final String CASE_MANAGEMENT_ORDERS_REQUESTS = "Case management orders / requests";
     public static final String NOTICE_OF_EMPLOYER_CONTRACT_CLAIM = "Notice of Employer Contract Claim";
     private static final String ERROR_MSG_PARTY_TO_NOTIFY_MUST_INCLUDE_SELECTED =
-            "Select the party or parties to notify must include the party or parties who must respond";
+        "Select the party or parties to notify must include the party or parties who must respond";
 
     private final HearingSelectionService hearingSelectionService;
     private final EmailService emailService;
@@ -121,7 +121,10 @@ public class SendNotificationService {
      */
     public List<String> validateInput(CaseData caseData) {
         List<String> errors = new ArrayList<>();
-        if (isPartyToNotifyMismatch(caseData)) {
+        if (isPartyToNotifyMismatch(
+            caseData.getSendNotificationSelectParties(),
+            caseData.getSendNotificationNotify()
+        )) {
             errors.add(ERROR_MSG_PARTY_TO_NOTIFY_MUST_INCLUDE_SELECTED);
         }
         return errors;

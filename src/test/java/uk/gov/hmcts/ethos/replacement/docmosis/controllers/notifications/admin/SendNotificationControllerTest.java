@@ -35,10 +35,10 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 @WebMvcTest({SendNotificationController.class, JsonMapper.class})
 class SendNotificationControllerTest extends BaseControllerTest {
 
-    private static final String ABOUT_TO_SUBMIT_URL = "/sendNotification/aboutToSubmit";
     private static final String ABOUT_TO_START_URL = "/sendNotification/aboutToStart";
-    private static final String SUBMITTED_URL = "/sendNotification/submitted";
     private static final String MID_VALIDATE_INPUT_URL = "/sendNotification/midValidateInput";
+    private static final String ABOUT_TO_SUBMIT_URL = "/sendNotification/aboutToSubmit";
+    private static final String SUBMITTED_URL = "/sendNotification/submitted";
 
     @MockBean
     private SendNotificationService sendNotificationService;

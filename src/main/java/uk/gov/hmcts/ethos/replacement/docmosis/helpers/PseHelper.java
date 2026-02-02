@@ -245,20 +245,29 @@ public final class PseHelper {
 
     /**
      * Checks if party to notify selection mismatches with selected parties.
-     * @param caseData in which the case details are extracted from
+     * @param partyToNotify selected party to notify
+     * @param partyToRespond selected party to respond
      * @return true if there is a mismatch, false otherwise
      */
-    public static boolean isPartyToNotifyMismatch(CaseData caseData) {
-        String selectParties = caseData.getSendNotificationSelectParties();
-        if (selectParties == null) {
+    public static boolean isPartyToNotifyMismatch(String partyToRespond, String partyToNotify) {
+        if (partyToRespond == null || partyToNotify == null) {
             return false;
         }
 
-        String partyToNotify = caseData.getSendNotificationNotify();
         if (BOTH_PARTIES.equals(partyToNotify)) {
             return false;
         }
 
-        return !partyToNotify.equals(selectParties);
+        String partyToRespondMap = switch (partyToRespond) {
+            case BOTH_PARTIES -> BOTH_PARTIES;
+            case CLAIMANT_TITLE, CLAIMANT_ONLY -> CLAIMANT_ONLY;
+            case RESPONDENT_TITLE, RESPONDENT_ONLY -> RESPONDENT_ONLY;
+            default -> null;
+        };
+        if (partyToRespondMap == null) {
+            return false;
+        }
+
+        return !partyToNotify.equals(partyToRespondMap);
     }
 }

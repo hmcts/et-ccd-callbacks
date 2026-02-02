@@ -942,8 +942,7 @@ class RespondentTellSomethingElseServiceTest {
         caseDetails.setCaseId("123456");
 
         when(caseAccessService.getCaseUserAssignmentsById("123456")).thenReturn(List.of());
-        TribunalOfficesService tribunalOfficesService = mock(TribunalOfficesService.class);
-        var tribunalLeedsOffice = TribunalOffice.valueOfOfficeName("Leeds");
+        TribunalOffice tribunalLeedsOffice = TribunalOffice.valueOfOfficeName("Leeds");
         when(tribunalOfficesService.getTribunalOffice(any()))
                 .thenReturn(tribunalLeedsOffice);
 

@@ -21,11 +21,15 @@ import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
+import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentTse;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
@@ -62,6 +66,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
@@ -862,5 +868,92 @@ class RespondentTellSomethingElseServiceTest {
         assertThat(caseData.getResTseDocument7(), is(nullValue()));
         assertThat(caseData.getResTseDocument11(), is(nullValue()));
         assertThat(caseData.getResTseDocument12(), is(nullValue()));
+    }
+
+    @Test
+    void sendEmails_shouldSendAllRelevantEmails_withoutSpy() {
+        // Arrange
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseId("123456");
+        CaseData caseDataWithRespondent = new CaseData();
+        caseDataWithRespondent.setResTseSelectApplication("Amend response");
+        caseDataWithRespondent.setEthosCaseReference("ET-1234-5678-9012-3456");
+        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+        RespondentSumType respondentSumType = new RespondentSumType();
+        respondentSumType.setRespondentName("Respondent Ltd");
+        respondentSumTypeItem.setValue(respondentSumType);
+        caseDataWithRespondent.setRespondentCollection(List.of(respondentSumTypeItem));
+        caseDataWithRespondent.setClaimant("John Doe");
+
+        HearingType hearingType = new HearingType();
+        DateListedTypeItem hearingItem = new DateListedTypeItem();
+        DateListedType dateListedType = new DateListedType();
+        dateListedType.setListedDate("2069-05-16T10:00:00.000");
+        hearingItem.setValue(dateListedType);
+        hearingType.setHearingDateCollection(new ArrayList<>(List.of(hearingItem)));
+        HearingTypeItem hearingTypeItem = new HearingTypeItem();
+        hearingTypeItem.setValue(hearingType);
+        caseDataWithRespondent.setHearingCollection(List.of(hearingTypeItem));
+
+        caseDetails.setCaseData(caseDataWithRespondent);
+        caseDetails.setCaseId("123456");
+
+        List<CaseUserAssignment> assignments = List.of(
+                CaseUserAssignment.builder().userId("user1").caseRole("role1").build()
+        );
+
+        when(caseAccessService.getCaseUserAssignmentsById("123456")).thenReturn(assignments);
+
+        RespondentTellSomethingElseService service = new RespondentTellSomethingElseService(
+                emailService, userIdamService, tribunalOfficesService, tornadoService,
+                documentManagementService, featureToggleService, caseAccessService, emailNotificationService
+        );
+
+        service.sendEmails(caseDetails, "token");
+
+        verify(emailService, atLeastOnce()).sendEmail(any(), any(), any());
+    }
+
+    @Test
+    void sendEmails_shouldLogWarningAndSendAdminEmailWhenNoAssignments_withoutSpy() {
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseId("123456");
+        CaseData caseDataWithRespondent = new CaseData();
+        caseDataWithRespondent.setResTseSelectApplication("Amend response");
+        caseDataWithRespondent.setEthosCaseReference("ET-1234-5678-9012-3456");
+        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+        RespondentSumType respondentSumType = new RespondentSumType();
+        respondentSumType.setRespondentName("Respondent Ltd");
+        respondentSumTypeItem.setValue(respondentSumType);
+        caseDataWithRespondent.setRespondentCollection(List.of(respondentSumTypeItem));
+        caseDataWithRespondent.setClaimant("John Doe");
+
+        HearingType hearingType = new HearingType();
+        DateListedTypeItem hearingItem = new DateListedTypeItem();
+        DateListedType dateListedType = new DateListedType();
+        dateListedType.setListedDate("2069-05-16T10:00:00.000");
+        hearingItem.setValue(dateListedType);
+        hearingType.setHearingDateCollection(new ArrayList<>(List.of(hearingItem)));
+        HearingTypeItem hearingTypeItem = new HearingTypeItem();
+        hearingTypeItem.setValue(hearingType);
+        caseDataWithRespondent.setHearingCollection(List.of(hearingTypeItem));
+
+        caseDetails.setCaseData(caseDataWithRespondent);
+        caseDetails.setCaseId("123456");
+
+        when(caseAccessService.getCaseUserAssignmentsById("123456")).thenReturn(List.of());
+        TribunalOfficesService tribunalOfficesService = mock(TribunalOfficesService.class);
+        var tribunalLeedsOffice = TribunalOffice.valueOfOfficeName("Leeds");
+        when(tribunalOfficesService.getTribunalOffice(any()))
+                .thenReturn(tribunalLeedsOffice);
+
+        RespondentTellSomethingElseService service = new RespondentTellSomethingElseService(
+                emailService, userIdamService, tribunalOfficesService, tornadoService,
+                documentManagementService, featureToggleService, caseAccessService, emailNotificationService
+        );
+
+        service.sendEmails(caseDetails, "token");
+
+        verify(emailService, atLeastOnce()).sendEmail(any(), any(), any());
     }
 }

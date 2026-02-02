@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
@@ -278,6 +279,38 @@ public final class RespondentUtils {
             }
         }
         return null;
+    }
+
+    /**
+     * Returns the index of a respondent in the case data respondent collection
+     * that matches the given respondent ID.
+     *
+     * <p>The method iterates through the respondent collection and returns the
+     * index of the first valid respondent whose ID matches the provided
+     * {@code respondentId}.</p>
+     *
+     * <p>If the case data is null, the respondent collection is empty, the
+     * respondent ID is blank, or no matching respondent is found, the method
+     * returns {@code -1}.</p>
+     *
+     * @param caseData the case data containing the respondent collection
+     * @param respondentId the unique identifier of the respondent to locate
+     * @return the zero-based index of the matching respondent, or {@code -1}
+     *         if no matching respondent is found or the input is invalid
+     */
+    public static int getRespondentIndexById(CaseData caseData, String respondentId) {
+        if (ObjectUtils.isEmpty(caseData)
+                || CollectionUtils.isEmpty(caseData.getRespondentCollection())
+                || StringUtils.isBlank(respondentId)) {
+            return NumberUtils.INTEGER_MINUS_ONE;
+        }
+        for (int i = 0; i < caseData.getRespondentCollection().size(); i++) {
+            RespondentSumTypeItem respondent = caseData.getRespondentCollection().get(i);
+            if (isValidRespondent(respondent) && respondentId.equals(respondent.getId())) {
+                return i;
+            }
+        }
+        return NumberUtils.INTEGER_MINUS_ONE;
     }
 
     /**

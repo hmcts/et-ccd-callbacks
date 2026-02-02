@@ -59,8 +59,7 @@ public final class NOCConstants {
     public static final String ERROR_INVALID_REPRESENTATIVE_EXISTS = "Invalid representative exists.";
     public static final String ERROR_INVALID_RESPONDENT_EXISTS = "Invalid respondent exists.";
     public static final String ERROR_UNABLE_TO_SET_ROLE = "Unable to set role {}. Case Id: {}. Error: {}";
-    public static final String ERROR_NO_ORGANISATION_POLICY_LEFT =
-            "There is no empty respondent organisation policy left, case id: {}";
+    public static final String ERROR_SOLICITOR_ROLE_NOT_FOUND = "Solicitor role not found, case id: {}";
     public static final String ERROR_UNABLE_TO_NOTIFY_REPRESENTATION_REMOVAL =
             "Unable to send notification for representative removal for case: {}. Exception: {}";
     public static final String ERROR_FAILED_TO_REMOVE_ORGANISATION_POLICIES_AND_NOC_ANSWERS =

@@ -355,4 +355,31 @@ final class RespondentUtilsTest {
         assertThat(RespondentUtils.findRespondentByName(respondents, RESPONDENT_NAME_1))
                 .isEqualTo(respondentSumTypeItem);
     }
+
+    @Test
+    void theGetRespondentIndexById() {
+        respondentUtils.close();
+        // when case data is empty should return integer -1
+        assertThat(RespondentUtils.getRespondentIndexById(null, RESPONDENT_ID_1)).isEqualTo(
+                NumberUtils.INTEGER_MINUS_ONE);
+        // when case data doesn't have any respondent should return integer -1
+        CaseData caseData = new CaseData();
+        assertThat(RespondentUtils.getRespondentIndexById(caseData, RESPONDENT_ID_1)).isEqualTo(
+                NumberUtils.INTEGER_MINUS_ONE);
+        // when respondent id is empty should return integer -1
+        caseData.setRespondentCollection(List.of(new RespondentSumTypeItem()));
+        caseData.getRespondentCollection().getFirst().setValue(RespondentSumType.builder().build());
+        assertThat(RespondentUtils.getRespondentIndexById(caseData, StringUtils.EMPTY)).isEqualTo(
+                NumberUtils.INTEGER_MINUS_ONE);
+        // when respondent id is not equal to any of the respondent's id in respondent collection should return
+        // Integer -1
+        caseData.getRespondentCollection().getFirst().getValue().setRespondentName(RESPONDENT_NAME_1);
+        caseData.getRespondentCollection().getFirst().setId(RESPONDENT_ID_2);
+        assertThat(RespondentUtils.getRespondentIndexById(caseData, RESPONDENT_ID_1)).isEqualTo(
+                NumberUtils.INTEGER_MINUS_ONE);
+        // when respondent id is found in respondent collection should return index of the respondent.
+        caseData.getRespondentCollection().getFirst().setId(RESPONDENT_ID_1);
+        assertThat(RespondentUtils.getRespondentIndexById(caseData, RESPONDENT_ID_1)).isEqualTo(
+                NumberUtils.INTEGER_ZERO);
+    }
 }

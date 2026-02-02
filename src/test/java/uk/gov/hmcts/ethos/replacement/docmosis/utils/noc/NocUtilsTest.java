@@ -380,16 +380,16 @@ final class NocUtilsTest {
     }
 
     @Test
-    void theRemoveOrganisationPoliciesAndNocAnswers() {
+    void theResetOrganisationPolicies() {
         // when case data is empty should not throw exception
         RepresentedTypeRItem representative = RepresentedTypeRItem.builder().build();
         List<RepresentedTypeRItem> representatives = new ArrayList<>(List.of(representative));
-        assertDoesNotThrow(() -> NocUtils.removeOrganisationPoliciesAndNocAnswers(null, representatives));
+        assertDoesNotThrow(() -> NocUtils.resetOrganisationPolicies(null, representatives));
         // when representatives are empty should not remove organisation policy or noc answer
         CaseData caseData = new CaseData();
         setAllNoticeOfChangeAnswers(caseData);
         setAllRespondentOrganisationPolicy(caseData);
-        assertDoesNotThrow(() -> NocUtils.removeOrganisationPoliciesAndNocAnswers(caseData, null));
+        assertDoesNotThrow(() -> NocUtils.resetOrganisationPolicies(caseData, null));
         // when representatives have all respondent representative roles, should remove all organisation policies and
         // noc answers
         representatives.getFirst().setValue(RepresentedTypeR.builder().role(ROLE_SOLICITOR_A).build());
@@ -411,38 +411,27 @@ final class NocUtilsTest {
                 .build()).build());
         representatives.add(RepresentedTypeRItem.builder().value(RepresentedTypeR.builder().role(ROLE_SOLICITOR_J)
                 .build()).build());
-        NocUtils.removeOrganisationPoliciesAndNocAnswers(caseData, representatives);
-        assertThat(caseData.getNoticeOfChangeAnswers0()).isEqualTo(null);
-        assertThat(caseData.getNoticeOfChangeAnswers1()).isEqualTo(null);
-        assertThat(caseData.getNoticeOfChangeAnswers2()).isEqualTo(null);
-        assertThat(caseData.getNoticeOfChangeAnswers3()).isEqualTo(null);
-        assertThat(caseData.getNoticeOfChangeAnswers4()).isEqualTo(null);
-        assertThat(caseData.getNoticeOfChangeAnswers5()).isEqualTo(null);
-        assertThat(caseData.getNoticeOfChangeAnswers6()).isEqualTo(null);
-        assertThat(caseData.getNoticeOfChangeAnswers7()).isEqualTo(null);
-        assertThat(caseData.getNoticeOfChangeAnswers8()).isEqualTo(null);
-        assertThat(caseData.getNoticeOfChangeAnswers9()).isEqualTo(null);
-
+        NocUtils.resetOrganisationPolicies(caseData, representatives);
         assertThat(caseData.getRespondentOrganisationPolicy0()).isEqualTo(OrganisationPolicy.builder()
-                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_A).build());
+                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_A).organisation(Organisation.builder().build()).build());
         assertThat(caseData.getRespondentOrganisationPolicy1()).isEqualTo(OrganisationPolicy.builder()
-                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_B).build());
+                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_B).organisation(Organisation.builder().build()).build());
         assertThat(caseData.getRespondentOrganisationPolicy2()).isEqualTo(OrganisationPolicy.builder()
-                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_C).build());
+                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_C).organisation(Organisation.builder().build()).build());
         assertThat(caseData.getRespondentOrganisationPolicy3()).isEqualTo(OrganisationPolicy.builder()
-                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_D).build());
+                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_D).organisation(Organisation.builder().build()).build());
         assertThat(caseData.getRespondentOrganisationPolicy4()).isEqualTo(OrganisationPolicy.builder()
-                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_E).build());
+                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_E).organisation(Organisation.builder().build()).build());
         assertThat(caseData.getRespondentOrganisationPolicy5()).isEqualTo(OrganisationPolicy.builder()
-                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_F).build());
+                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_F).organisation(Organisation.builder().build()).build());
         assertThat(caseData.getRespondentOrganisationPolicy6()).isEqualTo(OrganisationPolicy.builder()
-                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_G).build());
+                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_G).organisation(Organisation.builder().build()).build());
         assertThat(caseData.getRespondentOrganisationPolicy7()).isEqualTo(OrganisationPolicy.builder()
-                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_H).build());
+                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_H).organisation(Organisation.builder().build()).build());
         assertThat(caseData.getRespondentOrganisationPolicy8()).isEqualTo(OrganisationPolicy.builder()
-                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_I).build());
+                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_I).organisation(Organisation.builder().build()).build());
         assertThat(caseData.getRespondentOrganisationPolicy9()).isEqualTo(OrganisationPolicy.builder()
-                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_J).build());
+                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_J).organisation(Organisation.builder().build()).build());
     }
 
     private static void setAllRespondentOrganisationPolicy(CaseData caseData) {

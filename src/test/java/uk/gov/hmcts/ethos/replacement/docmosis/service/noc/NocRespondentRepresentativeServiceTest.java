@@ -152,8 +152,8 @@ class NocRespondentRepresentativeServiceTest {
             "Representative 'Legal One' could not be found using respondent@rep.email.com. "
                     + "Case access will not be defined for this representative.\n";
 
-    private static final String EXPECTED_ERROR_NO_ORGANISATION_POLICY_LEFT =
-            "There is no empty respondent organisation policy left, case id: 1234567890123456";
+    private static final String EXPECTED_ERROR_SOLICITOR_ROLE_NOT_FOUND =
+            "Solicitor role not found, case id: 1234567890123456";
     private static final String EXPECTED_ERROR_UNABLE_TO_SET_ROLE =
             "Unable to set role [SOLICITORA]. Case Id: 1234567890123456. Error: Something went wrong";
     private static final String EXPECTED_ERROR_FAILED_TO_REMOVE_ORGANISATION_POLICIES_AND_NOC_ANSWERS =
@@ -1134,8 +1134,10 @@ class NocRespondentRepresentativeServiceTest {
         verify(nocNotificationService, times(INTEGER_THREE)).sendRespondentRepresentationRemovalNotifications(
                 any(CaseDetails.class), any(CaseDetails.class), anyList());
         assertThat(newCaseDetails.getCaseData().getRespondentOrganisationPolicy0()).isEqualTo(OrganisationPolicy
-                .builder().orgPolicyCaseAssignedRole(ROLE_SOLICITORA).build());
-        assertThat(newCaseDetails.getCaseData().getNoticeOfChangeAnswers0()).isEqualTo(null);
+                .builder().orgPolicyCaseAssignedRole(ROLE_SOLICITORA).organisation(Organisation.builder().build())
+                .build());
+        assertThat(newCaseDetails.getCaseData().getNoticeOfChangeAnswers0()).isEqualTo(
+                NoticeOfChangeAnswers.builder().respondentName(RESPONDENT_NAME_ONE).build());
     }
 
     @Test
@@ -1257,17 +1259,20 @@ class NocRespondentRepresentativeServiceTest {
         nocRespondentRepresentativeService.grantRespondentRepresentativesAccess(caseDetails, representatives);
         verifyNoInteractions(nocCcdService);
         // when there is no respondent organisation policy left to add should log error
-        representatives.getFirst().setValue(RepresentedTypeR.builder().build());
+        representatives.getFirst().setValue(RepresentedTypeR.builder().respondentId(RESPONDENT_ID_ONE).build());
         representatives.getFirst().setId(REPRESENTATIVE_ID_ONE);
         setAllRespondentOrganisationPolicy(caseDetails.getCaseData());
         nocRespondentRepresentativeService.grantRespondentRepresentativesAccess(caseDetails, representatives);
         assertThat(appender.list)
                 .filteredOn(e -> e.getLevel() == Level.ERROR)
                 .extracting(ILoggingEvent::getFormattedMessage)
-                .containsExactly(EXPECTED_ERROR_NO_ORGANISATION_POLICY_LEFT);
+                .containsExactly(EXPECTED_ERROR_SOLICITOR_ROLE_NOT_FOUND);
         verifyNoInteractions(nocCcdService);
         // when not able to grant representative access should log error
-        caseDetails.getCaseData().setRespondentOrganisationPolicy0(null);
+        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+        respondentSumTypeItem.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_ONE).build());
+        respondentSumTypeItem.setId(RESPONDENT_ID_ONE);
+        caseData.setRespondentCollection(List.of(respondentSumTypeItem));
         when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
         doThrow(new GenericServiceException(EXCEPTION_DUMMY_MESSAGE)).when(nocService)
                 .grantRepresentativeAccess(eq(ADMIN_USER_TOKEN), any(), any(), any(), any());
@@ -1288,35 +1293,35 @@ class NocRespondentRepresentativeServiceTest {
 
     @Test
     @SneakyThrows
-    void theRemoveOrganisationPoliciesAndNocAnswers() {
+    void theResetOrganisationPolicies() {
         // when case details is empty should not do anything
         List<RepresentedTypeRItem> representatives = new ArrayList<>();
         assertDoesNotThrow(() -> nocRespondentRepresentativeService
-                .removeOrganisationPoliciesAndNocAnswers(null, representatives));
+                .resetOrganisationPolicies(null, representatives));
         verifyNoInteractions(ccdClient);
         // when case details not have case data should not do anything
         CaseDetails caseDetails = new  CaseDetails();
-        assertDoesNotThrow(() -> nocRespondentRepresentativeService.removeOrganisationPoliciesAndNocAnswers(
+        assertDoesNotThrow(() -> nocRespondentRepresentativeService.resetOrganisationPolicies(
                 caseDetails, representatives));
         verifyNoInteractions(ccdClient);
         // when case details not have case type id should not do anything
         caseDetails.setCaseData(new CaseData());
-        assertDoesNotThrow(() -> nocRespondentRepresentativeService.removeOrganisationPoliciesAndNocAnswers(
+        assertDoesNotThrow(() -> nocRespondentRepresentativeService.resetOrganisationPolicies(
                 caseDetails, representatives));
         verifyNoInteractions(ccdClient);
         // when case details not have jurisdiction should not do anything
         caseDetails.setCaseTypeId(CASE_TYPE_ID_ENGLAND_WALES);
-        assertDoesNotThrow(() -> nocRespondentRepresentativeService.removeOrganisationPoliciesAndNocAnswers(
+        assertDoesNotThrow(() -> nocRespondentRepresentativeService.resetOrganisationPolicies(
                 caseDetails, representatives));
         verifyNoInteractions(ccdClient);
         // when case details not have case id should not do anything
         caseDetails.setJurisdiction(JURISDICTION_EMPLOYMENT);
-        assertDoesNotThrow(() -> nocRespondentRepresentativeService.removeOrganisationPoliciesAndNocAnswers(
+        assertDoesNotThrow(() -> nocRespondentRepresentativeService.resetOrganisationPolicies(
                 caseDetails, representatives));
         verifyNoInteractions(ccdClient);
         // where there is no revoked representatives should not do anything
         caseDetails.setCaseId(CASE_ID_1);
-        assertDoesNotThrow(() -> nocRespondentRepresentativeService.removeOrganisationPoliciesAndNocAnswers(
+        assertDoesNotThrow(() -> nocRespondentRepresentativeService.resetOrganisationPolicies(
                 caseDetails, null));
         verifyNoInteractions(ccdClient);
         // when not able to startEventForCase should log exception
@@ -1324,7 +1329,7 @@ class NocRespondentRepresentativeServiceTest {
                 .build()).build());
         when(ccdClient.startEventForCase(ADMIN_USER_TOKEN, CASE_TYPE_ID_ENGLAND_WALES, JURISDICTION_EMPLOYMENT,
                 CASE_ID_1, EVENT_UPDATE_CASE_SUBMITTED)).thenThrow(new IOException(EXCEPTION_DUMMY_MESSAGE));
-        assertDoesNotThrow(() -> nocRespondentRepresentativeService.removeOrganisationPoliciesAndNocAnswers(
+        assertDoesNotThrow(() -> nocRespondentRepresentativeService.resetOrganisationPolicies(
                 caseDetails, representatives));
         verify(ccdClient, times(NumberUtils.INTEGER_ONE)).startEventForCase(ADMIN_USER_TOKEN,
                 CASE_TYPE_ID_ENGLAND_WALES, JURISDICTION_EMPLOYMENT, CASE_ID_1, EVENT_UPDATE_CASE_SUBMITTED);
@@ -1345,7 +1350,7 @@ class NocRespondentRepresentativeServiceTest {
         when(ccdClient.submitEventForCase(eq(ADMIN_USER_TOKEN), any(CaseData.class), eq(CASE_TYPE_ID_ENGLAND_WALES),
                 eq(JURISDICTION_EMPLOYMENT), any(CCDRequest.class), eq(CASE_ID_1)))
                 .thenThrow(new IOException(EXCEPTION_DUMMY_MESSAGE));
-        assertDoesNotThrow(() -> nocRespondentRepresentativeService.removeOrganisationPoliciesAndNocAnswers(caseDetails,
+        assertDoesNotThrow(() -> nocRespondentRepresentativeService.resetOrganisationPolicies(caseDetails,
                 representatives));
         verify(ccdClient, times(NumberUtils.INTEGER_TWO)).startEventForCase(ADMIN_USER_TOKEN,
                 CASE_TYPE_ID_ENGLAND_WALES, JURISDICTION_EMPLOYMENT, CASE_ID_1, EVENT_UPDATE_CASE_SUBMITTED);
@@ -1358,13 +1363,13 @@ class NocRespondentRepresentativeServiceTest {
         // removes organisation policies and noc answers successfully
         doReturn(new SubmitEvent()).when(ccdClient).submitEventForCase(eq(ADMIN_USER_TOKEN), any(CaseData.class),
                 eq(CASE_TYPE_ID_ENGLAND_WALES), eq(JURISDICTION_EMPLOYMENT), any(CCDRequest.class), eq(CASE_ID_1));
-        assertDoesNotThrow(() -> nocRespondentRepresentativeService.removeOrganisationPoliciesAndNocAnswers(caseDetails,
+        assertDoesNotThrow(() -> nocRespondentRepresentativeService.resetOrganisationPolicies(caseDetails,
                 representatives));
         verify(ccdClient, times(INTEGER_THREE)).startEventForCase(ADMIN_USER_TOKEN,
                 CASE_TYPE_ID_ENGLAND_WALES, JURISDICTION_EMPLOYMENT, CASE_ID_1, EVENT_UPDATE_CASE_SUBMITTED);
         verify(ccdClient, times(NumberUtils.INTEGER_TWO)).submitEventForCase(eq(ADMIN_USER_TOKEN), any(CaseData.class),
                 eq(CASE_TYPE_ID_ENGLAND_WALES), eq(JURISDICTION_EMPLOYMENT), any(CCDRequest.class), eq(CASE_ID_1));
         assertThat(caseDetails.getCaseData().getRespondentOrganisationPolicy0()).isEqualTo(OrganisationPolicy.builder()
-                .orgPolicyCaseAssignedRole(ROLE_SOLICITORA).build());
+                .orgPolicyCaseAssignedRole(ROLE_SOLICITORA).organisation(Organisation.builder().build()).build());
     }
 }

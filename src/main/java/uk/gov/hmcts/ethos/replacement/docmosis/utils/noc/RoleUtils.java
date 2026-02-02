@@ -7,12 +7,13 @@ import org.apache.commons.lang3.math.NumberUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
+import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentUtils;
 
 import java.util.List;
-import java.util.stream.IntStream;
 
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.MAX_NOC_ANSWERS;
 
@@ -241,134 +242,101 @@ public final class RoleUtils {
     }
 
     /**
-     * Removes the respondent organisation policy and Notice of Change answers
-     * associated with the given representative.
+     * Resets the respondent organisation policy associated with the given representative.
      * <p>
-     * This method determines the respondent role represented by the supplied
-     * {@link RepresentedTypeRItem}, resolves the corresponding role index, and
-     * clears both the {@link OrganisationPolicy} and {@link NoticeOfChangeAnswers}
-     * entries at that index on the provided {@link CaseData}.
+     * The method determines the solicitor role for the provided representative within the
+     * supplied {@link CaseData}, resolves the corresponding organisation policy index, and
+     * delegates to {@link #resetOrganisationPolicyByIndex(CaseData, int)} to perform the reset.
      * <p>
-     * If the {@code caseData} or {@code representative} is {@code null} or empty,
-     * the method performs no action.
+     * If {@code caseData} or {@code representative} is {@code null} or empty, the method
+     * performs no action.
      *
-     * @param caseData the case data containing respondent organisation policies and
-     *                 Notice of Change answers
-     * @param representative the representative whose associated organisation policy
-     *                       and Notice of Change answers should be removed
+     * @param caseData       the case data containing respondent organisation policies to reset
+     * @param representative the representative whose associated organisation policy should be reset
      */
-    public static void removeOrganisationPolicyAndNocAnswersByRepresentative(CaseData caseData,
-                                                                             RepresentedTypeRItem representative) {
+    public static void resetOrganisationPolicyByRepresentative(CaseData caseData,
+                                                               RepresentedTypeRItem representative) {
         if (ObjectUtils.isEmpty(caseData) || ObjectUtils.isEmpty(representative)) {
             return;
         }
         int roleIndex = findRoleIndexByRoleLabel(findRespondentRepresentativeRole(representative, caseData));
-        removeOrganisationPolicyByIndex(caseData, roleIndex);
-        removeNocAnswersByIndex(caseData, roleIndex);
+        resetOrganisationPolicyByIndex(caseData, roleIndex);
     }
 
     /**
-     * Removes (clears) the respondent organisation policy at the given index.
+     * Resets the respondent organisation policy on the given {@link CaseData} for the specified index.
      * <p>
-     * This method resets the corresponding {@link OrganisationPolicy} field on the
-     * supplied {@link CaseData} to an empty instance. If the {@code caseData} is
-     * {@code null} or empty, or if the {@code index} is out of range
-     * ({@code index < 0} or {@code index >= MAX_NOC_ANSWERS}), the method performs
-     * no action.
+     * The method initialises the corresponding respondent organisation policy field (0–9) with:
+     * <ul>
+     *   <li>a predefined solicitor case role based on the index</li>
+     *   <li>an empty {@link Organisation} instance</li>
+     * </ul>
+     * <p>
+     * If {@code caseData} is {@code null} or empty, or if the index is out of bounds
+     * (less than 0 or greater than or equal to {@code MAX_NOC_ANSWERS}), the method
+     * performs no action.
      *
-     * @param caseData the case data containing respondent organisation policies
-     * @param index the zero-based index of the respondent organisation policy to remove
+     * @param caseData the case data containing respondent organisation policies to reset
+     * @param index    the zero-based index identifying which respondent organisation policy to reset
      */
-    public static void removeOrganisationPolicyByIndex(CaseData caseData, int index) {
+    public static void resetOrganisationPolicyByIndex(CaseData caseData, int index) {
         if (ObjectUtils.isEmpty(caseData) || index < 0 || index >= MAX_NOC_ANSWERS) {
             return;
         }
 
         switch (index) {
             case 0 -> caseData.setRespondentOrganisationPolicy0(OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
-                    SolicitorRole.SOLICITORA.getCaseRoleLabel()).build());
+                    SolicitorRole.SOLICITORA.getCaseRoleLabel()).organisation(Organisation.builder().build()).build());
             case 1 -> caseData.setRespondentOrganisationPolicy1(OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
-                    SolicitorRole.SOLICITORB.getCaseRoleLabel()).build());
+                    SolicitorRole.SOLICITORB.getCaseRoleLabel()).organisation(Organisation.builder().build()).build());
             case 2 -> caseData.setRespondentOrganisationPolicy2(OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
-                    SolicitorRole.SOLICITORC.getCaseRoleLabel()).build());
+                    SolicitorRole.SOLICITORC.getCaseRoleLabel()).organisation(Organisation.builder().build()).build());
             case 3 -> caseData.setRespondentOrganisationPolicy3(OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
-                    SolicitorRole.SOLICITORD.getCaseRoleLabel()).build());
+                    SolicitorRole.SOLICITORD.getCaseRoleLabel()).organisation(Organisation.builder().build()).build());
             case 4 -> caseData.setRespondentOrganisationPolicy4(OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
-                    SolicitorRole.SOLICITORE.getCaseRoleLabel()).build());
+                    SolicitorRole.SOLICITORE.getCaseRoleLabel()).organisation(Organisation.builder().build()).build());
             case 5 -> caseData.setRespondentOrganisationPolicy5(OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
-                    SolicitorRole.SOLICITORF.getCaseRoleLabel()).build());
+                    SolicitorRole.SOLICITORF.getCaseRoleLabel()).organisation(Organisation.builder().build()).build());
             case 6 -> caseData.setRespondentOrganisationPolicy6(OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
-                    SolicitorRole.SOLICITORG.getCaseRoleLabel()).build());
+                    SolicitorRole.SOLICITORG.getCaseRoleLabel()).organisation(Organisation.builder().build()).build());
             case 7 -> caseData.setRespondentOrganisationPolicy7(OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
-                    SolicitorRole.SOLICITORH.getCaseRoleLabel()).build());
+                    SolicitorRole.SOLICITORH.getCaseRoleLabel()).organisation(Organisation.builder().build()).build());
             case 8 -> caseData.setRespondentOrganisationPolicy8(OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
-                    SolicitorRole.SOLICITORI.getCaseRoleLabel()).build());
+                    SolicitorRole.SOLICITORI.getCaseRoleLabel()).organisation(Organisation.builder().build()).build());
             case 9 -> caseData.setRespondentOrganisationPolicy9(OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
-                    SolicitorRole.SOLICITORJ.getCaseRoleLabel()).build());
+                    SolicitorRole.SOLICITORJ.getCaseRoleLabel()).organisation(Organisation.builder().build()).build());
             default -> { /* no-op */ }
         }
     }
 
     /**
-     * Removes (clears) the Notice of Change answers at the given index.
-     * <p>
-     * This method resets the corresponding {@link NoticeOfChangeAnswers} field
-     * on the supplied {@link CaseData} to an empty instance. If the {@code caseData}
-     * is {@code null} or empty, or if the {@code index} is out of range
-     * ({@code index < 0} or {@code index >= MAX_NOC_ANSWERS}), the method performs
-     * no action.
+     * Derives the solicitor role label to be assigned to a representative
+     * based on the respondent they are associated with.
      *
-     * @param caseData the case data containing Notice of Change answers
-     * @param index the zero-based index of the Notice of Change answers to remove
+     * <p>The method determines the index of the respondent identified by the
+     * representative’s respondent ID within the case data and uses that index
+     * to generate the corresponding solicitor role label.</p>
+     *
+     * <p>If the case data is null, the respondent collection is empty, the
+     * representative value is missing, or the respondent ID is blank, an
+     * empty string is returned.</p>
+     *
+     * @param caseData the case data containing the respondent collection
+     * @param representative the representative for whom the solicitor role
+     *                       is being derived
+     * @return the solicitor role label to assign, or an empty string if the
+     *         role cannot be derived due to invalid or missing input
      */
-    public static void removeNocAnswersByIndex(CaseData caseData, int index) {
-        if (ObjectUtils.isEmpty(caseData) || index < 0 || index >= MAX_NOC_ANSWERS) {
-            return;
-        }
-
-        switch (index) {
-            case 0 -> caseData.setNoticeOfChangeAnswers0(null);
-            case 1 -> caseData.setNoticeOfChangeAnswers1(null);
-            case 2 -> caseData.setNoticeOfChangeAnswers2(null);
-            case 3 -> caseData.setNoticeOfChangeAnswers3(null);
-            case 4 -> caseData.setNoticeOfChangeAnswers4(null);
-            case 5 -> caseData.setNoticeOfChangeAnswers5(null);
-            case 6 -> caseData.setNoticeOfChangeAnswers6(null);
-            case 7 -> caseData.setNoticeOfChangeAnswers7(null);
-            case 8 -> caseData.setNoticeOfChangeAnswers8(null);
-            case 9 -> caseData.setNoticeOfChangeAnswers9(null);
-            default -> { /* no-op */ }
-        }
-    }
-
-    /**
-     * Determines the next available respondent solicitor role label for the given case data.
-     *
-     * <p>The method evaluates respondent organisation policies in order and returns the
-     * case role label of the first respondent solicitor role whose corresponding
-     * organisation policy is missing or incomplete.</p>
-     *
-     * <p>If the case data is {@code null} or empty, or if no available role can be
-     * determined, an empty string is returned.</p>
-     *
-     * <p>The order of evaluation is significant and reflects the predefined allocation
-     * sequence of respondent solicitor roles.</p>
-     *
-     * @param caseData the case data containing respondent organisation policies
-     * @return the next available respondent solicitor case role label, or an empty
-     *         string if none is available
-     */
-    public static String getNextAvailableRespondentSolicitorRoleLabel(CaseData caseData) {
-        if (ObjectUtils.isEmpty(caseData)) {
+    public static String deriveSolicitorRoleToAssign(CaseData caseData, RepresentedTypeRItem representative) {
+        if (ObjectUtils.isEmpty(caseData)
+                || ObjectUtils.isEmpty(caseData.getRespondentCollection())
+                || ObjectUtils.isEmpty(representative)
+                || ObjectUtils.isEmpty(representative.getValue())
+                || StringUtils.isBlank(representative.getValue().getRespondentId())) {
             return StringUtils.EMPTY;
         }
-        List<OrganisationPolicy> organisationPolicies = getAllOrganisationPoliciesByCaseData(caseData);
-        List<SolicitorRole> respondentRepresentativeRoles = getRespondentSolicitorRoles();
-        return IntStream.range(0, organisationPolicies.size())
-                .filter(i -> isOrganisationMissing(organisationPolicies.get(i)))
-                .mapToObj(i -> respondentRepresentativeRoles.get(i).getCaseRoleLabel())
-                .findFirst()
-                .orElse(StringUtils.EMPTY);
+        int roleIndex = RespondentUtils.getRespondentIndexById(caseData, representative.getValue().getRespondentId());
+        return RoleUtils.solicitorRoleLabelForIndex(roleIndex);
     }
 
     /**
@@ -386,75 +354,5 @@ public final class RoleUtils {
             return true;
         }
         return StringUtils.isBlank(organisationPolicy.getOrganisation().getOrganisationID());
-    }
-
-    /**
-     * Retrieves all respondent organisation policies from the given case data.
-     *
-     * <p>This method returns a list containing all respondent organisation policies
-     * (indices 0 to 9). Each policy is guaranteed to be non-null; if a policy is
-     * missing or empty in the case data, an empty {@link OrganisationPolicy}
-     * instance is returned in its place.</p>
-     *
-     * <p>The order of policies in the returned list corresponds to their index
-     * within the case data.</p>
-     *
-     * @param caseData the case data containing respondent organisation policies
-     * @return a list of ten {@link OrganisationPolicy} instances, never {@code null}
-     */
-    public static List<OrganisationPolicy> getAllOrganisationPoliciesByCaseData(CaseData caseData) {
-        return List.of(
-                ensureOrganisationPolicy(caseData.getRespondentOrganisationPolicy0()),
-                ensureOrganisationPolicy(caseData.getRespondentOrganisationPolicy1()),
-                ensureOrganisationPolicy(caseData.getRespondentOrganisationPolicy2()),
-                ensureOrganisationPolicy(caseData.getRespondentOrganisationPolicy3()),
-                ensureOrganisationPolicy(caseData.getRespondentOrganisationPolicy4()),
-                ensureOrganisationPolicy(caseData.getRespondentOrganisationPolicy5()),
-                ensureOrganisationPolicy(caseData.getRespondentOrganisationPolicy6()),
-                ensureOrganisationPolicy(caseData.getRespondentOrganisationPolicy7()),
-                ensureOrganisationPolicy(caseData.getRespondentOrganisationPolicy8()),
-                ensureOrganisationPolicy(caseData.getRespondentOrganisationPolicy9())
-        );
-    }
-
-    /**
-     * Ensures that an {@link OrganisationPolicy} instance is always returned.
-     *
-     * <p>If the provided organisation policy is {@code null} or empty, a new
-     * empty {@link OrganisationPolicy} instance is created and returned.
-     * Otherwise, the provided instance is returned unchanged.</p>
-     *
-     * @param organisationPolicy the organisation policy to validate
-     * @return a non-null {@link OrganisationPolicy} instance
-     */
-    public static OrganisationPolicy ensureOrganisationPolicy(OrganisationPolicy organisationPolicy) {
-        return ObjectUtils.isEmpty(organisationPolicy) ? OrganisationPolicy.builder().build() : organisationPolicy;
-    }
-
-    /**
-     * Returns all solicitor roles that can represent respondents.
-     *
-     * <p>The returned list contains all respondent representative solicitor roles
-     * in a fixed order (A to J). The list is immutable and will always contain
-     * the same set of roles.</p>
-     *
-     * <p>This method provides a convenient, centralised view of all respondent
-     * representative roles.</p>
-     *
-     * @return an immutable list of respondent representative {@link SolicitorRole}s
-     */
-    public static List<SolicitorRole> getRespondentSolicitorRoles() {
-        return List.of(
-                SolicitorRole.SOLICITORA,
-                SolicitorRole.SOLICITORB,
-                SolicitorRole.SOLICITORC,
-                SolicitorRole.SOLICITORD,
-                SolicitorRole.SOLICITORE,
-                SolicitorRole.SOLICITORF,
-                SolicitorRole.SOLICITORG,
-                SolicitorRole.SOLICITORH,
-                SolicitorRole.SOLICITORI,
-                SolicitorRole.SOLICITORJ
-        );
     }
 }

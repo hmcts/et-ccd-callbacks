@@ -431,25 +431,26 @@ public final class NocUtils {
     }
 
     /**
-     * Removes organisation policies and Notice of Change (NoC) answers from the given
-     * {@link CaseData} for each provided representative.
+     * Resets respondent organisation policies for all provided representatives.
      * <p>
-     * If the {@code caseData} is {@code null} or empty, or if the list of representatives
-     * is {@code null} or empty, the method performs no action.
-     * </p>
+     * For each representative in the list, this method resolves the associated solicitor
+     * role within the given {@link CaseData} and resets the corresponding respondent
+     * organisation policy by delegating to esetOrganisationPolicyByRepresentative(CaseData, RepresentedTypeRItem).
+     * <p>
+     * If {@code caseData} is {@code null} or empty, or if the list of representatives is
+     * {@code null} or empty, the method performs no action.
      *
-     * @param caseData        the case data from which organisation policies and NoC answers
-     *                        should be removed
+     * @param caseData        the case data containing respondent organisation policies to reset
      * @param representatives the list of representatives whose associated organisation
-     *                        policies and NoC answers should be removed
+     *                        policies should be reset
      */
-    public static void removeOrganisationPoliciesAndNocAnswers(CaseData caseData,
-                                                               List<RepresentedTypeRItem> representatives) {
+    public static void resetOrganisationPolicies(CaseData caseData,
+                                                 List<RepresentedTypeRItem> representatives) {
         if (ObjectUtils.isEmpty(caseData) || CollectionUtils.isEmpty(representatives)) {
             return;
         }
         for (RepresentedTypeRItem representative : representatives) {
-            RoleUtils.removeOrganisationPolicyAndNocAnswersByRepresentative(caseData, representative);
+            RoleUtils.resetOrganisationPolicyByRepresentative(caseData, representative);
         }
     }
 

@@ -47,9 +47,16 @@ def sonarExclusions =
          '**/uk/gov/hmcts/ethos/replacement/docmosis/controllers/RespondentTellSomethingElseController.java'
 ]
 
+// Temporary CPD suppression while queue schemas are migrated from Service Bus and remain structurally similar
+def duplicateCodeExclusionList = [
+	'**/uk/gov/hmcts/ethos/replacement/docmosis/domain/messagequeue/CreateUpdatesQueueMessage.java',
+	'**/uk/gov/hmcts/ethos/replacement/docmosis/domain/messagequeue/UpdateCaseQueueMessage.java'
+]
+
 sonarqube {
     properties {
         property "sonar.exclusions", sonarExclusions.join(', ')
+        property "sonar.cpd.exclusions", duplicateCodeExclusionList.join(', ')
         property "sonar.projectKey", "et-ccd-callbacks"
         property "sonar.dynamicAnalysis", "reuseReports"
         property "sonar.dependencyCheck.reportPath", "${project.buildDir}/reports/dependency-check-report.xml"
@@ -218,13 +225,7 @@ tasks.register('integration', Test) {
     testLogging {
         events "passed", "skipped", "failed"
     }
-    reports {
-        html.required = true
-        html.outputLocation = file("${buildDir}/integration/")
-    }
 }
-
-project.tasks['check'].dependsOn integration
 
 project.ext {
     pacticipant = 'ethos_replDocmosisService'
@@ -281,7 +282,7 @@ tasks.register('fortifyScan', JavaExec) {
 }
 
 jacocoTestReport {
-    executionData(test)
+    executionData(test, integration)
     reports {
         xml.required = true
         csv.required = false
@@ -315,8 +316,9 @@ repositories {
     maven { url "https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1" }
 }
 
-project.tasks['sonarqube'].dependsOn test, integration, jacocoTestReport
-check.dependsOn integration
+project.tasks['check'].dependsOn integration
+project.tasks['sonarqube'].dependsOn jacocoTestReport
+
 checkstyleMain.shouldRunAfter(compileJava)
 test.shouldRunAfter(checkstyleTest)
 integration.shouldRunAfter(checkstyleIntegrationTest)

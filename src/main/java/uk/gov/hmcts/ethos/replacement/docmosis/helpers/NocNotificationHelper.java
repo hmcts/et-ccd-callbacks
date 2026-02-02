@@ -55,19 +55,29 @@ public final class NocNotificationHelper {
                 .orElse(UNKNOWN);
     }
 
-    public static RespondentSumType getRespondent(ChangeOrganisationRequest changeRequest, CaseData caseData,
-                                                  NocRespondentHelper nocRespondentHelper) {
+    public static RespondentSumType getRespondent(
+            ChangeOrganisationRequest changeRequest,
+            CaseData caseData,
+            NocRespondentHelper nocRespondentHelper) {
 
-        try {
-
-            String selectedRole = changeRequest.getCaseRoleId().getSelectedCode();
-            SolicitorRole solicitorRole = SolicitorRole.from(selectedRole).orElseThrow();
-            RespondentSumTypeItem respondentSumTypeItem = solicitorRole.getRepresentationItem(caseData).orElseThrow();
-            return nocRespondentHelper.getRespondent(respondentSumTypeItem.getValue().getRespondentName(), caseData);
-        } catch (NullPointerException e) {
+        if (changeRequest == null
+                || changeRequest.getCaseRoleId() == null
+                || caseData == null
+                || nocRespondentHelper == null) {
             return null;
         }
 
+        String selectedRole = changeRequest.getCaseRoleId().getSelectedCode();
+        if (selectedRole == null) {
+            return null;
+        }
+
+        return SolicitorRole.from(selectedRole)
+                .flatMap(role -> role.getRepresentationItem(caseData))
+                .map(RespondentSumTypeItem::getValue)
+                .map(RespondentSumType::getRespondentName)
+                .map(name -> nocRespondentHelper.getRespondent(name, caseData))
+                .orElse(null);
     }
 
     public static Map<String, String> buildPersonalisationWithPartyName(CaseDetails caseDetails, String partyName,

@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationContext;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -30,6 +31,7 @@ import java.util.concurrent.Executors;
  */
 @Slf4j
 @Service
+@ConditionalOnProperty(prefix = "queue", name = "enabled", havingValue = "true")
 @RequiredArgsConstructor
 public class CreateUpdatesQueueProcessor {
 

@@ -74,10 +74,17 @@ feature:
     enabled: 'false'
 
 queue:
+  enabled: ${QUEUE_ENABLED:false}
   create-updates:
-    queue-name: ${CREATE_UPDATES_QUEUE_NAME:create-updates}
-    send:
-      connection-string: ${CREATE_UPDATES_QUEUE_SEND_CONNECTION_STRING}
+    # Database queue configuration (replaces Azure Service Bus)
+    poll-interval: ${CREATE_UPDATES_POLL_INTERVAL:1000}
+    batch-size: ${CREATE_UPDATES_BATCH_SIZE:10}
+    threads: ${CREATE_UPDATES_THREADS:15}
+  update-case:
+    # Database queue configuration (replaces Azure Service Bus)
+    poll-interval: ${UPDATE_CASE_POLL_INTERVAL:1000}
+    batch-size: ${UPDATE_CASE_BATCH_SIZE:10}
+    threads: ${UPDATE_CASE_THREADS:15}
 
 springdoc:
   packagesToScan: uk.gov.hmcts.ethos.replacement.docmosis.controllers

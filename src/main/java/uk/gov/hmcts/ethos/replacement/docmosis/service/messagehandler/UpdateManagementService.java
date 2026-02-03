@@ -1,0 +1,122 @@
+package uk.gov.hmcts.ethos.replacement.docmosis.service.messagehandler;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ecm.common.model.servicebus.UpdateCaseMsg;
+import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.LegalRepDataModel;
+import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.ResetStateDataModel;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.MultipleCounter;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.MultipleErrors;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.MultipleCounterRepository;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.MultipleErrorsRepository;
+
+import java.io.IOException;
+import java.security.SecureRandom;
+import java.util.List;
+import javax.naming.NameNotFoundException;
+
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+
+/**
+ * Service for managing case updates from the message queue.
+ * Migrated from et-message-handler.
+ */
+@Slf4j
+@RequiredArgsConstructor
+@Service
+public class UpdateManagementService {
+
+    private static final String UNPROCESSABLE_MESSAGE = "Unprocessable message";
+
+    private final MultipleCounterRepository multipleCounterRepository;
+    private final MultipleErrorsRepository multipleErrorsRepository;
+    private final MultipleUpdateService multipleUpdateService;
+    private final SingleReadingService singleReadingService;
+    private final LegalRepAccessService legalRepAccessService;
+
+    public void updateLogic(UpdateCaseMsg updateCaseMsg) throws IOException, InterruptedException,
+        NameNotFoundException {
+
+        if (updateCaseMsg.getDataModelParent() instanceof LegalRepDataModel legalRepDataModel) {
+            legalRepAccessService.run(legalRepDataModel);
+            return;
+        }
+
+        if (updateCaseMsg.getDataModelParent() instanceof ResetStateDataModel) {
+
+            log.info("Resetting state of multiple to Open State");
+
+            deleteMultipleRefDatabase(updateCaseMsg.getMultipleRef());
+
+        } else {
+
+            singleReadingService.sendUpdateToSingleLogic(updateCaseMsg);
+
+            if (!updateCaseMsg.getMultipleRef().equals(SINGLE_CASE_TYPE)) {
+
+                checkIfFinish(updateCaseMsg);
+
+            }
+
+        }
+
+    }
+
+    public void checkIfFinish(UpdateCaseMsg updateCaseMsg) throws IOException, InterruptedException {
+
+        int counter = getNextCounterNumberWithDelay(updateCaseMsg.getMultipleRef());
+
+        log.info("COUNTER: " + counter + " TOTAL CASES: " + updateCaseMsg.getTotalCases());
+
+        if (counter == Integer.parseInt(updateCaseMsg.getTotalCases())) {
+
+            log.info("----- MULTIPLE UPDATE FINISHED: sending update to multiple ------");
+
+            if (updateCaseMsg.getConfirmation().equals(YES)) {
+
+                List<MultipleErrors> multipleErrorsList =
+                    multipleErrorsRepository.findByMultipleref(updateCaseMsg.getMultipleRef());
+
+                multipleUpdateService.sendUpdateToMultipleLogic(updateCaseMsg, multipleErrorsList);
+            }
+
+            deleteMultipleRefDatabase(updateCaseMsg.getMultipleRef());
+        }
+
+    }
+
+    private int getNextCounterNumberWithDelay(String multipleRef) throws InterruptedException {
+
+        SecureRandom random = new SecureRandom();
+
+        long delay = random.nextInt(1000);
+
+        Thread.sleep(delay);
+
+        return multipleCounterRepository.persistentQGetNextMultipleCountVal(multipleRef);
+    }
+
+    private void deleteMultipleRefDatabase(String multipleRef) {
+
+        log.info("Clearing all multipleRef from DBs: " + multipleRef);
+
+        log.info("Clearing multiple counter repository");
+        List<MultipleCounter> multipleCounters = multipleCounterRepository.findByMultipleref(multipleRef);
+        multipleCounterRepository.deleteAllInBatch(multipleCounters);
+
+        log.info("Clearing multiple errors repository");
+        List<MultipleErrors> multipleErrors = multipleErrorsRepository.findByMultipleref(multipleRef);
+        multipleErrorsRepository.deleteAllInBatch(multipleErrors);
+
+        log.info("Deleted repositories");
+    }
+
+    public void addUnrecoverableErrorToDatabase(UpdateCaseMsg updateCaseMsg) {
+
+        multipleErrorsRepository.persistentQLogMultipleError(updateCaseMsg.getMultipleRef(),
+                                                             updateCaseMsg.getEthosCaseReference(),
+                                                             UNPROCESSABLE_MESSAGE);
+    }
+}

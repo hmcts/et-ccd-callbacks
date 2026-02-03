@@ -333,6 +333,39 @@ class TornadoServiceTest {
         assertEquals(INITIAL_CONSIDERATION_PDF, documentInfo.getDescription());
     }
 
+    @Test
+    void getDmStoreDocumentName_shouldReturnEt3ProcessingOutputName_withValidRespondent() {
+        CaseData caseData = new CaseData();
+        DynamicFixedListType respondent = DynamicFixedListType.from("code", "Jane/Smith & Co.",
+                true);
+        caseData.setEt3ChooseRespondent(respondent);
+
+        String result = tornadoService.getDmStoreDocumentName(caseData, "ET3 Processing.pdf");
+        assertEquals("ET3 Processing - Jane Smith & Co..pdf", result);
+    }
+
+    @Test
+    void getDmStoreDocumentName_shouldThrowException_whenEt3ProcessingRespondentNull() {
+        CaseData caseData = new CaseData();
+        caseData.setEthosCaseReference("6000039/2025");
+        Exception exception = assertThrows(IllegalStateException.class, () ->
+                tornadoService.getDmStoreDocumentName(caseData, "ET3 Processing.pdf")
+        );
+        assertEquals("ET3 respondent must be selected before retrieving the selected label for case 6000039/2025",
+                exception.getMessage());
+    }
+
+    @Test
+    void getDmStoreDocumentName_shouldThrowException_whenEt3ResponseRespondentNull() {
+        CaseData caseData = new CaseData();
+        caseData.setEthosCaseReference("6000039/2024");
+        Exception exception = assertThrows(IllegalStateException.class, () ->
+                tornadoService.getDmStoreDocumentName(caseData, "ET3 Response.pdf")
+        );
+        assertEquals("An ET3 submitting respondent must be selected before retrieving respondent label "
+                + "for case 6000039/2024", exception.getMessage());
+    }
+
     private void createUserService() {
         IdamApi idamApi = new IdamApi() {
             @Override

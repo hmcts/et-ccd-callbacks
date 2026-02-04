@@ -47,9 +47,15 @@ def sonarExclusions =
          '**/uk/gov/hmcts/ethos/replacement/docmosis/controllers/RespondentTellSomethingElseController.java'
 ]
 
+def duplicateCodeExclusionList = [
+	'**/uk/gov/hmcts/ethos/replacement/docmosis/domain/messagequeue/CreateUpdatesQueueMessage.java',
+	'**/uk/gov/hmcts/ethos/replacement/docmosis/domain/messagequeue/UpdateCaseQueueMessage.java'
+]
+
 sonarqube {
     properties {
         property "sonar.exclusions", sonarExclusions.join(', ')
+        property "sonar.cpd.exclusions", duplicateCodeExclusionList.join(", ")
         property "sonar.projectKey", "et-ccd-callbacks"
         property "sonar.dynamicAnalysis", "reuseReports"
         property "sonar.dependencyCheck.reportPath", "${project.buildDir}/reports/dependency-check-report.xml"
@@ -224,8 +230,6 @@ tasks.register('integration', Test) {
     }
 }
 
-project.tasks['check'].dependsOn integration
-
 project.ext {
     pacticipant = 'ethos_replDocmosisService'
     pacticipantVersion = getCheckedOutGitCommitHash()
@@ -281,7 +285,7 @@ tasks.register('fortifyScan', JavaExec) {
 }
 
 jacocoTestReport {
-    executionData(test)
+    executionData(test, integration)
     reports {
         xml.required = true
         csv.required = false
@@ -315,8 +319,8 @@ repositories {
     maven { url "https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1" }
 }
 
-project.tasks['sonarqube'].dependsOn test, integration, jacocoTestReport
-check.dependsOn integration
+project.tasks['sonarqube'].dependsOn jacocoTestReport
+project.tasks['check'].dependsOn integration
 checkstyleMain.shouldRunAfter(compileJava)
 test.shouldRunAfter(checkstyleTest)
 integration.shouldRunAfter(checkstyleIntegrationTest)
@@ -383,7 +387,7 @@ dependencies {
     // CVE-2025-54988
     implementation group: 'org.apache.tika', name: 'tika-core', version: '3.2.3'
 
-    implementation group: 'commons-io', name: 'commons-io', version: '2.20.0'
+    implementation group: 'commons-io', name: 'commons-io', version: '2.21.0'
     implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.6.0'
     implementation group: 'io.netty', name: 'netty-tcnative-classes', version: '2.0.74.Final'
     implementation group: 'org.json', name: 'json', version: '20250107'
@@ -482,7 +486,7 @@ dependencies {
     contractTestImplementation sourceSets.main.runtimeClasspath
     contractTestImplementation sourceSets.test.runtimeClasspath
 
-    integrationTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.20.0'
+    integrationTestImplementation group: 'commons-io', name: 'commons-io', version:  '2.21.0'
     integrationTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitJupiterVersion
     integrationTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: junitJupiterVersion
     integrationTestRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: junitJupiterVersion

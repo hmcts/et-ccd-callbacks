@@ -321,13 +321,35 @@ public final class ReferralHelper {
         }
     }
 
-    public static ReferralType getSelectedReferral(BaseCaseData caseData) {
-        return caseData.getReferralCollection()
-                .get(Integer.parseInt(caseData.getSelectReferral().getValue().getCode()) - 1).getValue();
-    }
-    
     /**
-     * Gets the number a new referral should be labelled as.
+     * Returns the selected referral from the case data.
+     * Throws NotFoundException if no referrals exist or no referral is selected.
+     */
+    public static ReferralType getSelectedReferral(BaseCaseData caseData) {
+        if (caseData.getReferralCollection() == null || caseData.getReferralCollection().isEmpty()) {
+            throw new NotFoundException("No referrals found");
+        }
+
+        if (caseData.getSelectReferral() == null || caseData.getSelectReferral().getValue() == null
+                || isNullOrEmpty(caseData.getSelectReferral().getValue().getCode())) {
+            throw new NotFoundException("No referral is selected");
+        }
+
+        int index;
+        try {
+            index = Integer.parseInt(caseData.getSelectReferral().getValue().getCode()) - 1;
+        } catch (NumberFormatException e) {
+            throw (NotFoundException) new NotFoundException("Invalid referral index").initCause(e);
+        }
+
+        if (index < 0 || index >= caseData.getReferralCollection().size()) {
+            throw new NotFoundException("Referral index out of bounds");
+        }
+        return caseData.getReferralCollection().get(index).getValue();
+    }
+
+    /**
+     * Gets the number a new referral should be labeled as.
      * @param referrals contains the list of referrals
      */
     public static int getNextReferralNumber(List<?> referrals) {

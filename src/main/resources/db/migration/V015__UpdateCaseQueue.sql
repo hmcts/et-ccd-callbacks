@@ -8,7 +8,6 @@
 -- Version: 2026-01-21 - 1.0 - Initial version
 -- =====================================================
 
--- Create table for update-case queue messages
 CREATE TABLE IF NOT EXISTS update_case_queue (
     id BIGSERIAL PRIMARY KEY,
     message_id VARCHAR(255) UNIQUE NOT NULL,
@@ -22,7 +21,6 @@ CREATE TABLE IF NOT EXISTS update_case_queue (
     locked_by VARCHAR(255)
 );
 
--- Create indexes for performance
 CREATE INDEX IF NOT EXISTS idx_update_case_queue_status ON update_case_queue(status);
 CREATE INDEX IF NOT EXISTS idx_update_case_queue_created_at ON update_case_queue(created_at);
 CREATE INDEX IF NOT EXISTS idx_update_case_queue_locked_until ON update_case_queue(locked_until);

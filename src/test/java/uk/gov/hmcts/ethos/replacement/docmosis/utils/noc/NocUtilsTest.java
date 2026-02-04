@@ -97,6 +97,15 @@ final class NocUtilsTest {
     private static final String ROLE_SOLICITOR_I = "[SOLICITORI]";
     private static final String ROLE_SOLICITOR_J = "[SOLICITORJ]";
     private static final String ROLE_SOLICITOR_K = "[SOLICITORK]";
+    private static final int INTEGER_THREE = 3;
+    private static final int INTEGER_FOUR = 4;
+    private static final int INTEGER_FIVE = 5;
+    private static final int INTEGER_SIX = 6;
+    private static final int INTEGER_SEVEN = 7;
+    private static final int INTEGER_EIGHT = 8;
+    private static final int INTEGER_NINE = 9;
+    private static final int MAX_NOC_ANSWERS_COUNT = 10;
+    private static final int INTEGER_ELEVEN = 11;
 
     @Test
     void theValidateRepresentativeRespondentMapping() {
@@ -508,5 +517,90 @@ final class NocUtilsTest {
         assertThat(changeOrganisationRequest.getOrganisationToRemove()).isEqualTo(oldOrganisation);
         assertThat(changeOrganisationRequest.getCaseRoleId()).isEqualTo(roleItem);
         assertThat(changeOrganisationRequest.getApprovalStatus()).isEqualTo(APPROVED);
+    }
+
+    @Test
+    void theSetNoticeOfChangeAnswersAtIndex() {
+        // when case data is empty should do nothing
+        assertDoesNotThrow(() -> NocUtils.setNoticeOfChangeAnswerAtIndex(null, RESPONDENT_NAME_ONE,
+                NumberUtils.INTEGER_ZERO));
+        // when respondent name is empty should do nothing
+        CaseData caseData = new CaseData();
+        assertDoesNotThrow(() -> NocUtils.setNoticeOfChangeAnswerAtIndex(caseData, StringUtils.EMPTY,
+                NumberUtils.INTEGER_ZERO));
+        assertThat(caseData.getNoticeOfChangeAnswers0()).isNull();
+        // when index is less than zero should do nothing
+        assertDoesNotThrow(() -> NocUtils.setNoticeOfChangeAnswerAtIndex(caseData, RESPONDENT_NAME_ONE,
+                NumberUtils.INTEGER_MINUS_ONE));
+        assertThat(caseData.getNoticeOfChangeAnswers0()).isNull();
+        // when index is equal to max noc answers count should do nothing
+        assertDoesNotThrow(() -> NocUtils.setNoticeOfChangeAnswerAtIndex(caseData, RESPONDENT_NAME_ONE,
+                MAX_NOC_ANSWERS_COUNT));
+        assertThat(caseData.getNoticeOfChangeAnswers0()).isNull();
+        // when index is greater than max noc answers count should do nothing
+        assertDoesNotThrow(() -> NocUtils.setNoticeOfChangeAnswerAtIndex(caseData, RESPONDENT_NAME_ONE,
+                INTEGER_ELEVEN));
+        // when all input is correct should set notice of change answer to the given index
+        NocUtils.setNoticeOfChangeAnswerAtIndex(caseData, RESPONDENT_NAME_ONE, NumberUtils.INTEGER_ZERO);
+        NocUtils.setNoticeOfChangeAnswerAtIndex(caseData, RESPONDENT_NAME_TWO, NumberUtils.INTEGER_ONE);
+        NocUtils.setNoticeOfChangeAnswerAtIndex(caseData, RESPONDENT_NAME_THREE, NumberUtils.INTEGER_TWO);
+        NocUtils.setNoticeOfChangeAnswerAtIndex(caseData, RESPONDENT_NAME_FOUR, INTEGER_THREE);
+        NocUtils.setNoticeOfChangeAnswerAtIndex(caseData, RESPONDENT_NAME_FIVE, INTEGER_FOUR);
+        NocUtils.setNoticeOfChangeAnswerAtIndex(caseData, RESPONDENT_NAME_SIX, INTEGER_FIVE);
+        NocUtils.setNoticeOfChangeAnswerAtIndex(caseData, RESPONDENT_NAME_SEVEN, INTEGER_SIX);
+        NocUtils.setNoticeOfChangeAnswerAtIndex(caseData, RESPONDENT_NAME_EIGHT, INTEGER_SEVEN);
+        NocUtils.setNoticeOfChangeAnswerAtIndex(caseData, RESPONDENT_NAME_NINE, INTEGER_EIGHT);
+        NocUtils.setNoticeOfChangeAnswerAtIndex(caseData, RESPONDENT_NAME_TEN, INTEGER_NINE);
+
+        assertThat(caseData.getNoticeOfChangeAnswers0().getRespondentName()).isEqualTo(RESPONDENT_NAME_ONE);
+        assertThat(caseData.getNoticeOfChangeAnswers1().getRespondentName()).isEqualTo(RESPONDENT_NAME_TWO);
+        assertThat(caseData.getNoticeOfChangeAnswers2().getRespondentName()).isEqualTo(RESPONDENT_NAME_THREE);
+        assertThat(caseData.getNoticeOfChangeAnswers3().getRespondentName()).isEqualTo(RESPONDENT_NAME_FOUR);
+        assertThat(caseData.getNoticeOfChangeAnswers4().getRespondentName()).isEqualTo(RESPONDENT_NAME_FIVE);
+        assertThat(caseData.getNoticeOfChangeAnswers5().getRespondentName()).isEqualTo(RESPONDENT_NAME_SIX);
+        assertThat(caseData.getNoticeOfChangeAnswers6().getRespondentName()).isEqualTo(RESPONDENT_NAME_SEVEN);
+        assertThat(caseData.getNoticeOfChangeAnswers7().getRespondentName()).isEqualTo(RESPONDENT_NAME_EIGHT);
+        assertThat(caseData.getNoticeOfChangeAnswers8().getRespondentName()).isEqualTo(RESPONDENT_NAME_NINE);
+        assertThat(caseData.getNoticeOfChangeAnswers9().getRespondentName()).isEqualTo(RESPONDENT_NAME_TEN);
+    }
+
+    @Test
+    void thePopulateNoticeOfChangeAnswers() {
+        // when case data is null should not do anything
+        assertDoesNotThrow(() -> NocUtils.populateNoticeOfChangeAnswers(null));
+        // when respondent collection is empty should not do anything
+        CaseData caseData = new CaseData();
+        caseData.setRespondentCollection(new ArrayList<>());
+        assertDoesNotThrow(() -> NocUtils.populateNoticeOfChangeAnswers(caseData));
+        // when respondent collection has a respondent with valid notice of change answers should not do anything
+        RespondentSumTypeItem respondent1 = new RespondentSumTypeItem();
+        caseData.getRespondentCollection().add(respondent1);
+        NoticeOfChangeAnswers answers = NoticeOfChangeAnswers.builder().respondentName(RESPONDENT_NAME_ONE).build();
+        caseData.setNoticeOfChangeAnswers0(answers);
+        assertDoesNotThrow(() -> NocUtils.populateNoticeOfChangeAnswers(caseData));
+        // when respondent collection has invalid respondent should not do anything
+        caseData.setNoticeOfChangeAnswers0(null);
+        assertDoesNotThrow(() -> NocUtils.populateNoticeOfChangeAnswers(caseData));
+        // when respondent collection has valid and invalid respondent(s) should set notice of change answers for valid
+        // respondents
+        // should not set notice of change answers as it already has a respondent with a valid notice of change answer
+        caseData.setNoticeOfChangeAnswers0(answers);
+        caseData.getRespondentCollection().getFirst().setId(RESPONDENT_ID_ONE);
+        caseData.getRespondentCollection().getFirst().setValue(RespondentSumType.builder()
+                .respondentName(RESPONDENT_NAME_ONE).build());
+        // should not set notice of change answers as respondent is invalid
+        RespondentSumTypeItem respondent2 = new RespondentSumTypeItem();
+        caseData.getRespondentCollection().add(respondent2);
+        // should set notice of change answers for this respondent
+        RespondentSumTypeItem respondent3 = new RespondentSumTypeItem();
+        respondent3.setId(RESPONDENT_ID_TWO);
+        respondent3.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_TWO).build());
+        caseData.getRespondentCollection().add(respondent3);
+        assertDoesNotThrow(() -> NocUtils.populateNoticeOfChangeAnswers(caseData));
+        assertThat(caseData.getNoticeOfChangeAnswers0()).isEqualTo(NoticeOfChangeAnswers.builder()
+                .respondentName(RESPONDENT_NAME_ONE).build());
+        assertThat(caseData.getNoticeOfChangeAnswers1()).isNull();
+        assertThat(caseData.getNoticeOfChangeAnswers2()).isEqualTo(NoticeOfChangeAnswers.builder()
+                .respondentName(RESPONDENT_NAME_TWO).build());
     }
 }

@@ -31,6 +31,7 @@ final class RoleUtilsTest {
     private static final String RESPONDENT_NAME_EIGHT = "Respondent Name Eight";
     private static final String RESPONDENT_NAME_NINE = "Respondent Name Nine";
     private static final String RESPONDENT_NAME_TEN = "Respondent Name Ten";
+    private static final String RESPONDENT_NAME_ELEVEN = "Respondent Name Eleven";
     private static final String ORGANISATION_ID_ONE = "Organisation id one";
     private static final String ORGANISATION_ID_TWO = "Organisation id two";
     private static final String ORGANISATION_ID_THREE = "Organisation id three";
@@ -156,6 +157,21 @@ final class RoleUtilsTest {
                 .isEqualTo(INTEGER_EIGHT);
         assertThat(RoleUtils.findSolicitorRoleIndexByRespondentName(caseData, RESPONDENT_NAME_TEN))
                 .isEqualTo(INTEGER_NINE);
+        // when role index not found in Notice of Change Answers should check respondent collection.
+        // when respondent list is not empty but not has valid respondent should return integer -1
+        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+        caseData.setRespondentCollection(List.of(respondentSumTypeItem));
+        assertThat(RoleUtils.findSolicitorRoleIndexByRespondentName(caseData, RESPONDENT_NAME_ELEVEN))
+                .isEqualTo(NumberUtils.INTEGER_MINUS_ONE);
+        // when case data has valid respondent but respondent name is not equal should return integer -1
+        respondentSumTypeItem.setId(RESPONDENT_ID_1);
+        respondentSumTypeItem.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_ONE).build());
+        assertThat(RoleUtils.findSolicitorRoleIndexByRespondentName(caseData, RESPONDENT_NAME_ELEVEN))
+                .isEqualTo(NumberUtils.INTEGER_MINUS_ONE);
+        // when respondent name is equal to the respondent name in parameter should return that respondent's index
+        respondentSumTypeItem.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_ELEVEN).build());
+        assertThat(RoleUtils.findSolicitorRoleIndexByRespondentName(caseData, RESPONDENT_NAME_ELEVEN))
+                .isEqualTo(NumberUtils.INTEGER_ZERO);
     }
 
     @Test
@@ -204,7 +220,8 @@ final class RoleUtilsTest {
         representative.setValue(RepresentedTypeR.builder().build());
         assertThat(RoleUtils.findRespondentRepresentativeRole(representative, caseData)).isEqualTo(StringUtils.EMPTY);
 
-        // when representative has respondent name but case data does not have any notice of change answer
+        // when representative has respondent name but case data does not have any notice of change answer and
+        // respondent
         representative.getValue().setRespRepName(RESPONDENT_NAME_ONE);
         assertThat(RoleUtils.findRespondentRepresentativeRole(representative, caseData)).isEqualTo(StringUtils.EMPTY);
 
@@ -239,6 +256,9 @@ final class RoleUtilsTest {
 
     @Test
     void theFindRespondentNameByIndex() {
+        // when case data is empty should return empty string
+        assertThat(RoleUtils.findRespondentNameByIndex(null, NumberUtils.INTEGER_ZERO))
+                .isEqualTo(StringUtils.EMPTY);
         CaseData caseData = new CaseData();
         // when index is less than 0 should return empty string
         assertThat(RoleUtils.findRespondentNameByIndex(caseData, NumberUtils.INTEGER_MINUS_ONE))
@@ -265,6 +285,14 @@ final class RoleUtilsTest {
         assertThat(RoleUtils.findRespondentNameByIndex(caseData, INTEGER_SEVEN)).isEqualTo(RESPONDENT_NAME_EIGHT);
         assertThat(RoleUtils.findRespondentNameByIndex(caseData, INTEGER_EIGHT)).isEqualTo(RESPONDENT_NAME_NINE);
         assertThat(RoleUtils.findRespondentNameByIndex(caseData, INTEGER_NINE)).isEqualTo(RESPONDENT_NAME_TEN);
+        // when not found in notice of change answers should return respondent index in the respondent collection
+        caseData.setNoticeOfChangeAnswers0(NoticeOfChangeAnswers.builder().build());
+        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+        respondentSumTypeItem.setId(RESPONDENT_ID_1);
+        respondentSumTypeItem.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_ELEVEN).build());
+        caseData.setRespondentCollection(List.of(respondentSumTypeItem));
+        assertThat(RoleUtils.findRespondentNameByIndex(caseData, NumberUtils.INTEGER_ZERO))
+                .isEqualTo(RESPONDENT_NAME_ELEVEN);
     }
 
     @Test
@@ -478,5 +506,36 @@ final class RoleUtilsTest {
         // when representative has same id with respondent should return role
         representative.getValue().setRespondentId(RESPONDENT_ID_1);
         assertThat(RoleUtils.deriveSolicitorRoleToAssign(caseData, representative)).isEqualTo(ROLE_SOLICITOR_A);
+    }
+
+    @Test
+    void theGetNoticeOfChangeAnswersAtIndex() {
+        // when there case data is empty should return null
+        assertThat(RoleUtils.getNoticeOfChangeAnswersAtIndex(null, NumberUtils.INTEGER_ZERO)).isNull();
+        // when index is less than zero should return null
+        CaseData caseData = CaseDataBuilder.builder().build();
+        assertThat(RoleUtils.getNoticeOfChangeAnswersAtIndex(caseData, NumberUtils.INTEGER_MINUS_ONE)).isNull();
+        // when index is equal to max number of noc answers
+        assertThat(RoleUtils.getNoticeOfChangeAnswersAtIndex(caseData, INTEGER_TEN)).isNull();
+        // when index is zero but there is no notice of change answers should return null
+        assertThat(RoleUtils.getNoticeOfChangeAnswersAtIndex(caseData, NumberUtils.INTEGER_ZERO)).isNull();
+        // when there is notice of change answer by the given index should return it
+        NoticeOfChangeAnswers noticeOfChangeAnswers =
+                NoticeOfChangeAnswers.builder().respondentName(RESPONDENT_NAME_ONE).build();
+        caseData.setNoticeOfChangeAnswers0(noticeOfChangeAnswers);
+        assertThat(RoleUtils.getNoticeOfChangeAnswersAtIndex(caseData, NumberUtils.INTEGER_ZERO))
+                .isEqualTo(noticeOfChangeAnswers);
+    }
+
+    @Test
+    void theIsValidNoticeOfChangeAnswersByIndex() {
+        // when answer is null should return false
+        assertThat(RoleUtils.isValidNoticeOfChangeAnswers(null)).isFalse();
+        // when answer not has respondent name should return false
+        NoticeOfChangeAnswers noticeOfChangeAnswers = NoticeOfChangeAnswers.builder().build();
+        assertThat(RoleUtils.isValidNoticeOfChangeAnswers(noticeOfChangeAnswers)).isFalse();
+        // when answer has respondent name should return true
+        noticeOfChangeAnswers = NoticeOfChangeAnswers.builder().respondentName(RESPONDENT_NAME_ONE).build();
+        assertThat(RoleUtils.isValidNoticeOfChangeAnswers(noticeOfChangeAnswers)).isTrue();
     }
 }

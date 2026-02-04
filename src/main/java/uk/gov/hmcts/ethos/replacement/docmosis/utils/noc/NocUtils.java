@@ -9,6 +9,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
+import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CallbacksCollectionUtils;
@@ -40,6 +41,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXC
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_OLD_CASE_DETAILS_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_OLD_CASE_DETAILS_SUBMISSION_REFERENCE_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_OLD_RESPONDENT_COLLECTION_IS_EMPTY;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.MAX_NOC_ANSWERS;
 
 public final class NocUtils {
 
@@ -494,5 +496,88 @@ public final class NocUtils {
                 .organisationToRemove(oldOrganisation)
                 .organisationToAdd(newOrganisation)
                 .build();
+    }
+
+    /**
+     * Populates {@link NoticeOfChangeAnswers} on the given {@link CaseData}
+     * based on the respondents in the respondent collection.
+     * <p>
+     * For each respondent, this method checks whether a valid Notice of Change
+     * answers entry already exists at the corresponding index. If no valid entry
+     * is present and the respondent data is valid, a new
+     * {@link NoticeOfChangeAnswers} instance is created using the respondent name
+     * and set at that index.
+     * </p>
+     * <p>
+     * Existing valid Notice of Change answers are not overwritten.
+     * </p>
+     * <p>
+     * If the {@code caseData} is null or empty, or if the respondent collection
+     * is empty, the method performs no action.
+     * </p>
+     *
+     * @param caseData the case data to update with populated Notice of Change answers
+     */
+    public static void populateNoticeOfChangeAnswers(CaseData caseData) {
+        if (ObjectUtils.isEmpty(caseData) || CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
+            return;
+        }
+        for (int i = 0; i < caseData.getRespondentCollection().size(); i++) {
+            NoticeOfChangeAnswers answers = RoleUtils.getNoticeOfChangeAnswersAtIndex(caseData, i);
+            if (RoleUtils.isValidNoticeOfChangeAnswers(answers)) {
+                continue;
+            }
+            RespondentSumTypeItem respondent = RespondentUtils.getRespondentAtIndex(caseData, i);
+            if (!RespondentUtils.isValidRespondent(respondent)) {
+                continue;
+            }
+            assert respondent != null;
+            setNoticeOfChangeAnswerAtIndex(caseData, respondent.getValue().getRespondentName(), i);
+        }
+    }
+
+    /**
+     * Sets a {@link NoticeOfChangeAnswers} entry on the given {@link CaseData}
+     * at the specified index, using the provided respondent name.
+     * <p>
+     * The method creates a new {@link NoticeOfChangeAnswers} instance and assigns
+     * it to the corresponding Notice of Change field based on the index.
+     * </p>
+     * <p>
+     * If the {@code caseData} is null or empty, the {@code respondentName} is blank,
+     * or the {@code index} is out of bounds (less than 0 or greater than or equal to
+     * {@link uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants#MAX_NOC_ANSWERS}),
+     * the method performs no action.
+     * </p>
+     *
+     * @param caseData        the case data to update
+     * @param respondentName the name of the respondent to set on the Notice of Change answers
+     * @param index           the zero-based index identifying which Notice of Change answers field to update
+     */
+    public static void setNoticeOfChangeAnswerAtIndex(CaseData caseData, String respondentName, int index) {
+        if (ObjectUtils.isEmpty(caseData)
+                || StringUtils.isBlank(respondentName)
+                || index < 0
+                || index >= MAX_NOC_ANSWERS) {
+            return;
+        }
+
+        NoticeOfChangeAnswers answer = NoticeOfChangeAnswers.builder()
+                .respondentName(respondentName)
+                .build();
+
+        switch (index) {
+            case 0 -> caseData.setNoticeOfChangeAnswers0(answer);
+            case 1 -> caseData.setNoticeOfChangeAnswers1(answer);
+            case 2 -> caseData.setNoticeOfChangeAnswers2(answer);
+            case 3 -> caseData.setNoticeOfChangeAnswers3(answer);
+            case 4 -> caseData.setNoticeOfChangeAnswers4(answer);
+            case 5 -> caseData.setNoticeOfChangeAnswers5(answer);
+            case 6 -> caseData.setNoticeOfChangeAnswers6(answer);
+            case 7 -> caseData.setNoticeOfChangeAnswers7(answer);
+            case 8 -> caseData.setNoticeOfChangeAnswers8(answer);
+            case 9 -> caseData.setNoticeOfChangeAnswers9(answer);
+            default -> { /* no-op */ }
+        }
     }
 }

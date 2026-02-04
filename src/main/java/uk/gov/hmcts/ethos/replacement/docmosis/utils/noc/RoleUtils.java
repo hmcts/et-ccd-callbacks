@@ -1,11 +1,13 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.utils.noc;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.math.NumberUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
@@ -89,10 +91,23 @@ public final class RoleUtils {
         if (ObjectUtils.isEmpty(caseData) || StringUtils.isBlank(respondentName)) {
             return NumberUtils.INTEGER_MINUS_ONE;
         }
-        List<NoticeOfChangeAnswers> noticeOfChangeAnswers = getNoticeOfChangeAnswers(caseData);
-        for (int i = 0; i < noticeOfChangeAnswers.size(); i++) {
-            var answer = noticeOfChangeAnswers.get(i);
+        for (int i = 0; i < MAX_NOC_ANSWERS; i++) {
+            NoticeOfChangeAnswers answer = getNoticeOfChangeAnswersAtIndex(caseData, i);
             if (ObjectUtils.isNotEmpty(answer) && Strings.CI.equals(answer.getRespondentName(), respondentName)) {
+                return i;
+            }
+        }
+        // Checks in respondents
+        if (CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
+            return NumberUtils.INTEGER_MINUS_ONE;
+        }
+        List<RespondentSumTypeItem> respondents = caseData.getRespondentCollection();
+        for (int i = 0; i < respondents.size(); i++) {
+            RespondentSumTypeItem respondent = respondents.get(i);
+            if (!RespondentUtils.isValidRespondent(respondent)) {
+                continue;
+            }
+            if (Strings.CI.equals(respondent.getValue().getRespondentName(), respondentName)) {
                 return i;
             }
         }
@@ -100,35 +115,52 @@ public final class RoleUtils {
     }
 
     /**
-     * Returns a fixed list of {@link NoticeOfChangeAnswers} extracted from the given {@link CaseData}.
-     * <p>
-     * The list contains entries for notice of change answers indexed from 0 to 9. If any individual
-     * answer in {@code CaseData} is {@code null} or empty, it is replaced with a default
-     * {@link NoticeOfChangeAnswers} instance.
-     * </p>
+     * Returns the Notice of Change answers associated with the given index
+     * from the provided case data.
      *
-     * @param caseData the case data containing notice of change answer fields
-     * @return an immutable list of {@link NoticeOfChangeAnswers} with guaranteed non-null entries
+     * <p>The index corresponds to the numbered Notice of Change answer fields
+     * on the case data (e.g. {@code noticeOfChangeAnswers0} through
+     * {@code noticeOfChangeAnswers9}).</p>
+     *
+     * <p>If the case data is null, or if the index is outside the supported
+     * range (0 to {@code MAX_NOC_ANSWERS - 1}), the method returns {@code null}.</p>
+     *
+     * @param caseData the case data containing Notice of Change answer fields
+     * @param index the zero-based index identifying which Notice of Change
+     *              answers to retrieve
+     * @return the Notice of Change answers for the given index, or {@code null}
+     *         if the input is invalid or no answers exist at that index
      */
-    public static List<NoticeOfChangeAnswers> getNoticeOfChangeAnswers(CaseData caseData) {
-        return List.of(
-                defaultAnswerIfEmpty(caseData.getNoticeOfChangeAnswers0()),
-                defaultAnswerIfEmpty(caseData.getNoticeOfChangeAnswers1()),
-                defaultAnswerIfEmpty(caseData.getNoticeOfChangeAnswers2()),
-                defaultAnswerIfEmpty(caseData.getNoticeOfChangeAnswers3()),
-                defaultAnswerIfEmpty(caseData.getNoticeOfChangeAnswers4()),
-                defaultAnswerIfEmpty(caseData.getNoticeOfChangeAnswers5()),
-                defaultAnswerIfEmpty(caseData.getNoticeOfChangeAnswers6()),
-                defaultAnswerIfEmpty(caseData.getNoticeOfChangeAnswers7()),
-                defaultAnswerIfEmpty(caseData.getNoticeOfChangeAnswers8()),
-                defaultAnswerIfEmpty(caseData.getNoticeOfChangeAnswers9())
-        );
+    public static NoticeOfChangeAnswers getNoticeOfChangeAnswersAtIndex(CaseData caseData, int index) {
+        if (ObjectUtils.isEmpty(caseData) || index < 0 || index >= MAX_NOC_ANSWERS) {
+            return null;
+        }
+        return switch (index) {
+            case 0 -> caseData.getNoticeOfChangeAnswers0();
+            case 1 -> caseData.getNoticeOfChangeAnswers1();
+            case 2 -> caseData.getNoticeOfChangeAnswers2();
+            case 3 -> caseData.getNoticeOfChangeAnswers3();
+            case 4 -> caseData.getNoticeOfChangeAnswers4();
+            case 5 -> caseData.getNoticeOfChangeAnswers5();
+            case 6 -> caseData.getNoticeOfChangeAnswers6();
+            case 7 -> caseData.getNoticeOfChangeAnswers7();
+            case 8 -> caseData.getNoticeOfChangeAnswers8();
+            case 9 -> caseData.getNoticeOfChangeAnswers9();
+            default -> null;
+        };
     }
 
-    private static NoticeOfChangeAnswers defaultAnswerIfEmpty(NoticeOfChangeAnswers answer) {
-        return ObjectUtils.isNotEmpty(answer)
-                ? answer
-                : NoticeOfChangeAnswers.builder().build();
+    /**
+     * Determines whether the given Notice of Change answers are valid.
+     *
+     * <p>A Notice of Change answer is considered valid if it is not {@code null}
+     * and has a non-blank respondent name.</p>
+     *
+     * @param answer the Notice of Change answers to validate
+     * @return {@code true} if the answers are valid; {@code false} otherwise
+     */
+    public static boolean isValidNoticeOfChangeAnswers(NoticeOfChangeAnswers answer) {
+        return answer != null && StringUtils.isNotBlank(answer.getRespondentName());
     }
 
     /**
@@ -180,8 +212,7 @@ public final class RoleUtils {
         if (StringUtils.isBlank(respondentName) || ObjectUtils.isEmpty(caseData)) {
             return StringUtils.EMPTY;
         }
-        int noticeOfChangeAnswerIndex =
-                RoleUtils.findSolicitorRoleIndexByRespondentName(caseData, respondentName);
+        int noticeOfChangeAnswerIndex = findSolicitorRoleIndexByRespondentName(caseData, respondentName);
         return RoleUtils.solicitorRoleLabelForIndex(noticeOfChangeAnswerIndex);
     }
 
@@ -215,11 +246,19 @@ public final class RoleUtils {
      *         or the respondent name is blank
      */
     public static String findRespondentNameByIndex(CaseData caseData, int index) {
-        if (index < 0 || index >= MAX_NOC_ANSWERS) {
+        if (ObjectUtils.isEmpty(caseData) || index < 0 || index >= MAX_NOC_ANSWERS) {
             return StringUtils.EMPTY;
         }
-        String respondentName = getNoticeOfChangeAnswers(caseData).get(index).getRespondentName();
-        return StringUtils.isNotBlank(respondentName) ? respondentName : StringUtils.EMPTY;
+        NoticeOfChangeAnswers answers = RoleUtils.getNoticeOfChangeAnswersAtIndex(caseData, index);
+        if (ObjectUtils.isNotEmpty(answers) && StringUtils.isNotBlank(answers.getRespondentName())) {
+            return answers.getRespondentName();
+        }
+        RespondentSumTypeItem respondent = RespondentUtils.getRespondentAtIndex(caseData, index);
+        return ObjectUtils.isNotEmpty(respondent)
+                && ObjectUtils.isNotEmpty(respondent.getValue())
+                && StringUtils.isNotBlank(respondent.getValue().getRespondentName())
+                ? respondent.getValue().getRespondentName()
+                : StringUtils.EMPTY;
     }
 
     /**

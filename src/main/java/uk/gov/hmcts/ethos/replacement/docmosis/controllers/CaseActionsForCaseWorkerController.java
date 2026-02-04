@@ -54,6 +54,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleCaseMultipleMidEven
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SingleReferenceService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.LoggingUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.NocUtils;
 
 import java.io.IOException;
 import java.text.ParseException;
@@ -478,7 +479,6 @@ public class CaseActionsForCaseWorkerController {
         }
 
         eventValidationService.validateMaximumSize(caseData).ifPresent(errors::add);
-
         if (errors.isEmpty() && isNotEmpty(caseData.getRepCollection())) {
             //Needed to keep the respondent names in the rep collection sync
             nocRespondentHelper.amendRespondentNameRepresentativeNames(caseData);
@@ -486,6 +486,7 @@ public class CaseActionsForCaseWorkerController {
 
         if (errors.isEmpty() && isNotEmpty(caseData.getRespondentCollection())) {
             caseManagementForCaseWorkerService.updateListOfRespondentsWithAnEcc(caseData);
+            NocUtils.populateNoticeOfChangeAnswers(caseData);
         }
 
         if (featureToggleService.isGlobalSearchEnabled()) {

@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.dao.DataAccessResourceFailureException;
 import uk.gov.hmcts.ecm.common.model.servicebus.UpdateCaseMsg;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.CloseDataModel;
@@ -20,6 +21,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -32,11 +34,15 @@ class UpdateCaseQueueSenderTest {
     @Mock
     private ObjectMapper objectMapper;
 
+    @Mock
+    private ObjectProvider<UpdateCaseQueueSender> selfProvider;
+
     private UpdateCaseQueueSender sender;
 
     @BeforeEach
     void setUp() {
-        sender = new UpdateCaseQueueSender(updateCaseQueueRepository, objectMapper);
+        sender = new UpdateCaseQueueSender(updateCaseQueueRepository, objectMapper, selfProvider);
+        lenient().when(selfProvider.getObject()).thenReturn(sender);
     }
 
     @Test

@@ -41,7 +41,7 @@ class SingleReadingServiceTest {
     private static final String USER_TOKEN = "my-test-token";
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         SubmitEvent submitEvent = new SubmitEvent();
         CaseData caseData = new CaseData();
         caseData.setEthosCaseReference("4150002/2020");

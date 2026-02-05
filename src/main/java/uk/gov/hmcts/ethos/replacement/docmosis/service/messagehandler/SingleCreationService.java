@@ -33,6 +33,27 @@ public class SingleCreationService {
     private final CcdClient ccdClient;
     private String ccdGatewayBaseUrl;
 
+    private static class CaseTransferContext {
+        private final String caseId;
+        private final String ccdGatewayBaseUrl;
+        private final String positionTypeCT;
+        private final String jurisdiction;
+        private final String state;
+        private final String owningOfficeCT;
+        private final String reasonForCT;
+
+        CaseTransferContext(String caseId, String ccdGatewayBaseUrl, String positionTypeCT,
+                            String jurisdiction, String state, String owningOfficeCT, String reasonForCT) {
+            this.caseId = caseId;
+            this.ccdGatewayBaseUrl = ccdGatewayBaseUrl;
+            this.positionTypeCT = positionTypeCT;
+            this.jurisdiction = jurisdiction;
+            this.state = state;
+            this.owningOfficeCT = owningOfficeCT;
+            this.reasonForCT = reasonForCT;
+        }
+    }
+
     @Autowired
     public SingleCreationService(CcdClient ccdClient) {
         this.ccdClient = ccdClient;
@@ -65,18 +86,22 @@ public class SingleCreationService {
         String destinationCaseId = String.valueOf(caseDestinationOffice.getCaseId());
         ccdGatewayBaseUrl = creationSingleDataModel.getCcdGatewayBaseUrl();
         CCDRequest returnedRequest = ccdClient.returnCaseCreationTransfer(accessToken, caseTypeId, jurisdiction,
-                                                                          destinationCaseId
+                                                                          destinationCaseId);
+
+        CaseTransferContext context = new CaseTransferContext(
+            caseId,
+            ccdGatewayBaseUrl,
+            creationSingleDataModel.getPositionTypeCT(),
+            jurisdiction,
+            oldSubmitEvent.getState(),
+            creationSingleDataModel.getOfficeCT(),
+            creationSingleDataModel.getReasonForCT()
         );
 
         ccdClient.submitEventForCase(accessToken,
             generateCaseDataCaseTransfer(caseDestinationOffice.getCaseData(),
                                          oldSubmitEvent.getCaseData(),
-                                         caseId,
-                                         ccdGatewayBaseUrl,
-                                         creationSingleDataModel.getPositionTypeCT(),
-                                         oldSubmitEvent.getState(),
-                                         creationSingleDataModel.getOfficeCT(),
-                                         creationSingleDataModel.getReasonForCT()
+                                         context
             ),
             caseTypeId,
             jurisdiction,
@@ -92,15 +117,20 @@ public class SingleCreationService {
         String sourceCaseTypeId = updateCaseMsg.getCaseTypeId();
         String caseId = String.valueOf(oldSubmitEvent.getCaseId());
         String caseTypeId = TribunalOffice.getCaseTypeId(creationSingleDataModel.getOfficeCT());
+
+        CaseTransferContext context = new CaseTransferContext(
+            caseId,
+            ccdGatewayBaseUrl,
+            creationSingleDataModel.getPositionTypeCT(),
+            jurisdiction,
+            oldSubmitEvent.getState(),
+            creationSingleDataModel.getOfficeCT(),
+            creationSingleDataModel.getReasonForCT()
+        );
+
         CaseDetails newCaseDetailsCT = createCaseDetailsCaseTransfer(oldSubmitEvent.getCaseData(),
-                                                                     caseId,
                                                                      caseTypeId,
-                                                                     ccdGatewayBaseUrl,
-                                                                     creationSingleDataModel.getPositionTypeCT(),
-                                                                     jurisdiction,
-                                                                     oldSubmitEvent.getState(),
-                                                                     creationSingleDataModel.getOfficeCT(),
-                                                                     creationSingleDataModel.getReasonForCT());
+                                                                     context);
         CCDRequest returnedRequest = ccdClient.startCaseCreationTransfer(accessToken, newCaseDetailsCT);
         String eventSummary = String.format(CREATE_CASE_EVENT_SUMMARY_TEMPLATE,
                                          oldSubmitEvent.getCaseData().getManagingOffice());
@@ -141,44 +171,31 @@ public class SingleCreationService {
                                                     new ArrayList<>(Collections.singletonList(ethosCaseReference)));
     }
 
-    private CaseDetails createCaseDetailsCaseTransfer(CaseData oldCaseData, String caseId, String caseTypeId,
-                                                      String ccdGatewayBaseUrl, String positionTypeCT,
-                                                      String jurisdiction, String state, String owningOfficeCT,
-                                                      String reasonForCT) {
+    private CaseDetails createCaseDetailsCaseTransfer(CaseData oldCaseData, String caseTypeId,
+                                                      CaseTransferContext context) {
         CaseDetails newCaseTransferCaseDetails = new CaseDetails();
         newCaseTransferCaseDetails.setCaseTypeId(caseTypeId);
-        newCaseTransferCaseDetails.setJurisdiction(jurisdiction);
+        newCaseTransferCaseDetails.setJurisdiction(context.jurisdiction);
 
         CaseData newCaseData = generateNewCaseDataCaseTransfer(oldCaseData,
-                                                               caseId,
-                                                               ccdGatewayBaseUrl,
-                                                               positionTypeCT,
-                                                               state,
-                                                               owningOfficeCT,
-                                                               reasonForCT);
-        newCaseData.setReasonForCT(reasonForCT);
+                                                               context);
+        newCaseData.setReasonForCT(context.reasonForCT);
         newCaseTransferCaseDetails.setCaseData(newCaseData);
         return newCaseTransferCaseDetails;
     }
 
-    private CaseData generateNewCaseDataCaseTransfer(CaseData oldCaseData, String caseId,
-                                                     String ccdGatewayBaseUrl, String positionTypeCT,
-                                                     String state, String owningOfficeCT, String reasonForCT) {
-        return copyCaseData(oldCaseData, new CaseData(), caseId, ccdGatewayBaseUrl, positionTypeCT, state,
-                            owningOfficeCT, reasonForCT);
+    private CaseData generateNewCaseDataCaseTransfer(CaseData oldCaseData, CaseTransferContext context) {
+        return copyCaseData(oldCaseData, new CaseData(), context);
     }
 
-    private CaseData generateCaseDataCaseTransfer(CaseData newCaseData, CaseData oldCaseData, String caseId,
-                                                  String ccdGatewayBaseUrl, String positionTypeCT,
-                                                  String state, String owningOfficeCT, String reasonForCT) {
+    private CaseData generateCaseDataCaseTransfer(CaseData newCaseData, CaseData oldCaseData,
+                                                  CaseTransferContext context) {
 
-        return copyCaseData(oldCaseData, newCaseData, caseId, ccdGatewayBaseUrl, positionTypeCT, state, owningOfficeCT,
-                            reasonForCT);
+        return copyCaseData(oldCaseData, newCaseData, context);
     }
 
     @SuppressWarnings("PMD.NcssCount")
-    private CaseData copyCaseData(CaseData oldCaseData, CaseData newCaseData, String caseId, String ccdGatewayBaseUrl,
-                                  String positionTypeCT, String state, String owningOfficeCT, String reasonForCT) {
+    private CaseData copyCaseData(CaseData oldCaseData, CaseData newCaseData, CaseTransferContext context) {
         newCaseData.setEthosCaseReference(oldCaseData.getEthosCaseReference());
         newCaseData.setEcmCaseType(oldCaseData.getEcmCaseType());
         newCaseData.setClaimantTypeOfClaimant(oldCaseData.getClaimantTypeOfClaimant());
@@ -217,16 +234,17 @@ public class SingleCreationService {
         newCaseData.setCcdID(oldCaseData.getCcdID());
         newCaseData.setFlagsImageAltText(oldCaseData.getFlagsImageAltText());
         newCaseData.setCompanyPremises(oldCaseData.getCompanyPremises());
-        if (state != null && !state.equals(CLOSED_STATE)) {
-            newCaseData.setPositionType(positionTypeCT);
+        if (context.state != null && !context.state.equals(CLOSED_STATE)) {
+            newCaseData.setPositionType(context.positionTypeCT);
         }
-        newCaseData.setManagingOffice(owningOfficeCT);
+        newCaseData.setManagingOffice(context.owningOfficeCT);
         newCaseData.setMultipleReference(oldCaseData.getMultipleReference());
         log.info("setLeadClaimant is set to " + oldCaseData.getLeadClaimant());
         newCaseData.setLeadClaimant(oldCaseData.getLeadClaimant());
 
-        newCaseData.setReasonForCT(reasonForCT);
-        newCaseData.setLinkedCaseCT(generateMarkUp(ccdGatewayBaseUrl, caseId, oldCaseData.getEthosCaseReference()));
+        newCaseData.setReasonForCT(context.reasonForCT);
+        newCaseData.setLinkedCaseCT(generateMarkUp(context.ccdGatewayBaseUrl, context.caseId,
+                                                   oldCaseData.getEthosCaseReference()));
         newCaseData.setTypesOfClaim(oldCaseData.getTypesOfClaim());
         newCaseData.setClaimServedDate(oldCaseData.getClaimServedDate());
         newCaseData.setNoticeOfChangeAnswers0(oldCaseData.getNoticeOfChangeAnswers0());

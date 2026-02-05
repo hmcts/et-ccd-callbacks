@@ -1,9 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.messagequeue;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import uk.gov.hmcts.ecm.common.model.servicebus.UpdateCaseMsg;
@@ -41,13 +43,12 @@ public class UpdateCaseQueueSender {
             updateCaseQueueRepository.save(queueMessage);
             log.info("Sent UpdateCaseMsg to database queue: ethosCaseRef={}, multipleRef={}",
                     updateCaseMsg.getEthosCaseReference(), updateCaseMsg.getMultipleRef());
-        } catch (Exception e) {
+        } catch (JsonProcessingException | DataAccessException e) {
             log.error("Failed to send UpdateCaseMsg to queue", e);
-            throw new RuntimeException("Failed to queue update case message", e);
+            throw new IllegalStateException("Failed to queue update case message", e);
         }
     }
 
-    @Transactional
     public void sendMessageAsync(UpdateCaseMsg updateCaseMsg) {
         // For compatibility with existing code that expects async behavior
         sendMessage(updateCaseMsg);

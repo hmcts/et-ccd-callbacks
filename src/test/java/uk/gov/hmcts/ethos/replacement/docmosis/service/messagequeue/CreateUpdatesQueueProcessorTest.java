@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.context.ApplicationContext;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.model.servicebus.CreateUpdatesMsg;
@@ -26,6 +26,7 @@ import java.util.UUID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -44,7 +45,7 @@ class CreateUpdatesQueueProcessorTest {
     private ObjectMapper objectMapper;
 
     @Mock
-    private ApplicationContext applicationContext;
+    private ObjectProvider<CreateUpdatesQueueProcessor> selfProvider;
 
     @Mock
     private uk.gov.hmcts.ethos.replacement.docmosis.service.messagehandler.TransferToEcmService transferToEcmService;
@@ -57,9 +58,10 @@ class CreateUpdatesQueueProcessorTest {
                 createUpdatesQueueRepository,
                 updateCaseQueueSender,
                 objectMapper,
-                applicationContext,
+                selfProvider,
                 transferToEcmService
         );
+        lenient().when(selfProvider.getObject()).thenReturn(processor);
         ReflectionTestUtils.setField(processor, "threadCount", 5);
         ReflectionTestUtils.setField(processor, "batchSize", 10);
         processor.init(); // Initialize processor ID and executor
@@ -233,7 +235,7 @@ class CreateUpdatesQueueProcessorTest {
 
         // Then
         verify(createUpdatesQueueRepository).findPendingMessages(any(LocalDateTime.class), any(PageRequest.class));
-        verify(applicationContext, never()).getBean(CreateUpdatesQueueProcessor.class);
+        verify(selfProvider, never()).getObject();
     }
 
     @Test
@@ -245,15 +247,13 @@ class CreateUpdatesQueueProcessorTest {
         
         when(createUpdatesQueueRepository.findPendingMessages(any(LocalDateTime.class), any(PageRequest.class)))
                 .thenReturn(messages);
-        when(applicationContext.getBean(CreateUpdatesQueueProcessor.class))
-                .thenReturn(processor);
 
         // When
         processor.processPendingMessages();
 
         // Then
         verify(createUpdatesQueueRepository).findPendingMessages(any(LocalDateTime.class), any(PageRequest.class));
-        verify(applicationContext).getBean(CreateUpdatesQueueProcessor.class);
+        verify(selfProvider).getObject();
         // Note: actual message processing happens in executor thread, so we can't verify it directly
     }
 

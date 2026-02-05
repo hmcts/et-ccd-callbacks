@@ -61,7 +61,7 @@ class MultipleUpdateServiceTest {
     private static final String USER_TOKEN = "Token";
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         submitMultipleEvent = new SubmitMultipleEvent();
         MultipleData multipleData = new MultipleData();
         multipleData.setMultipleReference("4100001");

@@ -7,6 +7,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.dao.DataAccessResourceFailureException;
 import uk.gov.hmcts.ecm.common.model.servicebus.UpdateCaseMsg;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.CloseDataModel;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.QueueMessageStatus;
@@ -84,7 +85,7 @@ class UpdateCaseQueueSenderTest {
         
         when(objectMapper.writeValueAsString(msg)).thenReturn(messageBody);
         when(updateCaseQueueRepository.save(any(UpdateCaseQueueMessage.class)))
-                .thenThrow(new RuntimeException("Database error"));
+                .thenThrow(new DataAccessResourceFailureException("Database error"));
 
         // When & Then
         RuntimeException exception = assertThrows(RuntimeException.class, () -> sender.sendMessage(msg));

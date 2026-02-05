@@ -47,7 +47,7 @@ class LegalRepAccessServiceTest {
     private MultipleDetails details;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         when(userService.getAdminUserToken()).thenReturn(ACCESS_TOKEN);
         details = new MultipleDetails();
         details.setCaseTypeId(ENGLANDWALES_BULK_CASE_TYPE_ID);
@@ -86,10 +86,13 @@ class LegalRepAccessServiceTest {
         Map<String, String> expectedPayload = Maps.newHashMap();
         expectedPayload.put("id", USER_ID_1);
 
+        String jurisdiction = details.getJurisdiction();
+        String caseTypeId = details.getCaseTypeId();
+        String caseId = details.getCaseId();
         assertThrows(
             CaseCreationException.class,
-            () -> legalRepAccessService.addUserToMultiple(token, details.getJurisdiction(),
-                details.getCaseTypeId(), details.getCaseId(), USER_ID_1)
+            () -> legalRepAccessService.addUserToMultiple(token, jurisdiction,
+                caseTypeId, caseId, USER_ID_1)
         );
 
         verify(ccdClient, times(1)).addUserToMultiple(token,

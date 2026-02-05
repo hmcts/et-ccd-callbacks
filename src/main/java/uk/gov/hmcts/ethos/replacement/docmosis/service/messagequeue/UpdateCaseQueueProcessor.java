@@ -3,9 +3,9 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.messagequeue;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -40,7 +40,7 @@ public class UpdateCaseQueueProcessor {
     private final UpdateCaseQueueRepository updateCaseQueueRepository;
     private final ObjectMapper objectMapper;
     private final UpdateManagementService updateManagementService;
-    private final ApplicationContext applicationContext;
+    private final ObjectProvider<UpdateCaseQueueProcessor> selfProvider;
 
     @Value("${queue.update-case.batch-size:10}")
     private int batchSize;
@@ -78,7 +78,7 @@ public class UpdateCaseQueueProcessor {
         log.info("Found {} pending update-case messages to process", messages.size());
 
         // Use self-proxy to ensure @Transactional works
-        UpdateCaseQueueProcessor self = applicationContext.getBean(UpdateCaseQueueProcessor.class);
+        UpdateCaseQueueProcessor self = selfProvider.getObject();
         messages.forEach(message -> executor.submit(() -> self.processMessage(message)));
     }
 
@@ -108,34 +108,36 @@ public class UpdateCaseQueueProcessor {
                     updateCaseMsg.getMultipleRef(),
                     updateCaseMsg.getMultipleReferenceLinkMarkUp());
 
-            // Call business logic (migrated from et-message-handler)
-            try {
-                updateManagementService.updateLogic(updateCaseMsg);
-                
-                // Mark as completed
-                updateCaseQueueRepository.markAsCompleted(
-                        queueMessage.getMessageId(),
-                        LocalDateTime.now()
-                );
-                
-                log.info("COMPLETED RECEIVED 'Update Case' ----> message with ID {}", queueMessage.getMessageId());
-                
-            } catch (IOException e) {
-                // Unrecoverable error - mark as failed immediately
-                log.error("Unrecoverable error occurred when handling 'Update Case' message with ID {}",
-                        queueMessage.getMessageId(), e);
-                handleUnrecoverableError(queueMessage, updateCaseMsg, e);
-            } catch (InterruptedException interruptedException) {
-                Thread.currentThread().interrupt();
-            } catch (Exception exception) {
-                // Potentially recoverable error - allow retries
-                log.error("Potentially recoverable error occurred when handling 'Update Case' message with ID {}",
-                        queueMessage.getMessageId(), exception);
-                throw exception; // Will trigger retry logic in handleError
-            }
-
+            handleUpdateCaseMessage(queueMessage, updateCaseMsg);
         } catch (Exception e) {
-            handleError(queueMessage, e);
+            selfProvider.getObject().handleError(queueMessage, e);
+        }
+    }
+
+    private void handleUpdateCaseMessage(UpdateCaseQueueMessage queueMessage, UpdateCaseMsg updateCaseMsg) {
+        try {
+            updateManagementService.updateLogic(updateCaseMsg);
+
+            // Mark as completed
+            updateCaseQueueRepository.markAsCompleted(
+                    queueMessage.getMessageId(),
+                    LocalDateTime.now()
+            );
+
+            log.info("COMPLETED RECEIVED 'Update Case' ----> message with ID {}", queueMessage.getMessageId());
+
+        } catch (IOException | javax.naming.NameNotFoundException e) {
+            // Unrecoverable error - mark as failed immediately
+            log.error("Unrecoverable error occurred when handling 'Update Case' message with ID {}",
+                    queueMessage.getMessageId(), e);
+            selfProvider.getObject().handleUnrecoverableError(queueMessage, updateCaseMsg, e);
+        } catch (InterruptedException interruptedException) {
+            Thread.currentThread().interrupt();
+        } catch (Exception exception) {
+            // Potentially recoverable error - allow retries
+            log.error("Potentially recoverable error occurred when handling 'Update Case' message with ID {}",
+                    queueMessage.getMessageId(), exception);
+            throw exception; // Will trigger retry logic in handleError
         }
     }
 

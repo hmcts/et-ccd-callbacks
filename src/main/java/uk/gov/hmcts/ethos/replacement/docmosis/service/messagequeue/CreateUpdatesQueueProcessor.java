@@ -3,9 +3,9 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.messagequeue;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
-import org.springframework.context.ApplicationContext;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -41,7 +41,7 @@ public class CreateUpdatesQueueProcessor {
     private final CreateUpdatesQueueRepository createUpdatesQueueRepository;
     private final UpdateCaseQueueSender updateCaseQueueSender;
     private final ObjectMapper objectMapper;
-    private final ApplicationContext applicationContext;
+    private final ObjectProvider<CreateUpdatesQueueProcessor> selfProvider;
     private final TransferToEcmService transferToEcmService;
 
     @Value("${queue.create-updates.batch-size:10}")
@@ -83,7 +83,7 @@ public class CreateUpdatesQueueProcessor {
         messages.forEach(message -> {
             log.info("Submitting message {} to executor", message.getMessageId());
             // Use self-proxy to ensure @Transactional works
-            CreateUpdatesQueueProcessor self = applicationContext.getBean(CreateUpdatesQueueProcessor.class);
+            CreateUpdatesQueueProcessor self = selfProvider.getObject();
             executor.submit(() -> self.processMessage(message));
         });
     }
@@ -131,7 +131,7 @@ public class CreateUpdatesQueueProcessor {
             log.info("Successfully processed create-updates message: {}", queueMessage.getMessageId());
 
         } catch (Exception e) {
-            handleError(queueMessage, e);
+            selfProvider.getObject().handleError(queueMessage, e);
         }
     }
 

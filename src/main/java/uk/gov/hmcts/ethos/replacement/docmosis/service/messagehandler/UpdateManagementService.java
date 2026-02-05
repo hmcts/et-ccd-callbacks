@@ -29,6 +29,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 public class UpdateManagementService {
 
     private static final String UNPROCESSABLE_MESSAGE = "Unprocessable message";
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     private final MultipleCounterRepository multipleCounterRepository;
     private final MultipleErrorsRepository multipleErrorsRepository;
@@ -89,9 +90,7 @@ public class UpdateManagementService {
 
     private int getNextCounterNumberWithDelay(String multipleRef) throws InterruptedException {
 
-        SecureRandom random = new SecureRandom();
-
-        long delay = random.nextInt(1000);
+        long delay = RANDOM.nextInt(1000);
 
         Thread.sleep(delay);
 

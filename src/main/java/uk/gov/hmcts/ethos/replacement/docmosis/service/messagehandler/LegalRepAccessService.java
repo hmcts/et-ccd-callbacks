@@ -109,7 +109,7 @@ public class LegalRepAccessService {
                 throw new CaseCreationException(errorMessage);
             }
 
-            log.info("Http status received from CCD addUserToMultiple API; {}", response.getStatusCodeValue());
+            log.info("Http status received from CCD addUserToMultiple API; {}", response.getStatusCode().value());
         } catch (RestClientResponseException e) {
             throw (CaseCreationException)
                 new CaseCreationException(String.format("%s with %s", errorMessage, e.getMessage())).initCause(e);

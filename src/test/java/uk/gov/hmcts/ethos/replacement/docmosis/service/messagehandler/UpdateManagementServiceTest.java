@@ -47,7 +47,7 @@ class UpdateManagementServiceTest {
     private transient UpdateCaseMsg updateCaseMsg;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         updateCaseMsg = generateUpdateCaseMsg();
     }
 
@@ -106,9 +106,9 @@ class UpdateManagementServiceTest {
         updateManagementService.addUnrecoverableErrorToDatabase(updateCaseMsg);
 
         verify(multipleErrorsRepository).persistentQLogMultipleError(
-            eq(updateCaseMsg.getMultipleRef()),
-            eq(updateCaseMsg.getEthosCaseReference()),
-            eq("Unprocessable message"));
+            updateCaseMsg.getMultipleRef(),
+            updateCaseMsg.getEthosCaseReference(),
+            "Unprocessable message");
         verifyNoMoreInteractions(multipleErrorsRepository);
     }
 
@@ -118,9 +118,9 @@ class UpdateManagementServiceTest {
         updateCaseMsg.setDataModelParent(resetStateDataModel);
         updateManagementService.updateLogic(updateCaseMsg);
 
-        verify(multipleCounterRepository).findByMultipleref(eq(updateCaseMsg.getMultipleRef()));
+        verify(multipleCounterRepository).findByMultipleref(updateCaseMsg.getMultipleRef());
         verify(multipleCounterRepository).deleteAllInBatch(new ArrayList<>());
-        verify(multipleErrorsRepository).findByMultipleref(eq(updateCaseMsg.getMultipleRef()));
+        verify(multipleErrorsRepository).findByMultipleref(updateCaseMsg.getMultipleRef());
         verify(multipleErrorsRepository).deleteAllInBatch(new ArrayList<>());
         verifyNoMoreInteractions(multipleErrorsRepository);
         verifyNoMoreInteractions(multipleCounterRepository);

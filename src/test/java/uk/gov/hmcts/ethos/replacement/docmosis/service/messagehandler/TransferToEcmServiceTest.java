@@ -48,7 +48,7 @@ class TransferToEcmServiceTest {
 
     @BeforeEach
     @SuppressWarnings({"PMD.LawOfDemeter"})
-    public void setUp() {
+    void setUp() {
         createUpdatesMsg = generateTransferToEcmMessage();
         var caseData = new CaseData();
         caseData.setManagingOffice(TribunalOffice.LEEDS.getOfficeName());
@@ -84,8 +84,8 @@ class TransferToEcmServiceTest {
         transferToEcmService.transferToEcm(createUpdatesMsg);
         
         verify(ccdClient, times(1))
-            .retrieveCasesElasticSearch(eq(USER_TOKEN), eq(createUpdatesMsg.getCaseTypeId()),
-                                        eq(createUpdatesMsg.getEthosCaseRefCollection()));
+            .retrieveCasesElasticSearch(USER_TOKEN, createUpdatesMsg.getCaseTypeId(),
+                                        createUpdatesMsg.getEthosCaseRefCollection());
         verify(createEcmSingleService, never())
             .sendCreation(any(SubmitEvent.class), anyString(), eq(createUpdatesMsg));
     }

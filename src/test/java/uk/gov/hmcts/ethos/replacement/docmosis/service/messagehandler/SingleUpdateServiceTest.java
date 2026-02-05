@@ -49,7 +49,7 @@ class SingleUpdateServiceTest {
     private CCDRequest returnedRequest;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         submitEvent = new SubmitEvent();
         CaseData caseData = new CaseData();
         caseData.setEthosCaseReference("4150002/2020");

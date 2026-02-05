@@ -76,8 +76,8 @@ public class SingleUpdateService {
                 jurisdiction,
                 caseId
             );
-        } else if (updateCaseMsg.getDataModelParent() instanceof UpdateDataModel
-            && YES.equals(((UpdateDataModel) updateCaseMsg.getDataModelParent()).getIsRespondentRepRemovalUpdate())) {
+        } else if (updateCaseMsg.getDataModelParent() instanceof UpdateDataModel updateDataModel
+            && YES.equals(updateDataModel.getIsRespondentRepRemovalUpdate())) {
             return ccdClient.startEventForCase(
                 accessToken,
                 caseTypeId,

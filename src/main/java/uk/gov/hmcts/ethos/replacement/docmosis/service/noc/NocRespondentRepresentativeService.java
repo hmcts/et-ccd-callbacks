@@ -55,11 +55,13 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_INVALID_CASE_DETAILS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_INVALID_INPUTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_REPRESENTATIVE_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_FAILED_TO_REMOVE_ORGANISATION_POLICIES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_SOLICITOR_ROLE_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_NOTIFY_REPRESENTATION_REMOVAL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_SET_ROLE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_START_EVENT_TO_UPDATE_REPRESENTATIVE_AND_ORGANISATION_POLICY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EVENT_UPDATE_CASE_SUBMITTED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REQUEST;
@@ -380,18 +382,48 @@ public class NocRespondentRepresentativeService {
                 nocService.grantRepresentativeAccess(adminUserService.getAdminUserToken(),
                         representative.getValue().getRepresentativeEmailAddress(), caseDetails.getCaseId(),
                         representative.getValue().getRespondentOrganisation(), role);
-                updateCaseForNewRepresentative(caseDetails, representative.getId(), role);
+                updateRepresentativeRoleAndOrganisationPolicy(caseDetails, representative.getId(), role);
             } catch (GenericServiceException gse) {
                 log.info(ERROR_UNABLE_TO_SET_ROLE, role, caseDetails.getCaseId(), gse.getMessage());
             }
         }
     }
 
-    public void updateCaseForNewRepresentative(CaseDetails caseDetails,
-                                               String representativeId,
-                                               String role) {
-        if (ObjectUtils.isEmpty(caseDetails)) {
+    /**
+     * Updates the role of an existing representative on a case and reapplies the
+     * respondent organisation policy based on the updated role.
+     * <p>
+     * This method performs an admin-initiated case update which:
+     * <ul>
+     *   <li>Validates the supplied case details and input parameters</li>
+     *   <li>Starts a CCD {@code UPDATE_CASE_SUBMITTED} event</li>
+     *   <li>Finds the representative using the provided identifier</li>
+     *   <li>Updates the representative's role</li>
+     *   <li>Applies the appropriate respondent organisation policy for the updated role</li>
+     *   <li>Submits the updated case data back to CCD</li>
+     * </ul>
+     * <p>
+     * If validation fails, the representative cannot be found, or the CCD event cannot be
+     * started or submitted, the method logs an error and exits without persisting any changes.
+     * No exceptions are propagated to the caller.
+     *
+     * @param caseDetails       the case details containing the identifiers and data required
+     *                          to update the representative and organisation policy
+     * @param representativeId the unique identifier of the representative whose role is to be updated
+     * @param role              the new role to assign to the representative
+     */
+    public void updateRepresentativeRoleAndOrganisationPolicy(CaseDetails caseDetails,
+                                                              String representativeId,
+                                                              String role) {
+        if (ObjectUtils.isEmpty(caseDetails)
+                || StringUtils.isBlank(caseDetails.getCaseId())
+                || StringUtils.isBlank(caseDetails.getCaseTypeId())
+                || StringUtils.isBlank(caseDetails.getJurisdiction())) {
             log.error(ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_INVALID_CASE_DETAILS);
+            return;
+        }
+        if (StringUtils.isBlank(representativeId) || StringUtils.isBlank(role)) {
+            log.error(ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_INVALID_INPUTS, caseDetails.getCaseId());
             return;
         }
         String adminUserToken = adminUserService.getAdminUserToken();
@@ -401,6 +433,13 @@ public class NocRespondentRepresentativeService {
                     caseDetails.getJurisdiction(),
                     caseDetails.getCaseId(),
                     EVENT_UPDATE_CASE_SUBMITTED);
+            if (ObjectUtils.isEmpty(ccdRequest)
+                    || ObjectUtils.isEmpty(ccdRequest.getCaseDetails())
+                    || ObjectUtils.isEmpty(ccdRequest.getCaseDetails().getCaseData())) {
+                log.error(ERROR_UNABLE_TO_START_EVENT_TO_UPDATE_REPRESENTATIVE_AND_ORGANISATION_POLICY,
+                        caseDetails.getCaseId());
+                return;
+            }
             CaseData ccdRequestCaseData = ccdRequest.getCaseDetails().getCaseData();
             RepresentedTypeRItem representative = RespondentRepresentativeUtils.findRepresentativeById(
                     ccdRequestCaseData, representativeId);
@@ -410,7 +449,7 @@ public class NocRespondentRepresentativeService {
             }
             assert representative != null;
             representative.getValue().setRole(role);
-            NocUtils.applyRespondentOrganisationPolicyForRole(caseDetails.getCaseData(), representative);
+            NocUtils.applyRespondentOrganisationPolicyForRole(ccdRequestCaseData, representative);
             ccdClient.submitEventForCase(adminUserToken, ccdRequestCaseData, caseDetails.getCaseTypeId(),
                     caseDetails.getJurisdiction(), ccdRequest, caseDetails.getCaseId());
         } catch (IOException exception) {

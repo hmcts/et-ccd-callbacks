@@ -51,16 +51,26 @@ public final class NocUtils {
 
     private static final String CLASS_NAME = NocUtils.class.getSimpleName();
     private static final Map<String, BiConsumer<CaseData, OrganisationPolicy>> ROLE_TO_POLICY_SETTER = Map.of(
-            SolicitorRole.SOLICITORA.getCaseRoleLabel().toLowerCase(Locale.UK), CaseData::setRespondentOrganisationPolicy0,
-            SolicitorRole.SOLICITORB.getCaseRoleLabel().toLowerCase(Locale.UK), CaseData::setRespondentOrganisationPolicy1,
-            SolicitorRole.SOLICITORC.getCaseRoleLabel().toLowerCase(Locale.UK), CaseData::setRespondentOrganisationPolicy2,
-            SolicitorRole.SOLICITORD.getCaseRoleLabel().toLowerCase(Locale.UK), CaseData::setRespondentOrganisationPolicy3,
-            SolicitorRole.SOLICITORE.getCaseRoleLabel().toLowerCase(Locale.UK), CaseData::setRespondentOrganisationPolicy4,
-            SolicitorRole.SOLICITORF.getCaseRoleLabel().toLowerCase(Locale.UK), CaseData::setRespondentOrganisationPolicy5,
-            SolicitorRole.SOLICITORG.getCaseRoleLabel().toLowerCase(Locale.UK), CaseData::setRespondentOrganisationPolicy6,
-            SolicitorRole.SOLICITORH.getCaseRoleLabel().toLowerCase(Locale.UK), CaseData::setRespondentOrganisationPolicy7,
-            SolicitorRole.SOLICITORI.getCaseRoleLabel().toLowerCase(Locale.UK), CaseData::setRespondentOrganisationPolicy8,
-            SolicitorRole.SOLICITORJ.getCaseRoleLabel().toLowerCase(Locale.UK), CaseData::setRespondentOrganisationPolicy9
+            SolicitorRole.SOLICITORA.getCaseRoleLabel().toLowerCase(Locale.UK),
+            CaseData::setRespondentOrganisationPolicy0,
+            SolicitorRole.SOLICITORB.getCaseRoleLabel().toLowerCase(Locale.UK),
+            CaseData::setRespondentOrganisationPolicy1,
+            SolicitorRole.SOLICITORC.getCaseRoleLabel().toLowerCase(Locale.UK),
+            CaseData::setRespondentOrganisationPolicy2,
+            SolicitorRole.SOLICITORD.getCaseRoleLabel().toLowerCase(Locale.UK),
+            CaseData::setRespondentOrganisationPolicy3,
+            SolicitorRole.SOLICITORE.getCaseRoleLabel().toLowerCase(Locale.UK),
+            CaseData::setRespondentOrganisationPolicy4,
+            SolicitorRole.SOLICITORF.getCaseRoleLabel().toLowerCase(Locale.UK),
+            CaseData::setRespondentOrganisationPolicy5,
+            SolicitorRole.SOLICITORG.getCaseRoleLabel().toLowerCase(Locale.UK),
+            CaseData::setRespondentOrganisationPolicy6,
+            SolicitorRole.SOLICITORH.getCaseRoleLabel().toLowerCase(Locale.UK),
+            CaseData::setRespondentOrganisationPolicy7,
+            SolicitorRole.SOLICITORI.getCaseRoleLabel().toLowerCase(Locale.UK),
+            CaseData::setRespondentOrganisationPolicy8,
+            SolicitorRole.SOLICITORJ.getCaseRoleLabel().toLowerCase(Locale.UK),
+            CaseData::setRespondentOrganisationPolicy9
     );
 
     private NocUtils() {

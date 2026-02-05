@@ -145,19 +145,29 @@ class NocRespondentRepresentativeServiceTest {
     private static final String EXPECTED_ERROR_UNABLE_TO_NOTIFY_REPRESENTATION_REMOVAL =
             "Unable to send notification for representative removal for case: 1234567890123456. Exception: Something "
                     + "went wrong";
-
-    private static final String EXPECTED_WARNING_REPRESENTATIVE_MISSING_EMAIL_ADDRESS =
-            "Representative Legal One is missing an email address.\n";
-    private static final String EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL =
-            "Representative 'Legal One' could not be found using respondent@rep.email.com. "
-                    + "Case access will not be defined for this representative.\n";
-
     private static final String EXPECTED_ERROR_SOLICITOR_ROLE_NOT_FOUND =
             "Solicitor role not found, case id: 1234567890123456";
     private static final String EXPECTED_ERROR_UNABLE_TO_SET_ROLE =
             "Unable to set role [SOLICITORA]. Case Id: 1234567890123456. Error: Something went wrong";
     private static final String EXPECTED_ERROR_FAILED_TO_REMOVE_ORGANISATION_POLICIES =
             "Failed to remove organisation policies for case 1234567890123456. Exception: Something went wrong";
+    private static final String EXPECTED_ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_INVALID_CASE_DETAILS =
+            "Failed to add organisation policy. Reason: invalid case details";
+    private static final String EXPECTED_ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_INVALID_INPUTS =
+            "Failed to add organisation policy for case1234567890123456. Reason: invalid inputs";
+    private static final String EXPECTED_ERROR_UNABLE_TO_START_EVENT_TO_UPDATE_REPRESENTATIVE_AND_ORGANISATION_POLICY =
+            "Unable to start update case submitted event to update representative role and organisation policy for "
+                    + "case: 1234567890123456";
+    private static final String EXPECTED_ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_REPRESENTATIVE_NOT_FOUND =
+            "Failed to add organisation policy for case 1234567890123456. Reason: representative not found";
+    private static final String EXPECTED_ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES =
+            "Failed to add organisation policy for case 1234567890123456. Exception: Something went wrong";
+
+    private static final String EXPECTED_WARNING_REPRESENTATIVE_MISSING_EMAIL_ADDRESS =
+            "Representative Legal One is missing an email address.\n";
+    private static final String EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL =
+            "Representative 'Legal One' could not be found using respondent@rep.email.com. "
+                    + "Case access will not be defined for this representative.\n";
 
     private static final String CASE_ID_1 = "1234567890123456";
     private static final String REPRESENTATIVE_EMAIL = "representative1@gmail.com";
@@ -169,6 +179,7 @@ class NocRespondentRepresentativeServiceTest {
     private static final int INTEGER_EIGHT = 8;
     private static final int INTEGER_NINE = 9;
     private static final int INTEGER_TEN = 10;
+    private static final int INTEGER_ELEVEN = 11;
 
     private ListAppender<ILoggingEvent> appender;
 
@@ -1387,5 +1398,150 @@ class NocRespondentRepresentativeServiceTest {
                 eq(CASE_TYPE_ID_ENGLAND_WALES), eq(JURISDICTION_EMPLOYMENT), any(CCDRequest.class), eq(CASE_ID_1));
         assertThat(caseDetails.getCaseData().getRespondentOrganisationPolicy0()).isEqualTo(OrganisationPolicy.builder()
                 .orgPolicyCaseAssignedRole(ROLE_SOLICITORA).organisation(Organisation.builder().build()).build());
+    }
+
+    @Test
+    @SneakyThrows
+    void theUpdateRepresentativeRoleAndOrganisationPolicy() {
+        // when case details is empty should log invalid case details error
+        nocRespondentRepresentativeService.updateRepresentativeRoleAndOrganisationPolicy(null,
+                REPRESENTATIVE_ID_ONE, ROLE_SOLICITORA);
+        assertThat(appender.list)
+                .filteredOn(e -> e.getLevel() == Level.ERROR)
+                .extracting(ILoggingEvent::getFormattedMessage)
+                .hasSize(NumberUtils.INTEGER_ONE)
+                .contains(EXPECTED_ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_INVALID_CASE_DETAILS);
+        // when case details not have case id should log invalid case details error
+        CaseDetails caseDetails = new  CaseDetails();
+        nocRespondentRepresentativeService.updateRepresentativeRoleAndOrganisationPolicy(caseDetails,
+                REPRESENTATIVE_ID_ONE, ROLE_SOLICITORA);
+        assertThat(appender.list)
+                .filteredOn(e -> e.getLevel() == Level.ERROR)
+                .extracting(ILoggingEvent::getFormattedMessage)
+                .hasSize(NumberUtils.INTEGER_TWO)
+                .contains(EXPECTED_ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_INVALID_CASE_DETAILS);
+        // when case details not have case type id should log invalid case details error
+        caseDetails.setCaseId(CASE_ID_1);
+        nocRespondentRepresentativeService.updateRepresentativeRoleAndOrganisationPolicy(caseDetails,
+                REPRESENTATIVE_ID_ONE, ROLE_SOLICITORA);
+        assertThat(appender.list)
+                .filteredOn(e -> e.getLevel() == Level.ERROR)
+                .extracting(ILoggingEvent::getFormattedMessage)
+                .hasSize(INTEGER_THREE)
+                .contains(EXPECTED_ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_INVALID_CASE_DETAILS);
+        // when case details not have jurisdiction id should log invalid case details error
+        caseDetails.setCaseTypeId(CASE_TYPE_ID_ENGLAND_WALES);
+        nocRespondentRepresentativeService.updateRepresentativeRoleAndOrganisationPolicy(caseDetails,
+                REPRESENTATIVE_ID_ONE, ROLE_SOLICITORA);
+        assertThat(appender.list)
+                .filteredOn(e -> e.getLevel() == Level.ERROR)
+                .extracting(ILoggingEvent::getFormattedMessage)
+                .hasSize(INTEGER_FOUR)
+                .contains(EXPECTED_ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_INVALID_CASE_DETAILS);
+        // when representative id is empty should log invalid inputs error
+        caseDetails.setJurisdiction(JURISDICTION_EMPLOYMENT);
+        nocRespondentRepresentativeService.updateRepresentativeRoleAndOrganisationPolicy(caseDetails,
+                StringUtils.EMPTY, ROLE_SOLICITORA);
+        assertThat(appender.list)
+                .filteredOn(e -> e.getLevel() == Level.ERROR)
+                .extracting(ILoggingEvent::getFormattedMessage)
+                .hasSize(INTEGER_FIVE)
+                .contains(EXPECTED_ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_INVALID_INPUTS);
+        // when role is empty should log invalid inputs error
+        nocRespondentRepresentativeService.updateRepresentativeRoleAndOrganisationPolicy(caseDetails,
+                REPRESENTATIVE_ID_ONE, StringUtils.EMPTY);
+        assertThat(appender.list)
+                .filteredOn(e -> e.getLevel() == Level.ERROR)
+                .extracting(ILoggingEvent::getFormattedMessage)
+                .hasSize(INTEGER_SIX)
+                .contains(EXPECTED_ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_INVALID_INPUTS);
+        // when start event for update organisation policies and representative role returns empty ccd request should
+        // log unable to start event error
+        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
+        when(ccdClient.startEventForCase(ADMIN_USER_TOKEN,
+                CASE_TYPE_ID_ENGLAND_WALES,
+                JURISDICTION_EMPLOYMENT,
+                CASE_ID_1,
+                EVENT_UPDATE_CASE_SUBMITTED)).thenReturn(null);
+        nocRespondentRepresentativeService.updateRepresentativeRoleAndOrganisationPolicy(caseDetails,
+                REPRESENTATIVE_ID_ONE, ROLE_SOLICITORA);
+        assertThat(appender.list)
+                .filteredOn(e -> e.getLevel() == Level.ERROR)
+                .extracting(ILoggingEvent::getFormattedMessage)
+                .hasSize(INTEGER_SEVEN)
+                .contains(EXPECTED_ERROR_UNABLE_TO_START_EVENT_TO_UPDATE_REPRESENTATIVE_AND_ORGANISATION_POLICY);
+        // when CCD request not has case details should log unable to start event error
+        CCDRequest ccdRequest = new CCDRequest();
+        when(ccdClient.startEventForCase(ADMIN_USER_TOKEN,
+                CASE_TYPE_ID_ENGLAND_WALES,
+                JURISDICTION_EMPLOYMENT,
+                CASE_ID_1,
+                EVENT_UPDATE_CASE_SUBMITTED)).thenReturn(ccdRequest);
+        nocRespondentRepresentativeService.updateRepresentativeRoleAndOrganisationPolicy(caseDetails,
+                REPRESENTATIVE_ID_ONE, ROLE_SOLICITORA);
+        assertThat(appender.list)
+                .filteredOn(e -> e.getLevel() == Level.ERROR)
+                .extracting(ILoggingEvent::getFormattedMessage)
+                .hasSize(INTEGER_EIGHT)
+                .contains(EXPECTED_ERROR_UNABLE_TO_START_EVENT_TO_UPDATE_REPRESENTATIVE_AND_ORGANISATION_POLICY);
+        // when case details not have case data should log unable to start event error
+        ccdRequest.setCaseDetails(new CaseDetails());
+        when(ccdClient.startEventForCase(ADMIN_USER_TOKEN,
+                CASE_TYPE_ID_ENGLAND_WALES,
+                JURISDICTION_EMPLOYMENT,
+                CASE_ID_1,
+                EVENT_UPDATE_CASE_SUBMITTED)).thenReturn(ccdRequest);
+        nocRespondentRepresentativeService.updateRepresentativeRoleAndOrganisationPolicy(caseDetails,
+                REPRESENTATIVE_ID_ONE, ROLE_SOLICITORA);
+        assertThat(appender.list)
+                .filteredOn(e -> e.getLevel() == Level.ERROR)
+                .extracting(ILoggingEvent::getFormattedMessage)
+                .hasSize(INTEGER_NINE)
+                .contains(EXPECTED_ERROR_UNABLE_TO_START_EVENT_TO_UPDATE_REPRESENTATIVE_AND_ORGANISATION_POLICY);
+        // when representative in the case data is not a valid representative should log representative not found error
+        ccdRequest.setCaseDetails(caseDetails);
+        CaseData caseData = new CaseData();
+        caseDetails.setCaseData(caseData);
+        nocRespondentRepresentativeService.updateRepresentativeRoleAndOrganisationPolicy(caseDetails,
+                REPRESENTATIVE_ID_ONE, ROLE_SOLICITORA);
+        assertThat(appender.list)
+                .filteredOn(e -> e.getLevel() == Level.ERROR)
+                .extracting(ILoggingEvent::getFormattedMessage)
+                .hasSize(INTEGER_TEN)
+                .contains(EXPECTED_ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_REPRESENTATIVE_NOT_FOUND);
+        // when submit event for case to update role and organisation policy throws exception should log that exception
+        RepresentedTypeRItem representative = RepresentedTypeRItem.builder().build();
+        representative.setValue(RepresentedTypeR.builder().respondentId(RESPONDENT_ID_ONE).build());
+        representative.setId(REPRESENTATIVE_ID_ONE);
+        Organisation organisation = Organisation.builder().organisationID(ORGANISATION_ID_ONE).build();
+        representative.getValue().setRespondentOrganisation(organisation);
+        caseData.setRepCollection(List.of(representative));
+        when(ccdClient.submitEventForCase(eq(ADMIN_USER_TOKEN),
+                any(CaseData.class),
+                eq(CASE_TYPE_ID_ENGLAND_WALES),
+                eq(JURISDICTION_EMPLOYMENT),
+                any(CCDRequest.class),
+                eq(CASE_ID_1))).thenThrow(new IOException(EXCEPTION_DUMMY_MESSAGE));
+        nocRespondentRepresentativeService.updateRepresentativeRoleAndOrganisationPolicy(caseDetails,
+                REPRESENTATIVE_ID_ONE, ROLE_SOLICITORA);
+        assertThat(appender.list)
+                .filteredOn(e -> e.getLevel() == Level.ERROR)
+                .extracting(ILoggingEvent::getFormattedMessage)
+                .hasSize(INTEGER_ELEVEN)
+                .contains(EXPECTED_ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES);
+        // should successfully add organisation policy, role and reset Noc Warning
+        caseData.setRespondentOrganisationPolicy0(null);
+        representative.getValue().setRole(null);
+        when(ccdClient.submitEventForCase(eq(ADMIN_USER_TOKEN),
+                any(CaseData.class),
+                eq(CASE_TYPE_ID_ENGLAND_WALES),
+                eq(JURISDICTION_EMPLOYMENT),
+                any(CCDRequest.class),
+                eq(CASE_ID_1))).thenReturn(new SubmitEvent());
+        nocRespondentRepresentativeService.updateRepresentativeRoleAndOrganisationPolicy(caseDetails,
+                REPRESENTATIVE_ID_ONE, ROLE_SOLICITORA);
+        assertThat(representative.getValue().getRole()).isEqualTo(ROLE_SOLICITORA);
+        assertThat(caseData.getRespondentOrganisationPolicy0()).isEqualTo(OrganisationPolicy.builder()
+                .organisation(organisation).orgPolicyCaseAssignedRole(ROLE_SOLICITORA).build());
     }
 }

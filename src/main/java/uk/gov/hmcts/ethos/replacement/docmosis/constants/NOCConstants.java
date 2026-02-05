@@ -68,8 +68,13 @@ public final class NOCConstants {
             "Failed to add organisation policy for case {}. Exception: {}";
     public static final String ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_INVALID_CASE_DETAILS =
             "Failed to add organisation policy. Reason: invalid case details";
+    public static final String ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_INVALID_INPUTS =
+            "Failed to add organisation policy for case{}. Reason: invalid inputs";
     public static final String ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_REPRESENTATIVE_NOT_FOUND =
             "Failed to add organisation policy for case {}. Reason: representative not found";
+    public static final String ERROR_UNABLE_TO_START_EVENT_TO_UPDATE_REPRESENTATIVE_AND_ORGANISATION_POLICY =
+            "Unable to start update case submitted event to update representative role and organisation policy for "
+                    + "case: {}";
 
     public static final String WARNING_REPRESENTATIVE_MISSING_EMAIL_ADDRESS =
             "Representative %s is missing an email address.";

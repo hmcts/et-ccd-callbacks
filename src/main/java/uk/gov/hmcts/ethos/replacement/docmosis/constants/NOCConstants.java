@@ -62,8 +62,14 @@ public final class NOCConstants {
     public static final String ERROR_SOLICITOR_ROLE_NOT_FOUND = "Solicitor role not found, case id: {}";
     public static final String ERROR_UNABLE_TO_NOTIFY_REPRESENTATION_REMOVAL =
             "Unable to send notification for representative removal for case: {}. Exception: {}";
-    public static final String ERROR_FAILED_TO_REMOVE_ORGANISATION_POLICIES_AND_NOC_ANSWERS =
-            "Failed to remove organisation policies and noc answers for case {}. Exception: {}";
+    public static final String ERROR_FAILED_TO_REMOVE_ORGANISATION_POLICIES =
+            "Failed to remove organisation policies for case {}. Exception: {}";
+    public static final String ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES =
+            "Failed to add organisation policy for case {}. Exception: {}";
+    public static final String ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_INVALID_CASE_DETAILS =
+            "Failed to add organisation policy. Reason: invalid case details";
+    public static final String ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_REPRESENTATIVE_NOT_FOUND =
+            "Failed to add organisation policy for case {}. Reason: representative not found";
 
     public static final String WARNING_REPRESENTATIVE_MISSING_EMAIL_ADDRESS =
             "Representative %s is missing an email address.";

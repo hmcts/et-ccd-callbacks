@@ -479,4 +479,27 @@ final class RespondentRepresentativeUtilsTest {
         representative.setId(REPRESENTATIVE_ID_2);
         assertThat(RespondentRepresentativeUtils.findRespondentByRepresentative(tmpCaseData, representative)).isNull();
     }
+
+    @Test
+    void theFindRepresentativeById() {
+        // when case data is empty should return null
+        assertThat(RespondentRepresentativeUtils.findRepresentativeById(null, REPRESENTATIVE_ID_1)).isNull();
+        // when case data does not have representative should return null
+        CaseData caseData = new CaseData();
+        assertThat(RespondentRepresentativeUtils.findRepresentativeById(caseData, REPRESENTATIVE_ID_1)).isNull();
+        // when representative id is empty should return null
+        RepresentedTypeRItem representative = RepresentedTypeRItem.builder().build();
+        caseData.setRepCollection(List.of(representative));
+        assertThat(RespondentRepresentativeUtils.findRepresentativeById(caseData, StringUtils.EMPTY)).isNull();
+        // when representative is not a valid representative should return null
+        assertThat(RespondentRepresentativeUtils.findRepresentativeById(caseData, REPRESENTATIVE_ID_1)).isNull();
+        // when representative id is not equal to parameter id should return null
+        representative.setId(REPRESENTATIVE_ID_2);
+        representative.setValue(RepresentedTypeR.builder().build());
+        assertThat(RespondentRepresentativeUtils.findRepresentativeById(caseData, REPRESENTATIVE_ID_1)).isNull();
+        // when representative is is equal to parameter id should return that representative
+        representative.setId(REPRESENTATIVE_ID_1);
+        assertThat(RespondentRepresentativeUtils.findRepresentativeById(caseData, REPRESENTATIVE_ID_1))
+                .isEqualTo(representative);
+    }
 }

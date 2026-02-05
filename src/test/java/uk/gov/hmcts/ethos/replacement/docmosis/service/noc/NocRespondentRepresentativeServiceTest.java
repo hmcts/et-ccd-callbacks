@@ -156,9 +156,8 @@ class NocRespondentRepresentativeServiceTest {
             "Solicitor role not found, case id: 1234567890123456";
     private static final String EXPECTED_ERROR_UNABLE_TO_SET_ROLE =
             "Unable to set role [SOLICITORA]. Case Id: 1234567890123456. Error: Something went wrong";
-    private static final String EXPECTED_ERROR_FAILED_TO_REMOVE_ORGANISATION_POLICIES_AND_NOC_ANSWERS =
-            "Failed to remove organisation policies and noc answers for case 1234567890123456. Exception: Something "
-                    + "went wrong";
+    private static final String EXPECTED_ERROR_FAILED_TO_REMOVE_ORGANISATION_POLICIES =
+            "Failed to remove organisation policies for case 1234567890123456. Exception: Something went wrong";
 
     private static final String CASE_ID_1 = "1234567890123456";
     private static final String REPRESENTATIVE_EMAIL = "representative1@gmail.com";
@@ -1255,12 +1254,13 @@ class NocRespondentRepresentativeServiceTest {
         nocRespondentRepresentativeService.grantRespondentRepresentativesAccess(caseDetails, representatives);
         verifyNoInteractions(nocCcdService);
         // when representative in representative list is invalid should do nothing
-        representatives.add(RepresentedTypeRItem.builder().build());
+        RepresentedTypeRItem representative = RepresentedTypeRItem.builder().build();
+        representatives.add(representative);
         nocRespondentRepresentativeService.grantRespondentRepresentativesAccess(caseDetails, representatives);
         verifyNoInteractions(nocCcdService);
         // when there is no respondent organisation policy left to add should log error
-        representatives.getFirst().setValue(RepresentedTypeR.builder().respondentId(RESPONDENT_ID_ONE).build());
-        representatives.getFirst().setId(REPRESENTATIVE_ID_ONE);
+        representative.setValue(RepresentedTypeR.builder().respondentId(RESPONDENT_ID_ONE).build());
+        representative.setId(REPRESENTATIVE_ID_ONE);
         setAllRespondentOrganisationPolicy(caseDetails.getCaseData());
         nocRespondentRepresentativeService.grantRespondentRepresentativesAccess(caseDetails, representatives);
         assertThat(appender.list)
@@ -1285,6 +1285,22 @@ class NocRespondentRepresentativeServiceTest {
                 .containsExactly(EXPECTED_ERROR_UNABLE_TO_SET_ROLE);
         // when role successfully assigned should run setRepresentativesAccess without any error
         doNothing().when(nocService).grantRepresentativeAccess(eq(ADMIN_USER_TOKEN), any(), any(), any(), any());
+        caseDetails.setCaseTypeId(CASE_TYPE_ID_ENGLAND_WALES);
+        caseDetails.setJurisdiction(JURISDICTION_EMPLOYMENT);
+        CCDRequest ccdRequest = new  CCDRequest();
+        ccdRequest.setCaseDetails(caseDetails);
+        caseData.setRepCollection(representatives);
+        when(ccdClient.startEventForCase(ADMIN_USER_TOKEN,
+                CASE_TYPE_ID_ENGLAND_WALES,
+                JURISDICTION_EMPLOYMENT,
+                CASE_ID_1,
+                EVENT_UPDATE_CASE_SUBMITTED)).thenReturn(ccdRequest);
+        when(ccdClient.submitEventForCase(eq(ADMIN_USER_TOKEN),
+                any(CaseData.class),
+                eq(CASE_TYPE_ID_ENGLAND_WALES),
+                eq(JURISDICTION_EMPLOYMENT),
+                any(CCDRequest.class),
+                eq(CASE_ID_1))).thenReturn(new SubmitEvent());
         nocRespondentRepresentativeService.grantRespondentRepresentativesAccess(caseDetails, representatives);
         verify(nocService, times(NumberUtils.INTEGER_TWO)).grantRepresentativeAccess(eq(ADMIN_USER_TOKEN), any(), any(),
                 any(), any());
@@ -1336,7 +1352,7 @@ class NocRespondentRepresentativeServiceTest {
         assertThat(appender.list)
                 .filteredOn(e -> e.getLevel() == Level.INFO)
                 .extracting(ILoggingEvent::getFormattedMessage)
-                .containsExactly(EXPECTED_ERROR_FAILED_TO_REMOVE_ORGANISATION_POLICIES_AND_NOC_ANSWERS);
+                .containsExactly(EXPECTED_ERROR_FAILED_TO_REMOVE_ORGANISATION_POLICIES);
         // when not able to submitEventForCase should log exception
         CCDRequest ccdRequest = new CCDRequest();
         ccdRequest.setCaseDetails(caseDetails);
@@ -1359,7 +1375,7 @@ class NocRespondentRepresentativeServiceTest {
         assertThat(appender.list)
                 .filteredOn(e -> e.getLevel() == Level.INFO)
                 .extracting(ILoggingEvent::getFormattedMessage)
-                .contains(EXPECTED_ERROR_FAILED_TO_REMOVE_ORGANISATION_POLICIES_AND_NOC_ANSWERS);
+                .contains(EXPECTED_ERROR_FAILED_TO_REMOVE_ORGANISATION_POLICIES);
         // removes organisation policies and noc answers successfully
         doReturn(new SubmitEvent()).when(ccdClient).submitEventForCase(eq(ADMIN_USER_TOKEN), any(CaseData.class),
                 eq(CASE_TYPE_ID_ENGLAND_WALES), eq(JURISDICTION_EMPLOYMENT), any(CCDRequest.class), eq(CASE_ID_1));

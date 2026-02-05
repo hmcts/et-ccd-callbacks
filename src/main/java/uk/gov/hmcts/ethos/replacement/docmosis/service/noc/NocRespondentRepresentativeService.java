@@ -53,7 +53,10 @@ import static org.apache.commons.lang3.ObjectUtils.getIfNull;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_FAILED_TO_REMOVE_ORGANISATION_POLICIES_AND_NOC_ANSWERS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_INVALID_CASE_DETAILS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_REPRESENTATIVE_NOT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_FAILED_TO_REMOVE_ORGANISATION_POLICIES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_SOLICITOR_ROLE_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_NOTIFY_REPRESENTATION_REMOVAL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_SET_ROLE;
@@ -249,7 +252,7 @@ public class NocRespondentRepresentativeService {
             ccdClient.submitEventForCase(adminUserToken, ccdRequestCaseData, caseDetails.getCaseTypeId(),
                     caseDetails.getJurisdiction(), ccdRequest, caseDetails.getCaseId());
         } catch (IOException exception) {
-            log.info(ERROR_FAILED_TO_REMOVE_ORGANISATION_POLICIES_AND_NOC_ANSWERS, caseDetails.getCaseId(),
+            log.info(ERROR_FAILED_TO_REMOVE_ORGANISATION_POLICIES, caseDetails.getCaseId(),
                     exception.getMessage());
         }
     }
@@ -377,11 +380,42 @@ public class NocRespondentRepresentativeService {
                 nocService.grantRepresentativeAccess(adminUserService.getAdminUserToken(),
                         representative.getValue().getRepresentativeEmailAddress(), caseDetails.getCaseId(),
                         representative.getValue().getRespondentOrganisation(), role);
-                representative.getValue().setRole(role);
-                // addOrganisationPolicyAndNocAnswers(caseDetails.getCaseData(), representative);
+                updateCaseForNewRepresentative(caseDetails, representative.getId(), role);
             } catch (GenericServiceException gse) {
                 log.info(ERROR_UNABLE_TO_SET_ROLE, role, caseDetails.getCaseId(), gse.getMessage());
             }
+        }
+    }
+
+    public void updateCaseForNewRepresentative(CaseDetails caseDetails,
+                                               String representativeId,
+                                               String role) {
+        if (ObjectUtils.isEmpty(caseDetails)) {
+            log.error(ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_INVALID_CASE_DETAILS);
+            return;
+        }
+        String adminUserToken = adminUserService.getAdminUserToken();
+        try {
+            CCDRequest ccdRequest = ccdClient.startEventForCase(adminUserToken,
+                    caseDetails.getCaseTypeId(),
+                    caseDetails.getJurisdiction(),
+                    caseDetails.getCaseId(),
+                    EVENT_UPDATE_CASE_SUBMITTED);
+            CaseData ccdRequestCaseData = ccdRequest.getCaseDetails().getCaseData();
+            RepresentedTypeRItem representative = RespondentRepresentativeUtils.findRepresentativeById(
+                    ccdRequestCaseData, representativeId);
+            if (!RespondentRepresentativeUtils.isValidRepresentative(representative)) {
+                log.error(ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_REPRESENTATIVE_NOT_FOUND, caseDetails.getCaseId());
+                return;
+            }
+            assert representative != null;
+            representative.getValue().setRole(role);
+            NocUtils.applyRespondentOrganisationPolicyForRole(caseDetails.getCaseData(), representative);
+            ccdClient.submitEventForCase(adminUserToken, ccdRequestCaseData, caseDetails.getCaseTypeId(),
+                    caseDetails.getJurisdiction(), ccdRequest, caseDetails.getCaseId());
+        } catch (IOException exception) {
+            log.error(ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES, caseDetails.getCaseId(),
+                    exception.getMessage());
         }
     }
 

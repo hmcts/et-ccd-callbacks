@@ -482,4 +482,36 @@ public final class RespondentRepresentativeUtils {
         }
         return respondent;
     }
+
+    /**
+     * Finds a valid {@link RepresentedTypeRItem} in the case data by its identifier.
+     * <p>
+     * This method searches the representative collection on the given {@link CaseData}
+     * and returns the first representative whose identifier matches the supplied
+     * {@code representativeId} and which passes validity checks.
+     * </p>
+     * <p>
+     * If the case data is null or empty, the representative collection is empty,
+     * the identifier is blank, or no matching valid representative is found,
+     * the method returns {@code null}.
+     * </p>
+     *
+     * @param caseData         the case data containing the representative collection
+     * @param representativeId the identifier of the representative to find
+     * @return the matching valid {@link RepresentedTypeRItem}, or {@code null} if none is found
+     */
+    public static RepresentedTypeRItem findRepresentativeById(CaseData caseData,
+                                                              String representativeId) {
+        if (ObjectUtils.isEmpty(caseData)
+                || CollectionUtils.isEmpty(caseData.getRepCollection())
+                || StringUtils.isBlank(representativeId)) {
+            return null;
+        }
+
+        return caseData.getRepCollection().stream()
+                .filter(RespondentRepresentativeUtils::isValidRepresentative)
+                .filter(rep -> representativeId.equals(rep.getId()))
+                .findFirst()
+                .orElse(null);
+    }
 }

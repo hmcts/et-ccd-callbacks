@@ -11,6 +11,8 @@ import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
+import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CallbacksCollectionUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentUtils;
@@ -20,9 +22,11 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.function.BiConsumer;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -46,6 +50,18 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.MAX
 public final class NocUtils {
 
     private static final String CLASS_NAME = NocUtils.class.getSimpleName();
+    private static final Map<String, BiConsumer<CaseData, OrganisationPolicy>> ROLE_TO_POLICY_SETTER = Map.of(
+            SolicitorRole.SOLICITORA.getCaseRoleLabel().toLowerCase(Locale.UK), CaseData::setRespondentOrganisationPolicy0,
+            SolicitorRole.SOLICITORB.getCaseRoleLabel().toLowerCase(Locale.UK), CaseData::setRespondentOrganisationPolicy1,
+            SolicitorRole.SOLICITORC.getCaseRoleLabel().toLowerCase(Locale.UK), CaseData::setRespondentOrganisationPolicy2,
+            SolicitorRole.SOLICITORD.getCaseRoleLabel().toLowerCase(Locale.UK), CaseData::setRespondentOrganisationPolicy3,
+            SolicitorRole.SOLICITORE.getCaseRoleLabel().toLowerCase(Locale.UK), CaseData::setRespondentOrganisationPolicy4,
+            SolicitorRole.SOLICITORF.getCaseRoleLabel().toLowerCase(Locale.UK), CaseData::setRespondentOrganisationPolicy5,
+            SolicitorRole.SOLICITORG.getCaseRoleLabel().toLowerCase(Locale.UK), CaseData::setRespondentOrganisationPolicy6,
+            SolicitorRole.SOLICITORH.getCaseRoleLabel().toLowerCase(Locale.UK), CaseData::setRespondentOrganisationPolicy7,
+            SolicitorRole.SOLICITORI.getCaseRoleLabel().toLowerCase(Locale.UK), CaseData::setRespondentOrganisationPolicy8,
+            SolicitorRole.SOLICITORJ.getCaseRoleLabel().toLowerCase(Locale.UK), CaseData::setRespondentOrganisationPolicy9
+    );
 
     private NocUtils() {
         // Utility classes should not have a public or default constructor.
@@ -579,5 +595,48 @@ public final class NocUtils {
             case 9 -> caseData.setNoticeOfChangeAnswers9(answer);
             default -> { /* no-op */ }
         }
+    }
+
+    /**
+     * Applies a respondent {@link OrganisationPolicy} to the given {@link CaseData}
+     * based on the representative’s case role.
+     * <p>
+     * If the representative has a valid respondent representative role, this method
+     * creates an {@link OrganisationPolicy} using the representative’s organisation
+     * and assigns it to the corresponding respondent organisation policy field on
+     * the case data.
+     * </p>
+     * <p>
+     * The method performs no action if the case data or representative is null or empty,
+     * if the representative organisation is missing, if the role is blank or not a
+     * respondent representative role, or if no organisation policy field is mapped
+     * to the given role.
+     * </p>
+     *
+     * @param caseData       the case data to update with the respondent organisation policy
+     * @param representative the representative whose role and organisation are used
+     *                       to determine and apply the organisation policy
+     */
+    public static void applyRespondentOrganisationPolicyForRole(CaseData caseData,
+                                                                RepresentedTypeRItem representative) {
+        if (ObjectUtils.isEmpty(caseData)
+                || ObjectUtils.isEmpty(representative)
+                || ObjectUtils.isEmpty(representative.getValue())
+                || ObjectUtils.isEmpty(representative.getValue().getRespondentOrganisation())) {
+            return;
+        }
+        String role = representative.getValue().getRole();
+        if (StringUtils.isBlank(role) || !RoleUtils.isRespondentRepresentativeRole(role)) {
+            return;
+        }
+        BiConsumer<CaseData, OrganisationPolicy> setter = ROLE_TO_POLICY_SETTER.get(role.toLowerCase(Locale.UK));
+        if (setter == null) {
+            return;
+        }
+        OrganisationPolicy policy = OrganisationPolicy.builder()
+                .organisation(representative.getValue().getRespondentOrganisation())
+                .orgPolicyCaseAssignedRole(role)
+                .build();
+        setter.accept(caseData, policy);
     }
 }

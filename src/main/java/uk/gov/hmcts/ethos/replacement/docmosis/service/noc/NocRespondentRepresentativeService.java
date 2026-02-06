@@ -37,6 +37,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.OrganisationUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.ClaimantRepresentativeUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.NocUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.RespondentRepresentativeUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.RoleUtils;
@@ -165,7 +166,7 @@ public class NocRespondentRepresentativeService {
                 || CollectionUtils.isEmpty(representativesToRemove)) {
             return new ArrayList<>();
         }
-        CaseUserAssignmentData caseUserAssignments = nocCcdService.getCaseAssignments(
+        CaseUserAssignmentData caseUserAssignments = nocCcdService.retrieveCaseUserAssignments(
                 adminUserService.getAdminUserToken(), oldCaseDetails.getCaseId());
         if (ObjectUtils.isEmpty(caseUserAssignments)
                 || CollectionUtils.isEmpty(caseUserAssignments.getCaseUserAssignments())) {
@@ -270,7 +271,7 @@ public class NocRespondentRepresentativeService {
         }
         CaseDetails oldCaseDetails = callbackRequest.getCaseDetailsBefore();
         CaseDetails newCaseDetails = callbackRequest.getCaseDetails();
-        // finds both new and organisation or e-mail changed representatives
+        // finds both new, and organisation or e-mail changed representatives
         List<RepresentedTypeRItem> newOrUpdatedRepresentatives = RespondentRepresentativeUtils
                 .findNewOrUpdatedRepresentatives(newCaseDetails.getCaseData().getRepCollection(),
                         oldCaseDetails.getCaseData().getRepCollection());
@@ -308,7 +309,7 @@ public class NocRespondentRepresentativeService {
                 || StringUtils.isEmpty(caseDetails.getCaseId())) {
             return assignableRepresentatives;
         }
-        CaseUserAssignmentData caseUserAssignments = nocCcdService.getCaseAssignments(
+        CaseUserAssignmentData caseUserAssignments = nocCcdService.retrieveCaseUserAssignments(
                 adminUserService.getAdminUserToken(), caseDetails.getCaseId());
         if (ObjectUtils.isEmpty(caseUserAssignments)
                 || CollectionUtils.isEmpty(caseUserAssignments.getCaseUserAssignments())) {
@@ -428,34 +429,64 @@ public class NocRespondentRepresentativeService {
         }
         String adminUserToken = adminUserService.getAdminUserToken();
         try {
-            CCDRequest ccdRequest = ccdClient.startEventForCase(adminUserToken,
+            CCDRequest ccdRequest = nocCcdService.startEventForUpdateCaseSubmitted(adminUserToken,
                     caseDetails.getCaseTypeId(),
                     caseDetails.getJurisdiction(),
-                    caseDetails.getCaseId(),
-                    EVENT_UPDATE_CASE_SUBMITTED);
-            if (ObjectUtils.isEmpty(ccdRequest)
-                    || ObjectUtils.isEmpty(ccdRequest.getCaseDetails())
-                    || ObjectUtils.isEmpty(ccdRequest.getCaseDetails().getCaseData())) {
+                    caseDetails.getCaseId());
+            if (ObjectUtils.isEmpty(ccdRequest)) {
                 log.error(ERROR_UNABLE_TO_START_EVENT_TO_UPDATE_REPRESENTATIVE_AND_ORGANISATION_POLICY,
                         caseDetails.getCaseId());
                 return;
             }
-            CaseData ccdRequestCaseData = ccdRequest.getCaseDetails().getCaseData();
+            CaseDetails ccdRequestCaseDetails = ccdRequest.getCaseDetails();
             RepresentedTypeRItem representative = RespondentRepresentativeUtils.findRepresentativeById(
-                    ccdRequestCaseData, representativeId);
+                    ccdRequestCaseDetails.getCaseData(), representativeId);
             if (!RespondentRepresentativeUtils.isValidRepresentative(representative)) {
                 log.error(ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_REPRESENTATIVE_NOT_FOUND, caseDetails.getCaseId());
                 return;
             }
             assert representative != null;
             representative.getValue().setRole(role);
-            NocUtils.applyRespondentOrganisationPolicyForRole(ccdRequestCaseData, representative);
-            ccdClient.submitEventForCase(adminUserToken, ccdRequestCaseData, caseDetails.getCaseTypeId(),
-                    caseDetails.getJurisdiction(), ccdRequest, caseDetails.getCaseId());
+            NocUtils.applyRespondentOrganisationPolicyForRole(ccdRequestCaseDetails.getCaseData(), representative);
+            ccdClient.submitEventForCase(adminUserToken,
+                    ccdRequestCaseDetails.getCaseData(),
+                    ccdRequestCaseDetails.getCaseTypeId(),
+                    ccdRequestCaseDetails.getJurisdiction(),
+                    ccdRequest,
+                    ccdRequestCaseDetails.getCaseId());
         } catch (IOException exception) {
             log.error(ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES, caseDetails.getCaseId(),
                     exception.getMessage());
         }
+    }
+
+    public void removeClaimantRepresentativeIfOrganisationExistsInRespondent(CaseDetails caseDetails) {
+        if (ObjectUtils.isEmpty(caseDetails)
+                || StringUtils.isEmpty(caseDetails.getCaseId())
+                || ObjectUtils.isEmpty(caseDetails.getCaseData())
+                || CollectionUtils.isEmpty(caseDetails.getCaseData().getRepCollection())
+                || !YES.equals(caseDetails.getCaseData().getClaimantRepresentedQuestion())
+                || ObjectUtils.isEmpty(caseDetails.getCaseData().getRepresentativeClaimantType())
+                || (ObjectUtils.isEmpty(caseDetails.getCaseData().getRepresentativeClaimantType()
+                .getMyHmctsOrganisation())
+                || StringUtils.isBlank(caseDetails.getCaseData().getRepresentativeClaimantType()
+                .getMyHmctsOrganisation().getOrganisationID()))
+                && StringUtils.isEmpty(caseDetails.getCaseData().getRepresentativeClaimantType().getOrganisationId())) {
+            return;
+        }
+        List<String> respondentRepresentativeOrganisationIds = RespondentRepresentativeUtils
+                .getRespondentRepresentativeOrganisationIds(caseDetails.getCaseData());
+        if (CollectionUtils.isEmpty(respondentRepresentativeOrganisationIds)) {
+            return;
+        }
+        boolean claimantRepresentativeExists = ClaimantRepresentativeUtils
+                .isClaimantRepresentativeOrganisationInRespondentOrganisations(
+                        caseDetails.getCaseData().getRepresentativeClaimantType(),
+                        respondentRepresentativeOrganisationIds);
+        if (!claimantRepresentativeExists) {
+            return;
+        }
+        nocCcdService.removeClaimantRepresentation(adminUserService.getAdminUserToken(), caseDetails);
     }
 
     /**
@@ -672,7 +703,7 @@ public class NocRespondentRepresentativeService {
         String orgId = changeOrganisationRequest.getOrganisationToRemove().getOrganisationID();
         String roleOfRemovedOrg = changeOrganisationRequest.getCaseRoleId().getSelectedCode();
         CaseUserAssignmentData caseAssignments =
-            nocCcdService.getCaseAssignments(adminUserService.getAdminUserToken(), caseId);
+            nocCcdService.retrieveCaseUserAssignments(adminUserService.getAdminUserToken(), caseId);
 
         List<CaseUserAssignment> usersToRevoke = caseAssignments.getCaseUserAssignments().stream()
             .filter(caseUserAssignment -> caseUserAssignment.getCaseRole().equals(roleOfRemovedOrg))

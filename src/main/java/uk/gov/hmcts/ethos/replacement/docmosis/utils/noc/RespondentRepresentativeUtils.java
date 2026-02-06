@@ -514,4 +514,21 @@ public final class RespondentRepresentativeUtils {
                 .findFirst()
                 .orElse(null);
     }
+
+    public static List<String> getRespondentRepresentativeOrganisationIds(CaseData caseData) {
+        if (ObjectUtils.isEmpty(caseData) || CollectionUtils.isEmpty(caseData.getRepCollection())) {
+            return new ArrayList<>();
+        }
+        List<String> respondentRepresentativeOrganisations = new ArrayList<>();
+        for (RepresentedTypeRItem representative : caseData.getRepCollection()) {
+            if (!isValidRepresentative(representative)
+                    || ObjectUtils.isEmpty(representative.getValue().getRespondentOrganisation())
+                    || StringUtils.isBlank(representative.getValue().getRespondentOrganisation().getOrganisationID())) {
+                continue;
+            }
+            respondentRepresentativeOrganisations.add(representative.getValue().getRespondentOrganisation()
+                    .getOrganisationID());
+        }
+        return respondentRepresentativeOrganisations;
+    }
 }

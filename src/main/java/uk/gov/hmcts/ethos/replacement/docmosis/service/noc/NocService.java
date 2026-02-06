@@ -56,7 +56,7 @@ public class NocService {
         String roleOfRemovedOrg = changeOrganisationRequest.getCaseRoleId().getSelectedCode();
         String orgId = changeOrganisationRequest.getOrganisationToRemove().getOrganisationID();
         CaseUserAssignmentData caseAssignments =
-                nocCcdService.getCaseAssignments(adminUserService.getAdminUserToken(), caseId);
+                nocCcdService.retrieveCaseUserAssignments(adminUserService.getAdminUserToken(), caseId);
 
         List<CaseUserAssignment> usersToRevoke = caseAssignments.getCaseUserAssignments().stream()
                 .filter(caseUserAssignment -> caseUserAssignment.getCaseRole().equals(roleOfRemovedOrg))

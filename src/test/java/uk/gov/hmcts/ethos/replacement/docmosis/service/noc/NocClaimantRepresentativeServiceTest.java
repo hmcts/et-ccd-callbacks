@@ -163,7 +163,7 @@ class NocClaimantRepresentativeServiceTest {
 
         when(adminUserService.getAdminUserToken()).thenReturn("AUTH_TOKEN");
         when(nocCcdService.startEventForUpdateRepresentation(any(), any(), any(), any())).thenReturn(ccdRequest);
-        when(nocCcdService.getCaseAssignments(any(), any())).thenReturn(
+        when(nocCcdService.retrieveCaseUserAssignments(any(), any())).thenReturn(
                 mockCaseAssignmentData());
         when(ccdCaseAssignment.applyNocAsAdmin(any())).thenReturn(CCDCallbackResponse.builder()
                 .data(caseData)

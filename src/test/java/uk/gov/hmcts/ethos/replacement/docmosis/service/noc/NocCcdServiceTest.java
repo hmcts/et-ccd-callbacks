@@ -1,17 +1,29 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.noc;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
+import lombok.SneakyThrows;
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.testcontainers.shaded.org.apache.commons.lang3.math.NumberUtils;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
 import uk.gov.hmcts.et.common.model.ccd.AuditEventsResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 
 import java.io.IOException;
@@ -25,7 +37,10 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPLOYMENT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EVENT_UPDATE_CASE_SUBMITTED;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {
@@ -34,16 +49,51 @@ import static org.mockito.Mockito.when;
 })
 class NocCcdServiceTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
+    private static final String ADMIN_USER_TOKEN = "eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String JURISDICTION = "EMPLOYMENT";
-    public static final String CASE_TYPE = "ET_EnglandWales";
-    public static final String CASE_ID = "12345";
+    private static final String CASE_TYPE = "ET_EnglandWales";
+    private static final String CASE_ID = "12345";
+    private static final String ROLE_SOLICITORA = "SOLICITORA";
+    private static final String ROLE_SOLICITORB = "SOLICITORB";
+    private static final String OK = "Ok";
+
+    private static final int INTEGER_THREE = 3;
+    private static final int INTEGER_FOUR = 4;
+    private static final int INTEGER_FIVE = 5;
+    private static final int INTEGER_SIX = 6;
+    private static final int INTEGER_SEVEN = 7;
+    private static final int INTEGER_EIGHT = 8;
+    private static final int INTEGER_NINE = 9;
+
+    private static final String
+            EXPECTED_ERROR_UNABLE_TO_START_REMOVE_REP_ORG_POLICY_INVALID_PARAMETERS_WITHOUT_CASEID =
+            "Unable to start update case submitted event to update representative role and organisation policy for "
+                    + "case: , Reason: invalid parameters";
+    private static final String
+            EXPECTED_ERROR_UNABLE_TO_START_REMOVE_REP_ORG_POLICY_INVALID_PARAMETERS_WITH_CASEID =
+            "Unable to start update case submitted event to update representative role and organisation policy for "
+                    + "case: " + CASE_ID + ", Reason: invalid parameters";
+    private static final String EXPECTED_ERROR_UNABLE_TO_START_REMOVE_REP_ORG_POLICY_INVALID_CCD_REQUEST =
+            "Unable to start update case submitted event to update representative role and organisation policy for "
+                    + "case: " + CASE_ID + ", Reason: invalid ccd request";
+    private static final String EXPECTED_ERROR_FAILED_TO_REMOVE_CLAIMANT_REP_AND_ORG_POLICY =
+            "Failed to remove claimant representative and organisation policy for case " + CASE_ID + ". Exception: "
+                    + "Something went wrong";
+
+    private static final String EXCEPTION_DUMMY = "Something went wrong";
+
     @MockBean
     private CcdClient ccdClient;
 
     private NocCcdService nocCcdService;
+    private ListAppender<ILoggingEvent> appender;
 
     @BeforeEach
     void setUp() {
+        Logger logger = (Logger) LoggerFactory.getLogger(NocCcdService.class);
+        appender = new ListAppender<>();
+        appender.start();
+        logger.addAppender(appender);
         nocCcdService = new NocCcdService(ccdClient);
     }
 
@@ -84,7 +134,7 @@ class NocCcdServiceTest {
         when(ccdClient.retrieveCaseAssignments(AUTH_TOKEN, CASE_ID)).thenThrow(new IOException());
         CcdInputOutputException exception = assertThrows(
                 CcdInputOutputException.class, () ->
-                nocCcdService.getCaseAssignments(AUTH_TOKEN, CASE_ID));
+                nocCcdService.retrieveCaseUserAssignments(AUTH_TOKEN, CASE_ID));
 
         assertThat(exception.getMessage()).isEqualTo("Failed to retrieve case assignments");
     }
@@ -106,10 +156,198 @@ class NocCcdServiceTest {
         when(ccdClient.startEventForUpdateRep(AUTH_TOKEN, CASE_TYPE, JURISDICTION, CASE_ID)).thenReturn(request);
         when(ccdClient.submitUpdateRepEvent(eq(AUTH_TOKEN), any(), eq(CASE_TYPE), eq(JURISDICTION),
             eq(request), eq(CASE_ID))).thenReturn(new SubmitEvent());
-
         nocCcdService.startEventForUpdateRepresentation(AUTH_TOKEN, JURISDICTION, CASE_TYPE,
             CASE_ID);
+        verify(ccdClient, times(1)).startEventForUpdateRep(AUTH_TOKEN, CASE_TYPE, JURISDICTION,
+                CASE_ID);
+    }
 
-        verify(ccdClient, times(1)).startEventForUpdateRep(AUTH_TOKEN, CASE_TYPE, JURISDICTION, CASE_ID);
+    @Test
+    @SneakyThrows
+    void theFindCaseUserAssignmentByRole() {
+        // when user token is empty should return null
+        assertThat(nocCcdService.findCaseUserAssignmentByRole(StringUtils.EMPTY, CASE_ID, ROLE_SOLICITORA)).isNull();
+        // when case id is empty should return null
+        assertThat(nocCcdService.findCaseUserAssignmentByRole(ADMIN_USER_TOKEN, StringUtils.EMPTY,
+                ROLE_SOLICITORA)).isNull();
+        // when role is empty should return null
+        assertThat(nocCcdService.findCaseUserAssignmentByRole(ADMIN_USER_TOKEN, CASE_ID, StringUtils.EMPTY)).isNull();
+        // when case user assignment data is empty should return null
+        when(ccdClient.retrieveCaseAssignments(ADMIN_USER_TOKEN, CASE_ID)).thenReturn(null);
+        assertThat(nocCcdService.findCaseUserAssignmentByRole(ADMIN_USER_TOKEN, CASE_ID, ROLE_SOLICITORA)).isNull();
+        // when case user assignment data not has any assignment should return null
+        CaseUserAssignmentData caseUserAssignmentData = CaseUserAssignmentData.builder().build();
+        when(ccdClient.retrieveCaseAssignments(ADMIN_USER_TOKEN, CASE_ID)).thenReturn(caseUserAssignmentData);
+        assertThat(nocCcdService.findCaseUserAssignmentByRole(ADMIN_USER_TOKEN, CASE_ID, ROLE_SOLICITORA)).isNull();
+        // when case user assignment data has assignment with blank role should return null
+        CaseUserAssignment caseUserAssignment = CaseUserAssignment.builder().build();
+        caseUserAssignmentData.setCaseUserAssignments(List.of(caseUserAssignment));
+        assertThat(nocCcdService.findCaseUserAssignmentByRole(ADMIN_USER_TOKEN, CASE_ID, ROLE_SOLICITORA)).isNull();
+        // when case user assignment data has assignment with different role than checked role should return null
+        caseUserAssignment.setCaseRole(ROLE_SOLICITORB);
+        assertThat(nocCcdService.findCaseUserAssignmentByRole(ADMIN_USER_TOKEN, CASE_ID, ROLE_SOLICITORA)).isNull();
+        // when case user assignment data has assignment role same as checked role should return case user assingment
+        caseUserAssignment.setCaseRole(ROLE_SOLICITORA);
+        assertThat(nocCcdService.findCaseUserAssignmentByRole(ADMIN_USER_TOKEN, CASE_ID, ROLE_SOLICITORA)).isNotNull()
+                .isEqualTo(caseUserAssignment);
+    }
+
+    @Test
+    @SneakyThrows
+    void theStartEventForUpdateCaseSubmitted() {
+        // when user token is empty should return null
+        assertThat(nocCcdService.startEventForUpdateCaseSubmitted(StringUtils.EMPTY, CASE_TYPE, JURISDICTION, CASE_ID))
+                .isNull();
+        // when case type is empty should return null
+        assertThat(nocCcdService.startEventForUpdateCaseSubmitted(ADMIN_USER_TOKEN, StringUtils.EMPTY, JURISDICTION,
+                CASE_ID)).isNull();
+        // when jurisdiction is empty should return null
+        assertThat(nocCcdService.startEventForUpdateCaseSubmitted(ADMIN_USER_TOKEN, CASE_TYPE, StringUtils.EMPTY,
+                CASE_ID)).isNull();
+        // when case id is empty should return null
+        assertThat(nocCcdService.startEventForUpdateCaseSubmitted(ADMIN_USER_TOKEN, CASE_TYPE, JURISDICTION,
+                StringUtils.EMPTY)).isNull();
+        // when CCD request is empty should return null
+        when(ccdClient.startEventForCase(ADMIN_USER_TOKEN, CASE_TYPE, JURISDICTION, CASE_ID,
+                EVENT_UPDATE_CASE_SUBMITTED)).thenReturn(null);
+        assertThat(nocCcdService.startEventForUpdateCaseSubmitted(ADMIN_USER_TOKEN, CASE_TYPE, JURISDICTION, CASE_ID))
+                .isNull();
+        // when CCD request does not have case details should return null
+        CCDRequest ccdRequest = new CCDRequest();
+        when(ccdClient.startEventForCase(ADMIN_USER_TOKEN, CASE_TYPE, JURISDICTION, CASE_ID,
+                EVENT_UPDATE_CASE_SUBMITTED)).thenReturn(ccdRequest);
+        assertThat(nocCcdService.startEventForUpdateCaseSubmitted(ADMIN_USER_TOKEN, CASE_TYPE, JURISDICTION, CASE_ID))
+                .isNull();
+        // case details does not have case id should return null
+        CaseDetails caseDetails = new CaseDetails();
+        ccdRequest.setCaseDetails(caseDetails);
+        assertThat(nocCcdService.startEventForUpdateCaseSubmitted(ADMIN_USER_TOKEN, CASE_TYPE, JURISDICTION, CASE_ID))
+                .isNull();
+        // case details does not have jurisdiction should return null
+        ccdRequest.getCaseDetails().setCaseId(CASE_ID);
+        assertThat(nocCcdService.startEventForUpdateCaseSubmitted(ADMIN_USER_TOKEN, CASE_TYPE, JURISDICTION, CASE_ID))
+                .isNull();
+        // case details does not have case type id should return null
+        ccdRequest.getCaseDetails().setJurisdiction(EMPLOYMENT);
+        assertThat(nocCcdService.startEventForUpdateCaseSubmitted(ADMIN_USER_TOKEN, CASE_TYPE, JURISDICTION, CASE_ID))
+                .isNull();
+        // case details does not have case data should return null
+        ccdRequest.getCaseDetails().setCaseTypeId(CASE_TYPE);
+        assertThat(nocCcdService.startEventForUpdateCaseSubmitted(ADMIN_USER_TOKEN, CASE_TYPE, JURISDICTION, CASE_ID))
+                .isNull();
+        // case details has case data should return ccd request
+        ccdRequest.getCaseDetails().setCaseData(new CaseData());
+        assertThat(nocCcdService.startEventForUpdateCaseSubmitted(ADMIN_USER_TOKEN, CASE_TYPE, JURISDICTION, CASE_ID))
+                .isNotNull().isEqualTo(ccdRequest);
+    }
+
+    @Test
+    @SneakyThrows
+    void theRemoveClaimantRepresentation() {
+        // when user token is empty should do nothing
+        CaseDetails caseDetails = new CaseDetails();
+        nocCcdService.removeClaimantRepresentation(StringUtils.EMPTY, caseDetails);
+        verifyNoInteractions(ccdClient);
+        assertThat(appender.list)
+                .filteredOn(e -> e.getLevel() == Level.ERROR)
+                .extracting(ILoggingEvent::getFormattedMessage)
+                .hasSize(NumberUtils.INTEGER_ONE)
+                .contains(EXPECTED_ERROR_UNABLE_TO_START_REMOVE_REP_ORG_POLICY_INVALID_PARAMETERS_WITHOUT_CASEID);
+        // when case details is empty should do nothing
+        nocCcdService.removeClaimantRepresentation(ADMIN_USER_TOKEN, null);
+        verifyNoInteractions(ccdClient);
+        assertThat(appender.list)
+                .filteredOn(e -> e.getLevel() == Level.ERROR)
+                .extracting(ILoggingEvent::getFormattedMessage)
+                .hasSize(NumberUtils.INTEGER_TWO)
+                .contains(EXPECTED_ERROR_UNABLE_TO_START_REMOVE_REP_ORG_POLICY_INVALID_PARAMETERS_WITHOUT_CASEID);
+        // when case details does not have case id should do nothing
+        nocCcdService.removeClaimantRepresentation(ADMIN_USER_TOKEN, caseDetails);
+        verifyNoInteractions(ccdClient);
+        assertThat(appender.list)
+                .filteredOn(e -> e.getLevel() == Level.ERROR)
+                .extracting(ILoggingEvent::getFormattedMessage)
+                .hasSize(INTEGER_THREE)
+                .contains(EXPECTED_ERROR_UNABLE_TO_START_REMOVE_REP_ORG_POLICY_INVALID_PARAMETERS_WITHOUT_CASEID);
+        // when case details does not have case data should do nothing
+        caseDetails.setCaseId(CASE_ID);
+        nocCcdService.removeClaimantRepresentation(ADMIN_USER_TOKEN, caseDetails);
+        verifyNoInteractions(ccdClient);
+        assertThat(appender.list)
+                .filteredOn(e -> e.getLevel() == Level.ERROR)
+                .extracting(ILoggingEvent::getFormattedMessage)
+                .hasSize(INTEGER_FOUR)
+                .contains(EXPECTED_ERROR_UNABLE_TO_START_REMOVE_REP_ORG_POLICY_INVALID_PARAMETERS_WITH_CASEID);
+        // when case details does not have case type id should do nothing
+        caseDetails.setCaseData(new CaseData());
+        nocCcdService.removeClaimantRepresentation(ADMIN_USER_TOKEN, caseDetails);
+        verifyNoInteractions(ccdClient);
+        assertThat(appender.list)
+                .filteredOn(e -> e.getLevel() == Level.ERROR)
+                .extracting(ILoggingEvent::getFormattedMessage)
+                .hasSize(INTEGER_FIVE)
+                .contains(EXPECTED_ERROR_UNABLE_TO_START_REMOVE_REP_ORG_POLICY_INVALID_PARAMETERS_WITH_CASEID);
+        // when case details does not have jurisdiction should do nothing
+        caseDetails.setCaseTypeId(CASE_TYPE);
+        nocCcdService.removeClaimantRepresentation(ADMIN_USER_TOKEN, caseDetails);
+        verifyNoInteractions(ccdClient);
+        assertThat(appender.list)
+                .filteredOn(e -> e.getLevel() == Level.ERROR)
+                .extracting(ILoggingEvent::getFormattedMessage)
+                .hasSize(INTEGER_SIX)
+                .contains(EXPECTED_ERROR_UNABLE_TO_START_REMOVE_REP_ORG_POLICY_INVALID_PARAMETERS_WITH_CASEID);
+        // when case user assignment is empty should do nothing
+        caseDetails.setJurisdiction(EMPLOYMENT);
+        when(ccdClient.retrieveCaseAssignments(ADMIN_USER_TOKEN, CASE_ID)).thenReturn(null);
+        nocCcdService.removeClaimantRepresentation(ADMIN_USER_TOKEN, caseDetails);
+        verify(ccdClient, times(NumberUtils.INTEGER_ONE)).retrieveCaseAssignments(ADMIN_USER_TOKEN, CASE_ID);
+        assertThat(appender.list)
+                .filteredOn(e -> e.getLevel() == Level.ERROR)
+                .extracting(ILoggingEvent::getFormattedMessage)
+                .hasSize(INTEGER_SEVEN)
+                .contains(EXPECTED_ERROR_UNABLE_TO_START_REMOVE_REP_ORG_POLICY_INVALID_CCD_REQUEST);
+        // when CCD request is empty should log unable to start event to remove claimant representative and organisation
+        // policy error
+        CaseUserAssignment caseUserAssignment = new CaseUserAssignment();
+        caseUserAssignment.setCaseId(CASE_ID);
+        caseUserAssignment.setCaseRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
+        CaseUserAssignmentData caseUserAssignmentData = CaseUserAssignmentData.builder()
+                .caseUserAssignments(List.of(caseUserAssignment)).build();
+        when(ccdClient.retrieveCaseAssignments(ADMIN_USER_TOKEN, CASE_ID)).thenReturn(caseUserAssignmentData);
+        when(ccdClient.revokeCaseAssignments(ADMIN_USER_TOKEN, caseUserAssignmentData)).thenReturn(OK);
+        when(ccdClient.startEventForCase(ADMIN_USER_TOKEN, CASE_TYPE, JURISDICTION, CASE_ID,
+                EVENT_UPDATE_CASE_SUBMITTED)).thenReturn(null);
+        nocCcdService.removeClaimantRepresentation(ADMIN_USER_TOKEN, caseDetails);
+        assertThat(appender.list)
+                .filteredOn(e -> e.getLevel() == Level.ERROR)
+                .extracting(ILoggingEvent::getFormattedMessage)
+                .hasSize(INTEGER_EIGHT)
+                .contains(EXPECTED_ERROR_UNABLE_TO_START_REMOVE_REP_ORG_POLICY_INVALID_CCD_REQUEST);
+        // when CCD client submit event for case successful should not log anything
+        CCDRequest ccdRequest = new CCDRequest();
+        ccdRequest.setCaseDetails(caseDetails);
+        when(ccdClient.startEventForCase(ADMIN_USER_TOKEN, CASE_TYPE, JURISDICTION, CASE_ID,
+                EVENT_UPDATE_CASE_SUBMITTED)).thenReturn(ccdRequest);
+        when(ccdClient.submitEventForCase(ADMIN_USER_TOKEN, caseDetails.getCaseData(), CASE_TYPE, JURISDICTION,
+                ccdRequest, CASE_ID)).thenReturn(new SubmitEvent());
+        nocCcdService.removeClaimantRepresentation(ADMIN_USER_TOKEN, caseDetails);
+        verify(ccdClient, times(NumberUtils.INTEGER_ONE)).submitEventForCase(ADMIN_USER_TOKEN,
+                caseDetails.getCaseData(), CASE_TYPE, JURISDICTION, ccdRequest, CASE_ID);
+        assertThat(appender.list)
+                .filteredOn(e -> e.getLevel() == Level.ERROR)
+                .extracting(ILoggingEvent::getFormattedMessage)
+                .hasSize(INTEGER_EIGHT);
+        // when CCD client submit event for case throws exception should log that exception
+        when(ccdClient.submitEventForCase(ADMIN_USER_TOKEN, caseDetails.getCaseData(), CASE_TYPE, JURISDICTION,
+                ccdRequest, CASE_ID)).thenThrow(new IOException(EXCEPTION_DUMMY));
+        nocCcdService.removeClaimantRepresentation(ADMIN_USER_TOKEN, caseDetails);
+        verify(ccdClient, times(NumberUtils.INTEGER_TWO)).submitEventForCase(ADMIN_USER_TOKEN,
+                caseDetails.getCaseData(), CASE_TYPE, JURISDICTION, ccdRequest, CASE_ID);
+        assertThat(appender.list)
+                .filteredOn(e -> e.getLevel() == Level.ERROR)
+                .extracting(ILoggingEvent::getFormattedMessage)
+                .hasSize(INTEGER_NINE)
+                .contains(EXPECTED_ERROR_FAILED_TO_REMOVE_CLAIMANT_REP_AND_ORG_POLICY);
+
     }
 }

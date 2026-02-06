@@ -181,6 +181,8 @@ public class RespondentRepresentativeController {
             NocUtils.validateCallbackRequest(callbackRequest);
             nocRespondentRepresentativeService.removeOldRepresentatives(callbackRequest, userToken);
             nocRespondentRepresentativeService.addNewRepresentatives(callbackRequest);
+            nocRespondentRepresentativeService
+                    .removeClaimantRepresentativeIfOrganisationExistsInRespondent(callbackRequest.getCaseDetails());
             // nocRespondentRepresentativeService.updateRespondentRepresentativesAccess(callbackRequest);
         } catch (GenericServiceException e) {
             throw new GenericRuntimeException(e);

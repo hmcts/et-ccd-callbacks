@@ -502,4 +502,29 @@ final class RespondentRepresentativeUtilsTest {
         assertThat(RespondentRepresentativeUtils.findRepresentativeById(caseData, REPRESENTATIVE_ID_1))
                 .isEqualTo(representative);
     }
+
+    @Test
+    void theGetRespondentRepresentativeOrganisationIds() {
+        // when case data is empty should return an empty arraylist
+        assertThat(RespondentRepresentativeUtils.getRespondentRepresentativeOrganisationIds(null)).isEmpty();
+        // when case data representative collection is empty should return an empty arraylist
+        CaseData caseData = new CaseData();
+        caseData.setRepCollection(new ArrayList<>());
+        assertThat(RespondentRepresentativeUtils.getRespondentRepresentativeOrganisationIds(caseData)).isEmpty();
+        // when representative is not valid should return an empty arraylist
+        RepresentedTypeRItem representative = RepresentedTypeRItem.builder().build();
+        caseData.getRepCollection().add(representative);
+        assertThat(RespondentRepresentativeUtils.getRespondentRepresentativeOrganisationIds(caseData)).isEmpty();
+        // when representative does not have organisation should return an empty list
+        representative.setId(REPRESENTATIVE_ID_1);
+        representative.setValue(RepresentedTypeR.builder().build());
+        assertThat(RespondentRepresentativeUtils.getRespondentRepresentativeOrganisationIds(caseData)).isEmpty();
+        // when representative's organisation id is empty should return an empty list
+        representative.getValue().setRespondentOrganisation(Organisation.builder().build());
+        assertThat(RespondentRepresentativeUtils.getRespondentRepresentativeOrganisationIds(caseData)).isEmpty();
+        // when representative has organisation id should return that id in a string list
+        representative.getValue().getRespondentOrganisation().setOrganisationID(ORGANISATION_ID_1);
+        assertThat(RespondentRepresentativeUtils.getRespondentRepresentativeOrganisationIds(caseData)).isNotEmpty()
+                .isEqualTo(List.of(ORGANISATION_ID_1));
+    }
 }

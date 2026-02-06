@@ -146,7 +146,7 @@ class NocServiceTest {
                 .build();
 
         when(adminUserService.getAdminUserToken()).thenReturn("token");
-        when(nocCcdService.getCaseAssignments(anyString(), eq(caseId))).thenReturn(assignmentData);
+        when(nocCcdService.retrieveCaseUserAssignments(anyString(), eq(caseId))).thenReturn(assignmentData);
 
         nocService.removeOrganisationRepresentativeAccess(caseId, changeRequest);
 
@@ -174,7 +174,7 @@ class NocServiceTest {
 
         String caseId = "case123";
         when(adminUserService.getAdminUserToken()).thenReturn("token");
-        when(nocCcdService.getCaseAssignments(anyString(), eq(caseId))).thenReturn(assignmentData);
+        when(nocCcdService.retrieveCaseUserAssignments(anyString(), eq(caseId))).thenReturn(assignmentData);
 
         nocService.removeOrganisationRepresentativeAccess(caseId, changeRequest);
 

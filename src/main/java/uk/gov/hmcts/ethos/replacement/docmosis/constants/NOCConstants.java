@@ -75,6 +75,14 @@ public final class NOCConstants {
     public static final String ERROR_UNABLE_TO_START_EVENT_TO_UPDATE_REPRESENTATIVE_AND_ORGANISATION_POLICY =
             "Unable to start update case submitted event to update representative role and organisation policy for "
                     + "case: {}";
+    public static final String ERROR_UNABLE_TO_START_REMOVE_CLAIMANT_REP_AND_ORG_POLICY_INVALID_CCD_REQUEST =
+            "Unable to start update case submitted event to update representative role and organisation policy for "
+                    + "case: {}, Reason: invalid ccd request";
+    public static final String ERROR_UNABLE_TO_START_REMOVE_CLAIMANT_REP_AND_ORG_POLICY_INVALID_PARAMETERS =
+            "Unable to start update case submitted event to update representative role and organisation policy for "
+                    + "case: {}, Reason: invalid parameters";
+    public static final String ERROR_FAILED_TO_REMOVE_CLAIMANT_REP_AND_ORG_POLICY =
+            "Failed to remove claimant representative and organisation policy for case {}. Exception: {}";
 
     public static final String WARNING_REPRESENTATIVE_MISSING_EMAIL_ADDRESS =
             "Representative %s is missing an email address.";

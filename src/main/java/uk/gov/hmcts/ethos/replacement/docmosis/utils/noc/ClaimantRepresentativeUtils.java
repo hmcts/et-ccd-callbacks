@@ -1,11 +1,15 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.utils.noc;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.webjars.NotFoundException;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.ClaimantUtils;
+
+import java.util.List;
 
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.WARNING_CLAIMANT_EMAIL_NOT_FOUND;
 
@@ -53,5 +57,25 @@ public final class ClaimantRepresentativeUtils {
             log.warn(e.getMessage());
         }
         return email;
+    }
+
+    public static boolean isClaimantRepresentativeOrganisationInRespondentOrganisations(
+            RepresentedTypeC claimantRepresentative,
+            List<String> respondentRepresentativeOrganisationIds) {
+        if (ObjectUtils.isEmpty(claimantRepresentative)
+                || CollectionUtils.isEmpty(respondentRepresentativeOrganisationIds)) {
+            return false;
+        }
+        String claimantOrgId = claimantRepresentative.getOrganisationId();
+        String myHmctsOrgId = claimantRepresentative.getMyHmctsOrganisation() != null
+                ? claimantRepresentative.getMyHmctsOrganisation().getOrganisationID()
+                : null;
+
+        if (StringUtils.isBlank(claimantOrgId) && StringUtils.isBlank(myHmctsOrgId)) {
+            return false;
+        }
+        return respondentRepresentativeOrganisationIds.stream()
+                .filter(StringUtils::isNotBlank)
+                .anyMatch(id -> id.equals(claimantOrgId) || id.equals(myHmctsOrgId));
     }
 }

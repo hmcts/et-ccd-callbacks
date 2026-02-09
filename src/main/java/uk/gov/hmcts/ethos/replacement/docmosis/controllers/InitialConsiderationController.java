@@ -140,6 +140,9 @@ public class InitialConsiderationController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         initialConsiderationService.clearOldValues(caseData);
 
+        // Sets the document links to the initial consideration support documents details such as ET1, ET3, ect
+        initialConsiderationService.initialiseInitialConsideration(ccdRequest.getCaseDetails());
+
         // Sets the respondents details(respondent ET1 and ET3 names in a concatenated string format that forms
         // an HTML table markup and renders as table in ExUI
         caseData.setEtInitialConsiderationRespondent(initialConsiderationService.setRespondentDetails(caseData));
@@ -164,16 +167,9 @@ public class InitialConsiderationController {
         caseData.setEtInitialConsiderationJurisdictionCodes(initialConsiderationService.generateJurisdictionCodesHtml(
                         caseData.getJurCodesCollection(), caseTypeId));
 
-        initialConsiderationService.initialiseInitialConsideration(ccdRequest.getCaseDetails());
-
         initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData, caseTypeId);
 
-        // ET1 Vetting Issues
-        caseData.setIcEt1VettingIssuesDetail(initialConsiderationService.setIcEt1VettingIssuesDetails(caseData));
-
-        // ET3 Vetting Issues
-        caseData.setIcEt3ProcessingIssuesDetail(
-                initialConsiderationService.setIcEt3VettingIssuesDetailsForEachRespondent(caseData));
+        initialConsiderationService.setEt1VettingAndEt3ProcessingDetails(caseData, caseTypeId);
 
         initialConsiderationService.setHearingRegionAndVenue(caseData);
 

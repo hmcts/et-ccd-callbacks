@@ -1038,6 +1038,21 @@ public class InitialConsiderationService {
         };
     }
 
+    public void setEt1VettingAndEt3ProcessingDetails(CaseData caseData, String caseTypeId) {
+        if (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId)) {
+            // ET1 Vetting Issues
+            caseData.setIcEt1VettingIssuesDetail(setIcEt1VettingIssuesDetails(caseData));
+
+            // ET3 Vetting Issues
+            caseData.setIcEt3ProcessingIssuesDetail(
+                    setIcEt3VettingIssuesDetailsForEachRespondent(caseData));
+        } else {
+            // ET3 Vetting Issues for Scotland and Wales
+            caseData.setIcEt3ProcessingIssuesDetail(null);
+            caseData.setIcEt1VettingIssuesDetail(null);
+        }
+    }
+
     public String setIcEt1VettingIssuesDetails(CaseData caseData) {
 
         if (caseData == null) {

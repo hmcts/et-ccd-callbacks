@@ -471,7 +471,7 @@ public class NocRespondentRepresentativeService {
                 .getMyHmctsOrganisation())
                 || StringUtils.isBlank(caseDetails.getCaseData().getRepresentativeClaimantType()
                 .getMyHmctsOrganisation().getOrganisationID()))
-                && StringUtils.isEmpty(caseDetails.getCaseData().getRepresentativeClaimantType().getOrganisationId())) {
+                && StringUtils.isBlank(caseDetails.getCaseData().getRepresentativeClaimantType().getOrganisationId())) {
             return;
         }
         List<String> respondentRepresentativeOrganisationIds = RespondentRepresentativeUtils

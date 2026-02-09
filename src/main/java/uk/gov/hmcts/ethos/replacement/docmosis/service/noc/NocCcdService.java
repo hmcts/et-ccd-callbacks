@@ -23,6 +23,8 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_FAILED_TO_REMOVE_CLAIMANT_REP_AND_ORG_POLICY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_START_REMOVE_CLAIMANT_REP_AND_ORG_POLICY_INVALID_CCD_REQUEST;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_START_REMOVE_CLAIMANT_REP_AND_ORG_POLICY_INVALID_PARAMETERS;
@@ -235,6 +237,8 @@ public class NocCcdService {
             }
             CaseDetails ccdRequestCaseDetails = ccdRequest.getCaseDetails();
             ccdRequestCaseDetails.getCaseData().setRepresentativeClaimantType(null);
+            ccdRequestCaseDetails.getCaseData().setClaimantRepresentativeRemoved(YES);
+            ccdRequestCaseDetails.getCaseData().setClaimantRepresentedQuestion(NO);
             ccdRequestCaseDetails.getCaseData().setClaimantRepresentativeOrganisationPolicy(OrganisationPolicy.builder()
                     .orgPolicyCaseAssignedRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()).build());
             ccdClient.submitEventForCase(userToken, ccdRequestCaseDetails.getCaseData(),

@@ -72,8 +72,9 @@ public class NocService {
 
                 if (organisationsResponse != null
                         && organisationToAdd != null
-                        && organisationToAdd.getOrganisationID()
-                        .equals(organisationsResponse.getOrganisationIdentifier())) {
+                        && organisationToAdd.getOrganisationID() != null
+                        && organisationToAdd.getOrganisationID().equals(
+                                organisationsResponse.getOrganisationIdentifier())) {
                     grantCaseAccess(userResponse.getUserIdentifier(), caseId,
                             ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
                 }

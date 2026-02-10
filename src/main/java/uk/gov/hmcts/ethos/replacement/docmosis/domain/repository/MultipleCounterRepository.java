@@ -16,11 +16,8 @@ import java.util.List;
 @Transactional
 public interface MultipleCounterRepository extends JpaRepository<MultipleCounter, Integer> {
 
-    @Procedure("fn_persistentQ_getNextMultipleCountVal")
+    @Procedure("fn_persistentq_getnextmultiplecountval")
     int persistentQGetNextMultipleCountVal(String multipleRef);
-
-    @Procedure("fn_persistentQ_InsertFirstMultipleCountVal")
-    int persistentQInsertFirstMultipleCountVal(String multipleRef);
 
     List<MultipleCounter> findByMultipleref(String multipleRef);
 }

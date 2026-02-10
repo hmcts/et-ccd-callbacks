@@ -16,7 +16,7 @@ import java.util.List;
 @Transactional
 public interface MultipleErrorsRepository extends JpaRepository<MultipleErrors, Integer> {
 
-    @Procedure("fn_persistentQ_logMultipleError")
+    @Procedure("fn_persistentq_logmultipleerror")
     String persistentQLogMultipleError(String multipleRef, String ethosCaseRef, String description);
 
     List<MultipleErrors> findByMultipleref(String multipleRef);

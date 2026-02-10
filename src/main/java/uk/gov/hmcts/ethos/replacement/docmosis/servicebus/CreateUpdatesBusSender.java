@@ -32,18 +32,18 @@ public class CreateUpdatesBusSender {
     private final ServiceBusSender serviceBusSender;
     private final CreateUpdatesQueueRepository createUpdatesQueueRepository;
     private final ObjectMapper objectMapper;
-    private final boolean queueEnabled;
+    private final boolean dbQueueEnabled;
 
     public CreateUpdatesBusSender(
         @Qualifier("createUpdatesSendHelper") ObjectProvider<ServiceBusSender> serviceBusSenderProvider,
         CreateUpdatesQueueRepository createUpdatesQueueRepository,
         ObjectMapper objectMapper,
-        @Value("${queue.enabled:false}") boolean queueEnabled
+        @Value("${queue.enabled:false}") boolean dbQueueEnabled
     ) {
         this.serviceBusSender = serviceBusSenderProvider.getIfAvailable();
         this.createUpdatesQueueRepository = createUpdatesQueueRepository;
         this.objectMapper = objectMapper;
-        this.queueEnabled = queueEnabled;
+        this.dbQueueEnabled = dbQueueEnabled;
     }
 
     @Transactional
@@ -62,7 +62,7 @@ public class CreateUpdatesBusSender {
 
         createUpdatesMsgList.forEach(msg -> {
             try {
-                if (queueEnabled) {
+                if (dbQueueEnabled) {
                     String messageBody = objectMapper.writeValueAsString(msg);
                     CreateUpdatesQueueMessage queueMessage = CreateUpdatesQueueMessage.builder()
                         .messageId(UUID.randomUUID().toString())

@@ -74,7 +74,7 @@ feature:
     enabled: 'false'
 
 queue:
-  enabled: ${QUEUE_ENABLED:false}
+  enabled: ${DB_QUEUE_ENABLED:false}
   create-updates:
     queue-name: ${CREATE_UPDATES_QUEUE_NAME:create-updates}
     send:

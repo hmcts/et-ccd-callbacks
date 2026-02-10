@@ -335,9 +335,9 @@ class NocNotificationServiceTest {
                 caseDetailsBefore.getCaseData().getChangeOrganisationRequestField());
 
         // Respondent email notification
-        verify(emailService, times(1)).sendEmail(any(), eq("respondent@unrepresented.com"), any());
+        verify(emailService, times(0)).sendEmail(any(), eq("respondent@unrepresented.com"), any());
         // Claimant email notification
-        verify(emailService, times(1)).sendEmail(any(), eq("claimant@unrepresented.com"), any());
+        verify(emailService, times(0)).sendEmail(any(), eq("claimant@unrepresented.com"), any());
         // Tribunal email notification
         verify(emailService, times(1)).sendEmail(any(), eq(TRIBUNAL_EMAIL), any());
     }

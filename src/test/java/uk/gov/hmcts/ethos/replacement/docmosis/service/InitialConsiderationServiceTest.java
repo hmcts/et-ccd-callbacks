@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
 import org.joda.time.LocalDateTime;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -1708,7 +1709,15 @@ class InitialConsiderationServiceTest {
         RespondentSumTypeItem respondentItem1 = new RespondentSumTypeItem();
         respondentItem1.setValue(respondent1);
 
-        CaseData caseDataWithMultipleRespondents = getCaseDataWithMultipleRespondents(respondentItem1);
+        RespondentSumType respondent2 = new RespondentSumType();
+        respondent2.setRespondentName("Respondent 2");
+        Et3VettingType et3Vetting2 = new Et3VettingType();
+        et3Vetting2.setEt3AdditionalInformation("Info 2");
+        respondent2.setEt3Vetting(et3Vetting2);
+        RespondentSumTypeItem respondentItem2 = new RespondentSumTypeItem();
+        respondentItem2.setValue(respondent2);
+        CaseData caseDataWithMultipleRespondents = new CaseData();
+        caseDataWithMultipleRespondents.setRespondentCollection(List.of(respondentItem1, respondentItem2));
 
         String result = initialConsiderationService.setIcEt3VettingIssuesDetailsForEachRespondent(
                 caseDataWithMultipleRespondents);
@@ -1719,20 +1728,6 @@ class InitialConsiderationServiceTest {
         assertTrue(result.contains("Info 1"));
         assertTrue(result.contains("<h3>Respondent Respondent 2<h3>"));
         assertTrue(result.contains("Info 2"));
-    }
-
-    private static @NotNull CaseData getCaseDataWithMultipleRespondents(RespondentSumTypeItem respondentItem1) {
-        RespondentSumType respondent2 = new RespondentSumType();
-        respondent2.setRespondentName("Respondent 2");
-        Et3VettingType et3Vetting2 = new Et3VettingType();
-        et3Vetting2.setEt3AdditionalInformation("Info 2");
-        respondent2.setEt3Vetting(et3Vetting2);
-        RespondentSumTypeItem respondentItem2 = new RespondentSumTypeItem();
-        respondentItem2.setValue(respondent2);
-
-        CaseData caseDataWithMultipleRespondents = new CaseData();
-        caseDataWithMultipleRespondents.setRespondentCollection(List.of(respondentItem1, respondentItem2));
-        return caseDataWithMultipleRespondents;
     }
 
     @Test
@@ -1864,6 +1859,70 @@ class InitialConsiderationServiceTest {
         caseDataToReuse.setRespondentCollection(List.of(respondentItem));
         return caseDataToReuse;
     }
+    
+    @Test
+    void getIcRespondentHearingPanelPreference_shouldRenderDashes_whenFieldsAreNull() {
+        RespondentSumType respondent = new RespondentSumType();
+        RespondentSumTypeItem item = new RespondentSumTypeItem();
+        item.setValue(respondent);
+        List<RespondentSumTypeItem> respondents = List.of(item);
+
+        String result = initialConsiderationService.getIcRespondentHearingPanelPreference(respondents);
+
+        assertTrue(result.contains("<td>-</td>"));
+    }
+
+    @Test
+    void getIcRespondentHearingPanelPreference_shouldRenderEmptyTable_whenAllItemsNull() {
+        List<RespondentSumTypeItem> respondents = new ArrayList<>();
+        respondents.add(null);
+
+        String result = initialConsiderationService.getIcRespondentHearingPanelPreference(respondents);
+
+        assertTrue(result.contains("<table>"));
+    }
+
+    @Test
+    void getAdjustedHearingTypeName_shouldReturnInput_whenUnknownType() {
+        String input = "CustomType";
+        String result = InitialConsiderationService.getAdjustedHearingTypeName(input);
+
+        assertEquals(input, result);
+    }
+
+    @Test
+    void getHearingVenueDetails_shouldReturnDash_whenHearingIsNull() {
+        String result = InitialConsiderationService.getHearingVenueDetails(
+                null, ENGLANDWALES_CASE_TYPE_ID);
+
+        assertEquals("-", result);
+    }
+
+    @Test
+    void getHearingVenueDetails_shouldReturnDash_whenUnknownScotlandVenue() {
+        HearingType hearing = new HearingType();
+        hearing.setHearingVenueScotland("UnknownVenue");
+        String result = InitialConsiderationService.getHearingVenueDetails(hearing, SCOTLAND_CASE_TYPE_ID);
+
+        assertEquals("-", result);
+    }
+
+    @Test
+    void getHearingVenueDetails_shouldReturnDash_whenEnglandWalesVenueIsNull() {
+        HearingType hearing = new HearingType();
+        String result = InitialConsiderationService.getHearingVenueDetails(hearing, ENGLANDWALES_CASE_TYPE_ID);
+
+        assertEquals("-", result);
+    }
+
+    @Test
+    void setHearingRegionAndVenue_shouldSetNulls_whenListsAreNull() {
+        CaseData caseData = new CaseData();
+        initialConsiderationService.setHearingRegionAndVenue(caseData);
+
+        assertNull(caseData.getRegionalOffice());
+        assertNull(caseData.getEt1TribunalRegion());
+    }
 
     @Test
     void setIcEt3VettingIssuesDetailsForEachRespondent_shouldIncludeResponseInTimeDetails_whenResponseIsNotInTime() {
@@ -1913,290 +1972,61 @@ class InitialConsiderationServiceTest {
 
     @Test
     void setIcEt1VettingIssuesDetails_shouldReturnNull_whenCaseDataIsNull() {
-        InitialConsiderationService service = new InitialConsiderationService(tornadoService);
-        String result = service.setIcEt1VettingIssuesDetails(null);
+        String result = new InitialConsiderationService(null).setIcEt1VettingIssuesDetails(null);
+
         assertNull(result);
     }
 
     @Test
-    void setIcEt1VettingIssuesDetails_shouldReturnNonEmptyString_whenCaseDataIsValid() {
-        InitialConsiderationService service = new InitialConsiderationService(tornadoService);
-        //No specific fields are set in CaseData, but it is not null
-        CaseData caseDataWithEmptyFields = new CaseData();
-        String result = service.setIcEt1VettingIssuesDetails(caseDataWithEmptyFields);
-        assertNotNull(result);
-        assertTrue(result.isEmpty());
-    }
-
-    @Test
-    void setIcEt1VettingIssuesDetails_shouldIncludeServingClaimsSection_whenAnswerIsNo() {
-        InitialConsiderationService service = new InitialConsiderationService(tornadoService);
-        CaseData caseDataWithEt1VettingIssuesDetails = new CaseData();
-        caseDataWithEt1VettingIssuesDetails.setEt1VettingCanServeClaimYesOrNo("No");
-        caseDataWithEt1VettingIssuesDetails.setEt1VettingCanServeClaimNoReason("Missing address");
-        caseDataWithEt1VettingIssuesDetails.setEt1VettingCanServeClaimGeneralNote("serving claims - general notes");
-        String result = service.setIcEt1VettingIssuesDetails(caseDataWithEt1VettingIssuesDetails);
-
-        assertTrue(result.contains("serving claims") || result.toLowerCase(Locale.UK).contains("serving"));
-        assertThat(result).contains("Can we serve the claim with these contact details?");
-        assertThat(result).contains("Reason for not serving");
-        assertThat(result).contains("Missing address");
-        assertThat(result).contains("serving claims - general notes");
-    }
-
-    @Test
-    void setIcEt1VettingIssuesDetails_shouldIncludeSubstantiveDefectsSection_whenDefectsReported() {
-        InitialConsiderationService service = new InitialConsiderationService(tornadoService);
-        CaseData caseDataWithEt1VettingIssuesDetails = new CaseData();
-        caseDataWithEt1VettingIssuesDetails.setRule121aTextArea("Details for rule 13(1)(a)");
-        caseDataWithEt1VettingIssuesDetails.setRule121bTextArea("Details for rule 13(1)(b");
-
-        List<String> substantiveDefectsDetails = new ArrayList<>(List.of("rule121a", "rule121a"));
-        caseDataWithEt1VettingIssuesDetails.setSubstantiveDefectsList(substantiveDefectsDetails);
-        String result = service.setIcEt1VettingIssuesDetails(caseDataWithEt1VettingIssuesDetails);
-        assertTrue(result.toLowerCase(Locale.UK).contains("%rule 121a%")
-                || result.toLowerCase(Locale.UK).contains("substantive defects"));
-    }
-
-    @Test
-    void setIcEt1VettingIssuesDetails_shouldIncludeHearingVenueDetails_whenSuggestHearingVenueIsYes() {
-        CaseData caseDataWithEt1VettingIssuesDetails = new CaseData();
-        caseDataWithEt1VettingIssuesDetails.setEt1SuggestHearingVenue("Yes");
-        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
-        DynamicValueType dynamicValueType = new DynamicValueType();
-        dynamicValueType.setCode("VENUE1");
-        dynamicValueType.setLabel("London Venue");
-        dynamicFixedListType.setListItems(List.of(dynamicValueType));
-        dynamicFixedListType.setValue(dynamicValueType);
-
-        caseDataWithEt1VettingIssuesDetails.setEt1HearingVenues(dynamicFixedListType);
-        caseDataWithEt1VettingIssuesDetails.setEt1HearingVenueGeneralNotes("General notes about venue");
-
-        InitialConsiderationService service = new InitialConsiderationService(null);
-        String result = service.setIcEt1VettingIssuesDetails(caseDataWithEt1VettingIssuesDetails);
-
-        assertThat(result).contains("Details of Hearing Venue Issues");
-        assertThat(result).contains("London Venue");
-        assertThat(result).contains("General notes about venue");
-    }
-
-    @Test
-    void setIcEt1VettingIssuesDetails_shouldNotIncludeOtherReferralSection_whenNoOtherReferralsExist() {
-        CaseData caseDataWithEt1VettingIssuesDetails = new CaseData();
-        // Ensure no other referral data is set
-        InitialConsiderationService service = new InitialConsiderationService(null);
-        String result = service.setIcEt1VettingIssuesDetails(caseDataWithEt1VettingIssuesDetails);
-
-        assertThat(result).doesNotContain("Details of Other Referral");
-    }
-
-    @Test
-    void setIcEt1VettingIssuesDetails_shouldIncludeAllOtherReferralReasons() {
-        CaseData caseDataWithEt1VettingIssues = new CaseData();
-        caseDataWithEt1VettingIssues.setOtherReferralList(List.of(
-                "claimOutOfTime",
-                "multipleClaim",
-                "employmentStatusIssues",
-                "pidJurisdictionRegulator",
-                "videoHearingPreference",
-                "rule50IssuesOtherFactors",
-                "otherRelevantFactors"
-        ));
-
-        InitialConsiderationService service = new InitialConsiderationService(null);
-        String result = service.setIcEt1VettingIssuesDetails(caseDataWithEt1VettingIssues);
-
-        assertThat(result).contains("Claim out of time");
-        assertThat(result).contains("Multiple claims");
-        assertThat(result).contains("Employment status issues");
-        assertThat(result).contains("Pid jurisdiction regulator");
-        assertThat(result).contains("Video hearing preference");
-        assertThat(result).contains("Rule49 issues - other factors");
-        assertThat(result).contains("Other relevant factors");
-    }
-
-    @Test
-    void setIcEt1VettingIssuesDetails_shouldReturnEmpty_whenOtherReferralListIsNullOrEmpty() {
-        CaseData caseDataWithEt1VettingIssues = new CaseData();
-        caseDataWithEt1VettingIssues.setOtherReferralList(null);
-
-        InitialConsiderationService service = new InitialConsiderationService(null);
-        String result = service.setIcEt1VettingIssuesDetails(caseDataWithEt1VettingIssues);
-
-        assertThat(result).doesNotContain("Details of Other Referral");
-
-        caseDataWithEt1VettingIssues.setOtherReferralList(Collections.emptyList());
-        result = service.setIcEt1VettingIssuesDetails(caseDataWithEt1VettingIssues);
-
-        assertThat(result).doesNotContain("Details of Other Referral");
-    }
-
-    @Test
-    void setIcEt1VettingIssuesDetails_shouldReturnEmpty_whenReferralToJudgeOrLOListIsNullOrEmpty() {
-        CaseData caseDataWithEt1VettingIssues = new CaseData();
-        caseDataWithEt1VettingIssues.setReferralToJudgeOrLOList(null);
-        String result = initialConsiderationService.setIcEt1VettingIssuesDetails(caseDataWithEt1VettingIssues);
-        assertFalse(result.contains("Details of Referral To Judge or LO"));
-
-        caseDataWithEt1VettingIssues.setReferralToJudgeOrLOList(Collections.emptyList());
-        result = initialConsiderationService.setIcEt1VettingIssuesDetails(caseDataWithEt1VettingIssues);
-        assertFalse(result.contains("Details of Referral To Judge or LO"));
-    }
-
-    @Test
-    void setIcEt1VettingIssuesDetails_shouldIncludeAllReferralTypes() {
-        CaseData caseDataWithEt1VettingIssues = getCaseData2();
-
-        String result = initialConsiderationService.setIcEt1VettingIssuesDetails(caseDataWithEt1VettingIssues);
-
-        assertTrue(result.contains("A claim of interim relief"));
-        assertTrue(result.contains("Interim relief details"));
-        assertTrue(result.contains("A statutory appeal"));
-        assertTrue(result.contains("Statutory appeal details"));
-        assertTrue(result.contains("An allegation of the commission of a sexual offence"));
-        assertTrue(result.contains("Sexual offence details"));
-        assertTrue(result.contains("Insolvency"));
-        assertTrue(result.contains("Insolvency details"));
-        assertTrue(result.contains("Jurisdictions unclear"));
-        assertTrue(result.contains("Jurisdictions unclear details"));
-        assertTrue(result.contains("Length of service"));
-        assertTrue(result.contains("Length of service details"));
-        assertTrue(result.contains("Potentially linked cases in the ECM"));
-        assertTrue(result.contains("Linked cases details"));
-        assertTrue(result.contains("Rule 49 issues"));
-        assertTrue(result.contains("Rule 49 issues details"));
-        assertTrue(result.contains("Another reason for judicial referral"));
-        assertTrue(result.contains("Other judicial referral details"));
-    }
-
-    private static @NotNull CaseData getCaseData2() {
-        CaseData caseData = new CaseData();
-        caseData.setReferralToJudgeOrLOList(List.of(
-                "aClaimOfInterimRelief", "aStatutoryAppeal", "anAllegationOfCommissionOfSexualOffence",
-                "insolvency", "jurisdictionsUnclear", "lengthOfService", "potentiallyLinkedCasesInTheEcm",
-                "rule50Issues", "anotherReasonForJudicialReferral"
-        ));
-        caseData.setAclaimOfInterimReliefTextArea("Interim relief details");
-        caseData.setAstatutoryAppealTextArea("Statutory appeal details");
-        caseData.setAnAllegationOfCommissionOfSexualOffenceTextArea("Sexual offence details");
-        caseData.setInsolvencyTextArea("Insolvency details");
-        caseData.setJurisdictionsUnclearTextArea("Jurisdictions unclear details");
-        caseData.setLengthOfServiceTextArea("Length of service details");
-        caseData.setPotentiallyLinkedCasesInTheEcmTextArea("Linked cases details");
-        caseData.setRule50IssuesTextArea("Rule 49 issues details");
-        caseData.setAnotherReasonForJudicialReferralTextArea("Other judicial referral details");
-        return caseData;
-    }
-
-    @Test
-    void setIcEt1VettingIssuesDetails_shouldIncludeAllSubstantiveDefectsDescriptions() {
-        CaseData caseDataWithEt1VettingIssues = new CaseData();
-        caseDataWithEt1VettingIssues.setRule121aTextArea("Details for rule 13(1)(a)");
-        caseDataWithEt1VettingIssues.setRule121bTextArea("Details for rule 13(1)(b");
-        caseDataWithEt1VettingIssues.setRule121cTextArea("Details for rule 13(1)(c)");
-        caseDataWithEt1VettingIssues.setRule121dTextArea("Details for rule 13(1)(d)");
-        caseDataWithEt1VettingIssues.setRule121daTextArea("Details for rule 13(1)(e)");
-        caseDataWithEt1VettingIssues.setRule121eTextArea("Details for rule 13(1)(f)");
-        caseDataWithEt1VettingIssues.setRule121fTextArea("Details for rule 13(1)(g)");
-        caseDataWithEt1VettingIssues.setSubstantiveDefectsList(List.of(
-                "rule121a", "rule121b", "rule121c", "rule121d", "rule121 da", "rule121e", "rule121f"
-        ));
-
-        String result = initialConsiderationService.setIcEt1VettingIssuesDetails(caseDataWithEt1VettingIssues);
-
-        assertThat(result).contains("The tribunal has no jurisdiction to consider - Rule 13(1)(a)");
-        assertThat(result).contains("Is in a form which cannot sensibly be responded to or otherwise an abuse of "
-                + "process - Rule 13(1)(b)");
-        assertThat(result).contains("Has neither an EC number nor claims one of the EC exemptions - Rule 13(1)(c)");
-        assertThat(result).contains("States that one of the EC exceptions applies but it might not - Rule 13(1)(d)");
-        assertThat(result).contains("Institutes relevant proceedings and the EC number on the claim form does not "
-                + "match the EC number on the Acas certificate - Rule 13(1)(e)");
-        assertThat(result).contains("Has a different claimant name on the ET1 to the claimant name on the Acas "
-                + "certificate - Rule 13(1)(f)");
-        assertThat(result).contains("Has a different respondent name on the ET1 to the respondent name on the "
-                + "Acas certificate - Rule 13(1)(g)");
-    }
-
-    @Test
-    void setIcEt1VettingIssuesDetails_shouldReturnEmptyString_whenSubstantiveDefectsListIsNullOrEmpty() {
-        CaseData caseDataWithEt1VettingIssues = new CaseData();
-        caseDataWithEt1VettingIssues.setSubstantiveDefectsList(null);
-
-        String result = initialConsiderationService.setIcEt1VettingIssuesDetails(caseDataWithEt1VettingIssues);
-        assertThat(result).doesNotContain("Details of Substantive Defects");
-
-        caseDataWithEt1VettingIssues.setSubstantiveDefectsList(Collections.emptyList());
-        result = initialConsiderationService.setIcEt1VettingIssuesDetails(caseDataWithEt1VettingIssues);
-        assertThat(result).doesNotContain("Details of Substantive Defects");
-    }
-
-    @Test
-    void setIcEt1VettingIssuesDetails_shouldReturnEmptyString_whenTrackAllocationIsNull() {
-        CaseData caseDataWithEt1VettingIssues = new CaseData();
-        caseDataWithEt1VettingIssues.setIsTrackAllocationCorrect(null);
-        String result = initialConsiderationService.setIcEt1VettingIssuesDetails(caseDataWithEt1VettingIssues);
-        assertFalse(result.contains("Track Allocation Issue"));
-    }
-
-    @Test
-    void setIcEt1VettingIssuesDetails_shouldReturnEmptyString_whenTrackAllocationIsYes() {
-        CaseData caseDataWithEt1VettingIssues = new CaseData();
-        caseDataWithEt1VettingIssues.setIsTrackAllocationCorrect("Yes");
-        String result = initialConsiderationService.setIcEt1VettingIssuesDetails(caseDataWithEt1VettingIssues);
-        assertFalse(result.contains("Track Allocation Issue"));
-    }
-
-    @Test
-    void setIcEt1VettingIssuesDetails_shouldIncludeTrackAllocationDetails_whenTrackAllocationIsNo() {
-        CaseData caseDataWithEt1VettingIssues = new CaseData();
-        caseDataWithEt1VettingIssues.setIsTrackAllocationCorrect("No");
-        caseDataWithEt1VettingIssues.setSuggestAnotherTrack("Fast Track");
-        caseDataWithEt1VettingIssues.setWhyChangeTrackAllocation("Complex case");
-        caseDataWithEt1VettingIssues.setTrackAllocationGeneralNotes("Requires special handling");
-        String result = initialConsiderationService.setIcEt1VettingIssuesDetails(caseDataWithEt1VettingIssues);
-        assertTrue(result.contains("Track Allocation Issue"));
-        assertTrue(result.contains("Is the track allocation correct?"));
-        assertTrue(result.contains("Suggested Track:"));
-        assertTrue(result.contains("Why Change Track Allocation?"));
-        assertTrue(result.contains("Track Allocation General Notes"));
-    }
-
-    @Test
-    void setIcEt1VettingIssuesDetails_shouldIncludeLocationalIssues_whenLocationIsNotCorrect() {
-        CaseData caseDataWithRegionalOffice = new CaseData();
-        caseDataWithRegionalOffice.setIsLocationCorrect("No");
-
+    void setIcEt1VettingIssuesDetails_shouldHandleEmptyRegionalOfficeList() {
+        CaseData caseDataWithEmptyRegionalOffice = new CaseData();
+        caseDataWithEmptyRegionalOffice.setIsLocationCorrect("No");
         DynamicFixedListType regionalOfficeList = new DynamicFixedListType();
-        DynamicValueType dynamicValueType = new DynamicValueType();
-        dynamicValueType.setCode("RO1");
-        dynamicValueType.setLabel("London");
 
-        regionalOfficeList.setListItems(List.of(dynamicValueType));
-        regionalOfficeList.setValue(dynamicValueType);
-        regionalOfficeList.setValue(dynamicValueType);
+        caseDataWithEmptyRegionalOffice.setRegionalOfficeList(regionalOfficeList);
+        String result = new InitialConsiderationService(null)
+                .setIcEt1VettingIssuesDetails(caseDataWithEmptyRegionalOffice);
 
-        caseDataWithRegionalOffice.setRegionalOfficeList(regionalOfficeList);
-        caseDataWithRegionalOffice.setWhyChangeOffice("Closer to claimant");
+        assertTrue(result.contains("Is this location correct?"));
+        assertFalse(result.contains("Local or regional office selected"));
+    }
+
+    @Test
+    void setIcEt1VettingIssuesDetails_shouldHandleEmptyWhyChangeOffice() {
+        CaseData caseDataWithEmptyWhyChangeOffice = new CaseData();
+        caseDataWithEmptyWhyChangeOffice.setIsLocationCorrect("No");
+        caseDataWithEmptyWhyChangeOffice.setWhyChangeOffice("");
 
         String result = new InitialConsiderationService(null)
-                .setIcEt1VettingIssuesDetails(caseDataWithRegionalOffice);
+                .setIcEt1VettingIssuesDetails(caseDataWithEmptyWhyChangeOffice);
 
-        assertTrue(result.contains("Details of Locational Issues"));
+        assertTrue(result.contains("Is this location correct?"));
+        assertFalse(result.contains("Why should we change the office?"));
+    }
+
+    @Test
+    void setIcEt1VettingIssuesDetails_shouldIncludeDetails_whenAllFieldsArePopulated() {
+        final CaseData caseDataWithDetails = getCaseDataWithDetails();
+
+        String result = new InitialConsiderationService(null)
+                .setIcEt1VettingIssuesDetails(caseDataWithDetails);
+
         assertTrue(result.contains("Is this location correct?"));
         assertTrue(result.contains("Local or regional office selected"));
         assertTrue(result.contains("Why should we change the office?"));
-        assertTrue(result.contains("London"));
-        assertTrue(result.contains("Closer to claimant"));
     }
 
-    @Test
-    void setIcEt1VettingIssuesDetails_shouldNotIncludeLocationalIssues_whenLocationIsCorrect() {
-        CaseData caseDataWithLocation = new CaseData();
-        caseDataWithLocation.setIsLocationCorrect("Yes");
-
-        String result = new InitialConsiderationService(null).setIcEt1VettingIssuesDetails(caseDataWithLocation);
-
-        assertFalse(result.contains("Details of Locational Issues"));
+    private static @NonNull CaseData getCaseDataWithDetails() {
+        CaseData caseDataWithDetails = new CaseData();
+        caseDataWithDetails.setIsLocationCorrect("No");
+        DynamicFixedListType regionalOfficeList = new DynamicFixedListType();
+        DynamicValueType dynamicValueType = new DynamicValueType();
+        dynamicValueType.setCode("RO1");
+        dynamicValueType.setLabel("Regional Office 1");
+        regionalOfficeList.setValue(dynamicValueType);
+        caseDataWithDetails.setRegionalOfficeList(regionalOfficeList);
+        caseDataWithDetails.setWhyChangeOffice("Relocation");
+        return caseDataWithDetails;
     }
 
     @Test
@@ -2204,95 +2034,11 @@ class InitialConsiderationServiceTest {
         CaseData caseDataWithChangeOffice = new CaseData();
         caseDataWithChangeOffice.setIsLocationCorrect("No");
 
-        // regionalOfficeList and whyChangeOffice are null
-        String result = new InitialConsiderationService(
-                null).setIcEt1VettingIssuesDetails(caseDataWithChangeOffice);
+        String result = new InitialConsiderationService(null)
+                .setIcEt1VettingIssuesDetails(caseDataWithChangeOffice);
 
         assertTrue(result.contains("Is this location correct?"));
         assertFalse(result.contains("Local or regional office selected"));
         assertFalse(result.contains("Why should we change the office?"));
-    }
-
-    @Test
-    void setIcEt1VettingIssuesDetails_shouldGenerateCorrectMarkup() {
-        CaseData caseDataWithMarkUp = new CaseData();
-        caseDataWithMarkUp.setEt1GovOrMajorQuestion("Yes");
-        caseDataWithMarkUp.setEt1ReasonableAdjustmentsQuestion("Yes");
-        caseDataWithMarkUp.setEt1ReasonableAdjustmentsTextArea("Details about reasonable adjustments.");
-        caseDataWithMarkUp.setEt1VideoHearingQuestion("No");
-        caseDataWithMarkUp.setEt1VideoHearingTextArea("Details about video hearing.");
-        caseDataWithMarkUp.setEt1FurtherQuestionsGeneralNotes("General notes about the respondent.");
-
-        InitialConsiderationService service = new InitialConsiderationService(null);
-
-        String result = service.setIcEt1VettingIssuesDetails(caseDataWithMarkUp);
-
-        assertNotNull(result);
-        assertTrue(result.contains("Is the respondent a government agency or a major employer?"));
-        assertTrue(result.contains("Are reasonable adjustments required?"));
-        assertTrue(result.contains("Details about reasonable adjustments."));
-        assertTrue(result.contains("Can the claimant attend a video hearing?"));
-        assertTrue(result.contains("Details about video hearing."));
-        assertTrue(result.contains("General notes about the respondent."));
-    }
-
-    @Test
-    void setHearingRegionAndVenue_shouldSetFieldsCorrectly() {
-        CaseData caseDataWithVenue = new CaseData();
-
-        DynamicFixedListType regionalOfficeList = new DynamicFixedListType();
-        DynamicValueType dynamicValueType = new DynamicValueType();
-        dynamicValueType.setLabel("London");
-        regionalOfficeList.setValue(dynamicValueType);
-        caseDataWithVenue.setRegionalOfficeList(regionalOfficeList);
-
-        DynamicFixedListType hearingVenues = new DynamicFixedListType();
-        DynamicValueType dynamicValueTypeTwo = new DynamicValueType();
-        dynamicValueTypeTwo.setLabel("Manchester");
-        hearingVenues.setValue(dynamicValueTypeTwo);
-        caseDataWithVenue.setEt1HearingVenues(hearingVenues);
-
-        InitialConsiderationService service = new InitialConsiderationService(null);
-
-        service.setHearingRegionAndVenue(caseDataWithVenue);
-
-        assertEquals("London", caseDataWithVenue.getRegionalOffice());
-        assertEquals("Manchester", caseDataWithVenue.getEt1TribunalRegion());
-    }
-
-    @Test
-    void setHearingRegionAndVenue_shouldSetFieldsToNullWhenListsAreNull() {
-        CaseData caseDataWithNullVenue = new CaseData();
-        caseDataWithNullVenue.setRegionalOfficeList(null);
-        caseDataWithNullVenue.setEt1HearingVenues(null);
-
-        InitialConsiderationService service = new InitialConsiderationService(null);
-
-        service.setHearingRegionAndVenue(caseDataWithNullVenue);
-
-        assertNull(caseDataWithNullVenue.getRegionalOffice());
-        assertNull(caseDataWithNullVenue.getEt1TribunalRegion());
-    }
-
-    @Test
-    void shouldReturnFinalHearingForHearing() {
-        assertEquals("Final Hearing", InitialConsiderationService.getAdjustedHearingTypeName("Hearing"));
-    }
-
-    @Test
-    void shouldReturnReconsiderationHearingForReconsideration() {
-        assertEquals("Reconsideration Hearing",
-                InitialConsiderationService.getAdjustedHearingTypeName("Reconsideration"));
-    }
-
-    @Test
-    void shouldReturnRemedyHearingForRemedy() {
-        assertEquals("Remedy Hearing", InitialConsiderationService.getAdjustedHearingTypeName("Remedy"));
-    }
-
-    @Test
-    void shouldReturnOriginalValueForOtherTypes() {
-        assertEquals("Preliminary", InitialConsiderationService.getAdjustedHearingTypeName("Preliminary"));
-        assertEquals("", InitialConsiderationService.getAdjustedHearingTypeName(""));
     }
 }

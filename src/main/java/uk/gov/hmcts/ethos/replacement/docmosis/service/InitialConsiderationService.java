@@ -38,6 +38,7 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -111,6 +112,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 @RequiredArgsConstructor
 public class InitialConsiderationService {
 
+    public static final String GENERAL_NOTES = "General notes";
     private final TornadoService tornadoService;
     private static final String[] HEADER = {"Issue / Question", "Details / Answer"};
     private static final List<String> IC_DOC_TYPES = List.of(ET1, ET1_VETTING, ET3, ET3_PROCESSING);
@@ -268,6 +270,7 @@ public class InitialConsiderationService {
                """);
 
         respondentCollection.stream()
+                .filter(Objects::nonNull)
                 .filter(respondent -> respondent.getValue() != null)
                 .forEach(respondent ->
                         hearingPreferencesTable.append(String.format(HEARING_PANEL_PREFERENCE,
@@ -333,7 +336,7 @@ public class InitialConsiderationService {
             .orElse(HEARING_MISSING);
     }
 
-    private String getFormattedHearingDetails(HearingType hearing, DateTimeFormatter formatter, String caseType) {
+    String getFormattedHearingDetails(HearingType hearing, DateTimeFormatter formatter, String caseType) {
         StringBuilder hearingDetailsTable = new StringBuilder();
 
         hearingDetailsTable.append("""
@@ -379,7 +382,7 @@ public class InitialConsiderationService {
         };
     }
 
-    private static String getHearingVenueDetails(HearingType hearing, String caseType) {
+    static String getHearingVenueDetails(HearingType hearing, String caseType) {
         if (hearing == null) {
             return "-";
         }
@@ -1022,7 +1025,7 @@ public class InitialConsiderationService {
         }
     }
 
-    private String defaultIfNull(String value) {
+    private static String defaultIfNull(String value) {
         return value != null ? value : NONE_PROVIDED;
     }
 
@@ -1189,6 +1192,7 @@ public class InitialConsiderationService {
                     defaultIfEmpty(caseData.getIsLocationCorrect(), ""));
             //Newly selected regional office
             if (caseData.getRegionalOfficeList() != null
+                    && caseData.getRegionalOfficeList().getSelectedCode() != null
                     && !caseData.getRegionalOfficeList().getSelectedCode().isEmpty()) {
                 addPair(locationIssuesPairsList, "Local or regional office selected",
                         defaultIfEmpty(caseData.getRegionalOfficeList().getSelectedLabel(), ""));
@@ -1207,6 +1211,11 @@ public class InitialConsiderationService {
                         "Details of Locational Issues",
                         locationIssueStringBuilder.toString()));
                 et1VettingIssuesTablesMarkup.append(NEWLINE);
+            }
+
+            if (caseData.getEt1LocationGeneralNotes() != null && !caseData.getEt1LocationGeneralNotes().isEmpty()) {
+                addPair(locationIssuesPairsList, GENERAL_NOTES,
+                        caseData.getEt1JudgeReferralGeneralNotes());
             }
         }
     }
@@ -1256,6 +1265,13 @@ public class InitialConsiderationService {
             otherReferralsIssues.forEach(referralAndDetailPair ->
                     addPair(otherReferralIssuesPairsList, referralAndDetailPair.getFirst(),
                             referralAndDetailPair.get(1)));
+
+            if (caseData.getEt1OtherReferralGeneralNotes() != null
+                    && !caseData.getEt1OtherReferralGeneralNotes().isEmpty()) {
+                addPair(otherReferralIssuesPairsList, GENERAL_NOTES,
+                        caseData.getEt1OtherReferralGeneralNotes());
+            }
+
             otherReferralStringBuilder.append(MarkdownHelper.createTwoColumnTable(
                     new String[]{REFERRAL_ISSUE, DETAIL},
                     otherReferralIssuesPairsList));
@@ -1276,6 +1292,13 @@ public class InitialConsiderationService {
             referralsIssues.forEach(referralAndDetailPair ->
                     addPair(et1VettingReferralIssuesPairsList, referralAndDetailPair.getFirst(),
                             referralAndDetailPair.get(1)));
+
+            if (caseData != null && caseData.getReferralToREJOrVPList() != null
+                    && !caseData.getEt1REJOrVPReferralGeneralNotes().isEmpty()) {
+                addPair(et1VettingReferralIssuesPairsList, GENERAL_NOTES,
+                        caseData.getEt1REJOrVPReferralGeneralNotes());
+            }
+
             referralToJudgeOrLOStringBuilder.append(MarkdownHelper.createTwoColumnTable(
                     new String[]{REFERRAL_ISSUE, DETAIL},
                     et1VettingReferralIssuesPairsList));
@@ -1351,6 +1374,13 @@ public class InitialConsiderationService {
             referralsIssues.forEach(referralAndDetailPair ->
                     addPair(et1VettingReferralIssuesPairsList, referralAndDetailPair.getFirst(),
                             referralAndDetailPair.get(1)));
+
+            if (caseData.getEt1JudgeReferralGeneralNotes() != null
+                    && caseData.getEt1JudgeReferralGeneralNotes().isEmpty()) {
+                addPair(et1VettingReferralIssuesPairsList, GENERAL_NOTES,
+                        caseData.getEt1JudgeReferralGeneralNotes());
+            }
+
             referralToJudgeOrLOStringBuilder.append(MarkdownHelper.createTwoColumnTable(
                     new String[]{REFERRAL_ISSUE, DETAIL},
                     et1VettingReferralIssuesPairsList));
@@ -1365,11 +1395,6 @@ public class InitialConsiderationService {
         List<List<String>> icEt1SubstantiveDefects = composeIcEt1SubstantiveDefectsDetail(caseData);
 
         if (CollectionUtils.isNotEmpty(icEt1SubstantiveDefects)) {
-
-            if (caseData.getEt1SubstantiveDefectsGeneralNotes() != null
-                    && !caseData.getEt1SubstantiveDefectsGeneralNotes().isEmpty()) {
-                icEt1SubstantiveDefects.add(List.of("General notes", caseData.getEt1SubstantiveDefectsGeneralNotes()));
-            }
 
             List<String[]> et1VettingIssuesPairsList = icEt1SubstantiveDefects.stream()
                     .map(defectAndDetailPair -> new String[]{defectAndDetailPair.getFirst(),
@@ -1522,6 +1547,7 @@ public class InitialConsiderationService {
                 }
             }
         }
+
         return referralToJudgeOrLODetails;
     }
 
@@ -1533,32 +1559,31 @@ public class InitialConsiderationService {
                 switch (referralReason) {
                     case "claimOutOfTime" :
                         otherReferralDetails.add(List.of("Claim out of time",
-                                "The whole or any part of the claim is out of time"));
+                                defaultIfNull(caseData.getClaimOutOfTimeTextArea())));
                         break;
                     case "multipleClaim" :
                         otherReferralDetails.add(List.of("Multiple claims",
-                                "The claim is part of a multiple claim"));
+                                defaultIfNull(caseData.getMultipleClaimTextArea())));
                         break;
                     case "employmentStatusIssues" :
                         otherReferralDetails.add(List.of("Employment status issues",
-                                "The claim has a potential issue about employment status"));
+                                defaultIfNull(caseData.getEmploymentStatusIssuesTextArea())));
                         break;
                     case "pidJurisdictionRegulator" :
                         otherReferralDetails.add(List.of("Pid jurisdiction regulator",
-                                "The claim has PID jurisdiction and claimant wants it forwarded to relevant "
-                                + "regulator - Box 10.1"));
+                                defaultIfNull(caseData.getPidJurisdictionRegulatorTextArea())));
                         break;
                     case "videoHearingPreference" :
                         otherReferralDetails.add(List.of("Video hearing preference",
-                                "The claimant prefers a video hearing"));
+                                defaultIfNull(caseData.getVideoHearingPreferenceTextArea())));
                         break;
                     case "rule50IssuesOtherFactors" :
                         otherReferralDetails.add(List.of("Rule49 issues - other factors",
-                                "The claim has Rule 49 issues"));
+                                defaultIfNull(caseData.getRule50IssuesForOtherReferralTextArea())));
                         break;
                     case "otherRelevantFactors" :
                         otherReferralDetails.add(List.of("Other relevant factors",
-                                "The claim has other relevant factors for judicial referral"));
+                                defaultIfNull(caseData.getAnotherReasonForOtherReferralTextArea())));
                         break;
                     default:
                         break;

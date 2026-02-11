@@ -633,7 +633,7 @@ public final class DocumentHelper {
             sb.append(RESPONDENT).append(NEW_LINE);
         }
 
-        sb.append(getRespOthersName(caseData, respondent.getRespondentName()))
+        sb.append(getRespOthersName(caseData))
                 .append(getRespAddress(caseData));
     }
 
@@ -744,19 +744,18 @@ public final class DocumentHelper {
         return buildAddressFields(address, "\"respondent_or_rep_");
     }
 
-    private static StringBuilder getRespOthersName(CaseData caseData, String firstRespondentName) {
+    private static StringBuilder getRespOthersName(CaseData caseData) {
         StringBuilder sb = new StringBuilder(20);
         AtomicInteger atomicInteger = new AtomicInteger(2);
-        List<String> respOthers = caseData.getRespondentCollection()
-                .stream()
-                .filter(respondentSumTypeItem -> respondentSumTypeItem.getValue().getResponseStruckOut() == null
-                        || respondentSumTypeItem.getValue().getResponseStruckOut().equals(NO)
-                        && (respondentSumTypeItem.getValue().getResponseContinue() == null
-                        || respondentSumTypeItem.getValue().getResponseContinue().equals(YES))
-                        && !respondentSumTypeItem.getValue().getRespondentName().equals(firstRespondentName))
-                .map(respondentSumTypeItem -> atomicInteger.getAndIncrement() + ". "
-                        + respondentSumTypeItem.getValue().getRespondentName())
-                .toList();
+        List<String> respOthers = IntStream.range(1, caseData.getRespondentCollection().size())
+            .mapToObj(idx -> caseData.getRespondentCollection().get(idx))
+            .filter(respondentSumTypeItem -> respondentSumTypeItem.getValue().getResponseStruckOut() == null
+                || respondentSumTypeItem.getValue().getResponseStruckOut().equals(NO)
+                && (respondentSumTypeItem.getValue().getResponseContinue() == null
+                || respondentSumTypeItem.getValue().getResponseContinue().equals(YES)))
+            .map(respondentSumTypeItem -> atomicInteger.getAndIncrement() + ". "
+                                          + respondentSumTypeItem.getValue().getRespondentName())
+            .toList();
         sb.append(RESP_OTHERS).append(nullCheck(String.join(", ", respOthers))).append(NEW_LINE);
         return sb;
     }

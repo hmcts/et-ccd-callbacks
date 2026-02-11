@@ -1,11 +1,13 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
+import org.webjars.NotFoundException;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -43,6 +45,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_FAST_TRACK;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CONCILIATION_TRACK_NO_CONCILIATION;
@@ -828,4 +831,123 @@ class ReferralHelperTest {
         assertTrue(markdown.contains("|Referral||"));
     }
 
+    @Test
+    void shouldReturnSelectedReferral_whenValidDataProvided() {
+        ReferralType referralType = new ReferralType();
+        referralType.setReferralNumber("1");
+        ReferralTypeItem item = new ReferralTypeItem();
+        item.setId("1");
+        item.setValue(referralType);
+        CaseData caseDataWithSelectedReferral = new CaseData();
+        caseDataWithSelectedReferral.setReferralCollection(List.of(item));
+        DynamicFixedListType selectReferral = new DynamicFixedListType();
+        DynamicValueType value = new DynamicValueType();
+        value.setCode("1");
+        selectReferral.setValue(value);
+        caseDataWithSelectedReferral.setSelectReferral(selectReferral);
+
+        ReferralType result = ReferralHelper.getSelectedReferral(caseDataWithSelectedReferral);
+        Assertions.assertNotNull(result);
+        assertEquals("1", result.getReferralNumber());
+    }
+
+    @Test
+    void shouldThrowNotFoundException_whenReferralCollectionIsNull() {
+        CaseData caseDataWithNullReferralCollection = new CaseData();
+        caseDataWithNullReferralCollection.setReferralCollection(null);
+        caseDataWithNullReferralCollection.setSelectReferral(new DynamicFixedListType());
+        assertThrows(NotFoundException.class, () ->
+                ReferralHelper.getSelectedReferral(caseDataWithNullReferralCollection));
+    }
+
+    @Test
+    void shouldThrowNotFoundException_whenReferralCollectionIsEmpty() {
+        CaseData caseDataWithEmptyCaseDataWithNullReferralCollection = new CaseData();
+        caseDataWithEmptyCaseDataWithNullReferralCollection.setReferralCollection(List.of());
+        caseDataWithEmptyCaseDataWithNullReferralCollection.setSelectReferral(new DynamicFixedListType());
+        assertThrows(NotFoundException.class, () ->
+                ReferralHelper.getSelectedReferral(caseDataWithEmptyCaseDataWithNullReferralCollection));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideInvalidSelectReferralCases")
+    void shouldThrowNotFoundException_whenSelectReferralIsInvalid(
+            CaseData caseData) {
+        assertThrows(NotFoundException.class, () -> ReferralHelper.getSelectedReferral(caseData));
+    }
+
+    private static Stream<Arguments> provideInvalidSelectReferralCases() {
+        // Case 1: selectReferral is null
+        CaseData caseDataWithNullSelectReferral = new CaseData();
+        ReferralType referralType1 = new ReferralType();
+        ReferralTypeItem item1 = new ReferralTypeItem();
+        item1.setId("1");
+        item1.setValue(referralType1);
+        caseDataWithNullSelectReferral.setReferralCollection(List.of(item1));
+        caseDataWithNullSelectReferral.setSelectReferral(null);
+
+        // Case 2: selectReferral value is null
+        CaseData caseDataWithNullSelectReferralValue = new CaseData();
+        ReferralType referralType2 = new ReferralType();
+        ReferralTypeItem item2 = new ReferralTypeItem();
+        item2.setId("1");
+        item2.setValue(referralType2);
+        caseDataWithNullSelectReferralValue.setReferralCollection(List.of(item2));
+        DynamicFixedListType selectReferral2 = new DynamicFixedListType();
+        selectReferral2.setValue(null);
+        caseDataWithNullSelectReferralValue.setSelectReferral(selectReferral2);
+
+        // Case 3: selectReferral code is null or empty
+        ReferralType referralType3 = new ReferralType();
+        ReferralTypeItem item3 = new ReferralTypeItem();
+        item3.setId("1");
+        item3.setValue(referralType3);
+        CaseData caseDataWithEmptyCode = new CaseData();
+        caseDataWithEmptyCode.setReferralCollection(List.of(item3));
+        DynamicFixedListType selectReferral3 = new DynamicFixedListType();
+        DynamicValueType value3 = new DynamicValueType();
+        value3.setCode("");
+        selectReferral3.setValue(value3);
+        caseDataWithEmptyCode.setSelectReferral(selectReferral3);
+
+        return Stream.of(
+                Arguments.of(caseDataWithNullSelectReferral),
+                Arguments.of(caseDataWithNullSelectReferralValue),
+                Arguments.of(caseDataWithEmptyCode)
+        );
+    }
+
+    @Test
+    void shouldThrowNotFoundException_whenSelectReferralCodeIsNotANumber() {
+        CaseData caseDataWithInvalidSelectReferralCode = new CaseData();
+        ReferralType referralType = new ReferralType();
+        ReferralTypeItem item = new ReferralTypeItem();
+        item.setId("1");
+        item.setValue(referralType);
+        caseDataWithInvalidSelectReferralCode.setReferralCollection(List.of(item));
+        DynamicFixedListType selectReferral = new DynamicFixedListType();
+        DynamicValueType value = new DynamicValueType();
+        value.setCode("abc");
+        selectReferral.setValue(value);
+        caseDataWithInvalidSelectReferralCode.setSelectReferral(selectReferral);
+        assertThrows(NotFoundException.class, () ->
+                ReferralHelper.getSelectedReferral(caseDataWithInvalidSelectReferralCode));
+    }
+
+    @Test
+    void shouldThrowNotFoundException_whenReferralIndexOutOfBounds() {
+        CaseData caseDataWithReferralIndexOutOfBounds = new CaseData();
+        ReferralType referralType = new ReferralType();
+        ReferralTypeItem item = new ReferralTypeItem();
+        item.setId("1");
+        item.setValue(referralType);
+        caseDataWithReferralIndexOutOfBounds.setReferralCollection(List.of(item));
+        DynamicFixedListType selectReferral = new DynamicFixedListType();
+        DynamicValueType value = new DynamicValueType();
+        value.setCode("2"); // Only one item, index 1 is out of bounds
+        selectReferral.setValue(value);
+        caseDataWithReferralIndexOutOfBounds.setSelectReferral(selectReferral);
+        assertThrows(NotFoundException.class, () ->
+                ReferralHelper.getSelectedReferral(caseDataWithReferralIndexOutOfBounds));
+    }
 }

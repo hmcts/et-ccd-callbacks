@@ -684,7 +684,7 @@ public class InitialConsiderationService {
         clearHiddenValue(caseData);
 
         //clear old values
-        if (caseData.getEtICHearingListedAnswers() != null) {
+        /*if (caseData.getEtICHearingListedAnswers() != null) {
             caseData.getEtICHearingListedAnswers().setEtInitialConsiderationListedHearingType(null);
             caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJsaReasonOther(null);
             caseData.getEtICHearingListedAnswers().setEtICIsHearingWithMembers(null);
@@ -701,7 +701,7 @@ public class InitialConsiderationService {
             caseData.getEtICHearingListedAnswers().setEtICHearingListed(null);
             caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJudgeOrMembers(null);
             caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJudgeOrMembersReasonOther(null);
-        }
+        }*/
 
         caseData.setEtICHearingNotListedListForPrelimHearingUpdated(null);
         caseData.setEtICHearingNotListedListForFinalHearingUpdated(null);
@@ -1294,6 +1294,7 @@ public class InitialConsiderationService {
                             referralAndDetailPair.get(1)));
 
             if (caseData != null && caseData.getReferralToREJOrVPList() != null
+                    && caseData.getEt1REJOrVPReferralGeneralNotes() != null
                     && !caseData.getEt1REJOrVPReferralGeneralNotes().isEmpty()) {
                 addPair(et1VettingReferralIssuesPairsList, GENERAL_NOTES,
                         caseData.getEt1REJOrVPReferralGeneralNotes());

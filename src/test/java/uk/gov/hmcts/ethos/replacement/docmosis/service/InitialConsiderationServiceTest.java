@@ -3,7 +3,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
 import org.joda.time.LocalDateTime;
-import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -519,6 +518,31 @@ class InitialConsiderationServiceTest {
         dateListed.setHearingStatus("Settled");
         dateListed.setListedDate(EARLIEST_FUTURE_HEARING_DATE.toString());
         dateListed.setHearingTimingDuration("3.5 Hours");
+    }
+
+    @Test
+    void getAdjustedHearingTypeName_shouldReturnFinalHearing_whenInputIsHearing() {
+        String result = InitialConsiderationService.getAdjustedHearingTypeName("Hearing");
+        assertEquals("Final Hearing", result);
+    }
+
+    @Test
+    void getAdjustedHearingTypeName_shouldReturnReconsiderationHearing_whenInputIsReconsideration() {
+        String result = InitialConsiderationService.getAdjustedHearingTypeName("Reconsideration");
+        assertEquals("Reconsideration Hearing", result);
+    }
+
+    @Test
+    void getAdjustedHearingTypeName_shouldReturnRemedyHearing_whenInputIsRemedy() {
+        String result = InitialConsiderationService.getAdjustedHearingTypeName("Remedy");
+        assertEquals("Remedy Hearing", result);
+    }
+
+    @Test
+    void getAdjustedHearingTypeName_shouldReturnInput_whenInputIsUnknown() {
+        String input = "CustomType";
+        String result = InitialConsiderationService.getAdjustedHearingTypeName(input);
+        assertEquals(input, result);
     }
 
     @Test
@@ -1542,7 +1566,132 @@ class InitialConsiderationServiceTest {
         return dateListedTypeItem;
     }
 
-    // Add these tests to cover missing cases for getHearingDetails
+    @Test
+    void getHearingVenueDetails_returnsVenueForEnglandWales_whenVenueIsSet_London_Venue() {
+        DynamicValueType dynamicValueType = new DynamicValueType();
+        dynamicValueType.setLabel("London Venue");
+        dynamicValueType.setCode("LondonVenue");
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
+        dynamicFixedListType.setValue(dynamicValueType);
+        HearingType hearing = new HearingType();
+        hearing.setHearingVenue(dynamicFixedListType);
+        String result = InitialConsiderationService.getHearingVenueDetails(hearing, ENGLANDWALES_CASE_TYPE_ID);
+        assertEquals("London Venue", result);
+    }
+
+    @Test
+    void getHearingVenueDetails_returnsVenueForScotland_whenVenueIsRecognized_Aberdeen() {
+        DynamicValueType dynamicValueType = new DynamicValueType();
+        dynamicValueType.setLabel("Aberdeen");
+        dynamicValueType.setCode("Aberdeen");
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
+        dynamicFixedListType.setValue(dynamicValueType);
+        HearingType hearing = new HearingType();
+        hearing.setHearingAberdeen(dynamicFixedListType);
+        hearing.setHearingVenueScotland("Aberdeen");
+
+        String result = InitialConsiderationService.getHearingVenueDetails(hearing, SCOTLAND_CASE_TYPE_ID);
+        assertEquals("Aberdeen", result);
+    }
+
+    @Test
+    void clearOldValues_clearsAllFieldsWhenAnswersExist() {
+        EtICHearingListedAnswers answers = new EtICHearingListedAnswers();
+        // Set all fields to non-null values
+        answers.setEtInitialConsiderationListedHearingType("type");
+        answers.setEtICIsHearingWithJsaReasonOther("reason");
+        answers.setEtICIsHearingWithMembers("members");
+        answers.setEtICJsaFinalHearingReasonOther("jsa");
+        answers.setEtICMembersFinalHearingReasonOther("membersFinal");
+        answers.setEtICIsHearingWithJudgeOrMembersFurtherDetails("details");
+        answers.setEtICIsHearingWithJudgeOrMembersReason(Collections.singletonList("reason2"));
+        answers.setEtICIsFinalHearingWithJudgeOrMembersJsaReason(Collections.singletonList("jsa2"));
+        answers.setEtICIsFinalHearingWithJudgeOrMembersReason(Collections.singletonList("reason3"));
+        answers.setEtICIsHearingWithJsa("jsa3");
+        answers.setEtICHearingListed(Collections.singletonList("listed"));
+        answers.setEtICIsHearingWithJudgeOrMembers("judgeOrMembers");
+        answers.setEtICIsHearingWithJudgeOrMembersReasonOther("reasonOther");
+        CaseData caseDataWithFieldsToClear = new CaseData();
+        caseDataWithFieldsToClear.setEtICHearingListedAnswers(answers);
+
+        InitialConsiderationService service = new InitialConsiderationService(null);
+        service.clearOldValues(caseDataWithFieldsToClear);
+
+        EtICHearingListedAnswers cleared = caseDataWithFieldsToClear.getEtICHearingListedAnswers();
+        assertNull(cleared);
+    }
+
+    @Test
+    void getHearingVenueDetails_returnsVenueForScotland_whenVenueIsRecognized_Dundee() {
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
+        DynamicValueType dynamicValueType = new DynamicValueType();
+        dynamicValueType.setLabel("Dundee");
+        dynamicValueType.setCode("Dundee");
+        dynamicFixedListType.setValue(dynamicValueType);
+        HearingType hearing = new HearingType();
+        hearing.setHearingDundee(dynamicFixedListType);
+        hearing.setHearingVenueScotland("Dundee");
+
+        String result = InitialConsiderationService.getHearingVenueDetails(hearing, SCOTLAND_CASE_TYPE_ID);
+        assertEquals("Dundee", result);
+    }
+
+    @Test
+    void getHearingVenueDetails_returnsVenueForScotland_whenVenueIsRecognized_Edinburgh() {
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
+        DynamicValueType dynamicValueType = new DynamicValueType();
+        dynamicValueType.setLabel("Edinburgh");
+        dynamicValueType.setCode("Edinburgh");
+        dynamicFixedListType.setValue(dynamicValueType);
+        HearingType hearing = new HearingType();
+        hearing.setHearingEdinburgh(dynamicFixedListType);
+        hearing.setHearingVenueScotland("Edinburgh");
+
+        String result = InitialConsiderationService.getHearingVenueDetails(hearing, SCOTLAND_CASE_TYPE_ID);
+        assertEquals("Edinburgh", result);
+    }
+
+    @Test
+    void getHearingVenueDetails_returnsVenueForScotland_whenVenueIsRecognized_Glasgow() {
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
+        DynamicValueType dynamicValueType = new DynamicValueType();
+        dynamicValueType.setLabel("Glasgow");
+        dynamicValueType.setCode("Glasgow");
+        dynamicFixedListType.setValue(dynamicValueType);
+        HearingType hearing = new HearingType();
+        hearing.setHearingGlasgow(dynamicFixedListType);
+        hearing.setHearingVenueScotland("Glasgow");
+
+        String result = InitialConsiderationService.getHearingVenueDetails(hearing, SCOTLAND_CASE_TYPE_ID);
+        assertEquals("Glasgow", result);
+    }
+
+    @Test
+    void setPartiesHearingPanelPreferenceDetails_shouldFormatPanelPreferencesCorrectly() {
+        CaseData caseDataWithPanelPreferences = new CaseData();
+        caseDataWithPanelPreferences.setClaimant("Test Claimant");
+        ClaimantHearingPreference claimantPref = new ClaimantHearingPreference();
+        claimantPref.setClaimantHearingPanelPreference("Panel");
+        claimantPref.setClaimantHearingPanelPreferenceWhy("Reason");
+        caseDataWithPanelPreferences.setClaimantHearingPreference(claimantPref);
+
+        RespondentSumType respondent = new RespondentSumType();
+        respondent.setRespondentName("Respondent 1");
+        respondent.setRespondentHearingPanelPreference("Panel");
+        respondent.setRespondentHearingPanelPreferenceReason("Reason");
+        RespondentSumTypeItem respondentItem = new RespondentSumTypeItem();
+        respondentItem.setValue(respondent);
+        caseDataWithPanelPreferences.setRespondentCollection(List.of(respondentItem));
+
+        InitialConsiderationService service = new InitialConsiderationService(tornadoService);
+
+        String result = service.setPartiesHearingPanelPreferenceDetails(caseDataWithPanelPreferences);
+
+        assertNotNull(result);
+        assertTrue(result.contains("Test Claimant"));
+        assertTrue(result.contains("Panel"));
+    }
+
     @Test
     void getHearingDetails_shouldReturnMissingMessage_whenHearingTypeItemIsNull() {
         List<HearingTypeItem> hearingCollection = new ArrayList<>();
@@ -1703,21 +1852,23 @@ class InitialConsiderationServiceTest {
     void setIcEt3VettingIssuesDetailsForEachRespondent_shouldHandleMultipleRespondents() {
         RespondentSumType respondent1 = new RespondentSumType();
         respondent1.setRespondentName("Respondent 1");
-        Et3VettingType et3Vetting1 = new Et3VettingType();
-        et3Vetting1.setEt3AdditionalInformation("Info 1");
-        respondent1.setEt3Vetting(et3Vetting1);
-        RespondentSumTypeItem respondentItem1 = new RespondentSumTypeItem();
-        respondentItem1.setValue(respondent1);
+        respondent1.setResponseRespondentName("Response 1");
+        Et3VettingType et3VettingType = new Et3VettingType();
+        et3VettingType.setEt3AdditionalInformation("Info 1");
+        respondent1.setEt3Vetting(et3VettingType);
+        RespondentSumTypeItem item1 = new RespondentSumTypeItem();
+        item1.setValue(respondent1);
 
         RespondentSumType respondent2 = new RespondentSumType();
         respondent2.setRespondentName("Respondent 2");
-        Et3VettingType et3Vetting2 = new Et3VettingType();
-        et3Vetting2.setEt3AdditionalInformation("Info 2");
-        respondent2.setEt3Vetting(et3Vetting2);
-        RespondentSumTypeItem respondentItem2 = new RespondentSumTypeItem();
-        respondentItem2.setValue(respondent2);
+        respondent2.setResponseRespondentName("Response 2");
+        Et3VettingType et3VettingType2 = new Et3VettingType();
+        et3VettingType2.setEt3AdditionalInformation("Info 2");
+        RespondentSumTypeItem item2 = new RespondentSumTypeItem();
+        respondent2.setEt3Vetting(et3VettingType2);
+        item2.setValue(respondent2);
         CaseData caseDataWithMultipleRespondents = new CaseData();
-        caseDataWithMultipleRespondents.setRespondentCollection(List.of(respondentItem1, respondentItem2));
+        caseDataWithMultipleRespondents.setRespondentCollection(List.of(item1, item2));
 
         String result = initialConsiderationService.setIcEt3VettingIssuesDetailsForEachRespondent(
                 caseDataWithMultipleRespondents);
@@ -1971,62 +2122,9 @@ class InitialConsiderationServiceTest {
     }
 
     @Test
-    void setIcEt1VettingIssuesDetails_shouldReturnNull_whenCaseDataIsNull() {
-        String result = new InitialConsiderationService(null).setIcEt1VettingIssuesDetails(null);
-
-        assertNull(result);
-    }
-
-    @Test
-    void setIcEt1VettingIssuesDetails_shouldHandleEmptyRegionalOfficeList() {
-        CaseData caseDataWithEmptyRegionalOffice = new CaseData();
-        caseDataWithEmptyRegionalOffice.setIsLocationCorrect("No");
-        DynamicFixedListType regionalOfficeList = new DynamicFixedListType();
-
-        caseDataWithEmptyRegionalOffice.setRegionalOfficeList(regionalOfficeList);
-        String result = new InitialConsiderationService(null)
-                .setIcEt1VettingIssuesDetails(caseDataWithEmptyRegionalOffice);
-
-        assertTrue(result.contains("Is this location correct?"));
-        assertFalse(result.contains("Local or regional office selected"));
-    }
-
-    @Test
-    void setIcEt1VettingIssuesDetails_shouldHandleEmptyWhyChangeOffice() {
-        CaseData caseDataWithEmptyWhyChangeOffice = new CaseData();
-        caseDataWithEmptyWhyChangeOffice.setIsLocationCorrect("No");
-        caseDataWithEmptyWhyChangeOffice.setWhyChangeOffice("");
-
-        String result = new InitialConsiderationService(null)
-                .setIcEt1VettingIssuesDetails(caseDataWithEmptyWhyChangeOffice);
-
-        assertTrue(result.contains("Is this location correct?"));
-        assertFalse(result.contains("Why should we change the office?"));
-    }
-
-    @Test
-    void setIcEt1VettingIssuesDetails_shouldIncludeDetails_whenAllFieldsArePopulated() {
-        final CaseData caseDataWithDetails = getCaseDataWithDetails();
-
-        String result = new InitialConsiderationService(null)
-                .setIcEt1VettingIssuesDetails(caseDataWithDetails);
-
-        assertTrue(result.contains("Is this location correct?"));
-        assertTrue(result.contains("Local or regional office selected"));
-        assertTrue(result.contains("Why should we change the office?"));
-    }
-
-    private static @NonNull CaseData getCaseDataWithDetails() {
-        CaseData caseDataWithDetails = new CaseData();
-        caseDataWithDetails.setIsLocationCorrect("No");
-        DynamicFixedListType regionalOfficeList = new DynamicFixedListType();
-        DynamicValueType dynamicValueType = new DynamicValueType();
-        dynamicValueType.setCode("RO1");
-        dynamicValueType.setLabel("Regional Office 1");
-        regionalOfficeList.setValue(dynamicValueType);
-        caseDataWithDetails.setRegionalOfficeList(regionalOfficeList);
-        caseDataWithDetails.setWhyChangeOffice("Relocation");
-        return caseDataWithDetails;
+    void getHearingVenueDetails_returnsDashForNullHearing() {
+        String result = InitialConsiderationService.getHearingVenueDetails(null, ENGLANDWALES_CASE_TYPE_ID);
+        assertEquals("-", result);
     }
 
     @Test

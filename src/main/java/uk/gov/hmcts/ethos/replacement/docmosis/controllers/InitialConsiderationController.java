@@ -100,8 +100,6 @@ public class InitialConsiderationController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        //clear old values
-        initialConsiderationService.clearHiddenValue(caseData);
         initialConsiderationService.processIcDocumentCollections(caseData);
 
         caseData.setIcCompletedBy(reportDataService.getUserFullName(userToken));

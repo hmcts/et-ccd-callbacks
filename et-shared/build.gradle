@@ -1,0 +1,113 @@
+plugins {
+    id 'java-library'
+    id 'maven-publish'
+    id 'io.spring.dependency-management' version '1.1.5'
+}
+
+group 'com.github.hmcts'
+version System.getenv('RELEASE_VERSION') ?: "DEV-SNAPSHOT-${new Date().format('yyyyMMdd-HHmmss')}"
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url 'https://jitpack.io' }
+    maven { url "https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1" }
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.boot:spring-boot-dependencies:3.5.5"
+    }
+}
+
+tasks.register('sourcesJar', Jar) {
+    dependsOn classes
+    archiveClassifier.set("sources")
+    from sourceSets.main.allSource
+}
+
+tasks.register('javadocJar', Jar) {
+    dependsOn javadoc
+    archiveClassifier.set("javadoc")
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+publishing {
+    publications {
+        Main(MavenPublication) {
+            from components.java
+            artifact sourcesJar
+            artifact javadocJar
+            groupId project.group
+            artifactId 'et-shared'
+            version project.version
+        }
+    }
+
+    repositories {
+        maven {
+            name = "AzureArtifacts"
+            url = uri("https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1")
+            credentials {
+                username = System.getenv("AZURE_DEVOPS_ARTIFACT_USERNAME")
+                password = System.getenv("AZURE_DEVOPS_ARTIFACT_TOKEN")
+            }
+        }
+    }
+}
+
+dependencies {
+    api group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.1.2'
+    api group: 'com.microsoft.azure', name: 'azure-servicebus', version: '3.6.7'
+    api group: 'org.apache.poi', name: 'poi-ooxml', version: '5.4.1'
+    api group: 'org.elasticsearch', name: 'elasticsearch', version: '8.17.3'
+
+    implementation group: 'com.github.hmcts', name: 'core-case-data-store-client', version: '4.9.2'
+    implementation group: 'uk.gov.dwp.regex', name: 'postcode-validation', version: '1.1.0'
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.18.0'
+    implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.5.0'
+    implementation group: 'com.google.guava', name: 'guava', version: '33.4.8-jre'
+    implementation group: 'org.apache.tika', name: 'tika-core', version: '3.1.0'
+    implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '3.0.0-RC1'
+
+    implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '6.1.9'
+    implementation group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: '6.1.9'
+    implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '8.0'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.24.3'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.24.3'
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.14'
+    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.5.14'
+    implementation group: 'ch.qos.logback', name: 'logback-access', version: '1.5.14'
+    implementation group: 'org.slf4j', name: 'slf4j-ext', version: '2.0.17'
+
+    implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.10.2'
+
+    implementation 'org.springframework:spring-web'
+    implementation 'org.springframework:spring-context'
+    implementation 'org.springframework:spring-webmvc'
+    implementation 'org.aspectj:aspectjrt'
+    implementation 'org.aspectj:aspectjweaver'
+    implementation 'jakarta.annotation:jakarta.annotation-api'
+
+    implementation group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
+    implementation group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.2.5.Final'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.18.3'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.18.3'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.18.3'
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.18.3'
+    implementation group: 'org.springframework', name: 'spring-core', version: '6.2.11'
+
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.42'
+    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.42'
+}

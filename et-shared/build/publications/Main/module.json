@@ -1,0 +1,312 @@
+{
+  "formatVersion": "1.1",
+  "component": {
+    "group": "com.github.hmcts",
+    "module": "et-shared",
+    "version": "DEV-SNAPSHOT-20260211-145009",
+    "attributes": {
+      "org.gradle.status": "release"
+    }
+  },
+  "createdBy": {
+    "gradle": {
+      "version": "8.14.3"
+    }
+  },
+  "variants": [
+    {
+      "name": "apiElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 21,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-api"
+      },
+      "dependencies": [
+        {
+          "group": "com.github.hmcts",
+          "module": "service-auth-provider-java-client",
+          "version": {
+            "requires": "4.1.2"
+          }
+        },
+        {
+          "group": "com.microsoft.azure",
+          "module": "azure-servicebus",
+          "version": {
+            "requires": "3.6.7"
+          }
+        },
+        {
+          "group": "org.apache.poi",
+          "module": "poi-ooxml",
+          "version": {
+            "requires": "5.4.1"
+          }
+        },
+        {
+          "group": "org.elasticsearch",
+          "module": "elasticsearch",
+          "version": {
+            "requires": "8.17.3"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "et-shared-DEV-SNAPSHOT-20260211-145009.jar",
+          "url": "et-shared-DEV-SNAPSHOT-20260211-145009.jar",
+          "size": 1721783,
+          "sha512": "f059bb25b2f4aa79f81b7ddecc67c5afa2668a4389588d50f9b0c21888b209743f8bc4667e47e6e51460710405a8bd82f608b0a4e2d6644d5304247265e2b0d1",
+          "sha256": "566ad4bb8520a02202ba8130b8424771c29bdc12abc9c03c4219d37e0670a1f2",
+          "sha1": "3b282b553334abf855b1c87e5c13027b320b2ca3",
+          "md5": "cfd34e0940468bfb36becca46d83d51a"
+        }
+      ]
+    },
+    {
+      "name": "runtimeElements",
+      "attributes": {
+        "org.gradle.category": "library",
+        "org.gradle.dependency.bundling": "external",
+        "org.gradle.jvm.version": 21,
+        "org.gradle.libraryelements": "jar",
+        "org.gradle.usage": "java-runtime"
+      },
+      "dependencies": [
+        {
+          "group": "com.github.hmcts",
+          "module": "core-case-data-store-client",
+          "version": {
+            "requires": "4.9.2"
+          }
+        },
+        {
+          "group": "uk.gov.dwp.regex",
+          "module": "postcode-validation",
+          "version": {
+            "requires": "1.1.0"
+          }
+        },
+        {
+          "group": "org.apache.commons",
+          "module": "commons-lang3",
+          "version": {
+            "requires": "3.18.0"
+          }
+        },
+        {
+          "group": "org.apache.commons",
+          "module": "commons-collections4",
+          "version": {
+            "requires": "4.5.0"
+          }
+        },
+        {
+          "group": "com.google.guava",
+          "module": "guava",
+          "version": {
+            "requires": "33.4.8-jre"
+          }
+        },
+        {
+          "group": "org.apache.tika",
+          "module": "tika-core",
+          "version": {
+            "requires": "3.1.0"
+          }
+        },
+        {
+          "group": "org.apache.pdfbox",
+          "module": "pdfbox",
+          "version": {
+            "requires": "3.0.0-RC1"
+          }
+        },
+        {
+          "group": "com.github.hmcts.java-logging",
+          "module": "logging",
+          "version": {
+            "requires": "6.1.9"
+          }
+        },
+        {
+          "group": "com.github.hmcts.java-logging",
+          "module": "logging-appinsights",
+          "version": {
+            "requires": "6.1.9"
+          }
+        },
+        {
+          "group": "net.logstash.logback",
+          "module": "logstash-logback-encoder",
+          "version": {
+            "requires": "8.0"
+          }
+        },
+        {
+          "group": "org.apache.logging.log4j",
+          "module": "log4j-api",
+          "version": {
+            "requires": "2.24.3"
+          }
+        },
+        {
+          "group": "org.apache.logging.log4j",
+          "module": "log4j-to-slf4j",
+          "version": {
+            "requires": "2.24.3"
+          }
+        },
+        {
+          "group": "ch.qos.logback",
+          "module": "logback-classic",
+          "version": {
+            "requires": "1.5.14"
+          }
+        },
+        {
+          "group": "ch.qos.logback",
+          "module": "logback-core",
+          "version": {
+            "requires": "1.5.14"
+          }
+        },
+        {
+          "group": "ch.qos.logback",
+          "module": "logback-access",
+          "version": {
+            "requires": "1.5.14"
+          }
+        },
+        {
+          "group": "org.slf4j",
+          "module": "slf4j-ext",
+          "version": {
+            "requires": "2.0.17"
+          }
+        },
+        {
+          "group": "com.launchdarkly",
+          "module": "launchdarkly-java-server-sdk",
+          "version": {
+            "requires": "7.10.2"
+          }
+        },
+        {
+          "group": "org.springframework",
+          "module": "spring-web"
+        },
+        {
+          "group": "org.springframework",
+          "module": "spring-context"
+        },
+        {
+          "group": "org.springframework",
+          "module": "spring-webmvc"
+        },
+        {
+          "group": "org.aspectj",
+          "module": "aspectjrt"
+        },
+        {
+          "group": "org.aspectj",
+          "module": "aspectjweaver"
+        },
+        {
+          "group": "jakarta.annotation",
+          "module": "jakarta.annotation-api"
+        },
+        {
+          "group": "javax.validation",
+          "module": "validation-api",
+          "version": {
+            "requires": "2.0.1.Final"
+          }
+        },
+        {
+          "group": "org.hibernate.validator",
+          "module": "hibernate-validator",
+          "version": {
+            "requires": "6.2.5.Final"
+          }
+        },
+        {
+          "group": "com.fasterxml.jackson.core",
+          "module": "jackson-core",
+          "version": {
+            "requires": "2.18.3"
+          }
+        },
+        {
+          "group": "com.fasterxml.jackson.core",
+          "module": "jackson-annotations",
+          "version": {
+            "requires": "2.18.3"
+          }
+        },
+        {
+          "group": "com.fasterxml.jackson.core",
+          "module": "jackson-databind",
+          "version": {
+            "requires": "2.18.3"
+          }
+        },
+        {
+          "group": "com.fasterxml.jackson.datatype",
+          "module": "jackson-datatype-jsr310",
+          "version": {
+            "requires": "2.18.3"
+          }
+        },
+        {
+          "group": "org.springframework",
+          "module": "spring-core",
+          "version": {
+            "requires": "6.2.11"
+          }
+        },
+        {
+          "group": "com.github.hmcts",
+          "module": "service-auth-provider-java-client",
+          "version": {
+            "requires": "4.1.2"
+          }
+        },
+        {
+          "group": "com.microsoft.azure",
+          "module": "azure-servicebus",
+          "version": {
+            "requires": "3.6.7"
+          }
+        },
+        {
+          "group": "org.apache.poi",
+          "module": "poi-ooxml",
+          "version": {
+            "requires": "5.4.1"
+          }
+        },
+        {
+          "group": "org.elasticsearch",
+          "module": "elasticsearch",
+          "version": {
+            "requires": "8.17.3"
+          }
+        }
+      ],
+      "files": [
+        {
+          "name": "et-shared-DEV-SNAPSHOT-20260211-145009.jar",
+          "url": "et-shared-DEV-SNAPSHOT-20260211-145009.jar",
+          "size": 1721783,
+          "sha512": "f059bb25b2f4aa79f81b7ddecc67c5afa2668a4389588d50f9b0c21888b209743f8bc4667e47e6e51460710405a8bd82f608b0a4e2d6644d5304247265e2b0d1",
+          "sha256": "566ad4bb8520a02202ba8130b8424771c29bdc12abc9c03c4219d37e0670a1f2",
+          "sha1": "3b282b553334abf855b1c87e5c13027b320b2ca3",
+          "md5": "cfd34e0940468bfb36becca46d83d51a"
+        }
+      ]
+    }
+  ]
+}

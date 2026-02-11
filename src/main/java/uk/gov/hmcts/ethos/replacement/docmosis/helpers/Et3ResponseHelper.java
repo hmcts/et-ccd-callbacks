@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DynamicListTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
@@ -16,6 +17,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
@@ -186,13 +188,14 @@ public final class Et3ResponseHelper {
      */
     public static void addEt3DataToRespondent(CaseData caseData, String eventId) {
         Set<String> respondentSet = new HashSet<>();
+
         switch (eventId) {
-            case ET3_RESPONSE -> respondentSet.add(caseData.getSubmitEt3Respondent().getSelectedLabel());
-            case ET3_RESPONSE_DETAILS, ET3_RESPONSE_EMPLOYMENT_DETAILS -> {
-                for (DynamicListTypeItem dynamicListTypeItem : caseData.getEt3RepresentingRespondent()) {
-                    respondentSet.add(dynamicListTypeItem.getValue().getDynamicList().getSelectedLabel());
-                }
-            }
+
+            case ET3_RESPONSE -> addRespondentFromSingleSelection(caseData, respondentSet);
+
+            case ET3_RESPONSE_DETAILS, ET3_RESPONSE_EMPLOYMENT_DETAILS ->
+                    addRespondentsFromDynamicList(caseData, respondentSet);
+
             default -> throw new IllegalArgumentException(INVALID_EVENT_ID + eventId);
         }
 
@@ -203,6 +206,25 @@ public final class Et3ResponseHelper {
             respondent.ifPresent(respondentSumTypeItem -> addEt3Data(caseData, eventId, respondentSelected,
                     respondentSumTypeItem));
         }
+    }
+
+    private static void addRespondentFromSingleSelection(CaseData caseData, Set<String> respondentSet) {
+        Optional.ofNullable(caseData.getSubmitEt3Respondent())
+                .map(DynamicFixedListType::getValue)
+                .map(DynamicValueType::getLabel)
+                .ifPresent(respondentSet::add);
+    }
+
+    private static void addRespondentsFromDynamicList(CaseData caseData, Set<String> respondentSet) {
+        Optional.ofNullable(caseData.getEt3RepresentingRespondent())
+                .orElse(List.of())
+                .stream()
+                .map(DynamicListTypeItem::getValue)
+                .map(DynamicListType::getDynamicList)
+                .map(DynamicFixedListType::getValue)
+                .map(DynamicValueType::getLabel)
+                .filter(Objects::nonNull)
+                .forEach(respondentSet::add);
     }
 
     private static void addEt3Data(CaseData caseData, String eventId, String respondentSelected,

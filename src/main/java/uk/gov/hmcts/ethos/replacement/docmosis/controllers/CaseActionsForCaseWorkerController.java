@@ -260,6 +260,7 @@ public class CaseActionsForCaseWorkerController {
             buildFlagsImageFileName(ccdRequest.getCaseDetails());
             caseData.setMultipleFlag(caseData.getEcmCaseType() != null
                     && Constants.MULTIPLE_CASE_TYPE.equals(caseData.getEcmCaseType()) ? Constants.YES : Constants.NO);
+            caseData.setChangeOrganisationRequestField(null);
             UploadDocumentHelper.convertLegacyDocsToNewDocNaming(caseData);
             UploadDocumentHelper.setDocumentTypeForDocumentCollection(caseData);
             DocumentHelper.setDocumentNumbers(caseData);
@@ -285,7 +286,6 @@ public class CaseActionsForCaseWorkerController {
             if (featureToggleService.citizenEt1Generation() && SUBMIT_CASE_DRAFT.equals(ccdRequest.getEventId())) {
                 caseDetails.setCaseData(caseData);
                 et1SubmissionService.createAndUploadEt1Docs(caseDetails, userToken);
-                et1SubmissionService.sendEt1ConfirmationClaimant(caseDetails, userToken);
                 et1SubmissionService.vexationCheck(caseDetails, userToken);
             }
         }

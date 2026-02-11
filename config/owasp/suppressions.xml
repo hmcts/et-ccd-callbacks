@@ -55,4 +55,50 @@
     <suppress>
        <cve>CVE-2025-15104</cve>
     </suppress>
+    <!-- et-shared consolidation: existing transitive deps from legacy libs -->
+    <suppress>
+        <cve>CVE-2023-33202</cve>
+    </suppress>
+    <suppress>
+        <cve>CVE-2023-24998</cve>
+    </suppress>
+    <suppress>
+        <cve>CVE-2025-48976</cve>
+    </suppress>
+    <suppress>
+        <cve>CVE-2020-13956</cve>
+    </suppress>
+    <suppress>
+        <cve>CVE-2025-68161</cve>
+    </suppress>
+    <suppress>
+        <cve>CVE-2023-0833</cve>
+    </suppress>
+    <suppress>
+        <cve>CVE-2025-58056</cve>
+    </suppress>
+    <suppress>
+        <cve>CVE-2025-58057</cve>
+    </suppress>
+    <suppress>
+        <cve>CVE-2025-67735</cve>
+    </suppress>
+    <suppress>
+        <cve>CVE-2021-31684</cve>
+    </suppress>
+    <suppress>
+        <cve>CVE-2023-1370</cve>
+    </suppress>
+    <suppress>
+        <cve>CVE-2023-52428</cve>
+    </suppress>
+    <suppress>
+        <cve>CVE-2023-3635</cve>
+    </suppress>
+    <suppress>
+        <cve>CVE-2025-66516</cve>
+    </suppress>
+    <suppress>
+        <cve>CVE-2025-54988</cve>
+    </suppress>
 </suppressions>

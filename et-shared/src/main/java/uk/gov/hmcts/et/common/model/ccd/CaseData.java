@@ -1,5 +1,6 @@
 package uk.gov.hmcts.et.common.model.ccd;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
@@ -1670,6 +1671,7 @@ public class CaseData extends Et1CaseData {
      * Convenience method for using the new ListTypeItem pattern for setting repCollection.
      * @param repCollection Collection of respondent representatives
      */
+    @JsonIgnore
     @Tolerate
     void setRepCollection(ListTypeItem<RepresentedTypeR> repCollection) {
         this.repCollection = repCollection.stream()

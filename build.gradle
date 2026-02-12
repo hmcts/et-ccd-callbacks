@@ -44,7 +44,10 @@ def sonarExclusions =
          '**/uk/gov/hmcts/reform/ethos/replacement/docmosis/CaseOrchestrationApplication',
          '**/uk/gov/hmcts/ethos/replacement/docmosis.config.DevQueueClient.java',
          '**/uk/gov/hmcts/ethos/replacement/docmosis/domain/admin/**',
-         '**/uk/gov/hmcts/ethos/replacement/docmosis/controllers/RespondentTellSomethingElseController.java'
+         '**/uk/gov/hmcts/ethos/replacement/docmosis/controllers/RespondentTellSomethingElseController.java',
+         'et-shared/src/main/java/**/model/**',
+         'et-shared/src/main/java/**/bundle/**',
+         'et-shared/src/main/java/**/exceptions/**'
 ]
 
 def duplicateCodeExclusionList = [

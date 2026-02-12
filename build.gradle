@@ -47,7 +47,11 @@ def sonarExclusions =
          '**/uk/gov/hmcts/ethos/replacement/docmosis/controllers/RespondentTellSomethingElseController.java',
          'et-shared/src/main/java/**/model/**',
          'et-shared/src/main/java/**/bundle/**',
-         'et-shared/src/main/java/**/exceptions/**'
+         'et-shared/src/main/java/**/exceptions/**',
+         'et-shared/src/main/java/**/configuration/**',
+         'et-shared/src/main/java/**/helpers/**',
+         'et-shared/src/main/java/**/launchdarkly/**',
+         'et-shared/src/main/java/**/servicebus/**'
 ]
 
 def duplicateCodeExclusionList = [

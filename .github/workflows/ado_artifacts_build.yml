@@ -40,7 +40,7 @@ jobs:
         id: set_release_version
         run: |
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            BRANCH_NAME="${{ github.head_ref }}"
+            BRANCH_NAME="$GITHUB_HEAD_REF"
             SAFE_BRANCH_NAME=$(echo "$BRANCH_NAME" | tr -cd 'A-Za-z0-9._-')
             if [ -z "$SAFE_BRANCH_NAME" ]; then
               SAFE_BRANCH_NAME="pr"

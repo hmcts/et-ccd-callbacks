@@ -19,6 +19,8 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -630,5 +632,93 @@ class Et3ResponseServiceTest {
         GenericServiceException organisationNotFound = assertThrows(GenericServiceException.class, () ->
                 et3ResponseService.setRespondentRepresentsContactDetails(userToken, caseData4, submissionReference));
         assertThat(organisationNotFound.getMessage()).isEqualTo("Organisation details not found");
+    }
+
+    @Test
+    @SneakyThrows
+    void generateEt3ResponseDocument_withEmptyRepresentativeAddress_setsOrganisationAddress() {
+        CaseData testCaseData = new CaseData();
+        testCaseData.setSubmitEt3Respondent(DynamicFixedListType.of(DynamicValueType.create("test", "test")));
+        
+        // Create representative with null address
+        RepresentedTypeR representative = new RepresentedTypeR();
+        representative.setRespRepName("test");
+        representative.setRepresentativeAddress(null);
+        testCaseData.setRepCollection(List.of(RepresentedTypeRItem.builder().value(representative).build()));
+        
+        OrganisationAddress organisationAddress = OrganisationAddress.builder()
+                .addressLine1(ADDRESS_LINE_1)
+                .addressLine2(ADDRESS_LINE_2)
+                .addressLine3(ADDRESS_LINE_3)
+                .townCity(POST_TOWN)
+                .postCode(POST_CODE)
+                .county(COUNTY)
+                .country(COUNTRY)
+                .build();
+        
+        when(myHmctsService.getOrganisationAddress(VALID_USER_TOKEN)).thenReturn(organisationAddress);
+        when(pdfBoxService.generatePdfDocumentInfo(any(), anyString(), anyString(), 
+                anyString(), anyString(), anyString())).thenReturn(documentInfo);
+        
+        et3ResponseService.generateEt3ResponseDocument(testCaseData, VALID_USER_TOKEN,
+                ENGLANDWALES_CASE_TYPE_ID, SUBMIT_ET3);
+        
+        assertThat(representative.getRepresentativeAddress()).isNotNull();
+        assertThat(representative.getRepresentativeAddress().getAddressLine1()).isEqualTo(ADDRESS_LINE_1);
+        assertThat(representative.getRepresentativeAddress().getAddressLine2()).isEqualTo(ADDRESS_LINE_2);
+        assertThat(representative.getRepresentativeAddress().getAddressLine3()).isEqualTo(ADDRESS_LINE_3);
+        assertThat(representative.getRepresentativeAddress().getPostTown()).isEqualTo(POST_TOWN);
+        assertThat(representative.getRepresentativeAddress().getPostCode()).isEqualTo(POST_CODE);
+        assertThat(representative.getRepresentativeAddress().getCounty()).isEqualTo(COUNTY);
+        assertThat(representative.getRepresentativeAddress().getCountry()).isEqualTo(COUNTRY);
+    }
+
+    @Test
+    @SneakyThrows
+    void generateEt3ResponseDocument_withExistingRepresentativeAddress_doesNotOverwrite() {
+        CaseData testCaseData = new CaseData();
+        testCaseData.setSubmitEt3Respondent(DynamicFixedListType.of(DynamicValueType.create("test", "test")));
+        
+        // Create representative with existing address
+        Address existingAddress = new Address();
+        existingAddress.setAddressLine1("Existing Address Line 1");
+        existingAddress.setPostTown("Existing Town");
+        
+        RepresentedTypeR representative = new RepresentedTypeR();
+        representative.setRespRepName("test");
+        representative.setRepresentativeAddress(existingAddress);
+        testCaseData.setRepCollection(List.of(RepresentedTypeRItem.builder().value(representative).build()));
+        
+        when(pdfBoxService.generatePdfDocumentInfo(any(), anyString(), anyString(), 
+                anyString(), anyString(), anyString())).thenReturn(documentInfo);
+        
+        et3ResponseService.generateEt3ResponseDocument(testCaseData, VALID_USER_TOKEN,
+                ENGLANDWALES_CASE_TYPE_ID, SUBMIT_ET3);
+        
+        assertThat(representative.getRepresentativeAddress()).isNotNull();
+        assertThat(representative.getRepresentativeAddress().getAddressLine1()).isEqualTo("Existing Address Line 1");
+        assertThat(representative.getRepresentativeAddress().getPostTown()).isEqualTo("Existing Town");
+        verify(myHmctsService, times(0)).getOrganisationAddress(anyString());
+    }
+
+    @Test
+    @SneakyThrows
+    void generateEt3ResponseDocument_withNullRepresentative_doesNotThrowException() {
+        caseData = CaseDataBuilder.builder()
+                .withClaimantIndType("Doris", "Johnson")
+                .withRespondentWithAddress("Antonio Vazquez",
+                        "11 Small Street", "22 House", null,
+                        "Manchester", "M12 42R", "United Kingdom",
+                        "1234/5678/90")
+                .withSubmitEt3Respondent("Antonio Vazquez")
+                .build();
+        
+        when(pdfBoxService.generatePdfDocumentInfo(any(), anyString(), anyString(), 
+                anyString(), anyString(), anyString())).thenReturn(documentInfo);
+        
+        assertDoesNotThrow(() -> et3ResponseService.generateEt3ResponseDocument(
+                caseData, VALID_USER_TOKEN, ENGLANDWALES_CASE_TYPE_ID, SUBMIT_ET3));
+        
+        verify(myHmctsService, times(0)).getOrganisationAddress(anyString());
     }
 }

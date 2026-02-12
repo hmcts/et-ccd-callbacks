@@ -25,12 +25,14 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.CcdCaseAssignment;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Collections;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.UUID;
 import java.util.stream.Stream;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -183,16 +185,38 @@ class CaseAccessServiceTest {
     }
 
     @Test
-    void getCaseUserAssignmentsById_throwsExceptionWhenError() throws IOException {
+    void getCaseUserAssignmentsById_rolesNull_returnsEmptyList() throws IOException {
         String caseId = "1234567890123456";
-        when(caseAssignment.getCaseUserRoles(caseId)).thenThrow(new RuntimeException("Some error"));
+        when(caseAssignment.getCaseUserRoles(caseId)).thenReturn(null);
 
-        NoSuchElementException exception = org.junit.jupiter.api.Assertions.assertThrows(
-                NoSuchElementException.class,
-                () -> caseAccessService.getCaseUserAssignmentsById(caseId)
-        );
-        assertEquals("No user assignments found for case 1234567890123456", exception.getMessage());
-        assertEquals("Some error", exception.getCause().getMessage());
+        List<CaseUserAssignment> result = caseAccessService.getCaseUserAssignmentsById(caseId);
+
+        assertTrue(result.isEmpty());
     }
 
+    @Test
+    void getCaseUserAssignmentsById_assignmentsNull_returnsEmptyList() throws IOException {
+        String caseId = "1234567890123456";
+        CaseUserAssignmentData assignmentData = CaseUserAssignmentData.builder()
+                .caseUserAssignments(null)
+                .build();
+        when(caseAssignment.getCaseUserRoles(caseId)).thenReturn(assignmentData);
+
+        List<CaseUserAssignment> result = caseAccessService.getCaseUserAssignmentsById(caseId);
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void getCaseUserAssignmentsById_throwsUncheckedIOExceptionOnIOException() throws IOException {
+        String caseId = "1234567890123456";
+        when(caseAssignment.getCaseUserRoles(caseId)).thenThrow(new IOException("IO error"));
+
+        UncheckedIOException exception = assertThrows(
+                UncheckedIOException.class,
+                () -> caseAccessService.getCaseUserAssignmentsById(caseId)
+        );
+        assertEquals("Failed to retrieve user assignments for case " + caseId, exception.getMessage());
+        assertEquals("IO error", exception.getCause().getMessage());
+    }
 }

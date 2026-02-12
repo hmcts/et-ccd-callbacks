@@ -235,6 +235,13 @@ public class SendNotificationService {
         // Send notification to the claimant
         String caseId = caseDetails.getCaseId();
         List<CaseUserAssignment> caseUserAssignments = caseAccessService.getCaseUserAssignmentsById(caseId);
+
+        if (caseUserAssignments == null || caseUserAssignments.isEmpty()) {
+            log.warn("In SendNotificationService : No case user assignments found for caseId {}",
+                    caseDetails.getCaseId());
+            return;
+        }
+
         if (!RESPONDENT_ONLY.equals(caseData.getSendNotificationNotify())) {
             // If represented, send notification to claimant representative Only
             Map<String, String> personalisation;

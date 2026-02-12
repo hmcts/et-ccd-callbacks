@@ -463,30 +463,30 @@ class CaseTransferControllerTest extends BaseControllerTest {
         CaseTransferSameCountryService sameCountryService = mock(CaseTransferSameCountryService.class);
         CaseTransferDifferentCountryService diffCountryService = mock(CaseTransferDifferentCountryService.class);
         CaseTransferToEcmService toEcmService = mock(CaseTransferToEcmService.class);
-        DefaultValuesReaderService defaultValuesReaderService = mock(DefaultValuesReaderService.class);
-        CaseManagementLocationService caseManagementLocationService = mock(CaseManagementLocationService.class);
-        FeatureToggleService featureToggleService = mock(FeatureToggleService.class);
+        DefaultValuesReaderService defaultValuesReaderServiceMock = mock(DefaultValuesReaderService.class);
+        CaseManagementLocationService caseManagementLocationServiceMock = mock(CaseManagementLocationService.class);
+        FeatureToggleService featureToggleServiceMock = mock(FeatureToggleService.class);
         when(verifyTokenService.verifyTokenSignature("token")).thenReturn(true);
-        when(featureToggleService.isHmcEnabled()).thenReturn(true);
-        when(featureToggleService.isWorkAllocationEnabled()).thenReturn(false);
+        when(featureToggleServiceMock.isHmcEnabled()).thenReturn(true);
+        when(featureToggleServiceMock.isWorkAllocationEnabled()).thenReturn(false);
         DefaultValues defaultValues = mock(DefaultValues.class);
-        when(defaultValuesReaderService.getDefaultValues("Unassigned")).thenReturn(defaultValues);
+        when(defaultValuesReaderServiceMock.getDefaultValues("Unassigned")).thenReturn(defaultValues);
 
-        doNothing().when(caseManagementLocationService).setCaseManagementLocationCode(caseDataToBeUpdated);
+        doNothing().when(caseManagementLocationServiceMock).setCaseManagementLocationCode(caseDataToBeUpdated);
         doAnswer(i -> {
             caseDataToBeUpdated.setCaseManagementLocationCode("123");
             return null;
-        }).when(caseManagementLocationService).setCaseManagementLocation(caseDataToBeUpdated);
+        }).when(caseManagementLocationServiceMock).setCaseManagementLocation(caseDataToBeUpdated);
 
         doAnswer(i -> {
             caseDataToBeUpdated.setCaseManagementLocation(CaseLocation.builder()
                     .baseLocation("Leeds").region("321").build());
             return null;
-        }).when(caseManagementLocationService).setCaseManagementLocationCode(caseDataToBeUpdated);
+        }).when(caseManagementLocationServiceMock).setCaseManagementLocationCode(caseDataToBeUpdated);
 
         CaseTransferController controller = new CaseTransferController(
                 verifyTokenService, sameCountryService, diffCountryService, toEcmService,
-                defaultValuesReaderService, caseManagementLocationService, featureToggleService);
+                defaultValuesReaderService, caseManagementLocationServiceMock, featureToggleServiceMock);
 
         // Act
         ResponseEntity<?> response = controller.assignCase(ccdRequest, "token");
@@ -494,8 +494,8 @@ class CaseTransferControllerTest extends BaseControllerTest {
         // Assert
         assertEquals(200, response.getStatusCodeValue());
         verify(verifyTokenService).verifyTokenSignature("token");
-        verify(caseManagementLocationService, times(2)).setCaseManagementLocationCode(caseDataToBeUpdated);
-        verify(caseManagementLocationService).setCaseManagementLocation(caseDataToBeUpdated);
+        verify(caseManagementLocationServiceMock, times(2)).setCaseManagementLocationCode(caseDataToBeUpdated);
+        verify(caseManagementLocationServiceMock).setCaseManagementLocation(caseDataToBeUpdated);
         assertNotNull(caseDataToBeUpdated.getManagingOffice());
         assertNotNull(caseDataToBeUpdated.getCaseManagementLocation());
         assertNotNull(caseDataToBeUpdated.getCaseManagementLocationCode());

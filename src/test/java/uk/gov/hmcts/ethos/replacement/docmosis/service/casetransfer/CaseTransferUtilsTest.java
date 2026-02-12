@@ -19,6 +19,7 @@ import java.util.List;
 
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
@@ -273,7 +274,7 @@ class CaseTransferUtilsTest {
 
         CaseTransferUtils.setCaseManagingOffice(caseData, "INVALID_CASE_TYPE");
 
-        assertEquals(caseData.getManagingOffice(), null);
-        assertEquals(caseData.getAllocatedOffice(), null);
+        assertNull(caseData.getManagingOffice());
+        assertNull(caseData.getAllocatedOffice());
     }
 }

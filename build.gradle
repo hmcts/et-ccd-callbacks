@@ -111,16 +111,8 @@ sourceSets {
     }
 }
 
-configurations {
-    functionalImplementation.extendsFrom testImplementation
-    functionalRuntimeOnly.extendsFrom testRuntimeOnly
-    contractTestImplementation.extendsFrom testImplementation
-    contractTestRuntimeOnly.extendsFrom testRuntimeOnly
-    integrationTestImplementation.extendsFrom testImplementation
-    integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
-    apiTestImplementation.extendsFrom testImplementation
-    apiTestRuntimeOnly.extendsFrom testRuntimeOnly
-    configureEach {
+allprojects {
+    configurations.configureEach {
         resolutionStrategy.eachDependency { details ->
             if (details.requested.group.startsWith("com.fasterxml.jackson")) {
                 details.useVersion("$jacksonVersion")
@@ -158,6 +150,17 @@ configurations {
             'io.netty:netty-transport-classes-kqueue:4.2.9.Final'
         )
     }
+}
+
+configurations {
+    functionalImplementation.extendsFrom testImplementation
+    functionalRuntimeOnly.extendsFrom testRuntimeOnly
+    contractTestImplementation.extendsFrom testImplementation
+    contractTestRuntimeOnly.extendsFrom testRuntimeOnly
+    integrationTestImplementation.extendsFrom testImplementation
+    integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
+    apiTestImplementation.extendsFrom testImplementation
+    apiTestRuntimeOnly.extendsFrom testRuntimeOnly
 }
 
 test {

@@ -23,6 +23,39 @@ dependencyManagement {
     imports {
         mavenBom "org.springframework.boot:spring-boot-dependencies:3.5.5"
     }
+    dependencies {
+        dependency 'commons-fileupload:commons-fileupload:1.6.0'
+        dependency 'org.apache.httpcomponents:httpclient:4.5.14'
+        dependency 'org.apache.logging.log4j:log4j-core:2.25.3'
+        dependency 'com.nimbusds:nimbus-jose-jwt:10.5'
+        dependency 'net.minidev:json-smart:2.5.2'
+        dependency 'com.squareup.okhttp3:logging-interceptor:4.12.0'
+        dependency 'com.squareup.okhttp3:okhttp:4.12.0'
+        dependency 'com.squareup.okhttp3:okhttp-urlconnection:4.12.0'
+        dependency 'com.squareup.okio:okio:3.16.4'
+        dependency 'org.bouncycastle:bcprov-jdk15on:1.70'
+        dependencySet(group: 'io.netty', version: '4.2.9.Final') {
+            entry 'netty-buffer'
+            entry 'netty-codec'
+            entry 'netty-codec-dns'
+            entry 'netty-codec-http'
+            entry 'netty-codec-http2'
+            entry 'netty-codec-socks'
+            entry 'netty-common'
+            entry 'netty-handler'
+            entry 'netty-handler-proxy'
+            entry 'netty-resolver'
+            entry 'netty-resolver-dns'
+            entry 'netty-resolver-dns-classes-macos'
+            entry 'netty-resolver-dns-native-macos'
+            entry 'netty-transport'
+            entry 'netty-transport-native-epoll'
+            entry 'netty-transport-native-kqueue'
+            entry 'netty-transport-native-unix-common'
+            entry 'netty-transport-classes-epoll'
+            entry 'netty-transport-classes-kqueue'
+        }
+    }
 }
 
 tasks.register('sourcesJar', Jar) {
@@ -109,4 +142,38 @@ dependencies {
 
     compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.42'
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.42'
+}
+
+configurations.configureEach {
+    resolutionStrategy.force(
+        'commons-fileupload:commons-fileupload:1.6.0',
+        'org.apache.httpcomponents:httpclient:4.5.14',
+        'org.apache.logging.log4j:log4j-core:2.25.3',
+        'com.nimbusds:nimbus-jose-jwt:10.5',
+        'net.minidev:json-smart:2.5.2',
+        'com.squareup.okhttp3:logging-interceptor:4.12.0',
+        'com.squareup.okhttp3:okhttp:4.12.0',
+        'com.squareup.okhttp3:okhttp-urlconnection:4.12.0',
+        'com.squareup.okio:okio:3.16.4',
+        'org.bouncycastle:bcprov-jdk15on:1.70',
+        'io.netty:netty-buffer:4.2.9.Final',
+        'io.netty:netty-codec:4.2.9.Final',
+        'io.netty:netty-codec-dns:4.2.9.Final',
+        'io.netty:netty-codec-http:4.2.9.Final',
+        'io.netty:netty-codec-http2:4.2.9.Final',
+        'io.netty:netty-codec-socks:4.2.9.Final',
+        'io.netty:netty-common:4.2.9.Final',
+        'io.netty:netty-handler:4.2.9.Final',
+        'io.netty:netty-handler-proxy:4.2.9.Final',
+        'io.netty:netty-resolver:4.2.9.Final',
+        'io.netty:netty-resolver-dns:4.2.9.Final',
+        'io.netty:netty-resolver-dns-classes-macos:4.2.9.Final',
+        'io.netty:netty-resolver-dns-native-macos:4.2.9.Final',
+        'io.netty:netty-transport:4.2.9.Final',
+        'io.netty:netty-transport-native-epoll:4.2.9.Final',
+        'io.netty:netty-transport-native-kqueue:4.2.9.Final',
+        'io.netty:netty-transport-native-unix-common:4.2.9.Final',
+        'io.netty:netty-transport-classes-epoll:4.2.9.Final',
+        'io.netty:netty-transport-classes-kqueue:4.2.9.Final'
+    )
 }

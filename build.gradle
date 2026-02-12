@@ -49,7 +49,8 @@ def sonarExclusions =
 
 def duplicateCodeExclusionList = [
 	'**/uk/gov/hmcts/ethos/replacement/docmosis/domain/messagequeue/CreateUpdatesQueueMessage.java',
-	'**/uk/gov/hmcts/ethos/replacement/docmosis/domain/messagequeue/UpdateCaseQueueMessage.java'
+	'**/uk/gov/hmcts/ethos/replacement/docmosis/domain/messagequeue/UpdateCaseQueueMessage.java',
+    'et-shared/src/main/java/**'
 ]
 
 sonarqube {
@@ -59,7 +60,9 @@ sonarqube {
         property "sonar.projectKey", "et-ccd-callbacks"
         property "sonar.dynamicAnalysis", "reuseReports"
         property "sonar.dependencyCheck.reportPath", "${project.buildDir}/reports/dependency-check-report.xml"
-        property "sonar.coverage.jacoco.xmlReportPaths", "${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml"
+        property "sonar.coverage.jacoco.xmlReportPaths",
+                "${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml," +
+                        "${project(':et-shared').buildDir}/reports/jacoco/test/jacocoTestReport.xml"
     }
 }
 

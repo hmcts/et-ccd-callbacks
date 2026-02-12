@@ -1,5 +1,6 @@
 plugins {
     id 'java-library'
+    id 'jacoco'
     id 'maven-publish'
     id 'io.spring.dependency-management' version '1.1.5'
 }
@@ -142,6 +143,23 @@ dependencies {
 
     compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.42'
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.42'
+    testCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.42'
+    testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.42'
+
+    testImplementation(platform('org.junit:junit-bom:5.11.4'))
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.11.4'
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.11.4'
+    testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.11.4'
+    testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-commons', version: '1.11.4'
+    testRuntimeOnly group: 'org.junit.vintage', name: 'junit-vintage-engine', version: '5.11.4'
+    testImplementation group: 'junit', name: 'junit', version: '4.13.2'
+    testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '3.0'
+    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.6'
+    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.6'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.19.0'
+    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '5.19.0'
+    testImplementation group: 'org.springframework', name: 'spring-test', version: '6.2.10'
+    testImplementation group: 'pl.pragmatists', name: 'JUnitParams', version: '1.1.1'
 }
 
 configurations.configureEach {
@@ -177,3 +195,17 @@ configurations.configureEach {
         'io.netty:netty-transport-classes-kqueue:4.2.9.Final'
     )
 }
+
+test {
+    useJUnitPlatform()
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        csv.required = false
+    }
+}
+
+check.dependsOn jacocoTestReport

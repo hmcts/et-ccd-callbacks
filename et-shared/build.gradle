@@ -33,7 +33,7 @@ dependencyManagement {
         dependency 'com.squareup.okhttp3:okhttp:4.12.0'
         dependency 'com.squareup.okhttp3:okhttp-urlconnection:4.12.0'
         dependency 'com.squareup.okio:okio:3.16.4'
-        dependency 'org.bouncycastle:bcprov-jdk15on:1.78'
+        dependency 'org.bouncycastle:bcprov-jdk15on:1.70'
         dependencySet(group: 'io.netty', version: '4.2.9.Final') {
             entry 'netty-buffer'
             entry 'netty-codec'
@@ -155,7 +155,7 @@ configurations.configureEach {
         'com.squareup.okhttp3:okhttp:4.12.0',
         'com.squareup.okhttp3:okhttp-urlconnection:4.12.0',
         'com.squareup.okio:okio:3.16.4',
-        'org.bouncycastle:bcprov-jdk15on:1.78',
+        'org.bouncycastle:bcprov-jdk15on:1.70',
         'io.netty:netty-buffer:4.2.9.Final',
         'io.netty:netty-codec:4.2.9.Final',
         'io.netty:netty-codec-dns:4.2.9.Final',

@@ -918,6 +918,11 @@ public class InitialConsiderationService {
                 addPair(pairsList, GIVE_DETAILS, defaultIfNull(et3Vetting.getEt3RespondentNameMismatchDetails()));
             }
         }
+
+        if (et3Vetting.getEt3GeneralNotesRespondentName() != null) {
+            addPair(pairsList, "General notes (Respondent's name match):",
+                    defaultIfNull(et3Vetting.getEt3GeneralNotesRespondentName()));
+        }
     }
 
     private void processResponseInTime(Et3VettingType et3Vetting, List<String[]> pairsList) {
@@ -936,10 +941,20 @@ public class InitialConsiderationService {
             return;
         }
 
+        if (et3Vetting.getEt3GeneralNotesRespondentAddress() != null) {
+            addPair(pairsList, "General notes (Respondent's address provided):",
+                    defaultIfNull(et3Vetting.getEt3GeneralNotesRespondentAddress()));
+        }
+
         addPair(pairsList, "Does the respondent's address match?",
                 et3Vetting.getEt3DoesRespondentsAddressMatch());
         if (NO.equals(et3Vetting.getEt3DoesRespondentsAddressMatch())) {
             addPair(pairsList, GIVE_DETAILS, defaultIfNull(et3Vetting.getEt3RespondentAddressMismatchDetails()));
+        }
+
+        if (et3Vetting.getEt3GeneralNotesAddressMatch() != null) {
+            addPair(pairsList, "General notes (Respondent's address match):",
+                    defaultIfNull(et3Vetting.getEt3GeneralNotesAddressMatch()));
         }
     }
 
@@ -953,8 +968,11 @@ public class InitialConsiderationService {
         if (et3Vetting.getEt3ContestClaim() != null) {
             addPair(pairsList, GIVE_DETAILS, defaultIfNull(et3Vetting.getEt3ContestClaimGiveDetails()));
         }
-        addPair(pairsList, "General notes (Contest Claim)",
-                defaultIfNull(et3Vetting.getEt3GeneralNotesContestClaim()));
+
+        if (et3Vetting.getEt3GeneralNotesContestClaim() != null) {
+            addPair(pairsList, "General notes (Contest Claim)",
+                    defaultIfNull(et3Vetting.getEt3GeneralNotesContestClaim()));
+        }
     }
 
     private void processContractClaim(Et3VettingType et3Vetting, List<String[]> pairsList) {
@@ -967,6 +985,11 @@ public class InitialConsiderationService {
         if (YES.equals(et3Vetting.getEt3ContractClaimSection7())) {
             addPair(pairsList, GIVE_DETAILS, defaultIfNull(et3Vetting.getEt3ContractClaimSection7Details()));
         }
+
+        if (et3Vetting.getEt3GeneralNotesContractClaimSection7() != null) {
+            addPair(pairsList, "General notes (Employer's Contract Claim in section 7):",
+                    defaultIfNull(et3Vetting.getEt3GeneralNotesContractClaimSection7()));
+        }
     }
 
     private void processCaseListed(Et3VettingType et3Vetting, List<String[]> pairsList) {
@@ -976,6 +999,11 @@ public class InitialConsiderationService {
         addPair(pairsList, "Is the case listed for hearing?", et3Vetting.getEt3IsCaseListedForHearing());
         if (NO.equals(et3Vetting.getEt3IsCaseListedForHearing())) {
             addPair(pairsList, GIVE_DETAILS, defaultIfNull(et3Vetting.getEt3IsCaseListedForHearingDetails()));
+        }
+
+        if (et3Vetting.getEt3GeneralNotesCaseListed() != null) {
+            addPair(pairsList, "General notes (Case listed for hearing):",
+                    defaultIfNull(et3Vetting.getEt3GeneralNotesCaseListed()));
         }
     }
 
@@ -990,8 +1018,11 @@ public class InitialConsiderationService {
             addPair(pairsList, "Why should we change the office?",
                     defaultIfNull(et3Vetting.getEt3WhyWeShouldChangeTheOffice()));
         }
-        addPair(pairsList, "General notes (Location)",
-                defaultIfNull(et3Vetting.getEt3GeneralNotesTransferApplication()));
+
+        if (et3Vetting.getEt3GeneralNotesTransferApplication() != null) {
+            addPair(pairsList, "General notes (Location):",
+                    defaultIfNull(et3Vetting.getEt3GeneralNotesTransferApplication()));
+        }
     }
 
     private void processRule26(Et3VettingType et3Vetting, List<String[]> pairsList) {
@@ -1003,6 +1034,11 @@ public class InitialConsiderationService {
                 + "of claim / response arguable? (Rule 27)", et3Vetting.getEt3Rule26());
         if (YES.equals(et3Vetting.getEt3Rule26())) {
             addPair(pairsList, GIVE_DETAILS, defaultIfNull(et3Vetting.getEt3Rule26Details()));
+        }
+
+        if (et3Vetting.getEt3GeneralNotesRule26() != null) {
+            addPair(pairsList, "General notes (Issues for the judge's consideration):",
+                    defaultIfNull(et3Vetting.getEt3GeneralNotesRule26()));
         }
     }
 

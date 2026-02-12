@@ -19,8 +19,8 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.ClaimantRepresentativeUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.util.List;
@@ -28,7 +28,7 @@ import java.util.Map;
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantNonSystemUser;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isRepresentedClaimantWithMyHmctsCase;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantRepresentedByMyHmctsOrganisation;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper.buildNoCPersonalisation;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper.buildPersonalisationWithPartyName;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation;
@@ -115,7 +115,7 @@ public class NocNotificationService {
                 });
 
         // send claimant noc change email
-        String claimantEmail = NotificationHelper.getEmailAddressForClaimant(caseDataNew);
+        String claimantEmail = ClaimantRepresentativeUtils.getClaimantNocNotificationEmail(caseDetailsNew);
         if (isNullOrEmpty(claimantEmail)) {
             log.warn("missing claimantEmail");
             return;
@@ -134,7 +134,8 @@ public class NocNotificationService {
         CaseData caseDataPrevious = caseDetailsPrevious.getCaseData();
         String partyName = NocNotificationHelper.getRespondentNameForNewSolicitor(changeRequest, caseDataNew);
         // send claimant or claimant solicitor noc change email
-        if (!isClaimantNonSystemUser(caseDataPrevious) || isRepresentedClaimantWithMyHmctsCase(caseDataPrevious)) {
+        if (!isClaimantNonSystemUser(caseDataPrevious)
+                || isClaimantRepresentedByMyHmctsOrganisation(caseDataPrevious)) {
             sendClaimantEmail(caseDetailsPrevious, caseDetailsNew, partyName);
         }
 
@@ -194,7 +195,7 @@ public class NocNotificationService {
         if (caseDetailsPrevious.getCaseData().getRepresentativeClaimantType() != null) {
             email = claimantRep.getRepresentativeEmailAddress();
         } else {
-            email = NotificationHelper.getEmailAddressForClaimant(caseDetailsPrevious.getCaseData());
+            email = ClaimantRepresentativeUtils.getClaimantNocNotificationEmail(caseDetailsPrevious);
         }
 
         if (isNullOrEmpty(email)) {

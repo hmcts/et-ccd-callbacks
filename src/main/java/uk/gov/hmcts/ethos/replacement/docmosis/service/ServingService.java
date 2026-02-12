@@ -187,7 +187,6 @@ public class ServingService {
         }
 
         Map<String, String> personalisation;
-        if (isRepresentedClaimantWithMyHmctsCase(caseDetails.getCaseData())) {
         if (isClaimantRepresentedByMyHmctsOrganisation(caseDetails.getCaseData())) {
             personalisation = NotificationHelper.buildMapForClaimantRepresentative(caseDetails.getCaseData());
             personalisation.put(LINK_TO_EXUI, emailService.getExuiCaseLink(caseDetails.getCaseId()));

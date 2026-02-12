@@ -23,11 +23,14 @@ import java.util.Map;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 @ExtendWith(SpringExtension.class)
-class NocNotificationHelperTest {
+class   NocNotificationHelperTest {
     private static final String RESPONDENT_NAME_1 = "Respondent Name 1";
     private static final String NEW_REP_EMAIL = "rep1@test.com";
     private static final String OLD_REP_EMAIL = "rep2@test.com";

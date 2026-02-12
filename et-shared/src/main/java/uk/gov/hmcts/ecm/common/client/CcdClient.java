@@ -86,6 +86,7 @@ public class CcdClient {
     static final String UPDATE_BULK_EVENT_SUMMARY = "Bulk case updated by bulk";
 
     static final String UPDATE_CHANGE_ORG_SUMMARY = "Change of organisation completed";
+    private static final String QUERY_LOG_PREFIX = "QUERY: ";
     private static final int MAX_RETRIES = 7;
 
     public CcdClient(RestTemplate restTemplate, UserService userService, CaseDataBuilder caseDataBuilder,
@@ -622,7 +623,7 @@ public class CcdClient {
     public List<SubmitEvent> retrieveCasesElasticSearch(String authToken, String caseTypeId,
                                                         List<String> caseIds) throws IOException {
         String query = ESHelper.getSearchQuery(caseIds);
-        log.info("QUERY: " + query);
+        log.info(QUERY_LOG_PREFIX + query);
         return buildAndGetElasticSearchRequest(authToken, caseTypeId, query);
     }
 
@@ -675,7 +676,7 @@ public class CcdClient {
     public List<SubmitBulkEvent> retrieveBulkCasesElasticSearch(String authToken, String caseTypeId,
                                                                 String multipleReference) throws IOException {
         List<SubmitBulkEvent> submitBulkEvents = new ArrayList<>();
-        log.info("QUERY: " + ESHelper.getBulkSearchQuery(multipleReference));
+        log.info(QUERY_LOG_PREFIX + ESHelper.getBulkSearchQuery(multipleReference));
         HttpEntity<String> request =
                 new HttpEntity<>(ESHelper.getBulkSearchQuery(multipleReference), buildHeaders(authToken));
         String url = ccdClientConfig.buildRetrieveCasesUrlElasticSearch(caseTypeId);
@@ -699,7 +700,7 @@ public class CcdClient {
                                                                         String multipleReference)
             throws IOException {
         List<SubmitMultipleEvent> submitMultipleEvents = new ArrayList<>();
-        log.info("QUERY: " + ESHelper.getBulkSearchQuery(multipleReference));
+        log.info(QUERY_LOG_PREFIX + ESHelper.getBulkSearchQuery(multipleReference));
         HttpEntity<String> request =
                 new HttpEntity<>(ESHelper.getBulkSearchQuery(multipleReference), buildHeaders(authToken));
         String url = ccdClientConfig.buildRetrieveCasesUrlElasticSearch(caseTypeId);

@@ -16,7 +16,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class Et3RequestTest {
 
-    private static final String et3RequestDataFilePath = "et3-request-data.json";
+    private static final String ET3_REQUEST_DATA_FILE_PATH = "et3-request-data.json";
 
     @Test
     @SneakyThrows
@@ -454,7 +454,7 @@ public class Et3RequestTest {
 
     private static Et3Request generateEt3Request() throws  IOException, URISyntaxException {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
-                .getContextClassLoader().getResource(et3RequestDataFilePath)).toURI())));
+                .getContextClassLoader().getResource(ET3_REQUEST_DATA_FILE_PATH)).toURI())));
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(json, Et3Request.class);
     }

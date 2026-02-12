@@ -15,8 +15,13 @@ import uk.gov.hmcts.ecm.common.helpers.ServiceBusHelper;
 import uk.gov.hmcts.ecm.common.model.servicebus.UpdateCaseMsg;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.CreationDataModel;
 
+import java.util.concurrent.CompletableFuture;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.doThrow;
 
 @ExtendWith(MockitoExtension.class)
@@ -36,16 +41,20 @@ class ServiceBusSenderTest {
         serviceBusSender = new ServiceBusSender(sendClient, objectMapper);
         CreationDataModel creationDataModel = ServiceBusHelper.getCreationDataModel("4150002/2020");
         updateCaseMsg = ServiceBusHelper.generateUpdateCaseMsg(creationDataModel);
+        when(objectMapper.writeValueAsBytes(any())).thenReturn("{}".getBytes());
     }
 
     @Test
    void sendMessageAsync() {
-        serviceBusSender.sendMessageAsync(updateCaseMsg);
+        when(sendClient.sendAsync(any())).thenReturn(CompletableFuture.completedFuture(null));
+        assertDoesNotThrow(() -> serviceBusSender.sendMessageAsync(updateCaseMsg));
+        verify(sendClient).sendAsync(any());
     }
 
     @Test
     void sendMessage() {
-        serviceBusSender.sendMessage(updateCaseMsg);
+        assertDoesNotThrow(() -> serviceBusSender.sendMessage(updateCaseMsg));
+        verify(sendClient).send(any());
     }
 
     @Test

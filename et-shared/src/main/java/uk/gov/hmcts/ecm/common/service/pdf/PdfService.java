@@ -38,6 +38,7 @@ import static uk.gov.hmcts.ecm.common.service.pdf.et3.ET3FormConstants.UNABLE_TO
 @Service
 @RequiredArgsConstructor
 public class PdfService {
+    private static final String CREATE_PDF_METHOD = "createPdf";
     private final ET1PdfMapperService et1PdfMapperService;
 
     /**
@@ -79,30 +80,8 @@ public class PdfService {
         if (!ObjectUtils.isEmpty(stream)) {
             try (PDDocument pdfDocument = Loader.loadPDF(
                 Objects.requireNonNull(stream))) {
-                Set<Map.Entry<String, Optional<String>>> pdfEntriesMap = null;
-                if (PDF_TYPE_ET1.equals(pdfType)) {
-                    pdfEntriesMap = this.et1PdfMapperService.mapHeadersToPdf(caseData).entrySet();
-                }
-                if (PDF_TYPE_ET3.equals(pdfType)) {
-                    try {
-                        pdfEntriesMap = ET3FormMapper.mapEt3Form(caseData, event, clientType).entrySet();
-                    } catch (GenericServiceException e) {
-                        GenericServiceUtil.logException(UNABLE_TO_MAP_RESPONDENT_TO_ET3_FORM,
-                                caseData.getEthosCaseReference(),
-                                UNABLE_TO_MAP_RESPONDENT_TO_ET3_FORM,
-                                "PdfService",
-                                "createPdf");
-                    }
-                }
-                if (pdfEntriesMap == null) {
-                    GenericServiceUtil.logException(UNABLE_TO_MAP_RESPONDENT_TO_ET3_FORM,
-                            caseData.getEthosCaseReference(),
-                            UNABLE_TO_MAP_RESPONDENT_TO_ET3_FORM,
-                            "PdfService",
-                            "createPdf");
-                    throw new PdfServiceException("Failed to convert to PDF",
-                            new Exception("Unable to map case data to et3 pdf form"));
-                }
+                Set<Map.Entry<String, Optional<String>>> pdfEntriesMap =
+                        buildPdfEntriesMap(caseData, pdfType, clientType, event);
                 PDDocumentCatalog pdDocumentCatalog = pdfDocument.getDocumentCatalog();
                 PDAcroForm pdfForm = pdDocumentCatalog.getAcroForm();
                 PDResources defaultResources = pdfForm.getDefaultResources();
@@ -112,20 +91,7 @@ public class PdfService {
                         PDType1Font.HELVETICA);
                 defaultResources.put(COSName.getPDFName(HELVETICA_PDFBOX_CHARACTER_CODE_2),
                         PDType1Font.HELVETICA);
-                for (Map.Entry<String, Optional<String>> entry : pdfEntriesMap) {
-                    String entryKey = entry.getKey();
-                    Optional<String> entryValue = entry.getValue();
-                    if (entryValue.isPresent()) {
-                        try {
-                            PDField pdfField = pdfForm.getField(entryKey);
-                            pdfField.setValue(entryValue.get());
-                        } catch (Exception e) {
-                            GenericServiceUtil.logException("Error while parsing PDF file for entry key \""
-                                                         + entryKey, caseData.getEthosCaseReference(), e.getMessage(),
-                                                            this.getClass().getName(), "createPdf");
-                        }
-                    }
-                }
+                applyPdfEntries(pdfForm, pdfEntriesMap, caseData);
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
                 pdfForm.setNeedAppearances(true);
                 pdfDocument.save(byteArrayOutputStream);
@@ -136,6 +102,57 @@ public class PdfService {
         }
         safeClose(stream, caseData);
         return new byte[0];
+    }
+
+    private Set<Map.Entry<String, Optional<String>>> buildPdfEntriesMap(CaseData caseData,
+                                                                        String pdfType,
+                                                                        String clientType,
+                                                                        String event)
+            throws PdfServiceException {
+        Set<Map.Entry<String, Optional<String>>> pdfEntriesMap = null;
+        if (PDF_TYPE_ET1.equals(pdfType)) {
+            pdfEntriesMap = this.et1PdfMapperService.mapHeadersToPdf(caseData).entrySet();
+        }
+        if (PDF_TYPE_ET3.equals(pdfType)) {
+            try {
+                pdfEntriesMap = ET3FormMapper.mapEt3Form(caseData, event, clientType).entrySet();
+            } catch (GenericServiceException e) {
+                GenericServiceUtil.logException(UNABLE_TO_MAP_RESPONDENT_TO_ET3_FORM,
+                        caseData.getEthosCaseReference(),
+                        UNABLE_TO_MAP_RESPONDENT_TO_ET3_FORM,
+                        "PdfService",
+                        CREATE_PDF_METHOD);
+            }
+        }
+        if (pdfEntriesMap == null) {
+            GenericServiceUtil.logException(UNABLE_TO_MAP_RESPONDENT_TO_ET3_FORM,
+                    caseData.getEthosCaseReference(),
+                    UNABLE_TO_MAP_RESPONDENT_TO_ET3_FORM,
+                    "PdfService",
+                    CREATE_PDF_METHOD);
+            throw new PdfServiceException("Failed to convert to PDF",
+                    new Exception("Unable to map case data to et3 pdf form"));
+        }
+        return pdfEntriesMap;
+    }
+
+    private void applyPdfEntries(PDAcroForm pdfForm,
+                                 Set<Map.Entry<String, Optional<String>>> pdfEntriesMap,
+                                 CaseData caseData) {
+        for (Map.Entry<String, Optional<String>> entry : pdfEntriesMap) {
+            String entryKey = entry.getKey();
+            Optional<String> entryValue = entry.getValue();
+            if (entryValue.isPresent()) {
+                try {
+                    PDField pdfField = pdfForm.getField(entryKey);
+                    pdfField.setValue(entryValue.get());
+                } catch (Exception e) {
+                    GenericServiceUtil.logException("Error while parsing PDF file for entry key \""
+                                    + entryKey, caseData.getEthosCaseReference(), e.getMessage(),
+                            this.getClass().getName(), CREATE_PDF_METHOD);
+                }
+            }
+        }
     }
 
     public static void safeClose(InputStream is, CaseData caseData) {

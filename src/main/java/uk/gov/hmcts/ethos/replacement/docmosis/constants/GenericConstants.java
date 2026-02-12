@@ -12,17 +12,11 @@ public final class GenericConstants {
     public static final String EVENT_FIELDS_VALIDATION = "Event fields validation: ";
 
     public static final String ERROR_INVALID_CASE_DATA = "Invalid case data";
-    public static final String ERROR_FAILED_TO_SEND_EMAIL_CLAIMANT = "Failed to send email to claimant {}, error: {}";
-    public static final String ERROR_FAILED_TO_SEND_EMAIL_RESPONDENT =
-            "Failed to send email to respondent {}, error: {}";
+    public static final String ERROR_FAILED_TO_SEND_EMAIL_CLAIMANT = "Failed to send email to claimant, error: {}";
     public static final String ERROR_FAILED_TO_SEND_EMAIL_ORGANISATION_ADMIN =
-            "Failed to send email to organisation admin {}, error: {}";
-    public static final String ERROR_FAILED_TO_SEND_EMAIL_TRIBUNAL =
-            "Failed to send email to tribunal {}, error: {}";
+            "Failed to send email to organisation admin, error: {}";
     public static final String ERROR_EMAIL_NOT_FOUND = "Email not found. Error message: {}";
-
     public static final String WARNING_CLAIMANT_EMAIL_NOT_FOUND = "Claimant email not found for case {}";
-
     public static final String EMPTY_LOWERCASE = "empty";
 
     private GenericConstants() {

@@ -30,6 +30,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.ClaimantUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.LoggingUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.NotificationUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.ClaimantRepresentativeUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.RespondentRepresentativeUtils;
@@ -37,14 +38,33 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.ERROR_FAILED_TO_SEND_EMAIL_CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.ERROR_FAILED_TO_SEND_EMAIL_ORGANISATION_ADMIN;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.ERROR_FAILED_TO_SEND_EMAIL_RESPONDENT;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.ERROR_FAILED_TO_SEND_EMAIL_TRIBUNAL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.EXCEPTION_CASE_DETAILS_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.WARNING_CLAIMANT_EMAIL_NOT_FOUND;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_MISSING_EMAIL_ADDRESS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_TYPE_ADDITION;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_TYPE_REMOVAL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_CLAIMANT_EMAIL_NOT_FOUND_TO_NOTIFY_FOR_RESPONDENT_REP_UPDATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_CLAIMANT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_ORGANISATION;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_RESPONDENT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_TRIBUNAL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_NEW_REPRESENTATIVE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_INVALID_CASE_DETAILS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_INVALID_CASE_DETAILS_TO_NOTIFY_CLAIMANT_FOR_RESPONDENT_REP_UPDATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_INVALID_CASE_DETAILS_TO_NOTIFY_NEW_REPRESENTATIVE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_INVALID_CASE_DETAILS_TO_NOTIFY_ORGANISATION_FOR_RESPONDENT_REP_UPDATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_INVALID_CASE_DETAILS_TO_NOTIFY_TRIBUNAL_FOR_RESPONDENT_REP_UPDATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_INVALID_PARTY_NAME_TO_NOTIFY_NEW_REPRESENTATIVE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_INVALID_REPRESENTATIVE_TO_NOTIFY_ORGANISATION_FOR_RESPONDENT_REP_UPDATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_INVALID_REP_EMAIL_NOTIFY_NEW_REPRESENTATIVE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_INVALID_RESPONDENT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_MISSING_RESPONDENT_EMAIL_ADDRESS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_RESPONDENT_NAME_MISSING_TO_NOTIFY_CLAIMANT_FOR_RESP_REP_UPDATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_TRIBUNAL_EMAIL_NOT_FOUND_TO_NOTIFY_FOR_RESPONDENT_REP_UPDATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantNonSystemUser;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantRepresentedByMyHmctsOrganisation;
@@ -80,57 +100,342 @@ public class NocNotificationService {
     @Value("${template.nocNotification.tribunal}")
     private String tribunalTemplateId;
 
-    public void sendRespondentRepresentationRemovalNotifications(CaseDetails oldCaseDetails,
-                                                                 CaseDetails newCaseDetails,
-                                                                 List<RepresentedTypeRItem> revokedRepresentatives) {
-        if (CollectionUtils.isEmpty(revokedRepresentatives)) {
+    public void sendRespondentRepresentationUpdateNotifications(CaseDetails caseDetails,
+                                                                List<RepresentedTypeRItem> representatives,
+                                                                String nocType) {
+        if (CollectionUtils.isEmpty(representatives) || StringUtils.isBlank(nocType)) {
             return;
         }
-        for (RepresentedTypeRItem revokedRepresentative : revokedRepresentatives) {
-            if (!RespondentRepresentativeUtils.isValidRepresentative(revokedRepresentative)) {
-                continue;
-            }
-            CaseData oldCaseData = oldCaseDetails.getCaseData();
-            RespondentSumTypeItem respondent = RespondentRepresentativeUtils.findRespondentByRepresentative(oldCaseData,
-                    revokedRepresentative);
+        for (RepresentedTypeRItem representative : representatives) {
+            RespondentSumTypeItem respondent = RespondentRepresentativeUtils.findRespondentByRepresentative(
+                    caseDetails.getCaseData(), representative);
             if (!RespondentUtils.isValidRespondent(respondent)) {
                 continue;
             }
             assert respondent != null;
-
-            // Sending notification e-mail to claimant
-            if (!isClaimantNonSystemUser(oldCaseData)) {
-                sendClaimantEmail(oldCaseDetails, newCaseDetails, respondent.getValue().getRespondentName());
-            }
+            // sending respondent representative removal notification email to claimant
+            notifyClaimantOfRespondentRepresentativeUpdate(caseDetails, respondent.getValue().getRespondentName());
 
             // sending notification email to organisation admin of the representative
-            if (ObjectUtils.isNotEmpty(revokedRepresentative.getValue().getRespondentOrganisation())
-                    && StringUtils.isNotBlank(revokedRepresentative.getValue().getRespondentOrganisation()
-                    .getOrganisationID())) {
-                sendEmailToOldOrgAdmin(revokedRepresentative.getValue().getRespondentOrganisation().getOrganisationID(),
-                        oldCaseData);
-            }
+            notifyOrganisationOfRespondentRepresentativeUpdate(caseDetails, representative,
+                    respondent.getValue().getRespondentName(), nocType);
 
             // sending notification e-mail to tribunal
-            if (StringUtils.isNotBlank(oldCaseData.getTribunalCorrespondenceEmail())) {
-                sendTribunalEmail(oldCaseData);
-            }
+            notifyTribunalOfRespondentRepresentativeUpdate(caseDetails, nocType);
 
             // sending notification e-mail to respondent
-            if (StringUtils.isBlank(respondent.getValue().getRespondentEmail())) {
-                log.warn(WARNING_MISSING_EMAIL_ADDRESS, oldCaseDetails.getCaseId());
-                continue;
-            }
-            Map<String, String> personalisation = buildNoCPersonalisation(oldCaseDetails,
-                    respondent.getValue().getRespondentName());
-            try {
-                emailService.sendEmail(respondentTemplateId, respondent.getValue().getRespondentEmail(),
-                        personalisation);
-            } catch (Exception e) {
-                LoggingUtils.logNotificationIssue(ERROR_FAILED_TO_SEND_EMAIL_RESPONDENT,
-                        respondent.getValue().getRespondentEmail(), e);
+            notifyRespondentOfRepresentativeUpdate(caseDetails, respondent);
+
+            // sending email to the new legal representative
+            if (NOC_TYPE_ADDITION.equals(nocType)) {
+                notifyRepresentativeOfNewAssignment(caseDetails, respondent.getValue().getRespondentName(),
+                        representative);
             }
         }
+    }
+
+    /**
+     * Sends a notification to a respondent when their legal representative
+     * has been updated on a case.
+     *
+     * <p>The notification is sent only when the case is valid for notifications,
+     * the respondent is valid, and a respondent email address is available.</p>
+     *
+     * <p>No notification will be sent if required case or respondent information
+     * is missing, or if the respondent does not have a notification email
+     * address configured.</p>
+     *
+     * <p>This method performs defensive validation and fails safely by logging
+     * warnings rather than throwing exceptions.</p>
+     *
+     * @param caseDetails the case details containing case reference and party
+     *                    information
+     * @param respondent the respondent whose representative has been updated
+     */
+    public void notifyRespondentOfRepresentativeUpdate(CaseDetails caseDetails,
+                                                       RespondentSumTypeItem respondent) {
+        // sending notification e-mail to respondent
+        if (!NotificationUtils.isCaseValidForNotification(caseDetails)) {
+            String caseId = ObjectUtils.isEmpty(caseDetails) || StringUtils.isBlank(caseDetails.getCaseId())
+                    ? StringUtils.EMPTY : caseDetails.getCaseId();
+            log.warn(WARNING_INVALID_CASE_DETAILS, caseId);
+            return;
+        }
+        if (!RespondentUtils.isValidRespondent(respondent)) {
+            log.warn(WARNING_INVALID_RESPONDENT, caseDetails.getCaseId());
+            return;
+        }
+        if (StringUtils.isBlank(respondent.getValue().getRespondentEmail())) {
+            log.warn(WARNING_MISSING_RESPONDENT_EMAIL_ADDRESS, caseDetails.getCaseId());
+            return;
+        }
+        Map<String, String> personalisation = buildNoCPersonalisation(caseDetails,
+                respondent.getValue().getRespondentName());
+        try {
+            emailService.sendEmail(respondentTemplateId, respondent.getValue().getRespondentEmail(),
+                    personalisation);
+        } catch (Exception e) {
+            log.warn(WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_RESPONDENT, caseDetails.getCaseId(), e.getMessage());
+        }
+    }
+
+    /**
+     * Sends a notification to the claimant when a respondent’s representative
+     * has been updated on a case.
+     *
+     * <p>The notification is sent only when the case contains sufficient data
+     * for notifications, a respondent name is provided, and a claimant
+     * notification email address can be resolved.</p>
+     *
+     * <p>No notification will be sent if the claim was created by a caseworker
+     * (system user), if required case or respondent information is missing,
+     * or if the claimant email address cannot be determined.</p>
+     *
+     * <p>This method performs defensive checks and fails safely by logging
+     * warnings rather than throwing exceptions.</p>
+     *
+     * @param caseDetails the case details containing claimant, respondent,
+     *                    and case reference information
+     * @param respondentName the name of the respondent whose representative
+     *                       has been updated
+     */
+    public void notifyClaimantOfRespondentRepresentativeUpdate(CaseDetails caseDetails, String respondentName) {
+        if (!NotificationUtils.isCaseValidForNotification(caseDetails)) {
+            String caseId = ObjectUtils.isNotEmpty(caseDetails) && StringUtils.isNotBlank(caseDetails.getCaseId())
+                    ? caseDetails.getCaseId() : StringUtils.EMPTY;
+            log.warn(WARNING_INVALID_CASE_DETAILS_TO_NOTIFY_CLAIMANT_FOR_RESPONDENT_REP_UPDATE, caseId);
+            return;
+        }
+        if (StringUtils.isBlank(respondentName)) {
+            log.warn(WARNING_RESPONDENT_NAME_MISSING_TO_NOTIFY_CLAIMANT_FOR_RESP_REP_UPDATE, caseDetails.getCaseId());
+            return;
+        }
+        // should not send email to claimant if claim created by caseworker
+        if (isClaimantNonSystemUser(caseDetails.getCaseData())) {
+            return;
+        }
+        String claimantEmail = ClaimantRepresentativeUtils.getClaimantNocNotificationEmail(caseDetails);
+        if (isNullOrEmpty(claimantEmail)) {
+            log.warn(WARNING_CLAIMANT_EMAIL_NOT_FOUND_TO_NOTIFY_FOR_RESPONDENT_REP_UPDATE, caseDetails.getCaseId());
+            return;
+        }
+        String citUILink = ObjectUtils.isEmpty(caseDetails.getCaseData().getRepresentativeClaimantType())
+                ? emailService.getExuiCaseLink(caseDetails.getCaseId())
+                : emailService.getCitizenCaseLink(caseDetails.getCaseId());
+        var personalisation = buildPersonalisationWithPartyName(caseDetails, respondentName, citUILink);
+        try {
+            emailService.sendEmail(claimantTemplateId, claimantEmail, personalisation);
+        } catch (Exception e) {
+            log.warn(WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_CLAIMANT, caseDetails.getCaseId(), e.getMessage());
+        }
+    }
+
+    /**
+     * Sends a notification to a respondent organisation when a respondent’s
+     * representative has been added or removed via a Notice of Change (NoC).
+     *
+     * <p>The notification is sent to the organisation’s super user email address,
+     * provided that:</p>
+     * <ul>
+     *   <li>The case contains sufficient data for notifications</li>
+     *   <li>The representative is associated with a valid organisation</li>
+     *   <li>The organisation lookup is successful and a super user email is available</li>
+     * </ul>
+     *
+     * <p>The notification template and personalisation differ depending on
+     * whether the NoC represents a removal (previous representative) or an
+     * addition (new representative).</p>
+     *
+     * <p>This method performs defensive validation and fails safely by logging
+     * warnings rather than throwing exceptions.</p>
+     *
+     * @param caseDetails the case details containing party and reference information
+     * @param representative the respondent representative associated with the organisation
+     * @param partyName the name of the relevant party used for notification personalisation
+     * @param nocType the Notice of Change (NoC) type indicating whether the
+     *                representative is being added or removed
+     */
+    public void notifyOrganisationOfRespondentRepresentativeUpdate(CaseDetails caseDetails,
+                                                                   RepresentedTypeRItem representative,
+                                                                   String partyName,
+                                                                   String nocType) {
+        if (!NotificationUtils.isCaseValidForNotification(caseDetails)) {
+            String caseId = ObjectUtils.isEmpty(caseDetails) ? StringUtils.EMPTY : caseDetails.getCaseId();
+            log.warn(WARNING_INVALID_CASE_DETAILS_TO_NOTIFY_ORGANISATION_FOR_RESPONDENT_REP_UPDATE, caseId, nocType);
+            return;
+        }
+        if (!NotificationUtils.canNotifyRepresentativeOrganisation(representative)) {
+            log.warn(WARNING_INVALID_REPRESENTATIVE_TO_NOTIFY_ORGANISATION_FOR_RESPONDENT_REP_UPDATE,
+                    caseDetails.getCaseId(), nocType);
+            return;
+        }
+        String organisationId = representative.getValue().getRespondentOrganisation().getOrganisationID();
+        ResponseEntity<RetrieveOrgByIdResponse> organisationResponse = getOrganisationById(organisationId);
+        if (!NotificationUtils.canNotifyOrganisationForRepresentativeUpdate(caseDetails.getCaseId(), organisationId,
+                nocType, organisationResponse)) {
+            return;
+        }
+        Map<String, String> personalisation;
+        String templateId;
+        if (NOC_TYPE_REMOVAL.equals(nocType)) {
+            personalisation = buildPreviousRespondentSolicitorPersonalisation(caseDetails.getCaseData());
+            templateId = previousRespondentSolicitorTemplateId;
+        } else {
+            String citUrl = emailService.getCitizenCaseLink(caseDetails.getCaseId());
+            personalisation = buildPersonalisationWithPartyName(caseDetails, partyName, citUrl);
+            templateId = newRespondentSolicitorTemplateId;
+        }
+        try {
+            assert organisationResponse.getBody() != null;
+            emailService.sendEmail(
+                    templateId,
+                    organisationResponse.getBody().getSuperUser().getEmail(),
+                    personalisation);
+        } catch (Exception e) {
+            log.warn(WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_ORGANISATION, caseDetails.getCaseId(),
+                    e.getMessage());
+        }
+    }
+
+    /**
+     * Sends a notification to the tribunal when a respondent’s representative
+     * has been added or removed via a Notice of Change (NoC).
+     *
+     * <p>The notification is sent only if the case contains sufficient
+     * information for notifications and a tribunal correspondence email
+     * address is available.</p>
+     *
+     * <p>If the required case details or tribunal email address are missing,
+     * no notification is sent and a warning is logged.</p>
+     *
+     * <p>This method performs defensive validation and fails safely by logging
+     * warnings rather than throwing exceptions.</p>
+     *
+     * @param caseDetails the case details containing reference and tribunal
+     *                    correspondence information
+     * @param notificationType the type of notification (e.g. addition or removal)
+     *                         used for logging and contextual purposes
+     */
+    public void notifyTribunalOfRespondentRepresentativeUpdate(CaseDetails caseDetails, String notificationType) {
+        if (!NotificationUtils.isCaseValidForNotification(caseDetails)) {
+            String caseId = ObjectUtils.isEmpty(caseDetails) || StringUtils.isBlank(caseDetails.getCaseId())
+                    ? StringUtils.EMPTY : caseDetails.getCaseId();
+            log.warn(WARNING_INVALID_CASE_DETAILS_TO_NOTIFY_TRIBUNAL_FOR_RESPONDENT_REP_UPDATE, caseId,
+                    notificationType);
+            return;
+        }
+        if (StringUtils.isBlank(caseDetails.getCaseData().getTribunalCorrespondenceEmail())) {
+            log.warn(WARNING_TRIBUNAL_EMAIL_NOT_FOUND_TO_NOTIFY_FOR_RESPONDENT_REP_UPDATE, caseDetails.getCaseId(),
+                    notificationType);
+            return;
+        }
+        Map<String, String> personalisation = NocNotificationHelper.buildTribunalPersonalisation(
+                caseDetails.getCaseData());
+        try {
+            emailService.sendEmail(tribunalTemplateId, caseDetails.getCaseData().getTribunalCorrespondenceEmail(),
+                    personalisation);
+        } catch (Exception e) {
+            log.warn(WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_TRIBUNAL, caseDetails.getCaseId(), e.getMessage());
+        }
+    }
+
+    /**
+     * Sends a notification to a representative informing them that they have been
+     * newly assigned to a party on a case.
+     *
+     * <p>The notification is sent only if:</p>
+     * <ul>
+     *     <li>The case contains sufficient information for notifications</li>
+     *     <li>A valid party name is provided for personalisation</li>
+     *     <li>The representative has a valid email address</li>
+     * </ul>
+     *
+     * <p>If any required information is missing, no notification is sent and
+     * a warning is logged. This method performs defensive validation and fails
+     * safely without throwing exceptions.</p>
+     *
+     * @param caseDetails the case details containing reference and party information
+     * @param partyName the name of the party to which the representative has been assigned,
+     *                  used for notification personalisation
+     * @param representative the representative who has been newly assigned and
+     *                       will receive the notification
+     */
+    public void notifyRepresentativeOfNewAssignment(CaseDetails caseDetails,
+                                                    String partyName,
+                                                    RepresentedTypeRItem representative) {
+        if (!NotificationUtils.isCaseValidForNotification(caseDetails)) {
+            String caseId = ObjectUtils.isEmpty(caseDetails) ? StringUtils.EMPTY : caseDetails.getCaseId();
+            log.warn(WARNING_INVALID_CASE_DETAILS_TO_NOTIFY_NEW_REPRESENTATIVE, caseId);
+            return;
+        }
+        if (StringUtils.isBlank(partyName)) {
+            log.warn(WARNING_INVALID_PARTY_NAME_TO_NOTIFY_NEW_REPRESENTATIVE, caseDetails.getCaseId());
+            return;
+        }
+        if (Objects.isNull(representative)
+                || ObjectUtils.isEmpty(representative.getValue())
+                || StringUtils.isBlank(representative.getValue().getRepresentativeEmailAddress())) {
+            log.warn(WARNING_INVALID_REP_EMAIL_NOTIFY_NEW_REPRESENTATIVE, caseDetails.getCaseId());
+            return;
+        }
+        Map<String, String> personalisation = buildPersonalisationWithPartyName(caseDetails, partyName,
+                emailService.getExuiCaseLink(caseDetails.getCaseId()));
+        try {
+            emailService.sendEmail(newRespondentSolicitorTemplateId,
+                    representative.getValue().getRepresentativeEmailAddress(), personalisation);
+        } catch (Exception e) {
+            log.warn(WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_NEW_REPRESENTATIVE, caseDetails.getCaseId(),
+                    e.getMessage());
+        }
+    }
+
+    private void sendEmailToOldOrgAdmin(String orgId, CaseData caseDataPrevious) {
+        ResponseEntity<RetrieveOrgByIdResponse> getOrgResponse = getOrganisationById(orgId);
+        HttpStatusCode statusCode = getOrgResponse.getStatusCode();
+        if (!HttpStatus.OK.equals(statusCode)) {
+            log.error("Cannot retrieve old org by id {} [{}] {}", orgId, statusCode, getOrgResponse.getBody());
+            return;
+        }
+        RetrieveOrgByIdResponse resBody = getOrgResponse.getBody();
+        if (resBody == null) {
+            return;
+        }
+        if (resBody.getSuperUser() == null || isNullOrEmpty(resBody.getSuperUser().getEmail())) {
+            log.warn("Previous Org {} is missing org admin email", orgId);
+            return;
+        }
+        Map<String, String> personalisation = buildPreviousRespondentSolicitorPersonalisation(caseDataPrevious);
+        try {
+            emailService.sendEmail(
+                    previousRespondentSolicitorTemplateId,
+                    resBody.getSuperUser().getEmail(),
+                    personalisation);
+        } catch (Exception e) {
+            LoggingUtils.logNotificationIssue(ERROR_FAILED_TO_SEND_EMAIL_ORGANISATION_ADMIN, orgId, e);
+        }
+    }
+
+    private void sendEmailToNewOrgAdmin(String orgId, CaseDetails caseDetailsNew, String partyName) {
+        ResponseEntity<RetrieveOrgByIdResponse> getOrgResponse = getOrganisationById(orgId);
+        HttpStatusCode statusCode = getOrgResponse.getStatusCode();
+        if (!HttpStatus.OK.equals(statusCode)) {
+            log.error("Cannot retrieve new org by id {} [{}] {}", orgId, statusCode, getOrgResponse.getBody());
+            return;
+        }
+
+        RetrieveOrgByIdResponse resBody = getOrgResponse.getBody();
+        if (resBody == null) {
+            return;
+        }
+
+        if (resBody.getSuperUser() == null || isNullOrEmpty(resBody.getSuperUser().getEmail())) {
+            log.warn("New Org {} is missing org admin email", orgId);
+            return;
+        }
+
+        String citUrl = emailService.getCitizenCaseLink(caseDetailsNew.getCaseId());
+        Map<String, String> personalisation = buildPersonalisationWithPartyName(caseDetailsNew, partyName, citUrl);
+        emailService.sendEmail(newRespondentSolicitorTemplateId, resBody.getSuperUser().getEmail(), personalisation);
     }
 
     public void sendNotificationOfChangeEmails(CaseDetails caseDetailsPrevious,
@@ -160,7 +465,7 @@ public class NocNotificationService {
         handleOrganisationNocEmails(caseDataPrevious, caseDetailsNew, changeRequest, partyName, newRepEmailAddress);
 
         // send tribunal noc change email
-        sendTribunalEmail(caseDataPrevious);
+        notifyTribunalOfRespondentRepresentativeUpdate(caseDetailsPrevious, NOC_TYPE_REMOVAL);
     }
 
     private void handleClaimantNocEmails(CaseDetails caseDetailsNew, String partyName) {
@@ -194,7 +499,6 @@ public class NocNotificationService {
     private void handleRespondentNocEmails(CaseDetails caseDetailsPrevious,
                                           CaseDetails caseDetailsNew,
                                           ChangeOrganisationRequest changeRequest) {
-
         CaseData caseDataNew = caseDetailsNew.getCaseData();
         CaseData caseDataPrevious = caseDetailsPrevious.getCaseData();
         String partyName = NocNotificationHelper.getRespondentNameForNewSolicitor(changeRequest, caseDataNew);
@@ -243,21 +547,6 @@ public class NocNotificationService {
         }
     }
 
-    private void sendTribunalEmail(CaseData caseData) {
-        String tribunalEmail = caseData.getTribunalCorrespondenceEmail();
-        if (isNullOrEmpty(tribunalEmail)) {
-            log.warn("missing tribunalEmail");
-            return;
-        }
-
-        Map<String, String> personalisation = NocNotificationHelper.buildTribunalPersonalisation(caseData);
-        try {
-            emailService.sendEmail(tribunalTemplateId, tribunalEmail, personalisation);
-        } catch (Exception e) {
-            LoggingUtils.logNotificationIssue(ERROR_FAILED_TO_SEND_EMAIL_TRIBUNAL, tribunalEmail, e);
-        }
-    }
-
     public void sendClaimantEmail(CaseDetails caseDetailsPrevious, CaseDetails caseDetailsNew, String partyName) {
         if (ObjectUtils.isEmpty(caseDetailsPrevious) || ObjectUtils.isEmpty(caseDetailsNew)) {
             log.error(EXCEPTION_CASE_DETAILS_NOT_FOUND);
@@ -278,60 +567,6 @@ public class NocNotificationService {
         } catch (Exception e) {
             LoggingUtils.logNotificationIssue(ERROR_FAILED_TO_SEND_EMAIL_CLAIMANT, email, e);
         }
-    }
-
-    private void sendEmailToOldOrgAdmin(String orgId, CaseData caseDataPrevious) {
-        ResponseEntity<RetrieveOrgByIdResponse> getOrgResponse = getOrganisationById(orgId);
-        HttpStatusCode statusCode = getOrgResponse.getStatusCode();
-
-        if (!HttpStatus.OK.equals(statusCode)) {
-            log.error("Cannot retrieve old org by id {} [{}] {}", orgId, statusCode, getOrgResponse.getBody());
-            return;
-        }
-
-        RetrieveOrgByIdResponse resBody = getOrgResponse.getBody();
-        if (resBody == null) {
-            return;
-        }
-
-        if (resBody.getSuperUser() == null || isNullOrEmpty(resBody.getSuperUser().getEmail())) {
-            log.warn("Previous Org {} is missing org admin email", orgId);
-            return;
-        }
-
-        Map<String, String> personalisation = buildPreviousRespondentSolicitorPersonalisation(caseDataPrevious);
-        try {
-            emailService.sendEmail(
-                    previousRespondentSolicitorTemplateId,
-                    resBody.getSuperUser().getEmail(),
-                    personalisation);
-        } catch (Exception e) {
-            LoggingUtils.logNotificationIssue(ERROR_FAILED_TO_SEND_EMAIL_ORGANISATION_ADMIN, orgId, e);
-        }
-    }
-
-    private void sendEmailToNewOrgAdmin(String orgId, CaseDetails caseDetailsNew, String partyName) {
-        ResponseEntity<RetrieveOrgByIdResponse> getOrgResponse = getOrganisationById(orgId);
-        HttpStatusCode statusCode = getOrgResponse.getStatusCode();
-
-        if (!HttpStatus.OK.equals(statusCode)) {
-            log.error("Cannot retrieve new org by id {} [{}] {}", orgId, statusCode, getOrgResponse.getBody());
-            return;
-        }
-
-        RetrieveOrgByIdResponse resBody = getOrgResponse.getBody();
-        if (resBody == null) {
-            return;
-        }
-
-        if (resBody.getSuperUser() == null || isNullOrEmpty(resBody.getSuperUser().getEmail())) {
-            log.warn("New Org {} is missing org admin email", orgId);
-            return;
-        }
-
-        String citUrl = emailService.getCitizenCaseLink(caseDetailsNew.getCaseId());
-        Map<String, String> personalisation = buildPersonalisationWithPartyName(caseDetailsNew, partyName, citUrl);
-        emailService.sendEmail(newRespondentSolicitorTemplateId, resBody.getSuperUser().getEmail(), personalisation);
     }
 
     private ResponseEntity<RetrieveOrgByIdResponse> getOrganisationById(String orgId) {

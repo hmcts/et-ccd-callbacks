@@ -66,6 +66,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERR
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EVENT_UPDATE_CASE_SUBMITTED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REQUEST;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_TYPE_REMOVAL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_REPRESENTATIVE_MISSING_EMAIL_ADDRESS;
 
@@ -119,8 +120,8 @@ public class NocRespondentRepresentativeService {
             return;
         }
         try {
-            nocNotificationService.sendRespondentRepresentationRemovalNotifications(oldCaseDetails, newCaseDetails,
-                    representativesToRemove);
+            nocNotificationService.sendRespondentRepresentationUpdateNotifications(oldCaseDetails,
+                    representativesToRemove, NOC_TYPE_REMOVAL);
         } catch (Exception e) {
             log.info(ERROR_UNABLE_TO_NOTIFY_REPRESENTATION_REMOVAL, oldCaseDetails.getCaseId(), e.getMessage());
         }

@@ -472,11 +472,11 @@ public final class RespondentRepresentativeUtils {
         }
         RespondentSumTypeItem respondent = RespondentUtils.findRespondentById(caseData.getRespondentCollection(),
                 representative.getValue().getRespondentId());
-        if (org.springframework.util.ObjectUtils.isEmpty(respondent)) {
+        if (ObjectUtils.isEmpty(respondent)) {
             respondent = RespondentUtils.findRespondentByName(caseData.getRespondentCollection(),
                     representative.getValue().getRespRepName());
         }
-        if (org.springframework.util.ObjectUtils.isEmpty(respondent)) {
+        if (ObjectUtils.isEmpty(respondent)) {
             respondent = RespondentUtils.findRespondentByRepresentativeId(caseData.getRespondentCollection(),
                     representative.getId());
         }

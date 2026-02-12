@@ -4,6 +4,8 @@ public final class NOCConstants {
 
     public static final String NOC_REQUEST = "nocRequest";
     public static final String EVENT_UPDATE_CASE_SUBMITTED = "UPDATE_CASE_SUBMITTED";
+    public static final String NOC_TYPE_REMOVAL = "Removal";
+    public static final String NOC_TYPE_ADDITION = "Addition";
 
     public static final String EXCEPTION_RESPONDENT_NOT_FOUND = "Respondent not found for case ID %s.";
     public static final String EXCEPTION_RESPONDENT_ID_NOT_FOUND =
@@ -84,12 +86,62 @@ public final class NOCConstants {
     public static final String ERROR_FAILED_TO_REMOVE_CLAIMANT_REP_AND_ORG_POLICY =
             "Failed to remove claimant representative and organisation policy for case {}. Exception: {}";
 
+    public static final String WARNING_INVALID_CASE_DETAILS_TO_NOTIFY_CLAIMANT_FOR_RESPONDENT_REP_UPDATE =
+            "Invalid case details. Unable to notify claimant for respondent representative update. Case id: {}";
+    public static final String WARNING_RESPONDENT_NAME_MISSING_TO_NOTIFY_CLAIMANT_FOR_RESP_REP_UPDATE =
+            "Respondent name is missing. Unable to notify claimant for respondent representative update. Case id: {}";
+    public static final String WARNING_CLAIMANT_EMAIL_NOT_FOUND_TO_NOTIFY_FOR_RESPONDENT_REP_UPDATE =
+            "Claimant email not found. Unable to notify claimant for respondent representative update. Case id: {}";
+    public static final String WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_CLAIMANT =
+            "Failed to send noc notification email to claimant, case id: {}, error: {}";
+
     public static final String WARNING_REPRESENTATIVE_MISSING_EMAIL_ADDRESS =
             "Representative %s is missing an email address.";
     public static final String WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL =
             "Representative '%s' could not be found using %s. Case access will not be defined for this representative.";
-    public static final String WARNING_MISSING_EMAIL_ADDRESS =
-            "Missing email address for respondent while sending NOC notification email as revoked user for case {}.";
+    public static final String WARNING_MISSING_RESPONDENT_EMAIL_ADDRESS =
+            "Missing respondent email address while sending Notice of Change (NoC) respondent representative removal "
+                    + "notification for case {}.";
+    public static final String WARNING_INVALID_RESPONDENT =
+            "Invalid respondent while sending Notice of Change (NoC) respondent representative removal "
+                    + "notification for case {}.";
+    public static final String WARNING_INVALID_CASE_DETAILS =
+            "Invalid case details while sending Notice of Change (NoC) respondent representative removal "
+                    + "notification for case {}.";
+    public static final String WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_RESPONDENT =
+            "Failed to send noc notification email to respondent, case id: {}, error: {}";
+    public static final String WARNING_INVALID_CASE_DETAILS_TO_NOTIFY_ORGANISATION_FOR_RESPONDENT_REP_UPDATE =
+            "Invalid case details. Unable to notify organisation for respondent representative update. Case id: {}, "
+                    + "NOC type: {}";
+    public static final String WARNING_INVALID_REPRESENTATIVE_TO_NOTIFY_ORGANISATION_FOR_RESPONDENT_REP_UPDATE =
+            "Invalid case details. Unable to notify organisation for respondent representative update. Case id: {}, "
+                    + "NOC type: {}";
+    public static final String WARNING_INVALID_ORGANISATION_RESPONSE_TO_NOTIFY_FOR_RESPONDENT_REP_UPDATE =
+            "Cannot retrieve {} organisation by id {} [{}] {}. Unable to notify organisation for respondent "
+                    + "representative update. Case id: {}";
+    public static final String WARNING_INVALID_PARAMETERS_TO_NOTIFY_ORGANISATION_FOR_REP_UPDATE =
+            "Invalid parameters(orgId, caseId, nocType). Unable to notify organisation for respondent "
+                    + "representative update. Case id: {}";
+    public static final String WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_ORGANISATION =
+            "Failed to send NOC notification email to organisation admin, case id: {}, error: {}";
+    public static final String WARNING_INVALID_CASE_DETAILS_TO_NOTIFY_TRIBUNAL_FOR_RESPONDENT_REP_UPDATE =
+            "Invalid case details. Unable to notify tribunal for respondent representative update. Case id: {}, "
+                    + "NOC type: {}";
+    public static final String WARNING_TRIBUNAL_EMAIL_NOT_FOUND_TO_NOTIFY_FOR_RESPONDENT_REP_UPDATE =
+            "Tribunal email not found. Unable to notify organisation for respondent representative update. "
+                    + "Case id: {},  NOC type: {}";
+    public static final String WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_TRIBUNAL =
+            "Failed to send email to tribunal, case id: {}, error: {}";
+
+    public static final String WARNING_INVALID_CASE_DETAILS_TO_NOTIFY_NEW_REPRESENTATIVE =
+            "Invalid case details. Unable to notify new representative. Case id: {}";
+    public static final String WARNING_INVALID_PARTY_NAME_TO_NOTIFY_NEW_REPRESENTATIVE =
+            "Invalid party name. Unable to notify new representative. Case id: {}";
+    public static final String WARNING_INVALID_REP_EMAIL_NOTIFY_NEW_REPRESENTATIVE =
+            "Invalid representative email. Unable to notify new representative. Case id: {}";
+    public static final String WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_NEW_REPRESENTATIVE =
+            "Failed to send email to new representative, case id: {}, error: {}";
+
     public static final int MAX_NOC_ANSWERS = 10;
 
     private NOCConstants() {

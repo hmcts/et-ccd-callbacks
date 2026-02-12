@@ -14,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
-import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -27,13 +26,12 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransfer
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferOfficeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferSameCountryService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferToEcmService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferUtils;
 
 import java.util.List;
 
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
@@ -247,18 +245,19 @@ public class CaseTransferController {
         }
 
         CaseData caseData =  ccdRequest.getCaseDetails().getCaseData();
-        if (ENGLANDWALES_CASE_TYPE_ID.equals(ccdRequest.getCaseDetails().getCaseTypeId())) {
-            caseData.setManagingOffice(caseData.getAssignOffice().getSelectedCode());
-        } else if (SCOTLAND_CASE_TYPE_ID.equals(ccdRequest.getCaseDetails().getCaseTypeId())) {
-            caseData.setManagingOffice(TribunalOffice.GLASGOW.getOfficeName());
-            caseData.setAllocatedOffice(TribunalOffice.GLASGOW.getOfficeName());
+        CaseTransferUtils.setCaseManagingOffice(caseData, ccdRequest.getCaseDetails().getCaseTypeId());
+
+        if (featureToggleService.isHmcEnabled() || featureToggleService.isWorkAllocationEnabled()) {
+            caseManagementLocationService.setCaseManagementLocationCode(caseData);
+            caseManagementLocationService.setCaseManagementLocation(caseData);
         }
+
         DefaultValues defaultValues = defaultValuesReaderService.getDefaultValues(caseData.getManagingOffice());
         defaultValuesReaderService.setCaseData(caseData, defaultValues);
         FlagsImageHelper.buildFlagsImageFileName(ccdRequest.getCaseDetails());
 
         if (featureToggleService.isHmcEnabled()) {
-            caseManagementLocationService.setCaseManagementLocationCode(ccdRequest.getCaseDetails().getCaseData());
+            caseManagementLocationService.setCaseManagementLocationCode(caseData);
         }
 
         return getCallbackRespEntityNoErrors(caseData);

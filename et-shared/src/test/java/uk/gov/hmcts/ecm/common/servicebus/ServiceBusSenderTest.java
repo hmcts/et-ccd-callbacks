@@ -23,6 +23,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.lenient;
 
 @ExtendWith(MockitoExtension.class)
 class ServiceBusSenderTest {
@@ -37,11 +38,11 @@ class ServiceBusSenderTest {
     private UpdateCaseMsg updateCaseMsg;
 
     @BeforeEach
-    public void setUp() {
+    public void setUp() throws Exception {
         serviceBusSender = new ServiceBusSender(sendClient, objectMapper);
         CreationDataModel creationDataModel = ServiceBusHelper.getCreationDataModel("4150002/2020");
         updateCaseMsg = ServiceBusHelper.generateUpdateCaseMsg(creationDataModel);
-        when(objectMapper.writeValueAsBytes(any())).thenReturn("{}".getBytes());
+        lenient().when(objectMapper.writeValueAsBytes(any())).thenReturn("{}".getBytes());
     }
 
     @Test
@@ -52,7 +53,7 @@ class ServiceBusSenderTest {
     }
 
     @Test
-    void sendMessage() {
+    void sendMessage() throws Exception {
         assertDoesNotThrow(() -> serviceBusSender.sendMessage(updateCaseMsg));
         verify(sendClient).send(any());
     }

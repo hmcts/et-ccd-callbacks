@@ -8,15 +8,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.types.CaseLocation;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementLocationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferDifferentCountryService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferSameCountryService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.casetransfer.CaseTransferToEcmService;
@@ -26,13 +32,19 @@ import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.List;
 
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.hasToString;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -426,7 +438,66 @@ class CaseTransferControllerTest extends BaseControllerTest {
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isOk());
 
-        verify(caseManagementLocationService, times(1))
+        verify(caseManagementLocationService, times(2))
                 .setCaseManagementLocationCode(any());
+    }
+
+    @Test
+    void assignCase_invokesServicesAndUpdatesCaseData() {
+        CaseData caseDataToBeUpdated = new CaseData();
+        caseDataToBeUpdated.setManagingOffice("Unassigned");
+        DynamicFixedListType dl = new DynamicFixedListType();
+        var dvt = new DynamicValueType();
+        dvt.setLabel("Leeds2");
+        dl.setValue(dvt);
+        dl.getValue().setCode(TribunalOffice.LEEDS.getOfficeName());
+        dl.setListItems(List.of(dvt));
+        caseDataToBeUpdated.setAssignOffice(dl);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseDataToBeUpdated);
+        caseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
+        CCDRequest ccdRequest = new CCDRequest();
+        ccdRequest.setCaseDetails(caseDetails);
+
+        VerifyTokenService verifyTokenService = mock(VerifyTokenService.class);
+        CaseTransferSameCountryService sameCountryService = mock(CaseTransferSameCountryService.class);
+        CaseTransferDifferentCountryService diffCountryService = mock(CaseTransferDifferentCountryService.class);
+        CaseTransferToEcmService toEcmService = mock(CaseTransferToEcmService.class);
+        DefaultValuesReaderService defaultValuesReaderServiceMock = mock(DefaultValuesReaderService.class);
+        CaseManagementLocationService caseManagementLocationServiceMock = mock(CaseManagementLocationService.class);
+        FeatureToggleService featureToggleServiceMock = mock(FeatureToggleService.class);
+        when(verifyTokenService.verifyTokenSignature("token")).thenReturn(true);
+        when(featureToggleServiceMock.isHmcEnabled()).thenReturn(true);
+        when(featureToggleServiceMock.isWorkAllocationEnabled()).thenReturn(false);
+        DefaultValues defaultValues = mock(DefaultValues.class);
+        when(defaultValuesReaderServiceMock.getDefaultValues("Unassigned")).thenReturn(defaultValues);
+
+        doNothing().when(caseManagementLocationServiceMock).setCaseManagementLocationCode(caseDataToBeUpdated);
+        doAnswer(i -> {
+            caseDataToBeUpdated.setCaseManagementLocationCode("123");
+            return null;
+        }).when(caseManagementLocationServiceMock).setCaseManagementLocation(caseDataToBeUpdated);
+
+        doAnswer(i -> {
+            caseDataToBeUpdated.setCaseManagementLocation(CaseLocation.builder()
+                    .baseLocation("Leeds").region("321").build());
+            return null;
+        }).when(caseManagementLocationServiceMock).setCaseManagementLocationCode(caseDataToBeUpdated);
+
+        CaseTransferController controller = new CaseTransferController(
+                verifyTokenService, sameCountryService, diffCountryService, toEcmService,
+                defaultValuesReaderService, caseManagementLocationServiceMock, featureToggleServiceMock);
+
+        // Act
+        ResponseEntity<?> response = controller.assignCase(ccdRequest, "token");
+
+        // Assert
+        assertEquals(200, response.getStatusCodeValue());
+        verify(verifyTokenService).verifyTokenSignature("token");
+        verify(caseManagementLocationServiceMock, times(2)).setCaseManagementLocationCode(caseDataToBeUpdated);
+        verify(caseManagementLocationServiceMock).setCaseManagementLocation(caseDataToBeUpdated);
+        assertNotNull(caseDataToBeUpdated.getManagingOffice());
+        assertNotNull(caseDataToBeUpdated.getCaseManagementLocation());
+        assertNotNull(caseDataToBeUpdated.getCaseManagementLocationCode());
     }
 }

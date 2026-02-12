@@ -37,6 +37,14 @@
     <suppress>
         <cve>CVE-2024-45772</cve>
     </suppress>
+    <!-- Suppressing bcprov-jdk15on CVE while transitive deps still require jdk15on; no newer jdk15on artifact published -->
+    <suppress until="2026-06-30Z">
+        <notes><![CDATA[
+   file name: bcprov-jdk15on-1.70.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.bouncycastle/bcprov\-jdk15on@.*$</packageUrl>
+        <cve>CVE-2023-33202</cve>
+    </suppress>
     <!-- Suppressing due to dependency on other services as we use CFTLib-->
     <suppress>
         <cve>CVE-2024-38820</cve>

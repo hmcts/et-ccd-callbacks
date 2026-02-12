@@ -1,0 +1,211 @@
+plugins {
+    id 'java-library'
+    id 'jacoco'
+    id 'maven-publish'
+    id 'io.spring.dependency-management' version '1.1.5'
+}
+
+group 'com.github.hmcts'
+version System.getenv('RELEASE_VERSION') ?: "DEV-SNAPSHOT-${new Date().format('yyyyMMdd-HHmmss')}"
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url "https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1" }
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.springframework.boot:spring-boot-dependencies:3.5.5"
+    }
+    dependencies {
+        dependency 'commons-fileupload:commons-fileupload:1.6.0'
+        dependency 'org.apache.httpcomponents:httpclient:4.5.14'
+        dependency 'org.apache.logging.log4j:log4j-core:2.25.3'
+        dependency 'com.nimbusds:nimbus-jose-jwt:10.5'
+        dependency 'net.minidev:json-smart:2.5.2'
+        dependency 'com.squareup.okhttp3:logging-interceptor:4.12.0'
+        dependency 'com.squareup.okhttp3:okhttp:4.12.0'
+        dependency 'com.squareup.okhttp3:okhttp-urlconnection:4.12.0'
+        dependency 'com.squareup.okio:okio:3.16.4'
+        dependency 'org.bouncycastle:bcprov-jdk15on:1.70'
+        dependencySet(group: 'io.netty', version: '4.2.9.Final') {
+            entry 'netty-buffer'
+            entry 'netty-codec'
+            entry 'netty-codec-dns'
+            entry 'netty-codec-http'
+            entry 'netty-codec-http2'
+            entry 'netty-codec-socks'
+            entry 'netty-common'
+            entry 'netty-handler'
+            entry 'netty-handler-proxy'
+            entry 'netty-resolver'
+            entry 'netty-resolver-dns'
+            entry 'netty-resolver-dns-classes-macos'
+            entry 'netty-resolver-dns-native-macos'
+            entry 'netty-transport'
+            entry 'netty-transport-native-epoll'
+            entry 'netty-transport-native-kqueue'
+            entry 'netty-transport-native-unix-common'
+            entry 'netty-transport-classes-epoll'
+            entry 'netty-transport-classes-kqueue'
+        }
+    }
+}
+
+tasks.register('sourcesJar', Jar) {
+    dependsOn classes
+    archiveClassifier.set("sources")
+    from sourceSets.main.allSource
+}
+
+tasks.register('javadocJar', Jar) {
+    dependsOn javadoc
+    archiveClassifier.set("javadoc")
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+publishing {
+    publications {
+        Main(MavenPublication) {
+            from components.java
+            artifact sourcesJar
+            artifact javadocJar
+            groupId project.group
+            artifactId 'et-shared'
+            version project.version
+        }
+    }
+
+    repositories {
+        maven {
+            name = "AzureArtifacts"
+            url = uri("https://pkgs.dev.azure.com/hmcts/Artifacts/_packaging/hmcts-lib/maven/v1")
+            credentials {
+                username = System.getenv("AZURE_DEVOPS_ARTIFACT_USERNAME")
+                password = System.getenv("AZURE_DEVOPS_ARTIFACT_TOKEN")
+            }
+        }
+    }
+}
+
+dependencies {
+    api group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.1.2'
+    api group: 'com.microsoft.azure', name: 'azure-servicebus', version: '3.6.7'
+    api group: 'org.apache.poi', name: 'poi-ooxml', version: '5.4.1'
+    api group: 'org.elasticsearch', name: 'elasticsearch', version: '8.17.3'
+
+    implementation group: 'com.github.hmcts', name: 'core-case-data-store-client', version: '4.9.2'
+    implementation group: 'uk.gov.dwp.regex', name: 'postcode-validation', version: '1.1.0'
+    implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.18.0'
+    implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.5.0'
+    implementation group: 'com.google.guava', name: 'guava', version: '33.4.8-jre'
+    implementation group: 'org.apache.tika', name: 'tika-core', version: '3.2.3'
+    implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '3.0.0-RC1'
+
+    implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '6.1.9'
+    implementation group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: '6.1.9'
+    implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '8.0'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.25.3'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.25.3'
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.14'
+    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.5.14'
+    implementation group: 'ch.qos.logback', name: 'logback-access', version: '1.5.14'
+    implementation group: 'org.slf4j', name: 'slf4j-ext', version: '2.0.17'
+
+    implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.10.2'
+
+    implementation 'org.springframework:spring-web'
+    implementation 'org.springframework:spring-context'
+    implementation 'org.springframework:spring-webmvc'
+    implementation 'org.aspectj:aspectjrt'
+    implementation 'org.aspectj:aspectjweaver'
+    implementation 'jakarta.annotation:jakarta.annotation-api'
+
+    implementation group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
+    implementation group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.2.5.Final'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.18.3'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.18.3'
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.18.3'
+    implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.18.3'
+    implementation group: 'org.springframework', name: 'spring-core', version: '6.2.11'
+
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.42'
+    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.42'
+    testCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.42'
+    testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.42'
+
+    testImplementation(platform('org.junit:junit-bom:5.11.4'))
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.11.4'
+    testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: '5.11.4'
+    testRuntimeOnly group: 'org.junit.jupiter', name: 'junit-jupiter-engine', version: '5.11.4'
+    testRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-commons', version: '1.11.4'
+    testRuntimeOnly group: 'org.junit.vintage', name: 'junit-vintage-engine', version: '5.11.4'
+    testImplementation group: 'junit', name: 'junit', version: '4.13.2'
+    testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '3.0'
+    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.6'
+    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.6'
+    testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.19.0'
+    testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '5.19.0'
+    testImplementation group: 'org.springframework', name: 'spring-test', version: '6.2.10'
+    testImplementation group: 'pl.pragmatists', name: 'JUnitParams', version: '1.1.1'
+}
+
+configurations.configureEach {
+    resolutionStrategy.force(
+        'commons-fileupload:commons-fileupload:1.6.0',
+        'org.apache.httpcomponents:httpclient:4.5.14',
+        'org.apache.logging.log4j:log4j-core:2.25.3',
+        'com.nimbusds:nimbus-jose-jwt:10.5',
+        'net.minidev:json-smart:2.5.2',
+        'com.squareup.okhttp3:logging-interceptor:4.12.0',
+        'com.squareup.okhttp3:okhttp:4.12.0',
+        'com.squareup.okhttp3:okhttp-urlconnection:4.12.0',
+        'com.squareup.okio:okio:3.16.4',
+        'org.bouncycastle:bcprov-jdk15on:1.70',
+        'io.netty:netty-buffer:4.2.9.Final',
+        'io.netty:netty-codec:4.2.9.Final',
+        'io.netty:netty-codec-dns:4.2.9.Final',
+        'io.netty:netty-codec-http:4.2.9.Final',
+        'io.netty:netty-codec-http2:4.2.9.Final',
+        'io.netty:netty-codec-socks:4.2.9.Final',
+        'io.netty:netty-common:4.2.9.Final',
+        'io.netty:netty-handler:4.2.9.Final',
+        'io.netty:netty-handler-proxy:4.2.9.Final',
+        'io.netty:netty-resolver:4.2.9.Final',
+        'io.netty:netty-resolver-dns:4.2.9.Final',
+        'io.netty:netty-resolver-dns-classes-macos:4.2.9.Final',
+        'io.netty:netty-resolver-dns-native-macos:4.2.9.Final',
+        'io.netty:netty-transport:4.2.9.Final',
+        'io.netty:netty-transport-native-epoll:4.2.9.Final',
+        'io.netty:netty-transport-native-kqueue:4.2.9.Final',
+        'io.netty:netty-transport-native-unix-common:4.2.9.Final',
+        'io.netty:netty-transport-classes-epoll:4.2.9.Final',
+        'io.netty:netty-transport-classes-kqueue:4.2.9.Final'
+    )
+}
+
+test {
+    useJUnitPlatform()
+}
+
+jacocoTestReport {
+    dependsOn test
+    reports {
+        xml.required = true
+        csv.required = false
+    }
+}
+
+check.dependsOn jacocoTestReport

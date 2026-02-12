@@ -128,7 +128,7 @@ allprojects {
             'com.squareup.okhttp3:okhttp:4.12.0',
             'com.squareup.okhttp3:okhttp-urlconnection:4.12.0',
             'com.squareup.okio:okio:3.16.4',
-            'org.bouncycastle:bcprov-jdk15on:1.70',
+            'org.bouncycastle:bcprov-jdk15on:1.78',
             'io.netty:netty-buffer:4.2.9.Final',
             'io.netty:netty-codec:4.2.9.Final',
             'io.netty:netty-codec-dns:4.2.9.Final',

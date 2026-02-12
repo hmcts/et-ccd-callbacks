@@ -224,7 +224,13 @@ tasks.register('yarnAudit', Exec) {
 
 tasks.register('codeceptSmoke', Exec) {
     dependsOn ':yarnInstall'
-    commandLine 'yarn', 'test:smoke'
+    def junitDir = file("$buildDir/test-results/codeceptSmoke")
+    doFirst {
+        junitDir.mkdirs()
+    }
+    environment 'PLAYWRIGHT_JUNIT_OUTPUT_DIR', junitDir.absolutePath
+    environment 'PLAYWRIGHT_JUNIT_OUTPUT_NAME', 'playwright-junit.xml'
+    commandLine 'yarn', 'test:smoke', '--', '--reporter=junit'
 }
 
 tasks.register('codeceptFunctional', Exec) {

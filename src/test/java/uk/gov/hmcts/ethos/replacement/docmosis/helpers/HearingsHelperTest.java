@@ -34,6 +34,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
 import static uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType.create;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HearingConstants.TWO_JUDGES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper.BREAK_TIME_VALIDATION_MESSAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper.HEARING_BREAK_FUTURE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper.HEARING_BREAK_RESUME_INVALID;
@@ -51,7 +52,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper.upd
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper.validateTwoJudges;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.HEARING_CREATION_DAY_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.HEARING_CREATION_NUMBER_ERROR;
-import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.TWO_JUDGES;
 
 @Slf4j
 @ExtendWith(SpringExtension.class)

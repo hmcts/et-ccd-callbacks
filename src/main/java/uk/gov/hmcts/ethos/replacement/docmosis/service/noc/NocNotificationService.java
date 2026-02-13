@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.webjars.NotFoundException;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -392,23 +393,49 @@ public class NocNotificationService {
         }
     }
 
+    /**
+     * Notifies the claimant by email that their legal representative has been removed from the case.
+     *
+     * <p>This method performs validation and notification in the following steps:
+     * <ul>
+     *     <li>Validates that the {@code caseDetails} object is suitable for notification
+     *     using {@code NotificationUtils.isCaseValidForNotification}. If invalid, a warning
+     *     is logged and processing stops.</li>
+     *     <li>Attempts to retrieve the claimant's email address from the case data.
+     *     If no valid email address is found, a warning is logged and no notification is sent.</li>
+     *     <li>Builds the email personalisation map, including claimant details and a link
+     *     to the Citizen Hub for the relevant case.</li>
+     *     <li>Sends the notification email using the configured claimant template.</li>
+     * </ul>
+     *
+     * <p>If any exception occurs while retrieving the claimant email address or sending
+     * the email, the error is logged and the method exits without throwing the exception
+     * further, ensuring the calling flow is not interrupted.
+     *
+     * @param caseDetails the {@link CaseDetails} containing the case and claimant information
+     *                    required to send the notification
+     */
     public void notifyClaimantOfRepresentationRemoval(CaseDetails caseDetails) {
         if (!NotificationUtils.isCaseValidForNotification(caseDetails)) {
             String caseId = ObjectUtils.isEmpty(caseDetails) ? StringUtils.EMPTY : caseDetails.getCaseId();
             log.warn(WARNING_INVALID_CASE_DETAILS_CLAIMANT_NOT_NOTIFIED_OF_REMOVAL_OF_REPRESENTATIVE, caseId);
             return;
         }
-        String claimantEmail = ClaimantUtils.getClaimantEmailAddress(caseDetails.getCaseData());
-        String claimant = ClaimantUtils.getClaimant(caseDetails.getCaseData());
-        if (StringUtils.isBlank(claimantEmail)) {
+        String claimantEmailAddress;
+        try {
+            claimantEmailAddress = ClaimantUtils.getClaimantEmailAddress(caseDetails.getCaseData());
+        } catch (NotFoundException e) {
             log.warn(WARNING_INVALID_CLAIMANT_EMAIL_CLAIMANT_NOT_NOTIFIED_FOR_REMOVAL_OF_REPRESENTATIVE,
-                    caseDetails.getCaseId());
+                    caseDetails.getCaseId(), e.getMessage());
             return;
         }
+        String claimant = StringUtils.isBlank(ClaimantUtils.getClaimant(caseDetails.getCaseData()))
+                ? StringUtils.EMPTY : ClaimantUtils.getClaimant(caseDetails.getCaseData());
+        claimantEmailAddress = StringUtils.isBlank(claimantEmailAddress) ? StringUtils.EMPTY : claimantEmailAddress;
         Map<String, String> personalisation = buildNoCPersonalisation(caseDetails, claimant);
         personalisation.put(LINK_TO_CITIZEN_HUB, emailService.getCitizenCaseLink(caseDetails.getCaseId()));
         try {
-            emailService.sendEmail(claimantRepAssignedTemplateId, claimantEmail, personalisation);
+            emailService.sendEmail(claimantTemplateId, claimantEmailAddress, personalisation);
         } catch (Exception e) {
             log.warn(WARNING_FAILED_TO_SEND_REMOVAL_OF_REPRESENTATIVE_CLAIMANT, caseDetails.getCaseId(),
                     e.getMessage());

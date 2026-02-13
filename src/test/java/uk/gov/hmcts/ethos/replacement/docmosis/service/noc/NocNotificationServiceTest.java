@@ -162,6 +162,13 @@ class NocNotificationServiceTest {
             EXPECTED_WARNING_INVALID_CASE_DETAILS_CLAIMANT_NOT_NOTIFIED_OF_REMOVAL_OF_REPRESENTATIVE_WITH_CASEID =
             "Invalid case details. Unable to notify claimant for removal of representative update. Case id: "
                     + "1234567890123456.";
+    public static final String
+            EXPECTED_WARNING_INVALID_CLAIMANT_EMAIL_CLAIMANT_NOT_NOTIFIED_FOR_REMOVAL_OF_REPRESENTATIVE =
+            "Invalid claimant email. Unable to notify claimant for removal of representative update. Case id: "
+                    + "1234567890123456. Exception: Could not find claimant email address.";
+    public static final String EXPECTED_WARNING_FAILED_TO_SEND_REMOVAL_OF_REPRESENTATIVE_CLAIMANT =
+            "Failed to send email to claimant for removal of representative, case id: 1234567890123456, error: "
+                    + "Dummy exception occurred while sending email to respondent";
 
     @InjectMocks
     private NocNotificationService nocNotificationService;
@@ -585,6 +592,7 @@ class NocNotificationServiceTest {
 
     @Test
     void theNotifyClaimantOfRepresentationRemoval() {
+        ReflectionTestUtils.setField(nocNotificationService, FIELD_NAME_CLAIMANT_TEMPLATE_ID, CLAIMANT_TEMPLATE_ID);
         // when case details is empty should log invalid case details warning
         nocNotificationService.notifyClaimantOfRepresentationRemoval(null);
         LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_ONE,
@@ -596,6 +604,26 @@ class NocNotificationServiceTest {
         nocNotificationService.notifyClaimantOfRepresentationRemoval(caseDetails);
         LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_TWO,
                 EXPECTED_WARNING_INVALID_CASE_DETAILS_CLAIMANT_NOT_NOTIFIED_OF_REMOVAL_OF_REPRESENTATIVE_WITH_CASEID);
+        // when claimant not has email should log invalid claimant email warning
+        nocNotificationService.notifyClaimantOfRepresentationRemoval(validCaseDetails);
+        when(emailService.getCitizenCaseLink(CASE_ID)).thenReturn(CITIZEN_CASE_LINK);
+        LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_THREE,
+                EXPECTED_WARNING_INVALID_CLAIMANT_EMAIL_CLAIMANT_NOT_NOTIFIED_FOR_REMOVAL_OF_REPRESENTATIVE);
+        // when send email throws exception should throw that exception
+        validCaseDetails.getCaseData().setClaimantType(new ClaimantType());
+        validCaseDetails.getCaseData().getClaimantType().setClaimantEmailAddress(CLAIMANT_EMAIL);
+        doThrow(new RuntimeException(EXCEPTION_RESPONDENT_EMAIL_SEND)).when(emailService)
+                .sendEmail(eq(CLAIMANT_TEMPLATE_ID), eq(CLAIMANT_EMAIL), anyMap());
+        nocNotificationService.notifyClaimantOfRepresentationRemoval(validCaseDetails);
+        verify(emailService, times(NumberUtils.INTEGER_ONE)).sendEmail(eq(CLAIMANT_TEMPLATE_ID), eq(CLAIMANT_EMAIL),
+                anyMap());
+        LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_FOUR,
+                EXPECTED_WARNING_FAILED_TO_SEND_REMOVAL_OF_REPRESENTATIVE_CLAIMANT);
+        // should send email successfully
+        doNothing().when(emailService).sendEmail(eq(CLAIMANT_TEMPLATE_ID), eq(CLAIMANT_EMAIL), anyMap());
+        nocNotificationService.notifyClaimantOfRepresentationRemoval(validCaseDetails);
+        verify(emailService, times(NumberUtils.INTEGER_TWO)).sendEmail(eq(CLAIMANT_TEMPLATE_ID), eq(CLAIMANT_EMAIL),
+                anyMap());
     }
 
     @Test

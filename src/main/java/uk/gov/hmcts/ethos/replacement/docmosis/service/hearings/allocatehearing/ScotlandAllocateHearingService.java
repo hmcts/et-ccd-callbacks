@@ -7,7 +7,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.referencedata.CourtWorkerType;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.HearingSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.selection.CourtWorkerSelectionService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.selection.JudgeSelectionService;
@@ -92,7 +92,7 @@ public class ScotlandAllocateHearingService {
         DateListedType selectedListing = getSelectedListing(caseData);
         selectedListing.setHearingTypeReadingDeliberation(caseData.getAllocateHearingReadingDeliberation());
         selectedListing.setHearingStatus(caseData.getAllocateHearingStatus());
-        selectedListing.setPostponedBy(caseData.getAllocateHearingPostponedBy());
+        HearingsHelper.updatePostponedDate(caseData, selectedListing);
 
         String managingOffice = caseData.getAllocateHearingManagingOffice();
         selectedListing.setHearingVenueDayScotland(managingOffice);
@@ -125,8 +125,6 @@ public class ScotlandAllocateHearingService {
 
         selectedListing.setHearingRoom(caseData.getAllocateHearingRoom());
         selectedListing.setHearingClerk(caseData.getAllocateHearingClerk());
-
-        Helper.updatePostponedDate(caseData);
     }
 
     private HearingType getSelectedHearing(CaseData caseData) {

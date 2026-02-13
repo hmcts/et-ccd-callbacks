@@ -34,4 +34,11 @@ public final class ClaimantUtils {
         return caseData.getClaimantType().getClaimantEmailAddress();
     }
 
+    public static String getClaimant(CaseData caseData) {
+        if (ObjectUtils.isEmpty(caseData)
+                || StringUtils.isBlank(caseData.getClaimant())) {
+            return StringUtils.EMPTY;
+        }
+        return caseData.getClaimant();
+    }
 }

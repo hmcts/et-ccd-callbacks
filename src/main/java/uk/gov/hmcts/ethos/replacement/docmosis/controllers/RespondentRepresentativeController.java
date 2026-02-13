@@ -28,7 +28,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresen
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.NocUtils;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -182,10 +181,10 @@ public class RespondentRepresentativeController {
             NocUtils.validateCallbackRequest(callbackRequest);
             nocRespondentRepresentativeService.removeOldRepresentatives(callbackRequest, userToken);
             nocRespondentRepresentativeService.addNewRepresentatives(callbackRequest);
-            // nocRespondentRepresentativeService
-            // .removeClaimantRepresentativeIfOrganisationExistsInRespondent(callbackRequest.getCaseDetails());
-            nocRespondentRepresentativeService.updateRespondentRepresentativesAccess(callbackRequest);
-        } catch (IOException | GenericServiceException e) {
+            nocRespondentRepresentativeService
+             .removeClaimantRepresentativeIfOrganisationExistsInRespondent(callbackRequest.getCaseDetails());
+            // nocRespondentRepresentativeService.updateRespondentRepresentativesAccess(callbackRequest);
+        } catch (GenericServiceException e) {
             throw new GenericRuntimeException(new GenericServiceException(e));
         }
     }

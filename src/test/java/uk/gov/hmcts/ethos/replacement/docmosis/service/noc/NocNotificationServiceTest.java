@@ -155,6 +155,13 @@ class NocNotificationServiceTest {
     public static final String EXPECTED_WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_NEW_REPRESENTATIVE =
             "Failed to send email to new representative, case id: " + CASE_ID + ", error: Dummy exception occurred "
                     + "while sending email to respondent";
+    public static final String
+            EXPECTED_WARNING_INVALID_CASE_DETAILS_CLAIMANT_NOT_NOTIFIED_OF_REMOVAL_OF_REPRESENTATIVE_WITHOUT_CASEID =
+            "Invalid case details. Unable to notify claimant for removal of representative update. Case id: .";
+    public static final String
+            EXPECTED_WARNING_INVALID_CASE_DETAILS_CLAIMANT_NOT_NOTIFIED_OF_REMOVAL_OF_REPRESENTATIVE_WITH_CASEID =
+            "Invalid case details. Unable to notify claimant for removal of representative update. Case id: "
+                    + "1234567890123456.";
 
     @InjectMocks
     private NocNotificationService nocNotificationService;
@@ -574,6 +581,21 @@ class NocNotificationServiceTest {
         nocNotificationService.notifyRepresentativeOfNewAssignment(validCaseDetails, RESPONDENT_NAME, representative);
         verify(emailService, times(NumberUtils.INTEGER_TWO)).sendEmail(
                 eq(NEW_RESPONDENT_SOLICITOR_TEMPLATE_ID), eq(RESPONDENT_REPRESENTATIVE_EMAIL), anyMap());
+    }
+
+    @Test
+    void theNotifyClaimantOfRepresentationRemoval() {
+        // when case details is empty should log invalid case details warning
+        nocNotificationService.notifyClaimantOfRepresentationRemoval(null);
+        LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_ONE,
+                EXPECTED_WARNING_INVALID_CASE_DETAILS_CLAIMANT_NOT_NOTIFIED_OF_REMOVAL_OF_REPRESENTATIVE_WITHOUT_CASEID
+        );
+        // when case details is not valid should log invalid case details warning
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseId(CASE_ID);
+        nocNotificationService.notifyClaimantOfRepresentationRemoval(caseDetails);
+        LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_TWO,
+                EXPECTED_WARNING_INVALID_CASE_DETAILS_CLAIMANT_NOT_NOTIFIED_OF_REMOVAL_OF_REPRESENTATIVE_WITH_CASEID);
     }
 
     @Test

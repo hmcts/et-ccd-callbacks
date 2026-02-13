@@ -42,7 +42,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.et.common.model.ccd.types.UpdateRespondentRepresentativeRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseConverter;
@@ -74,11 +73,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPLOYMENT;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationApprovalStatus.APPROVED;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {CaseConverter.class, NoticeOfChangeFieldPopulator.class, ObjectMapper.class})
@@ -129,13 +125,9 @@ class NocRespondentRepresentativeServiceTest {
     private static final String RESPONDENT_ID_ONE = "106001";
     private static final String RESPONDENT_ID_TWO = "106002";
     private static final String RESPONDENT_ID_THREE = "106003";
-    private static final String RESPONDENT_REP_NAME_NEW = "New Dawn Solicitors";
-    private static final String RESPONDENT_REP_ID_NEW = "1111-5555-8888-1113";
     private static final String ADMIN_USER_TOKEN = "adminUserToken";
     private static final String USER_TOKEN = "userToken";
     private static final String S2S_TOKEN = "someS2SToken";
-    private static final String USER_ID_ONE = "891-456";
-    private static final String USER_ID_TWO = "123-456";
     private static final String EVENT_UPDATE_CASE_SUBMITTED = "UPDATE_CASE_SUBMITTED";
 
     private static final String EXCEPTION_DUMMY_MESSAGE = "Something went wrong";
@@ -412,317 +404,6 @@ class NocRespondentRepresentativeServiceTest {
     }
 
     @Test
-    @SneakyThrows
-    void updateRespondentRepresentativesAccess() {
-        CCDRequest ccdRequest = getCCDRequest();
-
-        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
-        when(ccdClient.startEventForCase(ADMIN_USER_TOKEN,
-                ccdRequest.getCaseDetails().getCaseTypeId(),
-                ccdRequest.getCaseDetails().getJurisdiction(),
-                ccdRequest.getCaseDetails().getCaseId(),
-                EVENT_UPDATE_CASE_SUBMITTED)).thenReturn(ccdRequest);
-        when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, ccdRequest.getCaseDetails().getCaseId()))
-                .thenReturn(mockCaseAssignmentData());
-        when(ccdClient.submitEventForCase(eq(ADMIN_USER_TOKEN),
-                any(CaseData.class),
-                eq(ccdRequest.getCaseDetails().getCaseTypeId()),
-                eq(ccdRequest.getCaseDetails().getJurisdiction()),
-                any(CCDRequest.class),
-                eq(ccdRequest.getCaseDetails().getCaseId()))).thenReturn(null);
-        nocRespondentRepresentativeService.updateRespondentRepresentativesAccess(getCallBackCallbackRequest());
-
-        verify(ccdClient, times(NumberUtils.INTEGER_TWO)).startEventForCase(ADMIN_USER_TOKEN,
-                ccdRequest.getCaseDetails().getCaseTypeId(),
-                ccdRequest.getCaseDetails().getJurisdiction(),
-                ccdRequest.getCaseDetails().getCaseId(),
-                EVENT_UPDATE_CASE_SUBMITTED
-        );
-
-        verify(nocNotificationService, times(NumberUtils.INTEGER_TWO)).sendNotificationOfChangeEmails(
-                any(CaseDetails.class),
-                any(CaseDetails.class),
-                any(ChangeOrganisationRequest.class));
-
-        verify(ccdClient, times(NumberUtils.INTEGER_TWO))
-                .submitEventForCase(eq(ADMIN_USER_TOKEN),
-                        any(CaseData.class),
-                        eq(ccdRequest.getCaseDetails().getCaseTypeId()),
-                        eq(ccdRequest.getCaseDetails().getJurisdiction()),
-                        any(CCDRequest.class),
-                        eq(ccdRequest.getCaseDetails().getCaseId()));
-    }
-
-    private CallbackRequest getCallBackCallbackRequest() {
-        CallbackRequest callbackRequest = new CallbackRequest();
-        CaseDetails caseDetailsBefore = new CaseDetails();
-        caseDetailsBefore.setCaseId(SUBMISSION_REFERENCE_ONE);
-        caseDetailsBefore.setCaseData(getCaseDataBefore());
-        callbackRequest.setCaseDetailsBefore(caseDetailsBefore);
-        CaseDetails caseDetailsAfter = new CaseDetails();
-        caseDetailsAfter.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
-        caseDetailsAfter.setCaseId(SUBMISSION_REFERENCE_ONE);
-        caseDetailsAfter.setJurisdiction(EMPLOYMENT);
-        caseDetailsAfter.setCaseData(getCaseDataAfter());
-        callbackRequest.setCaseDetails(caseDetailsAfter);
-        return callbackRequest;
-    }
-
-    private CCDRequest getCCDRequest() {
-        CaseDetails caseDetailsAfter = new CaseDetails();
-        caseDetailsAfter.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
-        caseDetailsAfter.setCaseId(SUBMISSION_REFERENCE_ONE);
-        caseDetailsAfter.setJurisdiction(EMPLOYMENT);
-        caseDetailsAfter.setCaseData(getCaseDataAfter());
-        CCDRequest ccdRequest = new CCDRequest();
-        ccdRequest.setCaseDetails(caseDetailsAfter);
-        return ccdRequest;
-    }
-
-    @Test
-    @SneakyThrows
-    void shouldReturnRepresentationChanges() {
-        CaseData caseDataBefore = getCaseDataBefore();
-        CaseData caseDataAfter = getCaseDataAfter();
-
-        List<UpdateRespondentRepresentativeRequest> representationChanges =
-            nocRespondentRepresentativeService.identifyRepresentationChanges(caseDataAfter, caseDataBefore);
-
-        assertThat(representationChanges).usingRecursiveComparison()
-            .ignoringFields("changeOrganisationRequest.requestTimestamp")
-            .isEqualTo(getUpdateRespondentRepresentativeRequestList());
-
-    }
-
-    private List<UpdateRespondentRepresentativeRequest> getUpdateRespondentRepresentativeRequestList() {
-        final Organisation orgNew =
-            Organisation.builder().organisationID(ORGANISATION_ID_FOUR).organisationName(ET_ORG_NEW).build();
-        final Organisation org2 =
-            Organisation.builder().organisationID(ORGANISATION_ID_TWO).organisationName(ET_ORG_2).build();
-        final Organisation org3 =
-            Organisation.builder().organisationID(ORGANISATION_ID_THREE).organisationName(ET_ORG_3).build();
-
-        DynamicFixedListType roleItem = new DynamicFixedListType();
-        DynamicValueType dynamicValueType = new DynamicValueType();
-        dynamicValueType.setCode(ROLE_SOLICITORB);
-        dynamicValueType.setLabel(ROLE_SOLICITORB);
-        roleItem.setValue(dynamicValueType);
-
-        ChangeOrganisationRequest changeOrganisationRequest = ChangeOrganisationRequest.builder()
-            .approvalStatus(APPROVED)
-            .requestTimestamp(LocalDateTime.now())
-            .caseRoleId(roleItem)
-            .organisationToRemove(org2)
-            .organisationToAdd(orgNew)
-            .build();
-        List<UpdateRespondentRepresentativeRequest> changes = new ArrayList<>();
-        changes.add(UpdateRespondentRepresentativeRequest.builder()
-                .changeOrganisationRequest(changeOrganisationRequest).respondentName(RESPONDENT_NAME_TWO).build());
-        DynamicFixedListType roleItem2 = new DynamicFixedListType();
-        DynamicValueType dynamicValueType2 = new DynamicValueType();
-        dynamicValueType2.setCode(ROLE_SOLICITORC);
-        dynamicValueType2.setLabel(ROLE_SOLICITORC);
-        roleItem2.setValue(dynamicValueType2);
-        ChangeOrganisationRequest changeOrganisationRequest2 = ChangeOrganisationRequest.builder()
-            .approvalStatus(APPROVED)
-            .requestTimestamp(LocalDateTime.now())
-            .caseRoleId(roleItem2)
-            .organisationToRemove(org3)
-            .organisationToAdd(org2)
-            .build();
-        changes.add(UpdateRespondentRepresentativeRequest.builder()
-                .changeOrganisationRequest(changeOrganisationRequest2).respondentName(RESPONDENT_NAME_THREE).build());
-        return changes;
-    }
-
-    private CaseData getCaseDataBefore() {
-        CaseData caseDataBefore = new CaseData();
-
-        caseDataBefore.setRespondentCollection(new ArrayList<>());
-        caseDataBefore.setClaimant("claimant");
-        caseDataBefore.setEthosCaseReference("caseRef");
-
-        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
-        respondentSumTypeItem.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_ONE)
-            .build());
-        respondentSumTypeItem.setId(RESPONDENT_ID_ONE);
-        caseDataBefore.getRespondentCollection().add(respondentSumTypeItem);
-
-        respondentSumTypeItem = new RespondentSumTypeItem();
-        respondentSumTypeItem.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_TWO)
-            .build());
-        respondentSumTypeItem.setId(RESPONDENT_ID_TWO);
-        caseDataBefore.getRespondentCollection().add(respondentSumTypeItem);
-
-        respondentSumTypeItem = new RespondentSumTypeItem();
-        respondentSumTypeItem.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_THREE)
-            .build());
-        respondentSumTypeItem.setId(RESPONDENT_ID_THREE);
-        caseDataBefore.getRespondentCollection().add(respondentSumTypeItem);
-
-        //Organisation
-        Organisation org1 =
-            Organisation.builder().organisationID(ORGANISATION_ID_ONE).organisationName(ET_ORG_1).build();
-        OrganisationPolicy orgPolicy1 =
-            OrganisationPolicy.builder().organisation(org1).orgPolicyCaseAssignedRole(ROLE_SOLICITORA).build();
-        Organisation org2 =
-            Organisation.builder().organisationID(ORGANISATION_ID_TWO).organisationName(ET_ORG_2).build();
-        OrganisationPolicy orgPolicy2 =
-            OrganisationPolicy.builder().organisation(org2).orgPolicyCaseAssignedRole(ROLE_SOLICITORB).build();
-        Organisation org3 =
-            Organisation.builder().organisationID(ORGANISATION_ID_THREE).organisationName(ET_ORG_3).build();
-        OrganisationPolicy orgPolicy3 =
-            OrganisationPolicy.builder().organisation(org3).orgPolicyCaseAssignedRole(ROLE_SOLICITORC).build();
-
-        caseDataBefore.setRespondentOrganisationPolicy0(orgPolicy1);
-        caseDataBefore.setRespondentOrganisationPolicy1(orgPolicy2);
-        caseDataBefore.setRespondentOrganisationPolicy2(orgPolicy3);
-
-        // Respondent Representative
-        caseDataBefore.setRepCollection(new ArrayList<>());
-        RepresentedTypeR representedType =
-            RepresentedTypeR.builder()
-                .nameOfRepresentative(RESPONDENT_REP_NAME)
-                .respRepName(RESPONDENT_NAME_ONE)
-                .respondentOrganisation(org1).build();
-        RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
-        representedTypeRItem.setId(REPRESENTATIVE_ID_ONE);
-        representedTypeRItem.setValue(representedType);
-        representedTypeRItem.getValue().setRespondentId(RESPONDENT_ID_ONE);
-        caseDataBefore.getRepCollection().add(representedTypeRItem);
-
-        representedType =
-            RepresentedTypeR.builder()
-                .nameOfRepresentative(RESPONDENT_REP_NAME_TWO)
-                .respRepName(RESPONDENT_NAME_TWO)
-                .respondentOrganisation(org2)
-                .representativeEmailAddress("oldRep1@test.com").build();
-        representedTypeRItem = new RepresentedTypeRItem();
-        representedTypeRItem.setId(REPRESENTATIVE_ID_TWO);
-        representedTypeRItem.setValue(representedType);
-        representedTypeRItem.getValue().setRespondentId(RESPONDENT_ID_TWO);
-        caseDataBefore.getRepCollection().add(representedTypeRItem);
-
-        representedType =
-            RepresentedTypeR.builder()
-                .nameOfRepresentative(RESPONDENT_REP_NAME_THREE)
-                .respRepName(RESPONDENT_NAME_THREE)
-                .respondentOrganisation(org3)
-                .representativeEmailAddress("oldRep2@test.com").build();
-        representedTypeRItem = new RepresentedTypeRItem();
-        representedTypeRItem.setId(REPRESENTATIVE_ID_THREE);
-        representedTypeRItem.setValue(representedType);
-        representedTypeRItem.getValue().setRespondentId(RESPONDENT_ID_THREE);
-        caseDataBefore.getRepCollection().add(representedTypeRItem);
-
-        return caseDataBefore;
-    }
-
-    private CaseData getCaseDataAfter() {
-        CaseData caseDataAfter = new CaseData();
-        caseDataAfter.setRespondentCollection(new ArrayList<>());
-
-        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
-        respondentSumTypeItem.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_ONE)
-            .build());
-        respondentSumTypeItem.setId(RESPONDENT_ID_ONE);
-        caseDataAfter.getRespondentCollection().add(respondentSumTypeItem);
-
-        respondentSumTypeItem = new RespondentSumTypeItem();
-        respondentSumTypeItem.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_TWO)
-            .build());
-        respondentSumTypeItem.setId(RESPONDENT_ID_TWO);
-        caseDataAfter.getRespondentCollection().add(respondentSumTypeItem);
-
-        respondentSumTypeItem = new RespondentSumTypeItem();
-        respondentSumTypeItem.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_THREE)
-            .build());
-        respondentSumTypeItem.setId(RESPONDENT_ID_THREE);
-        caseDataAfter.getRespondentCollection().add(respondentSumTypeItem);
-
-        //Organisation
-        Organisation org1 =
-            Organisation.builder().organisationID(ORGANISATION_ID_ONE).organisationName(ET_ORG_1).build();
-        OrganisationPolicy orgPolicy1 =
-            OrganisationPolicy.builder().organisation(org1).orgPolicyCaseAssignedRole(ROLE_SOLICITORA).build();
-        Organisation org2 =
-            Organisation.builder().organisationID(ORGANISATION_ID_FOUR).organisationName(ET_ORG_NEW).build();
-        OrganisationPolicy orgPolicy2 =
-            OrganisationPolicy.builder().organisation(org2).orgPolicyCaseAssignedRole(ROLE_SOLICITORB).build();
-        Organisation org3 =
-            Organisation.builder().organisationID(ORGANISATION_ID_TWO).organisationName(ET_ORG_2).build();
-        OrganisationPolicy orgPolicy3 =
-            OrganisationPolicy.builder().organisation(org3).orgPolicyCaseAssignedRole(ROLE_SOLICITORC).build();
-
-        caseDataAfter.setRespondentOrganisationPolicy0(orgPolicy1);
-        caseDataAfter.setRespondentOrganisationPolicy1(orgPolicy2);
-        caseDataAfter.setRespondentOrganisationPolicy2(orgPolicy3);
-
-        // Respondent Representative
-        caseDataAfter.setRepCollection(new ArrayList<>());
-        RepresentedTypeR representedType =
-            RepresentedTypeR.builder()
-                .nameOfRepresentative(RESPONDENT_REP_NAME)
-                .respRepName(RESPONDENT_NAME_ONE)
-                .respondentOrganisation(org1).build();
-        RepresentedTypeRItem representedTypeRItem = new RepresentedTypeRItem();
-        representedTypeRItem.setId(REPRESENTATIVE_ID_ONE);
-        representedTypeRItem.setValue(representedType);
-        representedTypeRItem.getValue().setRespondentId(RESPONDENT_ID_ONE);
-        caseDataAfter.getRepCollection().add(representedTypeRItem);
-
-        representedType =
-            RepresentedTypeR.builder()
-                .nameOfRepresentative(RESPONDENT_REP_NAME_NEW)
-                .respRepName(RESPONDENT_NAME_TWO)
-                .respondentOrganisation(org2).build();
-        representedTypeRItem = new RepresentedTypeRItem();
-        representedTypeRItem.setId(RESPONDENT_REP_ID_NEW);
-        representedTypeRItem.setValue(representedType);
-        representedTypeRItem.getValue().setRespondentId(RESPONDENT_ID_TWO);
-        caseDataAfter.getRepCollection().add(representedTypeRItem);
-
-        representedType =
-            RepresentedTypeR.builder()
-                .nameOfRepresentative(RESPONDENT_REP_NAME_TWO)
-                .respRepName(RESPONDENT_NAME_THREE)
-                .respondentOrganisation(org3).build();
-        representedTypeRItem = new RepresentedTypeRItem();
-        representedTypeRItem.setId(REPRESENTATIVE_ID_TWO);
-        representedTypeRItem.setValue(representedType);
-        representedTypeRItem.getValue().setRespondentId(RESPONDENT_ID_THREE);
-        caseDataAfter.getRepCollection().add(representedTypeRItem);
-        return caseDataAfter;
-    }
-
-    @Test
-    void removeOrganisationRepresentativeAccess() {
-        UserDetails mockUser = getMockUser();
-        when(adminUserService.getUserDetails(anyString(), any())).thenReturn(mockUser);
-        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
-        when(nocCcdService.retrieveCaseUserAssignments(any(), any())).thenReturn(
-            mockCaseAssignmentData());
-        doNothing().when(nocCcdService).revokeCaseAssignments(any(), any());
-
-        Organisation oldOrganisation =
-            Organisation.builder().organisationID(ORGANISATION_ID_TWO)
-                .organisationName(ET_ORG_2).build();
-
-        Organisation newOrganisation =
-            Organisation.builder().organisationID(ORGANISATION_ID_FOUR)
-                .organisationName(ET_ORG_NEW).build();
-
-        ChangeOrganisationRequest changeOrganisationRequest =
-            createChangeOrganisationRequest(newOrganisation, oldOrganisation);
-
-        nocRespondentRepresentativeService
-            .removeOrganisationRepresentativeAccess(SUBMISSION_REFERENCE_ONE, changeOrganisationRequest);
-
-        verify(nocCcdService, times(1))
-            .revokeCaseAssignments(any(), any());
-    }
-
-    @Test
     void prepopulateOrgAddressAndName() {
         OrganisationsResponse resOrg1 = createOrganisationsResponse(ORGANISATION_ID_ONE, ET_ORG_1);
         OrganisationsResponse resOrg2 = createOrganisationsResponse(ORGANISATION_ID_TWO, ET_ORG_2);
@@ -855,21 +536,6 @@ class NocRespondentRepresentativeServiceTest {
                         .organisationIdentifier(orgId)
                         .name(orgName)
                         .contactInformation(Collections.singletonList(orgAddress)).build();
-    }
-
-    private CaseUserAssignmentData mockCaseAssignmentData() {
-        List<CaseUserAssignment> caseUserAssignments = List.of(CaseUserAssignment.builder().userId(USER_ID_ONE)
-                .organisationId(ET_ORG_2)
-                .caseRole(ROLE_SOLICITORB)
-                .caseId(SUBMISSION_REFERENCE_ONE)
-                .build(),
-            CaseUserAssignment.builder().userId(USER_ID_TWO)
-                .organisationId(ET_ORG_2)
-                .caseRole(ROLE_SOLICITORB)
-                .caseId(SUBMISSION_REFERENCE_ONE)
-                .build());
-
-        return CaseUserAssignmentData.builder().caseUserAssignments(caseUserAssignments).build();
     }
 
     @Test
@@ -1455,7 +1121,7 @@ class NocRespondentRepresentativeServiceTest {
                 .extracting(ILoggingEvent::getFormattedMessage)
                 .hasSize(INTEGER_SIX)
                 .contains(EXPECTED_ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_INVALID_INPUTS);
-        // when start event for update organisation policies and representative role returns empty ccd request should
+        // when start event for update organisation policies and representative role returns empty CCD request should
         // log unable to start event error
         when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
         when(ccdClient.startEventForCase(ADMIN_USER_TOKEN,

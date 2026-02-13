@@ -141,6 +141,12 @@ public final class NOCConstants {
             "Invalid representative email. Unable to notify new representative. Case id: {}";
     public static final String WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_NEW_REPRESENTATIVE =
             "Failed to send email to new representative, case id: {}, error: {}";
+    public static final String WARNING_INVALID_CASE_DETAILS_CLAIMANT_NOT_NOTIFIED_OF_REMOVAL_OF_REPRESENTATIVE =
+            "Invalid case details. Unable to notify claimant for removal of representative update. Case id: {}.";
+    public static final String WARNING_INVALID_CLAIMANT_EMAIL_CLAIMANT_NOT_NOTIFIED_FOR_REMOVAL_OF_REPRESENTATIVE =
+            "Invalid claimant email. Unable to notify claimant for removal of representative update. Case id: {}.";
+    public static final String WARNING_FAILED_TO_SEND_REMOVAL_OF_REPRESENTATIVE_CLAIMANT =
+            "Failed to send email to claimant for removal of representative, case id: {}, error: {}";
 
     public static final int MAX_NOC_ANSWERS = 10;
 

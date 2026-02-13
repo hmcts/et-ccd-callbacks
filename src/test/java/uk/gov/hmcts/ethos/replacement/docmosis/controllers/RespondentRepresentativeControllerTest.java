@@ -367,8 +367,6 @@ class RespondentRepresentativeControllerTest {
                 .caseDetailsBefore(caseDetails).build();
         callbackRequest.getCaseDetails().setCaseId(DUMMY_SUBMISSION_REFERENCE);
         callbackRequest.getCaseDetailsBefore().setCaseId(DUMMY_SUBMISSION_REFERENCE);
-        doNothing().when(nocRespondentRepresentativeService)
-                .updateRespondentRepresentativesAccess(any(CallbackRequest.class));
         mockMvc.perform(post(URL_AMEND_RESPONDENT_REPRESENTATIVE_SUBMITTED)
                         .content(jsonMapper.toJson(callbackRequest))
                         .header(HEADER_AUTHORIZATION, DUMMY_TOKEN)

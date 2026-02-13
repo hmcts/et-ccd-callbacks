@@ -338,7 +338,7 @@ public class NocRespondentRepresentativeService {
             ccdClient.submitEventForCase(adminUserToken, ccdRequestCaseData, caseDetails.getCaseTypeId(),
                     caseDetails.getJurisdiction(), ccdRequest, caseDetails.getCaseId());
         } catch (IOException exception) {
-            log.info(ERROR_FAILED_TO_REMOVE_ORGANISATION_POLICIES, caseDetails.getCaseId(),
+            log.error(ERROR_FAILED_TO_REMOVE_ORGANISATION_POLICIES, caseDetails.getCaseId(),
                     exception.getMessage());
         }
     }
@@ -468,7 +468,7 @@ public class NocRespondentRepresentativeService {
                         representative.getValue().getRespondentOrganisation(), role);
                 updateRepresentativeRoleAndOrganisationPolicy(caseDetails, representative.getId(), role);
             } catch (GenericServiceException gse) {
-                log.info(ERROR_UNABLE_TO_SET_ROLE, role, caseDetails.getCaseId(), gse.getMessage());
+                log.error(ERROR_UNABLE_TO_SET_ROLE, role, caseDetails.getCaseId(), gse.getMessage());
             }
         }
     }

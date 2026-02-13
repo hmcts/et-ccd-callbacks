@@ -1,18 +1,15 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.utils.noc;
 
 import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.read.ListAppender;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.slf4j.LoggerFactory;
 import org.testcontainers.shaded.org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
+import uk.gov.hmcts.ethos.replacement.docmosis.test.utils.LoggerTestUtils;
 
 import java.util.List;
 
@@ -20,7 +17,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ClaimantRepresentativeUtilsTest {
 
-    private ListAppender<ILoggingEvent> appender;
     private static final String CASE_ID = "1234567890123456";
     private static final String CLAIMANT_EMAIL_ADDRESS = "claimant@email.com";
     private static final String CLAIMANT_REPRESENTATIVE_EMAIL_ADDRESS = "claimantrep@email.com";
@@ -33,35 +29,23 @@ public class ClaimantRepresentativeUtilsTest {
 
     @BeforeEach
     void setUp() {
-        Logger logger = (Logger) LoggerFactory.getLogger(ClaimantRepresentativeUtils.class);
-        appender = new ListAppender<>();
-        appender.start();
-        logger.addAppender(appender);
+        LoggerTestUtils.initializeLogger(ClaimantRepresentativeUtils.class);
     }
 
     @Test
     void testTheGetClaimantNocNotificationEmail() {
         // when case details is empty should return empty string
         assertThat(ClaimantRepresentativeUtils.getClaimantNocNotificationEmail(null)).isEmpty();
-        assertThat(appender.list)
-                .filteredOn(e -> e.getLevel() == Level.WARN)
-                .extracting(ILoggingEvent::getFormattedMessage)
-                .contains(EXPECTED_WARNING_WITHOUT_CASE_ID);
+        LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_ONE, EXPECTED_WARNING_WITHOUT_CASE_ID);
         // when case details does not have any case data should return empty string
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseId(CASE_ID);
         assertThat(ClaimantRepresentativeUtils.getClaimantNocNotificationEmail(caseDetails)).isEmpty();
-        assertThat(appender.list)
-                .filteredOn(e -> e.getLevel() == Level.WARN)
-                .extracting(ILoggingEvent::getFormattedMessage)
-                .contains(EXPECTED_WARNING_WITH_CASE_ID);
+        LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_TWO, EXPECTED_WARNING_WITH_CASE_ID);
         // when claimant representative is empty and not able to find claimant's email should log not found warning.
         caseDetails.setCaseData(new CaseData());
         assertThat(ClaimantRepresentativeUtils.getClaimantNocNotificationEmail(caseDetails)).isEmpty();
-        assertThat(appender.list)
-                .filteredOn(e -> e.getLevel() == Level.WARN)
-                .extracting(ILoggingEvent::getFormattedMessage)
-                .contains(EXPECTED_WARNING_CLAIMANT_EMAIL_NOT_FOUND);
+        LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_THREE, EXPECTED_WARNING_CLAIMANT_EMAIL_NOT_FOUND);
         // when claimant representative is not empty and finds claimant e-mail should return that e-mail address
         ClaimantType claimantType = new ClaimantType();
         claimantType.setClaimantEmailAddress(CLAIMANT_EMAIL_ADDRESS);

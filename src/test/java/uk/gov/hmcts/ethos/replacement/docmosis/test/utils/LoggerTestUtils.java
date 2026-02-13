@@ -21,6 +21,8 @@ public final class LoggerTestUtils {
     public static final int INTEGER_SEVEN = 7;
     public static final int INTEGER_EIGHT = 8;
     public static final int INTEGER_NINE = 9;
+    public static final int INTEGER_TEN = 10;
+    public static final int INTEGER_ELEVEN = 11;
 
     private static ListAppender<ILoggingEvent> appender;
 
@@ -36,6 +38,12 @@ public final class LoggerTestUtils {
     }
 
     public static void checkLog(Level loggingLevel, int numberOfMessages, String message) {
+        if (numberOfMessages == 0) {
+            assertThat(appender.list)
+                    .filteredOn(e -> e.getLevel().equals(loggingLevel))
+                    .hasSize(numberOfMessages);
+            return;
+        }
         assertThat(appender.list)
                 .filteredOn(e -> e.getLevel().equals(loggingLevel))
                 .extracting(ILoggingEvent::getFormattedMessage)

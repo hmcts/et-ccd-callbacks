@@ -1,19 +1,14 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service.noc;
 
 import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.read.ListAppender;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.slf4j.LoggerFactory;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.testcontainers.shaded.org.apache.commons.lang3.math.NumberUtils;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
 import uk.gov.hmcts.et.common.model.ccd.AuditEventsResponse;
@@ -25,6 +20,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
+import uk.gov.hmcts.ethos.replacement.docmosis.test.utils.LoggerTestUtils;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -57,14 +53,6 @@ class NocCcdServiceTest {
     private static final String ROLE_SOLICITORB = "SOLICITORB";
     private static final String OK = "Ok";
 
-    private static final int INTEGER_THREE = 3;
-    private static final int INTEGER_FOUR = 4;
-    private static final int INTEGER_FIVE = 5;
-    private static final int INTEGER_SIX = 6;
-    private static final int INTEGER_SEVEN = 7;
-    private static final int INTEGER_EIGHT = 8;
-    private static final int INTEGER_NINE = 9;
-
     private static final String
             EXPECTED_ERROR_UNABLE_TO_START_REMOVE_REP_ORG_POLICY_INVALID_PARAMETERS_WITHOUT_CASEID =
             "Unable to start update case submitted event to update representative role and organisation policy for "
@@ -86,14 +74,10 @@ class NocCcdServiceTest {
     private CcdClient ccdClient;
 
     private NocCcdService nocCcdService;
-    private ListAppender<ILoggingEvent> appender;
 
     @BeforeEach
     void setUp() {
-        Logger logger = (Logger) LoggerFactory.getLogger(NocCcdService.class);
-        appender = new ListAppender<>();
-        appender.start();
-        logger.addAppender(appender);
+        LoggerTestUtils.initializeLogger(NocCcdService.class);
         nocCcdService = new NocCcdService(ccdClient);
     }
 
@@ -248,64 +232,43 @@ class NocCcdServiceTest {
         CaseDetails caseDetails = new CaseDetails();
         nocCcdService.removeClaimantRepresentation(StringUtils.EMPTY, caseDetails);
         verifyNoInteractions(ccdClient);
-        assertThat(appender.list)
-                .filteredOn(e -> e.getLevel() == Level.ERROR)
-                .extracting(ILoggingEvent::getFormattedMessage)
-                .hasSize(NumberUtils.INTEGER_ONE)
-                .contains(EXPECTED_ERROR_UNABLE_TO_START_REMOVE_REP_ORG_POLICY_INVALID_PARAMETERS_WITHOUT_CASEID);
+        LoggerTestUtils.checkLog(Level.ERROR, LoggerTestUtils.INTEGER_ONE,
+                EXPECTED_ERROR_UNABLE_TO_START_REMOVE_REP_ORG_POLICY_INVALID_PARAMETERS_WITHOUT_CASEID);
         // when case details is empty should do nothing
         nocCcdService.removeClaimantRepresentation(ADMIN_USER_TOKEN, null);
         verifyNoInteractions(ccdClient);
-        assertThat(appender.list)
-                .filteredOn(e -> e.getLevel() == Level.ERROR)
-                .extracting(ILoggingEvent::getFormattedMessage)
-                .hasSize(NumberUtils.INTEGER_TWO)
-                .contains(EXPECTED_ERROR_UNABLE_TO_START_REMOVE_REP_ORG_POLICY_INVALID_PARAMETERS_WITHOUT_CASEID);
+        LoggerTestUtils.checkLog(Level.ERROR, LoggerTestUtils.INTEGER_TWO,
+                EXPECTED_ERROR_UNABLE_TO_START_REMOVE_REP_ORG_POLICY_INVALID_PARAMETERS_WITHOUT_CASEID);
         // when case details does not have case id should do nothing
         nocCcdService.removeClaimantRepresentation(ADMIN_USER_TOKEN, caseDetails);
         verifyNoInteractions(ccdClient);
-        assertThat(appender.list)
-                .filteredOn(e -> e.getLevel() == Level.ERROR)
-                .extracting(ILoggingEvent::getFormattedMessage)
-                .hasSize(INTEGER_THREE)
-                .contains(EXPECTED_ERROR_UNABLE_TO_START_REMOVE_REP_ORG_POLICY_INVALID_PARAMETERS_WITHOUT_CASEID);
+        LoggerTestUtils.checkLog(Level.ERROR, LoggerTestUtils.INTEGER_THREE,
+                EXPECTED_ERROR_UNABLE_TO_START_REMOVE_REP_ORG_POLICY_INVALID_PARAMETERS_WITHOUT_CASEID);
         // when case details does not have case data should do nothing
         caseDetails.setCaseId(CASE_ID);
         nocCcdService.removeClaimantRepresentation(ADMIN_USER_TOKEN, caseDetails);
         verifyNoInteractions(ccdClient);
-        assertThat(appender.list)
-                .filteredOn(e -> e.getLevel() == Level.ERROR)
-                .extracting(ILoggingEvent::getFormattedMessage)
-                .hasSize(INTEGER_FOUR)
-                .contains(EXPECTED_ERROR_UNABLE_TO_START_REMOVE_REP_ORG_POLICY_INVALID_PARAMETERS_WITH_CASEID);
+        LoggerTestUtils.checkLog(Level.ERROR, LoggerTestUtils.INTEGER_FOUR,
+                EXPECTED_ERROR_UNABLE_TO_START_REMOVE_REP_ORG_POLICY_INVALID_PARAMETERS_WITH_CASEID);
         // when case details does not have case type id should do nothing
         caseDetails.setCaseData(new CaseData());
         nocCcdService.removeClaimantRepresentation(ADMIN_USER_TOKEN, caseDetails);
         verifyNoInteractions(ccdClient);
-        assertThat(appender.list)
-                .filteredOn(e -> e.getLevel() == Level.ERROR)
-                .extracting(ILoggingEvent::getFormattedMessage)
-                .hasSize(INTEGER_FIVE)
-                .contains(EXPECTED_ERROR_UNABLE_TO_START_REMOVE_REP_ORG_POLICY_INVALID_PARAMETERS_WITH_CASEID);
+        LoggerTestUtils.checkLog(Level.ERROR, LoggerTestUtils.INTEGER_FIVE,
+                EXPECTED_ERROR_UNABLE_TO_START_REMOVE_REP_ORG_POLICY_INVALID_PARAMETERS_WITH_CASEID);
         // when case details does not have jurisdiction should do nothing
         caseDetails.setCaseTypeId(CASE_TYPE);
         nocCcdService.removeClaimantRepresentation(ADMIN_USER_TOKEN, caseDetails);
         verifyNoInteractions(ccdClient);
-        assertThat(appender.list)
-                .filteredOn(e -> e.getLevel() == Level.ERROR)
-                .extracting(ILoggingEvent::getFormattedMessage)
-                .hasSize(INTEGER_SIX)
-                .contains(EXPECTED_ERROR_UNABLE_TO_START_REMOVE_REP_ORG_POLICY_INVALID_PARAMETERS_WITH_CASEID);
+        LoggerTestUtils.checkLog(Level.ERROR, LoggerTestUtils.INTEGER_SIX,
+                EXPECTED_ERROR_UNABLE_TO_START_REMOVE_REP_ORG_POLICY_INVALID_PARAMETERS_WITH_CASEID);
         // when case user assignment is empty should do nothing
         caseDetails.setJurisdiction(EMPLOYMENT);
         when(ccdClient.retrieveCaseAssignments(ADMIN_USER_TOKEN, CASE_ID)).thenReturn(null);
         nocCcdService.removeClaimantRepresentation(ADMIN_USER_TOKEN, caseDetails);
-        verify(ccdClient, times(NumberUtils.INTEGER_ONE)).retrieveCaseAssignments(ADMIN_USER_TOKEN, CASE_ID);
-        assertThat(appender.list)
-                .filteredOn(e -> e.getLevel() == Level.ERROR)
-                .extracting(ILoggingEvent::getFormattedMessage)
-                .hasSize(INTEGER_SEVEN)
-                .contains(EXPECTED_ERROR_UNABLE_TO_START_REMOVE_REP_ORG_POLICY_INVALID_CCD_REQUEST);
+        verify(ccdClient, times(LoggerTestUtils.INTEGER_ONE)).retrieveCaseAssignments(ADMIN_USER_TOKEN, CASE_ID);
+        LoggerTestUtils.checkLog(Level.ERROR, LoggerTestUtils.INTEGER_SEVEN,
+                EXPECTED_ERROR_UNABLE_TO_START_REMOVE_REP_ORG_POLICY_INVALID_CCD_REQUEST);
         // when CCD request is empty should log unable to start event to remove claimant representative and organisation
         // policy error
         CaseUserAssignment caseUserAssignment = new CaseUserAssignment();
@@ -318,11 +281,8 @@ class NocCcdServiceTest {
         when(ccdClient.startEventForCase(ADMIN_USER_TOKEN, CASE_TYPE, JURISDICTION, CASE_ID,
                 EVENT_UPDATE_CASE_SUBMITTED)).thenReturn(null);
         nocCcdService.removeClaimantRepresentation(ADMIN_USER_TOKEN, caseDetails);
-        assertThat(appender.list)
-                .filteredOn(e -> e.getLevel() == Level.ERROR)
-                .extracting(ILoggingEvent::getFormattedMessage)
-                .hasSize(INTEGER_EIGHT)
-                .contains(EXPECTED_ERROR_UNABLE_TO_START_REMOVE_REP_ORG_POLICY_INVALID_CCD_REQUEST);
+        LoggerTestUtils.checkLog(Level.ERROR, LoggerTestUtils.INTEGER_EIGHT,
+                EXPECTED_ERROR_UNABLE_TO_START_REMOVE_REP_ORG_POLICY_INVALID_CCD_REQUEST);
         // when CCD client submit event for case successful should not log anything
         CCDRequest ccdRequest = new CCDRequest();
         ccdRequest.setCaseDetails(caseDetails);
@@ -331,23 +291,17 @@ class NocCcdServiceTest {
         when(ccdClient.submitEventForCase(ADMIN_USER_TOKEN, caseDetails.getCaseData(), CASE_TYPE, JURISDICTION,
                 ccdRequest, CASE_ID)).thenReturn(new SubmitEvent());
         nocCcdService.removeClaimantRepresentation(ADMIN_USER_TOKEN, caseDetails);
-        verify(ccdClient, times(NumberUtils.INTEGER_ONE)).submitEventForCase(ADMIN_USER_TOKEN,
+        verify(ccdClient, times(LoggerTestUtils.INTEGER_ONE)).submitEventForCase(ADMIN_USER_TOKEN,
                 caseDetails.getCaseData(), CASE_TYPE, JURISDICTION, ccdRequest, CASE_ID);
-        assertThat(appender.list)
-                .filteredOn(e -> e.getLevel() == Level.ERROR)
-                .extracting(ILoggingEvent::getFormattedMessage)
-                .hasSize(INTEGER_EIGHT);
+        LoggerTestUtils.checkLog(Level.ERROR, LoggerTestUtils.INTEGER_EIGHT,
+                EXPECTED_ERROR_UNABLE_TO_START_REMOVE_REP_ORG_POLICY_INVALID_CCD_REQUEST);
         // when CCD client submit event for case throws exception should log that exception
         when(ccdClient.submitEventForCase(ADMIN_USER_TOKEN, caseDetails.getCaseData(), CASE_TYPE, JURISDICTION,
                 ccdRequest, CASE_ID)).thenThrow(new IOException(EXCEPTION_DUMMY));
         nocCcdService.removeClaimantRepresentation(ADMIN_USER_TOKEN, caseDetails);
-        verify(ccdClient, times(NumberUtils.INTEGER_TWO)).submitEventForCase(ADMIN_USER_TOKEN,
+        verify(ccdClient, times(LoggerTestUtils.INTEGER_TWO)).submitEventForCase(ADMIN_USER_TOKEN,
                 caseDetails.getCaseData(), CASE_TYPE, JURISDICTION, ccdRequest, CASE_ID);
-        assertThat(appender.list)
-                .filteredOn(e -> e.getLevel() == Level.ERROR)
-                .extracting(ILoggingEvent::getFormattedMessage)
-                .hasSize(INTEGER_NINE)
-                .contains(EXPECTED_ERROR_FAILED_TO_REMOVE_CLAIMANT_REP_AND_ORG_POLICY);
-
+        LoggerTestUtils.checkLog(Level.ERROR, LoggerTestUtils.INTEGER_NINE,
+                EXPECTED_ERROR_FAILED_TO_REMOVE_CLAIMANT_REP_AND_ORG_POLICY);
     }
 }

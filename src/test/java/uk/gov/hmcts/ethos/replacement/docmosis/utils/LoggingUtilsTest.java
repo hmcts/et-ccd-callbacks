@@ -1,16 +1,12 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 
 import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
-import ch.qos.logback.classic.spi.ILoggingEvent;
-import ch.qos.logback.core.read.ListAppender;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.slf4j.LoggerFactory;
+import uk.gov.hmcts.ethos.replacement.docmosis.test.utils.LoggerTestUtils;
 
-import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 final class LoggingUtilsTest {
@@ -25,13 +21,9 @@ final class LoggingUtilsTest {
     private static final String EXPECTED_NOTIFICATION_ERROR_LOGGING_MESSAGE =
             "Failed to send email to claimant dummy@email.address, error: Exception message";
 
-    private final ListAppender<ILoggingEvent> appender = new ListAppender<>();
-
     @BeforeEach
     void setUp() {
-        Logger logger = (Logger) LoggerFactory.getLogger(LoggingUtils.class);
-        appender.start();
-        logger.addAppender(appender);
+        LoggerTestUtils.initializeLogger(LoggingUtils.class);
     }
 
     @Test
@@ -45,10 +37,7 @@ final class LoggingUtilsTest {
         // when exception message exists should log message
         final Exception exception = new Exception(EXCEPTION_MESSAGE);
         LoggingUtils.logCcdErrorMessageAtInfoLevel(exception);
-        assertThat(appender.list)
-                .filteredOn(e -> e.getLevel() == Level.INFO)
-                .extracting(ILoggingEvent::getFormattedMessage)
-                .containsExactly(EXPECTED_CCD_ERROR_LOGGING_MESSAGE);
+        LoggerTestUtils.checkLog(Level.INFO, LoggerTestUtils.INTEGER_ONE, EXPECTED_CCD_ERROR_LOGGING_MESSAGE);
     }
 
     @Test
@@ -57,10 +46,8 @@ final class LoggingUtilsTest {
         // when email is empty should log email not found error.
         final Exception exception = new Exception(EXCEPTION_MESSAGE);
         LoggingUtils.logNotificationIssue(ERROR_FAILED_TO_SEND_EMAIL_CLAIMANT, StringUtils.EMPTY, exception);
-        assertThat(appender.list)
-                .filteredOn(e -> e.getLevel() == Level.INFO)
-                .extracting(ILoggingEvent::getFormattedMessage)
-                .containsExactly(EXPECTED_NOTIFICATION_EMAIL_ERROR_LOGGING_MESSAGE);
+        LoggerTestUtils.checkLog(Level.INFO, LoggerTestUtils.INTEGER_ONE,
+                EXPECTED_NOTIFICATION_EMAIL_ERROR_LOGGING_MESSAGE);
         // when exception is null should not log anything and not throw exception
         assertDoesNotThrow(() -> LoggingUtils.logNotificationIssue(ERROR_FAILED_TO_SEND_EMAIL_CLAIMANT,
                 DUMMY_EMAIL_ADDRESS, null));
@@ -72,9 +59,6 @@ final class LoggingUtilsTest {
         assertDoesNotThrow(() -> LoggingUtils.logNotificationIssue(StringUtils.EMPTY, DUMMY_EMAIL_ADDRESS, exception));
         // should log message
         LoggingUtils.logNotificationIssue(ERROR_FAILED_TO_SEND_EMAIL_CLAIMANT, DUMMY_EMAIL_ADDRESS, exception);
-        assertThat(appender.list)
-                .filteredOn(e -> e.getLevel() == Level.INFO)
-                .extracting(ILoggingEvent::getFormattedMessage)
-                .contains(EXPECTED_NOTIFICATION_ERROR_LOGGING_MESSAGE);
+        LoggerTestUtils.checkLog(Level.INFO, LoggerTestUtils.INTEGER_TWO, EXPECTED_NOTIFICATION_ERROR_LOGGING_MESSAGE);
     }
 }

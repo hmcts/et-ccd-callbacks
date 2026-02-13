@@ -70,7 +70,8 @@ public class NocNotificationService {
         String partyName;
         String newRepEmailAddress = null;
 
-        if (caseRoleId.getValue().getCode().equals(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())) {
+        if (caseRoleId.getValue() != null && caseRoleId.getValue().getCode().equals(
+                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())) {
             // send claimant noc change email
             partyName = caseDataPrevious.getClaimant();
             if (caseDataNew.getRepresentativeClaimantType() != null) {
@@ -96,6 +97,12 @@ public class NocNotificationService {
 
         List<CaseUserAssignment> caseUserAssignments =
                 caseAccessService.getCaseUserAssignmentsById(caseDetailsNew.getCaseId());
+
+        if (caseUserAssignments == null || caseUserAssignments.isEmpty()) {
+            log.warn("In NocNotificationService : No case user assignments found for caseId {}",
+                    caseDetailsNew.getCaseId());
+            return;
+        }
 
         // send respondents or respondent solicitors the claimant noc change email
         emailNotificationService.getRespondentsAndRepsEmailAddresses(caseDataNew, caseUserAssignments)

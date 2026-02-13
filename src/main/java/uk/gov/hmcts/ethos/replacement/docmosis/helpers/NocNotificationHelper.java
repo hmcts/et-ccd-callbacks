@@ -32,8 +32,8 @@ public final class NocNotificationHelper {
 
     public static String getRespondentNameForNewSolicitor(ChangeOrganisationRequest changeRequest,
                                                           CaseData caseDataNew) {
-        if (changeRequest == null || changeRequest.getCaseRoleId() == null) {
-            log.warn("Failed to get RespondentNameForNewSolicitor - changeRequest or caseRoleId is null");
+        if (changeRequest == null || changeRequest.getCaseRoleId() == null || caseDataNew == null) {
+            log.warn("Failed to get RespondentNameForNewSolicitor - changeRequest, caseRoleId, or caseDataNew is null");
             return UNKNOWN;
         }
 
@@ -44,15 +44,16 @@ public final class NocNotificationHelper {
         }
 
         return SolicitorRole.from(selectedRole)
-                .flatMap(solicitorRole -> solicitorRole.getRepresentationItem(caseDataNew))
-                .map(respondentSumTypeItem -> respondentSumTypeItem.getValue().getRespondentName())
+                .flatMap(role -> role.getRepresentationItem(caseDataNew))
+                .map(item -> item.getValue().getRespondentName())
                 .filter(name -> !isNullOrEmpty(name))
                 .orElse(UNKNOWN);
     }
 
     public static RespondentSumType getRespondent(ChangeOrganisationRequest changeRequest, CaseData caseData,
                                                   NocRespondentHelper nocRespondentHelper) {
-        if (changeRequest == null || changeRequest.getCaseRoleId() == null) {
+        if (changeRequest == null || changeRequest.getCaseRoleId() == null 
+                || caseData == null || nocRespondentHelper == null) {
             return null;
         }
 
@@ -62,9 +63,9 @@ public final class NocNotificationHelper {
         }
 
         return SolicitorRole.from(selectedRole)
-                .flatMap(solicitorRole -> solicitorRole.getRepresentationItem(caseData))
-                .map(respondentSumTypeItem -> nocRespondentHelper.getRespondent(
-                        respondentSumTypeItem.getValue().getRespondentName(), caseData))
+                .flatMap(role -> role.getRepresentationItem(caseData))
+                .map(item -> nocRespondentHelper.getRespondent(
+                        item.getValue().getRespondentName(), caseData))
                 .orElse(null);
     }
 

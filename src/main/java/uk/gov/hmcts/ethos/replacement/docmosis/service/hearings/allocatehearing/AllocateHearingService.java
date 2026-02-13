@@ -70,29 +70,39 @@ public class AllocateHearingService {
                 venueChanged));
     }
 
+    /**
+     * Update common fields for EW and Scotland.
+     * @param caseData the case data
+     */
     public void updateSelectedHearing(CaseData caseData) {
         HearingType selectedHearing = getSelectedHearing(caseData);
         selectedHearing.setHearingSitAlone(caseData.getAllocateHearingSitAlone());
+
         selectedHearing.setJudge(caseData.getAllocateHearingJudge());
+        selectedHearing.getJudge().setListItems(null);
 
         if (TWO_JUDGES.equals(caseData.getAllocateHearingSitAlone())) {
             selectedHearing.setAdditionalJudge(caseData.getAllocateHearingAdditionalJudge());
+            selectedHearing.getAdditionalJudge().setListItems(null);
         } else {
             selectedHearing.setAdditionalJudge(null);
-            caseData.setAllocateHearingAdditionalJudge(null);
         }
 
         if (FULL_PANEL.equals(caseData.getAllocateHearingSitAlone())) {
             selectedHearing.setHearingERMember(caseData.getAllocateHearingEmployerMember());
+            selectedHearing.getHearingERMember().setListItems(null);
             selectedHearing.setHearingEEMember(caseData.getAllocateHearingEmployeeMember());
+            selectedHearing.getHearingEEMember().setListItems(null);
         } else {
             selectedHearing.setHearingERMember(null);
             selectedHearing.setHearingEEMember(null);
-            caseData.setAllocateHearingEmployerMember(null);
-            caseData.setAllocateHearingEmployeeMember(null);
         }
     }
 
+    /**
+     * Update other fields for EW.
+     * @param caseData the case data
+     */
     public void updateCase(CaseData caseData) {
         DateListedType selectedListing = getSelectedListing(caseData);
         selectedListing.setHearingStatus(caseData.getAllocateHearingStatus());
@@ -147,5 +157,16 @@ public class AllocateHearingService {
             dynamicFixedListType.setValue(selectedListing.getHearingClerk().getValue());
         }
         caseData.setAllocateHearingClerk(dynamicFixedListType);
+    }
+
+    /**
+     * Clears the dynamic fixed lists for allocateHearing event.
+     * @param caseData the case data
+     */
+    public void clearDynamicFixedList(CaseData caseData) {
+        caseData.setAllocateHearingJudge(null);
+        caseData.setAllocateHearingAdditionalJudge(null);
+        caseData.setAllocateHearingEmployerMember(null);
+        caseData.setAllocateHearingEmployeeMember(null);
     }
 }

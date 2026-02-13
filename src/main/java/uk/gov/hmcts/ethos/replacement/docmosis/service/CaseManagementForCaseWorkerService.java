@@ -61,6 +61,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTE
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HearingConstants.FULL_PANEL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HearingConstants.TWO_JUDGES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ACAS_DOC_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EMPTY_STRING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET1_ATTACHMENT_DOC_TYPE;
@@ -443,6 +445,13 @@ public class CaseManagementForCaseWorkerService {
         }
         caseData.getHearingCollection().forEach(hearingTypeItem -> {
             HearingType hearingType = hearingTypeItem.getValue();
+            if (!TWO_JUDGES.equals(hearingType.getHearingSitAlone())) {
+                hearingType.setAdditionalJudge(null);
+            }
+            if (!FULL_PANEL.equals(hearingType.getHearingSitAlone())) {
+                hearingType.setHearingERMember(null);
+                hearingType.setHearingEEMember(null);
+            }
             if (isNotEmpty(hearingType.getHearingDateCollection())) {
                 hearingType.getHearingDateCollection().stream()
                         .map(DateListedTypeItem::getValue)

@@ -14,6 +14,9 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.selection.J
 
 import java.util.Objects;
 
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HearingConstants.FULL_PANEL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HearingConstants.TWO_JUDGES;
+
 @Service
 public class AllocateHearingService {
 
@@ -71,9 +74,23 @@ public class AllocateHearingService {
         HearingType selectedHearing = getSelectedHearing(caseData);
         selectedHearing.setHearingSitAlone(caseData.getAllocateHearingSitAlone());
         selectedHearing.setJudge(caseData.getAllocateHearingJudge());
-        selectedHearing.setAdditionalJudge(caseData.getAllocateHearingAdditionalJudge());
-        selectedHearing.setHearingERMember(caseData.getAllocateHearingEmployerMember());
-        selectedHearing.setHearingEEMember(caseData.getAllocateHearingEmployeeMember());
+
+        if (TWO_JUDGES.equals(caseData.getAllocateHearingSitAlone())) {
+            selectedHearing.setAdditionalJudge(caseData.getAllocateHearingAdditionalJudge());
+        } else {
+            selectedHearing.setAdditionalJudge(null);
+            caseData.setAllocateHearingAdditionalJudge(null);
+        }
+
+        if (FULL_PANEL.equals(caseData.getAllocateHearingSitAlone())) {
+            selectedHearing.setHearingERMember(caseData.getAllocateHearingEmployerMember());
+            selectedHearing.setHearingEEMember(caseData.getAllocateHearingEmployeeMember());
+        } else {
+            selectedHearing.setHearingERMember(null);
+            selectedHearing.setHearingEEMember(null);
+            caseData.setAllocateHearingEmployerMember(null);
+            caseData.setAllocateHearingEmployeeMember(null);
+        }
     }
 
     public void updateCase(CaseData caseData) {

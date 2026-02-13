@@ -28,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HearingConstants.SIT_ALONE;
 
 @ExtendWith(SpringExtension.class)
 class ScotlandAllocatedHearingServiceTest {
@@ -66,8 +67,7 @@ class ScotlandAllocatedHearingServiceTest {
     @Test
     void testHandleManagingOfficeSelected() {
         // Arrange
-        String hearingSitAlone = String.valueOf(Boolean.TRUE);
-        selectedHearing.setHearingSitAlone(hearingSitAlone);
+        selectedHearing.setHearingSitAlone(SIT_ALONE);
         String readingDeliberation = "Reading Day";
         selectedListing.setHearingTypeReadingDeliberation(readingDeliberation);
         String hearingStatus = Constants.HEARING_STATUS_HEARD;
@@ -93,7 +93,7 @@ class ScotlandAllocatedHearingServiceTest {
         SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(employeeMembers,
                 "employeeMember", "Employee Member ");
 
-        assertEquals(hearingSitAlone, caseData.getAllocateHearingSitAlone());
+        assertEquals(SIT_ALONE, caseData.getAllocateHearingSitAlone());
         assertEquals(readingDeliberation, caseData.getAllocateHearingReadingDeliberation());
         assertEquals(postponedBy, caseData.getAllocateHearingPostponedBy());
         assertEquals(hearingStatus, caseData.getAllocateHearingStatus());
@@ -117,22 +117,12 @@ class ScotlandAllocatedHearingServiceTest {
     @Test
     void testUpdateCase() {
         // Arrange
-        String sitAlone = String.valueOf(Boolean.TRUE);
-        DynamicFixedListType judge = DynamicFixedListType.of(DynamicValueType.create("judge2", "Judge 2"));
-        DynamicFixedListType employerMember = DynamicFixedListType.of(DynamicValueType.create("employerMember2",
-            "Employer Member 2"));
-        DynamicFixedListType employeeMember = DynamicFixedListType.of(DynamicValueType.create("employeeMember2",
-            "Employee Member 2"));
         String readingDeliberation = "Reading Day";
         String hearingStatus = Constants.HEARING_STATUS_POSTPONED;
         String postponedBy = "Doris";
         DynamicFixedListType venue = DynamicFixedListType.of(DynamicValueType.create("venue2", "Venue 2"));
         DynamicFixedListType room = DynamicFixedListType.of(DynamicValueType.create("room2", "Room 2"));
         DynamicFixedListType clerk = DynamicFixedListType.of(DynamicValueType.create("clerk2", "Clerk 2"));
-        caseData.setAllocateHearingSitAlone(sitAlone);
-        caseData.setAllocateHearingJudge(judge);
-        caseData.setAllocateHearingEmployerMember(employerMember);
-        caseData.setAllocateHearingEmployeeMember(employeeMember);
         caseData.setAllocateHearingReadingDeliberation(readingDeliberation);
         caseData.setAllocateHearingStatus(hearingStatus);
         caseData.setAllocateHearingPostponedBy(postponedBy);
@@ -147,13 +137,6 @@ class ScotlandAllocatedHearingServiceTest {
             scotlandAllocateHearingService.updateCase(caseData);
 
             // Assert
-            assertEquals(sitAlone, selectedHearing.getHearingSitAlone());
-            assertEquals(judge.getSelectedCode(), selectedHearing.getJudge().getSelectedCode());
-            assertEquals(judge.getSelectedLabel(), selectedHearing.getJudge().getSelectedLabel());
-            assertEquals(employerMember.getSelectedCode(), selectedHearing.getHearingERMember().getSelectedCode());
-            assertEquals(employerMember.getSelectedLabel(), selectedHearing.getHearingERMember().getSelectedLabel());
-            assertEquals(employeeMember.getSelectedCode(), selectedHearing.getHearingEEMember().getSelectedCode());
-            assertEquals(employeeMember.getSelectedLabel(), selectedHearing.getHearingEEMember().getSelectedLabel());
             assertEquals(readingDeliberation, selectedListing.getHearingTypeReadingDeliberation());
             assertEquals(hearingStatus, selectedListing.getHearingStatus());
             assertEquals(postponedBy, selectedListing.getPostponedBy());

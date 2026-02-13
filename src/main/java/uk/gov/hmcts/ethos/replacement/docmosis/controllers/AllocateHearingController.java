@@ -190,8 +190,10 @@ public class AllocateHearingController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         String caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();
         if (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId)) {
+            allocateHearingService.updateSelectedHearing(caseData);
             allocateHearingService.updateCase(caseData);
         } else if (SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
+            allocateHearingService.updateSelectedHearing(caseData);
             scotlandAllocateHearingService.updateCase(caseData);
         }
 

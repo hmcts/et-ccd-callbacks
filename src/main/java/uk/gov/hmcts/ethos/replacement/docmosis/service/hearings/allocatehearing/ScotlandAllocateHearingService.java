@@ -82,13 +82,6 @@ public class ScotlandAllocateHearingService {
     }
 
     public void updateCase(CaseData caseData) {
-        HearingType selectedHearing = getSelectedHearing(caseData);
-        selectedHearing.setHearingSitAlone(caseData.getAllocateHearingSitAlone());
-        selectedHearing.setJudge(caseData.getAllocateHearingJudge());
-        selectedHearing.setAdditionalJudge(caseData.getAllocateHearingAdditionalJudge());
-        selectedHearing.setHearingERMember(caseData.getAllocateHearingEmployerMember());
-        selectedHearing.setHearingEEMember(caseData.getAllocateHearingEmployeeMember());
-
         DateListedType selectedListing = getSelectedListing(caseData);
         selectedListing.setHearingTypeReadingDeliberation(caseData.getAllocateHearingReadingDeliberation());
         selectedListing.setHearingStatus(caseData.getAllocateHearingStatus());
@@ -101,6 +94,7 @@ public class ScotlandAllocateHearingService {
         selectedListing.setHearingDundee(null);
         selectedListing.setHearingEdinburgh(null);
 
+        HearingType selectedHearing = getSelectedHearing(caseData);
         final TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(managingOffice);
         switch (tribunalOffice) {
             case GLASGOW:

@@ -67,14 +67,16 @@ public class AllocateHearingService {
                 venueChanged));
     }
 
-    public void updateCase(CaseData caseData) {
+    public void updateSelectedHearing(CaseData caseData) {
         HearingType selectedHearing = getSelectedHearing(caseData);
         selectedHearing.setHearingSitAlone(caseData.getAllocateHearingSitAlone());
         selectedHearing.setJudge(caseData.getAllocateHearingJudge());
         selectedHearing.setAdditionalJudge(caseData.getAllocateHearingAdditionalJudge());
         selectedHearing.setHearingERMember(caseData.getAllocateHearingEmployerMember());
         selectedHearing.setHearingEEMember(caseData.getAllocateHearingEmployeeMember());
+    }
 
+    public void updateCase(CaseData caseData) {
         DateListedType selectedListing = getSelectedListing(caseData);
         selectedListing.setHearingStatus(caseData.getAllocateHearingStatus());
         selectedListing.setHearingVenueDay(caseData.getAllocateHearingVenue());

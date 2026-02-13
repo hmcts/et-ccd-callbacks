@@ -29,6 +29,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HearingConstants.SIT_ALONE;
 
 @ExtendWith(SpringExtension.class)
 class AllocateHearingServiceTest {
@@ -57,8 +58,7 @@ class AllocateHearingServiceTest {
     @Test
     void testHandleListingSelectedNoExistingSelections() {
         // Arrange
-        String hearingSitAlone = String.valueOf(Boolean.TRUE);
-        selectedHearing.setHearingSitAlone(hearingSitAlone);
+        selectedHearing.setHearingSitAlone(SIT_ALONE);
 
         String hearingStatus = Constants.HEARING_STATUS_HEARD;
         String postponedBy = "Barney";
@@ -82,7 +82,7 @@ class AllocateHearingServiceTest {
         SelectionServiceTestUtils.verifyDynamicFixedListNoneSelected(
                 employeeMembers, "employeeMember", "Employee Member ");
 
-        assertEquals(hearingSitAlone, caseData.getAllocateHearingSitAlone());
+        assertEquals(SIT_ALONE, caseData.getAllocateHearingSitAlone());
         assertEquals(postponedBy, caseData.getAllocateHearingPostponedBy());
         assertEquals(hearingStatus, caseData.getAllocateHearingStatus());
     }
@@ -90,8 +90,7 @@ class AllocateHearingServiceTest {
     @Test
     void testHandleListingSelectedWithExistingSelections() {
         // Arrange
-        String hearingSitAlone = String.valueOf(Boolean.TRUE);
-        selectedHearing.setHearingSitAlone(hearingSitAlone);
+        selectedHearing.setHearingSitAlone(SIT_ALONE);
         DynamicValueType selectedEmployerMember = DynamicValueType.create("employerMember2",
             "Employer Member 2");
         selectedHearing.setHearingERMember(DynamicFixedListType.of(selectedEmployerMember));
@@ -126,7 +125,7 @@ class AllocateHearingServiceTest {
             "Employee Member ",
                 selectedEmployeeMember);
 
-        assertEquals(hearingSitAlone, caseData.getAllocateHearingSitAlone());
+        assertEquals(SIT_ALONE, caseData.getAllocateHearingSitAlone());
         assertEquals(postponedBy, caseData.getAllocateHearingPostponedBy());
         assertEquals(hearingStatus, caseData.getAllocateHearingStatus());
     }
@@ -170,23 +169,39 @@ class AllocateHearingServiceTest {
     }
 
     @Test
-    void testUpdateCase() {
+    void testUpdateSelectedHearing() {
         // Arrange
-        String sitAlone = String.valueOf(Boolean.TRUE);
         DynamicFixedListType judge = DynamicFixedListType.of(DynamicValueType.create("judge2", "Judge 2"));
         DynamicFixedListType employerMember = DynamicFixedListType.of(DynamicValueType.create("employerMember2",
             "Employer Member 2"));
         DynamicFixedListType employeeMember = DynamicFixedListType.of(DynamicValueType.create("employeeMember2",
             "Employee Member 2"));
+        caseData.setAllocateHearingSitAlone(SIT_ALONE);
+        caseData.setAllocateHearingJudge(judge);
+        caseData.setAllocateHearingEmployerMember(employerMember);
+        caseData.setAllocateHearingEmployeeMember(employeeMember);
+
+        // Act
+        allocateHearingService.updateSelectedHearing(caseData);
+
+        // Assert
+        assertEquals(SIT_ALONE, selectedHearing.getHearingSitAlone());
+        assertEquals(judge.getSelectedCode(), selectedHearing.getJudge().getSelectedCode());
+        assertEquals(judge.getSelectedLabel(), selectedHearing.getJudge().getSelectedLabel());
+        assertEquals(employerMember.getSelectedCode(), selectedHearing.getHearingERMember().getSelectedCode());
+        assertEquals(employerMember.getSelectedLabel(), selectedHearing.getHearingERMember().getSelectedLabel());
+        assertEquals(employeeMember.getSelectedCode(), selectedHearing.getHearingEEMember().getSelectedCode());
+        assertEquals(employeeMember.getSelectedLabel(), selectedHearing.getHearingEEMember().getSelectedLabel());
+    }
+
+    @Test
+    void testUpdateCase() {
+        // Arrange
         String hearingStatus = Constants.HEARING_STATUS_POSTPONED;
         String postponedBy = "Doris";
         DynamicFixedListType venue = DynamicFixedListType.of(DynamicValueType.create("venue2", "Venue 2"));
         DynamicFixedListType room = DynamicFixedListType.of(DynamicValueType.create("room2", "Room 2"));
         DynamicFixedListType clerk = DynamicFixedListType.of(DynamicValueType.create("clerk2", "Clerk 2"));
-        caseData.setAllocateHearingSitAlone(sitAlone);
-        caseData.setAllocateHearingJudge(judge);
-        caseData.setAllocateHearingEmployerMember(employerMember);
-        caseData.setAllocateHearingEmployeeMember(employeeMember);
         caseData.setAllocateHearingStatus(hearingStatus);
         caseData.setAllocateHearingPostponedBy(postponedBy);
         caseData.setAllocateHearingVenue(venue);
@@ -197,13 +212,6 @@ class AllocateHearingServiceTest {
         allocateHearingService.updateCase(caseData);
 
         // Assert
-        assertEquals(sitAlone, selectedHearing.getHearingSitAlone());
-        assertEquals(judge.getSelectedCode(), selectedHearing.getJudge().getSelectedCode());
-        assertEquals(judge.getSelectedLabel(), selectedHearing.getJudge().getSelectedLabel());
-        assertEquals(employerMember.getSelectedCode(), selectedHearing.getHearingERMember().getSelectedCode());
-        assertEquals(employerMember.getSelectedLabel(), selectedHearing.getHearingERMember().getSelectedLabel());
-        assertEquals(employeeMember.getSelectedCode(), selectedHearing.getHearingEEMember().getSelectedCode());
-        assertEquals(employeeMember.getSelectedLabel(), selectedHearing.getHearingEEMember().getSelectedLabel());
         assertEquals(hearingStatus, selectedListing.getHearingStatus());
         assertEquals(postponedBy, selectedListing.getPostponedBy());
         assertEquals(venue.getSelectedCode(), selectedListing.getHearingVenueDay().getSelectedCode());

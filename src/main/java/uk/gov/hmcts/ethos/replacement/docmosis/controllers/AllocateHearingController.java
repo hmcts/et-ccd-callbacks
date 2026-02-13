@@ -165,6 +165,7 @@ public class AllocateHearingController {
             allocateHearingService.updateSelectedHearing(caseData);
             scotlandAllocateHearingService.updateCase(caseData);
         }
+        allocateHearingService.clearDynamicFixedList(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
     }

@@ -49,6 +49,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.test.utils.LoggerTestUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
@@ -1295,5 +1296,49 @@ class NocRespondentRepresentativeServiceTest {
         nocRespondentRepresentativeService.removeClaimantRepresentativeIfOrganisationExistsInRespondent(caseDetails);
         verify(nocCcdService, times(NumberUtils.INTEGER_ONE)).removeClaimantRepresentation(ADMIN_USER_TOKEN,
                 caseDetails);
+    }
+
+    @Test
+    @SneakyThrows
+    void theAddNewRepresentatives() {
+        Organisation organisation = Organisation.builder().build();
+        // when callback request is empty should not do anything
+        nocRespondentRepresentativeService.addNewRepresentatives(null);
+        verify(nocService, times(LoggerTestUtils.INTEGER_ZERO)).grantRepresentativeAccess(ADMIN_USER_TOKEN,
+                RESPONDENT_EMAIL, CASE_ID_1, organisation, ROLE_SOLICITORA);
+        // when callback request does not have old case details should not do anything
+        CallbackRequest callbackRequest = CallbackRequest.builder().build();
+        nocRespondentRepresentativeService.addNewRepresentatives(callbackRequest);
+        verify(nocService, times(LoggerTestUtils.INTEGER_ZERO)).grantRepresentativeAccess(ADMIN_USER_TOKEN,
+                RESPONDENT_EMAIL, CASE_ID_1, organisation, ROLE_SOLICITORA);
+        // when callback request does not have new case details should not do anything
+        CaseDetails oldCaseDetails = new CaseDetails();
+        callbackRequest.setCaseDetailsBefore(oldCaseDetails);
+        nocRespondentRepresentativeService.addNewRepresentatives(callbackRequest);
+        verify(nocService, times(LoggerTestUtils.INTEGER_ZERO)).grantRepresentativeAccess(ADMIN_USER_TOKEN,
+                RESPONDENT_EMAIL, CASE_ID_1, organisation, ROLE_SOLICITORA);
+        // when old case details does not have case data should do nothing
+        CaseDetails newCaseDetails = new CaseDetails();
+        callbackRequest.setCaseDetails(newCaseDetails);
+        nocRespondentRepresentativeService.addNewRepresentatives(callbackRequest);
+        verify(nocService, times(LoggerTestUtils.INTEGER_ZERO)).grantRepresentativeAccess(ADMIN_USER_TOKEN,
+                RESPONDENT_EMAIL, CASE_ID_1, organisation, ROLE_SOLICITORA);
+        // when new case details does not have case data should do nothing
+        CaseData oldCaseData = new CaseData();
+        oldCaseDetails.setCaseData(oldCaseData);
+        nocRespondentRepresentativeService.addNewRepresentatives(callbackRequest);
+        verify(nocService, times(LoggerTestUtils.INTEGER_ZERO)).grantRepresentativeAccess(ADMIN_USER_TOKEN,
+                RESPONDENT_EMAIL, CASE_ID_1, organisation, ROLE_SOLICITORA);
+        // when new case details does not have respondent collection should call grantRespondentRepresentativesAccess
+        CaseData newCaseData = new CaseData();
+        newCaseDetails.setCaseData(newCaseData);
+        nocRespondentRepresentativeService.addNewRepresentatives(callbackRequest);
+        verify(nocService, times(LoggerTestUtils.INTEGER_ZERO)).grantRepresentativeAccess(ADMIN_USER_TOKEN,
+                RESPONDENT_EMAIL, CASE_ID_1, organisation, ROLE_SOLICITORA);
+        // when new case details exists should grant respondent representatives access
+        newCaseData.setRepCollection(List.of(RepresentedTypeRItem.builder().build()));
+        nocRespondentRepresentativeService.addNewRepresentatives(callbackRequest);
+        verify(nocService, times(LoggerTestUtils.INTEGER_ZERO)).grantRepresentativeAccess(ADMIN_USER_TOKEN,
+                RESPONDENT_EMAIL, CASE_ID_1, organisation, ROLE_SOLICITORA);
     }
 }

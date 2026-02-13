@@ -349,7 +349,7 @@ public class NocRespondentRepresentativeService {
                 || ObjectUtils.isEmpty(callbackRequest.getCaseDetails())
                 || ObjectUtils.isEmpty(callbackRequest.getCaseDetailsBefore().getCaseData())
                 || ObjectUtils.isEmpty(callbackRequest.getCaseDetails().getCaseData())
-                || ObjectUtils.isEmpty(callbackRequest.getCaseDetails().getCaseData().getRepCollection())) {
+                || CollectionUtils.isEmpty(callbackRequest.getCaseDetails().getCaseData().getRepCollection())) {
             return;
         }
         CaseDetails oldCaseDetails = callbackRequest.getCaseDetailsBefore();

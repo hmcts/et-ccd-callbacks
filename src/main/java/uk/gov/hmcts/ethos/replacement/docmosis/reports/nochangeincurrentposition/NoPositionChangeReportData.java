@@ -16,7 +16,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.REPORT_O
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.TOTAL_CASES;
 
 @Getter
-public class NoPositionChangeReportData extends ListingData {
+public final class NoPositionChangeReportData extends ListingData {
     // JsonIgnore is required on properties so that the report data is not
     // returned to CCD in any callback response.
     // Otherwise, this would trigger a CCD Case Data Validation error

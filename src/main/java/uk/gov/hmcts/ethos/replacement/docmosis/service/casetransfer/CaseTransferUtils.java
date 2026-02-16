@@ -68,8 +68,8 @@ public class CaseTransferUtils {
             return cases;
         } catch (Exception ex) {
             throw (CaseCreationException) new CaseCreationException(
-                "Error getting all cases to be transferred for case number: "
-                        + caseDetails.getCaseData().getEthosCaseReference()).initCause(ex);
+                    "Error getting all cases to be transferred for case number: "
+                    + caseDetails.getCaseData().getEthosCaseReference() + " " + ex.getMessage()).initCause(ex);
         }
     }
 
@@ -106,7 +106,7 @@ public class CaseTransferUtils {
 
         } catch (Exception ex) {
             throw (CaseCreationException) new CaseCreationException("Error getting counter claim case for : "
-                    + caseData.getEthosCaseReference()).initCause(ex);
+                    + caseData.getEthosCaseReference() + " " + ex.getMessage()).initCause(ex);
         }
     }
 

@@ -53,7 +53,8 @@ public class CaseRetrievalForCaseWorkerService {
             log.info("In Case Retrieval Service - caseRefRetrievalRequest for case type: {} ",  caseTypeId);
             return ccdClient.retrieveTransferredCaseReference(authToken, caseTypeId, jurisdiction, caseId);
         } catch (Exception ex) {
-            throw new CaseCreationException(MESSAGE + caseId + ex.getMessage());
+            throw (CaseCreationException) new CaseCreationException(
+                    MESSAGE + caseId + ex.getMessage()).initCause(ex);
         }
     }
 

@@ -427,8 +427,9 @@ dependencies {
     implementation group: 'org.asynchttpclient', name: 'async-http-client-netty-utils', version: '2.12.4'
     implementation group: 'com.fasterxml.woodstox', name: 'woodstox-core', version: '7.1.1'
     implementation group: 'com.squareup.okio', name: 'okio', version: '3.16.4'
-    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.6'
-    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.5.6'
+    // Updated from 1.5.6 to fix CVE-2024-12798, CVE-2024-12801, CVE-2025-11226, CVE-2026-1225
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.26'
+    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.5.26'
     // CVE-2025-48734
     implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.11.0'
     implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
@@ -556,7 +557,7 @@ bootWithCCD {
 
 }
 
-pmdMain.maxFailures = 13
+pmdMain.maxFailures = 0
 pmdTest.maxFailures = 0
 
 pmdTest.ruleSetFiles = files("config/pmd/rulesetTest.xml")

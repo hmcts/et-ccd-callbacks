@@ -11,6 +11,7 @@ public final class Constants {
     public static final String BEFORE_LABEL_ET1 = "<br><a target=\"_blank\" href=\"%s\">ET1 form"
         + " (opens in new tab)</a>";
     public static final String BEFORE_LABEL_ET1_IC = "<br><a target=\"_blank\" href=\"%s\">ET1</a>";
+    public static final String BEFORE_LABEL_TCF_IC = "<br><a target=\"_blank\" href=\"%s\">Tribunal case file</a>";
     public static final String BEFORE_LABEL_ET1_VETTING_IC = "<br><a target=\"_blank\" href=\"%s\">ET1 Vetting</a>";
     public static final String BEFORE_LABEL_ET3_IC = "<br><a target=\"_blank\" href=\"%s\">ET3</a>";
     public static final String BEFORE_LABEL_ET3_PROCESSING_IC = "<br><a target=\"_blank\" "

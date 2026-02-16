@@ -157,8 +157,8 @@ public class InitialConsiderationController {
                 initialConsiderationService.setPartiesHearingPanelPreferenceDetails(caseData));
 
         //Parties' Hearing Format HTML table markup
-        caseData.setEtIcPartiesHearingFormat(
-                initialConsiderationService.setPartiesHearingFormatDetails(caseData));
+        caseData.setEtIcPartiesHearingFormat(initialConsiderationService.setPartiesHearingFormatDetails(
+                caseData, ccdRequest.getCaseDetails().getCaseTypeId()));
 
         //Jurisdiction Codes section HTML table markup
         String caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();

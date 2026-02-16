@@ -426,7 +426,8 @@ class InitialConsiderationServiceTest {
 
         InitialConsiderationService service = new InitialConsiderationService(null);
 
-        String result = service.getClaimantHearingFormatDetails(caseDataWithClaimantHasNeitherPreference);
+        String result = service.getClaimantHearingFormatDetails(caseDataWithClaimantHasNeitherPreference,
+                ENGLANDWALES_CASE_TYPE_ID);
 
         assertNotNull(result);
         assertTrue(result.contains("Parties Hearing Format Details"));
@@ -444,7 +445,8 @@ class InitialConsiderationServiceTest {
 
         InitialConsiderationService service = new InitialConsiderationService(null);
 
-        String result = service.getClaimantHearingFormatDetails(caseDataWithNullClaimantHearingPreference);
+        String result = service.getClaimantHearingFormatDetails(caseDataWithNullClaimantHearingPreference,
+                ENGLANDWALES_CASE_TYPE_ID);
 
         assertNotNull(result);
         assertTrue(result.contains("Parties Hearing Format Details"));
@@ -454,7 +456,7 @@ class InitialConsiderationServiceTest {
     }
 
     @Test
-    void getClaimantHearingFormatDetails_shouldReturnDefaultDetails_whenHearingPreferencesAreEmpty() {
+    void getClaimantHearingFormatDetails_shouldReturnDefaultDetails_whenHearingPreferencesAreEmpty_EW() {
         CaseData caseDataWithEmptyHearingPreferences = new CaseData();
         ClaimantHearingPreference claimantHearingPreference = new ClaimantHearingPreference();
         claimantHearingPreference.setHearingPreferences(Collections.emptyList());
@@ -463,7 +465,8 @@ class InitialConsiderationServiceTest {
 
         InitialConsiderationService service = new InitialConsiderationService(null);
 
-        String result = service.getClaimantHearingFormatDetails(caseDataWithEmptyHearingPreferences);
+        String result = service.getClaimantHearingFormatDetails(caseDataWithEmptyHearingPreferences,
+                ENGLANDWALES_CASE_TYPE_ID);
 
         assertNotNull(result);
         assertTrue(result.contains("Parties Hearing Format Details"));
@@ -473,10 +476,30 @@ class InitialConsiderationServiceTest {
     }
 
     @Test
+    void getClaimantHearingFormatDetails_shouldReturnDefaultDetails_whenHearingPreferencesAreEmpty_Scotalnd() {
+        CaseData caseDataWithEmptyHearingPreferences = new CaseData();
+        ClaimantHearingPreference claimantHearingPreference = new ClaimantHearingPreference();
+        claimantHearingPreference.setHearingPreferences(Collections.emptyList());
+        caseDataWithEmptyHearingPreferences.setClaimantHearingPreference(claimantHearingPreference);
+        caseDataWithEmptyHearingPreferences.setClaimant("John Smith");
+
+        InitialConsiderationService service = new InitialConsiderationService(null);
+
+        String result = service.getClaimantHearingFormatDetails(caseDataWithEmptyHearingPreferences,
+                SCOTLAND_CASE_TYPE_ID);
+
+        assertNotNull(result);
+        assertTrue(result.contains("Hearing Format Comments"));
+        assertTrue(result.contains("Claimant Hearing Format"));
+        assertTrue(result.contains("John Smith"));
+        assertTrue(result.contains("-"));
+    }
+
+    @Test
     void getClaimantHearingFormatDetails_shouldReturnEmptyTable_whenCaseDataIsNull() {
         InitialConsiderationService service = new InitialConsiderationService(null);
 
-        String result = service.getClaimantHearingFormatDetails(null);
+        String result = service.getClaimantHearingFormatDetails(null, null);
 
         assertNotNull(result);
         assertTrue(result.contains("Parties Hearing Format Details"));
@@ -2057,13 +2080,14 @@ class InitialConsiderationServiceTest {
         InitialConsiderationService service = spy(new InitialConsiderationService(mock(TornadoService.class)));
         CaseData caseDataWithClaimantAndRespondent = mock(CaseData.class);
 
-        when(service.getClaimantHearingFormatDetails(caseDataWithClaimantAndRespondent))
+        when(service.getClaimantHearingFormatDetails(caseDataWithClaimantAndRespondent, ENGLANDWALES_CASE_TYPE_ID))
                 .thenReturn("ClaimantDetails");
         when(service.getRespondentHearingFormatDetails(caseDataWithClaimantAndRespondent))
                 .thenReturn("RespondentDetails");
 
         String expected = String.format(PARTIES_HEARING_FORMAT, "ClaimantDetails", "RespondentDetails");
-        String actual = service.setPartiesHearingFormatDetails(caseDataWithClaimantAndRespondent);
+        String actual = service.setPartiesHearingFormatDetails(caseDataWithClaimantAndRespondent,
+                ENGLANDWALES_CASE_TYPE_ID);
 
         assertEquals(expected, actual);
     }
@@ -2078,7 +2102,7 @@ class InitialConsiderationServiceTest {
                 <table>
                   <thead>
                   <tr>
-                    <th colspan="2"><h1>Parties Hearing Format Details</h1></th>
+                    <th colspan="2"><h1> Parties Hearing Format Details</h1></th>
                   </tr>
                   <tr>
                     <th colspan="2"><h2>Claimant Hearing Format</h2></th>
@@ -2112,7 +2136,8 @@ class InitialConsiderationServiceTest {
                 </table>
                 
                 """;
-        String actual = service.setPartiesHearingFormatDetails(caseDataWithClaimantAndRespondent);
+        String actual = service.setPartiesHearingFormatDetails(caseDataWithClaimantAndRespondent,
+                ENGLANDWALES_CASE_TYPE_ID);
 
         assertNull(caseData.getRegionalOffice());
         assertNull(caseData.getEt1TribunalRegion());
@@ -2137,11 +2162,12 @@ class InitialConsiderationServiceTest {
         InitialConsiderationService service = spy(new InitialConsiderationService(mock(TornadoService.class)));
         CaseData caseDataWithNullClaimant = mock(CaseData.class);
 
-        when(service.getClaimantHearingFormatDetails(caseDataWithNullClaimant)).thenReturn(null);
+        when(service.getClaimantHearingFormatDetails(caseDataWithNullClaimant,
+                ENGLANDWALES_CASE_TYPE_ID)).thenReturn(null);
         when(service.getRespondentHearingFormatDetails(caseDataWithNullClaimant)).thenReturn(null);
 
         String expected = String.format(PARTIES_HEARING_FORMAT, null, null);
-        String actual = service.setPartiesHearingFormatDetails(caseDataWithNullClaimant);
+        String actual = service.setPartiesHearingFormatDetails(caseDataWithNullClaimant, ENGLANDWALES_CASE_TYPE_ID);
         assertEquals(expected, actual);
     }
 

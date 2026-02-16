@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.Predicate;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
@@ -100,6 +101,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_L
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_LABEL_ET3_IC;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_LABEL_ET3_PROCESSING_IC;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_LABEL_REFERRALS_IC;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_LABEL_TCF_IC;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.CASE_DETAILS_URL_PARTIAL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.REFERRALS_PAGE_FRAGMENT_ID;
@@ -122,7 +124,7 @@ public class InitialConsiderationService {
             ET1_VETTING, BEFORE_LABEL_ET1_VETTING_IC,
             ET3, BEFORE_LABEL_ET3_IC,
             ET3_PROCESSING, BEFORE_LABEL_ET3_PROCESSING_IC,
-            TRIBUNAL_CASE_FILE_DOC_TYPE, BEFORE_LABEL_ET1_IC // Provide a value for TRIBUNAL_CASE_FILE_DOC_TYPE
+            TRIBUNAL_CASE_FILE_DOC_TYPE, BEFORE_LABEL_TCF_IC // Provide a value for TRIBUNAL_CASE_FILE_DOC_TYPE
     );
 
     public void initialiseInitialConsideration(CaseDetails caseDetails) {
@@ -133,12 +135,44 @@ public class InitialConsiderationService {
             return;
         }
 
+        List<DocumentTypeItem> docs = getDocumentsTypeByCaseTypeId(documents, caseDetails.getCaseTypeId());
+
         Map<String, List<String>> linksByType = getDocumentTypeByCaseTypeId(documents, caseDetails.getCaseTypeId());
 
         String docLinksMarkUp = formatDocLinks(linksByType);
         String referralLinks = generateReferralLinks(caseDetails);
         String beforeYouStart = String.format(TO_HELP_YOU_COMPLETE_IC_EVENT_LABEL, docLinksMarkUp, referralLinks);
         caseDetails.getCaseData().setInitialConsiderationBeforeYouStart(beforeYouStart);
+    }
+
+    private List<DocumentTypeItem> getDocumentsTypeByCaseTypeId(
+            List<DocumentTypeItem> documents,
+            String caseTypeId) {
+
+        if (CollectionUtils.isEmpty(documents)) {
+            return Collections.emptyList();
+        }
+
+        // Define the predicate based on case type
+        Predicate<DocumentTypeItem> filterPredicate;
+
+        if (SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
+            // Scotland: Only DCF files with "Tribunal case file" doc types
+            filterPredicate = item ->
+                    item != null && item.getValue() != null
+                            && TRIBUNAL_CASE_FILE_DOC_TYPE.equalsIgnoreCase(
+                                    String.valueOf(item.getValue().getDocumentType()));
+        } else {
+            // England/Wales: Only types in IC_DOC_TYPES
+            filterPredicate = item ->
+                    item != null && item.getValue() != null
+                            && IC_DOC_TYPES.contains(item.getValue().getDocumentType());
+        }
+
+        // Apply filter and return list
+        return documents.stream()
+                .filter((java.util.function.Predicate<? super DocumentTypeItem>) filterPredicate)
+                .collect(Collectors.toList());
     }
 
     // A method to select documents by type sutable for EW and Scotland
@@ -183,8 +217,19 @@ public class InitialConsiderationService {
             String linkType = entry.getKey();
             List<String> links = entry.getValue();
 
-            if (linkType != null && !linkType.isEmpty() && IC_LABELS.containsKey(linkType)) {
-                sb.append(String.format(IC_LABELS.get(linkType), String.join("", links)));
+            if (linkType != null && !linkType.isEmpty()
+                    && IC_LABELS.containsKey(linkType)) {
+                String icLabelMarkUp = IC_LABELS.get(linkType);
+
+                if (icLabelMarkUp == null) {
+                    throw new IllegalStateException(
+                            "No IC label mapping found for linkType: [" + linkType + "]"
+                    );
+                }
+
+                if (links != null && !links.isEmpty()) {
+                    links.forEach(link -> sb.append(String.format(icLabelMarkUp, link)));
+                }
             }
         }
 
@@ -489,14 +534,15 @@ public class InitialConsiderationService {
         return claimantHhearingPreferencesTable.toString();
     }
 
-    public String setPartiesHearingFormatDetails(CaseData caseData) {
+    public String setPartiesHearingFormatDetails(CaseData caseData, String caseTypeId) {
         return String.format(PARTIES_HEARING_FORMAT,
-                getClaimantHearingFormatDetails(caseData),
+                getClaimantHearingFormatDetails(caseData, caseTypeId),
                 getRespondentHearingFormatDetails(caseData));
     }
 
     public String getRespondentHearingFormatDetails(CaseData caseData) {
         StringBuilder hearingFormatTable = new StringBuilder();
+
         hearingFormatTable.append("""
           <table>
            <thead>
@@ -556,7 +602,13 @@ public class InitialConsiderationService {
         return hearingFormatTable.toString();
     }
 
-    public String getClaimantHearingFormatDetails(CaseData caseData) {
+    public String getClaimantHearingFormatDetails(CaseData caseData, String caseTypeId) {
+        String partiesHearingFormatDetails = "";
+        if (SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
+            partiesHearingFormatDetails = "Hearing Format Comments";
+        } else {
+            partiesHearingFormatDetails = "Parties Hearing Format Details";
+        }
         //set Claimant Hearing Format details
         StringBuilder hearingFormatTable = new StringBuilder();
 
@@ -565,18 +617,24 @@ public class InitialConsiderationService {
         <table>
           <thead>
           <tr>
-            <th colspan="2"><h1>Parties Hearing Format Details</h1></th>
-          </tr>
-          <tr>
-            <th colspan="2"><h2>Claimant Hearing Format</h2></th>
-          </tr>
-          <tr>
-            <th width="30%">Claimant</th>
-            <th width="70%">Hearing Format</th>
-          </tr>
-          </thead>
-          <tbody>
+            <th colspan="2"><h1>
             """);
+
+        hearingFormatTable.append(partiesHearingFormatDetails);
+
+        hearingFormatTable.append("""
+           </h1></th>
+           </tr>
+           <tr>
+            <th colspan="2"><h2>Claimant Hearing Format</h2></th>
+              </tr>
+              <tr>
+                <th width="30%">Claimant</th>
+                <th width="70%">Hearing Format</th>
+              </tr>
+              </thead>
+             <tbody>
+             """);
 
         // Concatenate all hearing formats for claimant
         if (caseData != null) {
@@ -1154,7 +1212,29 @@ public class InitialConsiderationService {
         //Other referrals - commented out as per requirements
         composeIcEt1OtherReferralTableMarkUp(caseData, et1VettingIssuesTablesMarkup);
 
+        //additional information
+        composeIcEt1AdditionalInformationTableMarkUp(caseData, et1VettingIssuesTablesMarkup);
+
         return et1VettingIssuesTablesMarkup.toString();
+    }
+
+    private static void composeIcEt1AdditionalInformationTableMarkUp(CaseData caseData,
+                                                                      StringBuilder additionalInformationTableMarkUp) {
+        List<String[]> respondentTypeIssuesPairsList = new ArrayList<>();
+
+        // Reasonable adjustments for respondent
+        if (caseData.getEt1VettingAdditionalInformationTextArea() != null
+                && !caseData.getEt1VettingAdditionalInformationTextArea().isEmpty()) {
+            addPairIfNotEmpty(respondentTypeIssuesPairsList, "Give details (Additional Information)",
+                    caseData.getEt1VettingAdditionalInformationTextArea());
+        }
+
+        if (!respondentTypeIssuesPairsList.isEmpty()) {
+            String table = MarkdownHelper.createTwoColumnTable(
+                    new String[]{"Final Notes Related Issues", DETAILS}, respondentTypeIssuesPairsList);
+            additionalInformationTableMarkUp.append(MarkdownHelper.detailsWrapper(
+                    "Details of Final Notes Related Issues", table)).append(NEWLINE);
+        }
     }
 
     private static void composeRespondentTypeRelatedIssuesTableMarkUp(CaseData caseData,
@@ -1278,7 +1358,7 @@ public class InitialConsiderationService {
 
             if (caseData.getEt1LocationGeneralNotes() != null && !caseData.getEt1LocationGeneralNotes().isEmpty()) {
                 addPair(locationIssuesPairsList, GENERAL_NOTES,
-                        caseData.getEt1JudgeReferralGeneralNotes());
+                        caseData.getEt1LocationGeneralNotes());
             }
         }
     }
@@ -1440,7 +1520,7 @@ public class InitialConsiderationService {
                             referralAndDetailPair.get(1)));
 
             if (caseData.getEt1JudgeReferralGeneralNotes() != null
-                    && caseData.getEt1JudgeReferralGeneralNotes().isEmpty()) {
+                    && !caseData.getEt1JudgeReferralGeneralNotes().isEmpty()) {
                 addPair(et1VettingReferralIssuesPairsList, GENERAL_NOTES,
                         caseData.getEt1JudgeReferralGeneralNotes());
             }
@@ -1465,6 +1545,12 @@ public class InitialConsiderationService {
                             defectAndDetailPair.get(1)})
                     .toList();
 
+            if (caseData.getEt1SubstantiveDefectsGeneralNotes() != null
+                    && !caseData.getEt1SubstantiveDefectsGeneralNotes().isEmpty()) {
+                addPair(et1VettingIssuesPairsList, GENERAL_NOTES,
+                        caseData.getEt1SubstantiveDefectsGeneralNotes());
+            }
+
             String twoColumnTable = MarkdownHelper.createTwoColumnTable(
                     new String[]{"Substantive Defects", DETAIL}, et1VettingIssuesPairsList);
 
@@ -1481,6 +1567,12 @@ public class InitialConsiderationService {
                     .map(defectAndDetailPair -> new String[]{defectAndDetailPair.getFirst(),
                             defectAndDetailPair.get(1)})
                     .toList();
+
+            if (caseData.getTrackAllocationGeneralNotes() != null
+                    && !caseData.getTrackAllocationGeneralNotes().isEmpty()) {
+                addPair(trackAllocationIssuePairsList, GENERAL_NOTES,
+                        caseData.getTrackAllocationGeneralNotes());
+            }
 
             String table = MarkdownHelper.createTwoColumnTable(
                     new String[]{"Track Allocation Issue", DETAIL}, trackAllocationIssuePairsList);

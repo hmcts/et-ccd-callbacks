@@ -49,9 +49,9 @@ public class NoticeOfChangeController {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
-
         CaseData caseData = noCRepresentativeService
                 .updateRepresentation(callbackRequest.getCaseDetails(), userToken);
+        // TODO remove respondent representatives if they have same organisation with new claimant representatives.
         callbackRequest.getCaseDetails().setCaseData(caseData);
         return ResponseEntity.ok(ccdCaseAssignment.applyNoc(callbackRequest, userToken));
     }

@@ -34,7 +34,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @ExtendWith({SpringExtension.class, MockitoExtension.class})
 class NocNotificationHelperTest {
     private static final String RESPONDENT_NAME_1 = "Respondent Name 1";
-    private static final String RESPONDENT_NAME = "Respondent";
+    private static final String UNKNOWN = "Unknown";
     private static final String NEW_REP_EMAIL = "rep1@test.com";
     private static final String OLD_REP_EMAIL = "rep2@test.com";
     private static final String NEW_ORG_ID = "1";
@@ -163,7 +163,7 @@ class NocNotificationHelperTest {
     @Test
     void testGetRespondentNameForNewSolicitor_nullChangeRequest() {
         String respondentName = NocNotificationHelper.getRespondentNameForNewSolicitor(null, caseData);
-        assertThat(respondentName, is("Unknown"));
+        assertThat(respondentName).isEqualTo(UNKNOWN);
     }
 
     @Test
@@ -171,13 +171,12 @@ class NocNotificationHelperTest {
         caseData.getChangeOrganisationRequestField().setCaseRoleId(null);
         String respondentName = NocNotificationHelper
                 .getRespondentNameForNewSolicitor(caseData.getChangeOrganisationRequestField(), caseData);
-        assertThat(respondentName, is("Unknown"));
+        assertThat(respondentName).isEqualTo(UNKNOWN);
     }
 
     @Test
     void testGetRespondent_nullChangeRequest() {
-        RespondentSumType result = NocNotificationHelper.getRespondent(null, caseData, nocRespondentHelper);
-        assertNull(result);
+        assertThat(NocNotificationHelper.getRespondent(null, caseData, nocRespondentHelper)).isNull();
     }
 
     @Test

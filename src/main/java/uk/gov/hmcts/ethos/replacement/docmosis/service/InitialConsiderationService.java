@@ -104,6 +104,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.CASE_DET
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.REFERRALS_PAGE_FRAGMENT_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.TO_HELP_YOU_COMPLETE_IC_EVENT_LABEL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.TRIBUNAL_CASE_FILE_DOC_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.getHearingDuration;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.nullCheck;
 
@@ -117,8 +118,11 @@ public class InitialConsiderationService {
     private static final String[] HEADER = {"Issue / Question", "Details / Answer"};
     private static final List<String> IC_DOC_TYPES = List.of(ET1, ET1_VETTING, ET3, ET3_PROCESSING);
     private static final Map<String, String> IC_LABELS = Map.of(
-            ET1, BEFORE_LABEL_ET1_IC, ET1_VETTING, BEFORE_LABEL_ET1_VETTING_IC,
-            ET3, BEFORE_LABEL_ET3_IC, ET3_PROCESSING, BEFORE_LABEL_ET3_PROCESSING_IC
+            ET1, BEFORE_LABEL_ET1_IC,
+            ET1_VETTING, BEFORE_LABEL_ET1_VETTING_IC,
+            ET3, BEFORE_LABEL_ET3_IC,
+            ET3_PROCESSING, BEFORE_LABEL_ET3_PROCESSING_IC,
+            TRIBUNAL_CASE_FILE_DOC_TYPE, BEFORE_LABEL_ET1_IC // Provide a value for TRIBUNAL_CASE_FILE_DOC_TYPE
     );
 
     public void initialiseInitialConsideration(CaseDetails caseDetails) {
@@ -129,21 +133,44 @@ public class InitialConsiderationService {
             return;
         }
 
-        Map<String, List<String>> linksByType = documents.stream()
-                .filter(item -> item != null && item.getValue() != null)
-                .filter(item ->
-                        IC_DOC_TYPES.contains(defaultIfEmpty(item.getValue().getDocumentType(), "")))
-                .sorted(Comparator.comparingInt(item -> IC_DOC_TYPES.indexOf(
-                        defaultIfEmpty(item.getValue().getDocumentType(), "")))).collect(
-                                Collectors.groupingBy(item -> item.getValue().getDocumentType(),
-                        LinkedHashMap::new, // preserve type order
-                        Collectors.mapping(DocumentManagementService::createLinkToBinaryDocument, Collectors.toList())
-                ));
+        Map<String, List<String>> linksByType = getDocumentTypeByCaseTypeId(documents, caseDetails.getCaseTypeId());
 
         String docLinksMarkUp = formatDocLinks(linksByType);
         String referralLinks = generateReferralLinks(caseDetails);
         String beforeYouStart = String.format(TO_HELP_YOU_COMPLETE_IC_EVENT_LABEL, docLinksMarkUp, referralLinks);
         caseDetails.getCaseData().setInitialConsiderationBeforeYouStart(beforeYouStart);
+    }
+
+    // A method to select documents by type sutable for EW and Scotland
+    // if EW case has ET1 and ET3 documents, both will be shown in the same order as they are in IC_DOC_TYPES list
+    // If Scotland case, only DCF files with "Tribunal case file" doc types are selected and
+    // shown in the order they are in the document collection
+    private Map<String, List<String>> getDocumentTypeByCaseTypeId(List<DocumentTypeItem> documents, String caseTypeId) {
+        if (CollectionUtils.isEmpty(documents)) {
+            return Collections.emptyMap();
+        }
+        // Scotland: Only DCF files with "Tribunal case file" doc types, keep order
+        if (SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
+            return documents.stream()
+                .filter(item -> item != null && item.getValue() != null)
+                .filter(item -> TRIBUNAL_CASE_FILE_DOC_TYPE.equalsIgnoreCase(
+                        defaultIfEmpty(item.getValue().getDocumentType(), "")))
+                .collect(Collectors.groupingBy(
+                    item -> item.getValue().getDocumentType(),
+                    LinkedHashMap::new,
+                    Collectors.mapping(DocumentManagementService::createLinkToBinaryDocument, Collectors.toList())
+                ));
+        }
+        // England/Wales: Only types in IC_DOC_TYPES, keep order
+        return documents.stream()
+            .filter(item -> item != null && item.getValue() != null)
+            .filter(item -> IC_DOC_TYPES.contains(
+                    defaultIfEmpty(item.getValue().getDocumentType(), "")))
+            .collect(Collectors.groupingBy(
+                item -> item.getValue().getDocumentType(),
+                LinkedHashMap::new,
+                Collectors.mapping(DocumentManagementService::createLinkToBinaryDocument, Collectors.toList())
+            ));
     }
 
     private String formatDocLinks(Map<String, List<String>> linksByType) {

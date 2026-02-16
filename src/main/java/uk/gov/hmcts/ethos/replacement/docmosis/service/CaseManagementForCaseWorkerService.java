@@ -653,7 +653,8 @@ public class CaseManagementForCaseWorkerService {
             }
             log.info("Http status received from CCD supplementary update API; {}", response.getStatusCode());
         } catch (RestClientResponseException e) {
-            throw new CaseCreationException(String.format("%s with %s", errorMessage, e.getMessage()));
+            throw (CaseCreationException) new CaseCreationException(
+                    String.format("%s with %s", errorMessage, e.getMessage())).initCause(e);
         }
     }
 

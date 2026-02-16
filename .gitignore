@@ -46,7 +46,11 @@ yarn-error.log
 yarn-error.log*
 
 ### VSCode ###
+.vscode/
 bin/
+
+### DevContainer ###
+.devcontainer/
 
 .pnp.*
 .yarn/*
@@ -55,4 +59,6 @@ bin/
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
-src/test/resources/PreHearingDepositData.xlsx
+
+### Claude Code ###
+.claude/settings.local.json

@@ -68,7 +68,7 @@ class NocNotificationServiceTest {
     private static final String REPRESENTATIVE_ID = "Representative ID";
     private static final String CLAIMANT_EMAIL = "claimant@hmcts.org";
     private static final String CLAIMANT_REPRESENTATIVE_EMAIL = "claimant_representative@hmcts.org";
-    private static final String RESPONDENT_REPRESENTATIVE_EMAIL = "claimant_representative@hmcts.org";
+    private static final String RESPONDENT_REPRESENTATIVE_EMAIL = "respondent_representative@hmcts.org";
     private static final String TRIBUNAL_CORRESPONDENCE_EMAIL = "tribunal_correspondence@hmcts.org";
     private static final String RESPONDENT_ID = "Respondent ID";
     private static final String RESPONDENT_NAME = "Respondent Name";
@@ -781,6 +781,9 @@ class NocNotificationServiceTest {
 
     @Test
     void sendNotificationsShouldSendClaimantRepNoCEmails() {
+        ReflectionTestUtils.setField(nocNotificationService, FIELD_NAME_PREVIOUS_RESPONDENT_SOLICITOR_TEMPLATE_ID,
+                PREVIOUS_RESPONDENT_SOLICITOR_TEMPLATE_ID);
+        ReflectionTestUtils.setField(nocNotificationService, FIELD_NAME_TRIBUNAL_TEMPLATE_ID, TRIBUNAL_TEMPLATE_ID);
         RetrieveOrgByIdResponse.SuperUser oldSuperUser = RetrieveOrgByIdResponse.SuperUser.builder()
                 .email(OLD_ORG_ADMIN_EMAIL).build();
         RetrieveOrgByIdResponse retrieveOrgByIdResponse1 = RetrieveOrgByIdResponse.builder()
@@ -804,13 +807,13 @@ class NocNotificationServiceTest {
 
         // Mock respondent email
         RespondentSumType respondentSumType = new RespondentSumType();
-        respondentSumType.setRespondentName("Respondent");
-        respondentSumType.setRespondentEmail("respondent@unrepresented.com");
+        respondentSumType.setRespondentName(RESPONDENT_NAME);
+        respondentSumType.setRespondentEmail(RESPONDENT_EMAIL);
         when(nocRespondentHelper.getRespondent(any(), any())).thenReturn(respondentSumType);
 
         List<RespondentSumTypeItem> respondentCollection = new ArrayList<>();
         RespondentSumTypeItem respondentItem = new RespondentSumTypeItem();
-        respondentItem.setId("123");
+        respondentItem.setId(RESPONDENT_ID);
         respondentItem.setValue(respondentSumType);
         respondentCollection.add(respondentItem);
 
@@ -821,12 +824,12 @@ class NocNotificationServiceTest {
 
         // Mock emailService links
         when(emailService.getSyrCaseLink(anyString(), anyString())).thenReturn("syrLink");
-        when(emailService.getExuiCaseLink(anyString())).thenReturn("exuiLink");
-        when(emailService.getCitizenCaseLink(any())).thenReturn("citizenLink");
+        when(emailService.getExuiCaseLink(anyString())).thenReturn(EXUI_CASE_LINK);
+        when(emailService.getCitizenCaseLink(anyString())).thenReturn(CITIZEN_CASE_LINK);
         when(caseAccessService.getCaseUserAssignmentsById(anyString())).thenReturn(
                 new ArrayList<>());
         when(emailNotificationService.getRespondentsAndRepsEmailAddresses(any(), any()))
-                .thenReturn(Map.of("respondent@unrepresented.com", "respondentId"));
+                .thenReturn(Map.of(RESPONDENT_EMAIL, RESPONDENT_ID));
 
         nocNotificationService.sendNotificationOfChangeEmails(
                 caseDetailsBefore,
@@ -834,10 +837,13 @@ class NocNotificationServiceTest {
                 caseDetailsBefore.getCaseData().getChangeOrganisationRequestField());
 
         // Respondent email notification
-        verify(emailService, times(1)).sendEmail(any(), eq("respondent@unrepresented.com"), any());
+        verify(emailService, times(1)).sendEmail(eq(PREVIOUS_RESPONDENT_SOLICITOR_TEMPLATE_ID),
+                eq(OLD_ORG_ADMIN_EMAIL), anyMap());
         // Claimant email notification
-        verify(emailService, times(1)).sendEmail(any(), eq("claimant@unrepresented.com"), any());
+        verify(emailService, times(1)).sendEmail(eq(PREVIOUS_RESPONDENT_SOLICITOR_TEMPLATE_ID),
+                eq(OLD_ORG_ADMIN_EMAIL), anyMap());
         // Tribunal email notification
-        verify(emailService, times(1)).sendEmail(any(), eq(TRIBUNAL_EMAIL), any());
+        verify(emailService, times(1)).sendEmail(eq(TRIBUNAL_TEMPLATE_ID), eq(TRIBUNAL_EMAIL),
+                anyMap());
     }
 }

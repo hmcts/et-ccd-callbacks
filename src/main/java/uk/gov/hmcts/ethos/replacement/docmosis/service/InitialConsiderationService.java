@@ -3,7 +3,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.Predicate;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
@@ -135,44 +134,12 @@ public class InitialConsiderationService {
             return;
         }
 
-        List<DocumentTypeItem> docs = getDocumentsTypeByCaseTypeId(documents, caseDetails.getCaseTypeId());
-
         Map<String, List<String>> linksByType = getDocumentTypeByCaseTypeId(documents, caseDetails.getCaseTypeId());
 
         String docLinksMarkUp = formatDocLinks(linksByType);
         String referralLinks = generateReferralLinks(caseDetails);
         String beforeYouStart = String.format(TO_HELP_YOU_COMPLETE_IC_EVENT_LABEL, docLinksMarkUp, referralLinks);
         caseDetails.getCaseData().setInitialConsiderationBeforeYouStart(beforeYouStart);
-    }
-
-    private List<DocumentTypeItem> getDocumentsTypeByCaseTypeId(
-            List<DocumentTypeItem> documents,
-            String caseTypeId) {
-
-        if (CollectionUtils.isEmpty(documents)) {
-            return Collections.emptyList();
-        }
-
-        // Define the predicate based on case type
-        Predicate<DocumentTypeItem> filterPredicate;
-
-        if (SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
-            // Scotland: Only DCF files with "Tribunal case file" doc types
-            filterPredicate = item ->
-                    item != null && item.getValue() != null
-                            && TRIBUNAL_CASE_FILE_DOC_TYPE.equalsIgnoreCase(
-                                    String.valueOf(item.getValue().getDocumentType()));
-        } else {
-            // England/Wales: Only types in IC_DOC_TYPES
-            filterPredicate = item ->
-                    item != null && item.getValue() != null
-                            && IC_DOC_TYPES.contains(item.getValue().getDocumentType());
-        }
-
-        // Apply filter and return list
-        return documents.stream()
-                .filter((java.util.function.Predicate<? super DocumentTypeItem>) filterPredicate)
-                .collect(Collectors.toList());
     }
 
     // A method to select documents by type sutable for EW and Scotland

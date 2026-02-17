@@ -335,6 +335,7 @@ public class NocRespondentRepresentativeService {
             ccdRequestCaseData.setChangeOrganisationRequestField(null);
             // Removes organisation policies & notice of change answers
             NocUtils.resetOrganisationPolicies(ccdRequestCaseData, revokedRepresentatives);
+            RespondentRepresentativeUtils.clearRolesForRepresentatives(ccdRequestCaseData, revokedRepresentatives);
             ccdClient.submitEventForCase(adminUserToken, ccdRequestCaseData, caseDetails.getCaseTypeId(),
                     caseDetails.getJurisdiction(), ccdRequest, caseDetails.getCaseId());
         } catch (IOException exception) {
@@ -343,6 +344,30 @@ public class NocRespondentRepresentativeService {
         }
     }
 
+    /**
+     * Identifies and assigns access to newly added or updated respondent representatives
+     * based on the differences between the previous and current case details.
+     *
+     * <p>This method performs the following steps:
+     * <ol>
+     *     <li>Validates that the {@link CallbackRequest}, its case details (before and after),
+     *     associated case data, and the current representative collection are present.</li>
+     *     <li>Compares the previous and current representative collections to determine
+     *     which representatives are either newly added or have had key details updated
+     *     (e.g. organisation or email address).</li>
+     *     <li>Filters the identified representatives to determine which require access
+     *     to be assigned.</li>
+     *     <li>Grants the appropriate access permissions to those representatives.</li>
+     * </ol>
+     *
+     * <p>If any required data is missing or empty, the method exits without performing
+     * any processing.
+     *
+     * @param callbackRequest the callback request containing both the previous
+     *                        ({@code caseDetailsBefore}) and current ({@code caseDetails})
+     *                        case details used to determine newly added or updated
+     *                        respondent representatives
+     */
     public void addNewRepresentatives(CallbackRequest callbackRequest) {
         if (ObjectUtils.isEmpty(callbackRequest)
                 || ObjectUtils.isEmpty(callbackRequest.getCaseDetailsBefore())
@@ -585,7 +610,7 @@ public class NocRespondentRepresentativeService {
             return;
         }
         List<String> respondentRepresentativeOrganisationIds = RespondentRepresentativeUtils
-                .getRespondentRepresentativeOrganisationIds(caseDetails.getCaseData());
+                .extractValidRespondentRepresentativeOrganisationIds(caseDetails.getCaseData());
         if (CollectionUtils.isEmpty(respondentRepresentativeOrganisationIds)) {
             return;
         }

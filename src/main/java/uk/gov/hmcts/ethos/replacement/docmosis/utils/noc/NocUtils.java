@@ -479,6 +479,7 @@ public final class NocUtils {
         }
         for (RepresentedTypeRItem representative : representatives) {
             RoleUtils.resetOrganisationPolicyByRepresentative(caseData, representative);
+
         }
     }
 
@@ -648,5 +649,12 @@ public final class NocUtils {
                 .orgPolicyCaseAssignedRole(role)
                 .build();
         setter.accept(caseData, policy);
+    }
+
+    public static void clearNocWarningIfPresent(CaseData caseData) {
+        if (ObjectUtils.isEmpty(caseData) || StringUtils.isBlank(caseData.getNocWarning())) {
+            return;
+        }
+        caseData.setNocWarning(null);
     }
 }

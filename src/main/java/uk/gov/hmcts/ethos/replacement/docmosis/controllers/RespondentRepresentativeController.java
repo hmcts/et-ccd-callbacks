@@ -49,6 +49,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HT
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_MESSAGE_FOUR_ZERO_ONE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_MESSAGE_FOUR_ZERO_THREE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_MESSAGE_TWO_HUNDRED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_WHILE_VALIDATING_REPRESENTATIVE_ORGANISATION_AND_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
@@ -112,14 +113,13 @@ public class RespondentRepresentativeController {
         log.info("CHECKING RESPONDENT REPRESENTATIVE ORGANISATION ---> " + LOG_MESSAGE + "{}",
                 ccdRequest.getCaseDetails().getCaseId());
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        List<String> errors = new ArrayList<>();
         try {
             nocRespondentRepresentativeService.validateRepresentativeOrganisationAndEmail(
                     caseData, ccdRequest.getCaseDetails().getCaseId());
         } catch (GenericRuntimeException | GenericServiceException gse) {
-            errors.addFirst(gse.getMessage());
+            log.info(WARNING_WHILE_VALIDATING_REPRESENTATIVE_ORGANISATION_AND_EMAIL, gse.getMessage());
         }
-        return getCallbackRespEntityErrors(errors, caseData);
+        return getCallbackRespEntityNoErrors(caseData);
     }
 
     @PostMapping(value = "/amendRespondentRepresentativeAboutToSubmit", consumes = APPLICATION_JSON_VALUE)
@@ -151,6 +151,7 @@ public class RespondentRepresentativeController {
                 nocRespondentHelper.removeUnmatchedRepresentations(caseData);
                 nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, userToken);
                 NocUtils.assignNonMyHmctsOrganisationIds(caseData.getRepCollection());
+                NocUtils.clearNocWarningIfPresent(caseData);
             } catch (GenericRuntimeException | GenericServiceException gse) {
                 errors.addFirst(gse.getMessage());
             }
@@ -183,7 +184,6 @@ public class RespondentRepresentativeController {
             nocRespondentRepresentativeService.addNewRepresentatives(callbackRequest);
             nocRespondentRepresentativeService
              .removeClaimantRepresentativeIfOrganisationExistsInRespondent(callbackRequest.getCaseDetails());
-            // nocRespondentRepresentativeService.updateRespondentRepresentativesAccess(callbackRequest);
         } catch (GenericServiceException e) {
             throw new GenericRuntimeException(new GenericServiceException(e));
         }

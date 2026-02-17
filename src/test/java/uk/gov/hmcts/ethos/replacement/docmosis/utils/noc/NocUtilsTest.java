@@ -19,6 +19,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
+import uk.gov.hmcts.ethos.replacement.docmosis.test.utils.LoggerTestUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -98,15 +99,8 @@ final class NocUtilsTest {
     private static final String ROLE_SOLICITOR_I = "[SOLICITORI]";
     private static final String ROLE_SOLICITOR_J = "[SOLICITORJ]";
     private static final String ROLE_SOLICITOR_K = "[SOLICITORK]";
-    private static final int INTEGER_THREE = 3;
-    private static final int INTEGER_FOUR = 4;
-    private static final int INTEGER_FIVE = 5;
-    private static final int INTEGER_SIX = 6;
-    private static final int INTEGER_SEVEN = 7;
-    private static final int INTEGER_EIGHT = 8;
-    private static final int INTEGER_NINE = 9;
     private static final int MAX_NOC_ANSWERS_COUNT = 10;
-    private static final int INTEGER_ELEVEN = 11;
+    private static final String NOC_WARNING = "Dummy NOC warning";
 
     @Test
     void theValidateRepresentativeRespondentMapping() {
@@ -540,18 +534,18 @@ final class NocUtilsTest {
         assertThat(caseData.getNoticeOfChangeAnswers0()).isNull();
         // when index is greater than max noc answers count should do nothing
         assertDoesNotThrow(() -> NocUtils.setNoticeOfChangeAnswerAtIndex(caseData, RESPONDENT_NAME_ONE,
-                INTEGER_ELEVEN));
+                LoggerTestUtils.INTEGER_ELEVEN));
         // when all input is correct should set notice of change answer to the given index
-        NocUtils.setNoticeOfChangeAnswerAtIndex(caseData, RESPONDENT_NAME_ONE, NumberUtils.INTEGER_ZERO);
-        NocUtils.setNoticeOfChangeAnswerAtIndex(caseData, RESPONDENT_NAME_TWO, NumberUtils.INTEGER_ONE);
-        NocUtils.setNoticeOfChangeAnswerAtIndex(caseData, RESPONDENT_NAME_THREE, NumberUtils.INTEGER_TWO);
-        NocUtils.setNoticeOfChangeAnswerAtIndex(caseData, RESPONDENT_NAME_FOUR, INTEGER_THREE);
-        NocUtils.setNoticeOfChangeAnswerAtIndex(caseData, RESPONDENT_NAME_FIVE, INTEGER_FOUR);
-        NocUtils.setNoticeOfChangeAnswerAtIndex(caseData, RESPONDENT_NAME_SIX, INTEGER_FIVE);
-        NocUtils.setNoticeOfChangeAnswerAtIndex(caseData, RESPONDENT_NAME_SEVEN, INTEGER_SIX);
-        NocUtils.setNoticeOfChangeAnswerAtIndex(caseData, RESPONDENT_NAME_EIGHT, INTEGER_SEVEN);
-        NocUtils.setNoticeOfChangeAnswerAtIndex(caseData, RESPONDENT_NAME_NINE, INTEGER_EIGHT);
-        NocUtils.setNoticeOfChangeAnswerAtIndex(caseData, RESPONDENT_NAME_TEN, INTEGER_NINE);
+        NocUtils.setNoticeOfChangeAnswerAtIndex(caseData, RESPONDENT_NAME_ONE, LoggerTestUtils.INTEGER_ZERO);
+        NocUtils.setNoticeOfChangeAnswerAtIndex(caseData, RESPONDENT_NAME_TWO, LoggerTestUtils.INTEGER_ONE);
+        NocUtils.setNoticeOfChangeAnswerAtIndex(caseData, RESPONDENT_NAME_THREE, LoggerTestUtils.INTEGER_TWO);
+        NocUtils.setNoticeOfChangeAnswerAtIndex(caseData, RESPONDENT_NAME_FOUR, LoggerTestUtils.INTEGER_THREE);
+        NocUtils.setNoticeOfChangeAnswerAtIndex(caseData, RESPONDENT_NAME_FIVE, LoggerTestUtils.INTEGER_FOUR);
+        NocUtils.setNoticeOfChangeAnswerAtIndex(caseData, RESPONDENT_NAME_SIX, LoggerTestUtils.INTEGER_FIVE);
+        NocUtils.setNoticeOfChangeAnswerAtIndex(caseData, RESPONDENT_NAME_SEVEN, LoggerTestUtils.INTEGER_SIX);
+        NocUtils.setNoticeOfChangeAnswerAtIndex(caseData, RESPONDENT_NAME_EIGHT, LoggerTestUtils.INTEGER_SEVEN);
+        NocUtils.setNoticeOfChangeAnswerAtIndex(caseData, RESPONDENT_NAME_NINE, LoggerTestUtils.INTEGER_EIGHT);
+        NocUtils.setNoticeOfChangeAnswerAtIndex(caseData, RESPONDENT_NAME_TEN, LoggerTestUtils.INTEGER_NINE);
 
         assertThat(caseData.getNoticeOfChangeAnswers0().getRespondentName()).isEqualTo(RESPONDENT_NAME_ONE);
         assertThat(caseData.getNoticeOfChangeAnswers1().getRespondentName()).isEqualTo(RESPONDENT_NAME_TWO);
@@ -703,5 +697,19 @@ final class NocUtilsTest {
                 .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_I).organisation(organisation9).build());
         assertThat(caseData.getRespondentOrganisationPolicy9()).isEqualTo(OrganisationPolicy.builder()
                 .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_J).organisation(organisation10).build());
+    }
+
+    @Test
+    void theClearNocWarningIfPresent() {
+        // when case data is empty should not throw any exception
+        assertDoesNotThrow(() -> NocUtils.clearNocWarningIfPresent(null));
+        // when case data does not have any noc warning should not throw any exception
+        CaseData caseData = new CaseData();
+        assertDoesNotThrow(() -> NocUtils.clearNocWarningIfPresent(caseData));
+        assertThat(caseData.getNocWarning()).isNull();
+        // when case data has noc warning should clear it
+        caseData.setNocWarning(NOC_WARNING);
+        assertDoesNotThrow(() -> NocUtils.clearNocWarningIfPresent(caseData));
+        assertThat(caseData.getNocWarning()).isNull();
     }
 }

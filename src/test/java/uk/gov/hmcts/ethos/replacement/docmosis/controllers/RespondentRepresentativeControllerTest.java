@@ -315,7 +315,7 @@ class RespondentRepresentativeControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
@@ -343,7 +343,7 @@ class RespondentRepresentativeControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 

@@ -515,7 +515,27 @@ public final class RespondentRepresentativeUtils {
                 .orElse(null);
     }
 
-    public static List<String> getRespondentRepresentativeOrganisationIds(CaseData caseData) {
+    /**
+     * Extracts the organisation IDs of all valid respondent representatives
+     * from the given {@link CaseData}.
+     *
+     * <p>This method iterates through the {@code repCollection} in the supplied
+     * {@code caseData} and collects organisation IDs where:
+     * <ul>
+     *     <li>The representative passes {@code isValidRepresentative(...)} validation,</li>
+     *     <li>The respondent organisation object is present, and</li>
+     *     <li>The organisation ID is not blank.</li>
+     * </ul>
+     *
+     * <p>Representatives that do not meet these criteria are ignored.
+     * If the provided {@code caseData} is {@code null}, empty, or contains
+     * no representatives, an empty list is returned.
+     *
+     * @param caseData the case data containing the respondent representative collection
+     * @return a list of non-blank organisation IDs for valid respondent representatives;
+     *         never {@code null}
+     */
+    public static List<String> extractValidRespondentRepresentativeOrganisationIds(CaseData caseData) {
         if (ObjectUtils.isEmpty(caseData) || CollectionUtils.isEmpty(caseData.getRepCollection())) {
             return new ArrayList<>();
         }
@@ -530,5 +550,46 @@ public final class RespondentRepresentativeUtils {
                     .getOrganisationID());
         }
         return respondentRepresentativeOrganisations;
+    }
+
+    /**
+     * Clears (sets to {@code null}) the role of the specified respondent representatives
+     * within the given {@link CaseData}.
+     *
+     * <p>This method performs the following steps:
+     * <ul>
+     *     <li>Validates that the provided {@code caseData}, its representative collection,
+     *     and the input {@code representatives} list are not empty.</li>
+     *     <li>Iterates over the supplied representatives and validates each using
+     *     {@code RespondentRepresentativeUtils.isValidRepresentative(...)}.</li>
+     *     <li>For each valid representative, attempts to locate the corresponding
+     *     representative in the case data by ID.</li>
+     *     <li>If found, sets the representative's {@code role} field to {@code null}.</li>
+     * </ul>
+     *
+     * <p>If any of the required inputs are missing or empty, the method exits
+     * without making changes. If a representative cannot be found in the case data,
+     * it is skipped. If an invalid representative is encountered in the input list,
+     * processing stops immediately.
+     *
+     * @param caseData the case data containing the full representative collection
+     * @param representatives the list of representatives whose roles should be cleared
+     */
+    public static void clearRolesForRepresentatives(CaseData caseData, List<RepresentedTypeRItem> representatives) {
+        if (ObjectUtils.isEmpty(caseData)
+                || CollectionUtils.isEmpty(caseData.getRepCollection())
+                || CollectionUtils.isEmpty(representatives)) {
+            return;
+        }
+        for (RepresentedTypeRItem representative : representatives) {
+            if (!RespondentRepresentativeUtils.isValidRepresentative(representative)) {
+                return;
+            }
+            RepresentedTypeRItem tmpRepresentative = findRepresentativeById(caseData, representative.getId());
+            if (ObjectUtils.isEmpty(tmpRepresentative)) {
+                continue;
+            }
+            tmpRepresentative.getValue().setRole(null);
+        }
     }
 }

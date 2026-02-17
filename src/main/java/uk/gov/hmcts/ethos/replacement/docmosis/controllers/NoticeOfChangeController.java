@@ -51,7 +51,6 @@ public class NoticeOfChangeController {
         }
         CaseData caseData = noCRepresentativeService
                 .updateRepresentation(callbackRequest.getCaseDetails(), userToken);
-        // TODO remove respondent representatives if they have same organisation with new claimant representatives.
         callbackRequest.getCaseDetails().setCaseData(caseData);
         return ResponseEntity.ok(ccdCaseAssignment.applyNoc(callbackRequest, userToken));
     }
@@ -83,9 +82,7 @@ public class NoticeOfChangeController {
             } catch (Exception exception) {
                 log.error(exception.getMessage(), exception);
             }
-
             String caseReference = caseData.getEthosCaseReference();
-
             callbackResponse.setConfirmation_header(
                 "# You're now representing a client on case " + caseReference
             );

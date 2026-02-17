@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -49,7 +50,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HT
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_MESSAGE_FOUR_ZERO_ONE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_MESSAGE_FOUR_ZERO_THREE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_MESSAGE_TWO_HUNDRED;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_WHILE_VALIDATING_REPRESENTATIVE_ORGANISATION_AND_EMAIL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_REPRESENTATIVE_ORGANISATION_AND_EMAIL_NOT_MATCHED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
@@ -113,13 +115,19 @@ public class RespondentRepresentativeController {
         log.info("CHECKING RESPONDENT REPRESENTATIVE ORGANISATION ---> " + LOG_MESSAGE + "{}",
                 ccdRequest.getCaseDetails().getCaseId());
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        List<String> errors = new ArrayList<>();
         try {
-            nocRespondentRepresentativeService.validateRepresentativeOrganisationAndEmail(
-                    caseData, ccdRequest.getCaseDetails().getCaseId());
+            nocRespondentRepresentativeService.validateRepresentativeOrganisationAndEmail(caseData);
         } catch (GenericRuntimeException | GenericServiceException gse) {
-            log.info(WARNING_WHILE_VALIDATING_REPRESENTATIVE_ORGANISATION_AND_EMAIL, gse.getMessage());
+            String errorMessage = String.format(ERROR_REPRESENTATIVE_ORGANISATION_AND_EMAIL_NOT_MATCHED,
+                    StringUtils.EMPTY);
+            if (EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND.equals(gse.getMessage())) {
+                errorMessage = String.format(ERROR_REPRESENTATIVE_ORGANISATION_AND_EMAIL_NOT_MATCHED,
+                        EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND);
+            }
+            errors.add(errorMessage);
         }
-        return getCallbackRespEntityNoErrors(caseData);
+        return getCallbackRespEntityErrors(errors, caseData);
     }
 
     @PostMapping(value = "/amendRespondentRepresentativeAboutToSubmit", consumes = APPLICATION_JSON_VALUE)

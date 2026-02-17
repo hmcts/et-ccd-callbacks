@@ -188,7 +188,7 @@ class RespondentRepresentativeControllerTest {
         CCDRequest ccdRequest = CCDRequestBuilder.builder().withCaseData(caseData).build();
         ccdRequest.getCaseDetails().setCaseId(DUMMY_SUBMISSION_REFERENCE);
         doNothing().when(nocRespondentRepresentativeService).validateRepresentativeOrganisationAndEmail(
-                any(CaseData.class), anyString());
+                any(CaseData.class));
         mockMvc.perform(post(URL_AMEND_RESPONDENT_REPRESENTATIVE_ABOUT_TO_SUBMIT)
                         .content(jsonMapper.toJson(ccdRequest))
                         .header(HEADER_AUTHORIZATION, DUMMY_TOKEN)
@@ -218,7 +218,7 @@ class RespondentRepresentativeControllerTest {
         CCDRequest ccdRequest = CCDRequestBuilder.builder().withCaseData(caseData).build();
         ccdRequest.getCaseDetails().setCaseId(DUMMY_SUBMISSION_REFERENCE);
         doNothing().when(nocRespondentRepresentativeService).validateRepresentativeOrganisationAndEmail(
-                any(CaseData.class), anyString());
+                any(CaseData.class));
         mockMvc.perform(post(URL_AMEND_RESPONDENT_REPRESENTATIVE_ABOUT_TO_SUBMIT)
                         .content(jsonMapper.toJson(ccdRequest))
                         .header(HEADER_AUTHORIZATION, DUMMY_TOKEN)
@@ -246,7 +246,7 @@ class RespondentRepresentativeControllerTest {
         CCDRequest ccdRequest = CCDRequestBuilder.builder().withCaseData(caseData).build();
         ccdRequest.getCaseDetails().setCaseId(DUMMY_SUBMISSION_REFERENCE);
         doNothing().when(nocRespondentRepresentativeService).validateRepresentativeOrganisationAndEmail(
-                any(CaseData.class), anyString());
+                any(CaseData.class));
         mockMvc.perform(post(URL_AMEND_RESPONDENT_REPRESENTATIVE_ABOUT_TO_SUBMIT)
                         .content(jsonMapper.toJson(ccdRequest))
                         .header(HEADER_AUTHORIZATION, DUMMY_TOKEN)
@@ -275,7 +275,7 @@ class RespondentRepresentativeControllerTest {
         CCDRequest ccdRequest = CCDRequestBuilder.builder().withCaseData(caseData).build();
         ccdRequest.getCaseDetails().setCaseId(DUMMY_SUBMISSION_REFERENCE);
         doNothing().when(nocRespondentRepresentativeService).validateRepresentativeOrganisationAndEmail(
-                any(CaseData.class), anyString());
+                any(CaseData.class));
         when(nocRespondentRepresentativeService.prepopulateOrgAddress(any(CaseData.class), anyString())).thenThrow(
                 new GenericRuntimeException(new GenericServiceException(DUMMY_EXCEPTION_MESSAGE,
                         new Exception(DUMMY_EXCEPTION_MESSAGE), DUMMY_EXCEPTION_MESSAGE, DUMMY_SUBMISSION_REFERENCE,
@@ -308,14 +308,14 @@ class RespondentRepresentativeControllerTest {
         CCDRequest ccdRequest = CCDRequestBuilder.builder().withCaseData(caseData).build();
         ccdRequest.getCaseDetails().setCaseId(DUMMY_SUBMISSION_REFERENCE);
         doNothing().when(nocRespondentRepresentativeService).validateRepresentativeOrganisationAndEmail(
-                any(CaseData.class), anyString());
+                any(CaseData.class));
         mockMvc.perform(post(URL_AMEND_RESPONDENT_REPRESENTATIVE_MID_EVENT)
                         .content(jsonMapper.toJson(ccdRequest))
                         .header(HEADER_AUTHORIZATION, DUMMY_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
@@ -336,14 +336,14 @@ class RespondentRepresentativeControllerTest {
         CCDRequest ccdRequest = CCDRequestBuilder.builder().withCaseData(caseData).build();
         ccdRequest.getCaseDetails().setCaseId(DUMMY_SUBMISSION_REFERENCE);
         doThrow(GenericServiceException.class).when(nocRespondentRepresentativeService)
-                .validateRepresentativeOrganisationAndEmail(any(CaseData.class), anyString());
+                .validateRepresentativeOrganisationAndEmail(any(CaseData.class));
         mockMvc.perform(post(URL_AMEND_RESPONDENT_REPRESENTATIVE_MID_EVENT)
                         .content(jsonMapper.toJson(ccdRequest))
                         .header(HEADER_AUTHORIZATION, DUMMY_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 

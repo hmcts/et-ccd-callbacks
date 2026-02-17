@@ -81,40 +81,34 @@ public class NocRespondentRepresentativeService {
     private final NocService nocService;
 
     /**
-     * Validates that each representative marked as a myHMCTS representative has an email address
-     * that corresponds to a user within the selected organisation.
+     * Validates that each representative marked as an HMCTS organisation user
+     * has a valid organisation and a resolvable email address within the
+     * organisation service.
      *
-     * <p>The method performs the following validations for each representative in the
-     * {@code repCollection}:</p>
-     *
+     * <p>The validation performs the following checks for each representative in the case data:</p>
      * <ul>
-     *     <li><strong>Organisation selection requirement:</strong>
-     *         If a representative is marked as a myHMCTS representative, an organisation must be selected.
-     *         If no organisation is present, a {@link GenericServiceException} is thrown.</li>
-     *
-     *     <li><strong>Email address presence:</strong>
-     *         If the representative does not have an email address, a warning message is added.</li>
-     *
-     *     <li><strong>Email-to-organisation user match:</strong>
-     *         The representative's email address is checked against the organisation's registered users.
-     *         If the email cannot be matched to any organisation user, a warning is added.</li>
+     *     <li>If the representative is marked as an HMCTS organisation user.</li>
+     *     <li>Ensures the representative has a non-null organisation with a valid organisation ID.
+     *         If not, a {@link GenericServiceException} is thrown.</li>
+     *     <li>Checks that the representative has a non-blank email address.
+     *         If missing, a warning message is added to the case data.</li>
+     *     <li>Attempts to resolve the representative’s account via the organisation service
+     *         using the provided email address. If no matching account is found or the lookup
+     *         fails, a warning message is added to the case data.</li>
      * </ul>
      *
-     * <p><strong>Important:</strong></p>
-     * <ul>
-     *     <li>No validation error is not implemented if the organisation cannot be found in the organisation list, when
-     *     user is a myHmcts organisation user. because all organisations are selected from existing organisation data
-     *     and are therefore assumed valid.</li>
-     *     <li>All representatives included in {@code caseData.getRepCollection()} are assumed to be structurally valid
-     *     and eligible for validation.</li>
-     * </ul>
+     * <p>If {@code caseData} or its representative collection is null or empty,
+     * the method exits without performing any validation.</p>
      *
-     * @param caseData the case data containing the representatives to validate
-     * @param submissionReference a reference identifier used for error tracking during submission
-     * @throws GenericServiceException if a myHMCTS representative does not have a selected organisation
+     * <p>All warnings generated during validation are aggregated and stored in
+     * {@code caseData.setNocWarning(...)}. The method does not fail on missing
+     * email accounts but records them as warnings instead.</p>
+     *
+     * @param caseData the case data containing representative details to validate
+     * @throws GenericServiceException if a representative marked as an HMCTS
+     *         organisation user does not have a valid organisation or organisation ID
      */
-    public void validateRepresentativeOrganisationAndEmail(CaseData caseData,
-                                                           String submissionReference)
+    public void validateRepresentativeOrganisationAndEmail(CaseData caseData)
             throws GenericServiceException {
         if (ObjectUtils.isEmpty(caseData)
                 || CollectionUtils.isEmpty(caseData.getRepCollection())) {
@@ -131,11 +125,7 @@ public class NocRespondentRepresentativeService {
             // Checking if representative has an organisation
             if (ObjectUtils.isEmpty(representative.getRespondentOrganisation())
                     || StringUtils.isBlank(representative.getRespondentOrganisation().getOrganisationID())) {
-                String exceptionMessage = String.format(EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND,
-                        representativeName);
-                throw new GenericServiceException(exceptionMessage, new Exception(), exceptionMessage,
-                        submissionReference, "NocRespondentRepresentativeService",
-                        "validateRepresentativeOrganisationAndEmail");
+                throw new GenericServiceException(EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND);
             }
             // checking if representative has an email address
             final String representativeEmail = representative.getRepresentativeEmailAddress();

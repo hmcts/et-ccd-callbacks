@@ -151,8 +151,8 @@ class NocRespondentRepresentativeServiceTest {
     private static final String EXPECTED_ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES =
             "Failed to add organisation policy for case 1234567890123456. Exception: Something went wrong";
 
-    private static final String EXPECTED_WARNING_REPRESENTATIVE_MISSING_EMAIL_ADDRESS =
-            "Representative Legal One is missing an email address.\n";
+    private static final String EXPECTED_WARNING_REPRESENTATIVE_EMAIL_ADDRESS_NOT_FOUND =
+            "Representative email address not found.\n";
     private static final String EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL =
             "Representative 'Legal One' could not be found using respondent@rep.email.com. "
                     + "Case access will not be defined for this representative.\n";
@@ -557,7 +557,7 @@ class NocRespondentRepresentativeServiceTest {
         caseData.getRepCollection().getFirst().getValue().getRespondentOrganisation().setOrganisationID(ET_ORG_1);
         nocRespondentRepresentativeService.validateRepresentativeOrganisationAndEmail(caseData);
         assertThat(caseData.getNocWarning()).isNotEmpty();
-        assertThat(caseData.getNocWarning()).isEqualTo(EXPECTED_WARNING_REPRESENTATIVE_MISSING_EMAIL_ADDRESS);
+        assertThat(caseData.getNocWarning()).isEqualTo(EXPECTED_WARNING_REPRESENTATIVE_EMAIL_ADDRESS_NOT_FOUND);
 
         // when organisation client returns empty response should return warning
         caseData.getRepCollection().getFirst().getValue().setRepresentativeEmailAddress(RESPONDENT_REP_EMAIL);

@@ -510,7 +510,6 @@ public class NocNotificationService {
         } else {
             // send respondent noc change email
             handleRespondentNocEmails(caseDetailsPrevious, caseDetailsNew, changeRequest);
-            // todo: to get the new respondent solicitor email address
             partyName = NocNotificationHelper.getRespondentNameForNewSolicitor(changeRequest, caseDataNew);
         }
 

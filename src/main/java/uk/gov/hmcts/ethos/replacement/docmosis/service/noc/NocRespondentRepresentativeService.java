@@ -62,7 +62,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXC
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REQUEST;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_TYPE_REMOVAL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_REPRESENTATIVE_MISSING_EMAIL_ADDRESS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_REPRESENTATIVE_EMAIL_ADDRESS_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -118,41 +118,40 @@ public class NocRespondentRepresentativeService {
         for (RepresentedTypeRItem representativeItem :  caseData.getRepCollection()) {
             RepresentedTypeR representative = representativeItem.getValue();
             // checking if representative organisation is a hmcts organisation
-            if (!YES.equals(representative.getMyHmctsYesNo())) {
-                continue;
-            }
-            final String representativeName = representative.getNameOfRepresentative();
-            // Checking if representative has an organisation
-            if (ObjectUtils.isEmpty(representative.getRespondentOrganisation())
-                    || StringUtils.isBlank(representative.getRespondentOrganisation().getOrganisationID())) {
-                throw new GenericServiceException(EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND);
-            }
-            // checking if representative has an email address
-            final String representativeEmail = representative.getRepresentativeEmailAddress();
-            if (StringUtils.isBlank(representativeEmail)) {
-                String warningMessage = String.format(WARNING_REPRESENTATIVE_MISSING_EMAIL_ADDRESS, representativeName);
-                nocWarnings.append(warningMessage).append('\n');
-                continue;
-            }
+            if (YES.equals(representative.getMyHmctsYesNo())) {
+                final String representativeName = representative.getNameOfRepresentative();
 
-            String accessToken = adminUserService.getAdminUserToken();
-            try {
-                ResponseEntity<AccountIdByEmailResponse> userResponse =
-                        organisationClient.getAccountIdByEmail(accessToken, authTokenGenerator.generate(),
-                                representativeEmail);
-                // checking if representative email address exists in organisation users
-                if (ObjectUtils.isEmpty(userResponse)
-                        || ObjectUtils.isEmpty(userResponse.getBody())
-                        || StringUtils.isBlank(userResponse.getBody().getUserIdentifier())) {
+                // Checking if representative has an organisation
+                if (ObjectUtils.isEmpty(representative.getRespondentOrganisation())
+                        || StringUtils.isBlank(representative.getRespondentOrganisation().getOrganisationID())) {
+                    throw new GenericServiceException(EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND);
+                }
+                // checking if representative has an email address
+                final String representativeEmail = representative.getRepresentativeEmailAddress();
+                if (StringUtils.isBlank(representativeEmail)) {
+                    nocWarnings.append(WARNING_REPRESENTATIVE_EMAIL_ADDRESS_NOT_FOUND).append('\n');
+                    continue;
+                }
+                String accessToken = adminUserService.getAdminUserToken();
+                try {
+                    ResponseEntity<AccountIdByEmailResponse> userResponse =
+                            organisationClient.getAccountIdByEmail(accessToken, authTokenGenerator.generate(),
+                                    representativeEmail);
+                    // checking if representative email address exists in organisation users
+                    if (ObjectUtils.isEmpty(userResponse)
+                            || ObjectUtils.isEmpty(userResponse.getBody())
+                            || StringUtils.isBlank(userResponse.getBody().getUserIdentifier())) {
+                        String warningMessage = String.format(WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL,
+                                representativeName, representativeEmail);
+                        nocWarnings.append(warningMessage).append('\n');
+                    }
+
+                } catch (Exception e) {
+                    // for localhost if e-mail is not entered same as wiremock request
                     String warningMessage = String.format(WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL,
                             representativeName, representativeEmail);
                     nocWarnings.append(warningMessage).append('\n');
                 }
-            } catch (Exception e) {
-                // for localhost if e-mail is not entered same as wiremock request
-                String warningMessage = String.format(WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL,
-                        representativeName, representativeEmail);
-                nocWarnings.append(warningMessage).append('\n');
             }
         }
         caseData.setNocWarning(nocWarnings.toString());

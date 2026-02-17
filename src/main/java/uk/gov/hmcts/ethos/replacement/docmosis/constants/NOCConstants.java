@@ -2,6 +2,9 @@ package uk.gov.hmcts.ethos.replacement.docmosis.constants;
 
 public final class NOCConstants {
 
+    private static final String NOTIFICATION_FOR_CASE = "notification for case {}.";
+    private static final String NOC_TYPE = "NOC type: {}";
+
     public static final String NOC_REQUEST = "nocRequest";
     public static final String EVENT_UPDATE_CASE_SUBMITTED = "UPDATE_CASE_SUBMITTED";
     public static final String NOC_TYPE_REMOVAL = "Removal";
@@ -95,27 +98,27 @@ public final class NOCConstants {
     public static final String WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_CLAIMANT =
             "Failed to send noc notification email to claimant, case id: {}, error: {}";
 
-    public static final String WARNING_REPRESENTATIVE_MISSING_EMAIL_ADDRESS =
-            "Representative %s is missing an email address.";
+    public static final String WARNING_REPRESENTATIVE_EMAIL_ADDRESS_NOT_FOUND =
+            "Representative email address not found.";
     public static final String WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL =
             "Representative '%s' could not be found using %s. Case access will not be defined for this representative.";
     public static final String WARNING_MISSING_RESPONDENT_EMAIL_ADDRESS =
             "Missing respondent email address while sending Notice of Change (NoC) respondent representative removal "
-                    + "notification for case {}.";
+                    + NOTIFICATION_FOR_CASE;
     public static final String WARNING_INVALID_RESPONDENT =
             "Invalid respondent while sending Notice of Change (NoC) respondent representative removal "
-                    + "notification for case {}.";
+                    + NOTIFICATION_FOR_CASE;
     public static final String WARNING_INVALID_CASE_DETAILS =
             "Invalid case details while sending Notice of Change (NoC) respondent representative removal "
-                    + "notification for case {}.";
+                    + NOTIFICATION_FOR_CASE;
     public static final String WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_RESPONDENT =
             "Failed to send noc notification email to respondent, case id: {}, error: {}";
     public static final String WARNING_INVALID_CASE_DETAILS_TO_NOTIFY_ORGANISATION_FOR_RESPONDENT_REP_UPDATE =
             "Invalid case details. Unable to notify organisation for respondent representative update. Case id: {}, "
-                    + "NOC type: {}";
+                    + NOC_TYPE;
     public static final String WARNING_INVALID_REPRESENTATIVE_TO_NOTIFY_ORGANISATION_FOR_RESPONDENT_REP_UPDATE =
             "Invalid case details. Unable to notify organisation for respondent representative update. Case id: {}, "
-                    + "NOC type: {}";
+                    + NOC_TYPE;
     public static final String WARNING_INVALID_ORGANISATION_RESPONSE_TO_NOTIFY_FOR_RESPONDENT_REP_UPDATE =
             "Cannot retrieve {} organisation by id {} [{}] {}. Unable to notify organisation for respondent "
                     + "representative update. Case id: {}";
@@ -126,7 +129,7 @@ public final class NOCConstants {
             "Failed to send NOC notification email to organisation admin, case id: {}, error: {}";
     public static final String WARNING_INVALID_CASE_DETAILS_TO_NOTIFY_TRIBUNAL_FOR_RESPONDENT_REP_UPDATE =
             "Invalid case details. Unable to notify tribunal for respondent representative update. Case id: {}, "
-                    + "NOC type: {}";
+                    + NOC_TYPE;
     public static final String WARNING_TRIBUNAL_EMAIL_NOT_FOUND_TO_NOTIFY_FOR_RESPONDENT_REP_UPDATE =
             "Tribunal email not found. Unable to notify organisation for respondent representative update. "
                     + "Case id: {},  NOC type: {}";

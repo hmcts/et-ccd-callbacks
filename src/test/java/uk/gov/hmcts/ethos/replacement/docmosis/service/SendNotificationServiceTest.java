@@ -33,6 +33,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -93,6 +95,8 @@ class SendNotificationServiceTest {
             "bundlesSubmittedNotificationForClaimantTemplateId";
     private static final String BUNDLES_SUBMITTED_NOTIFICATION_FOR_TRIBUNAL_TEMPLATE_ID =
             "bundlesSubmittedNotificationForTribunalTemplateId";
+    private static final String ERROR_MSG_PARTY_TO_NOTIFY_MUST_INCLUDE_SELECTED =
+        "Select the party or parties to notify must include the party or parties who must respond";
     private static final String CLAIMANT_ONLY = "Claimant only";
     private static final String DUMMY_ADMIN_USER_TOKEN = "DUMMY_ADMIN_USER_TOKEN";
 
@@ -789,5 +793,47 @@ class SendNotificationServiceTest {
         assertNotNull(bfActionItem.getId());
         assertTrue(bfActionItem.getId().matches(
                 "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"));
+    }
+
+    @Test
+    void validateInput_shouldReturnNoError_whenPartyToRespondIsNull() {
+        caseData.setSendNotificationSelectParties(null);
+        caseData.setSendNotificationNotify(CLAIMANT_ONLY);
+        List<String> errors = sendNotificationService.validateInput(caseData);
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void validateInput_shouldReturnNoError_whenPartyToNotifyIsBothParties() {
+        caseData.setSendNotificationSelectParties(CLAIMANT_ONLY);
+        caseData.setSendNotificationNotify(BOTH_PARTIES);
+        List<String> errors = sendNotificationService.validateInput(caseData);
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void validateInput_shouldReturnNoError_whenPartyToNotifyMatchesPartyToRespond() {
+        caseData.setSendNotificationSelectParties(CLAIMANT_ONLY);
+        caseData.setSendNotificationNotify(CLAIMANT_ONLY);
+        List<String> errors = sendNotificationService.validateInput(caseData);
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void validateInput_shouldReturnError_whenPartyToRespondIsBothPartyButPartyToNotifyNot() {
+        caseData.setSendNotificationSelectParties(BOTH_PARTIES);
+        caseData.setSendNotificationNotify(CLAIMANT_ONLY);
+        List<String> errors = sendNotificationService.validateInput(caseData);
+        assertThat(errors).hasSize(1);
+        assertThat(errors.getFirst()).isEqualTo(ERROR_MSG_PARTY_TO_NOTIFY_MUST_INCLUDE_SELECTED);
+    }
+
+    @Test
+    void validateInput_shouldReturnError_whenPartyToNotifyDoesNotMatchPartyToRespond() {
+        caseData.setSendNotificationSelectParties(CLAIMANT_ONLY);
+        caseData.setSendNotificationNotify(RESPONDENT_ONLY);
+        List<String> errors = sendNotificationService.validateInput(caseData);
+        assertThat(errors).hasSize(1);
+        assertThat(errors.getFirst()).isEqualTo(ERROR_MSG_PARTY_TO_NOTIFY_MUST_INCLUDE_SELECTED);
     }
 }

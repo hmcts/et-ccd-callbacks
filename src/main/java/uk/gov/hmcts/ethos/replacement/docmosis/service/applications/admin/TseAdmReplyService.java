@@ -50,6 +50,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NEITHER;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_STARTED_YET;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.REQUEST;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_ONLY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.UPDATED;
@@ -60,6 +61,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.TSE_ADMIN_CORRESPONDENCE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.setDocumentNumbers;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isRepresentedClaimantWithMyHmctsCase;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.isPartyToNotifyMismatch;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.applications.TseHelper.getAdminSelectedApplicationType;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.TSE_ADMIN_REPLY;
 import static uk.gov.service.notify.NotificationClient.prepareUpload;
@@ -86,6 +88,8 @@ public class TseAdmReplyService {
     private static final String RESPONSE_NOT_REQUIRED =
         "You have a new message from HMCTS about a claim made to an employment tribunal.";
     private static final String ERROR_MSG_ADD_DOC_MISSING = "Select or fill the required Add document field";
+    private static final String ERROR_MSG_PARTY_TO_NOTIFY_MUST_INCLUDE_SELECTED =
+        "Select the party or parties to notify must include the party or parties who must respond";
 
     /**
      * Initial Application and Respond details table.
@@ -108,6 +112,20 @@ public class TseAdmReplyService {
         List<String> errors = new ArrayList<>();
         if (addDocumentMissing(caseData)) {
             errors.add(ERROR_MSG_ADD_DOC_MISSING);
+        }
+        if (CASE_MANAGEMENT_ORDER.equals(caseData.getTseAdmReplyIsCmoOrRequest())
+            && isPartyToNotifyMismatch(
+                caseData.getTseAdmReplyCmoSelectPartyRespond(),
+                caseData.getTseAdmReplySelectPartyNotify())
+        ) {
+            errors.add(ERROR_MSG_PARTY_TO_NOTIFY_MUST_INCLUDE_SELECTED);
+        }
+        if (REQUEST.equals(caseData.getTseAdmReplyIsCmoOrRequest())
+            && isPartyToNotifyMismatch(
+                caseData.getTseAdmReplyRequestSelectPartyRespond(),
+                caseData.getTseAdmReplySelectPartyNotify())
+        ) {
+            errors.add(ERROR_MSG_PARTY_TO_NOTIFY_MUST_INCLUDE_SELECTED);
         }
         return errors;
     }

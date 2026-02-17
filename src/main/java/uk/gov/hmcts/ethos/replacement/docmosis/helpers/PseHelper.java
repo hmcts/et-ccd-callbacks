@@ -243,4 +243,32 @@ public final class PseHelper {
         String selectedAppId = caseData.getClaimantSelectNotification().getSelectedCode();
         return getSelectedNotificationWithCode(caseData, selectedAppId);
     }
+
+    /**
+     * Checks if party to notify selection mismatches with selected parties.
+     * @param partyToNotify selected party to notify
+     * @param partyToRespond selected party to respond
+     * @return true if there is a mismatch, false otherwise
+     */
+    public static boolean isPartyToNotifyMismatch(String partyToRespond, String partyToNotify) {
+        if (partyToRespond == null || partyToNotify == null) {
+            return false;
+        }
+
+        if (BOTH_PARTIES.equals(partyToNotify)) {
+            return false;
+        }
+
+        String partyToRespondMap = switch (partyToRespond) {
+            case BOTH_PARTIES -> BOTH_PARTIES;
+            case CLAIMANT_TITLE, CLAIMANT_ONLY -> CLAIMANT_ONLY;
+            case RESPONDENT_TITLE, RESPONDENT_ONLY -> RESPONDENT_ONLY;
+            default -> null;
+        };
+        if (partyToRespondMap == null) {
+            return false;
+        }
+
+        return !partyToNotify.equals(partyToRespondMap);
+    }
 }

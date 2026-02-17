@@ -557,4 +557,34 @@ final class RespondentRepresentativeUtilsTest {
         assertDoesNotThrow(() -> RespondentRepresentativeUtils.clearRolesForRepresentatives(caseData, representatives));
         assertThat(representative2.getValue().getRole()).isNull();
     }
+
+    @Test
+    void theHasRepresentatives() {
+        // when case data is empty should return false
+        assertThat(RespondentRepresentativeUtils.hasRepresentatives(null)).isFalse();
+        // when representative collection is empty should return false
+        CaseData caseData = new CaseData();
+        assertThat(RespondentRepresentativeUtils.hasRepresentatives(caseData)).isFalse();
+        // when representative collection size is zero should return false
+        caseData.setRepCollection(new ArrayList<>());
+        assertThat(RespondentRepresentativeUtils.hasRepresentatives(caseData)).isFalse();
+        // when has representative should return true
+        caseData.getRepCollection().add(RepresentedTypeRItem.builder().build());
+        assertThat(RespondentRepresentativeUtils.hasRepresentatives(caseData)).isTrue();
+    }
+
+    @Test
+    void theHasOrganisation() {
+        // when representative is empty should return false
+        assertThat(RespondentRepresentativeUtils.hasOrganisation(null)).isFalse();
+        // when representative does not have organisation should return false
+        RepresentedTypeR representative = RepresentedTypeR.builder().build();
+        assertThat(RespondentRepresentativeUtils.hasOrganisation(representative)).isFalse();
+        // when representative does not have organisation id should return false
+        representative.setRespondentOrganisation(Organisation.builder().build());
+        assertThat(RespondentRepresentativeUtils.hasOrganisation(representative)).isFalse();
+        // when has organisation with id should return true
+        representative.getRespondentOrganisation().setOrganisationID(ORGANISATION_ID_1);
+        assertThat(RespondentRepresentativeUtils.hasOrganisation(representative)).isTrue();
+    }
 }

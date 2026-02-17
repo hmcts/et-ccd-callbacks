@@ -592,4 +592,43 @@ public final class RespondentRepresentativeUtils {
             tmpRepresentative.getValue().setRole(null);
         }
     }
+
+    /**
+     * Determines whether the provided {@link CaseData} contains
+     * a non-empty collection of representatives.
+     *
+     * <p>This method returns {@code true} only if:
+     * <ul>
+     *     <li>The {@code caseData} object is not {@code null} or empty, and</li>
+     *     <li>The representative collection within {@code caseData} is not {@code null} or empty.</li>
+     * </ul>
+     *
+     * @param caseData the case data to evaluate; may be {@code null}
+     * @return {@code true} if the case data contains one or more representatives,
+     *         otherwise {@code false}
+     */
+    public static boolean hasRepresentatives(CaseData caseData) {
+        return ObjectUtils.isNotEmpty(caseData) && CollectionUtils.isNotEmpty(caseData.getRepCollection());
+    }
+
+    /**
+     * Determines whether the given {@link RepresentedTypeR} is associated
+     * with a valid organisation.
+     *
+     * <p>This method returns {@code true} only if:
+     * <ul>
+     *     <li>The {@code representative} is not {@code null} or empty,</li>
+     *     <li>The associated respondent organisation is not {@code null} or empty, and</li>
+     *     <li>The organisation has a non-blank organisation ID.</li>
+     * </ul>
+     *
+     * @param representative the representative to evaluate; may be {@code null}
+     * @return {@code true} if the representative has an associated organisation
+     *         with a non-blank organisation ID, otherwise {@code false}
+     */
+    public static boolean hasOrganisation(RepresentedTypeR representative) {
+        return ObjectUtils.isNotEmpty(representative)
+                && ObjectUtils.isNotEmpty(representative.getRespondentOrganisation())
+                && StringUtils.isNotBlank(representative.getRespondentOrganisation().getOrganisationID());
+    }
 }

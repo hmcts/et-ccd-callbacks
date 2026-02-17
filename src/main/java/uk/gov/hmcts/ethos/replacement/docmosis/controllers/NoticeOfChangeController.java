@@ -49,7 +49,6 @@ public class NoticeOfChangeController {
             log.error(INVALID_TOKEN, userToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
-
         CaseData caseData = noCRepresentativeService
                 .updateRepresentation(callbackRequest.getCaseDetails(), userToken);
         callbackRequest.getCaseDetails().setCaseData(caseData);
@@ -83,9 +82,7 @@ public class NoticeOfChangeController {
             } catch (Exception exception) {
                 log.error(exception.getMessage(), exception);
             }
-
             String caseReference = caseData.getEthosCaseReference();
-
             callbackResponse.setConfirmation_header(
                 "# You're now representing a client on case " + caseReference
             );

@@ -86,6 +86,8 @@ public final class NOCConstants {
     public static final String ERROR_FAILED_TO_REMOVE_CLAIMANT_REP_AND_ORG_POLICY =
             "Failed to remove claimant representative and organisation policy for case {}. Exception: {}";
 
+    public static final String WARNING_WHILE_VALIDATING_REPRESENTATIVE_ORGANISATION_AND_EMAIL =
+            "Failed to validate representative organisation and email. Warning: {}";
     public static final String WARNING_INVALID_CASE_DETAILS_TO_NOTIFY_CLAIMANT_FOR_RESPONDENT_REP_UPDATE =
             "Invalid case details. Unable to notify claimant for respondent representative update. Case id: {}";
     public static final String WARNING_RESPONDENT_NAME_MISSING_TO_NOTIFY_CLAIMANT_FOR_RESP_REP_UPDATE =

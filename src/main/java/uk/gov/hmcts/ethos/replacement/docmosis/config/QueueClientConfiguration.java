@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Profile;
 
 @Configuration
 @Profile("!test")
+@ConditionalOnProperty(prefix = "queue", name = "enabled", havingValue = "false", matchIfMissing = true)
 public class QueueClientConfiguration {
     @ConditionalOnProperty(name = "servicebus.fake", havingValue = "false", matchIfMissing = true)
     @Bean("createUpdatesSendClient")

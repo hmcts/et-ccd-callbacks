@@ -498,7 +498,6 @@ public class CaseActionsForCaseWorkerController {
         caseFlagsService.setupCaseFlags(caseData);
         caseManagementForCaseWorkerService.updateWorkAllocationField(errors, caseData);
         removeSpacesFromPartyNames(caseData);
-        LoggingUtils.logErrors(errors);
         return getCallbackRespEntityErrors(errors, caseData);
     }
 

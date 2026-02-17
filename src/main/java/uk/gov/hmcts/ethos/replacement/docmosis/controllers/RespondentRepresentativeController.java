@@ -155,8 +155,6 @@ public class RespondentRepresentativeController {
             } catch (GenericRuntimeException | GenericServiceException gse) {
                 errors.addFirst(gse.getMessage());
             }
-        } else {
-            log.info(errors.toString());
         }
         return getCallbackRespEntityErrors(errors, caseData);
     }

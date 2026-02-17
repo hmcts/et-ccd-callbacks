@@ -43,17 +43,15 @@ public final class NOCConstants {
     public static final String EXCEPTION_OLD_AND_NEW_RESPONDENTS_ARE_DIFFERENT =
             "Old and new respondent collections contain different respondents for case ID %s.";
     public static final String EXCEPTION_FAILED_TO_ASSIGN_ROLE =
-            "Failed to assign role %s, to user with email %s, for case %s. Exception message: %s";
+            "Failed to assign role %s, for case %s. Exception message: %s";
     public static final String EXCEPTION_INVALID_GRANT_ACCESS_PARAMETER =
-            "There are missing parameters; accessToken: %s, email: %s, submission reference: %s, organisationId: %s, "
-                    + "role: %s.";
+            "There are missing parameters; submission reference: %s, role: %s.";
     public static final String EXCEPTION_UNABLE_TO_GET_ACCOUNT_ID_BY_EMAIL =
-            "Unable to get account id by email %s for case %s.";
+            "Unable to get account id by email for case %s.";
     public static final String EXCEPTION_UNABLE_TO_FIND_ORGANISATION_BY_USER_ID =
-            "Unable to find organisation by user id %s for case %s.";
+            "Unable to find organisation by user id for case %s.";
     public static final String EXCEPTION_USER_AND_SELECTED_ORGANISATIONS_NOT_MATCH =
-            "User's organisation and selected organisation does not match user id %s, selected organisation id %s, for "
-                    + "case %s.";
+            "User's organisation and selected organisation does not match, for case %s.";
 
     public static final String ERROR_RESPONDENT_HAS_MULTIPLE_REPRESENTATIVES =
             "Respondent with name %s has more than one representative";

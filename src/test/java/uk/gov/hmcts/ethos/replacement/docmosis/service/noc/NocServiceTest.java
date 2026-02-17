@@ -71,33 +71,24 @@ class NocServiceTest {
     private static final int INTEGER_NINE = 9;
 
     private static final String EXPECTED_EXCEPTION_ACCESS_TOKEN_EMPTY =
-            "There are missing parameters; accessToken: empty, email: representative@email.com, "
-                    + "submission reference: 1234567890123456, organisationId: 79ZRSOU, role: [SOLICITORA].";
+            "There are missing parameters; submission reference: 1234567890123456, role: [SOLICITORA].";
     private static final String EXPECTED_EXCEPTION_EMAIL_EMPTY =
-            "There are missing parameters; accessToken: adminUserToken, email: empty, "
-                    + "submission reference: 1234567890123456, organisationId: 79ZRSOU, role: [SOLICITORA].";
+            "There are missing parameters; submission reference: 1234567890123456, role: [SOLICITORA].";
     private static final String EXPECTED_EXCEPTION_SUBMISSION_REFERENCE_EMPTY =
-            "There are missing parameters; accessToken: adminUserToken, email: representative@email.com, "
-                    + "submission reference: empty, organisationId: 79ZRSOU, role: [SOLICITORA].";
+            "There are missing parameters; submission reference: empty, role: [SOLICITORA].";
     private static final String EXPECTED_EXCEPTION_ORGANISATION_ID_EMPTY =
-            "There are missing parameters; accessToken: adminUserToken, email: representative@email.com, "
-                    + "submission reference: 1234567890123456, organisationId: empty, role: [SOLICITORA].";
+            "There are missing parameters; submission reference: 1234567890123456, role: [SOLICITORA].";
     private static final String EXPECTED_EXCEPTION_ROLE_INVALID =
-            "There are missing parameters; accessToken: adminUserToken, email: representative@email.com, "
-                    + "submission reference: 1234567890123456, organisationId: 79ZRSOU, role: [INVLAIDROLE].";
+            "There are missing parameters; submission reference: 1234567890123456, role: [INVLAIDROLE].";
     private static final String EXPECTED_EXCEPTION_ACCOUNT_NOT_FOUND_BY_EMAIL =
-            "Failed to assign role [SOLICITORA], to user with email representative@email.com, for case "
-                    + "1234567890123456. Exception message: Unable to get account id by email representative@email.com "
-                    + "for case 1234567890123456.";
+            "Failed to assign role [SOLICITORA], for case 1234567890123456. Exception message: Unable to get account "
+                    + "id by email for case 1234567890123456.";
     private static final String EXPECTED_EXCEPTION_ORGANISATION_DETAILS_NOT_FOUND_BY_USER_ID =
-            "Failed to assign role [SOLICITORA], to user with email representative@email.com, for case "
-                    + "1234567890123456. Exception message: Unable to find organisation by user id "
-                    + "112b0bdd-5e58-32f1-8c51-6e71f5f90bc5 for case 1234567890123456.";
+            "Failed to assign role [SOLICITORA], for case 1234567890123456. Exception message: Unable to find "
+                    + "organisation by user id for case 1234567890123456.";
     private static final String EXPECTED_EXCEPTION_EXCEPTION_USER_AND_SELECTED_ORGANISATIONS_NOT_MATCH =
-            "Failed to assign role [SOLICITORA], to user with email representative@email.com, for case "
-                    + "1234567890123456. Exception message: User's organisation and selected organisation does not "
-                    + "match user id 112b0bdd-5e58-32f1-8c51-6e71f5f90bc5, selected organisation id INVALID, for case "
-                    + "1234567890123456.";
+            "Failed to assign role [SOLICITORA], for case 1234567890123456. Exception message: User's organisation and "
+                    + "selected organisation does not match, for case 1234567890123456.";
 
     @Mock
     private NocCcdService nocCcdService;

@@ -104,15 +104,9 @@ public class NocService {
                 || ObjectUtils.isEmpty(organisationToAdd)
                 || StringUtils.isBlank(organisationToAdd.getOrganisationID())
                 || !RoleUtils.isValidRole(role)) {
-            String tmpAccessToken = StringUtils.isEmpty(accessToken) ? EMPTY_LOWERCASE : accessToken;
-            String tmpEmail = StringUtils.isEmpty(email) ? EMPTY_LOWERCASE : email;
             String tmpCaseId = StringUtils.isEmpty(submissionReference) ? EMPTY_LOWERCASE : submissionReference;
-            String tmpOrganisationId = ObjectUtils.isEmpty(organisationToAdd) ? EMPTY_LOWERCASE
-                    : StringUtils.isBlank(organisationToAdd.getOrganisationID()) ? EMPTY_LOWERCASE
-                    : organisationToAdd.getOrganisationID();
             String tmpRole = StringUtils.isBlank(role) ? EMPTY_LOWERCASE : role;
-            String exceptionMessage = String.format(EXCEPTION_INVALID_GRANT_ACCESS_PARAMETER, tmpAccessToken, tmpEmail,
-                    tmpCaseId, tmpOrganisationId, tmpRole);
+            String exceptionMessage = String.format(EXCEPTION_INVALID_GRANT_ACCESS_PARAMETER, tmpCaseId, tmpRole);
             throw new GenericServiceException(exceptionMessage);
         }
         try {
@@ -123,13 +117,12 @@ public class NocService {
             if (!Strings.CS.equals(organisationsResponse.getOrganisationIdentifier(),
                     organisationToAdd.getOrganisationID())) {
                 String exceptionMessage = String.format(EXCEPTION_USER_AND_SELECTED_ORGANISATIONS_NOT_MATCH,
-                        userResponse.getUserIdentifier(), organisationsResponse.getOrganisationIdentifier(),
                         submissionReference);
                 throw new GenericServiceException(exceptionMessage);
             }
             grantCaseAccess(userResponse.getUserIdentifier(), submissionReference, role);
         } catch (IOException | GenericServiceException exception) {
-            String exceptionMessage = String.format(EXCEPTION_FAILED_TO_ASSIGN_ROLE, role, email, submissionReference,
+            String exceptionMessage = String.format(EXCEPTION_FAILED_TO_ASSIGN_ROLE, role, submissionReference,
                     exception.getMessage());
             throw new GenericServiceException(exceptionMessage, new Exception(exception),
                     EXCEPTION_FAILED_TO_ASSIGN_ROLE, submissionReference, CLASS_NAME, "grantRepresentativeAccess");
@@ -159,7 +152,7 @@ public class NocService {
         if (ObjectUtils.isEmpty(organisationsResponseEntity)
                 || ObjectUtils.isEmpty(organisationsResponseEntity.getBody())
                 || StringUtils.isBlank(organisationsResponseEntity.getBody().getOrganisationIdentifier())) {
-            String exceptionMessage = String.format(EXCEPTION_UNABLE_TO_FIND_ORGANISATION_BY_USER_ID, userId,
+            String exceptionMessage = String.format(EXCEPTION_UNABLE_TO_FIND_ORGANISATION_BY_USER_ID,
                     submissionReference);
             throw new GenericServiceException(exceptionMessage);
         }
@@ -189,8 +182,7 @@ public class NocService {
         if (ObjectUtils.isEmpty(userResponseEntity)
                 || ObjectUtils.isEmpty(userResponseEntity.getBody())
                 || StringUtils.isBlank(userResponseEntity.getBody().getUserIdentifier())) {
-            String exceptionMessage = String.format(EXCEPTION_UNABLE_TO_GET_ACCOUNT_ID_BY_EMAIL, email,
-                    submissionReference);
+            String exceptionMessage = String.format(EXCEPTION_UNABLE_TO_GET_ACCOUNT_ID_BY_EMAIL, submissionReference);
             throw new GenericServiceException(exceptionMessage);
         }
         return userResponseEntity.getBody();

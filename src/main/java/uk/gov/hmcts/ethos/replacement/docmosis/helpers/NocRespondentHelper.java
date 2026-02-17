@@ -146,7 +146,7 @@ public class NocRespondentHelper {
             String respondentId = respondent.getId();
             String respondentName = respondent.getValue().getRespondentName();
 
-            boolean hasMatchingRepresentative = caseData.getRepCollection().stream()
+            boolean hasMatchingRepresentative = emptyIfNull(caseData.getRepCollection()).stream()
                     .filter(Objects::nonNull)
                     .filter(rep -> rep.getValue() != null)
                     .anyMatch(rep ->

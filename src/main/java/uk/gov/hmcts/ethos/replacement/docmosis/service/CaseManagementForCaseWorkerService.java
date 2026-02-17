@@ -25,6 +25,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
+import uk.gov.hmcts.et.common.model.ccd.types.NextHearingDetails;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.generic.BaseCaseData;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
@@ -313,6 +314,10 @@ public class CaseManagementForCaseWorkerService {
                 }
             }
             caseData.setNextListedDate(nextListedDate.split("T")[0]);
+            // set next hearing details
+            NextHearingDetails nextHearingDetails = new NextHearingDetails();
+            nextHearingDetails.setHearingDateTime(nextListedDate);
+            caseData.setNextHearingDetails(nextHearingDetails);
         }
     }
 

@@ -57,6 +57,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.DOCGEN_E
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.createLinkForUploadedDocument;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantNonSystemUser;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantRepresentedByMyHmctsOrganisation;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.isPartyToNotifyMismatch;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.NOTIFICATION_SUMMARY_PDF;
 
 @Service("sendNotificationService")
@@ -66,6 +67,8 @@ public class SendNotificationService {
     public static final String EMPLOYER_CONTRACT_CLAIM = "Employer Contract Claim";
     public static final String CASE_MANAGEMENT_ORDERS_REQUESTS = "Case management orders / requests";
     public static final String NOTICE_OF_EMPLOYER_CONTRACT_CLAIM = "Notice of Employer Contract Claim";
+    private static final String ERROR_MSG_PARTY_TO_NOTIFY_MUST_INCLUDE_SELECTED =
+        "Select the party or parties to notify must include the party or parties who must respond";
 
     private final HearingSelectionService hearingSelectionService;
     private final EmailService emailService;
@@ -109,6 +112,22 @@ public class SendNotificationService {
         DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
         dynamicFixedListType.setListItems(hearingSelectionService.getHearingSelectionSortedByDateTime(caseData));
         caseData.setSendNotificationSelectHearing(dynamicFixedListType);
+    }
+
+    /**
+     * Validate user input.
+     * @param caseData in which the case details are extracted from
+     * @return Error message list
+     */
+    public List<String> validateInput(CaseData caseData) {
+        List<String> errors = new ArrayList<>();
+        if (isPartyToNotifyMismatch(
+            caseData.getSendNotificationSelectParties(),
+            caseData.getSendNotificationNotify()
+        )) {
+            errors.add(ERROR_MSG_PARTY_TO_NOTIFY_MUST_INCLUDE_SELECTED);
+        }
+        return errors;
     }
 
     public void createSendNotification(CaseData caseData) {

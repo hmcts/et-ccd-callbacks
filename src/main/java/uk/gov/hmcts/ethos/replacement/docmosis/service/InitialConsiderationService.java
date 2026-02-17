@@ -736,27 +736,6 @@ public class InitialConsiderationService {
 
     public void clearOldValues(CaseData caseData) {
         clearHiddenValue(caseData);
-
-        //clear old values
-        /*if (caseData.getEtICHearingListedAnswers() != null) {
-            caseData.getEtICHearingListedAnswers().setEtInitialConsiderationListedHearingType(null);
-            caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJsaReasonOther(null);
-            caseData.getEtICHearingListedAnswers().setEtICIsHearingWithMembers(null);
-
-            caseData.getEtICHearingListedAnswers().setEtICJsaFinalHearingReasonOther(null);
-            caseData.getEtICHearingListedAnswers().setEtICMembersFinalHearingReasonOther(null);
-
-            caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJudgeOrMembersFurtherDetails(null);
-            caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJudgeOrMembersReason(null);
-            caseData.getEtICHearingListedAnswers().setEtICIsFinalHearingWithJudgeOrMembersJsaReason(null);
-            caseData.getEtICHearingListedAnswers().setEtICIsFinalHearingWithJudgeOrMembersReason(null);
-
-            caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJsa(null);
-            caseData.getEtICHearingListedAnswers().setEtICHearingListed(null);
-            caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJudgeOrMembers(null);
-            caseData.getEtICHearingListedAnswers().setEtICIsHearingWithJudgeOrMembersReasonOther(null);
-        }*/
-
         caseData.setEtICHearingNotListedListForPrelimHearingUpdated(null);
         caseData.setEtICHearingNotListedListForFinalHearingUpdated(null);
         caseData.setEtICHearingNotListedListUpdated(null);
@@ -1566,8 +1545,6 @@ public class InitialConsiderationService {
                     defaultIfNull(caseData.getSuggestAnotherTrack())));
             trackAllocationDetails.add(List.of("Why Change Track Allocation?",
                     defaultIfNull(caseData.getWhyChangeTrackAllocation())));
-            trackAllocationDetails.add(List.of("Track Allocation General Notes",
-                    defaultIfNull(caseData.getTrackAllocationGeneralNotes())));
         }
 
         return trackAllocationDetails;

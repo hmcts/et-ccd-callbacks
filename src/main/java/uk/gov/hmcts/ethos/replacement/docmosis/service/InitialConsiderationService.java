@@ -159,7 +159,8 @@ public class InitialConsiderationService {
                 .collect(Collectors.groupingBy(
                     item -> item.getValue().getDocumentType(),
                     LinkedHashMap::new,
-                    Collectors.mapping(DocumentManagementService::createLinkToBinaryDocument, Collectors.toList())
+                    Collectors.mapping(DocumentManagementService::createLinkToBinaryDocument,
+                            Collectors.toCollection(ArrayList::new))
                 ));
         }
         // England/Wales: Only types in IC_DOC_TYPES, keep order
@@ -170,7 +171,8 @@ public class InitialConsiderationService {
             .collect(Collectors.groupingBy(
                 item -> item.getValue().getDocumentType(),
                 LinkedHashMap::new,
-                Collectors.mapping(DocumentManagementService::createLinkToBinaryDocument, Collectors.toList())
+                Collectors.mapping(DocumentManagementService::createLinkToBinaryDocument,
+                        Collectors.toCollection(ArrayList::new))
             ));
     }
 
@@ -678,7 +680,7 @@ public class InitialConsiderationService {
                 .filter(jurisdictionCode -> {
                     String codeTxtOnly = jurisdictionCode.replaceAll("[^a-zA-Z]+", "");
                     return EnumUtils.isValidEnum(JurisdictionCode.class, codeTxtOnly);
-                }).toList();
+                }).collect(Collectors.toCollection(ArrayList::new));
 
         if (!validJurisdictionCodes.isEmpty()) {
             validJurisdictionCodes.forEach(jurisdictionCode ->
@@ -798,7 +800,7 @@ public class InitialConsiderationService {
             List<String> filteredTypes = prelimHearing.getEtICTypeOfPreliminaryHearing().stream()
                     .filter(type -> !TELEPHONE.equals(type))
                     .map(type -> CVP.equals(type) ? VIDEO : type)
-                    .toList();
+                    .collect(Collectors.toCollection(ArrayList::new));
             updatedPrelimHearing.setEtICTypeOfPreliminaryHearing(filteredTypes);
 
             updatedPrelimHearing.setEtICPurposeOfPreliminaryHearing(prelimHearing.getEtICPurposeOfPreliminaryHearing());
@@ -816,7 +818,7 @@ public class InitialConsiderationService {
             List<String> filteredTypes = finalHearing.getEtICTypeOfFinalHearing().stream()
                     .filter(type -> !TELEPHONE.equals(type))
                     .map(type -> CVP.equals(type) ? VIDEO : type)
-                    .toList();
+                    .collect(Collectors.toCollection(ArrayList::new));
             updatedFinalHearing.setEtICTypeOfFinalHearing(filteredTypes);
             updatedFinalHearing.setEtICLengthOfFinalHearing(finalHearing.getEtICLengthOfFinalHearing());
             updatedFinalHearing.setFinalHearingLengthNumType(finalHearing.getFinalHearingLengthNumType());
@@ -830,7 +832,7 @@ public class InitialConsiderationService {
             EtICListForFinalHearingUpdated updatedFinalHearing = new EtICListForFinalHearingUpdated();
             List<String> mappedTypes = Stream.of(udlHearing.getEtIcudlHearFormat())
                     .map(type -> HEARING_TYPE_MAPPINGS.getOrDefault(type, type))
-                    .toList();
+                    .collect(Collectors.toCollection(ArrayList::new));
 
             updatedFinalHearing.setEtICTypeOfFinalHearing(mappedTypes);
 
@@ -1533,7 +1535,7 @@ public class InitialConsiderationService {
             List<String[]> trackAllocationIssuePairsList = icEt1TrackAllocationIssues.stream()
                     .map(defectAndDetailPair -> new String[]{defectAndDetailPair.getFirst(),
                             defectAndDetailPair.get(1)})
-                    .toList();
+                    .collect(Collectors.toCollection(ArrayList::new));
 
             if (caseData.getTrackAllocationGeneralNotes() != null
                     && !caseData.getTrackAllocationGeneralNotes().isEmpty()) {

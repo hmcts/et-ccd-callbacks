@@ -19,7 +19,10 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.SendNotificationService;
 
+import java.util.List;
+
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 /**
@@ -70,6 +73,33 @@ public class SendNotificationController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         sendNotificationService.populateHearingSelection(caseData);
         return getCallbackRespEntityNoErrors(caseData);
+    }
+
+    /**
+     * send Notification validate user input.
+     *
+     * @param ccdRequest holds the request and case data
+     * @param userToken  used for authorization
+     * @return Callback response entity with case data attached.
+     */
+    @PostMapping(value = "/midValidateInput", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "midValidateInput")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = CCDCallbackResponse.class))
+                }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> midValidateInput(
+        @RequestBody CCDRequest ccdRequest,
+        @RequestHeader("Authorization") String userToken) {
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        List<String> errors = sendNotificationService.validateInput(caseData);
+        return getCallbackRespEntityErrors(errors, caseData);
     }
 
     /**

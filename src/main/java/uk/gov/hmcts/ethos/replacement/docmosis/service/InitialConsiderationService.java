@@ -1108,7 +1108,7 @@ public class InitialConsiderationService {
     }
 
     private static void addPair(List<String[]> list, String key, String value) {
-        if (key != null && value != null) {
+        if (list != null && key != null && value != null) {
             list.add(new String[]{key, value});
         }
     }
@@ -1510,7 +1510,7 @@ public class InitialConsiderationService {
             List<String[]> et1VettingIssuesPairsList = icEt1SubstantiveDefects.stream()
                     .map(defectAndDetailPair -> new String[]{defectAndDetailPair.getFirst(),
                             defectAndDetailPair.get(1)})
-                    .toList();
+                    .collect(Collectors.toCollection(ArrayList::new));
 
             if (caseData.getEt1SubstantiveDefectsGeneralNotes() != null
                     && !caseData.getEt1SubstantiveDefectsGeneralNotes().isEmpty()) {

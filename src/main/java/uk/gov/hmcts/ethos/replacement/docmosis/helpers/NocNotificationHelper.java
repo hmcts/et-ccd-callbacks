@@ -24,7 +24,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_ST
 @Slf4j
 public final class NocNotificationHelper {
 
-    public static final String UNKNOWN = "Unknown";
+    private static final String UNKNOWN = "Unknown";
+    private static final String NOT_SET = "Not set";
+    private static final String TRIBUNAL = "tribunal";
 
     private NocNotificationHelper() {
         // Access through static methods
@@ -113,11 +115,9 @@ public final class NocNotificationHelper {
     }
 
     public static Map<String, String> buildTribunalPersonalisation(CaseData caseData) {
-        Map<String, String> personalisation = new ConcurrentHashMap<>();
-
-        addCommonValues(caseData, personalisation);
-        personalisation.put(DATE, ReferralHelper.getNearestHearingToReferral(caseData, "Not set"));
-        personalisation.put("tribunal", isNullOrEmpty(caseData.getTribunalAndOfficeLocation()) ? UNKNOWN :
+        Map<String, String> personalisation = buildPreviousRespondentSolicitorPersonalisation(caseData);
+        personalisation.put(DATE, ReferralHelper.getNearestHearingToReferral(caseData, NOT_SET));
+        personalisation.put(TRIBUNAL, isNullOrEmpty(caseData.getTribunalAndOfficeLocation()) ? UNKNOWN :
                 caseData.getTribunalAndOfficeLocation());
 
         return personalisation;

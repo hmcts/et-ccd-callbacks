@@ -460,21 +460,20 @@ public class NocRespondentRepresentativeService {
             return;
         }
         for (RepresentedTypeRItem representative : representatives) {
-            if (!RespondentRepresentativeUtils.isValidRepresentative(representative)) {
-                continue;
-            }
-            String role = RoleUtils.deriveSolicitorRoleToAssign(caseDetails.getCaseData(), representative);
-            if (StringUtils.isBlank(role)) {
-                log.error(ERROR_SOLICITOR_ROLE_NOT_FOUND, caseDetails.getCaseId());
-                break;
-            }
-            try {
-                nocService.grantRepresentativeAccess(adminUserService.getAdminUserToken(),
-                        representative.getValue().getRepresentativeEmailAddress(), caseDetails.getCaseId(),
-                        representative.getValue().getRespondentOrganisation(), role);
-                updateRepresentativeRoleAndOrganisationPolicy(caseDetails, representative.getId(), role);
-            } catch (GenericServiceException gse) {
-                log.error(ERROR_UNABLE_TO_SET_ROLE, role, caseDetails.getCaseId(), gse.getMessage());
+            if (RespondentRepresentativeUtils.isValidRepresentative(representative)) {
+                String role = RoleUtils.deriveSolicitorRoleToAssign(caseDetails.getCaseData(), representative);
+                if (StringUtils.isBlank(role)) {
+                    log.error(ERROR_SOLICITOR_ROLE_NOT_FOUND, caseDetails.getCaseId());
+                    break;
+                }
+                try {
+                    nocService.grantRepresentativeAccess(adminUserService.getAdminUserToken(),
+                            representative.getValue().getRepresentativeEmailAddress(), caseDetails.getCaseId(),
+                            representative.getValue().getRespondentOrganisation(), role);
+                    updateRepresentativeRoleAndOrganisationPolicy(caseDetails, representative.getId(), role);
+                } catch (GenericServiceException gse) {
+                    log.error(ERROR_UNABLE_TO_SET_ROLE, role, caseDetails.getCaseId(), gse.getMessage());
+                }
             }
         }
     }

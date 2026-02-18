@@ -237,7 +237,7 @@ public class NocRespondentRepresentativeService {
                 || CollectionUtils.isEmpty(caseUserAssignments.getCaseUserAssignments())) {
             return new ArrayList<>();
         }
-        // to get list of representatives whose assignment is revoked
+        // finds list of representatives whose assignment is revoked
         List<RepresentedTypeRItem> representativesToRevoke = new ArrayList<>();
         List<CaseUserAssignment> caseUserAssignmentsToRevoke = new ArrayList<>();
         for (CaseUserAssignment caseUserAssignment : caseUserAssignments.getCaseUserAssignments()) {
@@ -245,16 +245,14 @@ public class NocRespondentRepresentativeService {
                 continue;
             }
             for (RepresentedTypeRItem representative : representativesToRemove) {
-                if (!RespondentRepresentativeUtils.isValidRepresentative(representative)) {
-                    continue;
-                }
                 String respondentName = RoleUtils.findRespondentNameByRole(oldCaseDetails.getCaseData(),
                         caseUserAssignment.getCaseRole());
-                if (RespondentRepresentativeUtils.isEligibleForAccessRevocation(representative, caseUserAssignment,
+                if (!RespondentRepresentativeUtils.isEligibleForAccessRevocation(representative, caseUserAssignment,
                         respondentName)) {
-                    representativesToRevoke.add(representative);
-                    caseUserAssignmentsToRevoke.add(caseUserAssignment);
+                    continue;
                 }
+                representativesToRevoke.add(representative);
+                caseUserAssignmentsToRevoke.add(caseUserAssignment);
             }
         }
         if (CollectionUtils.isNotEmpty(caseUserAssignmentsToRevoke)) {

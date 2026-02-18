@@ -44,7 +44,8 @@ public class ReferenceService {
             }
             return caseData;
         } catch (Exception ex) {
-            throw new CaseRetrievalException(MESSAGE + caseDetails.getCaseId() + ex.getMessage());
+            throw (CaseRetrievalException) new CaseRetrievalException(
+                    MESSAGE + caseDetails.getCaseId() + ex.getMessage()).initCause(ex);
         }
     }
 
@@ -70,7 +71,8 @@ public class ReferenceService {
             }
             return caseData;
         } catch (Exception ex) {
-            throw new CaseRetrievalException(MESSAGE + caseDetails.getCaseId() + ex.getMessage());
+            throw (CaseRetrievalException) new CaseRetrievalException(
+                    MESSAGE + caseDetails.getCaseId() + ex.getMessage()).initCause(ex);
         }
     }
 

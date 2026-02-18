@@ -151,7 +151,8 @@ public class DocumentGenerationService {
                     caseDetails.getCaseData().getCorrespondenceType(),
                     caseDetails.getCaseData().getCorrespondenceScotType(), null);
         } catch (Exception ex) {
-            throw new DocumentManagementException(MESSAGE + caseDetails.getCaseId() + ex.getMessage());
+            throw (DocumentManagementException) new DocumentManagementException(
+                    MESSAGE + caseDetails.getCaseId() + ex.getMessage()).initCause(ex);
         }
     }
 

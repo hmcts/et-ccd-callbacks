@@ -148,15 +148,17 @@ public final class LoggingUtils {
      * @return {@code emptyMessage} if the object is considered empty;
      *         otherwise {@code notEmptyMessage}
      */
-    public static <T> String resolveMessageByPresence(T object, String emptyMessage, String notEmptyMessage) {
-        boolean isEmpty;
-        if (object instanceof String str) {
-            isEmpty = StringUtils.isBlank(str);
-        } else if (object instanceof Collection<?> collection) {
-            isEmpty = CollectionUtils.isEmpty(collection);
-        } else {
-            isEmpty = ObjectUtils.isEmpty(object);
+    public static <T> String resolveMessageByPresence(T object,
+                                                      String emptyMessage,
+                                                      String notEmptyMessage) {
+        if (object == null) {
+            return emptyMessage;
         }
+        boolean isEmpty = switch (object) {
+            case String str -> StringUtils.isBlank(str);
+            case Collection<?> collection -> CollectionUtils.isEmpty(collection);
+            default -> ObjectUtils.isEmpty(object);
+        };
         return isEmpty ? emptyMessage : notEmptyMessage;
     }
 }

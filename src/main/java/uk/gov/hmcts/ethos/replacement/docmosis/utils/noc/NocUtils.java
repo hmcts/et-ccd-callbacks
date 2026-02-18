@@ -552,15 +552,14 @@ public final class NocUtils {
         }
         for (int i = 0; i < caseData.getRespondentCollection().size(); i++) {
             NoticeOfChangeAnswers answers = RoleUtils.getNoticeOfChangeAnswersAtIndex(caseData, i);
-            if (RoleUtils.isValidNoticeOfChangeAnswers(answers)) {
-                continue;
+            if (!RoleUtils.isValidNoticeOfChangeAnswers(answers)) {
+                RespondentSumTypeItem respondent = RespondentUtils.getRespondentAtIndex(caseData, i);
+                if (!RespondentUtils.isValidRespondent(respondent)) {
+                    continue;
+                }
+                assert respondent != null;
+                setNoticeOfChangeAnswerAtIndex(caseData, respondent.getValue().getRespondentName(), i);
             }
-            RespondentSumTypeItem respondent = RespondentUtils.getRespondentAtIndex(caseData, i);
-            if (!RespondentUtils.isValidRespondent(respondent)) {
-                continue;
-            }
-            assert respondent != null;
-            setNoticeOfChangeAnswerAtIndex(caseData, respondent.getValue().getRespondentName(), i);
         }
     }
 

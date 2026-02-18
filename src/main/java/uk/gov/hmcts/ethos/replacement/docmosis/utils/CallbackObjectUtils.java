@@ -103,14 +103,13 @@ public final class CallbackObjectUtils {
      * @return {@code true} if the object is considered empty; {@code false} otherwise
      */
     public static <T> boolean isEmpty(T object) {
-        boolean isEmpty;
-        if (object instanceof String str) {
-            isEmpty = StringUtils.isBlank(str);
-        } else if (object instanceof Collection<?> collection) {
-            isEmpty = CollectionUtils.isEmpty(collection);
-        } else {
-            isEmpty = ObjectUtils.isEmpty(object);
+        if (object == null) {
+            return true;
         }
-        return isEmpty;
+        return switch (object) {
+            case String str -> StringUtils.isBlank(str);
+            case Collection<?> collection -> CollectionUtils.isEmpty(collection);
+            default -> ObjectUtils.isEmpty(object);
+        };
     }
 }

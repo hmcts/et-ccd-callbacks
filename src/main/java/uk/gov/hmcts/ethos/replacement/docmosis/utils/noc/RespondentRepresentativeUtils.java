@@ -18,7 +18,6 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_INVALID_REPRESENTATIVE_EXISTS;
@@ -240,7 +239,7 @@ public final class RespondentRepresentativeUtils {
         }
         return representatives.stream()
                 .filter(RespondentRepresentativeUtils::canModifyAccess)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     /**
@@ -371,26 +370,39 @@ public final class RespondentRepresentativeUtils {
                 continue;
             }
             // to check if representative exists but its organisation or email is changed or not
-            boolean representativeChanged = false;
+            boolean hasRepresentativeContactDetailsChanged = false;
             // to check if representative exists or not
-            boolean representativeFound = false;
+            boolean isMatchingValidRepresentative = false;
             for (RepresentedTypeRItem newRepresentative : newRepresentatives) {
-                if (!isValidRepresentative(newRepresentative)
-                        || !representsSameRespondent(oldRepresentative, newRepresentative)) {
-                    continue;
-                }
-                representativeFound = true;
-                if (isRepresentativeOrganisationChanged(oldRepresentative.getValue(), newRepresentative.getValue())
-                        || isRepresentativeEmailChanged(oldRepresentative.getValue(), newRepresentative.getValue())) {
+                if (isMatchingValidRepresentative(oldRepresentative, newRepresentative)) {
+                    isMatchingValidRepresentative = true;
                     // representative already exists but its organisation or email is changed
-                    representativeChanged = true;
+                    hasRepresentativeContactDetailsChanged = hasRepresentativeContactDetailsChanged(oldRepresentative,
+                                newRepresentative);
                 }
             }
-            if (!representativeFound || representativeChanged) {
+            if (canRemoveRepresentative(isMatchingValidRepresentative, hasRepresentativeContactDetailsChanged)) {
                 representativesToRemove.add(oldRepresentative);
             }
         }
         return representativesToRemove;
+    }
+
+    private static boolean isMatchingValidRepresentative(RepresentedTypeRItem oldRepresentative,
+                                                         RepresentedTypeRItem newRepresentative) {
+        return isValidRepresentative(newRepresentative)
+                && representsSameRespondent(oldRepresentative, newRepresentative);
+    }
+
+    private static boolean hasRepresentativeContactDetailsChanged(
+            RepresentedTypeRItem oldRepresentative, RepresentedTypeRItem newRepresentative) {
+        return isRepresentativeOrganisationChanged(oldRepresentative.getValue(), newRepresentative.getValue())
+                || isRepresentativeEmailChanged(oldRepresentative.getValue(), newRepresentative.getValue());
+    }
+
+    private static boolean canRemoveRepresentative(boolean  isMatchingValidRepresentative,
+                                                   boolean hasRepresentativeContactDetailsChanged) {
+        return !isMatchingValidRepresentative || hasRepresentativeContactDetailsChanged;
     }
 
     /**

@@ -418,8 +418,9 @@ public class NocRespondentRepresentativeService {
                 }
             }
         }
-        assignableRepresentatives.removeAll(representativesToRemove);
-        return assignableRepresentatives;
+        List<RepresentedTypeRItem> representativesToAssign = new ArrayList<>(assignableRepresentatives);
+        representativesToAssign.removeAll(representativesToRemove);
+        return representativesToAssign;
     }
 
     /**

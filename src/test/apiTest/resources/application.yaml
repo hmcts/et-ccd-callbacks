@@ -228,3 +228,13 @@ feature-flags:
 
 caching:
   adminUserService: ${CACHING_ADMIN_USER_SERVICE:21600000}
+
+queue:
+  create-updates:
+    poll-interval: ${CREATE_UPDATES_POLL_INTERVAL:1000}
+    batch-size: ${CREATE_UPDATES_BATCH_SIZE:10}
+    threads: ${CREATE_UPDATES_THREADS:15}
+  update-case:
+    poll-interval: ${UPDATE_CASE_POLL_INTERVAL:1000}
+    batch-size: ${UPDATE_CASE_BATCH_SIZE:10}
+    threads: ${UPDATE_CASE_THREADS:15}

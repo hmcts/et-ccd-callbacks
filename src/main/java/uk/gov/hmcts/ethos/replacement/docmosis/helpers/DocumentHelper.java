@@ -43,6 +43,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADDRESS_LABELS_PAGE_SIZE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADDRESS_LABELS_TEMPLATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.COMPANY_TYPE_CLAIMANT;
@@ -83,6 +85,9 @@ public final class DocumentHelper {
     public static final String CLAIMANT_OR_REP_FULL_NAME = "\"claimant_or_rep_full_name\":\"";
     public static final String CLAIMANT_REP_ORG = "\"claimant_rep_organisation\":\"";
     private static final Double DOUBLE_ONE = 1d;
+    private static final List<String> EW_ECC_REJECTION_SECTIONS = List.of("3.1", "3.2", "3.3", "3.4", "3.5",
+        "3.6", "3.7", "3.22", "3.23");
+    private static final List<String> SCOT_ECC_REJECTION_SECTIONS = List.of("19");
 
     private DocumentHelper() {
     }
@@ -125,7 +130,7 @@ public final class DocumentHelper {
         } else if (templateName.equals(ADDRESS_LABELS_TEMPLATE)) {
             sb.append(getAddressLabelsDataMultipleCase(multipleData));
         } else {
-            if (isEccDocumentTemplate(caseTypeId, templateName)) {
+            if (isEccDocumentTemplate(caseTypeId, correspondenceType, correspondenceScotType)) {
                 processECCData(caseData, correspondenceType, correspondenceScotType, caseTypeId, sb);
             } else {
                 sb.append(getClaimantData(caseData)).append(getRespondentData(caseData));
@@ -1432,8 +1437,24 @@ public final class DocumentHelper {
         }
     }
 
-    static boolean isEccDocumentTemplate(String caseTypeId, String templateName) {
-        return (SCOTLAND_CASE_TYPE_ID.equals(caseTypeId) && templateName.contains(ECC_DOCUMENT_SCOT_TEMPLATE))
-                || (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId) && templateName.contains(ECC_DOCUMENT_ENG_TEMPLATE));
+    /**
+     * Checks if the document is an ECC template based on the case type and letter type. If the ECC letter is of a
+     * rejection letter type, it will return false and use the default logic as opposed to the ECC specific logic.
+     *
+     * @param caseTypeId     the case type ID
+     * @param ewLetterType   the England/Wales letter type
+     * @param scotlandLetterType the Scotland letter type
+     * @return true if the document is an ECC template, false if it's an ECC rejection letter or any other template
+     */
+    static boolean isEccDocumentTemplate(String caseTypeId, CorrespondenceType ewLetterType,
+                                         CorrespondenceScotType scotlandLetterType) {
+        return (SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)
+            && isNotEmpty(scotlandLetterType)
+            && defaultIfEmpty(scotlandLetterType.getTopLevelScotDocuments(), "").contains(ECC_DOCUMENT_SCOT_TEMPLATE)
+            && !SCOT_ECC_REJECTION_SECTIONS.contains(defaultIfEmpty(scotlandLetterType.getPart3ScotDocuments(), "")))
+            || (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId)
+            && isNotEmpty(ewLetterType)
+            && defaultIfEmpty(ewLetterType.getTopLevelDocuments(), "").contains(ECC_DOCUMENT_ENG_TEMPLATE)
+            && !EW_ECC_REJECTION_SECTIONS.contains(defaultIfEmpty(ewLetterType.getPart3Documents(), "")));
     }
 }

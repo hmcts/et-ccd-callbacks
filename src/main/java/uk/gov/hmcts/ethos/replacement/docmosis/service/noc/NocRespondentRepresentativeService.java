@@ -255,6 +255,11 @@ public class NocRespondentRepresentativeService {
                 caseUserAssignmentsToRevoke.add(caseUserAssignment);
             }
         }
+        revokeCaseAssignments(userToken, caseUserAssignmentsToRevoke);
+        return representativesToRevoke;
+    }
+
+    private void revokeCaseAssignments(String userToken, List<CaseUserAssignment> caseUserAssignmentsToRevoke) {
         if (CollectionUtils.isNotEmpty(caseUserAssignmentsToRevoke)) {
             try {
                 ccdClient.revokeCaseAssignments(userToken, CaseUserAssignmentData.builder().caseUserAssignments(
@@ -263,7 +268,6 @@ public class NocRespondentRepresentativeService {
                 log.info(exception.getMessage(), exception);
             }
         }
-        return representativesToRevoke;
     }
 
     /**

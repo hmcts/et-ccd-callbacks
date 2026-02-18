@@ -62,6 +62,8 @@ final class NocUtilsTest {
     private static final String EXPECTED_EXCEPTION_OLD_AND_NEW_RESPONDENTS_ARE_DIFFERENT =
             "Old and new respondent collections contain different respondents for case ID 1234567890123456.";
 
+    private static final String NOC_WARNING = "Dummy NOC warning";
+
     private static final String REPRESENTATIVE_NAME = "Representative Name";
     private static final String RESPONDENT_NAME_ONE = "Respondent Name One";
     private static final String RESPONDENT_NAME_TWO = "Respondent Name Two";
@@ -100,7 +102,8 @@ final class NocUtilsTest {
     private static final String ROLE_SOLICITOR_J = "[SOLICITORJ]";
     private static final String ROLE_SOLICITOR_K = "[SOLICITORK]";
     private static final int MAX_NOC_ANSWERS_COUNT = 10;
-    private static final String NOC_WARNING = "Dummy NOC warning";
+    private static final String USER_TOKEN = "userToken";
+    private static final String CASE_ID = "1234567890123456";
 
     @Test
     void theValidateRepresentativeRespondentMapping() {
@@ -711,5 +714,29 @@ final class NocUtilsTest {
         caseData.setNocWarning(NOC_WARNING);
         assertDoesNotThrow(() -> NocUtils.clearNocWarningIfPresent(caseData));
         assertThat(caseData.getNocWarning()).isNull();
+    }
+
+    @Test
+    void theCanRevokeRepresentativeAccess() {
+        // when callback request is empty should return false
+        List<RepresentedTypeRItem> representatives = List.of(RepresentedTypeRItem.builder().build());
+        assertThat(NocUtils.canRevokeRepresentativeAccess(null, USER_TOKEN, representatives)).isFalse();
+        // when callback request not has case details before should return false
+        CallbackRequest callbackRequest = new CallbackRequest();
+        assertThat(NocUtils.canRevokeRepresentativeAccess(callbackRequest, USER_TOKEN, representatives)).isFalse();
+        // when case details before not have case id should return false
+        callbackRequest.setCaseDetailsBefore(new CaseDetails());
+        assertThat(NocUtils.canRevokeRepresentativeAccess(callbackRequest, USER_TOKEN, representatives)).isFalse();
+        // when case details before not have case data should return false
+        callbackRequest.getCaseDetailsBefore().setCaseId(CASE_ID);
+        assertThat(NocUtils.canRevokeRepresentativeAccess(callbackRequest, USER_TOKEN, representatives)).isFalse();
+        // when user token is empty should return false
+        callbackRequest.getCaseDetailsBefore().setCaseData(new CaseData());
+        assertThat(NocUtils.canRevokeRepresentativeAccess(callbackRequest, StringUtils.EMPTY, representatives))
+                .isFalse();
+        // when representative list is empty should return false
+        assertThat(NocUtils.canRevokeRepresentativeAccess(callbackRequest, USER_TOKEN, new ArrayList<>())).isFalse();
+        // when all parameters are valid should return true
+        assertThat(NocUtils.canRevokeRepresentativeAccess(callbackRequest, USER_TOKEN, representatives)).isTrue();
     }
 }

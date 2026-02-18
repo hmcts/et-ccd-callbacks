@@ -152,10 +152,13 @@ class NocRespondentRepresentativeServiceTest {
             "Failed to add organisation policy for case 1234567890123456. Exception: Something went wrong";
 
     private static final String EXPECTED_WARNING_REPRESENTATIVE_EMAIL_ADDRESS_NOT_FOUND =
-            "Representative email address not found.\n";
+            "Representative 'Legal One' could not be found using representative1@gmail.com. Case access will not be "
+                    + "defined for this representative.\n";
     private static final String EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL =
             "Representative 'Legal One' could not be found using respondent@rep.email.com. "
                     + "Case access will not be defined for this representative.\n";
+    private static final String EXPECTED_WARNING_REPRESENTATIVE_EMAIL_NOT_FOUND =
+            "Representative email address not found.\n";
 
     private static final String CASE_ID_1 = "1234567890123456";
     private static final String REPRESENTATIVE_NAME = "Representative Name";
@@ -521,27 +524,29 @@ class NocRespondentRepresentativeServiceTest {
 
     @Test
     @SneakyThrows
-    void theValidateRepresentativeOrganisationAndEmail() {
+    void theValidateRepresentativesOrganisationsAndEmails() {
         // when case data is empty should return empty list
         assertDoesNotThrow(() -> nocRespondentRepresentativeService
-                .validateRepresentativeOrganisationAndEmail(null));
-
+                .validateRepresentativesOrganisationsAndEmails(null));
         // when representative not exists in hmcts organisation. (my Hmcts is selected as NO) should return empty list
         CaseData caseData = new CaseData();
         DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
         DynamicValueType dynamicValueType = new DynamicValueType();
         dynamicValueType.setLabel(RESPONDENT_NAME_ONE);
         dynamicFixedListType.setValue(dynamicValueType);
-        caseData.setRepCollection(List.of(RepresentedTypeRItem.builder().id(RESPONDENT_REP_NAME).value(
+        caseData.setRepCollection(List.of(RepresentedTypeRItem.builder().id(REPRESENTATIVE_ID_ONE).value(
                 RepresentedTypeR.builder().myHmctsYesNo(NO).dynamicRespRepName(dynamicFixedListType)
                         .nameOfRepresentative(RESPONDENT_REP_NAME).build()).build()));
-        nocRespondentRepresentativeService.validateRepresentativeOrganisationAndEmail(caseData);
+        nocRespondentRepresentativeService.validateRepresentativesOrganisationsAndEmails(caseData);
         assertThat(caseData.getNocWarning()).isEmpty();
-
-        // when representative my hmcts is yes and does not have organisation should throw exception
+        // when representative does not have email address should return empty list
         caseData.getRepCollection().getFirst().getValue().setMyHmctsYesNo(YES);
+        nocRespondentRepresentativeService.validateRepresentativesOrganisationsAndEmails(caseData);
+        assertThat(caseData.getNocWarning()).isEqualTo(EXPECTED_WARNING_REPRESENTATIVE_EMAIL_NOT_FOUND);
+        // when representative has email and does not have organisation should throw exception
+        caseData.getRepCollection().getFirst().getValue().setRepresentativeEmailAddress(REPRESENTATIVE_EMAIL);
         GenericServiceException genericServiceException = assertThrows(GenericServiceException.class,
-                () -> nocRespondentRepresentativeService.validateRepresentativeOrganisationAndEmail(caseData));
+                () -> nocRespondentRepresentativeService.validateRepresentativesOrganisationsAndEmails(caseData));
         assertThat(genericServiceException.getMessage()).isEqualTo(
                 EXPECTED_EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND);
 
@@ -549,13 +554,13 @@ class NocRespondentRepresentativeServiceTest {
         caseData.getRepCollection().getFirst().getValue().setRespondentOrganisation(Organisation.builder().build());
         caseData.getRepCollection().getFirst().getValue().setMyHmctsYesNo(YES);
         genericServiceException = assertThrows(GenericServiceException.class,
-                () -> nocRespondentRepresentativeService.validateRepresentativeOrganisationAndEmail(caseData));
+                () -> nocRespondentRepresentativeService.validateRepresentativesOrganisationsAndEmails(caseData));
         assertThat(genericServiceException.getMessage()).isEqualTo(
                 EXPECTED_EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND);
 
         // when representative does not have email address
         caseData.getRepCollection().getFirst().getValue().getRespondentOrganisation().setOrganisationID(ET_ORG_1);
-        nocRespondentRepresentativeService.validateRepresentativeOrganisationAndEmail(caseData);
+        nocRespondentRepresentativeService.validateRepresentativesOrganisationsAndEmails(caseData);
         assertThat(caseData.getNocWarning()).isNotEmpty();
         assertThat(caseData.getNocWarning()).isEqualTo(EXPECTED_WARNING_REPRESENTATIVE_EMAIL_ADDRESS_NOT_FOUND);
 
@@ -563,7 +568,7 @@ class NocRespondentRepresentativeServiceTest {
         caseData.getRepCollection().getFirst().getValue().setRepresentativeEmailAddress(RESPONDENT_REP_EMAIL);
         when(organisationClient.getAccountIdByEmail(ADMIN_USER_TOKEN, S2S_TOKEN, RESPONDENT_REP_EMAIL))
                 .thenReturn(null);
-        nocRespondentRepresentativeService.validateRepresentativeOrganisationAndEmail(caseData);
+        nocRespondentRepresentativeService.validateRepresentativesOrganisationsAndEmails(caseData);
         assertThat(caseData.getNocWarning()).isNotEmpty();
         assertThat(caseData.getNocWarning()).isEqualTo(EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL);
 
@@ -585,7 +590,7 @@ class NocRespondentRepresentativeServiceTest {
         organisationClientResponse = ResponseEntity.ok(accountIdByEmailResponse);
         when(organisationClient.getAccountIdByEmail(ADMIN_USER_TOKEN, S2S_TOKEN, RESPONDENT_REP_EMAIL))
                 .thenReturn(organisationClientResponse);
-        nocRespondentRepresentativeService.validateRepresentativeOrganisationAndEmail(caseData);
+        nocRespondentRepresentativeService.validateRepresentativesOrganisationsAndEmails(caseData);
         assertThat(caseData.getNocWarning()).isEmpty();
     }
 

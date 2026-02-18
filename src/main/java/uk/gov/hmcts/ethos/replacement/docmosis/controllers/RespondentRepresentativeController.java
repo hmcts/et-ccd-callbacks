@@ -117,7 +117,7 @@ public class RespondentRepresentativeController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>();
         try {
-            nocRespondentRepresentativeService.validateRepresentativeOrganisationAndEmail(caseData);
+            nocRespondentRepresentativeService.validateRepresentativesOrganisationsAndEmails(caseData);
         } catch (GenericRuntimeException | GenericServiceException gse) {
             String errorMessage = String.format(ERROR_REPRESENTATIVE_ORGANISATION_AND_EMAIL_NOT_MATCHED,
                     StringUtils.EMPTY);

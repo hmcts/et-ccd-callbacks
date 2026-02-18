@@ -109,48 +109,51 @@ public class NocRespondentRepresentativeService {
      * @throws GenericServiceException if a representative marked as an HMCTS
      *         organisation user does not have a valid organisation or organisation ID
      */
-    public void validateRepresentativeOrganisationAndEmail(CaseData caseData)
+    public void validateRepresentativesOrganisationsAndEmails(CaseData caseData)
             throws GenericServiceException {
         if (!RespondentRepresentativeUtils.hasRepresentatives(caseData)) {
             return;
         }
         StringBuilder nocWarnings = new StringBuilder(StringUtils.EMPTY);
         for (RepresentedTypeRItem representativeItem :  caseData.getRepCollection()) {
-            RepresentedTypeR representative = representativeItem.getValue();
-            // checking if representative organisation is a hmcts organisation
-            if (YES.equals(representative.getMyHmctsYesNo())) {
-                final String representativeName = representative.getNameOfRepresentative();
-
-                // Checking if representative has an organisation
-                if (!RespondentRepresentativeUtils.hasOrganisation(representative)) {
-                    throw new GenericServiceException(EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND);
-                }
-                // checking if representative has an email address
-                final String representativeEmail = representative.getRepresentativeEmailAddress();
-                if (StringUtils.isBlank(representativeEmail)) {
+            if (RespondentRepresentativeUtils.isValidRepresentative(representativeItem)
+                    && YES.equals(representativeItem.getValue().getMyHmctsYesNo())) {
+                if (StringUtils.isBlank(representativeItem.getValue().getRepresentativeEmailAddress())) {
                     nocWarnings.append(WARNING_REPRESENTATIVE_EMAIL_ADDRESS_NOT_FOUND).append('\n');
                     continue;
                 }
-                String accessToken = adminUserService.getAdminUserToken();
-                try {
-                    ResponseEntity<AccountIdByEmailResponse> userResponse =
-                            organisationClient.getAccountIdByEmail(accessToken, authTokenGenerator.generate(),
-                                    representativeEmail);
-                    // checking if representative email address exists in organisation users
-                    if (!OrganisationUtils.hasUserIdentifier(userResponse)) {
-                        String warningMessage = String.format(WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL,
-                                representativeName, representativeEmail);
-                        nocWarnings.append(warningMessage).append('\n');
-                    }
-
-                } catch (Exception e) {
-                    String warningMessage = String.format(WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL,
-                            representativeName, representativeEmail);
-                    nocWarnings.append(warningMessage).append('\n');
-                }
+                nocWarnings.append(validateRepresentativeOrganisationAndEmail(representativeItem));
             }
         }
         caseData.setNocWarning(nocWarnings.toString());
+    }
+
+    private String validateRepresentativeOrganisationAndEmail(RepresentedTypeRItem representativeItem)
+            throws GenericServiceException {
+        StringBuilder nocWarnings = new StringBuilder(StringUtils.EMPTY);
+        RepresentedTypeR representative = representativeItem.getValue();
+        final String representativeName = representative.getNameOfRepresentative();
+        // Checking if representative has an organisation
+        if (!RespondentRepresentativeUtils.hasOrganisation(representative)) {
+            throw new GenericServiceException(EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND);
+        }
+        String accessToken = adminUserService.getAdminUserToken();
+        try {
+            ResponseEntity<AccountIdByEmailResponse> userResponse =
+                    organisationClient.getAccountIdByEmail(accessToken, authTokenGenerator.generate(),
+                            representative.getRepresentativeEmailAddress());
+            // checking if representative email address exists in organisation users
+            if (!OrganisationUtils.hasUserIdentifier(userResponse)) {
+                String warningMessage = String.format(WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL,
+                        representativeName, representative.getRepresentativeEmailAddress());
+                nocWarnings.append(warningMessage).append('\n');
+            }
+        } catch (Exception e) {
+            String warningMessage = String.format(WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL,
+                    representativeName, representative.getRepresentativeEmailAddress());
+            nocWarnings.append(warningMessage).append('\n');
+        }
+        return nocWarnings.toString();
     }
 
     /**
@@ -224,16 +227,10 @@ public class NocRespondentRepresentativeService {
      */
     public List<RepresentedTypeRItem> revokeOldRespondentRepresentativeAccess(
             CallbackRequest callbackRequest, String userToken, List<RepresentedTypeRItem> representativesToRemove) {
-        if (ObjectUtils.isEmpty(callbackRequest) || StringUtils.isBlank(userToken)) {
+        if (!NocUtils.canRevokeRepresentativeAccess(callbackRequest, userToken, representativesToRemove)) {
             return new  ArrayList<>();
         }
         CaseDetails oldCaseDetails = callbackRequest.getCaseDetailsBefore();
-        if (ObjectUtils.isEmpty(oldCaseDetails)
-                || StringUtils.isEmpty(oldCaseDetails.getCaseId())
-                || ObjectUtils.isEmpty(oldCaseDetails.getCaseData())
-                || CollectionUtils.isEmpty(representativesToRemove)) {
-            return new ArrayList<>();
-        }
         CaseUserAssignmentData caseUserAssignments = nocCcdService.retrieveCaseUserAssignments(
                 adminUserService.getAdminUserToken(), oldCaseDetails.getCaseId());
         if (ObjectUtils.isEmpty(caseUserAssignments)

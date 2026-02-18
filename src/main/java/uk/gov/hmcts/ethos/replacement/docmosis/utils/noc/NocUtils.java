@@ -651,10 +651,55 @@ public final class NocUtils {
         setter.accept(caseData, policy);
     }
 
+    /**
+     * Clears the Notice of Change (NoC) warning from the given {@link CaseData},
+     * if one is present.
+     *
+     * <p>If the {@code caseData} is {@code null} or empty, or if no NoC warning
+     * is currently set, this method performs no action.</p>
+     *
+     * @param caseData the case data from which the NoC warning should be cleared;
+     *                 may be {@code null}
+     */
     public static void clearNocWarningIfPresent(CaseData caseData) {
         if (ObjectUtils.isEmpty(caseData) || StringUtils.isBlank(caseData.getNocWarning())) {
             return;
         }
         caseData.setNocWarning(null);
+    }
+
+    /**
+     * Determines whether sufficient data is available to proceed with
+     * revoking representative access.
+     *
+     * <p>This method returns {@code true} only if:
+     * <ul>
+     *     <li>The {@code callbackRequest} is not {@code null} or empty,</li>
+     *     <li>The {@code userToken} is not blank,</li>
+     *     <li>The {@code caseDetailsBefore} section of the callback request is present,</li>
+     *     <li>The case ID within {@code caseDetailsBefore} is not blank,</li>
+     *     <li>The case data within {@code caseDetailsBefore} is present, and</li>
+     *     <li>The list of representatives to remove is not {@code null} or empty.</li>
+     * </ul>
+     *
+     * <p>No business validation is performed beyond checking for the presence
+     * of required values.
+     *
+     * @param callbackRequest the callback request containing case details; may be {@code null}
+     * @param userToken the authorisation token of the requesting user; may be {@code null} or blank
+     * @param representativesToRemove the list of representatives whose access is to be revoked;
+     *                                may be {@code null} or empty
+     * @return {@code true} if all required parameters are present and non-empty,
+     *         otherwise {@code false}
+     */
+    public static boolean canRevokeRepresentativeAccess(CallbackRequest callbackRequest,
+                                                        String userToken,
+                                                        List<RepresentedTypeRItem> representativesToRemove) {
+        return ObjectUtils.isNotEmpty(callbackRequest)
+                && ObjectUtils.isNotEmpty(callbackRequest.getCaseDetailsBefore())
+                && StringUtils.isNotBlank(callbackRequest.getCaseDetailsBefore().getCaseId())
+                && ObjectUtils.isNotEmpty(callbackRequest.getCaseDetailsBefore().getCaseData())
+                && StringUtils.isNotBlank(userToken)
+                && CollectionUtils.isNotEmpty(representativesToRemove);
     }
 }

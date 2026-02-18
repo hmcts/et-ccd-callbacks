@@ -5,6 +5,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
@@ -630,5 +631,38 @@ public final class RespondentRepresentativeUtils {
         return ObjectUtils.isNotEmpty(representative)
                 && ObjectUtils.isNotEmpty(representative.getRespondentOrganisation())
                 && StringUtils.isNotBlank(representative.getRespondentOrganisation().getOrganisationID());
+    }
+
+    /**
+     * Determines whether a representative is eligible for access revocation.
+     *
+     * <p>A representative is considered eligible if:
+     * <ul>
+     *     <li>The representative is allowed to modify access (via {@link
+     *     RespondentRepresentativeUtils#canModifyAccess(RepresentedTypeRItem)}), and</li>
+     *     <li>Either:
+     *         <ul>
+     *             <li>The provided respondent name is not blank and matches the representative's name, or</li>
+     *             <li>The {@link CaseUserAssignment} is not null, its case role is not blank,
+     *                 and it matches the representative's assigned role.</li>
+     *         </ul>
+     *     </li>
+     * </ul>
+     *
+     * @param representative     the representative whose access eligibility is being evaluated
+     * @param caseUserAssignment the case user assignment containing the case role (may be null)
+     * @param respondentName     the respondent name to match against the representative (may be blank)
+     * @return {@code true} if the representative meets the criteria for access revocation;
+     *         {@code false} otherwise
+     */
+    public static boolean isEligibleForAccessRevocation(RepresentedTypeRItem representative,
+                                                        CaseUserAssignment caseUserAssignment,
+                                                        String respondentName) {
+        return RespondentRepresentativeUtils.canModifyAccess(representative)
+                && (StringUtils.isNotBlank(respondentName)
+                && respondentName.equals(representative.getValue().getRespRepName())
+                || ObjectUtils.isNotEmpty(caseUserAssignment)
+                && StringUtils.isNotBlank(caseUserAssignment.getCaseRole())
+                && caseUserAssignment.getCaseRole().equals(representative.getValue().getRole()));
     }
 }

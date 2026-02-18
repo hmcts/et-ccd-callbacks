@@ -250,11 +250,8 @@ public class NocRespondentRepresentativeService {
                 }
                 String respondentName = RoleUtils.findRespondentNameByRole(oldCaseDetails.getCaseData(),
                         caseUserAssignment.getCaseRole());
-                if (RespondentRepresentativeUtils.canModifyAccess(representative)
-                        && (StringUtils.isNotBlank(respondentName)
-                        && respondentName.equals(representative.getValue().getRespRepName())
-                        || StringUtils.isNotBlank(caseUserAssignment.getCaseRole())
-                        && caseUserAssignment.getCaseRole().equals(representative.getValue().getRole()))) {
+                if (RespondentRepresentativeUtils.isEligibleForAccessRevocation(representative, caseUserAssignment,
+                        respondentName)) {
                     representativesToRevoke.add(representative);
                     caseUserAssignmentsToRevoke.add(caseUserAssignment);
                 }

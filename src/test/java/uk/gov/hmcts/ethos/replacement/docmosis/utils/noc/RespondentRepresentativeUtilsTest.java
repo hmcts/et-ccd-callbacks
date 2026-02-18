@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
@@ -586,5 +587,41 @@ final class RespondentRepresentativeUtilsTest {
         // when has organisation with id should return true
         representative.getRespondentOrganisation().setOrganisationID(ORGANISATION_ID_1);
         assertThat(RespondentRepresentativeUtils.hasOrganisation(representative)).isTrue();
+    }
+
+    @Test
+    void theIsEligibleForAccessRevocation() {
+        // when representative is empty should return false
+        CaseUserAssignment caseUserAssignment = CaseUserAssignment.builder().caseRole(ROLE_SOLICITOR_A).build();
+        assertThat(RespondentRepresentativeUtils.isEligibleForAccessRevocation(null, caseUserAssignment,
+                RESPONDENT_NAME_1)).isFalse();
+        // when respondent name and case user assignments are empty should return false
+        RepresentedTypeRItem representative = RepresentedTypeRItem.builder().id(REPRESENTATIVE_ID_1).value(
+                RepresentedTypeR.builder().myHmctsYesNo(YES).representativeEmailAddress(REPRESENTATIVE_EMAIL_1)
+                        .respondentOrganisation(Organisation.builder().organisationID(ORGANISATION_ID_1).build())
+                        .build()).build();
+        assertThat(RespondentRepresentativeUtils.isEligibleForAccessRevocation(representative, null,
+                StringUtils.EMPTY)).isFalse();
+        // when respondent name not equal to selected respondent name should return false
+        representative.getValue().setRespRepName(RESPONDENT_NAME_2);
+        assertThat(RespondentRepresentativeUtils.isEligibleForAccessRevocation(representative, null,
+                RESPONDENT_NAME_1)).isFalse();
+        // when respondent name equals to selected respondent name should return true
+        representative.getValue().setRespRepName(RESPONDENT_NAME_1);
+        assertThat(RespondentRepresentativeUtils.isEligibleForAccessRevocation(representative, null,
+                RESPONDENT_NAME_1)).isTrue();
+        // when case user assignment is not empty but not has role should return false
+        representative.getValue().setRespRepName(RESPONDENT_NAME_2);
+        caseUserAssignment.setCaseRole(null);
+        assertThat(RespondentRepresentativeUtils.isEligibleForAccessRevocation(representative, caseUserAssignment,
+                RESPONDENT_NAME_1)).isFalse();
+        // when case user assignment role is not equal to representative role should return false
+        caseUserAssignment.setCaseRole(ROLE_SOLICITOR_A);
+        assertThat(RespondentRepresentativeUtils.isEligibleForAccessRevocation(representative, caseUserAssignment,
+                RESPONDENT_NAME_1)).isFalse();
+        // when case user assignment role is equal to representative role should return true
+        representative.getValue().setRole(ROLE_SOLICITOR_A);
+        assertThat(RespondentRepresentativeUtils.isEligibleForAccessRevocation(representative, caseUserAssignment,
+                RESPONDENT_NAME_1)).isTrue();
     }
 }

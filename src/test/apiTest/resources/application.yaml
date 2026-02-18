@@ -1,8 +1,11 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5050/et_cos
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
   flyway:
-    locations: classpath:db/migration,classpath:db/dev
+    enabled: false
   main:
     lazy-initialization: true
 
@@ -231,10 +234,10 @@ caching:
 
 queue:
   create-updates:
-    poll-interval: ${CREATE_UPDATES_POLL_INTERVAL:1000}
-    batch-size: ${CREATE_UPDATES_BATCH_SIZE:10}
-    threads: ${CREATE_UPDATES_THREADS:15}
+    poll-interval: 1000
+    batch-size: 10
+    threads: 15
   update-case:
-    poll-interval: ${UPDATE_CASE_POLL_INTERVAL:1000}
-    batch-size: ${UPDATE_CASE_BATCH_SIZE:10}
-    threads: ${UPDATE_CASE_THREADS:15}
+    poll-interval: 1000
+    batch-size: 10
+    threads: 15

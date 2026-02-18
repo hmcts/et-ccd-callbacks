@@ -5,6 +5,7 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
@@ -664,5 +665,30 @@ public final class RespondentRepresentativeUtils {
                 || ObjectUtils.isNotEmpty(caseUserAssignment)
                 && StringUtils.isNotBlank(caseUserAssignment.getCaseRole())
                 && caseUserAssignment.getCaseRole().equals(representative.getValue().getRole()));
+    }
+
+    /**
+     * Determines whether the assignment context is valid.
+     *
+     * <p>The context is considered valid if:
+     * <ul>
+     *     <li>The list of representatives is not null and not empty,</li>
+     *     <li>The {@link CaseDetails} object is not null or empty, and</li>
+     *     <li>The case ID within the {@link CaseDetails} is not null, empty, or blank.</li>
+     * </ul>
+     *
+     * <p>This method is intended to be used as a guard check before performing
+     * representative assignment logic.</p>
+     *
+     * @param representatives the list of representatives eligible for assignment
+     * @param caseDetails     the case details containing the case identifier
+     * @return {@code true} if all required assignment context data is present and valid;
+     *         {@code false} otherwise
+     */
+    public static boolean hasValidAssignmentContext(List<RepresentedTypeRItem> representatives,
+                                                    CaseDetails caseDetails) {
+        return CollectionUtils.isNotEmpty(representatives)
+                && ObjectUtils.isNotEmpty(caseDetails)
+                && StringUtils.isNotBlank(caseDetails.getCaseId());
     }
 }

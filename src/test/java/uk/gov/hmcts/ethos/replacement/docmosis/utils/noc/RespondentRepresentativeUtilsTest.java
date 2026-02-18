@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
@@ -24,19 +25,28 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 final class RespondentRepresentativeUtilsTest {
 
-    private static final String DUMMY_CASE_REFERENCE = "1234567890123456";
+    private static final String CASE_ID = "1234567890123456";
+
     private static final String RESPONDENT_ID_1 = "1abc957b-e8f5-3487-84c5-a736eb6605b8";
     private static final String RESPONDENT_ID_2 = "2abc957b-e8f5-3487-84c5-a736eb6605b8";
     private static final String REPRESENTATIVE_ID_1 = "6abc957b-e8f5-3487-84c5-a736eb6605b8";
     private static final String REPRESENTATIVE_ID_2 = "6abc957b-e8f5-3487-84c5-a736eb6605b9";
+    private static final String REPRESENTATIVE_NAME_1 = "Representative name 1";
+    private static final String REPRESENTATIVE_NAME_2 = "Representative name 2";
+    private static final String REPRESENTATIVE_EMAIL_1 = "representative1@testmail.com";
+    private static final String REPRESENTATIVE_EMAIL_1_CAPITALISED = "REPRESENTATIVE1@TESTMAIL.COM";
+    private static final String REPRESENTATIVE_EMAIL_2 = "representative2@testmail.com";
+
     private static final String ORGANISATION_ID_1 = "dummy12_organisation34_id56";
     private static final String ORGANISATION_ID_2 = "dummy65_organisation43_id21";
+
     private static final String ROLE_SOLICITOR_A = "SOLICITORA";
-    private static final String EXCEPTION_REPRESENTATIVE_NOT_FOUND =
+
+    private static final String EXPECTED_EXCEPTION_REPRESENTATIVE_NOT_FOUND =
             "Representative not found for case ID 1234567890123456.";
-    private static final String EXCEPTION_REPRESENTATIVE_ID_NOT_FOUND =
+    private static final String EXPECTED_EXCEPTION_REPRESENTATIVE_ID_NOT_FOUND =
             "Representative ID not found for case ID 1234567890123456.";
-    private static final String EXCEPTION_REPRESENTATIVE_DETAILS_NOT_EXISTS =
+    private static final String EXPECTED_EXCEPTION_REPRESENTATIVE_DETAILS_NOT_EXISTS =
             "Representative details not found for representative ID 6abc957b-e8f5-3487-84c5-a736eb6605b8 "
                     + "in case 1234567890123456.";
 
@@ -46,32 +56,26 @@ final class RespondentRepresentativeUtilsTest {
 
     private static final String RESPONDENT_NAME_1 = "Respondent name 1";
     private static final String RESPONDENT_NAME_2 = "Respondent name 2";
-    private static final String REPRESENTATIVE_NAME_1 = "Representative name 1";
-    private static final String REPRESENTATIVE_NAME_2 = "Representative name 2";
-
-    private static final String REPRESENTATIVE_EMAIL_1 = "representative1@testmail.com";
-    private static final String REPRESENTATIVE_EMAIL_1_CAPITALISED = "REPRESENTATIVE1@TESTMAIL.COM";
-    private static final String REPRESENTATIVE_EMAIL_2 = "representative2@testmail.com";
 
     @Test
     void theValidateRepresentative() {
         // when representative is null
         GenericServiceException gse = assertThrows(GenericServiceException.class,
-                () -> RespondentRepresentativeUtils.validateRepresentative(null, DUMMY_CASE_REFERENCE));
-        assertThat(gse.getMessage()).isEqualTo(EXCEPTION_REPRESENTATIVE_NOT_FOUND);
+                () -> RespondentRepresentativeUtils.validateRepresentative(null, CASE_ID));
+        assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_REPRESENTATIVE_NOT_FOUND);
         // when representative does not have id
         RepresentedTypeRItem representativeWithoutId = RepresentedTypeRItem.builder().build();
         gse = assertThrows(GenericServiceException.class,
                 () -> RespondentRepresentativeUtils.validateRepresentative(representativeWithoutId,
-                        DUMMY_CASE_REFERENCE));
-        assertThat(gse.getMessage()).isEqualTo(EXCEPTION_REPRESENTATIVE_ID_NOT_FOUND);
+                        CASE_ID));
+        assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_REPRESENTATIVE_ID_NOT_FOUND);
         // when respondent details not found
         RepresentedTypeRItem representativeWithoutDetails = RepresentedTypeRItem.builder().build();
         representativeWithoutDetails.setId(REPRESENTATIVE_ID_1);
         gse = assertThrows(GenericServiceException.class,
                 () -> RespondentRepresentativeUtils.validateRepresentative(representativeWithoutDetails,
-                        DUMMY_CASE_REFERENCE));
-        assertThat(gse.getMessage()).isEqualTo(EXCEPTION_REPRESENTATIVE_DETAILS_NOT_EXISTS);
+                        CASE_ID));
+        assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_REPRESENTATIVE_DETAILS_NOT_EXISTS);
     }
 
     @Test
@@ -623,5 +627,23 @@ final class RespondentRepresentativeUtilsTest {
         representative.getValue().setRole(ROLE_SOLICITOR_A);
         assertThat(RespondentRepresentativeUtils.isEligibleForAccessRevocation(representative, caseUserAssignment,
                 RESPONDENT_NAME_1)).isTrue();
+    }
+
+    @Test
+    void theHasValidAssignmentContext() {
+        // when representative list is empty should return false
+        List<RepresentedTypeRItem> representatives = new ArrayList<>();
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseId(CASE_ID);
+        assertThat(RespondentRepresentativeUtils.hasValidAssignmentContext(representatives, caseDetails)).isFalse();
+        // when case details is empty should return false
+        representatives.add(RepresentedTypeRItem.builder().build());
+        assertThat(RespondentRepresentativeUtils.hasValidAssignmentContext(representatives, null)).isFalse();
+        // when case details not have case id should return false
+        caseDetails.setCaseId(StringUtils.EMPTY);
+        assertThat(RespondentRepresentativeUtils.hasValidAssignmentContext(representatives, caseDetails)).isFalse();
+        // when case details have case id should return true
+        caseDetails.setCaseId(CASE_ID);
+        assertThat(RespondentRepresentativeUtils.hasValidAssignmentContext(representatives, caseDetails)).isTrue();
     }
 }

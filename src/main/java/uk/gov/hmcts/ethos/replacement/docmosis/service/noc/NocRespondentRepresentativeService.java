@@ -393,9 +393,7 @@ public class NocRespondentRepresentativeService {
         }
         List<RepresentedTypeRItem> assignableRepresentatives = RespondentRepresentativeUtils
                 .filterModifiableRepresentatives(representatives);
-        if (CollectionUtils.isEmpty(assignableRepresentatives)
-                || ObjectUtils.isEmpty(caseDetails)
-                || StringUtils.isEmpty(caseDetails.getCaseId())) {
+        if (!RespondentRepresentativeUtils.hasValidAssignmentContext(assignableRepresentatives, caseDetails)) {
             return assignableRepresentatives;
         }
         CaseUserAssignmentData caseUserAssignments = nocCcdService.retrieveCaseUserAssignments(

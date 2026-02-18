@@ -5,14 +5,23 @@ import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.test.utils.LoggerTestUtils;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 final class LoggingUtilsTest {
 
     private static final String DUMMY_EMAIL_ADDRESS = "dummy@email.address";
     private static final String ERROR_FAILED_TO_SEND_EMAIL_CLAIMANT = "Failed to send email to claimant {}, error: {}";
+    private static final String DUMMY_STRING = "Dummy string";
+    private static final String EMPTY_MESSAGE = "Empty message";
+    private static final String NOT_EMPTY_MESSAGE = "Not empty message";
 
     private static final String EXCEPTION_MESSAGE = "Exception message";
     private static final String EXPECTED_CCD_ERROR_LOGGING_MESSAGE = "Error form ccd - Exception message";
@@ -60,5 +69,27 @@ final class LoggingUtilsTest {
         // should log message
         LoggingUtils.logNotificationIssue(ERROR_FAILED_TO_SEND_EMAIL_CLAIMANT, DUMMY_EMAIL_ADDRESS, exception);
         LoggerTestUtils.checkLog(Level.INFO, LoggerTestUtils.INTEGER_TWO, EXPECTED_NOTIFICATION_ERROR_LOGGING_MESSAGE);
+    }
+
+    @Test
+    void theResolveMessageByPresence() {
+        // when object is instance of string and empty should return empty message
+        assertThat(LoggingUtils.resolveMessageByPresence(StringUtils.EMPTY, EMPTY_MESSAGE, NOT_EMPTY_MESSAGE))
+                .isEqualTo(EMPTY_MESSAGE);
+        // when object is instance of string and not empty should return not empty message
+        assertThat(LoggingUtils.resolveMessageByPresence(DUMMY_STRING, EMPTY_MESSAGE, NOT_EMPTY_MESSAGE))
+                .isEqualTo(NOT_EMPTY_MESSAGE);
+        // when object is a collection and empty should return empty message
+        assertThat(LoggingUtils.resolveMessageByPresence(new ArrayList<>(), EMPTY_MESSAGE, NOT_EMPTY_MESSAGE))
+                .isEqualTo(EMPTY_MESSAGE);
+        // when object is a collection and not empty should return not empty message
+        assertThat(LoggingUtils.resolveMessageByPresence(List.of(new RespondentSumTypeItem()), EMPTY_MESSAGE,
+                NOT_EMPTY_MESSAGE)).isEqualTo(NOT_EMPTY_MESSAGE);
+        // when object is empty should return empty message
+        assertThat(LoggingUtils.resolveMessageByPresence(null, EMPTY_MESSAGE, NOT_EMPTY_MESSAGE))
+                .isEqualTo(EMPTY_MESSAGE);
+        // when object is not empty should return not empty message
+        assertThat(LoggingUtils.resolveMessageByPresence(new CallbackRequest(), EMPTY_MESSAGE, NOT_EMPTY_MESSAGE))
+                .isEqualTo(NOT_EMPTY_MESSAGE);
     }
 }

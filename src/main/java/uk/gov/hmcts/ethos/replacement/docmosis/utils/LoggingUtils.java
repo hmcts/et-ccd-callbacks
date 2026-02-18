@@ -1,9 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.util.Collection;
 import java.util.List;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
@@ -121,5 +123,40 @@ public final class LoggingUtils {
             return;
         }
         log.info(loggingText, email, exception.getMessage());
+    }
+
+    /**
+     * Resolves and returns one of two messages based on whether the provided object
+     * is considered empty.
+     *
+     * <p>The object is evaluated as follows:
+     * <ul>
+     *     <li>If the object is a {@link String}, it is considered empty if it is
+     *         {@code null}, empty, or contains only whitespace
+     *         (evaluated using {@link StringUtils#isBlank(CharSequence)}).</li>
+     *     <li>If the object is a {@link Collection}, it is considered empty if it is
+     *         {@code null} or contains no elements
+     *         (evaluated using {@link CollectionUtils#isEmpty(Collection)}).</li>
+     *     <li>For all other object types, emptiness is determined using
+     *         {@link ObjectUtils#isEmpty(Object)}.</li>
+     * </ul>
+     *
+     * @param <T>              the type of the object to evaluate
+     * @param object           the object whose presence or emptiness is evaluated
+     * @param emptyMessage     the message to return if the object is considered empty
+     * @param notEmptyMessage  the message to return if the object is not empty
+     * @return {@code emptyMessage} if the object is considered empty;
+     *         otherwise {@code notEmptyMessage}
+     */
+    public static <T> String resolveMessageByPresence(T object, String emptyMessage, String notEmptyMessage) {
+        boolean isEmpty;
+        if (object instanceof String str) {
+            isEmpty = StringUtils.isBlank(str);
+        } else if (object instanceof Collection<?> collection) {
+            isEmpty = CollectionUtils.isEmpty(collection);
+        } else {
+            isEmpty = ObjectUtils.isEmpty(object);
+        }
+        return isEmpty ? emptyMessage : notEmptyMessage;
     }
 }

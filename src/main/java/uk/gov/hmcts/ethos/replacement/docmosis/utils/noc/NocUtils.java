@@ -14,7 +14,9 @@ import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.CallbackObjectUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CallbacksCollectionUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.LoggingUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentUtils;
 
 import java.time.LocalDateTime;
@@ -406,19 +408,18 @@ public final class NocUtils {
                     new Exception(EXCEPTION_CALLBACK_REQUEST_NOT_FOUND), EXCEPTION_CALLBACK_REQUEST_NOT_FOUND,
                     StringUtils.EMPTY, CLASS_NAME, methodName);
         }
-        if (ObjectUtils.isEmpty(callbackRequest.getCaseDetails())
-                || ObjectUtils.isEmpty(callbackRequest.getCaseDetailsBefore())) {
-            String exceptionMessage = ObjectUtils.isEmpty(callbackRequest.getCaseDetails())
-                    ? EXCEPTION_NEW_CASE_DETAILS_NOT_FOUND
-                    : EXCEPTION_OLD_CASE_DETAILS_NOT_FOUND;
+        if (CallbackObjectUtils.isAnyEmpty(callbackRequest.getCaseDetails(), callbackRequest.getCaseDetailsBefore())) {
+            String exceptionMessage = LoggingUtils.resolveMessageByPresence(callbackRequest.getCaseDetails(),
+                    EXCEPTION_NEW_CASE_DETAILS_NOT_FOUND, EXCEPTION_OLD_CASE_DETAILS_NOT_FOUND);
             throw new GenericServiceException(exceptionMessage,
                     new Exception(exceptionMessage), exceptionMessage, StringUtils.EMPTY, CLASS_NAME, methodName);
         }
-        if (StringUtils.isBlank(callbackRequest.getCaseDetails().getCaseId())
-                || StringUtils.isBlank(callbackRequest.getCaseDetailsBefore().getCaseId())) {
-            String exceptionMessage = ObjectUtils.isEmpty(callbackRequest.getCaseDetails().getCaseId())
-                    ? EXCEPTION_NEW_CASE_DETAILS_SUBMISSION_REFERENCE_NOT_FOUND
-                    : EXCEPTION_OLD_CASE_DETAILS_SUBMISSION_REFERENCE_NOT_FOUND;
+        if (CallbackObjectUtils.isAnyEmpty(callbackRequest.getCaseDetails().getCaseId(),
+                callbackRequest.getCaseDetailsBefore().getCaseId())) {
+            String exceptionMessage = LoggingUtils.resolveMessageByPresence(
+                    callbackRequest.getCaseDetails().getCaseId(),
+                    EXCEPTION_NEW_CASE_DETAILS_SUBMISSION_REFERENCE_NOT_FOUND,
+                    EXCEPTION_OLD_CASE_DETAILS_SUBMISSION_REFERENCE_NOT_FOUND);
             throw new GenericServiceException(exceptionMessage,
                     new Exception(exceptionMessage), exceptionMessage, StringUtils.EMPTY, CLASS_NAME, methodName);
         }
@@ -430,22 +431,22 @@ public final class NocUtils {
         }
         CaseData newCaseData = callbackRequest.getCaseDetails().getCaseData();
         CaseData oldCaseData = callbackRequest.getCaseDetailsBefore().getCaseData();
-        if (ObjectUtils.isEmpty(newCaseData) || ObjectUtils.isEmpty(oldCaseData)) {
-            String exceptionMessage = ObjectUtils.isEmpty(newCaseData)
-                    ? String.format(EXCEPTION_NEW_CASE_DATA_NOT_FOUND,
-                    callbackRequest.getCaseDetailsBefore().getCaseId())
-                    : String.format(EXCEPTION_OLD_CASE_DATA_NOT_FOUND,
-                    callbackRequest.getCaseDetailsBefore().getCaseId());
+        if (CallbackObjectUtils.isAnyEmpty(newCaseData, oldCaseData)) {
+            String exceptionMessage = LoggingUtils.resolveMessageByPresence(newCaseData,
+                    String.format(EXCEPTION_NEW_CASE_DATA_NOT_FOUND,
+                            callbackRequest.getCaseDetailsBefore().getCaseId()),
+                    String.format(EXCEPTION_OLD_CASE_DATA_NOT_FOUND,
+                            callbackRequest.getCaseDetailsBefore().getCaseId()));
             throw new GenericServiceException(exceptionMessage,
                     new Exception(exceptionMessage), exceptionMessage, StringUtils.EMPTY, CLASS_NAME, methodName);
         }
-        if (CollectionUtils.isEmpty(newCaseData.getRespondentCollection())
-                || CollectionUtils.isEmpty(oldCaseData.getRespondentCollection())) {
-            String exceptionMessage = CollectionUtils.isEmpty(newCaseData.getRespondentCollection())
-                    ? String.format(EXCEPTION_NEW_RESPONDENT_COLLECTION_IS_EMPTY,
-                    callbackRequest.getCaseDetailsBefore().getCaseId())
-                    : String.format(EXCEPTION_OLD_RESPONDENT_COLLECTION_IS_EMPTY,
-                    callbackRequest.getCaseDetailsBefore().getCaseId());
+        if (CallbackObjectUtils.isAnyEmpty(newCaseData.getRespondentCollection(),
+                oldCaseData.getRespondentCollection())) {
+            String exceptionMessage = LoggingUtils.resolveMessageByPresence(newCaseData.getRespondentCollection(),
+                    String.format(EXCEPTION_NEW_RESPONDENT_COLLECTION_IS_EMPTY,
+                    callbackRequest.getCaseDetailsBefore().getCaseId()),
+                    String.format(EXCEPTION_OLD_RESPONDENT_COLLECTION_IS_EMPTY,
+                    callbackRequest.getCaseDetailsBefore().getCaseId()));
             throw new GenericServiceException(exceptionMessage,
                     new Exception(exceptionMessage), exceptionMessage, StringUtils.EMPTY, CLASS_NAME, methodName);
         }

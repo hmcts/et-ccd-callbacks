@@ -628,8 +628,8 @@ class NocRespondentRepresentativeServiceTest {
         representativesToRemove.add(tmpRepresentative);
         when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
         when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, CASE_ID_1)).thenReturn(null);
-        assertThat(nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(callbackRequest,
-                USER_TOKEN, representativesToRemove)).isEmpty();
+        nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(callbackRequest, USER_TOKEN,
+                representativesToRemove);
         verifyNocCcdServiceCaseAssignmentsCall(LoggerTestUtils.INTEGER_ONE);
         // when nocCcdService.getCaseAssignments returns case assignments data without any case user assignments should
         // not revoke case user assignments

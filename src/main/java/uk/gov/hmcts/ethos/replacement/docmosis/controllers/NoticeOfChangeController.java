@@ -38,15 +38,13 @@ public class NoticeOfChangeController {
     private final NocRepresentativeService noCRepresentativeService;
     private final CcdCaseAssignment ccdCaseAssignment;
 
-    private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String APPLY_NOC_DECISION = "applyNocDecision";
 
     @PostMapping("/about-to-submit")
     public ResponseEntity<CCDCallbackResponse> handleAboutToSubmit(
             @RequestHeader("Authorization") String userToken,
             @RequestBody CallbackRequest callbackRequest) throws IOException {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
+        if (!verifyTokenService.isTokenSignatureValid(userToken)) {
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
         CaseData caseData = noCRepresentativeService
@@ -64,10 +62,8 @@ public class NoticeOfChangeController {
     public GenericCallbackResponse nocSubmitted(
             @RequestHeader("Authorization") String userToken,
             @RequestBody CallbackRequest callbackRequest) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-        }
 
+        verifyTokenService.isTokenSignatureValid(userToken);
         GenericCallbackResponse callbackResponse = new GenericCallbackResponse();
 
         if (APPLY_NOC_DECISION.equals(callbackRequest.getEventId())) {

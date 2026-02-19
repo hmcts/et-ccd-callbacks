@@ -310,7 +310,7 @@ final class NocUtilsTest {
 
     @Test
     @SneakyThrows
-    void theValidateCallbackRequest() {
+    void theValidateCallbackRequest_Part_1() {
         // when callback request is empty should throw EXCEPTION_CALLBACK_REQUEST_NOT_FOUND
         GenericServiceException genericServiceException = assertThrows(GenericServiceException.class,
                 () -> NocUtils.validateCallbackRequest(null));
@@ -356,9 +356,21 @@ final class NocUtilsTest {
         genericServiceException = assertThrows(GenericServiceException.class,
                 () -> NocUtils.validateCallbackRequest(callbackRequest));
         assertThat(genericServiceException.getMessage()).isEqualTo(EXPECTED_EXCEPTION_OLD_CASE_DATA_NOT_FOUND);
+    }
+
+    @Test
+    @SneakyThrows
+    void theValidateCallbackRequest_Part_2() {
+        CallbackRequest callbackRequest = CallbackRequest.builder().build();
+        callbackRequest.setCaseDetails(new CaseDetails());
+        callbackRequest.setCaseDetailsBefore(new CaseDetails());
+        callbackRequest.getCaseDetails().setCaseId(DUMMY_CASE_SUBMISSION_REFERENCE_1);
+        callbackRequest.getCaseDetailsBefore().setCaseId(DUMMY_CASE_SUBMISSION_REFERENCE_2);
+        callbackRequest.getCaseDetailsBefore().setCaseId(DUMMY_CASE_SUBMISSION_REFERENCE_1);
+        callbackRequest.getCaseDetails().setCaseData(new CaseData());
         // when new case data does not have any respondent should throw EXCEPTION_NEW_RESPONDENT_COLLECTION_IS_EMPTY
         callbackRequest.getCaseDetailsBefore().setCaseData(new CaseData());
-        genericServiceException = assertThrows(GenericServiceException.class,
+        GenericServiceException genericServiceException = assertThrows(GenericServiceException.class,
                 () -> NocUtils.validateCallbackRequest(callbackRequest));
         assertThat(genericServiceException.getMessage())
                 .isEqualTo(EXPECTED_EXCEPTION_NEW_RESPONDENT_COLLECTION_IS_EMPTY);

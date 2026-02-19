@@ -1450,7 +1450,7 @@ public final class DocumentHelper {
         return (SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)
             && isNotEmpty(scotlandLetterType)
             && defaultIfEmpty(scotlandLetterType.getTopLevelScotDocuments(), "").contains(ECC_DOCUMENT_SCOT_TEMPLATE)
-            && !defaultIfEmpty(scotlandLetterType.getPart3ScotDocuments(), "").equals("19"))
+            && !"19".equals(defaultIfEmpty(scotlandLetterType.getPart3ScotDocuments(), "")))
             || (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId)
             && isNotEmpty(ewLetterType)
             && defaultIfEmpty(ewLetterType.getTopLevelDocuments(), "").contains(ECC_DOCUMENT_ENG_TEMPLATE)

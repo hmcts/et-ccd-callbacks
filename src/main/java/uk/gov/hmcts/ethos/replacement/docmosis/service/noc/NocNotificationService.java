@@ -238,12 +238,12 @@ public class NocNotificationService {
      * Sends a notification to a respondent organisation when a respondent’s
      * representative has been added or removed via a Notice of Change (NoC).
      *
-     * <p>The notification is sent to the organisation’s super user email address,
+     * <p>The notification is sent to the organisation’s superuser email address,
      * provided that:</p>
      * <ul>
      *   <li>The case contains sufficient data for notifications</li>
      *   <li>The representative is associated with a valid organisation</li>
-     *   <li>The organisation lookup is successful and a super user email is available</li>
+     *   <li>The organisation lookup is successful and a superuser email is available</li>
      * </ul>
      *
      * <p>The notification template and personalisation differ depending on
@@ -442,19 +442,30 @@ public class NocNotificationService {
         }
     }
 
-    private void sendEmailToOldOrgAdmin(String orgId, CaseData caseDataPrevious) {
+    private RetrieveOrgByIdResponse getOrganisationResponse(String orgId, boolean isNewOrg) {
         ResponseEntity<RetrieveOrgByIdResponse> getOrgResponse = getOrganisationById(orgId);
         HttpStatusCode statusCode = getOrgResponse.getStatusCode();
         if (!HttpStatus.OK.equals(statusCode)) {
-            log.error("Cannot retrieve old org by id {} [{}] {}", orgId, statusCode, getOrgResponse.getBody());
-            return;
+            String orgType = isNewOrg ? "new" : "old";
+            log.error("Cannot retrieve {} org by id {} [{}] {}", orgType, orgId, statusCode, getOrgResponse.getBody());
+            return null;
         }
         RetrieveOrgByIdResponse resBody = getOrgResponse.getBody();
         if (resBody == null) {
-            return;
+            return null;
         }
         if (resBody.getSuperUser() == null || isNullOrEmpty(resBody.getSuperUser().getEmail())) {
-            log.warn("Previous Org {} is missing org admin email", orgId);
+            String orgType = isNewOrg ? "New" : "Previous";
+            log.warn("{} Org {} is missing org admin email", orgType, orgId);
+            return null;
+        }
+        return resBody;
+    }
+
+    private void sendEmailToOldOrgAdmin(String orgId, CaseData caseDataPrevious) {
+
+        RetrieveOrgByIdResponse resBody = getOrganisationResponse(orgId, false);
+        if (ObjectUtils.isEmpty(resBody)) {
             return;
         }
         Map<String, String> personalisation = buildPreviousRespondentSolicitorPersonalisation(caseDataPrevious);
@@ -469,23 +480,10 @@ public class NocNotificationService {
     }
 
     private void sendEmailToNewOrgAdmin(String orgId, CaseDetails caseDetailsNew, String partyName) {
-        ResponseEntity<RetrieveOrgByIdResponse> getOrgResponse = getOrganisationById(orgId);
-        HttpStatusCode statusCode = getOrgResponse.getStatusCode();
-        if (!HttpStatus.OK.equals(statusCode)) {
-            log.error("Cannot retrieve new org by id {} [{}] {}", orgId, statusCode, getOrgResponse.getBody());
+        RetrieveOrgByIdResponse resBody = getOrganisationResponse(orgId, true);
+        if (ObjectUtils.isEmpty(resBody)) {
             return;
         }
-
-        RetrieveOrgByIdResponse resBody = getOrgResponse.getBody();
-        if (resBody == null) {
-            return;
-        }
-
-        if (resBody.getSuperUser() == null || isNullOrEmpty(resBody.getSuperUser().getEmail())) {
-            log.warn("New Org {} is missing org admin email", orgId);
-            return;
-        }
-
         String citUrl = emailService.getCitizenCaseLink(caseDetailsNew.getCaseId());
         Map<String, String> personalisation = buildPersonalisationWithPartyName(caseDetailsNew, partyName, citUrl);
         emailService.sendEmail(newRespondentSolicitorTemplateId, resBody.getSuperUser().getEmail(), personalisation);

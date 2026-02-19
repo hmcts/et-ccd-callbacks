@@ -97,7 +97,7 @@ public final class NocNotificationHelper {
         addCommonValues(caseData, personalisation);
         personalisation.put("respondent_name", partyName);
         personalisation.put("ccdId", detail.getCaseId());
-        personalisation.put("date", "Not set");
+        personalisation.put("date", NOT_SET);
 
         String nextHearingDate = HearingsHelper.getEarliestFutureHearingDate(caseData.getHearingCollection());
 

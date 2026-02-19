@@ -120,13 +120,14 @@ class NocNotificationHelperTest {
 
         Map<String, String> claimantPersonalisation =
             NocNotificationHelper.buildPersonalisationWithPartyName(caseDetails, PARTY_NAME, LINK_TO_CIT_UI);
-        assertThat(claimantPersonalisation).hasSize(LoggerTestUtils.INTEGER_SIX);
-        assertThat(claimantPersonalisation).containsEntry(FIELD_PARTY_NAME, PARTY_NAME);
-        assertThat(claimantPersonalisation).containsEntry(FIELD_CCD_ID, CASE_ID);
-        assertThat(claimantPersonalisation).containsEntry(FIELD_CLAIMANT, CLAIMANT);
-        assertThat(claimantPersonalisation).containsEntry(FIELD_LIST_OF_RESPONDENTS, LIST_OF_RESPONDENTS);
-        assertThat(claimantPersonalisation).containsEntry(FIELD_CASE_NUMBER, CASE_NUMBER);
-        assertThat(claimantPersonalisation).containsEntry(FIELD_LINK_TO_CIT_UI, LINK_TO_CIT_UI);
+        assertThat(claimantPersonalisation)
+                .hasSize(LoggerTestUtils.INTEGER_SIX)
+                .containsEntry(FIELD_PARTY_NAME, PARTY_NAME)
+                .containsEntry(FIELD_CCD_ID, CASE_ID)
+                .containsEntry(FIELD_CLAIMANT, CLAIMANT)
+                .containsEntry(FIELD_LIST_OF_RESPONDENTS, LIST_OF_RESPONDENTS)
+                .containsEntry(FIELD_CASE_NUMBER, CASE_NUMBER)
+                .containsEntry(FIELD_LINK_TO_CIT_UI, LINK_TO_CIT_UI);
     }
 
     @Test
@@ -152,8 +153,8 @@ class NocNotificationHelperTest {
     @Test
     void testBuildTribunalPersonalisation() {
         Map<String, String> claimantPersonalisation = NocNotificationHelper.buildTribunalPersonalisation(caseData);
-        assertThat(claimantPersonalisation).hasSize(LoggerTestUtils.INTEGER_FIVE);
-        assertThat(claimantPersonalisation).containsEntry(FIELD_HEARING_DATE, HEARING_DATE);
+        assertThat(claimantPersonalisation).hasSize(LoggerTestUtils.INTEGER_FIVE)
+                .containsEntry(FIELD_HEARING_DATE, HEARING_DATE);
         for (String value : claimantPersonalisation.values()) {
             assertThat(value).isNotNull();
         }
@@ -163,8 +164,8 @@ class NocNotificationHelperTest {
     void testBuildTribunalPersonalisationWithHearingDate() {
         caseData.setHearingCollection(new ArrayList<>());
         Map<String, String> claimantPersonalisation = NocNotificationHelper.buildTribunalPersonalisation(caseData);
-        assertThat(claimantPersonalisation).hasSize(LoggerTestUtils.INTEGER_FIVE);
-        assertThat(claimantPersonalisation).containsEntry(FIELD_HEARING_DATE, NOT_SET);
+        assertThat(claimantPersonalisation).hasSize(LoggerTestUtils.INTEGER_FIVE)
+                .containsEntry(FIELD_HEARING_DATE, NOT_SET);
         for (String value : claimantPersonalisation.values()) {
             assertThat(value).isNotNull();
         }

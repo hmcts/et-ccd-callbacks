@@ -358,9 +358,9 @@ class NocNotificationServiceTest {
         // when respondent is empty should not send email and log respondent email not found warning
         RespondentSumType respondentSumType = new RespondentSumType();
         respondentSumType.setRespondentEmail(RESPONDENT_EMAIL);
-        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
-        respondentSumTypeItem.setValue(respondentSumType);
-        caseData.setRespondentCollection(List.of(respondentSumTypeItem));
+        RespondentSumTypeItem tmpRespondentSumTypeItem = new RespondentSumTypeItem();
+        tmpRespondentSumTypeItem.setValue(respondentSumType);
+        caseData.setRespondentCollection(List.of(tmpRespondentSumTypeItem));
         nocNotificationService.notifyRespondentOfRepresentativeUpdate(caseDetails, null);
         LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_SIX, EXPECTED_WARNING_INVALID_RESPONDENT);
         // when respondent not has email should not send email and log respondent email not found warning

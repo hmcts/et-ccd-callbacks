@@ -87,7 +87,6 @@ public final class DocumentHelper {
     private static final Double DOUBLE_ONE = 1d;
     private static final List<String> EW_ECC_REJECTION_SECTIONS = List.of("3.1", "3.2", "3.3", "3.4", "3.5",
         "3.6", "3.7", "3.22", "3.23");
-    private static final List<String> SCOT_ECC_REJECTION_SECTIONS = List.of("19");
 
     private DocumentHelper() {
     }
@@ -1451,7 +1450,7 @@ public final class DocumentHelper {
         return (SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)
             && isNotEmpty(scotlandLetterType)
             && defaultIfEmpty(scotlandLetterType.getTopLevelScotDocuments(), "").contains(ECC_DOCUMENT_SCOT_TEMPLATE)
-            && !SCOT_ECC_REJECTION_SECTIONS.contains(defaultIfEmpty(scotlandLetterType.getPart3ScotDocuments(), "")))
+            && !defaultIfEmpty(scotlandLetterType.getPart3ScotDocuments(), "").equals("19"))
             || (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId)
             && isNotEmpty(ewLetterType)
             && defaultIfEmpty(ewLetterType.getTopLevelDocuments(), "").contains(ECC_DOCUMENT_ENG_TEMPLATE)

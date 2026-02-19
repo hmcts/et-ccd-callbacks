@@ -124,7 +124,7 @@ public class NocRespondentHelper {
      *     <li>a {@code respRepName} equal to the respondent's name</li>
      * </ul>
      * When an unmatched respondent is found, their representation is cleared by invoking
-     * {@link #resetRepresentation(RespondentSumTypeItem, String)}.
+     * {@link #resetRepresentation(RespondentSumTypeItem)}.
      * <p>
      * Invalid or incomplete respondent and representative entries are safely skipped.
      * No action is taken if the case contains no respondents or no representatives.
@@ -157,45 +157,23 @@ public class NocRespondentHelper {
                     );
 
             if (!hasMatchingRepresentative) {
-                resetRepresentation(respondent, caseData.getCcdID());
+                resetRepresentation(respondent);
             }
         }
     }
 
     /**
-     * Resets the representation details for the specified respondent within a case by
-     * clearing all representation-related fields and marking the respondent as no longer
-     * represented.
-     * <p>
-     * Before applying the reset, this method performs strict validation on the provided
-     * respondent using {@link RespondentUtils#validateRespondent(RespondentSumTypeItem, String)}.
-     * The validation ensures that:
-     * <ul>
-     *     <li>The respondent object itself is not null.</li>
-     *     <li>The respondent has a non-blank identifier.</li>
-     *     <li>The respondent contains a non-null value object.</li>
-     *     <li>The respondent has a non-null and non-empty respondent name.</li>
-     * </ul>
-     * If any of these conditions fail, a {@link GenericServiceException} is thrown with
-     * a descriptive, case-specific error message.
-     * <p>
-     * Once validation succeeds, this method:
-     * <ul>
-     *     <li>Marks the respondent as having a representative removed ({@code YES}).</li>
-     *     <li>Marks the respondent as not represented ({@code NO}).</li>
-     *     <li>Clears the associated representative identifier by setting it to {@code null}.</li>
-     * </ul>
-     * This method is typically invoked when a respondent’s representation is withdrawn,
-     * terminated, or otherwise needs to be fully removed from the case.
+     * Resets the representation status of the given respondent.
      *
-     * @param respondent          the respondent whose representation information is being reset
-     * @param caseReferenceNumber the CCD case reference number associated with the operation
-     * @throws GenericServiceException if the respondent fails validation or if the
-     *                                 representation cannot be reset
+     * <p>This method marks the representative as removed, sets the respondent as no longer represented,
+     * and clears any associated representative ID.</p>
+     *
+     * <p>It is assumed that the {@code respondent} is not {@code null} and that
+     * {@code respondent.getValue()} is not {@code null}.</p>
+     *
+     * @param respondent the {@link RespondentSumTypeItem} whose representation details are to be reset
      */
-    public static void resetRepresentation(RespondentSumTypeItem respondent,
-                                         String caseReferenceNumber) throws GenericServiceException {
-        RespondentUtils.validateRespondent(respondent, caseReferenceNumber);
+    public static void resetRepresentation(RespondentSumTypeItem respondent) {
         respondent.getValue().setRepresentativeRemoved(YES);
         respondent.getValue().setRepresented(NO);
         respondent.getValue().setRepresentativeId(null);

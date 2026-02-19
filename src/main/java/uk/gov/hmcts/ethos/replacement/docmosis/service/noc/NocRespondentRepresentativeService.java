@@ -388,9 +388,6 @@ public class NocRespondentRepresentativeService {
      */
     public List<RepresentedTypeRItem> findRepresentativesToAssign(CaseDetails caseDetails,
                                                                   List<RepresentedTypeRItem> representatives) {
-        if (CollectionUtils.isEmpty(representatives)) {
-            return new ArrayList<>();
-        }
         List<RepresentedTypeRItem> assignableRepresentatives = RespondentRepresentativeUtils
                 .filterModifiableRepresentatives(representatives);
         if (!RespondentRepresentativeUtils.hasValidAssignmentContext(assignableRepresentatives, caseDetails)) {

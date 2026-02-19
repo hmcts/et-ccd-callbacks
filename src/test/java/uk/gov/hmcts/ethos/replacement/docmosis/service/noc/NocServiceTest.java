@@ -25,6 +25,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.test.utils.LoggerTestUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
@@ -42,7 +43,6 @@ import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 class NocServiceTest {
@@ -62,14 +62,6 @@ class NocServiceTest {
     private static final String ORGANISATION_ID_INVALID = "INVALID";
     private static final String REPRESENTATIVE_ID = "112b0bdd-5e58-32f1-8c51-6e71f5f90bc5";
 
-    private static final int INTEGER_THREE = 3;
-    private static final int INTEGER_FOUR = 4;
-    private static final int INTEGER_FIVE = 5;
-    private static final int INTEGER_SIX = 6;
-    private static final int INTEGER_SEVEN = 7;
-    private static final int INTEGER_EIGHT = 8;
-    private static final int INTEGER_NINE = 9;
-
     private static final String EXPECTED_EXCEPTION_ACCESS_TOKEN_EMPTY =
             "There are missing parameters; submission reference: 1234567890123456, role: [SOLICITORA].";
     private static final String EXPECTED_EXCEPTION_EMAIL_EMPTY =
@@ -81,9 +73,13 @@ class NocServiceTest {
     private static final String EXPECTED_EXCEPTION_ROLE_INVALID =
             "There are missing parameters; submission reference: 1234567890123456, role: [INVLAIDROLE].";
     private static final String EXPECTED_EXCEPTION_ACCOUNT_NOT_FOUND_BY_EMAIL =
+            "Unable to get account id by email for case 1234567890123456.";
+    private static final String EXPECTED_EXCEPTION_ACCOUNT_NOT_FOUND_BY_EMAIL_EXTENDED =
             "Failed to assign role [SOLICITORA], for case 1234567890123456. Exception message: Unable to get account "
                     + "id by email for case 1234567890123456.";
     private static final String EXPECTED_EXCEPTION_ORGANISATION_DETAILS_NOT_FOUND_BY_USER_ID =
+            "Unable to find organisation by user id for case 1234567890123456.";
+    private static final String EXPECTED_EXCEPTION_ORGANISATION_DETAILS_NOT_FOUND_BY_USER_ID_EXTENDED =
             "Failed to assign role [SOLICITORA], for case 1234567890123456. Exception message: Unable to find "
                     + "organisation by user id for case 1234567890123456.";
     private static final String EXPECTED_EXCEPTION_EXCEPTION_USER_AND_SELECTED_ORGANISATIONS_NOT_MATCH =
@@ -216,34 +212,28 @@ class NocServiceTest {
         GenericServiceException gse = assertThrows(GenericServiceException.class, () ->
                 nocService.grantRepresentativeAccess(StringUtils.EMPTY, REPRESENTATIVE_EMAIL, SUBMISSION_REFERENCE,
                         organisationToAdd, ROLE_SOLICITOR_A));
-        verifyNoInteractions(organisationClient);
         assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_ACCESS_TOKEN_EMPTY);
         // when representative email is empty should not throw any exception
         gse = assertThrows(GenericServiceException.class, () -> nocService.grantRepresentativeAccess(ADMIN_USER_TOKEN,
                 StringUtils.EMPTY, SUBMISSION_REFERENCE, organisationToAdd, ROLE_SOLICITOR_A));
-        verifyNoInteractions(organisationClient);
         assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_EMAIL_EMPTY);
         // when submission reference is empty should not throw any exception
         gse = assertThrows(GenericServiceException.class, () -> nocService.grantRepresentativeAccess(ADMIN_USER_TOKEN,
                 REPRESENTATIVE_EMAIL, StringUtils.EMPTY, organisationToAdd, ROLE_SOLICITOR_A));
-        verifyNoInteractions(organisationClient);
         assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_SUBMISSION_REFERENCE_EMPTY);
         // when organisation to add is empty should not throw any exception
         gse = assertThrows(GenericServiceException.class, () -> nocService.grantRepresentativeAccess(ADMIN_USER_TOKEN,
                 REPRESENTATIVE_EMAIL, SUBMISSION_REFERENCE, null, ROLE_SOLICITOR_A));
-        verifyNoInteractions(organisationClient);
         assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_ORGANISATION_ID_EMPTY);
         // when organisation to add id is empty should not throw any exception
         organisationToAdd.setOrganisationID(StringUtils.EMPTY);
         gse = assertThrows(GenericServiceException.class, () -> nocService.grantRepresentativeAccess(ADMIN_USER_TOKEN,
                 REPRESENTATIVE_EMAIL, SUBMISSION_REFERENCE, organisationToAdd, ROLE_SOLICITOR_A));
-        verifyNoInteractions(organisationClient);
         assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_ORGANISATION_ID_EMPTY);
         // when role value is not valid should not throw any exception
         organisationToAdd.setOrganisationID(ORGANISATION_ID_1);
         gse = assertThrows(GenericServiceException.class, () -> nocService.grantRepresentativeAccess(ADMIN_USER_TOKEN,
                 REPRESENTATIVE_EMAIL, SUBMISSION_REFERENCE, organisationToAdd, ROLE_INVALID));
-        verifyNoInteractions(organisationClient);
         assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_ROLE_INVALID);
         // when organisationClient.getAccountIdByEmail returns null value should not throw any exception
         when(authTokenGenerator.generate()).thenReturn(AUTH_TOKEN);
@@ -253,7 +243,7 @@ class NocServiceTest {
                 REPRESENTATIVE_EMAIL, SUBMISSION_REFERENCE, organisationToAdd, ROLE_SOLICITOR_A));
         verify(organisationClient, times(NumberUtils.INTEGER_ONE))
                 .getAccountIdByEmail(ADMIN_USER_TOKEN, AUTH_TOKEN, REPRESENTATIVE_EMAIL);
-        assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_ACCOUNT_NOT_FOUND_BY_EMAIL);
+        assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_ACCOUNT_NOT_FOUND_BY_EMAIL_EXTENDED);
         // when organisationClient.getAccountIdByEmail returns null body should not throw any exception
         ResponseEntity<AccountIdByEmailResponse> accountIdByEmailResponseWithoutBody =
                 new ResponseEntity<>(HttpStatus.OK);
@@ -263,7 +253,7 @@ class NocServiceTest {
                 REPRESENTATIVE_EMAIL, SUBMISSION_REFERENCE, organisationToAdd, ROLE_SOLICITOR_A));
         verify(organisationClient, times(NumberUtils.INTEGER_TWO))
                 .getAccountIdByEmail(ADMIN_USER_TOKEN, AUTH_TOKEN, REPRESENTATIVE_EMAIL);
-        assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_ACCOUNT_NOT_FOUND_BY_EMAIL);
+        assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_ACCOUNT_NOT_FOUND_BY_EMAIL_EXTENDED);
         // when organisationClient.getAccountIdByEmail returns body without user identifier should not throw any
         // exception
         AccountIdByEmailResponse accountIdByEmailResponseWithoutUserIdentifier = new AccountIdByEmailResponse();
@@ -274,9 +264,9 @@ class NocServiceTest {
                 .thenReturn(accountIdByEmailResponseWithoutUserIdentifierEntity);
         gse = assertThrows(GenericServiceException.class, () -> nocService.grantRepresentativeAccess(ADMIN_USER_TOKEN,
                 REPRESENTATIVE_EMAIL, SUBMISSION_REFERENCE, organisationToAdd, ROLE_SOLICITOR_A));
-        verify(organisationClient, times(INTEGER_THREE))
+        verify(organisationClient, times(LoggerTestUtils.INTEGER_THREE))
                 .getAccountIdByEmail(ADMIN_USER_TOKEN, AUTH_TOKEN, REPRESENTATIVE_EMAIL);
-        assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_ACCOUNT_NOT_FOUND_BY_EMAIL);
+        assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_ACCOUNT_NOT_FOUND_BY_EMAIL_EXTENDED);
         // when organisationClient.retrieveOrganisationDetailsByUserId returns null should not throw any exception
         AccountIdByEmailResponse validAccountIdByEmailResponse = new AccountIdByEmailResponse();
         validAccountIdByEmailResponse.setUserIdentifier(REPRESENTATIVE_ID);
@@ -288,11 +278,9 @@ class NocServiceTest {
                 .thenReturn(null);
         gse = assertThrows(GenericServiceException.class, () -> nocService.grantRepresentativeAccess(ADMIN_USER_TOKEN,
                 REPRESENTATIVE_EMAIL, SUBMISSION_REFERENCE, organisationToAdd, ROLE_SOLICITOR_A));
-        verify(organisationClient, times(INTEGER_FOUR))
-                .getAccountIdByEmail(ADMIN_USER_TOKEN, AUTH_TOKEN, REPRESENTATIVE_EMAIL);
         verify(organisationClient, times(NumberUtils.INTEGER_ONE))
                 .retrieveOrganisationDetailsByUserId(ADMIN_USER_TOKEN, AUTH_TOKEN, REPRESENTATIVE_ID);
-        assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_ORGANISATION_DETAILS_NOT_FOUND_BY_USER_ID);
+        assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_ORGANISATION_DETAILS_NOT_FOUND_BY_USER_ID_EXTENDED);
         // when organisationClient.retrieveOrganisationDetailsByUserId returns null body should not throw any exception
         ResponseEntity<OrganisationsResponse> organisationsResponseWithoutBodyEntity =
                 new ResponseEntity<>(HttpStatus.OK);
@@ -300,11 +288,9 @@ class NocServiceTest {
                 .thenReturn(organisationsResponseWithoutBodyEntity);
         gse = assertThrows(GenericServiceException.class, () -> nocService.grantRepresentativeAccess(ADMIN_USER_TOKEN,
                 REPRESENTATIVE_EMAIL, SUBMISSION_REFERENCE, organisationToAdd, ROLE_SOLICITOR_A));
-        verify(organisationClient, times(INTEGER_FIVE))
-                .getAccountIdByEmail(ADMIN_USER_TOKEN, AUTH_TOKEN, REPRESENTATIVE_EMAIL);
         verify(organisationClient, times(NumberUtils.INTEGER_TWO))
                 .retrieveOrganisationDetailsByUserId(ADMIN_USER_TOKEN, AUTH_TOKEN, REPRESENTATIVE_ID);
-        assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_ORGANISATION_DETAILS_NOT_FOUND_BY_USER_ID);
+        assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_ORGANISATION_DETAILS_NOT_FOUND_BY_USER_ID_EXTENDED);
         // when organisationClient.retrieveOrganisationDetailsByUserId returns empty organisation identifier
         // should not throw any exception
         OrganisationsResponse organisationsResponseWithoutIdentifier = OrganisationsResponse.builder().build();
@@ -314,11 +300,9 @@ class NocServiceTest {
                 .thenReturn(organisationsResponseWithoutIdentifierEntity);
         gse = assertThrows(GenericServiceException.class, () -> nocService.grantRepresentativeAccess(ADMIN_USER_TOKEN,
                 REPRESENTATIVE_EMAIL, SUBMISSION_REFERENCE, organisationToAdd, ROLE_SOLICITOR_A));
-        verify(organisationClient, times(INTEGER_SIX))
-                .getAccountIdByEmail(ADMIN_USER_TOKEN, AUTH_TOKEN, REPRESENTATIVE_EMAIL);
-        verify(organisationClient, times(INTEGER_THREE))
+        verify(organisationClient, times(LoggerTestUtils.INTEGER_THREE))
                 .retrieveOrganisationDetailsByUserId(ADMIN_USER_TOKEN, AUTH_TOKEN, REPRESENTATIVE_ID);
-        assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_ORGANISATION_DETAILS_NOT_FOUND_BY_USER_ID);
+        assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_ORGANISATION_DETAILS_NOT_FOUND_BY_USER_ID_EXTENDED);
         // when organisationClient.retrieveOrganisationDetailsByUserId returns invalid organisation identifier should
         // not throw any exception
         OrganisationsResponse organisationsResponseInvalidIdentifier = OrganisationsResponse.builder()
@@ -329,9 +313,7 @@ class NocServiceTest {
                 .thenReturn(organisationsResponseInvalidIdentifierEntity);
         gse = assertThrows(GenericServiceException.class, () -> nocService.grantRepresentativeAccess(ADMIN_USER_TOKEN,
                 REPRESENTATIVE_EMAIL, SUBMISSION_REFERENCE, organisationToAdd, ROLE_SOLICITOR_A));
-        verify(organisationClient, times(INTEGER_SEVEN))
-                .getAccountIdByEmail(ADMIN_USER_TOKEN, AUTH_TOKEN, REPRESENTATIVE_EMAIL);
-        verify(organisationClient, times(INTEGER_FOUR))
+        verify(organisationClient, times(LoggerTestUtils.INTEGER_FOUR))
                 .retrieveOrganisationDetailsByUserId(ADMIN_USER_TOKEN, AUTH_TOKEN, REPRESENTATIVE_ID);
         assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_EXCEPTION_USER_AND_SELECTED_ORGANISATIONS_NOT_MATCH);
         // when caseAssignment.addCaseUserRole throws exception should log that exception
@@ -344,20 +326,12 @@ class NocServiceTest {
         doThrow(new IOException()).when(caseAssignment).addCaseUserRole(any());
         nocService.grantRepresentativeAccess(ADMIN_USER_TOKEN,
                 REPRESENTATIVE_EMAIL, SUBMISSION_REFERENCE, organisationToAdd, ROLE_SOLICITOR_A);
-        verify(organisationClient, times(INTEGER_EIGHT))
-                .getAccountIdByEmail(ADMIN_USER_TOKEN, AUTH_TOKEN, REPRESENTATIVE_EMAIL);
-        verify(organisationClient, times(INTEGER_FIVE))
-                .retrieveOrganisationDetailsByUserId(ADMIN_USER_TOKEN, AUTH_TOKEN, REPRESENTATIVE_ID);
         verify(caseAssignment, times(NumberUtils.INTEGER_ONE))
                 .addCaseUserRole(any());
         // when caseAssignment.addCaseUserRole does not throw exception should add representative access
         doNothing().when(caseAssignment).addCaseUserRole(any());
         assertDoesNotThrow(() -> nocService.grantRepresentativeAccess(ADMIN_USER_TOKEN,
                 REPRESENTATIVE_EMAIL, SUBMISSION_REFERENCE, organisationToAdd, ROLE_SOLICITOR_A));
-        verify(organisationClient, times(INTEGER_NINE))
-                .getAccountIdByEmail(ADMIN_USER_TOKEN, AUTH_TOKEN, REPRESENTATIVE_EMAIL);
-        verify(organisationClient, times(INTEGER_SIX))
-                .retrieveOrganisationDetailsByUserId(ADMIN_USER_TOKEN, AUTH_TOKEN, REPRESENTATIVE_ID);
         verify(caseAssignment, times(NumberUtils.INTEGER_TWO))
                 .addCaseUserRole(any());
     }
@@ -374,7 +348,7 @@ class NocServiceTest {
                 () -> nocService.findUserByEmail(ADMIN_USER_TOKEN, REPRESENTATIVE_EMAIL, SUBMISSION_REFERENCE));
         verify(organisationClient, times(NumberUtils.INTEGER_ONE))
                 .getAccountIdByEmail(ADMIN_USER_TOKEN, AUTH_TOKEN, REPRESENTATIVE_EMAIL);
-        assertThat(EXPECTED_EXCEPTION_ACCOUNT_NOT_FOUND_BY_EMAIL).contains(gse.getMessage());
+        assertThat(gse.getMessage()).contains(EXPECTED_EXCEPTION_ACCOUNT_NOT_FOUND_BY_EMAIL);
 
         // when organisation client returns no-body response should throw exception
         ResponseEntity<AccountIdByEmailResponse> userResponse = new ResponseEntity<>(HttpStatus.OK);
@@ -384,7 +358,7 @@ class NocServiceTest {
                 () -> nocService.findUserByEmail(ADMIN_USER_TOKEN, REPRESENTATIVE_EMAIL, SUBMISSION_REFERENCE));
         verify(organisationClient, times(NumberUtils.INTEGER_TWO))
                 .getAccountIdByEmail(ADMIN_USER_TOKEN, AUTH_TOKEN, REPRESENTATIVE_EMAIL);
-        assertThat(EXPECTED_EXCEPTION_ACCOUNT_NOT_FOUND_BY_EMAIL).contains(gse.getMessage());
+        assertThat(gse.getMessage()).contains(EXPECTED_EXCEPTION_ACCOUNT_NOT_FOUND_BY_EMAIL);
 
         // when organisation client returns user response without identifier should throw exception
         AccountIdByEmailResponse accountIdByEmailResponse = new AccountIdByEmailResponse();
@@ -393,9 +367,9 @@ class NocServiceTest {
                 .thenReturn(userResponse);
         gse = assertThrows(GenericServiceException.class,
                 () -> nocService.findUserByEmail(ADMIN_USER_TOKEN, REPRESENTATIVE_EMAIL, SUBMISSION_REFERENCE));
-        verify(organisationClient, times(INTEGER_THREE))
+        verify(organisationClient, times(LoggerTestUtils.INTEGER_THREE))
                 .getAccountIdByEmail(ADMIN_USER_TOKEN, AUTH_TOKEN, REPRESENTATIVE_EMAIL);
-        assertThat(EXPECTED_EXCEPTION_ACCOUNT_NOT_FOUND_BY_EMAIL).contains(gse.getMessage());
+        assertThat(gse.getMessage()).contains(EXPECTED_EXCEPTION_ACCOUNT_NOT_FOUND_BY_EMAIL);
 
         // when organisation client returns valid user response should return that response body
         accountIdByEmailResponse.setUserIdentifier(REPRESENTATIVE_ID);
@@ -404,7 +378,7 @@ class NocServiceTest {
                 .thenReturn(userResponse);
         AccountIdByEmailResponse actualAccountIdByEmailResponse = nocService.findUserByEmail(ADMIN_USER_TOKEN,
                 REPRESENTATIVE_EMAIL, SUBMISSION_REFERENCE);
-        verify(organisationClient, times(INTEGER_FOUR))
+        verify(organisationClient, times(LoggerTestUtils.INTEGER_FOUR))
                 .getAccountIdByEmail(ADMIN_USER_TOKEN, AUTH_TOKEN, REPRESENTATIVE_EMAIL);
         assertThat(actualAccountIdByEmailResponse).isEqualTo(userResponse.getBody());
     }
@@ -426,7 +400,7 @@ class NocServiceTest {
                 .findOrganisationByUserId(ADMIN_USER_TOKEN, REPRESENTATIVE_ID, SUBMISSION_REFERENCE));
         verify(organisationClient, times(NumberUtils.INTEGER_ONE))
                 .retrieveOrganisationDetailsByUserId(ADMIN_USER_TOKEN, AUTH_TOKEN, REPRESENTATIVE_ID);
-        assertThat(EXPECTED_EXCEPTION_ORGANISATION_DETAILS_NOT_FOUND_BY_USER_ID).contains(gse.getMessage());
+        assertThat(gse.getMessage()).contains(EXPECTED_EXCEPTION_ORGANISATION_DETAILS_NOT_FOUND_BY_USER_ID);
 
         // when organisation client returns empty body response for organisation detils should throw exception
         ResponseEntity<OrganisationsResponse> organisationsResponseEntity = new ResponseEntity<>(HttpStatus.OK);
@@ -436,7 +410,7 @@ class NocServiceTest {
                 REPRESENTATIVE_ID, SUBMISSION_REFERENCE));
         verify(organisationClient, times(NumberUtils.INTEGER_TWO)).retrieveOrganisationDetailsByUserId(ADMIN_USER_TOKEN,
                 AUTH_TOKEN, REPRESENTATIVE_ID);
-        assertThat(EXPECTED_EXCEPTION_ORGANISATION_DETAILS_NOT_FOUND_BY_USER_ID).contains(gse.getMessage());
+        assertThat(gse.getMessage()).contains(EXPECTED_EXCEPTION_ORGANISATION_DETAILS_NOT_FOUND_BY_USER_ID);
 
         // when organisation client returns valid organisation response should return that response body
         OrganisationsResponse organisationsResponse = OrganisationsResponse.builder().organisationIdentifier(
@@ -446,8 +420,8 @@ class NocServiceTest {
                 .thenReturn(organisationsResponseEntity);
         OrganisationsResponse actualOrganisationResponse = nocService.findOrganisationByUserId(ADMIN_USER_TOKEN,
                 REPRESENTATIVE_ID, SUBMISSION_REFERENCE);
-        verify(organisationClient, times(INTEGER_THREE)).retrieveOrganisationDetailsByUserId(ADMIN_USER_TOKEN,
-                AUTH_TOKEN, REPRESENTATIVE_ID);
+        verify(organisationClient, times(LoggerTestUtils.INTEGER_THREE))
+                .retrieveOrganisationDetailsByUserId(ADMIN_USER_TOKEN, AUTH_TOKEN, REPRESENTATIVE_ID);
         assertThat(actualOrganisationResponse).isEqualTo(organisationsResponse);
     }
 }

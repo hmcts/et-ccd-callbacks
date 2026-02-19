@@ -8,7 +8,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class ClaimantUtilsTest {
+final class ClaimantUtilsTest {
 
     private static final String CLAIMANT_EMAIL = "claimant@hmcts.org";
 

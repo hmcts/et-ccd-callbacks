@@ -203,7 +203,7 @@ final class RoleUtilsTest {
     }
 
     @Test
-    public void theFindRespondentRepresentativeRole() {
+    void theFindRespondentRepresentativeRole() {
         // when representative is empty should return empty string
         CaseData caseData = new CaseData();
         assertThat(RoleUtils.findRespondentRepresentativeRole(null, caseData)).isEqualTo(StringUtils.EMPTY);

@@ -15,7 +15,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ClaimantRepresentativeUtilsTest {
+final class ClaimantRepresentativeUtilsTest {
 
     private static final String CASE_ID = "1234567890123456";
     private static final String CLAIMANT_EMAIL_ADDRESS = "claimant@email.com";

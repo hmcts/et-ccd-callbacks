@@ -48,7 +48,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceC
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.CASE_DATA_NOT_FOUND_EXCEPTION_MESSAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.STRING_EMPTY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormMapper.mapEt3Form;
-import static uk.gov.hmcts.ethos.replacement.docmosis.utils.LoggingUtil.logException;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.LoggingUtils.logException;
 
 /**
  * Service to support ET3 Response journey. Contains methods for generating and saving ET3 Response documents.

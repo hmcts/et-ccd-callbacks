@@ -34,7 +34,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.OrganisationUtils;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.ClaimantRepresentativeUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.NocUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.RespondentRepresentativeUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.RoleUtils;
@@ -544,61 +543,21 @@ public class NocRespondentRepresentativeService {
         }
     }
 
-    /**
-     * Removes the claimant representative from the case if the same organisation
-     * already exists as a respondent representative.
-     *
-     * <p>This method performs a series of validation checks before attempting removal:
-     * <ul>
-     *     <li>Ensures {@code caseDetails}, {@code caseId}, and {@code caseData} are not null or empty.</li>
-     *     <li>Verifies that a claimant is marked as represented ({@code YES}).</li>
-     *     <li>Ensures claimant representative details and organisation identifiers are present
-     *     (either via {@code MyHmctsOrganisation.organisationID} or {@code organisationId}).</li>
-     *     <li>Ensures that respondent representatives exist on the case.</li>
-     * </ul>
-     *
-     * <p>If the claimant representative's organisation ID matches any organisation ID
-     * in the respondent representatives list, the claimant representation is removed
-     * using {@code nocCcdService.removeClaimantRepresentation(...)} with an admin user token.
-     *
-     * <p>No action is taken if:
-     * <ul>
-     *     <li>Mandatory case data is missing,</li>
-     *     <li>The claimant is not represented,</li>
-     *     <li>The claimant representative has no valid organisation identifier, or</li>
-     *     <li>No matching organisation is found among respondent representatives.</li>
-     * </ul>
-     *
-     * @param caseDetails the {@link CaseDetails} containing the case data and representation details
-     */
-    public void removeClaimantRepresentativeIfOrganisationExistsInRespondent(CaseDetails caseDetails) {
+    public void removeClaimantRepresentative(CaseDetails caseDetails) {
         if (ObjectUtils.isEmpty(caseDetails)
                 || StringUtils.isEmpty(caseDetails.getCaseId())
+                || StringUtils.isBlank(caseDetails.getCaseTypeId())
+                || StringUtils.isBlank(caseDetails.getJurisdiction())
                 || ObjectUtils.isEmpty(caseDetails.getCaseData())
                 || CollectionUtils.isEmpty(caseDetails.getCaseData().getRepCollection())
-                || !YES.equals(caseDetails.getCaseData().getClaimantRepresentedQuestion())
-                || ObjectUtils.isEmpty(caseDetails.getCaseData().getRepresentativeClaimantType())
-                || (ObjectUtils.isEmpty(caseDetails.getCaseData().getRepresentativeClaimantType()
-                .getMyHmctsOrganisation())
-                || StringUtils.isBlank(caseDetails.getCaseData().getRepresentativeClaimantType()
-                .getMyHmctsOrganisation().getOrganisationID()))
-                && StringUtils.isBlank(caseDetails.getCaseData().getRepresentativeClaimantType().getOrganisationId())) {
+                || !YES.equals(caseDetails.getCaseData().getClaimantRepresentedQuestion())) {
             return;
         }
-        List<String> respondentRepresentativeOrganisationIds = RespondentRepresentativeUtils
-                .extractValidRespondentRepresentativeOrganisationIds(caseDetails.getCaseData());
-        if (CollectionUtils.isEmpty(respondentRepresentativeOrganisationIds)) {
-            return;
+        boolean isClaimantRepresentativeRemoved = nocCcdService.revokeClaimantRepresentation(
+                adminUserService.getAdminUserToken(), caseDetails);
+        if (isClaimantRepresentativeRemoved) {
+            nocNotificationService.notifyClaimantOfRepresentationRemoval(caseDetails);
         }
-        boolean claimantRepresentativeExists = ClaimantRepresentativeUtils
-                .isClaimantRepresentativeOrganisationInRespondentOrganisations(
-                        caseDetails.getCaseData().getRepresentativeClaimantType(),
-                        respondentRepresentativeOrganisationIds);
-        if (!claimantRepresentativeExists) {
-            return;
-        }
-        nocCcdService.removeClaimantRepresentation(adminUserService.getAdminUserToken(), caseDetails);
-        nocNotificationService.notifyClaimantOfRepresentationRemoval(caseDetails);
     }
 
     /**

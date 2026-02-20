@@ -64,41 +64,61 @@ final class ClaimantRepresentativeUtilsTest {
     }
 
     @Test
-    void theIsClaimantRepresentativeOrganisationInRespondentOrganisations() {
+    void theIsClaimantOrganisationLinkedToRespondents() {
         // when claimant representative is empty should return false
         List<String> respondentRepresentativeOrganisationIds = List.of(StringUtils.EMPTY);
-        assertThat(ClaimantRepresentativeUtils.isClaimantRepresentativeOrganisationInRespondentOrganisations(
+        assertThat(ClaimantRepresentativeUtils.isClaimantOrganisationLinkedToRespondents(
                 null, respondentRepresentativeOrganisationIds)).isFalse();
         // when respondent representative organisation ids is empty should return false
         RepresentedTypeC claimantRepresentative =  RepresentedTypeC.builder().build();
-        assertThat(ClaimantRepresentativeUtils.isClaimantRepresentativeOrganisationInRespondentOrganisations(
+        assertThat(ClaimantRepresentativeUtils.isClaimantOrganisationLinkedToRespondents(
                 claimantRepresentative, null)).isFalse();
-        // when both claimant organisation id and myHmctsOrganisation Ids are empty should return false
-        assertThat(ClaimantRepresentativeUtils.isClaimantRepresentativeOrganisationInRespondentOrganisations(
+        // when both claimant organisation id and my hmcts organisation Ids are empty should return false
+        assertThat(ClaimantRepresentativeUtils.isClaimantOrganisationLinkedToRespondents(
                 claimantRepresentative, respondentRepresentativeOrganisationIds)).isFalse();
         Organisation organisation = Organisation.builder().build();
         claimantRepresentative.setMyHmctsOrganisation(organisation);
-        assertThat(ClaimantRepresentativeUtils.isClaimantRepresentativeOrganisationInRespondentOrganisations(
+        assertThat(ClaimantRepresentativeUtils.isClaimantOrganisationLinkedToRespondents(
                 claimantRepresentative, respondentRepresentativeOrganisationIds)).isFalse();
         // when respondent representative organisation id is empty should return false
         organisation.setOrganisationID(ORGANISATION_ID_2);
-        assertThat(ClaimantRepresentativeUtils.isClaimantRepresentativeOrganisationInRespondentOrganisations(
+        assertThat(ClaimantRepresentativeUtils.isClaimantOrganisationLinkedToRespondents(
                 claimantRepresentative, respondentRepresentativeOrganisationIds)).isFalse();
-        // when respondent representative's organisation id is not equal to representative's both myHmctsOrganisation Id
-        // and organisation id should return false
+        // when respondent representative's organisation id is not equal to representative's both my Hmcts Organisation
+        // id and organisation id should return false
         respondentRepresentativeOrganisationIds = List.of(ORGANISATION_ID_1);
-        assertThat(ClaimantRepresentativeUtils.isClaimantRepresentativeOrganisationInRespondentOrganisations(
+        assertThat(ClaimantRepresentativeUtils.isClaimantOrganisationLinkedToRespondents(
                 claimantRepresentative, respondentRepresentativeOrganisationIds)).isFalse();
-        // when respondent representative's organisation id is equal to claimant's representative' s my hmcts
+        // when respondent representative's organisation id is equal to claimant's representative's my hmcts
         // organisation id should return true
         claimantRepresentative.getMyHmctsOrganisation().setOrganisationID(ORGANISATION_ID_1);
-        assertThat(ClaimantRepresentativeUtils.isClaimantRepresentativeOrganisationInRespondentOrganisations(
+        assertThat(ClaimantRepresentativeUtils.isClaimantOrganisationLinkedToRespondents(
                 claimantRepresentative, respondentRepresentativeOrganisationIds)).isTrue();
         // when respondent representative's organisation id is equal to claimant's representative's organisation id
         // should return true
         claimantRepresentative.getMyHmctsOrganisation().setOrganisationID(StringUtils.EMPTY);
         claimantRepresentative.setOrganisationId(ORGANISATION_ID_1);
-        assertThat(ClaimantRepresentativeUtils.isClaimantRepresentativeOrganisationInRespondentOrganisations(
+        assertThat(ClaimantRepresentativeUtils.isClaimantOrganisationLinkedToRespondents(
                 claimantRepresentative, respondentRepresentativeOrganisationIds)).isTrue();
+    }
+
+    @Test
+    void theHasOrganisationIdentifier() {
+        // when representative is empty should return false
+        assertThat(ClaimantRepresentativeUtils.hasOrganisationIdentifier(null)).isFalse();
+        // when both organisation id and my hmcts organisation id are empty should return false
+        RepresentedTypeC claimantRepresentative =  RepresentedTypeC.builder().build();
+        assertThat(ClaimantRepresentativeUtils.hasOrganisationIdentifier(claimantRepresentative)).isFalse();
+        // when my hmcts organisation id is empty and organisation id is not empty should return true
+        claimantRepresentative.setOrganisationId(ORGANISATION_ID_1);
+        assertThat(ClaimantRepresentativeUtils.hasOrganisationIdentifier(claimantRepresentative)).isTrue();
+        // when both my hmcts organisation id and organisation id are empty should return true
+        claimantRepresentative.setOrganisationId(StringUtils.EMPTY);
+        Organisation organisation = Organisation.builder().build();
+        claimantRepresentative.setMyHmctsOrganisation(organisation);
+        assertThat(ClaimantRepresentativeUtils.hasOrganisationIdentifier(claimantRepresentative)).isFalse();
+        // when my hmcts organisation id is not empty and organisation id is empty should return true
+        organisation.setOrganisationID(ORGANISATION_ID_1);
+        assertThat(ClaimantRepresentativeUtils.hasOrganisationIdentifier(claimantRepresentative)).isTrue();
     }
 }

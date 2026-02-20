@@ -1,6 +1,6 @@
 #!groovy
 
-@Library("Infrastructure")
+@Library("Infrastructure@performance-stages-tidy")
 
 import uk.gov.hmcts.contino.AppPipelineDsl
 
@@ -67,6 +67,15 @@ withPipeline(type, product, component) {
   }
   syncBranchesWithMaster(branchesToSync)
   enableSlackNotifications('#et-builds')
+
+  // Enable Performance Test Stages
+  enablePerformanceTestStages(timeout: 60)
+  enableGatlingLoadTests([
+    repo: 'https://github.com/hmcts/performance-testing.git', //https://github.com/hmcts/et-performance.git
+    branch: 'add-et-tests', //*SHould be master
+    simulation: 'et.simulations.EtCosApiBuildSimulation', // ETCreateClaim
+    timeout: 10
+  ])
 
   afterAlways('test') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/**/*'

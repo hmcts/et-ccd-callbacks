@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.exceptions.VerifyTokenServiceException;
 
-import java.net.URL;
+import java.net.URI;
 import java.security.Key;
 
 @Slf4j
@@ -53,7 +53,7 @@ public class VerifyTokenService {
 
     private JWKSet loadJsonWebKeySet(String jwksUrl) {
         try {
-            return JWKSet.load(new URL(jwksUrl));
+            return JWKSet.load(new URI(jwksUrl).toURL());
         } catch (Exception e) {
             log.error("JWKS key loading error", e);
             throw new VerifyTokenServiceException("JWKS error", e);
@@ -79,4 +79,13 @@ public class VerifyTokenService {
         }
     }
 
+    public boolean isTokenSignatureValid(String token) {
+        boolean valid = verifyTokenSignature(token);
+
+        if (!valid) {
+            log.error(INVALID_TOKEN, token);
+        }
+
+        return valid;
+    }
 }

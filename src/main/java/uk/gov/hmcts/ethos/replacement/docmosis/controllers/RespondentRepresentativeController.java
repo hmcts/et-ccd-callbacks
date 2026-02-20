@@ -189,7 +189,7 @@ public class RespondentRepresentativeController {
             nocRespondentRepresentativeService.removeOldRepresentatives(callbackRequest, userToken);
             nocRespondentRepresentativeService.addNewRepresentatives(callbackRequest);
             nocRespondentRepresentativeService
-             .removeClaimantRepresentativeIfOrganisationExistsInRespondent(callbackRequest.getCaseDetails());
+             .removeClaimantRepresentative(callbackRequest.getCaseDetails());
         } catch (GenericServiceException e) {
             throw new GenericRuntimeException(new GenericServiceException(e));
         }

@@ -1,8 +1,11 @@
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5050/et_cos
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
   flyway:
-    locations: classpath:db/migration,classpath:db/dev
+    enabled: false
   main:
     lazy-initialization: true
 
@@ -169,13 +172,6 @@ template:
     submitCaseEmailTemplateId: ${SUBMIT_CASE_EMAIL_TEMPLATE_ID:7b1f33eb-31c5-4a00-b1a4-c1bca84bc441}
     cySubmitCaseEmailTemplateId: ${CY_SUBMIT_CASE_EMAIL_TEMPLATE_ID:7b1f33eb-31c5-4a00-b1a4-c1bca84bc441}
 
-queue:
-  create-updates:
-    queue-name: ${CREATE_UPDATES_QUEUE_NAME:create-updates}
-    send:
-      connection-string: ${CREATE_UPDATES_QUEUE_SEND_CONNECTION_STRING:test}
-
-
 ccd_gateway_base_url: http://127.0.0.1:3453
 
 etcos:
@@ -235,3 +231,13 @@ feature-flags:
 
 caching:
   adminUserService: ${CACHING_ADMIN_USER_SERVICE:21600000}
+
+queue:
+  create-updates:
+    poll-interval: 1000
+    batch-size: 10
+    threads: 15
+  update-case:
+    poll-interval: 1000
+    batch-size: 10
+    threads: 15

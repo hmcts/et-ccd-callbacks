@@ -58,23 +58,6 @@ Run the script with source, so that the environment variables are set in your cu
 source ./bin/set_env.sh
 ```
 
-
-### Azure Service Bus
-You must either provide a connection string in an environment variable to a queue in Azure or
-configure a fake service bus.
-
-If you require a real Azure queue then ask one of the team to set this up.
-
-| Variable | Purpose                                              |
-| -------- |------------------------------------------------------|
-| CREATE_UPDATES_QUEUE_SEND_CONNECTION_STRING | Connection string for create-updates queue in Azure  |
-
-Or, if no development queue is available, set the following environment variable to use the fake.
-
-| Variable | Purpose                                             |
-| -------- |-----------------------------------------------------|
-| SERVICEBUS_FAKE | Set to ```true``` to enable fake service bus client |
-
 ### RSE IdAM Simulator
 
 Make sure you have the latest RSE IdAM Simulator image

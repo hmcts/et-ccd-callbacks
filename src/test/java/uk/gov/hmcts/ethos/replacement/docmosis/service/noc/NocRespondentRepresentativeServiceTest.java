@@ -34,6 +34,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationAddress;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
@@ -1195,14 +1196,29 @@ class NocRespondentRepresentativeServiceTest {
                 caseDetails);
         verify(nocNotificationService, times(LoggerTestUtils.INTEGER_ZERO)).notifyClaimantOfRepresentationRemoval(
                 any(CaseDetails.class));
+        // when claimant representative not removed and claimant representative email matches with respondent
+        // representative email should send notification of claimant representative removal
+        when(nocCcdService.revokeClaimantRepresentation(eq(ADMIN_USER_TOKEN), any(CaseDetails.class)))
+                .thenReturn(false);
+        RepresentedTypeC claimantRepresentative = RepresentedTypeC.builder().representativeEmailAddress(
+                REPRESENTATIVE_EMAIL).build();
+        caseDetails.getCaseData().setRepresentativeClaimantType(claimantRepresentative);
+        when(nocCcdService.removeClaimantRepresentation(eq(ADMIN_USER_TOKEN), any(CaseDetails.class))).thenReturn(true);
+        nocRespondentRepresentativeService.removeClaimantRepresentative(caseDetails);
+        verify(nocCcdService, times(LoggerTestUtils.INTEGER_TWO)).revokeClaimantRepresentation(ADMIN_USER_TOKEN,
+                caseDetails);
+        verify(nocCcdService, times(LoggerTestUtils.INTEGER_ONE)).removeClaimantRepresentation(ADMIN_USER_TOKEN,
+                caseDetails);
+        verify(nocNotificationService, times(LoggerTestUtils.INTEGER_ONE)).notifyClaimantOfRepresentationRemoval(
+                any(CaseDetails.class));
         // when claimant representative not removed should not send notification of claimant representative removal
         when(nocCcdService.revokeClaimantRepresentation(eq(ADMIN_USER_TOKEN), any(CaseDetails.class)))
                 .thenReturn(true);
         doNothing().when(nocNotificationService).notifyClaimantOfRepresentationRemoval(any(CaseDetails.class));
         nocRespondentRepresentativeService.removeClaimantRepresentative(caseDetails);
-        verify(nocCcdService, times(LoggerTestUtils.INTEGER_TWO)).revokeClaimantRepresentation(ADMIN_USER_TOKEN,
+        verify(nocCcdService, times(LoggerTestUtils.INTEGER_THREE)).revokeClaimantRepresentation(ADMIN_USER_TOKEN,
                 caseDetails);
-        verify(nocNotificationService, times(LoggerTestUtils.INTEGER_ONE)).notifyClaimantOfRepresentationRemoval(
+        verify(nocNotificationService, times(LoggerTestUtils.INTEGER_TWO)).notifyClaimantOfRepresentationRemoval(
                 any(CaseDetails.class));
     }
 

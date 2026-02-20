@@ -203,7 +203,7 @@ public final class RespondentRepresentativeUtils {
      * A representative is eligible for removal if:
      * <ul>
      *   <li>The representative is valid</li>
-     *   <li>The representative is marked as a MyHMCTS user</li>
+     *   <li>The representative is marked as my HMCTS user</li>
      *   <li>A respondent organisation is present</li>
      *   <li>The respondent organisation has a non-empty organisation ID</li>
      *   <li>The representative has a non-empty email address</li>
@@ -663,8 +663,8 @@ public final class RespondentRepresentativeUtils {
      * </ul>
      *
      * @param representative     the representative whose access eligibility is being evaluated
-     * @param caseUserAssignment the case user assignment containing the case role (may be null)
-     * @param respondentName     the respondent name to match against the representative (may be blank)
+     * @param caseUserAssignment the case user assignment containing the case role (maybe null)
+     * @param respondentName     the respondent name to match against the representative (maybe blank)
      * @return {@code true} if the representative meets the criteria for access revocation;
      *         {@code false} otherwise
      */

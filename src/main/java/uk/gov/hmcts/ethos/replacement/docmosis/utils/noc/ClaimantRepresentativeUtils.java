@@ -5,6 +5,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.webjars.NotFoundException;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.ClaimantUtils;
@@ -122,5 +123,39 @@ public final class ClaimantRepresentativeUtils {
                 && (ObjectUtils.isNotEmpty(representative.getMyHmctsOrganisation())
                 && StringUtils.isNotBlank(representative.getMyHmctsOrganisation().getOrganisationID())
                 || StringUtils.isNotBlank(representative.getOrganisationId()));
+    }
+
+    /**
+     * Determines whether the claimant representative's email address matches
+     * any valid respondent representative's email address.
+     *
+     * <p>The method retrieves the claimant representative's email from the case data
+     * and compares it against the email addresses of respondent representatives,
+     * considering only those deemed valid.</p>
+     *
+     * <p>If the claimant representative details are missing or the email address
+     * is blank, the method returns {@code false}.</p>
+     *
+     * <p><strong>Assumptions:</strong> It is assumed that {@code caseData} is not
+     * {@code null} and that it contains a respondent representative collection.
+     * These values are not explicitly validated within this method.</p>
+     *
+     * @param caseData the {@link CaseData} containing claimant and respondent
+     *                 representative information; assumed to be non-null and
+     *                 populated with a respondent collection
+     * @return {@code true} if the claimant representative's email matches any
+     *         valid respondent representative email; {@code false} otherwise
+     */
+    public static boolean isClaimantRepresentativeEmailMatchedWithRespondents(CaseData caseData) {
+        if (ObjectUtils.isEmpty(caseData.getRepresentativeClaimantType())
+                || StringUtils.isBlank(caseData.getRepresentativeClaimantType().getRepresentativeEmailAddress())) {
+            return false;
+        }
+        String claimantEmail = caseData.getRepresentativeClaimantType().getRepresentativeEmailAddress();
+
+        return caseData.getRepCollection().stream()
+                .filter(RespondentRepresentativeUtils::isValidRepresentative)
+                .map(item -> item.getValue().getRepresentativeEmailAddress())
+                .anyMatch(claimantEmail::equals);
     }
 }

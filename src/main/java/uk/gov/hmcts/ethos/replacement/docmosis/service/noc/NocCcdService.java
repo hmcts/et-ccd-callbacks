@@ -29,6 +29,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_FAILED_TO_REMOVE_CLAIMANT_REP_AND_ORG_POLICY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_START_REMOVE_CLAIMANT_REP_AND_ORG_POLICY_INVALID_CCD_REQUEST;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_UPDATE_REVOKED_CLAIMANT_REP_AND_ORG_POLICY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EVENT_UPDATE_CASE_SUBMITTED;
 
 @Service
@@ -248,7 +249,9 @@ public class NocCcdService {
         CaseUserAssignmentData caseUserAssignmentData = CaseUserAssignmentData.builder().caseUserAssignments(
                 List.of(caseUserAssignment)).build();
         revokeCaseAssignments(userToken, caseUserAssignmentData);
-        removeClaimantRepresentation(userToken, caseDetails);
+        if (!removeClaimantRepresentation(userToken, caseDetails)) {
+            log.error(ERROR_UNABLE_TO_UPDATE_REVOKED_CLAIMANT_REP_AND_ORG_POLICY, caseDetails.getCaseId());
+        }
         return true;
     }
 
@@ -256,35 +259,39 @@ public class NocCcdService {
      * Removes the claimant's legal representation and updates the associated
      * organisation policy for the specified case.
      *
-     * <p>This method initiates a CCD event to update a case in the "Submitted" state
-     * and performs the following actions:
+     * <p>This method initiates a CCD event to update a case in the "Submitted" state.
+     * If the event is successfully started, it performs the following updates:
      * <ul>
      *     <li>Clears the claimant representative details</li>
      *     <li>Marks the claimant representative as removed</li>
-     *     <li>Updates the claimant representation status to not represented</li>
-     *     <li>Sets the claimant solicitor case role within the organisation policy</li>
+     *     <li>Sets the claimant representation status to not represented</li>
+     *     <li>Updates the claimant organisation policy with the claimant solicitor case role</li>
      * </ul>
-     * The updated case data is then submitted using the CCD client.</p>
+     * The updated case data is then submitted via the CCD client.</p>
      *
-     * <p>If the CCD event cannot be started (i.e. the returned {@link CCDRequest}
-     * is empty), the method logs an error and exits without applying any changes.</p>
+     * <p>If the CCD event cannot be started (i.e. the {@link CCDRequest} is empty),
+     * the method logs an error and returns {@code false}. If an {@link IOException}
+     * occurs during submission, the error is logged and {@code false} is returned.</p>
      *
-     * <p>If an {@link IOException} occurs during case submission, the error is logged
-     * together with the case ID.</p>
-     *
-     * <p><strong>Assumptions:</strong> It is assumed that {@code userToken} and
-     * {@code caseDetails} are not {@code null} or empty, and that
-     * {@code caseDetails.getCaseId()}, {@code caseDetails.getCaseTypeId()},
-     * {@code caseDetails.getJurisdiction()}, and {@code caseDetails.getCaseData()}
-     * contain valid non-null values. These parameters are not explicitly validated
-     * within this method.</p>
+     * <p><strong>Assumptions:</strong>
+     * <ul>
+     *     <li>{@code userToken} is not {@code null} or blank.</li>
+     *     <li>{@code caseDetails} is not {@code null}.</li>
+     *     <li>{@code caseDetails.getCaseId()}, {@code caseDetails.getCaseTypeId()},
+     *         {@code caseDetails.getJurisdiction()}, and {@code caseDetails.getCaseData()}
+     *         are not {@code null}.</li>
+     * </ul>
+     * These values are not explicitly validated within this method.</p>
      *
      * @param userToken   the authorisation token of the user performing the operation;
      *                    assumed to be non-null and non-blank
      * @param caseDetails the {@link CaseDetails} containing the identifiers and case data
      *                    required to perform the update; assumed to be non-null and populated
+     * @return {@code true} if the representation was successfully removed and the case
+     *         update submitted; {@code false} if the CCD event could not be started or
+     *         an error occurred during submission
      */
-    public void removeClaimantRepresentation(String userToken, CaseDetails caseDetails) {
+    public boolean removeClaimantRepresentation(String userToken, CaseDetails caseDetails) {
         try {
             CCDRequest ccdRequest = startEventForUpdateCaseSubmitted(userToken,
                     caseDetails.getCaseTypeId(),
@@ -293,7 +300,7 @@ public class NocCcdService {
             if (ObjectUtils.isEmpty(ccdRequest)) {
                 log.error(ERROR_UNABLE_TO_START_REMOVE_CLAIMANT_REP_AND_ORG_POLICY_INVALID_CCD_REQUEST,
                         caseDetails.getCaseId());
-                return;
+                return false;
             }
             CaseDetails ccdRequestCaseDetails = ccdRequest.getCaseDetails();
             ccdRequestCaseDetails.getCaseData().setRepresentativeClaimantType(null);
@@ -309,6 +316,8 @@ public class NocCcdService {
         } catch (IOException exception) {
             log.error(ERROR_FAILED_TO_REMOVE_CLAIMANT_REP_AND_ORG_POLICY, caseDetails.getCaseId(),
                     exception.getMessage(), exception);
+            return false;
         }
+        return true;
     }
 }

@@ -34,6 +34,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.OrganisationUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.ClaimantRepresentativeUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.NocUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.RespondentRepresentativeUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.RoleUtils;
@@ -553,8 +554,14 @@ public class NocRespondentRepresentativeService {
                 || !YES.equals(caseDetails.getCaseData().getClaimantRepresentedQuestion())) {
             return;
         }
-        boolean isClaimantRepresentativeRemoved = nocCcdService.revokeClaimantRepresentation(
-                adminUserService.getAdminUserToken(), caseDetails);
+        final String adminUserToken = adminUserService.getAdminUserToken();
+        boolean isClaimantRepresentativeRemoved = nocCcdService.revokeClaimantRepresentation(adminUserToken,
+                caseDetails);
+        if  (!isClaimantRepresentativeRemoved
+                && ClaimantRepresentativeUtils.isClaimantRepresentativeEmailMatchedWithRespondents(
+                        caseDetails.getCaseData())) {
+            isClaimantRepresentativeRemoved = nocCcdService.removeClaimantRepresentation(adminUserToken, caseDetails);
+        }
         if (isClaimantRepresentativeRemoved) {
             nocNotificationService.notifyClaimantOfRepresentationRemoval(caseDetails);
         }

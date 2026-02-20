@@ -6,11 +6,14 @@ import org.junit.jupiter.api.Test;
 import org.testcontainers.shaded.org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.ethos.replacement.docmosis.test.utils.LoggerTestUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,6 +25,7 @@ final class ClaimantRepresentativeUtilsTest {
     private static final String CLAIMANT_REPRESENTATIVE_EMAIL_ADDRESS = "claimantrep@email.com";
     private static final String ORGANISATION_ID_1 = "dummy12_organisation34_id56";
     private static final String ORGANISATION_ID_2 = "dummy65_organisation43_id21";
+    private static final String RESPONDENT_REPRESENTATIVE_ID = "respondentRepresentativeId";
 
     private static final String EXPECTED_WARNING_CLAIMANT_EMAIL_NOT_FOUND = "Could not find claimant email address.";
     private static final String EXPECTED_WARNING_WITHOUT_CASE_ID = "Claimant email not found for case ";
@@ -120,5 +124,27 @@ final class ClaimantRepresentativeUtilsTest {
         // when my hmcts organisation id is not empty and organisation id is empty should return true
         organisation.setOrganisationID(ORGANISATION_ID_1);
         assertThat(ClaimantRepresentativeUtils.hasOrganisationIdentifier(claimantRepresentative)).isTrue();
+    }
+
+    @Test
+    void theIsClaimantRepresentativeEmailMatchedWithRespondents() {
+        // when claimant representative is empty should return false
+        CaseData caseData = new CaseData();
+        caseData.setRepCollection(new ArrayList<>());
+        assertThat(ClaimantRepresentativeUtils.isClaimantRepresentativeEmailMatchedWithRespondents(caseData)).isFalse();
+        // when claimant representative's email address is empty should return false
+        caseData.setRepresentativeClaimantType(RepresentedTypeC.builder().build());
+        assertThat(ClaimantRepresentativeUtils.isClaimantRepresentativeEmailMatchedWithRespondents(caseData)).isFalse();
+        // when claimant representative's email address is not equal to any of the respondent representative's email
+        // address should return false
+        caseData.getRepresentativeClaimantType().setRepresentativeEmailAddress(CLAIMANT_REPRESENTATIVE_EMAIL_ADDRESS);
+        assertThat(ClaimantRepresentativeUtils.isClaimantRepresentativeEmailMatchedWithRespondents(caseData)).isFalse();
+        // when respondent representative's email address is equal to claimant representative's email address
+        // should return true
+        RepresentedTypeRItem respondentRepresentative = RepresentedTypeRItem.builder().id(RESPONDENT_REPRESENTATIVE_ID)
+                .value(RepresentedTypeR.builder().representativeEmailAddress(CLAIMANT_REPRESENTATIVE_EMAIL_ADDRESS)
+                        .build()).build();
+        caseData.getRepCollection().add(respondentRepresentative);
+        assertThat(ClaimantRepresentativeUtils.isClaimantRepresentativeEmailMatchedWithRespondents(caseData)).isTrue();
     }
 }

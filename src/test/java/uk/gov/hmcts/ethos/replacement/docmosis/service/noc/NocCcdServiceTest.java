@@ -70,6 +70,9 @@ class NocCcdServiceTest {
     private static final String EXPECTED_ERROR_FAILED_TO_REMOVE_CLAIMANT_REP_AND_ORG_POLICY =
             "Failed to remove claimant representative and organisation policy for case " + CASE_ID + ". Exception: "
                     + "Something went wrong";
+    private static final String EXPECTED_ERROR_UNABLE_TO_UPDATE_REVOKED_CLAIMANT_REP_AND_ORG_POLICY =
+            "Claimant representative role assignment revoked but failed to update claimant representation and "
+                    + "organisation policy for case ID: " + CASE_ID;
 
     private static final String EXCEPTION_DUMMY = "Something went wrong";
 
@@ -222,7 +225,7 @@ class NocCcdServiceTest {
         ccdRequest.getCaseDetails().setCaseTypeId(CASE_TYPE);
         assertThat(nocCcdService.startEventForUpdateCaseSubmitted(ADMIN_USER_TOKEN, CASE_TYPE, JURISDICTION, CASE_ID))
                 .isNull();
-        // case details has case data should return ccd request
+        // case details has case data should return CCD request
         ccdRequest.getCaseDetails().setCaseData(new CaseData());
         assertThat(nocCcdService.startEventForUpdateCaseSubmitted(ADMIN_USER_TOKEN, CASE_TYPE, JURISDICTION, CASE_ID))
                 .isNotNull().isEqualTo(ccdRequest);
@@ -276,6 +279,16 @@ class NocCcdServiceTest {
         assertThat(ccdRequest.getCaseDetails().getCaseData().getClaimantRepresentativeOrganisationPolicy())
                 .isEqualTo(OrganisationPolicy.builder().orgPolicyCaseAssignedRole(ClaimantSolicitorRole
                         .CLAIMANTSOLICITOR.getCaseRoleLabel()).build());
+        // when start event for case throws exception should log unable to update claimant rep and org policy error but
+        // should return true as case assignment is revoked
+        caseData.setRepresentativeClaimantType(RepresentedTypeC.builder().myHmctsOrganisation(Organisation.builder()
+                .organisationID(ORGANISATION_ID_1).build()).build());
+        caseData.setClaimantRepresentedQuestion(YES);
+        doThrow(new IOException(EXCEPTION_DUMMY)).when(ccdClient).startEventForCase(
+                ADMIN_USER_TOKEN, CASE_TYPE, JURISDICTION, CASE_ID, EVENT_UPDATE_CASE_SUBMITTED);
+        assertThat(nocCcdService.revokeClaimantRepresentation(ADMIN_USER_TOKEN, caseDetails)).isTrue();
+        LoggerTestUtils.checkLog(Level.ERROR, LoggerTestUtils.INTEGER_TWO,
+                EXPECTED_ERROR_UNABLE_TO_UPDATE_REVOKED_CLAIMANT_REP_AND_ORG_POLICY);
     }
 
     @Test

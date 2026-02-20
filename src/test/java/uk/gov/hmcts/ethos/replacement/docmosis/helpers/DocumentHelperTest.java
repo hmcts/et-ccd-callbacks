@@ -2295,16 +2295,36 @@ class DocumentHelperTest {
 
     @ParameterizedTest
     @CsvSource({
-        "EnglandWales, EM-TRB-EGW-ENG-00028, true, 'England Wales ECC template'",
-        "Scotland, EM-TRB-SCO-ENG-00044, true, 'Scotland ECC template'",
-        "EnglandWales, EM-TRB-EGW-ENG-00026, false, 'Non-ECC template'",
-        "Scotland, EM-TRB-SCO-ENG-00045, false, 'Wrong case type for template'"
+        "ET_EnglandWales, EM-TRB-EGW-ENG-00028, null, true, 'England Wales ECC template'",
+        "ET_EnglandWales, EM-TRB-EGW-ENG-00028, 3.1, false, 'England Wales ECC rejection template (section 3.1)'",
+        "ET_EnglandWales, EM-TRB-EGW-ENG-00028, 3.2, false, 'England Wales ECC rejection template (section 3.2)'",
+        "ET_EnglandWales, EM-TRB-EGW-ENG-00028, 3.22, false, 'England Wales ECC rejection template (section 3.22)'",
+        "ET_EnglandWales, EM-TRB-EGW-ENG-00028, 3.3, false, 'England Wales ECC rejection template (section 3.3)'",
+        "ET_Scotland, EM-TRB-SCO-ENG-00044, null, true, 'Scotland ECC template'",
+        "ET_Scotland, EM-TRB-SCO-ENG-00044, 19, false, 'Scotland ECC rejection template (section 19)'",
+        "ET_EnglandWales, EM-TRB-EGW-ENG-00026, null, false, 'Non-ECC template'",
+        "ET_Scotland, EM-TRB-SCO-ENG-00045, null, false, 'Wrong template for Scotland'"
     })
     void testIsEccDocumentTemplate_variousTemplates_returnsExpectedResult(
-            String caseType, String templateName, boolean expectedResult, String description) {
-        String caseTypeId = "EnglandWales".equals(caseType) ? ENGLANDWALES_CASE_TYPE_ID : SCOTLAND_CASE_TYPE_ID;
+            String caseType, String templateName, String rejectionSection, boolean expectedResult, String description) {
+        CorrespondenceType ewCorrespondenceType = null;
+        CorrespondenceScotType scotCorrespondenceType = null;
+        
+        if (ENGLANDWALES_CASE_TYPE_ID.equals(caseType)) {
+            ewCorrespondenceType = new CorrespondenceType();
+            ewCorrespondenceType.setTopLevelDocuments(templateName);
+            if (rejectionSection != null) {
+                ewCorrespondenceType.setPart3Documents(rejectionSection);
+            }
+        } else {
+            scotCorrespondenceType = new CorrespondenceScotType();
+            scotCorrespondenceType.setTopLevelScotDocuments(templateName);
+            if (rejectionSection != null) {
+                scotCorrespondenceType.setPart3ScotDocuments(rejectionSection);
+            }
+        }
 
-        boolean result = DocumentHelper.isEccDocumentTemplate(caseTypeId, templateName);
+        boolean result = DocumentHelper.isEccDocumentTemplate(caseType, ewCorrespondenceType, scotCorrespondenceType);
 
         assertThat(result).isEqualTo(expectedResult);
     }

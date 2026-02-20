@@ -1,0 +1,12 @@
+[
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "TTL",
+    "Label": "Case Deletion",
+    "FieldType": "TTL",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  }
+]
+
+

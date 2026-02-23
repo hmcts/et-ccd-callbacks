@@ -14,8 +14,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static org.apache.commons.lang3.ObjectUtils.isEmpty;
-import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPLOYMENT;
 
 @Component
@@ -52,7 +50,7 @@ public class BatchReconfigurationTask implements Runnable {
         String adminUserToken = adminUserService.getAdminUserToken();
         AtomicInteger counter = new AtomicInteger(0);
         AtomicReference<String> reconfiguredCases = new AtomicReference<>();
-        AtomicReference<String> skippedCases = new AtomicReference<>();
+        AtomicReference<String> failedCases = new AtomicReference<>();
         caseIds.stream()
                 .limit(limit)
                 .parallel()
@@ -62,15 +60,6 @@ public class BatchReconfigurationTask implements Runnable {
                         CCDRequest ccdRequest = ccdClient.startEventForCase(adminUserToken, caseTypeIdsString,
                             EMPLOYMENT, caseId, "RECONFIGURE_WA_TASKS");
                         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-                        boolean isValidCase = isValidCase(caseData);
-                        if (!isValidCase) {
-                            log.info("Case {} is not valid, skipping", caseId);
-                            skippedCases.updateAndGet(v -> v == null ? caseId : v + ", " + caseId);
-                            return;
-                        }
-
-                        caseData.getClaimantRepresentativeOrganisationPolicy()
-                            .setOrganisation(caseData.getRepresentativeClaimantType().getMyHmctsOrganisation());
 
                         ccdClient.submitEventForCase(adminUserToken, caseData, caseTypeIdsString, EMPLOYMENT,
                             ccdRequest, caseId);
@@ -78,19 +67,12 @@ public class BatchReconfigurationTask implements Runnable {
                         reconfiguredCases.updateAndGet(v -> v == null ? caseId : v + ", " + caseId);
                     } catch (Exception e) {
                         log.error(ERROR_TRIGGERING_RECONFIGURATION_EVENT_FOR_CASE, caseId, e.getMessage());
+                        failedCases.updateAndGet(v -> v == null ? caseId : v + ", " + caseId);
                     }
                 });
         log.info("Completed updates for {} cases", counter.get());
         log.info("Updated cases: {}", reconfiguredCases.get());
-        log.info("Skipped cases: {}", skippedCases.get());
+        log.info("Skipped cases: {}", failedCases.get());
     }
 
-    private boolean isValidCase(CaseData caseData) {
-        return isNotEmpty(caseData)
-               && isNotEmpty(caseData.getClaimantRepresentativeOrganisationPolicy())
-               && isEmpty(caseData.getClaimantRepresentativeOrganisationPolicy().getOrganisation())
-               && isNotEmpty(caseData.getRepresentativeClaimantType())
-               && isNotEmpty(caseData.getRepresentativeClaimantType().getMyHmctsOrganisation())
-               && isNotEmpty(caseData.getRepresentativeClaimantType().getMyHmctsOrganisation().getOrganisationID());
-    }
 }

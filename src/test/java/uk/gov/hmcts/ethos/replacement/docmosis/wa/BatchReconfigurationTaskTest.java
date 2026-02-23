@@ -17,6 +17,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 
 import java.io.IOException;
 import java.util.List;
@@ -42,6 +43,8 @@ class BatchReconfigurationTaskTest {
     private AdminUserService adminUserService;
     @Mock
     private CcdClient ccdClient;
+    @Mock
+    private CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
 
     private BatchReconfigurationTask task;
 
@@ -53,7 +56,7 @@ class BatchReconfigurationTaskTest {
 
     @BeforeEach
     void setUp() {
-        task = new BatchReconfigurationTask(adminUserService, ccdClient);
+        task = new BatchReconfigurationTask(adminUserService, ccdClient, caseManagementForCaseWorkerService);
         ReflectionTestUtils.setField(task, "caseTypeIdsString", ENGLANDWALES_CASE_TYPE_ID);
         ReflectionTestUtils.setField(
             task,

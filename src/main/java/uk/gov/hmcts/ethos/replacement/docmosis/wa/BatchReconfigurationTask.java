@@ -8,6 +8,7 @@ import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -25,6 +26,7 @@ public class BatchReconfigurationTask implements Runnable {
     private static final String NO_CASE_IDS_TO_RECONFIGURE_EXITING_JOB = "No case ids to reconfigure, exiting job";
     private final AdminUserService adminUserService;
     private final CcdClient ccdClient;
+    private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
 
     @Value("${cron.reconfigurationCaseIds}")
     private String caseIdsToReconfigure;
@@ -60,6 +62,7 @@ public class BatchReconfigurationTask implements Runnable {
                         CCDRequest ccdRequest = ccdClient.startEventForCase(adminUserToken, caseTypeIdsString,
                             EMPLOYMENT, caseId, "RECONFIGURE_WA_TASKS");
                         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+                        caseManagementForCaseWorkerService.setGlobalSearchDefaults(caseData);
 
                         ccdClient.submitEventForCase(adminUserToken, caseData, caseTypeIdsString, EMPLOYMENT,
                             ccdRequest, caseId);

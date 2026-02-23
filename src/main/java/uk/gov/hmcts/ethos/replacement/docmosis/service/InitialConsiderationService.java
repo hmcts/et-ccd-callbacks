@@ -953,9 +953,15 @@ public class InitialConsiderationService {
         }
 
         if (et3Vetting.getEt3GeneralNotesRespondentName() != null) {
-            addPair(pairsList, "General notes (Respondent's name match):",
+            addPair(pairsList, "General notes - Respondent's name",
                     defaultIfNull(et3Vetting.getEt3GeneralNotesRespondentName()));
         }
+
+        if (et3Vetting.getEt3GeneralNotesRespondentNameMatch() != null) {
+            addPair(pairsList, "General notes - does the respondent's name match?",
+                defaultIfNull(et3Vetting.getEt3GeneralNotesRespondentNameMatch()));
+        }
+
     }
 
     private void processResponseInTime(Et3VettingType et3Vetting, List<String[]> pairsList) {
@@ -1046,7 +1052,7 @@ public class InitialConsiderationService {
         }
 
         addPair(pairsList, "Is this location correct?", et3Vetting.getEt3IsThisLocationCorrect());
-        if (NO.equals(et3Vetting.getEt3IsThisLocationCorrect())) {
+        if ("No - suggest another location".equals(et3Vetting.getEt3IsThisLocationCorrect())) {
             addPair(pairsList, "Regional Office selected:", defaultIfNull(et3Vetting.getEt3RegionalOffice()));
             addPair(pairsList, "Why should we change the office?",
                     defaultIfNull(et3Vetting.getEt3WhyWeShouldChangeTheOffice()));
@@ -1294,6 +1300,12 @@ public class InitialConsiderationService {
                 addPair(locationIssuesPairsList, "Why should we change the office?",
                         defaultIfEmpty(caseData.getWhyChangeOffice(), ""));
             }
+
+            if (caseData.getEt1LocationGeneralNotes() != null && !caseData.getEt1LocationGeneralNotes().isEmpty()) {
+                addPair(locationIssuesPairsList, GENERAL_NOTES,
+                        caseData.getEt1LocationGeneralNotes());
+            }
+
             if (!locationIssuesPairsList.isEmpty()) {
                 locationIssueStringBuilder.append(MarkdownHelper.createTwoColumnTable(
                         new String[]{"Locational Issue", DETAILS},
@@ -1304,10 +1316,6 @@ public class InitialConsiderationService {
                 et1VettingIssuesTablesMarkup.append(NEWLINE);
             }
 
-            if (caseData.getEt1LocationGeneralNotes() != null && !caseData.getEt1LocationGeneralNotes().isEmpty()) {
-                addPair(locationIssuesPairsList, GENERAL_NOTES,
-                        caseData.getEt1LocationGeneralNotes());
-            }
         }
     }
 

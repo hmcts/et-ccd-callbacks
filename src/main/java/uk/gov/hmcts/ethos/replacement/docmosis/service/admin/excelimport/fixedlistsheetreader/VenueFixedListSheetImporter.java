@@ -22,6 +22,8 @@ public class VenueFixedListSheetImporter implements FixedListSheetImporter {
     private final RoomRepository roomRepository;
     private final FixedListMappings fixedListMappings;
 
+    // TODO implement logic to save the DisplayOrder from the definitions to retain the ordering of venues and rooms
+    //  rather than having workarounds like JpaRoomService.getRooms(String venueCode)}
     @Override
     public void importSheet(TribunalOffice tribunalOffice, XSSFSheet sheet) {
         deleteExistingData(tribunalOffice);

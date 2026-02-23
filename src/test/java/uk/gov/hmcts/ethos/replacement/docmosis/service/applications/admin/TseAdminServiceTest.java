@@ -97,6 +97,8 @@ class TseAdminServiceTest {
     private static final String RESPONDENT_1 = "Respondent 1";
     private static final String RESPONDENT_2 = "Respondent 2";
     private static final String REP_EMAIL = "rep@test.com";
+    private static final String ERROR_MSG_PARTY_TO_NOTIFY_MUST_INCLUDE_SELECTED =
+        "Select the party or parties to notify must include the party or parties who must respond";
 
     @BeforeEach
     void setUp() {
@@ -211,6 +213,31 @@ class TseAdminServiceTest {
         documentTypeItem.setId("1234");
         documentTypeItem.setValue(DocumentTypeBuilder.builder().withUploadedDocument(fileName, "1234").build());
         return documentTypeItem;
+    }
+
+    @Test
+    void validateInput_shouldReturnNoError_whenPartyToRespondIsNull() {
+        caseData.setTseAdminSelectPartyRespond(null);
+        caseData.setTseAdminSelectPartyNotify(CLAIMANT_ONLY);
+        List<String> errors = tseAdminService.validateInput(caseData);
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void validateInput_shouldReturnNoError_whenPartyToNotifyIsBothParties() {
+        caseData.setTseAdminSelectPartyRespond(RESPONDENT_TITLE);
+        caseData.setTseAdminSelectPartyNotify(BOTH_PARTIES);
+        List<String> errors = tseAdminService.validateInput(caseData);
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void validateInput_shouldReturnError_whenPartyToNotifyDoesNotMatchPartyToRespond() {
+        caseData.setTseAdminSelectPartyRespond(CLAIMANT_TITLE);
+        caseData.setTseAdminSelectPartyNotify(RESPONDENT_ONLY);
+        List<String> errors = tseAdminService.validateInput(caseData);
+        assertThat(errors).hasSize(1);
+        assertThat(errors.getFirst()).isEqualTo(ERROR_MSG_PARTY_TO_NOTIFY_MUST_INCLUDE_SELECTED);
     }
 
     @Test

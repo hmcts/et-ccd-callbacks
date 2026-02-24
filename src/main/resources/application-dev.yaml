@@ -1,9 +1,3 @@
-queue:
-  create-updates:
-    queue-name: ${CREATE_UPDATES_QUEUE_NAME:create-updates}
-    send:
-      connection-string: ${CREATE_UPDATES_QUEUE_SEND_CONNECTION_STRING}
-
 idam:
   s2s-auth:
     # noinspection SpringBootApplicationYaml

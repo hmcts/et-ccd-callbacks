@@ -48,8 +48,6 @@ java:
           alias: ET_COS_DB_PORT
     et:
       secrets:
-        - name: create-updates-queue-send-connection-string
-          alias: CREATE_UPDATES_QUEUE_SEND_CONNECTION_STRING
         - name: tornado-access-key
           alias: TORNADO_ACCESS_KEY
         - name: gov-notify-api-key

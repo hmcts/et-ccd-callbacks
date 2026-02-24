@@ -55,13 +55,6 @@ A local database is required. This is provided by one of the CCD common componen
 
 [flyway](https://flywaydb.org/) migrations are automatically applied on startup.
 
-### Azure Service Bus
-The application requires a connection to an Azure Service Bus queue.
-
-There are two options for achieving this:
-- Provide a connection string for a development queue in Azure
-- Configure a fake connection client
-
 ### Docmosis Tornado
 [Docmosis Tornado](https://www.docmosis.com/products/tornado.html) is a third-party product used by et-ccd-callbacks to
 generate documents and reports.

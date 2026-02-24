@@ -2,6 +2,11 @@ name: Publish et-shared to Azure Artifacts
 
 on:
   workflow_dispatch:
+    inputs:
+      release_version:
+        description: 'Release version to publish for et-shared (e.g. 0.0.1)'
+        required: false
+        default: '0.0.1'
   pull_request:
   push:
     branches:
@@ -39,7 +44,14 @@ jobs:
       - name: Set Release Version
         id: set_release_version
         run: |
-          if [ "${{ github.event_name }}" = "pull_request" ]; then
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            RELEASE_VERSION="${{ github.event.inputs.release_version }}"
+            if [ -z "$RELEASE_VERSION" ]; then
+              echo "release_version input is required for workflow_dispatch"
+              exit 1
+            fi
+            echo "release_version=$RELEASE_VERSION" >> $GITHUB_OUTPUT
+          elif [ "${{ github.event_name }}" = "pull_request" ]; then
             BRANCH_NAME="$GITHUB_HEAD_REF"
             SAFE_BRANCH_NAME=$(echo "$BRANCH_NAME" | tr -cd 'A-Za-z0-9._-')
             if [ -z "$SAFE_BRANCH_NAME" ]; then

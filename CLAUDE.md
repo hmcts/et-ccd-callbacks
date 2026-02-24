@@ -94,7 +94,6 @@ yarn generate-excel-cftlib
 - **PostgreSQL** database with Flyway migrations (src/main/resources/db)
 - **Feign** for HTTP clients
 - **Docmosis Tornado** for document generation
-- **Azure Service Bus** for message queuing
 - **Lombok** for code generation (requires IDE plugin and annotation processing enabled)
 
 ### Package Structure
@@ -125,8 +124,6 @@ The codebase follows a layered architecture under `uk.gov.hmcts.ethos.replacemen
 
 - **tasks/** - Scheduled tasks that run via Spring Scheduling or command line
   - Examples: `AcasCertificateTask`, `Et1DocumentGenerationTask`, `NoticeOfChangeFieldsTask`
-
-- **servicebus/** - Azure Service Bus integration
 
 - **wa/** - Work Allocation integration
 
@@ -195,7 +192,6 @@ The codebase follows a layered architecture under `uk.gov.hmcts.ethos.replacemen
 
 - **CCD Data Store API**: Core case data service
 - **IDAM**: Identity and Access Management (uses RSE IdAM Simulator locally)
-- **Azure Service Bus**: Message queue (can use fake client locally via `SERVICEBUS_FAKE=true`)
 - **Docmosis Tornado**: Document generation (requires `TORNADO_ACCESS_KEY` and `TORNADO_URL`)
 - **Document Management**: DM Store for document storage
 - **Case Document AM API**: Document access management

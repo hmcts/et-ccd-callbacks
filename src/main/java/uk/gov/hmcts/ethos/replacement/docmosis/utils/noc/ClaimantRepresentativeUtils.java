@@ -7,11 +7,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.webjars.NotFoundException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.ClaimantUtils;
 
 import java.util.List;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.WARNING_CLAIMANT_EMAIL_NOT_FOUND;
 
 @Slf4j
@@ -101,31 +105,6 @@ public final class ClaimantRepresentativeUtils {
     }
 
     /**
-     * Determines whether the given representative has a valid organisation identifier.
-     *
-     * <p>This method returns {@code true} if the representative is not {@code null} and
-     * at least one of the following conditions is met:
-     * <ul>
-     *     <li>The representative has a non-null MyHMCTS organisation with a non-blank organisation ID, or</li>
-     *     <li>The representative has a non-blank direct organisation ID.</li>
-     * </ul>
-     * </p>
-     *
-     * <p>If the representative is {@code null}, or both organisation identifiers are
-     * absent or blank, the method returns {@code false}.</p>
-     *
-     * @param representative the {@link RepresentedTypeC} instance to evaluate
-     * @return {@code true} if a valid organisation identifier is present;
-     *         {@code false} otherwise
-     */
-    public static boolean hasOrganisationIdentifier(RepresentedTypeC representative) {
-        return ObjectUtils.isNotEmpty(representative)
-                && (ObjectUtils.isNotEmpty(representative.getMyHmctsOrganisation())
-                && StringUtils.isNotBlank(representative.getMyHmctsOrganisation().getOrganisationID())
-                || StringUtils.isNotBlank(representative.getOrganisationId()));
-    }
-
-    /**
      * Determines whether the claimant representative's email address matches
      * any valid respondent representative's email address.
      *
@@ -157,5 +136,39 @@ public final class ClaimantRepresentativeUtils {
                 .filter(RespondentRepresentativeUtils::isValidRepresentative)
                 .map(item -> item.getValue().getRepresentativeEmailAddress())
                 .anyMatch(claimantEmail::equals);
+    }
+
+    /**
+     * Updates the given {@link CaseData} to reflect that the claimant
+     * is no longer represented.
+     *
+     * <p>This method performs the following state changes:
+     * <ul>
+     *     <li>Clears the claimant representative type.</li>
+     *     <li>Marks the claimant representative as removed.</li>
+     *     <li>Sets the claimant represented question flag to {@code NO}.</li>
+     *     <li>Resets the claimant representative organisation policy with the
+     *         {@link ClaimantSolicitorRole#CLAIMANTSOLICITOR} case role label.</li>
+     * </ul>
+     *
+     * <h3>Assumptions</h3>
+     * <ul>
+     *     <li>{@code caseData} is not {@code null}.</li>
+     *     <li>The {@code YES} and {@code NO} constants are valid flag values
+     *         expected by the {@link CaseData} model.</li>
+     * </ul>
+     *
+     * <p>If {@code caseData} is {@code null}, a {@link NullPointerException}
+     * will be thrown.
+     *
+     * @param caseData the case data to update to an unrepresented claimant state;
+     *                 must not be {@code null}
+     */
+    public static void markClaimantAsUnrepresented(CaseData caseData) {
+        caseData.setRepresentativeClaimantType(null);
+        caseData.setClaimantRepresentativeRemoved(YES);
+        caseData.setClaimantRepresentedQuestion(NO);
+        caseData.setClaimantRepresentativeOrganisationPolicy(OrganisationPolicy.builder()
+                .orgPolicyCaseAssignedRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()).build());
     }
 }

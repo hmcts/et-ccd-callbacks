@@ -13,23 +13,15 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
-import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.LoggingUtils;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.ClaimantRepresentativeUtils;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.RespondentRepresentativeUtils;
 
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_FAILED_TO_REMOVE_CLAIMANT_REP_AND_ORG_POLICY;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_START_REMOVE_CLAIMANT_REP_AND_ORG_POLICY_INVALID_CCD_REQUEST;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_UPDATE_REVOKED_CLAIMANT_REP_AND_ORG_POLICY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EVENT_UPDATE_CASE_SUBMITTED;
 
 @Service
@@ -187,137 +179,38 @@ public class NocCcdService {
     }
 
     /**
-     * Revokes the claimant solicitor's case role assignment and removes the claimant's
-     * representation where the claimant's organisation matches one of the respondent
-     * representative organisations.
+     * Revokes the claimant solicitor's case role assignment for the given case,
+     * if such an assignment exists.
      *
-     * <p>This method performs the following checks before proceeding:
+     * <p>This method performs the following steps:
      * <ul>
-     *     <li>The provided {@code userToken} is not blank.</li>
-     *     <li>The claimant representative has a valid organisation identifier.</li>
-     *     <li>There are valid respondent representative organisation identifiers.</li>
-     *     <li>The claimant organisation is linked to one of the respondent organisations.</li>
+     *     <li>Returns immediately if the provided {@code userToken} is blank.</li>
+     *     <li>Attempts to locate a {@link CaseUserAssignment} for the
+     *         {@link ClaimantSolicitorRole#CLAIMANTSOLICITOR} role
+     *         associated with the given case ID.</li>
+     *     <li>If no matching assignment is found, the method exits without action.</li>
+     *     <li>If an assignment is found, it is revoked via {@code revokeCaseAssignments}.</li>
      * </ul>
-     * If any of these conditions are not satisfied, the method returns {@code false}
-     * and no further action is taken.</p>
      *
-     * <p>If the conditions are satisfied, the method attempts to:
-     * <ol>
-     *     <li>Locate the claimant solicitor's case user assignment.</li>
-     *     <li>Revoke the case assignment if present.</li>
-     *     <li>Remove the claimant's representation and update the associated organisation policy.</li>
-     * </ol>
-     * </p>
-     *
-     * <p>If a {@link CcdInputOutputException} occurs during case assignment revocation,
-     * the error is logged and the process continues with representation removal.</p>
-     *
-     * <p><strong>Assumptions:</strong> It is assumed that {@code caseDetails} is not {@code null},
-     * and that {@code caseDetails.getCaseData()} and its nested properties used within this
-     * method are not {@code null}. These values are not explicitly null-checked.</p>
+     * <p>No action is taken if the user token is invalid or the claimant solicitor
+     * role is not currently assigned to the case.
      *
      * @param userToken   the authorisation token of the user performing the operation;
-     *                    must not be {@code null} (blank values are handled)
-     * @param caseDetails the {@link CaseDetails} containing case identifiers and
-     *                    representation data; assumed to be non-{@code null}
-     * @return {@code true} if the revocation process was initiated and representation
-     *         removal executed; {@code false} if preconditions were not met
+     *                    must not be blank
+     * @param caseDetails the case details containing the case ID from which the
+     *                    claimant solicitor role should be revoked
      */
-    public boolean revokeClaimantRepresentation(String userToken, CaseDetails caseDetails) {
-        if (StringUtils.isBlank(userToken)
-                || !ClaimantRepresentativeUtils.hasOrganisationIdentifier(caseDetails.getCaseData()
-                .getRepresentativeClaimantType())) {
-            return false;
-        }
-        List<String> respondentRepresentativeOrganisationIds = RespondentRepresentativeUtils
-                .extractValidRespondentRepresentativeOrganisationIds(caseDetails.getCaseData());
-        if (!CollectionUtils.isNotEmpty(respondentRepresentativeOrganisationIds)) {
-            return false;
-        }
-        boolean claimantRepresentativeExists = ClaimantRepresentativeUtils
-                .isClaimantOrganisationLinkedToRespondents(
-                        caseDetails.getCaseData().getRepresentativeClaimantType(),
-                        respondentRepresentativeOrganisationIds);
-        if (!claimantRepresentativeExists) {
-            return false;
+    public void revokeClaimantRepresentation(String userToken, CaseDetails caseDetails) {
+        if (StringUtils.isBlank(userToken)) {
+            return;
         }
         CaseUserAssignment caseUserAssignment = findCaseUserAssignmentByRole(userToken, caseDetails.getCaseId(),
                 ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
         if (ObjectUtils.isEmpty(caseUserAssignment)) {
-            return false;
+            return;
         }
         CaseUserAssignmentData caseUserAssignmentData = CaseUserAssignmentData.builder().caseUserAssignments(
                 List.of(caseUserAssignment)).build();
         revokeCaseAssignments(userToken, caseUserAssignmentData);
-        if (!removeClaimantRepresentation(userToken, caseDetails)) {
-            log.error(ERROR_UNABLE_TO_UPDATE_REVOKED_CLAIMANT_REP_AND_ORG_POLICY, caseDetails.getCaseId());
-        }
-        return true;
-    }
-
-    /**
-     * Removes the claimant's legal representation and updates the associated
-     * organisation policy for the specified case.
-     *
-     * <p>This method initiates a CCD event to update a case in the "Submitted" state.
-     * If the event is successfully started, it performs the following updates:
-     * <ul>
-     *     <li>Clears the claimant representative details</li>
-     *     <li>Marks the claimant representative as removed</li>
-     *     <li>Sets the claimant representation status to not represented</li>
-     *     <li>Updates the claimant organisation policy with the claimant solicitor case role</li>
-     * </ul>
-     * The updated case data is then submitted via the CCD client.</p>
-     *
-     * <p>If the CCD event cannot be started (i.e. the {@link CCDRequest} is empty),
-     * the method logs an error and returns {@code false}. If an {@link IOException}
-     * occurs during submission, the error is logged and {@code false} is returned.</p>
-     *
-     * <p><strong>Assumptions:</strong>
-     * <ul>
-     *     <li>{@code userToken} is not {@code null} or blank.</li>
-     *     <li>{@code caseDetails} is not {@code null}.</li>
-     *     <li>{@code caseDetails.getCaseId()}, {@code caseDetails.getCaseTypeId()},
-     *         {@code caseDetails.getJurisdiction()}, and {@code caseDetails.getCaseData()}
-     *         are not {@code null}.</li>
-     * </ul>
-     * These values are not explicitly validated within this method.</p>
-     *
-     * @param userToken   the authorisation token of the user performing the operation;
-     *                    assumed to be non-null and non-blank
-     * @param caseDetails the {@link CaseDetails} containing the identifiers and case data
-     *                    required to perform the update; assumed to be non-null and populated
-     * @return {@code true} if the representation was successfully removed and the case
-     *         update submitted; {@code false} if the CCD event could not be started or
-     *         an error occurred during submission
-     */
-    public boolean removeClaimantRepresentation(String userToken, CaseDetails caseDetails) {
-        try {
-            CCDRequest ccdRequest = startEventForUpdateCaseSubmitted(userToken,
-                    caseDetails.getCaseTypeId(),
-                    caseDetails.getJurisdiction(),
-                    caseDetails.getCaseId());
-            if (ObjectUtils.isEmpty(ccdRequest)) {
-                log.error(ERROR_UNABLE_TO_START_REMOVE_CLAIMANT_REP_AND_ORG_POLICY_INVALID_CCD_REQUEST,
-                        caseDetails.getCaseId());
-                return false;
-            }
-            CaseDetails ccdRequestCaseDetails = ccdRequest.getCaseDetails();
-            ccdRequestCaseDetails.getCaseData().setRepresentativeClaimantType(null);
-            ccdRequestCaseDetails.getCaseData().setClaimantRepresentativeRemoved(YES);
-            ccdRequestCaseDetails.getCaseData().setClaimantRepresentedQuestion(NO);
-            ccdRequestCaseDetails.getCaseData().setClaimantRepresentativeOrganisationPolicy(OrganisationPolicy.builder()
-                    .orgPolicyCaseAssignedRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()).build());
-            ccdClient.submitEventForCase(userToken, ccdRequestCaseDetails.getCaseData(),
-                    ccdRequestCaseDetails.getCaseTypeId(),
-                    ccdRequestCaseDetails.getJurisdiction(),
-                    ccdRequest,
-                    ccdRequestCaseDetails.getCaseId());
-        } catch (IOException exception) {
-            log.error(ERROR_FAILED_TO_REMOVE_CLAIMANT_REP_AND_ORG_POLICY, caseDetails.getCaseId(),
-                    exception.getMessage(), exception);
-            return false;
-        }
-        return true;
     }
 }

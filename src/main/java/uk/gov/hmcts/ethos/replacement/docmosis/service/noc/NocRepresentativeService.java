@@ -30,6 +30,8 @@ public class NocRepresentativeService {
         } else {
             caseData = nocRespondentRepresentativeService.updateRespondentRepresentation(caseDetails);
             caseData = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, userToken);
+            caseDetails.setCaseData(caseData);
+            caseData = nocRespondentRepresentativeService.removeConflictingClaimantRepresentation(caseDetails);
         }
         return caseData;
     }

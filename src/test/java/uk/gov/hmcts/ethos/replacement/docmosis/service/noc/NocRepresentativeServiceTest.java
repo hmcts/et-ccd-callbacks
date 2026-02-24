@@ -18,6 +18,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -79,11 +80,12 @@ class NocRepresentativeServiceTest {
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
 
-        when(nocRespondentRepresentativeService.updateRespondentRepresentation(any()))
+        when(nocRespondentRepresentativeService.updateRespondentRepresentation(any(CaseDetails.class)))
                 .thenReturn(caseData);
-        when(nocRespondentRepresentativeService.prepopulateOrgAddress(any(), any()))
+        when(nocRespondentRepresentativeService.prepopulateOrgAddress(any(CaseData.class), anyString()))
                 .thenReturn(caseData);
-
+        when(nocRespondentRepresentativeService.removeConflictingClaimantRepresentation(any(CaseDetails.class)))
+                .thenReturn(caseData);
         CaseData result = nocRepresentativeService.updateRepresentation(caseDetails, "token");
 
         assertThat(result).isSameAs(caseData);

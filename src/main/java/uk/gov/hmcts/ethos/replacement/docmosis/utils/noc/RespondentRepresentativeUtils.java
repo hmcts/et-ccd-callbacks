@@ -530,29 +530,38 @@ public final class RespondentRepresentativeUtils {
     }
 
     /**
-     * Extracts the organisation IDs of all valid respondent representatives
+     * Extracts a list of valid respondent representative organisation IDs
      * from the given {@link CaseData}.
      *
-     * <p>This method iterates through the {@code repCollection} in the supplied
-     * {@code caseData} and collects organisation IDs where:
+     * <p>This method iterates through the respondent representative collection
+     * contained in {@code caseData} and returns the organisation IDs for
+     * representatives that meet all of the following conditions:
      * <ul>
-     *     <li>The representative passes {@code isValidRepresentative(...)} validation,</li>
-     *     <li>The respondent organisation object is present, and</li>
-     *     <li>The organisation ID is not blank.</li>
+     *     <li>The representative passes {@code isValidRepresentative(...)} validation.</li>
+     *     <li>The representative has a non-null respondent organisation.</li>
+     *     <li>The respondent organisation has a non-blank organisation ID.</li>
      * </ul>
      *
-     * <p>Representatives that do not meet these criteria are ignored.
-     * If the provided {@code caseData} is {@code null}, empty, or contains
-     * no representatives, an empty list is returned.
+     * <p>Representatives that do not satisfy these conditions are ignored.
      *
-     * @param caseData the case data containing the respondent representative collection
+     * <h3>Assumptions</h3>
+     * <ul>
+     *     <li>{@code caseData} is not {@code null}.</li>
+     *     <li>{@code caseData.getRepCollection()} is not {@code null}
+     *         (an empty collection is permitted).</li>
+     *     <li>Each {@link RepresentedTypeRItem} in the collection is not {@code null}.</li>
+     *     <li>{@code representative.getValue()} is not {@code null}.</li>
+     * </ul>
+     *
+     * <p>If any of the above assumptions are violated, a {@link NullPointerException}
+     * may be thrown.
+     *
+     * @param caseData the case data containing the respondent representative collection;
+     *                 must not be {@code null}
      * @return a list of non-blank organisation IDs for valid respondent representatives;
-     *         never {@code null}
+     *         never {@code null}, but may be empty if no valid representatives are found
      */
     public static List<String> extractValidRespondentRepresentativeOrganisationIds(CaseData caseData) {
-        if (ObjectUtils.isEmpty(caseData) || CollectionUtils.isEmpty(caseData.getRepCollection())) {
-            return new ArrayList<>();
-        }
         List<String> respondentRepresentativeOrganisations = new ArrayList<>();
         for (RepresentedTypeRItem representative : caseData.getRepCollection()) {
             if (!isValidRepresentative(representative)

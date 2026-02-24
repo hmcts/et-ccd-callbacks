@@ -152,8 +152,8 @@ class NocRespondentRepresentativeServiceTest {
             "Failed to add organisation policy for case 1234567890123456. Exception: Something went wrong";
 
     private static final String EXPECTED_WARNING_REPRESENTATIVE_EMAIL_ADDRESS_NOT_FOUND =
-            "Representative 'Legal One' could not be found using representative1@gmail.com. Case access will not be "
-                    + "defined for this representative.\n";
+            "Representative 'Legal One' could not be found using respondentRepresentative@gmail.com. Case access will "
+                    + "not be defined for this representative.\n";
     private static final String EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL =
             "Representative 'Legal One' could not be found using respondent@rep.email.com. "
                     + "Case access will not be defined for this representative.\n";
@@ -162,7 +162,9 @@ class NocRespondentRepresentativeServiceTest {
 
     private static final String CASE_ID_1 = "1234567890123456";
     private static final String REPRESENTATIVE_NAME = "Representative Name";
-    private static final String REPRESENTATIVE_EMAIL = "representative1@gmail.com";
+    private static final String RESPONDENT_REPRESENTATIVE_EMAIL = "respondentRepresentative@gmail.com";
+    private static final String CLAIMANT_REPRESENTATIVE_EMAIL = "claimantRepresentative@gmail.com";
+    private static final String REPRESENTATIVE_EMAIL = "representative@gmail.com";
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -544,7 +546,8 @@ class NocRespondentRepresentativeServiceTest {
         nocRespondentRepresentativeService.validateRepresentativesOrganisationsAndEmails(tmpCaseData);
         assertThat(tmpCaseData.getNocWarning()).isEqualTo(EXPECTED_WARNING_REPRESENTATIVE_EMAIL_NOT_FOUND);
         // when representative has email and does not have organisation should throw exception
-        tmpCaseData.getRepCollection().getFirst().getValue().setRepresentativeEmailAddress(REPRESENTATIVE_EMAIL);
+        tmpCaseData.getRepCollection().getFirst().getValue().setRepresentativeEmailAddress(
+                RESPONDENT_REPRESENTATIVE_EMAIL);
         GenericServiceException genericServiceException = assertThrows(GenericServiceException.class,
                 () -> nocRespondentRepresentativeService.validateRepresentativesOrganisationsAndEmails(tmpCaseData));
         assertThat(genericServiceException.getMessage()).isEqualTo(
@@ -664,7 +667,7 @@ class NocRespondentRepresentativeServiceTest {
         tmpRepresentative.getValue().setMyHmctsYesNo(YES);
         tmpRepresentative.getValue().setRespondentOrganisation(Organisation.builder()
                 .organisationID(ORGANISATION_ID_ONE).build());
-        tmpRepresentative.getValue().setRepresentativeEmailAddress(REPRESENTATIVE_EMAIL);
+        tmpRepresentative.getValue().setRepresentativeEmailAddress(RESPONDENT_REPRESENTATIVE_EMAIL);
         assertThat(nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(callbackRequest,
                 USER_TOKEN, representativesToRemove)).isEmpty();
         verifyNocCcdServiceCaseAssignmentsCall(LoggerTestUtils.INTEGER_SIX);
@@ -764,7 +767,7 @@ class NocRespondentRepresentativeServiceTest {
         representative1.getValue().setRespRepName(RESPONDENT_NAME_ONE);
         representative1.getValue().setRespondentOrganisation(Organisation.builder().organisationID(ORGANISATION_ID_ONE)
                 .build());
-        representative1.getValue().setRepresentativeEmailAddress(REPRESENTATIVE_EMAIL);
+        representative1.getValue().setRepresentativeEmailAddress(RESPONDENT_REPRESENTATIVE_EMAIL);
         CCDRequest ccdRequest = new CCDRequest();
         ccdRequest.setCaseDetails(new CaseDetails());
         ccdRequest.getCaseDetails().setCaseData(newCaseDetails.getCaseData());
@@ -799,7 +802,7 @@ class NocRespondentRepresentativeServiceTest {
         representative.setId(REPRESENTATIVE_ID_ONE);
         representative.setValue(RepresentedTypeR.builder().myHmctsYesNo(YES).respondentOrganisation(
                         Organisation.builder().organisationID(ORGANISATION_ID_ONE).build())
-                .representativeEmailAddress(REPRESENTATIVE_EMAIL).build());
+                .representativeEmailAddress(RESPONDENT_REPRESENTATIVE_EMAIL).build());
         List<RepresentedTypeRItem> assignableRepresentatives = nocRespondentRepresentativeService
                 .findRepresentativesToAssign(null, representatives);
         assertThat(assignableRepresentatives).isNotEmpty().hasSize(LoggerTestUtils.INTEGER_ONE);
@@ -1139,87 +1142,99 @@ class NocRespondentRepresentativeServiceTest {
 
     @Test
     @SneakyThrows
-    void theRemoveClaimantRepresentative() {
-        // when case details empty should not revoke claimant representative case assignment.
-        nocRespondentRepresentativeService.removeClaimantRepresentative(null);
+    void theRemoveConflictingClaimantRepresentation() {
+        // when case details empty should not revoke claimant representative case assignment and return null.
+        assertThat(nocRespondentRepresentativeService.removeConflictingClaimantRepresentation(null)).isNull();
+        // when case details not have case id should not revoke claimant representative case assignment and return null.
         CaseDetails caseDetails = new CaseDetails();
+        assertThat(nocRespondentRepresentativeService.removeConflictingClaimantRepresentation(caseDetails)).isNull();
         verify(nocCcdService, times(LoggerTestUtils.INTEGER_ZERO)).revokeClaimantRepresentation(ADMIN_USER_TOKEN,
                 caseDetails);
-        // when case details not have case id should not revoke claimant representative case assignment.
-        nocRespondentRepresentativeService.removeClaimantRepresentative(caseDetails);
-        verify(nocCcdService, times(LoggerTestUtils.INTEGER_ZERO)).revokeClaimantRepresentation(ADMIN_USER_TOKEN,
-                caseDetails);
-        // when case details not have case type id should not revoke claimant representative case assignment.
+        // when case details not have case type id should not revoke claimant representative case assignment and
+        // return null.
         caseDetails.setCaseId(CASE_ID_1);
-        nocRespondentRepresentativeService.removeClaimantRepresentative(caseDetails);
+        assertThat(nocRespondentRepresentativeService.removeConflictingClaimantRepresentation(caseDetails)).isNull();
         verify(nocCcdService, times(LoggerTestUtils.INTEGER_ZERO)).revokeClaimantRepresentation(ADMIN_USER_TOKEN,
                 caseDetails);
-        // when case details not have jurisdiction should not revoke claimant representative case assignment.
+        // when case details not have jurisdiction should not revoke claimant representative case assignment and
+        // return null.
         caseDetails.setCaseTypeId(CASE_TYPE_ID_ENGLAND_WALES);
-        nocRespondentRepresentativeService.removeClaimantRepresentative(caseDetails);
+        nocRespondentRepresentativeService.removeConflictingClaimantRepresentation(caseDetails);
         verify(nocCcdService, times(LoggerTestUtils.INTEGER_ZERO)).revokeClaimantRepresentation(ADMIN_USER_TOKEN,
                 caseDetails);
-        // when case details not have case data should not revoke claimant representative case assignment.
+        // when case details not have case data should not revoke claimant representative case assignment and
+        // return null.
         caseDetails.setJurisdiction(JURISDICTION_EMPLOYMENT);
-        nocRespondentRepresentativeService.removeClaimantRepresentative(caseDetails);
+        nocRespondentRepresentativeService.removeConflictingClaimantRepresentation(caseDetails);
         verify(nocCcdService, times(LoggerTestUtils.INTEGER_ZERO)).revokeClaimantRepresentation(ADMIN_USER_TOKEN,
                 caseDetails);
-        // when case details not have respondent collection should not revoke claimant representative case assignment.
-        caseDetails.setCaseData(new CaseData());
-        nocRespondentRepresentativeService.removeClaimantRepresentative(caseDetails);
+        // when case details not have respondent representative collection should not revoke claimant representative
+        // case assignment and return case data.
+        CaseData tmpCaseData = new CaseData();
+        caseDetails.setCaseData(tmpCaseData);
+        assertThat(nocRespondentRepresentativeService.removeConflictingClaimantRepresentation(caseDetails))
+                .isEqualTo(tmpCaseData);
         verify(nocCcdService, times(LoggerTestUtils.INTEGER_ZERO)).revokeClaimantRepresentation(ADMIN_USER_TOKEN,
                 caseDetails);
-        // when claimant represented question not equals to Yes should not revoke claimant representative case
-        // assignment.
-        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
-        respondent.setId(RESPONDENT_ID_ONE);
-        respondent.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_ONE).respondentOrganisation(
-                ORGANISATION_ID_ONE).representativeId(REPRESENTATIVE_ID_ONE).represented(YES).build());
-        Organisation respondentRepresentativeOrganisation = Organisation.builder().organisationID(StringUtils.EMPTY)
-                .build();
+        // when claimant represented question is NO should not revoke claimant representative case assignment and
+        // return case data.
         RepresentedTypeRItem respondentRepresentative = RepresentedTypeRItem.builder().value(RepresentedTypeR.builder()
-                        .nameOfRepresentative(REPRESENTATIVE_NAME).representativeEmailAddress(REPRESENTATIVE_EMAIL)
-                        .respondentOrganisation(respondentRepresentativeOrganisation).build())
+                .nameOfRepresentative(REPRESENTATIVE_NAME)
+                .representativeEmailAddress(RESPONDENT_REPRESENTATIVE_EMAIL)
+                .respondentOrganisation(Organisation.builder().organisationID(ORGANISATION_ID_ONE).build()).build())
                 .id(REPRESENTATIVE_ID_ONE).build();
-        caseDetails.getCaseData().setRespondentCollection(List.of(respondent));
-        caseDetails.getCaseData().setRepCollection(List.of(respondentRepresentative));
-        caseDetails.getCaseData().setClaimantRepresentedQuestion(NO);
-        nocRespondentRepresentativeService.removeClaimantRepresentative(caseDetails);
+        tmpCaseData.setRepCollection(List.of(respondentRepresentative));
+        tmpCaseData.setClaimantRepresentedQuestion(NO);
+        assertThat(nocRespondentRepresentativeService.removeConflictingClaimantRepresentation(caseDetails))
+                .isEqualTo(tmpCaseData);
         verify(nocCcdService, times(LoggerTestUtils.INTEGER_ZERO)).revokeClaimantRepresentation(ADMIN_USER_TOKEN,
                 caseDetails);
-        // when claimant representative not removed should not send notification of claimant representative removal
-        caseDetails.getCaseData().setClaimantRepresentedQuestion(YES);
-        when(nocCcdService.revokeClaimantRepresentation(eq(ADMIN_USER_TOKEN), any(CaseDetails.class)))
-                .thenReturn(false);
-        nocRespondentRepresentativeService.removeClaimantRepresentative(caseDetails);
+        // when there is no matching claimant and respondent representative organisation ids should not revoke claimant
+        // representative case assignment and return case data.
+        RepresentedTypeC claimantRepresentative = RepresentedTypeC.builder().nameOfRepresentative(REPRESENTATIVE_NAME)
+                .representativeEmailAddress(CLAIMANT_REPRESENTATIVE_EMAIL).myHmctsOrganisation(Organisation.builder()
+                        .organisationID(ORGANISATION_ID_TWO).build()).build();
+        tmpCaseData.setRepresentativeClaimantType(claimantRepresentative);
+        tmpCaseData.setClaimantRepresentedQuestion(YES);
+        tmpCaseData.setClaimantRepresentativeRemoved(NO);
+        assertThat(nocRespondentRepresentativeService.removeConflictingClaimantRepresentation(caseDetails))
+                .isEqualTo(tmpCaseData);
+        verify(nocCcdService, times(LoggerTestUtils.INTEGER_ZERO)).revokeClaimantRepresentation(ADMIN_USER_TOKEN,
+                caseDetails);
+        // when claimant representative email is same with respondent representative email should revoke claimant
+        // representative case assignment and return case data.
+        tmpCaseData.getRepresentativeClaimantType().setRepresentativeEmailAddress(REPRESENTATIVE_EMAIL);
+        tmpCaseData.getRepCollection().getFirst().getValue().setRepresentativeEmailAddress(REPRESENTATIVE_EMAIL);
+        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
+        doNothing().when(nocCcdService).revokeClaimantRepresentation(ADMIN_USER_TOKEN, caseDetails);
+        doNothing().when(nocNotificationService).notifyClaimantOfRepresentationRemoval(any(CaseDetails.class));
+        assertThat(nocRespondentRepresentativeService.removeConflictingClaimantRepresentation(caseDetails))
+                .isEqualTo(tmpCaseData);
         verify(nocCcdService, times(LoggerTestUtils.INTEGER_ONE)).revokeClaimantRepresentation(ADMIN_USER_TOKEN,
                 caseDetails);
-        verify(nocNotificationService, times(LoggerTestUtils.INTEGER_ZERO)).notifyClaimantOfRepresentationRemoval(
-                any(CaseDetails.class));
-        // when claimant representative not removed and claimant representative email matches with respondent
-        // representative email should send notification of claimant representative removal
-        when(nocCcdService.revokeClaimantRepresentation(eq(ADMIN_USER_TOKEN), any(CaseDetails.class)))
-                .thenReturn(false);
-        RepresentedTypeC claimantRepresentative = RepresentedTypeC.builder().representativeEmailAddress(
-                REPRESENTATIVE_EMAIL).build();
-        caseDetails.getCaseData().setRepresentativeClaimantType(claimantRepresentative);
-        when(nocCcdService.removeClaimantRepresentation(eq(ADMIN_USER_TOKEN), any(CaseDetails.class))).thenReturn(true);
-        nocRespondentRepresentativeService.removeClaimantRepresentative(caseDetails);
+        assertThat(tmpCaseData.getClaimantRepresentedQuestion()).isEqualTo(NO);
+        assertThat(tmpCaseData.getClaimantRepresentativeRemoved()).isEqualTo(YES);
+        assertThat(tmpCaseData.getRepresentativeClaimantType()).isNull();
+        OrganisationPolicy tmpClaimantOrganisationPolicy = OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
+                        ROLE_CLAIMANT_SOLICITOR).build();
+        assertThat(tmpCaseData.getClaimantRepresentativeOrganisationPolicy()).isEqualTo(tmpClaimantOrganisationPolicy);
+        // when claimant representative organisation id is same with respondent representative organisation id should
+        // revoke claimant representative case assignment and return case data.
+        respondentRepresentative.getValue().setRepresentativeEmailAddress(RESPONDENT_REPRESENTATIVE_EMAIL);
+        respondentRepresentative.getValue().getRespondentOrganisation().setOrganisationID(ORGANISATION_ID_ONE);
+        claimantRepresentative.setRepresentativeEmailAddress(CLAIMANT_REPRESENTATIVE_EMAIL);
+        claimantRepresentative.getMyHmctsOrganisation().setOrganisationID(ORGANISATION_ID_ONE);
+        tmpCaseData.setRepresentativeClaimantType(claimantRepresentative);
+        tmpCaseData.setClaimantRepresentedQuestion(YES);
+        tmpCaseData.setClaimantRepresentativeRemoved(NO);
+        assertThat(nocRespondentRepresentativeService.removeConflictingClaimantRepresentation(caseDetails))
+                .isEqualTo(tmpCaseData);
         verify(nocCcdService, times(LoggerTestUtils.INTEGER_TWO)).revokeClaimantRepresentation(ADMIN_USER_TOKEN,
                 caseDetails);
-        verify(nocCcdService, times(LoggerTestUtils.INTEGER_ONE)).removeClaimantRepresentation(ADMIN_USER_TOKEN,
-                caseDetails);
-        verify(nocNotificationService, times(LoggerTestUtils.INTEGER_ONE)).notifyClaimantOfRepresentationRemoval(
-                any(CaseDetails.class));
-        // when claimant representative not removed should not send notification of claimant representative removal
-        when(nocCcdService.revokeClaimantRepresentation(eq(ADMIN_USER_TOKEN), any(CaseDetails.class)))
-                .thenReturn(true);
-        doNothing().when(nocNotificationService).notifyClaimantOfRepresentationRemoval(any(CaseDetails.class));
-        nocRespondentRepresentativeService.removeClaimantRepresentative(caseDetails);
-        verify(nocCcdService, times(LoggerTestUtils.INTEGER_THREE)).revokeClaimantRepresentation(ADMIN_USER_TOKEN,
-                caseDetails);
-        verify(nocNotificationService, times(LoggerTestUtils.INTEGER_TWO)).notifyClaimantOfRepresentationRemoval(
-                any(CaseDetails.class));
+        assertThat(tmpCaseData.getClaimantRepresentedQuestion()).isEqualTo(NO);
+        assertThat(tmpCaseData.getClaimantRepresentativeRemoved()).isEqualTo(YES);
+        assertThat(tmpCaseData.getRepresentativeClaimantType()).isNull();
+        assertThat(tmpCaseData.getClaimantRepresentativeOrganisationPolicy()).isEqualTo(tmpClaimantOrganisationPolicy);
     }
 
     @Test

@@ -544,7 +544,36 @@ public class NocRespondentRepresentativeService {
         }
     }
 
-    public void removeClaimantRepresentative(CaseDetails caseDetails) {
+    /**
+     * Removes the claimant's legal representation where a conflict exists with a respondent's
+     * representative.
+     *
+     * <p>This method performs a series of validation checks to ensure the supplied
+     * {@link CaseDetails} contains the minimum required information (case ID,
+     * case type ID, jurisdiction, case data, representative collection, and that
+     * the claimant is currently marked as represented). If any of these checks fail,
+     * no action is taken and the existing {@link CaseData} is returned (or {@code null}
+     * if {@code caseDetails} itself is {@code null}).</p>
+     *
+     * <p>If validation passes, the method:
+     * <ol>
+     *     <li>Obtains an admin user token.</li>
+     *     <li>Attempts to revoke the claimant's representation via CCD.</li>
+     *     <li>If revocation fails and the claimant representative’s email matches
+     *         a respondent representative, forcefully removes the claimant representation.</li>
+     *     <li>Sends a notification to the claimant if the representation is successfully removed.</li>
+     * </ol>
+     *
+     * <p>If representation removal is unsuccessful, the original {@link CaseData}
+     * is returned unchanged.</p>
+     *
+     * @param caseDetails the case details containing identifiers and case data;
+     *                    may be {@code null}
+     * @return the updated {@link CaseData} if representation was successfully removed,
+     *         the existing {@link CaseData} if no action was taken or removal failed,
+     *         or {@code null} if {@code caseDetails} is {@code null}
+     */
+    public CaseData removeConflictingClaimantRepresentation(CaseDetails caseDetails) {
         if (ObjectUtils.isEmpty(caseDetails)
                 || StringUtils.isEmpty(caseDetails.getCaseId())
                 || StringUtils.isBlank(caseDetails.getCaseTypeId())
@@ -552,19 +581,24 @@ public class NocRespondentRepresentativeService {
                 || ObjectUtils.isEmpty(caseDetails.getCaseData())
                 || CollectionUtils.isEmpty(caseDetails.getCaseData().getRepCollection())
                 || !YES.equals(caseDetails.getCaseData().getClaimantRepresentedQuestion())) {
-            return;
+            return ObjectUtils.isEmpty(caseDetails) ? null : caseDetails.getCaseData();
+        }
+        List<String> respondentRepresentativeOrganisationIds = RespondentRepresentativeUtils
+                .extractValidRespondentRepresentativeOrganisationIds(caseDetails.getCaseData());
+        boolean claimantRepresentativeOrganisationMatches = ClaimantRepresentativeUtils
+                .isClaimantOrganisationLinkedToRespondents(
+                        caseDetails.getCaseData().getRepresentativeClaimantType(),
+                        respondentRepresentativeOrganisationIds);
+        boolean claimantRepresentativeEmailMatches = ClaimantRepresentativeUtils
+                .isClaimantRepresentativeEmailMatchedWithRespondents(caseDetails.getCaseData());
+        if (!claimantRepresentativeOrganisationMatches && !claimantRepresentativeEmailMatches) {
+            return caseDetails.getCaseData();
         }
         final String adminUserToken = adminUserService.getAdminUserToken();
-        boolean isClaimantRepresentativeRemoved = nocCcdService.revokeClaimantRepresentation(adminUserToken,
-                caseDetails);
-        if  (!isClaimantRepresentativeRemoved
-                && ClaimantRepresentativeUtils.isClaimantRepresentativeEmailMatchedWithRespondents(
-                        caseDetails.getCaseData())) {
-            isClaimantRepresentativeRemoved = nocCcdService.removeClaimantRepresentation(adminUserToken, caseDetails);
-        }
-        if (isClaimantRepresentativeRemoved) {
-            nocNotificationService.notifyClaimantOfRepresentationRemoval(caseDetails);
-        }
+        nocCcdService.revokeClaimantRepresentation(adminUserToken, caseDetails);
+        ClaimantRepresentativeUtils.markClaimantAsUnrepresented(caseDetails.getCaseData());
+        nocNotificationService.notifyClaimantOfRepresentationRemoval(caseDetails);
+        return caseDetails.getCaseData();
     }
 
     /**
@@ -621,6 +655,8 @@ public class NocRespondentRepresentativeService {
         final SolicitorRole role = SolicitorRole.from(change.getCaseRoleId().getSelectedCode()).orElseThrow();
         RespondentSumTypeItem respondent = caseData.getRespondentCollection().get(role.getIndex());
         RepresentedTypeR addedSolicitor = nocRespondentHelper.generateNewRepDetails(change, userDetails, respondent);
+        addedSolicitor.setRole(role.getCaseRoleLabel());
+        addedSolicitor.setRespondentId(respondent.getId());
         List<RepresentedTypeRItem> repCollection = getIfNull(caseData.getRepCollection(), new ArrayList<>());
         int repIndex = nocRespondentHelper.getIndexOfRep(respondent, repCollection);
         if (repIndex >= 0) {

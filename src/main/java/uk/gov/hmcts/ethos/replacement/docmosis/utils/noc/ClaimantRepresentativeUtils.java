@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.webjars.NotFoundException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
@@ -132,10 +133,16 @@ public final class ClaimantRepresentativeUtils {
         }
         String claimantEmail = caseData.getRepresentativeClaimantType().getRepresentativeEmailAddress();
 
-        return caseData.getRepCollection().stream()
-                .filter(RespondentRepresentativeUtils::isValidRepresentative)
-                .map(item -> item.getValue().getRepresentativeEmailAddress())
-                .anyMatch(claimantEmail::equals);
+        for (RepresentedTypeRItem respondentRepresentative : caseData.getRepCollection()) {
+            if (ObjectUtils.isEmpty(respondentRepresentative)
+                    && ObjectUtils.isEmpty(respondentRepresentative.getValue())) {
+                continue;
+            }
+            if (claimantEmail.equals(respondentRepresentative.getValue().getRepresentativeEmailAddress())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**

@@ -564,7 +564,8 @@ public final class RespondentRepresentativeUtils {
     public static List<String> extractValidRespondentRepresentativeOrganisationIds(CaseData caseData) {
         List<String> respondentRepresentativeOrganisations = new ArrayList<>();
         for (RepresentedTypeRItem representative : caseData.getRepCollection()) {
-            if (!isValidRepresentative(representative)
+            if (ObjectUtils.isEmpty(representative)
+                    || ObjectUtils.isEmpty(representative.getValue())
                     || ObjectUtils.isEmpty(representative.getValue().getRespondentOrganisation())
                     || StringUtils.isBlank(representative.getValue().getRespondentOrganisation().getOrganisationID())) {
                 continue;

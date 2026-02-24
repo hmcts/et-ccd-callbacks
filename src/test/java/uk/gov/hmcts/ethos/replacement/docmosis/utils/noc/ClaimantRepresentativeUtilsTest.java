@@ -9,14 +9,18 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
+import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.test.utils.LoggerTestUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 final class ClaimantRepresentativeUtilsTest {
 
@@ -26,6 +30,7 @@ final class ClaimantRepresentativeUtilsTest {
     private static final String ORGANISATION_ID_1 = "dummy12_organisation34_id56";
     private static final String ORGANISATION_ID_2 = "dummy65_organisation43_id21";
     private static final String RESPONDENT_REPRESENTATIVE_ID = "respondentRepresentativeId";
+    private static final String CLAIMANT_REPRESENTATIVE_ID = "claimantRepresentativeId";
 
     private static final String EXPECTED_WARNING_CLAIMANT_EMAIL_NOT_FOUND = "Could not find claimant email address.";
     private static final String EXPECTED_WARNING_WITHOUT_CASE_ID = "Claimant email not found for case ";
@@ -107,26 +112,6 @@ final class ClaimantRepresentativeUtilsTest {
     }
 
     @Test
-    void theHasOrganisationIdentifier() {
-        // when representative is empty should return false
-        assertThat(ClaimantRepresentativeUtils.hasOrganisationIdentifier(null)).isFalse();
-        // when both organisation id and my hmcts organisation id are empty should return false
-        RepresentedTypeC claimantRepresentative =  RepresentedTypeC.builder().build();
-        assertThat(ClaimantRepresentativeUtils.hasOrganisationIdentifier(claimantRepresentative)).isFalse();
-        // when my hmcts organisation id is empty and organisation id is not empty should return true
-        claimantRepresentative.setOrganisationId(ORGANISATION_ID_1);
-        assertThat(ClaimantRepresentativeUtils.hasOrganisationIdentifier(claimantRepresentative)).isTrue();
-        // when both my hmcts organisation id and organisation id are empty should return true
-        claimantRepresentative.setOrganisationId(StringUtils.EMPTY);
-        Organisation organisation = Organisation.builder().build();
-        claimantRepresentative.setMyHmctsOrganisation(organisation);
-        assertThat(ClaimantRepresentativeUtils.hasOrganisationIdentifier(claimantRepresentative)).isFalse();
-        // when my hmcts organisation id is not empty and organisation id is empty should return true
-        organisation.setOrganisationID(ORGANISATION_ID_1);
-        assertThat(ClaimantRepresentativeUtils.hasOrganisationIdentifier(claimantRepresentative)).isTrue();
-    }
-
-    @Test
     void theIsClaimantRepresentativeEmailMatchedWithRespondents() {
         // when claimant representative is empty should return false
         CaseData caseData = new CaseData();
@@ -146,5 +131,24 @@ final class ClaimantRepresentativeUtilsTest {
                         .build()).build();
         caseData.getRepCollection().add(respondentRepresentative);
         assertThat(ClaimantRepresentativeUtils.isClaimantRepresentativeEmailMatchedWithRespondents(caseData)).isTrue();
+    }
+
+    @Test
+    void theMarkClaimantAsUnrepresented() {
+        // should remove all claimant representative details and not throw any exception
+        CaseData caseData = new CaseData();
+        caseData.setClaimantRepresentativeOrganisationPolicy(OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
+                ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()).build());
+        caseData.setRepresentativeClaimantType(RepresentedTypeC.builder().representativeId(CLAIMANT_REPRESENTATIVE_ID)
+                .myHmctsOrganisation(Organisation.builder().organisationID(ORGANISATION_ID_1).build()).build());
+        caseData.setClaimantRepresentativeRemoved(NO);
+        caseData.setClaimantRepresentedQuestion(YES);
+        ClaimantRepresentativeUtils.markClaimantAsUnrepresented(caseData);
+        assertThat(caseData.getRepresentativeClaimantType()).isNull();
+        assertThat(caseData.getClaimantRepresentativeRemoved()).isEqualTo(YES);
+        assertThat(caseData.getClaimantRepresentedQuestion()).isEqualTo(NO);
+        assertThat(caseData.getClaimantRepresentativeOrganisationPolicy()).isEqualTo(OrganisationPolicy.builder()
+                .orgPolicyCaseAssignedRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()).build());
+
     }
 }

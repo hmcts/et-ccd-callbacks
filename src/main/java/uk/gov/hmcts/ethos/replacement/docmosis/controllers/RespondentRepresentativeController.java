@@ -160,6 +160,7 @@ public class RespondentRepresentativeController {
                 nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, userToken);
                 NocUtils.assignNonMyHmctsOrganisationIds(caseData.getRepCollection());
                 NocUtils.clearNocWarningIfPresent(caseData);
+                nocRespondentRepresentativeService.removeConflictingClaimantRepresentation(ccdRequest.getCaseDetails());
             } catch (GenericRuntimeException | GenericServiceException gse) {
                 errors.addFirst(gse.getMessage());
             }
@@ -188,7 +189,6 @@ public class RespondentRepresentativeController {
             NocUtils.validateCallbackRequest(callbackRequest);
             nocRespondentRepresentativeService.removeOldRepresentatives(callbackRequest, userToken);
             nocRespondentRepresentativeService.addNewRepresentatives(callbackRequest);
-            nocRespondentRepresentativeService.removeClaimantRepresentative(callbackRequest.getCaseDetails());
         } catch (GenericServiceException e) {
             throw new GenericRuntimeException(new GenericServiceException(e));
         }

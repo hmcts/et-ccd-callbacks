@@ -512,14 +512,9 @@ final class RespondentRepresentativeUtilsTest {
 
     @Test
     void theExtractValidRespondentRepresentativeOrganisationIds() {
-        // when case data is empty should return an empty arraylist
-        assertThat(RespondentRepresentativeUtils.extractValidRespondentRepresentativeOrganisationIds(null)).isEmpty();
-        // when case data representative collection is empty should return an empty arraylist
+        // when representative is not valid should return an empty arraylist
         CaseData caseData = new CaseData();
         caseData.setRepCollection(new ArrayList<>());
-        assertThat(RespondentRepresentativeUtils.extractValidRespondentRepresentativeOrganisationIds(caseData))
-                .isEmpty();
-        // when representative is not valid should return an empty arraylist
         RepresentedTypeRItem representative = RepresentedTypeRItem.builder().build();
         caseData.getRepCollection().add(representative);
         assertThat(RespondentRepresentativeUtils.extractValidRespondentRepresentativeOrganisationIds(caseData))

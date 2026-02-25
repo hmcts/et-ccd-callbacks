@@ -127,6 +127,10 @@ allprojects {
             if (details.requested.group.startsWith("com.fasterxml.jackson")) {
                 details.useVersion("$jacksonVersion")
             }
+            // CVE-2020-29582 - Force Kotlin to 2.1.0+
+            if (details.requested.group == "org.jetbrains.kotlin" && details.requested.name.startsWith("kotlin-stdlib")) {
+                details.useVersion("2.1.0")
+            }
         }
         resolutionStrategy.force(
             'commons-fileupload:commons-fileupload:1.6.0',

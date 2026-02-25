@@ -163,6 +163,12 @@ dependencies {
 }
 
 configurations.configureEach {
+    resolutionStrategy.eachDependency { details ->
+        // CVE-2020-29582 - Force Kotlin to 2.1.0+
+        if (details.requested.group == "org.jetbrains.kotlin" && details.requested.name.startsWith("kotlin-stdlib")) {
+            details.useVersion("2.1.0")
+        }
+    }
     resolutionStrategy.force(
         'commons-fileupload:commons-fileupload:1.6.0',
         'org.apache.httpcomponents:httpclient:4.5.14',

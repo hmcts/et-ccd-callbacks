@@ -13,7 +13,7 @@ public final class LoggerTestUtils {
 
     public static final int INTEGER_ZERO = NumberUtils.INTEGER_ZERO;
     public static final int INTEGER_ONE = NumberUtils.INTEGER_ONE;
-    public static final int INTEGER_TWO = 2;
+    public static final int INTEGER_TWO = NumberUtils.INTEGER_TWO;
     public static final int INTEGER_THREE = 3;
     public static final int INTEGER_FOUR = 4;
     public static final int INTEGER_FIVE = 5;

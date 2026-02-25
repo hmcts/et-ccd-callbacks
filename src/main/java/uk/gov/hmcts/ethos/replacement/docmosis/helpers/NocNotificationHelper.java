@@ -123,6 +123,12 @@ public final class NocNotificationHelper {
         return personalisation;
     }
 
+    public static Map<String, String> buildCommonPersonalisation(CaseData caseData) {
+        Map<String, String> personalisation = new ConcurrentHashMap<>();
+        addCommonValues(caseData, personalisation);
+        return personalisation;
+    }
+
     private static void addCommonValues(CaseData caseData, Map<String, String> personalisation) {
         personalisation.put(CLAIMANT, caseData.getClaimant());
         personalisation.put("list_of_respondents", getListOfRespondents(caseData));

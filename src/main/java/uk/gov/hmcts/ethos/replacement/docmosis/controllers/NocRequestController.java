@@ -68,10 +68,7 @@ public class NocRequestController {
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
 
-        nocRequestService.sendEmailToOrgAdmin();
-        nocRequestService.sendEmailToThisLegalRep();
-        nocRequestService.sendEmailToRemovedParty();
-        nocRequestService.sendEmailToOtherParty();
+        nocRequestService.sendEmailNotification(userToken, ccdRequest.getCaseDetails());
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()
             .data(ccdRequest.getCaseDetails().getCaseData())

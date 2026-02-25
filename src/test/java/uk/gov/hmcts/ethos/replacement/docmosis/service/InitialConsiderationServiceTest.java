@@ -2004,7 +2004,6 @@ class InitialConsiderationServiceTest {
         String result = service.setIcEt3VettingIssuesDetailsForEachRespondent(caseDataWithRespondentNameDetails);
 
         assertNotNull(result);
-        assertTrue(result.contains("Do we have the respondent's name?"));
         assertTrue(result.contains("Does the respondent's name match?"));
         assertTrue(result.contains("Mismatch details"));
     }

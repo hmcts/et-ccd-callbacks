@@ -63,7 +63,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsidera
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.DOC_GEN_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.DOES_THE_RESPONDENT_S_NAME_MATCH;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.DO_WE_HAVE_THE_RESPONDENT_S_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.GIVE_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.HEARING_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.HEARING_FORMAT_PREFERENCE;
@@ -87,6 +86,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsidera
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.RESPONDENT_MISSING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.RESPONDENT_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.RULE_49;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.RULE_50;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.SEEK_COMMENTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.SEEK_COMMENTS_SC;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.TABLE_END;
@@ -944,7 +944,6 @@ public class InitialConsiderationService {
             return;
         }
 
-        addPair(pairsList, DO_WE_HAVE_THE_RESPONDENT_S_NAME, et3Vetting.getEt3DoWeHaveRespondentsName());
         if (YES.equals(et3Vetting.getEt3DoWeHaveRespondentsName())) {
             addPair(pairsList, DOES_THE_RESPONDENT_S_NAME_MATCH, et3Vetting.getEt3DoesRespondentsNameMatch());
             if (NO.equals(et3Vetting.getEt3DoesRespondentsNameMatch())) {
@@ -978,11 +977,6 @@ public class InitialConsiderationService {
     private void processAddressMatch(Et3VettingType et3Vetting, List<String[]> pairsList) {
         if (et3Vetting == null) {
             return;
-        }
-
-        if (et3Vetting.getEt3GeneralNotesRespondentAddress() != null) {
-            addPair(pairsList, "General notes (Respondent's address provided):",
-                    defaultIfNull(et3Vetting.getEt3GeneralNotesRespondentAddress()));
         }
 
         addPair(pairsList, "Does the respondent's address match?",
@@ -1087,10 +1081,12 @@ public class InitialConsiderationService {
             return;
         }
 
-        if (et3Vetting.getEt3SuggestedIssues() != null && !et3Vetting.getEt3SuggestedIssues().isEmpty()) {
+        if (CollectionUtils.isNotEmpty(et3Vetting.getEt3SuggestedIssues())) {
             addPair(pairsList, "Are there any other suggested orders, directions or issues?", "");
-            et3Vetting.getEt3SuggestedIssues().forEach(issue -> addPair(pairsList, issue,
-                    getSuggestedIssueDetails(et3Vetting, issue)));
+            et3Vetting.getEt3SuggestedIssues().stream()
+                .map(issue -> RULE_50.equals(issue) ? RULE_49 : issue)
+                .forEach(expectedIssue ->
+                    addPair(pairsList, expectedIssue, getSuggestedIssueDetails(et3Vetting, expectedIssue)));
         }
     }
 

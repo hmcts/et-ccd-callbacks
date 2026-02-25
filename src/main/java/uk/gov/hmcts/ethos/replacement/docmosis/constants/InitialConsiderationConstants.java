@@ -130,6 +130,7 @@ public final class InitialConsiderationConstants {
     public static final String ISSUE_RULE_28_NOTICE_AND_ORDER_SC = "issueRule28";
     public static final String RULE_29_NOTICE = "Rule 29 Notice";
     public static final String RULE_49 = "Rule 49";
+    public static final String RULE_50 = "Rule 50";
     public static final String REQUEST_FOR_ADJUSTMENTS = "Request for adjustments";
     public static final String TIME_POINTS = "Time points";
     public static final String TABLE_END = """

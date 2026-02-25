@@ -44,12 +44,20 @@ def sonarExclusions =
          '**/uk/gov/hmcts/reform/ethos/replacement/docmosis/CaseOrchestrationApplication',
          '**/uk/gov/hmcts/ethos/replacement/docmosis.config.DevQueueClient.java',
          '**/uk/gov/hmcts/ethos/replacement/docmosis/domain/admin/**',
-         '**/uk/gov/hmcts/ethos/replacement/docmosis/controllers/RespondentTellSomethingElseController.java'
+         '**/uk/gov/hmcts/ethos/replacement/docmosis/controllers/RespondentTellSomethingElseController.java',
+         'et-shared/src/main/java/**/model/**',
+         'et-shared/src/main/java/**/bundle/**',
+         'et-shared/src/main/java/**/exceptions/**',
+         'et-shared/src/main/java/**/configuration/**',
+         'et-shared/src/main/java/**/helpers/**',
+         'et-shared/src/main/java/**/launchdarkly/**',
+         'et-shared/src/main/java/**/servicebus/**'
 ]
 
 def duplicateCodeExclusionList = [
 	'**/uk/gov/hmcts/ethos/replacement/docmosis/domain/messagequeue/CreateUpdatesQueueMessage.java',
-	'**/uk/gov/hmcts/ethos/replacement/docmosis/domain/messagequeue/UpdateCaseQueueMessage.java'
+	'**/uk/gov/hmcts/ethos/replacement/docmosis/domain/messagequeue/UpdateCaseQueueMessage.java',
+    'et-shared/src/main/java/**'
 ]
 
 sonarqube {
@@ -59,7 +67,9 @@ sonarqube {
         property "sonar.projectKey", "et-ccd-callbacks"
         property "sonar.dynamicAnalysis", "reuseReports"
         property "sonar.dependencyCheck.reportPath", "${project.buildDir}/reports/dependency-check-report.xml"
-        property "sonar.coverage.jacoco.xmlReportPaths", "${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml"
+        property "sonar.coverage.jacoco.xmlReportPaths",
+                "${project.buildDir}/reports/jacoco/test/jacocoTestReport.xml," +
+                        "${project(':et-shared').buildDir}/reports/jacoco/test/jacocoTestReport.xml"
     }
 }
 
@@ -111,6 +121,47 @@ sourceSets {
     }
 }
 
+allprojects {
+    configurations.configureEach {
+        resolutionStrategy.eachDependency { details ->
+            if (details.requested.group.startsWith("com.fasterxml.jackson")) {
+                details.useVersion("$jacksonVersion")
+            }
+        }
+        resolutionStrategy.force(
+            'commons-fileupload:commons-fileupload:1.6.0',
+            'org.apache.httpcomponents:httpclient:4.5.14',
+            'org.apache.logging.log4j:log4j-core:2.25.3',
+            'com.nimbusds:nimbus-jose-jwt:10.5',
+            'net.minidev:json-smart:2.5.2',
+            'com.squareup.okhttp3:logging-interceptor:4.12.0',
+            'com.squareup.okhttp3:okhttp:4.12.0',
+            'com.squareup.okhttp3:okhttp-urlconnection:4.12.0',
+            'com.squareup.okio:okio:3.16.4',
+            'org.bouncycastle:bcprov-jdk15on:1.70',
+            'io.netty:netty-buffer:4.2.9.Final',
+            'io.netty:netty-codec:4.2.9.Final',
+            'io.netty:netty-codec-dns:4.2.9.Final',
+            'io.netty:netty-codec-http:4.2.9.Final',
+            'io.netty:netty-codec-http2:4.2.9.Final',
+            'io.netty:netty-codec-socks:4.2.9.Final',
+            'io.netty:netty-common:4.2.9.Final',
+            'io.netty:netty-handler:4.2.9.Final',
+            'io.netty:netty-handler-proxy:4.2.9.Final',
+            'io.netty:netty-resolver:4.2.9.Final',
+            'io.netty:netty-resolver-dns:4.2.9.Final',
+            'io.netty:netty-resolver-dns-classes-macos:4.2.9.Final',
+            'io.netty:netty-resolver-dns-native-macos:4.2.9.Final',
+            'io.netty:netty-transport:4.2.9.Final',
+            'io.netty:netty-transport-native-epoll:4.2.9.Final',
+            'io.netty:netty-transport-native-kqueue:4.2.9.Final',
+            'io.netty:netty-transport-native-unix-common:4.2.9.Final',
+            'io.netty:netty-transport-classes-epoll:4.2.9.Final',
+            'io.netty:netty-transport-classes-kqueue:4.2.9.Final'
+        )
+    }
+}
+
 configurations {
     functionalImplementation.extendsFrom testImplementation
     functionalRuntimeOnly.extendsFrom testRuntimeOnly
@@ -120,13 +171,6 @@ configurations {
     integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
     apiTestImplementation.extendsFrom testImplementation
     apiTestRuntimeOnly.extendsFrom testRuntimeOnly
-    configureEach {
-        resolutionStrategy.eachDependency { details ->
-            if (details.requested.group.startsWith("com.fasterxml.jackson")) {
-                details.useVersion("$jacksonVersion")
-            }
-        }
-    }
 }
 
 test {
@@ -371,11 +415,7 @@ dependencyManagement {
 
 dependencies {
 
-    implementation group: 'com.github.hmcts', name: 'et-common', version: '3.1.4'
-    implementation group: 'com.github.hmcts', name: 'et-data-model', version: '4.3.10'
-
-    implementation group: 'com.github.hmcts', name: 'ecm-common', version: '3.0.1'
-    implementation group: 'com.github.hmcts', name: 'ecm-data-model', version: '2.0.4'
+    implementation project(':et-shared')
     implementation group: 'uk.gov.dwp.regex', name: 'postcode-validation', version: '1.1.0'
     implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.59.2'
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'

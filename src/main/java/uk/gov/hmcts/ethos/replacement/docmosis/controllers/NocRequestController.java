@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
-import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.NocRequestService;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -51,9 +50,8 @@ public class NocRequestController {
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
 
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        nocRequestService.revokeClaimantLegalRep();
-        return getCallbackRespEntityNoErrors(caseData);
+        nocRequestService.revokeClaimantLegalRep(userToken, ccdRequest.getCaseDetails());
+        return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }
 
     @PostMapping(value = "/submitted", consumes = APPLICATION_JSON_VALUE)
@@ -70,7 +68,7 @@ public class NocRequestController {
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
 
-        nocRequestService.sendEmailToAdmin();
+        nocRequestService.sendEmailToOrgAdmin();
         nocRequestService.sendEmailToThisLegalRep();
         nocRequestService.sendEmailToRemovedParty();
         nocRequestService.sendEmailToOtherParty();

@@ -309,6 +309,11 @@ rootProject.tasks.named("processFunctionalResources") {
     duplicatesStrategy = 'include'
 }
 
+rootProject.tasks.named("createManifestApplication") {
+    // bootWithCCD host manifest references the et-shared jar; ensure it exists.
+    dependsOn(':et-shared:jar')
+}
+
 runAndPublishConsumerPactTests.finalizedBy pactPublish
 
 pact {

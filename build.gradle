@@ -539,7 +539,8 @@ dependencies {
     integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.40'
 
     cftlibImplementation group: 'org.mockito', name: 'mockito-core', version: '5.19.0'
-    cftlibImplementation 'org.springframework.boot:spring-boot-devtools'
+    // Removed spring-boot-devtools due to classloader issue with multi-module project dependencies
+    // cftlibImplementation 'org.springframework.boot:spring-boot-devtools'
 }
 
 bootJar {
@@ -550,10 +551,32 @@ bootJar {
     manifest {
         attributes('Implementation-Version': project.version.toString())
     }
+    
+    // Handle duplicates from et-shared copy task
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+jar {
+    // Handle duplicates from et-shared copy task
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 wrapper {
     distributionType = Wrapper.DistributionType.ALL
+}
+
+// Workaround for rse-cft-lib plugin not properly handling multi-module dependencies
+// Copy et-shared classes and resources into main build output so bootWithCCD can find them
+tasks.register('copyEtSharedClasses', Copy) {
+    dependsOn ':et-shared:classes'
+    from project(':et-shared').sourceSets.main.output
+    into sourceSets.main.output.classesDirs.singleFile
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
+}
+
+// Make the classes task depend on copying et-shared, which will transitively affect all tasks that depend on classes
+tasks.named('classes').configure { 
+    dependsOn 'copyEtSharedClasses' 
 }
 
 bootWithCCD {

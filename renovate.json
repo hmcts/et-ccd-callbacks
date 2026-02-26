@@ -4,9 +4,5 @@
     "local>hmcts/.github:renovate-config",
     "local>hmcts/.github//renovate/automerge-all"
   ],
-  "ignoreDeps": [
-    "com.github.hmcts:et-common",
-    "com.github.hmcts:et-data-model"
-  ],
   "automergeSchedule": ["before 12pm every weekday"]
 }

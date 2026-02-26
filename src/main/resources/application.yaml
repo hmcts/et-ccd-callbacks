@@ -190,6 +190,10 @@ template:
       new: ${NOC_NOTIFICATION_TEMPLATE_NEW_REP_ID:8fe52f24-40b2-4986-8f86-4dd1af311cbd}
     tribunal: ${NOC_NOTIFICATION_TEMPLATE_TRIBUNAL_ID:1d5efcbd-1971-4ebe-bfe8-72ba36b5abac}
     claimantRepAssigned: ${NOC_NOTIFICATION_TEMPLATE_CLAIMANT_REP_ASSIGNED_ID:ddd304c0-9e92-473e-aa96-a0036f59e5ef}
+    org-admin-not-representing: ${NOC_ORG_ADMIN_NOT_REPRESENTING:039c5bc5-f2a7-4ba0-b217-ef493c582d2e}
+    noc-legal-rep-no-longer-assigned: ${NOC_LEGAL_REP_NO_LONGER_ASSIGNED:fe52b39f-852c-43ca-a42a-b9a27c43b130}
+    noc-citizen-no-longer-represented: ${NOC_CITIZEN_NO_LONGER_REPRESENTED:7bee670f-9110-4000-98ef-5f96274a68fb}
+    noc-other-party-not-represented: ${NOC_OTHER_PARTY_NOT_REPRESENTED:4ecc836b-ad03-4b6e-b449-51d0e9d48241}
 
   sendNotification: ${SEND_NOTIFICATION_TEMPLATE_ID:1b8299d7-5051-4b78-a870-726b6384d8a8}
 

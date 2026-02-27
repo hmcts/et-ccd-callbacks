@@ -196,7 +196,7 @@ class AllocateHearingControllerTest {
     }
 
     @Test
-    void testAboutToSubmit() throws Exception {
+    void testAboutToSubmit_EnglandWales() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder()
                 .withCaseTypeId(ENGLANDWALES_CASE_TYPE_ID)
                 .build();
@@ -212,7 +212,29 @@ class AllocateHearingControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+        verify(allocateHearingService, times(1)).updateSelectedHearing(ccdRequest.getCaseDetails().getCaseData());
         verify(allocateHearingService, times(1)).updateCase(ccdRequest.getCaseDetails().getCaseData());
+    }
+
+    @Test
+    void testAboutToSubmit_Scotland() throws Exception {
+        CCDRequest ccdRequest = CCDRequestBuilder.builder()
+            .withCaseTypeId(SCOTLAND_CASE_TYPE_ID)
+            .build();
+        String token = "some-token";
+        when(verifyTokenService.verifyTokenSignature(token)).thenReturn(true);
+
+        mockMvc.perform(post("/allocatehearing/aboutToSubmit")
+                .contentType(MediaType.APPLICATION_JSON)
+                .header("Authorization", token)
+                .content(jsonMapper.toJson(ccdRequest)))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+            .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+            .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(allocateHearingService, times(1)).updateSelectedHearing(ccdRequest.getCaseDetails().getCaseData());
+        verify(scotlandAllocateHearingService, times(1)).updateCase(ccdRequest.getCaseDetails().getCaseData());
     }
 
     @Test
@@ -229,6 +251,7 @@ class AllocateHearingControllerTest {
                 .content(jsonMapper.toJson(ccdRequest)))
 
                 .andExpect(status().isForbidden());
+        verify(allocateHearingService, never()).updateSelectedHearing(ccdRequest.getCaseDetails().getCaseData());
         verify(allocateHearingService, never()).updateCase(ccdRequest.getCaseDetails().getCaseData());
     }
 }

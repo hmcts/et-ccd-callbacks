@@ -14,6 +14,9 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.referencedata.selection.J
 
 import java.util.Objects;
 
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HearingConstants.FULL_PANEL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HearingConstants.TWO_JUDGES;
+
 @Service
 public class AllocateHearingService {
 
@@ -67,14 +70,40 @@ public class AllocateHearingService {
                 venueChanged));
     }
 
-    public void updateCase(CaseData caseData) {
+    /**
+     * Update common fields for EW and Scotland.
+     * @param caseData the case data
+     */
+    public void updateSelectedHearing(CaseData caseData) {
         HearingType selectedHearing = getSelectedHearing(caseData);
         selectedHearing.setHearingSitAlone(caseData.getAllocateHearingSitAlone());
-        selectedHearing.setJudge(caseData.getAllocateHearingJudge());
-        selectedHearing.setAdditionalJudge(caseData.getAllocateHearingAdditionalJudge());
-        selectedHearing.setHearingERMember(caseData.getAllocateHearingEmployerMember());
-        selectedHearing.setHearingEEMember(caseData.getAllocateHearingEmployeeMember());
 
+        selectedHearing.setJudge(caseData.getAllocateHearingJudge());
+        selectedHearing.getJudge().setListItems(null);
+
+        if (TWO_JUDGES.equals(caseData.getAllocateHearingSitAlone())) {
+            selectedHearing.setAdditionalJudge(caseData.getAllocateHearingAdditionalJudge());
+            selectedHearing.getAdditionalJudge().setListItems(null);
+        } else {
+            selectedHearing.setAdditionalJudge(null);
+        }
+
+        if (FULL_PANEL.equals(caseData.getAllocateHearingSitAlone())) {
+            selectedHearing.setHearingERMember(caseData.getAllocateHearingEmployerMember());
+            selectedHearing.getHearingERMember().setListItems(null);
+            selectedHearing.setHearingEEMember(caseData.getAllocateHearingEmployeeMember());
+            selectedHearing.getHearingEEMember().setListItems(null);
+        } else {
+            selectedHearing.setHearingERMember(null);
+            selectedHearing.setHearingEEMember(null);
+        }
+    }
+
+    /**
+     * Update other fields for EW.
+     * @param caseData the case data
+     */
+    public void updateCase(CaseData caseData) {
         DateListedType selectedListing = getSelectedListing(caseData);
         selectedListing.setHearingStatus(caseData.getAllocateHearingStatus());
         selectedListing.setHearingVenueDay(caseData.getAllocateHearingVenue());
@@ -128,5 +157,16 @@ public class AllocateHearingService {
             dynamicFixedListType.setValue(selectedListing.getHearingClerk().getValue());
         }
         caseData.setAllocateHearingClerk(dynamicFixedListType);
+    }
+
+    /**
+     * Clears the dynamic fixed lists for allocateHearing event.
+     * @param caseData the case data
+     */
+    public void clearDynamicFixedList(CaseData caseData) {
+        caseData.setAllocateHearingJudge(null);
+        caseData.setAllocateHearingAdditionalJudge(null);
+        caseData.setAllocateHearingEmployerMember(null);
+        caseData.setAllocateHearingEmployeeMember(null);
     }
 }

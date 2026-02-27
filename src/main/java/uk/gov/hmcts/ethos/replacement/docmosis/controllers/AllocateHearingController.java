@@ -5,6 +5,7 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,13 +17,11 @@ import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing.AllocateHearingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing.ScotlandAllocateHearingService;
 
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
@@ -34,20 +33,10 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper.val
 @RestController
 @RequestMapping("/allocatehearing")
 @Slf4j
+@RequiredArgsConstructor
 public class AllocateHearingController {
-    private static final String INVALID_TOKEN = "Invalid Token {}";
-
-    private final VerifyTokenService verifyTokenService;
     private final AllocateHearingService allocateHearingService;
     private final ScotlandAllocateHearingService scotlandAllocateHearingService;
-
-    public AllocateHearingController(VerifyTokenService verifyTokenService,
-                                     AllocateHearingService allocateHearingService,
-                                     ScotlandAllocateHearingService scotlandAllocateHearingService) {
-        this.verifyTokenService = verifyTokenService;
-        this.allocateHearingService = allocateHearingService;
-        this.scotlandAllocateHearingService = scotlandAllocateHearingService;
-    }
 
     @PostMapping(value = "/initialiseHearings", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Initialise hearings selection list")
@@ -62,10 +51,6 @@ public class AllocateHearingController {
     public ResponseEntity<CCDCallbackResponse> initialiseHearingDynamicList(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         allocateHearingService.initialiseAllocateHearing(caseData);
@@ -86,10 +71,6 @@ public class AllocateHearingController {
     public ResponseEntity<CCDCallbackResponse> handleListingSelected(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         String caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();
@@ -98,7 +79,7 @@ public class AllocateHearingController {
         } else if (Constants.SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
             scotlandAllocateHearingService.handleListingSelected(caseData);
         } else {
-            log.error("Unexpected case type id " + caseTypeId);
+            log.error("Unexpected case type id {}", caseTypeId);
             return ResponseEntity.badRequest().build();
         }
 
@@ -118,10 +99,6 @@ public class AllocateHearingController {
     public ResponseEntity<CCDCallbackResponse> handleManagingOfficeSelected(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         String caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();
         if (!Constants.SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
@@ -148,10 +125,6 @@ public class AllocateHearingController {
     public ResponseEntity<CCDCallbackResponse> populateRoomDynamicList(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = validateTwoJudges(caseData);
@@ -182,18 +155,17 @@ public class AllocateHearingController {
     public ResponseEntity<CCDCallbackResponse> aboutToSubmit(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader("Authorization") String userToken) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         String caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();
         if (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId)) {
+            allocateHearingService.updateSelectedHearing(caseData);
             allocateHearingService.updateCase(caseData);
         } else if (SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
+            allocateHearingService.updateSelectedHearing(caseData);
             scotlandAllocateHearingService.updateCase(caseData);
         }
+        allocateHearingService.clearDynamicFixedList(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
     }

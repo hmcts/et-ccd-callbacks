@@ -51,6 +51,8 @@ public class NocRequestService {
     private static final String LEGAL_REP_ORG = "legalRepOrg";
     private static final String LINK_TO_CIT_UI = "linkToCitUI";
     private static final String PARTY_NAME = "party_name";
+    private static final String ERROR_RETRIEVING_ORGANISATION =
+        "Error when retrieving organisation for organisation ID: {}. Exception message: {}";
 
     public void revokeClaimantLegalRep(String userToken, CaseDetails caseDetails) {
         // create a copy of existing claimant legal rep details
@@ -112,7 +114,9 @@ public class NocRequestService {
             }
             return resBody.getSuperUser().getEmail();
         } catch (Exception e) {
-            log.warn("getRetrieveOrgByIdResponse");
+            log.warn(ERROR_RETRIEVING_ORGANISATION,
+                organisationId,
+                e.getMessage());
             return null;
         }
     }

@@ -3,9 +3,11 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.RetrieveOrgByIdResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
@@ -15,6 +17,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocNotificationServic
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.ClaimantUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.ClaimantRepresentativeUtils;
 
+import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
@@ -31,6 +34,8 @@ public class NocRequestService {
     private final EmailService emailService;
     private final NocCcdService nocCcdService;
     private final NocNotificationService nocNotificationService;
+    private final CaseAccessService caseAccessService;
+    private final EmailNotificationService emailNotificationService;
 
     @Value("${template.nocNotification.org-admin-not-representing}")
     private String nocOrgAdminNotRepresentingTemplateId;
@@ -130,7 +135,7 @@ public class NocRequestService {
         Map<String, String> personalisation =
             NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation(caseDetails.getCaseData());
         personalisation.put(LEGAL_REP_ORG, repCopy.getNameOfOrganisation());
-        personalisation.put(LINK_TO_CIT_UI, "linkToCitUI");
+        personalisation.put(LINK_TO_CIT_UI, emailService.getCitizenCaseLink(caseDetails.getCaseId()));
 
         try {
             emailService.sendEmail(
@@ -146,9 +151,26 @@ public class NocRequestService {
     }
 
     private void sendEmailToOtherParty(CaseDetails caseDetails) {
+        List<CaseUserAssignment> caseUserAssignments =
+            caseAccessService.getCaseUserAssignmentsById(caseDetails.getCaseId());
+        emailNotificationService
+            .getRespondentsAndRepsEmailAddresses(caseDetails.getCaseData(), caseUserAssignments)
+            .forEach((email, respondentId) -> {
+                sendRespondentEmail(caseDetails, email, respondentId);
+            });
+    }
+
+    private void sendRespondentEmail(CaseDetails caseDetails, String email, String respondentId) {
         Map<String, String> personalisation =
             NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation(caseDetails.getCaseData());
         personalisation.put(PARTY_NAME, CLAIMANT_TITLE);
-        personalisation.put(LINK_TO_CIT_UI, "linkToCitUI");
+        String caseLink = StringUtils.isNotBlank(respondentId)
+            ? emailService.getSyrCaseLink(caseDetails.getCaseId(), respondentId)
+            : emailService.getExuiCaseLink(caseDetails.getCaseId());
+        personalisation.put(LINK_TO_CIT_UI, caseLink);
+        emailService.sendEmail(
+            nocOtherPartyNotRepresentedTemplateId,
+            email,
+            personalisation);
     }
 }

@@ -68,8 +68,6 @@ public class NocRequestController {
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
 
-        nocRequestService.sendEmailNotification(userToken, ccdRequest.getCaseDetails());
-
         return ResponseEntity.ok(CCDCallbackResponse.builder()
             .data(ccdRequest.getCaseDetails().getCaseData())
             .confirmation_header(green1 + "<h5>" + green2 + ccdRequest.getCaseDetails().getCaseId() + "</h5>" + "<br>")

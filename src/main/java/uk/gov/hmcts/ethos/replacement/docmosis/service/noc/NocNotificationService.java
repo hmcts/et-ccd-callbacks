@@ -442,7 +442,7 @@ public class NocNotificationService {
         }
     }
 
-    private RetrieveOrgByIdResponse getOrganisationResponse(String orgId, boolean isNewOrg) {
+    public RetrieveOrgByIdResponse getOrganisationResponse(String orgId, boolean isNewOrg) {
         ResponseEntity<RetrieveOrgByIdResponse> getOrgResponse = getOrganisationById(orgId);
         HttpStatusCode statusCode = getOrgResponse.getStatusCode();
         if (!HttpStatus.OK.equals(statusCode)) {

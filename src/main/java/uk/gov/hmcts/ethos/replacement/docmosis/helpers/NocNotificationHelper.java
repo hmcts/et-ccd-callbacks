@@ -85,7 +85,6 @@ public final class NocNotificationHelper {
 
     public static Map<String, String> buildPreviousRespondentSolicitorPersonalisation(CaseData caseData) {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
-
         addCommonValues(caseData, personalisation);
         return personalisation;
     }

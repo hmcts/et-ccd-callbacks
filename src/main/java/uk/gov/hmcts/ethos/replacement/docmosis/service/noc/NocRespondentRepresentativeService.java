@@ -184,8 +184,8 @@ public class NocRespondentRepresentativeService {
 
         List<RepresentedTypeRItem> oldRepresentatives = oldCaseDetails.getCaseData().getRepCollection();
         List<RepresentedTypeRItem> newRepresentatives = newCaseDetails.getCaseData().getRepCollection();
-        List<RepresentedTypeRItem> representativesToRemove = RespondentRepresentativeUtils
-                .findRepresentativesToRemove(oldRepresentatives, newRepresentatives);
+        List<RepresentedTypeRItem> representativesToRemove =
+                findRepresentativesToRemove(oldRepresentatives, newRepresentatives);
         if (CollectionUtils.isEmpty(representativesToRemove)) {
             return;
         }
@@ -201,6 +201,124 @@ public class NocRespondentRepresentativeService {
             return;
         }
         resetOrganisationPolicies(callbackRequest.getCaseDetails(), revokedRepresentatives);
+    }
+
+    /**
+     * Identifies representatives from the existing list that should be treated as changed
+     * for the same respondent when compared against a new list of representatives.
+     * <p>
+     * A representative from {@code oldRepresentatives} is included in the returned list if:
+     * <ul>
+     *     <li>it is a valid representative, and</li>
+     *     <li>no matching representative exists in {@code newRepresentatives} for the same respondent, or</li>
+     *     <li>a matching representative exists but the organisation or email address has changed</li>
+     * </ul>
+     * <p>
+     * Only valid representatives are considered during the comparison. If
+     * {@code oldRepresentatives} is {@code null} or empty, an empty list is returned.
+     *
+     * @param oldRepresentatives the existing representatives to compare against
+     * @param newRepresentatives the updated representatives to compare with
+     * @return a list of representatives from {@code oldRepresentatives} that are either
+     *         no longer present or have updated organisation or email details
+     */
+    public List<RepresentedTypeRItem> findRepresentativesToRemove(
+            List<RepresentedTypeRItem> oldRepresentatives, List<RepresentedTypeRItem> newRepresentatives) {
+        if (CollectionUtils.isEmpty(oldRepresentatives)) {
+            return new ArrayList<>();
+        }
+        if (CollectionUtils.isEmpty(newRepresentatives)) {
+            return oldRepresentatives;
+        }
+        List<RepresentedTypeRItem> representativesToRemove = new ArrayList<>();
+        for (RepresentedTypeRItem oldRepresentative : oldRepresentatives) {
+            if (!RespondentRepresentativeUtils.isValidRepresentative(oldRepresentative)) {
+                continue;
+            }
+            // to check if representative exists but its organisation or email is changed or not
+            boolean hasRespondentRepresentativeOrganisationChanged = false;
+            // to check if representative exists or not
+            boolean isMatchingValidRepresentative = false;
+            boolean hmctsRepresentativeEmailChanged = false;
+            for (RepresentedTypeRItem newRepresentative : newRepresentatives) {
+                if (RespondentRepresentativeUtils.isMatchingValidRepresentative(oldRepresentative, newRepresentative)) {
+                    isMatchingValidRepresentative = true;
+                    // representative already exists but its organisation or email is changed
+                    hasRespondentRepresentativeOrganisationChanged =
+                            RespondentRepresentativeUtils.hasRespondentRepresentativeOrganisationChanged(
+                                    oldRepresentative.getValue(), newRepresentative.getValue());
+                    // when representative email changed and new representative has account on HMCTS should
+                    // remove old representative and assign new representative access with new email address.
+                    hmctsRepresentativeEmailChanged = hasHmctsRepresentativeEmailChanged(oldRepresentative,
+                            newRepresentative);
+                }
+            }
+            if (RespondentRepresentativeUtils.canRemoveRepresentative(isMatchingValidRepresentative,
+                    hasRespondentRepresentativeOrganisationChanged,
+                    hmctsRepresentativeEmailChanged)) {
+                representativesToRemove.add(oldRepresentative);
+            }
+        }
+        return representativesToRemove;
+    }
+
+    /**
+     * Determines whether the representative's email address has changed and the
+     * updated email belongs to a registered HMCTS organisation user.
+     *
+     * <p>This method returns {@code true} only if:</p>
+     * <ul>
+     *     <li>The representative email address differs between the old and new
+     *         {@link RepresentedTypeRItem} instances (case-insensitive comparison), and</li>
+     *     <li>The new representative email address is associated with a valid
+     *         HMCTS organisation user.</li>
+     * </ul>
+     *
+     * <p><strong>Assumption:</strong> Both {@code oldRepresentative} and
+     * {@code newRepresentative}, including their underlying values and email
+     * addresses, are non-null and non-empty. This method does not perform
+     * null-safety validation.</p>
+     *
+     * @param oldRepresentative the original representative item (assumed non-null and populated)
+     * @param newRepresentative the updated representative item (assumed non-null and populated)
+     * @return {@code true} if the email has changed and the new email belongs to an
+     *         HMCTS organisation user; {@code false} otherwise
+     */
+    public boolean hasHmctsRepresentativeEmailChanged(RepresentedTypeRItem oldRepresentative,
+                                                      RepresentedTypeRItem newRepresentative) {
+        return RespondentRepresentativeUtils.isRepresentativeEmailChanged(oldRepresentative.getValue(),
+                newRepresentative.getValue())
+                && isHmctsOrganisationUser(newRepresentative.getValue().getRepresentativeEmailAddress());
+    }
+
+    /**
+     * Checks whether the given email address belongs to a registered HMCTS organisation user.
+     *
+     * <p>This method performs a lookup against the organisation service using
+     * an administrative access token. An email is considered associated with an
+     * HMCTS organisation user if:</p>
+     * <ul>
+     *     <li>A non-null response is returned,</li>
+     *     <li>The HTTP status code is present and indicates a successful (2xx) response,</li>
+     *     <li>The response body is not null, and</li>
+     *     <li>The returned user identifier is non-blank.</li>
+     * </ul>
+     *
+     * @param email the email address to validate; must not be {@code null} or blank
+     * @return {@code true} if the email corresponds to a valid HMCTS organisation user;
+     *         {@code false} otherwise
+     */
+    public boolean isHmctsOrganisationUser(String email) {
+        if (StringUtils.isBlank(email)) {
+            return false;
+        }
+        ResponseEntity<AccountIdByEmailResponse> accountIdByEmailResponseResponseEntity = organisationClient
+                .getAccountIdByEmail(adminUserService.getAdminUserToken(), authTokenGenerator.generate(), email);
+        return ObjectUtils.isNotEmpty(accountIdByEmailResponseResponseEntity)
+                && ObjectUtils.isNotEmpty(accountIdByEmailResponseResponseEntity.getStatusCode())
+                && accountIdByEmailResponseResponseEntity.getStatusCode().is2xxSuccessful()
+                && ObjectUtils.isNotEmpty(accountIdByEmailResponseResponseEntity.getBody())
+                && StringUtils.isNotBlank(accountIdByEmailResponseResponseEntity.getBody().getUserIdentifier());
     }
 
     /**

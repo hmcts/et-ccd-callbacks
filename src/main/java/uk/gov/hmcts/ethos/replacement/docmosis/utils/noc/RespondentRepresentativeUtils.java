@@ -297,8 +297,8 @@ public final class RespondentRepresentativeUtils {
      * @return {@code true} if the respondent organisation has changed;
      *         {@code false} otherwise
      */
-    public static boolean isRepresentativeOrganisationChanged(RepresentedTypeR oldRepresentative,
-                                                              RepresentedTypeR newRepresentative) {
+    public static boolean hasRespondentRepresentativeOrganisationChanged(RepresentedTypeR oldRepresentative,
+                                                                         RepresentedTypeR newRepresentative) {
         if (ObjectUtils.isEmpty(oldRepresentative.getRespondentOrganisation())
                 && ObjectUtils.isEmpty(newRepresentative.getRespondentOrganisation())) {
             return false;
@@ -331,6 +331,19 @@ public final class RespondentRepresentativeUtils {
                 newRepresentative.getRespondentOrganisation().getOrganisationID());
     }
 
+    /**
+     * Determines whether the representative's email address has changed between
+     * the old and new {@link RepresentedTypeR} instances.
+     *
+     * <p>The comparison is performed using a case-insensitive equality check.
+     * If the email addresses differ (ignoring case), this method returns {@code true}.
+     * If they are equal, this method returns {@code false}.</p>
+     *
+     * @param oldRepresentative the original representative instance (must not be {@code null})
+     * @param newRepresentative the updated representative instance (must not be {@code null})
+     * @return {@code true} if the representative's email address has changed (case-insensitive comparison),
+     *         {@code false} otherwise
+     */
     public static boolean isRepresentativeEmailChanged(RepresentedTypeR oldRepresentative,
                                                         RepresentedTypeR newRepresentative) {
         return !Strings.CI.equals(oldRepresentative.getRepresentativeEmailAddress(), newRepresentative
@@ -338,71 +351,36 @@ public final class RespondentRepresentativeUtils {
     }
 
     /**
-     * Identifies representatives from the existing list that should be treated as changed
-     * for the same respondent when compared against a new list of representatives.
-     * <p>
-     * A representative from {@code oldRepresentatives} is included in the returned list if:
-     * <ul>
-     *     <li>it is a valid representative, and</li>
-     *     <li>no matching representative exists in {@code newRepresentatives} for the same respondent, or</li>
-     *     <li>a matching representative exists but the organisation or email address has changed</li>
-     * </ul>
-     * <p>
-     * Only valid representatives are considered during the comparison. If
-     * {@code oldRepresentatives} is {@code null} or empty, an empty list is returned.
+     * Determines whether the provided new representative is both valid and
+     * represents the same respondent as the old representative.
      *
-     * @param oldRepresentatives the existing representatives to compare against
-     * @param newRepresentatives the updated representatives to compare with
-     * @return a list of representatives from {@code oldRepresentatives} that are either
-     *         no longer present or have updated organisation or email details
+     * <p>This method returns {@code true} only if:
+     * <ul>
+     *   <li>The {@code newRepresentative} satisfies the validation rules defined
+     *       in {@link #isValidRepresentative(RepresentedTypeRItem)}, and</li>
+     *   <li>The {@code oldRepresentative} and {@code newRepresentative} refer to
+     *       the same respondent as determined by
+     *       {@link #representsSameRespondent(RepresentedTypeRItem, RepresentedTypeRItem)}.</li>
+     * </ul>
+     * </p>
+     *
+     * @param oldRepresentative the original representative item to compare against (must not be {@code null})
+     * @param newRepresentative the representative item to validate and compare (must not be {@code null})
+     * @return {@code true} if the new representative is valid and matches the same respondent
+     *         as the old representative; {@code false} otherwise
      */
-    public static List<RepresentedTypeRItem> findRepresentativesToRemove(
-            List<RepresentedTypeRItem> oldRepresentatives, List<RepresentedTypeRItem> newRepresentatives) {
-        if (CollectionUtils.isEmpty(oldRepresentatives)) {
-            return new ArrayList<>();
-        }
-        if (CollectionUtils.isEmpty(newRepresentatives)) {
-            return oldRepresentatives;
-        }
-        List<RepresentedTypeRItem> representativesToRemove = new ArrayList<>();
-        for (RepresentedTypeRItem oldRepresentative : oldRepresentatives) {
-            if (!RespondentRepresentativeUtils.isValidRepresentative(oldRepresentative)) {
-                continue;
-            }
-            // to check if representative exists but its organisation or email is changed or not
-            boolean hasRepresentativeContactDetailsChanged = false;
-            // to check if representative exists or not
-            boolean isMatchingValidRepresentative = false;
-            for (RepresentedTypeRItem newRepresentative : newRepresentatives) {
-                if (isMatchingValidRepresentative(oldRepresentative, newRepresentative)) {
-                    isMatchingValidRepresentative = true;
-                    // representative already exists but its organisation or email is changed
-                    hasRepresentativeContactDetailsChanged = hasRepresentativeContactDetailsChanged(oldRepresentative,
-                                newRepresentative);
-                }
-            }
-            if (canRemoveRepresentative(isMatchingValidRepresentative, hasRepresentativeContactDetailsChanged)) {
-                representativesToRemove.add(oldRepresentative);
-            }
-        }
-        return representativesToRemove;
-    }
-
-    private static boolean isMatchingValidRepresentative(RepresentedTypeRItem oldRepresentative,
+    public static boolean isMatchingValidRepresentative(RepresentedTypeRItem oldRepresentative,
                                                          RepresentedTypeRItem newRepresentative) {
         return isValidRepresentative(newRepresentative)
-                && representsSameRespondent(oldRepresentative, newRepresentative);
+                &&  representsSameRespondent(oldRepresentative, newRepresentative);
     }
 
-    private static boolean hasRepresentativeContactDetailsChanged(
-            RepresentedTypeRItem oldRepresentative, RepresentedTypeRItem newRepresentative) {
-        return isRepresentativeOrganisationChanged(oldRepresentative.getValue(), newRepresentative.getValue())
-                || isRepresentativeEmailChanged(oldRepresentative.getValue(), newRepresentative.getValue());
-    }
-
-    private static boolean canRemoveRepresentative(boolean  isMatchingValidRepresentative,
-                                                   boolean hasRepresentativeContactDetailsChanged) {
-        return !isMatchingValidRepresentative || hasRepresentativeContactDetailsChanged;
+    public static boolean canRemoveRepresentative(boolean  isMatchingValidRepresentative,
+                                                   boolean hasRepresentativeContactDetailsChanged,
+                                                   boolean hmctsRepresentativeEmailChanged) {
+        return !isMatchingValidRepresentative
+                || hasRepresentativeContactDetailsChanged
+                || hmctsRepresentativeEmailChanged;
     }
 
     /**
@@ -447,7 +425,7 @@ public final class RespondentRepresentativeUtils {
             for (RepresentedTypeRItem oldRepresentative : oldRepresentatives) {
                 if (isValidRepresentative(oldRepresentative)
                         && representsSameRespondent(oldRepresentative, newRepresentative)
-                        && !isRepresentativeOrganisationChanged(oldRepresentative.getValue(),
+                        && !hasRespondentRepresentativeOrganisationChanged(oldRepresentative.getValue(),
                         newRepresentative.getValue())
                         && !isRepresentativeEmailChanged(oldRepresentative.getValue(), newRepresentative.getValue())) {
                     representsSameRespondent = true;

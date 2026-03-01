@@ -29,6 +29,15 @@ applicationinsights-agent-*.jar
 /nbdist/
 /.nb-gradle/
 
+### CCD Definitions Workspace ###
+ccd-definitions/dist/
+ccd-definitions/jurisdictions/*/xlsx/*.xlsx
+ccd-definitions/jurisdictions/*/node_modules/
+ccd-definitions/node_modules/
+ccd-definitions/tools/*/node_modules/
+ccd-definitions/.yarn/cache/
+ccd-definitions/.yarn/install-state.gz
+
 # macos
 **/.DS_Store
 

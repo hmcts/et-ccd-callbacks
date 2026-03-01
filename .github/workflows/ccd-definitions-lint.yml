@@ -1,0 +1,26 @@
+name: CCD Definitions Lint
+
+on:
+  pull_request:
+    branches:
+      - master
+  push:
+    branches:
+      - master
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+      - name: Enable corepack
+        run: corepack enable
+      - name: Install dependencies
+        working-directory: ccd-definitions
+        run: yarn install
+      - name: Lint CCD definitions
+        working-directory: ccd-definitions
+        run: yarn lint

@@ -1,0 +1,14 @@
+[
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseStateID": "Open",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseStateID": "Open",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  }
+]

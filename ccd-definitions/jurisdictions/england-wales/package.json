@@ -1,0 +1,25 @@
+{
+  "name": "england-wales",
+  "version": "1.0.0",
+  "description": "ET CCD England & Wales definitions",
+  "private": true,
+  "scripts": {
+    "build": "node ../../tools/build-package.js england-wales",
+    "build:local": "yarn build --env local",
+    "build:demo": "yarn build --env demo",
+    "build:aat": "yarn build --env aat",
+    "build:prod": "yarn build --env prod",
+    "build:preview": "yarn build --env preview",
+    "generate-json": "node ../../tools/ccd-definition-processor/bin/xlsx2json -D ./json -i ./xlsx/et-englandwales-ccd-config-base.xlsx",
+    "generate-excel": "node ../../tools/ccd-definition-processor/bin/json2xlsx -D ./json -o ./xlsx/et-englandwales-ccd-config-${ET_ENV:-base}.xlsx",
+    "test": "mocha ./src/test --timeout 20000",
+    "test:functional": "codeceptjs run --steps -c src/test/functional/codecept.conf.js --grep @pipeline --reporter mochawesome",
+    "lint": "eslint . --no-error-on-unmatched-pattern --config ../../configs/eslint.config.js --fix-dry-run",
+    "lint:fix": "eslint . --no-error-on-unmatched-pattern --config ../../configs/eslint.config.js --fix",
+    "clean": "rimraf xlsx/*.xlsx dist/"
+  },
+  "eslintConfig": {
+    "extends": "../../configs/eslint.config.js"
+  },
+  "prettier": "../../configs/prettier.config.js"
+}

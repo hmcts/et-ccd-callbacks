@@ -2,77 +2,56 @@
 
 set -eu
 
-
-if ([ $# -eq 0 ] || [ $# -eq 2 ] || ([ $1 != "a" ] && [ $1 != "s" ] && [ $1 != "e" ] && [ $1 != "all" ]))
-then
-
-    echo "Usage: ./import-ccd-definition-zsh.sh [e|s|a|all]"
-    exit 1
+if ([ $# -eq 0 ] || [ $# -gt 1 ] || ([ "$1" != "a" ] && [ "$1" != "s" ] && [ "$1" != "e" ] && [ "$1" != "all" ])); then
+  echo "Usage: ./import-ccd-definition.sh [e|s|a|all]"
+  exit 1
 fi
-dir=$(dirname ${0})
-if [ $1 = "e" ]
-then
-  echo "*************IMPORTING ENGLANDWALES CONFIG*************"
-  if [[ -z "$ENGLANDWALES_CCD_CONFIG_PATH" ]]
-  then
-    echo "Please set ENGLANDWALES_CCD_CONFIG_PATH environment variable to your local GitHub repo for et-ccd-definitions-englandwales"
+
+script_dir=$(cd -- "$(dirname -- "$0")" && pwd)
+repo_root=$(cd -- "${script_dir}/.." && pwd)
+definitions_root="${repo_root}/ccd-definitions/dist/cftlib"
+
+admin_file="${definitions_root}/et-admin-ccd-config-cftlib.xlsx"
+england_wales_file="${definitions_root}/et-englandwales-ccd-config-cftlib.xlsx"
+scotland_file="${definitions_root}/et-scotland-ccd-config-cftlib.xlsx"
+
+ensure_file_exists() {
+  local file="$1"
+  if [[ ! -f "${file}" ]]; then
+    echo "Missing CCD definition file: ${file}"
+    echo "Generate local cftlib files with:"
+    echo "  cd ${repo_root}/ccd-definitions && yarn setup && yarn generate-excel:cftlib"
     exit 1
   fi
-  importFile="${ENGLANDWALES_CCD_CONFIG_PATH}/definitions/xlsx/et-englandwales-ccd-config-cftlib.xlsx"
-elif [ $1 = "s" ]
-then
-  echo "*************IMPORTING SCOTLAND CONFIG*************"
-  if [[ -z "$SCOTLAND_CCD_CONFIG_PATH" ]]
-  then
-    echo "Please set SCOTLAND_CCD_CONFIG_PATH environment variable to your local GiHub repo for et-ccd-definitions-scotland"
-    exit 1
-  fi
-  importFile="${SCOTLAND_CCD_CONFIG_PATH}/definitions/xlsx/et-scotland-ccd-config-cftlib.xlsx"
-elif [ $1 = "a" ]
-then
-  echo "*************IMPORTING ADMIN CONFIG*************"
-    if [[ -z "$ADMIN_CCD_CONFIG_PATH" ]]
-    then
-      echo "Please set ADMIN_CCD_CONFIG_PATH environment variable to your local GiHub repo for et-ccd-definitions-admin"
-      exit 1
-    fi
-    importFile="${ADMIN_CCD_CONFIG_PATH}/definitions/xlsx/et-admin-ccd-config-cftlib.xlsx"
-else
-  if [ $1 = "all" ]
-  then
+}
+
+import_file() {
+  local file="$1"
+  ensure_file_exists "${file}"
+  echo "Using CCD definition file ${file}"
+  "${script_dir}/utils/ccd-import-definition.sh" "${file}"
+}
+
+case "$1" in
+  a)
+    echo "*************IMPORTING ADMIN CONFIG*************"
+    import_file "${admin_file}"
+    ;;
+  e)
+    echo "*************IMPORTING ENGLANDWALES CONFIG*************"
+    import_file "${england_wales_file}"
+    ;;
+  s)
+    echo "*************IMPORTING SCOTLAND CONFIG*************"
+    import_file "${scotland_file}"
+    ;;
+  all)
     echo "*************IMPORTING ALL CONFIGURATIONS*************"
-    echo "*************IMPORTING ADMIN CONFIG**********"
-    if [[ -z "$ADMIN_CCD_CONFIG_PATH" ]]
-    then
-      echo "Please set ADMIN_CCD_CONFIG_PATH environment variable to your local GiHub repo for et-ccd-definitions-admin"
-    else
-      importFile="${ADMIN_CCD_CONFIG_PATH}/definitions/xlsx/et-admin-ccd-config-cftlib.xlsx"
-      echo "Using CCD definition file ${importFile}"
-      ${dir}/utils/ccd-import-definition.sh ${importFile}
-    fi
-    echo "***********IMPORTING ENGLANDWALES CONFIG***********"
-    if [[ -z "$ENGLANDWALES_CCD_CONFIG_PATH" ]]
-    then
-      echo "Please set ENGLANDWALES_CCD_CONFIG_PATH environment variable to your local GitHub repo for et-ccd-definitions-englandwales"
-    else
-      importFile="${ENGLANDWALES_CCD_CONFIG_PATH}/definitions/xlsx/et-englandwales-ccd-config-cftlib.xlsx"
-      echo "Using CCD definition file ${importFile}"
-      ${dir}/utils/ccd-import-definition.sh ${importFile}
-    fi
-    echo "**********IMPORTING SCOTLAND CONFIG*************"
-      if [[ -z "$SCOTLAND_CCD_CONFIG_PATH" ]]
-      then
-        echo "Please set SCOTLAND_CCD_CONFIG_PATH environment variable to your local GiHub repo for et-ccd-definitions-scotland"
-        exit 1
-      else
-        importFile="${SCOTLAND_CCD_CONFIG_PATH}/definitions/xlsx/et-scotland-ccd-config-cftlib.xlsx"
-        echo "Using CCD definition file ${importFile}"
-        ${dir}/utils/ccd-import-definition.sh ${importFile}
-      fi
-    fi
-fi
-if [ $1 != "all" ]
-then
-  echo "Using CCD definition file ${importFile}"
-  ${dir}/utils/ccd-import-definition.sh ${importFile}
-fi
+    echo "*************IMPORTING ADMIN CONFIG*************"
+    import_file "${admin_file}"
+    echo "*************IMPORTING ENGLANDWALES CONFIG*************"
+    import_file "${england_wales_file}"
+    echo "*************IMPORTING SCOTLAND CONFIG*************"
+    import_file "${scotland_file}"
+    ;;
+esac

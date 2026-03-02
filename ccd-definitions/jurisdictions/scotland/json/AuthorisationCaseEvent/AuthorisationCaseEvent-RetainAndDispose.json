@@ -1,0 +1,20 @@
+[
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseEventID": "manageCaseTTL",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseEventID": "migrateCaseTTLDetails",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseEventID": "rollbackMigrateCaseTTLDetails",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  }
+]

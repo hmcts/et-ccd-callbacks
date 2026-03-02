@@ -12,9 +12,6 @@ See [ECM CCD Docker](https://github.com/hmcts/ecm-ccd-docker) for steps to start
 |-------------------------|-------------------------------------------------|
 | ET_COS_DB_PASSWORD      | Local et_cos database password                  |
 | SPRING_PROFILES_ACTIVE  | Set to ```cftlib``` to use cftlib Spring profile |
-| ENGLANDWALES_CCD_CONFIG_PATH | Set to the path of your local et-ccd-definitions-englandwales GitHub repository
-| SCOTLAND_CCD_CONFIG_PATH | Set to the path of your local et-ccd-definitions-scotland GitHub repository
-| ADMIN_CCD_CONFIG_PATH   | Set to the path of your local et-ccd-definitions-admin GitHub repository
 
 ### PostgreSQL Database
 Create the local et_cos database:
@@ -30,6 +27,5 @@ Create the local et_cos database:
 Once the services are all booted (i.e. when the log messages stop) then ExUI is accessible from:
 
 http://localhost:3455
-
 
 

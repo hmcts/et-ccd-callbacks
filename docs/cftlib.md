@@ -38,7 +38,7 @@ The latest version of the RSE CFT lib can be found [here](https://github.com/hmc
 ### Prerequisites
 - **Java 21**: Required for Spring Boot 3 compatibility
 - **Docker**: For RSE IdAM Simulator and other containerized services
-- **Git**: For accessing CCD definition repositories
+- **Git**: For this repository
 
 ### Environment Variables
 | Variable                       | Purpose                                                                               |
@@ -46,13 +46,10 @@ The latest version of the RSE CFT lib can be found [here](https://github.com/hmc
 | ET_COS_CFTLIB_DB_PASSWORD      | Local et_cos database password<br/>Set to `postgres`                                  |
 | XUI_LD_ID                      | Launch Darkly Client Id                                                               |
 | SPRING_PROFILES_ACTIVE         | Set to ```cftlib``` to use cftlib Spring profile                                      |
-| ENGLANDWALES_CCD_CONFIG_PATH   | Set to the path of your local et-ccd-definitions-englandwales GitHub repository       |
-| SCOTLAND_CCD_CONFIG_PATH       | Set to the path of your local et-ccd-definitions-scotland GitHub repository           |
-| ADMIN_CCD_CONFIG_PATH          | Set to the path of your local et-ccd-definitions-admin GitHub repository              |
 | CFTLIB_IMPORT_CCD_DEFS_ON_BOOT | Optional<br/>Set to `false` to prevent CCD definitions from being imported at startup |
 | ET_LAUNCH_DARKLY_SDK_KEY       | ET Launch Darkly SDK Key - this can be retrieved from the et-aat Key Vault            |
 
-These can be set with the ./bin/set_env.sh script. Edit the script to add your own path to config-repos and any missing variables.
+These can be set with the ./bin/set_env.sh script.
 Run the script with source, so that the environment variables are set in your current shell that you invoke the gradle command from.
 ```bash
 source ./bin/set_env.sh
@@ -90,45 +87,29 @@ All logins use a password of `password`.
 
 ## Importing CCD Definitions
 
-et-ccd-callbacks uses 3 CCD definition files that are maintained in separate repositories:
-* [England/Wales](https://github.com/hmcts/et-ccd-definitions-englandwales)
-* [Scotland](https://github.com/hmcts/et-ccd-definitions-scotland)
-* [ECM Admin](https://github.com/hmcts/et-ccd-definitions-admin)
+et-ccd-callbacks uses 3 CCD definition files maintained in this repository under `ccd-definitions`.
 
 CCD definitions can be imported automatically at startup and also imported manually.
 
-In order for the CCD definitions to be imported automatically as part of the Gradle bootWithCCD task it is
-necessary to
-* Configure where the local version is located
-* Generate the cftlib versions locally
-
-### Configure local CCD Definition locations
-The following environment variables must be set to point to the local directory of the repository:
-
-| Repository                      | Environment Variable 
-|---------------------------------| --- 
-| et-ccd-definitions-englandwales | ENGLANDWALES_CCD_CONFIG_PATH
-| et-ccd-definitions-scotland     | SCOTLAND_CCD_CONFIG_PATH
-| et-ccd-definitions-admin        | ADMIN_CCD_CONFIG_PATH
-
 ### Generate cftlib CCD definitions
-From each of the CCD definition repositories execute:
+From the `ccd-definitions` workspace execute:
 ```bash
-yarn generate-excel-cftlib
+cd ccd-definitions
+yarn setup
+yarn generate-excel:cftlib
 ```
 
 ### Import CCD definitions manually
-The CCD definition locations must have been configured as in the previous section and the version 
-of the definitions to be imported must have been generated. 
+Generate the cftlib versions locally first, then execute:
 
-Execute the following
 ```bash
-./bin/import-ccd-definition.sh [e|s|a]
+./bin/import-ccd-definition.sh [e|s|a|all]
 ```
 The argument should be:
 * `e` for importing England/Wales
 * `s` for importing Scotland
 * `a` for importing ECM Admin
+* `all` for importing all three
 
 ### Configure CCD definitions not to be automatically imported
 It is possible to configure the bootWithCCD task not to automatically import CCD definitions.

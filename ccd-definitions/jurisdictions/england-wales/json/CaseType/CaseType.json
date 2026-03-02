@@ -1,0 +1,32 @@
+[
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "ET_EnglandWales",
+    "Name": "Eng/Wales - Singles",
+    "Description": "England/Wales - Singles",
+    "JurisdictionID": "EMPLOYMENT",
+    "PrintableDocumentsUrl": "${CCD_DEF_URL}/callback/jurisdictions/EMPLOYMENT/case-types/ET_EnglandWales/documents",
+    "SecurityClassification": "Public",
+    "EnableForDeletion": "Yes"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "ET_EnglandWales_Listings",
+    "Name": "Eng/Wales - Hearings/Reports",
+    "Description": "England/Wales - Hearings/Reports",
+    "JurisdictionID": "EMPLOYMENT",
+    "PrintableDocumentsUrl": "${CCD_DEF_URL}/callback/jurisdictions/EMPLOYMENT/case-types/ET_EnglandWales_Listings/documents",
+    "SecurityClassification": "Public",
+    "EnableForDeletion": "No"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "ID": "ET_EnglandWales_Multiple",
+    "Name": "Eng/Wales - Multiples",
+    "Description": "England/Wales - Multiples",
+    "JurisdictionID": "EMPLOYMENT",
+    "PrintableDocumentsUrl": "${CCD_DEF_URL}/callback/jurisdictions/EMPLOYMENT/case-types/ET_EnglandWales_Multiple/documents",
+    "SecurityClassification": "Public",
+    "EnableForDeletion": "No"
+  }
+]

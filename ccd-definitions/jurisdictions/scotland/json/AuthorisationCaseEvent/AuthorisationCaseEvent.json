@@ -1740,6 +1740,12 @@
   },
   {
     "CaseTypeId": "ET_Scotland",
+    "CaseEventID": "respondNotification",
+    "UserRole": "caseworker-wa-task-configuration",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
     "CaseEventID": "viewAllNotifications",
     "AccessControl": [
       {
@@ -2415,5 +2421,23 @@
         "CRUD": "CRUD"
       }
     ]
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseEventID": "deleteDraftCase",
+    "UserRole": "caseworker-employment-legalrep-solicitor",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseEventID": "DELETE_DRAFT_CASE",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseEventID": "DELETE_DRAFT_CASE",
+    "UserRole": "[CREATOR]",
+    "CRUD": "CRUD"
   }
 ]

@@ -6732,6 +6732,14 @@
   },
   {
     "ID": "pseRespondCollection",
+    "ListElementCode": "fromIdamId",
+    "FieldType": "Text",
+    "ElementLabel": "Response from Idam id",
+    "FieldShowCondition": "date=\"dummy\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "pseRespondCollection",
     "ListElementCode": "hasSupportingMaterial",
     "FieldType": "Text",
     "ElementLabel": "Has supporting material",
@@ -6818,6 +6826,34 @@
     "FieldType": "Text",
     "ElementLabel": " ",
     "FieldShowCondition": "state=\"dummy\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "respondNotificationTypeCollection",
+    "ListElementCode": "dateTime",
+    "FieldType": "Text",
+    "ElementLabel": "Updated date time",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "pseStatus",
+    "ListElementCode": "userIdamId",
+    "FieldType": "Text",
+    "ElementLabel": "User Idam Id",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "pseStatus",
+    "ListElementCode": "notificationState",
+    "FieldType": "Text",
+    "ElementLabel": "Notification state",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "pseStatus",
+    "ListElementCode": "dateTime",
+    "FieldType": "Text",
+    "ElementLabel": "Updated date time",
     "SecurityClassification": "Public"
   },
   {
@@ -6976,6 +7012,15 @@
     "ListElementCode": "notificationState",
     "FieldType": "Text",
     "ElementLabel": "Notification State",
+    "FieldShowCondition": "number=\"dummy\"",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "sendNotificationCollection",
+    "ListElementCode": "respondentState",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "pseStatus",
+    "ElementLabel": "Respondent notification State",
     "FieldShowCondition": "number=\"dummy\"",
     "SecurityClassification": "Public"
   },
@@ -7174,5 +7219,23 @@
     "ElementLabel": "Date",
     "FieldType": "Text",
     "SecurityClassification": "Public"
-  }
+  },
+  {
+    "ID": "nextHearingDetails",
+    "ListElementCode": "hearingID",
+    "FieldType": "Text",
+    "FieldLabel": "Hearing ID",
+    "FieldOrder": 1,
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "nextHearingDetails",
+    "ListElementCode": "hearingDateTime",
+    "FieldType": "DateTime",
+    "FieldLabel": "Hearing Date and Time",
+    "FieldOrder": 2,
+    "ElementLabel": " ",
+    "SecurityClassification": "Public"
+}
 ]

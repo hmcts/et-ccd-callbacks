@@ -340,14 +340,14 @@ public class NocNotificationService {
     }
 
     public String resolveClaimantRepresentativeOrganisationSuperuserEmail(CaseDetails caseDetails,
-                                                                          RepresentedTypeC representative,
                                                                           String nocType) {
         if (!NotificationUtils.isCaseValidForNotification(caseDetails)) {
             String caseId = ObjectUtils.isEmpty(caseDetails) ? StringUtils.EMPTY : caseDetails.getCaseId();
             log.warn(WARNING_INVALID_CASE_DETAILS_TO_RESOLVE_CLAIMANT_REP_ORGANISATION_EMAIL, caseId, nocType);
             return StringUtils.EMPTY;
         }
-        String organisationId = NotificationUtils.findClaimantRepresentativeOrganisationId(representative);
+        String organisationId = NotificationUtils.findClaimantRepresentativeOrganisationId(caseDetails.getCaseData()
+                .getRepresentativeClaimantType());
         if (StringUtils.isBlank(organisationId)) {
             log.warn(WARNING_CLAIMANT_REP_ORGANISATION_ID_NOT_FOUND_TO_RESOLVE_ORGANISATION_EMAIL,
                     caseDetails.getCaseId(), nocType);

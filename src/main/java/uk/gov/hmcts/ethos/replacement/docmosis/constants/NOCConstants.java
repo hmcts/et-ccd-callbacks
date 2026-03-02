@@ -78,14 +78,6 @@ public final class NOCConstants {
     public static final String ERROR_UNABLE_TO_START_EVENT_TO_UPDATE_REPRESENTATIVE_AND_ORGANISATION_POLICY =
             "Unable to start update case submitted event to update representative role and organisation policy for "
                     + "case: {}";
-    public static final String ERROR_UNABLE_TO_START_REMOVE_CLAIMANT_REP_AND_ORG_POLICY_INVALID_CCD_REQUEST =
-            "Unable to start update case submitted event to update representative role and organisation policy for "
-                    + "case: {}, Reason: invalid ccd request";
-    public static final String ERROR_UNABLE_TO_UPDATE_REVOKED_CLAIMANT_REP_AND_ORG_POLICY =
-            "Claimant representative role assignment revoked but failed to update claimant representation and "
-                    + "organisation policy for case ID: {}";
-    public static final String ERROR_FAILED_TO_REMOVE_CLAIMANT_REP_AND_ORG_POLICY =
-            "Failed to remove claimant representative and organisation policy for case {}. Exception: {}";
     public static final String ERROR_REPRESENTATIVE_ORGANISATION_AND_EMAIL_NOT_MATCHED =
             "Failed to validate representative organisation and email. %s";
 
@@ -113,18 +105,15 @@ public final class NOCConstants {
                     + NOTIFICATION_FOR_CASE;
     public static final String WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_RESPONDENT =
             "Failed to send noc notification email to respondent, case id: {}, error: {}";
-    public static final String WARNING_INVALID_CASE_DETAILS_TO_NOTIFY_ORGANISATION_FOR_RESPONDENT_REP_UPDATE =
-            "Invalid case details. Unable to notify organisation for respondent representative update. Case id: {}, "
-                    + NOC_TYPE;
-    public static final String WARNING_INVALID_REPRESENTATIVE_TO_NOTIFY_ORGANISATION_FOR_RESPONDENT_REP_UPDATE =
-            "Invalid case details. Unable to notify organisation for respondent representative update. Case id: {}, "
-                    + NOC_TYPE;
-    public static final String WARNING_INVALID_ORGANISATION_RESPONSE_TO_NOTIFY_FOR_RESPONDENT_REP_UPDATE =
-            "Cannot retrieve {} organisation by id {} [{}] {}. Unable to notify organisation for respondent "
-                    + "representative update. Case id: {}";
-    public static final String WARNING_INVALID_PARAMETERS_TO_NOTIFY_ORGANISATION_FOR_REP_UPDATE =
-            "Invalid parameters(orgId, caseId, nocType). Unable to notify organisation for respondent "
-                    + "representative update. Case id: {}";
+    public static final String WARNING_INVALID_CASE_DETAILS_TO_RESOLVE_ORGANISATION_EMAIL =
+            "Invalid case details. Unable to resolve organisation's superuser email. Case id: {}, " + NOC_TYPE;
+    public static final String WARNING_INVALID_REPRESENTATIVE_TO_RESOLVE_ORGANISATION_EMAIL =
+            "Invalid representative details. Unable to resolve organisation superuser email. Case id: {}, " + NOC_TYPE;
+    public static final String WARNING_INVALID_ORGANISATION_RESPONSE_TO_RESOLVE_ORGANISATION_EMAIL =
+            "Cannot retrieve {} organisation by id {} [{}] {}. Unable to resolve organisation's superuser email. "
+                    + "Case id: {}";
+    public static final String WARNING_INVALID_PARAMETERS_TO_RESOLVE_ORGANISATION_EMAIL =
+            "Invalid parameters(orgId, caseId, nocType). Unable to resolve organisation's superuser email Case id: {}";
     public static final String WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_ORGANISATION =
             "Failed to send NOC notification email to organisation admin, case id: {}, error: {}";
     public static final String WARNING_INVALID_CASE_DETAILS_TO_NOTIFY_TRIBUNAL_FOR_RESPONDENT_REP_UPDATE =

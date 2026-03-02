@@ -47,8 +47,12 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.ERROR_FAILED_TO_SEND_EMAIL_ORGANISATION_ADMIN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.EXCEPTION_CASE_DETAILS_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.WARNING_CLAIMANT_EMAIL_NOT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.LEGAL_REP_NAME;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.LEGAL_REP_ORG;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.LINK_TO_CIT_UI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_TYPE_ADDITION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_TYPE_REMOVAL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.PARTY_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_CLAIMANT_EMAIL_NOT_FOUND_TO_NOTIFY_FOR_RESPONDENT_REP_UPDATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_ORGANISATION;
@@ -114,11 +118,6 @@ public class NocNotificationService {
     private String nocCitizenNoLongerRepresentedTemplateId;
     @Value("${template.nocNotification.noc-other-party-not-represented}")
     private String nocOtherPartyNotRepresentedTemplateId;
-
-    private static final String LEGAL_REP_NAME = "legalRepName";
-    private static final String LEGAL_REP_ORG = "legalRepOrg";
-    private static final String LINK_TO_CIT_UI = "linkToCitUI";
-    private static final String PARTY_NAME = "party_name";
 
     public void sendRespondentRepresentationUpdateNotifications(CaseDetails caseDetails,
                                                                 List<RepresentedTypeRItem> representatives,

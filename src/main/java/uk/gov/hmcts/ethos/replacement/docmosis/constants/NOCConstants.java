@@ -10,6 +10,11 @@ public final class NOCConstants {
     public static final String NOC_TYPE_REMOVAL = "Removal";
     public static final String NOC_TYPE_ADDITION = "Addition";
 
+    public static final String LEGAL_REP_NAME = "legalRepName";
+    public static final String LEGAL_REP_ORG = "legalRepOrg";
+    public static final String LINK_TO_CIT_UI = "linkToCitUI";
+    public static final String PARTY_NAME = "party_name";
+
     public static final String EXCEPTION_RESPONDENT_NOT_FOUND = "Respondent not found for case ID %s.";
     public static final String EXCEPTION_RESPONDENT_ID_NOT_FOUND =
             "Respondent ID not found for case ID %s.";

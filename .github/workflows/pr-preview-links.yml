@@ -1,0 +1,27 @@
+name: PR Preview Links Comment
+
+on:
+  workflow_dispatch:
+  pull_request:
+    types: [opened]
+
+jobs:
+  comment-preview-urls:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Comment PR Links
+        if: github.event_name == 'pull_request'
+        run: |
+          gh pr comment ${{ github.event.pull_request.number }} --body "
+          MyHMCTS/ExUI - https://xui-et-cos-admin-pr-${{ github.event.pull_request.number }}.preview.platform.hmcts.net
+            CCD Admin Web - https://admin-web-et-cos-admin-pr-${{ github.event.pull_request.number }}.preview.platform.hmcts.net
+            Camunda - https://camunda-et-cos-admin-pr-${{ github.event.pull_request.number }}.preview.platform.hmcts.net
+            SYA Web - https://et-sya-et-cos-admin-pr-${{ github.event.pull_request.number }}.preview.platform.hmcts.net
+            SYR Web - https://et-syr-et-cos-admin-pr-${{ github.event.pull_request.number }}.preview.platform.hmcts.net
+            Manage Org - https://xui-mo-webapp-et-cos-admin-pr-${{ github.event.pull_request.number }}.preview.platform.hmcts.net
+            Register Org - https://xui-mo-webapp-et-cos-admin-pr-${{ github.event.pull_request.number }}.preview.platform.hmcts.net/register-org/register
+            Approve Org - https://xui-ao-webapp-et-cos-admin-pr-${{ github.event.pull_request.number }}.preview.platform.hmcts.net
+          "
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

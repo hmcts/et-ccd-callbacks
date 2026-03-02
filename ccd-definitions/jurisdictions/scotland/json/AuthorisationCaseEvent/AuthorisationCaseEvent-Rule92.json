@@ -1,0 +1,38 @@
+[
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseEventID": "STORE_CLAIMANT_TSE",
+    "UserRole": "[CREATOR]",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseEventID": "STORE_CLAIMANT_TSE_RESPOND",
+    "UserRole": "[CREATOR]",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseEventID": "SUBMIT_STORED_CLAIMANT_TSE_RESPOND",
+    "UserRole": "[CREATOR]",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseEventID": "STORE_PSE_RESPONSE",
+    "UserRole": "[CREATOR]",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseEventID": "SUBMIT_STORED_PSE_RESPONSE",
+    "UserRole": "[CREATOR]",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseEventID": "STORE_RESPONDENT_TSE",
+    "UserRole": "[DEFENDANT]",
+    "CRUD": "CRU"
+  }
+]

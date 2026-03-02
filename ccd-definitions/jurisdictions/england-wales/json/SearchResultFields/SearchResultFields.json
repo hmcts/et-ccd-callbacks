@@ -1,0 +1,62 @@
+[
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "ethosCaseReference",
+    "Label": "Case Number",
+    "DisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "claimant",
+    "Label": "Claimant",
+    "DisplayOrder": 2
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "respondent",
+    "Label": "Respondent",
+    "DisplayOrder": 3
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "positionType",
+    "Label": "Current Position",
+    "DisplayOrder": 4
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "fileLocation",
+    "Label": "Physical Location",
+    "DisplayOrder": 5
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "multipleReference",
+    "Label": "Multiple Reference",
+    "DisplayOrder": 6
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "leadClaimant",
+    "Label": "Lead Claimant",
+    "DisplayOrder": 7
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales_Listings",
+    "CaseFieldID": "documentName",
+    "Label": "Document Name",
+    "DisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales_Multiple",
+    "CaseFieldID": "multipleName",
+    "Label": "Multiple Name",
+    "DisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales_Multiple",
+    "CaseFieldID": "multipleReference",
+    "Label": "Multiple Reference",
+    "DisplayOrder": 2
+  }
+]

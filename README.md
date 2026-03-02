@@ -7,6 +7,23 @@
 
 This application is responsible for handling all CCD callback requests for Employment Tribunal cases.
 
+
+## CCD Definitions
+
+This repository now includes consolidated CCD definitions for all Employment Tribunal jurisdictions in the `ccd-definitions/` directory. These definitions were merged from three separate repositories:
+
+- **Admin configurations** (`jurisdictions/admin/`) - Administrative case management
+- **England & Wales configurations** (`jurisdictions/england-wales/`) - England & Wales specific cases
+- **Scotland configurations** (`jurisdictions/scotland/`) - Scotland specific cases
+
+For detailed information about working with the CCD definitions, see [ccd-definitions/README.md](ccd-definitions/README.md).
+
+### Key Features:
+- Consolidated multi-jurisdiction definitions
+- JSON to Excel conversion tools
+- Environment-specific configuration management
+- Automated build and deployment scripts
+=======
 ## Supported Versions
 
 | Component | Version | Status |

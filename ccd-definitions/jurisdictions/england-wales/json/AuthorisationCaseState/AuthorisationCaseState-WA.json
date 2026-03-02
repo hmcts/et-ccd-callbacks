@@ -1,0 +1,170 @@
+[
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseStateID": "AWAITING_SUBMISSION_TO_HMCTS",
+    "UserRole": "caseworker-wa-task-configuration",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseStateID": "AWAITING_SUBMISSION_TO_HMCTS",
+    "UserRole": "caseworker-ras-validation",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseStateID": "Submitted",
+    "UserRole": "caseworker-wa-task-configuration",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseStateID": "Submitted",
+    "UserRole": "caseworker-ras-validation",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseStateID": "Vetted",
+    "UserRole": "caseworker-wa-task-configuration",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseStateID": "Vetted",
+    "UserRole": "caseworker-ras-validation",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseStateID": "Accepted",
+    "UserRole": "caseworker-wa-task-configuration",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseStateID": "Accepted",
+    "UserRole": "caseworker-ras-validation",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseStateID": "Closed",
+    "UserRole": "caseworker-wa-task-configuration",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseStateID": "Closed",
+    "UserRole": "caseworker-ras-validation",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseStateID": "Rejected",
+    "UserRole": "caseworker-wa-task-configuration",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseStateID": "Rejected",
+    "UserRole": "caseworker-ras-validation",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseStateID": "Transferred",
+    "UserRole": "caseworker-wa-task-configuration",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseStateID": "Transferred",
+    "UserRole": "caseworker-ras-validation",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales_Listings",
+    "CaseStateID": "Submitted",
+    "UserRole": "caseworker-wa-task-configuration",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales_Listings",
+    "CaseStateID": "Submitted",
+    "UserRole": "caseworker-ras-validation",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales_Listings",
+    "CaseStateID": "SubmittedReport",
+    "UserRole": "caseworker-wa-task-configuration",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales_Listings",
+    "CaseStateID": "SubmittedReport",
+    "UserRole": "caseworker-ras-validation",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales_Multiple",
+    "CaseStateID": "Open",
+    "UserRole": "caseworker-wa-task-configuration",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales_Multiple",
+    "CaseStateID": "Open",
+    "UserRole": "caseworker-ras-validation",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales_Multiple",
+    "CaseStateID": "Updating",
+    "UserRole": "caseworker-wa-task-configuration",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales_Multiple",
+    "CaseStateID": "Updating",
+    "UserRole": "caseworker-ras-validation",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales_Multiple",
+    "CaseStateID": "Closed",
+    "UserRole": "caseworker-wa-task-configuration",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales_Multiple",
+    "CaseStateID": "Closed",
+    "UserRole": "caseworker-ras-validation",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales_Multiple",
+    "CaseStateID": "Error",
+    "UserRole": "caseworker-wa-task-configuration",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales_Multiple",
+    "CaseStateID": "Error",
+    "UserRole": "caseworker-ras-validation",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales_Multiple",
+    "CaseStateID": "Transferred",
+    "UserRole": "caseworker-wa-task-configuration",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales_Multiple",
+    "CaseStateID": "Transferred",
+    "UserRole": "caseworker-ras-validation",
+    "CRUD": "R"
+  }
+]

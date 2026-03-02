@@ -10,6 +10,11 @@ public final class NOCConstants {
     public static final String NOC_TYPE_REMOVAL = "Removal";
     public static final String NOC_TYPE_ADDITION = "Addition";
 
+    public static final String LEGAL_REP_NAME = "legalRepName";
+    public static final String LEGAL_REP_ORG = "legalRepOrg";
+    public static final String LINK_TO_CIT_UI = "linkToCitUI";
+    public static final String PARTY_NAME = "party_name";
+
     public static final String EXCEPTION_RESPONDENT_NOT_FOUND = "Respondent not found for case ID %s.";
     public static final String EXCEPTION_RESPONDENT_ID_NOT_FOUND =
             "Respondent ID not found for case ID %s.";
@@ -146,6 +151,11 @@ public final class NOCConstants {
                     + "Exception: {}";
     public static final String WARNING_FAILED_TO_SEND_REMOVAL_OF_REPRESENTATIVE_CLAIMANT =
             "Failed to send email to claimant for removal of representative, case id: {}, error: {}";
+
+    public static final String WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_TO_REMOVED_REPRESENTATIVE =
+        "Failed to send email to removed legal representative, case id: {}, error: {}";
+    public static final String WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_TO_UNREPRESENTED_PARTY =
+        "Failed to send email to unrepresented party, case id: {}, error: {}";
 
     public static final int MAX_NOC_ANSWERS = 10;
 

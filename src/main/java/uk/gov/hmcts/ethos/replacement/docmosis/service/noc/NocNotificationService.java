@@ -42,12 +42,17 @@ import java.util.Map;
 import java.util.Objects;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.ERROR_FAILED_TO_SEND_EMAIL_CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.ERROR_FAILED_TO_SEND_EMAIL_ORGANISATION_ADMIN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.EXCEPTION_CASE_DETAILS_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.WARNING_CLAIMANT_EMAIL_NOT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.LEGAL_REP_NAME;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.LEGAL_REP_ORG;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.LINK_TO_CIT_UI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_TYPE_ADDITION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_TYPE_REMOVAL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.PARTY_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_CLAIMANT_EMAIL_NOT_FOUND_TO_NOTIFY_FOR_RESPONDENT_REP_UPDATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_CLAIMANT_REP_ORGANISATION_ID_NOT_FOUND_TO_RESOLVE_ORGANISATION_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_CLAIMANT;
@@ -55,6 +60,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WAR
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_RESPONDENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_TRIBUNAL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_NEW_REPRESENTATIVE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_TO_REMOVED_REPRESENTATIVE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_TO_UNREPRESENTED_PARTY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_REMOVAL_OF_REPRESENTATIVE_CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_INVALID_CASE_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_INVALID_CASE_DETAILS_CLAIMANT_NOT_NOTIFIED_OF_REMOVAL_OF_REPRESENTATIVE;
@@ -105,6 +112,14 @@ public class NocNotificationService {
     private String newRespondentSolicitorTemplateId;
     @Value("${template.nocNotification.tribunal}")
     private String tribunalTemplateId;
+    @Value("${template.nocNotification.org-admin-not-representing}")
+    private String nocOrgAdminNotRepresentingTemplateId;
+    @Value("${template.nocNotification.noc-legal-rep-no-longer-assigned}")
+    private String nocLegalRepNoLongerAssignedTemplateId;
+    @Value("${template.nocNotification.noc-citizen-no-longer-represented}")
+    private String nocCitizenNoLongerRepresentedTemplateId;
+    @Value("${template.nocNotification.noc-other-party-not-represented}")
+    private String nocOtherPartyNotRepresentedTemplateId;
 
     public void sendRespondentRepresentationUpdateNotifications(CaseDetails caseDetails,
                                                                 List<RepresentedTypeRItem> representatives,
@@ -503,7 +518,7 @@ public class NocNotificationService {
         }
     }
 
-    private RetrieveOrgByIdResponse getOrganisationResponse(String orgId, boolean isNewOrg) {
+    public RetrieveOrgByIdResponse getOrganisationResponse(String orgId, boolean isNewOrg) {
         ResponseEntity<RetrieveOrgByIdResponse> getOrgResponse = getOrganisationById(orgId);
         HttpStatusCode statusCode = getOrgResponse.getStatusCode();
         if (!HttpStatus.OK.equals(statusCode)) {
@@ -691,5 +706,110 @@ public class NocNotificationService {
                 adminUserService.getAdminUserToken(),
                 authTokenGenerator.generate(),
                 orgId);
+    }
+
+    public void sendEmailToOrgAdmin(CaseDetails caseDetails, RepresentedTypeC representedTypeC) {
+        String organisationEmail = getOrganisationEmailWithID(representedTypeC);
+        if (organisationEmail == null) {
+            return;
+        }
+
+        Map<String, String> personalisation =
+            NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation(caseDetails.getCaseData());
+        personalisation.put(LEGAL_REP_NAME, representedTypeC.getNameOfRepresentative());
+
+        try {
+            emailService.sendEmail(
+                nocOrgAdminNotRepresentingTemplateId,
+                organisationEmail,
+                personalisation);
+        } catch (Exception e) {
+            log.warn(
+                WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_ORGANISATION,
+                caseDetails.getCaseId(),
+                e.getMessage());
+        }
+    }
+
+    private String getOrganisationEmailWithID(RepresentedTypeC representedTypeC) {
+        if (representedTypeC.getMyHmctsOrganisation() == null) {
+            return null;
+        }
+        String organisationId = representedTypeC.getMyHmctsOrganisation().getOrganisationID();
+        ResponseEntity<RetrieveOrgByIdResponse> organisationResponse = getOrganisationById(organisationId);
+        if (organisationResponse.getBody() == null) {
+            return null;
+        }
+        return organisationResponse.getBody().getSuperUser().getEmail();
+    }
+
+    public void sendEmailToRemovedLegalRep(CaseDetails caseDetails, RepresentedTypeC representedTypeC) {
+        Map<String, String> personalisation =
+            NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation(caseDetails.getCaseData());
+        try {
+            emailService.sendEmail(
+                nocLegalRepNoLongerAssignedTemplateId,
+                representedTypeC.getRepresentativeEmailAddress(),
+                personalisation);
+        } catch (Exception e) {
+            log.warn(
+                WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_TO_REMOVED_REPRESENTATIVE,
+                caseDetails.getCaseId(),
+                e.getMessage());
+        }
+    }
+
+    public void sendEmailToUnrepresentedParty(CaseDetails caseDetails, RepresentedTypeC representedTypeC) {
+        CaseData caseData = caseDetails.getCaseData();
+        if (ObjectUtils.isEmpty(caseData.getClaimantType())
+            || StringUtils.isBlank(caseData.getClaimantType().getClaimantEmailAddress())) {
+            return;
+        }
+
+        Map<String, String> personalisation =
+            NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation(caseDetails.getCaseData());
+        personalisation.put(LEGAL_REP_ORG, representedTypeC.getNameOfOrganisation());
+        personalisation.put(LINK_TO_CIT_UI, emailService.getCitizenCaseLink(caseDetails.getCaseId()));
+
+        try {
+            emailService.sendEmail(
+                nocCitizenNoLongerRepresentedTemplateId,
+                caseData.getClaimantType().getClaimantEmailAddress(),
+                personalisation);
+        } catch (Exception e) {
+            log.warn(
+                WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_TO_UNREPRESENTED_PARTY,
+                caseDetails.getCaseId(),
+                e.getMessage());
+        }
+    }
+
+    public void sendEmailToOtherParty(CaseDetails caseDetails) {
+        CaseData caseData = caseDetails.getCaseData();
+
+        List<CaseUserAssignment> caseUserAssignments =
+            caseAccessService.getCaseUserAssignmentsById(caseDetails.getCaseId());
+        if (caseUserAssignments == null || caseUserAssignments.isEmpty()) {
+            log.warn("In NocNotificationService : No case user assignments found for caseId {}",
+                caseDetails.getCaseId());
+            return;
+        }
+
+        emailNotificationService.getRespondentsAndRepsEmailAddresses(caseData, caseUserAssignments)
+            .forEach((email, respondentId) -> sendRespondentEmail(caseDetails, email, respondentId));
+    }
+
+    private void sendRespondentEmail(CaseDetails caseDetails, String email, String respondentId) {
+        Map<String, String> personalisation =
+            NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation(caseDetails.getCaseData());
+        personalisation.put(PARTY_NAME, CLAIMANT_TITLE);
+        String caseLink = StringUtils.isNotBlank(respondentId)
+            ? emailService.getSyrCaseLink(caseDetails.getCaseId(), respondentId)
+            : emailService.getExuiCaseLink(caseDetails.getCaseId());
+        personalisation.put(LINK_TO_CIT_UI, caseLink);
+        emailService.sendEmail(
+            nocOtherPartyNotRepresentedTemplateId,
+            email,
+            personalisation);
     }
 }

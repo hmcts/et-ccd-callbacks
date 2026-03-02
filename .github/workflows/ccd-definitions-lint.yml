@@ -21,7 +21,7 @@ jobs:
         run: corepack enable
       - name: Install dependencies
         working-directory: ccd-definitions
-        run: yarn install
+        run: YARN_ENABLE_SCRIPTS=false yarn install --immutable
       - name: Lint CCD definitions
         working-directory: ccd-definitions
         run: yarn lint

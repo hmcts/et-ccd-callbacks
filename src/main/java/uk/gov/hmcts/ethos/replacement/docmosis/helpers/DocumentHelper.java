@@ -1460,8 +1460,7 @@ public final class DocumentHelper {
             .collect(Collectors.joining(", "));
 
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("\"noticeOfChangeRespondentName\":\"")
+        return stringBuilder.append("\"noticeOfChangeRespondentName\":\"")
             .append(nullCheck(noticeOfChangeRespondentName));
-        return stringBuilder;
     }
 }

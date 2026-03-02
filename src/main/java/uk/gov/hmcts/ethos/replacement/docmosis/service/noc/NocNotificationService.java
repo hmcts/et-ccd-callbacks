@@ -42,17 +42,15 @@ import java.util.Map;
 import java.util.Objects;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_TITLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.ERROR_FAILED_TO_SEND_EMAIL_CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.ERROR_FAILED_TO_SEND_EMAIL_ORGANISATION_ADMIN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.EXCEPTION_CASE_DETAILS_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.WARNING_CLAIMANT_EMAIL_NOT_FOUND;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.LEGAL_REP_NAME;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.LEGAL_REP_ORG;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.LINK_TO_CIT_UI;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LEGAL_REP_NAME;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LEGAL_REP_ORG;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CIT_UI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_TYPE_ADDITION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_TYPE_REMOVAL;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.PARTY_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_CLAIMANT_EMAIL_NOT_FOUND_TO_NOTIFY_FOR_RESPONDENT_REP_UPDATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_CLAIMANT_REP_ORGANISATION_ID_NOT_FOUND_TO_RESOLVE_ORGANISATION_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_CLAIMANT;
@@ -708,7 +706,7 @@ public class NocNotificationService {
                 orgId);
     }
 
-    public void sendEmailToOrgAdmin(CaseDetails caseDetails, RepresentedTypeC representedTypeC) {
+    public void sendClaimantNocRequestEmailToOrgAdmin(CaseDetails caseDetails, RepresentedTypeC representedTypeC) {
         String organisationEmail = getOrganisationEmailWithID(representedTypeC);
         if (organisationEmail == null) {
             return;
@@ -743,7 +741,10 @@ public class NocNotificationService {
         return organisationResponse.getBody().getSuperUser().getEmail();
     }
 
-    public void sendEmailToRemovedLegalRep(CaseDetails caseDetails, RepresentedTypeC representedTypeC) {
+    public void sendClaimantNocRequestEmailToRemovedLegalRep(
+        CaseDetails caseDetails,
+        RepresentedTypeC representedTypeC
+    ) {
         Map<String, String> personalisation =
             NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation(caseDetails.getCaseData());
         try {
@@ -759,7 +760,10 @@ public class NocNotificationService {
         }
     }
 
-    public void sendEmailToUnrepresentedParty(CaseDetails caseDetails, RepresentedTypeC representedTypeC) {
+    public void sendClaimantNocRequestEmailToUnrepresentedParty(
+        CaseDetails caseDetails,
+        RepresentedTypeC representedTypeC
+    ) {
         CaseData caseData = caseDetails.getCaseData();
         if (ObjectUtils.isEmpty(caseData.getClaimantType())
             || StringUtils.isBlank(caseData.getClaimantType().getClaimantEmailAddress())) {
@@ -784,7 +788,7 @@ public class NocNotificationService {
         }
     }
 
-    public void sendEmailToOtherParty(CaseDetails caseDetails) {
+    public void sendClaimantNocRequestEmailToOtherParty(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
 
         List<CaseUserAssignment> caseUserAssignments =
@@ -796,20 +800,16 @@ public class NocNotificationService {
         }
 
         emailNotificationService.getRespondentsAndRepsEmailAddresses(caseData, caseUserAssignments)
-            .forEach((email, respondentId) -> sendRespondentEmail(caseDetails, email, respondentId));
-    }
-
-    private void sendRespondentEmail(CaseDetails caseDetails, String email, String respondentId) {
-        Map<String, String> personalisation =
-            NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation(caseDetails.getCaseData());
-        personalisation.put(PARTY_NAME, CLAIMANT_TITLE);
-        String caseLink = StringUtils.isNotBlank(respondentId)
-            ? emailService.getSyrCaseLink(caseDetails.getCaseId(), respondentId)
-            : emailService.getExuiCaseLink(caseDetails.getCaseId());
-        personalisation.put(LINK_TO_CIT_UI, caseLink);
-        emailService.sendEmail(
-            nocOtherPartyNotRepresentedTemplateId,
-            email,
-            personalisation);
+            .forEach((email, respondentId) -> {
+                String partyName = caseData.getClaimant();
+                String caseLink = StringUtils.isNotBlank(respondentId)
+                    ? emailService.getSyrCaseLink(caseDetails.getCaseId(), respondentId)
+                    : emailService.getExuiCaseLink(caseDetails.getCaseId());
+                emailService.sendEmail(
+                    nocOtherPartyNotRepresentedTemplateId,
+                    email,
+                    buildPersonalisationWithPartyName(caseDetails, partyName, caseLink)
+                );
+            });
     }
 }

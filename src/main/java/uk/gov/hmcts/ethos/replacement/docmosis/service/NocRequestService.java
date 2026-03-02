@@ -20,13 +20,13 @@ public class NocRequestService {
         RepresentedTypeC repCopy = getRepTrueCopy(caseDetails);
 
         // send email to organisation admin
-        nocNotificationService.sendEmailToOrgAdmin(caseDetails, repCopy);
+        nocNotificationService.sendClaimantNocRequestEmailToOrgAdmin(caseDetails, repCopy);
         // send email to removed legal rep
-        nocNotificationService.sendEmailToRemovedLegalRep(caseDetails, repCopy);
+        nocNotificationService.sendClaimantNocRequestEmailToRemovedLegalRep(caseDetails, repCopy);
         // send email to unrepresented party, i.e. claimant
-        nocNotificationService.sendEmailToUnrepresentedParty(caseDetails, repCopy);
+        nocNotificationService.sendClaimantNocRequestEmailToUnrepresentedParty(caseDetails, repCopy);
         // send email to other party, i.e. respondents
-        nocNotificationService.sendEmailToOtherParty(caseDetails);
+        nocNotificationService.sendClaimantNocRequestEmailToOtherParty(caseDetails);
     }
 
     private static RepresentedTypeC getRepTrueCopy(CaseDetails caseDetails) {

@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -121,13 +122,11 @@ class NocNotificationServiceTest {
     private static final String EXPECTED_WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_CLAIMANT =
             "Failed to send noc notification email to claimant, case id: " + CASE_ID + ", error: Dummy exception "
                     + "occurred while sending email to respondent";
-    private static final String EXPECTED_WARNING_INVALID_CASE_DETAILS_TO_NOTIFY_ORGANISATION_FOR_RESPONDENT_REP_UPDATE =
-            "Invalid case details. Unable to notify organisation for respondent representative update. Case id: , "
-                    + "NOC type: Removal";
+    private static final String EXPECTED_WARNING_INVALID_CASE_DETAILS_TO_RESOLVE_ORGANISATION_EMAIL =
+            "Invalid case details. Unable to resolve organisation's superuser email. Case id: , NOC type: Removal";
     private static final String
-            EXPECTED_WARNING_INVALID_REPRESENTATIVE_TO_NOTIFY_ORGANISATION_FOR_RESPONDENT_REP_UPDATE = "Invalid case "
-            + "details. Unable to notify organisation for respondent representative update. Case id: " + CASE_ID
-            + ", NOC type: Removal";
+            EXPECTED_WARNING_INVALID_REPRESENTATIVE_TO_RESOLVE_ORGANISATION_EMAIL = "Invalid representative details. "
+            + "Unable to resolve organisation superuser email. Case id: 1234567890123456, NOC type: Removal";
     private static final String EXPECTED_WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_ORGANISATION =
             "Failed to send NOC notification email to organisation admin, case id: " + CASE_ID + ", error: Dummy "
                     + "exception occurred while sending email to respondent";
@@ -459,32 +458,14 @@ class NocNotificationServiceTest {
     @Test
     @SneakyThrows
     void theNotifyOrganisationOfRespondentRepresentativeUpdate() {
+        RepresentedTypeRItem representative = RepresentedTypeRItem.builder().build();
+        representative.setId(REPRESENTATIVE_ID);
+        representative.setValue(RepresentedTypeR.builder().respondentOrganisation(Organisation.builder()
+                .organisationID(OLD_ORG_ID).build()).build());
         ReflectionTestUtils.setField(nocNotificationService, FIELD_NAME_PREVIOUS_RESPONDENT_SOLICITOR_TEMPLATE_ID,
                 PREVIOUS_RESPONDENT_SOLICITOR_TEMPLATE_ID);
         ReflectionTestUtils.setField(nocNotificationService, FIELD_NAME_NEW_RESPONDENT_SOLICITOR_TEMPLATE_ID,
                 NEW_RESPONDENT_SOLICITOR_TEMPLATE_ID);
-        // when case details not valid should log invalid case details warning
-        RepresentedTypeRItem representative = RepresentedTypeRItem.builder().build();
-        nocNotificationService.notifyOrganisationOfRespondentRepresentativeUpdate(null, representative,
-                RESPONDENT_NAME, NOC_TYPE_REMOVAL);
-        LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_ONE,
-                EXPECTED_WARNING_INVALID_CASE_DETAILS_TO_NOTIFY_ORGANISATION_FOR_RESPONDENT_REP_UPDATE);
-        // when can not notify organisation should log invalid representative
-        nocNotificationService.notifyOrganisationOfRespondentRepresentativeUpdate(validCaseDetails, representative,
-                RESPONDENT_NAME, NOC_TYPE_REMOVAL);
-        LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_TWO,
-                EXPECTED_WARNING_INVALID_REPRESENTATIVE_TO_NOTIFY_ORGANISATION_FOR_RESPONDENT_REP_UPDATE);
-        // when organisation response is empty should log invalid parameters
-        representative.setId(REPRESENTATIVE_ID);
-        representative.setValue(RepresentedTypeR.builder().respondentOrganisation(Organisation.builder()
-                .organisationID(OLD_ORG_ID).build()).build());
-        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
-        when(authTokenGenerator.generate()).thenReturn(AUTH_TOKEN);
-        when(organisationClient.getOrganisationById(ADMIN_USER_TOKEN, AUTH_TOKEN, OLD_ORG_ID)).thenReturn(null);
-        nocNotificationService.notifyOrganisationOfRespondentRepresentativeUpdate(validCaseDetails, representative,
-                RESPONDENT_NAME, NOC_TYPE_REMOVAL);
-        verify(emailService, times(NumberUtils.INTEGER_ZERO)).sendEmail(eq(PREVIOUS_RESPONDENT_SOLICITOR_TEMPLATE_ID),
-                eq(ORGANISATION_ADMIN_EMAIL), anyMap());
         // when send email throws exception should log that exception
         RetrieveOrgByIdResponse orgByIdResponse = RetrieveOrgByIdResponse.builder().superUser(RetrieveOrgByIdResponse
                 .SuperUser.builder().email(ORGANISATION_ADMIN_EMAIL).build()).build();
@@ -496,7 +477,7 @@ class NocNotificationServiceTest {
                 RESPONDENT_NAME, NOC_TYPE_REMOVAL);
         verify(emailService, times(NumberUtils.INTEGER_ONE)).sendEmail(eq(PREVIOUS_RESPONDENT_SOLICITOR_TEMPLATE_ID),
                 eq(ORGANISATION_ADMIN_EMAIL), anyMap());
-        LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_THREE,
+        LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_ONE,
                 EXPECTED_WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_ORGANISATION);
         // Successfully send removal of old representative notification
         doNothing().when(emailService).sendEmail(eq(PREVIOUS_RESPONDENT_SOLICITOR_TEMPLATE_ID),
@@ -513,6 +494,37 @@ class NocNotificationServiceTest {
                 RESPONDENT_NAME, NOC_TYPE_ADDITION);
         verify(emailService, times(NumberUtils.INTEGER_ONE)).sendEmail(eq(NEW_RESPONDENT_SOLICITOR_TEMPLATE_ID),
                 eq(ORGANISATION_ADMIN_EMAIL), anyMap());
+    }
+
+    @Test
+    void theResolveRespondentRepresentativeOrganisationSuperuserEmail() {
+        // when case details not valid should log invalid case details warning
+        RepresentedTypeRItem representative = RepresentedTypeRItem.builder().build();
+        assertThat(nocNotificationService.resolveRespondentRepresentativeOrganisationSuperuserEmail(null,
+                representative, NOC_TYPE_REMOVAL)).isEmpty();
+        LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_ONE,
+                EXPECTED_WARNING_INVALID_CASE_DETAILS_TO_RESOLVE_ORGANISATION_EMAIL);
+        // when can not notify organisation should log invalid representative
+        assertThat(nocNotificationService.resolveRespondentRepresentativeOrganisationSuperuserEmail(validCaseDetails,
+                representative, NOC_TYPE_REMOVAL)).isEmpty();
+        LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_TWO,
+                EXPECTED_WARNING_INVALID_REPRESENTATIVE_TO_RESOLVE_ORGANISATION_EMAIL);
+        // when organisation response is empty should log invalid parameters
+        representative.setId(REPRESENTATIVE_ID);
+        representative.setValue(RepresentedTypeR.builder().respondentOrganisation(Organisation.builder()
+                .organisationID(OLD_ORG_ID).build()).build());
+        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
+        when(authTokenGenerator.generate()).thenReturn(AUTH_TOKEN);
+        when(organisationClient.getOrganisationById(ADMIN_USER_TOKEN, AUTH_TOKEN, OLD_ORG_ID)).thenReturn(null);
+        assertThat(nocNotificationService.resolveRespondentRepresentativeOrganisationSuperuserEmail(validCaseDetails,
+                representative, NOC_TYPE_REMOVAL)).isEmpty();
+        // when able to find respondent representative organisation should return superuser email
+        RetrieveOrgByIdResponse orgByIdResponse = RetrieveOrgByIdResponse.builder().superUser(RetrieveOrgByIdResponse
+                .SuperUser.builder().email(ORGANISATION_ADMIN_EMAIL).build()).build();
+        ResponseEntity<RetrieveOrgByIdResponse> orgResponse = new ResponseEntity<>(orgByIdResponse, HttpStatus.OK);
+        when(organisationClient.getOrganisationById(ADMIN_USER_TOKEN, AUTH_TOKEN, OLD_ORG_ID)).thenReturn(orgResponse);
+        assertThat(nocNotificationService.resolveRespondentRepresentativeOrganisationSuperuserEmail(validCaseDetails,
+                representative, NOC_TYPE_REMOVAL)).isNotEmpty().isEqualTo(ORGANISATION_ADMIN_EMAIL);
     }
 
     @Test

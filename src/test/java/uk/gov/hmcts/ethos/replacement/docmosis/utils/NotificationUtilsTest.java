@@ -33,30 +33,27 @@ final class NotificationUtilsTest {
     private static final String ORGANISATION_ID = "Organisation ID";
     private static final String ORGANISATION_EMAIL = "organisation@hmcts.org";
 
-    private static final String EXPECTED_WARNING_INVALID_PARAMETERS_TO_NOTIFY_ORG_FOR_REP_UPDATE_WITHOUT_CASE_ID =
-            "Invalid parameters(orgId, caseId, nocType). Unable to notify organisation for respondent "
-                    + "representative update. Case id: ";
-    private static final String EXPECTED_WARNING_INVALID_PARAMETERS_TO_NOTIFY_ORG_FOR_REP_UPDATE_WITH_CASE_ID =
-            "Invalid parameters(orgId, caseId, nocType). Unable to notify organisation for respondent "
-                    + "representative update. Case id: 1234567890123456";
-    private static final String EXPECTED_WARNING_INVALID_ORG_RESP_TO_NOTIFY_FOR_RESPONDENT_REP_UPDATE_REMOVAL_1 =
-            "Cannot retrieve old organisation by id " + ORGANISATION_ID + " [null] null. Unable to notify "
-                    + "organisation for respondent representative update. Case id: " + CASE_ID;
-    private static final String EXPECTED_WARNING_INVALID_ORG_RESP_TO_NOTIFY_FOR_RESPONDENT_REP_UPDATE_REMOVAL_2 =
+    private static final String EXPECTED_WARNING_INVALID_PARAMETERS_TO_RESOLVE_ORGANISATION_EMAIL_WITHOUT_CASE_ID =
+            "Invalid parameters(orgId, caseId, nocType). Unable to resolve organisation's superuser email Case id: ";
+    private static final String EXPECTED_WARNING_INVALID_PARAMETERS_TO_RESOLVE_ORGANISATION_EMAIL_WITH_CASE_ID =
+            "Invalid parameters(orgId, caseId, nocType). Unable to resolve organisation's superuser email "
+                    + "Case id: " + CASE_ID;
+    private static final String EXPECTED_WARNING_INVALID_ORGANISATION_RESPONSE_TO_RESOLVE_ORGANISATION_EMAIL_1 =
+            "Cannot retrieve old organisation by id Organisation ID [null] null. Unable to resolve organisation's "
+                    + "superuser email. Case id: " + CASE_ID;
+    private static final String EXPECTED_WARNING_INVALID_ORGANISATION_RESPONSE_TO_RESOLVE_ORGANISATION_EMAIL_2 =
             "Cannot retrieve old organisation by id " + ORGANISATION_ID + " [400 BAD_REQUEST] RetrieveOrgByIdResponse"
-                    + "(superUser=null). Unable to notify organisation for respondent representative update. Case id: "
-                    + CASE_ID;
-    private static final String EXPECTED_WARNING_INVALID_ORG_RESP_TO_NOTIFY_FOR_RESPONDENT_REP_UPDATE_REMOVAL_3 =
-            "Cannot retrieve old organisation by id " + ORGANISATION_ID + " [200 OK] null. Unable to notify "
-                    + "organisation for respondent representative update. Case id: " + CASE_ID;
-    private static final String EXPECTED_WARNING_INVALID_ORG_RESP_TO_NOTIFY_FOR_RESPONDENT_REP_UPDATE_REMOVAL_4 =
+                    + "(superUser=null). Unable to resolve organisation's superuser email. Case id: " + CASE_ID;
+    private static final String EXPECTED_WARNING_INVALID_ORGANISATION_RESPONSE_TO_RESOLVE_ORGANISATION_EMAIL_3 =
+            "Cannot retrieve old organisation by id " + ORGANISATION_ID + " [200 OK] null. Unable to resolve "
+                    + "organisation's superuser email. Case id: " + CASE_ID;
+    private static final String EXPECTED_WARNING_INVALID_ORGANISATION_RESPONSE_TO_RESOLVE_ORGANISATION_EMAIL_4 =
             "Cannot retrieve old organisation by id " + ORGANISATION_ID + " [200 OK] RetrieveOrgByIdResponse"
-                    + "(superUser=null). Unable to notify organisation for respondent representative update. Case id: "
-                    + CASE_ID;
-    private static final String EXPECTED_WARNING_INVALID_ORG_RESP_TO_NOTIFY_FOR_RESPONDENT_REP_UPDATE_REMOVAL_5 =
+                    + "(superUser=null). Unable to resolve organisation's superuser email. Case id: " + CASE_ID;
+    private static final String EXPECTED_WARNING_INVALID_ORGANISATION_RESPONSE_TO_RESOLVE_ORGANISATION_EMAIL_5 =
             "Cannot retrieve old organisation by id " + ORGANISATION_ID + " [200 OK] RetrieveOrgByIdResponse"
                     + "(superUser=RetrieveOrgByIdResponse.SuperUser(firstName=null, lastName=null, email=null)). "
-                    + "Unable to notify organisation for respondent representative update. Case id: " + CASE_ID;
+                    + "Unable to resolve organisation's superuser email. Case id: " + CASE_ID;
 
     @BeforeEach
     void setUp() {
@@ -116,58 +113,58 @@ final class NotificationUtilsTest {
     }
 
     @Test
-    void theCanNotifyOrganisationForRepresentativeUpdate() {
+    void theCanResolveOrganisationSuperuserEmail() {
         // when organisation id is empty should return false
         RetrieveOrgByIdResponse retrieveOrgByIdResponse = RetrieveOrgByIdResponse.builder().build();
         ResponseEntity<RetrieveOrgByIdResponse> orgResponse = new ResponseEntity<>(retrieveOrgByIdResponse,
                 HttpStatus.OK);
-        assertThat(NotificationUtils.canNotifyOrganisationForRepresentativeUpdate(StringUtils.EMPTY, ORGANISATION_ID,
+        assertThat(NotificationUtils.canResolveOrganisationSuperuserEmail(StringUtils.EMPTY, ORGANISATION_ID,
                 NOC_TYPE_REMOVAL, orgResponse)).isFalse();
         LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_ONE,
-                EXPECTED_WARNING_INVALID_PARAMETERS_TO_NOTIFY_ORG_FOR_REP_UPDATE_WITHOUT_CASE_ID);
+                EXPECTED_WARNING_INVALID_PARAMETERS_TO_RESOLVE_ORGANISATION_EMAIL_WITHOUT_CASE_ID);
         // when case id is empty should return false
-        assertThat(NotificationUtils.canNotifyOrganisationForRepresentativeUpdate(CASE_ID, StringUtils.EMPTY,
+        assertThat(NotificationUtils.canResolveOrganisationSuperuserEmail(CASE_ID, StringUtils.EMPTY,
                 NOC_TYPE_REMOVAL, orgResponse)).isFalse();
         LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_TWO,
-                EXPECTED_WARNING_INVALID_PARAMETERS_TO_NOTIFY_ORG_FOR_REP_UPDATE_WITH_CASE_ID);
+                EXPECTED_WARNING_INVALID_PARAMETERS_TO_RESOLVE_ORGANISATION_EMAIL_WITH_CASE_ID);
         // when noc type is empty should return false
-        assertThat(NotificationUtils.canNotifyOrganisationForRepresentativeUpdate(CASE_ID, ORGANISATION_ID,
+        assertThat(NotificationUtils.canResolveOrganisationSuperuserEmail(CASE_ID, ORGANISATION_ID,
                 StringUtils.EMPTY, orgResponse)).isFalse();
         LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_THREE,
-                EXPECTED_WARNING_INVALID_PARAMETERS_TO_NOTIFY_ORG_FOR_REP_UPDATE_WITH_CASE_ID);
+                EXPECTED_WARNING_INVALID_PARAMETERS_TO_RESOLVE_ORGANISATION_EMAIL_WITH_CASE_ID);
         // when organisation response is empty should return false
-        assertThat(NotificationUtils.canNotifyOrganisationForRepresentativeUpdate(CASE_ID, ORGANISATION_ID,
+        assertThat(NotificationUtils.canResolveOrganisationSuperuserEmail(CASE_ID, ORGANISATION_ID,
                 NOC_TYPE_REMOVAL, null)).isFalse();
         LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_FOUR,
-                EXPECTED_WARNING_INVALID_ORG_RESP_TO_NOTIFY_FOR_RESPONDENT_REP_UPDATE_REMOVAL_1);
+                EXPECTED_WARNING_INVALID_ORGANISATION_RESPONSE_TO_RESOLVE_ORGANISATION_EMAIL_1);
         // when organisation response status code is different from successful should return false
         orgResponse = new ResponseEntity<>(retrieveOrgByIdResponse, HttpStatus.BAD_REQUEST);
-        assertThat(NotificationUtils.canNotifyOrganisationForRepresentativeUpdate(CASE_ID, ORGANISATION_ID,
+        assertThat(NotificationUtils.canResolveOrganisationSuperuserEmail(CASE_ID, ORGANISATION_ID,
                 NOC_TYPE_REMOVAL, orgResponse)).isFalse();
         LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_FIVE,
-                EXPECTED_WARNING_INVALID_ORG_RESP_TO_NOTIFY_FOR_RESPONDENT_REP_UPDATE_REMOVAL_2);
+                EXPECTED_WARNING_INVALID_ORGANISATION_RESPONSE_TO_RESOLVE_ORGANISATION_EMAIL_2);
         // when organisation response not has body should return false
         orgResponse = new ResponseEntity<>(null, HttpStatus.OK);
-        assertThat(NotificationUtils.canNotifyOrganisationForRepresentativeUpdate(CASE_ID, ORGANISATION_ID,
+        assertThat(NotificationUtils.canResolveOrganisationSuperuserEmail(CASE_ID, ORGANISATION_ID,
                 NOC_TYPE_REMOVAL, orgResponse)).isFalse();
         LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_SIX,
-                EXPECTED_WARNING_INVALID_ORG_RESP_TO_NOTIFY_FOR_RESPONDENT_REP_UPDATE_REMOVAL_3);
+                EXPECTED_WARNING_INVALID_ORGANISATION_RESPONSE_TO_RESOLVE_ORGANISATION_EMAIL_3);
         // when organisation response body not has superuser should return false
         orgResponse = new ResponseEntity<>(retrieveOrgByIdResponse, HttpStatus.OK);
-        assertThat(NotificationUtils.canNotifyOrganisationForRepresentativeUpdate(CASE_ID, ORGANISATION_ID,
+        assertThat(NotificationUtils.canResolveOrganisationSuperuserEmail(CASE_ID, ORGANISATION_ID,
                 NOC_TYPE_REMOVAL, orgResponse)).isFalse();
         LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_SEVEN,
-                EXPECTED_WARNING_INVALID_ORG_RESP_TO_NOTIFY_FOR_RESPONDENT_REP_UPDATE_REMOVAL_4);
+                EXPECTED_WARNING_INVALID_ORGANISATION_RESPONSE_TO_RESOLVE_ORGANISATION_EMAIL_4);
         // when superuser not has email should return false
         retrieveOrgByIdResponse.setSuperUser(RetrieveOrgByIdResponse.SuperUser.builder().build());
         orgResponse = new ResponseEntity<>(retrieveOrgByIdResponse, HttpStatus.OK);
-        assertThat(NotificationUtils.canNotifyOrganisationForRepresentativeUpdate(CASE_ID, ORGANISATION_ID,
+        assertThat(NotificationUtils.canResolveOrganisationSuperuserEmail(CASE_ID, ORGANISATION_ID,
                 NOC_TYPE_REMOVAL, orgResponse)).isFalse();
         LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_EIGHT,
-                EXPECTED_WARNING_INVALID_ORG_RESP_TO_NOTIFY_FOR_RESPONDENT_REP_UPDATE_REMOVAL_5);
+                EXPECTED_WARNING_INVALID_ORGANISATION_RESPONSE_TO_RESOLVE_ORGANISATION_EMAIL_5);
         // when superuser has email should return true
         retrieveOrgByIdResponse.getSuperUser().setEmail(ORGANISATION_EMAIL);
-        assertThat(NotificationUtils.canNotifyOrganisationForRepresentativeUpdate(CASE_ID, ORGANISATION_ID,
+        assertThat(NotificationUtils.canResolveOrganisationSuperuserEmail(CASE_ID, ORGANISATION_ID,
                 NOC_TYPE_REMOVAL, orgResponse)).isTrue();
     }
 }

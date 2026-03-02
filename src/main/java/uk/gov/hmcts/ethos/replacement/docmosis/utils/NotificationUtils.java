@@ -11,8 +11,8 @@ import uk.gov.hmcts.et.common.model.ccd.RetrieveOrgByIdResponse;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_TYPE_REMOVAL;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_INVALID_ORGANISATION_RESPONSE_TO_NOTIFY_FOR_RESPONDENT_REP_UPDATE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_INVALID_PARAMETERS_TO_NOTIFY_ORGANISATION_FOR_REP_UPDATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_INVALID_ORGANISATION_RESPONSE_TO_RESOLVE_ORGANISATION_EMAIL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_INVALID_PARAMETERS_TO_RESOLVE_ORGANISATION_EMAIL;
 
 @Slf4j
 public final class NotificationUtils {
@@ -73,35 +73,41 @@ public final class NotificationUtils {
     }
 
     /**
-     * Determines whether an organisation can be notified about a representative
-     * update for a given case.
+     * Determines whether the organisation response is valid for resolving the
+     * organisation superuser email address.
      *
-     * <p>The organisation is eligible for notification only if all required
-     * identifiers are provided and the organisation lookup response contains
-     * a successful result with a resolvable superuser email address.</p>
+     * <p>This method validates:</p>
+     * <ul>
+     *     <li>That {@code caseId}, {@code orgId}, and {@code nocType} are not blank,</li>
+     *     <li>That the organisation response is not null,</li>
+     *     <li>That the HTTP status code indicates a successful (2xx) response,</li>
+     *     <li>That the response body is present,</li>
+     *     <li>That a superuser exists in the response,</li>
+     *     <li>That the superuser email address is not blank.</li>
+     * </ul>
      *
-     * <p>The notification context (old or new organisation) is derived from
-     * the supplied Notice of Change (NoC) type.</p>
+     * <p>If any validation step fails, a warning is logged and {@code false} is returned.
+     * This method does not throw exceptions for validation failures.</p>
      *
-     * <p>This method performs defensive validation and fails safely by logging
-     * warnings rather than throwing exceptions.</p>
+     * <p>The {@code nocType} is used to determine whether the validation relates to an
+     * old or new organisation (for example, in Notice of Change removal scenarios),
+     * which is reflected in logging context.</p>
      *
-     * @param caseId the unique identifier of the case
-     * @param orgId the identifier of the organisation to be notified
-     * @param nocType the Notice of Change (NoC) type indicating whether the
-     *                organisation represents the old or new party
-     * @param orgResponse the response returned from the organisation lookup service
-     * @return {@code true} if the organisation can be notified for the
-     *         representative update; {@code false} otherwise
+     * @param caseId the case identifier associated with the request (must not be blank)
+     * @param orgId the organisation identifier to validate (must not be blank)
+     * @param nocType the Notice of Change (NoC) type used to determine context (must not be blank)
+     * @param orgResponse the response returned from retrieving the organisation by ID
+     * @return {@code true} if the organisation response contains a valid superuser
+     *         email address and all required parameters are valid; {@code false} otherwise
      */
-    public static boolean canNotifyOrganisationForRepresentativeUpdate(String caseId,
-                                                                       String orgId,
-                                                                       String nocType,
-                                                                       ResponseEntity<RetrieveOrgByIdResponse>
+    public static boolean canResolveOrganisationSuperuserEmail(String caseId,
+                                                               String orgId,
+                                                               String nocType,
+                                                               ResponseEntity<RetrieveOrgByIdResponse>
                                                                                orgResponse) {
         if (StringUtils.isBlank(caseId) || StringUtils.isBlank(orgId) || StringUtils.isBlank(nocType)) {
             String tmpCaseId = StringUtils.isBlank(caseId) ? StringUtils.EMPTY : caseId;
-            log.warn(WARNING_INVALID_PARAMETERS_TO_NOTIFY_ORGANISATION_FOR_REP_UPDATE, tmpCaseId);
+            log.warn(WARNING_INVALID_PARAMETERS_TO_RESOLVE_ORGANISATION_EMAIL, tmpCaseId);
             return false;
         }
         final String orgType = NOC_TYPE_REMOVAL.equals(nocType) ? OLD_LOWERCASE : NEW_LOWERCASE;
@@ -112,7 +118,7 @@ public final class NotificationUtils {
                 || StringUtils.isBlank(orgResponse.getBody().getSuperUser().getEmail())) {
             RetrieveOrgByIdResponse body = ObjectUtils.isEmpty(orgResponse) ? null : orgResponse.getBody();
             HttpStatusCode statusCode = ObjectUtils.isEmpty(orgResponse) ? null : orgResponse.getStatusCode();
-            log.warn(WARNING_INVALID_ORGANISATION_RESPONSE_TO_NOTIFY_FOR_RESPONDENT_REP_UPDATE, orgType, orgId,
+            log.warn(WARNING_INVALID_ORGANISATION_RESPONSE_TO_RESOLVE_ORGANISATION_EMAIL, orgType, orgId,
                     statusCode, body, caseId);
             return false;
         }

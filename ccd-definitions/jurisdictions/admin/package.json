@@ -15,8 +15,8 @@
     "test": "mocha ../../tests/unit/definitions/*.test.js --timeout 10000",
     "test:functional": "codeceptjs run --steps -c ../../tests/functional/codecept.conf.js",
     "test:smoke": "yarn test:functional --grep @smoke",
-    "lint": "eslint . --config ../../configs/eslint.config.js --fix-dry-run",
-    "lint:fix": "eslint . --config ../../configs/eslint.config.js --fix",
+    "lint": "eslint . --no-error-on-unmatched-pattern --config ../../configs/eslint.config.js --fix-dry-run",
+    "lint:fix": "eslint . --no-error-on-unmatched-pattern --config ../../configs/eslint.config.js --fix",
     "clean": "rimraf xlsx/*.xlsx dist/",
     "start": "cd ../../ && node index.js"
   },

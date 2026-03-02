@@ -14,8 +14,8 @@
     "generate-excel": "node ../../tools/ccd-definition-processor/bin/json2xlsx -D ./json -o ./xlsx/et-scotland-ccd-config-${ET_ENV:-base}.xlsx",
     "test": "mocha ./src/test --timeout 20000",
     "test:functional": "codeceptjs run --steps -c src/test/functional/codecept.conf.js --grep @pipeline --reporter mochawesome",
-    "lint": "eslint . --config ../../configs/eslint.config.js --fix-dry-run",
-    "lint:fix": "eslint . --config ../../configs/eslint.config.js --fix",
+    "lint": "eslint . --no-error-on-unmatched-pattern --config ../../configs/eslint.config.js --fix-dry-run",
+    "lint:fix": "eslint . --no-error-on-unmatched-pattern --config ../../configs/eslint.config.js --fix",
     "clean": "rimraf xlsx/*.xlsx dist/"
   },
   "eslintConfig": {

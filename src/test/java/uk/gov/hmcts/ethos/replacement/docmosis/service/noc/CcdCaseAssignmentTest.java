@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.service;
+package uk.gov.hmcts.ethos.replacement.docmosis.service.noc;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -24,8 +24,8 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
-import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
 
 import java.io.IOException;
@@ -88,9 +88,6 @@ class CcdCaseAssignmentTest {
 
         rolesRequest = ccdCaseAssignment.getCaseAssignmentRequest(
                 Long.valueOf("1234123412341234"), UUID.randomUUID().toString(), "AA11BB", "[CREATOR]");
-
-        MultipleDetails multipleDetails = new MultipleDetails();
-        multipleDetails.setCaseData(MultipleUtil.getMultipleData());
 
         when(ccdClient.buildHeaders(anyString())).thenReturn(new HttpHeaders());
     }

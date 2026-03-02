@@ -1,13 +1,13 @@
 {
   "request": {
     "method": "GET",
-    "urlPath": "/refdata/internal/v1/organisations"
+    "urlPathPattern": "/refdata/internal/v1/organisations?id=79ZRSOU"
   },
   "response": {
     "status": 200,
     "headers": {
       "Content-Type": "application/json"
     },
-    "bodyFileName": "prd/activeOrganisations.json"
+    "bodyFileName": "prd/organisationResponse.json"
   }
 }

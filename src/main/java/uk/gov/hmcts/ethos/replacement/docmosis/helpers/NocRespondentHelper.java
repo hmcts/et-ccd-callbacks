@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
@@ -12,20 +14,26 @@ import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
 import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationApprovalStatus.APPROVED;
 
 @Component
+@Slf4j
 @SuppressWarnings({"PMD.ConfusingTernary"})
 public class NocRespondentHelper {
     public Map<String, Organisation> getRespondentOrganisations(CaseData caseData) {
@@ -98,16 +106,77 @@ public class NocRespondentHelper {
                 .orElse(new RespondentSumType());
     }
 
-    public void updateWithRespondentIds(CaseData caseData) {
-        for (RepresentedTypeRItem respondentRep : caseData.getRepCollection()) {
-            Optional<RespondentSumTypeItem> respondentSumTypeItem = caseData.getRespondentCollection().stream()
-                    .filter(i -> i.getValue()
-                            .getRespondentName()
-                            .equals(respondentRep.getValue().getRespRepName()))
-                    .findFirst();
-            respondentSumTypeItem.ifPresent(
-                    sumTypeItem -> respondentRep.getValue().setRespondentId(sumTypeItem.getId()));
+    /**
+     * Removes representation from respondents who no longer have a matching representative
+     * in the provided {@link CaseData}.
+     * <p>
+     * This method iterates through each respondent and determines whether a representative
+     * exists that matches the respondent either by:
+     * <ul>
+     *     <li>respondent ID, or</li>
+     *     <li>respondent name</li>
+     * </ul>
+     * using the details present in the representative records.
+     * <p>
+     * A respondent is considered <em>unmatched</em> if no representative in the case has:
+     * <ul>
+     *     <li>a {@code respondentId} equal to the respondent's ID, nor</li>
+     *     <li>a {@code respRepName} equal to the respondent's name</li>
+     * </ul>
+     * When an unmatched respondent is found, their representation is cleared by invoking
+     * {@link #resetRepresentation(RespondentSumTypeItem)}.
+     * <p>
+     * Invalid or incomplete respondent and representative entries are safely skipped.
+     * No action is taken if the case contains no respondents or no representatives.
+     *
+     * @param caseData the case data containing respondents and representatives from which
+     *                 unmatched representation entries should be removed
+     * @throws GenericServiceException if resetting a respondent's representation fails
+     */
+    public void removeUnmatchedRepresentations(CaseData caseData) throws GenericServiceException {
+        if (!RespondentUtils.hasRespondents(caseData)) {
+            return;
         }
+
+        for (RespondentSumTypeItem respondent : caseData.getRespondentCollection()) {
+            if (!RespondentUtils.isValidRespondent(respondent)) {
+                continue;
+            }
+
+            String respondentId = respondent.getId();
+            String respondentName = respondent.getValue().getRespondentName();
+
+            boolean hasMatchingRepresentative = emptyIfNull(caseData.getRepCollection()).stream()
+                    .filter(Objects::nonNull)
+                    .filter(rep -> rep.getValue() != null)
+                    .anyMatch(rep ->
+                            StringUtils.isNotBlank(rep.getValue().getRespondentId())
+                                    && rep.getValue().getRespondentId().equals(respondentId)
+                                    || StringUtils.isNotBlank(rep.getValue().getRespRepName())
+                                    && rep.getValue().getRespRepName().equals(respondentName)
+                    );
+
+            if (!hasMatchingRepresentative) {
+                resetRepresentation(respondent);
+            }
+        }
+    }
+
+    /**
+     * Resets the representation status of the given respondent.
+     *
+     * <p>This method marks the representative as removed, sets the respondent as no longer represented,
+     * and clears any associated representative ID.</p>
+     *
+     * <p>It is assumed that the {@code respondent} is not {@code null} and that
+     * {@code respondent.getValue()} is not {@code null}.</p>
+     *
+     * @param respondent the {@link RespondentSumTypeItem} whose representation details are to be reset
+     */
+    public static void resetRepresentation(RespondentSumTypeItem respondent) {
+        respondent.getValue().setRepresentativeRemoved(YES);
+        respondent.getValue().setRepresented(NO);
+        respondent.getValue().setRepresentativeId(null);
     }
 
     public void amendRespondentNameRepresentativeNames(CaseData caseData) {

@@ -1,13 +1,18 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
+import org.jetbrains.annotations.NotNull;
+import org.springframework.http.ResponseEntity;
+import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
+import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.UpdateRespondentRepresentativeRequest;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 
 import java.util.ArrayList;
@@ -31,6 +36,43 @@ public final class OrganisationUtils {
         // Utility classes should not have a public or default constructor.
     }
 
+    /**
+     * Removes a respondent organisation policy from the given {@link CaseData}
+     * based on the respondent name and organisation ID provided in the
+     * {@link UpdateRespondentRepresentativeRequest}.
+     *
+     * <p>This method performs the following steps:
+     * <ol>
+     *     <li>Validates that {@code caseData}, {@code updateRespondentRepresentativeRequest},
+     *         and the respondent name are provided.</li>
+     *     <li>Checks whether an organisation ID has been specified for removal.
+     *         If not, the method exits without performing any action.</li>
+     *     <li>Finds the notice of change entry index for the given respondent name.</li>
+     *     <li>Verifies that the specified organisation ID is associated with the
+     *         identified respondent.</li>
+     *     <li>If a match is found, removes the corresponding organisation policy
+     *         from the case data.</li>
+     * </ol>
+     *
+     * <p>The method performs no action if:
+     * <ul>
+     *     <li>No organisation is specified for removal,</li>
+     *     <li>No matching respondent is found, or</li>
+     *     <li>The organisation is not associated with the identified respondent.</li>
+     * </ul>
+     *
+     * @param caseData the case data containing respondent organisation policies;
+     *                 must not be {@code null}
+     * @param updateRespondentRepresentativeRequest the request containing the
+     *                 respondent name and organisation details for removal;
+     *                 must not be {@code null}
+     * @throws GenericServiceException if:
+     *         <ul>
+     *             <li>{@code caseData} is {@code null} or empty,</li>
+     *             <li>{@code updateRespondentRepresentativeRequest} is {@code null} or empty, or</li>
+     *             <li>The respondent name is {@code null} or empty.</li>
+     *         </ul>
+     */
     public static void removeRespondentOrganisationPolicyByRespondentName(
             CaseData caseData, UpdateRespondentRepresentativeRequest updateRespondentRepresentativeRequest)
             throws GenericServiceException {
@@ -286,5 +328,66 @@ public final class OrganisationUtils {
                 // added to not have any PMD or Checkstyle warnings
             }
         }
+    }
+
+    /**
+     * Extracts the primary organisation address from the given {@link OrganisationsResponse}.
+     *
+     * <p>This method retrieves the first entry from the organisation's contact information
+     * collection (if present) and maps its address fields to a new {@link Address} object.
+     * If no contact information is available, an empty {@code Address} instance is returned.
+     *
+     * <p>The following fields are mapped:
+     * <ul>
+     *     <li>Address Line 1</li>
+     *     <li>Address Line 2</li>
+     *     <li>Address Line 3</li>
+     *     <li>Postcode</li>
+     *     <li>Post Town</li>
+     *     <li>County</li>
+     *     <li>Country</li>
+     * </ul>
+     *
+     * @param organisationDetails the organisation details containing contact information;
+     *                            may be {@code null}
+     * @return a populated {@link Address} based on the first contact information entry,
+     *         or an empty {@link Address} if no contact information is available
+     */
+    @NotNull
+    public static Address getOrganisationAddress(OrganisationsResponse organisationDetails) {
+        Address organisationAddress = new Address();
+        if (CollectionUtils.isEmpty(organisationDetails.getContactInformation())) {
+            return organisationAddress;
+        }
+        organisationAddress.setAddressLine1(organisationDetails.getContactInformation().getFirst().getAddressLine1());
+        organisationAddress.setAddressLine2(organisationDetails.getContactInformation().getFirst().getAddressLine2());
+        organisationAddress.setAddressLine3(organisationDetails.getContactInformation().getFirst().getAddressLine3());
+        organisationAddress.setPostCode(organisationDetails.getContactInformation().getFirst().getPostCode());
+        organisationAddress.setPostTown(organisationDetails.getContactInformation().getFirst().getTownCity());
+        organisationAddress.setCounty(organisationDetails.getContactInformation().getFirst().getCounty());
+        organisationAddress.setCountry(organisationDetails.getContactInformation().getFirst().getCountry());
+        return organisationAddress;
+    }
+
+    /**
+     * Determines whether the given {@link ResponseEntity} contains
+     * a non-blank user identifier in its body.
+     *
+     * <p>This method returns {@code true} only if:
+     * <ul>
+     *     <li>The {@code userResponse} is not {@code null} or empty,</li>
+     *     <li>The response body is not {@code null} or empty, and</li>
+     *     <li>The {@code userIdentifier} within the body is not blank.</li>
+     * </ul>
+     *
+     * @param userResponse the response entity containing {@link AccountIdByEmailResponse};
+     *                     may be {@code null}
+     * @return {@code true} if a non-blank user identifier is present in the response body,
+     *         otherwise {@code false}
+     */
+    public static boolean hasUserIdentifier(ResponseEntity<AccountIdByEmailResponse> userResponse) {
+        return ObjectUtils.isNotEmpty(userResponse)
+                && ObjectUtils.isNotEmpty(userResponse.getBody())
+                && StringUtils.isNotBlank(userResponse.getBody().getUserIdentifier());
     }
 }

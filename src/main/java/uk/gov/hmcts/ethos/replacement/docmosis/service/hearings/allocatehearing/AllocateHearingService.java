@@ -77,6 +77,7 @@ public class AllocateHearingService {
 
         DateListedType selectedListing = getSelectedListing(caseData);
         selectedListing.setHearingStatus(caseData.getAllocateHearingStatus());
+        selectedListing.setPostponedBy(caseData.getAllocateHearingPostponedBy());
         selectedListing.setHearingVenueDay(caseData.getAllocateHearingVenue());
         selectedListing.setHearingRoom(caseData.getAllocateHearingRoom());
         selectedListing.setHearingClerk(caseData.getAllocateHearingClerk());

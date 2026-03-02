@@ -708,11 +708,16 @@ public class NocNotificationService {
                 orgId);
     }
 
-    public void sendEmailToOrgAdmin(CaseDetails caseDetails, RepresentedTypeC repCopy) {
-        String organisationEmail = getOrganisationEmailWithID(repCopy);
+    public void sendEmailToOrgAdmin(CaseDetails caseDetails, RepresentedTypeC representedTypeC) {
+        String organisationEmail = getOrganisationEmailWithID(representedTypeC);
+        if (organisationEmail == null) {
+            return;
+        }
+
         Map<String, String> personalisation =
             NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation(caseDetails.getCaseData());
-        personalisation.put(LEGAL_REP_NAME, repCopy.getNameOfRepresentative());
+        personalisation.put(LEGAL_REP_NAME, representedTypeC.getNameOfRepresentative());
+
         try {
             emailService.sendEmail(
                 nocOrgAdminNotRepresentingTemplateId,
@@ -726,11 +731,11 @@ public class NocNotificationService {
         }
     }
 
-    private String getOrganisationEmailWithID(RepresentedTypeC repCopy) {
-        if (repCopy.getMyHmctsOrganisation() == null) {
+    private String getOrganisationEmailWithID(RepresentedTypeC representedTypeC) {
+        if (representedTypeC.getMyHmctsOrganisation() == null) {
             return null;
         }
-        String organisationId = repCopy.getMyHmctsOrganisation().getOrganisationID();
+        String organisationId = representedTypeC.getMyHmctsOrganisation().getOrganisationID();
         ResponseEntity<RetrieveOrgByIdResponse> organisationResponse = getOrganisationById(organisationId);
         if (organisationResponse.getBody() == null) {
             return null;
@@ -738,13 +743,13 @@ public class NocNotificationService {
         return organisationResponse.getBody().getSuperUser().getEmail();
     }
 
-    public void sendEmailToRemovedLegalRep(CaseDetails caseDetails, RepresentedTypeC repCopy) {
+    public void sendEmailToRemovedLegalRep(CaseDetails caseDetails, RepresentedTypeC representedTypeC) {
         Map<String, String> personalisation =
             NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation(caseDetails.getCaseData());
         try {
             emailService.sendEmail(
                 nocLegalRepNoLongerAssignedTemplateId,
-                repCopy.getRepresentativeEmailAddress(),
+                representedTypeC.getRepresentativeEmailAddress(),
                 personalisation);
         } catch (Exception e) {
             log.warn(
@@ -754,25 +759,22 @@ public class NocNotificationService {
         }
     }
 
-    public void sendEmailToUnrepresentedParty(CaseDetails caseDetails, RepresentedTypeC repCopy) {
-        String claimantEmailAddress;
-        try {
-            claimantEmailAddress = ClaimantUtils.getClaimantEmailAddress(caseDetails.getCaseData());
-        } catch (NotFoundException e) {
-            log.warn(WARNING_INVALID_CLAIMANT_EMAIL_CLAIMANT_NOT_NOTIFIED_FOR_REMOVAL_OF_REPRESENTATIVE,
-                caseDetails.getCaseId(), e.getMessage());
+    public void sendEmailToUnrepresentedParty(CaseDetails caseDetails, RepresentedTypeC representedTypeC) {
+        CaseData caseData = caseDetails.getCaseData();
+        if (ObjectUtils.isEmpty(caseData.getClaimantType())
+            || StringUtils.isBlank(caseData.getClaimantType().getClaimantEmailAddress())) {
             return;
         }
 
         Map<String, String> personalisation =
             NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation(caseDetails.getCaseData());
-        personalisation.put(LEGAL_REP_ORG, repCopy.getNameOfOrganisation());
+        personalisation.put(LEGAL_REP_ORG, representedTypeC.getNameOfOrganisation());
         personalisation.put(LINK_TO_CIT_UI, emailService.getCitizenCaseLink(caseDetails.getCaseId()));
 
         try {
             emailService.sendEmail(
                 nocCitizenNoLongerRepresentedTemplateId,
-                claimantEmailAddress,
+                caseData.getClaimantType().getClaimantEmailAddress(),
                 personalisation);
         } catch (Exception e) {
             log.warn(
@@ -783,10 +785,17 @@ public class NocNotificationService {
     }
 
     public void sendEmailToOtherParty(CaseDetails caseDetails) {
+        CaseData caseData = caseDetails.getCaseData();
+
         List<CaseUserAssignment> caseUserAssignments =
             caseAccessService.getCaseUserAssignmentsById(caseDetails.getCaseId());
-        emailNotificationService
-            .getRespondentsAndRepsEmailAddresses(caseDetails.getCaseData(), caseUserAssignments)
+        if (caseUserAssignments == null || caseUserAssignments.isEmpty()) {
+            log.warn("In NocNotificationService : No case user assignments found for caseId {}",
+                caseDetails.getCaseId());
+            return;
+        }
+
+        emailNotificationService.getRespondentsAndRepsEmailAddresses(caseData, caseUserAssignments)
             .forEach((email, respondentId) -> sendRespondentEmail(caseDetails, email, respondentId));
     }
 

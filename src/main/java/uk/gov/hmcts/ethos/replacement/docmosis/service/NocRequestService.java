@@ -44,10 +44,12 @@ public class NocRequestService {
             .nameOfOrganisation(existingClaimantRep.getNameOfOrganisation())
             .representativeEmailAddress(existingClaimantRep.getRepresentativeEmailAddress())
             .organisationId(existingClaimantRep.getOrganisationId())
-            .myHmctsOrganisation(Organisation.builder()
-                .organisationID(existingClaimantRep.getMyHmctsOrganisation().getOrganisationID())
-                .organisationName(existingClaimantRep.getMyHmctsOrganisation().getOrganisationName())
-                .build())
+            .myHmctsOrganisation(existingClaimantRep.getMyHmctsOrganisation() == null
+                ? null
+                : Organisation.builder()
+                    .organisationID(existingClaimantRep.getMyHmctsOrganisation().getOrganisationID())
+                    .organisationName(existingClaimantRep.getMyHmctsOrganisation().getOrganisationName())
+                    .build())
             .build();
     }
 }

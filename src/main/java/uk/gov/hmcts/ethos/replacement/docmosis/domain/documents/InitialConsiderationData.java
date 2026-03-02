@@ -44,6 +44,13 @@ public class InitialConsiderationData {
     private String hearingWithJudgeOrMembers;
     @JsonProperty("hearingWithJudgeOrMembersReason")
     private List<String> hearingWithJudgeOrMembersReason;
+    @JsonProperty("hearingWithJsa")
+    private String hearingWithJsa;
+    @JsonProperty("hearingWithMembersLabel")
+    private String hearingWithMembersLabel;
+    @JsonProperty("hearingWithMembers")
+    private String hearingWithMembers;
+
     @JsonProperty("hearingWithJudgeOrMembersFurtherDetails")
     private String hearingWithJudgeOrMembersFurtherDetails;
     @JsonProperty("otherDirections")
@@ -93,8 +100,26 @@ public class InitialConsiderationData {
     private String etICFinalHearingLengthType;
     @JsonProperty("etICFinalHearingIsEJSitAlone")
     private String etICFinalHearingIsEJSitAlone;
-    @JsonProperty("etICFinalHearingIsEJSitAloneReason")
-    private String etICFinalHearingIsEJSitAloneReason;
+    @JsonProperty("etICFinalHearingIsEJSitAloneReasonYes")
+    private List<String> etICFinalHearingIsEJSitAloneReasonYes;
+    @JsonProperty("etICFinalHearingIsEJSitAloneReasonYesOther")
+    private String etICFinalHearingIsEJSitAloneReasonYesOther;
+
+    @JsonProperty("etICFinalHearingIsEJSitAloneReasonNo")
+    private List<String> etICFinalHearingIsEJSitAloneReasonNo;
+    @JsonProperty("etICFinalHearingIsEJSitAloneReasonNoOther")
+    private String etICFinalHearingIsEJSitAloneReasonNoOther;
+
+    @JsonProperty("etICNoLFinalHearingIsEJSitAloneReasonsJsa")
+    private List<String> etICNoLFinalHearingIsEJSitAloneReasonsJsa;
+    @JsonProperty("etICNoLFinalHearingIsEJSitAloneReasonsJsaOther")
+    private String  etICNoLFinalHearingIsEJSitAloneReasonsJsaOther;
+
+    @JsonProperty("etICNoLFinalHearingIsEJSitAloneReasonsMembers")
+    private List<String> etICNoLFinalHearingIsEJSitAloneReasonsMembers;
+    @JsonProperty("etICNoLFinalHearingIsEJSitAloneReasonMembersOther")
+    private String etICNoLFinalHearingIsEJSitAloneReasonsMembersOther;
+
     @JsonProperty("etICFinalHearingIsEJSitAloneFurtherDetails")
     private String etICFinalHearingIsEJSitAloneFurtherDetails;
 

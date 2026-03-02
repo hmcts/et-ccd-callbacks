@@ -1,13 +1,18 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.jetbrains.annotations.NotNull;
 import org.joda.time.LocalDateTime;
+import org.jspecify.annotations.NonNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.EtICHearingListedAnswers;
 import uk.gov.hmcts.et.common.model.ccd.EtICListForFinalHearing;
@@ -20,14 +25,21 @@ import uk.gov.hmcts.et.common.model.ccd.EtInitialConsiderationRule27;
 import uk.gov.hmcts.et.common.model.ccd.EtInitialConsiderationRule28;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.ReferralTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
+import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
+import uk.gov.hmcts.et.common.model.ccd.types.Et3VettingType;
+import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.JurCodesType;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
-import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -35,90 +47,108 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.Objects;
 import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.doCallRealMethod;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET3;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.APPLICATIONS_FOR_STRIKE_OUT_OR_DEPOSIT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CLAIMANT_HEARING_PANEL_PREFERENCE_MISSING;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CODES_URL_ENGLAND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CODES_URL_SCOTLAND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CVP;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CVP_HEARING;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.HEARING_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.HEARING_MISSING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.HEARING_NOT_LISTED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.INTERPRETERS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.JSA;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.JURISDICTIONAL_ISSUES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.JURISDICTION_HEADER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.LIST_FOR_FINAL_HEARING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.LIST_FOR_PRELIMINARY_HEARING;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.RESPONDENT_HEARING_PANEL_PREFERENCE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.RESPONDENT_NAME;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.REQUEST_FOR_ADJUSTMENTS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.RULE_49;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.SEEK_COMMENTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.TELEPHONE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.TIME_POINTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.UDL_HEARING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.VIDEO;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_LABEL_ET1_IC;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_LABEL_ET3_IC;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.CASE_DETAILS_URL_PARTIAL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.NOT_AVAILABLE_FOR_VIDEO_HEARINGS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.REFERRALS_PAGE_FRAGMENT_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
 @ExtendWith(SpringExtension.class)
 class InitialConsiderationServiceTest {
     private static final LocalDateTime EARLIEST_FUTURE_HEARING_DATE = LocalDateTime.now().plusDays(5);
     private static final LocalDateTime SECOND_FUTURE_HEARING_DATE = LocalDateTime.now().plusDays(9);
-
-    private static final String EXPECTED_RESPONDENT_NAME = """
-        | Respondent 1 name given | |
-        |-------------|:------------|
-        |In ET1 by claimant | Test Corp|
-        |In ET3 by respondent | |
-        
-        """;
-
-    private static final String EXPECTED_RESPONDENT_NAME_2 = """
-        | Respondent 1 name given | |
-        |-------------|:------------|
-        |In ET1 by claimant | Test Corp|
-        |In ET3 by respondent | |
-
-        | Respondent 2 name given | |
-        |-------------|:------------|
-        |In ET1 by claimant | Test Name Two|
-        |In ET3 by respondent | |
-
-        """;
-
-    private static final String EXPECTED_RESPONDENT_NAME_BLANK = """
-        | Respondent  name given | |
-        |-------------|:------------|
-        |In ET1 by claimant | |
-        |In ET3 by respondent | |
-
-        """;
-
-    private static final String EXPECTED_HEARING_STRING =
-        "|Hearing details | |\n"
-            + "|-------------|:------------|\n"
-            + "|Date | "
-            + EARLIEST_FUTURE_HEARING_DATE.toString("dd MMM yyyy")
-            + "|\r\n"
-            + "|Type | Hearing|\n"
-            + "|Duration | 3.5 Hours|"
-            + "\n\n";
+    private static final String GIVE_DETAILS = "Give Details:";
 
     private static final String EXPECTED_HEARING_DETAILS_STRING = """
-        |Hearing details | |
-        |-------------|:------------|
-        |Date | 16 May 2022|
-        |Type | Hearing|
-        |Duration | 60 Days|
-        """;
+            |Hearing details | |
+            |-------------|:------------|
+            |Date | 16 May 2022|
+            |Type | Hearing|
+            |Duration | 60 Days|
+            """;
 
-    private static final String EXPECTED_HEARING_BLANK = String.format(HEARING_DETAILS, "-", "-", "-");
+    private static final String EXPECTED_BLANK_HEARING_DETAILS = """
+             <br/>
+             <table>
+             <thead>
+             <tr>
+             <th colspan="2"><h2>Listed Hearing Details</h2></th>
+             </tr>
+             <tr>
+             <th width="30%">Aspect</th>
+             <th width="70%">Detail</th>
+             </tr>
+             <thead>
+             <tbody>
+                <tr>
+                    <td>Date</td> <td> - </td>
+                </tr>
+                <tr>
+                    <td>Type</td> <td> - </td>
+                </tr>
+                <tr>
+                    <td>Duration</td> <td> - </td>
+                </tr>
+                <tr>
+                    <td>Hearing format</td> <td> - </td>
+                </tr>
+                <tr>
+                    <td>Panel Type</td> <td> - </td>
+                </tr>
+                <tr>
+                    <td>Venue</td> <td> - </td>
+                </tr>
+            </tbody>
+            </table>
+            """;
 
     private static final String EXPECTED_JURISDICTION_HTML = "<h2>Jurisdiction codes</h2><a "
             + "target=\"_blank\" href=\"https://judiciary.sharepoint.com/sites/empjudgesew/Shared%20Documents/Forms/"
@@ -129,17 +159,22 @@ class InitialConsiderationServiceTest {
             + "</a><br><br><h4>DAG</h4>Discrimination, including harassment or discrimination based on "
             + "association or perception on grounds of age<h4>SXD</h4>Discrimination, including "
             + "indirect discrimination, discrimination based on association or perception, or harassment on "
-            + "grounds of sex, marriage and civil partnership<hr>";
+            + "grounds of sex, marriage and civil partnership";
 
     private static final String EXPECTED_JURISDICTION_SCOTLAND_HTML = "<h2>Jurisdiction codes</h2><a "
-        + "target=\"_blank\" href=\"https://judiciary.sharepoint"
-        + ".com/:w:/r/sites/ScotlandEJs/Shared%20Documents/Jurisdictional%20Codes%20List"
-        + "/Jurisdiction%20list%20July%202024%20.doc?d=wfa6ba431b0b941ffa0b82504fd093af0&csf=1&web=1&e=Dm6Hda\">"
-        + "View all jurisdiction codes and descriptors (opens in new tab)"
-        + "</a><br><br><h4>DAG</h4>Discrimination, including harassment or discrimination "
-        + "based on association or perception on grounds of age<h4>SXD</h4>"
-        + "Discrimination, including indirect discrimination, discrimination based on association or perception, "
-        + "or harassment on grounds of sex, marriage and civil partnership<hr>";
+            + "target=\"_blank\" href=\"https://judiciary.sharepoint"
+            + ".com/:w:/r/sites/ScotlandEJs/Shared%20Documents/Jurisdictional%20Codes%20List"
+            + "/Jurisdiction%20list%20July%202024%20.doc?d=wfa6ba431b0b941ffa0b82504fd093af0&csf=1&web=1&e=Dm6Hda\">"
+            + "View all jurisdiction codes and descriptors (opens in new tab)"
+            + "</a><br><br><h4>DAG</h4>Discrimination, including harassment or discrimination "
+            + "based on association or perception on grounds of age<h4>SXD</h4>"
+            + "Discrimination, including indirect discrimination, discrimination based on association or perception, "
+            + "or harassment on grounds of sex, marriage and civil partnership";
+    public static final String PARTIES_HEARING_FORMAT = """
+            %s
+            %s
+            
+            """;
 
     private CaseData caseDataEmpty;
     private CaseData caseData;
@@ -163,54 +198,96 @@ class InitialConsiderationServiceTest {
     }
 
     @Test
-    void getRespondentNameWithPanelPreference_shouldReturnFormattedDetails_whenRespondentIsValid() {
-        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
-        respondent.setValue(new RespondentSumType());
-        respondent.getValue().setRespondentName("Test Corp");
-        respondent.getValue().setResponseRespondentName("Test Response");
+    void initialiseInitialConsideration_shouldSetBeforeYouStart_whenDocumentCollectionIsNotNull() {
+        List<DocumentTypeItem> documentCollection = new ArrayList<>();
+        DocumentTypeItem documentItem = new DocumentTypeItem();
+        documentItem.setValue(DocumentType.from(new UploadedDocumentType()));
+        documentItem.getValue().setDocumentType("ET1");
+        documentCollection.add(documentItem);
+        caseData.setDocumentCollection(documentCollection);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
 
-        String respondentDetails = initialConsiderationService.getRespondentName(List.of(respondent));
-        assertThat(respondentDetails).isEqualTo(String.format(RESPONDENT_NAME, "1",
-                "Test Corp", "Test Response"));
+        initialConsiderationService.initialiseInitialConsideration(caseDetails);
+
+        assertThat(caseDetails.getCaseData().getInitialConsiderationBeforeYouStart()).isNotEmpty();
     }
 
     @Test
-    void getRespondentNameDetails_shouldReturnFormattedDetails_whenRespondentHasNoResponseName() {
-        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
-        respondent.setValue(new RespondentSumType());
-        respondent.getValue().setRespondentName("Test Corp");
+    void initialiseInitialConsideration_shouldSetEmptyBeforeYouStart_whenDocumentCollectionIsNull() {
+        CaseData caseDataWithNullDocCollection = new CaseData();
+        caseDataWithNullDocCollection.setDocumentCollection(null);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseDataWithNullDocCollection);
 
-        String respondentDetails = initialConsiderationService.getRespondentName(List.of(respondent));
-        assertThat(respondentDetails).isEqualTo(String.format(RESPONDENT_NAME, 1, "Test Corp", ""));
+        initialConsiderationService.initialiseInitialConsideration(caseDetails);
+
+        assertThat(caseDetails.getCaseData().getInitialConsiderationBeforeYouStart()).isEmpty();
     }
 
     @Test
-    void getRespondentNameDetails_shouldReturnFormattedDetails_whenRespondentHasNoName() {
-        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
-        respondent.setValue(new RespondentSumType());
-        respondent.getValue().setResponseRespondentName("Test Response");
+    void initialiseInitialConsideration_shouldIncludeAllDocumentLinks_whenDocCollectionHasMultipleValidDocuments() {
+        DocumentTypeItem et1Document = new DocumentTypeItem();
+        et1Document.setValue(DocumentType.from(new UploadedDocumentType()));
+        et1Document.getValue().setDocumentType(ET1);
+        DocumentTypeItem et3Document = new DocumentTypeItem();
+        et3Document.setValue(DocumentType.from(new UploadedDocumentType()));
+        et3Document.getValue().setDocumentType(ET3);
+        List<DocumentTypeItem> documentCollection = new ArrayList<>();
+        documentCollection.add(et1Document);
+        documentCollection.add(et3Document);
 
-        String respondentDetails = initialConsiderationService.getRespondentName(List.of(respondent));
-        assertThat(respondentDetails).isEqualTo(String.format(RESPONDENT_NAME, 1, "", "Test Response"));
+        CaseData caseDataWithMultipleDocs = new CaseData();
+        caseDataWithMultipleDocs.setDocumentCollection(documentCollection);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseDataWithMultipleDocs);
+
+        initialConsiderationService.initialiseInitialConsideration(caseDetails);
+        String beforeYouStart = caseDetails.getCaseData().getInitialConsiderationBeforeYouStart();
+        assertThat(beforeYouStart).contains(String.format(BEFORE_LABEL_ET1_IC, ""));
+        assertThat(beforeYouStart).contains(String.format(BEFORE_LABEL_ET3_IC, ""));
     }
 
     @Test
     void getIcHearingPanelPreference_shouldReturnNull_whenRespondentCollectionIsNull() {
-        String hearingPanelPreferenceDetails = initialConsiderationService.getIcRespondentHearingPanelPreference(null);
+        String hearingPanelPreferenceDetails = initialConsiderationService.getIcRespondentHearingPanelPreference(
+                null);
         assertThat(hearingPanelPreferenceDetails).isNull();
     }
 
     @Test
     void getIcHearingPanelPreference_shouldReturnFormattedDetails_whenRespondentHasPreferenceAndReason() {
         RespondentSumTypeItem respondent = new RespondentSumTypeItem();
-        respondent.setValue(new RespondentSumType());
+        RespondentSumType respondentSumType = new RespondentSumType();
+        respondentSumType.setRespondentName("Test Response");
+        respondent.setValue(respondentSumType);
         respondent.getValue().setRespondentHearingPanelPreference("judge");
         respondent.getValue().setRespondentHearingPanelPreferenceReason("I deserve it");
 
+        String expectedOutput = """
+                <table>
+                <thead>
+                <tr>
+                <th colspan="3"><h2>Respondents' Panel Preferences</h2></th>
+                </tr>
+                <tr>
+                <th width="25%">Respondent</th>
+                <th width="25%">Preference</th>
+                <th>Reason</th>
+                </tr>
+                <thead>
+                <tbody>
+                  <tr>
+                    <td>Test Response</td>
+                    <td>judge</td>
+                    <td>I deserve it</td>
+                  </tr>
+                </tbody>
+                </table>
+                """;
         String hearingPanelPreferenceDetails = initialConsiderationService.getIcRespondentHearingPanelPreference(
                 List.of(respondent));
-        assertThat(hearingPanelPreferenceDetails).isEqualTo(
-                String.format(RESPONDENT_HEARING_PANEL_PREFERENCE, 1, "judge", "I deserve it"));
+        assertThat(hearingPanelPreferenceDetails).isEqualTo(expectedOutput);
     }
 
     @Test
@@ -218,162 +295,405 @@ class InitialConsiderationServiceTest {
         RespondentSumTypeItem respondent = new RespondentSumTypeItem();
         respondent.setValue(new RespondentSumType());
 
+        String expectedOutput = """
+                <table>
+                <thead>
+                <tr>
+                <th colspan="3"><h2>Respondents' Panel Preferences</h2></th>
+                </tr>
+                <tr>
+                <th width="25%">Respondent</th>
+                <th width="25%">Preference</th>
+                <th>Reason</th>
+                </tr>
+                <thead>
+                <tbody>
+                  <tr>
+                    <td>-</td>
+                    <td>-</td>
+                    <td>-</td>
+                  </tr>
+                </tbody>
+                </table>
+                """;
         String hearingPanelPreferenceDetails = initialConsiderationService.getIcRespondentHearingPanelPreference(
                 List.of(respondent));
-        assertThat(hearingPanelPreferenceDetails).isEqualTo(
-                String.format(RESPONDENT_HEARING_PANEL_PREFERENCE, 1, "-", "-"));
+        assertThat(hearingPanelPreferenceDetails).isEqualTo(expectedOutput);
     }
 
     @Test
     void getIcHearingPanelPreference_shouldReturnFormattedDetailsForMultipleRespondents() {
         RespondentSumTypeItem respondent1 = new RespondentSumTypeItem();
         respondent1.setValue(new RespondentSumType());
+        respondent1.getValue().setRespondentName("Respondent1");
         respondent1.getValue().setRespondentHearingPanelPreference("judge");
         respondent1.getValue().setRespondentHearingPanelPreferenceReason("I deserve it");
 
         RespondentSumTypeItem respondent2 = new RespondentSumTypeItem();
         respondent2.setValue(new RespondentSumType());
+        respondent2.getValue().setRespondentName("Respondent2");
         respondent2.getValue().setRespondentHearingPanelPreference("panel");
         respondent2.getValue().setRespondentHearingPanelPreferenceReason("Fair trial");
 
         String hearingPanelPreferenceDetails = initialConsiderationService.getIcRespondentHearingPanelPreference(
                 List.of(respondent1, respondent2));
         assertThat(hearingPanelPreferenceDetails).isEqualTo(
-                String.format(RESPONDENT_HEARING_PANEL_PREFERENCE, 1, "judge", "I deserve it")
-                        + String.format(RESPONDENT_HEARING_PANEL_PREFERENCE, 2, "panel", "Fair trial"));
+                """
+                        <table>
+                        <thead>
+                        <tr>
+                        <th colspan="3"><h2>Respondents' Panel Preferences</h2></th>
+                        </tr>
+                        <tr>
+                        <th width="25%">Respondent</th>
+                        <th width="25%">Preference</th>
+                        <th>Reason</th>
+                        </tr>
+                        <thead>
+                        <tbody>
+                          <tr>
+                            <td>Respondent1</td>
+                            <td>judge</td>
+                            <td>I deserve it</td>
+                          </tr>
+                          <tr>
+                            <td>Respondent2</td>
+                            <td>panel</td>
+                            <td>Fair trial</td>
+                          </tr>
+                        </tbody>
+                        </table>
+                        """
+        );
+    }
+
+    @Test
+    void setRespondentDetails_shouldReturnFormattedDetails_whenRespondentCollectionIsValid() {
+        RespondentSumType respondent = new RespondentSumType();
+        respondent.setRespondentName("Test Respondent");
+        respondent.setResponseRespondentName("Test Response");
+        RespondentSumTypeItem respondentItem = new RespondentSumTypeItem();
+        respondentItem.setValue(respondent);
+        CaseData caseDataWithValidRespondentCollection = new CaseData();
+        caseDataWithValidRespondentCollection.setRespondentCollection(Collections.singletonList(respondentItem));
+
+        String result = initialConsiderationService.setRespondentDetails(caseDataWithValidRespondentCollection);
+
+        assertThat(result).contains("Test Respondent");
+    }
+
+    @Test
+    void setRespondentDetails_shouldHandleNullRespondentInCollection() {
+        CaseData caseDataWithNullRespondentInCollection = new CaseData();
+        caseDataWithNullRespondentInCollection.setRespondentCollection(Collections.singletonList(null));
+
+        String result = initialConsiderationService.setRespondentDetails(caseDataWithNullRespondentInCollection);
+
+        // Should not throw and should be empty or handle gracefully
+        assertThat(result).isNotNull();
+    }
+
+    @Test
+    void setRespondentDetails_shouldHandleMultipleRespondents() {
+        RespondentSumType respondent1 = new RespondentSumType();
+        respondent1.setRespondentName("Respondent 1");
+        respondent1.setResponseRespondentName("Response 1");
+        RespondentSumTypeItem item1 = new RespondentSumTypeItem();
+        item1.setValue(respondent1);
+
+        RespondentSumType respondent2 = new RespondentSumType();
+        respondent2.setRespondentName("Respondent 2");
+        respondent2.setResponseRespondentName("Response 2");
+        RespondentSumTypeItem item2 = new RespondentSumTypeItem();
+        item2.setValue(respondent2);
+        CaseData caseDataWithMultipleRespondents = new CaseData();
+        caseDataWithMultipleRespondents.setRespondentCollection(List.of(item1, item2));
+
+        String result = initialConsiderationService.setRespondentDetails(caseDataWithMultipleRespondents);
+
+        assertThat(result).contains("Respondent 1");
+        assertThat(result).contains("Respondent 2");
+    }
+
+    @Test
+    void getClaimantHearingFormatDetails_shouldReturnCorrectDetails_whenClaimantHasNeitherPreference() {
+        CaseData caseDataWithClaimantHasNeitherPreference = new CaseData();
+        ClaimantHearingPreference claimantHearingPreference = new ClaimantHearingPreference();
+        claimantHearingPreference.setHearingPreferences(List.of("Neither"));
+        claimantHearingPreference.setHearingAssistance("Requires assistance for hearing");
+        caseDataWithClaimantHasNeitherPreference.setClaimantHearingPreference(claimantHearingPreference);
+        caseDataWithClaimantHasNeitherPreference.setClaimant("John Doe");
+
+        InitialConsiderationService service = new InitialConsiderationService(null);
+
+        String result = service.getClaimantHearingFormatDetails(caseDataWithClaimantHasNeitherPreference,
+                ENGLANDWALES_CASE_TYPE_ID);
+
+        assertNotNull(result);
+        assertTrue(result.contains("Parties Hearing Format Details"));
+        assertTrue(result.contains("Claimant Hearing Format"));
+        assertTrue(result.contains("John Doe"));
+        assertTrue(result.contains("Neither (of Phone or Video)"));
+        assertTrue(result.contains("Requires assistance for hearing"));
+    }
+
+    @Test
+    void getClaimantHearingFormatDetails_shouldReturnDefaultDetails_whenClaimantHearingPreferenceIsNull() {
+        CaseData caseDataWithNullClaimantHearingPreference = new CaseData();
+        caseDataWithNullClaimantHearingPreference.setClaimant("Jane Doe");
+        caseDataWithNullClaimantHearingPreference.setClaimantHearingPreference(null);
+
+        InitialConsiderationService service = new InitialConsiderationService(null);
+
+        String result = service.getClaimantHearingFormatDetails(caseDataWithNullClaimantHearingPreference,
+                ENGLANDWALES_CASE_TYPE_ID);
+
+        assertNotNull(result);
+        assertTrue(result.contains("Parties Hearing Format Details"));
+        assertTrue(result.contains("Claimant Hearing Format"));
+        assertTrue(result.contains("Jane Doe"));
+        assertTrue(result.contains("-"));
+    }
+
+    @Test
+    void getClaimantHearingFormatDetails_shouldReturnDefaultDetails_whenHearingPreferencesAreEmpty_EW() {
+        CaseData caseDataWithEmptyHearingPreferences = new CaseData();
+        ClaimantHearingPreference claimantHearingPreference = new ClaimantHearingPreference();
+        claimantHearingPreference.setHearingPreferences(Collections.emptyList());
+        caseDataWithEmptyHearingPreferences.setClaimantHearingPreference(claimantHearingPreference);
+        caseDataWithEmptyHearingPreferences.setClaimant("John Smith");
+
+        InitialConsiderationService service = new InitialConsiderationService(null);
+
+        String result = service.getClaimantHearingFormatDetails(caseDataWithEmptyHearingPreferences,
+                ENGLANDWALES_CASE_TYPE_ID);
+
+        assertNotNull(result);
+        assertTrue(result.contains("Parties Hearing Format Details"));
+        assertTrue(result.contains("Claimant Hearing Format"));
+        assertTrue(result.contains("John Smith"));
+        assertTrue(result.contains("-"));
+    }
+
+    @Test
+    void getClaimantHearingFormatDetails_shouldReturnDefaultDetails_whenHearingPreferencesAreEmpty_Scotalnd() {
+        CaseData caseDataWithEmptyHearingPreferences = new CaseData();
+        ClaimantHearingPreference claimantHearingPreference = new ClaimantHearingPreference();
+        claimantHearingPreference.setHearingPreferences(Collections.emptyList());
+        caseDataWithEmptyHearingPreferences.setClaimantHearingPreference(claimantHearingPreference);
+        caseDataWithEmptyHearingPreferences.setClaimant("John Smith");
+
+        InitialConsiderationService service = new InitialConsiderationService(null);
+
+        String result = service.getClaimantHearingFormatDetails(caseDataWithEmptyHearingPreferences,
+                SCOTLAND_CASE_TYPE_ID);
+
+        assertNotNull(result);
+        assertTrue(result.contains("Hearing Format Comments"));
+        assertTrue(result.contains("Claimant Hearing Format"));
+        assertTrue(result.contains("John Smith"));
+        assertTrue(result.contains("-"));
+    }
+
+    @Test
+    void getClaimantHearingFormatDetails_shouldReturnEmptyTable_whenCaseDataIsNull() {
+        InitialConsiderationService service = new InitialConsiderationService(null);
+
+        String result = service.getClaimantHearingFormatDetails(null, null);
+
+        assertNotNull(result);
+        assertTrue(result.contains("Parties Hearing Format Details"));
+        assertTrue(result.contains("Claimant Hearing Format"));
+        assertTrue(result.contains("Claimant"));
+        assertTrue(result.contains("Hearing Format"));
+    }
+
+    @Test
+    void setRespondentDetails_shouldHandleNullRespondentCollection() {
+        CaseData caseDataWithNoRespondents = new CaseData();
+        caseDataWithNoRespondents.setRespondentCollection(null);
+        String result = initialConsiderationService.setRespondentDetails(caseDataWithNoRespondents);
+        String expected = """
+                <br/>
+                <table>
+                  <thead>
+                    <tr>
+                        <th colspan="3"><h2>Respondent Name Details</h2></th>
+                    </tr>
+                    <tr>
+                      <th width="25%">Respondent</th>
+                      <th width="25%">Name given in ET1</th>
+                      <th>Name given in ET3</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>Respondent </td>
+                      <td>  </td>
+                      <td>  </td>
+                    </tr>
+                </tbody>
+                </table>
+                """;
+        assertThat(result).isEqualTo(expected);
     }
 
     private void setFutureHearingDate(CaseData caseData) {
-        DateListedType dateListed = caseData.getHearingCollection().get(0).getValue().getHearingDateCollection()
-            .get(0).getValue();
+        DateListedType dateListed = caseData.getHearingCollection().getFirst().getValue().getHearingDateCollection()
+                .getFirst().getValue();
         dateListed.setHearingStatus("Listed");
         dateListed.setListedDate(EARLIEST_FUTURE_HEARING_DATE.toString());
         dateListed.setHearingTimingDuration("3.5 Hours");
     }
 
     private void setFutureHearingDateWithSettledHearing(CaseData caseData) {
-        DateListedType dateListed = caseData.getHearingCollection().get(0).getValue().getHearingDateCollection()
-            .get(0).getValue();
+        DateListedType dateListed = caseData.getHearingCollection().getFirst().getValue().getHearingDateCollection()
+                .getFirst().getValue();
         dateListed.setHearingStatus("Settled");
         dateListed.setListedDate(EARLIEST_FUTURE_HEARING_DATE.toString());
         dateListed.setHearingTimingDuration("3.5 Hours");
     }
 
     @Test
+    void getAdjustedHearingTypeName_shouldReturnFinalHearing_whenInputIsHearing() {
+        String result = InitialConsiderationService.getAdjustedHearingTypeName("Hearing");
+        assertEquals("Final Hearing", result);
+    }
+
+    @Test
+    void getAdjustedHearingTypeName_shouldReturnReconsiderationHearing_whenInputIsReconsideration() {
+        String result = InitialConsiderationService.getAdjustedHearingTypeName("Reconsideration");
+        assertEquals("Reconsideration Hearing", result);
+    }
+
+    @Test
+    void getAdjustedHearingTypeName_shouldReturnRemedyHearing_whenInputIsRemedy() {
+        String result = InitialConsiderationService.getAdjustedHearingTypeName("Remedy");
+        assertEquals("Remedy Hearing", result);
+    }
+
+    @Test
+    void getAdjustedHearingTypeName_shouldReturnInput_whenInputIsUnknown() {
+        String input = "CustomType";
+        String result = InitialConsiderationService.getAdjustedHearingTypeName(input);
+        assertEquals(input, result);
+    }
+
+    @Test
     void getEarliestHearingDate() {
         setFutureHearingDate(caseData);
         assertThat(initialConsiderationService.getEarliestHearingDateForListedHearings(generateHearingDates()))
-            .isEqualTo(Optional.of(LocalDate.of(EARLIEST_FUTURE_HEARING_DATE.getYear(),
-                EARLIEST_FUTURE_HEARING_DATE.getMonthOfYear(),
-                EARLIEST_FUTURE_HEARING_DATE.getDayOfMonth())));
+                .isEqualTo(Optional.of(LocalDate.of(EARLIEST_FUTURE_HEARING_DATE.getYear(),
+                        EARLIEST_FUTURE_HEARING_DATE.getMonthOfYear(),
+                        EARLIEST_FUTURE_HEARING_DATE.getDayOfMonth())));
     }
 
     @Test
     void getEarliestHearingDateWithEmptyDateListedTypeItem() {
         setFutureHearingDate(caseData);
         assertThat(initialConsiderationService.getEarliestHearingDateForListedHearings(generateHearingDatesWithEmpty()))
-            .isEqualTo(Optional.of(LocalDate.of(EARLIEST_FUTURE_HEARING_DATE.getYear(),
-                EARLIEST_FUTURE_HEARING_DATE.getMonthOfYear(),
-                EARLIEST_FUTURE_HEARING_DATE.getDayOfMonth())));
+                .isEqualTo(Optional.of(LocalDate.of(EARLIEST_FUTURE_HEARING_DATE.getYear(),
+                        EARLIEST_FUTURE_HEARING_DATE.getMonthOfYear(),
+                        EARLIEST_FUTURE_HEARING_DATE.getDayOfMonth())));
     }
 
     @Test
     void getEarliestHearingDateWithEmptyHearingDatesCollection() {
         assertThat(initialConsiderationService.getEarliestHearingDateForListedHearings(new ArrayList<>()))
-            .isEmpty();
+                .isEmpty();
     }
 
     @Test
     void getHearingDetailsForSettledHearing() {
         setFutureHearingDateWithSettledHearing(caseData);
-        String hearingDetails = initialConsiderationService.getHearingDetails(caseData.getHearingCollection());
+        String hearingDetails = initialConsiderationService.getHearingDetails(caseData.getHearingCollection(),
+                ENGLANDWALES_CASE_TYPE_ID);
         assertThat(hearingDetails)
-            .isEqualTo(EXPECTED_HEARING_BLANK);
-    }
-
-    @Test
-    void getHearingDetailsTest() {
-        setFutureHearingDate(caseData);
-        String hearingDetails = initialConsiderationService.getHearingDetails(caseData.getHearingCollection());
-        assertThat(hearingDetails)
-            .isEqualTo(EXPECTED_HEARING_STRING);
-    }
-
-    @Test
-    void getRespondentNameTest() {
-        String respondentName = initialConsiderationService.getRespondentName(caseData.getRespondentCollection());
-        assertThat(respondentName)
-            .isEqualTo(EXPECTED_RESPONDENT_NAME);
-    }
-
-    @Test
-    void getRespondentTwoNameTest() {
-        caseData = CaseDataBuilder.builder()
-                .withRespondent("Test Corp", YES, "2022-03-01", false)
-                .withRespondent("Test Name Two", YES, "2022-03-01", false)
-                .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID).getCaseData();
-        String respondentName = initialConsiderationService.getRespondentName(caseData.getRespondentCollection());
-        assertThat(respondentName).isEqualTo(EXPECTED_RESPONDENT_NAME_2);
+                .isEqualTo(EXPECTED_BLANK_HEARING_DETAILS);
     }
 
     @Test
     void generateJurisdictionCodesHtmlTest() {
         String jurisdictionCodesHtml =
-            initialConsiderationService.generateJurisdictionCodesHtml(generateJurisdictionCodes(),
-                ENGLANDWALES_CASE_TYPE_ID);
+                initialConsiderationService.generateJurisdictionCodesHtml(generateJurisdictionCodes(),
+                        ENGLANDWALES_CASE_TYPE_ID);
         assertThat(jurisdictionCodesHtml)
-            .isEqualTo(EXPECTED_JURISDICTION_HTML);
+                .isEqualTo(EXPECTED_JURISDICTION_HTML);
     }
 
     @Test
     void generateJurisdictionCodesHtmlScotlandTest() {
         String jurisdictionCodesHtml =
-            initialConsiderationService.generateJurisdictionCodesHtml(generateJurisdictionCodes(),
-                SCOTLAND_CASE_TYPE_ID);
+                initialConsiderationService.generateJurisdictionCodesHtml(generateJurisdictionCodes(),
+                        SCOTLAND_CASE_TYPE_ID);
         assertThat(jurisdictionCodesHtml)
-            .isEqualTo(EXPECTED_JURISDICTION_SCOTLAND_HTML);
+                .isEqualTo(EXPECTED_JURISDICTION_SCOTLAND_HTML);
     }
 
     @Test
     void missingHearingCollectionTest() {
-        String hearingDetails = initialConsiderationService.getHearingDetails(caseDataEmpty.getHearingCollection());
-        assertThat(hearingDetails)
-            .isEqualTo(EXPECTED_HEARING_BLANK);
+        String expectedResult = """
+                 <br/>
+                 <table>
+                 <thead>
+                 <tr>
+                 <th colspan="2"><h2>Listed Hearing Details</h2></th>
+                 </tr>
+                 <tr>
+                 <th width="30%">Aspect</th>
+                 <th width="70%">Detail</th>
+                 </tr>
+                 <thead>
+                 <tbody>
+                    <tr>
+                        <td>Date</td> <td> - </td>
+                    </tr>
+                    <tr>
+                        <td>Type</td> <td> - </td>
+                    </tr>
+                    <tr>
+                        <td>Duration</td> <td> - </td>
+                    </tr>
+                    <tr>
+                        <td>Hearing format</td> <td> - </td>
+                    </tr>
+                    <tr>
+                        <td>Panel Type</td> <td> - </td>
+                    </tr>
+                    <tr>
+                        <td>Venue</td> <td> - </td>
+                    </tr>
+                </tbody>
+                </table>
+                """;
+        String hearingDetails = initialConsiderationService.getHearingDetails(caseDataEmpty.getHearingCollection(),
+                ENGLANDWALES_CASE_TYPE_ID);
+        assertThat(hearingDetails).isEqualTo(expectedResult);
     }
 
     @Test
     void missingJurisdictionCollectionTest() {
-        String jurisdictionCodesHtml =
-            initialConsiderationService.generateJurisdictionCodesHtml(caseDataEmpty.getJurCodesCollection(),
-                ENGLANDWALES_CASE_TYPE_ID);
-        assertThat(jurisdictionCodesHtml)
-            .isEmpty();
+        final String jurisdictionCode = String.format(JURISDICTION_HEADER, CODES_URL_ENGLAND);
+        String jurisdictionCodesHtml = initialConsiderationService.generateJurisdictionCodesHtml(
+                caseDataEmpty.getJurCodesCollection(), ENGLANDWALES_CASE_TYPE_ID);
+        assertEquals(jurisdictionCodesHtml, jurisdictionCode);
     }
 
     @Test
     void invalidJurisdictionCollectionTest() {
-        String jurisdictionCodesHtml =
-            initialConsiderationService.generateJurisdictionCodesHtml(generateInvalidJurisdictionCodes(),
-                ENGLANDWALES_CASE_TYPE_ID);
-        assertThat(jurisdictionCodesHtml)
-            .isEmpty();
+        final String jurisdictionCode = String.format(JURISDICTION_HEADER, CODES_URL_ENGLAND);
+        String jurisdictionCodesHtml = initialConsiderationService.generateJurisdictionCodesHtml(
+                generateInvalidJurisdictionCodes(), ENGLANDWALES_CASE_TYPE_ID);
+        assertEquals(jurisdictionCodesHtml, jurisdictionCode);
     }
 
     @Test
     void invalidAndValidJurisdictionCollectionTest() {
         String jurisdictionCodesHtml =
-            initialConsiderationService.generateJurisdictionCodesHtml(generateValidInvalidJurisdictionCodes(),
-                ENGLANDWALES_CASE_TYPE_ID);
+                initialConsiderationService.generateJurisdictionCodesHtml(generateValidInvalidJurisdictionCodes(),
+                        ENGLANDWALES_CASE_TYPE_ID);
         assertThat(jurisdictionCodesHtml)
-            .isEqualTo(EXPECTED_JURISDICTION_HTML);
-    }
-
-    @Test
-    void missingRespondentCollectionTest() {
-        String respondentName =
-            initialConsiderationService.getRespondentName(caseDataEmpty.getRespondentCollection());
-        assertThat(respondentName)
-            .isEqualTo(EXPECTED_RESPONDENT_NAME_BLANK);
+                .isEqualTo(EXPECTED_JURISDICTION_HTML);
     }
 
     @Test
@@ -398,8 +718,8 @@ class InitialConsiderationServiceTest {
     void generateDocument_Exceptions() throws IOException {
         when(tornadoService.generateEventDocument(any(CaseData.class), anyString(),
                 anyString(), anyString())).thenThrow(new InternalException(ERROR_MESSAGE));
-        assertThrows(Exception.class, () -> initialConsiderationService.generateDocument(new CaseData(), "userToken",
-                ENGLANDWALES_CASE_TYPE_ID));
+        assertThrows(Exception.class, () -> initialConsiderationService.generateDocument(new CaseData(),
+                "userToken", ENGLANDWALES_CASE_TYPE_ID));
     }
 
     @Test
@@ -535,24 +855,24 @@ class InitialConsiderationServiceTest {
         caseData.setEtInitialConsiderationHearing(EXPECTED_HEARING_DETAILS_STRING);
 
         initialConsiderationService.setIsHearingAlreadyListed(caseData, ENGLANDWALES_CASE_TYPE_ID);
-        assertThat(caseData.getEtICHearingAlreadyListed()).isNull();
+        assertThat(caseData.getEtICHearingAlreadyListed()).isNotNull();
     }
 
     private List<JurCodesTypeItem> generateJurisdictionCodes() {
         return List.of(generateJurisdictionCode("DAG"),
-            generateJurisdictionCode("SXD"));
+                generateJurisdictionCode("SXD"));
     }
 
     private List<JurCodesTypeItem> generateInvalidJurisdictionCodes() {
         return List.of(generateJurisdictionCode("PGA"),
-            generateJurisdictionCode("CGA"));
+                generateJurisdictionCode("CGA"));
     }
 
     private List<JurCodesTypeItem> generateValidInvalidJurisdictionCodes() {
         return List.of(generateJurisdictionCode("DAG"),
-            generateJurisdictionCode("SXD"),
-            generateJurisdictionCode("PGA"),
-            generateJurisdictionCode("CGA"));
+                generateJurisdictionCode("SXD"),
+                generateJurisdictionCode("PGA"),
+                generateJurisdictionCode("CGA"));
     }
 
     private JurCodesTypeItem generateJurisdictionCode(String codeString) {
@@ -565,28 +885,28 @@ class InitialConsiderationServiceTest {
 
     private CaseData generateCaseData(String fileName) throws URISyntaxException, IOException {
         String json = new String(Files.readAllBytes(Paths.get(Objects.requireNonNull(Thread.currentThread()
-            .getContextClassLoader().getResource(fileName)).toURI())));
+                .getContextClassLoader().getResource(fileName)).toURI())));
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(json, CaseData.class);
     }
 
     private List<DateListedTypeItem> generateHearingDates() {
         return List.of(createDate("2022-07-15T10:00:00.000", null),
-            createDate("2022-07-15T10:00:00.000", null),
-            createDate("2022-05-20T10:00:00.000", null),
-            createDate("2022-03-22T10:00:00.000", null),
-            createDate("2022-01-07T10:00:00.000", null),
-            createDate("2022-01-07T10:00:00.000", null),
-            createDate(EARLIEST_FUTURE_HEARING_DATE.toString(), "Listed"),
-            createDate(SECOND_FUTURE_HEARING_DATE.toString(), "Listed"));
+                createDate("2022-07-15T10:00:00.000", null),
+                createDate("2022-05-20T10:00:00.000", null),
+                createDate("2022-03-22T10:00:00.000", null),
+                createDate("2022-01-07T10:00:00.000", null),
+                createDate("2022-01-07T10:00:00.000", null),
+                createDate(EARLIEST_FUTURE_HEARING_DATE.toString(), "Listed"),
+                createDate(SECOND_FUTURE_HEARING_DATE.toString(), "Listed"));
     }
 
     private List<DateListedTypeItem> generateHearingDatesWithEmpty() {
         return List.of(createDate("2022-07-15T10:00:00.000", null),
-            createDate("2022-07-15T10:00:00.000", null),
-            new DateListedTypeItem(),
-            createDate("2022-03-22T10:00:00.000", null),
-            createDate(EARLIEST_FUTURE_HEARING_DATE.toString(), "Listed"));
+                createDate("2022-07-15T10:00:00.000", null),
+                new DateListedTypeItem(),
+                createDate("2022-03-22T10:00:00.000", null),
+                createDate(EARLIEST_FUTURE_HEARING_DATE.toString(), "Listed"));
     }
 
     private DateListedTypeItem createDate(String dateString, String status) {
@@ -640,34 +960,16 @@ class InitialConsiderationServiceTest {
     }
 
     @Test
-    void getClaimantHearingPanelPreferenceTest() {
-        ClaimantHearingPreference preference = new ClaimantHearingPreference();
-        preference.setClaimantHearingPanelPreference("Preference");
-        preference.setClaimantHearingPanelPreferenceWhy("Reason");
-        caseData.setClaimantHearingPreference(preference);
-
-        String result = String.format(initialConsiderationService.getClaimantHearingPanelPreference(
-                caseData.getClaimantHearingPreference()));
-
-        String expected = """
-            |Claimant's hearing panel preference | |
-            |-------------|:------------|
-            |Panel Preference | Preference|
-            |Reason for Panel Preference | Reason|
-            """;
-        assertEquals(expected, result);
-    }
-
-    @Test
     void getClaimantHearingPanelPreference_NullPreference() {
-        String result = initialConsiderationService.getClaimantHearingPanelPreference(null);
+        String result = initialConsiderationService.getClaimantHearingPanelPreference("",
+                null);
 
         String expected = """
-            |Claimant's hearing panel preference | |
-            |-------------|:------------|
-            |Panel Preference | -|
-            |Reason for Panel Preference | -|
-            """;
+                |Claimant's hearing panel preference | |
+                |-------------|:------------|
+                |Panel Preference | -|
+                |Reason for Panel Preference | -|
+                """;
         assertEquals(expected, result);
     }
 
@@ -832,5 +1134,1433 @@ class InitialConsiderationServiceTest {
         assertThat(caseData1.getEtICHearingNotListedListForFinalHearing()).isNull();
         assertThat(caseData1.getEtICHearingNotListedUDLHearing()).isNull();
         assertThat(caseData1.getEtICHearingNotListedAnyOtherDirections()).isNull();
+    }
+
+    @Test
+    void getEarliestHearingDateForListedHearings_shouldReturnEarliestFutureDate_whenMultipleValidListedHearingsExist() {
+        List<DateListedTypeItem> hearingDates = List.of(
+                createDateListedTypeItem("2026-10-15T10:00:00", "Listed", "2 Hours"),
+                createDateListedTypeItem("2026-10-10T09:00:00", "Listed", "1 Hour"),
+                createDateListedTypeItem("2026-10-20T11:00:00", "Listed", "3 Hours")
+        );
+
+        Optional<LocalDate> result = initialConsiderationService.getEarliestHearingDateForListedHearings(hearingDates);
+
+        assertThat(result).isPresent();
+        assertThat(result.get().getYear()).isEqualTo(2026);
+        assertThat(result.get().getMonthValue()).isEqualTo(10);
+        assertThat(result.get().getDayOfMonth()).isEqualTo(10);
+    }
+
+    @Test
+    void getEarliestHearingDateForListedHearings_shouldIgnoreNonListedHearings() {
+        List<DateListedTypeItem> hearingDates = List.of(
+                createDateListedTypeItem("2026-10-15T10:00:00", "NotListed", "2 Hours"),
+                createDateListedTypeItem("2026-10-10T09:00:00", "Listed", "1 Hour"),
+                createDateListedTypeItem("2026-10-20T11:00:00", "NotListed", "3 Hours")
+        );
+
+        Optional<LocalDate> result = initialConsiderationService.getEarliestHearingDateForListedHearings(hearingDates);
+
+        assertThat(result).isPresent();
+        assertThat(result.get().getYear()).isEqualTo(2026);
+        assertThat(result.get().getMonthValue()).isEqualTo(10);
+        assertThat(result.get().getDayOfMonth()).isEqualTo(10);
+    }
+
+    @Test
+    void getEarliestHearingDateForListedHearings_shouldReturnEmpty_whenAllHearingDatesAreInThePast() {
+        List<DateListedTypeItem> hearingDates = List.of(
+                createDate("2022-10-15T10:00:00.000", "Listed"),
+                createDate("2022-10-10T10:00:00.000", "Listed")
+        );
+
+        Optional<LocalDate> result = initialConsiderationService.getEarliestHearingDateForListedHearings(hearingDates);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void getEarliestHearingDateForListedHearings_shouldReturnEmpty_whenHearingDatesListIsEmpty() {
+        List<DateListedTypeItem> hearingDates = new ArrayList<>();
+
+        Optional<LocalDate> result = initialConsiderationService.getEarliestHearingDateForListedHearings(hearingDates);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void getEarliestHearingDateForListedHearings_shouldReturnEmpty_whenHearingDatesListIsNull() {
+        Optional<LocalDate> result = initialConsiderationService.getEarliestHearingDateForListedHearings(
+                null);
+
+        assertThat(result).isEmpty();
+    }
+
+    @Test
+    void getEarliestHearingDateForListedHearings_shouldIgnoreInvalidDateFormats() {
+        List<DateListedTypeItem> hearingDates = List.of(
+                createDate("InvalidDate", "Listed"),
+                createDate("2026-10-15T10:00:00.000", "Listed")
+        );
+
+        Optional<LocalDate> result = initialConsiderationService.getEarliestHearingDateForListedHearings(hearingDates);
+
+        assertThat(result).isPresent();
+        assertThat(result.get().getYear()).isEqualTo(2026);
+        assertThat(result.get().getMonthValue()).isEqualTo(10);
+        assertThat(result.get().getDayOfMonth()).isEqualTo(15);
+    }
+
+    @Test
+    void generateJurisdictionCodesHtml_shouldReturnEmptyString_whenJurisdictionCodesAreNull() {
+        String result = initialConsiderationService.generateJurisdictionCodesHtml(null,
+                ENGLANDWALES_CASE_TYPE_ID);
+
+        assertThat(result).isNotEmpty();
+    }
+
+    @Test
+    void generateJurisdictionCodesHtml_shouldReturnEmptyString_whenJurisdictionCodesAreEmpty() {
+        List<JurCodesTypeItem> jurisdictionCodes = new ArrayList<>();
+        String result = initialConsiderationService.generateJurisdictionCodesHtml(jurisdictionCodes,
+                ENGLANDWALES_CASE_TYPE_ID);
+        assertThat(result).isNotEmpty();
+    }
+
+    @Test
+    void generateJurisdictionCodesHtml_shouldReturnFormattedHtml_whenValidJurisdictionCodesExist() {
+        List<JurCodesTypeItem> jurisdictionCodes = generateJurisdictionCodes();
+
+        String result = initialConsiderationService.generateJurisdictionCodesHtml(jurisdictionCodes,
+                ENGLANDWALES_CASE_TYPE_ID);
+
+        assertThat(result).isNotEmpty();
+        assertThat(result).contains("<h2>Jurisdiction codes</h2>");
+    }
+
+    @Test
+    void generateJurisdictionCodesHtml_shouldReturnFormattedHtmlForScotland_whenValidJurisdictionCodesExist() {
+        List<JurCodesTypeItem> jurisdictionCodes = generateJurisdictionCodes();
+
+        String result = initialConsiderationService.generateJurisdictionCodesHtml(jurisdictionCodes,
+                SCOTLAND_CASE_TYPE_ID);
+
+        assertThat(result).isNotEmpty();
+        assertThat(result).contains("<h2>Jurisdiction codes</h2>");
+        assertThat(result).contains(CODES_URL_SCOTLAND);
+    }
+
+    @Test
+    void generateJurisdictionCodesHtml_shouldIgnoreInvalidJurisdictionCodes() {
+        List<JurCodesTypeItem> jurisdictionCodes = generateInvalidJurisdictionCodes();
+        String result = initialConsiderationService.generateJurisdictionCodesHtml(jurisdictionCodes,
+                ENGLANDWALES_CASE_TYPE_ID);
+
+        assertThat(result).isNotEmpty();
+        assertThat(result).contains("<h2>Jurisdiction codes</h2>");
+    }
+
+    @Test
+    void clearOldValuesValues_clearsAllFieldsWhenAnswersExist() {
+        EtICHearingListedAnswers hearingListedAnswers = getEtICHearingListedAnswers();
+
+        CaseData caseDataForListedAnswers = new CaseData();
+        caseDataForListedAnswers.setEtICHearingListedAnswers(hearingListedAnswers);
+        caseDataForListedAnswers.setEtInitialConsiderationHearing("SomeHearing");
+        initialConsiderationService.clearOldValues(caseDataForListedAnswers);
+
+        assertNull(caseDataForListedAnswers.getEtICHearingListedAnswers());
+    }
+
+    private static @NotNull EtICHearingListedAnswers getEtICHearingListedAnswers() {
+        EtICHearingListedAnswers hearingListedAnswers = new EtICHearingListedAnswers();
+        hearingListedAnswers.setEtInitialConsiderationListedHearingType("SomeType");
+        hearingListedAnswers.setEtICIsHearingWithJsaReasonOther("SomeReason");
+        hearingListedAnswers.setEtICIsHearingWithMembers("Yes");
+        hearingListedAnswers.setEtICJsaFinalHearingReasonOther("SomeFinalReason");
+        hearingListedAnswers.setEtICMembersFinalHearingReasonOther("SomeMemberReason");
+        hearingListedAnswers.setEtICIsHearingWithJudgeOrMembersFurtherDetails("Details");
+        hearingListedAnswers.setEtICIsHearingWithJudgeOrMembersReason(List.of("Reason"));
+        hearingListedAnswers.setEtICIsFinalHearingWithJudgeOrMembersJsaReason(
+                Collections.singletonList("FinalJsaReason"));
+        hearingListedAnswers.setEtICIsFinalHearingWithJudgeOrMembersReason(Collections.singletonList("FinalReason"));
+        hearingListedAnswers.setEtICIsHearingWithJsa("Yes");
+        hearingListedAnswers.setEtICHearingListed(Collections.singletonList("Listed"));
+        hearingListedAnswers.setEtICIsHearingWithJudgeOrMembers("Yes");
+        hearingListedAnswers.setEtICIsHearingWithJudgeOrMembersReasonOther("OtherReason");
+        return hearingListedAnswers;
+    }
+
+    @Test
+    void initialiseInitialConsideration_shouldSetBeforeYouStart_whenDocumentCollectionHasValidDocuments() {
+        List<DocumentTypeItem> documentCollection = new ArrayList<>();
+        DocumentTypeItem et1Document = new DocumentTypeItem();
+        et1Document.setValue(DocumentType.from(new UploadedDocumentType()));
+        et1Document.getValue().setDocumentType(ET1);
+        documentCollection.add(et1Document);
+
+        CaseData caseDataForEt1DocType = new CaseData();
+        caseDataForEt1DocType.setDocumentCollection(documentCollection);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseDataForEt1DocType);
+
+        initialConsiderationService.initialiseInitialConsideration(caseDetails);
+
+        assertThat(caseDetails.getCaseData().getInitialConsiderationBeforeYouStart()).isNotEmpty();
+    }
+
+    @Test
+    void initialiseInitialConsideration_shouldSetEmptyBeforeYouStart_whenDocumentCollectionIsEmpty() {
+        CaseData caseDataWithEmptyDocCollection = new CaseData();
+        caseDataWithEmptyDocCollection.setDocumentCollection(new ArrayList<>());
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseDataWithEmptyDocCollection);
+
+        initialConsiderationService.initialiseInitialConsideration(caseDetails);
+
+        assertThat(caseDetails.getCaseData().getInitialConsiderationBeforeYouStart()).isEmpty();
+    }
+
+    @Test
+    void initialiseInitialConsideration_shouldIncludeReferralLinks_whenReferralCollectionIsNotEmpty() {
+        List<DocumentTypeItem> documentCollection = new ArrayList<>();
+        DocumentTypeItem et1Document = new DocumentTypeItem();
+        et1Document.setValue(DocumentType.from(new UploadedDocumentType()));
+        et1Document.getValue().setDocumentType(ET1);
+        documentCollection.add(et1Document);
+
+        CaseData caseDataWithReferralLinks = new CaseData();
+        caseDataWithReferralLinks.setDocumentCollection(documentCollection);
+        caseDataWithReferralLinks.setReferralCollection(Collections.singletonList(new ReferralTypeItem()));
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseDataWithReferralLinks);
+        caseDetails.setCaseId("12345");
+
+        initialConsiderationService.initialiseInitialConsideration(caseDetails);
+
+        assertThat(caseDetails.getCaseData().getInitialConsiderationBeforeYouStart())
+                .contains(CASE_DETAILS_URL_PARTIAL + "12345" + REFERRALS_PAGE_FRAGMENT_ID);
+    }
+
+    @Test
+    void initialiseInitialConsideration_shouldNotIncludeReferralLinks_whenReferralCollectionIsNull() {
+        List<DocumentTypeItem> documentCollection = new ArrayList<>();
+        DocumentTypeItem et1Document = new DocumentTypeItem();
+        et1Document.setValue(DocumentType.from(new UploadedDocumentType()));
+        et1Document.getValue().setDocumentType(ET1);
+        documentCollection.add(et1Document);
+
+        CaseData caseDataWithNullReferralList = new CaseData();
+        caseDataWithNullReferralList.setDocumentCollection(documentCollection);
+        caseDataWithNullReferralList.setReferralCollection(null);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseDataWithNullReferralList);
+
+        initialConsiderationService.initialiseInitialConsideration(caseDetails);
+
+        assertThat(caseDetails.getCaseData().getInitialConsiderationBeforeYouStart())
+                .doesNotContain(CASE_DETAILS_URL_PARTIAL);
+    }
+
+    @Test
+    void clearOldEtICHearingListedAnswersValues_doesNothingWhenAnswersAreNull() {
+        CaseData caseDataLocal = new CaseData();
+        caseDataLocal.setEtICHearingListedAnswers(null);
+        caseDataLocal.setEtInitialConsiderationHearing("SomeHearing");
+
+        initialConsiderationService.clearOldValues(caseDataLocal);
+
+        assertNull(caseDataLocal.getEtICHearingListedAnswers());
+        assertEquals("SomeHearing", caseDataLocal.getEtInitialConsiderationHearing());
+    }
+
+    @Test
+    void getHearingDetails_shouldReturnMissingMessage_whenHearingCollectionIsNull() {
+        String expectedResult = """
+                 <br/>
+                 <table>
+                 <thead>
+                 <tr>
+                 <th colspan="2"><h2>Listed Hearing Details</h2></th>
+                 </tr>
+                 <tr>
+                 <th width="30%">Aspect</th>
+                 <th width="70%">Detail</th>
+                 </tr>
+                 <thead>
+                 <tbody>
+                    <tr>
+                        <td>Date</td> <td> - </td>
+                    </tr>
+                    <tr>
+                        <td>Type</td> <td> - </td>
+                    </tr>
+                    <tr>
+                        <td>Duration</td> <td> - </td>
+                    </tr>
+                    <tr>
+                        <td>Hearing format</td> <td> - </td>
+                    </tr>
+                    <tr>
+                        <td>Panel Type</td> <td> - </td>
+                    </tr>
+                    <tr>
+                        <td>Venue</td> <td> - </td>
+                    </tr>
+                </tbody>
+                </table>
+                """;
+        String result = initialConsiderationService.getHearingDetails(null, null);
+        assertThat(result).isEqualTo(expectedResult);
+    }
+
+    @Test
+    void getHearingDetails_shouldReturnMissingMessage_whenHearingCollectionIsEmpty() {
+        List<HearingTypeItem> hearingCollection = new ArrayList<>();
+
+        String result = initialConsiderationService.getHearingDetails(hearingCollection, ENGLANDWALES_CASE_TYPE_ID);
+        assertThat(result).isEqualTo(HEARING_MISSING);
+    }
+
+    @Test
+    void getHearingDetails_shouldReturnMissingMessage_whenNoListedHearingsExist() {
+        List<HearingTypeItem> hearingCollection = List.of(
+                createHearingTypeItem("2023-10-15T10:00:00.000", "Not Listed", "Hearing Type 1", "Hours", "3"),
+                createHearingTypeItem("2023-10-10T10:00:00.000", "Cancelled", "Hearing Type 2", "Hours", "2")
+        );
+
+        String expectedResult = """
+                 <br/>
+                 <table>
+                 <thead>
+                 <tr>
+                 <th colspan="2"><h2>Listed Hearing Details</h2></th>
+                 </tr>
+                 <tr>
+                 <th width="30%">Aspect</th>
+                 <th width="70%">Detail</th>
+                 </tr>
+                 <thead>
+                 <tbody>
+                    <tr>
+                        <td>Date</td> <td> - </td>
+                    </tr>
+                    <tr>
+                        <td>Type</td> <td> - </td>
+                    </tr>
+                    <tr>
+                        <td>Duration</td> <td> - </td>
+                    </tr>
+                    <tr>
+                        <td>Hearing format</td> <td> - </td>
+                    </tr>
+                    <tr>
+                        <td>Panel Type</td> <td> - </td>
+                    </tr>
+                    <tr>
+                        <td>Venue</td> <td> - </td>
+                    </tr>
+                </tbody>
+                </table>
+                """;
+
+        String result = initialConsiderationService.getHearingDetails(hearingCollection, ENGLANDWALES_CASE_TYPE_ID);
+        assertThat(result).isEqualTo(expectedResult);
+    }
+
+    @Test
+    void getHearingDetails_shouldReturnFormattedDetails_whenValidHearingCollectionExists() {
+        List<HearingTypeItem> hearingCollection = List.of(
+                createHearingTypeItem("2026-10-15T10:00:00.000", "Listed",
+                        "Hearing Type 1", "Hours", "3"),
+                createHearingTypeItem("2026-10-10T10:00:00.000", "Listed",
+                        "Hearing Type 2", "Hours", "2")
+        );
+
+        String expectedResult = """
+                 <br/>
+                 <table>
+                 <thead>
+                 <tr>
+                 <th colspan="2"><h2>Listed Hearing Details</h2></th>
+                 </tr>
+                 <tr>
+                 <th width="30%">Aspect</th>
+                 <th width="70%">Detail</th>
+                 </tr>
+                 <thead>
+                 <tbody>
+                    <tr>
+                        <td>Date</td> <td> 10 Oct 2026 </td>
+                    </tr>
+                    <tr>
+                        <td>Type</td> <td> Hearing Type 2 </td>
+                    </tr>
+                    <tr>
+                        <td>Duration</td> <td> 2 Hours </td>
+                    </tr>
+                    <tr>
+                        <td>Hearing format</td> <td> - </td>
+                    </tr>
+                    <tr>
+                        <td>Panel Type</td> <td> - </td>
+                    </tr>
+                    <tr>
+                        <td>Venue</td> <td> - </td>
+                    </tr>
+                </tbody>
+                </table>
+                """;
+        String result = initialConsiderationService.getHearingDetails(hearingCollection, ENGLANDWALES_CASE_TYPE_ID);
+        assertThat(result).isEqualTo(expectedResult);
+    }
+
+    @Test
+    void getHearingDetails_shouldReturnFormattedDetails_whenEarliestListedHearingExists() {
+        HearingTypeItem hearingTypeItem = createHearingTypeItem(
+                "2027-02-04T10:00:00.000", "Listed", "Final Hearing", "Full Day", "6");
+
+        List<HearingTypeItem> hearingCollection = List.of(hearingTypeItem);
+
+        String result = initialConsiderationService.getHearingDetails(hearingCollection, ENGLANDWALES_CASE_TYPE_ID);
+
+        assertNotNull(result);
+        assertTrue(result.contains("Listed Hearing Details"));
+        assertTrue(result.contains("2027"));
+        assertTrue(result.contains("Final Hearing"));
+    }
+
+    @Test
+    void getHearingDetails_shouldIgnoreInvalidDateFormats() {
+        List<HearingTypeItem> hearingCollection = List.of(
+                createHearingTypeItem("InvalidDate", "Listed", "Hearing Type 1", "Hours", "3"),
+                createHearingTypeItem("2026-10-15T10:00:00.000", "Listed", "Hearing Type 2", "Hours", "2")
+        );
+
+        String result = initialConsiderationService.getHearingDetails(hearingCollection, ENGLANDWALES_CASE_TYPE_ID);
+        String detail = """
+                 <br/>
+                 <table>
+                 <thead>
+                 <tr>
+                 <th colspan="2"><h2>Listed Hearing Details</h2></th>
+                 </tr>
+                 <tr>
+                 <th width="30%">Aspect</th>
+                 <th width="70%">Detail</th>
+                 </tr>
+                 <thead>
+                 <tbody>
+                    <tr>
+                        <td>Date</td> <td> 15 Oct 2026 </td>
+                    </tr>
+                    <tr>
+                        <td>Type</td> <td> Hearing Type 2 </td>
+                    </tr>
+                    <tr>
+                        <td>Duration</td> <td> 2 Hours </td>
+                    </tr>
+                    <tr>
+                        <td>Hearing format</td> <td> - </td>
+                    </tr>
+                    <tr>
+                        <td>Panel Type</td> <td> - </td>
+                    </tr>
+                    <tr>
+                        <td>Venue</td> <td> - </td>
+                    </tr>
+                </tbody>
+                </table>
+                """;
+        assertThat(result).isEqualTo(detail);
+    }
+
+    private HearingTypeItem createHearingTypeItem(String date, String status, String type, String lengthType,
+                                                  String duration) {
+        HearingType hearing = new HearingType();
+        hearing.setHearingType(type);
+        hearing.setHearingDateCollection(List.of(createDateListedTypeItem(date, status, duration)));
+        hearing.setHearingEstLengthNum(duration);
+        hearing.setHearingEstLengthNumType(lengthType);
+
+        HearingTypeItem hearingTypeItem = new HearingTypeItem();
+        hearingTypeItem.setValue(hearing);
+        return hearingTypeItem;
+    }
+
+    private DateListedTypeItem createDateListedTypeItem(String date, String status, String duration) {
+        DateListedType dateListedType = new DateListedType();
+        dateListedType.setListedDate(date);
+        dateListedType.setHearingStatus(status);
+        dateListedType.setHearingTimingDuration(duration);
+
+        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
+        dateListedTypeItem.setValue(dateListedType);
+        return dateListedTypeItem;
+    }
+
+    @Test
+    void getHearingVenueDetails_returnsVenueForEnglandWales_whenVenueIsSet_London_Venue() {
+        DynamicValueType dynamicValueType = new DynamicValueType();
+        dynamicValueType.setLabel("London Venue");
+        dynamicValueType.setCode("LondonVenue");
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
+        dynamicFixedListType.setValue(dynamicValueType);
+        HearingType hearing = new HearingType();
+        hearing.setHearingVenue(dynamicFixedListType);
+        String result = InitialConsiderationService.getHearingVenueDetails(hearing, ENGLANDWALES_CASE_TYPE_ID);
+        assertEquals("London Venue", result);
+    }
+
+    @Test
+    void clearOldValues_clearsAllFieldsWhenAnswersExist() {
+        EtICHearingListedAnswers answers = new EtICHearingListedAnswers();
+        // Set all fields to non-null values
+        answers.setEtInitialConsiderationListedHearingType("type");
+        answers.setEtICIsHearingWithJsaReasonOther("reason");
+        answers.setEtICIsHearingWithMembers("members");
+        answers.setEtICJsaFinalHearingReasonOther("jsa");
+        answers.setEtICMembersFinalHearingReasonOther("membersFinal");
+        answers.setEtICIsHearingWithJudgeOrMembersFurtherDetails("details");
+        answers.setEtICIsHearingWithJudgeOrMembersReason(Collections.singletonList("reason2"));
+        answers.setEtICIsFinalHearingWithJudgeOrMembersJsaReason(Collections.singletonList("jsa2"));
+        answers.setEtICIsFinalHearingWithJudgeOrMembersReason(Collections.singletonList("reason3"));
+        answers.setEtICIsHearingWithJsa("jsa3");
+        answers.setEtICHearingListed(Collections.singletonList("listed"));
+        answers.setEtICIsHearingWithJudgeOrMembers("judgeOrMembers");
+        answers.setEtICIsHearingWithJudgeOrMembersReasonOther("reasonOther");
+        CaseData caseDataWithFieldsToClear = new CaseData();
+        caseDataWithFieldsToClear.setEtICHearingListedAnswers(answers);
+
+        InitialConsiderationService service = new InitialConsiderationService(null);
+        service.clearOldValues(caseDataWithFieldsToClear);
+
+        EtICHearingListedAnswers cleared = caseDataWithFieldsToClear.getEtICHearingListedAnswers();
+        assertNull(cleared);
+    }
+
+    @Test
+    void setPartiesHearingPanelPreferenceDetails_shouldFormatPanelPreferencesCorrectly() {
+        CaseData caseDataWithPanelPreferences = new CaseData();
+        caseDataWithPanelPreferences.setClaimant("Test Claimant");
+        ClaimantHearingPreference claimantPref = new ClaimantHearingPreference();
+        claimantPref.setClaimantHearingPanelPreference("Panel");
+        claimantPref.setClaimantHearingPanelPreferenceWhy("Reason");
+        caseDataWithPanelPreferences.setClaimantHearingPreference(claimantPref);
+
+        RespondentSumType respondent = new RespondentSumType();
+        respondent.setRespondentName("Respondent 1");
+        respondent.setRespondentHearingPanelPreference("Panel");
+        respondent.setRespondentHearingPanelPreferenceReason("Reason");
+        RespondentSumTypeItem respondentItem = new RespondentSumTypeItem();
+        respondentItem.setValue(respondent);
+        caseDataWithPanelPreferences.setRespondentCollection(List.of(respondentItem));
+
+        InitialConsiderationService service = new InitialConsiderationService(tornadoService);
+
+        String result = service.setPartiesHearingPanelPreferenceDetails(caseDataWithPanelPreferences);
+
+        assertNotNull(result);
+        assertTrue(result.contains("Test Claimant"));
+        assertTrue(result.contains("Panel"));
+    }
+
+    @Test
+    void getHearingDetails_shouldReturnMissingMessage_whenHearingTypeItemIsNull() {
+        List<HearingTypeItem> hearingCollection = new ArrayList<>();
+        hearingCollection.add(null);
+
+        String result = initialConsiderationService.getHearingDetails(hearingCollection, ENGLANDWALES_CASE_TYPE_ID);
+        assertThat(result).isEqualTo(HEARING_MISSING);
+    }
+
+    @Test
+    void getHearingDetails_shouldReturnMissingMessage_whenHearingTypeValueIsNull() {
+        HearingTypeItem item = new HearingTypeItem();
+        item.setValue(null);
+        List<HearingTypeItem> hearingCollection = List.of(item);
+
+        String result = initialConsiderationService.getHearingDetails(hearingCollection, ENGLANDWALES_CASE_TYPE_ID);
+        assertThat(result).isEqualTo(HEARING_MISSING);
+    }
+
+    @Test
+    void getHearingDetails_shouldReturnMissingMessage_whenHearingDateCollectionIsNull() {
+        HearingType hearing = new HearingType();
+        hearing.setHearingDateCollection(null);
+        HearingTypeItem item = new HearingTypeItem();
+        item.setValue(hearing);
+        List<HearingTypeItem> hearingCollection = List.of(item);
+
+        String result = initialConsiderationService.getHearingDetails(hearingCollection, ENGLANDWALES_CASE_TYPE_ID);
+        assertThat(result).isEqualTo(HEARING_MISSING);
+    }
+
+    @Test
+    void getHearingDetails_shouldReturnMissingMessage_whenHearingDateCollectionIsEmpty() {
+        HearingType hearing = new HearingType();
+        hearing.setHearingDateCollection(new ArrayList<>());
+        HearingTypeItem item = new HearingTypeItem();
+        item.setValue(hearing);
+        List<HearingTypeItem> hearingCollection = List.of(item);
+
+        String result = initialConsiderationService.getHearingDetails(hearingCollection, ENGLANDWALES_CASE_TYPE_ID);
+        assertThat(result).isEqualTo(HEARING_MISSING);
+    }
+
+    @Test
+    void getClaimantHearingPanelPreference_shouldReturnMissing_whenNull() {
+        String result = initialConsiderationService.getClaimantHearingPanelPreference("",
+                null);
+        assertEquals(CLAIMANT_HEARING_PANEL_PREFERENCE_MISSING, result);
+    }
+
+    @Test
+    void getHearingVenueDetails_returnsVenueForScotland_whenVenueIsRecognized_Aberdeen() {
+        DynamicValueType dynamicValueType = new DynamicValueType();
+        dynamicValueType.setLabel("Aberdeen");
+        dynamicValueType.setCode("Aberdeen");
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
+        dynamicFixedListType.setValue(dynamicValueType);
+        HearingType hearing = new HearingType();
+        hearing.setHearingAberdeen(dynamicFixedListType);
+        hearing.setHearingVenueScotland("Aberdeen");
+
+        String result = InitialConsiderationService.getHearingVenueDetails(hearing, SCOTLAND_CASE_TYPE_ID);
+        assertEquals("Aberdeen", result);
+    }
+
+    @Test
+    void getHearingVenueDetails_returnsVenueForScotland_whenVenueIsRecognized_Dundee() {
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
+        DynamicValueType dynamicValueType = new DynamicValueType();
+        dynamicValueType.setLabel("Dundee");
+        dynamicValueType.setCode("Dundee");
+        dynamicFixedListType.setValue(dynamicValueType);
+        HearingType hearing = new HearingType();
+        hearing.setHearingDundee(dynamicFixedListType);
+        hearing.setHearingVenueScotland("Dundee");
+
+        String result = InitialConsiderationService.getHearingVenueDetails(hearing, SCOTLAND_CASE_TYPE_ID);
+        assertEquals("Dundee", result);
+    }
+
+    @Test
+    void getHearingVenueDetails_returnsVenueForScotland_whenVenueIsRecognized_Edinburgh() {
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
+        DynamicValueType dynamicValueType = new DynamicValueType();
+        dynamicValueType.setLabel("Edinburgh");
+        dynamicValueType.setCode("Edinburgh");
+        dynamicFixedListType.setValue(dynamicValueType);
+        HearingType hearing = new HearingType();
+        hearing.setHearingEdinburgh(dynamicFixedListType);
+        hearing.setHearingVenueScotland("Edinburgh");
+
+        String result = InitialConsiderationService.getHearingVenueDetails(hearing, SCOTLAND_CASE_TYPE_ID);
+        assertEquals("Edinburgh", result);
+    }
+
+    @Test
+    void getHearingVenueDetails_returnsVenueForScotland_whenVenueIsRecognized_Glasgow() {
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
+        DynamicValueType dynamicValueType = new DynamicValueType();
+        dynamicValueType.setLabel("Glasgow");
+        dynamicValueType.setCode("Glasgow");
+        dynamicFixedListType.setValue(dynamicValueType);
+        HearingType hearing = new HearingType();
+        hearing.setHearingGlasgow(dynamicFixedListType);
+        hearing.setHearingVenueScotland("Glasgow");
+
+        String result = InitialConsiderationService.getHearingVenueDetails(hearing, SCOTLAND_CASE_TYPE_ID);
+        assertEquals("Glasgow", result);
+    }
+
+    @Test
+    void getClaimantHearingPanelPreference_shouldReturnDashes_whenFieldsAreNull() {
+        ClaimantHearingPreference pref = new ClaimantHearingPreference();
+        String result = initialConsiderationService.getClaimantHearingPanelPreference("", pref);
+        String expected = """
+            <br/>
+            <table>
+            <thead>
+            <tr>
+             <th colspan="3"><h1>Parties Hearing Panel Preferences</h1></th>
+            </tr>
+            <tr>
+            <th colspan="3"><h2>Claimant's Panel Preference</h2></th>
+            </tr>
+            <tr>
+            <th width="25%">Claimant</th>
+            <th width="25%">Preference</th>
+            <th>Reason</th>
+            </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td></td>
+                <td>-</td>
+                <td>-</td>
+              </tr>
+            </tbody>
+            </table>
+            """;
+        assertThat(result).isEqualTo(expected);
+    }
+
+    @Test
+    void getClaimantHearingPanelPreference_shouldReturnPanelPreference_whenVideoPresent() {
+        ClaimantHearingPreference pref = new ClaimantHearingPreference();
+        pref.setClaimantHearingPanelPreference("Panel");
+        pref.setClaimantHearingPanelPreferenceWhy("Reason");
+        pref.setHearingPreferences(List.of(VIDEO));
+        String result = initialConsiderationService.getClaimantHearingPanelPreference("", pref);
+        assertTrue(result.contains("Panel"));
+        assertTrue(result.contains("Reason"));
+        assertFalse(result.toUpperCase(Locale.UK).contains(NOT_AVAILABLE_FOR_VIDEO_HEARINGS.toUpperCase(Locale.UK)));
+    }
+
+    @Test
+    void setIcEt3VettingIssuesDetailsForEachRespondent_shouldReturnNull_whenRespondentCollectionIsNull() {
+        CaseData caseDataWithNullRespondentCollection = new CaseData();
+        caseDataWithNullRespondentCollection.setRespondentCollection(null);
+        String result = initialConsiderationService.setIcEt3VettingIssuesDetailsForEachRespondent(
+                caseDataWithNullRespondentCollection);
+
+        assertNull(result);
+    }
+
+    @Test
+    void setIcEt3VettingIssuesDetailsForEachRespondent_shouldReturnNull_whenRespondentCollectionIsEmpty() {
+        CaseData caseDataWithEmptyRespondentCollection = new CaseData();
+        caseDataWithEmptyRespondentCollection.setRespondentCollection(new ArrayList<>());
+        String result = initialConsiderationService.setIcEt3VettingIssuesDetailsForEachRespondent(
+                caseDataWithEmptyRespondentCollection);
+
+        assertNull(result);
+    }
+
+    @Test
+    void setIcEt3VettingIssuesDetailsForEachRespondent_shouldSkipRespondentsWithNullEt3Vetting() {
+        CaseData caseDataWithNullEt3Vetting = new CaseData();
+        RespondentSumTypeItem respondent1 = new RespondentSumTypeItem();
+        respondent1.setValue(new RespondentSumType());
+        RespondentSumTypeItem respondent2 = new RespondentSumTypeItem();
+        respondent2.setValue(new RespondentSumType());
+        caseDataWithNullEt3Vetting.setRespondentCollection(List.of(respondent1, respondent2));
+
+        String result = initialConsiderationService.setIcEt3VettingIssuesDetailsForEachRespondent(
+                caseDataWithNullEt3Vetting);
+        assertNotNull(result);
+        assertTrue(result.contains("Details of ET3 Processing Issues"));
+        assertFalse(result.contains("<h3>Respondent"));
+    }
+
+    @Test
+    void setIcEt3VettingIssuesDetailsForEachRespondent_shouldIncludeDetailsForValidRespondents() {
+        CaseData caseDataWithValidRespondents = getCaseData();
+        String result = initialConsiderationService.setIcEt3VettingIssuesDetailsForEachRespondent(
+                caseDataWithValidRespondents);
+
+        assertNotNull(result);
+        assertTrue(result.contains("Details of ET3 Processing Issues"));
+        assertTrue(result.contains("<h3>Respondent Valid Respondent<h3>"));
+        assertTrue(result.contains("Additional Info"));
+    }
+
+    private static @NotNull CaseData getCaseData() {
+        RespondentSumType respondent = new RespondentSumType();
+        respondent.setRespondentName("Valid Respondent");
+        Et3VettingType et3Vetting = new Et3VettingType();
+        et3Vetting.setEt3AdditionalInformation("Additional Info");
+        respondent.setEt3Vetting(et3Vetting);
+        RespondentSumTypeItem respondentItem = new RespondentSumTypeItem();
+        respondentItem.setValue(respondent);
+        CaseData caseDataWithValidRespondents = new CaseData();
+        caseDataWithValidRespondents.setRespondentCollection(List.of(respondentItem));
+        return caseDataWithValidRespondents;
+    }
+
+    private static @NonNull CaseData getCaseData(RespondentSumTypeItem item1) {
+        RespondentSumType respondent2 = new RespondentSumType();
+        respondent2.setRespondentName("Respondent 2");
+        respondent2.setResponseRespondentName("Response 2");
+        Et3VettingType et3VettingType2 = new Et3VettingType();
+        et3VettingType2.setEt3AdditionalInformation("Info 2");
+        RespondentSumTypeItem item2 = new RespondentSumTypeItem();
+        respondent2.setEt3Vetting(et3VettingType2);
+        item2.setValue(respondent2);
+        CaseData caseDataWithMultipleRespondents = new CaseData();
+        caseDataWithMultipleRespondents.setRespondentCollection(List.of(item1, item2));
+        return caseDataWithMultipleRespondents;
+    }
+
+    @Test
+    void processEt3Response_shouldAddPairForEt3ResponseWhenResponseExists() {
+        Et3VettingType et3Vetting = new Et3VettingType();
+        et3Vetting.setEt3IsThereAnEt3Response(YES);
+        List<String[]> pairsList = new ArrayList<>();
+
+        initialConsiderationService.processEt3Response(et3Vetting, pairsList);
+
+        assertEquals(1, pairsList.size());
+        assertEquals("Is there an ET3 response?", pairsList.getFirst()[0]);
+        assertEquals(YES, pairsList.getFirst()[1]);
+    }
+
+    @Test
+    void processEt3Response_shouldAddDetailsWhenNoEt3Response() {
+        Et3VettingType et3Vetting = new Et3VettingType();
+        et3Vetting.setEt3IsThereAnEt3Response(NO);
+        et3Vetting.setEt3NoEt3Response("No response details");
+        et3Vetting.setEt3GeneralNotes("General notes");
+        List<String[]> pairsList = new ArrayList<>();
+
+        initialConsiderationService.processEt3Response(et3Vetting, pairsList);
+        assertEquals(3, pairsList.size());
+        assertEquals("Is there an ET3 response?", pairsList.get(0)[0]);
+        assertEquals(NO, pairsList.get(0)[1]);
+        assertEquals(GIVE_DETAILS, pairsList.get(1)[0]);
+        assertEquals("No response details", pairsList.get(1)[1]);
+        assertEquals("General notes (No ET3 Response):", pairsList.get(2)[0]);
+        assertEquals("General notes", pairsList.get(2)[1]);
+    }
+
+    @Test
+    void setIcEt3VettingIssuesDetailsForEachRespondent_shouldHandleMultipleRespondents() {
+        RespondentSumType respondent1 = new RespondentSumType();
+        respondent1.setRespondentName("Respondent 1");
+        respondent1.setResponseRespondentName("Response 1");
+        Et3VettingType et3VettingType = new Et3VettingType();
+        et3VettingType.setEt3AdditionalInformation("Info 1");
+        respondent1.setEt3Vetting(et3VettingType);
+        RespondentSumTypeItem item1 = new RespondentSumTypeItem();
+        item1.setValue(respondent1);
+
+        final CaseData caseDataWithMultipleRespondents = getCaseData(item1);
+
+        String result = initialConsiderationService.setIcEt3VettingIssuesDetailsForEachRespondent(
+                caseDataWithMultipleRespondents);
+
+        assertNotNull(result);
+        assertTrue(result.contains("Details of ET3 Processing Issues"));
+        assertTrue(result.contains("<h3>Respondent Respondent 1<h3>"));
+        assertTrue(result.contains("Info 1"));
+        assertTrue(result.contains("<h3>Respondent Respondent 2<h3>"));
+        assertTrue(result.contains("Info 2"));
+    }
+
+    @Test
+    void processEt3Response_shouldHandleNullEt3VettingGracefully() {
+        List<String[]> pairsList = new ArrayList<>();
+
+        initialConsiderationService.processEt3Response(null, pairsList);
+
+        assertTrue(pairsList.isEmpty());
+    }
+
+    @Test
+    void processEt3Response_shouldNotAddPairsIfNullFieldsInEt3Vetting() {
+        Et3VettingType et3Vetting = new Et3VettingType();
+        et3Vetting.setEt3IsThereAnEt3Response(null);
+        et3Vetting.setEt3NoEt3Response(null);
+        et3Vetting.setEt3GeneralNotes(null);
+        List<String[]> pairsList = new ArrayList<>();
+
+        initialConsiderationService.processEt3Response(et3Vetting, pairsList);
+
+        assertEquals(0, pairsList.size());
+    }
+
+    @Test
+    void shouldIncludeSuggestedIssueDetailsInEt3VettingIssues() {
+
+        Et3VettingType et3Vetting = getEt3VettingType();
+        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
+        RespondentSumType respondentValue = new RespondentSumType();
+        respondentValue.setRespondentName("Test Respondent");
+        respondentValue.setEt3Vetting(et3Vetting);
+        respondent.setValue(respondentValue);
+
+        CaseData caseDataWithSuggestedIssues = new CaseData();
+        caseDataWithSuggestedIssues.setRespondentCollection(List.of(respondent));
+
+        InitialConsiderationService service = new InitialConsiderationService(tornadoService);
+        String result = service.setIcEt3VettingIssuesDetailsForEachRespondent(caseDataWithSuggestedIssues);
+
+        assertTrue(result.contains("Strike out details"));
+        assertTrue(result.contains("Interpreters"));
+        assertTrue(result.contains("Jurisdictional issues"));
+        assertTrue(result.contains("Rule 49"));
+        assertTrue(result.contains("Request for adjustments"));
+        assertTrue(result.contains("Time points"));
+    }
+
+    @Test
+    void setIcEt3VettingIssuesDetailsForEachRespondent_shouldIncludeRespondentNameDetails() {
+        CaseData caseDataWithRespondentNameDetails = getData();
+        InitialConsiderationService service = new InitialConsiderationService(tornadoService);
+
+        String result = service.setIcEt3VettingIssuesDetailsForEachRespondent(caseDataWithRespondentNameDetails);
+
+        assertNotNull(result);
+        assertTrue(result.contains("Does the respondent's name match?"));
+        assertTrue(result.contains("Mismatch details"));
+    }
+
+    private static @NotNull CaseData getData() {
+        Et3VettingType et3Vetting = new Et3VettingType();
+        et3Vetting.setEt3DoWeHaveRespondentsName(YES);
+        et3Vetting.setEt3DoesRespondentsNameMatch(NO);
+        et3Vetting.setEt3RespondentNameMismatchDetails("Mismatch details");
+
+        RespondentSumType respondent = new RespondentSumType();
+        respondent.setRespondentName("Test Respondent");
+        respondent.setEt3Vetting(et3Vetting);
+
+        RespondentSumTypeItem respondentItem = new RespondentSumTypeItem();
+        respondentItem.setValue(respondent);
+
+        CaseData caseDataToReuse = new CaseData();
+        caseDataToReuse.setRespondentCollection(List.of(respondentItem));
+        return caseDataToReuse;
+    }
+
+    @Test
+    void getIcRespondentHearingPanelPreference_shouldRenderDashes_whenFieldsAreNull() {
+        RespondentSumType respondent = new RespondentSumType();
+        RespondentSumTypeItem item = new RespondentSumTypeItem();
+        item.setValue(respondent);
+        List<RespondentSumTypeItem> respondents = List.of(item);
+
+        String result = initialConsiderationService.getIcRespondentHearingPanelPreference(respondents);
+
+        assertTrue(result.contains("<td>-</td>"));
+    }
+
+    @Test
+    void getIcRespondentHearingPanelPreference_shouldRenderEmptyTable_whenAllItemsNull() {
+        List<RespondentSumTypeItem> respondents = new ArrayList<>();
+        respondents.add(null);
+
+        String result = initialConsiderationService.getIcRespondentHearingPanelPreference(respondents);
+
+        assertTrue(result.contains("<table>"));
+    }
+
+    @Test
+    void getHearingVenueDetails_shouldReturnDash_whenHearingIsNull() {
+        String result = InitialConsiderationService.getHearingVenueDetails(
+                null, ENGLANDWALES_CASE_TYPE_ID);
+
+        assertEquals("-", result);
+    }
+
+    private static @NotNull Et3VettingType getEt3VettingType() {
+        Et3VettingType et3Vetting = new Et3VettingType();
+        et3Vetting.setEt3SuggestedIssues(List.of(
+                APPLICATIONS_FOR_STRIKE_OUT_OR_DEPOSIT,
+                INTERPRETERS,
+                JURISDICTIONAL_ISSUES,
+                RULE_49,
+                REQUEST_FOR_ADJUSTMENTS,
+                TIME_POINTS));
+        et3Vetting.setEt3SuggestedIssuesStrikeOut("Strike out details");
+        et3Vetting.setEt3SuggestedIssueInterpreters("Interpreters");
+        et3Vetting.setEt3SuggestedIssueJurisdictional("Jurisdictional issues");
+        et3Vetting.setEt3SuggestedIssueRule50("Rule 49");
+        et3Vetting.setEt3SuggestedIssueAdjustments("Request for adjustments");
+        et3Vetting.setEt3SuggestedIssueTimePoints("Time points");
+        return et3Vetting;
+    }
+
+    @Test
+    void setPartiesHearingFormatDetails_shouldFormatWithClaimantAndRespondentDetails() {
+        InitialConsiderationService service = spy(new InitialConsiderationService(mock(TornadoService.class)));
+        CaseData caseDataWithClaimantAndRespondent = mock(CaseData.class);
+
+        when(service.getClaimantHearingFormatDetails(caseDataWithClaimantAndRespondent, ENGLANDWALES_CASE_TYPE_ID))
+                .thenReturn("ClaimantDetails");
+        when(service.getRespondentHearingFormatDetails(caseDataWithClaimantAndRespondent))
+                .thenReturn("RespondentDetails");
+
+        String expected = String.format(PARTIES_HEARING_FORMAT, "ClaimantDetails", "RespondentDetails");
+        String actual = service.setPartiesHearingFormatDetails(caseDataWithClaimantAndRespondent,
+                ENGLANDWALES_CASE_TYPE_ID);
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void setHearingRegionAndVenue_shouldSetNulls_whenListsAreNull() {
+        InitialConsiderationService service = spy(new InitialConsiderationService(mock(TornadoService.class)));
+        CaseData caseDataWithClaimantAndRespondent = mock(CaseData.class);
+        initialConsiderationService.setHearingRegionAndVenue(caseData);
+        String expected = """
+                <br/>
+                <table>
+                  <thead>
+                  <tr>
+                    <th colspan="2"><h1> Parties Hearing Format Details</h1></th>
+                  </tr>
+                  <tr>
+                    <th colspan="2"><h2>Claimant Hearing Format</h2></th>
+                  </tr>
+                  <tr>
+                    <th width="30%">Claimant</th>
+                    <th width="70%">Hearing Format</th>
+                  </tr>
+                  </thead>
+                  <tbody>
+                  <tr>
+                    <td>null</td>
+                    <td>-</td>
+                  </tr>
+                
+                </tbody>
+                </table>
+                
+                <table>
+                 <thead>
+                    <tr>
+                      <th colspan="2"><h2>Respondents Hearing Format</h2></th>
+                    </tr>
+                    <tr>
+                      <th width="30%"><h3>Respondent</h3></th>
+                      <th width="70%"><span class="bold">Hearing Format</span></th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+                </table>
+                
+                """;
+        String actual = service.setPartiesHearingFormatDetails(caseDataWithClaimantAndRespondent,
+                ENGLANDWALES_CASE_TYPE_ID);
+
+        assertNull(caseData.getRegionalOffice());
+        assertNull(caseData.getEt1TribunalRegion());
+        assertThat(actual).isEqualToNormalizingWhitespace(expected);
+    }
+
+    @Test
+    void setIcEt1VettingIssuesDetails_shouldHandleNullRegionalOfficeListAndWhyChangeOffice() {
+        CaseData caseDataWithChangeOffice = new CaseData();
+        caseDataWithChangeOffice.setIsLocationCorrect("No");
+
+        String result = new InitialConsiderationService(null)
+                .setIcEt1VettingIssuesDetails(caseDataWithChangeOffice);
+
+        assertTrue(result.contains("Is this location correct?"));
+        assertFalse(result.contains("Local or regional office selected"));
+        assertFalse(result.contains("Why should we change the office?"));
+    }
+
+    @Test
+    void setPartiesHearingFormatDetails_shouldHandleNullClaimantAndRespondentDetails() {
+        InitialConsiderationService service = spy(new InitialConsiderationService(mock(TornadoService.class)));
+        CaseData caseDataWithNullClaimant = mock(CaseData.class);
+
+        when(service.getClaimantHearingFormatDetails(caseDataWithNullClaimant,
+                ENGLANDWALES_CASE_TYPE_ID)).thenReturn(null);
+        when(service.getRespondentHearingFormatDetails(caseDataWithNullClaimant)).thenReturn(null);
+
+        String expected = String.format(PARTIES_HEARING_FORMAT, null, null);
+        String actual = service.setPartiesHearingFormatDetails(caseDataWithNullClaimant, ENGLANDWALES_CASE_TYPE_ID);
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void getRespondentHearingFormatDetails_shouldIncludeRespondentHearingFormatPreference() {
+        // Respondent with non-null, non-empty Et3ResponseHearingRespondent
+        RespondentSumType respondent = new RespondentSumType();
+        respondent.setRespondentName("Resp1");
+        List<String> hearingPrefs = List.of("Video", "Phone");
+        respondent.setEt3ResponseHearingRespondent(hearingPrefs);
+        RespondentSumTypeItem respondentItem = new RespondentSumTypeItem();
+        respondentItem.setValue(respondent);
+        CaseData caseDataWithRespondentHearingFormat = new CaseData();
+        caseDataWithRespondentHearingFormat.setRespondentCollection(List.of(respondentItem));
+        String result = initialConsiderationService.getRespondentHearingFormatDetails(
+                caseDataWithRespondentHearingFormat);
+        assertThat(result).contains("Resp1");
+        assertThat(result).contains("Video, Phone");
+    }
+
+    @Test
+    void getRespondentHearingFormatDetails_shouldSkipWhenEt3ResponseHearingRespondentIsNullOrEmpty() {
+        // Respondent with null Et3ResponseHearingRespondent
+        RespondentSumType respondent = new RespondentSumType();
+        respondent.setRespondentName("Resp2");
+        respondent.setEt3ResponseHearingRespondent(null);
+        RespondentSumTypeItem respondentItem = new RespondentSumTypeItem();
+        respondentItem.setValue(respondent);
+        CaseData caseDataWithNoEt3Respondent = new CaseData();
+        caseDataWithNoEt3Respondent.setRespondentCollection(List.of(respondentItem));
+        String result = initialConsiderationService.getRespondentHearingFormatDetails(caseDataWithNoEt3Respondent);
+        // Should not contain respondent name or preference row
+        assertThat(result).doesNotContain("Resp2");
+    }
+
+    @Test
+    void getRespondentHearingFormatDetails_shouldIncludeRepHearingFormatPreference() {
+        // RepCollection with a matching rep and non-null Et3ResponseHearingRepresentative
+        RespondentSumType respondent = new RespondentSumType();
+        respondent.setRespondentName("Resp3");
+        List<String> repPrefs = List.of("In person");
+        respondent.setEt3ResponseHearingRepresentative(repPrefs);
+        RespondentSumTypeItem respondentItem = new RespondentSumTypeItem();
+        respondentItem.setValue(respondent);
+        RepresentedTypeRItem repItem = new RepresentedTypeRItem();
+        RepresentedTypeR rep = new RepresentedTypeR();
+        rep.setRespRepName("Resp3");
+        rep.setNameOfRepresentative("RepName");
+        repItem.setValue(rep);
+        CaseData caseDataWithRepHearing = new CaseData();
+        caseDataWithRepHearing.setRespondentCollection(List.of(respondentItem));
+        caseDataWithRepHearing.setRepCollection(List.of(repItem));
+        String result = initialConsiderationService.getRespondentHearingFormatDetails(caseDataWithRepHearing);
+        assertThat(result).contains("RepName");
+        assertThat(result).contains("In person");
+    }
+
+    @Test
+    void getRespondentHearingFormatDetails_shouldSkipRepRowIfNoMatchingRepOrNullRepPrefs() {
+        // RepCollection with no matching rep
+        RespondentSumType respondent = new RespondentSumType();
+        respondent.setRespondentName("Resp4");
+        respondent.setEt3ResponseHearingRepresentative(List.of("Video"));
+        RespondentSumTypeItem respondentItem = new RespondentSumTypeItem();
+        respondentItem.setValue(respondent);
+        RepresentedTypeRItem repItem = new RepresentedTypeRItem();
+        RepresentedTypeR rep = new RepresentedTypeR();
+        rep.setRespRepName("OtherResp");
+        rep.setNameOfRepresentative("OtherRep");
+        repItem.setValue(rep);
+        CaseData caseDataWithNoMatchingRep = new CaseData();
+        caseDataWithNoMatchingRep.setRespondentCollection(List.of(respondentItem));
+        caseDataWithNoMatchingRep.setRepCollection(List.of(repItem));
+        String result = initialConsiderationService.getRespondentHearingFormatDetails(caseDataWithNoMatchingRep);
+        // Should not contain OtherRep
+        assertThat(result).doesNotContain("OtherRep");
+        // Now test with null Et3ResponseHearingRepresentative
+        respondent.setEt3ResponseHearingRepresentative(null);
+        rep.setRespRepName("Resp4"); // Now matches
+        String result2 = initialConsiderationService.getRespondentHearingFormatDetails(caseDataWithNoMatchingRep);
+        // Should not contain rep row
+        assertThat(result2).doesNotContain("Resp4");
+    }
+
+    @Test
+    void composeIcEt1OtherReferralListDetails_shouldReturnCorrectDetailsForEachReferralReason() {
+        CaseData caseDataWithOtherReferrals = new CaseData();
+        caseDataWithOtherReferrals.setOtherReferralList(Arrays.asList(
+                "claimOutOfTime", "multipleClaim", "employmentStatusIssues", "pidJurisdictionRegulator",
+                "videoHearingPreference", "rule50IssuesOtherFactors", "otherRelevantFactors", "unknown"
+        ));
+        caseDataWithOtherReferrals.setClaimOutOfTimeTextArea("out of time details");
+        caseDataWithOtherReferrals.setMultipleClaimTextArea("multiple claim details");
+        caseDataWithOtherReferrals.setEmploymentStatusIssuesTextArea("employment status details");
+        caseDataWithOtherReferrals.setPidJurisdictionRegulatorTextArea("pid jurisdiction details");
+        caseDataWithOtherReferrals.setVideoHearingPreferenceTextArea("video hearing details");
+        caseDataWithOtherReferrals.setRule50IssuesForOtherReferralTextArea("rule 49 details");
+        caseDataWithOtherReferrals.setAnotherReasonForOtherReferralTextArea("other relevant details");
+
+        String result = initialConsiderationService.setIcEt1VettingIssuesDetails(caseDataWithOtherReferrals);
+
+        assertTrue(result.contains("Claim out of time"));
+        assertTrue(result.contains("Multiple claim"));
+        assertTrue(result.contains("employment status details"));
+        assertTrue(result.contains("video hearing details"));
+        assertTrue(result.contains("rule 49 details"));
+    }
+
+    @Test
+    void composeIcEt1ReferralToJudgeOrLOListWithDetails_shouldReturnCorrectDetailsForEachReferralReason() {
+        CaseData caseDataWithReferralReasons = new CaseData();
+        List<String> referralList = Arrays.asList(
+                "aClaimOfInterimRelief",
+                "aStatutoryAppeal",
+                "anAllegationOfCommissionOfSexualOffence",
+                "insolvency",
+                "jurisdictionsUnclear",
+                "lengthOfService",
+                "potentiallyLinkedCasesInTheEcm",
+                "rule50Issues",
+                "anotherReasonForJudicialReferral"
+        );
+        caseDataWithReferralReasons.setReferralToJudgeOrLOList(referralList);
+        caseDataWithReferralReasons.setAclaimOfInterimReliefTextArea("Interim relief details");
+        caseDataWithReferralReasons.setAstatutoryAppealTextArea("Statutory appeal details");
+        caseDataWithReferralReasons.setAnAllegationOfCommissionOfSexualOffenceTextArea("Sexual offence details");
+        caseDataWithReferralReasons.setInsolvencyTextArea("Insolvency details");
+        caseDataWithReferralReasons.setJurisdictionsUnclearTextArea("Jurisdictions unclear details");
+        caseDataWithReferralReasons.setLengthOfServiceTextArea("Length of service details");
+        caseDataWithReferralReasons.setPotentiallyLinkedCasesInTheEcmTextArea("Linked cases details");
+        caseDataWithReferralReasons.setRule50IssuesTextArea("Rule 49 issues details");
+        caseDataWithReferralReasons.setAnotherReasonForJudicialReferralTextArea("Other judicial referral details");
+
+        String result = initialConsiderationService.setIcEt1VettingIssuesDetails(caseDataWithReferralReasons);
+
+        assertTrue(result.contains("A claim of interim relief"));
+        assertTrue(result.contains("A statutory appeal"));
+        assertTrue(result.contains("Length of service details"));
+    }
+
+    @Test
+    void setIcEt1VettingIssuesDetails_shouldIncludeAllSubstantiveDefects() {
+        final CaseData caseDataWithSubstantiveDefects = getCaseDataWithSubstantiveDefects();
+
+        String result = initialConsiderationService.setIcEt1VettingIssuesDetails(caseDataWithSubstantiveDefects);
+
+        assertTrue(result.contains("The tribunal has no jurisdiction to consider - Rule 13(1)(a)|Defect A text|"));
+        assertTrue(result.contains("Is in a form which cannot sensibly be responded to or otherwise an abuse of "
+                + "process - Rule 13(1)(b)|Defect B text|"));
+        assertTrue(result.contains("Has neither an EC number nor claims one of the EC exemptions - Rule 13(1)(c)"));
+        assertTrue(result.contains("States that one of the EC exceptions applies but it might not - Rule 13(1)(d)"));
+        assertTrue(result.contains("Institutes relevant proceedings and the EC number on the claim form does not "
+                + "match the EC number on the Acas certificate - Rule 13(1)(e)"));
+        assertTrue(result.contains("Has a different claimant name on the ET1 to the claimant name on the Acas "
+                + "certificate - Rule 13(1)(f)"));
+    }
+
+    private static @NonNull CaseData getCaseDataWithSubstantiveDefects() {
+        CaseData caseDataWithSubstantiveDefects = new CaseData();
+        caseDataWithSubstantiveDefects.setSubstantiveDefectsList(List.of(
+                "rule121a", "rule121b", "rule121c", "rule121d", "rule121 da", "rule121e", "rule121f"
+        ));
+        caseDataWithSubstantiveDefects.setRule121aTextArea("Defect A text");
+        caseDataWithSubstantiveDefects.setRule121bTextArea("Defect B text");
+        caseDataWithSubstantiveDefects.setRule121cTextArea("C");
+        caseDataWithSubstantiveDefects.setRule121dTextArea("D");
+        caseDataWithSubstantiveDefects.setRule121daTextArea("DA");
+        caseDataWithSubstantiveDefects.setRule121eTextArea("E");
+        caseDataWithSubstantiveDefects.setRule121fTextArea("F");
+        return caseDataWithSubstantiveDefects;
+    }
+
+    @Test
+    void setIcEt1VettingIssuesDetails_shouldIncludeReferralToJudgeOrLO_whenReferralListIsPopulated() {
+        CaseData caseDataWithReferralToJudgeOrLO = new CaseData();
+        caseDataWithReferralToJudgeOrLO.setReferralToJudgeOrLOList(
+                List.of("aClaimOfInterimRelief", "aStatutoryAppeal"));
+        caseDataWithReferralToJudgeOrLO.setAclaimOfInterimReliefTextArea("Interim relief details");
+        caseDataWithReferralToJudgeOrLO.setAstatutoryAppealTextArea("Statutory appeal details");
+        String result = initialConsiderationService.setIcEt1VettingIssuesDetails(caseDataWithReferralToJudgeOrLO);
+
+        assertNotNull(result);
+        assertTrue(result.contains("A claim of interim relief"));
+        assertTrue(result.contains("Interim relief details"));
+        assertTrue(result.contains("A statutory appeal"));
+        assertTrue(result.contains("Statutory appeal details"));
+    }
+
+    @Test
+    void composeTrackAllocationDetails_shouldReturnEmptyList_whenCaseDataIsNull() {
+        List<List<String>> result = initialConsiderationService.composeTrackAllocationDetails(null);
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void composeTrackAllocationDetails_shouldReturnEmptyList_whenIsTrackAllocationCorrectIsNull() {
+        List<List<String>> result = initialConsiderationService.composeTrackAllocationDetails(new CaseData());
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void composeTrackAllocationDetails_shouldReturnEmptyList_whenIsTrackAllocationCorrectIsYes() {
+        CaseData caseDataWithCorrectTrackAllocation = new CaseData();
+        caseDataWithCorrectTrackAllocation.setIsTrackAllocationCorrect("Yes");
+        List<List<String>> result = initialConsiderationService.composeTrackAllocationDetails(
+                caseDataWithCorrectTrackAllocation);
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void composeTrackAllocationDetails_shouldReturnEmptyList_whenIsTrackAllocationCorrectIsNo() {
+        CaseData caseDataWithInCorrectTrackAllocation = new CaseData();
+        caseDataWithInCorrectTrackAllocation.setIsTrackAllocationCorrect("No");
+        caseDataWithInCorrectTrackAllocation.setSuggestAnotherTrack("Suggested track details");
+        List<List<String>> result = initialConsiderationService.composeTrackAllocationDetails(
+                caseDataWithInCorrectTrackAllocation);
+        assertNotNull(result);
+        assertTrue(result.getFirst().contains("Is the track allocation correct?"));
+        assertTrue(result.get(1).contains("Suggested track details"));
+    }
+
+    @Test
+    void composeTrackAllocationTableMarkUp_shouldAppendDetails_whenTrackAllocationIssuesExist() {
+        CaseData caseDataWithTrackAllocationIssues = mock(CaseData.class);
+        when(caseDataWithTrackAllocationIssues.getIsTrackAllocationCorrect()).thenReturn("No");
+        when(caseDataWithTrackAllocationIssues.getSuggestAnotherTrack()).thenReturn("Suggested track details");
+        // Indirectly test via public API
+        String result = initialConsiderationService.setIcEt1VettingIssuesDetails(caseDataWithTrackAllocationIssues);
+
+        assertTrue(result.contains("Details of Track Allocation Issue"));
+        assertTrue(result.contains("Suggested track details"));
+    }
+
+    @Test
+    void composeServingClaimsTableMarkUp_shouldAppendTable_whenClaimCannotBeServed() {
+        CaseData caseDataWithNoClaimToBeServe = new CaseData();
+        caseDataWithNoClaimToBeServe.setEt1VettingCanServeClaimYesOrNo("No");
+        caseDataWithNoClaimToBeServe.setEt1VettingCanServeClaimNoReason("Incorrect address");
+        caseDataWithNoClaimToBeServe.setEt1VettingCanServeClaimGeneralNote("Check claimant details");
+        InitialConsiderationService service = new InitialConsiderationService(mock(TornadoService.class));
+        service.setIcEt1VettingIssuesDetails(caseDataWithNoClaimToBeServe);
+        String result = service.setIcEt1VettingIssuesDetails(caseDataWithNoClaimToBeServe);
+
+        assertTrue(result.contains("Serving Claim Issue"));
+        assertTrue(result.contains("Reason for not serving"));
+        assertTrue(result.contains("General Note (Serve Claim)"));
+        assertTrue(result.contains("Incorrect address"));
+        assertTrue(result.contains("Check claimant details"));
+    }
+
+    @Test
+    void composeServingClaimsTableMarkUp_shouldAppendTable_whenClaimCanBeServed() {
+        InitialConsiderationService service = new InitialConsiderationService(mock(TornadoService.class));
+        CaseData caseDataWithClaimToBeServe = new CaseData();
+        caseDataWithClaimToBeServe.setEt1VettingCanServeClaimYesOrNo("Yes");
+
+        String result = service.setIcEt1VettingIssuesDetails(caseDataWithClaimToBeServe);
+
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void setIcEt1VettingIssuesDetails_shouldIncludeReferralToREJOrVP_whenReferralListIsPopulated() {
+        final CaseData caseDataWithReferralsToREJOrVP = getCaseDataWithReferralsToREJOrVP();
+        String result = initialConsiderationService.setIcEt1VettingIssuesDetails(caseDataWithReferralsToREJOrVP);
+        assertNotNull(result);
+        assertTrue(result.contains("Details of Referral To REJ or VP"));
+        assertTrue(result.contains("A claimant covered by vexatious litigant order"));
+        assertTrue(result.contains("Vexatious details"));
+        assertTrue(result.contains("A national security issue"));
+        assertTrue(result.contains("National security details"));
+        assertTrue(result.contains("A part of national multiple / covered by Presidential case management order"));
+        assertTrue(result.contains("Presidential order details"));
+        assertTrue(result.contains("A request for transfer to another ET region"));
+        assertTrue(result.contains("Transfer details"));
+    }
+
+    private static @NonNull CaseData getCaseDataWithReferralsToREJOrVP() {
+        CaseData caseDataWithReferralsToREJOrVP = new CaseData();
+        caseDataWithReferralsToREJOrVP.setReferralToREJOrVPList(List.of(
+                "vexatiousLitigantOrder",
+                "aNationalSecurityIssue",
+                "nationalMultipleOrPresidentialOrder",
+                "transferToOtherRegion",
+                "serviceAbroad",
+                "aSensitiveIssue",
+                "anyPotentialConflict"
+        ));
+        caseDataWithReferralsToREJOrVP.setVexatiousLitigantOrderTextArea("Vexatious details");
+        caseDataWithReferralsToREJOrVP.setAnationalSecurityIssueTextArea("National security details");
+        caseDataWithReferralsToREJOrVP.setNationalMultipleOrPresidentialOrderTextArea("Presidential order details");
+        caseDataWithReferralsToREJOrVP.setTransferToOtherRegionTextArea("Transfer details");
+        caseDataWithReferralsToREJOrVP.setServiceAbroadTextArea("Service abroad details");
+        caseDataWithReferralsToREJOrVP.setAsensitiveIssueTextArea("Sensitive issue details");
+        caseDataWithReferralsToREJOrVP.setAnyPotentialConflictTextArea("Conflict details");
+        return caseDataWithReferralsToREJOrVP;
+    }
+
+    @Test
+    void setEt1VettingAndEt3ProcessingDetails_shouldSetEt1AndEt3Details_whenCaseTypeIsEnglandWales() {
+        CaseData caseDataWithEt1AndEt3Details = new CaseData();
+        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+        RespondentSumType respondentSumType = new RespondentSumType();
+        respondentSumTypeItem.setValue(respondentSumType);
+        respondentSumTypeItem.getValue().setEt3Vetting(new Et3VettingType());
+        caseDataWithEt1AndEt3Details.setRespondentCollection(List.of(respondentSumTypeItem));
+        initialConsiderationService.setEt1VettingAndEt3ProcessingDetails(
+                    caseDataWithEt1AndEt3Details, ENGLANDWALES_CASE_TYPE_ID);
+
+        assertNotNull(caseDataWithEt1AndEt3Details.getIcEt1VettingIssuesDetail());
+        assertNotNull(caseDataWithEt1AndEt3Details.getIcEt3ProcessingIssuesDetail());
+    }
+
+    @Test
+    void setEt1VettingAndEt3ProcessingDetails_shouldSetEt1AndEt3Details_whenCaseTypeIsScotland() {
+        CaseData caseDataWithEt1AndEt3Details = new CaseData();
+        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+        RespondentSumType respondentSumType = new RespondentSumType();
+        respondentSumTypeItem.setValue(respondentSumType);
+        respondentSumTypeItem.getValue().setEt3Vetting(new Et3VettingType());
+        caseDataWithEt1AndEt3Details.setRespondentCollection(List.of(respondentSumTypeItem));
+        initialConsiderationService.setEt1VettingAndEt3ProcessingDetails(
+                caseDataWithEt1AndEt3Details, SCOTLAND_CASE_TYPE_ID);
+
+        assertNull(caseDataWithEt1AndEt3Details.getIcEt1VettingIssuesDetail());
+        assertNull(caseDataWithEt1AndEt3Details.getIcEt3ProcessingIssuesDetail());
+    }
+
+    @Test
+    void clearOldValues_shouldClearEtICHearingListedAnswers_whenAnswersExist() {
+        CaseData caseDataWithHearingListedAnswers = new CaseData();
+        // Mock EtICHearingListedAnswers to be non-null
+        EtICHearingListedAnswers answers = mock(EtICHearingListedAnswers.class);
+        caseDataWithHearingListedAnswers.setEtICHearingListedAnswers(answers);
+
+        InitialConsiderationService service = new InitialConsiderationService(mock(TornadoService.class));
+        service.clearOldValues(caseDataWithHearingListedAnswers);
+
+        // Add assertions relevant to the clearing logic, e.g. verify fields are cleared
+        // Example: verify(answers).clearSomeField(); // Replace with actual clearing logic
+        assertNull(caseDataWithHearingListedAnswers.getEtICHearingListedAnswers());
+    }
+
+    @Test
+    void shouldNotAppendAnythingIfEt1SuggestHearingVenueIsNull() {
+        CaseData caseDataWithEt1SuggestedHearingVenue = new CaseData();
+        caseDataWithEt1SuggestedHearingVenue.setEt1SuggestHearingVenue(null);
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
+        DynamicValueType dynamicValueType = new DynamicValueType();
+        dynamicValueType.setCode("Venue1");
+        dynamicValueType.setLabel("Venue1");
+        dynamicFixedListType.setValue(dynamicValueType);
+        dynamicFixedListType.setListItems(List.of(dynamicValueType));
+        caseDataWithEt1SuggestedHearingVenue.setEt1HearingVenues(dynamicFixedListType);
+
+        InitialConsiderationService service = new InitialConsiderationService(mock(TornadoService.class));
+        String result = service.setIcEt1VettingIssuesDetails(caseDataWithEt1SuggestedHearingVenue);
+        assertEquals("", result);
+    }
+
+    @Test
+    void shouldNotAppendAnythingIfEt1SuggestHearingVenueIsNotNull() {
+        CaseData caseDataWithEt1SuggestedHearingVenue = new CaseData();
+        caseDataWithEt1SuggestedHearingVenue.setEt1SuggestHearingVenue("Yes");
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
+        DynamicValueType dynamicValueType = new DynamicValueType();
+        dynamicValueType.setCode("Venue1");
+        dynamicValueType.setLabel("Venue1");
+        dynamicFixedListType.setValue(dynamicValueType);
+        dynamicFixedListType.setListItems(List.of(dynamicValueType));
+        caseDataWithEt1SuggestedHearingVenue.setEt1HearingVenues(dynamicFixedListType);
+
+        InitialConsiderationService service = new InitialConsiderationService(mock(TornadoService.class));
+        String result = service.setIcEt1VettingIssuesDetails(caseDataWithEt1SuggestedHearingVenue);
+        assertTrue(result.contains("Venue1"));
+    }
+
+    @Test
+    void shouldNotAppendAnythingIfEt1SuggestHearingVenueIsNotYes() {
+        CaseData caseDataWithNoEt1SuggestedHearingVenue = new CaseData();
+        caseDataWithNoEt1SuggestedHearingVenue.setEt1SuggestHearingVenue("No");
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
+        DynamicValueType dynamicValueType = new DynamicValueType();
+        dynamicValueType.setCode("Venue1");
+        dynamicValueType.setLabel("Venue1");
+        dynamicFixedListType.setValue(dynamicValueType);
+        dynamicFixedListType.setListItems(List.of(dynamicValueType));
+        caseDataWithNoEt1SuggestedHearingVenue.setEt1HearingVenues(dynamicFixedListType);
+        InitialConsiderationService service = new InitialConsiderationService(mock(TornadoService.class));
+        String result = service.setIcEt1VettingIssuesDetails(caseDataWithNoEt1SuggestedHearingVenue);
+
+        assertEquals("", result);
     }
 }

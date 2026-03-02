@@ -8,6 +8,7 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.EtICHearingListedAnswers;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
 import uk.gov.hmcts.et.common.model.ccd.items.BFActionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
@@ -110,7 +111,7 @@ public class CaseDataBuilder {
         HearingTypeItem hearingTypeItem = createHearing(hearingNumber, hearingType, judge, venue, hearingFormat,
                 hearingLengthNum, hearingLengthType, hearingSitAlone);
         caseData.getHearingCollection().add(hearingTypeItem);
-
+        caseData.setEtICHearingListedAnswers(new EtICHearingListedAnswers());
         return this;
     }
 
@@ -146,6 +147,24 @@ public class CaseDataBuilder {
 
         caseData.getHearingCollection().add(hearingTypeItem);
 
+        return this;
+    }
+
+    public CaseDataBuilder withRegionalOfficeList(String officeName) {
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
+        DynamicValueType  dvt = DynamicValueType.create(officeName, officeName);
+        dynamicFixedListType.setListItems(List.of(dvt));
+        dynamicFixedListType.setValue(dvt);
+        caseData.setRegionalOfficeList(dynamicFixedListType);
+        return this;
+    }
+
+    public CaseDataBuilder withEt1TribunalRegion(String officeName) {
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
+        DynamicValueType  dvt = DynamicValueType.create(officeName, officeName);
+        dynamicFixedListType.setListItems(List.of(dvt));
+        dynamicFixedListType.setValue(dvt);
+        caseData.setEt1HearingVenues(dynamicFixedListType);
         return this;
     }
 

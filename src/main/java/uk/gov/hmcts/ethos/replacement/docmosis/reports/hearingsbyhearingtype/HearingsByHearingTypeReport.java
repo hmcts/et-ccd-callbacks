@@ -19,6 +19,7 @@ import java.util.Optional;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_FINAL_HEARING;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_HEARING;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_RECONSIDERATION;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_JUDICIAL_REMEDY;
@@ -206,7 +207,7 @@ public final class HearingsByHearingTypeReport {
 
     private void setReportFields(String hearingType, ReportFields fields) {
         switch (hearingType) {
-            case HEARING_TYPE_JUDICIAL_HEARING:
+            case HEARING_TYPE_JUDICIAL_HEARING, HEARING_TYPE_FINAL_HEARING:
                 fields.setHearingCount(String.valueOf(Integer.parseInt(fields.getHearingCount()) + 1));
                 fields.setTotal(String.valueOf(Integer.parseInt(fields.getTotal()) + 1));
                 break;
@@ -522,4 +523,3 @@ public final class HearingsByHearingTypeReport {
         }
     }
 }
-

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.FileUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +65,8 @@ public class DocumentManagementService {
     private static final String SERVICE_AUTHORIZATION = "ServiceAuthorization";
     private static final String FILE_DISPLAY = "<a href=\"/documents/%s\" target=\"_blank\">%s (%s, %s)</a>";
     private static final String FILE_DISPLAY_FALLBACK = "<a href=\"/documents/%s\" target=\"_blank\">%s</a>";
+    public static final String DOCUMENTS = "/documents/";
+    public static final String UPLOADED_DOCUMENT_SUCCESSFUL = "Uploaded document successful";
 
     private final DocumentUploadClientApi documentUploadClient;
     private final AuthTokenGenerator authTokenGenerator;
@@ -116,7 +119,7 @@ public class DocumentManagementService {
                         .orElseThrow(() ->
                                 new DocumentManagementException("Document management failed uploading file"
                                         + OUTPUT_FILE_NAME));
-                log.info("Uploaded document successful");
+                log.info(UPLOADED_DOCUMENT_SUCCESSFUL);
                 return URI.create(document.links.self.href);
             } else {
                 log.info("Using Document Upload Client");
@@ -134,7 +137,7 @@ public class DocumentManagementService {
                         .orElseThrow(() ->
                                 new DocumentManagementException("Document management failed uploading file"
                                         + OUTPUT_FILE_NAME));
-                log.info("Uploaded document successful");
+                log.info(UPLOADED_DOCUMENT_SUCCESSFUL);
                 return URI.create(document.links.self.href);
             }
         } catch (Exception ex) {
@@ -186,7 +189,7 @@ public class DocumentManagementService {
     }
 
     public String getDocumentUUID(String urlString) {
-        String documentUUID = urlString.replace(ccdDMStoreBaseUrl + "/documents/", "");
+        String documentUUID = urlString.replace(ccdDMStoreBaseUrl + DOCUMENTS, "");
         documentUUID = documentUUID.replace(BINARY, "");
         return documentUUID;
     }
@@ -199,7 +202,7 @@ public class DocumentManagementService {
      */
     public UploadedDocumentType addDocumentToDocumentField(DocumentInfo documentInfo) {
         UploadedDocumentType document = new UploadedDocumentType();
-        String documentId = documentInfo.getUrl().substring(documentInfo.getUrl().indexOf("/documents/"));
+        String documentId = documentInfo.getUrl().substring(documentInfo.getUrl().indexOf(DOCUMENTS));
         document.setDocumentBinaryUrl(ccdDMStoreBaseUrl + documentId);
         document.setDocumentUrl(document.getDocumentBinaryUrl().replace(BINARY, ""));
         document.setDocumentFilename(documentInfo.getDescription());
@@ -299,6 +302,15 @@ public class DocumentManagementService {
                             uploadedDocType.getDocumentIndex());
                 });
         setDocumentNumbers(caseData);
+    }
+
+    public static String createLinkToBinaryDocument(DocumentTypeItem documentTypeItem) {
+        String documentBinaryUrl = documentTypeItem.getValue().getUploadedDocument().getDocumentBinaryUrl();
+        if (!Strings.isNullOrEmpty(documentBinaryUrl) && documentBinaryUrl.contains(DOCUMENTS)) {
+            return documentBinaryUrl.substring(documentBinaryUrl.indexOf(DOCUMENTS));
+        } else {
+            return "";
+        }
     }
 
     private HttpHeaders getResponseHeaders() {

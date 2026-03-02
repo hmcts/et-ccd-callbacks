@@ -92,24 +92,24 @@ final class NotificationUtilsTest {
     }
 
     @Test
-    void theCanNotifyRepresentativeOrganisation() {
+    void theCanNotifyRespondentRepresentativeOrganisation() {
         // when representative is empty should return false
-        assertThat(NotificationUtils.canNotifyRepresentativeOrganisation(null)).isFalse();
+        assertThat(NotificationUtils.canNotifyRespondentRepresentativeOrganisation(null)).isFalse();
         // when representative does not have id should return false
         RepresentedTypeRItem representative = new RepresentedTypeRItem();
-        assertThat(NotificationUtils.canNotifyRepresentativeOrganisation(representative)).isFalse();
+        assertThat(NotificationUtils.canNotifyRespondentRepresentativeOrganisation(representative)).isFalse();
         // when representative does not have value should return false
         representative.setId(REPRESENTATIVE_ID);
-        assertThat(NotificationUtils.canNotifyRepresentativeOrganisation(representative)).isFalse();
+        assertThat(NotificationUtils.canNotifyRespondentRepresentativeOrganisation(representative)).isFalse();
         // when representative does not have organisation should return false
         representative.setValue(RepresentedTypeR.builder().build());
-        assertThat(NotificationUtils.canNotifyRepresentativeOrganisation(representative)).isFalse();
+        assertThat(NotificationUtils.canNotifyRespondentRepresentativeOrganisation(representative)).isFalse();
         // when representative does not have organisation id should return false
         representative.getValue().setRespondentOrganisation(Organisation.builder().build());
-        assertThat(NotificationUtils.canNotifyRepresentativeOrganisation(representative)).isFalse();
+        assertThat(NotificationUtils.canNotifyRespondentRepresentativeOrganisation(representative)).isFalse();
         // when representative is valid should return true
         representative.getValue().getRespondentOrganisation().setOrganisationID(ORGANISATION_ID);
-        assertThat(NotificationUtils.canNotifyRepresentativeOrganisation(representative)).isTrue();
+        assertThat(NotificationUtils.canNotifyRespondentRepresentativeOrganisation(representative)).isTrue();
     }
 
     @Test

@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.RetrieveOrgByIdResponse;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_TYPE_REMOVAL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_INVALID_ORGANISATION_RESPONSE_TO_RESOLVE_ORGANISATION_EMAIL;
@@ -64,12 +65,26 @@ public final class NotificationUtils {
      *         information is present to allow a notification to be sent;
      *         {@code false} otherwise
      */
-    public static boolean canNotifyRepresentativeOrganisation(RepresentedTypeRItem representative) {
+    public static boolean canNotifyRespondentRepresentativeOrganisation(RepresentedTypeRItem representative) {
         return ObjectUtils.isNotEmpty(representative)
                 && StringUtils.isNotBlank(representative.getId())
                 && ObjectUtils.isNotEmpty(representative.getValue())
                 && ObjectUtils.isNotEmpty(representative.getValue().getRespondentOrganisation())
                 && StringUtils.isNotBlank(representative.getValue().getRespondentOrganisation().getOrganisationID());
+    }
+
+    public static String findClaimantRepresentativeOrganisationId(RepresentedTypeC claimantRepresentative) {
+        if (ObjectUtils.isEmpty(claimantRepresentative)) {
+            return StringUtils.EMPTY;
+        }
+        if (ObjectUtils.isNotEmpty(claimantRepresentative.getMyHmctsOrganisation())
+                && StringUtils.isNotBlank(claimantRepresentative.getMyHmctsOrganisation().getOrganisationID())) {
+            return claimantRepresentative.getMyHmctsOrganisation().getOrganisationID();
+        }
+        if (StringUtils.isNotBlank(claimantRepresentative.getOrganisationId())) {
+            return claimantRepresentative.getOrganisationId();
+        }
+        return StringUtils.EMPTY;
     }
 
     /**

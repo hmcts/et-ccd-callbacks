@@ -107,8 +107,14 @@ public final class NOCConstants {
             "Failed to send noc notification email to respondent, case id: {}, error: {}";
     public static final String WARNING_INVALID_CASE_DETAILS_TO_RESOLVE_ORGANISATION_EMAIL =
             "Invalid case details. Unable to resolve organisation's superuser email. Case id: {}, " + NOC_TYPE;
+    public static final String WARNING_INVALID_CASE_DETAILS_TO_RESOLVE_CLAIMANT_REP_ORGANISATION_EMAIL =
+            "Invalid case details. Unable to resolve claimant representative organisation's superuser email. "
+                    + "Case id: {}, " + NOC_TYPE;
     public static final String WARNING_INVALID_REPRESENTATIVE_TO_RESOLVE_ORGANISATION_EMAIL =
             "Invalid representative details. Unable to resolve organisation superuser email. Case id: {}, " + NOC_TYPE;
+    public static final String WARNING_CLAIMANT_REP_ORGANISATION_ID_NOT_FOUND_TO_RESOLVE_ORGANISATION_EMAIL =
+            "Claimant representative organisation id not found. Unable to resolve organisation superuser email."
+                    + "Case id: {}, " + NOC_TYPE;
     public static final String WARNING_INVALID_ORGANISATION_RESPONSE_TO_RESOLVE_ORGANISATION_EMAIL =
             "Cannot retrieve {} organisation by id {} [{}] {}. Unable to resolve organisation's superuser email. "
                     + "Case id: {}";

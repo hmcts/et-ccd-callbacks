@@ -46,9 +46,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.ERROR_FAILED_TO_SEND_EMAIL_ORGANISATION_ADMIN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.EXCEPTION_CASE_DETAILS_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.WARNING_CLAIMANT_EMAIL_NOT_FOUND;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LEGAL_REP_NAME;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LEGAL_REP_ORG;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CIT_UI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_TYPE_ADDITION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_TYPE_REMOVAL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_CLAIMANT_EMAIL_NOT_FOUND_TO_NOTIFY_FOR_RESPONDENT_REP_UPDATE;
@@ -76,7 +73,10 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WAR
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_MISSING_RESPONDENT_EMAIL_ADDRESS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_RESPONDENT_NAME_MISSING_TO_NOTIFY_CLAIMANT_FOR_RESP_REP_UPDATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_TRIBUNAL_EMAIL_NOT_FOUND_TO_NOTIFY_FOR_RESPONDENT_REP_UPDATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LEGAL_REP_NAME;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LEGAL_REP_ORG;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CIT_UI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantNonSystemUser;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantRepresentedByMyHmctsOrganisation;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper.buildNoCPersonalisation;

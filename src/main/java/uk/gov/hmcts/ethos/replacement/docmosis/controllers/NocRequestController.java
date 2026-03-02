@@ -27,12 +27,13 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 @RequiredArgsConstructor
 public class NocRequestController {
 
-    private static final String green1 = "<h1>Notice of change successful</h1>";
-    private static final String green2 = "Your organisation is no longer representing a client on ";
-    private static final String contentHeader = "<h3>What happens next</h3>";
-    private static final String content1 = "<p>A notification will be sent to all the parties on this case.</p>";
-    private static final String content2 = "<p>This case will no longer appear in your organisation's case list.</p>";
-    private static final String content3 = "<p>This is a new online process - "
+    private static final String GREEN_BANNER_HEADING = "<h1>Notice of change successful</h1>";
+    private static final String GREEN_BANNER_TEXT = "Your organisation is no longer representing a client on ";
+    private static final String CONFIRM_HEADING = "<h3>What happens next</h3>";
+    private static final String CONFIRM_TEXT_1 = "<p>A notification will be sent to all the parties on this case.</p>";
+    private static final String CONFIRM_TEXT_2 =
+        "<p>This case will no longer appear in your organisation's case list.</p>";
+    private static final String CONFIRM_TEXT_3 = "<p>This is a new online process - "
         + "you don't need to file any further documents in relation to this notice of change with the court.</p>";
 
     private final NocRequestService nocRequestService;
@@ -72,8 +73,9 @@ public class NocRequestController {
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()
             .data(ccdRequest.getCaseDetails().getCaseData())
-            .confirmation_header(green1 + "<h5>" + green2 + ccdRequest.getCaseDetails().getCaseId() + "</h5>" + "<br>")
-            .confirmation_body(contentHeader + content1 + content2 + content3)
+            .confirmation_header(GREEN_BANNER_HEADING
+                + "<h5>" + GREEN_BANNER_TEXT + ccdRequest.getCaseDetails().getCaseId() + "</h5>" + "<br>")
+            .confirmation_body(CONFIRM_HEADING + CONFIRM_TEXT_1 + CONFIRM_TEXT_2 + CONFIRM_TEXT_3)
             .build());
     }
 }

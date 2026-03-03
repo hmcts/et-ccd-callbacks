@@ -559,7 +559,7 @@ public class NocNotificationService {
                     resBody.getSuperUser().getEmail(),
                     personalisation);
         } catch (Exception e) {
-            LoggingUtils.logNotificationIssue(ERROR_FAILED_TO_SEND_EMAIL_ORGANISATION_ADMIN, orgId, e);
+            LoggingUtils.logNotificationIssue(ERROR_FAILED_TO_SEND_EMAIL_ORGANISATION_ADMIN, e);
         }
     }
 
@@ -705,7 +705,7 @@ public class NocNotificationService {
         try {
             emailService.sendEmail(claimantTemplateId, email, personalisation);
         } catch (Exception e) {
-            LoggingUtils.logNotificationIssue(ERROR_FAILED_TO_SEND_EMAIL_CLAIMANT, email, e);
+            LoggingUtils.logNotificationIssue(ERROR_FAILED_TO_SEND_EMAIL_CLAIMANT, e);
         }
     }
 

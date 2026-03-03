@@ -17,18 +17,15 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 final class LoggingUtilsTest {
 
-    private static final String DUMMY_EMAIL_ADDRESS = "dummy@email.address";
-    private static final String ERROR_FAILED_TO_SEND_EMAIL_CLAIMANT = "Failed to send email to claimant {}, error: {}";
+    private static final String ERROR_FAILED_TO_SEND_EMAIL_CLAIMANT = "Failed to send email to claimant, error: {}";
     private static final String DUMMY_STRING = "Dummy string";
     private static final String EMPTY_MESSAGE = "Empty message";
     private static final String NOT_EMPTY_MESSAGE = "Not empty message";
 
     private static final String EXCEPTION_MESSAGE = "Exception message";
-    private static final String EXPECTED_CCD_ERROR_LOGGING_MESSAGE = "Error form ccd - Exception message";
-    private static final String EXPECTED_NOTIFICATION_EMAIL_ERROR_LOGGING_MESSAGE =
-            "Email not found. Error message: Exception message";
+    private static final String EXPECTED_CCD_ERROR_LOGGING_MESSAGE = "Error from ccd - Exception message";
     private static final String EXPECTED_NOTIFICATION_ERROR_LOGGING_MESSAGE =
-            "Failed to send email to claimant dummy@email.address, error: Exception message";
+            "Failed to send email to claimant, error: Exception message";
 
     @BeforeEach
     void setUp() {
@@ -54,20 +51,19 @@ final class LoggingUtilsTest {
     void theLogNotificationIssue() {
         // when email is empty should log email not found error.
         final Exception exception = new Exception(EXCEPTION_MESSAGE);
-        LoggingUtils.logNotificationIssue(ERROR_FAILED_TO_SEND_EMAIL_CLAIMANT, StringUtils.EMPTY, exception);
+        LoggingUtils.logNotificationIssue(ERROR_FAILED_TO_SEND_EMAIL_CLAIMANT, exception);
         LoggerTestUtils.checkLog(Level.INFO, LoggerTestUtils.INTEGER_ONE,
-                EXPECTED_NOTIFICATION_EMAIL_ERROR_LOGGING_MESSAGE);
+                EXPECTED_NOTIFICATION_ERROR_LOGGING_MESSAGE);
         // when exception is null should not log anything and not throw exception
-        assertDoesNotThrow(() -> LoggingUtils.logNotificationIssue(ERROR_FAILED_TO_SEND_EMAIL_CLAIMANT,
-                DUMMY_EMAIL_ADDRESS, null));
+        assertDoesNotThrow(() -> LoggingUtils.logNotificationIssue(ERROR_FAILED_TO_SEND_EMAIL_CLAIMANT, null));
         // when exception message is empty should not log anything and not throw exception
         final Exception emptyException = new Exception(StringUtils.EMPTY);
         assertDoesNotThrow(() -> LoggingUtils.logNotificationIssue(ERROR_FAILED_TO_SEND_EMAIL_CLAIMANT,
-                DUMMY_EMAIL_ADDRESS, emptyException));
+                emptyException));
         // when logging text is empty should not log anything and not throw exception
-        assertDoesNotThrow(() -> LoggingUtils.logNotificationIssue(StringUtils.EMPTY, DUMMY_EMAIL_ADDRESS, exception));
+        assertDoesNotThrow(() -> LoggingUtils.logNotificationIssue(StringUtils.EMPTY, exception));
         // should log message
-        LoggingUtils.logNotificationIssue(ERROR_FAILED_TO_SEND_EMAIL_CLAIMANT, DUMMY_EMAIL_ADDRESS, exception);
+        LoggingUtils.logNotificationIssue(ERROR_FAILED_TO_SEND_EMAIL_CLAIMANT, exception);
         LoggerTestUtils.checkLog(Level.INFO, LoggerTestUtils.INTEGER_TWO, EXPECTED_NOTIFICATION_ERROR_LOGGING_MESSAGE);
     }
 

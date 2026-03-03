@@ -11,12 +11,6 @@ import lombok.extern.jackson.Jacksonized;
 @Jacksonized
 @Builder
 public class OrganisationPolicy {
-
-    public OrganisationPolicy(String role) {
-        this.setOrgPolicyCaseAssignedRole(role);
-        this.setOrganisation(Organisation.builder().build());
-    }
-
     @JsonProperty("Organisation")
     private Organisation organisation;
 
@@ -28,4 +22,11 @@ public class OrganisationPolicy {
 
     @JsonProperty("PrepopulateToUsersOrganisation")
     private String prepopulateToUsersOrganisation;
+
+    public static OrganisationPolicy createDefaultPolicyByRole(String role) {
+        return OrganisationPolicy.builder()
+                .orgPolicyCaseAssignedRole(role)
+                .organisation(Organisation.builder().build())
+                .build();
+    }
 }

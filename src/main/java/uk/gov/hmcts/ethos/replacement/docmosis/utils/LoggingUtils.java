@@ -9,7 +9,6 @@ import java.util.Collection;
 import java.util.List;
 
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.ERROR_EMAIL_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.EVENT_FIELDS_VALIDATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.STRING_EMPTY;
 
@@ -109,14 +108,9 @@ public final class LoggingUtils {
      * logged; the stack trace is not included.
      *
      * @param loggingText the SLF4J message template used for logging
-     * @param email the email address associated with the notification
      * @param exception the exception whose message should be logged
      */
-    public static void logNotificationIssue(String loggingText, String email, Exception exception) {
-        if (StringUtils.isBlank(email)) {
-            log.info(ERROR_EMAIL_NOT_FOUND, exception.getMessage());
-            return;
-        }
+    public static void logNotificationIssue(String loggingText, Exception exception) {
         if (ObjectUtils.isEmpty(exception)
                 || StringUtils.isBlank(exception.getMessage())
                 || StringUtils.isBlank(loggingText)) {

@@ -8,6 +8,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocCcdService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocNotificationService;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
@@ -23,7 +24,11 @@ class NocRequestServiceTest {
     @Mock
     private NocNotificationService nocNotificationService;
     @InjectMocks
+    private NocCcdService nocCcdService;
+    @InjectMocks
     private NocRequestService nocRequestService;
+
+    private static final String USER_TOKEN = "userToken";
 
     @Test
     void shouldRevokeClaimantLegalRepAndSendNotifications() {
@@ -41,7 +46,7 @@ class NocRequestServiceTest {
             .build();
         caseDetails.getCaseData().setRepresentativeClaimantType(rep);
 
-        nocRequestService.revokeClaimantLegalRep(caseDetails);
+        nocRequestService.revokeClaimantLegalRep(caseDetails, USER_TOKEN);
 
         verify(nocNotificationService)
             .sendClaimantNocRequestEmailToOrgAdmin(eq(caseDetails), any(RepresentedTypeC.class));

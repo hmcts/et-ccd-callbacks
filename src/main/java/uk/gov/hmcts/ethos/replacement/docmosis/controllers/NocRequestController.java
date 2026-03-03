@@ -53,7 +53,7 @@ public class NocRequestController {
         @RequestHeader("Authorization") String userToken) {
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
-        nocRequestService.revokeClaimantLegalRep(caseDetails);
+        nocRequestService.revokeClaimantLegalRep(caseDetails, userToken);
         return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
     }
 

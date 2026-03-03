@@ -6,18 +6,25 @@ import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocCcdService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocNotificationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.ClaimantRepresentativeUtils;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
 public class NocRequestService {
 
+    private final NocCcdService nocCcdService;
     private final NocNotificationService nocNotificationService;
 
-    public void revokeClaimantLegalRep(CaseDetails caseDetails) {
+    public void revokeClaimantLegalRep(CaseDetails caseDetails, String userToken) {
         // create a copy of existing claimant legal rep details
         RepresentedTypeC repCopy = getRepTrueCopy(caseDetails);
+
+        // revoke claimant legal rep
+        nocCcdService.revokeClaimantRepresentation(userToken, caseDetails);
+        ClaimantRepresentativeUtils.markClaimantAsUnrepresented(caseDetails.getCaseData());
 
         // send email to organisation admin
         nocNotificationService.sendClaimantNocRequestEmailToOrgAdmin(caseDetails, repCopy);

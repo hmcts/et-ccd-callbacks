@@ -322,28 +322,27 @@ public final class RoleUtils {
         if (ObjectUtils.isEmpty(caseData) || index < 0 || index >= MAX_NOC_ANSWERS) {
             return;
         }
-
         switch (index) {
-            case 0 -> caseData.setRespondentOrganisationPolicy0(OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
-                    SolicitorRole.SOLICITORA.getCaseRoleLabel()).organisation(Organisation.builder().build()).build());
-            case 1 -> caseData.setRespondentOrganisationPolicy1(OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
-                    SolicitorRole.SOLICITORB.getCaseRoleLabel()).organisation(Organisation.builder().build()).build());
-            case 2 -> caseData.setRespondentOrganisationPolicy2(OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
-                    SolicitorRole.SOLICITORC.getCaseRoleLabel()).organisation(Organisation.builder().build()).build());
-            case 3 -> caseData.setRespondentOrganisationPolicy3(OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
-                    SolicitorRole.SOLICITORD.getCaseRoleLabel()).organisation(Organisation.builder().build()).build());
-            case 4 -> caseData.setRespondentOrganisationPolicy4(OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
-                    SolicitorRole.SOLICITORE.getCaseRoleLabel()).organisation(Organisation.builder().build()).build());
-            case 5 -> caseData.setRespondentOrganisationPolicy5(OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
-                    SolicitorRole.SOLICITORF.getCaseRoleLabel()).organisation(Organisation.builder().build()).build());
-            case 6 -> caseData.setRespondentOrganisationPolicy6(OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
-                    SolicitorRole.SOLICITORG.getCaseRoleLabel()).organisation(Organisation.builder().build()).build());
-            case 7 -> caseData.setRespondentOrganisationPolicy7(OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
-                    SolicitorRole.SOLICITORH.getCaseRoleLabel()).organisation(Organisation.builder().build()).build());
-            case 8 -> caseData.setRespondentOrganisationPolicy8(OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
-                    SolicitorRole.SOLICITORI.getCaseRoleLabel()).organisation(Organisation.builder().build()).build());
-            case 9 -> caseData.setRespondentOrganisationPolicy9(OrganisationPolicy.builder().orgPolicyCaseAssignedRole(
-                    SolicitorRole.SOLICITORJ.getCaseRoleLabel()).organisation(Organisation.builder().build()).build());
+            case 0 -> caseData.setRespondentOrganisationPolicy0(
+                    new OrganisationPolicy(SolicitorRole.SOLICITORA.getCaseRoleLabel()));
+            case 1 -> caseData.setRespondentOrganisationPolicy1(
+                    new OrganisationPolicy(SolicitorRole.SOLICITORB.getCaseRoleLabel()));
+            case 2 -> caseData.setRespondentOrganisationPolicy2(
+                    new OrganisationPolicy(SolicitorRole.SOLICITORC.getCaseRoleLabel()));
+            case 3 -> caseData.setRespondentOrganisationPolicy3(
+                    new OrganisationPolicy(SolicitorRole.SOLICITORD.getCaseRoleLabel()));
+            case 4 -> caseData.setRespondentOrganisationPolicy4(
+                    new OrganisationPolicy(SolicitorRole.SOLICITORE.getCaseRoleLabel()));
+            case 5 -> caseData.setRespondentOrganisationPolicy5(
+                    new OrganisationPolicy(SolicitorRole.SOLICITORF.getCaseRoleLabel()));
+            case 6 -> caseData.setRespondentOrganisationPolicy6(
+                    new OrganisationPolicy(SolicitorRole.SOLICITORG.getCaseRoleLabel()));
+            case 7 -> caseData.setRespondentOrganisationPolicy7(
+                    new OrganisationPolicy(SolicitorRole.SOLICITORH.getCaseRoleLabel()));
+            case 8 -> caseData.setRespondentOrganisationPolicy8(
+                    new OrganisationPolicy(SolicitorRole.SOLICITORI.getCaseRoleLabel()));
+            case 9 -> caseData.setRespondentOrganisationPolicy9(
+                    new OrganisationPolicy(SolicitorRole.SOLICITORJ.getCaseRoleLabel()));
             default -> { /* no-op */ }
         }
     }

@@ -80,12 +80,6 @@ public class VerifyTokenService {
     }
 
     public boolean isTokenSignatureValid(String token) {
-        boolean valid = verifyTokenSignature(token);
-
-        if (!valid) {
-            log.error(INVALID_TOKEN, token);
-        }
-
-        return valid;
+        return verifyTokenSignature(token);
     }
 }

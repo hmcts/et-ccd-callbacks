@@ -11,6 +11,12 @@ import lombok.extern.jackson.Jacksonized;
 @Jacksonized
 @Builder
 public class OrganisationPolicy {
+
+    public OrganisationPolicy(String role) {
+        this.setOrgPolicyCaseAssignedRole(role);
+        this.setOrganisation(Organisation.builder().build());
+    }
+
     @JsonProperty("Organisation")
     private Organisation organisation;
 

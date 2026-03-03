@@ -94,7 +94,7 @@ public final class LoggingUtils {
         if (ObjectUtils.isEmpty(exception) || StringUtils.isBlank(exception.getMessage())) {
             return;
         }
-        log.info("Error form ccd - {}", exception.getMessage());
+        log.info("Error from ccd - {}", exception.getMessage());
     }
 
     /**
@@ -122,7 +122,7 @@ public final class LoggingUtils {
                 || StringUtils.isBlank(loggingText)) {
             return;
         }
-        log.info(loggingText, email, exception.getMessage());
+        log.info(loggingText, exception.getMessage());
     }
 
     /**

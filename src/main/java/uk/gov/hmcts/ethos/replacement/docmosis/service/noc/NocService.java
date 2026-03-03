@@ -68,7 +68,7 @@ public class NocService {
                                 .build()
                 ).toList();
 
-        if (!CollectionUtils.isEmpty(usersToRevoke)) {
+        if (CollectionUtils.isNotEmpty(usersToRevoke)) {
             nocCcdService.revokeCaseAssignments(adminUserService.getAdminUserToken(),
                     CaseUserAssignmentData.builder().caseUserAssignments(usersToRevoke).build());
         }

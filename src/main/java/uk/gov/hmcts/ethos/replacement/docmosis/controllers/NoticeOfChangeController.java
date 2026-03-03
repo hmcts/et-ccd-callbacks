@@ -44,9 +44,6 @@ public class NoticeOfChangeController {
     public ResponseEntity<CCDCallbackResponse> handleAboutToSubmit(
             @RequestHeader("Authorization") String userToken,
             @RequestBody CallbackRequest callbackRequest) throws IOException {
-        if (!verifyTokenService.isTokenSignatureValid(userToken)) {
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
         CaseData caseData = noCRepresentativeService
                 .updateRepresentation(callbackRequest.getCaseDetails(), userToken);
         callbackRequest.getCaseDetails().setCaseData(caseData);
@@ -62,8 +59,6 @@ public class NoticeOfChangeController {
     public GenericCallbackResponse nocSubmitted(
             @RequestHeader("Authorization") String userToken,
             @RequestBody CallbackRequest callbackRequest) {
-
-        verifyTokenService.isTokenSignatureValid(userToken);
         GenericCallbackResponse callbackResponse = new GenericCallbackResponse();
 
         if (APPLY_NOC_DECISION.equals(callbackRequest.getEventId())) {

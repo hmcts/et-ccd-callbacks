@@ -352,6 +352,29 @@ public class NocNotificationService {
         return organisationResponse.getBody().getSuperUser().getEmail();
     }
 
+    /**
+     * Resolves the email address of the claimant representative organisation's superuser
+     * for the given case and Notice of Change (NoC) type.
+     *
+     * <p>The resolution process performs the following steps:
+     * <ol>
+     *     <li>Validates that the provided {@link CaseDetails} is suitable for notification processing.</li>
+     *     <li>Extracts the claimant representative organisation ID from the case data.</li>
+     *     <li>Retrieves the organisation details using the organisation ID.</li>
+     *     <li>Verifies that the organisation superuser email can be resolved.</li>
+     *     <li>Returns the superuser’s email address if all validations pass.</li>
+     * </ol>
+     *
+     * <p>If any validation step fails (e.g. invalid case details, missing organisation ID,
+     * unsuccessful organisation lookup, or unresolved superuser email), the method logs
+     * a warning and returns an empty string.
+     *
+     * @param caseDetails the {@link CaseDetails} containing case and representative information;
+     *                    may be {@code null}
+     * @param nocType the Notice of Change (NoC) type used for logging and validation context
+     * @return the email address of the claimant representative organisation’s superuser,
+     *         or an empty string if it cannot be resolved
+     */
     public String resolveClaimantRepresentativeOrganisationSuperuserEmail(CaseDetails caseDetails,
                                                                           String nocType) {
         if (!NotificationUtils.isCaseValidForNotification(caseDetails)) {

@@ -335,34 +335,34 @@ final class RoleUtilsTest {
         // when index is equal or greater than zero and less than ten should remove correspondent organisation policy
         RoleUtils.resetOrganisationPolicyByIndex(caseData, NumberUtils.INTEGER_ZERO);
         assertThat(caseData.getRespondentOrganisationPolicy0()).isEqualTo(OrganisationPolicy.builder()
-                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_A).organisation(Organisation.builder().build()).build());
+                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_A).build());
         RoleUtils.resetOrganisationPolicyByIndex(caseData, NumberUtils.INTEGER_ONE);
         assertThat(caseData.getRespondentOrganisationPolicy1()).isEqualTo(OrganisationPolicy.builder()
-                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_B).organisation(Organisation.builder().build()).build());
+                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_B).build());
         RoleUtils.resetOrganisationPolicyByIndex(caseData, NumberUtils.INTEGER_TWO);
         assertThat(caseData.getRespondentOrganisationPolicy2()).isEqualTo(OrganisationPolicy.builder()
-                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_C).organisation(Organisation.builder().build()).build());
+                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_C).build());
         RoleUtils.resetOrganisationPolicyByIndex(caseData, INTEGER_THREE);
         assertThat(caseData.getRespondentOrganisationPolicy3()).isEqualTo(OrganisationPolicy.builder()
-                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_D).organisation(Organisation.builder().build()).build());
+                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_D).build());
         RoleUtils.resetOrganisationPolicyByIndex(caseData, INTEGER_FOUR);
         assertThat(caseData.getRespondentOrganisationPolicy4()).isEqualTo(OrganisationPolicy.builder()
-                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_E).organisation(Organisation.builder().build()).build());
+                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_E).build());
         RoleUtils.resetOrganisationPolicyByIndex(caseData, INTEGER_FIVE);
         assertThat(caseData.getRespondentOrganisationPolicy5()).isEqualTo(OrganisationPolicy.builder()
-                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_F).organisation(Organisation.builder().build()).build());
+                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_F).build());
         RoleUtils.resetOrganisationPolicyByIndex(caseData, INTEGER_SIX);
         assertThat(caseData.getRespondentOrganisationPolicy6()).isEqualTo(OrganisationPolicy.builder()
-                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_G).organisation(Organisation.builder().build()).build());
+                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_G).build());
         RoleUtils.resetOrganisationPolicyByIndex(caseData, INTEGER_SEVEN);
         assertThat(caseData.getRespondentOrganisationPolicy7()).isEqualTo(OrganisationPolicy.builder()
-                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_H).organisation(Organisation.builder().build()).build());
+                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_H).build());
         RoleUtils.resetOrganisationPolicyByIndex(caseData, INTEGER_EIGHT);
         assertThat(caseData.getRespondentOrganisationPolicy8()).isEqualTo(OrganisationPolicy.builder()
-                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_I).organisation(Organisation.builder().build()).build());
+                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_I).build());
         RoleUtils.resetOrganisationPolicyByIndex(caseData, INTEGER_NINE);
         assertThat(caseData.getRespondentOrganisationPolicy9()).isEqualTo(OrganisationPolicy.builder()
-                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_J).organisation(Organisation.builder().build()).build());
+                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_J).build());
     }
 
     @Test
@@ -379,52 +379,52 @@ final class RoleUtilsTest {
         representative.setValue(RepresentedTypeR.builder().role(ROLE_SOLICITOR_A).build());
         RoleUtils.resetOrganisationPolicyByRepresentative(caseData, representative);
         assertThat(caseData.getRespondentOrganisationPolicy0()).isEqualTo(OrganisationPolicy.builder()
-                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_A).organisation(Organisation.builder().build()).build());
+                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_A).build());
 
         representative.setValue(RepresentedTypeR.builder().role(ROLE_SOLICITOR_B).build());
         RoleUtils.resetOrganisationPolicyByRepresentative(caseData, representative);
         assertThat(caseData.getRespondentOrganisationPolicy1()).isEqualTo(OrganisationPolicy.builder()
-                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_B).organisation(Organisation.builder().build()).build());
+                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_B).build());
 
         representative.setValue(RepresentedTypeR.builder().role(ROLE_SOLICITOR_C).build());
         RoleUtils.resetOrganisationPolicyByRepresentative(caseData, representative);
         assertThat(caseData.getRespondentOrganisationPolicy2()).isEqualTo(OrganisationPolicy.builder()
-                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_C).organisation(Organisation.builder().build()).build());
+                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_C).build());
 
         representative.setValue(RepresentedTypeR.builder().role(ROLE_SOLICITOR_D).build());
         RoleUtils.resetOrganisationPolicyByRepresentative(caseData, representative);
         assertThat(caseData.getRespondentOrganisationPolicy3()).isEqualTo(OrganisationPolicy.builder()
-                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_D).organisation(Organisation.builder().build()).build());
+                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_D).build());
 
         representative.setValue(RepresentedTypeR.builder().role(ROLE_SOLICITOR_E).build());
         RoleUtils.resetOrganisationPolicyByRepresentative(caseData, representative);
         assertThat(caseData.getRespondentOrganisationPolicy4()).isEqualTo(OrganisationPolicy.builder()
-                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_E).organisation(Organisation.builder().build()).build());
+                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_E).build());
 
         representative.setValue(RepresentedTypeR.builder().role(ROLE_SOLICITOR_F).build());
         RoleUtils.resetOrganisationPolicyByRepresentative(caseData, representative);
         assertThat(caseData.getRespondentOrganisationPolicy5()).isEqualTo(OrganisationPolicy.builder()
-                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_F).organisation(Organisation.builder().build()).build());
+                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_F).build());
 
         representative.setValue(RepresentedTypeR.builder().role(ROLE_SOLICITOR_G).build());
         RoleUtils.resetOrganisationPolicyByRepresentative(caseData, representative);
         assertThat(caseData.getRespondentOrganisationPolicy6()).isEqualTo(OrganisationPolicy.builder()
-                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_G).organisation(Organisation.builder().build()).build());
+                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_G).build());
 
         representative.setValue(RepresentedTypeR.builder().role(ROLE_SOLICITOR_H).build());
         RoleUtils.resetOrganisationPolicyByRepresentative(caseData, representative);
         assertThat(caseData.getRespondentOrganisationPolicy7()).isEqualTo(OrganisationPolicy.builder()
-                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_H).organisation(Organisation.builder().build()).build());
+                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_H).build());
 
         representative.setValue(RepresentedTypeR.builder().role(ROLE_SOLICITOR_I).build());
         RoleUtils.resetOrganisationPolicyByRepresentative(caseData, representative);
         assertThat(caseData.getRespondentOrganisationPolicy8()).isEqualTo(OrganisationPolicy.builder()
-                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_I).organisation(Organisation.builder().build()).build());
+                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_I).build());
 
         representative.setValue(RepresentedTypeR.builder().role(ROLE_SOLICITOR_J).build());
         RoleUtils.resetOrganisationPolicyByRepresentative(caseData, representative);
         assertThat(caseData.getRespondentOrganisationPolicy9()).isEqualTo(OrganisationPolicy.builder()
-                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_J).organisation(Organisation.builder().build()).build());
+                .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_J).build());
     }
 
     private static void setAllRespondentOrganisationPolicy(CaseData caseData) {

@@ -15,28 +15,28 @@ then
   echo "*************IMPORTING ENGLANDWALES CONFIG*************"
   if [[ -z "$ENGLANDWALES_CCD_CONFIG_PATH" ]]
   then
-    echo "Please set ENGLANDWALES_CCD_CONFIG_PATH environment variable to your local GitHub repo for et-ccd-definitions-englandwales"
+    echo "Please set ENGLANDWALES_CCD_CONFIG_PATH environment variable to your local GitHub repo for england-wales"
     exit 1
   fi
-  importFile="${ENGLANDWALES_CCD_CONFIG_PATH}/definitions/xlsx/et-englandwales-ccd-config-cftlib.xlsx"
+  importFile="${ENGLANDWALES_CCD_CONFIG_PATH}/xlsx/et-englandwales-ccd-config-cftlib.xlsx"
 elif [ $1 = "s" ]
 then
   echo "*************IMPORTING SCOTLAND CONFIG*************"
   if [[ -z "$SCOTLAND_CCD_CONFIG_PATH" ]]
   then
-    echo "Please set SCOTLAND_CCD_CONFIG_PATH environment variable to your local GiHub repo for et-ccd-definitions-scotland"
+    echo "Please set SCOTLAND_CCD_CONFIG_PATH environment variable to your local GiHub repo for scotland"
     exit 1
   fi
-  importFile="${SCOTLAND_CCD_CONFIG_PATH}/definitions/xlsx/et-scotland-ccd-config-cftlib.xlsx"
+  importFile="${SCOTLAND_CCD_CONFIG_PATH}/xlsx/et-scotland-ccd-config-cftlib.xlsx"
 elif [ $1 = "a" ]
 then
   echo "*************IMPORTING ADMIN CONFIG*************"
     if [[ -z "$ADMIN_CCD_CONFIG_PATH" ]]
     then
-      echo "Please set ADMIN_CCD_CONFIG_PATH environment variable to your local GiHub repo for et-ccd-definitions-admin"
+      echo "Please set ADMIN_CCD_CONFIG_PATH environment variable to your local GiHub repo for admin"
       exit 1
     fi
-    importFile="${ADMIN_CCD_CONFIG_PATH}/definitions/xlsx/et-admin-ccd-config-cftlib.xlsx"
+    importFile="${ADMIN_CCD_CONFIG_PATH}/xlsx/et-admin-ccd-config-cftlib.xlsx"
 else
   if [ $1 = "all" ]
   then
@@ -44,28 +44,28 @@ else
     echo "*************IMPORTING ADMIN CONFIG**********"
     if [[ -z "$ADMIN_CCD_CONFIG_PATH" ]]
     then
-      echo "Please set ADMIN_CCD_CONFIG_PATH environment variable to your local GiHub repo for et-ccd-definitions-admin"
+      echo "Please set ADMIN_CCD_CONFIG_PATH environment variable to your local GiHub repo for admin"
     else
-      importFile="${ADMIN_CCD_CONFIG_PATH}/definitions/xlsx/et-admin-ccd-config-cftlib.xlsx"
+      importFile="${ADMIN_CCD_CONFIG_PATH}/xlsx/et-admin-ccd-config-cftlib.xlsx"
       echo "Using CCD definition file ${importFile}"
       ${dir}/utils/ccd-import-definition.sh ${importFile}
     fi
     echo "***********IMPORTING ENGLANDWALES CONFIG***********"
     if [[ -z "$ENGLANDWALES_CCD_CONFIG_PATH" ]]
     then
-      echo "Please set ENGLANDWALES_CCD_CONFIG_PATH environment variable to your local GitHub repo for et-ccd-definitions-englandwales"
+      echo "Please set ENGLANDWALES_CCD_CONFIG_PATH environment variable to your local GitHub repo for england-wales"
     else
-      importFile="${ENGLANDWALES_CCD_CONFIG_PATH}/definitions/xlsx/et-englandwales-ccd-config-cftlib.xlsx"
+      importFile="${ENGLANDWALES_CCD_CONFIG_PATH}/xlsx/et-englandwales-ccd-config-cftlib.xlsx"
       echo "Using CCD definition file ${importFile}"
       ${dir}/utils/ccd-import-definition.sh ${importFile}
     fi
     echo "**********IMPORTING SCOTLAND CONFIG*************"
       if [[ -z "$SCOTLAND_CCD_CONFIG_PATH" ]]
       then
-        echo "Please set SCOTLAND_CCD_CONFIG_PATH environment variable to your local GiHub repo for et-ccd-definitions-scotland"
+        echo "Please set SCOTLAND_CCD_CONFIG_PATH environment variable to your local GiHub repo for scotland"
         exit 1
       else
-        importFile="${SCOTLAND_CCD_CONFIG_PATH}/definitions/xlsx/et-scotland-ccd-config-cftlib.xlsx"
+        importFile="${SCOTLAND_CCD_CONFIG_PATH}/xlsx/et-scotland-ccd-config-cftlib.xlsx"
         echo "Using CCD definition file ${importFile}"
         ${dir}/utils/ccd-import-definition.sh ${importFile}
       fi

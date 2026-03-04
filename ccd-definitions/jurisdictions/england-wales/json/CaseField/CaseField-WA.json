@@ -1,238 +1,107 @@
 [
   {
     "CaseTypeID": "ET_EnglandWales",
-    "ID": "etICJuridictionCodesInvalid",
-    "Label": "Are there any issues or instructions regarding the jurisdiction codes?",
-    "FieldType": "YesOrNo",
-    "SecurityClassification": "Public",
-    "Searchable": "N"
+    "ID": "etICAnyOtherDirectionsDividerHrLabel3",
+    "Label": "<hr>",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
-    "ID": "etICInvalidDetails",
-    "Label": "Give details",
-    "FieldType": "TextArea",
-    "SecurityClassification": "Public",
-    "Searchable": "N"
+    "ID": "etICNavigationButtonsDividerHrLabel3",
+    "Label": "<hr>",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
-    "ID": "etICCanProceed",
-    "Label": "Can the claim proceed due to an arguable claim and/or response?",
-    "FieldType": "YesOrNo",
-    "SecurityClassification": "Public",
-    "Searchable": "N"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "ID": "etICHearingAlreadyListed",
-    "Label": "Is the hearing already listed?",
-    "FieldType": "YesOrNo",
-    "SecurityClassification": "Public",
-    "Searchable": "N"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "ID": "etICHearingNotListedRespondentLabel",
+    "ID": "etICRespondentHearingListed",
     "Label": "${etInitialConsiderationRespondent}",
     "FieldType": "Label",
     "SecurityClassification": "Public"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
-    "ID": "etICHearingNotListedHearingLabel",
+    "ID": "etICHearingHearingListed",
     "Label": "${etInitialConsiderationHearing}",
     "FieldType": "Label",
     "SecurityClassification": "Public"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
-    "ID": "etICHearingNotListedJurCodesLabel",
-    "Label": "${etInitialConsiderationJurisdictionCodes}",
-    "FieldType": "Label",
-    "SecurityClassification": "Public"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "ID": "etICHearingNotListedList",
-    "Label": "Hearing not listed",
-    "HintText": "Select all that apply",
-    "FieldType": "MultiSelectList",
-    "FieldTypeParameter": "msl_etICHearingNotListed",
-    "SecurityClassification": "Public",
-    "Searchable": "N"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "ID": "etICHearingNotListedListUpdated",
-    "Label": "Hearing not listed",
-    "HintText": "Select all that apply",
-    "FieldType": "MultiSelectList",
-    "FieldTypeParameter": "msl_etICHearingNotListed_v2",
-    "SecurityClassification": "Public",
-    "Searchable": "N"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "ID": "etICHearingNotListedSeekComments",
-    "Label": "Seek comments on the video hearing",
-    "FieldType": "etICHearingNotListedSeekComments",
-    "SecurityClassification": "Public",
-    "Searchable": "N"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "ID": "etICHearingNotListedListForPrelimHearing",
-    "Label": "List for preliminary hearing",
-    "FieldType": "etICHearingNotListedListForPrelimHearing",
-    "SecurityClassification": "Public",
-    "Searchable": "N"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "ID": "etICHearingNotListedListForPrelimHearingUpdated",
-    "Label": "List for preliminary hearing",
-    "FieldType": "etICHearingNotListedListForPrelimHearingUpdated",
-    "SecurityClassification": "Public",
-    "Searchable": "N"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "ID": "etICHearingNotListedListForFinalHearing",
-    "Label": "List for final hearing",
-    "FieldType": "etICHearingNotListedListForFinalHearing",
-    "SecurityClassification": "Public",
-    "Searchable": "N"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "ID": "etICHearingNotListedListForFinalHearingUpdated",
-    "Label": "List for final hearing",
-    "FieldType": "etICHearingNotListedListForFinalHearingUpdated",
-    "SecurityClassification": "Public",
-    "Searchable": "N"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "ID": "etICHearingNotListedUDLHearing",
-    "Label": "UDL hearing",
-    "FieldType": "etICHearingNotListedUDLHearing",
-    "SecurityClassification": "Public",
-    "Searchable": "N"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "ID": "etICHearingNotListedAnyOtherDirectionsLabel",
-    "Label": "<h3>Any other directions (Optional)</h3><p>Are there any other issues or instructions to consider, or further orders to give?</p><p>This could include:</p><ul><li>Rule 49</li><li>Interpreters</li><li>Adjustments required for hearings</li><li>Further information required</li><li>Employer’s Contract Claim</li><li>Respondent’s identity</li><li>Time limits: claim or response</li></ul>",
-    "FieldType": "Label",
-    "SecurityClassification": "Public"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "ID": "etICHearingNotListedAnyOtherDirections",
-    "Label": " ",
+    "ID": "etICHearingAnyOtherDirections",
+    "Label": "Any other directions",
     "FieldType": "TextArea",
     "SecurityClassification": "Public",
     "Searchable": "N"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
-    "ID": "etICHearingListedRespondentLabel",
-    "Label": "${etInitialConsiderationRespondent}",
-    "FieldType": "Label",
-    "SecurityClassification": "Public"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "ID": "etICHearingListedHearingLabel",
-    "Label": "${etInitialConsiderationHearing}",
-    "FieldType": "Label",
-    "SecurityClassification": "Public"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "ID": "etICHearingListedJurisdictionCodesLabel",
+    "ID": "etICJurisdictionCodesHearingListed",
     "Label": "${etInitialConsiderationJurisdictionCodes}",
     "FieldType": "Label",
     "SecurityClassification": "Public"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
-    "ID": "etICFurtherInfoRespondentLabel",
-    "Label": "${etInitialConsiderationRespondent}",
+    "ID": "icEt1VettingIssuesDividerHrLabel",
+    "Label": "<hr><h2>ET1 Vetting Issues</h2>",
     "FieldType": "Label",
-    "SecurityClassification": "Public"
+    "SecurityClassification": "Public",
+    "Searchable": "N"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
-    "ID": "etICFurtherInfoHearingLabel",
-    "Label": "${etInitialConsiderationHearing}",
+    "ID": "icEt1VettingIssuesBottomDividerHrLabel",
+    "Label": "<hr>",
     "FieldType": "Label",
-    "SecurityClassification": "Public"
+    "SecurityClassification": "Public",
+    "Searchable": "N"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
-    "ID": "etICFurtherInfoJurisdictionCodesLabel",
-    "Label": "${etInitialConsiderationJurisdictionCodes}",
+    "ID": "icEt3IsThereAnEt3ResponseLabel",
+    "Label": "${et3IsThereAnEt3Response}",
     "FieldType": "Label",
-    "SecurityClassification": "Public"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "ID": "etICHearingListedAnswers",
-    "Label": "Hearing already listed",
-    "FieldType": "etICHearingListedAnswers",
     "SecurityClassification": "Public",
     "Searchable": "N"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
-    "ID": "etICFurtherInformation",
-    "Label": "Further information",
-    "HintText": "Select all that apply",
-    "FieldType": "MultiSelectList",
-    "FieldTypeParameter": "msl_furtherInformation",
-    "SecurityClassification": "Public",
-    "Searchable": "N"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "ID": "etICFurtherInfoAnswers",
-    "Label": "Further information required",
-    "FieldType": "etICFurtherInfoAnswers",
-    "SecurityClassification": "Public",
-    "Searchable": "N"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "ID": "etInitialConsiderationRule27",
-    "Label": "Issue Rule 28 Notice and order",
-    "FieldType": "etInitialConsiderationRule27",
-    "SecurityClassification": "Public",
-    "Searchable": "N"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "ID": "etInitialConsiderationRule28",
-    "Label": "Issue Rule 29 Notice and order",
-    "FieldType": "etInitialConsiderationRule28",
-    "SecurityClassification": "Public",
-    "Searchable": "N"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "ID": "etICFurtherInformationHearingAnyOtherDirectionsLabel",
-    "Label": "<h3>Any other directions (Optional)</h3><p>Are there any other issues or instructions to consider, or further orders to give?</p><p>This could include:</p><ul><li>Rule 49</li><li>Interpreters</li><li>Adjustments required for hearings</li><li>Further information required</li><li>Employer’s Contract Claim</li><li>Respondent’s identity</li><li>Time limits: claim or response</li></ul>",
-    "FieldType": "Label",
-    "SecurityClassification": "Public"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "ID": "etICFurtherInformationHearingAnyOtherDirections",
-    "Label": " ",
+    "ID": "etICFurtherInformationGiveDetails",
+    "Label": "Give details to include in the letter",
     "FieldType": "TextArea",
     "SecurityClassification": "Public",
     "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "etICFurtherInformationTimeToComply",
+    "Label": "How much time to comply?",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "etICHearingFurtherInfo",
+    "Label": "${etInitialConsiderationHearing}",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "etICJurisdictionCodesFurtherInfo",
+    "Label": "${etInitialConsiderationJurisdictionCodes}",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "etICRespondentFurtherInfo",
+    "Label": "${etInitialConsiderationRespondent}",
+    "FieldType": "Label",
+    "SecurityClassification": "Public"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
@@ -240,13 +109,6 @@
     "Label": "### Initial Consideration",
     "FieldType": "Label",
     "SecurityClassification": "PUBLIC"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "ID": "initialConsiderationBeforeYouStart",
-    "Label": "To help you complete this, <a href=\"/cases/case-details/${[CASE_REFERENCE]}#Documents\" target=\"_blank\">open the ET1 vetting form or other documents in the Documents tab (opens in new tab).</a>",
-    "FieldType": "Label",
-    "SecurityClassification": "Public"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
@@ -296,33 +158,6 @@
   {
     "CaseTypeID": "ET_EnglandWales",
     "ID": "icAllDocumentCollection",
-    "Label": "Upload document",
-    "FieldType": "Collection",
-    "FieldTypeParameter": "icDocumentUpload",
-    "SecurityClassification": "Public",
-    "Searchable": "N"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "ID": "icDocumentCollection1",
-    "Label": "Upload document",
-    "FieldType": "Collection",
-    "FieldTypeParameter": "icDocumentUpload",
-    "SecurityClassification": "Public",
-    "Searchable": "N"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "ID": "icDocumentCollection2",
-    "Label": "Upload document",
-    "FieldType": "Collection",
-    "FieldTypeParameter": "icDocumentUpload",
-    "SecurityClassification": "Public",
-    "Searchable": "N"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "ID": "icDocumentCollection3",
     "Label": "Upload document",
     "FieldType": "Collection",
     "FieldTypeParameter": "icDocumentUpload",

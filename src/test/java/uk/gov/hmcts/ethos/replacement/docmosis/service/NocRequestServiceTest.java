@@ -10,6 +10,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocCcdService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocNotificationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRequestNotificationService;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -22,7 +23,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 class NocRequestServiceTest {
 
     @Mock
-    private NocNotificationService nocNotificationService;
+    private NocRequestNotificationService nocRequestNotificationService;
     @InjectMocks
     private NocCcdService nocCcdService;
     @InjectMocks
@@ -48,14 +49,14 @@ class NocRequestServiceTest {
 
         nocRequestService.revokeClaimantLegalRep(caseDetails, USER_TOKEN);
 
-        verify(nocNotificationService)
+        verify(nocRequestNotificationService)
             .sendClaimantNocRequestEmailToOrgAdmin(eq(caseDetails), any(RepresentedTypeC.class));
-        verify(nocNotificationService)
+        verify(nocRequestNotificationService)
             .sendClaimantNocRequestEmailToRemovedLegalRep(eq(caseDetails), any(RepresentedTypeC.class));
-        verify(nocNotificationService)
+        verify(nocRequestNotificationService)
             .sendClaimantNocRequestEmailToUnrepresentedParty(eq(caseDetails), any(RepresentedTypeC.class));
-        verify(nocNotificationService)
+        verify(nocRequestNotificationService)
             .sendClaimantNocRequestEmailToOtherParty(eq(caseDetails));
-        verifyNoMoreInteractions(nocNotificationService);
+        verifyNoMoreInteractions(nocRequestNotificationService);
     }
 }

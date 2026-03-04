@@ -7,7 +7,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocCcdService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocNotificationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRequestNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.ClaimantRepresentativeUtils;
 
 @Slf4j
@@ -16,7 +16,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.ClaimantRepresentativeU
 public class NocRequestService {
 
     private final NocCcdService nocCcdService;
-    private final NocNotificationService nocNotificationService;
+    private final NocRequestNotificationService nocRequestNotificationService;
 
     public void revokeClaimantLegalRep(CaseDetails caseDetails, String userToken) {
         // create a copy of existing claimant legal rep details
@@ -27,13 +27,13 @@ public class NocRequestService {
         ClaimantRepresentativeUtils.markClaimantAsUnrepresented(caseDetails.getCaseData());
 
         // send email to organisation admin
-        nocNotificationService.sendClaimantNocRequestEmailToOrgAdmin(caseDetails, repCopy);
+        nocRequestNotificationService.sendClaimantNocRequestEmailToOrgAdmin(caseDetails, repCopy);
         // send email to removed legal rep
-        nocNotificationService.sendClaimantNocRequestEmailToRemovedLegalRep(caseDetails, repCopy);
+        nocRequestNotificationService.sendClaimantNocRequestEmailToRemovedLegalRep(caseDetails, repCopy);
         // send email to unrepresented party, i.e. claimant
-        nocNotificationService.sendClaimantNocRequestEmailToUnrepresentedParty(caseDetails, repCopy);
+        nocRequestNotificationService.sendClaimantNocRequestEmailToUnrepresentedParty(caseDetails, repCopy);
         // send email to other party, i.e. respondents
-        nocNotificationService.sendClaimantNocRequestEmailToOtherParty(caseDetails);
+        nocRequestNotificationService.sendClaimantNocRequestEmailToOtherParty(caseDetails);
     }
 
     private static RepresentedTypeC getRepTrueCopy(CaseDetails caseDetails) {

@@ -138,7 +138,7 @@ public final class NotificationUtils {
     }
 
     public static boolean canFindOrganisationSuperuserEmail(ResponseEntity<RetrieveOrgByIdResponse> orgResponse) {
-        return !ObjectUtils.isEmpty(orgResponse)
+        return ObjectUtils.isNotEmpty(orgResponse)
                 && orgResponse.getStatusCode().is2xxSuccessful()
                 && ObjectUtils.isNotEmpty(orgResponse.getBody())
                 && ObjectUtils.isNotEmpty(orgResponse.getBody().getSuperUser())

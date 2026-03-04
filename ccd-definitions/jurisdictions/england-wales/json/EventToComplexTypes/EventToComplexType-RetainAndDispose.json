@@ -1,0 +1,62 @@
+[
+  {
+    "ID": "ManageCaseTTL",
+    "CaseEventID": "manageCaseTTL",
+    "CaseFieldID": "TTL",
+    "ListElementCode": "SystemTTL",
+    "EventElementLabel": "System TTL",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "ManageCaseTTL",
+    "CaseEventID": "manageCaseTTL",
+    "CaseFieldID": "TTL",
+    "ListElementCode": "OverrideTTL",
+    "EventElementLabel": "Override TTL",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "ManageCaseTTL",
+    "CaseEventID": "manageCaseTTL",
+    "CaseFieldID": "TTL",
+    "ListElementCode": "Suspended",
+    "EventElementLabel": "Suspend Deletion",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "amendCaseDetailsTtl",
+    "CaseEventID": "amendCaseDetails",
+    "CaseFieldID": "TTL",
+    "ListElementCode": "Suspended",
+    "DefaultValue": "Yes",
+    "EventElementLabel": "Do you want to suspend case deletion?",
+    "EventHintText": "By default, a closed case will be deleted after 365 days. As this case if flagged for a live appeal/speak to REJ, the case can be retained if there is still action pending.",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "amendCaseDetailsClosedTtl",
+    "CaseEventID": "amendCaseDetailsClosed",
+    "CaseFieldID": "TTL",
+    "ListElementCode": "Suspended",
+    "DefaultValue": "Yes",
+    "EventElementLabel": "Do you want to suspend case deletion?",
+    "EventHintText": "By default, a closed case will be deleted after 365 days. As this case if flagged for a live appeal/speak to REJ, the case can be retained if there is still action pending",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY"
+  },
+  {
+    "ID": "disposeCaseTTL",
+    "CaseEventID": "disposeCase",
+    "CaseFieldID": "TTL",
+    "ListElementCode": "Suspended",
+    "DefaultValue": "Yes",
+    "EventElementLabel": "Do you want to suspend case deletion?",
+    "EventHintText": "By default, a closed case will be deleted after 365 days. If you want to retain the case, select 'Yes'. If you want to delete the case, select 'No'.",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "MANDATORY"
+  }
+]

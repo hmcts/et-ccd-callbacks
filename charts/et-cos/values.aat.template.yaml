@@ -44,4 +44,4 @@ ccd-case-document-am-api:
 xui-mo-webapp:
   enabled: false
 xui-ao-webapp:
-    enabled: false
+  enabled: false

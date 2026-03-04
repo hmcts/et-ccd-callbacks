@@ -1,6 +1,7 @@
 java:
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN}
+  enabled: true
 
 ccd:
   enabled: false

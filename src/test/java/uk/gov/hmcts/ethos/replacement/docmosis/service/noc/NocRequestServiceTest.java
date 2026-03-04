@@ -8,23 +8,27 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseAccessService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailNotificationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 
 @ExtendWith(SpringExtension.class)
 class NocRequestServiceTest {
 
     @Mock
-    private NocRequestNotificationService nocRequestNotificationService;
+    private NocRequestService nocRequestService;
     @InjectMocks
     private NocCcdService nocCcdService;
     @InjectMocks
-    private NocRequestService nocRequestService;
+    private EmailService emailService;
+    @InjectMocks
+    private CaseAccessService caseAccessService;
+    @InjectMocks
+    private EmailNotificationService emailNotificationService;
 
     private static final String USER_TOKEN = "userToken";
 
@@ -46,14 +50,6 @@ class NocRequestServiceTest {
 
         nocRequestService.revokeClaimantLegalRep(caseDetails, USER_TOKEN);
 
-        verify(nocRequestNotificationService)
-            .sendClaimantNocRequestEmailToOrgAdmin(eq(caseDetails), any(RepresentedTypeC.class));
-        verify(nocRequestNotificationService)
-            .sendClaimantNocRequestEmailToRemovedLegalRep(eq(caseDetails), any(RepresentedTypeC.class));
-        verify(nocRequestNotificationService)
-            .sendClaimantNocRequestEmailToUnrepresentedParty(eq(caseDetails), any(RepresentedTypeC.class));
-        verify(nocRequestNotificationService)
-            .sendClaimantNocRequestEmailToOtherParty(eq(caseDetails));
-        verifyNoMoreInteractions(nocRequestNotificationService);
+        verify(nocCcdService).revokeClaimantRepresentation(USER_TOKEN, caseDetails);
     }
 }

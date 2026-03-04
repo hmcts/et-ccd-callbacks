@@ -18,6 +18,7 @@ public final class GenericConstants {
     public static final String ERROR_EMAIL_NOT_FOUND = "Email not found. Error message: {}";
     public static final String WARNING_CLAIMANT_EMAIL_NOT_FOUND = "Claimant email not found for case {}";
     public static final String EMPTY_LOWERCASE = "empty";
+    public static final String QUERY_LABELS = "QUERY Labels: {}";
 
     private GenericConstants() {
         // Final classes should not have a public or default constructor.

@@ -18,14 +18,12 @@ import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.generic.GenericCallbackResponse;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.CcdCaseAssignment;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRepresentativeService;
 
 import java.io.IOException;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
@@ -33,7 +31,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequiredArgsConstructor
 @Slf4j
 public class NoticeOfChangeController {
-    private final VerifyTokenService verifyTokenService;
     private final NocNotificationService nocNotificationService;
     private final NocRepresentativeService noCRepresentativeService;
     private final CcdCaseAssignment ccdCaseAssignment;

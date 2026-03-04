@@ -39,7 +39,7 @@ class VerifyTokenServiceServiceTest {
             + "lbbWU6Mi5lWI19q2AS9jGcK5U4hcIU06JzoWGsh-Ob1xkq7VtJKyrOSiUth-SjY5PqQzjvpuEO8Mr"
             + "LWTI0sCaWRHbmbF0bHICGO17bQ42_PfTHgza4A";
 
-    private static final String EXPECTED_ERROR_INVALID_TOKEN = "Invalid Token " + INVALID_USER_TOKEN;
+    private static final String EXPECTED_ERROR_INVALID_TOKEN = "Token validation error:";
 
     @Mock
     JWSVerifierFactory jwsVerifierFactory;
@@ -64,6 +64,6 @@ class VerifyTokenServiceServiceTest {
     void theIsTokenSignatureValid() {
         // when token is invalid should return false and log invalid token error
         assertThat(verifyTokenService.isTokenSignatureValid(INVALID_USER_TOKEN)).isFalse();
-        LoggerTestUtils.checkLog(Level.ERROR, LoggerTestUtils.INTEGER_THREE, EXPECTED_ERROR_INVALID_TOKEN);
+        LoggerTestUtils.checkLog(Level.ERROR, LoggerTestUtils.INTEGER_TWO, EXPECTED_ERROR_INVALID_TOKEN);
     }
 }

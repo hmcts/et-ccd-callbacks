@@ -20,6 +20,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.ClaimantRepresentativeU
 import java.util.List;
 import java.util.Map;
 
+import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_TYPE_REMOVAL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_ORGANISATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_TO_REMOVED_REPRESENTATIVE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_TO_UNREPRESENTED_PARTY;
@@ -34,6 +36,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHel
 public class NocRequestService {
 
     private final NocCcdService nocCcdService;
+    private final NocNotificationService nocNotificationService;
     private final EmailService emailService;
     private final CaseAccessService caseAccessService;
     private final EmailNotificationService emailNotificationService;
@@ -83,8 +86,9 @@ public class NocRequestService {
     }
 
     private void sendClaimantNocRequestEmailToOrgAdmin(CaseDetails caseDetails, RepresentedTypeC representedTypeC) {
-        String organisationEmail = getOrganisationEmailWithID(representedTypeC);
-        if (organisationEmail == null) {
+        String organisationEmail = nocNotificationService.resolveClaimantRepresentativeOrganisationSuperuserEmail(
+            caseDetails, NOC_TYPE_REMOVAL);
+        if (isNullOrEmpty(organisationEmail)) {
             return;
         }
 

@@ -1,0 +1,10 @@
+[
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "TTL",
+    "Label": "Case Deletion",
+    "FieldType": "TTL",
+    "SecurityClassification": "Public",
+    "Searchable": "Y"
+  }
+]

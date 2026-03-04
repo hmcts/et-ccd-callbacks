@@ -21,7 +21,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_TYPE_REMOVAL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_ORGANISATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_TO_REMOVED_REPRESENTATIVE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_TO_UNREPRESENTED_PARTY;
@@ -86,8 +85,8 @@ public class NocRequestService {
     }
 
     private void sendClaimantNocRequestEmailToOrgAdmin(CaseDetails caseDetails, RepresentedTypeC representedTypeC) {
-        String organisationEmail = nocNotificationService.resolveClaimantRepresentativeOrganisationSuperuserEmail(
-            caseDetails, NOC_TYPE_REMOVAL);
+        String organisationEmail =
+            nocNotificationService.findClaimantRepOrgSuperUserEmail(representedTypeC);
         if (isNullOrEmpty(organisationEmail)) {
             return;
         }

@@ -1,0 +1,7132 @@
+[
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Awaiting appeal judgment",
+    "ListElement": "Awaiting appeal judgment",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Awaiting appeal order",
+    "ListElement": "Awaiting appeal order",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Awaiting copy of improvement or prohibition notice",
+    "ListElement": "Awaiting copy of improvement or prohibition notice",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Awaiting default judgment",
+    "ListElement": "Awaiting default judgment",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Awaiting default judgment reconsideration",
+    "ListElement": "Awaiting default judgment reconsideration",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Awaiting discovery/inspection",
+    "ListElement": "Awaiting discovery/inspection",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Awaiting disposal of claim application",
+    "ListElement": "Awaiting disposal of claim application",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Awaiting draft judgment from chairman",
+    "ListElement": "Awaiting draft judgment from Judge",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Awaiting ET3",
+    "ListElement": "Awaiting ET3",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Awaiting ET3 - extension of time granted",
+    "ListElement": "Awaiting ET3 - extension of time granted",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Awaiting ET3 (c)",
+    "ListElement": "Awaiting ET3 (c)",
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Awaiting further and better particulars",
+    "ListElement": "Awaiting further and better particulars",
+    "DisplayOrder": 12
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Awaiting instructions from chairman",
+    "ListElement": "Awaiting instructions from Judge",
+    "DisplayOrder": 13
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Awaiting judgment being sent to the parties, other",
+    "ListElement": "Awaiting judgment being sent to the parties, other",
+    "DisplayOrder": 14
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Awaiting listing for Preliminary Hearing",
+    "ListElement": "Awaiting listing for Preliminary Hearing",
+    "DisplayOrder": 15
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Awaiting listing for preliminary hearing(CM)",
+    "ListElement": "Awaiting listing for preliminary hearing(CM)",
+    "DisplayOrder": 16
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Awaiting listing Hearing",
+    "ListElement": "Awaiting listing Hearing",
+    "DisplayOrder": 17
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Awaiting listing reconsideration application",
+    "ListElement": "Awaiting listing reconsideration application",
+    "DisplayOrder": 18
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Awaiting listing remedy/costs hearing",
+    "ListElement": "Awaiting listing remedy/costs hearing",
+    "DisplayOrder": 19
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Awaiting outside proceeding",
+    "ListElement": "Awaiting outside proceeding",
+    "DisplayOrder": 20
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Awaiting reply to a pre-listing stencil",
+    "ListElement": "Awaiting reply to a pre-listing stencil",
+    "DisplayOrder": 21
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Awaiting settlement confirmation",
+    "ListElement": "Awaiting settlement confirmation",
+    "DisplayOrder": 22
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Awaiting withdrawal confirmation",
+    "ListElement": "Awaiting withdrawal confirmation",
+    "DisplayOrder": 23
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Awaiting written answer",
+    "ListElement": "Awaiting written answer",
+    "DisplayOrder": 24
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Awaiting written reasons",
+    "ListElement": "Awaiting written reasons",
+    "DisplayOrder": 25
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Case closed",
+    "ListElement": "Case closed",
+    "DisplayOrder": 26
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Case input in error",
+    "ListElement": "Case input in error",
+    "DisplayOrder": 27
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Case transferred - other country",
+    "ListElement": "Case transferred - other country",
+    "DisplayOrder": 28
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Case transferred - same country",
+    "ListElement": "Case transferred - same country",
+    "DisplayOrder": 29
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Conciliation paused",
+    "ListElement": "Conciliation paused",
+    "DisplayOrder": 30
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Draft judgment received, awaiting typing",
+    "ListElement": "Draft judgment received, awaiting typing",
+    "DisplayOrder": 31
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Draft judgment typed, to chairman for amendment",
+    "ListElement": "Draft judgment typed, to Judge for amendment",
+    "DisplayOrder": 32
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Draft with members",
+    "ListElement": "Draft with members",
+    "DisplayOrder": 33
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "ET1 Online submission",
+    "ListElement": "ET1 Online submission",
+    "DisplayOrder": 34
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "ET3 receiving attention",
+    "ListElement": "ET3 receiving attention",
+    "DisplayOrder": 35
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "ET3 referred to chairman",
+    "ListElement": "ET3 referred to Judge",
+    "DisplayOrder": 36
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Fair copy, to chairman for signature",
+    "ListElement": "Fair copy, to Judge for signature",
+    "DisplayOrder": 37
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Fixed period of conciliation",
+    "ListElement": "Fixed period of conciliation",
+    "DisplayOrder": 38
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Heard awaiting judgment being sent to the parties",
+    "ListElement": "Heard awaiting judgment being sent to the parties",
+    "DisplayOrder": 39
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Listed for a Hearing",
+    "ListElement": "Listed for a Hearing",
+    "DisplayOrder": 40
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Listed for a interim relief hearing",
+    "ListElement": "Listed for a interim relief hearing",
+    "DisplayOrder": 41
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Listed for a preliminary hearing",
+    "ListElement": "Listed for a preliminary hearing",
+    "DisplayOrder": 42
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Listed for a preliminary hearing(CM)",
+    "ListElement": "Listed for a preliminary hearing(CM)",
+    "DisplayOrder": 43
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Listed for a reconsideration hearing",
+    "ListElement": "Listed for a reconsideration hearing",
+    "DisplayOrder": 44
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Listed for a remedy/costs hearing",
+    "ListElement": "Listed for a remedy/costs hearing",
+    "DisplayOrder": 45
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Live EAT case",
+    "ListElement": "Live EAT case",
+    "DisplayOrder": 46
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Manually Created",
+    "ListElement": "Manually created",
+    "DisplayOrder": 47
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Part heard awaiting listing",
+    "ListElement": "Part heard awaiting listing",
+    "DisplayOrder": 48
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Part heard case relisted",
+    "ListElement": "Part heard case relisted",
+    "DisplayOrder": 49
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Postponed by tribunal awaiting listing",
+    "ListElement": "Postponed by tribunal awaiting listing",
+    "DisplayOrder": 50
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Received by Auto-Import",
+    "ListElement": "Received by Auto-Import",
+    "DisplayOrder": 51
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "REJECTED",
+    "ListElement": "Rejected",
+    "DisplayOrder": 52
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Revised draft received, awaiting typing",
+    "ListElement": "Revised draft received, awaiting typing",
+    "DisplayOrder": 53
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Settled awaiting notification being sent to the parties",
+    "ListElement": "Settled awaiting notification being sent to the parties",
+    "DisplayOrder": 54
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Signed fair copy received",
+    "ListElement": "Signed fair copy received",
+    "DisplayOrder": 55
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Striking out warning issued",
+    "ListElement": "Striking out warning issued",
+    "DisplayOrder": 56
+  },
+  {
+    "ID": "fl_Position",
+    "ListElementCode": "Withdrawn awaiting notification being sent to the parties",
+    "ListElement": "Withdrawn awaiting notification being sent to the parties",
+    "DisplayOrder": 57
+  },
+  {
+    "ID": "fl_PositionCT",
+    "ListElementCode": "Case transferred - same country",
+    "ListElement": "Case transferred - same country",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_PositionCT",
+    "ListElementCode": "Case transferred - other country",
+    "ListElement": "Case transferred - other country",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "caseSourceList",
+    "ListElementCode": "ET1 Online",
+    "ListElement": "ET1 Online",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "caseSourceList",
+    "ListElementCode": "Manually Created",
+    "ListElement": "Manually Created",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "caseSourceList",
+    "ListElementCode": "Migration",
+    "ListElement": "Migration",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "caseSourceList",
+    "ListElementCode": "ECC",
+    "ListElement": "ECC",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "caseSourceList",
+    "ListElementCode": "MyHMCTS",
+    "ListElement": "MyHMCTS",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_CaseType",
+    "ListElementCode": "Single",
+    "ListElement": "Single",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_CaseType",
+    "ListElementCode": "Multiple",
+    "ListElement": "Multiple",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "frl_ClaimantType",
+    "ListElementCode": "Individual",
+    "ListElement": "Individual",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "frl_ClaimantType",
+    "ListElementCode": "Company",
+    "ListElement": "Company",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_Title",
+    "ListElementCode": "Mr",
+    "ListElement": "Mr",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_Title",
+    "ListElementCode": "Mrs",
+    "ListElement": "Mrs",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_Title",
+    "ListElementCode": "Miss",
+    "ListElement": "Miss",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_Title",
+    "ListElementCode": "Ms",
+    "ListElement": "Ms",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_Title",
+    "ListElementCode": "Mx",
+    "ListElement": "Mx",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_PreferredTitle",
+    "ListElementCode": "Mr",
+    "ListElement": "Mr",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_PreferredTitle",
+    "ListElementCode": "Mrs",
+    "ListElement": "Mrs",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_PreferredTitle",
+    "ListElementCode": "Miss",
+    "ListElement": "Miss",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_PreferredTitle",
+    "ListElementCode": "Ms",
+    "ListElement": "Ms",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_PreferredTitle",
+    "ListElementCode": "Mx",
+    "ListElement": "Mx",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_PreferredTitle",
+    "ListElementCode": "Other",
+    "ListElement": "Other",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "fl_PreferredTitle",
+    "ListElementCode": "Prefer not to say",
+    "ListElement": "Prefer not to say",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "fl_Title",
+    "ListElementCode": "Dr",
+    "ListElement": "Dr",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "fl_Title",
+    "ListElementCode": "Prof",
+    "ListElement": "Prof",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "fl_Title",
+    "ListElementCode": "Sir",
+    "ListElement": "Sir",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "fl_Title",
+    "ListElementCode": "Lord",
+    "ListElement": "Lord",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "fl_Title",
+    "ListElementCode": "Lady",
+    "ListElement": "Lady",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "fl_Title",
+    "ListElementCode": "Dame",
+    "ListElement": "Dame",
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "fl_Title",
+    "ListElementCode": "Capt",
+    "ListElement": "Capt",
+    "DisplayOrder": 12
+  },
+  {
+    "ID": "fl_Title",
+    "ListElementCode": "Rev",
+    "ListElement": "Rev",
+    "DisplayOrder": 13
+  },
+  {
+    "ID": "fl_Title",
+    "ListElementCode": "Other ",
+    "ListElement": "Other ",
+    "DisplayOrder": 14
+  },
+  {
+    "ID": "fl_Title",
+    "ListElementCode": "N/K",
+    "ListElement": "N/K",
+    "DisplayOrder": 15
+  },
+  {
+    "ID": "fl_Gender",
+    "ListElementCode": "Male",
+    "ListElement": "Male",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_Gender",
+    "ListElementCode": "Female",
+    "ListElement": "Female",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_Gender",
+    "ListElementCode": "Not Known",
+    "ListElement": "Not Known",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_Gender",
+    "ListElementCode": "Non-binary",
+    "ListElement": "Non-binary",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_Sex",
+    "ListElementCode": "Male",
+    "ListElement": "Male",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_Sex",
+    "ListElementCode": "Female",
+    "ListElement": "Female",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_Sex",
+    "ListElementCode": "Prefer not to say",
+    "ListElement": "Prefer not to say",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_YesOrNoOrPreferNot",
+    "ListElementCode": "Yes",
+    "ListElement": "Yes",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_YesOrNoOrPreferNot",
+    "ListElementCode": "No",
+    "ListElement": "No",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_YesOrNoOrPreferNot",
+    "ListElementCode": "Prefer not to say",
+    "ListElement": "Prefer not to say",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_StillWorking",
+    "ListElementCode": "Working",
+    "ListElement": "Working",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_StillWorking",
+    "ListElementCode": "Notice",
+    "ListElement": "Notice",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_StillWorking",
+    "ListElementCode": "No longer working",
+    "ListElement": "No longer working",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_RepresentativeContact",
+    "ListElementCode": "Email",
+    "ListElement": "Email",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_RepresentativeContact",
+    "ListElementCode": "DX Number",
+    "ListElement": "DX Number",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_RepresentativeContact",
+    "ListElementCode": "Post",
+    "ListElement": "Post",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_RepresentativeOccupation",
+    "ListElementCode": "Solicitor",
+    "ListElement": "Solicitor",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_RepresentativeOccupation",
+    "ListElementCode": "CAB",
+    "ListElement": "CAB",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_RepresentativeOccupation",
+    "ListElementCode": "FRU",
+    "ListElement": "FRU",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_RepresentativeOccupation",
+    "ListElementCode": "Law Centre",
+    "ListElement": "Law Centre",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_RepresentativeOccupation",
+    "ListElementCode": "Union",
+    "ListElement": "Union",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_RepresentativeOccupation",
+    "ListElementCode": "Private Individual",
+    "ListElement": "Private Individual",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "fl_RepresentativeOccupation",
+    "ListElementCode": "Trade Association",
+    "ListElement": "Trade Association",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "fl_RepresentativeOccupation",
+    "ListElementCode": "In-house Representative",
+    "ListElement": "In-house Representative",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "fl_RepresentativeOccupation",
+    "ListElementCode": "Liquidator",
+    "ListElement": "Liquidator",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "fl_RepresentativeOccupation",
+    "ListElementCode": "Administrator",
+    "ListElement": "Administrator",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "fl_RepresentativeOccupation",
+    "ListElementCode": "Trustee",
+    "ListElement": "Trustee",
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "fl_RepresentativeOccupation",
+    "ListElementCode": "Other",
+    "ListElement": "Other",
+    "DisplayOrder": 12
+  },
+  {
+    "ID": "fl_ContactPreference",
+    "ListElementCode": "Email",
+    "ListElement": "Email",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_ContactPreference",
+    "ListElementCode": "Post",
+    "ListElement": "Post",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_HearingPanelPreference",
+    "ListElementCode": "No preference",
+    "ListElement": "No preference",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_HearingPanelPreference",
+    "ListElementCode": "Judge",
+    "ListElement": "Judge",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_HearingPanelPreference",
+    "ListElementCode": "Panel",
+    "ListElement": "Panel",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_languages",
+    "ListElementCode": "English",
+    "ListElement": "English",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_languages",
+    "ListElementCode": "Welsh",
+    "ListElement": "Welsh",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "msl_PreAcceptanceResponse",
+    "ListElementCode": "Not on Prescribed Form",
+    "ListElement": "Not on Prescribed Form",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "msl_PreAcceptanceResponse",
+    "ListElementCode": "Required Info. Absent",
+    "ListElement": "Required Info. Absent",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "msl_PreAcceptanceResponse",
+    "ListElementCode": "No Jurisdiction",
+    "ListElement": "No Jurisdiction",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "msl_PreAcceptanceResponse",
+    "ListElementCode": "Admissibility  (Not applicable to dismissal only claims)",
+    "ListElement": "Admissibility  (Not applicable to dismissal only claims)",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "msl_PreAcceptanceResponse",
+    "ListElementCode": "Defect",
+    "ListElement": "Defect",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_Conciliation",
+    "ListElementCode": "No Conciliation",
+    "ListElement": "No Track",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_Conciliation",
+    "ListElementCode": "Fast Track",
+    "ListElement": "Short Track",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_Conciliation",
+    "ListElementCode": "Standard Track",
+    "ListElement": "Standard Track",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_Conciliation",
+    "ListElementCode": "Open Track",
+    "ListElement": "Open Track",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_DocumentType",
+    "ListElementCode": "ET1",
+    "ListElement": "ET1",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_DocumentType",
+    "ListElementCode": "ET1 Attachment",
+    "ListElement": "ET1 Attachment",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_DocumentType",
+    "ListElementCode": "ACAS Certificate",
+    "ListElement": "ACAS Certificate",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_DocumentType",
+    "ListElementCode": "Acknowledgement of claim",
+    "ListElement": "Acknowledgement of claim",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_DocumentType",
+    "ListElementCode": "Notice of a claim",
+    "ListElement": "Notice of a claim",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_DocumentType",
+    "ListElementCode": "ET3",
+    "ListElement": "ET3",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "fl_DocumentType",
+    "ListElementCode": "ET3 Attachment",
+    "ListElement": "ET3 Attachment",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "fl_DocumentType",
+    "ListElementCode": "Claimant correspondence",
+    "ListElement": "Claimant correspondence",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "fl_DocumentType",
+    "ListElementCode": "Respondent correspondence",
+    "ListElement": "Respondent correspondence",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "fl_DocumentType",
+    "ListElementCode": "Notice of Hearing",
+    "ListElement": "Notice of Hearing",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "fl_DocumentType",
+    "ListElementCode": "Tribunal case file",
+    "ListElement": "Tribunal case file",
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "fl_DocumentType",
+    "ListElementCode": "Tribunal correspondence",
+    "ListElement": "Tribunal correspondence",
+    "DisplayOrder": 12
+  },
+  {
+    "ID": "fl_DocumentType",
+    "ListElementCode": "Tribunal Order/Deposit Order",
+    "ListElement": "Tribunal Order/Deposit Order",
+    "DisplayOrder": 13
+  },
+  {
+    "ID": "fl_DocumentType",
+    "ListElementCode": "Tribunal Judgment/Reasons",
+    "ListElement": "Tribunal Judgment/Reasons",
+    "DisplayOrder": 14
+  },
+  {
+    "ID": "fl_DocumentType",
+    "ListElementCode": "Referral/Judicial direction",
+    "ListElement": "Referral/Judicial direction",
+    "DisplayOrder": 15
+  },
+  {
+    "ID": "fl_DocumentType",
+    "ListElementCode": "Rejection of claim",
+    "ListElement": "Rejection of claim",
+    "DisplayOrder": 16
+  },
+  {
+    "ID": "fl_DocumentType",
+    "ListElementCode": "Other ",
+    "ListElement": "Other ",
+    "DisplayOrder": 17
+  },
+  {
+    "ID": "fl_DocumentType",
+    "ListElementCode": "Tse admin correspondence",
+    "ListElement": "Tse admin correspondence",
+    "DisplayOrder": 18
+  },
+  {
+    "ID": "fl_ResponseStatus",
+    "ListElementCode": "Accepted",
+    "ListElement": "Accepted",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_ResponseStatus",
+    "ListElementCode": "Not Received",
+    "ListElement": "Not Received",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_ResponseStatus",
+    "ListElementCode": "Not Accepted",
+    "ListElement": "Not Accepted",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_ResponseStatus",
+    "ListElementCode": "Rejected",
+    "ListElement": "Rejected",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "msl_Response",
+    "ListElementCode": "Out of Time",
+    "ListElement": "Out of Time",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "msl_Response",
+    "ListElementCode": "Not on Prescribed Form",
+    "ListElement": "Not on Prescribed Form",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "msl_Response",
+    "ListElementCode": "Required Info. Absent",
+    "ListElement": "Required Info. Absent",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "msl_Response",
+    "ListElementCode": "Other",
+    "ListElement": "Other",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "frl_ACAS",
+    "ListElementCode": "Another person",
+    "ListElement": "Another Person I'm making the claim with has an early ACAS concilication certificate number",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "frl_ACAS",
+    "ListElementCode": "No Power",
+    "ListElement": "ACAS doesn't have the power to conciliate on all or part of my claim",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "frl_ACAS",
+    "ListElementCode": "Employer already in touch",
+    "ListElement": "My employer has already been in touch with ACAS",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "frl_ACAS",
+    "ListElementCode": "Unfair Dismissal",
+    "ListElement": "My claim consists only of a claim of unfair dismissal which contains an application for interim relief",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "frl_ACAS",
+    "ListElementCode": "ECC",
+    "ListElement": "Claim type is Employer Contract Claim",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_et3Struckout",
+    "ListElementCode": "Chairman's decision",
+    "ListElement": "Judge's decision",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_et3Struckout",
+    "ListElementCode": "Entered in error",
+    "ListElement": "Entered in error",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_Hearing",
+    "ListElementCode": "Costs Hearing",
+    "ListElement": "Costs Hearing",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_Hearing",
+    "ListElementCode": "Hearing",
+    "ListElement": "Hearing",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_Hearing",
+    "ListElementCode": "Preliminary Hearing",
+    "ListElement": "Preliminary Hearing",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_Hearing",
+    "ListElementCode": "Preliminary Hearing(CM)",
+    "ListElement": "Preliminary Hearing (CM)",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_Hearing",
+    "ListElementCode": "Reconsideration",
+    "ListElement": "Reconsideration Hearing",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_Hearing",
+    "ListElementCode": "Remedy",
+    "ListElement": "Remedy Hearing",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "msl_HearingFormat",
+    "ListElementCode": "In person",
+    "ListElement": "In person",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "msl_HearingFormat",
+    "ListElementCode": "Telephone",
+    "ListElement": "Telephone",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "msl_HearingFormat",
+    "ListElementCode": "Video",
+    "ListElement": "Video",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "msl_HearingFormat",
+    "ListElementCode": "Hybrid",
+    "ListElement": "Hybrid",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_HearingStatus",
+    "ListElementCode": "Postponed",
+    "ListElement": "Postponed",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_HearingStatus",
+    "ListElementCode": "Heard",
+    "ListElement": "Heard",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_HearingStatus",
+    "ListElementCode": "Listed",
+    "ListElement": "Listed",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_HearingStatus",
+    "ListElementCode": "Settled",
+    "ListElement": "Settled",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_HearingStatus",
+    "ListElementCode": "Vacated",
+    "ListElement": "Vacated",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_HearingStatus",
+    "ListElementCode": "Withdrawn",
+    "ListElement": "Withdrawn",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "fl_HearingLength",
+    "ListElementCode": "Days",
+    "ListElement": "Days",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_HearingLength",
+    "ListElementCode": "Hours",
+    "ListElement": "Hours",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_HearingLength",
+    "ListElementCode": "Minutes",
+    "ListElement": "Minutes",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "frl_SitAlone",
+    "ListElementCode": "Sit Alone",
+    "ListElement": "Sit Alone",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "frl_SitAlone",
+    "ListElementCode": "Full Panel",
+    "ListElement": "Full Panel",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "frl_SitAlone",
+    "ListElementCode": "Two Judges",
+    "ListElement": "Two Judges",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_Stage",
+    "ListElementCode": "Stage 1",
+    "ListElement": "Stage 1",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_Stage",
+    "ListElementCode": "Stage 2",
+    "ListElement": "Stage 2",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_Stage",
+    "ListElementCode": "Stage 3",
+    "ListElement": "Stage 3",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_PostponedBy",
+    "ListElementCode": "Claimant",
+    "ListElement": "Claimant",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_PostponedBy",
+    "ListElementCode": "Tribunal",
+    "ListElement": "Tribunal",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_PostponedBy",
+    "ListElementCode": "Respondent",
+    "ListElement": "Respondent",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_PostponedBy",
+    "ListElementCode": "Joint",
+    "ListElement": "Joint",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_PublicPrivate",
+    "ListElementCode": "Public",
+    "ListElement": "Public",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_PublicPrivate",
+    "ListElementCode": "Private",
+    "ListElement": "Private",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_Attendee",
+    "ListElementCode": "Claimant and representative",
+    "ListElement": "Claimant and Representative",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_Attendee",
+    "ListElementCode": "Claimant only",
+    "ListElement": "Claimant only",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_Attendee",
+    "ListElementCode": "Claimant representative only",
+    "ListElement": "Claimant Representative only",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_Attendee",
+    "ListElementCode": "No attendance",
+    "ListElement": "No attendance",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_RestrictedRequestedBy",
+    "ListElementCode": "Respondent",
+    "ListElement": "Respondent",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_RestrictedRequestedBy",
+    "ListElementCode": "Claimant",
+    "ListElement": "Claimant",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_RestrictedRequestedBy",
+    "ListElementCode": "Judge",
+    "ListElement": "Judge",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_RestrictedRequestedBy",
+    "ListElementCode": "Both Parties",
+    "ListElement": "Both Parties",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_RestrictedRequestedBy",
+    "ListElementCode": "Other",
+    "ListElement": "Other",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_RestrictedRequestedBy",
+    "ListElementCode": "None",
+    "ListElement": "None",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "fl_RestrictedExcludedRegister",
+    "ListElementCode": "No",
+    "ListElement": "No",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_RestrictedExcludedRegister",
+    "ListElementCode": "Definite",
+    "ListElement": "Definite",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_RestrictedExcludedRegister",
+    "ListElementCode": "Provisional",
+    "ListElement": "Provisional",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_DepositRequestedBy",
+    "ListElementCode": "Tribunal",
+    "ListElement": "Tribunal",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_DepositRequestedBy",
+    "ListElementCode": "Claimant",
+    "ListElement": "Claimant",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_DepositRequestedBy",
+    "ListElementCode": "Respondent",
+    "ListElement": "Respondent",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_DepositCovers",
+    "ListElementCode": "All",
+    "ListElement": "All",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_DepositCovers",
+    "ListElementCode": "Part",
+    "ListElement": "Part",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_JudgmentOutcome",
+    "ListElementCode": "Not allocated",
+    "ListElement": "Not allocated",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_JudgmentOutcome",
+    "ListElementCode": "Acas conciliated settlement",
+    "ListElement": "ACAS conciliated settlement",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_JudgmentOutcome",
+    "ListElementCode": "Withdrawn or private settlement",
+    "ListElement": "Withdrawn or private settlement",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_JudgmentOutcome",
+    "ListElementCode": "Successful at hearing",
+    "ListElement": "Successful at hearing",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_JudgmentOutcome",
+    "ListElementCode": "Unsuccessful at hearing",
+    "ListElement": "Unsuccessful at hearing",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_JudgmentOutcome",
+    "ListElementCode": "Dismissed at hearing - out of scope",
+    "ListElement": "Dismissed at hearing - out of scope",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "fl_JudgmentOutcome",
+    "ListElementCode": "Disposed of / other",
+    "ListElement": "Disposed of / other",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "fl_JudgmentOutcome",
+    "ListElementCode": "Input in error",
+    "ListElement": "Input in error",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "fl_JudgmentOutcome",
+    "ListElementCode": "Default judgment, claimant successful",
+    "ListElement": "Default judgment, claimant successful",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "fl_JudgmentOutcome",
+    "ListElementCode": "Default judgment, claimant unsuccessful",
+    "ListElement": "Default judgment, claimant unsuccessful",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "fl_JudgmentOutcome",
+    "ListElementCode": "Dismissed under Rule 27",
+    "ListElement": "Dismissed under Rule 28",
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "fl_JudgmentOutcome",
+    "ListElementCode": "Dismissed on withdrawal",
+    "ListElement": "Dismissed on withdrawal",
+    "DisplayOrder": 12
+  },
+  {
+    "ID": "fl_JudgmentOutcome",
+    "ListElementCode": "Case discontinued",
+    "ListElement": "Case discontinued",
+    "DisplayOrder": 13
+  },
+  {
+    "ID": "fl_JudgmentOutcome",
+    "ListElementCode": "Struck Out",
+    "ListElement": "Struck Out",
+    "DisplayOrder": 14
+  },
+  {
+    "ID": "fl_JudgementType",
+    "ListElementCode": "Case Management",
+    "ListElement": "Case Management",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_JudgementType",
+    "ListElementCode": "Judgment",
+    "ListElement": "Judgment",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_JudgementType",
+    "ListElementCode": "Jurisdiction",
+    "ListElement": "Jurisdiction",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_JudgementType",
+    "ListElementCode": "Reserved",
+    "ListElement": "Reserved",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_JudgementType",
+    "ListElementCode": "Reconsideration ",
+    "ListElement": "Reconsideration ",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_JudgementType",
+    "ListElementCode": "Rule21",
+    "ListElement": "Rule 22",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "fl_Liability",
+    "ListElementCode": "Liability",
+    "ListElement": "Liability",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_Liability",
+    "ListElementCode": "Remedy",
+    "ListElement": "Remedy",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_Liability",
+    "ListElementCode": "Liability and Remedy",
+    "ListElement": "Liability and Remedy",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_Reinstate",
+    "ListElementCode": "Neither",
+    "ListElement": "Neither",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_Reinstate",
+    "ListElementCode": "Reengage",
+    "ListElement": "Reengage",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_Reinstate",
+    "ListElementCode": "Reinstate",
+    "ListElement": "Reinstate",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_Reinstated",
+    "ListElementCode": "Neither",
+    "ListElement": "Neither",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_Reinstated",
+    "ListElementCode": "Reengaged",
+    "ListElement": "Re-engaged",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_Reinstated",
+    "ListElementCode": "Reinstated",
+    "ListElement": "Reinstated",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_Adjustment",
+    "ListElementCode": "Mitigation (Old regs)",
+    "ListElement": "Mitigation (Old regs)",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_Adjustment",
+    "ListElementCode": "Enhancement (Old regs)",
+    "ListElement": "Enhancement (Old regs)",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_Adjustment",
+    "ListElementCode": "Mit & Enhance (Old regs)",
+    "ListElement": "Mit & Enhance (Old regs)",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_Adjustment",
+    "ListElementCode": "Increase (New regs)",
+    "ListElement": "Increase (New regs)",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_Adjustment",
+    "ListElementCode": "Decrease (New regs)",
+    "ListElement": "Decrease (New regs)",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_ClaimantOrRespondent",
+    "ListElementCode": "Claimant",
+    "ListElement": "Claimant",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_ClaimantOrRespondent",
+    "ListElementCode": "Respondent",
+    "ListElement": "Respondent",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_JudgeDirection",
+    "ListElementCode": "Application to be considered at Reconsideration hearing",
+    "ListElement": "Application to be considered at Reconsideration hearing",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_JudgeDirection",
+    "ListElementCode": "Application to be considered on the written submissions",
+    "ListElement": "Application to be considered on the written submissions",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_JudgeDirection",
+    "ListElementCode": "Application Refused",
+    "ListElement": "Application refused",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_JudgeDecision",
+    "ListElementCode": "Judgment Confirmed",
+    "ListElement": "Judgment confirmed",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_JudgeDecision",
+    "ListElementCode": "Judgment Revoked",
+    "ListElement": "Judgment revoked",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_JudgeDecision",
+    "ListElementCode": "Judgment Varied",
+    "ListElement": "Judgment varied",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_JudgeDecision",
+    "ListElementCode": "Application Refused",
+    "ListElement": "Application refused",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_BFActionsCW",
+    "ListElementCode": "Application of letter to ACAS/RPO",
+    "ListElement": "Application of letter to ACAS/RPO",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_BFActionsCW",
+    "ListElementCode": "Case listed",
+    "ListElement": "Case listed",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_BFActionsCW",
+    "ListElementCode": "Case papers prepared",
+    "ListElement": "Case papers prepared",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_BFActionsCW",
+    "ListElementCode": "Case transferred",
+    "ListElement": "Case transferred",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_BFActionsCW",
+    "ListElementCode": "Draft to members",
+    "ListElement": "Draft to members",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_BFActionsCW",
+    "ListElementCode": "Enquiry letter issued",
+    "ListElement": "Enquiry letter issued",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "fl_BFActionsCW",
+    "ListElementCode": "Enquiry letter received",
+    "ListElement": "Enquiry letter received",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "fl_BFActionsCW",
+    "ListElementCode": "Exhibits returned",
+    "ListElement": "Exhibits returned",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "fl_BFActionsCW",
+    "ListElementCode": "Interlocutory order requested",
+    "ListElement": "Interlocutory order requested",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "fl_BFActionsCW",
+    "ListElementCode": "IT3 received",
+    "ListElement": "IT3 received",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "fl_BFActionsCW",
+    "ListElementCode": "Other action",
+    "ListElement": "Other action",
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "fl_BFActionsCW",
+    "ListElementCode": "Postponement requested",
+    "ListElement": "Postponement requested",
+    "DisplayOrder": 12
+  },
+  {
+    "ID": "fl_BFActionsCW",
+    "ListElementCode": "Refer to chairman for listing instructions",
+    "ListElement": "Refer to chairman for listing instructions",
+    "DisplayOrder": 13
+  },
+  {
+    "ID": "fl_BFActionsCW",
+    "ListElementCode": "Reply to enquiry letter sent",
+    "ListElement": "Reply to enquiry letter sent",
+    "DisplayOrder": 14
+  },
+  {
+    "ID": "fl_BFActionsCW",
+    "ListElementCode": "Striking out warning issued",
+    "ListElement": "Striking out warning issued",
+    "DisplayOrder": 15
+  },
+  {
+    "ID": "fl_BFActionsCW",
+    "ListElementCode": "Witnesses recorded",
+    "ListElement": "Witnesses recorded",
+    "DisplayOrder": 16
+  },
+  {
+    "ID": "fl_HearingDocType",
+    "ListElementCode": "IT56 - List of Exhibits",
+    "ListElement": "IT56 - List of Exhibits",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_HearingDocType",
+    "ListElementCode": "ETCL - Cause List",
+    "ListElement": "ETCL - Cause List",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_HearingDocType",
+    "ListElementCode": "ETRP - ET recording of proceeding",
+    "ListElement": "ETRP - ET recording of proceeding",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_HearingDocETCL",
+    "ListElementCode": "Public",
+    "ListElement": "Public",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_HearingDocETCL",
+    "ListElementCode": "Staff",
+    "ListElement": "Staff",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_HearingDocETCL",
+    "ListElementCode": "Press List",
+    "ListElement": "Press List",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_reportCaseType",
+    "ListElementCode": "Brought Forward Report",
+    "ListElement": "Brought Forward Report",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_reportCaseType",
+    "ListElementCode": "Member Days",
+    "ListElement": "Member Days",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_reportCaseType",
+    "ListElementCode": "Cases Completed",
+    "ListElement": "Cases Completed",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_reportCaseType",
+    "ListElementCode": "Claims By Hearing Venue",
+    "ListElement": "Claims By Hearing Venue",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_reportCaseType",
+    "ListElementCode": "Hearings By Hearing Type",
+    "ListElement": "Hearings By Hearing Type",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_reportCaseType",
+    "ListElementCode": "Time To First Hearing",
+    "ListElement": "Time To First Hearing",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "fl_reportCaseType",
+    "ListElementCode": "Hearings To Judgments",
+    "ListElement": "Hearings To Judgments",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "fl_reportCaseType",
+    "ListElementCode": "Live Caseload",
+    "ListElement": "Live Caseload",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "fl_reportCaseType",
+    "ListElementCode": "No Change In Current Position",
+    "ListElement": "No Change In Current Position",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "fl_reportCaseType",
+    "ListElementCode": "Claims Accepted",
+    "ListElement": "Claims Accepted",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "fl_reportCaseType",
+    "ListElementCode": "Serving Claims",
+    "ListElement": "Serving Claims",
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "fl_reportCaseType",
+    "ListElementCode": "Cases Awaiting Judgment",
+    "ListElement": "Cases Awaiting Judgment",
+    "DisplayOrder": 12
+  },
+  {
+    "ID": "fl_reportCaseType",
+    "ListElementCode": "Case Source",
+    "ListElement": "Case Source",
+    "DisplayOrder": 13
+  },
+  {
+    "ID": "fl_reportCaseType",
+    "ListElementCode": "Respondents",
+    "ListElement": "Respondents",
+    "DisplayOrder": 14
+  },
+  {
+    "ID": "fl_reportCaseType",
+    "ListElementCode": "Session Days",
+    "ListElement": "Session Days",
+    "DisplayOrder": 15
+  },
+  {
+    "ID": "fl_reportCaseType",
+    "ListElementCode": "ECC",
+    "ListElement": "ECC",
+    "DisplayOrder": 16
+  },
+  {
+    "ID": "fl_HearingDateType",
+    "ListElementCode": "Single",
+    "ListElement": "Single",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_HearingDateType",
+    "ListElementCode": "Range",
+    "ListElement": "Range",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_scheduleDoc",
+    "ListElementCode": "List Cases",
+    "ListElement": "List Cases",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_scheduleDoc",
+    "ListElementCode": "Multiple Schedule",
+    "ListElement": "Multiple Schedule",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_scheduleDoc",
+    "ListElementCode": "Multiple Schedule (Detailed)",
+    "ListElement": "Multiple Schedule (Detailed)",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "msl_SelectLabels",
+    "ListElementCode": "claimantAddressLabel",
+    "ListElement": "Claimant",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "msl_SelectLabels",
+    "ListElementCode": "claimantRepAddressLabel",
+    "ListElement": "Claimant Representative",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "msl_SelectLabels",
+    "ListElementCode": "respondentsAddressLabel",
+    "ListElement": "Respondent(s)",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "msl_SelectLabels",
+    "ListElementCode": "respondentsRepsAddressLabel",
+    "ListElement": "Respondent Representative(s)",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_AddressLabelNumber",
+    "ListElementCode": 1,
+    "ListElement": 1,
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_AddressLabelNumber",
+    "ListElementCode": 2,
+    "ListElement": 2,
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_AddressLabelNumber",
+    "ListElementCode": 3,
+    "ListElement": 3,
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_AddressLabelNumber",
+    "ListElementCode": 4,
+    "ListElement": 4,
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_AddressLabelNumber",
+    "ListElementCode": 5,
+    "ListElement": 5,
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_AddressLabelNumber",
+    "ListElementCode": 6,
+    "ListElement": 6,
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "fl_AddressLabelNumber",
+    "ListElementCode": 7,
+    "ListElement": 7,
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "fl_AddressLabelNumber",
+    "ListElementCode": 8,
+    "ListElement": 8,
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "fl_AddressLabelNumber",
+    "ListElementCode": 9,
+    "ListElement": 9,
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "fl_AddressLabelNumber",
+    "ListElementCode": 10,
+    "ListElement": 10,
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "fl_AddressLabelNumber",
+    "ListElementCode": 11,
+    "ListElement": 11,
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "fl_AddressLabelNumber",
+    "ListElementCode": 12,
+    "ListElement": 12,
+    "DisplayOrder": 12
+  },
+  {
+    "ID": "fl_AddressLabelNumber",
+    "ListElementCode": 13,
+    "ListElement": 13,
+    "DisplayOrder": 13
+  },
+  {
+    "ID": "fl_AddressLabelNumber",
+    "ListElementCode": 14,
+    "ListElement": 14,
+    "DisplayOrder": 14
+  },
+  {
+    "ID": "multiplesAmendment",
+    "ListElementCode": "Amend multiple name",
+    "ListElement": "Amend multiple name",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "multiplesAmendment",
+    "ListElementCode": "Amend lead case",
+    "ListElement": "Amend lead case",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "multiplesAmendment",
+    "ListElementCode": "Add cases to multiple",
+    "ListElement": "Add cases to multiple",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_batchUpdate",
+    "ListElementCode": "batchUpdateType1",
+    "ListElement": "Batch update based on flag criteria",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_batchUpdate",
+    "ListElementCode": "batchUpdateType2",
+    "ListElement": "Batch transfer of cases to another multiple or submultiple",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_batchUpdate",
+    "ListElementCode": "batchUpdateType3",
+    "ListElement": "Update cases with details of a case in the Multiple",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_subMultipleAction",
+    "ListElementCode": "Create",
+    "ListElement": "Create",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_subMultipleAction",
+    "ListElementCode": "Amend",
+    "ListElement": "Amend",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_subMultipleAction",
+    "ListElementCode": "Delete",
+    "ListElement": "Delete",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "ADT",
+    "ListElement": "ADT",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "ADG",
+    "ListElement": "ADG",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "ADT(ST)",
+    "ListElement": "ADT(ST)",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "APA",
+    "ListElement": "APA",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "AWR",
+    "ListElement": "AWR",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "BOC",
+    "ListElement": "BOC",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "CCP",
+    "ListElement": "CCP",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "COM",
+    "ListElement": "COM",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "DAG",
+    "ListElement": "DAG",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "DDA",
+    "ListElement": "DDA",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "DOD",
+    "ListElement": "DOD",
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "DRB",
+    "ListElement": "DRB",
+    "DisplayOrder": 12
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "DSO",
+    "ListElement": "DSO",
+    "DisplayOrder": 13
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "EAP",
+    "ListElement": "EAP",
+    "DisplayOrder": 14
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "ECC",
+    "ListElement": "ECC",
+    "DisplayOrder": 15
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "EQP",
+    "ListElement": "EQP",
+    "DisplayOrder": 16
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "FCT",
+    "ListElement": "FCT",
+    "DisplayOrder": 17
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "FLW",
+    "ListElement": "FLW",
+    "DisplayOrder": 18
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "FML",
+    "ListElement": "FML",
+    "DisplayOrder": 19
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "FPA",
+    "ListElement": "FPA",
+    "DisplayOrder": 20
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "FPI",
+    "ListElement": "FPI",
+    "DisplayOrder": 21
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "FT1",
+    "ListElement": "FT1",
+    "DisplayOrder": 22
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "FTC",
+    "ListElement": "FTC",
+    "DisplayOrder": 23
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "FTE",
+    "ListElement": "FTE",
+    "DisplayOrder": 24
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "FTO",
+    "ListElement": "FTO",
+    "DisplayOrder": 25
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "FTP",
+    "ListElement": "FTP",
+    "DisplayOrder": 26
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "FTR",
+    "ListElement": "FTR",
+    "DisplayOrder": 27
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "FTS",
+    "ListElement": "FTS",
+    "DisplayOrder": 28
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "FTU",
+    "ListElement": "FTU",
+    "DisplayOrder": 29
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "FWP",
+    "ListElement": "FWP",
+    "DisplayOrder": 30
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "FWS",
+    "ListElement": "FWS",
+    "DisplayOrder": 31
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "GRA",
+    "ListElement": "GRA",
+    "DisplayOrder": 32
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "HAS",
+    "ListElement": "HAS",
+    "DisplayOrder": 33
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "HSD",
+    "ListElement": "HSD",
+    "DisplayOrder": 34
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "HSR",
+    "ListElement": "HSR",
+    "DisplayOrder": 35
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "IRF",
+    "ListElement": "IRF",
+    "DisplayOrder": 36
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "ISV",
+    "ListElement": "ISV",
+    "DisplayOrder": 37
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "LEV ",
+    "ListElement": "LEV ",
+    "DisplayOrder": 38
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "LSO",
+    "ListElement": "LSO",
+    "DisplayOrder": 39
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "MAT",
+    "ListElement": "MAT",
+    "DisplayOrder": 40
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "MWA",
+    "ListElement": "MWA",
+    "DisplayOrder": 41
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "MWD",
+    "ListElement": "MWD",
+    "DisplayOrder": 42
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "NNA",
+    "ListElement": "NNA",
+    "DisplayOrder": 43
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "PAC",
+    "ListElement": "PAC",
+    "DisplayOrder": 44
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "PAY",
+    "ListElement": "PAY",
+    "DisplayOrder": 45
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "PEN",
+    "ListElement": "PEN",
+    "DisplayOrder": 46
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "PID",
+    "ListElement": "PID",
+    "DisplayOrder": 47
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "PLD",
+    "ListElement": "PLD",
+    "DisplayOrder": 48
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "PTE",
+    "ListElement": "PTE",
+    "DisplayOrder": 49
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "RPT",
+    "ListElement": "RPT",
+    "DisplayOrder": 50
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "RPT(S) ",
+    "ListElement": "RPT(S) ",
+    "DisplayOrder": 51
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "RRD",
+    "ListElement": "RRD",
+    "DisplayOrder": 52
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "RTR",
+    "ListElement": "RTR",
+    "DisplayOrder": 53
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "RTR(ST)",
+    "ListElement": "RTR(ST)",
+    "DisplayOrder": 54
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "SUN",
+    "ListElement": "SUN",
+    "DisplayOrder": 55
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "SXD",
+    "ListElement": "SXD",
+    "DisplayOrder": 56
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "TBA",
+    "ListElement": "TBA",
+    "DisplayOrder": 57
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "TIP",
+    "ListElement": "TIP",
+    "DisplayOrder": 58
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "TPE",
+    "ListElement": "TPE",
+    "DisplayOrder": 59
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "TT",
+    "ListElement": "TT",
+    "DisplayOrder": 60
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "TUE",
+    "ListElement": "TUE",
+    "DisplayOrder": 61
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "TUI",
+    "ListElement": "TUI",
+    "DisplayOrder": 62
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "TUM",
+    "ListElement": "TUM",
+    "DisplayOrder": 63
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "TUR",
+    "ListElement": "TUR",
+    "DisplayOrder": 64
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "TUS",
+    "ListElement": "TUS",
+    "DisplayOrder": 65
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "TXC",
+    "ListElement": "TXC",
+    "DisplayOrder": 66
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "TXC(ST)",
+    "ListElement": "TXC(ST)",
+    "DisplayOrder": 67
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "UDC",
+    "ListElement": "UDC",
+    "DisplayOrder": 68
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "UDL",
+    "ListElement": "UDL",
+    "DisplayOrder": 69
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "UIA",
+    "ListElement": "UIA",
+    "DisplayOrder": 70
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "VIC",
+    "ListElement": "VIC",
+    "DisplayOrder": 71
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "WA",
+    "ListElement": "WA",
+    "DisplayOrder": 72
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "WTA",
+    "ListElement": "WTA",
+    "DisplayOrder": 73
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "WTR",
+    "ListElement": "WTR",
+    "DisplayOrder": 74
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "WTR(AL)",
+    "ListElement": "WTR(AL)",
+    "DisplayOrder": 75
+  },
+  {
+    "ID": "fl_jurisdictionCodes",
+    "ListElementCode": "ZNON",
+    "ListElement": "ZNON",
+    "DisplayOrder": 76
+  },
+  {
+    "ID": "fl_TopLevel",
+    "ListElementCode": "EM-TRB-LET-ENG-00544",
+    "ListElement": "PART 0 – Print Address Labels",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_TopLevel",
+    "ListElementCode": "EM-TRB-EGW-ENG-00026",
+    "ListElement": "PART 1 – Starting a claim: Rules 8 – 14",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_TopLevel",
+    "ListElementCode": "EM-TRB-EGW-ENG-00027",
+    "ListElement": "PART 2 – The response to the claim: Rules 16-23",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_TopLevel",
+    "ListElementCode": "EM-TRB-EGW-ENG-00028",
+    "ListElement": "PART 3 – Employer’s Contract Claims: Rules 23 - 25",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_TopLevel",
+    "ListElementCode": "EM-TRB-EGW-ENG-00029",
+    "ListElement": "PART 4 – Initial Consideration of Claim and Response (including Rule 22 Judgments): Rules 27 - 29",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_TopLevel",
+    "ListElementCode": "EM-TRB-EGW-ENG-00030",
+    "ListElement": "PART 5 – Case management orders & other powers: Rules 29-40",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "fl_TopLevel",
+    "ListElementCode": "EM-TRB-EGW-ENG-00031",
+    "ListElement": "PART 6 – Striking out & withdrawal: Rules 38 & 50-51",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "fl_TopLevel",
+    "ListElementCode": "EM-TRB-EGW-ENG-00032",
+    "ListElement": "PART 7 – Preliminary hearings: Rules 39 and 53 – 56 (and Rules 41-49)",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "fl_TopLevel",
+    "ListElementCode": "EM-TRB-EGW-ENG-00065",
+    "ListElement": "PART 8 - Notices of hearings: Rules 55 – 57 (and Rules 41-48, 72 -82)",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "fl_TopLevel",
+    "ListElementCode": "EM-TRB-EGW-ENG-00033",
+    "ListElement": "PART 9 –  Privacy and restrictions on disclosure: Rule 49 ",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "fl_TopLevel",
+    "ListElementCode": "EM-TRB-EGW-ENG-00034",
+    "ListElement": "PART 10 – Decisions and Reasons: Rules 58–67",
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "fl_TopLevel",
+    "ListElementCode": "EM-TRB-EGW-ENG-00035",
+    "ListElement": "PART 11 – Reconsideration of Judgments: Rules 70-73",
+    "DisplayOrder": 12
+  },
+  {
+    "ID": "fl_TopLevel",
+    "ListElementCode": "EM-TRB-EGW-ENG-00036",
+    "ListElement": "PART 12 – Costs & Preparation Time Orders: Rules 72 – 82",
+    "DisplayOrder": 13
+  },
+  {
+    "ID": "fl_TopLevel",
+    "ListElementCode": "EM-TRB-EGW-ENG-00037",
+    "ListElement": "PART 13 – General correspondence",
+    "DisplayOrder": 14
+  },
+  {
+    "ID": "fl_TopLevel",
+    "ListElementCode": "EM-TRB-EGW-ENG-00038",
+    "ListElement": "PART 14 – Insolvency and Dissolved companies",
+    "DisplayOrder": 15
+  },
+  {
+    "ID": "fl_TopLevel",
+    "ListElementCode": "EM-TRB-EGW-ENG-00039",
+    "ListElement": "PART 15 – Judicial Mediation",
+    "DisplayOrder": 16
+  },
+  {
+    "ID": "fl_TopLevel",
+    "ListElementCode": "EM-TRB-EGW-ENG-00040",
+    "ListElement": "PART 16 – Schedule 2 Procedure in Equal Value claims",
+    "DisplayOrder": 17
+  },
+  {
+    "ID": "fl_TopLevel",
+    "ListElementCode": "EM-TRB-EGW-ENG-00041",
+    "ListElement": "PART 17 – Appeals: Rules 104 - 106",
+    "DisplayOrder": 18
+  },
+  {
+    "ID": "fl_TopLevel",
+    "ListElementCode": "EM-TRB-EGW-ENG-00066",
+    "ListElement": "PART 18 – Recoupment",
+    "DisplayOrder": 19
+  },
+  {
+    "ID": "fl_TopLevel",
+    "ListElementCode": "EM-TRB-EGW-ENG-00043",
+    "ListElement": "PART 20 – Legal Officer Letters",
+    "DisplayOrder": 20
+  },
+  {
+    "ID": "fl_Part_0",
+    "ListElementCode": 0.1,
+    "ListElement": "0.1 - Customise selected addresses",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_Part_0",
+    "ListElementCode": 0.2,
+    "ListElement": "0.2 - All available addresses",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_Part_0",
+    "ListElementCode": 0.3,
+    "ListElement": "0.3 - Claimant address",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_Part_0",
+    "ListElementCode": 0.4,
+    "ListElement": "0.4 - Claimant Rep address",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_Part_0",
+    "ListElementCode": 0.5,
+    "ListElement": "0.5 - Claimant and Claimant Rep addresses",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_Part_0",
+    "ListElementCode": 0.6,
+    "ListElement": "0.6 - Respondents addresses",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "fl_Part_0",
+    "ListElementCode": 0.7,
+    "ListElement": "0.7 - Respondents Reps addresses",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "fl_Part_0",
+    "ListElementCode": 0.8,
+    "ListElement": "0.8 - Respondents and Respondents Reps addresses",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "fl_Part_0",
+    "ListElementCode": 0.9,
+    "ListElement": "0.9 - Claimant and Respondents addresses",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "fl_Part_0",
+    "ListElementCode": "0.10",
+    "ListElement": "0.10 - Claimant Rep and Respondents Reps addresses",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "fl_Part_0",
+    "ListElementCode": 0.11,
+    "ListElement": "0.11 - Claimant and Respondents Reps addresses",
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "fl_Part_0",
+    "ListElementCode": 0.12,
+    "ListElement": "0.12 - Claimint Rep and Respondents addresses",
+    "DisplayOrder": 12
+  },
+  {
+    "ID": "fl_Part_1",
+    "ListElementCode": "1.1",
+    "ListElement": "1.1 - ET5 Acknowledgment of claim",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_Part_1",
+    "ListElementCode": "1.1A",
+    "ListElement": "1.1A - Claim - documents returned",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_Part_1",
+    "ListElementCode": "1.1B",
+    "ListElement": "1.1B - Identity of respondent",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_Part_1",
+    "ListElementCode": "1.2",
+    "ListElement": "1.2 - Interim relief – acknowledgement",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_Part_1",
+    "ListElementCode": "1.3",
+    "ListElement": "1.3 - PID claim - notification to Regulator - Rule 14",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_Part_1",
+    "ListElementCode": "1.3A",
+    "ListElement": "1.3A - Claim - request not to serve on respondent",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "fl_Part_1",
+    "ListElementCode": "1.3B",
+    "ListElement": "1.3B - Claim Re-direct",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "fl_Part_1",
+    "ListElementCode": "1.4",
+    "ListElement": "1.4 - Claim rejection - not E&W",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "fl_Part_1",
+    "ListElementCode": "1.5",
+    "ListElement": "1.5 - Claim rejection - not on prescribed form - Rule 12(1)(a)",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "fl_Part_1",
+    "ListElementCode": "1.6",
+    "ListElement": "1.6 - Claim rejection - minimum information - Rule 12(1)(b)",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "fl_Part_1",
+    "ListElementCode": "1.6A",
+    "ListElement": "1.6A - Claim rejection - lack of early conciliation information - Rule 12(1)(c) ",
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "fl_Part_1",
+    "ListElementCode": "1.6B",
+    "ListElement": "1.6B - Claim rejection in part – lack of early conciliation information Rule 12(1)(c)",
+    "DisplayOrder": 12
+  },
+  {
+    "ID": "fl_Part_1",
+    "ListElementCode": "1.7",
+    "ListElement": "1.7 - Claim rejection - no jurisdiction – whole claim - Rule 13(1)(a)",
+    "DisplayOrder": 13
+  },
+  {
+    "ID": "fl_Part_1",
+    "ListElementCode": "1.8",
+    "ListElement": "1.8 - Claim rejection - no jurisdiction - part claim - Rule 13(1)(a)",
+    "DisplayOrder": 14
+  },
+  {
+    "ID": "fl_Part_1",
+    "ListElementCode": "1.9",
+    "ListElement": "1.9 - Claim rejection - abuse of process etc- whole claim – Rule 13(1)(b)",
+    "DisplayOrder": 15
+  },
+  {
+    "ID": "fl_Part_1",
+    "ListElementCode": "1.9A",
+    "ListElement": "1.9A - Claim rejection - no early conciliation - Rule 13(1)(c) ",
+    "DisplayOrder": 16
+  },
+  {
+    "ID": "fl_Part_1",
+    "ListElementCode": "1.9B",
+    "ListElement": "1.9B - Claim rejection - early conciliation exemption does not apply - Rule 13(1)(d)",
+    "DisplayOrder": 17
+  },
+  {
+    "ID": "fl_Part_1",
+    "ListElementCode": "1.9C",
+    "ListElement": "1.9C - Claim rejection - Rule 13(1)(g) - name of respondent differs",
+    "DisplayOrder": 18
+  },
+  {
+    "ID": "fl_Part_1",
+    "ListElementCode": "1.9D",
+    "ListElement": "1.9D - Claim rejection - Rule 13(1)(f) - prospective claimant differs",
+    "DisplayOrder": 19
+  },
+  {
+    "ID": "fl_Part_1",
+    "ListElementCode": "1.9E",
+    "ListElement": "1.9E - Claim rejection - rule 13(1)(e) - early conciliation number differs",
+    "DisplayOrder": 20
+  },
+  {
+    "ID": "fl_Part_1",
+    "ListElementCode": "1.10",
+    "ListElement": "1.10 - Claim rejection - abuse of process etc - part claim - Rule 13(1)(b) ",
+    "DisplayOrder": 21
+  },
+  {
+    "ID": "fl_Part_1",
+    "ListElementCode": "1.11",
+    "ListElement": "1.11 - Claim rejection - your questions answered",
+    "DisplayOrder": 22
+  },
+  {
+    "ID": "fl_Part_1",
+    "ListElementCode": "1.11A",
+    "ListElement": "1.11A - \tClaim rejection - Your Questions Answered (Requirement to Contact ACAS) ",
+    "DisplayOrder": 23
+  },
+  {
+    "ID": "fl_Part_1",
+    "ListElementCode": "1.12",
+    "ListElement": "1.12 - Claim rejection - reconsideration - apply again - Rule 14",
+    "DisplayOrder": 24
+  },
+  {
+    "ID": "fl_Part_1",
+    "ListElementCode": "1.13",
+    "ListElement": "1.13 - Claim rejection - reconsideration - claim accepted - Rule 14",
+    "DisplayOrder": 25
+  },
+  {
+    "ID": "fl_Part_1",
+    "ListElementCode": "1.14",
+    "ListElement": "1.14 - Claim rejection - reconsideration - hearing - Rule 14(3)",
+    "DisplayOrder": 26
+  },
+  {
+    "ID": "fl_Part_1",
+    "ListElementCode": "1.14A",
+    "ListElement": "1.14A - Claim rejection - reconsideration - dismissed - Rule 14",
+    "DisplayOrder": 27
+  },
+  {
+    "ID": "fl_Part_1",
+    "ListElementCode": "1.14B",
+    "ListElement": "1.14B - Claim rejection - reconsideration - successful in part - Rule 14",
+    "DisplayOrder": 28
+  },
+  {
+    "ID": "fl_Part_1",
+    "ListElementCode": "1.15",
+    "ListElement": "1.15 - UDL - length of service - show cause - whole claim",
+    "DisplayOrder": 29
+  },
+  {
+    "ID": "fl_Part_1",
+    "ListElementCode": "1.15A",
+    "ListElement": "1.15A - RPT - length of service - show cause - whole claim",
+    "DisplayOrder": 30
+  },
+  {
+    "ID": "fl_Part_1",
+    "ListElementCode": "1.16",
+    "ListElement": "1.16 - UDL - length of service - show cause - part claim",
+    "DisplayOrder": 31
+  },
+  {
+    "ID": "fl_Part_1",
+    "ListElementCode": "1.16A",
+    "ListElement": "1.16A - RPT - length of service - show cause - part claim",
+    "DisplayOrder": 32
+  },
+  {
+    "ID": "fl_Part_1",
+    "ListElementCode": "1.17",
+    "ListElement": "1.17 - UDL - length of service - strike out judgment - whole claim",
+    "DisplayOrder": 33
+  },
+  {
+    "ID": "fl_Part_1",
+    "ListElementCode": "1.17A",
+    "ListElement": "1.17A - RPT - length of service - strike out judgment - whole claim",
+    "DisplayOrder": 34
+  },
+  {
+    "ID": "fl_Part_1",
+    "ListElementCode": "1.18",
+    "ListElement": "1.18 - UDL - length of service - strike out judgment - part claim",
+    "DisplayOrder": 35
+  },
+  {
+    "ID": "fl_Part_1",
+    "ListElementCode": "1.18A",
+    "ListElement": "1.18A - RPT - length of service - strike out judgment - part claim",
+    "DisplayOrder": 36
+  },
+  {
+    "ID": "fl_Part_1",
+    "ListElementCode": "1.19",
+    "ListElement": "1.19 - Claim – amendment granted",
+    "DisplayOrder": 37
+  },
+  {
+    "ID": "fl_Part_2",
+    "ListElementCode": "2.1",
+    "ListElement": "2.1 - UDL - length of service - no response required - whole claim",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_Part_2",
+    "ListElementCode": "2.2",
+    "ListElement": "2.2 - UDL - length of service - no response required - part claim",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_Part_2",
+    "ListElementCode": "2.3",
+    "ListElement": "2.3 - UDL - length of service - response now required",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_Part_2",
+    "ListElementCode": "2.4",
+    "ListElement": "2.4 - Interim relief - notice of application",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_Part_2",
+    "ListElementCode": "2.5",
+    "ListElement": "2.5 - Interim relief - notice of hearing",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_Part_2",
+    "ListElementCode": "2.6",
+    "ListElement": "2.6 - ET2 - no hearing date",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "fl_Part_2",
+    "ListElementCode": "2.6 Reform",
+    "ListElement": "2.6 Reform - ET2 - no hearing date",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "fl_Part_2",
+    "ListElementCode": "2.6A",
+    "ListElement": "2.6A - Multiple claims - Rule 17(3)",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "fl_Part_2",
+    "ListElementCode": "2.7",
+    "ListElement": "2.7 - ET2 - short track",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "fl_Part_2",
+    "ListElementCode": "2.7 Reform",
+    "ListElement": "2.7 Reform - ET2 - short track",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "fl_Part_2",
+    "ListElementCode": "2.7A",
+    "ListElement": "2.7A - ET2 - short track - Video",
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "fl_Part_2",
+    "ListElementCode": "2.7A Reform",
+    "ListElement": "2.7A Reform - ET2 - short track - Video",
+    "DisplayOrder": 12
+  },
+  {
+    "ID": "fl_Part_2",
+    "ListElementCode": "2.8",
+    "ListElement": "2.8 - ET2 - UDL plus",
+    "DisplayOrder": 13
+  },
+  {
+    "ID": "fl_Part_2",
+    "ListElementCode": "2.8 Reform",
+    "ListElement": "2.8 Reform - ET2 - UDL plus",
+    "DisplayOrder": 14
+  },
+  {
+    "ID": "fl_Part_2",
+    "ListElementCode": "2.8A",
+    "ListElement": "2.8A - ET2 - UDL plus - Video",
+    "DisplayOrder": 15
+  },
+  {
+    "ID": "fl_Part_2",
+    "ListElementCode": "2.8A Reform",
+    "ListElement": "2.8A Reform - ET2 - UDL plus - Video",
+    "DisplayOrder": 16
+  },
+  {
+    "ID": "fl_Part_2",
+    "ListElementCode": "2.9",
+    "ListElement": "2.9 - Response required - claim reconsideration - further complaints accepted",
+    "DisplayOrder": 17
+  },
+  {
+    "ID": "fl_Part_2",
+    "ListElementCode": "2.10",
+    "ListElement": "2.10 - Resending claim",
+    "DisplayOrder": 18
+  },
+  {
+    "ID": "fl_Part_2",
+    "ListElementCode": "2.10A",
+    "ListElement": "2.10A - Substituted service - rule 87",
+    "DisplayOrder": 19
+  },
+  {
+    "ID": "fl_Part_2",
+    "ListElementCode": "2.10B",
+    "ListElement": "2.10B - Service on Secretary of State - Rule 95 ",
+    "DisplayOrder": 20
+  },
+  {
+    "ID": "fl_Part_2",
+    "ListElementCode": "2.11",
+    "ListElement": "2.11 - Response accepted",
+    "DisplayOrder": 21
+  },
+  {
+    "ID": "fl_Part_2",
+    "ListElementCode": "2.11A",
+    "ListElement": "2.11A - Response - documents returned",
+    "DisplayOrder": 22
+  },
+  {
+    "ID": "fl_Part_2",
+    "ListElementCode": "2.12",
+    "ListElement": "2.12 - Response rejection - prescribed form - Rule 18(1)(a)",
+    "DisplayOrder": 23
+  },
+  {
+    "ID": "fl_Part_2",
+    "ListElementCode": "2.12A",
+    "ListElement": "2.12A - Response rejection - insufficient evidence",
+    "DisplayOrder": 24
+  },
+  {
+    "ID": "fl_Part_2",
+    "ListElementCode": "2.13",
+    "ListElement": "2.13 - Response rejection - minimum information – Rule 18(1)(b)",
+    "DisplayOrder": 25
+  },
+  {
+    "ID": "fl_Part_2",
+    "ListElementCode": "2.14",
+    "ListElement": "2.14 - Response rejection - out of time – Rule 19",
+    "DisplayOrder": 26
+  },
+  {
+    "ID": "fl_Part_2",
+    "ListElementCode": "2.15",
+    "ListElement": "2.15 - Response Rejection - Your Questions Answered",
+    "DisplayOrder": 27
+  },
+  {
+    "ID": "fl_Part_2",
+    "ListElementCode": "2.16",
+    "ListElement": "2.16 - Response rejection - apply again – Rule 20",
+    "DisplayOrder": 28
+  },
+  {
+    "ID": "fl_Part_2",
+    "ListElementCode": "2.17",
+    "ListElement": "2.17 - Response reconsideration – successful - Rule 20",
+    "DisplayOrder": 29
+  },
+  {
+    "ID": "fl_Part_2",
+    "ListElementCode": "2.18",
+    "ListElement": "2.18 - Response rejection - reconsideration hearing - Rule 20(3) ",
+    "DisplayOrder": 30
+  },
+  {
+    "ID": "fl_Part_2",
+    "ListElementCode": "2.18A",
+    "ListElement": "2.18A - Response rejection - reconsideration - dismissed – Rule 20",
+    "DisplayOrder": 31
+  },
+  {
+    "ID": "fl_Part_2",
+    "ListElementCode": "2.19",
+    "ListElement": "2.19 - Response - extension of time - apply again - Rules 5 & 21",
+    "DisplayOrder": 32
+  },
+  {
+    "ID": "fl_Part_2",
+    "ListElementCode": "2.20",
+    "ListElement": "2.20 - Response - extension of time - time limit not yet expired - granted – Rules 5 & 21",
+    "DisplayOrder": 33
+  },
+  {
+    "ID": "fl_Part_2",
+    "ListElementCode": "2.21",
+    "ListElement": "2.21 - Response - extension of time - time limit not yet expired - refused – Rules 5 & 21",
+    "DisplayOrder": 34
+  },
+  {
+    "ID": "fl_Part_2",
+    "ListElementCode": "2.22",
+    "ListElement": "2.22 - Response submitted late - extension of time - refused – Rules 5 & 21",
+    "DisplayOrder": 35
+  },
+  {
+    "ID": "fl_Part_2",
+    "ListElementCode": "2.23",
+    "ListElement": "2.23 - Response submitted late - extension of time – copy to claimant – Rules 5 & 21",
+    "DisplayOrder": 36
+  },
+  {
+    "ID": "fl_Part_2",
+    "ListElementCode": "2.24",
+    "ListElement": "2.24 - Response submitted late - extension of time – granted – Rules 5 & 21",
+    "DisplayOrder": 37
+  },
+  {
+    "ID": "fl_Part_2",
+    "ListElementCode": "2.24A",
+    "ListElement": "2.24A - Response late by email - extension of time - granted",
+    "DisplayOrder": 38
+  },
+  {
+    "ID": "fl_Part_2",
+    "ListElementCode": "2.25",
+    "ListElement": "2.25 - Response – extension of time - hearing required – Rule 21",
+    "DisplayOrder": 39
+  },
+  {
+    "ID": "fl_Part_2",
+    "ListElementCode": "2.26",
+    "ListElement": "2.26 - No response received - Rule 22",
+    "DisplayOrder": 40
+  },
+  {
+    "ID": "fl_Part_2",
+    "ListElementCode": "2.26A",
+    "ListElement": "2.26A - Case not contested – Rule 22",
+    "DisplayOrder": 41
+  },
+  {
+    "ID": "fl_Part_2",
+    "ListElementCode": "2.27",
+    "ListElement": "2.27 - Response – amendment granted",
+    "DisplayOrder": 42
+  },
+  {
+    "ID": "fl_Part_3",
+    "ListElementCode": "3.1",
+    "ListElement": "3.1 - Employer's contract claim rejected - jurisdiction - Rule 24",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_Part_3",
+    "ListElementCode": "3.2",
+    "ListElement": "3.2 - Employer's contract claim rejected - out of time - not part of response – r. 24",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_Part_3",
+    "ListElementCode": "3.3",
+    "ListElement": "3.3 - Employer's contract claim rejected - Rule 24",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_Part_3",
+    "ListElementCode": "3.4",
+    "ListElement": "3.4 - Employer's contract claim rejection of part - Rule 24",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_Part_3",
+    "ListElementCode": "3.5",
+    "ListElement": "3.5 - Employer's contract claim rejection - reconsideration – re-apply - Rule 14",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_Part_3",
+    "ListElementCode": "3.6",
+    "ListElement": "3.6 - Employer's contract claim rejection - reconsideration - claim accepted – r. 14",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "fl_Part_3",
+    "ListElementCode": "3.7",
+    "ListElement": "3.7 - Employer's contract claim rejection - reconsideration - hearing - Rule 14",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "fl_Part_3",
+    "ListElementCode": "3.8",
+    "ListElement": "3.8 - Notice of employer's contract claim - Rule 25",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "fl_Part_3",
+    "ListElementCode": "3.9",
+    "ListElement": "3.9 - Employer's contract claim - no response required - whole claim",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "fl_Part_3",
+    "ListElementCode": "3.10",
+    "ListElement": "3.10 - Employer's contract claim - response required to part",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "fl_Part_3",
+    "ListElementCode": "3.11",
+    "ListElement": "3.11 - Employer's contract claim - response now required",
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "fl_Part_3",
+    "ListElementCode": "3.12",
+    "ListElement": "3.12 - Response to employer's contract claim - extension of time - apply again - Rules 26 & 21",
+    "DisplayOrder": 12
+  },
+  {
+    "ID": "fl_Part_3",
+    "ListElementCode": "3.13",
+    "ListElement": "3.13 - Response to employer's contract claim - extension of time - time limit not yet expired - granted - Rules 26 & 21",
+    "DisplayOrder": 13
+  },
+  {
+    "ID": "fl_Part_3",
+    "ListElementCode": "3.14",
+    "ListElement": "3.14 - Response to employer's contract claim- extension of time - time limit not yet expired - refused -Rules 26 & 21",
+    "DisplayOrder": 14
+  },
+  {
+    "ID": "fl_Part_3",
+    "ListElementCode": "3.15",
+    "ListElement": "3.15 - Response to employer's contract claim submitted late - extension of time-refused - Rules 26 & 21",
+    "DisplayOrder": 15
+  },
+  {
+    "ID": "fl_Part_3",
+    "ListElementCode": "3.16",
+    "ListElement": "3.16 - \tResponse to employer's contract claim submitted late - extension of time - granted - Rules 26 & 21",
+    "DisplayOrder": 16
+  },
+  {
+    "ID": "fl_Part_3",
+    "ListElementCode": "3.17",
+    "ListElement": "3.17 - Reply to employer's contract claim-extension of time-hearing required- Rule 21",
+    "DisplayOrder": 17
+  },
+  {
+    "ID": "fl_Part_3",
+    "ListElementCode": "3.18",
+    "ListElement": "3.18 - Employer's contract claim - no reply received- Rule 22",
+    "DisplayOrder": 18
+  },
+  {
+    "ID": "fl_Part_3",
+    "ListElementCode": "3.19",
+    "ListElement": "3.19 - Response to employer's contract claim - amendment granted",
+    "DisplayOrder": 19
+  },
+  {
+    "ID": "fl_Part_3",
+    "ListElementCode": "3.20",
+    "ListElement": "3.20 - Employer's contract claim- response submitted late - extension of time",
+    "DisplayOrder": 20
+  },
+  {
+    "ID": "fl_Part_3",
+    "ListElementCode": "3.21",
+    "ListElement": "3.21 - Employer's contract claim - response accepted",
+    "DisplayOrder": 21
+  },
+  {
+    "ID": "fl_Part_3",
+    "ListElementCode": "3.22",
+    "ListElement": "3.22 - Employer's contract claim - rejection of response - out of time ",
+    "DisplayOrder": 22
+  },
+  {
+    "ID": "fl_Part_3",
+    "ListElementCode": "3.23",
+    "ListElement": "3.23 - Employer's contract claim - Response Rejection - Your Questions Answered",
+    "DisplayOrder": 23
+  },
+  {
+    "ID": "fl_Part_4",
+    "ListElementCode": "4.1",
+    "ListElement": "4.1 - Further information - Rule 27",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_Part_4",
+    "ListElementCode": "4.1A",
+    "ListElement": "4.1A - Disability Information",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_Part_4",
+    "ListElementCode": "4.2",
+    "ListElement": "4.2 - Notice and order-whole claim- both parties - Rule 28(1) ",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_Part_4",
+    "ListElementCode": "4.3",
+    "ListElement": "4.3 - Notice and order-part of claim- both parties - Rule 28(1) ",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_Part_4",
+    "ListElementCode": "4.4",
+    "ListElement": "4.4 - Letter following dismissal - both parties - Rule 28(2) ",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_Part_4",
+    "ListElementCode": "4.5",
+    "ListElement": "4.5 - Notice of preliminary hearing after initial consideration of claim - Rule 28(3)",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "fl_Part_4",
+    "ListElementCode": "4.6",
+    "ListElement": "4.6 - Notice and order-whole response- both parties - Rule 29(1) ",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "fl_Part_4",
+    "ListElementCode": "4.7",
+    "ListElement": "4.7 - Notice and order-part of response- both parties - Rule 29(1)",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "fl_Part_4",
+    "ListElementCode": "4.8",
+    "ListElement": "4.8 - Letter following dismissal - both parties - Rule 29(2)",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "fl_Part_4",
+    "ListElementCode": "4.8A",
+    "ListElement": "4.8A - Notice of preliminary hearing after initial consideration of response - Rule 29(3)",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "fl_Part_4",
+    "ListElementCode": "4.9",
+    "ListElement": "4.9 - Trading name of respondent ",
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "fl_Part_4",
+    "ListElementCode": "4.9A",
+    "ListElement": "4.9A - Respondent’s name on response ",
+    "DisplayOrder": 12
+  },
+  {
+    "ID": "fl_Part_4",
+    "ListElementCode": "4.10",
+    "ListElement": "4.10 - Rule 22 judgment - remedy hearing required",
+    "DisplayOrder": 13
+  },
+  {
+    "ID": "fl_Part_4",
+    "ListElementCode": "4.11",
+    "ListElement": "4.11 - Rule 22 judgment - reconsideration",
+    "DisplayOrder": 14
+  },
+  {
+    "ID": "fl_Part_4",
+    "ListElementCode": "4.12",
+    "ListElement": "4.12 - Rule 22 judgment - reconsideration – application out of time – accepted",
+    "DisplayOrder": 15
+  },
+  {
+    "ID": "fl_Part_4",
+    "ListElementCode": "4.13",
+    "ListElement": "4.13 - Rule 22 judgment - reconsideration – application rejected",
+    "DisplayOrder": 16
+  },
+  {
+    "ID": "fl_Part_4",
+    "ListElementCode": "4.14",
+    "ListElement": "4.14 - Rule 22 judgment - reconsideration – denied",
+    "DisplayOrder": 17
+  },
+  {
+    "ID": "fl_Part_4",
+    "ListElementCode": "4.15",
+    "ListElement": "4.15 - Rule 22 judgment – claim not quantified ",
+    "DisplayOrder": 18
+  },
+  {
+    "ID": "fl_Part_4",
+    "ListElementCode": "4.16",
+    "ListElement": "4.16 - Rule 22 judgment not appropriate",
+    "DisplayOrder": 19
+  },
+  {
+    "ID": "fl_Part_4",
+    "ListElementCode": "4.17",
+    "ListElement": "4.17 - Rule 22 judgment – universal template ",
+    "DisplayOrder": 20
+  },
+  {
+    "ID": "fl_Part_4",
+    "ListElementCode": "4.18",
+    "ListElement": "4.18 - Rule 27 referral to EJ - response received",
+    "DisplayOrder": 21
+  },
+  {
+    "ID": "fl_Part_4",
+    "ListElementCode": "4.19",
+    "ListElement": "4.19 - Rule 22 referral to EJ – no response",
+    "DisplayOrder": 22
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.1A",
+    "ListElement": "5.1A - Application not copied – not considered = rules 31 and 90",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.1B",
+    "ListElement": "5.1B - Correspondence not copied – sent to other party(ies) by Tribunal office - rule 90",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.1C",
+    "ListElement": "5.1C - Application not copied - claimant - Rule 31",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.1R",
+    "ListElement": "5.1R - Application not copied - respondent - Rule 31",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.2C",
+    "ListElement": "5.2C - Application not copied but sent on by ET - claimant - Rules 31 & 90",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.2R",
+    "ListElement": "5.2R - Application not copied but sent on by ET - respondent - Rule 31 & 90",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.3C",
+    "ListElement": "5.3C - Application refused - claimant - Rule 31",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.3R",
+    "ListElement": "5.3R - Application refused - respondent - Rule 31",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.4C",
+    "ListElement": "5.4C - Consider application at hearing - claimant - Rule 31(3)",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.4R",
+    "ListElement": "5.4R - Consider application at hearing - respondent - Rule 31(3)",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.5",
+    "ListElement": "5.5 - Considering case management prelim hearing - Rule 30",
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.5A",
+    "ListElement": "5.5A - Short track directions- rule 30",
+    "DisplayOrder": 12
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.6",
+    "ListElement": "5.6 - Case management order as proposed by parties - Rule 30",
+    "DisplayOrder": 13
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.7",
+    "ListElement": "5.7 - Case management prelim hearing necessary - Rule 30",
+    "DisplayOrder": 14
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.8",
+    "ListElement": "5.8 - Case management order signed by EJ - Rule 30",
+    "DisplayOrder": 15
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.9C",
+    "ListElement": "5.9C - Leave to amend claim - Rule 30",
+    "DisplayOrder": 16
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.9R",
+    "ListElement": "5.9R - Leave to amend response – respondent - Rule 30",
+    "DisplayOrder": 17
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.10",
+    "ListElement": "5.10 - Postponement by order of REJ",
+    "DisplayOrder": 18
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.11C",
+    "ListElement": "5.11C - Postponement order - claimant",
+    "DisplayOrder": 19
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.11R",
+    "ListElement": "5.11R - Postponement order - respondent",
+    "DisplayOrder": 20
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.12C",
+    "ListElement": "5.12C - Postponement refused – claimant ",
+    "DisplayOrder": 21
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.12R",
+    "ListElement": "5.12R - Postponement refused - respondent ",
+    "DisplayOrder": 22
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.13C",
+    "ListElement": "5.13C - Disclose information – claimant - Rule 33",
+    "DisplayOrder": 23
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.13R",
+    "ListElement": "5.13R - Disclose information - respondent - Rule 33",
+    "DisplayOrder": 24
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.14C",
+    "ListElement": "5.14C - Disclose documents - claimant - Rule 33",
+    "DisplayOrder": 25
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.14R",
+    "ListElement": "5.14R - Disclose documents - respondent - Rule 33",
+    "DisplayOrder": 26
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.15C",
+    "ListElement": "5.15C - Witness order query - claimant - Rule 34",
+    "DisplayOrder": 27
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.15R",
+    "ListElement": "5.15R - Witness order query - respondent - Rule 34",
+    "DisplayOrder": 28
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.16",
+    "ListElement": "5.16 - Refusal of Witness Order - respondent - Rule 34",
+    "DisplayOrder": 29
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.17",
+    "ListElement": "5.17 - Witness Order - to produce documents or information - Rule 34",
+    "DisplayOrder": 30
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.18",
+    "ListElement": "5.18 - Witness Order – to give evidence - Rule 34",
+    "DisplayOrder": 31
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.18A",
+    "ListElement": "5.18A Witness Order – to give evidence - Rule 34",
+    "DisplayOrder": 32
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.19",
+    "ListElement": "5.19 - Witness Order - accompanying letter - claimant - Rule 34",
+    "DisplayOrder": 33
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.19A",
+    "ListElement": "5.19A - Witness order - Notice to other party - rule 34(2)",
+    "DisplayOrder": 34
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.20",
+    "ListElement": "5.20 - Witness order set aside - Rule 34",
+    "DisplayOrder": 35
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.21",
+    "ListElement": "5.21 - Witness order not set aside - Rule 34",
+    "DisplayOrder": 36
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.22",
+    "ListElement": "5.22 - Order adding a party - Rule 35",
+    "DisplayOrder": 37
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.23",
+    "ListElement": "5.23 - Order removing a party - Rule 35",
+    "DisplayOrder": 38
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.24",
+    "ListElement": "5.24 - Considering cases together",
+    "DisplayOrder": 39
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.25",
+    "ListElement": "5.25 - Order considering cases together",
+    "DisplayOrder": 40
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.26",
+    "ListElement": "5.26 - Unless Order - claimant - Rule 39",
+    "DisplayOrder": 41
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.27",
+    "ListElement": "5.27 - Unless order - respondent - Rule 39",
+    "DisplayOrder": 42
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.28",
+    "ListElement": "5.28 - Dismissal of claim - Rule 39",
+    "DisplayOrder": 43
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.29",
+    "ListElement": "5.29 - Dismissal of response - Rule 39",
+    "DisplayOrder": 44
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.30",
+    "ListElement": "5.30 - Setting aside dismissal of claim - granted - Rule 39",
+    "DisplayOrder": 45
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.31",
+    "ListElement": "5.31 - Setting aside dismissal of response - granted - Rule 39",
+    "DisplayOrder": 46
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.32",
+    "ListElement": "5.32 - Hearing to consider setting dismissal of claim - Rule 39",
+    "DisplayOrder": 47
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.33",
+    "ListElement": "5.33 - Hearing to consider setting dismissal of response - Rule 39",
+    "DisplayOrder": 48
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.34",
+    "ListElement": "5.34 - Application to set aside dismissal of claim - refused - Rule 39",
+    "DisplayOrder": 49
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.35",
+    "ListElement": "5.35 - Application to set aside dismissal of response - refused - Rule 39",
+    "DisplayOrder": 50
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.36",
+    "ListElement": "5.36 - Proposal to strike out – claim not struck out - Rule 38",
+    "DisplayOrder": 51
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.37",
+    "ListElement": "5.37 - Proposal to strike out - response not struck out – Rule 38",
+    "DisplayOrder": 52
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.38",
+    "ListElement": "5.38 - Order - non-compliance - claimant - Rule 38",
+    "DisplayOrder": 53
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.39",
+    "ListElement": "5.39 - Order - non-compliance - respondent - Rule 38",
+    "DisplayOrder": 54
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.42",
+    "ListElement": "5.42 - Stay order - Rule 30",
+    "DisplayOrder": 55
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.43",
+    "ListElement": "5.43 - Schedule of Loss",
+    "DisplayOrder": 56
+  },
+  {
+    "ID": "fl_Part_5",
+    "ListElementCode": "5.44",
+    "ListElement": "5.44 - PHCM Order",
+    "DisplayOrder": 57
+  },
+  {
+    "ID": "fl_Part_6",
+    "ListElementCode": "6.1C",
+    "ListElement": "6.1C - Strike out warning - claimant - Rule 38",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_Part_6",
+    "ListElementCode": "6.1R",
+    "ListElement": "6.1R - Strike out warning - respondent - Rule 38",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_Part_6",
+    "ListElementCode": "6.2",
+    "ListElement": "6.2 - Strike out Judgment claim - Rule 38",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_Part_6",
+    "ListElementCode": "6.3",
+    "ListElement": "6.3 - Strike out Judgment - claim - part - Rule 38",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_Part_6",
+    "ListElementCode": "6.4",
+    "ListElement": "6.4 - Strike out Judgment response - Rule 38",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_Part_6",
+    "ListElementCode": "6.5",
+    "ListElement": "6.5 - Strike out Judgment – response - part - Rule 38",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "fl_Part_6",
+    "ListElementCode": "6.6",
+    "ListElement": "6.6 - Withdrawal of claim - Rule 50",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "fl_Part_6",
+    "ListElementCode": "6.7",
+    "ListElement": "6.7 - Withdrawal of claim - part - Rule 50",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "fl_Part_6",
+    "ListElementCode": "6.8",
+    "ListElement": "6.8 - Judgment on withdrawal - Rule 51",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "fl_Part_6",
+    "ListElementCode": "6.9",
+    "ListElement": "6.9 - Judgment on withdrawal - part – Rule 51",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "fl_Part_6",
+    "ListElementCode": "6.10",
+    "ListElement": "6.10 - Letter declining withdrawal judgment - Rule 51",
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "fl_Part_6",
+    "ListElementCode": "6.11C",
+    "ListElement": "6.11C - Case remains listed - claimant",
+    "DisplayOrder": 12
+  },
+  {
+    "ID": "fl_Part_6",
+    "ListElementCode": "6.11R",
+    "ListElement": "6.11R - Case remains listed - respondent",
+    "DisplayOrder": 13
+  },
+  {
+    "ID": "fl_Part_7",
+    "ListElementCode": "7.3",
+    "ListElement": "7.3 - Preliminary hearing - deposit order guidance note for parties - Rule 40",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_Part_7",
+    "ListElementCode": "7.4C",
+    "ListElement": "7.4C - Deposit Order and payment guidance - claimant - Rule 40",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_Part_7",
+    "ListElementCode": "7.4R",
+    "ListElement": "7.4R - Deposit Order and payment guidance - respondent - Rule 40",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_Part_7",
+    "ListElementCode": "7.5",
+    "ListElement": "7.5 - Preliminary hearing - deposit order payment guidance for parties - Rule 40",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_Part_7",
+    "ListElementCode": "7.6C",
+    "ListElement": "7.6C - Deposit not paid – Judgment – claimant - Rule 40(4)",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_Part_7",
+    "ListElementCode": "7.6R",
+    "ListElement": "7.6R - Deposit not paid - Judgment – respondent - Rule 40(4)",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "fl_Part_7",
+    "ListElementCode": "7.7",
+    "ListElement": "7.7 - Notice of attended preliminary hearing for case management listed on service",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "fl_Part_7",
+    "ListElementCode": "7.8",
+    "ListElement": "7.8 - Notice of telephone preliminary hearing for case management listed on service",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "fl_Part_7",
+    "ListElementCode": "7.8A",
+    "ListElement": "7.8A - Notice of video preliminary hearing for case management listed on service",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "fl_Part_7",
+    "ListElementCode": "7.9",
+    "ListElement": "7.9 - Notice of any other attended preliminary hearing",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "fl_Part_7",
+    "ListElementCode": "7.9A",
+    "ListElement": "7.9A - Notice of any other video preliminary hearing",
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "fl_Part_7",
+    "ListElementCode": "7.10",
+    "ListElement": "7.10 - Notice of any other telephone preliminary hearing",
+    "DisplayOrder": 12
+  },
+  {
+    "ID": "fl_Part_7",
+    "ListElementCode": "7.11",
+    "ListElement": "7.11 - Information about video hearings, to be used with 7.8A and 7.9A.",
+    "DisplayOrder": 13
+  },
+  {
+    "ID": "fl_Part_8",
+    "ListElementCode": "8.1",
+    "ListElement": "8.1 - Notice of attended final hearing",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_Part_8",
+    "ListElementCode": "8.1A",
+    "ListElement": "8.1A - Notice of video final hearing",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_Part_8",
+    "ListElementCode": "8.2",
+    "ListElement": "8.2 - Notice of attended remedy hearing",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_Part_8",
+    "ListElementCode": "8.2A",
+    "ListElement": "8.2A - Notice of video remedy hearing",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_Part_8",
+    "ListElementCode": "8.3",
+    "ListElement": "8.3 - Notice of attended rule 22 remedy hearing",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_Part_8",
+    "ListElementCode": "8.3A",
+    "ListElement": "8.3A - Notice of video rule 22 remedy hearing",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "fl_Part_8",
+    "ListElementCode": "8.3C",
+    "ListElement": "8.3C - Notice of attended rule 22 hearing",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "fl_Part_8",
+    "ListElementCode": "8.3D",
+    "ListElement": "8.3D - Notice of video rule 22 hearing",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "fl_Part_8",
+    "ListElementCode": "8.4",
+    "ListElement": "8.4 - Notice of attended costs or preparation time order hearing",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "fl_Part_8",
+    "ListElementCode": "8.4A",
+    "ListElement": "8.4A - Notice of video costs or preparation time order hearing",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "fl_Part_8",
+    "ListElementCode": "8.5",
+    "ListElement": "8.5 - Notice of attended wasted costs hearing",
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "fl_Part_8",
+    "ListElementCode": "8.5A",
+    "ListElement": "8.5A - Notice of video wasted costs hearing",
+    "DisplayOrder": 12
+  },
+  {
+    "ID": "fl_Part_8",
+    "ListElementCode": "8.6",
+    "ListElement": "8.6 - Adjournment of attended hearing and notice of new hearing date",
+    "DisplayOrder": 13
+  },
+  {
+    "ID": "fl_Part_8",
+    "ListElementCode": "8.6A",
+    "ListElement": "8.6A - Adjournment of video hearing and notice of new hearing date",
+    "DisplayOrder": 14
+  },
+  {
+    "ID": "fl_Part_8",
+    "ListElementCode": "8.7",
+    "ListElement": "8.7 - Adjournment of hearing without new hearing date",
+    "DisplayOrder": 15
+  },
+  {
+    "ID": "fl_Part_8",
+    "ListElementCode": "8.8",
+    "ListElement": "8.8 - Order postponing attended hearing and notice of new hearing date",
+    "DisplayOrder": 16
+  },
+  {
+    "ID": "fl_Part_8",
+    "ListElementCode": "8.8A",
+    "ListElement": "8.8A - Order postponing telephone hearing and notice of new hearing date",
+    "DisplayOrder": 17
+  },
+  {
+    "ID": "fl_Part_8",
+    "ListElementCode": "8.8B",
+    "ListElement": "8.8B - Order postponing video hearing and notice of new hearing date",
+    "DisplayOrder": 18
+  },
+  {
+    "ID": "fl_Part_8",
+    "ListElementCode": "8.9",
+    "ListElement": "8.9 - Information on CVP",
+    "DisplayOrder": 19
+  },
+  {
+    "ID": "fl_Part_9",
+    "ListElementCode": "9.1A",
+    "ListElement": "9.1A - Hearing in private - interest of justice - Rule 49(3)(a)",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_Part_9",
+    "ListElementCode": "9.1B",
+    "ListElement": "9.1B - Hearing in private - other specified provision - Rule 49(3)(a)",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_Part_9",
+    "ListElementCode": "9.2A",
+    "ListElement": "9.2A - Anonymisation Order - interests of justice - Rule 49(3)(b)",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_Part_9",
+    "ListElementCode": "9.2B",
+    "ListElement": "9.2B - Anonymisation Order etc - other specified provision - Rule 49(3)(b)",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_Part_9",
+    "ListElementCode": "9.3A",
+    "ListElement": "9.3A - Witness protection - interests of justice - Rule 49(3)(c)",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_Part_9",
+    "ListElementCode": "9.3B",
+    "ListElement": "9.3B - Witness protection - other specified provision – Rule 49(3)(c)",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "fl_Part_9",
+    "ListElementCode": "9.4",
+    "ListElement": "9.4 - RRO – sexual misconduct - r. 49(3)(d) + s. 11 ETA",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "fl_Part_9",
+    "ListElementCode": "9.5",
+    "ListElement": "9.5 - RRO - disability - r. 49(3)(d) + s. 12 ETA",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "fl_Part_9",
+    "ListElementCode": "9.6A",
+    "ListElement": "9.6A - RRO - sexual misconduct – indefinite duration/scope - interests of justice - Rule 49(3)(e) + s. 11 ETA",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "fl_Part_9",
+    "ListElementCode": "9.6B",
+    "ListElement": "9.6B - RRO - sexual misconduct – indefinite duration/scope - other specified provision - Rule 49(3)(e) + s. 11 ETA",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "fl_Part_9",
+    "ListElementCode": "9.7A",
+    "ListElement": "9.7A - RRO – disability - indefinite duration - interests of justice - Rule 49(3)(e) + s.12 ETA ",
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "fl_Part_9",
+    "ListElementCode": "9.7B",
+    "ListElement": "9.7B - RRO – disability - indefinite duration - other specified provision – Rule 49(3)(e) + s. 12 ETA +",
+    "DisplayOrder": 12
+  },
+  {
+    "ID": "fl_Part_9",
+    "ListElementCode": "9.8A",
+    "ListElement": "9.8A - RRO – other cases – interests of justice - Rule 49",
+    "DisplayOrder": 13
+  },
+  {
+    "ID": "fl_Part_9",
+    "ListElementCode": "9.8B",
+    "ListElement": "9.8B - RRO – other cases - other specified provision - Rule 49",
+    "DisplayOrder": 14
+  },
+  {
+    "ID": "fl_Part_9",
+    "ListElementCode": "9.9",
+    "ListElement": "9.9 - Restricted reporting order - Notice - Rule 49(5)(c) ",
+    "DisplayOrder": 15
+  },
+  {
+    "ID": "fl_Part_10",
+    "ListElementCode": "10.1",
+    "ListElement": "10.1 - Judgment - no hearing - Rule 58",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_Part_10",
+    "ListElementCode": "10.2",
+    "ListElement": "10.2 - Judgment - Rule 59",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_Part_10",
+    "ListElementCode": "10.3",
+    "ListElement": "10.3 - Judgment reasons reserved - Rule 60(2)",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_Part_10",
+    "ListElementCode": "10.4",
+    "ListElement": "10.4 - Reserved judgment letter - Rule 60(2)",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_Part_10",
+    "ListElementCode": "10.5",
+    "ListElement": "10.5 - Reserved judgment with reasons - Rule 60",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_Part_10",
+    "ListElementCode": "10.6",
+    "ListElement": "10.6 - Judgment cover letter - Rule 59",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "fl_Part_10",
+    "ListElementCode": "10.6A",
+    "ListElement": "10.6A Judgment cover letter Enforcement Notices ",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "fl_Part_10",
+    "ListElementCode": "10.6B",
+    "ListElement": "10.6B Rule 22 Judgment cover letter ",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "fl_Part_10",
+    "ListElementCode": "10.7",
+    "ListElement": "10.7 - Judgment with reasons - Rule 60",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "fl_Part_10",
+    "ListElementCode": "10.8",
+    "ListElement": "10.8 - Reasons - Rule 60(3) ",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "fl_Part_10",
+    "ListElementCode": "10.9",
+    "ListElement": "10.9 - Extending the time to request written reasons - claimant - Rules 60(3) & 5",
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "fl_Part_10",
+    "ListElementCode": "10.10",
+    "ListElement": "10.10 - Extending the time to request written reasons - respondent - Rule 60(3) & 5",
+    "DisplayOrder": 12
+  },
+  {
+    "ID": "fl_Part_10",
+    "ListElementCode": "10.11",
+    "ListElement": "10.11 - Refusal of late request for written reasons - Rule 60(3) ",
+    "DisplayOrder": 13
+  },
+  {
+    "ID": "fl_Part_10",
+    "ListElementCode": "10.12",
+    "ListElement": "10.12 - Refusal of late request for written reasons - respondent -Rule 60(3) ",
+    "DisplayOrder": 14
+  },
+  {
+    "ID": "fl_Part_10",
+    "ListElementCode": "10.13",
+    "ListElement": "10.13 - Consent judgment - Rule 62",
+    "DisplayOrder": 15
+  },
+  {
+    "ID": "fl_Part_10",
+    "ListElementCode": "10.14",
+    "ListElement": "10.14 - Consent order - Rule 62",
+    "DisplayOrder": 16
+  },
+  {
+    "ID": "fl_Part_10",
+    "ListElementCode": "10.15",
+    "ListElement": "10.15 - Certificate of correction - Rule 67",
+    "DisplayOrder": 17
+  },
+  {
+    "ID": "fl_Part_10",
+    "ListElementCode": "10.16",
+    "ListElement": "10.16 - Corrected judgment with reasons - Rule 67",
+    "DisplayOrder": 18
+  },
+  {
+    "ID": "fl_Part_10",
+    "ListElementCode": "10.17",
+    "ListElement": "10.17 - Letter with Corrected Judgment - Rule 67",
+    "DisplayOrder": 19
+  },
+  {
+    "ID": "fl_Part_11",
+    "ListElementCode": "11.1C",
+    "ListElement": "11.1C - Reconsideration - non-compliance - claimant - Rule 69",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_Part_11",
+    "ListElementCode": "11.1R",
+    "ListElement": "11.1R - Reconsideration - non-compliance - respondent - Rule 69",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_Part_11",
+    "ListElementCode": "11.2C",
+    "ListElement": "11.2C - Reconsideration of judgment - EOT granted- claimant Rule 69",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_Part_11",
+    "ListElementCode": "11.2R",
+    "ListElement": "11.2R - Reconsideration of judgment - EOT granted respondent - Rule 69",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_Part_11",
+    "ListElementCode": "11.3C",
+    "ListElement": "11.3C - Reconsideration of decision - rejected - claimant - Rule 69",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_Part_11",
+    "ListElementCode": "11.3R",
+    "ListElement": "11.3R - Reconsideration of decision - rejected - respondent- Rule 69",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "fl_Part_11",
+    "ListElementCode": "11.4",
+    "ListElement": "11.4 - Reconsideration on Tribunal's initiative - Rule 71",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "fl_Part_11",
+    "ListElementCode": "11.5C",
+    "ListElement": "11.5C - Reconsideration of judgment - claimant - Rule 70",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "fl_Part_11",
+    "ListElementCode": "11.5R",
+    "ListElement": "11.5R - Reconsideration of judgment - respondent - Rule 70",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "fl_Part_11",
+    "ListElementCode": "11.6C",
+    "ListElement": "11.6C - Judgment – reconsideration refused - claimant - Rule 70",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "fl_Part_11",
+    "ListElementCode": "11.6R",
+    "ListElement": "11.6R - Judgment - reconsideration refused - respondent - Rule 70",
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "fl_Part_11",
+    "ListElementCode": "11.7",
+    "ListElement": "11.7 - Reconsideration of judgment - hearing not required - Rule 70",
+    "DisplayOrder": 12
+  },
+  {
+    "ID": "fl_Part_11",
+    "ListElementCode": "11.8",
+    "ListElement": "11.8 - Notice of reconsideration hearing - merits adjourned - Rule 70",
+    "DisplayOrder": 13
+  },
+  {
+    "ID": "fl_Part_11",
+    "ListElementCode": "11.9",
+    "ListElement": "11.9 - Notice of reconsideration hearing - merits that day - Rule 70",
+    "DisplayOrder": 14
+  },
+  {
+    "ID": "fl_Part_11",
+    "ListElementCode": "11.10",
+    "ListElement": "11.10 - Judgment on reconsideration of judgment - hearing - Rules 68 & 71",
+    "DisplayOrder": 15
+  },
+  {
+    "ID": "fl_Part_11",
+    "ListElementCode": "11.11",
+    "ListElement": "11.11 - Judgment on reconsideration of Rule 21 judgment - hearing- Rule 68",
+    "DisplayOrder": 16
+  },
+  {
+    "ID": "fl_Part_11",
+    "ListElementCode": "11.12",
+    "ListElement": "11.12 - Judgment on reconsideration of judgment – no hearing - Rules 68 & 71",
+    "DisplayOrder": 17
+  },
+  {
+    "ID": "fl_Part_11",
+    "ListElementCode": "11.13",
+    "ListElement": "11.13 - Judgment on reconsideration of Rule 20 judgment - no hearing - Rule 68",
+    "DisplayOrder": 18
+  },
+  {
+    "ID": "fl_Part_12",
+    "ListElementCode": "12.1C",
+    "ListElement": "12.1C - Costs - party to give reasons - claimant - Rule 75",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_Part_12",
+    "ListElementCode": "12.1R",
+    "ListElement": "12.1R - Costs - party to give reasons - respondent - Rule 75",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_Part_12",
+    "ListElementCode": "12.2C",
+    "ListElement": "12.2C - Costs - out of time - rejected - claimant - Rule 75",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_Part_12",
+    "ListElementCode": "12.2R",
+    "ListElement": "12.2R - Costs – out of time - rejected - respondent -Rule 75",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_Part_12",
+    "ListElementCode": "12.3C",
+    "ListElement": "12.3C - Preparation time - party to give reasons - claimant - Rule 75",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_Part_12",
+    "ListElementCode": "12.3R",
+    "ListElement": "12.3R - Preparation time - party to give reasons - respondent - Rule 75",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "fl_Part_12",
+    "ListElementCode": "12.4C",
+    "ListElement": "12.4C - Preparation time order - rejected - claimant - Rule 75",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "fl_Part_12",
+    "ListElementCode": "12.4R",
+    "ListElement": "12.4R - Preparation time order -rejected - respondent - Rule 75",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "fl_Part_12",
+    "ListElementCode": "12.5C",
+    "ListElement": "12.5C - Wasted costs - party to give reasons - claimant's rep - Rule 80",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "fl_Part_12",
+    "ListElementCode": "12.5R",
+    "ListElement": "12.5R - Wasted costs - party to give reasons - respondent's rep -Rule 80",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "fl_Part_12",
+    "ListElementCode": "12.6C",
+    "ListElement": "12.6C - Wasted costs - party to give reasons - tribunal's initiative - Rule 80",
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "fl_Part_12",
+    "ListElementCode": "12.6R",
+    "ListElement": "12.6R - Wasted costs - party to give reasons - tribunal's initiative- resp rep - Rule 80",
+    "DisplayOrder": 12
+  },
+  {
+    "ID": "fl_Part_12",
+    "ListElementCode": "12.7C",
+    "ListElement": "12.7C - Wasted costs application - out of time - rejected - claimant's rep - Rule 80",
+    "DisplayOrder": 13
+  },
+  {
+    "ID": "fl_Part_12",
+    "ListElementCode": "12.7R",
+    "ListElement": "12.7R - Wasted costs application - out of time - rejected - respondent's rep - Rule 80",
+    "DisplayOrder": 14
+  },
+  {
+    "ID": "fl_Part_12",
+    "ListElementCode": "12.8C",
+    "ListElement": "12.8C - Wasted costs order - out of time -rejected - claimant - Rule 80",
+    "DisplayOrder": 15
+  },
+  {
+    "ID": "fl_Part_12",
+    "ListElementCode": "12.8R",
+    "ListElement": "12.8R - Wasted costs order - out of time - rejected - respondent - Rule 80",
+    "DisplayOrder": 16
+  },
+  {
+    "ID": "fl_Part_13",
+    "ListElementCode": "13.1C",
+    "ListElement": "13.1C - Listing stencil - claimant",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_Part_13",
+    "ListElementCode": "13.1R",
+    "ListElement": "13.1R - Listing stencil - respondent",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_Part_13",
+    "ListElementCode": "13.2A",
+    "ListElement": "13.2A Correspondence to both parties",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_Part_13",
+    "ListElementCode": "13.2C",
+    "ListElement": "13.2C - Acknowledgment of correspondence - claimant",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_Part_13",
+    "ListElementCode": "13.2R",
+    "ListElement": "13.2R - Acknowledgment of correspondence - respondent",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_Part_13",
+    "ListElementCode": "13.3C",
+    "ListElement": "13.3C - Ack and copy - claimant",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "fl_Part_13",
+    "ListElementCode": "13.3R",
+    "ListElement": "13.3R - Ack and copy - respondent",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "fl_Part_13",
+    "ListElementCode": "13.4C",
+    "ListElement": "13.4C - Correspondence - reminder - claimant",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "fl_Part_13",
+    "ListElementCode": "13.4R",
+    "ListElement": "13.4R - Correspondence - reminder - respondent",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "fl_Part_13",
+    "ListElementCode": "13.5C",
+    "ListElement": "13.5C - Request for comments – claimant ",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "fl_Part_13",
+    "ListElementCode": "13.5R",
+    "ListElement": "13.5R - Request for comments – respondent ",
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "fl_Part_13",
+    "ListElementCode": "13.6C",
+    "ListElement": "13.6C - Current position - claimant",
+    "DisplayOrder": 12
+  },
+  {
+    "ID": "fl_Part_13",
+    "ListElementCode": "13.6R",
+    "ListElement": "13.6R - Current position - respondent ",
+    "DisplayOrder": 13
+  },
+  {
+    "ID": "fl_Part_13",
+    "ListElementCode": "13.7C",
+    "ListElement": "13.7C - Change of correspondence address - claimant",
+    "DisplayOrder": 14
+  },
+  {
+    "ID": "fl_Part_13",
+    "ListElementCode": "13.7R",
+    "ListElement": "13.7R - Change of correspondence address - respondent",
+    "DisplayOrder": 15
+  },
+  {
+    "ID": "fl_Part_13",
+    "ListElementCode": "13.8C",
+    "ListElement": "13.8C - Correspondence to EJ - claimant",
+    "DisplayOrder": 16
+  },
+  {
+    "ID": "fl_Part_13",
+    "ListElementCode": "13.8R",
+    "ListElement": "13.8R - Correspondence to EJ - respondent",
+    "DisplayOrder": 17
+  },
+  {
+    "ID": "fl_Part_13",
+    "ListElementCode": "13.9C",
+    "ListElement": "13.9C - Do not copy to tribunal - claimant",
+    "DisplayOrder": 18
+  },
+  {
+    "ID": "fl_Part_13",
+    "ListElementCode": "13.9R",
+    "ListElement": "13.9R - Do not copy to tribunal – respondent",
+    "DisplayOrder": 19
+  },
+  {
+    "ID": "fl_Part_13",
+    "ListElementCode": "13.10C",
+    "ListElement": "13.10C - Advice – claimant ",
+    "DisplayOrder": 20
+  },
+  {
+    "ID": "fl_Part_13",
+    "ListElementCode": "13.10R",
+    "ListElement": "13.10R - Advice - respondent  ",
+    "DisplayOrder": 21
+  },
+  {
+    "ID": "fl_Part_13",
+    "ListElementCode": "13.11C",
+    "ListElement": "13.11C - Case transfer request - comments - claimant",
+    "DisplayOrder": 22
+  },
+  {
+    "ID": "fl_Part_13",
+    "ListElementCode": "13.11R",
+    "ListElement": "13.11R - Case transfer request - comments - respondent",
+    "DisplayOrder": 23
+  },
+  {
+    "ID": "fl_Part_13",
+    "ListElementCode": "13.12C",
+    "ListElement": "13.12C - Case transfer request - refused - claimant",
+    "DisplayOrder": 24
+  },
+  {
+    "ID": "fl_Part_13",
+    "ListElementCode": "13.12R",
+    "ListElement": "13.12R - Case transfer request - refused - respondent",
+    "DisplayOrder": 25
+  },
+  {
+    "ID": "fl_Part_13",
+    "ListElementCode": "13.13",
+    "ListElement": "13.13 - Case transferred",
+    "DisplayOrder": 26
+  },
+  {
+    "ID": "fl_Part_13",
+    "ListElementCode": "13.14C",
+    "ListElement": "13.14C - Case transfer request - Scotland - refused - claimant",
+    "DisplayOrder": 27
+  },
+  {
+    "ID": "fl_Part_13",
+    "ListElementCode": "13.14R",
+    "ListElement": "13.14R - Case transfer request - Scotland - refused - respondent",
+    "DisplayOrder": 28
+  },
+  {
+    "ID": "fl_Part_13",
+    "ListElementCode": "13.15",
+    "ListElement": "13.15 - Enforcement of award",
+    "DisplayOrder": 29
+  },
+  {
+    "ID": "fl_Part_13",
+    "ListElementCode": "13.16",
+    "ListElement": "13.16 - Consent to Employment Judge sitting alone",
+    "DisplayOrder": 30
+  },
+  {
+    "ID": "fl_Part_13",
+    "ListElementCode": "13.17",
+    "ListElement": "13.17 - Consent to two person tribunal",
+    "DisplayOrder": 31
+  },
+  {
+    "ID": "fl_Part_13",
+    "ListElementCode": "13.18",
+    "ListElement": "13.18 - Authorisation to act in proceedings",
+    "DisplayOrder": 32
+  },
+  {
+    "ID": "fl_Part_13",
+    "ListElementCode": "13.19",
+    "ListElement": "13.19 - Claim settled?",
+    "DisplayOrder": 33
+  },
+  {
+    "ID": "fl_Part_13",
+    "ListElementCode": "13.20",
+    "ListElement": "13.20 - Settlement of claim",
+    "DisplayOrder": 34
+  },
+  {
+    "ID": "fl_Part_13",
+    "ListElementCode": "13.21",
+    "ListElement": "13.21 - Evidence from Abroad",
+    "DisplayOrder": 35
+  },
+  {
+    "ID": "fl_Part_13",
+    "ListElementCode": "ETF1",
+    "ListElement": "ETF1 - Returned form notice",
+    "DisplayOrder": 36
+  },
+  {
+    "ID": "fl_Part_14",
+    "ListElementCode": "14.1",
+    "ListElement": "14.1 - Insolvency - RPO claims enquiry",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_Part_14",
+    "ListElementCode": "14.2",
+    "ListElement": "14.2 - Insolvency - administration – proceedings stayed",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_Part_14",
+    "ListElementCode": "14.3",
+    "ListElement": "14.3 - Insolvency - administration – strike out warning",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_Part_14",
+    "ListElementCode": "14.4",
+    "ListElement": "14.4 - Insolvency - administration – judgment",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_Part_14",
+    "ListElementCode": "14.5",
+    "ListElement": "14.5 - Insolvency - compulsory liquidation – proceedings stayed",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_Part_14",
+    "ListElementCode": "14.6",
+    "ListElement": "14.6 - Insolvency - compulsory liquidation – strike out warning",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "fl_Part_14",
+    "ListElementCode": "14.7",
+    "ListElement": "14.7 - Insolvency - compulsory liquidation – judgment",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "fl_Part_14",
+    "ListElementCode": "14.8",
+    "ListElement": "14.8 - Dissolved company - proceedings stayed",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "fl_Part_14",
+    "ListElementCode": "14.9",
+    "ListElement": "14.9 - Dissolved company - strike out warning",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "fl_Part_14",
+    "ListElementCode": "14.10",
+    "ListElement": "14.10 - Dissolved company – judgment",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "fl_Part_15",
+    "ListElementCode": "15.1",
+    "ListElement": "15.1 - JM by video Notice of hearing and CMOs",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_Part_15",
+    "ListElementCode": "15.2",
+    "ListElement": "15.2 - Attended JM Notice of hearing and CMOs",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_Part_15",
+    "ListElementCode": "15.3",
+    "ListElement": "15.3 - DRA by video Notice of Hearing and CMOs",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_Part_15",
+    "ListElementCode": "15.4",
+    "ListElement": "15.4 - Attended DRA Notice of Hearing and CMOs",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_Part_15",
+    "ListElementCode": "15.5",
+    "ListElement": "15.5 - DRA appointments - Information Sheet",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_Part_16",
+    "ListElementCode": "16.1",
+    "ListElement": "16.1 - Notice of Stage 1 EQV hearing ",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_Part_16",
+    "ListElementCode": "16.2",
+    "ListElement": "16.2 - Notice of Stage 2 EQV hearing ",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_Part_16",
+    "ListElementCode": "16.3",
+    "ListElement": "16.3 - EQV - Order - Independent Expert  ",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_Part_16",
+    "ListElementCode": "16.4",
+    "ListElement": "16.4 - EQV - Requirement – Expert Report",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_Part_16",
+    "ListElementCode": "16.5",
+    "ListElement": "16.5 - EQV - Receipt of Expert’s Report",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_Part_17",
+    "ListElementCode": "17.1",
+    "ListElement": "17.1 - Acknowledgment of appeal ",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_Part_17",
+    "ListElementCode": "17.2",
+    "ListElement": "17.2 - Notice of appeal received",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_Part_17",
+    "ListElementCode": "17.3",
+    "ListElement": "17.3 - Notice of appeal hearing ",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_Part_17",
+    "ListElementCode": "17.4",
+    "ListElement": "17.4 - H & S appeal  - suspension of prohibition notice - written representations ",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_Part_17",
+    "ListElementCode": "17.5",
+    "ListElement": "17.5 - H & S appeal -  direction - prohibition notice suspended ",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_Part_17",
+    "ListElementCode": "17.6",
+    "ListElement": "17.6 - Notes for H & S or Training Levy Appeal Judgment                                                                    ",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "fl_Part_17",
+    "ListElementCode": "17.7",
+    "ListElement": "17.7 - Acknowledgement of withdrawal of appeal ",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "fl_Part_18",
+    "ListElementCode": 18.1,
+    "ListElement": "18.1 – Recoupment Annex (Reg 4). Monetary Awards",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_Part_18",
+    "ListElementCode": 18.2,
+    "ListElement": "18.2 – Recoupment Annex (Reg 5(2)). Protective Award",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_Part_18",
+    "ListElementCode": 18.3,
+    "ListElement": "18.3 – Recoupment Notice (Reg 4). Monetary Awards",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_Part_18",
+    "ListElementCode": 18.4,
+    "ListElement": "18.4 – Recoupment Notice (Reg 5(1)). Protective Award",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_Part_18",
+    "ListElementCode": "FPJA",
+    "ListElement": "FPJA - Financial Penalties Judgment Annex",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_Part_18",
+    "ListElementCode": "IOJULY",
+    "ListElement": "Interest Order from 29 July ",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "fl_Part_20",
+    "ListElementCode": "LO1",
+    "ListElement": "R21 EOT Granted",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_Part_20",
+    "ListElementCode": "LO2",
+    "ListElement": "R21 EOT Refused - Application in Time",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_Part_20",
+    "ListElementCode": "LO3",
+    "ListElement": "R21 EOT Refused - Application OOT",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_Part_20",
+    "ListElementCode": "LO4",
+    "ListElement": "R51 Dismissal Judgments",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_Part_20",
+    "ListElementCode": "LO5",
+    "ListElement": "General Order",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_BFActions",
+    "ListElementCode": "Application of letter to ACAS/RPO",
+    "ListElement": "Application of letter to ACAS/RPO",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_BFActions",
+    "ListElementCode": "Case listed",
+    "ListElement": "Case listed",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_BFActions",
+    "ListElementCode": "Case papers prepared",
+    "ListElement": "Case papers prepared",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_BFActions",
+    "ListElementCode": "Case transferred",
+    "ListElement": "Case transferred",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_BFActions",
+    "ListElementCode": "Draft to members",
+    "ListElement": "Draft to members",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_BFActions",
+    "ListElementCode": "Enquiry letter issued",
+    "ListElement": "Enquiry letter issued",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "fl_BFActions",
+    "ListElementCode": "Enquiry letter received",
+    "ListElement": "Enquiry letter received",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "fl_BFActions",
+    "ListElementCode": "ET2 + ET3 + ET5 issued",
+    "ListElement": "ET2 + ET3 + ET5 issued",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "fl_BFActions",
+    "ListElementCode": "ET2 + ET3 issued",
+    "ListElement": "ET2 + ET3 issued",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "fl_BFActions",
+    "ListElementCode": "ET2COMB-SH issued",
+    "ListElement": "ET2COMB-SH issued",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "fl_BFActions",
+    "ListElementCode": "ET2COMB-UDLplus issued",
+    "ListElement": "ET2COMB-UDLplus issued",
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "fl_BFActions",
+    "ListElementCode": "ET3 acceptance letter issued",
+    "ListElement": "ET3 acceptance letter issued",
+    "DisplayOrder": 12
+  },
+  {
+    "ID": "fl_BFActions",
+    "ListElementCode": "ET3 rejection letter issued",
+    "ListElement": "ET3 rejection letter issued",
+    "DisplayOrder": 13
+  },
+  {
+    "ID": "fl_BFActions",
+    "ListElementCode": "ET4 issued",
+    "ListElement": "ET4 issued",
+    "DisplayOrder": 14
+  },
+  {
+    "ID": "fl_BFActions",
+    "ListElementCode": "ET5 issued",
+    "ListElement": "ET5 issued",
+    "DisplayOrder": 15
+  },
+  {
+    "ID": "fl_BFActions",
+    "ListElementCode": "Exhibits returned",
+    "ListElement": "Exhibits returned",
+    "DisplayOrder": 16
+  },
+  {
+    "ID": "fl_BFActions",
+    "ListElementCode": "Interlocutory order requested",
+    "ListElement": "Interlocutory order requested",
+    "DisplayOrder": 17
+  },
+  {
+    "ID": "fl_BFActions",
+    "ListElementCode": "IT2c_IT3c_IT5c issued",
+    "ListElement": "IT2c_IT3c_IT5c issued",
+    "DisplayOrder": 18
+  },
+  {
+    "ID": "fl_BFActions",
+    "ListElementCode": "IT3 received",
+    "ListElement": "IT3 received",
+    "DisplayOrder": 19
+  },
+  {
+    "ID": "fl_BFActions",
+    "ListElementCode": "IT4 (PDNR) issued",
+    "ListElement": "IT4 (PDNR) issued",
+    "DisplayOrder": 20
+  },
+  {
+    "ID": "fl_BFActions",
+    "ListElementCode": "Other action",
+    "ListElement": "Other action",
+    "DisplayOrder": 21
+  },
+  {
+    "ID": "fl_BFActions",
+    "ListElementCode": "PA part rejected letter issued",
+    "ListElement": "PA part rejected letter issued",
+    "DisplayOrder": 22
+  },
+  {
+    "ID": "fl_BFActions",
+    "ListElementCode": "Postponement requested",
+    "ListElement": "Postponement requested",
+    "DisplayOrder": 23
+  },
+  {
+    "ID": "fl_BFActions",
+    "ListElementCode": "Refer to chairman for listing instructions",
+    "ListElement": "Refer to chairman for listing instructions",
+    "DisplayOrder": 24
+  },
+  {
+    "ID": "fl_BFActions",
+    "ListElementCode": "Reply to enquiry letter sent",
+    "ListElement": "Reply to enquiry letter sent",
+    "DisplayOrder": 25
+  },
+  {
+    "ID": "fl_BFActions",
+    "ListElementCode": "Striking out warning issued",
+    "ListElement": "Striking out warning issued",
+    "DisplayOrder": 26
+  },
+  {
+    "ID": "fl_BFActions",
+    "ListElementCode": "Witnesses recorded",
+    "ListElement": "Witnesses recorded",
+    "DisplayOrder": 27
+  },
+  {
+    "ID": "fl_TribunalOffice",
+    "ListElementCode": "Bristol",
+    "ListElement": "Bristol",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_TribunalOffice",
+    "ListElementCode": "Leeds",
+    "ListElement": "Leeds",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_TribunalOffice",
+    "ListElementCode": "London Central",
+    "ListElement": "London Central",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_TribunalOffice",
+    "ListElementCode": "London East",
+    "ListElement": "London East",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_TribunalOffice",
+    "ListElementCode": "London South",
+    "ListElement": "London South",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_TribunalOffice",
+    "ListElementCode": "Manchester",
+    "ListElement": "Manchester",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "fl_TribunalOffice",
+    "ListElementCode": "Midlands East",
+    "ListElement": "Midlands East",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "fl_TribunalOffice",
+    "ListElementCode": "Midlands West",
+    "ListElement": "Midlands West",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "fl_TribunalOffice",
+    "ListElementCode": "Newcastle",
+    "ListElement": "Newcastle",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "fl_TribunalOffice",
+    "ListElementCode": "Wales",
+    "ListElement": "Wales",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "fl_TribunalOffice",
+    "ListElementCode": "Watford",
+    "ListElement": "Watford",
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "fl_TribunalOffice",
+    "ListElementCode": "Unassigned",
+    "ListElement": "Unassigned",
+    "DisplayOrder": 12
+  },
+  {
+    "ID": "fl_notice_period_unit",
+    "ListElementCode": "Weeks",
+    "ListElement": "Weeks",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_notice_period_unit",
+    "ListElementCode": "Months",
+    "ListElement": "Months",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_pay_cycle",
+    "ListElementCode": "Weeks",
+    "ListElement": "Weeks",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_pay_cycle",
+    "ListElementCode": "Months",
+    "ListElement": "Months",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_pay_cycle",
+    "ListElementCode": "Annual",
+    "ListElement": "Annual",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_pension_contribution",
+    "ListElementCode": "Yes",
+    "ListElement": "Yes",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_pension_contribution",
+    "ListElementCode": "No",
+    "ListElement": "No",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_pension_contribution",
+    "ListElementCode": "Not Sure",
+    "ListElement": "Not Sure",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_ServingDocumentType",
+    "ListElementCode": "1.1",
+    "ListElement": "1.1 ET5 Acknowledgment of Claim",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_ServingDocumentType",
+    "ListElementCode": "2.6",
+    "ListElement": "2.6 Notice of Claim",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_ServingDocumentType",
+    "ListElementCode": "2.7",
+    "ListElement": "2.7 ET2 short track claim",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_ServingDocumentType",
+    "ListElementCode": "2.8",
+    "ListElement": "2.8 ET2 UDL plus",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_ServingDocumentType",
+    "ListElementCode": "7.7",
+    "ListElement": "7.7 In person preliminary hearing - notice of case management discussion",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_ServingDocumentType",
+    "ListElementCode": "7.8",
+    "ListElement": "7.8 Telephone preliminary hearing - notice of case management discussion",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "fl_ServingDocumentType",
+    "ListElementCode": "7.8a",
+    "ListElement": "7.8a Video preliminary hearing - notice of case management discussion",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "fl_ServingDocumentRecipient",
+    "ListElementCode": "Acas",
+    "ListElement": "Acas",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_ServingDocumentRecipient",
+    "ListElementCode": "Claimant",
+    "ListElement": "Claimant",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_ServingDocumentRecipient",
+    "ListElementCode": "Respondent",
+    "ListElement": "Respondent",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "msl_claimOutcomes",
+    "ListElementCode": "compensation",
+    "ListElement": "Compensation only",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "msl_claimOutcomes",
+    "ListElementCode": "tribunal",
+    "ListElement": "If claiming discrimination, a tribunal recommendation",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "msl_claimOutcomes",
+    "ListElementCode": "oldJob",
+    "ListElement": "If claiming unfair dismissal, to get your old job back and compensation",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "msl_claimOutcomes",
+    "ListElementCode": "anotherJob",
+    "ListElement": "If claiming unfair dismissal, to get another job with the same employer or associated employer and compensation(re-engagement)",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "msl_discriminationClaims",
+    "ListElementCode": "Age",
+    "ListElement": "Age",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "msl_discriminationClaims",
+    "ListElementCode": "Disability",
+    "ListElement": "Disability",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "msl_discriminationClaims",
+    "ListElementCode": "Ethnicity",
+    "ListElement": "Ethnicity",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "msl_discriminationClaims",
+    "ListElementCode": "Gender reassignment",
+    "ListElement": "Gender reassignment",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "msl_discriminationClaims",
+    "ListElementCode": "Marriage or civil partnership",
+    "ListElement": "Marriage or civil partnership",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "msl_discriminationClaims",
+    "ListElementCode": "Pregnancy or maternity",
+    "ListElement": "Pregnancy or maternity",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "msl_discriminationClaims",
+    "ListElementCode": "Race",
+    "ListElement": "Race (including colour, nationality, and ethnic or national origins",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "msl_discriminationClaims",
+    "ListElementCode": "Religion or belief",
+    "ListElement": "Religion or belief",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "msl_discriminationClaims",
+    "ListElementCode": "Sex",
+    "ListElement": "Sex (including equal pay)",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "msl_discriminationClaims",
+    "ListElementCode": "Sexual orientation",
+    "ListElement": "Sexual orientation",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "msl_payClaims",
+    "ListElementCode": "Arrears",
+    "ListElement": "Arrears (pay you are owed)",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "msl_payClaims",
+    "ListElementCode": "Holiday pay",
+    "ListElement": "Holiday pay",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "msl_payClaims",
+    "ListElementCode": "Notice pay",
+    "ListElement": "Notice pay",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "msl_payClaims",
+    "ListElementCode": "Redundancy pay",
+    "ListElement": "Redundancy pay",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "msl_payClaims",
+    "ListElementCode": "Other payments",
+    "ListElement": "Other payments",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "msl_typeOfClaim",
+    "ListElementCode": "discrimination",
+    "ListElement": "discrimination",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "msl_typeOfClaim",
+    "ListElementCode": "breachOfContract",
+    "ListElement": "breachOfContract",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "msl_typeOfClaim",
+    "ListElementCode": "payRelated",
+    "ListElement": "payRelated",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "msl_typeOfClaim",
+    "ListElementCode": "unfairDismissal",
+    "ListElement": "unfairDismissal",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "msl_typeOfClaim",
+    "ListElementCode": "whistleBlowing",
+    "ListElement": "whistleBlowing",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "msl_typeOfClaim",
+    "ListElementCode": "otherTypesOfClaims",
+    "ListElement": "otherTypesOfClaims",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "msl_Defects",
+    "ListElementCode": "rule121a",
+    "ListElement": "The tribunal has no jurisdiction to consider - Rule 13(1)(a)",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "msl_Defects",
+    "ListElementCode": "rule121b",
+    "ListElement": "Is in a form which cannot sensibly be responded to or otherwise an abuse of process - Rule 13(1)(b)",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "msl_Defects",
+    "ListElementCode": "rule121c",
+    "ListElement": "Has neither an EC number nor claims one of the EC exemptions - Rule 13(1)(c)",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "msl_Defects",
+    "ListElementCode": "rule121d",
+    "ListElement": "States that one of the EC exceptions applies but it might not - Rule 13(1)(d)",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "msl_Defects",
+    "ListElementCode": "rule121 da",
+    "ListElement": "Institutes relevant proceedings and the EC number on the claim form does not match the EC number on the Acas certificate - Rule 13(1)(e)",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "msl_Defects",
+    "ListElementCode": "rule121e",
+    "ListElement": "Has a different claimant name on the ET1 to the claimant name on the Acas certificate - Rule 13(1)(f)",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "msl_Defects",
+    "ListElementCode": "rule121f",
+    "ListElement": "Has a different respondent name on the ET1 to the respondent name on the Acas certificate - Rule 13(1)(g)",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "msl_judgeOrLO",
+    "ListElementCode": "aClaimOfInterimRelief",
+    "ListElement": "A claim of interim relief",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "msl_judgeOrLO",
+    "ListElementCode": "aStatutoryAppeal",
+    "ListElement": "A statutory appeal",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "msl_judgeOrLO",
+    "ListElementCode": "anAllegationOfCommissionOfSexualOffence",
+    "ListElement": "An allegation of commission of sexual offence",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "msl_judgeOrLO",
+    "ListElementCode": "insolvency",
+    "ListElement": "Insolvency",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "msl_judgeOrLO",
+    "ListElementCode": "jurisdictionsUnclear",
+    "ListElement": "Jurisdictions unclear",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "msl_judgeOrLO",
+    "ListElementCode": "lengthOfService",
+    "ListElement": "Length of service",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "msl_judgeOrLO",
+    "ListElementCode": "potentiallyLinkedCasesInTheEcm",
+    "ListElement": "Potentially linked cases in the ECM",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "msl_judgeOrLO",
+    "ListElementCode": "rule50Issues",
+    "ListElement": "Rule 49 issues",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "msl_judgeOrLO",
+    "ListElementCode": "anotherReasonForJudicialReferral",
+    "ListElement": "Another reason for judicial referral",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "msl_REJOrVP",
+    "ListElementCode": "vexatiousLitigantOrder",
+    "ListElement": "A claimant covered by vexatious litigant order",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "msl_REJOrVP",
+    "ListElementCode": "aNationalSecurityIssue",
+    "ListElement": "A national security issue",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "msl_REJOrVP",
+    "ListElementCode": "nationalMultipleOrPresidentialOrder",
+    "ListElement": "A part of national multiple / covered by Presidential case management order",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "msl_REJOrVP",
+    "ListElementCode": "transferToOtherRegion",
+    "ListElement": "A request for transfer to another ET region",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "msl_REJOrVP",
+    "ListElementCode": "serviceAbroad",
+    "ListElement": "A request for service abroad",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "msl_REJOrVP",
+    "ListElementCode": "aSensitiveIssue",
+    "ListElement": "A sensitive issue which may attract publicity or need early allocation to a specific judge",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "msl_REJOrVP",
+    "ListElementCode": "anyPotentialConflict",
+    "ListElement": "Any potential conflict involving judge, non-legal member or HMCTS staff member",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "msl_REJOrVP",
+    "ListElementCode": "anotherReasonREJOrVP",
+    "ListElement": "Another reason for Regional Employment Judge / Vice-President referral",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "msl_otherFactors",
+    "ListElementCode": "claimOutOfTime",
+    "ListElement": "The whole or any part of the claim is out of time",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "msl_otherFactors",
+    "ListElementCode": "multipleClaim",
+    "ListElement": "The claim is part of a multiple claim",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "msl_otherFactors",
+    "ListElementCode": "employmentStatusIssues",
+    "ListElement": "The claim has a potential issue about employment status",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "msl_otherFactors",
+    "ListElementCode": "pidJurisdictionRegulator",
+    "ListElement": "The claim has PID jurisdiction and claimant wants it forwarded to relevant regulator - Box 10.1",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "msl_otherFactors",
+    "ListElementCode": "videoHearingPreference",
+    "ListElement": "The claimant prefers a video hearing",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "msl_otherFactors",
+    "ListElementCode": "rule50IssuesOtherFactors",
+    "ListElement": "The claim has Rule 49 issues",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "msl_otherFactors",
+    "ListElementCode": "otherRelevantFactors",
+    "ListElement": "The claim has other relevant factors for judicial referral",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "fl_respondent_legal_entity",
+    "ListElementCode": "Yes",
+    "ListElement": "Yes",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_respondent_legal_entity",
+    "ListElementCode": "No",
+    "ListElement": "No",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_respondent_legal_entity",
+    "ListElementCode": "Don't know",
+    "ListElement": "Don't know",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_isTrackAllocationCorrect",
+    "ListElementCode": "Yes",
+    "ListElement": "Yes",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_isTrackAllocationCorrect",
+    "ListElementCode": "No",
+    "ListElement": "No - suggest another track",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_isLocationCorrect",
+    "ListElementCode": "Yes",
+    "ListElement": "Yes",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_isLocationCorrect",
+    "ListElementCode": "No",
+    "ListElement": "No - suggest another location",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_suggestAnotherTrack",
+    "ListElementCode": "Open",
+    "ListElement": "Open",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_suggestAnotherTrack",
+    "ListElementCode": "Short",
+    "ListElement": "Short",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_suggestAnotherTrack",
+    "ListElementCode": "Standard",
+    "ListElement": "Standard",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_suggestAnotherTrack",
+    "ListElementCode": "No track",
+    "ListElement": "No track",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_contest_claim_status",
+    "ListElementCode": "Yes",
+    "ListElement": "Yes",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_contest_claim_status",
+    "ListElementCode": "No",
+    "ListElement": "No",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_contest_claim_status",
+    "ListElementCode": "Unknown - no answer given",
+    "ListElement": "Unknown - no answer given",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_et3_tribunal_location_change",
+    "ListElementCode": "Yes",
+    "ListElement": "Yes",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_et3_tribunal_location_change",
+    "ListElementCode": "No - suggest another location",
+    "ListElement": "No - suggest another location",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_et3_suggested_issues",
+    "ListElement": "Applications for strike out or deposit",
+    "ListElementCode": "Applications for strike out or deposit",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_et3_suggested_issues",
+    "ListElement": "Interpreters",
+    "ListElementCode": "Interpreters",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_et3_suggested_issues",
+    "ListElement": "Jurisdictional issues",
+    "ListElementCode": "Jurisdictional issues",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_et3_suggested_issues",
+    "ListElement": "Request for adjustments",
+    "ListElementCode": "Request for adjustments",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_et3_suggested_issues",
+    "ListElement": "Rule 49",
+    "ListElementCode": "Rule 50",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_et3_suggested_issues",
+    "ListElement": "Time points",
+    "ListElementCode": "Time points",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "msl_HearingPreferences",
+    "ListElementCode": "Video",
+    "ListElement": "Video",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "msl_HearingPreferences",
+    "ListElementCode": "Phone",
+    "ListElement": "Phone",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "msl_HearingPreferences",
+    "ListElementCode": "Neither",
+    "ListElement": "Neither",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_employer_type",
+    "ListElement": "Individual",
+    "ListElementCode": "Individual",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_employer_type",
+    "ListElement": "Limited company",
+    "ListElementCode": "Limited company",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_employer_type",
+    "ListElement": "Partnership",
+    "ListElementCode": "Partnership",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_employer_type",
+    "ListElement": "Unincorporated association (such as a sports club)",
+    "ListElementCode": "Unincorporated association",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_employer_type",
+    "ListElement": "Other",
+    "ListElementCode": "Other",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "frl_et3_contact_preference",
+    "ListElement": "Email",
+    "ListElementCode": "Email",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "frl_et3_contact_preference",
+    "ListElement": "Post",
+    "ListElementCode": "Post",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "msl_et3_hearing_type",
+    "ListElement": "Phone hearings",
+    "ListElementCode": "Phone hearings",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "msl_et3_hearing_type",
+    "ListElement": "Video hearings",
+    "ListElementCode": "Video hearings",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "frl_yes_no_not_applicable",
+    "ListElement": "Yes",
+    "ListElementCode": "Yes",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "frl_yes_no_not_applicable",
+    "ListElement": "No",
+    "ListElementCode": "No",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "frl_yes_no_not_applicable",
+    "ListElement": "Not applicable",
+    "ListElementCode": "Not applicable",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_et3_pay_frequency",
+    "ListElement": "Weekly",
+    "ListElementCode": "Weekly",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_et3_pay_frequency",
+    "ListElement": "Monthly",
+    "ListElementCode": "Monthly",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_et3_pay_frequency",
+    "ListElement": "Annually",
+    "ListElementCode": "Annually",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "frl_et3_contest_claim",
+    "ListElement": "Yes - the respondent contests all or part of the claim",
+    "ListElementCode": "Yes",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "frl_et3_contest_claim",
+    "ListElement": "No - the respondent does not contest any of the claim",
+    "ListElementCode": "No",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "frl_et3_yes_no_not_sure_yet",
+    "ListElement": "Yes",
+    "ListElementCode": "Yes",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "frl_et3_yes_no_not_sure_yet",
+    "ListElement": "No",
+    "ListElementCode": "No",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "frl_et3_yes_no_not_sure_yet",
+    "ListElement": "I'm not sure yet",
+    "ListElementCode": "not sure",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_Et3NotificationDocType",
+    "ListElementCode": "2.11",
+    "ListElement": "2.11 Response accepted",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_Et3NotificationDocType",
+    "ListElementCode": "2.12",
+    "ListElement": "2.12 Response rejection - prescribed form - Rule 18(1)(a)",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_Et3NotificationDocType",
+    "ListElementCode": "2.13",
+    "ListElement": "2.13 Response rejection - minimum information - Rule 18(1)(b)",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_Et3NotificationDocType",
+    "ListElementCode": "2.14",
+    "ListElement": "2.14 Response rejection - out of time - Rule 19",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_Et3NotificationDocType",
+    "ListElementCode": "2.15",
+    "ListElement": "2.15 Response rejection - your questions answered",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "frl_ReferCaseTo",
+    "ListElementCode": "Admin",
+    "ListElement": "Admin",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "frl_ReferCaseTo",
+    "ListElementCode": "Judge",
+    "ListElement": "Judge",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "frl_ReferCaseTo",
+    "ListElementCode": "Legal officer",
+    "ListElement": "Legal officer",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_ReferralSubject",
+    "ListElementCode": "ET1",
+    "ListElement": "ET1",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_ReferralSubject",
+    "ListElementCode": "ET3/ECC",
+    "ListElement": "ET3/ECC",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_ReferralSubject",
+    "ListElementCode": "Amend claim",
+    "ListElement": "Amend claim",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_ReferralSubject",
+    "ListElementCode": "Amend response",
+    "ListElement": "Amend response",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_ReferralSubject",
+    "ListElementCode": "Strike out all or part of claim",
+    "ListElement": "Strike out all or part of claim",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_ReferralSubject",
+    "ListElementCode": "Strike out all or part of response",
+    "ListElement": "Strike out all or part of response",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "fl_ReferralSubject",
+    "ListElementCode": "Withdraw claim",
+    "ListElement": "Withdraw claim",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "fl_ReferralSubject",
+    "ListElementCode": "Orders",
+    "ListElement": "Orders",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "fl_ReferralSubject",
+    "ListElementCode": "Party not responded/compiled",
+    "ListElement": "Party not responded/complied",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "fl_ReferralSubject",
+    "ListElementCode": "Order other party",
+    "ListElement": "Order other party",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "fl_ReferralSubject",
+    "ListElementCode": "Rule 21",
+    "ListElement": "Rule 22",
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "fl_ReferralSubject",
+    "ListElementCode": "Rule 50 application",
+    "ListElement": "Rule 49 application",
+    "DisplayOrder": 12
+  },
+  {
+    "ID": "fl_ReferralSubject",
+    "ListElementCode": "Order a witness to attend",
+    "ListElement": "Order a witness to attend",
+    "DisplayOrder": 13
+  },
+  {
+    "ID": "fl_ReferralSubject",
+    "ListElementCode": "Hearings",
+    "ListElement": "Hearings",
+    "DisplayOrder": 14
+  },
+  {
+    "ID": "fl_ReferralSubject",
+    "ListElementCode": "Postpone a hearing",
+    "ListElement": "Postpone a hearing",
+    "DisplayOrder": 15
+  },
+  {
+    "ID": "fl_ReferralSubject",
+    "ListElementCode": "Judgment",
+    "ListElement": "Judgment",
+    "DisplayOrder": 16
+  },
+  {
+    "ID": "fl_ReferralSubject",
+    "ListElementCode": "Reconsider decision",
+    "ListElement": "Reconsider decision",
+    "DisplayOrder": 17
+  },
+  {
+    "ID": "fl_ReferralSubject",
+    "ListElementCode": "Reconsider judgment",
+    "ListElement": "Reconsider judgment",
+    "DisplayOrder": 18
+  },
+  {
+    "ID": "fl_ReferralSubject",
+    "ListElementCode": "Extension of time request",
+    "ListElement": "Extension of time request",
+    "DisplayOrder": 19
+  },
+  {
+    "ID": "fl_ReferralSubject",
+    "ListElementCode": "Transfer request",
+    "ListElement": "Transfer request",
+    "DisplayOrder": 20
+  },
+  {
+    "ID": "msl_confirmCloseReferral",
+    "ListElementCode": "Yes",
+    "ListElement": "Yes",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_costs_pro_bono_awarded_to",
+    "ListElement": "Access to Justice Foundation",
+    "ListElementCode": "Access to Justice Foundation",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_pro_bono_awarded_against",
+    "ListElement": "Claimant's Representative",
+    "ListElementCode": "Claimant's Representative",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_pro_bono_awarded_against",
+    "ListElement": "Respondent's Representative",
+    "ListElementCode": "Respondent's Representative",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_resTseSelectApp",
+    "ListElement": "Amend response",
+    "ListElementCode": "Amend response",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_resTseSelectApp",
+    "ListElement": "Change personal details",
+    "ListElementCode": "Change personal details",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_resTseSelectApp",
+    "ListElement": "Claimant not complied",
+    "ListElementCode": "Claimant not complied",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_resTseSelectApp",
+    "ListElement": "Consider a decision afresh",
+    "ListElementCode": "Consider a decision afresh",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_resTseSelectApp",
+    "ListElement": "Contact the tribunal",
+    "ListElementCode": "Contact the tribunal",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_resTseSelectApp",
+    "ListElement": "Order other party",
+    "ListElementCode": "Order other party",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "fl_resTseSelectApp",
+    "ListElement": "Order a witness to attend to give evidence",
+    "ListElementCode": "Order a witness to attend to give evidence",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "fl_resTseSelectApp",
+    "ListElement": "Postpone a hearing",
+    "ListElementCode": "Postpone a hearing",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "fl_resTseSelectApp",
+    "ListElement": "Reconsider judgment",
+    "ListElementCode": "Reconsider judgement",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "fl_resTseSelectApp",
+    "ListElement": "Restrict publicity",
+    "ListElementCode": "Restrict publicity",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "fl_resTseSelectApp",
+    "ListElement": "Strike out all or part of a claim",
+    "ListElementCode": "Strike out all or part of a claim",
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "fl_resTseSelectApp",
+    "ListElement": "Vary or revoke an order",
+    "ListElementCode": "Vary or revoke an order",
+    "DisplayOrder": 12
+  },
+  {
+    "ID": "fl_claimantTseSelectApp",
+    "ListElement": "Amend claim",
+    "ListElementCode": "Amend claim",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_claimantTseSelectApp",
+    "ListElement": "Change personal details",
+    "ListElementCode": "Change personal details",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_claimantTseSelectApp",
+    "ListElement": "Consider decision afresh",
+    "ListElementCode": "Consider decision afresh",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_claimantTseSelectApp",
+    "ListElement": "Contact the tribunal",
+    "ListElementCode": "Contact the tribunal",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_claimantTseSelectApp",
+    "ListElement": "Order a witness to attend to give evidence",
+    "ListElementCode": "Order a witness to attend to give evidence",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_claimantTseSelectApp",
+    "ListElement": "Order other party",
+    "ListElementCode": "Order other party",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "fl_claimantTseSelectApp",
+    "ListElement": "Postpone a hearing",
+    "ListElementCode": "Postpone a hearing",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "fl_claimantTseSelectApp",
+    "ListElement": "Reconsider judgment",
+    "ListElementCode": "Reconsider judgment",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "fl_claimantTseSelectApp",
+    "ListElement": "Respondent not complied",
+    "ListElementCode": "Respondent not complied",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "fl_claimantTseSelectApp",
+    "ListElement": "Restrict publicity",
+    "ListElementCode": "Restrict publicity",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "fl_claimantTseSelectApp",
+    "ListElement": "Strike out all or part of the response",
+    "ListElementCode": "Strike out all or part of the response",
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "fl_claimantTseSelectApp",
+    "ListElement": "Vary or revoke an order",
+    "ListElementCode": "Vary or revoke an order",
+    "DisplayOrder": 12
+  },
+  {
+    "ID": "fl_claimantTseSelectApp",
+    "ListElement": "Withdraw all or part of claim",
+    "ListElementCode": "Withdraw all or part of claim",
+    "DisplayOrder": 13
+  },
+  {
+    "ID": "frl_CopyToOtherPartyYesOrNo",
+    "ListElement": "Yes, I confirm I want to copy this correspondence to the other party to satisfy the Employment Tribunal Rules of Procedure. By selecting this option, a copy of this correspondence will be sent to the other party upon submission. The other party will be notified that any objections to your application should be sent to the tribunal as soon as possible and in any event within 7 days.",
+    "ListElementCode": "Yes",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "frl_CopyToOtherPartyYesOrNo",
+    "ListElement": "No, I do not want to copy this correspondence to the other party. You must tell the tribunal why you do not want to inform the other party. The tribunal will consider your reasons and decide if you must inform the other party or not.",
+    "ListElementCode": "No",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "frl_tseAdminDecision",
+    "ListElement": "Granted",
+    "ListElementCode": "Granted",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "frl_tseAdminDecision",
+    "ListElement": "Granted in part",
+    "ListElementCode": "Granted in part",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "frl_tseAdminDecision",
+    "ListElement": "Refused",
+    "ListElementCode": "Refused",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "frl_tseAdminDecision",
+    "ListElement": "Other",
+    "ListElementCode": "Other",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "frl_tseAdminTypeOfDecision",
+    "ListElement": "Judgment",
+    "ListElementCode": "Judgment",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "frl_tseAdminTypeOfDecision",
+    "ListElement": "Case management order",
+    "ListElementCode": "Case management order",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "frl_tseAdminIsResponseRequired",
+    "ListElement": "Yes - view document for details",
+    "ListElementCode": "Yes",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "frl_tseAdminIsResponseRequired",
+    "ListElement": "No",
+    "ListElementCode": "No",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_ClaimantRespondentBothParties",
+    "ListElement": "Both parties",
+    "ListElementCode": "Both parties",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_ClaimantRespondentBothParties",
+    "ListElement": "Claimant",
+    "ListElementCode": "Claimant",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_ClaimantRespondentBothParties",
+    "ListElement": "Respondent",
+    "ListElementCode": "Respondent",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "frl_tseAdminDecisionMadeBy",
+    "ListElement": "Legal officer",
+    "ListElementCode": "Legal officer",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "frl_tseAdminDecisionMadeBy",
+    "ListElement": "Judge",
+    "ListElementCode": "Judge",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "frl_tseAdminSelectPartyNotify",
+    "ListElement": "Both parties",
+    "ListElementCode": "Both parties",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "frl_tseAdminSelectPartyNotify",
+    "ListElement": "Claimant only",
+    "ListElementCode": "Claimant only",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "frl_tseAdminSelectPartyNotify",
+    "ListElement": "Respondent only",
+    "ListElementCode": "Respondent only",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "frl_tseAdmReplyIsCmoOrRequest",
+    "ListElement": "Case management order",
+    "ListElementCode": "Case management order",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "frl_tseAdmReplyIsCmoOrRequest",
+    "ListElement": "Request",
+    "ListElementCode": "Request",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "frl_tseAdmReplyIsCmoOrRequest",
+    "ListElement": "Neither",
+    "ListElementCode": "Neither",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_tseAdmReplyCmoMadeBy",
+    "ListElement": "Legal officer",
+    "ListElementCode": "Legal officer",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_tseAdmReplyCmoMadeBy",
+    "ListElement": "Judge",
+    "ListElementCode": "Judge",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_tseAdmReplyRequestMadeBy",
+    "ListElement": "Legal officer",
+    "ListElementCode": "Legal officer",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_tseAdmReplyRequestMadeBy",
+    "ListElement": "Judge",
+    "ListElementCode": "Judge",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_tseAdmReplyRequestMadeBy",
+    "ListElement": "Case worker",
+    "ListElementCode": "Case worker",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_sendNotificationSubject",
+    "ListElement": "Claimant / Respondent details",
+    "ListElementCode": "Claimant / Respondent details",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_sendNotificationSubject",
+    "ListElement": "Claim (ET1)",
+    "ListElementCode": "Claim (ET1)",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_sendNotificationSubject",
+    "ListElement": "Response (ET3)",
+    "ListElementCode": "Response (ET3)",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_sendNotificationSubject",
+    "ListElement": "Hearing",
+    "ListElementCode": "Hearing",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_sendNotificationSubject",
+    "ListElement": "Case management orders / requests",
+    "ListElementCode": "Case management orders / requests",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_sendNotificationSubject",
+    "ListElement": "Judgment",
+    "ListElementCode": "Judgment",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "fl_sendNotificationSubject",
+    "ListElement": "Employer Contract Claim",
+    "ListElementCode": "Employer Contract Claim",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "fl_sendNotificationSubject",
+    "ListElement": "Other (General correspondence)",
+    "ListElementCode": "Other (General correspondence)",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "sendNotificationNotify",
+    "ListElement": "Both parties",
+    "ListElementCode": "Both parties",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "sendNotificationNotify",
+    "ListElement": "Claimant only",
+    "ListElementCode": "Claimant only",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "sendNotificationNotify",
+    "ListElement": "Respondent only",
+    "ListElementCode": "Respondent only",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_sendNotificationCaseManagement",
+    "ListElement": "Case management order",
+    "ListElementCode": "Case management order",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_sendNotificationCaseManagement",
+    "ListElement": "Request",
+    "ListElementCode": "Request",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "sendNotificationResponseTribunal",
+    "ListElement": "Yes - view document for details",
+    "ListElementCode": "Yes - view document for details",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "sendNotificationResponseTribunal",
+    "ListElement": "No",
+    "ListElementCode": "No",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_sendNotificationWhoCaseOrder",
+    "ListElement": "Legal officer",
+    "ListElementCode": "Legal officer",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_sendNotificationWhoCaseOrder",
+    "ListElement": "Judge",
+    "ListElementCode": "Judge",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_sendNotificationParties",
+    "ListElement": "Both parties",
+    "ListElementCode": "Both parties",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_sendNotificationParties",
+    "ListElement": "Claimant only",
+    "ListElementCode": "Claimant only",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_sendNotificationParties",
+    "ListElement": "Respondent only",
+    "ListElementCode": "Respondent only",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_sendNotificationDecision",
+    "ListElement": "Granted",
+    "ListElementCode": "Granted",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_sendNotificationDecision",
+    "ListElement": "Granted in part",
+    "ListElementCode": "Granted in part",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_sendNotificationDecision",
+    "ListElement": "Refused",
+    "ListElementCode": "Refused",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_sendNotificationDecision",
+    "ListElement": "Other",
+    "ListElementCode": "Other",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "Legal officer",
+    "ListElement": "Judge",
+    "ListElementCode": "Judge",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "msl_closeApplicationYes",
+    "ListElementCode": "Yes",
+    "ListElement": "Yes",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_sendNotificationWhoMadeJudgement",
+    "ListElement": "Judge",
+    "ListElementCode": "Judge",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "sendNotificationEccQuestion",
+    "ListElement": "Notice of Employer Contract Claim",
+    "ListElementCode": "Notice of Employer Contract Claim",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "sendNotificationEccQuestion",
+    "ListElement": "Acceptance of ECC response",
+    "ListElementCode": "Acceptance of ECC response",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "sendNotificationEccQuestion",
+    "ListElement": "Rejection of ECC response",
+    "ListElementCode": "Rejection of ECC response",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "frl_sendNotificationRequestMadeBy",
+    "ListElement": "Legal officer",
+    "ListElementCode": "Legal officer",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "frl_sendNotificationRequestMadeBy",
+    "ListElement": "Judge",
+    "ListElementCode": "Judge",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "frl_sendNotificationRequestMadeBy",
+    "ListElement": "Caseworker",
+    "ListElementCode": "Caseworker",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_sendNotificationWhoMadeJudgement",
+    "ListElement": "Legal officer",
+    "ListElementCode": "Legal officer",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "frl_tseApplicationsOpenOrClosed",
+    "ListElementCode": "Open",
+    "ListElement": "Open",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": " fl_respondNotificationResponseRequired",
+    "ListElement": "Yes - view document for details",
+    "ListElementCode": "Yes",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": " fl_respondNotificationResponseRequired",
+    "ListElement": "No",
+    "ListElementCode": "No",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_respondNotificationWhoRespond",
+    "ListElement": "Both parties",
+    "ListElementCode": "Both parties",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_respondNotificationWhoRespond",
+    "ListElement": "Claimant only",
+    "ListElementCode": "Claimant only",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_respondNotificationWhoRespond",
+    "ListElement": "Respondent only",
+    "ListElementCode": "Respondent only",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_respondNotificationWhoRespond",
+    "ListElement": "n/a",
+    "ListElementCode": "n/a",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "frl_respondNotificationCmoRequestBy",
+    "ListElement": "Legal officer",
+    "ListElementCode": "Legal officer",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "frl_respondNotificationCmoRequestBy",
+    "ListElement": "Judge",
+    "ListElementCode": "Judge",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "frl_respondNotificationRequestBy",
+    "ListElement": "Legal officer",
+    "ListElementCode": "Legal officer",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "frl_respondNotificationRequestBy",
+    "ListElement": "Judge",
+    "ListElementCode": "Judge",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "frl_respondNotificationRequestBy",
+    "ListElement": "Case worker",
+    "ListElementCode": "Case worker",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "frl_tseApplicationsOpenOrClosed",
+    "ListElementCode": "Closed",
+    "ListElement": "Closed",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "msl_confirmSubmitEt3",
+    "ListElementCode": "Yes",
+    "ListElement": "Yes - I want to submit this ET3",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_DocumentCategories",
+    "ListElementCode": "Starting a Claim",
+    "ListElement": "Starting a Claim",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_DocumentCategories",
+    "ListElementCode": "Response to a Claim",
+    "ListElement": "Response to a Claim",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_DocumentCategories",
+    "ListElementCode": "Initial Consideration",
+    "ListElement": "Initial Consideration",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_DocumentCategories",
+    "ListElementCode": "Case Management",
+    "ListElement": "Case Management",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_DocumentCategories",
+    "ListElementCode": "Employer Contract Claim",
+    "ListElement": "Employer Contract Claim",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_DocumentCategories",
+    "ListElementCode": "Withdrawal/Settled",
+    "ListElement": "Withdrawal/Settled",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "fl_DocumentCategories",
+    "ListElementCode": "Hearings",
+    "ListElement": "Hearings",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "fl_DocumentCategories",
+    "ListElementCode": "Judgment and Reasons",
+    "ListElement": "Judgment and Reasons",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "fl_DocumentCategories",
+    "ListElementCode": "Reconsideration",
+    "ListElement": "Reconsideration",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "fl_DocumentCategories",
+    "ListElementCode": "Misc",
+    "ListElement": "Misc",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "fl_DocumentCategories",
+    "ListElementCode": "Legacy Document Names",
+    "ListElement": "Legacy Document Names",
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "fl_StartingAClaim",
+    "ListElementCode": "ET1",
+    "ListElement": "ET1",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_StartingAClaim",
+    "ListElementCode": "ET1 Attachment",
+    "ListElement": "ET1 Attachment",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_StartingAClaim",
+    "ListElementCode": "ACAS Certificate",
+    "ListElement": "ACAS Certificate",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_StartingAClaim",
+    "ListElementCode": "Notice of claim",
+    "ListElement": "Notice of claim",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_StartingAClaim",
+    "ListElementCode": "Claim accepted",
+    "ListElement": "Claim accepted",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_StartingAClaim",
+    "ListElementCode": "Claim rejected",
+    "ListElement": "Claim rejected",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "fl_StartingAClaim",
+    "ListElementCode": "Claim part rejected",
+    "ListElement": "Claim part rejected",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "fl_StartingAClaim",
+    "ListElementCode": "ET1 Vetting",
+    "ListElement": "ET1 Vetting",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "fl_ResponseToAClaim",
+    "ListElementCode": "ET3",
+    "ListElement": "ET3",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_ResponseToAClaim",
+    "ListElementCode": "ET3 Attachment",
+    "ListElement": "ET3 Attachment",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_ResponseToAClaim",
+    "ListElementCode": "Response accepted",
+    "ListElement": "Response accepted",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_ResponseToAClaim",
+    "ListElementCode": "Response rejected",
+    "ListElement": "Response rejected",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_ResponseToAClaim",
+    "ListElementCode": "App to extend time to present a response",
+    "ListElement": "App to extend time to present a response",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_ResponseToAClaim",
+    "ListElementCode": "ET3 Processing",
+    "ListElement": "ET3 Processing",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "fl_InitialConsideration",
+    "ListElementCode": "Initial Consideration",
+    "ListElement": "Initial Consideration",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_InitialConsideration",
+    "ListElementCode": "Rule 27 Notice",
+    "ListElement": "Rule 28 Notice",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_InitialConsideration",
+    "ListElementCode": "Rule 28 Notice",
+    "ListElement": "Rule 29 Notice",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_CaseManagement",
+    "ListElementCode": "Tribunal Order",
+    "ListElement": "Tribunal Order",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_CaseManagement",
+    "ListElementCode": "Deposit Order",
+    "ListElement": "Deposit Order",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_CaseManagement",
+    "ListElementCode": "Unless Order",
+    "ListElement": "Unless Order",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_CaseManagement",
+    "ListElementCode": "Tribunal Notice",
+    "ListElement": "Tribunal Notice",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_CaseManagement",
+    "ListElementCode": "App to vary an order – C",
+    "ListElement": "App to vary an order – C",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_CaseManagement",
+    "ListElementCode": "App to vary an order – R",
+    "ListElement": "App to vary an order – R",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "fl_CaseManagement",
+    "ListElementCode": "App to revoke an order - C",
+    "ListElement": "App to revoke an order - C",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "fl_CaseManagement",
+    "ListElementCode": "App to revoke an order – R",
+    "ListElement": "App to revoke an order – R",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "fl_CaseManagement",
+    "ListElementCode": "App to vary or revoke an order - C",
+    "ListElement": "App to vary or revoke an order - C",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "fl_CaseManagement",
+    "ListElementCode": "App to vary or revoke an order – R",
+    "ListElement": "App to vary or revoke an order – R",
+    "DisplayOrder": 10
+  },
+  {
+    "ID": "fl_CaseManagement",
+    "ListElementCode": "App to extend time to comply to an order/directions – C",
+    "ListElement": "App to extend time to comply to an order/directions – C",
+    "DisplayOrder": 11
+  },
+  {
+    "ID": "fl_CaseManagement",
+    "ListElementCode": "App to extend time to comply to an order/directions – R",
+    "ListElement": "App to extend time to comply to an order/directions – R",
+    "DisplayOrder": 12
+  },
+  {
+    "ID": "fl_CaseManagement",
+    "ListElementCode": "App to Order the R to do something",
+    "ListElement": "App to Order the R to do something",
+    "DisplayOrder": 13
+  },
+  {
+    "ID": "fl_CaseManagement",
+    "ListElementCode": "App to Order the C to do something",
+    "ListElement": "App to Order the C to do something",
+    "DisplayOrder": 14
+  },
+  {
+    "ID": "fl_CaseManagement",
+    "ListElementCode": "App to amend claim",
+    "ListElement": "App to amend claim",
+    "DisplayOrder": 15
+  },
+  {
+    "ID": "fl_CaseManagement",
+    "ListElementCode": "App to amend response",
+    "ListElement": "App to amend response",
+    "DisplayOrder": 16
+  },
+  {
+    "ID": "fl_CaseManagement",
+    "ListElementCode": "App for a Witness Order - C",
+    "ListElement": "App for a Witness Order - C",
+    "DisplayOrder": 17
+  },
+  {
+    "ID": "fl_CaseManagement",
+    "ListElementCode": "App for a Witness Order - R",
+    "ListElement": "App for a Witness Order - R",
+    "DisplayOrder": 18
+  },
+  {
+    "ID": "fl_CaseManagement",
+    "ListElementCode": "Disability Impact statement",
+    "ListElement": "Disability Impact statement",
+    "DisplayOrder": 19
+  },
+  {
+    "ID": "fl_CaseManagement",
+    "ListElementCode": "R has not complied with an order - C",
+    "ListElement": "R has not complied with an order - C",
+    "DisplayOrder": 20
+  },
+  {
+    "ID": "fl_CaseManagement",
+    "ListElementCode": "C has not complied with an order - R",
+    "ListElement": "C has not complied with an order - R",
+    "DisplayOrder": 21
+  },
+  {
+    "ID": "fl_CaseManagement",
+    "ListElementCode": "App to Strike out all or part of the claim",
+    "ListElement": "App to Strike out all or part of the claim",
+    "DisplayOrder": 22
+  },
+  {
+    "ID": "fl_CaseManagement",
+    "ListElementCode": "App to Strike out all or part of the response",
+    "ListElement": "App to Strike out all or part of the response",
+    "DisplayOrder": 23
+  },
+  {
+    "ID": "fl_CaseManagement",
+    "ListElementCode": "Referral/Judicial Direction",
+    "ListElement": "Referral/Judicial Direction",
+    "DisplayOrder": 24
+  },
+  {
+    "ID": "fl_CaseManagement",
+    "ListElementCode": "Change of party’s details",
+    "ListElement": "Change of party’s details",
+    "DisplayOrder": 25
+  },
+  {
+    "ID": "fl_CaseManagement",
+    "ListElementCode": "Contact the tribunal about something else - C",
+    "ListElement": "Contact the tribunal about something else - C",
+    "DisplayOrder": 26
+  },
+  {
+    "ID": "fl_CaseManagement",
+    "ListElementCode": "Contact the tribunal about something else - R",
+    "ListElement": "Contact the tribunal about something else - R",
+    "DisplayOrder": 27
+  },
+  {
+    "ID": "fl_EmployerContractClaim",
+    "ListElementCode": "Notice of Employer Contract Claim",
+    "ListElement": "Notice of Employer Contract Claim",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_EmployerContractClaim",
+    "ListElementCode": "Acceptance of ECC response",
+    "ListElement": "Acceptance of ECC response",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_EmployerContractClaim",
+    "ListElementCode": "Rejection of ECC response",
+    "ListElement": "Rejection of ECC response",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_WithdrawalSettled",
+    "ListElementCode": "Withdrawal of entire claim",
+    "ListElement": "Withdrawal of entire claim",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_WithdrawalSettled",
+    "ListElementCode": "Withdrawal of part of claim",
+    "ListElement": "Withdrawal of part of claim",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_WithdrawalSettled",
+    "ListElementCode": "Withdrawal of all or part of claim",
+    "ListElement": "Withdrawal of all or part of claim",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_WithdrawalSettled",
+    "ListElementCode": "COT3",
+    "ListElement": "COT3",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_Hearings",
+    "ListElementCode": "App to restrict publicity - C",
+    "ListElement": "App to restrict publicity - C",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_Hearings",
+    "ListElementCode": "App to restrict publicity - R",
+    "ListElement": "App to restrict publicity - R",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_Hearings",
+    "ListElementCode": "Anonymity Order",
+    "ListElement": "Anonymity Order",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_Hearings",
+    "ListElementCode": "Notice of Hearing",
+    "ListElement": "Notice of Hearing",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_Hearings",
+    "ListElementCode": "App to postpone – C",
+    "ListElement": "App to postpone – C",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "fl_Hearings",
+    "ListElementCode": "App to postpone – R",
+    "ListElement": "App to postpone – R",
+    "DisplayOrder": 6
+  },
+  {
+    "ID": "fl_Hearings",
+    "ListElementCode": "Hearing Bundle",
+    "ListElement": "Hearing Bundle",
+    "DisplayOrder": 7
+  },
+  {
+    "ID": "fl_Hearings",
+    "ListElementCode": "Schedule of loss",
+    "ListElement": "Schedule of loss",
+    "DisplayOrder": 8
+  },
+  {
+    "ID": "fl_Hearings",
+    "ListElementCode": "Counter Schedule of Loss",
+    "ListElement": "Counter Schedule of Loss",
+    "DisplayOrder": 9
+  },
+  {
+    "ID": "fl_JudgmentAndReasons",
+    "ListElementCode": "Judgment",
+    "ListElement": "Judgment",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_JudgmentAndReasons",
+    "ListElementCode": "Judgment with Reasons",
+    "ListElement": "Judgment with Reasons",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_JudgmentAndReasons",
+    "ListElementCode": "Reasons",
+    "ListElement": "Reasons",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_JudgmentAndReasons",
+    "ListElementCode": "Extract of Judgment",
+    "ListElement": "Extract of Judgment",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_Reconsideration",
+    "ListElementCode": "App to have a Legal Officer decision considered afresh - C",
+    "ListElement": "App to have a Legal Officer decision considered afresh - C",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_Reconsideration",
+    "ListElementCode": "App to have a Legal Officer decision considered afresh - R",
+    "ListElement": "App to have a Legal Officer decision considered afresh - R",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_Reconsideration",
+    "ListElementCode": "App for a judgment to be reconsidered - C",
+    "ListElement": "App for a judgment to be reconsidered - C",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_Reconsideration",
+    "ListElementCode": "App for a judgment to be reconsidered - R",
+    "ListElement": "App for a judgment to be reconsidered - R",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "fl_Misc",
+    "ListElementCode": "Certificate of Correction",
+    "ListElement": "Certificate of Correction",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_Misc",
+    "ListElementCode": "Tribunal case file",
+    "ListElement": "Tribunal case file",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "fl_Misc",
+    "ListElementCode": "Other",
+    "ListElement": "Other",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_Misc",
+    "ListElementCode": "Needs updating",
+    "ListElement": "NEEDS UPDATING",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "msl_Yes",
+    "ListElementCode": "Yes",
+    "ListElement": "Yes",
+    "DisplayOrder": 1
+  },
+  {"ID": "frl_respondentType", "ListElementCode": "Organisation", "ListElement": "Organisation", "DisplayOrder": 1},
+  {"ID": "frl_respondentType", "ListElementCode": "Individual", "ListElement": "Individual", "DisplayOrder": 2},
+  {
+    "ID": "frl_ClaimantTseCopyToOtherPartyYesOrNo",
+    "ListElement": "Yes I confirm I will copy this correspondence to the other party to satisfy the Employment Tribunal Rules of Procedure. I will also notify the other party that any objections to the application should be sent to the tribunal as soon as possible and in any event within 7 days.",
+    "ListElementCode": "Yes",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "frl_ClaimantTseCopyToOtherPartyYesOrNo",
+    "ListElement": "No, I do not want to copy this correspondence to the other party. You must tell the tribunal why you do not want to inform the other party. The tribunal will consider your reasons and decide if you must inform the other party or not.",
+    "ListElementCode": "No",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "msl_removeDocument",
+    "ListElementCode": "Yes - Remove document",
+    "ListElement": "Yes - Remove document",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "claimant_hearingPanelPreference",
+    "ListElementCode": "No preference",
+    "ListElement": "No preference",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "claimant_hearingPanelPreference",
+    "ListElementCode": "Judge",
+    "ListElement": "Judge",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "claimant_hearingPanelPreference",
+    "ListElementCode": "Panel",
+    "ListElement": "Panel",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "fl_representativeContactChangeOptions",
+    "ListElementCode": "Amend contact details",
+    "ListElement": "Amend contact details",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "fl_representativeContactChangeOptions",
+    "ListElementCode": "Use MyHMCTS details",
+    "ListElement": "Use MyHMCTS details",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "frl_ClaimantOrRespondents",
+    "ListElementCode": "Claimant",
+    "ListElement": "Claimant",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "frl_ClaimantOrRespondents",
+    "ListElementCode": "Respondent",
+    "ListElement": "Respondent(s)",
+    "DisplayOrder": 2
+  }
+]

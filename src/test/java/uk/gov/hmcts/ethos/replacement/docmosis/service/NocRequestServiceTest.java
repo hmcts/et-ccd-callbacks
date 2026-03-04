@@ -9,8 +9,8 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocCcdService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRequestNotificationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRequestService;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import static org.mockito.ArgumentMatchers.any;

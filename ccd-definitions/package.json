@@ -66,7 +66,7 @@
   "resolutions": {
     "axios": "1.8.4",
     "flat": "^5.0.1",
-    "minimatch": "3.1.2",
+    "minimatch": "3.1.4",
     "phin": "^3.7.1",
     "formidable": "^3.2.4",
     "ws": "^8.17.1",

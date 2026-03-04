@@ -117,7 +117,7 @@ public final class NotificationUtils {
      * @return {@code true} if the organisation response contains a valid superuser
      *         email address and all required parameters are valid; {@code false} otherwise
      */
-    public static boolean hasOrganisationSuperUserEmail(String caseId,
+    public static boolean hasOrganisationSuperuserEmail(String caseId,
                                                         String orgId,
                                                         String nocType,
                                                         ResponseEntity<RetrieveOrgByIdResponse>
@@ -158,7 +158,7 @@ public final class NotificationUtils {
      * @param orgResponse the organisation lookup response to validate
      * @return {@code true} if a non-blank superuser email exists in the response; {@code false} otherwise
      */
-    public static boolean hasOrganisationSuperUserEmail(ResponseEntity<RetrieveOrgByIdResponse> orgResponse) {
+    public static boolean hasOrganisationSuperuserEmail(ResponseEntity<RetrieveOrgByIdResponse> orgResponse) {
         return ObjectUtils.isNotEmpty(orgResponse)
                 && orgResponse.getStatusCode().is2xxSuccessful()
                 && ObjectUtils.isNotEmpty(orgResponse.getBody())

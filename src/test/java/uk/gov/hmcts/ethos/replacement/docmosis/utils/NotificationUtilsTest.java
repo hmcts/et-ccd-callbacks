@@ -135,53 +135,53 @@ final class NotificationUtilsTest {
         RetrieveOrgByIdResponse retrieveOrgByIdResponse = RetrieveOrgByIdResponse.builder().build();
         ResponseEntity<RetrieveOrgByIdResponse> orgResponse = new ResponseEntity<>(retrieveOrgByIdResponse,
                 HttpStatus.OK);
-        assertThat(NotificationUtils.hasOrganisationSuperUserEmail(StringUtils.EMPTY, ORGANISATION_ID,
+        assertThat(NotificationUtils.hasOrganisationSuperuserEmail(StringUtils.EMPTY, ORGANISATION_ID,
                 NOC_TYPE_REMOVAL, orgResponse)).isFalse();
         LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_ONE,
                 EXPECTED_WARNING_INVALID_PARAMETERS_TO_RESOLVE_ORGANISATION_EMAIL_WITHOUT_CASE_ID);
         // when case id is empty should return false
-        assertThat(NotificationUtils.hasOrganisationSuperUserEmail(CASE_ID, StringUtils.EMPTY,
+        assertThat(NotificationUtils.hasOrganisationSuperuserEmail(CASE_ID, StringUtils.EMPTY,
                 NOC_TYPE_REMOVAL, orgResponse)).isFalse();
         LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_TWO,
                 EXPECTED_WARNING_INVALID_PARAMETERS_TO_RESOLVE_ORGANISATION_EMAIL_WITH_CASE_ID);
         // when noc type is empty should return false
-        assertThat(NotificationUtils.hasOrganisationSuperUserEmail(CASE_ID, ORGANISATION_ID,
+        assertThat(NotificationUtils.hasOrganisationSuperuserEmail(CASE_ID, ORGANISATION_ID,
                 StringUtils.EMPTY, orgResponse)).isFalse();
         LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_THREE,
                 EXPECTED_WARNING_INVALID_PARAMETERS_TO_RESOLVE_ORGANISATION_EMAIL_WITH_CASE_ID);
         // when organisation response is empty should return false
-        assertThat(NotificationUtils.hasOrganisationSuperUserEmail(CASE_ID, ORGANISATION_ID,
+        assertThat(NotificationUtils.hasOrganisationSuperuserEmail(CASE_ID, ORGANISATION_ID,
                 NOC_TYPE_REMOVAL, null)).isFalse();
         LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_FOUR,
                 EXPECTED_WARNING_INVALID_ORGANISATION_RESPONSE_TO_RESOLVE_ORGANISATION_EMAIL_1);
         // when organisation response status code is different from successful should return false
         orgResponse = new ResponseEntity<>(retrieveOrgByIdResponse, HttpStatus.BAD_REQUEST);
-        assertThat(NotificationUtils.hasOrganisationSuperUserEmail(CASE_ID, ORGANISATION_ID,
+        assertThat(NotificationUtils.hasOrganisationSuperuserEmail(CASE_ID, ORGANISATION_ID,
                 NOC_TYPE_REMOVAL, orgResponse)).isFalse();
         LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_FIVE,
                 EXPECTED_WARNING_INVALID_ORGANISATION_RESPONSE_TO_RESOLVE_ORGANISATION_EMAIL_2);
         // when organisation response not has body should return false
         orgResponse = new ResponseEntity<>(null, HttpStatus.OK);
-        assertThat(NotificationUtils.hasOrganisationSuperUserEmail(CASE_ID, ORGANISATION_ID,
+        assertThat(NotificationUtils.hasOrganisationSuperuserEmail(CASE_ID, ORGANISATION_ID,
                 NOC_TYPE_REMOVAL, orgResponse)).isFalse();
         LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_SIX,
                 EXPECTED_WARNING_INVALID_ORGANISATION_RESPONSE_TO_RESOLVE_ORGANISATION_EMAIL_3);
         // when organisation response body not has superuser should return false
         orgResponse = new ResponseEntity<>(retrieveOrgByIdResponse, HttpStatus.OK);
-        assertThat(NotificationUtils.hasOrganisationSuperUserEmail(CASE_ID, ORGANISATION_ID,
+        assertThat(NotificationUtils.hasOrganisationSuperuserEmail(CASE_ID, ORGANISATION_ID,
                 NOC_TYPE_REMOVAL, orgResponse)).isFalse();
         LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_SEVEN,
                 EXPECTED_WARNING_INVALID_ORGANISATION_RESPONSE_TO_RESOLVE_ORGANISATION_EMAIL_4);
         // when superuser not has email should return false
         retrieveOrgByIdResponse.setSuperUser(RetrieveOrgByIdResponse.SuperUser.builder().build());
         orgResponse = new ResponseEntity<>(retrieveOrgByIdResponse, HttpStatus.OK);
-        assertThat(NotificationUtils.hasOrganisationSuperUserEmail(CASE_ID, ORGANISATION_ID,
+        assertThat(NotificationUtils.hasOrganisationSuperuserEmail(CASE_ID, ORGANISATION_ID,
                 NOC_TYPE_REMOVAL, orgResponse)).isFalse();
         LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_EIGHT,
                 EXPECTED_WARNING_INVALID_ORGANISATION_RESPONSE_TO_RESOLVE_ORGANISATION_EMAIL_5);
         // when superuser has email should return true
         retrieveOrgByIdResponse.getSuperUser().setEmail(ORGANISATION_EMAIL);
-        assertThat(NotificationUtils.hasOrganisationSuperUserEmail(CASE_ID, ORGANISATION_ID,
+        assertThat(NotificationUtils.hasOrganisationSuperuserEmail(CASE_ID, ORGANISATION_ID,
                 NOC_TYPE_REMOVAL, orgResponse)).isTrue();
     }
 
@@ -193,21 +193,21 @@ final class NotificationUtilsTest {
                 .build();
         ResponseEntity<RetrieveOrgByIdResponse> orgResponse = new ResponseEntity<>(retrieveOrgByIdResponse,
                 HttpStatus.OK);
-        assertThat(NotificationUtils.hasOrganisationSuperUserEmail(orgResponse)).isTrue();
+        assertThat(NotificationUtils.hasOrganisationSuperuserEmail(orgResponse)).isTrue();
         // when organisation response is empty should return false
-        assertThat(NotificationUtils.hasOrganisationSuperUserEmail(null)).isFalse();
+        assertThat(NotificationUtils.hasOrganisationSuperuserEmail(null)).isFalse();
         // when organisation response status code is different from successful should return false
         orgResponse = new ResponseEntity<>(retrieveOrgByIdResponse, HttpStatus.BAD_REQUEST);
-        assertThat(NotificationUtils.hasOrganisationSuperUserEmail(orgResponse)).isFalse();
+        assertThat(NotificationUtils.hasOrganisationSuperuserEmail(orgResponse)).isFalse();
         // when organisation response not has body should return false
         orgResponse = new ResponseEntity<>(null, HttpStatus.OK);
-        assertThat(NotificationUtils.hasOrganisationSuperUserEmail(orgResponse)).isFalse();
+        assertThat(NotificationUtils.hasOrganisationSuperuserEmail(orgResponse)).isFalse();
         // when organisation response body not has superuser should return false
         orgResponse = new ResponseEntity<>(RetrieveOrgByIdResponse.builder().build(), HttpStatus.OK);
-        assertThat(NotificationUtils.hasOrganisationSuperUserEmail(orgResponse)).isFalse();
+        assertThat(NotificationUtils.hasOrganisationSuperuserEmail(orgResponse)).isFalse();
         // when superuser not has email should return false
         retrieveOrgByIdResponse.setSuperUser(RetrieveOrgByIdResponse.SuperUser.builder().build());
         orgResponse = new ResponseEntity<>(retrieveOrgByIdResponse, HttpStatus.OK);
-        assertThat(NotificationUtils.hasOrganisationSuperUserEmail(orgResponse)).isFalse();
+        assertThat(NotificationUtils.hasOrganisationSuperuserEmail(orgResponse)).isFalse();
     }
 }

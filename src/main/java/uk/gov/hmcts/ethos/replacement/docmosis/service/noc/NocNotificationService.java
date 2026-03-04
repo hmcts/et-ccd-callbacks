@@ -329,7 +329,7 @@ public class NocNotificationService {
         }
         String organisationId = representative.getValue().getRespondentOrganisation().getOrganisationID();
         ResponseEntity<RetrieveOrgByIdResponse> organisationResponse = getOrganisationById(organisationId);
-        if (!NotificationUtils.hasOrganisationSuperUserEmail(caseDetails.getCaseId(), organisationId, nocType,
+        if (!NotificationUtils.hasOrganisationSuperuserEmail(caseDetails.getCaseId(), organisationId, nocType,
                 organisationResponse)) {
             return StringUtils.EMPTY;
         }
@@ -353,7 +353,7 @@ public class NocNotificationService {
             return StringUtils.EMPTY;
         }
         ResponseEntity<RetrieveOrgByIdResponse> organisationResponse = getOrganisationById(organisationId);
-        if (!NotificationUtils.hasOrganisationSuperUserEmail(organisationResponse)) {
+        if (!NotificationUtils.hasOrganisationSuperuserEmail(organisationResponse)) {
             return StringUtils.EMPTY;
         }
         assert organisationResponse.getBody() != null;

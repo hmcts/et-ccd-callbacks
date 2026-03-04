@@ -22,11 +22,4 @@ public class OrganisationPolicy {
 
     @JsonProperty("PrepopulateToUsersOrganisation")
     private String prepopulateToUsersOrganisation;
-
-    public static OrganisationPolicy createDefaultPolicyByRole(String role) {
-        return OrganisationPolicy.builder()
-                .orgPolicyCaseAssignedRole(role)
-                .organisation(Organisation.builder().build())
-                .build();
-    }
 }

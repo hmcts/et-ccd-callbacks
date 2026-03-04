@@ -322,7 +322,8 @@ public final class RoleUtils {
         if (ObjectUtils.isEmpty(caseData) || index < 0 || index >= MAX_NOC_ANSWERS) {
             return;
         }
-                OrganisationPolicy orgPolicy = new OrganisationPolicy(SolicitorRole.values()[index].getCaseRoleLabel());
+        OrganisationPolicy orgPolicy = OrganisationPolicy.builder().orgPolicyCaseAssignedRole(SolicitorRole
+                .values()[index].getCaseRoleLabel()).build();
 
         switch (index) {
             case 0 -> caseData.setRespondentOrganisationPolicy0(orgPolicy);

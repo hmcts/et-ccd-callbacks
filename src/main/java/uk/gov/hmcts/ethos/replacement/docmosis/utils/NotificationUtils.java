@@ -81,9 +81,6 @@ public final class NotificationUtils {
                 && StringUtils.isNotBlank(claimantRepresentative.getMyHmctsOrganisation().getOrganisationID())) {
             return claimantRepresentative.getMyHmctsOrganisation().getOrganisationID();
         }
-        if (StringUtils.isNotBlank(claimantRepresentative.getOrganisationId())) {
-            return claimantRepresentative.getOrganisationId();
-        }
         return StringUtils.EMPTY;
     }
 
@@ -115,10 +112,10 @@ public final class NotificationUtils {
      * @return {@code true} if the organisation response contains a valid superuser
      *         email address and all required parameters are valid; {@code false} otherwise
      */
-    public static boolean canResolveOrganisationSuperuserEmail(String caseId,
-                                                               String orgId,
-                                                               String nocType,
-                                                               ResponseEntity<RetrieveOrgByIdResponse>
+    public static boolean canFindOrganisationSuperuserEmail(String caseId,
+                                                            String orgId,
+                                                            String nocType,
+                                                            ResponseEntity<RetrieveOrgByIdResponse>
                                                                                orgResponse) {
         if (StringUtils.isBlank(caseId) || StringUtils.isBlank(orgId) || StringUtils.isBlank(nocType)) {
             String tmpCaseId = StringUtils.isBlank(caseId) ? StringUtils.EMPTY : caseId;
@@ -138,5 +135,13 @@ public final class NotificationUtils {
             return false;
         }
         return true;
+    }
+
+    public static boolean canFindOrganisationSuperuserEmail(ResponseEntity<RetrieveOrgByIdResponse> orgResponse) {
+        return !ObjectUtils.isEmpty(orgResponse)
+                && orgResponse.getStatusCode().is2xxSuccessful()
+                && ObjectUtils.isNotEmpty(orgResponse.getBody())
+                && ObjectUtils.isNotEmpty(orgResponse.getBody().getSuperUser())
+                && StringUtils.isNotBlank(orgResponse.getBody().getSuperUser().getEmail());
     }
 }

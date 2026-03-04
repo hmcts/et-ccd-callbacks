@@ -125,19 +125,8 @@ class NocNotificationServiceTest {
     private static final String EXPECTED_WARNING_INVALID_CASE_DETAILS_TO_RESOLVE_ORGANISATION_EMAIL =
             "Invalid case details. Unable to resolve organisation's superuser email. Case id: , NOC type: Removal";
     private static final String
-            EXPECTED_WARNING_INVALID_CASE_DETAILS_TO_RESOLVE_CLAIMANT_REP_ORGANISATION_EMAIL_WITHOUT_CASE_ID =
-            "Invalid case details. Unable to resolve claimant representative organisation's superuser email. "
-                    + "Case id: , NOC type: Removal";
-    private static final String
-            EXPECTED_WARNING_INVALID_CASE_DETAILS_TO_RESOLVE_CLAIMANT_REP_ORGANISATION_EMAIL_WITH_CASE_ID =
-            "Invalid case details. Unable to resolve claimant representative organisation's superuser email. "
-                    + "Case id: " + CASE_ID + ", NOC type: Removal";
-    private static final String
             EXPECTED_WARNING_INVALID_REPRESENTATIVE_TO_RESOLVE_ORGANISATION_EMAIL = "Invalid representative details. "
             + "Unable to resolve organisation superuser email. Case id: 1234567890123456, NOC type: Removal";
-    private static final String EXPECTED_WARNING_CLAIMANT_REP_ORGANISATION_ID_NOT_FOUND_TO_RESOLVE_ORGANISATION_EMAIL =
-            "Claimant representative organisation id not found. Unable to resolve organisation superuser email. "
-                    + "Case id: " + CASE_ID + ", NOC type: Removal";
     private static final String EXPECTED_WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_ORGANISATION =
             "Failed to send NOC notification email to organisation admin, case id: " + CASE_ID + ", error: Dummy "
                     + "exception occurred while sending email to respondent";
@@ -539,44 +528,23 @@ class NocNotificationServiceTest {
     }
 
     @Test
-    void theResolveClaimantRepresentativeOrganisationSuperuserEmail() {
-        // when case details not valid should log invalid case details warning
-        assertThat(nocNotificationService.resolveClaimantRepresentativeOrganisationSuperuserEmail(null,
-                NOC_TYPE_REMOVAL)).isEmpty();
-        LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_ONE,
-                EXPECTED_WARNING_INVALID_CASE_DETAILS_TO_RESOLVE_CLAIMANT_REP_ORGANISATION_EMAIL_WITHOUT_CASE_ID);
-        // when case details are invalid should log invalid case details warning
-        CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setCaseId(CASE_ID);
-        assertThat(nocNotificationService.resolveClaimantRepresentativeOrganisationSuperuserEmail(caseDetails,
-                NOC_TYPE_REMOVAL)).isEmpty();
-        LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_TWO,
-                EXPECTED_WARNING_INVALID_CASE_DETAILS_TO_RESOLVE_CLAIMANT_REP_ORGANISATION_EMAIL_WITH_CASE_ID);
-        // when representative does not have organisation id should log organisation id not found warning
-        caseDetails.setCaseData(new CaseData());
-        caseDetails.getCaseData().setEthosCaseReference(ETHOS_CASE_REFERENCE);
-        caseDetails.getCaseData().setClaimant(CLAIMANT_NAME);
-        caseDetails.getCaseData().setRespondentCollection(List.of(new RespondentSumTypeItem()));
-        RepresentedTypeC representative = RepresentedTypeC.builder().build();
-        caseDetails.getCaseData().setRepresentativeClaimantType(representative);
-        assertThat(nocNotificationService.resolveClaimantRepresentativeOrganisationSuperuserEmail(caseDetails,
-                NOC_TYPE_REMOVAL)).isEmpty();
-        LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_THREE,
-                EXPECTED_WARNING_CLAIMANT_REP_ORGANISATION_ID_NOT_FOUND_TO_RESOLVE_ORGANISATION_EMAIL);
-        // when organisation response is empty should return empty string
-        representative.setMyHmctsOrganisation(Organisation.builder().organisationID(OLD_ORG_ID).build());
+    void theFindClaimantRepOrgSuperUserEmail() {
+        // when representative does not have organisation id should return empty string
+        assertThat(nocNotificationService.findClaimantRepOrgSuperUserEmail(null)).isEmpty();
+        // when representative organisation not found should return empty string
+        RepresentedTypeC claimantRepresentative = RepresentedTypeC.builder().myHmctsOrganisation(Organisation.builder()
+                .organisationID(OLD_ORG_ID).build()).build();
         when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
         when(authTokenGenerator.generate()).thenReturn(AUTH_TOKEN);
         when(organisationClient.getOrganisationById(ADMIN_USER_TOKEN, AUTH_TOKEN, OLD_ORG_ID)).thenReturn(null);
-        assertThat(nocNotificationService.resolveClaimantRepresentativeOrganisationSuperuserEmail(caseDetails,
-                NOC_TYPE_REMOVAL)).isEmpty();
+        assertThat(nocNotificationService.findClaimantRepOrgSuperUserEmail(claimantRepresentative)).isEmpty();
         // when able to find respondent representative organisation should return superuser email
         RetrieveOrgByIdResponse orgByIdResponse = RetrieveOrgByIdResponse.builder().superUser(RetrieveOrgByIdResponse
                 .SuperUser.builder().email(ORGANISATION_ADMIN_EMAIL).build()).build();
         ResponseEntity<RetrieveOrgByIdResponse> orgResponse = new ResponseEntity<>(orgByIdResponse, HttpStatus.OK);
         when(organisationClient.getOrganisationById(ADMIN_USER_TOKEN, AUTH_TOKEN, OLD_ORG_ID)).thenReturn(orgResponse);
-        assertThat(nocNotificationService.resolveClaimantRepresentativeOrganisationSuperuserEmail(caseDetails,
-                NOC_TYPE_REMOVAL)).isNotEmpty().isEqualTo(ORGANISATION_ADMIN_EMAIL);
+        assertThat(nocNotificationService.findClaimantRepOrgSuperUserEmail(claimantRepresentative)).isNotEmpty()
+                .isEqualTo(ORGANISATION_ADMIN_EMAIL);
     }
 
     @Test

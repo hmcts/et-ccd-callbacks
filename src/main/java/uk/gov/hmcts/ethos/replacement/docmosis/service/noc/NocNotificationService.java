@@ -49,7 +49,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_TYPE_ADDITION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_TYPE_REMOVAL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_CLAIMANT_EMAIL_NOT_FOUND_TO_NOTIFY_FOR_RESPONDENT_REP_UPDATE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_CLAIMANT_REP_ORGANISATION_ID_NOT_FOUND_TO_RESOLVE_ORGANISATION_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_ORGANISATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_RESPONDENT;
@@ -61,7 +60,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WAR
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_INVALID_CASE_DETAILS_TO_NOTIFY_CLAIMANT_FOR_RESPONDENT_REP_UPDATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_INVALID_CASE_DETAILS_TO_NOTIFY_NEW_REPRESENTATIVE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_INVALID_CASE_DETAILS_TO_NOTIFY_TRIBUNAL_FOR_RESPONDENT_REP_UPDATE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_INVALID_CASE_DETAILS_TO_RESOLVE_CLAIMANT_REP_ORGANISATION_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_INVALID_CASE_DETAILS_TO_RESOLVE_ORGANISATION_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_INVALID_CLAIMANT_EMAIL_CLAIMANT_NOT_NOTIFIED_FOR_REMOVAL_OF_REPRESENTATIVE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_INVALID_PARTY_NAME_TO_NOTIFY_NEW_REPRESENTATIVE;
@@ -331,7 +329,7 @@ public class NocNotificationService {
         }
         String organisationId = representative.getValue().getRespondentOrganisation().getOrganisationID();
         ResponseEntity<RetrieveOrgByIdResponse> organisationResponse = getOrganisationById(organisationId);
-        if (!NotificationUtils.canResolveOrganisationSuperuserEmail(caseDetails.getCaseId(), organisationId, nocType,
+        if (!NotificationUtils.canFindOrganisationSuperuserEmail(caseDetails.getCaseId(), organisationId, nocType,
                 organisationResponse)) {
             return StringUtils.EMPTY;
         }
@@ -340,45 +338,22 @@ public class NocNotificationService {
     }
 
     /**
-     * Resolves the email address of the claimant representative organisation's superuser
-     * for the given case and Notice of Change (NoC) type.
+     * Attempts to retrieve the super user email address for the claimant representative's organisation.
      *
-     * <p>The resolution process performs the following steps:
-     * <ol>
-     *     <li>Validates that the provided {@link CaseDetails} is suitable for notification processing.</li>
-     *     <li>Extracts the claimant representative organisation ID from the case data.</li>
-     *     <li>Retrieves the organisation details using the organisation ID.</li>
-     *     <li>Verifies that the organisation superuser email can be resolved.</li>
-     *     <li>Returns the superuser’s email address if all validations pass.</li>
-     * </ol>
+     * <p>The method first resolves the organisation ID from the provided representative.
+     * If the organisation ID is blank, or if the organisation response does not contain
+     * a resolvable superuser email, an empty string is returned.</p>
      *
-     * <p>If any validation step fails (e.g. invalid case details, missing organisation ID,
-     * unsuccessful organisation lookup, or unresolved superuser email), the method logs
-     * a warning and returns an empty string.
-     *
-     * @param caseDetails the {@link CaseDetails} containing case and representative information;
-     *                    may be {@code null}
-     * @param nocType the Notice of Change (NoC) type used for logging and validation context
-     * @return the email address of the claimant representative organisation’s superuser,
-     *         or an empty string if it cannot be resolved
+     * @param representative the claimant representative details used to resolve the organisation
+     * @return the organisation superuser email if available; otherwise an empty string
      */
-    public String resolveClaimantRepresentativeOrganisationSuperuserEmail(CaseDetails caseDetails,
-                                                                          String nocType) {
-        if (!NotificationUtils.isCaseValidForNotification(caseDetails)) {
-            String caseId = ObjectUtils.isEmpty(caseDetails) ? StringUtils.EMPTY : caseDetails.getCaseId();
-            log.warn(WARNING_INVALID_CASE_DETAILS_TO_RESOLVE_CLAIMANT_REP_ORGANISATION_EMAIL, caseId, nocType);
-            return StringUtils.EMPTY;
-        }
-        String organisationId = NotificationUtils.findClaimantRepresentativeOrganisationId(caseDetails.getCaseData()
-                .getRepresentativeClaimantType());
+    public String findClaimantRepOrgSuperUserEmail(RepresentedTypeC representative) {
+        String organisationId = NotificationUtils.findClaimantRepresentativeOrganisationId(representative);
         if (StringUtils.isBlank(organisationId)) {
-            log.warn(WARNING_CLAIMANT_REP_ORGANISATION_ID_NOT_FOUND_TO_RESOLVE_ORGANISATION_EMAIL,
-                    caseDetails.getCaseId(), nocType);
             return StringUtils.EMPTY;
         }
         ResponseEntity<RetrieveOrgByIdResponse> organisationResponse = getOrganisationById(organisationId);
-        if (!NotificationUtils.canResolveOrganisationSuperuserEmail(caseDetails.getCaseId(), organisationId,
-                nocType, organisationResponse)) {
+        if (!NotificationUtils.canFindOrganisationSuperuserEmail(organisationResponse)) {
             return StringUtils.EMPTY;
         }
         assert organisationResponse.getBody() != null;

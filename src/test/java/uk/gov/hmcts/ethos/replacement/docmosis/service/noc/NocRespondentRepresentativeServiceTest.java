@@ -782,8 +782,7 @@ class NocRespondentRepresentativeServiceTest {
         verify(nocNotificationService, times(LoggerTestUtils.INTEGER_THREE))
                 .sendRespondentRepresentationUpdateNotifications(any(CaseDetails.class), anyList(), anyString());
         assertThat(newCaseDetails.getCaseData().getRespondentOrganisationPolicy0()).isEqualTo(OrganisationPolicy
-                .builder().orgPolicyCaseAssignedRole(ROLE_SOLICITORA).organisation(Organisation.builder().build())
-                .build());
+                .builder().orgPolicyCaseAssignedRole(ROLE_SOLICITORA).build());
         assertThat(newCaseDetails.getCaseData().getNoticeOfChangeAnswers0()).isEqualTo(
                 NoticeOfChangeAnswers.builder().respondentName(RESPONDENT_NAME_ONE).build());
     }
@@ -1028,7 +1027,7 @@ class NocRespondentRepresentativeServiceTest {
                 any(CaseData.class),
                 eq(CASE_TYPE_ID_ENGLAND_WALES), eq(JURISDICTION_EMPLOYMENT), any(CCDRequest.class), eq(CASE_ID_1));
         assertThat(caseDetails.getCaseData().getRespondentOrganisationPolicy0()).isEqualTo(OrganisationPolicy.builder()
-                .orgPolicyCaseAssignedRole(ROLE_SOLICITORA).organisation(Organisation.builder().build()).build());
+                .orgPolicyCaseAssignedRole(ROLE_SOLICITORA).build());
     }
 
     @Test

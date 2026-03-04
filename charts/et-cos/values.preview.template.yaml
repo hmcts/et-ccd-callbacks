@@ -164,6 +164,7 @@ et-sya-api:
       EXUI_CASE_DETAILS_URL: "https://xui-${SERVICE_FQDN}/cases/case-details/"
 
 ccd:
+  enabled: true
   ccd:
     definitionImporter:
       enabled: false

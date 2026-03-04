@@ -73,15 +73,20 @@ public final class NotificationUtils {
                 && StringUtils.isNotBlank(representative.getValue().getRespondentOrganisation().getOrganisationID());
     }
 
+    /**
+     * Attempts to retrieve the organisation ID associated with the given claimant representative.
+     *
+     * <p>If the representative, their organisation details, or the organisation ID
+     * is null, empty, or blank, this method returns an empty string.</p>
+     *
+     * @param claimantRepresentative the claimant representative whose organisation ID is to be retrieved
+     * @return the organisation ID if available; otherwise an empty string
+     */
     public static String findClaimantRepresentativeOrganisationId(RepresentedTypeC claimantRepresentative) {
-        if (ObjectUtils.isEmpty(claimantRepresentative)) {
-            return StringUtils.EMPTY;
-        }
-        if (ObjectUtils.isNotEmpty(claimantRepresentative.getMyHmctsOrganisation())
-                && StringUtils.isNotBlank(claimantRepresentative.getMyHmctsOrganisation().getOrganisationID())) {
-            return claimantRepresentative.getMyHmctsOrganisation().getOrganisationID();
-        }
-        return StringUtils.EMPTY;
+        return ObjectUtils.isEmpty(claimantRepresentative)
+                || ObjectUtils.isEmpty(claimantRepresentative.getMyHmctsOrganisation())
+                || StringUtils.isBlank(claimantRepresentative.getMyHmctsOrganisation().getOrganisationID())
+                ? StringUtils.EMPTY : claimantRepresentative.getMyHmctsOrganisation().getOrganisationID();
     }
 
     /**
@@ -112,10 +117,10 @@ public final class NotificationUtils {
      * @return {@code true} if the organisation response contains a valid superuser
      *         email address and all required parameters are valid; {@code false} otherwise
      */
-    public static boolean canFindOrganisationSuperuserEmail(String caseId,
-                                                            String orgId,
-                                                            String nocType,
-                                                            ResponseEntity<RetrieveOrgByIdResponse>
+    public static boolean hasOrganisationSuperUserEmail(String caseId,
+                                                        String orgId,
+                                                        String nocType,
+                                                        ResponseEntity<RetrieveOrgByIdResponse>
                                                                                orgResponse) {
         if (StringUtils.isBlank(caseId) || StringUtils.isBlank(orgId) || StringUtils.isBlank(nocType)) {
             String tmpCaseId = StringUtils.isBlank(caseId) ? StringUtils.EMPTY : caseId;
@@ -137,7 +142,23 @@ public final class NotificationUtils {
         return true;
     }
 
-    public static boolean canFindOrganisationSuperuserEmail(ResponseEntity<RetrieveOrgByIdResponse> orgResponse) {
+    /**
+     * Checks whether the given organisation response contains a valid super user email address.
+     *
+     * <p>This method returns {@code true} only if:
+     * <ul>
+     *   <li>The response entity is not null</li>
+     *   <li>The HTTP status code indicates a successful (2xx) response</li>
+     *   <li>The response body is present</li>
+     *   <li>The superuser details are present</li>
+     *   <li>The superuser email is not blank</li>
+     * </ul>
+     * Otherwise, {@code false} is returned.</p>
+     *
+     * @param orgResponse the organisation lookup response to validate
+     * @return {@code true} if a non-blank superuser email exists in the response; {@code false} otherwise
+     */
+    public static boolean hasOrganisationSuperUserEmail(ResponseEntity<RetrieveOrgByIdResponse> orgResponse) {
         return ObjectUtils.isNotEmpty(orgResponse)
                 && orgResponse.getStatusCode().is2xxSuccessful()
                 && ObjectUtils.isNotEmpty(orgResponse.getBody())

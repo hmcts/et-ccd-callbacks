@@ -134,10 +134,11 @@ public class InitialConsiderationService {
             return;
         }
 
-        Map<String, List<String>> linksByType = getDocumentTypeByCaseTypeId(documents, caseDetails.getCaseTypeId());
+        String caseTypeId = caseDetails.getCaseTypeId();
+        Map<String, List<String>> linksByType = getDocumentTypeByCaseTypeId(documents, caseTypeId);
 
         String docLinksMarkUp = formatDocLinks(linksByType);
-        String referralLinks = generateReferralLinks(caseDetails);
+        String referralLinks = ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId) ? generateReferralLinks(caseDetails) : "";
         String beforeYouStart = String.format(TO_HELP_YOU_COMPLETE_IC_EVENT_LABEL, docLinksMarkUp, referralLinks);
         caseDetails.getCaseData().setInitialConsiderationBeforeYouStart(beforeYouStart);
     }

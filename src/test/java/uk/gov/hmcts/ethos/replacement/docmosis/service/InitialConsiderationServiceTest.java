@@ -1334,6 +1334,7 @@ class InitialConsiderationServiceTest {
         caseDataWithReferralLinks.setDocumentCollection(documentCollection);
         caseDataWithReferralLinks.setReferralCollection(Collections.singletonList(new ReferralTypeItem()));
         CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
         caseDetails.setCaseData(caseDataWithReferralLinks);
         caseDetails.setCaseId("12345");
 

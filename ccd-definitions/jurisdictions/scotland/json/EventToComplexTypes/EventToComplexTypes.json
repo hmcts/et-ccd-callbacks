@@ -6594,7 +6594,7 @@
     "ListElementCode": "etICTypeOfF2fHearingOrder",
     "EventElementLabel": "Issue standard orders when listed",
     "FieldDisplayOrder": 2,
-    "DisplayContext": "MANDATORY"
+    "DisplayContext": "OPTIONAL"
   },
   {
     "ID": "InitialConsideration",

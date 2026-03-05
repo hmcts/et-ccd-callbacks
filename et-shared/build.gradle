@@ -22,7 +22,7 @@ repositories {
 
 dependencyManagement {
     imports {
-        mavenBom "org.springframework.boot:spring-boot-dependencies:3.5.5"
+        mavenBom "org.springframework.boot:spring-boot-dependencies:3.5.11"
     }
     dependencies {
         dependency 'commons-fileupload:commons-fileupload:1.6.0'

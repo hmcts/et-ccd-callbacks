@@ -329,7 +329,7 @@ public class NocNotificationService {
         }
         String organisationId = representative.getValue().getRespondentOrganisation().getOrganisationID();
         ResponseEntity<RetrieveOrgByIdResponse> organisationResponse = getOrganisationById(organisationId);
-        if (!NotificationUtils.canFindOrganisationSuperuserEmail(caseDetails.getCaseId(), organisationId, nocType,
+        if (!NotificationUtils.hasOrganisationSuperuserEmail(caseDetails.getCaseId(), organisationId, nocType,
                 organisationResponse)) {
             return StringUtils.EMPTY;
         }
@@ -338,7 +338,7 @@ public class NocNotificationService {
     }
 
     /**
-     * Attempts to retrieve the super user email address for the claimant representative's organisation.
+     * Attempts to retrieve the superuser email address for the claimant representative's organisation.
      *
      * <p>The method first resolves the organisation ID from the provided representative.
      * If the organisation ID is blank, or if the organisation response does not contain
@@ -353,7 +353,7 @@ public class NocNotificationService {
             return StringUtils.EMPTY;
         }
         ResponseEntity<RetrieveOrgByIdResponse> organisationResponse = getOrganisationById(organisationId);
-        if (!NotificationUtils.canFindOrganisationSuperuserEmail(organisationResponse)) {
+        if (!NotificationUtils.hasOrganisationSuperuserEmail(organisationResponse)) {
             return StringUtils.EMPTY;
         }
         assert organisationResponse.getBody() != null;

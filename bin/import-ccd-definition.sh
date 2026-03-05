@@ -13,7 +13,7 @@ dir=$(dirname ${0})
 
 if [[ -z "$CALLBACKS_PROJECT_PATH" ]]
   then
-    echo "Please set CALLBACKS_PROJECT_PATH environment variable to your local GitHub repo for england-wales"
+    echo "Please set CALLBACKS_PROJECT_PATH variable to your local environment"
     exit 1
 fi
 

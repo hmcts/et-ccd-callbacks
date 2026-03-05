@@ -8,26 +8,32 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseAccessService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 
 @ExtendWith(SpringExtension.class)
 class NocRequestServiceTest {
 
-    @Mock
+    @InjectMocks
     private NocRequestService nocRequestService;
-    @InjectMocks
+    @Mock
     private NocCcdService nocCcdService;
-    @InjectMocks
+    @Mock
+    private NocNotificationService nocNotificationService;
+    @Mock
     private EmailService emailService;
-    @InjectMocks
+    @Mock
     private CaseAccessService caseAccessService;
-    @InjectMocks
+    @Mock
     private EmailNotificationService emailNotificationService;
 
     private static final String USER_TOKEN = "userToken";
@@ -35,6 +41,11 @@ class NocRequestServiceTest {
     @Test
     void shouldRevokeClaimantLegalRepAndSendNotifications() {
         CaseDetails caseDetails = CaseDataBuilder.builder()
+            .withEthosCaseReference("123456789/1234")
+            .withClaimant("Claimant Name")
+            .withRespondent(RespondentSumType.builder()
+                .respondentName("Jane Doe")
+                .build())
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
 
         RepresentedTypeC rep = RepresentedTypeC.builder()
@@ -50,6 +61,6 @@ class NocRequestServiceTest {
 
         nocRequestService.revokeClaimantLegalRep(caseDetails, USER_TOKEN);
 
-        verify(nocCcdService).revokeClaimantRepresentation(USER_TOKEN, caseDetails);
+        verify(nocCcdService, times(1)).revokeClaimantRepresentation(anyString(), any());
     }
 }

@@ -85,7 +85,7 @@ public class TseRespondentReplyController {
         caseData.setTseRespondSelectApplication(TseHelper.populateRespondentSelectApplication(caseData));
 
         if (Helper.isClaimantNonSystemUser(caseData)
-            && !Helper.isRepresentedClaimantWithMyHmctsCase(caseData)) {
+            && !Helper.isClaimantRepresentedByMyHmctsOrganisation(caseData)) {
             caseData.setTseRespondNotAvailableWarning(YES);
         }
 
@@ -115,7 +115,7 @@ public class TseRespondentReplyController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>();
         if (Helper.isClaimantNonSystemUser(caseData)
-            && !Helper.isRepresentedClaimantWithMyHmctsCase(caseData)) {
+            && !Helper.isClaimantRepresentedByMyHmctsOrganisation(caseData)) {
             errors.add(FUNCTION_NOT_AVAILABLE_ERROR);
         }
 

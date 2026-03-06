@@ -20,8 +20,7 @@ import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AddAmendClaimantRepresentativeService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.NocClaimantRepresentativeService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocClaimantRepresentativeService;
 
 import java.io.IOException;
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
@@ -38,7 +37,6 @@ public class AddAmendClaimantRepresentativeController {
     private static final String LOG_MESSAGE = "received notification request for case reference : ";
     private final AddAmendClaimantRepresentativeService addAmendClaimantRepresentativeService;
     private final NocClaimantRepresentativeService nocClaimantRepresentativeService;
-    private final UserIdamService userIdamService;
 
     /**
      * AboutToSubmit for addAmendClaimantRepresentative. Sets the claimant rep's id.

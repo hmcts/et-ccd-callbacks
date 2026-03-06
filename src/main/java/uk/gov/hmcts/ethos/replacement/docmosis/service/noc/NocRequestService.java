@@ -49,6 +49,11 @@ public class NocRequestService {
     @Value("${template.nocNotification.noc-other-party-not-represented}")
     private String nocOtherPartyNotRepresentedTemplateId;
 
+    /**
+     * Revoke claimant legal rep and send email notifications to related parties.
+     * @param caseDetails the case details of the case to revoke claimant legal rep
+     * @param userToken the user token of the requester
+     */
     public void revokeClaimantLegalRep(CaseDetails caseDetails, String userToken) {
         // create a copy of existing claimant legal rep details
         RepresentedTypeC repCopy = getRepTrueCopy(caseDetails);
@@ -178,5 +183,36 @@ public class NocRequestService {
                     buildPersonalisationWithPartyName(caseDetails, partyName, caseLink)
                 );
             });
+    }
+
+    /**
+     * Revoke respondent legal rep and send email notifications to related parties.
+     * @param caseDetails the case details of the case to revoke respondent legal rep
+     * @param userToken the user token of the requester
+     */
+    public void revokeRespondentLegalRep(CaseDetails caseDetails, String userToken) {
+        // revoke respondent legal rep
+        // TODO
+
+        // send email to organisation admin
+        sendRespondentNocRequestEmailToOrgAdmin(caseDetails);
+        // send email to removed legal rep
+        sendRespondentNocRequestEmailToRemovedLegalRep(caseDetails);
+        // send email to unrepresented party, i.e. this respondent
+        sendRespondentNocRequestEmailToUnrepresentedParty(caseDetails);
+        // send email to other party, i.e. claimant and other respondents
+        sendRespondentNocRequestEmailToOtherParty(caseDetails);
+    }
+
+    private void sendRespondentNocRequestEmailToOtherParty(CaseDetails caseDetails) {
+    }
+
+    private void sendRespondentNocRequestEmailToUnrepresentedParty(CaseDetails caseDetails) {
+    }
+
+    private void sendRespondentNocRequestEmailToRemovedLegalRep(CaseDetails caseDetails) {
+    }
+
+    private void sendRespondentNocRequestEmailToOrgAdmin(CaseDetails caseDetails) {
     }
 }

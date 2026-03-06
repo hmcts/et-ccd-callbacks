@@ -7,7 +7,7 @@
     "DisplayOrder": 52,
     "PreConditionState(s)": "*",
     "PostConditionState": "*",
-    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/noCRequest/aboutToSubmit",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/noCRequest/claimant/aboutToSubmit",
     "CallBackURLSubmittedEvent": "${ET_COS_URL}/noCRequest/submitted",
     "SecurityClassification": "Public",
     "ShowEventNotes": "N",

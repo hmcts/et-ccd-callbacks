@@ -92,20 +92,19 @@ public class NocRequestService {
     }
 
     private void sendClaimantNocRequestEmailToOrgAdmin(CaseDetails caseDetails, RepresentedTypeC representedTypeC) {
-        String organisationEmail =
+        String emailToSend =
             nocNotificationService.findClaimantRepOrgSuperUserEmail(representedTypeC);
-        if (isNullOrEmpty(organisationEmail)) {
+        if (isNullOrEmpty(emailToSend)) {
             return;
         }
 
         Map<String, String> personalisation =
             NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation(caseDetails.getCaseData());
         personalisation.put(LEGAL_REP_NAME, representedTypeC.getNameOfRepresentative());
-
         try {
             emailService.sendEmail(
                 nocOrgAdminNotRepresentingTemplateId,
-                organisationEmail,
+                emailToSend,
                 personalisation);
         } catch (Exception e) {
             log.warn(
@@ -119,12 +118,13 @@ public class NocRequestService {
         CaseDetails caseDetails,
         RepresentedTypeC representedTypeC
     ) {
+        String emailToSend = representedTypeC.getRepresentativeEmailAddress();
         Map<String, String> personalisation =
             NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation(caseDetails.getCaseData());
         try {
             emailService.sendEmail(
                 nocLegalRepNoLongerAssignedTemplateId,
-                representedTypeC.getRepresentativeEmailAddress(),
+                emailToSend,
                 personalisation);
         } catch (Exception e) {
             log.warn(
@@ -144,15 +144,15 @@ public class NocRequestService {
             return;
         }
 
+        String emailToSend = caseData.getClaimantType().getClaimantEmailAddress();
         Map<String, String> personalisation =
             NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation(caseDetails.getCaseData());
         personalisation.put(LEGAL_REP_ORG, representedTypeC.getNameOfOrganisation());
         personalisation.put(LINK_TO_CIT_UI, emailService.getCitizenCaseLink(caseDetails.getCaseId()));
-
         try {
             emailService.sendEmail(
                 nocCitizenNoLongerRepresentedTemplateId,
-                caseData.getClaimantType().getClaimantEmailAddress(),
+                emailToSend,
                 personalisation);
         } catch (Exception e) {
             log.warn(
@@ -163,8 +163,6 @@ public class NocRequestService {
     }
 
     private void sendClaimantNocRequestEmailToOtherParty(CaseDetails caseDetails) {
-        CaseData caseData = caseDetails.getCaseData();
-
         List<CaseUserAssignment> caseUserAssignments =
             caseAccessService.getCaseUserAssignmentsById(caseDetails.getCaseId());
         if (caseUserAssignments == null || caseUserAssignments.isEmpty()) {
@@ -173,19 +171,26 @@ public class NocRequestService {
             return;
         }
 
+        emailNotificationService.getRespondentsAndRepsEmailAddresses(caseDetails.getCaseData(), caseUserAssignments)
+            .forEach((email, respondentId) ->
+                sendClaimantNocRequestEmailToEachRespondent(caseDetails, email, respondentId));
+    }
+
+    private void sendClaimantNocRequestEmailToEachRespondent(
+        CaseDetails caseDetails,
+        String email,
+        String respondentId
+    ) {
+        String partyName = caseDetails.getCaseData().getClaimant();
+        String caseLink = StringUtils.isNotBlank(respondentId)
+            ? emailService.getSyrCaseLink(caseDetails.getCaseId(), respondentId)
+            : emailService.getExuiCaseLink(caseDetails.getCaseId());
         try {
-            emailNotificationService.getRespondentsAndRepsEmailAddresses(caseData, caseUserAssignments)
-                .forEach((email, respondentId) -> {
-                    String partyName = caseData.getClaimant();
-                    String caseLink = StringUtils.isNotBlank(respondentId)
-                        ? emailService.getSyrCaseLink(caseDetails.getCaseId(), respondentId)
-                        : emailService.getExuiCaseLink(caseDetails.getCaseId());
-                    emailService.sendEmail(
-                        nocOtherPartyNotRepresentedTemplateId,
-                        email,
-                        buildPersonalisationWithPartyName(caseDetails, partyName, caseLink)
-                    );
-                });
+            emailService.sendEmail(
+                nocOtherPartyNotRepresentedTemplateId,
+                email,
+                buildPersonalisationWithPartyName(caseDetails, partyName, caseLink)
+            );
         } catch (Exception e) {
             log.warn(
                 WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_RESPONDENT,
@@ -217,18 +222,21 @@ public class NocRequestService {
     }
 
     private void sendRespondentNocRequestEmailToOrgAdmin(CaseDetails caseDetails) {
+        // TODO
     }
 
     private void sendRespondentNocRequestEmailToRemovedLegalRep(CaseDetails caseDetails) {
+        // TODO
     }
 
     private void sendRespondentNocRequestEmailToUnrepresentedParty(CaseDetails caseDetails) {
+        // TODO
     }
 
     private void sendRespondentNocRequestEmailToClaimant(CaseDetails caseDetails) {
         RepresentedTypeC representativeClaimantType = caseDetails.getCaseData().getRepresentativeClaimantType();
         boolean isClaimantRepresented = representativeClaimantType != null;
-        String email = isClaimantRepresented
+        String emailToSend = isClaimantRepresented
             ? representativeClaimantType.getRepresentativeEmailAddress()
             : caseDetails.getCaseData().getClaimantType().getClaimantEmailAddress();
         String partyName = "partyName"; // TODO
@@ -238,7 +246,7 @@ public class NocRequestService {
         try {
             emailService.sendEmail(
                 nocOtherPartyNotRepresentedTemplateId,
-                email,
+                emailToSend,
                 buildPersonalisationWithPartyName(caseDetails, partyName, caseLink)
             );
         } catch (Exception e) {
@@ -251,6 +259,6 @@ public class NocRequestService {
     }
 
     private void sendRespondentNocRequestEmailToOtherParty(CaseDetails caseDetails) {
-
+        // TODO
     }
 }

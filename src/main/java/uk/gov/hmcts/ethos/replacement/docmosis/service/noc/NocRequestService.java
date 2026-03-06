@@ -21,7 +21,9 @@ import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_ORGANISATION;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_RESPONDENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_TO_REMOVED_REPRESENTATIVE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_TO_UNREPRESENTED_PARTY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LEGAL_REP_NAME;
@@ -171,18 +173,26 @@ public class NocRequestService {
             return;
         }
 
-        emailNotificationService.getRespondentsAndRepsEmailAddresses(caseData, caseUserAssignments)
-            .forEach((email, respondentId) -> {
-                String partyName = caseData.getClaimant();
-                String caseLink = StringUtils.isNotBlank(respondentId)
-                    ? emailService.getSyrCaseLink(caseDetails.getCaseId(), respondentId)
-                    : emailService.getExuiCaseLink(caseDetails.getCaseId());
-                emailService.sendEmail(
-                    nocOtherPartyNotRepresentedTemplateId,
-                    email,
-                    buildPersonalisationWithPartyName(caseDetails, partyName, caseLink)
-                );
-            });
+        try {
+            emailNotificationService.getRespondentsAndRepsEmailAddresses(caseData, caseUserAssignments)
+                .forEach((email, respondentId) -> {
+                    String partyName = caseData.getClaimant();
+                    String caseLink = StringUtils.isNotBlank(respondentId)
+                        ? emailService.getSyrCaseLink(caseDetails.getCaseId(), respondentId)
+                        : emailService.getExuiCaseLink(caseDetails.getCaseId());
+                    emailService.sendEmail(
+                        nocOtherPartyNotRepresentedTemplateId,
+                        email,
+                        buildPersonalisationWithPartyName(caseDetails, partyName, caseLink)
+                    );
+                });
+        } catch (Exception e) {
+            log.warn(
+                WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_RESPONDENT,
+                caseDetails.getCaseId(),
+                e.getMessage()
+            );
+        }
     }
 
     /**
@@ -200,19 +210,47 @@ public class NocRequestService {
         sendRespondentNocRequestEmailToRemovedLegalRep(caseDetails);
         // send email to unrepresented party, i.e. this respondent
         sendRespondentNocRequestEmailToUnrepresentedParty(caseDetails);
-        // send email to other party, i.e. claimant and other respondents
+        // send email to claimant representative or claimant
+        sendRespondentNocRequestEmailToClaimant(caseDetails);
+        // send email to other respondents
         sendRespondentNocRequestEmailToOtherParty(caseDetails);
     }
 
-    private void sendRespondentNocRequestEmailToOtherParty(CaseDetails caseDetails) {
-    }
-
-    private void sendRespondentNocRequestEmailToUnrepresentedParty(CaseDetails caseDetails) {
+    private void sendRespondentNocRequestEmailToOrgAdmin(CaseDetails caseDetails) {
     }
 
     private void sendRespondentNocRequestEmailToRemovedLegalRep(CaseDetails caseDetails) {
     }
 
-    private void sendRespondentNocRequestEmailToOrgAdmin(CaseDetails caseDetails) {
+    private void sendRespondentNocRequestEmailToUnrepresentedParty(CaseDetails caseDetails) {
+    }
+
+    private void sendRespondentNocRequestEmailToClaimant(CaseDetails caseDetails) {
+        RepresentedTypeC representativeClaimantType = caseDetails.getCaseData().getRepresentativeClaimantType();
+        boolean isClaimantRepresented = representativeClaimantType != null;
+        String email = isClaimantRepresented
+            ? representativeClaimantType.getRepresentativeEmailAddress()
+            : caseDetails.getCaseData().getClaimantType().getClaimantEmailAddress();
+        String partyName = "partyName"; // TODO
+        String caseLink = isClaimantRepresented
+            ? emailService.getExuiCaseLink(caseDetails.getCaseId())
+            : emailService.getCitizenCaseLink(caseDetails.getCaseId());
+        try {
+            emailService.sendEmail(
+                nocOtherPartyNotRepresentedTemplateId,
+                email,
+                buildPersonalisationWithPartyName(caseDetails, partyName, caseLink)
+            );
+        } catch (Exception e) {
+            log.warn(
+                WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_CLAIMANT,
+                caseDetails.getCaseId(),
+                e.getMessage()
+            );
+        }
+    }
+
+    private void sendRespondentNocRequestEmailToOtherParty(CaseDetails caseDetails) {
+
     }
 }

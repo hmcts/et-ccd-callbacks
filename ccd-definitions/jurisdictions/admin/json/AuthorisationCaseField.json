@@ -1,0 +1,326 @@
+[
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseFieldID": "name",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseFieldID": "staffImportFile",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseFieldID": "venueImport",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseFieldID": "caseHistory",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseFieldID": "tribunalOffice",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseFieldID": "judgeCode",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseFieldID": "judgeName",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseFieldID": "employmentStatus",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseFieldID": "judgeSelectList",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseFieldID": "adminCourtWorker",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseFieldID": "courtWorkerOffice",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseFieldID": "courtWorkerType",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseFieldID": "courtWorkerSelectList",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseFieldID": "courtWorkerCode",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseFieldID": "courtWorkerName",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseFieldID": "fileLocationCode",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseFieldID": "fileLocationName",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseFieldID": "fileLocationList",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseFieldID": "caseReferenceNumber",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseFieldID": "preHearingDepositImportFile",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseFieldID": "preHearingDepositImportFile",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseFieldID": "caseNumber",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseFieldID": "claimantOrRespondentName",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseFieldID": "depositAmount",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseFieldID": "depositOrderedAgainst",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseFieldID": "depositRequestedBy",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseFieldID": "depositCovers",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseFieldID": "depositOrderSent",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseFieldID": "depositDue",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseFieldID": "depositTimeExtension",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseFieldID": "depositTimeExtensionDue",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseFieldID": "depositReceived",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseFieldID": "dateDepositReceived",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseFieldID": "depositRefund",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseFieldID": "amountRefunded",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseFieldID": "depositRefundDate",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseFieldID": "chequeOrPONumber",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseFieldID": "receivedBy",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseFieldID": "depositRefundedTo",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseFieldID": "notes",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseFieldID": "documentUpload",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseFieldID": "depositReceivedFrom",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseFieldID": "depositComments",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseFieldID": "comments",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseFieldID": "phrNumber",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseFieldID": "mr1Reference",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseFieldID": "bankingDate",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseFieldID": "journalConfirmedReceipt",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseFieldID": "status",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseFieldID": "dateSentForRefund",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseFieldID": "refundReference",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseFieldID": "regionOffice",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseFieldID": "payeeName",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseFieldID": "journalConfirmedPaid",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  }
+]

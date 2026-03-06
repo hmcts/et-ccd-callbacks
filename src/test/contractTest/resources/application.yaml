@@ -28,11 +28,6 @@ feign:
 tornado:
   accessKey: ${TORNADO_ACCESS_KEY:}
   url: ${TORNADO_URL:http://localhost:8090/rs/render}
-queue:
-  create-updates:
-    queue-name: create-updates
-    send:
-      connection-string: ${CREATE_UPDATES_QUEUE_SEND_CONNECTION_STRING}
 management:
   endpoints:
     web:

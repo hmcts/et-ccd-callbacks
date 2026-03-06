@@ -1,5 +1,6 @@
 .gradle
 /build/
+/et-shared/build/
 !gradle/wrapper/gradle-wrapper.jar
 
 ### STS ###
@@ -27,6 +28,16 @@ applicationinsights-agent-*.jar
 /dist/
 /nbdist/
 /.nb-gradle/
+
+### CCD Definitions Workspace ###
+ccd-definitions/dist/
+ccd-definitions/packages/*/xlsx/*.xlsx
+ccd-definitions/packages/*/node_modules/
+ccd-definitions/node_modules/
+ccd-definitions/tools/*/node_modules/
+ccd-definitions/.yarn/cache/
+ccd-definitions/.yarn/install-state.gz
+ccd-definitions/yarn.lock
 
 # macos
 **/.DS_Store

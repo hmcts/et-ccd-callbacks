@@ -17,6 +17,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 
 import java.io.IOException;
 import java.util.List;
@@ -42,6 +43,8 @@ class BatchReconfigurationTaskTest {
     private AdminUserService adminUserService;
     @Mock
     private CcdClient ccdClient;
+    @Mock
+    private CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
 
     private BatchReconfigurationTask task;
 
@@ -53,7 +56,7 @@ class BatchReconfigurationTaskTest {
 
     @BeforeEach
     void setUp() {
-        task = new BatchReconfigurationTask(adminUserService, ccdClient);
+        task = new BatchReconfigurationTask(adminUserService, ccdClient, caseManagementForCaseWorkerService);
         ReflectionTestUtils.setField(task, "caseTypeIdsString", ENGLANDWALES_CASE_TYPE_ID);
         ReflectionTestUtils.setField(
             task,
@@ -114,13 +117,6 @@ class BatchReconfigurationTaskTest {
                 anyString(),
                 any(CCDRequest.class),
                 anyString());
-        
-        // verify that organisation policy was updated from representative claimant type
-        for (CaseData submittedCaseData : caseDataCaptor.getAllValues()) {
-            assertThat(submittedCaseData.getClaimantRepresentativeOrganisationPolicy().getOrganisation())
-                .isNotNull()
-                .isEqualTo(submittedCaseData.getRepresentativeClaimantType().getMyHmctsOrganisation());
-        }
     }
 
     @Test
@@ -306,259 +302,5 @@ class BatchReconfigurationTaskTest {
         CCDRequest ccdRequest = new CCDRequest();
         ccdRequest.setCaseDetails(caseDetails);
         return ccdRequest;
-    }
-
-    @Test
-    void run_skipsInvalidCase_whenOrganisationPolicyIsNull() throws Exception {
-        // given
-        ReflectionTestUtils.setField(task, "caseIdsToReconfigure", CASE_ID_1);
-        ReflectionTestUtils.setField(task, "limit", 1);
-
-        CaseData caseData = new CaseData();
-        caseData.setClaimantRepresentativeOrganisationPolicy(null);
-
-        CCDRequest ccdRequest = new CCDRequest();
-        CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setCaseData(caseData);
-        caseDetails.setJurisdiction(EMPLOYMENT);
-        ccdRequest.setCaseDetails(caseDetails);
-
-        when(ccdClient.startEventForCase(
-                TOKEN,
-                ENGLANDWALES_CASE_TYPE_ID,
-                EMPLOYMENT,
-                CASE_ID_1,
-                RECONFIGURE_EVENT)
-        ).thenReturn(ccdRequest);
-
-        // when
-        task.run();
-
-        // then - verify submit was not called since case is invalid
-        verify(ccdClient, never()).submitEventForCase(
-            eq(TOKEN),
-            any(CaseData.class),
-            eq(ENGLANDWALES_CASE_TYPE_ID),
-            anyString(),
-            eq(ccdRequest),
-            eq(CASE_ID_1));
-    }
-
-    @Test
-    void run_skipsInvalidCase_whenOrganisationAlreadyPopulated() throws Exception {
-        // given
-        ReflectionTestUtils.setField(task, "caseIdsToReconfigure", CASE_ID_1);
-        ReflectionTestUtils.setField(task, "limit", 1);
-
-        CaseData caseData = new CaseData();
-        Organisation existingOrg = Organisation.builder()
-            .organisationID("EXISTING_ORG")
-            .organisationName("Existing Organisation")
-            .build();
-        OrganisationPolicy orgPolicy = OrganisationPolicy.builder()
-            .organisation(existingOrg)
-            .build();
-        caseData.setClaimantRepresentativeOrganisationPolicy(orgPolicy);
-
-        CCDRequest ccdRequest = new CCDRequest();
-        CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setCaseData(caseData);
-        caseDetails.setJurisdiction(EMPLOYMENT);
-        ccdRequest.setCaseDetails(caseDetails);
-
-        when(ccdClient.startEventForCase(
-                TOKEN,
-                ENGLANDWALES_CASE_TYPE_ID,
-                EMPLOYMENT,
-                CASE_ID_1,
-                RECONFIGURE_EVENT)
-        ).thenReturn(ccdRequest);
-
-        // when
-        task.run();
-
-        // then - verify submit was not called since organisation is already populated
-        verify(ccdClient, never()).submitEventForCase(
-            eq(TOKEN),
-            any(CaseData.class),
-            eq(ENGLANDWALES_CASE_TYPE_ID),
-            anyString(),
-            eq(ccdRequest),
-            eq(CASE_ID_1));
-    }
-
-    @Test
-    void run_skipsInvalidCase_whenRepresentativeClaimantTypeIsNull() throws Exception {
-        // given
-        ReflectionTestUtils.setField(task, "caseIdsToReconfigure", CASE_ID_1);
-        ReflectionTestUtils.setField(task, "limit", 1);
-
-        CaseData caseData = new CaseData();
-        OrganisationPolicy orgPolicy = OrganisationPolicy.builder()
-            .organisation(null)
-            .build();
-        caseData.setClaimantRepresentativeOrganisationPolicy(orgPolicy);
-        caseData.setRepresentativeClaimantType(null);
-
-        CCDRequest ccdRequest = new CCDRequest();
-        CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setCaseData(caseData);
-        caseDetails.setJurisdiction(EMPLOYMENT);
-        ccdRequest.setCaseDetails(caseDetails);
-
-        when(ccdClient.startEventForCase(
-                TOKEN,
-                ENGLANDWALES_CASE_TYPE_ID,
-                EMPLOYMENT,
-                CASE_ID_1,
-                RECONFIGURE_EVENT)
-        ).thenReturn(ccdRequest);
-
-        // when
-        task.run();
-
-        // then - verify submit was not called since representative claimant type is null
-        verify(ccdClient, never()).submitEventForCase(
-            eq(TOKEN),
-            any(CaseData.class),
-            eq(ENGLANDWALES_CASE_TYPE_ID),
-            anyString(),
-            eq(ccdRequest),
-            eq(CASE_ID_1));
-    }
-
-    @Test
-    void run_skipsInvalidCase_whenMyHmctsOrganisationIsNull() throws Exception {
-        // given
-        ReflectionTestUtils.setField(task, "caseIdsToReconfigure", CASE_ID_1);
-        ReflectionTestUtils.setField(task, "limit", 1);
-
-        CaseData caseData = new CaseData();
-        OrganisationPolicy orgPolicy = OrganisationPolicy.builder()
-            .organisation(null)
-            .build();
-        caseData.setClaimantRepresentativeOrganisationPolicy(orgPolicy);
-        
-        RepresentedTypeC representativeClaimantType = new RepresentedTypeC();
-        representativeClaimantType.setMyHmctsOrganisation(null);
-        caseData.setRepresentativeClaimantType(representativeClaimantType);
-
-        CCDRequest ccdRequest = new CCDRequest();
-        CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setCaseData(caseData);
-        caseDetails.setJurisdiction(EMPLOYMENT);
-        ccdRequest.setCaseDetails(caseDetails);
-
-        when(ccdClient.startEventForCase(
-                TOKEN,
-                ENGLANDWALES_CASE_TYPE_ID,
-                EMPLOYMENT,
-                CASE_ID_1,
-                RECONFIGURE_EVENT)
-        ).thenReturn(ccdRequest);
-
-        // when
-        task.run();
-
-        // then - verify submit was not called since MyHmctsOrganisation is null
-        verify(ccdClient, never()).submitEventForCase(
-            eq(TOKEN),
-            any(CaseData.class),
-            eq(ENGLANDWALES_CASE_TYPE_ID),
-            anyString(),
-            eq(ccdRequest),
-            eq(CASE_ID_1));
-    }
-
-    @Test
-    void run_skipsInvalidCase_whenOrganisationIdIsNull() throws Exception {
-        // given
-        ReflectionTestUtils.setField(task, "caseIdsToReconfigure", CASE_ID_1);
-        ReflectionTestUtils.setField(task, "limit", 1);
-
-        CaseData caseData = new CaseData();
-        OrganisationPolicy orgPolicy = OrganisationPolicy.builder()
-            .organisation(null)
-            .build();
-        caseData.setClaimantRepresentativeOrganisationPolicy(orgPolicy);
-        
-        RepresentedTypeC representativeClaimantType = new RepresentedTypeC();
-        Organisation myHmctsOrganisation = Organisation.builder()
-            .organisationID(null)
-            .organisationName("Test Organisation")
-            .build();
-        representativeClaimantType.setMyHmctsOrganisation(myHmctsOrganisation);
-        caseData.setRepresentativeClaimantType(representativeClaimantType);
-
-        CCDRequest ccdRequest = new CCDRequest();
-        CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setCaseData(caseData);
-        caseDetails.setJurisdiction(EMPLOYMENT);
-        ccdRequest.setCaseDetails(caseDetails);
-
-        when(ccdClient.startEventForCase(
-                TOKEN,
-                ENGLANDWALES_CASE_TYPE_ID,
-                EMPLOYMENT,
-                CASE_ID_1,
-                RECONFIGURE_EVENT)
-        ).thenReturn(ccdRequest);
-
-        // when
-        task.run();
-
-        // then - verify submit was not called since organisation ID is null
-        verify(ccdClient, never()).submitEventForCase(
-            eq(TOKEN),
-            any(CaseData.class),
-            eq(ENGLANDWALES_CASE_TYPE_ID),
-            anyString(),
-            eq(ccdRequest),
-            eq(CASE_ID_1));
-    }
-
-    @Test
-    void run_updatesOrganisationPolicy_whenCaseIsValid() throws Exception {
-        // given
-        ReflectionTestUtils.setField(task, "caseIdsToReconfigure", CASE_ID_1);
-        ReflectionTestUtils.setField(task, "limit", 1);
-
-        CCDRequest ccdRequest = buildCcdRequestWithValidCaseData();
-
-        when(ccdClient.startEventForCase(
-                TOKEN,
-                ENGLANDWALES_CASE_TYPE_ID,
-                EMPLOYMENT,
-                CASE_ID_1,
-                RECONFIGURE_EVENT)
-        ).thenReturn(ccdRequest);
-        when(ccdClient.submitEventForCase(
-                eq(TOKEN),
-                any(CaseData.class),
-                eq(ENGLANDWALES_CASE_TYPE_ID),
-                anyString(),
-                eq(ccdRequest),
-                eq(CASE_ID_1))
-        ).thenReturn(mock(SubmitEvent.class));
-
-        // when
-        task.run();
-
-        // then
-        ArgumentCaptor<CaseData> caseDataCaptor = ArgumentCaptor.forClass(CaseData.class);
-        verify(ccdClient).submitEventForCase(
-            eq(TOKEN),
-            caseDataCaptor.capture(),
-            eq(ENGLANDWALES_CASE_TYPE_ID),
-            anyString(),
-            eq(ccdRequest),
-            eq(CASE_ID_1));
-
-        CaseData submitted = caseDataCaptor.getValue();
-        assertThat(submitted.getClaimantRepresentativeOrganisationPolicy().getOrganisation())
-            .isNotNull()
-            .isEqualTo(submitted.getRepresentativeClaimantType().getMyHmctsOrganisation());
-        assertThat(submitted.getClaimantRepresentativeOrganisationPolicy().getOrganisation().getOrganisationID())
-            .isEqualTo("ORG123");
     }
 }

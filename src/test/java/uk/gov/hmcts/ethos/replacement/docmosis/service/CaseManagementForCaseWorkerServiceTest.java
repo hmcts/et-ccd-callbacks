@@ -83,6 +83,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HearingConstants.SIT_ALONE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ACAS_DOC_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EMPTY_STRING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET1_ATTACHMENT_DOC_TYPE;
@@ -754,6 +755,29 @@ class CaseManagementForCaseWorkerServiceTest {
                 caseData.getHearingCollection().getFirst().getValue().getHearingDateCollection();
         assertThat(sorted.get(0).getValue().getListedDate()).isEqualTo("2025-03-01T09:00:00");
         assertThat(sorted.get(1).getValue().getListedDate()).isEqualTo("2025-03-01T09:00:00.123");
+    }
+
+    @Test
+    void amendHearing_sitAlone() {
+        HearingType hearingType = new HearingType();
+        hearingType.setHearingSitAlone(SIT_ALONE);
+        hearingType.setAdditionalJudge(DynamicFixedListType.of(
+            DynamicValueType.create("judge", "Judge")));
+        hearingType.setHearingERMember(DynamicFixedListType.of(
+            DynamicValueType.create("ERMember", "Employer Member")));
+        hearingType.setHearingEEMember(DynamicFixedListType.of(
+            DynamicValueType.create("EEMember", "Employee Member")));
+        HearingTypeItem hearing = new HearingTypeItem();
+        hearing.setValue(hearingType);
+        CaseData caseData = new CaseData();
+        caseData.setHearingCollection(List.of(hearing));
+
+        caseManagementForCaseWorkerService.amendHearing(caseData, ENGLANDWALES_CASE_TYPE_ID);
+
+        HearingType actual = caseData.getHearingCollection().getFirst().getValue();
+        assertThat(actual.getAdditionalJudge()).isNull();
+        assertThat(actual.getHearingERMember()).isNull();
+        assertThat(actual.getHearingEEMember()).isNull();
     }
 
     private static DateListedTypeItem listing(String listedDate) {

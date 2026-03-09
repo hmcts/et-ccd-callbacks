@@ -62,4 +62,8 @@ public class HearingType {
     private String doesHearingNotesDocExist;
     @JsonProperty("removeHearingNotesDocument")
     private List<String> removeHearingNotesDocument;
+    @JsonProperty("numberOfDays")
+    private String numberOfDays;
+    @JsonProperty("hearingDates")
+    private String hearingDates;
 }

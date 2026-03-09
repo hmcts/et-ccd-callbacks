@@ -10,10 +10,12 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingDetailTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingDetailType;
+import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -32,6 +34,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
 import static uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType.create;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper.BREAK_TIME_VALIDATION_MESSAGE;
@@ -47,6 +50,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper.get
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper.hearingMidEventValidation;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper.hearingTimeValidation;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper.isDateInFuture;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper.setHearingDaysAndDates;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper.updatePostponedDate;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper.validateTwoJudges;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.HEARING_CREATION_DAY_ERROR;
@@ -479,6 +483,150 @@ class HearingsHelperTest {
 
         assertNull(dateListedType.getPostponedBy());
         assertNull(dateListedType.getPostponedDate());
+    }
+
+    @Test
+    void setHearingDaysAndDates_nullHearingCollection_doesNothing() {
+        caseData.setHearingCollection(null);
+        setHearingDaysAndDates(caseData);
+        assertNull(caseData.getHearingCollection());
+    }
+
+    @Test
+    void setHearingDaysAndDates_emptyHearingCollection_doesNothing() {
+        caseData.setHearingCollection(new ArrayList<>());
+        setHearingDaysAndDates(caseData);
+        assertTrue(caseData.getHearingCollection().isEmpty());
+    }
+
+    @Test
+    void setHearingDaysAndDates_nullDateCollection_skipsHearing() {
+        HearingType hearingType = new HearingType();
+        hearingType.setHearingDateCollection(null);
+        HearingTypeItem item = new HearingTypeItem();
+        item.setValue(hearingType);
+        caseData.setHearingCollection(List.of(item));
+
+        setHearingDaysAndDates(caseData);
+
+        assertNull(hearingType.getNumberOfDays());
+        assertNull(hearingType.getHearingDates());
+    }
+
+    @Test
+    void setHearingDaysAndDates_emptyDateCollection_skipsHearing() {
+        HearingType hearingType = new HearingType();
+        hearingType.setHearingDateCollection(new ArrayList<>());
+        HearingTypeItem item = new HearingTypeItem();
+        item.setValue(hearingType);
+        caseData.setHearingCollection(List.of(item));
+
+        setHearingDaysAndDates(caseData);
+
+        assertNull(hearingType.getNumberOfDays());
+        assertNull(hearingType.getHearingDates());
+    }
+
+    @Test
+    void setHearingDaysAndDates_singleListedDate_setsCountAndDate() {
+        HearingType hearingType = buildHearingWithDates(
+            hearingDate("2024-03-15T10:00:00.000", HEARING_STATUS_LISTED));
+        caseData.setHearingCollection(List.of(hearingTypeItem(hearingType)));
+
+        setHearingDaysAndDates(caseData);
+
+        assertEquals("1", hearingType.getNumberOfDays());
+        assertEquals("15 Mar 2024", hearingType.getHearingDates());
+    }
+
+    @Test
+    void setHearingDaysAndDates_singleHeardDate_setsCountAndDate() {
+        HearingType hearingType = buildHearingWithDates(
+            hearingDate("2024-06-01T10:00:00.000", HEARING_STATUS_HEARD));
+        caseData.setHearingCollection(List.of(hearingTypeItem(hearingType)));
+
+        setHearingDaysAndDates(caseData);
+
+        assertEquals("-", hearingType.getNumberOfDays());
+        assertEquals("-", hearingType.getHearingDates());
+    }
+
+    @Test
+    void setHearingDaysAndDates_multipleDates_setsCountAndRange() {
+        HearingType hearingType = buildHearingWithDates(
+            hearingDate("2024-03-10T10:00:00.000", HEARING_STATUS_LISTED),
+            hearingDate("2024-03-01T10:00:00.000", HEARING_STATUS_LISTED),
+            hearingDate("2024-03-05T10:00:00.000", HEARING_STATUS_HEARD));
+        caseData.setHearingCollection(List.of(hearingTypeItem(hearingType)));
+
+        setHearingDaysAndDates(caseData);
+
+        assertEquals("2", hearingType.getNumberOfDays());
+        assertEquals("1 Mar 2024 - 10 Mar 2024", hearingType.getHearingDates());
+    }
+
+    @Test
+    void setHearingDaysAndDates_noValidStatusDates_setsDashAndTbc() {
+        HearingType hearingType = buildHearingWithDates(
+            hearingDate("2024-03-01T10:00:00.000", HEARING_STATUS_POSTPONED));
+        caseData.setHearingCollection(List.of(hearingTypeItem(hearingType)));
+
+        setHearingDaysAndDates(caseData);
+
+        assertEquals("-", hearingType.getNumberOfDays());
+        assertEquals("-", hearingType.getHearingDates());
+    }
+
+    @Test
+    void setHearingDaysAndDates_mixedStatuses_onlyCountsListedAndHeard() {
+        HearingType hearingType = buildHearingWithDates(
+            hearingDate("2024-03-01T10:00:00.000", HEARING_STATUS_LISTED),
+            hearingDate("2024-03-05T10:00:00.000", HEARING_STATUS_POSTPONED),
+            hearingDate("2024-03-10T10:00:00.000", HEARING_STATUS_HEARD));
+        caseData.setHearingCollection(List.of(hearingTypeItem(hearingType)));
+
+        setHearingDaysAndDates(caseData);
+
+        assertEquals("1", hearingType.getNumberOfDays());
+        assertEquals("1 Mar 2024", hearingType.getHearingDates());
+    }
+
+    @Test
+    void setHearingDaysAndDates_multipleHearings_processesBothIndependently() {
+        HearingType hearing1 = buildHearingWithDates(
+            hearingDate("2024-03-01T10:00:00.000", HEARING_STATUS_LISTED),
+            hearingDate("2024-03-02T10:00:00.000", HEARING_STATUS_LISTED));
+        HearingType hearing2 = buildHearingWithDates(
+            hearingDate("2024-06-10T10:00:00.000", HEARING_STATUS_POSTPONED));
+        caseData.setHearingCollection(List.of(hearingTypeItem(hearing1), hearingTypeItem(hearing2)));
+
+        setHearingDaysAndDates(caseData);
+
+        assertEquals("2", hearing1.getNumberOfDays());
+        assertEquals("1 Mar 2024 - 2 Mar 2024", hearing1.getHearingDates());
+        assertEquals("-", hearing2.getNumberOfDays());
+        assertEquals("-", hearing2.getHearingDates());
+    }
+
+    private static HearingType buildHearingWithDates(DateListedTypeItem... dates) {
+        HearingType hearingType = new HearingType();
+        hearingType.setHearingDateCollection(new ArrayList<>(List.of(dates)));
+        return hearingType;
+    }
+
+    private static HearingTypeItem hearingTypeItem(HearingType hearingType) {
+        HearingTypeItem item = new HearingTypeItem();
+        item.setValue(hearingType);
+        return item;
+    }
+
+    private static DateListedTypeItem hearingDate(String listedDate, String status) {
+        DateListedType dateListedType = new DateListedType();
+        dateListedType.setListedDate(listedDate);
+        dateListedType.setHearingStatus(status);
+        DateListedTypeItem item = new DateListedTypeItem();
+        item.setValue(dateListedType);
+        return item;
     }
 
     @Test

@@ -57,6 +57,10 @@ public class HearingType {
     private String judicialMediation;
     @JsonProperty("hearingNotesDocument")
     private Document hearingNotesDocument;
+    @JsonProperty("numberOfDays")
+    private String numberOfDays;
+    @JsonProperty("hearingDates")
+    private String hearingDates;
 
     public boolean hasHearingJudge() {
         return judge != null && judge.getValue() != null;

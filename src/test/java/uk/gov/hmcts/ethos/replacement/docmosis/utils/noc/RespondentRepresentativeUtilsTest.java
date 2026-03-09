@@ -10,6 +10,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
@@ -40,7 +41,8 @@ final class RespondentRepresentativeUtilsTest {
     private static final String ORGANISATION_ID_1 = "dummy12_organisation34_id56";
     private static final String ORGANISATION_ID_2 = "dummy65_organisation43_id21";
 
-    private static final String ROLE_SOLICITOR_A = "SOLICITORA";
+    private static final String ROLE_SOLICITOR_A = "[SOLICITORA]";
+    private static final String ROLE_INVALID = "ROLE_INVALID";
 
     private static final String EXPECTED_EXCEPTION_REPRESENTATIVE_NOT_FOUND =
             "Representative not found for case ID 1234567890123456.";
@@ -593,5 +595,70 @@ final class RespondentRepresentativeUtilsTest {
         oldRepresentative.setValue(RepresentedTypeR.builder().respondentId(RESPONDENT_ID_1).build());
         assertThat(RespondentRepresentativeUtils.isMatchingValidRepresentative(oldRepresentative, newRepresentative))
                 .isTrue();
+    }
+
+    @Test
+    void theFindRepresentativeByRespondentName() {
+        // when respondent name is empty should return null
+        CaseData caseData = new CaseData();
+        assertThat(RespondentRepresentativeUtils.findRepresentativeByRespondentName(caseData, StringUtils.EMPTY))
+                .isNull();
+        // when case data has representative with respondent name should return that representative
+        RepresentedTypeRItem representative = RepresentedTypeRItem.builder().id(REPRESENTATIVE_ID_1).value(
+                RepresentedTypeR.builder().respRepName(RESPONDENT_NAME_1).build()).build();
+        caseData.setRepCollection(List.of(representative));
+        assertThat(RespondentRepresentativeUtils.findRepresentativeByRespondentName(caseData, RESPONDENT_NAME_1))
+                .isEqualTo(representative);
+    }
+
+    @Test
+    void theFindRespondentNameByRole() {
+        // when role index is -1 should return null
+        CaseData caseData = new CaseData();
+        assertThat(RespondentRepresentativeUtils.findRespondentNameByRole(caseData, ROLE_INVALID)).isNull();
+        // when notice of change answers is empty should return null
+        assertThat(RespondentRepresentativeUtils.findRespondentNameByRole(caseData, ROLE_SOLICITOR_A)).isNull();
+        // when notice of change answers does not have respondent name should return null
+        NoticeOfChangeAnswers noticeOfChangeAnswers = NoticeOfChangeAnswers.builder().build();
+        caseData.setNoticeOfChangeAnswers0(noticeOfChangeAnswers);
+        assertThat(RespondentRepresentativeUtils.findRespondentNameByRole(caseData, ROLE_SOLICITOR_A)).isNull();
+        // when notice of change answers has respondent name should return that respondent name
+        noticeOfChangeAnswers = NoticeOfChangeAnswers.builder().respondentName(RESPONDENT_NAME_1).build();
+        caseData.setNoticeOfChangeAnswers0(noticeOfChangeAnswers);
+        assertThat(RespondentRepresentativeUtils.findRespondentNameByRole(caseData, ROLE_SOLICITOR_A))
+                .isEqualTo(RESPONDENT_NAME_1);
+    }
+
+    @Test
+    void theFindRepresentativeByRole() {
+        // when role is empty should return null
+        CaseData caseData = new CaseData();
+        assertThat(RespondentRepresentativeUtils.findRepresentativeByRole(caseData, StringUtils.EMPTY)).isNull();
+        // when case data has representative with role should return that representative
+        RepresentedTypeRItem representative = RepresentedTypeRItem.builder().id(REPRESENTATIVE_ID_1).value(
+                RepresentedTypeR.builder().role(ROLE_SOLICITOR_A).build()).build();
+        caseData.setRepCollection(List.of(representative));
+        assertThat(RespondentRepresentativeUtils.findRepresentativeByRole(caseData, ROLE_SOLICITOR_A))
+                .isEqualTo(representative);
+    }
+
+    @Test
+    void theFindRepresentativeByRoleOrRespondentName() {
+        // when representative not found by role should check by respondent name
+        CaseData caseData = new CaseData();
+        NoticeOfChangeAnswers noticeOfChangeAnswers = NoticeOfChangeAnswers.builder().respondentName(RESPONDENT_NAME_1)
+                .build();
+        caseData.setNoticeOfChangeAnswers0(noticeOfChangeAnswers);
+        RepresentedTypeRItem representative = RepresentedTypeRItem.builder().id(REPRESENTATIVE_ID_1).value(
+                RepresentedTypeR.builder().respRepName(RESPONDENT_NAME_1).build()).build();
+        caseData.setRepCollection(List.of(representative));
+        assertThat(RespondentRepresentativeUtils.findRepresentativeByRoleOrRespondentName(caseData, ROLE_SOLICITOR_A))
+                .isEqualTo(representative);
+        // when representative found by role should return that representative
+        representative = RepresentedTypeRItem.builder().id(REPRESENTATIVE_ID_1).value(
+                RepresentedTypeR.builder().role(ROLE_SOLICITOR_A).build()).build();
+        caseData.setRepCollection(List.of(representative));
+        assertThat(RespondentRepresentativeUtils.findRepresentativeByRoleOrRespondentName(caseData, ROLE_SOLICITOR_A))
+                .isEqualTo(representative);
     }
 }

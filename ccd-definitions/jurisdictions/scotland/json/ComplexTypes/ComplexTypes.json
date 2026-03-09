@@ -5468,13 +5468,6 @@
   },
   {
     "ID": "Hearing",
-    "ListElementCode": "numberOfDays",
-    "FieldType": "Text",
-    "ElementLabel": "Days",
-    "SecurityClassification": "Public"
-  },
-  {
-    "ID": "Hearing",
     "ListElementCode": "hearingDates",
     "FieldType": "Text",
     "ElementLabel": "Hearing Days",

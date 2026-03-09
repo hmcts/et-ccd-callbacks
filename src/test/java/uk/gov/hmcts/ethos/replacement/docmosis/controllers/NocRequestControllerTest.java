@@ -31,7 +31,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 @WebMvcTest({NocRequestController.class, JsonMapper.class})
 class NocRequestControllerTest extends BaseControllerTest {
 
-    private static final String NOC_REQUEST_ABOUT_TO_SUBMIT = "/noCRequest/aboutToSubmit";
+    private static final String NOC_REQUEST_CLAIMANT_ABOUT_TO_SUBMIT = "/noCRequest/claimant/aboutToSubmit";
+    private static final String NOC_REQUEST_SUBMITTED = "/noCRequest/submitted";
 
     private CCDRequest ccdRequest;
 
@@ -52,9 +53,9 @@ class NocRequestControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void nocRequestAboutToSubmittokenOk() throws Exception {
+    void nocRequestAboutToSubmit_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        mockMvc.perform(post(NOC_REQUEST_ABOUT_TO_SUBMIT)
+        mockMvc.perform(post(NOC_REQUEST_CLAIMANT_ABOUT_TO_SUBMIT)
                 .content(jsonMapper.toJson(ccdRequest))
                 .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                 .contentType(APPLICATION_JSON))
@@ -67,7 +68,7 @@ class NocRequestControllerTest extends BaseControllerTest {
     @Test
     void nocRequestAboutToSubmit_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
-        mockMvc.perform(post(NOC_REQUEST_ABOUT_TO_SUBMIT)
+        mockMvc.perform(post(NOC_REQUEST_CLAIMANT_ABOUT_TO_SUBMIT)
                 .content(jsonMapper.toJson(ccdRequest))
                 .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                 .contentType(APPLICATION_JSON))
@@ -77,7 +78,40 @@ class NocRequestControllerTest extends BaseControllerTest {
     @Test
     void nocRequestAboutToSubmit_badRequest() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        mockMvc.perform(post(NOC_REQUEST_ABOUT_TO_SUBMIT)
+        mockMvc.perform(post(NOC_REQUEST_CLAIMANT_ABOUT_TO_SUBMIT)
+                .content("garbage content")
+                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                .contentType(APPLICATION_JSON))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void nocRequestSubmitted_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(NOC_REQUEST_SUBMITTED)
+                .content(jsonMapper.toJson(ccdRequest))
+                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                .contentType(APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+            .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+            .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    void nocRequestSubmitted_tokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mockMvc.perform(post(NOC_REQUEST_SUBMITTED)
+                .content(jsonMapper.toJson(ccdRequest))
+                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                .contentType(APPLICATION_JSON))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void nocRequestSubmitted_badRequest() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(NOC_REQUEST_SUBMITTED)
                 .content("garbage content")
                 .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                 .contentType(APPLICATION_JSON))

@@ -1,4 +1,5 @@
 java:
+  enabled: true
   image: ${IMAGE_NAME}
   ingressHost: ${SERVICE_FQDN} # e.g. et-cos-pr-2674.preview.platform.hmcts.net
   devcpuRequests: 250m
@@ -164,6 +165,7 @@ et-sya-api:
       EXUI_CASE_DETAILS_URL: "https://xui-${SERVICE_FQDN}/cases/case-details/"
 
 ccd:
+  enabled: true
   ccd:
     definitionImporter:
       enabled: false

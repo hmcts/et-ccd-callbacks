@@ -85,10 +85,8 @@ public final class InitialConsiderationConstants {
     public static final String JURISDICTIONAL_ISSUES = "Jurisdictional issues";
     public static final String JURISDICTION_HEADER = "<h2>Jurisdiction codes</h2><a target=\"_blank\" "
             + "href=\"%s\">View all jurisdiction codes and descriptors (opens in new tab)</a><br><br>";
-    public static final String CODES_URL_ENGLAND = "https://judiciary.sharepoint.com/sites/empjudgesew/"
-            + "Shared%20Documents/Forms/AllItems.aspx?id=%2Fsites%2Fempjudgesew%2FShared%20Documents%2FET%20"
-            + "Jurisdiction%20List%2FJurisdiction%20list%20October%202024.pdf&viewid=9cee6d50-61e5-4d87-92d2-"
-            + "8c9444f00c95&parent=%2Fsites%2Fempjudgesew%2FShared%20Documents%2FET%20Jurisdiction%20List";
+    public static final String CODES_URL_ENGLAND = "https://judiciary.sharepoint.com/:b:/r/sites/empjudgesew/"
+        + "Shared%20Documents/Jurisdiction%20List%20(ET)/Jurisdiction%20list%20January%202026.pdf?csf=1&web=1&e=cacIAn";
     public static final String CODES_URL_SCOTLAND = "https://judiciary.sharepoint"
             + ".com/:w:/r/sites/ScotlandEJs/Shared%20Documents/Jurisdictional%20Codes%20List"
             + "/Jurisdiction%20list%20July%202024%20.doc?d=wfa6ba431b0b941ffa0b82504fd093af0&csf=1&web=1&e=Dm6Hda";

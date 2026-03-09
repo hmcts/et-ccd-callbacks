@@ -509,7 +509,6 @@ class HearingsHelperTest {
 
         setHearingDaysAndDates(caseData);
 
-        assertNull(hearingType.getNumberOfDays());
         assertNull(hearingType.getHearingDates());
     }
 
@@ -523,7 +522,6 @@ class HearingsHelperTest {
 
         setHearingDaysAndDates(caseData);
 
-        assertNull(hearingType.getNumberOfDays());
         assertNull(hearingType.getHearingDates());
     }
 
@@ -535,7 +533,6 @@ class HearingsHelperTest {
 
         setHearingDaysAndDates(caseData);
 
-        assertEquals("1", hearingType.getNumberOfDays());
         assertEquals("15 Mar 2024", hearingType.getHearingDates());
     }
 
@@ -547,8 +544,7 @@ class HearingsHelperTest {
 
         setHearingDaysAndDates(caseData);
 
-        assertEquals("-", hearingType.getNumberOfDays());
-        assertEquals("-", hearingType.getHearingDates());
+        assertEquals("1 Jun 2024", hearingType.getHearingDates());
     }
 
     @Test
@@ -561,7 +557,6 @@ class HearingsHelperTest {
 
         setHearingDaysAndDates(caseData);
 
-        assertEquals("2", hearingType.getNumberOfDays());
         assertEquals("1 Mar 2024 - 10 Mar 2024", hearingType.getHearingDates());
     }
 
@@ -573,7 +568,6 @@ class HearingsHelperTest {
 
         setHearingDaysAndDates(caseData);
 
-        assertEquals("-", hearingType.getNumberOfDays());
         assertEquals("-", hearingType.getHearingDates());
     }
 
@@ -587,8 +581,7 @@ class HearingsHelperTest {
 
         setHearingDaysAndDates(caseData);
 
-        assertEquals("1", hearingType.getNumberOfDays());
-        assertEquals("1 Mar 2024", hearingType.getHearingDates());
+        assertEquals("1 Mar 2024 - 10 Mar 2024", hearingType.getHearingDates());
     }
 
     @Test
@@ -602,9 +595,7 @@ class HearingsHelperTest {
 
         setHearingDaysAndDates(caseData);
 
-        assertEquals("2", hearing1.getNumberOfDays());
         assertEquals("1 Mar 2024 - 2 Mar 2024", hearing1.getHearingDates());
-        assertEquals("-", hearing2.getNumberOfDays());
         assertEquals("-", hearing2.getHearingDates());
     }
 

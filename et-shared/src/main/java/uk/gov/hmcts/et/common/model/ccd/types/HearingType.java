@@ -57,8 +57,6 @@ public class HearingType {
     private String judicialMediation;
     @JsonProperty("hearingNotesDocument")
     private Document hearingNotesDocument;
-    @JsonProperty("numberOfDays")
-    private String numberOfDays;
     @JsonProperty("hearingDates")
     private String hearingDates;
 

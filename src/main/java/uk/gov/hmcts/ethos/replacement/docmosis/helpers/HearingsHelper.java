@@ -321,7 +321,8 @@ public final class HearingsHelper {
                 List<String> hearingDates = dateListedTypeItems.stream()
                     .map(DateListedTypeItem::getValue)
                     .filter(dateListedType ->
-                        HEARING_STATUS_LISTED.equals(dateListedType.getHearingStatus()))
+                        HEARING_STATUS_LISTED.equals(dateListedType.getHearingStatus())
+                        || HEARING_STATUS_HEARD.equals(dateListedType.getHearingStatus()))
                     .map(dateListedType -> LocalDate.parse(dateListedType.getListedDate().substring(0, 10))
                         .format(DateTimeFormatter.ofPattern("d MMM yyyy")))
                     .sorted(Comparator.comparing(date ->
@@ -329,14 +330,11 @@ public final class HearingsHelper {
                     .toList();
 
                 if (isNotEmpty(hearingDates)) {
-                    String numberOfDays = String.valueOf(hearingDates.size());
-                    hearingType.setNumberOfDays(numberOfDays);
                     hearingType.setHearingDates(
                         hearingDates.size() == 1
                             ? hearingDates.getFirst()
                             : hearingDates.getFirst() + " - " + hearingDates.getLast());
                 } else {
-                    hearingType.setNumberOfDays("-");
                     hearingType.setHearingDates("-");
                 }
             });

@@ -67,7 +67,7 @@ et-sya:
   enabled: true
   nodejs:
     imagePullPolicy: Always
-    image: hmctspublic.azurecr.io/et/sya:latest
+    image: hmctspublic.azurecr.io/et/sya:pr-2209
     releaseNameOverride: ${SERVICE_NAME}-et-sya
     ingressHost: et-sya-${SERVICE_FQDN}
     devcpuRequests: 500m
@@ -93,7 +93,7 @@ et-syr:
   enabled: true
   nodejs:
     imagePullPolicy: Always
-    image: hmctspublic.azurecr.io/et/syr:latest
+    image: hmctspublic.azurecr.io/et/syr:pr-817
     releaseNameOverride: ${SERVICE_NAME}-et-syr
     ingressHost: et-syr-${SERVICE_FQDN}
     devcpuRequests: 500m
@@ -119,7 +119,7 @@ et-sya-api:
   enabled: true
   java:
     imagePullPolicy: Always
-    image: hmctspublic.azurecr.io/et/sya-api:latest
+    image: hmctspublic.azurecr.io/et/sya-api:pr-1377
     releaseNameOverride: ${SERVICE_NAME}-et-sya-api
     ingressHost: et-sya-api-${SERVICE_FQDN}
     devcpuRequests: 500m

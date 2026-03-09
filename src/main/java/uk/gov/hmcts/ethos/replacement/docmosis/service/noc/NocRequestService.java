@@ -223,14 +223,20 @@ public class NocRequestService {
 
     private void sendRespondentNocRequestEmailToOrgAdmin(CaseDetails caseDetails) {
         // TODO
+        log.info("sendRespondentNocRequestEmailToOrgAdmin is not implemented yet for caseId {}",
+            caseDetails.getCaseId());
     }
 
     private void sendRespondentNocRequestEmailToRemovedLegalRep(CaseDetails caseDetails) {
         // TODO
+        log.info("sendRespondentNocRequestEmailToRemovedLegalRep is not implemented yet for caseId {}",
+            caseDetails.getCaseId());
     }
 
     private void sendRespondentNocRequestEmailToUnrepresentedParty(CaseDetails caseDetails) {
         // TODO
+        log.info("sendRespondentNocRequestEmailToUnrepresentedParty is not implemented yet for caseId {}",
+            caseDetails.getCaseId());
     }
 
     private void sendRespondentNocRequestEmailToClaimant(CaseDetails caseDetails) {
@@ -260,5 +266,7 @@ public class NocRequestService {
 
     private void sendRespondentNocRequestEmailToOtherParty(CaseDetails caseDetails) {
         // TODO
+        log.info("sendRespondentNocRequestEmailToOtherParty is not implemented yet for caseId {}",
+            caseDetails.getCaseId());
     }
 }

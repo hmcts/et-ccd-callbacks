@@ -26,12 +26,14 @@ import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.OrganisationUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.ClaimantRepresentativeUtils;
@@ -62,6 +64,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EVE
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REQUEST;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_TYPE_REMOVAL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_RETRIEVE_CASE_ASSIGNMENTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_REPRESENTATIVE_EMAIL_ADDRESS_NOT_FOUND;
 
@@ -80,6 +83,7 @@ public class NocRespondentRepresentativeService {
     private final OrganisationClient organisationClient;
     private final AuthTokenGenerator authTokenGenerator;
     private final NocService nocService;
+    private final UserIdamService userIdamService;
 
     /**
      * Validates that each representative marked as an HMCTS organisation user
@@ -717,6 +721,66 @@ public class NocRespondentRepresentativeService {
         ClaimantRepresentativeUtils.markClaimantAsUnrepresented(caseDetails.getCaseData());
         nocNotificationService.notifyClaimantOfRepresentationRemoval(caseDetails);
         return caseDetails.getCaseData();
+    }
+
+    /**
+     * Finds the respondent representative associated with the authenticated user for the specified case.
+     *
+     * <p>The method validates the provided inputs and retrieves {@link UserDetails} using the
+     * supplied user token. It then retrieves the {@link CaseUserAssignmentData} for the given
+     * case and iterates through the user's case role assignments.</p>
+     *
+     * <p>If an assignment corresponds to a respondent representative role and belongs to the
+     * authenticated user, the method attempts to locate the corresponding
+     * {@link RepresentedTypeRItem} in the case data using
+     * {@link RespondentRepresentativeUtils#findRepresentativeByRoleOrRespondentName(CaseData, String)}.
+     * The first matching representative found is returned.</p>
+     *
+     * <p>If the user token is invalid, the case details are incomplete, the case assignments
+     * cannot be retrieved, or no matching representative can be resolved, the method returns
+     * {@code null}. Any failure while retrieving case assignments is logged as a warning.</p>
+     *
+     * @param userToken the authentication token used to retrieve user details and case assignments
+     * @param caseDetails the case details containing the case ID and case data
+     * @return the matching {@link RepresentedTypeRItem} associated with the authenticated user,
+     *         or {@code null} if no representative can be found
+     */
+    public RepresentedTypeRItem findRepresentativeByToken(String userToken, CaseDetails caseDetails) {
+        if (StringUtils.isBlank(userToken)
+                || ObjectUtils.isEmpty(caseDetails)
+                || StringUtils.isBlank(caseDetails.getCaseId())
+                || ObjectUtils.isEmpty(caseDetails.getCaseData())
+                || CollectionUtils.isEmpty(caseDetails.getCaseData().getRepCollection())) {
+            return null;
+        }
+        UserDetails userDetails = userIdamService.getUserDetails(userToken);
+        if (ObjectUtils.isEmpty(userDetails) || StringUtils.isBlank(userDetails.getUid())) {
+            return null;
+        }
+        CaseUserAssignmentData caseUserAssignmentData = null;
+        try {
+            caseUserAssignmentData = nocCcdService.retrieveCaseUserAssignments(userToken, caseDetails.getCaseId());
+        } catch (CcdInputOutputException exception) {
+            log.warn(WARNING_FAILED_TO_RETRIEVE_CASE_ASSIGNMENTS, caseDetails.getCaseId(),
+                    exception.getMessage());
+        }
+        if (ObjectUtils.isEmpty(caseUserAssignmentData)
+                || CollectionUtils.isEmpty(caseUserAssignmentData.getCaseUserAssignments())) {
+            return null;
+        }
+        for (CaseUserAssignment caseUserAssignment : caseUserAssignmentData.getCaseUserAssignments()) {
+            if (!RoleUtils.isRespondentRepresentativeRole(caseUserAssignment.getCaseRole())
+                    || !userDetails.getUid().equals(caseUserAssignment.getUserId())) {
+                continue;
+            }
+            RepresentedTypeRItem representative =
+                    RespondentRepresentativeUtils.findRepresentativeByRoleOrRespondentName(caseDetails.getCaseData(),
+                            caseUserAssignment.getCaseRole());
+            if (ObjectUtils.isNotEmpty(representative)) {
+                return representative;
+            }
+        }
+        return null;
     }
 
     /**

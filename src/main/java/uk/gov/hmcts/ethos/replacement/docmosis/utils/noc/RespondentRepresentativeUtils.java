@@ -9,6 +9,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentUtils;
@@ -690,5 +691,114 @@ public final class RespondentRepresentativeUtils {
         return CollectionUtils.isNotEmpty(representatives)
                 && ObjectUtils.isNotEmpty(caseDetails)
                 && StringUtils.isNotBlank(caseDetails.getCaseId());
+    }
+
+    /**
+     * Finds a respondent representative associated with the given role using a fallback strategy.
+     *
+     * <p>The method first attempts to locate a valid representative in the {@link CaseData}
+     * whose role matches the provided role. If no representative is found, it retrieves the
+     * respondent name associated with the role and attempts to find a representative by that
+     * respondent name instead.</p>
+     *
+     * <p>If neither lookup returns a matching representative, the method returns {@code null}.</p>
+     *
+     * @param caseData the case data containing the representative collection and notice of change answers
+     * @param role the role used to identify the representative
+     * @return the matching {@link RepresentedTypeRItem}, or {@code null} if no representative
+     *         can be found using either lookup strategy
+     */
+    public static RepresentedTypeRItem findRepresentativeByRoleOrRespondentName(CaseData caseData, String role) {
+        RepresentedTypeRItem representative = findRepresentativeByRole(caseData, role);
+        if (ObjectUtils.isNotEmpty(representative)) {
+            return representative;
+        }
+        String respondentName = findRespondentNameByRole(caseData, role);
+        return findRepresentativeByRespondentName(caseData, respondentName);
+    }
+
+    /**
+     * Finds the first valid respondent representative in the case data whose role matches
+     * the specified role.
+     *
+     * <p>The method searches the representative collection in the provided {@link CaseData},
+     * filters out invalid representatives using
+     * {@link RespondentRepresentativeUtils#isValidRepresentative}, and returns the first
+     * representative whose {@code role} matches the given role.</p>
+     *
+     * <p>If the provided role is blank or no matching representative is found, the method
+     * returns {@code null}.</p>
+     *
+     * @param caseData the case data containing the representative collection
+     * @param role the role used to identify the representative
+     * @return the first matching {@link RepresentedTypeRItem}, or {@code null} if the role is blank
+     *         or no matching representative exists
+     */
+    public static RepresentedTypeRItem findRepresentativeByRole(CaseData caseData, String role) {
+        if (StringUtils.isBlank(role)) {
+            return null;
+        }
+        return caseData.getRepCollection().stream()
+                .filter(RespondentRepresentativeUtils::isValidRepresentative)
+                .filter(rep -> role.equals(rep.getValue().getRole()))
+                .findFirst()
+                .orElse(null);
+    }
+
+    /**
+     * Retrieves the respondent name associated with the specified role from the case data.
+     *
+     * <p>The method determines the index of the given role using
+     * {@link RoleUtils#findRoleIndexByRoleLabel(String)} and then retrieves the corresponding
+     * {@link NoticeOfChangeAnswers} from the {@link CaseData}. If a matching entry exists and
+     * contains a respondent name, that name is returned.</p>
+     *
+     * <p>If the role cannot be resolved to a valid index, or if the corresponding
+     * {@link NoticeOfChangeAnswers} object or respondent name is empty, the method returns {@code null}.</p>
+     *
+     * @param caseData the case data containing notice of change answers
+     * @param role the role label used to locate the respondent
+     * @return the respondent name associated with the given role, or {@code null} if the role is invalid
+     *         or no respondent name is available
+     */
+    public static String findRespondentNameByRole(CaseData caseData, String role) {
+        int roleIndex = RoleUtils.findRoleIndexByRoleLabel(role);
+        if (roleIndex == -1) {
+            return null;
+        }
+        NoticeOfChangeAnswers noticeOfChangeAnswers = RoleUtils.getNoticeOfChangeAnswersAtIndex(caseData, roleIndex);
+        if (ObjectUtils.isEmpty(noticeOfChangeAnswers)
+                || ObjectUtils.isEmpty(noticeOfChangeAnswers.getRespondentName())) {
+            return null;
+        }
+        return noticeOfChangeAnswers.getRespondentName();
+    }
+
+    /**
+     * Finds the first valid respondent representative in the case data whose name matches the
+     * provided respondent name.
+     *
+     * <p>The method searches through the representative collection in the given {@link CaseData},
+     * filters out invalid representatives using {@link RespondentRepresentativeUtils#isValidRepresentative},
+     * and returns the first representative whose {@code respRepName} matches the provided name.</p>
+     *
+     * <p>If the provided respondent name is blank or no matching representative is found,
+     * the method returns {@code null}.</p>
+     *
+     * @param caseData the case data containing the representative collection
+     * @param respondentName the name of the respondent representative to search for
+     * @return the first matching {@link RepresentedTypeRItem}, or {@code null} if the respondent name
+     *         is blank or no matching representative exists
+     */
+    public static RepresentedTypeRItem findRepresentativeByRespondentName(CaseData caseData,
+                                                                           String respondentName) {
+        if (StringUtils.isBlank(respondentName)) {
+            return null;
+        }
+        return caseData.getRepCollection().stream()
+                .filter(RespondentRepresentativeUtils::isValidRepresentative)
+                .filter(rep -> respondentName.equals(rep.getValue().getRespRepName()))
+                .findFirst()
+                .orElse(null);
     }
 }

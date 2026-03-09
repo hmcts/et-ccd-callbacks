@@ -146,6 +146,8 @@ public final class NOCConstants {
                     + "Exception: {}";
     public static final String WARNING_FAILED_TO_SEND_REMOVAL_OF_REPRESENTATIVE_CLAIMANT =
             "Failed to send email to claimant for removal of representative, case id: {}, error: {}";
+    public static final String WARNING_FAILED_TO_RETRIEVE_CASE_ASSIGNMENTS =
+            "Failed to retrieve case assignments for case id: {}, error: {}";
 
     public static final String WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_TO_REMOVED_REPRESENTATIVE =
         "Failed to send email to removed legal representative, case id: {}, error: {}";

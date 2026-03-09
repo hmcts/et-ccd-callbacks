@@ -1,0 +1,8 @@
+[
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "noCRequestClaimant",
+    "UserRole": "[CLAIMANTSOLICITOR]",
+    "CRUD": "CRU"
+  }
+]

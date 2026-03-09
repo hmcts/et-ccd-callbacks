@@ -1,7 +1,7 @@
 [
   {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseEventID": "noCRequestClaimant",
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "nocRequestClaimant",
     "CaseFieldID": "nocRequestLandingPageLabel",
     "DisplayContext": "READONLY",
     "PageID": 1,
@@ -10,8 +10,8 @@
     "ShowSummaryChangeOption": "N"
   },
   {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseEventID": "noCRequestClaimant",
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "nocRequestClaimant",
     "CaseFieldID": "nocRequestClaimantSignLabel",
     "DisplayContext": "READONLY",
     "PageID": 2,
@@ -20,8 +20,8 @@
     "ShowSummaryChangeOption": "N"
   },
   {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseEventID": "noCRequestClaimant",
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "nocRequestClaimant",
     "CaseFieldID": "nocRequestConfirmNoLonger",
     "DisplayContext": "MANDATORY",
     "PageID": 2,
@@ -30,8 +30,8 @@
     "ShowSummaryChangeOption": "N"
   },
   {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseEventID": "noCRequestClaimant",
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "nocRequestClaimant",
     "CaseFieldID": "nocRequestConfirmNotice",
     "DisplayContext": "MANDATORY",
     "PageID": 2,

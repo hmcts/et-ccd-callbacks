@@ -22,7 +22,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @Slf4j
-@RequestMapping("/noCRequest")
+@RequestMapping("/nocRequest")
 @RestController
 @RequiredArgsConstructor
 public class NocRequestController {

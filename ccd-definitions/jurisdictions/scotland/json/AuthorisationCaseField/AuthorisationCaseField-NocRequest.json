@@ -1,0 +1,26 @@
+[
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "nocRequestLandingPageLabel",
+    "UserRole": "[CLAIMANTSOLICITOR]",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "nocRequestClaimantSignLabel",
+    "UserRole": "[CLAIMANTSOLICITOR]",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "nocRequestConfirmNoLonger",
+    "UserRole": "[CLAIMANTSOLICITOR]",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "nocRequestConfirmNotice",
+    "UserRole": "[CLAIMANTSOLICITOR]",
+    "CRUD": "CRU"
+  }
+]

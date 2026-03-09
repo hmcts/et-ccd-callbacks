@@ -1,14 +1,14 @@
 [
   {
     "CaseTypeID": "ET_EnglandWales",
-    "ID": "noCRequestClaimant",
+    "ID": "nocRequestClaimant",
     "Name": "NoC Request",
     "Description": "NoC Request",
     "DisplayOrder": 52,
     "PreConditionState(s)": "*",
     "PostConditionState": "*",
-    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/noCRequest/claimant/aboutToSubmit",
-    "CallBackURLSubmittedEvent": "${ET_COS_URL}/noCRequest/submitted",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/nocRequest/claimant/aboutToSubmit",
+    "CallBackURLSubmittedEvent": "${ET_COS_URL}/nocRequest/submitted",
     "SecurityClassification": "Public",
     "ShowEventNotes": "N",
     "ShowSummary": "N"

@@ -31,8 +31,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 @WebMvcTest({NocRequestController.class, JsonMapper.class})
 class NocRequestControllerTest extends BaseControllerTest {
 
-    private static final String NOC_REQUEST_CLAIMANT_ABOUT_TO_SUBMIT = "/noCRequest/claimant/aboutToSubmit";
-    private static final String NOC_REQUEST_SUBMITTED = "/noCRequest/submitted";
+    private static final String NOC_REQUEST_CLAIMANT_ABOUT_TO_SUBMIT = "/nocRequest/claimant/aboutToSubmit";
+    private static final String NOC_REQUEST_SUBMITTED = "/nocRequest/submitted";
 
     private CCDRequest ccdRequest;
 

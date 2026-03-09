@@ -40,12 +40,14 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.test.utils.LoggerTestUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
@@ -162,6 +164,8 @@ class NocRespondentRepresentativeServiceTest {
                     + "Case access will not be defined for this representative.\n";
     private static final String EXPECTED_WARNING_REPRESENTATIVE_EMAIL_NOT_FOUND =
             "Representative email address not found.\n";
+    private static final String EXPECTED_WARNING_FAILED_TO_RETRIEVE_CASE_ASSIGNMENTS =
+            "Failed to retrieve case assignments for case id: 1234567890123456, error: Something went wrong";
 
     private static final String CASE_ID_1 = "1234567890123456";
     private static final String REPRESENTATIVE_NAME = "Representative Name";
@@ -189,6 +193,8 @@ class NocRespondentRepresentativeServiceTest {
     private AuthTokenGenerator authTokenGenerator;
     @MockBean
     private NocService nocService;
+    @MockBean
+    private UserIdamService userIdamService;
 
     @InjectMocks
     private NocRespondentRepresentativeService nocRespondentRepresentativeService;
@@ -206,7 +212,7 @@ class NocRespondentRepresentativeServiceTest {
         nocRespondentRepresentativeService =
                 new NocRespondentRepresentativeService(noticeOfChangeFieldPopulator, converter, nocCcdService,
                         adminUserService, nocRespondentHelper, nocNotificationService, ccdClient, organisationClient,
-                        authTokenGenerator, nocService);
+                        authTokenGenerator, nocService, userIdamService);
 
         // Respondent
         caseData.setRespondentCollection(new ArrayList<>());
@@ -1239,6 +1245,66 @@ class NocRespondentRepresentativeServiceTest {
     }
 
     @Test
+    void theFindRepresentativeByToken() {
+        // when user token is empty should return null
+        CaseDetails caseDetails = new CaseDetails();
+        assertThat(nocRespondentRepresentativeService.findRepresentativeByToken(StringUtils.EMPTY, caseDetails))
+                .isNull();
+        // when case details is empty should return null
+        assertThat(nocRespondentRepresentativeService.findRepresentativeByToken(USER_TOKEN, null)).isNull();
+        // when case details not have case id should return null
+        assertThat(nocRespondentRepresentativeService.findRepresentativeByToken(USER_TOKEN, caseDetails)).isNull();
+        // when case data is empty should return null
+        caseDetails.setCaseId(CASE_ID_1);
+        assertThat(nocRespondentRepresentativeService.findRepresentativeByToken(USER_TOKEN, caseDetails)).isNull();
+        // when representative collection is empty should return null
+        CaseData caseData = new CaseData();
+        caseDetails.setCaseData(caseData);
+        assertThat(nocRespondentRepresentativeService.findRepresentativeByToken(USER_TOKEN, caseDetails)).isNull();
+        // when user details are empty should return null
+        RepresentedTypeRItem representative = RepresentedTypeRItem.builder().id(REPRESENTATIVE_ID_ONE).value(
+                RepresentedTypeR.builder().build()).build();
+        caseData.setRepCollection(List.of(representative));
+        when(userIdamService.getUserDetails(USER_TOKEN)).thenReturn(null);
+        assertThat(nocRespondentRepresentativeService.findRepresentativeByToken(USER_TOKEN, caseDetails)).isNull();
+        // when user details not have id should return null
+        UserDetails userDetails = new UserDetails();
+        when(userIdamService.getUserDetails(USER_TOKEN)).thenReturn(userDetails);
+        assertThat(nocRespondentRepresentativeService.findRepresentativeByToken(USER_TOKEN, caseDetails)).isNull();
+        // when there is no case user assignment data should return null
+        userDetails.setUid(REPRESENTATIVE_ID_ONE);
+        when(nocCcdService.retrieveCaseUserAssignments(USER_TOKEN, CASE_ID_1)).thenReturn(null);
+        assertThat(nocRespondentRepresentativeService.findRepresentativeByToken(USER_TOKEN, caseDetails)).isNull();
+        // when case user assignment data not has any case user assignment should return null
+        CaseUserAssignmentData caseUserAssignmentData = new CaseUserAssignmentData();
+        when(nocCcdService.retrieveCaseUserAssignments(USER_TOKEN, CASE_ID_1)).thenReturn(caseUserAssignmentData);
+        assertThat(nocRespondentRepresentativeService.findRepresentativeByToken(USER_TOKEN, caseDetails)).isNull();
+        // when case user assignment role is not respondent solicitor should return null
+        CaseUserAssignment caseUserAssignment = new CaseUserAssignment();
+        caseUserAssignment.setCaseRole(ROLE_CLAIMANT_SOLICITOR);
+        caseUserAssignmentData.setCaseUserAssignments(List.of(caseUserAssignment));
+        assertThat(nocRespondentRepresentativeService.findRepresentativeByToken(USER_TOKEN, caseDetails)).isNull();
+        // when case user assignment role user id is not same with representative user id should return null
+        caseUserAssignment.setCaseRole(ROLE_SOLICITORA);
+        caseUserAssignment.setUserId(REPRESENTATIVE_ID_TWO);
+        assertThat(nocRespondentRepresentativeService.findRepresentativeByToken(USER_TOKEN, caseDetails)).isNull();
+        // when representative not found by role should return null
+        caseUserAssignment.setUserId(REPRESENTATIVE_ID_ONE);
+        assertThat(nocRespondentRepresentativeService.findRepresentativeByToken(USER_TOKEN, caseDetails)).isNull();
+        // when representative found by role should return that representative
+        representative.getValue().setRole(ROLE_SOLICITORA);
+        caseUserAssignment.setCaseRole(ROLE_SOLICITORA);
+        assertThat(nocRespondentRepresentativeService.findRepresentativeByToken(USER_TOKEN, caseDetails))
+                .isEqualTo(representative);
+        // when gets exception while retrieving case user assignment should log that exception and return null
+        when(nocCcdService.retrieveCaseUserAssignments(USER_TOKEN, CASE_ID_1)).thenThrow(
+                new CcdInputOutputException(EXCEPTION_DUMMY_MESSAGE, new IOException(EXCEPTION_DUMMY_MESSAGE)));
+        assertThat(nocRespondentRepresentativeService.findRepresentativeByToken(USER_TOKEN, caseDetails)).isNull();
+        LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_ONE,
+                EXPECTED_WARNING_FAILED_TO_RETRIEVE_CASE_ASSIGNMENTS);
+    }
+
+    @Test
     @SneakyThrows
     void theAddNewRepresentatives() {
         Organisation organisation = Organisation.builder().build();
@@ -1401,7 +1467,7 @@ class NocRespondentRepresentativeServiceTest {
                 .representativeEmailAddress(REPRESENTATIVE_EMAIL_1).build()).build();
         assertThat(nocRespondentRepresentativeService.hasHmctsRepresentativeEmailChanged(oldRepresentative,
                 newRepresentative)).isFalse();
-        // when old and new representative emails are different but new representative is not an hmcts organisation
+        // when old and new representative emails are different but new representative is not a hmcts organisation
         // user should return false
         oldRepresentative.getValue().setRepresentativeEmailAddress(REPRESENTATIVE_EMAIL_1);
         newRepresentative.getValue().setRepresentativeEmailAddress(REPRESENTATIVE_EMAIL_2);

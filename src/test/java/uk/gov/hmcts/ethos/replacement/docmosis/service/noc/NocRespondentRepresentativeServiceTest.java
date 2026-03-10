@@ -1258,13 +1258,13 @@ class NocRespondentRepresentativeServiceTest {
         caseDetails.setCaseId(CASE_ID_1);
         assertThat(nocRespondentRepresentativeService.findRepresentativeByToken(USER_TOKEN, caseDetails)).isNull();
         // when representative collection is empty should return null
-        CaseData caseData = new CaseData();
-        caseDetails.setCaseData(caseData);
+        CaseData tmpCaseData = new CaseData();
+        caseDetails.setCaseData(tmpCaseData);
         assertThat(nocRespondentRepresentativeService.findRepresentativeByToken(USER_TOKEN, caseDetails)).isNull();
         // when user details are empty should return null
         RepresentedTypeRItem representative = RepresentedTypeRItem.builder().id(REPRESENTATIVE_ID_ONE).value(
                 RepresentedTypeR.builder().build()).build();
-        caseData.setRepCollection(List.of(representative));
+        tmpCaseData.setRepCollection(List.of(representative));
         when(userIdamService.getUserDetails(USER_TOKEN)).thenReturn(null);
         assertThat(nocRespondentRepresentativeService.findRepresentativeByToken(USER_TOKEN, caseDetails)).isNull();
         // when user details not have id should return null

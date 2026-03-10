@@ -57,6 +57,25 @@ public class NocRequestController {
         return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
     }
 
+    @PostMapping(value = "/respondent/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "nocRequest submitted page")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> aboutToSubmitRespondent(
+        @RequestBody CCDRequest ccdRequest,
+        @RequestHeader("Authorization") String userToken) {
+
+        CaseDetails caseDetails = ccdRequest.getCaseDetails();
+        nocRequestService.revokeRespondentLegalRep(caseDetails, userToken);
+        return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
+    }
+
     @PostMapping(value = "/submitted", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "nocRequest submitted page")
     @ApiResponses(value = {

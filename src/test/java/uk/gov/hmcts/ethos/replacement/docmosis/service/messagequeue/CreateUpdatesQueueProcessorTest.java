@@ -8,7 +8,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.ecm.common.model.servicebus.CreateUpdatesMsg;
 import uk.gov.hmcts.ecm.common.model.servicebus.UpdateCaseMsg;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.CloseDataModel;
@@ -17,6 +20,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.CreateUpdates
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.QueueMessageStatus;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.messagequeue.CreateUpdatesQueueRepository;
 
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
@@ -135,11 +139,10 @@ class CreateUpdatesQueueProcessorTest {
         processor.processMessage(queueMessage);
 
         // Then
-        verify(createUpdatesQueueRepository).markAsFailed(
+        verify(createUpdatesQueueRepository).incrementRetryAndMarkFailureIfMax(
                 eq(queueMessage.getMessageId()),
                 anyString(),
-                eq(1),
-                eq(QueueMessageStatus.PENDING),
+                eq(10),
                 any()
         );
     }
@@ -158,11 +161,10 @@ class CreateUpdatesQueueProcessorTest {
         processor.processMessage(queueMessage);
 
         // Then
-        verify(createUpdatesQueueRepository).markAsFailed(
+        verify(createUpdatesQueueRepository).incrementRetryAndMarkFailureIfMax(
                 eq(queueMessage.getMessageId()),
                 anyString(),
-                eq(1),
-                eq(QueueMessageStatus.PENDING),
+                eq(10),
                 any()
         );
     }
@@ -201,27 +203,33 @@ class CreateUpdatesQueueProcessorTest {
     }
 
     @Test
-    void processMessage_maxRetriesReached() throws Exception {
+    void processMessage_unprocessableEntity_noRetry() throws Exception {
         // Given
         CreateUpdatesMsg msg = generateCreateUpdatesMsg();
         CreateUpdatesQueueMessage queueMessage = createQueueMessage(msg);
-        queueMessage.setRetryCount(9); // MAX_RETRIES = 10, so this is the last retry
+        HttpClientErrorException exception = HttpClientErrorException.create(
+                HttpStatus.UNPROCESSABLE_ENTITY,
+                "Unprocessable Entity",
+                HttpHeaders.EMPTY,
+                "{\"message\":\"Case data validation failed\"}".getBytes(StandardCharsets.UTF_8),
+                StandardCharsets.UTF_8
+        );
         
         when(objectMapper.readValue(anyString(), eq(CreateUpdatesMsg.class)))
-                .thenThrow(new RuntimeException("Failed"));
+                .thenThrow(exception);
         when(createUpdatesQueueRepository.lockMessage(anyString(), anyString(), any(), any())).thenReturn(1);
 
         // When
         processor.processMessage(queueMessage);
 
         // Then
-        verify(createUpdatesQueueRepository).markAsFailed(
+        verify(createUpdatesQueueRepository).markAsFailedNoRetry(
                 eq(queueMessage.getMessageId()),
                 anyString(),
-                eq(10),
-                eq(QueueMessageStatus.FAILED),
                 any()
         );
+        verify(createUpdatesQueueRepository, never()).incrementRetryAndMarkFailureIfMax(anyString(), anyString(),
+                any(Integer.class), any());
     }
 
     @Test
@@ -243,7 +251,7 @@ class CreateUpdatesQueueProcessorTest {
         // Given
         CreateUpdatesMsg msg = generateCreateUpdatesMsg();
         CreateUpdatesQueueMessage queueMessage = createQueueMessage(msg);
-        List<CreateUpdatesQueueMessage> messages = Arrays.asList(queueMessage);
+        List<CreateUpdatesQueueMessage> messages = Collections.singletonList(queueMessage);
         
         when(createUpdatesQueueRepository.findPendingMessages(any(LocalDateTime.class), any(PageRequest.class)))
                 .thenReturn(messages);
@@ -254,7 +262,7 @@ class CreateUpdatesQueueProcessorTest {
         // Then
         verify(createUpdatesQueueRepository).findPendingMessages(any(LocalDateTime.class), any(PageRequest.class));
         verify(selfProvider).getObject();
-        // Note: actual message processing happens in executor thread, so we can't verify it directly
+        // Note: actual message processing happens in the executor thread, so we can't verify it directly
     }
 
     private CreateUpdatesQueueMessage createQueueMessage(CreateUpdatesMsg msg) {

@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.CreateUpdatesQueueMessage;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.QueueMessageStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -50,18 +49,34 @@ public interface CreateUpdatesQueueRepository extends JpaRepository<CreateUpdate
 
     @Modifying
     @Query("UPDATE CreateUpdatesQueueMessage m "
-           + "SET m.status = :status, "
+           + "SET m.status = CASE "
+           + "WHEN (m.retryCount + 1) >= :maxRetries "
+           + "THEN uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.QueueMessageStatus.FAILED "
+           + "ELSE uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.QueueMessageStatus.PENDING "
+           + "END, "
            + "m.errorMessage = :errorMessage, "
-           + "m.retryCount = :retryCount, "
+           + "m.retryCount = m.retryCount + 1, "
            + "m.lockedBy = NULL, "
            + "m.lockedUntil = NULL, "
            + "m.processedAt = CASE "
-           + "WHEN :status = uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.QueueMessageStatus.FAILED "
+           + "WHEN (m.retryCount + 1) >= :maxRetries "
            + "THEN :processedAt ELSE NULL END "
            + "WHERE m.messageId = :messageId")
-    void markAsFailed(@Param("messageId") String messageId,
-                      @Param("errorMessage") String errorMessage,
-                      @Param("retryCount") int retryCount,
-                      @Param("status") QueueMessageStatus status,
-                      @Param("processedAt") LocalDateTime processedAt);
+    int incrementRetryAndMarkFailureIfMax(@Param("messageId") String messageId,
+                                          @Param("errorMessage") String errorMessage,
+                                          @Param("maxRetries") int maxRetries,
+                                          @Param("processedAt") LocalDateTime processedAt);
+
+    @Modifying
+    @Query("UPDATE CreateUpdatesQueueMessage m "
+           + "SET m.status = uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.QueueMessageStatus.FAILED, "
+           + "m.errorMessage = :errorMessage, "
+           + "m.retryCount = m.retryCount + 1, "
+           + "m.lockedBy = NULL, "
+           + "m.lockedUntil = NULL, "
+           + "m.processedAt = :processedAt "
+           + "WHERE m.messageId = :messageId")
+    int markAsFailedNoRetry(@Param("messageId") String messageId,
+                            @Param("errorMessage") String errorMessage,
+                            @Param("processedAt") LocalDateTime processedAt);
 }

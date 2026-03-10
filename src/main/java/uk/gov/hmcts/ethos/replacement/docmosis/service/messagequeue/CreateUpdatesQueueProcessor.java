@@ -9,11 +9,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.ecm.common.model.servicebus.CreateUpdatesMsg;
 import uk.gov.hmcts.ecm.common.model.servicebus.UpdateCaseMsg;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.TransferToEcmDataModel;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.CreateUpdatesQueueMessage;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.QueueMessageStatus;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.messagequeue.CreateUpdatesQueueRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.messagehandler.TransferToEcmService;
 
@@ -162,17 +162,25 @@ public class CreateUpdatesQueueProcessor {
         log.error("Error processing create-updates message {}: {}",
                 queueMessage.getMessageId(), ex.getMessage(), ex);
 
-        int newRetryCount = queueMessage.getRetryCount() + 1;
-        QueueMessageStatus newStatus = newRetryCount >= MAX_RETRIES
-                ? QueueMessageStatus.FAILED
-                : QueueMessageStatus.PENDING;
+        if (isUnprocessableEntity(ex)) {
+            createUpdatesQueueRepository.markAsFailedNoRetry(
+                    queueMessage.getMessageId(),
+                    ex.getMessage(),
+                    LocalDateTime.now()
+            );
+            return;
+        }
 
-        createUpdatesQueueRepository.markAsFailed(
+        createUpdatesQueueRepository.incrementRetryAndMarkFailureIfMax(
                 queueMessage.getMessageId(),
                 ex.getMessage(),
-                newRetryCount,
-                newStatus,
+                MAX_RETRIES,
                 LocalDateTime.now()
         );
+    }
+
+    private boolean isUnprocessableEntity(Exception ex) {
+        return ex instanceof HttpClientErrorException httpException
+                && httpException.getStatusCode().value() == 422;
     }
 }

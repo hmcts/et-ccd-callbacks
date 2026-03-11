@@ -47,6 +47,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.OrganisationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.test.utils.LoggerTestUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -157,8 +158,7 @@ class NocRespondentRepresentativeServiceTest {
             "Failed to add organisation policy for case 1234567890123456. Exception: Something went wrong";
 
     private static final String EXPECTED_WARNING_REPRESENTATIVE_EMAIL_ADDRESS_NOT_FOUND =
-            "Representative 'Legal One' could not be found using respondentRepresentative@gmail.com. Case access will "
-                    + "not be defined for this representative.\n";
+            "Representative email address not found.\n";
     private static final String EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL =
             "Representative 'Legal One' could not be found using respondent@rep.email.com. "
                     + "Case access will not be defined for this representative.\n";
@@ -195,6 +195,8 @@ class NocRespondentRepresentativeServiceTest {
     private NocService nocService;
     @MockBean
     private UserIdamService userIdamService;
+    @MockBean
+    private OrganisationService organisationService;
 
     @InjectMocks
     private NocRespondentRepresentativeService nocRespondentRepresentativeService;
@@ -212,7 +214,7 @@ class NocRespondentRepresentativeServiceTest {
         nocRespondentRepresentativeService =
                 new NocRespondentRepresentativeService(noticeOfChangeFieldPopulator, converter, nocCcdService,
                         adminUserService, nocRespondentHelper, nocNotificationService, ccdClient, organisationClient,
-                        authTokenGenerator, nocService, userIdamService);
+                        authTokenGenerator, nocService, userIdamService, organisationService);
 
         // Respondent
         caseData.setRespondentCollection(new ArrayList<>());
@@ -538,6 +540,7 @@ class NocRespondentRepresentativeServiceTest {
         // when case data is empty should return empty list
         assertDoesNotThrow(() -> nocRespondentRepresentativeService
                 .validateRepresentativesOrganisationsAndEmails(null));
+
         // when representative not exists in hmcts organisation. (my Hmcts is selected as NO) should return empty list
         CaseData tmpCaseData = new CaseData();
         DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
@@ -569,40 +572,20 @@ class NocRespondentRepresentativeServiceTest {
         assertThat(genericServiceException.getMessage()).isEqualTo(
                 EXPECTED_EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND);
 
-        // when representative does not have email address
+        // when organisation service returns empty response should not return warning
         tmpCaseData.getRepCollection().getFirst().getValue().getRespondentOrganisation().setOrganisationID(ET_ORG_1);
-        nocRespondentRepresentativeService.validateRepresentativesOrganisationsAndEmails(tmpCaseData);
-        assertThat(tmpCaseData.getNocWarning()).isNotEmpty();
-        assertThat(tmpCaseData.getNocWarning()).isEqualTo(EXPECTED_WARNING_REPRESENTATIVE_EMAIL_ADDRESS_NOT_FOUND);
-
-        // when organisation client returns empty response should return warning
-        tmpCaseData.getRepCollection().getFirst().getValue().setRepresentativeEmailAddress(RESPONDENT_REP_EMAIL);
-        when(organisationClient.getAccountIdByEmail(ADMIN_USER_TOKEN, S2S_TOKEN, RESPONDENT_REP_EMAIL))
-                .thenReturn(null);
-        nocRespondentRepresentativeService.validateRepresentativesOrganisationsAndEmails(tmpCaseData);
-        assertThat(tmpCaseData.getNocWarning()).isNotEmpty();
-        assertThat(tmpCaseData.getNocWarning()).isEqualTo(EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL);
-
-        // when organisation client response body is empty should return warning
-        ResponseEntity<AccountIdByEmailResponse> organisationClientResponse = ResponseEntity.ok(null);
-        when(organisationClient.getAccountIdByEmail(ADMIN_USER_TOKEN, S2S_TOKEN, RESPONDENT_REP_EMAIL))
-                .thenReturn(organisationClientResponse);
-        assertThat(tmpCaseData.getNocWarning()).isNotEmpty();
-        assertThat(tmpCaseData.getNocWarning()).isEqualTo(EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL);
-        // when organisation client response body not has user identifier
-        AccountIdByEmailResponse accountIdByEmailResponse = new AccountIdByEmailResponse();
-        organisationClientResponse = ResponseEntity.ok(accountIdByEmailResponse);
-        when(organisationClient.getAccountIdByEmail(ADMIN_USER_TOKEN, S2S_TOKEN, RESPONDENT_REP_EMAIL))
-                .thenReturn(organisationClientResponse);
-        assertThat(tmpCaseData.getNocWarning()).isNotEmpty();
-        assertThat(tmpCaseData.getNocWarning()).isEqualTo(EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL);
-        // when organisation client response body not has user identifier
-        accountIdByEmailResponse.setUserIdentifier(RESPONDENT_REP_EMAIL);
-        organisationClientResponse = ResponseEntity.ok(accountIdByEmailResponse);
-        when(organisationClient.getAccountIdByEmail(ADMIN_USER_TOKEN, S2S_TOKEN, RESPONDENT_REP_EMAIL))
-                .thenReturn(organisationClientResponse);
+        when(organisationService.checkRepresentativeAccountByEmail(RESPONDENT_REP_NAME,
+                RESPONDENT_REPRESENTATIVE_EMAIL)).thenReturn(StringUtils.EMPTY);
         nocRespondentRepresentativeService.validateRepresentativesOrganisationsAndEmails(tmpCaseData);
         assertThat(tmpCaseData.getNocWarning()).isEmpty();
+
+        // when organisation service returns warning should return that warning
+        when(organisationService.checkRepresentativeAccountByEmail(RESPONDENT_REP_NAME,
+                RESPONDENT_REPRESENTATIVE_EMAIL))
+                .thenReturn(EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL);
+        nocRespondentRepresentativeService.validateRepresentativesOrganisationsAndEmails(tmpCaseData);
+        assertThat(tmpCaseData.getNocWarning()).isNotEmpty();
+        assertThat(tmpCaseData.getNocWarning()).isEqualTo(EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL);
     }
 
     @Test

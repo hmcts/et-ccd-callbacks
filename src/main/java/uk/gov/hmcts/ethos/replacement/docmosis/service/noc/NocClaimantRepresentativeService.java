@@ -19,7 +19,9 @@ import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputExceptio
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.OrganisationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.OrganisationUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.ClaimantRepresentativeUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.NocUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
@@ -45,6 +47,18 @@ public class NocClaimantRepresentativeService {
     private final CcdCaseAssignment ccdCaseAssignment;
     private final CcdClient ccdClient;
     private final NocService nocService;
+    private final OrganisationService organisationService;
+
+    public void validateRepresentativeOrganisationAndEmail(CaseData caseData) {
+        if (!ClaimantRepresentativeUtils.hasRepresentative(caseData.getRepresentativeClaimantType())
+                || !ClaimantRepresentativeUtils.hasRepresentativeEmail(caseData.getRepresentativeClaimantType())
+                || !ClaimantRepresentativeUtils.hasHmctsOrganisationId(caseData.getRepresentativeClaimantType())) {
+            return;
+        }
+        caseData.setNocWarning(organisationService.checkRepresentativeAccountByEmail(
+                caseData.getRepresentativeClaimantType().getNameOfRepresentative(),
+                caseData.getRepresentativeClaimantType().getRepresentativeEmailAddress()));
+    }
 
     /**
      * Update claimant representation based on NoC request.

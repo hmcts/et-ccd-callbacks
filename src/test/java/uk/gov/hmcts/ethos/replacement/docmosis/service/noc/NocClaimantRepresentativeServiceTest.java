@@ -27,6 +27,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.OrganisationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.NocUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
@@ -79,6 +80,8 @@ class NocClaimantRepresentativeServiceTest {
     private CcdClient ccdClient;
     @Mock
     private NocService nocService;
+    @Mock
+    private OrganisationService organisationService;
 
     private CaseData caseData;
     private CaseDetails caseDetails;
@@ -101,7 +104,8 @@ class NocClaimantRepresentativeServiceTest {
                 nocNotificationService,
                 ccdCaseAssignment,
                 ccdClient,
-                nocService
+                nocService,
+                organisationService
         );
         when(adminUserService.getAdminUserToken()).thenReturn(DUMMY_ADMIN_USER_TOKEN);
         when(authTokenGenerator.generate()).thenReturn(S2S_TOKEN);

@@ -48,6 +48,17 @@ public final class CallbackRespHelper {
     }
 
     @NotNull
+    public static ResponseEntity<CCDCallbackResponse> getCallbackRespEntityErrorsAndWarnings(
+            List<String> warnings, List<String> errors, CaseData caseData) {
+
+        return ResponseEntity.ok(CCDCallbackResponse.builder()
+                .data(caseData)
+                .errors(errors)
+                .warnings(warnings)
+                .build());
+    }
+
+    @NotNull
     public static ResponseEntity<ListingCallbackResponse> getListingCallbackRespEntityErrors(
             List<String> errors, ListingData listingData) {
 

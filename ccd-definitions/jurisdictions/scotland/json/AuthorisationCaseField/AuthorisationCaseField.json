@@ -13903,6 +13903,19 @@
   },
   {
     "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "nocWarning",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-employment-scotland",
+          "caseworker-employment-api"
+        ],
+        "CRUD": "CRUD"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
     "CaseFieldID": "et3ResponseHearingRepresentative",
     "UserRole": "caseworker-employment-legalrep-solicitor",
     "CRUD": "CRU"

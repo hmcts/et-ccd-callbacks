@@ -26,6 +26,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_PERLIM
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_TYPE_PERLIMINARY_HEARING_CM;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.OLD_DATE_TIME_PATTERN;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HearingConstants.FULL_PANEL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HearingConstants.SIT_ALONE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HearingConstants.TWO_JUDGES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportCommonMethods.getHearingDurationInMinutes;
 
 public final class HearingsByHearingTypeReport {
@@ -37,9 +40,6 @@ public final class HearingsByHearingTypeReport {
     private static final String STAGE_1 = "Stage 1";
     private static final String STAGE_2 = "Stage 2";
     private static final String STAGE_3 = "Stage 3";
-    private static final String SIT_ALONE = "Sit Alone";
-    private static final String FULL_PANEL = "Full Panel";
-    private static final String TWO_JUDGES = "Two Judges";
 
     private static final String COSTS_HEARING_TYPE_SCOTLAND = "Expenses/Wasted Costs Hearing";
     private String dateFrom;

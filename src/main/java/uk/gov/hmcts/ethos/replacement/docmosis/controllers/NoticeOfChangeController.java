@@ -18,12 +18,14 @@ import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.generic.GenericCallbackResponse;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.CcdCaseAssignment;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRepresentativeService;
 
 import java.io.IOException;
 
+import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
@@ -34,6 +36,7 @@ public class NoticeOfChangeController {
     private final NocNotificationService nocNotificationService;
     private final NocRepresentativeService noCRepresentativeService;
     private final CcdCaseAssignment ccdCaseAssignment;
+    private final VerifyTokenService verifyTokenService;
 
     private static final String APPLY_NOC_DECISION = "applyNocDecision";
 
@@ -41,6 +44,9 @@ public class NoticeOfChangeController {
     public ResponseEntity<CCDCallbackResponse> handleAboutToSubmit(
             @RequestHeader("Authorization") String userToken,
             @RequestBody CallbackRequest callbackRequest) throws IOException {
+        if (!verifyTokenService.isTokenSignatureValid(userToken)) {
+            return ResponseEntity.status(FORBIDDEN.value()).build();
+        }
         CaseData caseData = noCRepresentativeService
                 .updateRepresentation(callbackRequest.getCaseDetails(), userToken);
         callbackRequest.getCaseDetails().setCaseData(caseData);
@@ -56,6 +62,7 @@ public class NoticeOfChangeController {
     public GenericCallbackResponse nocSubmitted(
             @RequestHeader("Authorization") String userToken,
             @RequestBody CallbackRequest callbackRequest) {
+        verifyTokenService.isTokenSignatureValid(userToken);
         GenericCallbackResponse callbackResponse = new GenericCallbackResponse();
 
         if (APPLY_NOC_DECISION.equals(callbackRequest.getEventId())) {

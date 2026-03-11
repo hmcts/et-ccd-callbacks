@@ -367,7 +367,8 @@ public class ManageCaseRoleService {
             if (responseBody != null && responseBody.contains("\\\"roleCategory\\\":\\\"PROFESSIONAL\\\"")) {
                 log.info("Professional user detected - user will be redirected to use MyHMCTS instead.");
                 throw new ProfessionalUserException(
-                    "User is a professional user - user will be redirected to use MyHMCTS.");
+                    "User is a professional user - user will be redirected to use MyHMCTS.",
+                    exception);
             }
             log.error("Error from CCD - {}", exception.getMessage());
             throw exception;

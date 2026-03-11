@@ -129,7 +129,7 @@ public class DocumentGenerationService {
     }
 
     @Data
-    private static class TornadoRequestWrapper {
+    private static final class TornadoRequestWrapper {
         String accessKey;
         String templateName;
         String outputName;

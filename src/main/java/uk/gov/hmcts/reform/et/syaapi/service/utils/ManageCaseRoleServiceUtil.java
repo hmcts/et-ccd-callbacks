@@ -468,7 +468,7 @@ public final class ManageCaseRoleServiceUtil {
                 )));
             }
         } catch (IllegalArgumentException e) {
-            throw new ManageCaseRoleException(new Exception(String.format(INVALID_CASE_USER_ROLE, caseUserRole)));
+            throw new ManageCaseRoleException(new Exception(String.format(INVALID_CASE_USER_ROLE, caseUserRole), e));
         }
     }
 

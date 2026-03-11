@@ -22,12 +22,11 @@ import static uk.gov.hmcts.reform.et.syaapi.enums.CaseEvent.SUBMIT_ET3_FORM;
 import static uk.gov.hmcts.reform.et.syaapi.enums.CaseEvent.UPDATE_ET3_FORM;
 
 public final class ResponseUtil {
+    public static final String ET3_RESPONSE_RECEIVED_INITIAL_VALUE = "1";
 
     private ResponseUtil() {
         // restrict instantiation
     }
-
-    public static final String ET3_RESPONSE_RECEIVED_INITIAL_VALUE = "1";
 
     public static void checkModifyEt3DataParameters(String authorisation, Et3Request et3Request) {
         if (StringUtils.isBlank(authorisation)) {

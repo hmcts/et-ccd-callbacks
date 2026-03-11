@@ -14,7 +14,7 @@ import java.util.stream.IntStream;
 
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.INVALID_NOTICE_OF_CHANGE_ANSWER_INDEX;
 
-public class NoticeOfChangeUtil {
+public final class NoticeOfChangeUtil {
 
     private NoticeOfChangeUtil() {
         // restrict instantiation

@@ -277,7 +277,7 @@ public class CaseDocumentService {
     }
 
     @Data
-    private static class DocumentUploadResponse {
+    private static final class DocumentUploadResponse {
         private List<CaseDocument> documents;
 
         /**

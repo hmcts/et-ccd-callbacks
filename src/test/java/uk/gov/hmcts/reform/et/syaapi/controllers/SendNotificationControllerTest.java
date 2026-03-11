@@ -10,6 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.types.PseResponseType;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.et.syaapi.models.ChangeRespondentNotificationStatusRequest;
 import uk.gov.hmcts.reform.et.syaapi.models.ClaimantApplicationRequest;
@@ -19,7 +20,6 @@ import uk.gov.hmcts.reform.et.syaapi.models.SubmitRespondentPseRespondRequest;
 import uk.gov.hmcts.reform.et.syaapi.service.ApplicationService;
 import uk.gov.hmcts.reform.et.syaapi.service.SendNotificationRespondentService;
 import uk.gov.hmcts.reform.et.syaapi.service.SendNotificationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.reform.et.syaapi.service.utils.ResourceLoader;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -37,7 +37,6 @@ import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.TEST_SER
 @Import(SendNotificationController.class)
 @SuppressWarnings({"PMD.ExcessiveImports", "PMD.TooManyMethods"})
 class SendNotificationControllerTest {
-
 
     @MockBean
     private VerifyTokenService verifyTokenService;
@@ -57,7 +56,6 @@ class SendNotificationControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
-
 
     SendNotificationControllerTest() {
         // Default constructor

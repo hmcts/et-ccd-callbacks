@@ -676,7 +676,7 @@ class CaseServiceTest {
             .build();
 
         CaseDetails startCaseDetails = CaseDetails.builder()
-            .id(12345L)
+            .id(12_345L)
             .caseTypeId("TestType")
             .jurisdiction("ET")
             .createdDate(null)
@@ -692,7 +692,7 @@ class CaseServiceTest {
             .build();
 
         CaseDetails expectedCaseDetails = CaseDetails.builder()
-            .id(12345L)
+            .id(12_345L)
             .caseTypeId("TestType")
             .jurisdiction("ET")
             .createdDate(null)
@@ -758,7 +758,7 @@ class CaseServiceTest {
             .build();
 
         CaseDetails startCaseDetails = CaseDetails.builder()
-            .id(12345L)
+            .id(12_345L)
             .caseTypeId("TestType")
             .jurisdiction("ET")
             .createdDate(null)

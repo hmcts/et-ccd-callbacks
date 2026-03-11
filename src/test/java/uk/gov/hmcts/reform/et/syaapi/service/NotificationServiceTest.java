@@ -1017,7 +1017,7 @@ class NotificationServiceTest {
             );
         }
 
-        private static Stream<Arguments> responseToRequestArguments() {
+        static Stream<Arguments> responseToRequestArguments() {
             return Stream.of(
                 Arguments.of(YES, "tseClaimantResponseToRequestYesTemplateId"),
                 Arguments.of("No", "tseClaimantResponseToRequestNoTemplateId")
@@ -1526,7 +1526,7 @@ class NotificationServiceTest {
             );
         }
 
-        private static Stream<Arguments> responseToRequestArguments() {
+        static Stream<Arguments> responseToRequestArguments() {
             return Stream.of(
                 Arguments.of(YES, "tseClaimantResponseToRequestYesTemplateId"),
                 Arguments.of("No", "tseClaimantResponseToRequestNoTemplateId")
@@ -1772,4 +1772,3 @@ class NotificationServiceTest {
         }
     }
 }
-

@@ -9,13 +9,13 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.et.syaapi.models.SubmitStoredRespondToApplicationRequest;
 import uk.gov.hmcts.reform.et.syaapi.models.SubmitStoredRespondToTribunalRequest;
 import uk.gov.hmcts.reform.et.syaapi.service.StoredApplicationService;
 import uk.gov.hmcts.reform.et.syaapi.service.StoredRespondToApplicationService;
 import uk.gov.hmcts.reform.et.syaapi.service.StoredRespondToTribunalService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.reform.et.syaapi.service.utils.ResourceLoader;
 
 import static org.mockito.ArgumentMatchers.any;

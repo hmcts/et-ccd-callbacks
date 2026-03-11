@@ -18,7 +18,7 @@ class HubLinksUtilTest {
 
     @Test
     void theSetCheckYourAnswersSection() {
-        assertThat(HubLinksUtil.getResponseHubCheckYourAnswersStatus(null,null))
+        assertThat(HubLinksUtil.getResponseHubCheckYourAnswersStatus(null, null))
             .isEqualTo(LINK_STATUS_CANNOT_START_YET);
         ET3HubLinksStatuses et3HubLinksStatuses = new ET3HubLinksStatuses();
         CaseData caseData = new CaseData();

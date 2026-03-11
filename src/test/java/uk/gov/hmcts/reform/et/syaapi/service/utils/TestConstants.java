@@ -83,7 +83,7 @@ public final class TestConstants {
     public static final String TEST_RESPONDENT_IDAM_ID_1 = "test_respondent_idam_id_1";
     public static final String TEST_CLAIMANT_SOLICITOR_IDAM_ID = "test_claimant_solicitor_idam_id";
     public static final String TEST_CASE_ID_STRING = "1234567890123456";
-    public static final long TEST_CASE_ID_LONG = 1234567890123456L;
+    public static final long TEST_CASE_ID_LONG = 1_234_567_890_123_456L;
     public static final String TEST_RESPONDENT_IDAM_ID_2 = "test_respondent_idam_id_2";
     public static final String TEST_RESPONDENT_COLLECTION_KEY = "respondentCollection";
     public static final String TEST_HASHMAP_RESPONDENT_SUM_TYPE_ITEM_ID_KEY = "id";
@@ -328,4 +328,3 @@ public final class TestConstants {
             .uploadedDocument(NOT_EMPTY_UPLOADED_DOCUMENT_TYPE_FILE).build();
     }
 }
-

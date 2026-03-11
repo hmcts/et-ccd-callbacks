@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.et.syaapi.config;
 
-
 import feign.FeignException;
 import feign.Request;
 import org.junit.jupiter.api.Test;
@@ -36,8 +35,6 @@ class GlobalExceptionHandlerTest {
         final GlobalExceptionHandler exceptionHandler = new GlobalExceptionHandler();
         final UnAuthorisedServiceException unAuthorisedServiceException = new UnAuthorisedServiceException("Forbidden");
         final ErrorResponse errorResponse = ErrorResponse.builder().message("Forbidden").code(403).build();
-
-
 
         final ResponseEntity<ErrorResponse> actualResponse =
             exceptionHandler.handleUnAuthorisedServiceException(unAuthorisedServiceException);

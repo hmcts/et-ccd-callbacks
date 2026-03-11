@@ -24,7 +24,6 @@ import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.NOT_EMPT
 import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.NOT_EMPTY_UPLOADED_DOCUMENT_TYPE_FILE;
 import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.TYPE_OF_DOCUMENT_ET1;
 
-
 class GenericServiceUtilTest {
 
     @ParameterizedTest

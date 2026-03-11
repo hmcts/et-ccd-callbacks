@@ -51,7 +51,7 @@ class TseApplicationHelperTest {
 
     TestData data = new TestData();
 
-    private static Stream<Arguments> checkApplicationDocMapping() {
+    static Stream<Arguments> provideCheckApplicationDocMapping() {
         return Stream.of(
             Arguments.of("Withdraw all/part of claim", WITHDRAWAL_OF_ALL_OR_PART_CLAIM),
             Arguments.of("Change my personal details", CHANGE_OF_PARTYS_DETAILS),
@@ -70,7 +70,7 @@ class TseApplicationHelperTest {
     }
 
     @ParameterizedTest
-    @MethodSource()
+    @MethodSource("provideCheckApplicationDocMapping")
     void checkApplicationDocMapping(String applicationType, String documentType) {
         CaseData caseData = data.getCaseData();
         caseData.getGenericTseApplicationCollection().get(0).getValue().setApplicant(CLAIMANT_TITLE);

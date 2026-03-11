@@ -437,19 +437,18 @@ class ApplicationServiceTest {
             GenericTseApplicationType application = GenericTseApplicationType.builder()
                 .claimantResponseRequired(YES).applicationState(INITIAL_STATE).build();
 
-            MockedStatic<TseApplicationHelper> mockStatic = mockStatic(TseApplicationHelper.class);
-            mockStatic.when(() -> TseApplicationHelper.getSelectedApplication(any(), any()))
-                .thenReturn(GenericTseApplicationTypeItem.builder().value(application).build());
+            try (MockedStatic<TseApplicationHelper> mockStatic = mockStatic(TseApplicationHelper.class)) {
+                mockStatic.when(() -> TseApplicationHelper.getSelectedApplication(any(), any()))
+                    .thenReturn(GenericTseApplicationTypeItem.builder().value(application).build());
 
-            applicationService.respondToApplication(TEST_SERVICE_AUTH_TOKEN, testRequest);
+                applicationService.respondToApplication(TEST_SERVICE_AUTH_TOKEN, testRequest);
 
-            assertThat(application.getApplicationState()).isEqualTo(expectedApplicationState);
-            assertThat(application.getClaimantResponseRequired()).isEqualTo(expectedClaimantResponseRequired);
-
-            mockStatic.close();
+                assertThat(application.getApplicationState()).isEqualTo(expectedApplicationState);
+                assertThat(application.getClaimantResponseRequired()).isEqualTo(expectedClaimantResponseRequired);
+            }
         }
 
-        private static Stream<Arguments> testNewStateAndResponseRequired() {
+        static Stream<Arguments> testNewStateAndResponseRequired() {
             return Stream.of(
                 Arguments.of(true, "inProgress", "No"),
                 Arguments.of(false, INITIAL_STATE, YES)
@@ -630,19 +629,18 @@ class ApplicationServiceTest {
             GenericTseApplicationType application = GenericTseApplicationType.builder()
                 .respondentResponseRequired(YES).applicationState(INITIAL_STATE).build();
 
-            MockedStatic<TseApplicationHelper> mockStatic = mockStatic(TseApplicationHelper.class);
-            mockStatic.when(() -> TseApplicationHelper.getSelectedApplication(any(), any()))
-                .thenReturn(GenericTseApplicationTypeItem.builder().value(application).build());
+            try (MockedStatic<TseApplicationHelper> mockStatic = mockStatic(TseApplicationHelper.class)) {
+                mockStatic.when(() -> TseApplicationHelper.getSelectedApplication(any(), any()))
+                    .thenReturn(GenericTseApplicationTypeItem.builder().value(application).build());
 
-            applicationService.respondToClaimantApplication(TEST_SERVICE_AUTH_TOKEN, testRequest);
+                applicationService.respondToClaimantApplication(TEST_SERVICE_AUTH_TOKEN, testRequest);
 
-            assertThat(application.getApplicationState()).isEqualTo(expectedApplicationState);
-            assertThat(application.getRespondentResponseRequired()).isEqualTo(expectedRespondentResponseRequired);
-
-            mockStatic.close();
+                assertThat(application.getApplicationState()).isEqualTo(expectedApplicationState);
+                assertThat(application.getRespondentResponseRequired()).isEqualTo(expectedRespondentResponseRequired);
+            }
         }
 
-        private static Stream<Arguments> testNewStateAndResponseRequiredForClaimant() {
+        static Stream<Arguments> testNewStateAndResponseRequiredForClaimant() {
             return Stream.of(
                 Arguments.of(true, "inProgress", "No"),
                 Arguments.of(false, INITIAL_STATE, YES)

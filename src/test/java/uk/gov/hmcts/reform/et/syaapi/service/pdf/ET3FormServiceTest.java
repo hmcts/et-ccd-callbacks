@@ -59,11 +59,10 @@ class ET3FormServiceTest {
         caseTestData = new CaseTestData();
     }
 
-
     @Test
     @SneakyThrows
     void theGenerateET3WelshAndEnglishForms() {
-        CaseData caseData =  caseTestData.getCaseData();
+        CaseData caseData = caseTestData.getCaseData();
         when(caseDocumentService.createDocumentTypeItem(
             eq(TEST_SERVICE_AUTH_TOKEN),
             eq(caseData.getEcmCaseType()),
@@ -146,7 +145,6 @@ class ET3FormServiceTest {
         }
     }
 
-
     private static Stream<Arguments> provideGetRespondentNameBySelectedRespondentTestData() {
         RespondentSumTypeItem selectedRespondentWithEmptyValue = new CaseTestData().getEt3Request().getRespondent();
         selectedRespondentWithEmptyValue.setValue(null);
@@ -198,7 +196,7 @@ class ET3FormServiceTest {
                          Arguments.of(selectedRespondentWithEmptyValue, null),
                          Arguments.of(selectedRespondentWithRespondentName, null),
                          Arguments.of(selectedRespondentWithRespondentOrganisation, null),
-                         Arguments.of(selectedRespondentWithoutRespondentAndOrganisationNames,userInfoWithGivenName),
+                         Arguments.of(selectedRespondentWithoutRespondentAndOrganisationNames, userInfoWithGivenName),
                          Arguments.of(selectedRespondentWithoutRespondentAndOrganisationNames, userInfoWithFamilyName),
                          Arguments.of(
                              selectedRespondentWithoutRespondentAndOrganisationNames, userInfoWithGivenAndFamilyNames),

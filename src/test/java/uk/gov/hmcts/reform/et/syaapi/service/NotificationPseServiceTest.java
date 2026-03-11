@@ -399,7 +399,6 @@ class NotificationPseServiceTest {
             verify(notificationClient, times(1)).sendEmail(any(), any(), any(), any());
         }
 
-
         @Test
         void shouldSendEmailToClaimant_whenEmailNotPresent() throws NotificationClientException {
             details.caseData().getClaimantType().setClaimantEmailAddress("");

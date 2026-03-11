@@ -389,7 +389,6 @@ class SendNotificationServiceTest {
         assertEquals("SendNotification Id is incorrect", exception.getMessage());
     }
 
-
     public StartEventResponse updateCaseEventResponseNoNotificationResponses() {
         StartEventResponse startEventResponse1 = ResourceLoader.fromString(
             "responses/updateCaseEventResponse.json",

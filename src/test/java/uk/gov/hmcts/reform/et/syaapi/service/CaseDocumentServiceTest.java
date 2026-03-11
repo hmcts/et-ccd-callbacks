@@ -130,7 +130,6 @@ class CaseDocumentServiceTest {
     private static final String MOCK_RESPONSE_WITHOUT_SELF = RESPONSE_BODY
         + "\"claim-submit.png\",\"_links\":{}}]}";
 
-
     private final String fullJsonResponse;
     private CaseDocumentService caseDocumentService;
     private MockRestServiceServer mockServer;

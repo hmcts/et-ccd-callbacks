@@ -45,7 +45,6 @@ public final class CaseTestData {
         CaseRequest.class
     );
 
-
     private final ClaimantTse claimantApplication = ResourceLoader.fromString(
         "responses/claimantTse.json",
         ClaimantTse.class

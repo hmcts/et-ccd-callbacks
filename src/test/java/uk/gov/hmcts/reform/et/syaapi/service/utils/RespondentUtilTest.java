@@ -50,7 +50,7 @@ class RespondentUtilTest {
         "java.lang.Exception: Respondent representative not found for case: %s";
     private static final String RESPONDENT_NAME = "Respondent Ldt";
 
-    private static final Organisation mockOrganisation = Organisation.builder()
+    private static final Organisation MOCK_ORGANISATION = Organisation.builder()
         .organisationID("my org")
         .organisationName("New Organisation").build();
 
@@ -230,7 +230,7 @@ class RespondentUtilTest {
         return StringUtils.EMPTY;
     }
 
-    @SuppressWarnings({"unchecked","rawtypes"})
+    @SuppressWarnings({"unchecked", "rawtypes"})
     private static Stream<Arguments> provideTheSetRespondentIdamIdAndDefaultLinkStatusesTestData() {
         CaseDetails caseDetailsWithEmptyRespondentCollection = new CaseTestData().getCaseDetailsWithCaseData();
         caseDetailsWithEmptyRespondentCollection.getData()
@@ -239,7 +239,7 @@ class RespondentUtilTest {
         CaseDetails caseDetailsWithEmptyRespondentSumTypeItem = new CaseTestData().getCaseDetailsWithCaseData();
         caseDetailsWithEmptyRespondentSumTypeItem.getData()
             .put(TestConstants.TEST_RESPONDENT_COLLECTION_KEY, new ArrayList<>());
-        ((ArrayList<?>)caseDetailsWithEmptyRespondentSumTypeItem.getData()
+        ((ArrayList<?>) caseDetailsWithEmptyRespondentSumTypeItem.getData()
             .get(TestConstants.TEST_RESPONDENT_COLLECTION_KEY)).add(null);
 
         CaseDetails caseDetailsWithEmptyRespondentSumType = new CaseTestData().getCaseDetailsWithCaseData();
@@ -554,7 +554,7 @@ class RespondentUtilTest {
     void isRespondentLegalRepOnlineWithEmail_shouldReturnTrueWhenAllFieldsValid() {
         RepresentedTypeR rep = RepresentedTypeR.builder()
             .myHmctsYesNo("Yes")
-            .respondentOrganisation(mockOrganisation)
+            .respondentOrganisation(MOCK_ORGANISATION)
             .representativeEmailAddress("rep@email.com")
             .build();
         assertThat(RespondentUtil.isRespondentLegalRepOnlineWithEmail(rep)).isTrue();
@@ -564,7 +564,7 @@ class RespondentUtilTest {
     void isRespondentLegalRepOnlineWithEmail_shouldReturnFalseWhenMyHmctsYesNoIsNotYes() {
         RepresentedTypeR rep = RepresentedTypeR.builder()
             .myHmctsYesNo("No")
-            .respondentOrganisation(mockOrganisation)
+            .respondentOrganisation(MOCK_ORGANISATION)
             .representativeEmailAddress("rep@email.com")
             .build();
         assertThat(RespondentUtil.isRespondentLegalRepOnlineWithEmail(rep)).isFalse();
@@ -584,7 +584,7 @@ class RespondentUtilTest {
     void isRespondentLegalRepOnlineWithEmail_shouldReturnFalseWhenEmailIsBlank() {
         RepresentedTypeR rep = RepresentedTypeR.builder()
             .myHmctsYesNo("Yes")
-            .respondentOrganisation(mockOrganisation)
+            .respondentOrganisation(MOCK_ORGANISATION)
             .representativeEmailAddress("")
             .build();
         assertThat(RespondentUtil.isRespondentLegalRepOnlineWithEmail(rep)).isFalse();
@@ -594,7 +594,7 @@ class RespondentUtilTest {
     void isRespondentLegalRepOnlineWithEmail_shouldReturnFalseWhenEmailIsWhitespace() {
         RepresentedTypeR rep = RepresentedTypeR.builder()
             .myHmctsYesNo("Yes")
-            .respondentOrganisation(mockOrganisation)
+            .respondentOrganisation(MOCK_ORGANISATION)
             .representativeEmailAddress("   ")
             .build();
         assertThat(RespondentUtil.isRespondentLegalRepOnlineWithEmail(rep)).isFalse();
@@ -604,7 +604,7 @@ class RespondentUtilTest {
     void isRespondentLegalRepOnlineWithEmail_shouldReturnFalseWhenEmailIsNull() {
         RepresentedTypeR rep = RepresentedTypeR.builder()
             .myHmctsYesNo("Yes")
-            .respondentOrganisation(mockOrganisation)
+            .respondentOrganisation(MOCK_ORGANISATION)
             .representativeEmailAddress(null)
             .build();
         assertThat(RespondentUtil.isRespondentLegalRepOnlineWithEmail(rep)).isFalse();

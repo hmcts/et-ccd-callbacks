@@ -19,7 +19,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 class RespondentTseUtilTest {
 
-    private static Stream<Arguments> checkGetGenericTseApplicationFromRespondentTse() {
+    static Stream<Arguments> checkGetGenericTseApplicationFromRespondentTse() {
         String applicationText = "Test details";
         String documentFilename = "test-Document-Filename.pdf";
         String copyToOtherPartyText = "No details";

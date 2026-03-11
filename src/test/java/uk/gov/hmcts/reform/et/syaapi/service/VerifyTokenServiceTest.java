@@ -14,7 +14,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 @ExtendWith(MockitoExtension.class)
 class VerifyTokenServiceTest {
 
-
     @InjectMocks
     private VerifyTokenService verifyTokenService;
 

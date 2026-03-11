@@ -1,6 +1,5 @@
 package uk.gov.hmcts.reform.et.syaapi.models;
 
-
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

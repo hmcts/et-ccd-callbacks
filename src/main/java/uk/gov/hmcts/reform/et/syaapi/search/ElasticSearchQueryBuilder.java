@@ -56,7 +56,6 @@ public final class ElasticSearchQueryBuilder {
                 new TermQueryBuilder(FIELD_NAME_RESPONDENT,
                 findCaseForRoleModificationRequest.getRespondentName()).caseInsensitive(true));
 
-
             // Claimant Queries
             BoolQueryBuilder boolQueryForClaimantFirstNames = boolQuery().filter(
                 new TermQueryBuilder(FIELD_NAME_CLAIMANT_FIRST_NAMES,

@@ -6,7 +6,6 @@ public final class DocumentCategoryConstants {
     public static final String ET3_PDF_DOC_CATEGORY = "C18";
     public static final String CASE_MANAGEMENT_DOC_CATEGORY = "C4";
 
-
     private DocumentCategoryConstants() {
         // restrict instantiation
     }

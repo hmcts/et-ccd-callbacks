@@ -227,7 +227,6 @@ public final class RespondentUtil {
         return et3HubLinksStatuses;
     }
 
-
     public static boolean checkIsUserCreator(CaseAssignedUserRolesResponse caseAssignedUserRolesResponse) {
         if (ObjectUtils.isEmpty(caseAssignedUserRolesResponse)
             || CollectionUtils.isEmpty(caseAssignedUserRolesResponse.getCaseAssignedUserRoles())) {

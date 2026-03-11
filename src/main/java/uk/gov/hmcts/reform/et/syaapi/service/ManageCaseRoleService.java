@@ -757,18 +757,18 @@ public class ManageCaseRoleService {
             caseDetails.getId().toString(),
             REMOVE_OWN_REP_AS_CLAIMANT.name()
         );
-        caseDetails = startEventResponse.getCaseDetails();
-        CaseData caseData = EmployeeObjectMapper.convertCaseDataMapToCaseDataObject(caseDetails.getData());
+        CaseDetails startedCaseDetails = startEventResponse.getCaseDetails();
+        CaseData caseData = EmployeeObjectMapper.convertCaseDataMapToCaseDataObject(startedCaseDetails.getData());
         caseData.setClaimantRepresentedQuestion(NO);
         caseData.setClaimantRepresentativeRemoved(YES);
         ManageCaseRoleServiceUtil.resetOrganizationPolicy(caseData,
                                                           CASE_USER_ROLE_CLAIMANT_SOLICITOR,
-                                                          caseDetails.getId().toString());
+                                                          startedCaseDetails.getId().toString());
         return caseService.submitUpdate(
             authorisation,
-            caseDetails.getId().toString(),
+            startedCaseDetails.getId().toString(),
             caseDetailsConverter.caseDataContent(startEventResponse, caseData),
-            caseDetails.getCaseTypeId()
+            startedCaseDetails.getCaseTypeId()
         );
     }
 
@@ -808,33 +808,35 @@ public class ManageCaseRoleService {
             caseDetails.getId().toString(),
             REMOVE_OWN_REP_AS_RESPONDENT.name()
         );
-        caseDetails = startEventResponse.getCaseDetails();
-        CaseData caseData = EmployeeObjectMapper.convertCaseDataMapToCaseDataObject(caseDetails.getData());
+        CaseDetails startedCaseDetails = startEventResponse.getCaseDetails();
+        CaseData caseData = EmployeeObjectMapper.convertCaseDataMapToCaseDataObject(startedCaseDetails.getData());
         RespondentSumTypeItem respondentSumTypeItem =
             RespondentUtil.findRespondentSumTypeItemByIndex(caseData.getRespondentCollection(),
                                                             respondentIndex,
-                                                            caseDetails.getId().toString());
+                                                            startedCaseDetails.getId().toString());
         if (StringUtils.isNotBlank(caseUserRole)) {
-            ManageCaseRoleServiceUtil.resetOrganizationPolicy(caseData, caseUserRole, caseDetails.getId().toString());
+            ManageCaseRoleServiceUtil.resetOrganizationPolicy(caseData,
+                                                              caseUserRole,
+                                                              startedCaseDetails.getId().toString());
         }
         respondentSumTypeItem.getValue().setRepresentativeRemoved(YES);
         RepresentedTypeRItem representativeRItem =
             RespondentUtil.findRespondentRepresentative(respondentSumTypeItem,
                                                         caseData.getRepCollection(),
-                                                        caseDetails.getId().toString());
+                                                        startedCaseDetails.getId().toString());
         if (ObjectUtils.isNotEmpty(representativeRItem)) {
             caseData.setRepCollectionToRemove(List.of(representativeRItem));
         }
-        caseDetails.setData(EmployeeObjectMapper.mapCaseDataToLinkedHashMap(caseData));
-        CaseDataContent caseDataContent =  caseDetailsConverter.caseDataContent(startEventResponse, caseData);
+        startedCaseDetails.setData(EmployeeObjectMapper.mapCaseDataToLinkedHashMap(caseData));
+        CaseDataContent caseDataContent = caseDetailsConverter.caseDataContent(startEventResponse, caseData);
         return ccdApi.submitEventForCitizen(authorisation,
-                                       authTokenGenerator.generate(),
-                                       userInfo.getUid(),
-                                       JURISDICTION_ID,
-                                       caseDetails.getCaseTypeId(),
-                                       caseDetails.getId().toString(),
-                                       true,
-                                       caseDataContent);
+                                            authTokenGenerator.generate(),
+                                            userInfo.getUid(),
+                                            JURISDICTION_ID,
+                                            startedCaseDetails.getCaseTypeId(),
+                                            startedCaseDetails.getId().toString(),
+                                            true,
+                                            caseDataContent);
     }
 
     /**

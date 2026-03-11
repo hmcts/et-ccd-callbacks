@@ -23,7 +23,6 @@ public final class RemoteServiceUtil {
         // restrict instantiation
     }
 
-
     /**
      * Returns HttpMethod by the given modification type. If modification type is Assignment then returns
      * HttpMethod POST else returns HttpMethod DELETE. Throws {@link ManageCaseRoleException} when modification

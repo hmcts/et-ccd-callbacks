@@ -405,7 +405,6 @@ public class CaseDocumentService {
             .orElse(null);
     }
 
-
     /**
      * Accepts a {@link PdfDecodedMultipartFile} and wraps it in a {@link DocumentTypeItem} and assigns a random UUID.
      * @param authToken is the jwt token used to call this service

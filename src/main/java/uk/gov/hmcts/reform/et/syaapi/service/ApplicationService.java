@@ -458,7 +458,6 @@ public class ApplicationService {
         return finalCaseDetails;
     }
 
-
     /**
      * Respond to claimant application.
      *

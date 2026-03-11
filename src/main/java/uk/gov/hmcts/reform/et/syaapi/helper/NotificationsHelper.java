@@ -253,7 +253,6 @@ public final class NotificationsHelper {
             .isAfter(now.atZone(ZoneId.of("UTC")));
     }
 
-
     public static boolean isRepresentedClaimantWithMyHmctsCase(CaseData caseData) {
         return MY_HMCTS.equals(caseData.getCaseSource())
             && YES.equals(caseData.getClaimantRepresentedQuestion())

@@ -45,8 +45,6 @@ public final class ResponseConstants {
     public static final String ET3_FORM_DOCUMENT_TYPE = "ET3";
     public static final String UNABLE_TO_UPLOAD_DOCUMENT = "Unable to upload document";
 
-
-
     private ResponseConstants() {
         // restrict instantiation
     }

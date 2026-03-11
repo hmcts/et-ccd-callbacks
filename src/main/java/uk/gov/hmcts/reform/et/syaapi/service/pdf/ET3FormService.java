@@ -37,7 +37,6 @@ import static uk.gov.hmcts.reform.et.syaapi.constants.ResponseConstants.UNABLE_T
 import static uk.gov.hmcts.reform.et.syaapi.service.pdf.PdfUploadService.createPdfDocumentDescriptionFromCaseData;
 import static uk.gov.hmcts.reform.et.syaapi.service.pdf.PdfUploadService.sanitizePartyName;
 
-
 @Slf4j
 @Service
 @RequiredArgsConstructor()

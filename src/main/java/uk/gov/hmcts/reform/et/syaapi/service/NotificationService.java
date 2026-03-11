@@ -782,7 +782,6 @@ public class NotificationService {
             : getRespondentRepPortalLink(details.caseId());
         emailParameters.put(SEND_EMAIL_PARAMS_CITIZEN_PORTAL_LINK_KEY, linkToCase);
 
-
         sendEmailToRespondent(emailAddress, emailTemplate, emailParameters, details.caseId);
     }
 

@@ -43,7 +43,6 @@ public final class ManageCaseRoleConstants {
     public static final String EXCEPTION_RESPONDENT_REPRESENTATIVE_NOT_FOUND =
         "Respondent representative not found for case: %s";
 
-
     public static final String MODIFY_CASE_ROLE_EMPTY_REQUEST = "Request to modify roles is empty";
     public static final String MODIFY_CASE_USER_ROLE_ITEM_INVALID = "One of the case user role modification item is "
         + "invalid. Invalid Data is For CaseId: %s";

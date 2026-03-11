@@ -20,7 +20,6 @@ public class NoticeOfChangeUtil {
         // restrict instantiation
     }
 
-
     /**
      * Finds the index of a {@link NoticeOfChangeAnswers} entry in the given {@link CaseData}
      * that matches the specified respondent name.

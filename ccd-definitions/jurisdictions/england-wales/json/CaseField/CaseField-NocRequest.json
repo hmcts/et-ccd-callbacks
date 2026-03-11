@@ -1,0 +1,38 @@
+[
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "nocRequestLandingPageLabel",
+    "Label": "As the lead legal representative, you can withdraw yourself and your organisation from this case and cease representing this client.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "nocRequestClaimantSignLabel",
+    "Label": "You should tick to 'sign' when<br>Your organisation will no longer be representing claimant.<br>You have served notice of this change to your former client.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "nocRequestConfirmNoLonger",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "msl_NoCRequest_NoLonger",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "nocRequestConfirmNotice",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "msl_NoCRequest_Notice",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]
+
+

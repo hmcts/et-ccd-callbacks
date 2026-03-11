@@ -1,0 +1,14 @@
+[
+  {
+    "ID": "msl_NoCRequest_NoLonger",
+    "ListElementCode": "I confirm this organisation will no longer be representing this client",
+    "ListElement": "I confirm this organisation will no longer be representing this client",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "msl_NoCRequest_Notice",
+    "ListElementCode": "I confirm notice of this change has been served to our former client",
+    "ListElement": "I confirm notice of this change has been served to our former client",
+    "DisplayOrder": 1
+  }
+]

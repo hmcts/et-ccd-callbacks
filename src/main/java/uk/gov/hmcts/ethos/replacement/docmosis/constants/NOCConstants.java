@@ -153,6 +153,8 @@ public final class NOCConstants {
         "Failed to send email to removed legal representative, case id: {}, error: {}";
     public static final String WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_TO_UNREPRESENTED_PARTY =
         "Failed to send email to unrepresented party, case id: {}, error: {}";
+    public static final String WARNING_FAILED_TO_GET_CASE_ASSIGNMENTS_BY_ID =
+        "Failed to get case assignments by id for case id: {}";
 
     public static final int MAX_NOC_ANSWERS = 10;
 

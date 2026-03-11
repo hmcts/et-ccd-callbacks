@@ -98,7 +98,6 @@ class NocRespondentRepresentativeServiceTest {
     private static final String RESPONDENT_REP_NAME = "Legal One";
     private static final String RESPONDENT_REP_NAME_TWO = "Legal Two";
     private static final String RESPONDENT_REP_NAME_THREE = "Legal Three";
-    private static final String RESPONDENT_REP_EMAIL = "respondent@rep.email.com";
     private static final String ROLE_CLAIMANT_SOLICITOR = "[CLAIMANTSOLICITOR]";
     private static final String ROLE_SOLICITORA = "[SOLICITORA]";
     private static final String ROLE_SOLICITORB = "[SOLICITORB]";
@@ -157,8 +156,6 @@ class NocRespondentRepresentativeServiceTest {
     private static final String EXPECTED_ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES =
             "Failed to add organisation policy for case 1234567890123456. Exception: Something went wrong";
 
-    private static final String EXPECTED_WARNING_REPRESENTATIVE_EMAIL_ADDRESS_NOT_FOUND =
-            "Representative email address not found.\n";
     private static final String EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL =
             "Representative 'Legal One' could not be found using respondent@rep.email.com. "
                     + "Case access will not be defined for this representative.\n";

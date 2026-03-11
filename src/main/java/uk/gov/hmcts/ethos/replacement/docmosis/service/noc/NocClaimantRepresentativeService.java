@@ -49,6 +49,29 @@ public class NocClaimantRepresentativeService {
     private final NocService nocService;
     private final OrganisationService organisationService;
 
+    /**
+     * Validates the representative organisation and email associated with the given case data.
+     * <p>
+     * This method performs preliminary checks to ensure that the claimant representative,
+     * their email address, and the HMCTS organisation ID are present. If any of these
+     * required details are missing, the validation is skipped and the method returns
+     * without performing further checks.
+     * </p>
+     *
+     * <p>
+     * If all required representative details are available, the method verifies whether
+     * a representative account exists for the provided email address by calling the
+     * organisation service. Any warning returned from the service is stored in the
+     * {@code nocWarning} field of the {@link CaseData}.
+     * </p>
+     *
+     * <p>
+     * <strong>Assumption:</strong> The {@code caseData} parameter is expected to be non-null
+     * when this method is invoked.
+     * </p>
+     *
+     * @param caseData the case data containing representative details to validate
+     */
     public void validateRepresentativeOrganisationAndEmail(CaseData caseData) {
         if (!ClaimantRepresentativeUtils.hasRepresentative(caseData.getRepresentativeClaimantType())
                 || !ClaimantRepresentativeUtils.hasRepresentativeEmail(caseData.getRepresentativeClaimantType())

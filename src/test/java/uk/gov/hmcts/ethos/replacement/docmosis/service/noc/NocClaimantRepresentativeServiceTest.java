@@ -62,7 +62,11 @@ class NocClaimantRepresentativeServiceTest {
     private static final String DUMMY_ADMIN_USER_TOKEN = "dummyAdminUserToken";
     private static final String DUMMY_ORGANISATION_USER_ID = "dummyOrganisationUserId";
     private static final String ORGANISATION_ID_NEW = "ORG3_NEW";
+    private static final String REPRESENTATIVE_NAME_1 = "Representative Name 1";
     private static final String S2S_TOKEN = "s2sToken";
+    private static final String EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL =
+            "Representative 'Representative Name 1' could not be found using representative_1@hmcts.org. Case access "
+                    + "will not be defined for this representative.\n";
 
     @Mock
     private AuthTokenGenerator authTokenGenerator;
@@ -272,5 +276,30 @@ class NocClaimantRepresentativeServiceTest {
                 nocClaimantRepresentativeService.identifyRepresentationChanges(after, before);
 
         assertThat(result).isEqualTo(expected);
+    }
+
+    @Test
+    void theValidateRepresentativeOrganisationAndEmail() {
+        // when representative claimant type is empty should not set noc warning
+        CaseData tmpCaseData = new CaseData();
+        nocClaimantRepresentativeService.validateRepresentativeOrganisationAndEmail(tmpCaseData);
+        assertThat(tmpCaseData.getNocWarning()).isNull();
+        // when representative does not have email should not set noc warning
+        RepresentedTypeC claimantRepresentative = RepresentedTypeC.builder().build();
+        tmpCaseData.setRepresentativeClaimantType(claimantRepresentative);
+        nocClaimantRepresentativeService.validateRepresentativeOrganisationAndEmail(tmpCaseData);
+        assertThat(tmpCaseData.getNocWarning()).isNull();
+        // when representative does not have hmcts organisation id should not set noc warning
+        claimantRepresentative.setRepresentativeEmailAddress(REPRESENTATIVE_EMAIL_1);
+        nocClaimantRepresentativeService.validateRepresentativeOrganisationAndEmail(tmpCaseData);
+        assertThat(tmpCaseData.getNocWarning()).isNull();
+        // when representative has hmcts organisation id and email should set noc warning
+        claimantRepresentative.setMyHmctsOrganisation(Organisation.builder().organisationID(ORGANISATION_ID_NEW)
+                .build());
+        claimantRepresentative.setNameOfRepresentative(REPRESENTATIVE_NAME_1);
+        when(organisationService.checkRepresentativeAccountByEmail(REPRESENTATIVE_NAME_1, REPRESENTATIVE_EMAIL_1))
+                .thenReturn(EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL);
+        nocClaimantRepresentativeService.validateRepresentativeOrganisationAndEmail(tmpCaseData);
+        assertThat(tmpCaseData.getNocWarning()).isEqualTo(EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL);
     }
 }

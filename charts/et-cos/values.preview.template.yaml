@@ -41,10 +41,16 @@ java:
           alias: ET_COS_SYSTEM_USER_PASSWORD
         - name: idam-client-secret
           alias: IDAM_CLIENT_SECRET
+        - name: acas-idam-client-secret
+          alias: ET_SYA_API_IDAM_CLIENT_SECRET
         - name: et-api-caseworker-user-name
           alias: CASEWORKER_USER_NAME
         - name: et-api-caseworker-password
           alias: CASEWORKER_PASSWORD
+        - name: et1-service-owner-notification-email
+          alias: ET1_SERVICE_OWNER_NOTIFICATION_EMAIL
+        - name: et1-ecm-dts-core-team-slack-notification-email
+          alias: ET1_ECM_DTS_CORE_TEAM_SLACK_NOTIFICATION_EMAIL
         - name: et-cos-postgres-user-v15
           alias: ET_COS_DB_USER_NAME
         - name: et-cos-postgres-password-v15

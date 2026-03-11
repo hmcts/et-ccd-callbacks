@@ -70,7 +70,7 @@ idam:
     jwksUrl: ${IDAM_JWKS_BASEURL:${IDAM_API_JWK_URL:http://sidam-api:5000/jwks}}
   client:
     scope: openid profile roles manage-user
-    secret: ${IDAM_CLIENT_SECRET:AAAAAAAAAAAAAAAA}
+    secret: ${IDAM_CLIENT_SECRET:${ET_SYA_API_IDAM_CLIENT_SECRET:AAAAAAAAAAAAAAAA}}
     id: ${REFORM_SERVICE_NAME:et-cos}
 
 ccd_gateway_base_url: ${CCD_GATEWAY_BASE_URL:http://127.0.0.1:3453}

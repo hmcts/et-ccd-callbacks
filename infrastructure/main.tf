@@ -9,6 +9,12 @@ provider "azurerm" {
   subscription_id            = var.aks_subscription_id
 }
 
+provider "azurerm" {
+  alias           = "aks-cftapps"
+  subscription_id = var.aks_subscription_id
+  features {}
+}
+
 locals {
   tagEnv = var.env == "aat" ? "staging" : var.env == "perftest" ? "testing" : var.env
   tags = merge(var.common_tags,
@@ -21,6 +27,11 @@ locals {
       "builtFrom"    = "et-ccd-callbacks"
     })
   )
+  api_mgmt_suffix      = var.apim_suffix == "" ? var.env : var.apim_suffix
+  api_mgmt_name        = "cft-api-mgmt-${local.api_mgmt_suffix}"
+  api_mgmt_rg          = join("-", ["cft", var.env, "network-rg"])
+  et_ccd_callbacks_url = join("", ["http://et-cos-", var.env, ".service.core-compute-", var.env, ".internal"])
+  s2sUrl               = join("", ["http://rpe-service-auth-provider-", var.env, ".service.core-compute-", var.env, ".internal"])
 }
 
 
@@ -55,4 +66,31 @@ resource "azurerm_key_vault_secret" "et_cos_s2s_secret" {
   name         = "et-cos-s2s-secret"
   value        = data.azurerm_key_vault_secret.et_cos_s2s_key.value
   key_vault_id = module.key-vault.key_vault_id
+}
+
+data "azurerm_key_vault" "et-msg-handler-vault" {
+  name                = "et-msg-handler-${var.env}"
+  resource_group_name = "et-msg-handler-${var.env}"
+}
+
+data "azurerm_key_vault_secret" "et-api-caseworker-username" {
+  name         = "caseworker-user-name"
+  key_vault_id = data.azurerm_key_vault.et-msg-handler-vault.id
+}
+
+data "azurerm_key_vault_secret" "et-api-caseworker-password" {
+  name         = "caseworker-password"
+  key_vault_id = data.azurerm_key_vault.et-msg-handler-vault.id
+}
+
+resource "azurerm_key_vault_secret" "et-caseworker-user-name" {
+  key_vault_id = module.key-vault.key_vault_id
+  name         = "et-api-caseworker-user-name"
+  value        = data.azurerm_key_vault_secret.et-api-caseworker-username.value
+}
+
+resource "azurerm_key_vault_secret" "et-caseworker-password" {
+  key_vault_id = module.key-vault.key_vault_id
+  name         = "et-api-caseworker-password"
+  value        = data.azurerm_key_vault_secret.et-api-caseworker-password.value
 }

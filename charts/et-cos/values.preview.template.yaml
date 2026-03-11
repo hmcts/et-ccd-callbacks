@@ -9,12 +9,14 @@ java:
   environment:
     EXUI_CASE_DETAILS_URL: "https://xui-${SERVICE_FQDN}/cases/case-details/"
     CITIZEN_CASE_DETAILS_URL: "https://et-sya-${SERVICE_FQDN}/citizen-hub/"
+    RESPONDENT_PORTAL_LINK: "https://et-syr-${SERVICE_FQDN}/"
     LAUNCH_DARKLY_ENV: '{{ .Values.global.environment }}'
     ET_COS_URL: "https://${SERVICE_NAME}"
     AAC_URL: "https://aac-${SERVICE_FQDN}"
     TORNADO_URL: "https://docmosis.aat.platform.hmcts.net/rs/render"
     IDAM_API_URL: "https://idam-api.aat.platform.hmcts.net"
     IDAM_API_JWK_URL: "https://idam-api.aat.platform.hmcts.net/jwks"
+    IDAM_JWKS_BASEURL: "https://idam-api.aat.platform.hmcts.net/o/jwks"
     CCD_DATA_STORE_API_URL: "https://ccd-data-store-api-${SERVICE_FQDN}"
     DOCUMENT_MANAGEMENT_URL: http://dm-store-aat.service.core-compute-aat.internal
     SERVICE_AUTH_PROVIDER_URL: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
@@ -39,6 +41,10 @@ java:
           alias: ET_COS_SYSTEM_USER_PASSWORD
         - name: idam-client-secret
           alias: IDAM_CLIENT_SECRET
+        - name: et-api-caseworker-user-name
+          alias: CASEWORKER_USER_NAME
+        - name: et-api-caseworker-password
+          alias: CASEWORKER_PASSWORD
         - name: et-cos-postgres-user-v15
           alias: ET_COS_DB_USER_NAME
         - name: et-cos-postgres-password-v15

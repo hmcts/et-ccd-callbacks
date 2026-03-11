@@ -1632,7 +1632,7 @@
     "PageColumnNumber": 1
   },
   {
-    "CaseTypeID": "ET_EnglandWales",
+    "CaseTypeID": "ET_Scotland",
     "CaseEventID": "amendRespondentRepresentative",
     "CaseFieldID": "nocWarning",
     "DisplayContext": "READONLY",

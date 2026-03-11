@@ -32,7 +32,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @Slf4j
 public class NoticeOfChangeController {
     private final NocNotificationService nocNotificationService;
-    private final NocRepresentativeService noCRepresentativeService;
+    private final NocRepresentativeService nocRepresentativeService;
     private final CcdCaseAssignment ccdCaseAssignment;
 
     private static final String APPLY_NOC_DECISION = "applyNocDecision";
@@ -41,7 +41,7 @@ public class NoticeOfChangeController {
     public ResponseEntity<CCDCallbackResponse> handleAboutToSubmit(
             @RequestHeader("Authorization") String userToken,
             @RequestBody CallbackRequest callbackRequest) throws IOException {
-        CaseData caseData = noCRepresentativeService
+        CaseData caseData = nocRepresentativeService
                 .updateRepresentation(callbackRequest.getCaseDetails(), userToken);
         callbackRequest.getCaseDetails().setCaseData(caseData);
         return ResponseEntity.ok(ccdCaseAssignment.applyNoc(callbackRequest, userToken));

@@ -1593,9 +1593,9 @@
     "PageID": 1,
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 1,
-    "CallBackURLMidEvent": "${ET_COS_URL}/addAmendClaimantRepresentative/amendClaimantRepresentativeMidEvent",
     "PageColumnNumber": 1,
-    "ShowSummaryChangeOption": "Y"
+    "ShowSummaryChangeOption": "Y",
+    "CallBackURLMidEvent": "${ET_COS_URL}/addAmendClaimantRepresentative/amendClaimantRepresentativeMidEvent"
   },
   {
     "CaseTypeID": "ET_Scotland",
@@ -1610,12 +1610,12 @@
     "PageColumnNumber": 1
   },
   {
-    "CaseTypeID": "ET_EnglandWales",
+    "CaseTypeID": "ET_Scotland",
     "CaseEventID": "addAmendClaimantRepresentative",
     "CaseFieldID": "nocWarning",
-    "DisplayContext": "Text",
+    "DisplayContext": "READONLY",
     "PageID": 2,
-    "PageDisplayOrder": 1,
+    "PageDisplayOrder": 2,
     "PageFieldDisplayOrder": 1,
     "PageShowCondition": "nocWarning!=\"\"",
     "PageColumnNumber": 1

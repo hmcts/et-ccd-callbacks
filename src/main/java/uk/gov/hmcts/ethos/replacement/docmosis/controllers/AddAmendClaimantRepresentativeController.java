@@ -24,6 +24,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericRuntimeExceptio
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocClaimantRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.ClaimantRepresentativeUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.NocUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -46,6 +47,40 @@ public class AddAmendClaimantRepresentativeController {
     private static final String LOG_MESSAGE = "received notification request for case reference : ";
     private final NocClaimantRepresentativeService nocClaimantRepresentativeService;
 
+    @PostMapping(value = "/amendClaimantRepresentativeMidEvent", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "checks claimant representative's organisation and email address")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "Accessed successfully",
+                content = {
+                    @Content(mediaType = "application/json",
+                        schema = @Schema(implementation = CCDCallbackResponse.class))
+                }),
+            @ApiResponse(responseCode = "400", description = "Bad Request"),
+            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> amendClaimantRepresentativeMidEvent(
+            @RequestBody CCDRequest ccdRequest) {
+        CaseDataUtils.validateCCDRequest(ccdRequest);
+        log.info("CHECKING RESPONDENT REPRESENTATIVE ORGANISATION ---> " + LOG_MESSAGE + "{}",
+                ccdRequest.getCaseDetails().getCaseId());
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        NocUtils.clearNocWarningIfPresent(caseData);
+        List<String> errors = new ArrayList<>();
+        try {
+            nocClaimantRepresentativeService.validateRepresentativeOrganisationAndEmail(caseData);
+        } catch (GenericRuntimeException gse) {
+            String errorMessage = String.format(ERROR_REPRESENTATIVE_ORGANISATION_AND_EMAIL_NOT_MATCHED,
+                    StringUtils.EMPTY);
+            if (EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND.equals(gse.getMessage())) {
+                errorMessage = String.format(ERROR_REPRESENTATIVE_ORGANISATION_AND_EMAIL_NOT_MATCHED,
+                        EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND);
+            }
+            errors.add(errorMessage);
+        }
+        return getCallbackRespEntityErrors(errors, caseData);
+    }
+
+
     /**
      * AboutToSubmit for addAmendClaimantRepresentative. Sets the claimant rep's id.
      *
@@ -65,49 +100,9 @@ public class AddAmendClaimantRepresentativeController {
     })
     public ResponseEntity<CCDCallbackResponse> aboutToSubmit(
             @RequestBody CCDRequest ccdRequest) {
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         ClaimantRepresentativeUtils.addAmendClaimantRepresentative(caseData);
-
         return getCallbackRespEntityNoErrors(caseData);
-    }
-
-    /**
-     * AboutToSubmit for addAmendClaimantRepresentative. Sets the claimant rep's id.
-     *
-     * @param ccdRequest holds the request and case data
-     * @return Callback response entity with case data attached.
-     */
-    @PostMapping(value = "/amendClaimantRepresentativeMidEvent", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "gives the claimant representative an id")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully",
-            content = {
-                @Content(mediaType = "application/json",
-                    schema = @Schema(implementation = CCDCallbackResponse.class))
-            }),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
-    public ResponseEntity<CCDCallbackResponse> amendClaimantRepresentativeMidEvent(
-            @RequestBody CCDRequest ccdRequest) {
-        CaseDataUtils.validateCCDRequest(ccdRequest);
-        log.info("CHECKING RESPONDENT REPRESENTATIVE ORGANISATION ---> " + LOG_MESSAGE + "{}",
-                ccdRequest.getCaseDetails().getCaseId());
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        List<String> errors = new ArrayList<>();
-        try {
-            nocClaimantRepresentativeService.validateRepresentativeOrganisationAndEmail(caseData);
-        } catch (GenericRuntimeException gse) {
-            String errorMessage = String.format(ERROR_REPRESENTATIVE_ORGANISATION_AND_EMAIL_NOT_MATCHED,
-                    StringUtils.EMPTY);
-            if (EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND.equals(gse.getMessage())) {
-                errorMessage = String.format(ERROR_REPRESENTATIVE_ORGANISATION_AND_EMAIL_NOT_MATCHED,
-                        EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND);
-            }
-            errors.add(errorMessage);
-        }
-        return getCallbackRespEntityErrors(errors, caseData);
     }
 
     @PostMapping("/amendClaimantRepSubmitted")

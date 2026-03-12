@@ -115,6 +115,7 @@ public class RespondentRepresentativeController {
         log.info("CHECKING RESPONDENT REPRESENTATIVE ORGANISATION ---> " + LOG_MESSAGE + "{}",
                 ccdRequest.getCaseDetails().getCaseId());
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        NocUtils.clearNocWarningIfPresent(caseData);
         List<String> errors = new ArrayList<>();
         try {
             nocRespondentRepresentativeService.validateRepresentativesOrganisationsAndEmails(caseData);
@@ -152,10 +153,10 @@ public class RespondentRepresentativeController {
         log.info("AMEND RESPONDENT REPRESENTATIVE ABOUT TO SUBMIT ---> " + LOG_MESSAGE + "{}",
                 ccdRequest.getCaseDetails().getCaseId());
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        NocUtils.clearNocWarningIfPresent(caseData);
         List<String> errors = new ArrayList<>(NocUtils.validateNocCaseData(caseData));
         if (errors.isEmpty()) {
             try {
-                NocUtils.clearNocWarningIfPresent(caseData);
                 NocUtils.mapRepresentativesToRespondents(caseData, ccdRequest.getCaseDetails().getCaseId());
                 nocRespondentHelper.removeUnmatchedRepresentations(caseData);
                 nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, userToken);

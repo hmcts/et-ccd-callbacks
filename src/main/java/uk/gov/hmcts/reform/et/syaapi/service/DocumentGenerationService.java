@@ -59,8 +59,8 @@ public class DocumentGenerationService {
      * @param tornadoAccessKey the access key Tornado will require for authentication
      */
     public DocumentGenerationService(RestTemplate restTemplate, ObjectMapper objectMapper,
-                                     @Value("${tornado.api.url}") String tornadoUrl,
-                                     @Value("${tornado.api.key}") String tornadoAccessKey) {
+                                     @Value("${tornado.url}") String tornadoUrl,
+                                     @Value("${tornado.accessKey}") String tornadoAccessKey) {
         this.restTemplate = restTemplate;
         this.objectMapper = objectMapper;
         this.tornadoUrl = tornadoUrl;

@@ -37,9 +37,6 @@ feign:
 tornado:
   accessKey: ${TORNADO_ACCESS_KEY}
   url: ${TORNADO_URL:https://eu.dws3.docmosis.com/api/render}
-  api:
-    url: ${TORNADO_URL:https://eu.dws3.docmosis.com/api/render}
-    key: ${TORNADO_ACCESS_KEY}
 
 ccd:
   client:
@@ -48,7 +45,7 @@ ccd:
 
 core_case_data:
   api:
-    url: ${CCD_DATA_STORE_API_URL:http://ccd-data-store-api:4452}
+    url: ${CCD_DATA_STORE_API_URL:http://localhost:4452}
   search:
     page_size: ${CCD_SEARCH_PAGE_SIZE:100}
 
@@ -284,10 +281,6 @@ pdf:
 
 caching:
   adminUserService: ${CACHING_ADMIN_USER_SERVICE:21600000}
-  adminUserTokenTTL: ${ADMIN_USER_TOKEN_TTL:${CACHING_ADMIN_USER_SERVICE:21600000}}
-
-caseWorkerUserName: ${CASEWORKER_USER_NAME:${ET_COS_SYSTEM_USER:user_name}}
-caseWorkerPassword: ${CASEWORKER_PASSWORD:${ET_COS_SYSTEM_USER_PASSWORD:password}}
 
 notifications:
   govNotifyApiKey: ${GOV_NOTIFY_API_KEY:AAAAAAAAAAAAAAAAA}

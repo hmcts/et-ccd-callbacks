@@ -87,7 +87,7 @@ public class ManageCaseRoleService {
     @Value("${assign_case_access_api_url}")
     private String aacUrl;
 
-    @Value("${core_case_data.api.url}")
+    @Value("${ccd.data-store-api-url}")
     private String ccdApiUrl;
 
     /**

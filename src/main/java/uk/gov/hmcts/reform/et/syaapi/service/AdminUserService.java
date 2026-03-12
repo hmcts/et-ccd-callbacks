@@ -43,10 +43,10 @@ public class AdminUserService {
     public static final String BEARER = "Bearer";
     private final IdamClient idamClient;
 
-    @Value("${caseWorkerUserName}")
+    @Value("${etcos.system.username}")
     private String apiCallUserName;
 
-    @Value("${caseWorkerPassword}")
+    @Value("${etcos.system.password}")
     private String apiCallUserPassword;
 
     /**
@@ -77,7 +77,7 @@ public class AdminUserService {
      * </p>
      */
     @CacheEvict(value = "adminUserToken", allEntries = true)
-    @Scheduled(fixedRateString = "${caching.adminUserTokenTTL}")
+    @Scheduled(fixedRateString = "${caching.adminUserService}")
     public void emptyAdminUserToken() {
         log.info("emptying adminUserToken cache");
     }

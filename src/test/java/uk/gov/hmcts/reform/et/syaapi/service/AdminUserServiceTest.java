@@ -19,9 +19,9 @@ import static org.mockito.Mockito.when;
 
 class AdminUserServiceTest {
 
-    private static final String PARAM_CASEWORKER_USERNAME = "caseWorkerUserName=";
+    private static final String PARAM_CASEWORKER_USERNAME = "etcos.system.username=";
     private static final String CASEWORKER_USERNAME = "caseworker@hmcts.com";
-    private static final String PARAM_CASEWORKER_PASSWORD = "caseWorkerPassword=";
+    private static final String PARAM_CASEWORKER_PASSWORD = "etcos.system.password=";
     private static final String CASEWORKER_PASSWORD = "caseWorkerPassword";
     private static final String CONFIG_ADMIN_USER_TOKEN_TTL = "caching.adminUserTokenTTL=";
     private static final String ADMIN_USER_TTL = "60000";

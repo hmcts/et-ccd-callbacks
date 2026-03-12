@@ -68,24 +68,9 @@ resource "azurerm_key_vault_secret" "et_cos_s2s_secret" {
   key_vault_id = module.key-vault.key_vault_id
 }
 
-data "azurerm_key_vault" "et-msg-handler-vault" {
-  name                = "et-msg-handler-${var.env}"
-  resource_group_name = "et-msg-handler-${var.env}"
-}
-
 data "azurerm_key_vault" "et-sya-api-vault" {
   name                = "et-sya-api-${var.env}"
   resource_group_name = "et-sya-api-${var.env}"
-}
-
-data "azurerm_key_vault_secret" "et-api-caseworker-username" {
-  name         = "caseworker-user-name"
-  key_vault_id = data.azurerm_key_vault.et-msg-handler-vault.id
-}
-
-data "azurerm_key_vault_secret" "et-api-caseworker-password" {
-  name         = "caseworker-password"
-  key_vault_id = data.azurerm_key_vault.et-msg-handler-vault.id
 }
 
 data "azurerm_key_vault_secret" "sya_api_idam_client_secret" {
@@ -101,6 +86,16 @@ data "azurerm_key_vault_secret" "sya_et1_service_owner_email" {
 data "azurerm_key_vault_secret" "sya_et1_core_team_slack_email" {
   name         = "et1-ecm-dts-core-team-slack-notification-email"
   key_vault_id = data.azurerm_key_vault.et-sya-api-vault.id
+}
+
+data "azurerm_key_vault_secret" "et-api-caseworker-username" {
+  name         = "cos-system-user"
+  key_vault_id = module.key-vault.key_vault_id
+}
+
+data "azurerm_key_vault_secret" "et-api-caseworker-password" {
+  name         = "cos-system-user-password"
+  key_vault_id = module.key-vault.key_vault_id
 }
 
 resource "azurerm_key_vault_secret" "et-caseworker-user-name" {

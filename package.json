@@ -39,7 +39,9 @@
         "test:functional-chromium": "cd et-xui-e2e-tests && yarn install && yarn test:functional-ccd-callback",
         "codeceptjs": "codeceptjs run --steps",
         "codeceptjs:headless": "HEADLESS=true codeceptjs run --steps",
-        "tests:a11y": "NODE_TLS_REJECT_UNAUTHORIZED=0 NODE_ENV=test LOG_LEVEL=ERROR mocha --exit --reporter mochawesome --require ts-node/register --require tsconfig-paths/register src/test/a11y/a11y.ts --timeout 60000 --reporter-options reportDir=functional-output/accessibility-report,reportFilename=a11y,inlineAssets=true,reportTitle=et-sya-frontend"
+        "tests:a11y": "NODE_TLS_REJECT_UNAUTHORIZED=0 NODE_ENV=test LOG_LEVEL=ERROR mocha --exit --reporter mochawesome --require ts-node/register --require tsconfig-paths/register src/test/a11y/a11y.ts --timeout 60000 --reporter-options reportDir=functional-output/accessibility-report,reportFilename=a11y,inlineAssets=true,reportTitle=et-sya-frontend",
+        "generate-excel:all-envs": "cd ccd-definitions && yarn install && yarn generate-excel:aat && yarn generate-excel:prod && yarn generate-excel:demo && yarn generate-excel:perftest && yarn generate-excel:ithc",
+        "generate-excel:preview": "cd ccd-definitions && yarn setup && yarn scripts:preview ${CHANGE_ID}"
     },
     "devDependencies": {
         "@babel/eslint-parser": "^7.17.0",

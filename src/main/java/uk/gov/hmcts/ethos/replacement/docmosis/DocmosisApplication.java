@@ -25,8 +25,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EUROPE_L
 @EnableFeignClients(basePackages = {
     "uk.gov.hmcts.ethos.replacement",
     "uk.gov.hmcts.reform.idam.client",
-    "uk.gov.hmcts.reform.ccd.client",
-    "uk.gov.hmcts.reform.authorisation"
+    "uk.gov.hmcts.reform.ccd.client"
 })
 @EnableCaching
 @SuppressWarnings("HideUtilityClassConstructor") // Spring needs a constructor, this is not a utility class

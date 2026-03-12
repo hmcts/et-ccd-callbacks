@@ -101,6 +101,7 @@ public class AddAmendClaimantRepresentativeController {
     public ResponseEntity<CCDCallbackResponse> aboutToSubmit(
             @RequestBody CCDRequest ccdRequest) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        NocUtils.clearNocWarningIfPresent(caseData);
         ClaimantRepresentativeUtils.addAmendClaimantRepresentative(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
@@ -119,6 +120,7 @@ public class AddAmendClaimantRepresentativeController {
                 callbackRequest.getCaseDetails().getCaseId());
         try {
             nocClaimantRepresentativeService.updateClaimantRepAccess(callbackRequest);
+
         } catch (IOException e) {
             throw new CcdInputOutputException("Failed to update claimant representatives access", e);
         }

@@ -11,11 +11,13 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScheduledTaskRunner;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocClaimantRepresentativeService;
+import uk.gov.hmcts.ethos.replacement.docmosis.test.utils.LoggerTestUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -23,6 +25,7 @@ import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -37,6 +40,10 @@ class AddAmendClaimantRepresentativeControllerTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String ABOUT_TO_SUBMIT_URL = "/addAmendClaimantRepresentative/aboutToSubmit";
     private static final String SUBMITTED_URL = "/addAmendClaimantRepresentative/amendClaimantRepSubmitted";
+    private static final String AMEND_CLAIMANT_REPRESENTATIVE_MID_EVENT =
+            "/addAmendClaimantRepresentative/amendClaimantRepresentativeMidEvent";
+    private static final String CASE_ID = "1234567890123456";
+    private static final String TEST_USER_EMAIL = "test@test.com";
 
     @MockBean
     private ScheduledTaskRunner taskRunner;
@@ -63,6 +70,7 @@ class AddAmendClaimantRepresentativeControllerTest {
 
         ccdRequest = CCDRequestBuilder.builder()
                 .withCaseData(caseDetails.getCaseData())
+                .withCaseId(CASE_ID)
                 .build();
     }
 
@@ -80,7 +88,7 @@ class AddAmendClaimantRepresentativeControllerTest {
     }
 
     @Test
-    void testAmendClaimantRepSubmitted() throws Exception {
+    void testAmendClaimantRepresentativeMidEvent() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         UserDetails userDetails = new UserDetails();
         userDetails.setEmail("test@test.com");
@@ -93,5 +101,22 @@ class AddAmendClaimantRepresentativeControllerTest {
 
         verify(nocClaimantRepresentativeService, times(1))
                 .updateClaimantRepAccess(any());
+    }
+
+    @Test
+    void testAmendClaimantRepSubmitted() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        UserDetails userDetails = new UserDetails();
+        userDetails.setEmail(TEST_USER_EMAIL);
+        when(userIdamService.getUserDetails(any())).thenReturn(userDetails);
+        doNothing().when(nocClaimantRepresentativeService).validateRepresentativeOrganisationAndEmail(any(
+                CaseData.class));
+        mockMvc.perform(post(AMEND_CLAIMANT_REPRESENTATIVE_MID_EVENT)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+        verify(nocClaimantRepresentativeService, times(LoggerTestUtils.INTEGER_ONE))
+                .validateRepresentativeOrganisationAndEmail(any(CaseData.class));
     }
 }

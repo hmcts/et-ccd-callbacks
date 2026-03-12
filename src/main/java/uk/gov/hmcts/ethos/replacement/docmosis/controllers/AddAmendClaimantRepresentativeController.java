@@ -50,13 +50,13 @@ public class AddAmendClaimantRepresentativeController {
     @PostMapping(value = "/amendClaimantRepresentativeMidEvent", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "checks claimant representative's organisation and email address")
     @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                content = {
-                    @Content(mediaType = "application/json",
-                        schema = @Schema(implementation = CCDCallbackResponse.class))
-                }),
-            @ApiResponse(responseCode = "400", description = "Bad Request"),
-            @ApiResponse(responseCode = "500", description = "Internal Server Error")
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<CCDCallbackResponse> amendClaimantRepresentativeMidEvent(
             @RequestBody CCDRequest ccdRequest) {

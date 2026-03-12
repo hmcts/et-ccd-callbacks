@@ -259,11 +259,8 @@ withPipeline(type, product, component) {
   }
 
   before('highleveldatasetup') {
-    generateDefinitions()
-  }
-
-  before('highleveldatasetup') {
     stageWithAgent('Generate ET CCD configs - all', product) {
+      yarnBuilder.yarn('install')
       onPR{
         yarnBuilder.yarn('generate-excel:preview' + " ${CHANGE_ID}")
       }

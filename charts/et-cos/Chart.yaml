@@ -33,10 +33,6 @@ dependencies:
     version: ~1.0.1
     repository: 'oci://hmctspublic.azurecr.io/helm'
     condition: et-syr.enabled
-  - name: et-sya-api
-    version: ~0.0.29
-    repository: 'oci://hmctspublic.azurecr.io/helm'
-    condition: et-sya-api.enabled
   - name: aac-manage-case-assignment
     version: ~0.2.11
     repository: 'oci://hmctspublic.azurecr.io/helm'

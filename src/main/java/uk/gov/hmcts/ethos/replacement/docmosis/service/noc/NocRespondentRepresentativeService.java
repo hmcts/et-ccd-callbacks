@@ -33,9 +33,9 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.OrganisationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.OrganisationUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.ClaimantRepresentativeUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.NocUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.RespondentRepresentativeUtils;
@@ -65,7 +65,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXC
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REQUEST;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_TYPE_REMOVAL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_RETRIEVE_CASE_ASSIGNMENTS;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_REPRESENTATIVE_EMAIL_ADDRESS_NOT_FOUND;
 
 @Service
@@ -84,6 +83,7 @@ public class NocRespondentRepresentativeService {
     private final AuthTokenGenerator authTokenGenerator;
     private final NocService nocService;
     private final UserIdamService userIdamService;
+    private final OrganisationService organisationService;
 
     /**
      * Validates that each representative marked as an HMCTS organisation user
@@ -126,38 +126,15 @@ public class NocRespondentRepresentativeService {
                     nocWarnings.append(WARNING_REPRESENTATIVE_EMAIL_ADDRESS_NOT_FOUND).append('\n');
                     continue;
                 }
-                nocWarnings.append(validateRepresentativeOrganisationAndEmail(representativeItem));
+                if (!RespondentRepresentativeUtils.hasOrganisation(representativeItem.getValue())) {
+                    throw new GenericServiceException(EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND);
+                }
+                nocWarnings.append(organisationService.checkRepresentativeAccountByEmail(
+                        representativeItem.getValue().getNameOfRepresentative(),
+                        representativeItem.getValue().getRepresentativeEmailAddress()));
             }
         }
         caseData.setNocWarning(nocWarnings.toString());
-    }
-
-    private String validateRepresentativeOrganisationAndEmail(RepresentedTypeRItem representativeItem)
-            throws GenericServiceException {
-        StringBuilder nocWarnings = new StringBuilder(StringUtils.EMPTY);
-        RepresentedTypeR representative = representativeItem.getValue();
-        final String representativeName = representative.getNameOfRepresentative();
-        // Checking if representative has an organisation
-        if (!RespondentRepresentativeUtils.hasOrganisation(representative)) {
-            throw new GenericServiceException(EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND);
-        }
-        String accessToken = adminUserService.getAdminUserToken();
-        try {
-            ResponseEntity<AccountIdByEmailResponse> userResponse =
-                    organisationClient.getAccountIdByEmail(accessToken, authTokenGenerator.generate(),
-                            representative.getRepresentativeEmailAddress());
-            // checking if representative email address exists in organisation users
-            if (!OrganisationUtils.hasUserIdentifier(userResponse)) {
-                String warningMessage = String.format(WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL,
-                        representativeName, representative.getRepresentativeEmailAddress());
-                nocWarnings.append(warningMessage).append('\n');
-            }
-        } catch (Exception e) {
-            String warningMessage = String.format(WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL,
-                    representativeName, representative.getRepresentativeEmailAddress());
-            nocWarnings.append(warningMessage).append('\n');
-        }
-        return nocWarnings.toString();
     }
 
     /**

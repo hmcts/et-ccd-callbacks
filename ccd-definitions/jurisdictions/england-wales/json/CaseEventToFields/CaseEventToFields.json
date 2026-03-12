@@ -1457,8 +1457,8 @@
     "PageID": 1,
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 1,
-    "ShowSummaryChangeOption": "Y",
-    "PageColumnNumber": 1
+    "PageColumnNumber": 1,
+    "ShowSummaryChangeOption": "Y"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
@@ -1470,6 +1470,18 @@
     "PageFieldDisplayOrder": 2,
     "FieldShowCondition": "claimantRepresentedQuestion=\"Yes\"",
     "ShowSummaryChangeOption": "Y",
+    "PageColumnNumber": 1,
+    "CallBackURLMidEvent": "${ET_COS_URL}/addAmendClaimantRepresentative/amendClaimantRepresentativeMidEvent"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseEventID": "addAmendClaimantRepresentative",
+    "CaseFieldID": "nocWarning",
+    "DisplayContext": "READONLY",
+    "PageID": 2,
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 1,
+    "PageShowCondition": "nocWarning!=\"\"",
     "PageColumnNumber": 1
   },
   {

@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -24,6 +25,7 @@ import java.util.Optional;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
@@ -293,5 +295,49 @@ public final class HearingsHelper {
             dateListedType.setPostponedBy(null);
             dateListedType.setPostponedDate(null);
         }
+    }
+
+    /**
+     * Sets the hearing days and dates for each hearing in the case data. This method processes the hearing
+     * collection in the provided case data. For each hearing, it calculates the number
+     * of days and formats the hearing dates based on the listed and heard statuses.
+     * If there are no hearing dates with the listed or heard status, it sets the number of days to "-" and the
+     * hearing dates to "TBC". Otherwise, it sets the number of days to the count of valid hearing dates and
+     * the hearing dates to a formatted string of the first and last valid dates.
+     *
+     * @param caseData The case data containing the hearing collection to process.
+     */
+    public static void setHearingDaysAndDates(CaseData caseData) {
+        if (isEmpty(caseData.getHearingCollection())) {
+            return;
+        }
+        caseData.getHearingCollection().stream()
+            .map(HearingTypeItem::getValue)
+            .forEach(hearingType -> {
+                List<DateListedTypeItem> dateListedTypeItems = hearingType.getHearingDateCollection();
+                if (isEmpty(dateListedTypeItems)) {
+                    return;
+                }
+                List<String> hearingDates = dateListedTypeItems.stream()
+                    .filter(Objects::nonNull)
+                    .map(DateListedTypeItem::getValue)
+                    .filter(dateListedType ->
+                        HEARING_STATUS_LISTED.equals(dateListedType.getHearingStatus())
+                        || HEARING_STATUS_HEARD.equals(dateListedType.getHearingStatus()))
+                    .map(dateListedType -> LocalDate.parse(dateListedType.getListedDate().substring(0, 10))
+                        .format(DateTimeFormatter.ofPattern("d MMM yyyy")))
+                    .sorted(Comparator.comparing(date ->
+                        LocalDate.parse(date, DateTimeFormatter.ofPattern("d MMM yyyy"))))
+                    .toList();
+
+                if (isNotEmpty(hearingDates)) {
+                    hearingType.setHearingDates(
+                        hearingDates.size() == 1
+                            ? hearingDates.getFirst()
+                            : hearingDates.getFirst() + " - " + hearingDates.getLast());
+                } else {
+                    hearingType.setHearingDates("-");
+                }
+            });
     }
 }

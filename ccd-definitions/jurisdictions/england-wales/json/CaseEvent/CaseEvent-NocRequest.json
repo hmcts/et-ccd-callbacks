@@ -5,7 +5,7 @@
     "Name": "Remove representation",
     "Description": "Remove representation",
     "DisplayOrder": 52,
-    "PreConditionState(s)": "*",
+    "PreConditionState(s)": "Submitted;Vetted;Accepted;Rejected;",
     "PostConditionState": "*",
     "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/nocRemoveRepresentation/claimant/aboutToSubmit",
     "CallBackURLSubmittedEvent": "${ET_COS_URL}/nocRemoveRepresentation/submitted",

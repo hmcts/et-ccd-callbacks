@@ -177,6 +177,17 @@ final class ClaimantRepresentativeUtilsTest {
     }
 
     @Test
+    void theGetHmctsOrganisationIdOrEmpty() {
+        // when claimant representative's hmcts organisation is empty should return empty string
+        assertThat(ClaimantRepresentativeUtils.getHmctsOrganisationIdOrEmpty(RepresentedTypeC.builder()
+                .organisationId(StringUtils.EMPTY).build())).isEmpty();
+        // when claimant representative's hmcts organisation id is not empty should return organisation id
+        assertThat(ClaimantRepresentativeUtils.getHmctsOrganisationIdOrEmpty(RepresentedTypeC.builder()
+                .myHmctsOrganisation(Organisation.builder().organisationID(ORGANISATION_ID_1).build()).build()))
+                .isEqualTo(ORGANISATION_ID_1);
+    }
+
+    @Test
     void theHasRepresentativeEmail() {
         // when claimant representative's email address is empty should return false
         assertThat(ClaimantRepresentativeUtils.hasRepresentativeEmail(RepresentedTypeC.builder()

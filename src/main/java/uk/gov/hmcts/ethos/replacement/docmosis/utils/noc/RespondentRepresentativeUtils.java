@@ -718,6 +718,54 @@ public final class RespondentRepresentativeUtils {
     }
 
     /**
+     * Finds a representative based on the provided role or respondent name and verifies
+     * that the representative exists within the supplied list of representatives.
+     *
+     * <p>The method first attempts to locate a representative using
+     * {@link #findRepresentativeByRoleOrRespondentName(CaseData, String)}. If a representative
+     * is found, it then checks whether a valid representative with the same identifier exists
+     * in the provided {@code representatives} list.</p>
+     *
+     * <p>If a matching representative is found in the list, the representative returned by
+     * {@code findRepresentativeByRoleOrRespondentName} is returned. If no matching representative
+     * is found or the initially resolved representative is empty, {@code null} is returned.</p>
+     *
+     * <h3>Assumptions</h3>
+     * <ul>
+     *     <li>{@code caseData} contains sufficient information to resolve a representative
+     *     via role or respondent name.</li>
+     *     <li>The {@code role} parameter corresponds to a valid representative role or can
+     *     be used to determine the respondent name.</li>
+     *     <li>The {@code representatives} list may contain invalid or incomplete entries,
+     *     therefore each element is validated using {@code isValidRepresentative}.</li>
+     *     <li>Representative identity comparison is performed using the representative
+     *     identifier ({@code id}).</li>
+     *     <li>The method may return {@code null} if no matching representative is found.</li>
+     * </ul>
+     *
+     * @param caseData the case data used to resolve the representative
+     * @param role the role used to identify the representative
+     * @param representatives the list of representatives to search within
+     * @return the matching {@link RepresentedTypeRItem} if present in the list; otherwise {@code null}
+     */
+    public static RepresentedTypeRItem findRepresentativeInListByRoleOrRespondentName(
+            CaseData caseData, String role, List<RepresentedTypeRItem> representatives) {
+        RepresentedTypeRItem tmpRepresentative = findRepresentativeByRoleOrRespondentName(caseData, role);
+        if (ObjectUtils.isEmpty(tmpRepresentative)) {
+            return null;
+        }
+        for (RepresentedTypeRItem representative : representatives) {
+            if (!isValidRepresentative(representative)) {
+                continue;
+            }
+            if (representative.getId().equals(tmpRepresentative.getId())) {
+                return tmpRepresentative;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Finds the first valid respondent representative in the case data whose role matches
      * the specified role.
      *
@@ -800,5 +848,46 @@ public final class RespondentRepresentativeUtils {
                 .filter(rep -> respondentName.equals(rep.getValue().getRespRepName()))
                 .findFirst()
                 .orElse(null);
+    }
+
+    /**
+     * Finds all respondent representatives in the case data that belong to the specified HMCTS organisation ID.
+     * <p>
+     * The method iterates through the representative collection in the provided {@link CaseData}
+     * and returns those representatives that:
+     * <ul>
+     *     <li>are valid representatives,</li>
+     *     <li>have a non-empty respondent organisation,</li>
+     *     <li>have a non-empty organisation ID, and</li>
+     *     <li>have an organisation ID matching the provided {@code organisationId}.</li>
+     * </ul>
+     *
+     * <p><strong>Assumptions:</strong>
+     * <ul>
+     *     <li>{@link CaseData#getRepCollection()} returns a non-null collection.</li>
+     *     <li>{@code organisationId} represents a valid HMCTS organisation identifier.</li>
+     *     <li>The {@link #isValidRepresentative(RepresentedTypeRItem)} method performs necessary
+     *     validation to ensure the representative and its value are safe to access.</li>
+     * </ul>
+     *
+     * @param caseData the case data containing the collection of respondent representatives
+     * @param organisationId the HMCTS organisation ID used to filter representatives
+     * @return a list of {@link RepresentedTypeRItem} whose organisation ID matches the provided value;
+     *         returns an empty list if no matching representatives are found
+     */
+    public static List<RepresentedTypeRItem> findRepresentativesByOrganisationId(CaseData caseData,
+                                                                                 String organisationId) {
+        List<RepresentedTypeRItem> representatives = new ArrayList<>();
+        for (RepresentedTypeRItem representative : caseData.getRepCollection()) {
+            if (!isValidRepresentative(representative)
+                    || ObjectUtils.isEmpty(representative.getValue().getRespondentOrganisation())
+                    || StringUtils.isEmpty(representative.getValue().getRespondentOrganisation().getOrganisationID())
+                    || !representative.getValue().getRespondentOrganisation().getOrganisationID()
+                    .equals(organisationId)) {
+                continue;
+            }
+            representatives.add(representative);
+        }
+        return representatives;
     }
 }

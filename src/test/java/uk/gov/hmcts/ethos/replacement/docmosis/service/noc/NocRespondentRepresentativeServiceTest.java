@@ -1468,4 +1468,104 @@ class NocRespondentRepresentativeServiceTest {
         assertThat(nocRespondentRepresentativeService.hasHmctsRepresentativeEmailChanged(oldRepresentative,
                 newRepresentative)).isTrue();
     }
+
+    @Test
+    @SneakyThrows
+    void theRevokeRespondentRepresentatives() {
+        // when case user assignments data is empty should not revoke case user assignments
+        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
+        when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, CASE_ID_1)).thenReturn(null);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseId(CASE_ID_1);
+        nocRespondentRepresentativeService.revokeRespondentRepresentatives(caseDetails, new  ArrayList<>());
+        verifyNoInteractions(ccdClient);
+        // when case user assignments data does not have any assignment should not revoke case user assignments
+        CaseUserAssignmentData caseUserAssignmentsData = new CaseUserAssignmentData();
+        when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, CASE_ID_1))
+                .thenReturn(caseUserAssignmentsData);
+        nocRespondentRepresentativeService.revokeRespondentRepresentatives(caseDetails, new  ArrayList<>());
+        verifyNoInteractions(ccdClient);
+        // when role in case user assignments is a claimant role should not revoke case user assignments
+        CaseUserAssignment caseUserAssignment = CaseUserAssignment.builder().caseRole(ROLE_CLAIMANT_SOLICITOR).build();
+        caseUserAssignmentsData.setCaseUserAssignments(List.of(caseUserAssignment));
+        nocRespondentRepresentativeService.revokeRespondentRepresentatives(caseDetails, new  ArrayList<>());
+        verifyNoInteractions(ccdClient);
+        // when representative not found should not revoke case user assignment
+        caseUserAssignment.setCaseRole(ROLE_SOLICITORA);
+        CaseData tmpCaseData = new CaseData();
+        RepresentedTypeR representedTypeR = RepresentedTypeR.builder().role(ROLE_SOLICITORA).build();
+        RepresentedTypeRItem representative = new  RepresentedTypeRItem();
+        representative.setValue(representedTypeR);
+        representative.setId(REPRESENTATIVE_ID_ONE);
+        tmpCaseData.setRepCollection(List.of(representative));
+        caseDetails.setCaseData(tmpCaseData);
+        nocRespondentRepresentativeService.revokeRespondentRepresentatives(caseDetails, new  ArrayList<>());
+        verifyNoInteractions(ccdClient);
+        // when representative is found should revoke case user assignment
+        when(ccdClient.revokeCaseAssignments(eq(ADMIN_USER_TOKEN), any(CaseUserAssignmentData.class)))
+                .thenReturn(StringUtils.EMPTY);
+        nocRespondentRepresentativeService.revokeRespondentRepresentatives(caseDetails, List.of(representative));
+        verify(ccdClient).revokeCaseAssignments(eq(ADMIN_USER_TOKEN), any(CaseUserAssignmentData.class));
+    }
+
+    @Test
+    @SneakyThrows
+    void theRevokeRespondentRepresentativesWithSameOrganisationAsClaimant() {
+        // when case details is empty should not revoke any respondent representative
+        nocRespondentRepresentativeService.revokeRespondentRepresentativesWithSameOrganisationAsClaimant(null);
+        verifyNoInteractions(ccdClient);
+        // when case details not have case id should not revoke any respondent representative
+        CaseDetails caseDetails = new CaseDetails();
+        nocRespondentRepresentativeService.revokeRespondentRepresentativesWithSameOrganisationAsClaimant(caseDetails);
+        verifyNoInteractions(ccdClient);
+        // when case details not have case data should not revoke any respondent representative
+        caseDetails.setCaseId(CASE_ID_1);
+        nocRespondentRepresentativeService.revokeRespondentRepresentativesWithSameOrganisationAsClaimant(caseDetails);
+        verifyNoInteractions(ccdClient);
+        // when case data not has any claimant representative should not revoke any respondent representative
+        CaseData tmpCaseData = new CaseData();
+        caseDetails.setCaseData(tmpCaseData);
+        nocRespondentRepresentativeService.revokeRespondentRepresentativesWithSameOrganisationAsClaimant(caseDetails);
+        verifyNoInteractions(ccdClient);
+        // when case data not has any respondent representative should not revoke any respondent representative
+        RepresentedTypeC claimantRepresentative = RepresentedTypeC.builder().build();
+        tmpCaseData.setRepresentativeClaimantType(claimantRepresentative);
+        tmpCaseData.setRepCollection(new ArrayList<>());
+        nocRespondentRepresentativeService.revokeRespondentRepresentativesWithSameOrganisationAsClaimant(caseDetails);
+        verifyNoInteractions(ccdClient);
+        // when claimant representative does not have hmcts organisation id should not revoke any respondent
+        // representative
+        RepresentedTypeRItem respondentRepresentative = new  RepresentedTypeRItem();
+        respondentRepresentative.setId(REPRESENTATIVE_ID_ONE);
+        tmpCaseData.getRepCollection().add(respondentRepresentative);
+        nocRespondentRepresentativeService.revokeRespondentRepresentativesWithSameOrganisationAsClaimant(caseDetails);
+        verifyNoInteractions(ccdClient);
+        // when there is no respondent representative with claimant representative organisation should not revoke any
+        // respondent representative
+        claimantRepresentative.setRepresentativeId(REPRESENTATIVE_ID_ONE);
+        claimantRepresentative.setMyHmctsOrganisation(Organisation.builder().organisationID(ORGANISATION_ID_ONE)
+                .build());
+        nocRespondentRepresentativeService.revokeRespondentRepresentativesWithSameOrganisationAsClaimant(caseDetails);
+        verifyNoInteractions(ccdClient);
+        // when there is respondent representative with same organisation with representative should revoke respondent
+        // representatives and reset organisation policies
+        respondentRepresentative.setValue(RepresentedTypeR.builder().respondentOrganisation(Organisation.builder()
+                .organisationID(ORGANISATION_ID_ONE).build()).respRepName(RESPONDENT_NAME_ONE).build());
+        tmpCaseData.setRespondentOrganisationPolicy0(OrganisationPolicy.builder().organisation(Organisation.builder()
+                .organisationID(ORGANISATION_ID_ONE).build()).orgPolicyCaseAssignedRole(ROLE_SOLICITORA).build());
+        tmpCaseData.setNoticeOfChangeAnswers0(NoticeOfChangeAnswers.builder().respondentName(RESPONDENT_NAME_ONE)
+                .build());
+        claimantRepresentative.setMyHmctsOrganisation(Organisation.builder().organisationID(ORGANISATION_ID_ONE)
+                .build());
+        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
+        CaseUserAssignmentData caseUserAssignmentData = CaseUserAssignmentData.builder().caseUserAssignments(
+                List.of(CaseUserAssignment.builder().caseId(CASE_ID_1).caseRole(ROLE_SOLICITORA)
+                        .organisationId(ORGANISATION_ID_ONE).build())).build();
+        when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, CASE_ID_1)).thenReturn(caseUserAssignmentData);
+        nocRespondentRepresentativeService.revokeRespondentRepresentativesWithSameOrganisationAsClaimant(caseDetails);
+        verify(ccdClient, times(LoggerTestUtils.INTEGER_ONE)).revokeCaseAssignments(eq(ADMIN_USER_TOKEN),
+                any(CaseUserAssignmentData.class));
+        assertThat(tmpCaseData.getRespondentOrganisationPolicy0()).isEqualTo(OrganisationPolicy.builder()
+                .orgPolicyCaseAssignedRole(ROLE_SOLICITORA).build());
+    }
 }

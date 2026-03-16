@@ -22,6 +22,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericRuntimeException;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocClaimantRepresentativeService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.ClaimantRepresentativeUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.NocUtils;
@@ -46,6 +47,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 public class AddAmendClaimantRepresentativeController {
     private static final String LOG_MESSAGE = "received notification request for case reference : ";
     private final NocClaimantRepresentativeService nocClaimantRepresentativeService;
+    private final NocRespondentRepresentativeService nocRespondentRepresentativeService;
 
     @PostMapping(value = "/amendClaimantRepresentativeMidEvent", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "checks claimant representative's organisation and email address")
@@ -103,6 +105,8 @@ public class AddAmendClaimantRepresentativeController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         NocUtils.clearNocWarningIfPresent(caseData);
         ClaimantRepresentativeUtils.addAmendClaimantRepresentative(caseData);
+        nocRespondentRepresentativeService.revokeRespondentRepresentativesWithSameOrganisationAsClaimant(
+                ccdRequest.getCaseDetails());
         return getCallbackRespEntityNoErrors(caseData);
     }
 

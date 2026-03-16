@@ -207,6 +207,20 @@ public final class ClaimantRepresentativeUtils {
     }
 
     /**
+     * Returns the HMCTS organisation ID for the given claimant representative.
+     * <p>
+     * If the representative has an associated HMCTS organisation ID, the ID is returned.
+     * Otherwise, an empty string is returned.
+     *
+     * @param claimantRepresentative the claimant representative whose HMCTS organisation ID is to be retrieved
+     * @return the HMCTS organisation ID if present; otherwise {@link StringUtils#EMPTY}
+     */
+    public static String getHmctsOrganisationIdOrEmpty(RepresentedTypeC claimantRepresentative) {
+        return hasHmctsOrganisationId(claimantRepresentative)
+                ? claimantRepresentative.getMyHmctsOrganisation().getOrganisationID() : StringUtils.EMPTY;
+    }
+
+    /**
      * Determines whether the claimant representative has an email address.
      *
      * <p>An email address is considered present if the {@code representativeEmailAddress}

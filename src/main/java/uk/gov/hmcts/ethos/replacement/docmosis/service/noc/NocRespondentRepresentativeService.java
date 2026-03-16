@@ -358,6 +358,105 @@ public class NocRespondentRepresentativeService {
         return representativesToRevoke;
     }
 
+    /**
+     * Revokes respondent representatives that belong to the same organisation as the claimant's representative.
+     *
+     * <p>The method first validates that the required {@link CaseDetails} and associated case data are present.
+     * If the claimant representative has a valid HMCTS organisation ID, the method searches for respondent
+     * representatives linked to the same organisation. Any matching respondent representatives are then revoked
+     * and their associated organisation policies are reset.</p>
+     *
+     * <p><b>Assumptions:</b></p>
+     * <ul>
+     *     <li>The {@code caseDetails} object may be null or incomplete; in such cases the method exits without action.
+     *     </li>
+     *     <li>The claimant representative contains a valid HMCTS organisation ID used to identify related
+     *     representatives.</li>
+     *     <li>Respondent representatives belonging to the same organisation should not remain active.</li>
+     *     <li>Organisation policies must be reset after representatives are revoked.</li>
+     * </ul>
+     *
+     * @param caseDetails the case details containing case data and representative information
+     */
+    public void revokeRespondentRepresentativesWithSameOrganisationAsClaimant(CaseDetails caseDetails) {
+        if (ObjectUtils.isEmpty(caseDetails)
+                || StringUtils.isEmpty(caseDetails.getCaseId())
+                || ObjectUtils.isEmpty(caseDetails.getCaseData())
+                || ObjectUtils.isEmpty(caseDetails.getCaseData().getRepresentativeClaimantType())
+                || CollectionUtils.isEmpty(caseDetails.getCaseData().getRepCollection())) {
+            return;
+        }
+        String organisationId = ClaimantRepresentativeUtils.getHmctsOrganisationIdOrEmpty(caseDetails.getCaseData()
+                .getRepresentativeClaimantType());
+        if (StringUtils.isEmpty(organisationId)) {
+            return;
+        }
+        List<RepresentedTypeRItem> respondentRepresentativesToRevoke = RespondentRepresentativeUtils
+                .findRepresentativesByOrganisationId(caseDetails.getCaseData(), organisationId);
+        if (CollectionUtils.isEmpty(respondentRepresentativesToRevoke)) {
+            return;
+        }
+        List<RepresentedTypeRItem> revokedRepresentatives = revokeRespondentRepresentatives(caseDetails,
+                respondentRepresentativesToRevoke);
+        NocUtils.resetOrganisationPolicies(caseDetails.getCaseData(), revokedRepresentatives);
+    }
+
+    /**
+     * Revokes respondent representative case assignments for the specified representatives.
+     *
+     * <p>This method retrieves all current case user assignments for the given case and
+     * identifies those associated with respondent representative roles. If a representative
+     * corresponding to the assignment exists in the provided list of representatives to revoke,
+     * the assignment is marked for revocation.</p>
+     *
+     * <p>Only assignments linked to respondent representative roles are considered. Matching
+     * representatives are resolved using
+     * {@link RespondentRepresentativeUtils#findRepresentativeInListByRoleOrRespondentName(CaseData, String, List)}.</p>
+     *
+     * <p>If no case user assignments are found for the case, the method exits without performing
+     * any revocation.</p>
+     *
+     * <h3>Assumptions</h3>
+     * <ul>
+     *     <li>{@code caseDetails} contains valid case data and a case identifier.</li>
+     *     <li>The list {@code representativesToRevoke} contains representatives whose access
+     *     should be removed from the case.</li>
+     *     <li>Only assignments associated with respondent representative roles are eligible
+     *     for revocation.</li>
+     *     <li>Role validation is performed using {@link RoleUtils#isRespondentRepresentativeRole(String)}.</li>
+     *     <li>Case assignments are revoked using an administrative user token.</li>
+     * </ul>
+     *
+     * @param caseDetails the case details containing the case identifier and associated case data
+     * @param representativesToRevoke the list of respondent representatives whose case assignments
+     *                                should be revoked
+     */
+    public List<RepresentedTypeRItem> revokeRespondentRepresentatives(
+            CaseDetails caseDetails, List<RepresentedTypeRItem> representativesToRevoke) {
+        CaseUserAssignmentData caseUserAssignmentsData = nocCcdService.retrieveCaseUserAssignments(
+                adminUserService.getAdminUserToken(), caseDetails.getCaseId());
+        List<RepresentedTypeRItem> representativesToRemove = new ArrayList<>();
+        if (ObjectUtils.isEmpty(caseUserAssignmentsData)
+                || CollectionUtils.isEmpty(caseUserAssignmentsData.getCaseUserAssignments())) {
+            return  representativesToRemove;
+        }
+        List<CaseUserAssignment> caseUserAssignmentsToRevoke = new ArrayList<>();
+        for (CaseUserAssignment caseUserAssignment : caseUserAssignmentsData.getCaseUserAssignments()) {
+            if (!RoleUtils.isRespondentRepresentativeRole(caseUserAssignment.getCaseRole())) {
+                continue;
+            }
+            RepresentedTypeRItem representedTypeRItem = RespondentRepresentativeUtils
+                    .findRepresentativeInListByRoleOrRespondentName(caseDetails.getCaseData(),
+                            caseUserAssignment.getCaseRole(), representativesToRevoke);
+            if (ObjectUtils.isNotEmpty(representedTypeRItem)) {
+                caseUserAssignmentsToRevoke.add(caseUserAssignment);
+                representativesToRemove.add(representedTypeRItem);
+            }
+        }
+        revokeCaseAssignments(adminUserService.getAdminUserToken(), caseUserAssignmentsToRevoke);
+        return representativesToRemove;
+    }
+
     private void revokeCaseAssignments(String userToken, List<CaseUserAssignment> caseUserAssignmentsToRevoke) {
         if (CollectionUtils.isNotEmpty(caseUserAssignmentsToRevoke)) {
             try {

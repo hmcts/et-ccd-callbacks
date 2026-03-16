@@ -28,7 +28,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 public class NocRequestController {
 
     private static final String GREEN_BANNER_HEADING = "<h1>Notice of change successful</h1>";
-    private static final String GREEN_BANNER_TEXT = "Your organisation is no longer representing a client on ";
+    private static final String GREEN_BANNER_TEXT_TEMPLATE =
+        "<h5>Your organisation is no longer representing a client on %s</h5><br>";
     private static final String CONFIRM_HEADING = "<h3>What happens next</h3>";
     private static final String CONFIRM_TEXT_1 = "<p>A notification will be sent to all the parties on this case.</p>";
     private static final String CONFIRM_TEXT_2 =
@@ -74,7 +75,7 @@ public class NocRequestController {
         return ResponseEntity.ok(CCDCallbackResponse.builder()
             .data(ccdRequest.getCaseDetails().getCaseData())
             .confirmation_header(GREEN_BANNER_HEADING
-                + "<h5>" + GREEN_BANNER_TEXT + ccdRequest.getCaseDetails().getCaseId() + "</h5>" + "<br>")
+                + String.format(GREEN_BANNER_TEXT_TEMPLATE, ccdRequest.getCaseDetails().getCaseId()))
             .confirmation_body(CONFIRM_HEADING + CONFIRM_TEXT_1 + CONFIRM_TEXT_2 + CONFIRM_TEXT_3)
             .build());
     }

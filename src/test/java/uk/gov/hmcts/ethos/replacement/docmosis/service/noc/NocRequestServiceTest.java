@@ -45,94 +45,111 @@ class NocRequestServiceTest {
     private EmailNotificationService emailNotificationService;
 
     private static final String USER_TOKEN = "userToken";
+    private static final String TEMPLATE_NOC_ORG_ADMIN_NOT_REPRESENTING = "nocOrgAdminNotRepresentingTemplateId";
+    private static final String TEMPLATE_NOC_LEGAL_REP_NO_LONGER_ASSIGNED = "nocLegalRepNoLongerAssignedTemplateId";
+    private static final String TEMPLATE_NOC_CITIZEN_NO_LONGER_REPRESENTED = "nocCitizenNoLongerRepresentedTemplateId";
+    private static final String TEMPLATE_NOC_OTHER_PARTY_NOT_REPRESENTED = "nocOtherPartyNotRepresentedTemplateId";
+    private static final String EMAIL_ORG_ADMIN = "org@test.com";
+    private static final String EMAIL_LEGAL_REP = "rep@test.com";
+    private static final String EMAIL_CLAIMANT = "claimant@test.com";
+    private static final String EMAIL_RESP_SOLICITOR = "respSolicitor@test.com";
+    private static final String CASE_REFERENCE = "123456789/1234";
+    private static final String CASE_ID = "caseId";
+    private static final String CLAIMANT_NAME = "Claimant Name";
+    private static final String RESPONDENT_NAME = "Respondent Name";
+    private static final String CLAIMANT_LEGAL_REP_NAME = "Claimant Legal Rep Name";
+    private static final String ORGANISATION_NAME = "Org Name";
+    private static final String LINK_CITIZEN_CASE = "claimantCitizenCaseLink";
+    private static final String LINK_RESP_EXUI_CASE = "respondentExUICaseLink";
+    private static final String LINK_RESP_CITIZEN_CASE = "respondentCitizenCaseLink";
 
     @BeforeEach
     void setUp() {
         ReflectionTestUtils.setField(nocRequestService,
-            "nocOrgAdminNotRepresentingTemplateId", "nocOrgAdminNotRepresentingTemplateId");
+            TEMPLATE_NOC_ORG_ADMIN_NOT_REPRESENTING, TEMPLATE_NOC_ORG_ADMIN_NOT_REPRESENTING);
         ReflectionTestUtils.setField(nocRequestService,
-            "nocLegalRepNoLongerAssignedTemplateId", "nocLegalRepNoLongerAssignedTemplateId");
+            TEMPLATE_NOC_LEGAL_REP_NO_LONGER_ASSIGNED, TEMPLATE_NOC_LEGAL_REP_NO_LONGER_ASSIGNED);
         ReflectionTestUtils.setField(nocRequestService,
-            "nocCitizenNoLongerRepresentedTemplateId", "nocCitizenNoLongerRepresentedTemplateId");
+            TEMPLATE_NOC_CITIZEN_NO_LONGER_REPRESENTED, TEMPLATE_NOC_CITIZEN_NO_LONGER_REPRESENTED);
         ReflectionTestUtils.setField(nocRequestService,
-            "nocOtherPartyNotRepresentedTemplateId", "nocOtherPartyNotRepresentedTemplateId");
+            TEMPLATE_NOC_OTHER_PARTY_NOT_REPRESENTED, TEMPLATE_NOC_OTHER_PARTY_NOT_REPRESENTED);
     }
 
     @Test
     void shouldRevokeClaimantLegalRep() {
         CaseDetails caseDetails = CaseDataBuilder.builder()
-            .withEthosCaseReference("123456789/1234")
-            .withClaimant("Claimant Name")
-            .withClaimantType("claimant@test.com")
+            .withEthosCaseReference(CASE_REFERENCE)
+            .withClaimant(CLAIMANT_NAME)
+            .withClaimantType(EMAIL_CLAIMANT)
             .withRespondent(RespondentSumType.builder()
-                .respondentName("Respondent Name")
+                .respondentName(RESPONDENT_NAME)
                 .respondentEmail("respondent@test.com")
                 .build())
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
-        caseDetails.setCaseId("caseId");
+        caseDetails.setCaseId(CASE_ID);
 
         RepresentedTypeC rep = RepresentedTypeC.builder()
             .representativeId("repId")
-            .nameOfRepresentative("Claimant Legal Rep Name")
-            .nameOfOrganisation("Org Name")
-            .representativeEmailAddress("rep@test.com")
+            .nameOfRepresentative(CLAIMANT_LEGAL_REP_NAME)
+            .nameOfOrganisation(ORGANISATION_NAME)
+            .representativeEmailAddress(EMAIL_LEGAL_REP)
             .myHmctsOrganisation(Organisation.builder()
                 .organisationID("orgId")
                 .build())
             .build();
         caseDetails.getCaseData().setRepresentativeClaimantType(rep);
 
-        when(nocNotificationService.findClaimantRepOrgSuperUserEmail(rep)).thenReturn("org@test.com");
-        when(emailService.getCitizenCaseLink(anyString())).thenReturn("claimantCitizenCaseLink");
-        when(emailService.getExuiCaseLink(anyString())).thenReturn("respondentExUICaseLink");
-        when(emailService.getSyrCaseLink(anyString(), anyString())).thenReturn("respondentCitizenCaseLink");
+        when(nocNotificationService.findClaimantRepOrgSuperUserEmail(rep)).thenReturn(EMAIL_ORG_ADMIN);
+        when(emailService.getCitizenCaseLink(anyString())).thenReturn(LINK_CITIZEN_CASE);
+        when(emailService.getExuiCaseLink(anyString())).thenReturn(LINK_RESP_EXUI_CASE);
+        when(emailService.getSyrCaseLink(anyString(), anyString())).thenReturn(LINK_RESP_CITIZEN_CASE);
         when(caseAccessService.getCaseUserAssignmentsById(any()))
             .thenReturn(List.of(CaseUserAssignment.builder().build()));
         when(emailNotificationService.getRespondentsAndRepsEmailAddresses(any(), any()))
-            .thenReturn(Map.of("respSolicitor@test.com", "respondentId"));
+            .thenReturn(Map.of(EMAIL_RESP_SOLICITOR, "respondentId"));
 
         nocRequestService.revokeClaimantLegalRep(caseDetails, USER_TOKEN);
 
-        verify(nocCcdService, times(1)).revokeClaimantRepresentation(anyString(), any());
+        verify(nocCcdService, times(1)).revokeClaimantRepresentation(USER_TOKEN, caseDetails);
         verify(emailService, times(1)).sendEmail(
-            eq("nocOrgAdminNotRepresentingTemplateId"),
-            eq("org@test.com"),
+            eq(TEMPLATE_NOC_ORG_ADMIN_NOT_REPRESENTING),
+            eq(EMAIL_ORG_ADMIN),
             eq(Map.of(
-                "case_number", "123456789/1234",
-                "claimant", "Claimant Name",
-                "list_of_respondents", "Respondent Name",
-                "legalRepName", "Claimant Legal Rep Name"
+                "case_number", CASE_REFERENCE,
+                "claimant", CLAIMANT_NAME,
+                "list_of_respondents", RESPONDENT_NAME,
+                "legalRepName", CLAIMANT_LEGAL_REP_NAME
             ))
         );
         verify(emailService, times(1)).sendEmail(
-            eq("nocLegalRepNoLongerAssignedTemplateId"),
-            eq("rep@test.com"),
+            eq(TEMPLATE_NOC_LEGAL_REP_NO_LONGER_ASSIGNED),
+            eq(EMAIL_LEGAL_REP),
             eq(Map.of(
-                "case_number", "123456789/1234",
-                "claimant", "Claimant Name",
-                "list_of_respondents", "Respondent Name"
+                "case_number", CASE_REFERENCE,
+                "claimant", CLAIMANT_NAME,
+                "list_of_respondents", RESPONDENT_NAME
             ))
         );
         verify(emailService, times(1)).sendEmail(
-            eq("nocCitizenNoLongerRepresentedTemplateId"),
-            eq("claimant@test.com"),
+            eq(TEMPLATE_NOC_CITIZEN_NO_LONGER_REPRESENTED),
+            eq(EMAIL_CLAIMANT),
             eq(Map.of(
-                "case_number", "123456789/1234",
-                "claimant", "Claimant Name",
-                "list_of_respondents", "Respondent Name",
-                "legalRepOrg", "Org Name",
-                "linkToCitUI", "claimantCitizenCaseLink"
+                "case_number", CASE_REFERENCE,
+                "claimant", CLAIMANT_NAME,
+                "list_of_respondents", RESPONDENT_NAME,
+                "legalRepOrg", ORGANISATION_NAME,
+                "linkToCitUI", LINK_CITIZEN_CASE
             ))
         );
         verify(emailService, times(1)).sendEmail(
-            eq("nocOtherPartyNotRepresentedTemplateId"),
-            eq("respSolicitor@test.com"),
+            eq(TEMPLATE_NOC_OTHER_PARTY_NOT_REPRESENTED),
+            eq(EMAIL_RESP_SOLICITOR),
             eq(Map.of(
-                "case_number", "123456789/1234",
-                "claimant", "Claimant Name",
-                "list_of_respondents", "Respondent Name",
-                "party_name", "Claimant Name",
-                "linkToCitUI", "respondentCitizenCaseLink"
+                "case_number", CASE_REFERENCE,
+                "claimant", CLAIMANT_NAME,
+                "list_of_respondents", RESPONDENT_NAME,
+                "party_name", CLAIMANT_NAME,
+                "linkToCitUI", LINK_RESP_CITIZEN_CASE
             ))
         );
     }

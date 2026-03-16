@@ -175,15 +175,6 @@ public class CftlibConfig implements CFTLibConfigurer {
     @Value("${cftlib.import-ccd-defs-on-boot}")
     private boolean importCcdDefsOnBoot;
 
-    @Value("${cftlib.englandwales-ccd-config-path}")
-    private String englandWalesCcdConfigPath;
-
-    @Value("${cftlib.scotland-ccd-config-path}")
-    private String scotlandCcdConfigPath;
-
-    @Value("${cftlib.admin-ccd-config-path}")
-    private String adminCcdConfigPath;
-
     @Override
     public void configure(CFTLib lib) throws IOException, URISyntaxException {
         createRoles(lib);
@@ -315,18 +306,15 @@ public class CftlibConfig implements CFTLibConfigurer {
     }
 
     private void importEnglandWales(CFTLib lib) {
-        String file = englandWalesCcdConfigPath + ENGLANGWALES_CONFIG_FILE;
-        importCcdDefinition(lib, file);
+        importCcdDefinition(lib, ENGLANGWALES_CONFIG_FILE);
     }
 
     private void importScotland(CFTLib lib) {
-        String file = scotlandCcdConfigPath + SCOTLAND_CONFIG_FILE;
-        importCcdDefinition(lib, file);
+        importCcdDefinition(lib, SCOTLAND_CONFIG_FILE);
     }
 
     private void importAdmin(CFTLib lib) {
-        String file = adminCcdConfigPath + ADMIN_CONFIG_FILE;
-        importCcdDefinition(lib, file);
+        importCcdDefinition(lib, ADMIN_CONFIG_FILE);
     }
 
     private void importCcdDefinition(CFTLib lib, String file) {

@@ -41,13 +41,12 @@ java:
           alias: ET_COS_SYSTEM_USER_PASSWORD
         - name: idam-client-secret
           alias: IDAM_CLIENT_SECRET
-        # Temp commenting out as not in the et-cos KV
-        #- name: acas-idam-client-secret
-        #  alias: ET_SYA_API_IDAM_CLIENT_SECRET
-        #- name: et1-service-owner-notification-email
-        #  alias: ET1_SERVICE_OWNER_NOTIFICATION_EMAIL
-        #- name: et1-ecm-dts-core-team-slack-notification-email
-        #  alias: ET1_ECM_DTS_CORE_TEAM_SLACK_NOTIFICATION_EMAIL
+        - name: acas-idam-client-secret
+          alias: ET_SYA_API_IDAM_CLIENT_SECRET
+        - name: et1-service-owner-notification-email
+          alias: ET1_SERVICE_OWNER_NOTIFICATION_EMAIL
+        - name: et1-ecm-dts-core-team-slack-notification-email
+          alias: ET1_ECM_DTS_CORE_TEAM_SLACK_NOTIFICATION_EMAIL
         - name: et-cos-postgres-user-v15
           alias: ET_COS_DB_USER_NAME
         - name: et-cos-postgres-password-v15
@@ -56,15 +55,6 @@ java:
           alias: ET_COS_DB_HOST
         - name: et-cos-postgres-port-v15
           alias: ET_COS_DB_PORT
-    # To be deleted once et-sya-api secrets created in et-cos KV
-    et-sya-api:
-      secrets:
-        - name: acas-idam-client-secret
-          alias: IDAM_CLIENT_SECRET
-        - name: et1-service-owner-notification-email
-          alias: ET1_SERVICE_OWNER_NOTIFICATION_EMAIL
-        - name: et1-ecm-dts-core-team-slack-notification-email
-          alias: ET1_ECM_DTS_CORE_TEAM_SLACK_NOTIFICATION_EMAIL
     et:
       secrets:
         - name: tornado-access-key

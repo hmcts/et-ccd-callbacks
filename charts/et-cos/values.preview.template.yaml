@@ -93,7 +93,7 @@ et-syr:
   enabled: true
   nodejs:
     imagePullPolicy: Always
-    image: hmctspublic.azurecr.io/et/syr:latest
+    image: hmctspublic.azurecr.io/et/syr:pr-814
     releaseNameOverride: ${SERVICE_NAME}-et-syr
     ingressHost: et-syr-${SERVICE_FQDN}
     devcpuRequests: 500m

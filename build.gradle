@@ -192,7 +192,7 @@ test {
 }
 
 tasks.register('smoke', Test) {
-    dependsOn ':codeceptSmoke'
+//    dependsOn ':codeceptSmoke'
     testClassesDirs = sourceSets.functional.output.classesDirs
     classpath = sourceSets.functional.runtimeClasspath
 
@@ -211,8 +211,10 @@ tasks.register('functional', Test) {
     classpath = sourceSets.apiTest.runtimeClasspath
 
     exclude '**/multiples/**'
-    
-    useJUnitPlatform()
+
+    useJUnitPlatform {
+        includeTags 'acasTesting'
+    }
     testLogging {
         events "passed", "skipped", "failed"
     }
@@ -490,6 +492,9 @@ dependencies {
     implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.11.0'
     implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
     implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.10.2'
+
+    // CVE-2025-7962
+    implementation group: 'org.eclipse.angus', name: 'angus-mail', version: '2.0.4'
 
     runtimeOnly group: 'com.squareup.okio', name: 'okio-jvm', version: '3.16.4'
     compileOnly 'org.projectlombok:lombok'

@@ -1010,7 +1010,7 @@
   {
     "ID": "fl_Hearing",
     "ListElementCode": "Hearing",
-    "ListElement": "Hearing",
+    "ListElement": "Final Hearing",
     "DisplayOrder": 2
   },
   {
@@ -1059,6 +1059,85 @@
     "ID": "msl_HearingFormat",
     "ListElementCode": "Hybrid",
     "ListElement": "Hybrid",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "msl_finalHearingWithJudgeOrMembersReasonsJsa",
+    "ListElementCode": "Already decided",
+    "ListElement": "Already decided",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "msl_finalHearingWithJudgeOrMembersReasonsJsa",
+    "ListElementCode": "Members' experience is not likely to add significant value to the adjudication process",
+    "ListElement": "Members' experience is not likely to add significant value to the adjudication process",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "msl_finalHearingWithJudgeOrMembersReasonsJsa",
+    "ListElementCode": "No views expressed by parties",
+    "ListElement": "No views expressed by parties",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "msl_finalHearingWithJudgeOrMembersReasonsJsa",
+    "ListElementCode": "Other",
+    "ListElement": "Other",
+    "DisplayOrder": 4
+  },
+
+  {
+    "ID": "msl_hearingWithJudgeOrMembersReasons",
+    "ListElementCode": "Already decided",
+    "ListElement": "Already decided",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "msl_hearingWithJudgeOrMembersReasons",
+    "ListElementCode": "Members' experience is likely to add significant value to the adjudication process",
+    "ListElement": "Members' experience is likely to add significant value to the adjudication process",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "msl_hearingWithJudgeOrMembersReasons",
+    "ListElementCode": "Members' experience is not likely to add significant value to the adjudication process",
+    "ListElement": "Members' experience is not likely to add significant value to the adjudication process",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "msl_hearingWithJudgeOrMembersReasons",
+    "ListElementCode": "No views expressed by parties",
+    "ListElement": "No views expressed by parties",
+    "DisplayOrder": 4
+  },
+  {
+    "ID": "msl_hearingWithJudgeOrMembersReasons",
+    "ListElementCode": "Other",
+    "ListElement": "Other",
+    "DisplayOrder": 5
+  },
+  {
+    "ID": "msl_finalHearingWithJudgeOrMembersReasons",
+    "ListElementCode": "Already decided",
+    "ListElement": "Already decided",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "msl_finalHearingWithJudgeOrMembersReasons",
+    "ListElementCode": "Members' experience is not likely to add significant value to the adjudication process",
+    "ListElement": "Members' experience is not likely to add significant value to the adjudication process",
+    "DisplayOrder": 2
+  },
+  {
+    "ID": "msl_finalHearingWithJudgeOrMembersReasons",
+    "ListElementCode": "No views expressed by parties",
+    "ListElement": "No views expressed by parties",
+    "DisplayOrder": 3
+  },
+  {
+    "ID": "msl_finalHearingWithJudgeOrMembersReasons",
+    "ListElementCode": "Other",
+    "ListElement": "Other",
     "DisplayOrder": 4
   },
   {

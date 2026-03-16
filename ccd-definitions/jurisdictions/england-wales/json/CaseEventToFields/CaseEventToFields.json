@@ -3524,16 +3524,6 @@
   },
   {
     "CaseTypeID": "ET_EnglandWales",
-    "CaseEventID": "initialConsideration",
-    "CaseFieldID": "initialConsiderationBeforeYouStart",
-    "DisplayContext": "READONLY",
-    "PageID": 1,
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 2,
-    "PageColumnNumber": 1
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
     "CaseEventID": "et3Vetting",
     "CaseFieldID": "horizontalLine",
     "DisplayContext": "READONLY",
@@ -6433,7 +6423,6 @@
     "PageDisplayOrder": 2,
     "PageFieldDisplayOrder": 1,
     "FieldShowCondition": "tseAdminTableLabel=\"dummy\"",
-    "CallBackURLMidEvent": "${ET_COS_URL}/tseAdmin/midValidateInput",
     "PageLabel": "Record a decision"
   },
   {
@@ -6853,7 +6842,6 @@
     "PageID": 1,
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 1,
-    "CallBackURLMidEvent": "${ET_COS_URL}/sendNotification/midValidateInput",
     "PageLabel": "Send a notification"
   },
   {

@@ -192,7 +192,7 @@ test {
 }
 
 tasks.register('smoke', Test) {
-//    dependsOn ':codeceptSmoke'
+    dependsOn ':codeceptSmoke'
     testClassesDirs = sourceSets.functional.output.classesDirs
     classpath = sourceSets.functional.runtimeClasspath
 
@@ -212,9 +212,7 @@ tasks.register('functional', Test) {
 
     exclude '**/multiples/**'
 
-    useJUnitPlatform {
-        includeTags 'acasTesting'
-    }
+    useJUnitPlatform ()
     testLogging {
         events "passed", "skipped", "failed"
     }

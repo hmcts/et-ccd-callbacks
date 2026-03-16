@@ -4,11 +4,23 @@ public final class Constants {
 
     public static final String ET1_DOC_TYPE = "ET1";
     public static final String ET1_ATTACHMENT_DOC_TYPE = "ET1 Attachment";
+    public static final String TRIBUNAL_CASE_FILE_DOC_TYPE = "Tribunal case file";
     public static final String COMPANY = "Company";
     public static final String ACAS_DOC_TYPE = "ACAS Certificate";
     public static final String BEFORE_LABEL_TEMPLATE = "Open these documents to help you complete this form: %s%s%s";
-    public static final String BEFORE_LABEL_ET1 =
-            "<br><a target=\"_blank\" href=\"%s\">ET1 form (opens in new tab)</a>";
+    public static final String BEFORE_LABEL_ET1 = "<br><a target=\"_blank\" href=\"%s\">ET1 form"
+        + " (opens in new tab)</a>";
+    public static final String BEFORE_LABEL_ET1_IC = "<br><a target=\"_blank\" href=\"%s\">ET1</a>";
+    public static final String BEFORE_LABEL_TCF_IC = "<br><a target=\"_blank\" href=\"%s\">Tribunal case file</a>";
+    public static final String BEFORE_LABEL_ET1_VETTING_IC = "<br><a target=\"_blank\" href=\"%s\">ET1 Vetting</a>";
+    public static final String BEFORE_LABEL_ET3_IC = "<br><a target=\"_blank\" href=\"%s\">ET3</a>";
+    public static final String BEFORE_LABEL_ET3_PROCESSING_IC = "<br><a target=\"_blank\" "
+        + "href=\"%s\">ET3 Processing</a>";
+    public static final String BEFORE_LABEL_REFERRALS_IC = "<br><a target=\"_blank\" "
+            + "href=\"%s\">Referrals</a>";
+    public static final String REFERRALS_PAGE_FRAGMENT_ID = "#Referrals";
+    public static final String TO_HELP_YOU_COMPLETE_IC_EVENT_LABEL = "To help you complete this (opens in new tab)"
+            + "%s%s";
     public static final String BEFORE_LABEL_ACAS =
             "<br><a target=\"_blank\" href=\"%s\">Acas certificate %s (opens in new tab)</a>";
     public static final String BEFORE_LABEL_ET1_ATTACHMENT =
@@ -16,6 +28,7 @@ public final class Constants {
     public static final String BEFORE_LABEL_ACAS_OPEN_TAB =
             "<br><a target=\"_blank\" href=\"/cases/case-details/%s#Documents\">"
                     + "Open the Documents tab to view/open Acas certificates (opens in new tab)</a>";
+    public static final String CASE_DETAILS_URL_PARTIAL = "/cases/case-details/";
     public static final String CLAIMANT_DETAILS_PERSON = "<hr><h3>Claimant</h3>"
             + "<pre>First name &#09&#09&#09&#09&nbsp; %s"
             + "<br><br>Last name &#09&#09&#09&#09&nbsp; %s"
@@ -71,6 +84,7 @@ public final class Constants {
     public static final String DIGITAL_CASE_FILE = "Digital case file";
     public static final String DOC_OPENS_IN_NEW_TAB_MARK_UP =
         "<a target=\"_blank\" href=\"%s\">%s (opens in new tab)</a><br>";
+    public static final String NOT_AVAILABLE_FOR_VIDEO_HEARINGS = "\nNot available for video hearings\n";
     public static final String EUROPE_LONDON = "Europe/London";
     public static final String EXCEPTION_CASE_REFERENCE_NOT_FOUND = "Case reference not found";
     public static final String EXCEPTION_CASE_DATA_NOT_FOUND = "Case data not found";

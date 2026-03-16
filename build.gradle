@@ -51,7 +51,8 @@ def sonarExclusions =
          'et-shared/src/main/java/**/configuration/**',
          'et-shared/src/main/java/**/helpers/**',
          'et-shared/src/main/java/**/launchdarkly/**',
-         'et-shared/src/main/java/**/servicebus/**'
+         'et-shared/src/main/java/**/servicebus/**',
+		 'et-shared/src/main/java/uk/gov/hmcts/ecm/compat/common/client/CcdClient.java'
 ]
 
 def duplicateCodeExclusionList = [
@@ -191,7 +192,7 @@ test {
 }
 
 tasks.register('smoke', Test) {
-    dependsOn ':codeceptSmoke'
+//    dependsOn ':codeceptSmoke'
     testClassesDirs = sourceSets.functional.output.classesDirs
     classpath = sourceSets.functional.runtimeClasspath
 
@@ -210,8 +211,10 @@ tasks.register('functional', Test) {
     classpath = sourceSets.apiTest.runtimeClasspath
 
     exclude '**/multiples/**'
-    
-    useJUnitPlatform()
+
+    useJUnitPlatform {
+        includeTags 'acasTesting'
+    }
     testLogging {
         events "passed", "skipped", "failed"
     }

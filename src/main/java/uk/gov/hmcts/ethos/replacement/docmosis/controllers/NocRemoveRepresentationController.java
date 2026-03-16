@@ -16,16 +16,16 @@ import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRequestService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRemoveRepresentationService;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @Slf4j
-@RequestMapping("/nocRequest")
+@RequestMapping("/nocRemoveRepresentation")
 @RestController
 @RequiredArgsConstructor
-public class NocRequestController {
+public class NocRemoveRepresentationController {
 
     private static final String GREEN_BANNER_HEADING = "<h1>Notice of change successful</h1>";
     private static final String GREEN_BANNER_TEXT_TEMPLATE =
@@ -37,10 +37,10 @@ public class NocRequestController {
     private static final String CONFIRM_TEXT_3 = "<p>This is a new online process - "
         + "you don't need to file any further documents in relation to this notice of change with the court.</p>";
 
-    private final NocRequestService nocRequestService;
+    private final NocRemoveRepresentationService nocRemoveRepresentationService;
 
     @PostMapping(value = "/claimant/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "nocRequest submitted page")
+    @Operation(summary = "nocRemoveRepresentation submitted page")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -54,12 +54,12 @@ public class NocRequestController {
         @RequestHeader("Authorization") String userToken) {
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
-        nocRequestService.revokeClaimantLegalRep(caseDetails, userToken);
+        nocRemoveRepresentationService.revokeClaimantLegalRep(caseDetails, userToken);
         return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
     }
 
     @PostMapping(value = "/submitted", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "nocRequest submitted page")
+    @Operation(summary = "nocRemoveRepresentation submitted page")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {

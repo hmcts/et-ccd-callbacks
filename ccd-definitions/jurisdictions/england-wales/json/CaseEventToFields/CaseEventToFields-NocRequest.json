@@ -1,8 +1,8 @@
 [
   {
     "CaseTypeID": "ET_EnglandWales",
-    "CaseEventID": "nocRequestClaimant",
-    "CaseFieldID": "nocRequestLandingPageLabel",
+    "CaseEventID": "nocRemoveRepresentationClaimant",
+    "CaseFieldID": "nocRemoveRepresentationLandingPageLabel",
     "DisplayContext": "READONLY",
     "PageID": 1,
     "PageDisplayOrder": 1,
@@ -11,8 +11,8 @@
   },
   {
     "CaseTypeID": "ET_EnglandWales",
-    "CaseEventID": "nocRequestClaimant",
-    "CaseFieldID": "nocRequestClaimantSignLabel",
+    "CaseEventID": "nocRemoveRepresentationClaimant",
+    "CaseFieldID": "nocRemoveRepresentationClaimantSignLabel",
     "DisplayContext": "READONLY",
     "PageID": 2,
     "PageDisplayOrder": 2,
@@ -21,8 +21,8 @@
   },
   {
     "CaseTypeID": "ET_EnglandWales",
-    "CaseEventID": "nocRequestClaimant",
-    "CaseFieldID": "nocRequestConfirmNoLonger",
+    "CaseEventID": "nocRemoveRepresentationClaimant",
+    "CaseFieldID": "nocRemoveRepresentationConfirmNoLonger",
     "DisplayContext": "MANDATORY",
     "PageID": 2,
     "PageDisplayOrder": 2,
@@ -31,8 +31,8 @@
   },
   {
     "CaseTypeID": "ET_EnglandWales",
-    "CaseEventID": "nocRequestClaimant",
-    "CaseFieldID": "nocRequestConfirmNotice",
+    "CaseEventID": "nocRemoveRepresentationClaimant",
+    "CaseFieldID": "nocRemoveRepresentationConfirmNotice",
     "DisplayContext": "MANDATORY",
     "PageID": 2,
     "PageDisplayOrder": 2,

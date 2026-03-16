@@ -33,7 +33,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 @Slf4j
 @Service
 @RequiredArgsConstructor
-public class NocRequestService {
+public class NocRemoveRepresentationService {
 
     private final NocCcdService nocCcdService;
     private final NocNotificationService nocNotificationService;

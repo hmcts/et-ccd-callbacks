@@ -1,25 +1,25 @@
 [
   {
     "CaseTypeId": "ET_EnglandWales",
-    "CaseFieldID": "nocRequestLandingPageLabel",
+    "CaseFieldID": "nocRemoveRepresentationLandingPageLabel",
     "UserRole": "[CLAIMANTSOLICITOR]",
     "CRUD": "R"
   },
   {
     "CaseTypeId": "ET_EnglandWales",
-    "CaseFieldID": "nocRequestClaimantSignLabel",
+    "CaseFieldID": "nocRemoveRepresentationClaimantSignLabel",
     "UserRole": "[CLAIMANTSOLICITOR]",
     "CRUD": "R"
   },
   {
     "CaseTypeId": "ET_EnglandWales",
-    "CaseFieldID": "nocRequestConfirmNoLonger",
+    "CaseFieldID": "nocRemoveRepresentationConfirmNoLonger",
     "UserRole": "[CLAIMANTSOLICITOR]",
     "CRUD": "CRU"
   },
   {
     "CaseTypeId": "ET_EnglandWales",
-    "CaseFieldID": "nocRequestConfirmNotice",
+    "CaseFieldID": "nocRemoveRepresentationConfirmNotice",
     "UserRole": "[CLAIMANTSOLICITOR]",
     "CRUD": "CRU"
   }

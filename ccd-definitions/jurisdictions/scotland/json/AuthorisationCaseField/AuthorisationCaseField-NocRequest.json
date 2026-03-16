@@ -1,25 +1,25 @@
 [
   {
     "CaseTypeId": "ET_Scotland",
-    "CaseFieldID": "nocRequestLandingPageLabel",
+    "CaseFieldID": "nocRemoveRepresentationLandingPageLabel",
     "UserRole": "[CLAIMANTSOLICITOR]",
     "CRUD": "R"
   },
   {
     "CaseTypeId": "ET_Scotland",
-    "CaseFieldID": "nocRequestClaimantSignLabel",
+    "CaseFieldID": "nocRemoveRepresentationClaimantSignLabel",
     "UserRole": "[CLAIMANTSOLICITOR]",
     "CRUD": "R"
   },
   {
     "CaseTypeId": "ET_Scotland",
-    "CaseFieldID": "nocRequestConfirmNoLonger",
+    "CaseFieldID": "nocRemoveRepresentationConfirmNoLonger",
     "UserRole": "[CLAIMANTSOLICITOR]",
     "CRUD": "CRU"
   },
   {
     "CaseTypeId": "ET_Scotland",
-    "CaseFieldID": "nocRequestConfirmNotice",
+    "CaseFieldID": "nocRemoveRepresentationConfirmNotice",
     "UserRole": "[CLAIMANTSOLICITOR]",
     "CRUD": "CRU"
   }

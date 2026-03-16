@@ -1,15 +1,15 @@
 [
   {
     "CaseTypeID": "ET_Scotland",
-    "ID": "nocRequestLandingPageLabel",
-    "Label": "As the lead legal representative, you can withdraw yourself and your organisation from this case and cease representing this client.",
+    "ID": "nocRemoveRepresentationLandingPageLabel",
+    "Label": "This will remove you and your organisation from the case. You will no longer represent the client.",
     "FieldType": "Label",
     "SecurityClassification": "Public",
     "Searchable": "N"
   },
   {
     "CaseTypeID": "ET_Scotland",
-    "ID": "nocRequestClaimantSignLabel",
+    "ID": "nocRemoveRepresentationClaimantSignLabel",
     "Label": "You should tick to 'sign' when<br>Your organisation will no longer be representing claimant.<br>You have served notice of this change to your former client.",
     "FieldType": "Label",
     "SecurityClassification": "Public",
@@ -17,7 +17,7 @@
   },
   {
     "CaseTypeID": "ET_Scotland",
-    "ID": "nocRequestConfirmNoLonger",
+    "ID": "nocRemoveRepresentationConfirmNoLonger",
     "Label": " ",
     "FieldType": "MultiSelectList",
     "FieldTypeParameter": "msl_NoCRequest_NoLonger",
@@ -26,7 +26,7 @@
   },
   {
     "CaseTypeID": "ET_Scotland",
-    "ID": "nocRequestConfirmNotice",
+    "ID": "nocRemoveRepresentationConfirmNotice",
     "Label": " ",
     "FieldType": "MultiSelectList",
     "FieldTypeParameter": "msl_NoCRequest_Notice",

@@ -29,10 +29,10 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 
 @ExtendWith(SpringExtension.class)
-class NocRequestServiceTest {
+class NocRemoveRepresentationServiceTest {
 
     @InjectMocks
-    private NocRequestService nocRequestService;
+    private NocRemoveRepresentationService nocRemoveRepresentationService;
     @Mock
     private NocCcdService nocCcdService;
     @Mock
@@ -65,13 +65,13 @@ class NocRequestServiceTest {
 
     @BeforeEach
     void setUp() {
-        ReflectionTestUtils.setField(nocRequestService,
+        ReflectionTestUtils.setField(nocRemoveRepresentationService,
             TEMPLATE_NOC_ORG_ADMIN_NOT_REPRESENTING, TEMPLATE_NOC_ORG_ADMIN_NOT_REPRESENTING);
-        ReflectionTestUtils.setField(nocRequestService,
+        ReflectionTestUtils.setField(nocRemoveRepresentationService,
             TEMPLATE_NOC_LEGAL_REP_NO_LONGER_ASSIGNED, TEMPLATE_NOC_LEGAL_REP_NO_LONGER_ASSIGNED);
-        ReflectionTestUtils.setField(nocRequestService,
+        ReflectionTestUtils.setField(nocRemoveRepresentationService,
             TEMPLATE_NOC_CITIZEN_NO_LONGER_REPRESENTED, TEMPLATE_NOC_CITIZEN_NO_LONGER_REPRESENTED);
-        ReflectionTestUtils.setField(nocRequestService,
+        ReflectionTestUtils.setField(nocRemoveRepresentationService,
             TEMPLATE_NOC_OTHER_PARTY_NOT_REPRESENTED, TEMPLATE_NOC_OTHER_PARTY_NOT_REPRESENTED);
     }
 
@@ -108,7 +108,7 @@ class NocRequestServiceTest {
         when(emailNotificationService.getRespondentsAndRepsEmailAddresses(any(), any()))
             .thenReturn(Map.of(EMAIL_RESP_SOLICITOR, "respondentId"));
 
-        nocRequestService.revokeClaimantLegalRep(caseDetails, USER_TOKEN);
+        nocRemoveRepresentationService.revokeClaimantLegalRep(caseDetails, USER_TOKEN);
 
         verify(nocCcdService, times(1)).revokeClaimantRepresentation(USER_TOKEN, caseDetails);
         verify(emailService, times(1)).sendEmail(

@@ -176,8 +176,8 @@ class DocumentHelperTest {
             + "\"claimant_or_rep_county\":\"Lancashire" + COMMA_NEWLINE
             + "\"claimant_or_rep_postCode\":\"M3 KJR" + COMMA_NEWLINE
             + "\"claimant_reference\":\"1111111" + COMMA_NEWLINE
-            + "\"claimant_full_name\":\"Mr A J Rodriguez" + COMMA_NEWLINE
-            + "\"Claimant\":\"Mr A J Rodriguez" + COMMA_NEWLINE
+            + "\"claimant_full_name\":\"Anton Juliet Rodriguez" + COMMA_NEWLINE
+            + "\"Claimant\":\"Anton Juliet Rodriguez" + COMMA_NEWLINE
             + "\"claimant_addressLine1\":\"34" + COMMA_NEWLINE
             + "\"claimant_addressLine2\":\"Low Street" + COMMA_NEWLINE
             + "\"claimant_addressLine3\":\"" + COMMA_NEWLINE
@@ -406,9 +406,9 @@ class DocumentHelperTest {
             + "\"templateName\":\"EM-TRB-EGW-ENG-00028.docx" + COMMA_NEWLINE
             + "\"outputName\":\"document.docx" + COMMA_NEWLINE
             + "\"data\":{\n"
-            + "\"claimant_or_rep_full_name\":\"Mr A J Rodriguez" + COMMA_NEWLINE
-            + "\"claimant_full_name\":\"Mr A J Rodriguez" + COMMA_NEWLINE
-            + "\"Claimant\":\"Mr A J Rodriguez" + COMMA_NEWLINE
+            + "\"claimant_or_rep_full_name\":\"Anton Juliet Rodriguez" + COMMA_NEWLINE
+            + "\"claimant_full_name\":\"Anton Juliet Rodriguez" + COMMA_NEWLINE
+            + "\"Claimant\":\"Anton Juliet Rodriguez" + COMMA_NEWLINE
             + "\"claimant_or_rep_addressLine1\":\"34" + COMMA_NEWLINE
             + "\"claimant_or_rep_addressLine2\":\"Low Street" + COMMA_NEWLINE
             + "\"claimant_or_rep_addressLine3\":\"" + COMMA_NEWLINE
@@ -493,8 +493,8 @@ class DocumentHelperTest {
             + "\"claimant_or_rep_county\":\"Lancashire" + COMMA_NEWLINE
             + "\"claimant_or_rep_postCode\":\"M3 KJR" + COMMA_NEWLINE
             + "\"claimant_reference\":\"1111111" + COMMA_NEWLINE
-            + "\"claimant_full_name\":\"Mr A J Rodriguez" + COMMA_NEWLINE
-            + "\"Claimant\":\"Mr A J Rodriguez" + COMMA_NEWLINE
+            + "\"claimant_full_name\":\"Anton Juliet Rodriguez" + COMMA_NEWLINE
+            + "\"Claimant\":\"Anton Juliet Rodriguez" + COMMA_NEWLINE
             + "\"claimant_addressLine1\":\"34" + COMMA_NEWLINE
             + "\"claimant_addressLine2\":\"Low Street" + COMMA_NEWLINE
             + "\"claimant_addressLine3\":\"" + COMMA_NEWLINE
@@ -571,8 +571,8 @@ class DocumentHelperTest {
             + "\"claimant_or_rep_county\":\"Lancashire" + COMMA_NEWLINE
             + "\"claimant_or_rep_postCode\":\"M3 KJR" + COMMA_NEWLINE
             + "\"claimant_reference\":\"1111111" + COMMA_NEWLINE
-            + "\"claimant_full_name\":\"Mr A J Rodriguez" + COMMA_NEWLINE
-            + "\"Claimant\":\"Mr A J Rodriguez" + COMMA_NEWLINE
+            + "\"claimant_full_name\":\"Anton Juliet Rodriguez" + COMMA_NEWLINE
+            + "\"Claimant\":\"Anton Juliet Rodriguez" + COMMA_NEWLINE
             + "\"claimant_addressLine1\":\"34" + COMMA_NEWLINE
             + "\"claimant_addressLine2\":\"Low Street" + COMMA_NEWLINE
             + "\"claimant_addressLine3\":\"" + COMMA_NEWLINE
@@ -732,8 +732,8 @@ class DocumentHelperTest {
             + "\"claimant_or_rep_county\":\"Lancashire" + COMMA_NEWLINE
             + "\"claimant_or_rep_postCode\":\"M3 KJR" + COMMA_NEWLINE
             + "\"claimant_reference\":\"1111111" + COMMA_NEWLINE
-            + "\"claimant_full_name\":\"Mr A J Rodriguez" + COMMA_NEWLINE
-            + "\"Claimant\":\"Mr A J Rodriguez" + COMMA_NEWLINE
+            + "\"claimant_full_name\":\"Anton Juliet Rodriguez" + COMMA_NEWLINE
+            + "\"Claimant\":\"Anton Juliet Rodriguez" + COMMA_NEWLINE
             + "\"claimant_addressLine1\":\"34" + COMMA_NEWLINE
             + "\"claimant_addressLine2\":\"Low Street" + COMMA_NEWLINE
             + "\"claimant_addressLine3\":\"" + COMMA_NEWLINE
@@ -813,8 +813,8 @@ class DocumentHelperTest {
             + "\"claimant_or_rep_county\":\"Lancashire" + COMMA_NEWLINE
             + "\"claimant_or_rep_postCode\":\"M3 KJR" + COMMA_NEWLINE
             + "\"claimant_reference\":\"1111111" + COMMA_NEWLINE
-            + "\"claimant_full_name\":\"Mr A J Rodriguez" + COMMA_NEWLINE
-            + "\"Claimant\":\"Mr A J Rodriguez" + COMMA_NEWLINE
+            + "\"claimant_full_name\":\"Anton Juliet Rodriguez" + COMMA_NEWLINE
+            + "\"Claimant\":\"Anton Juliet Rodriguez" + COMMA_NEWLINE
             + "\"claimant_addressLine1\":\"34" + COMMA_NEWLINE
             + "\"claimant_addressLine2\":\"Low Street" + COMMA_NEWLINE
             + "\"claimant_addressLine3\":\"" + COMMA_NEWLINE
@@ -893,8 +893,8 @@ class DocumentHelperTest {
             + "\"claimant_or_rep_county\":\"Lancashire" + COMMA_NEWLINE
             + "\"claimant_or_rep_postCode\":\"M3 KJR" + COMMA_NEWLINE
             + "\"claimant_reference\":\"1111111" + COMMA_NEWLINE
-            + "\"claimant_full_name\":\"Mr A J Rodriguez" + COMMA_NEWLINE
-            + "\"Claimant\":\"Mr A J Rodriguez" + COMMA_NEWLINE
+            + "\"claimant_full_name\":\"Anton Juliet Rodriguez" + COMMA_NEWLINE
+            + "\"Claimant\":\"Anton Juliet Rodriguez" + COMMA_NEWLINE
             + "\"claimant_addressLine1\":\"34" + COMMA_NEWLINE
             + "\"claimant_addressLine2\":\"Low Street" + COMMA_NEWLINE
             + "\"claimant_addressLine3\":\"" + COMMA_NEWLINE
@@ -1486,8 +1486,8 @@ class DocumentHelperTest {
             + "\"claimant_or_rep_county\":\"Lancashire" + COMMA_NEWLINE
             + "\"claimant_or_rep_postCode\":\"M3 KJR" + COMMA_NEWLINE
             + "\"claimant_reference\":\"1111111" + COMMA_NEWLINE
-            + "\"claimant_full_name\":\"Mr A J Rodriguez" + COMMA_NEWLINE
-            + "\"Claimant\":\"Mr A J Rodriguez" + COMMA_NEWLINE
+            + "\"claimant_full_name\":\"Anton Juliet Rodriguez" + COMMA_NEWLINE
+            + "\"Claimant\":\"Anton Juliet Rodriguez" + COMMA_NEWLINE
             + "\"claimant_addressLine1\":\"34" + COMMA_NEWLINE
             + "\"claimant_addressLine2\":\"Low Street" + COMMA_NEWLINE
             + "\"claimant_addressLine3\":\"" + COMMA_NEWLINE
@@ -1639,8 +1639,8 @@ class DocumentHelperTest {
             + "\"claimant_or_rep_county\":\"Lancashire" + COMMA_NEWLINE
             + "\"claimant_or_rep_postCode\":\"M3 KJR" + COMMA_NEWLINE
             + "\"claimant_reference\":\"1111111" + COMMA_NEWLINE
-            + "\"claimant_full_name\":\"Mr A J Rodriguez" + COMMA_NEWLINE
-            + "\"Claimant\":\"Mr A J Rodriguez" + COMMA_NEWLINE
+            + "\"claimant_full_name\":\"Anton Juliet Rodriguez" + COMMA_NEWLINE
+            + "\"Claimant\":\"Anton Juliet Rodriguez" + COMMA_NEWLINE
             + "\"claimant_addressLine1\":\"34" + COMMA_NEWLINE
             + "\"claimant_addressLine2\":\"Low Street" + COMMA_NEWLINE
             + "\"claimant_addressLine3\":\"" + COMMA_NEWLINE
@@ -1789,9 +1789,9 @@ class DocumentHelperTest {
             + "\"templateName\":\"EM-TRB-SCO-ENG-00044.docx" + COMMA_NEWLINE
             + "\"outputName\":\"document.docx" + COMMA_NEWLINE
             + "\"data\":{\n"
-            + "\"claimant_or_rep_full_name\":\"Mr A J Rodriguez" + COMMA_NEWLINE
-            + "\"claimant_full_name\":\"Mr A J Rodriguez" + COMMA_NEWLINE
-            + "\"Claimant\":\"Mr A J Rodriguez" + COMMA_NEWLINE
+            + "\"claimant_or_rep_full_name\":\"Anton Juliet Rodriguez" + COMMA_NEWLINE
+            + "\"claimant_full_name\":\"Anton Juliet Rodriguez" + COMMA_NEWLINE
+            + "\"Claimant\":\"Anton Juliet Rodriguez" + COMMA_NEWLINE
             + "\"claimant_or_rep_addressLine1\":\"34" + COMMA_NEWLINE
             + "\"claimant_or_rep_addressLine2\":\"Low Street" + COMMA_NEWLINE
             + "\"claimant_or_rep_addressLine3\":\"" + COMMA_NEWLINE
@@ -1867,9 +1867,9 @@ class DocumentHelperTest {
             + "\"templateName\":\"EM-TRB-SCO-ENG-00044.docx" + COMMA_NEWLINE
             + "\"outputName\":\"document.docx" + COMMA_NEWLINE
             + "\"data\":{\n"
-            + "\"claimant_or_rep_full_name\":\"Mr A J Rodriguez" + COMMA_NEWLINE
-            + "\"claimant_full_name\":\"Mr A J Rodriguez" + COMMA_NEWLINE
-            + "\"Claimant\":\"Mr A J Rodriguez" + COMMA_NEWLINE
+            + "\"claimant_or_rep_full_name\":\"Anton Juliet Rodriguez" + COMMA_NEWLINE
+            + "\"claimant_full_name\":\"Anton Juliet Rodriguez" + COMMA_NEWLINE
+            + "\"Claimant\":\"Anton Juliet Rodriguez" + COMMA_NEWLINE
             + "\"claimant_or_rep_addressLine1\":\"34" + COMMA_NEWLINE
             + "\"claimant_or_rep_addressLine2\":\"Low Street" + COMMA_NEWLINE
             + "\"claimant_or_rep_addressLine3\":\"" + COMMA_NEWLINE
@@ -2757,7 +2757,8 @@ class DocumentHelperTest {
         caseData.setClaimantRepresentedQuestion(YES);
 
         ClaimantIndType claimantInd = mock(ClaimantIndType.class);
-        when(claimantInd.claimantFullName()).thenReturn("John Smith");
+        when(claimantInd.getClaimantFirstNames()).thenReturn("John");
+        when(claimantInd.getClaimantLastName()).thenReturn("Smith");
         caseData.setClaimantIndType(claimantInd);
 
         return caseData;
@@ -2767,7 +2768,8 @@ class DocumentHelperTest {
         CaseData caseData = new CaseData();
 
         ClaimantIndType claimantInd = mock(ClaimantIndType.class);
-        when(claimantInd.claimantFullName()).thenReturn("John Smith");
+        when(claimantInd.getClaimantFirstNames()).thenReturn("John");
+        when(claimantInd.getClaimantLastName()).thenReturn("Smith");
         caseData.setClaimantIndType(claimantInd);
 
         Address claimantAddress = new Address();
@@ -2807,7 +2809,9 @@ class DocumentHelperTest {
 
     private ClaimantIndType createMockClaimantIndType(String fullName) {
         ClaimantIndType claimantInd = mock(ClaimantIndType.class);
-        when(claimantInd.claimantFullName()).thenReturn(fullName);
+        String[] parts = fullName.split(" ", 2);
+        when(claimantInd.getClaimantFirstNames()).thenReturn(parts[0]);
+        when(claimantInd.getClaimantLastName()).thenReturn(parts.length > 1 ? parts[1] : "");
         return claimantInd;
     }
 

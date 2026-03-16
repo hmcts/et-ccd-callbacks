@@ -17,7 +17,6 @@ import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.AddressLabelType;
 import uk.gov.hmcts.et.common.model.ccd.types.AddressLabelsAttributesType;
-import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceScotType;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceType;
@@ -240,7 +239,8 @@ public final class DocumentHelper {
                 .filter(COMPANY_TYPE_CLAIMANT::equals)
                 .map(type -> caseData.getClaimantCompany())
                 .orElseGet(() -> Optional.ofNullable(caseData.getClaimantIndType())
-                        .map(ClaimantIndType::claimantFullName).orElse(""));
+                        .map(ind -> ind.getClaimantFirstNames() + " " + ind.getClaimantLastName())
+                        .orElse(""));
     }
 
     private static StringBuilder getClaimantOrRepAddressUK(Address address) {

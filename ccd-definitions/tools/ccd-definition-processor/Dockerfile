@@ -1,5 +1,5 @@
 # ---- Base Image ----
-FROM hmctspublic.azurecr.io/base/node:18-alpine as base
+FROM hmctssbox.azurecr.io/base/node:18-alpine as base
 
 # ---- Build image ---- #
 FROM base as build

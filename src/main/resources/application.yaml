@@ -59,7 +59,7 @@ idam:
     # noinspection SpringBootApplicationYaml
     url: ${SERVICE_AUTH_PROVIDER_URL:http://service-auth-provider-api:8080} # used in ServiceAuthorisationApi
     totp_secret: ${ET_COS_S2S_SECRET:AAAAAAAAAAAAAAAC}
-    secret: ${ET_SYA_S2S_SECRET:${ET_COS_S2S_SECRET:AAAAAAAAAAAAAAAC}}
+    secret: ${ET_COS_S2S_SECRET:AAAAAAAAAAAAAAAC}
     microservice: ${MICRO_SERVICE:ccd_gw}
   api:
     url: ${IDAM_API_URL:http://sidam-api:5000}

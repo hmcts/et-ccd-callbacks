@@ -278,6 +278,40 @@ class AllocateHearingServiceTest {
         assertNotNull(selectedListing.getPostponedDate());
     }
 
+    @Test
+    void clearDynamicFixedList_setsAllRelevantFieldsToNull() {
+        caseData.setAllocateHearingJudge(DynamicFixedListType.of(
+            DynamicValueType.create("judge1", "Judge 1")));
+        caseData.setAllocateHearingAdditionalJudge(DynamicFixedListType.of(
+            DynamicValueType.create("judge2", "Judge 2")));
+        caseData.setAllocateHearingEmployerMember(DynamicFixedListType.of(
+            DynamicValueType.create("employer1", "Employer 1")));
+        caseData.setAllocateHearingEmployeeMember(DynamicFixedListType.of(
+            DynamicValueType.create("employee1", "Employee 1")));
+
+        allocateHearingService.clearDynamicFixedList(caseData);
+
+        assertThat(caseData.getAllocateHearingJudge()).isNull();
+        assertThat(caseData.getAllocateHearingAdditionalJudge()).isNull();
+        assertThat(caseData.getAllocateHearingEmployerMember()).isNull();
+        assertThat(caseData.getAllocateHearingEmployeeMember()).isNull();
+    }
+
+    @Test
+    void clearDynamicFixedList_whenFieldsAlreadyNull() {
+        caseData.setAllocateHearingJudge(null);
+        caseData.setAllocateHearingAdditionalJudge(null);
+        caseData.setAllocateHearingEmployerMember(null);
+        caseData.setAllocateHearingEmployeeMember(null);
+
+        allocateHearingService.clearDynamicFixedList(caseData);
+
+        assertThat(caseData.getAllocateHearingJudge()).isNull();
+        assertThat(caseData.getAllocateHearingAdditionalJudge()).isNull();
+        assertThat(caseData.getAllocateHearingEmployerMember()).isNull();
+        assertThat(caseData.getAllocateHearingEmployeeMember()).isNull();
+    }
+
     private CaseData createCaseData() {
         CaseData newCaseData = SelectionServiceTestUtils.createCaseData(tribunalOffice);
         newCaseData.setAllocateHearingHearing(new DynamicFixedListType());

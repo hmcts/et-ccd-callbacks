@@ -20,6 +20,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_INVALID_REPRESENTATIVE_EXISTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_RESPONDENT_HAS_MULTIPLE_REPRESENTATIVES;
@@ -889,5 +890,58 @@ public final class RespondentRepresentativeUtils {
             representatives.add(representative);
         }
         return representatives;
+    }
+
+    /**
+     * Removes the given respondent representatives from the case data and updates the associated
+     * respondentsaccordingly.
+     * <p>
+     * For each representative in the provided list:
+     * <ul>
+     *     <li>If the representative or its ID is null/blank, it is skipped.</li>
+     *     <li>The corresponding respondent is located using {@code findRespondentByRepresentative}.</li>
+     *     <li>If a matching respondent is found, its representative details are cleared:
+     *         <ul>
+     *             <li>Representative ID is set to {@code null}</li>
+     *             <li>Represented flag is set to {@code NO}</li>
+     *             <li>Representative removed flag is set to {@code YES}</li>
+     *         </ul>
+     *     </li>
+     *     <li>The representative is removed from the case's representative collection.</li>
+     * </ul>
+     * If the input list of representatives is null or empty, no action is taken.
+     *
+     * <h3>Assumptions</h3>
+     * <ul>
+     *     <li>{@code caseData} is not {@code null} and contains a non-null representative collection.</li>
+     *     <li>Representative IDs are unique within the collection.</li>
+     *     <li>{@code findRespondentByRepresentative} returns the correct respondent associated with the given
+     *     representative, or {@code null} if none exists.</li>
+     *     <li>{@code NO} and {@code YES} are valid constants representing boolean-like flags in the domain model.</li>
+     *     <li>String comparison via {@code Strings.CS.equals} is case-sensitive and appropriate for matching
+     *     representative IDs.</li>
+     * </ul>
+     *
+     * @param caseData the case data containing respondents and representative collection
+     * @param representatives the list of representatives to be removed
+     */
+    public static void removeRespondentRepresentatives(CaseData caseData, List<RepresentedTypeRItem> representatives) {
+        if (CollectionUtils.isEmpty(representatives)) {
+            return;
+        }
+        List<RepresentedTypeRItem> repCollection = new ArrayList<>(caseData.getRepCollection());
+        for (RepresentedTypeRItem representative : representatives) {
+            if (representative == null || StringUtils.isBlank(representative.getId())) {
+                continue;
+            }
+            RespondentSumTypeItem respondent = findRespondentByRepresentative(caseData, representative);
+            if (respondent != null && respondent.getValue() != null) {
+                respondent.getValue().setRepresentativeId(null);
+                respondent.getValue().setRepresented(NO);
+                respondent.getValue().setRepresentativeRemoved(YES);
+            }
+            repCollection.removeIf(rep -> Strings.CS.equals(rep.getId(), representative.getId()));
+        }
+        caseData.setRepCollection(repCollection);
     }
 }

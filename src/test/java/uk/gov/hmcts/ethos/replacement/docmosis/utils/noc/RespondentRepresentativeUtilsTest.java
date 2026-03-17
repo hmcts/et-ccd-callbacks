@@ -23,6 +23,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 final class RespondentRepresentativeUtilsTest {
@@ -716,5 +717,43 @@ final class RespondentRepresentativeUtilsTest {
         representative2.setId(REPRESENTATIVE_ID_1);
         assertThat(RespondentRepresentativeUtils.findRepresentativeInListByRoleOrRespondentName(caseData,
                 ROLE_SOLICITOR_A, representedTypeRItems)).isNotNull().isEqualTo(representative1);
+    }
+
+    @Test
+    void theRemoveRespondentRepresentatives() {
+        // when representative list is empty should not remove any representative
+        RepresentedTypeRItem representative1 = new  RepresentedTypeRItem();
+        representative1.setId(REPRESENTATIVE_ID_1);
+        representative1.setValue(RepresentedTypeR.builder().role(ROLE_SOLICITOR_A).build());
+        CaseData caseData = new CaseData();
+        caseData.setRepCollection(List.of(representative1));
+        RespondentRepresentativeUtils.removeRespondentRepresentatives(caseData, new  ArrayList<>());
+        assertThat(caseData.getRepCollection()).hasSize(LoggerTestUtils.INTEGER_ONE);
+        // when respondent not found should not reset respondent representation
+        RespondentSumTypeItem  respondent = new RespondentSumTypeItem();
+        respondent.setId(RESPONDENT_ID_1);
+        RespondentSumType respondentValue = RespondentSumType.builder().respondentName(RESPONDENT_NAME_1)
+                .representativeId(REPRESENTATIVE_ID_1).represented(YES).representativeRemoved(NO).build();
+        respondent.setValue(respondentValue);
+        caseData.setRespondentCollection(List.of(respondent));
+        RepresentedTypeRItem representative2 = new  RepresentedTypeRItem();
+        representative2.setId(REPRESENTATIVE_ID_2);
+        representative2.setValue(RepresentedTypeR.builder().role(ROLE_SOLICITOR_A).respondentId(RESPONDENT_ID_2)
+                .build());
+        List<RepresentedTypeRItem> representedTypeRItems = List.of(representative2);
+        RespondentRepresentativeUtils.removeRespondentRepresentatives(caseData, representedTypeRItems);
+        assertThat(caseData.getRepCollection()).hasSize(LoggerTestUtils.INTEGER_ONE);
+        assertThat(caseData.getRespondentCollection().getFirst().getValue().getRepresentativeId())
+                .isEqualTo(REPRESENTATIVE_ID_1);
+        assertThat(caseData.getRespondentCollection().getFirst().getValue().getRepresented()).isEqualTo(YES);
+        assertThat(caseData.getRespondentCollection().getFirst().getValue().getRepresentativeRemoved()).isEqualTo(NO);
+        // when respondent found should reset respondent representation
+        representative2.getValue().setRespondentId(RESPONDENT_ID_1);
+        representative2.setId(REPRESENTATIVE_ID_1);
+        RespondentRepresentativeUtils.removeRespondentRepresentatives(caseData, representedTypeRItems);
+        assertThat(caseData.getRepCollection()).hasSize(LoggerTestUtils.INTEGER_ZERO);
+        assertThat(caseData.getRespondentCollection().getFirst().getValue().getRepresentativeId()).isNull();
+        assertThat(caseData.getRespondentCollection().getFirst().getValue().getRepresented()).isEqualTo(NO);
+        assertThat(caseData.getRespondentCollection().getFirst().getValue().getRepresentativeRemoved()).isEqualTo(YES);
     }
 }

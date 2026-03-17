@@ -399,6 +399,8 @@ public class NocRespondentRepresentativeService {
         List<RepresentedTypeRItem> revokedRepresentatives = revokeRespondentRepresentatives(caseDetails,
                 respondentRepresentativesToRevoke);
         NocUtils.resetOrganisationPolicies(caseDetails.getCaseData(), revokedRepresentatives);
+        RespondentRepresentativeUtils.removeRespondentRepresentatives(caseDetails.getCaseData(),
+                respondentRepresentativesToRevoke);
     }
 
     /**

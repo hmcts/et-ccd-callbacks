@@ -107,6 +107,7 @@ public class AddAmendClaimantRepresentativeController {
         ClaimantRepresentativeUtils.addAmendClaimantRepresentative(caseData);
         nocRespondentRepresentativeService.revokeRespondentRepresentativesWithSameOrganisationAsClaimant(
                 ccdRequest.getCaseDetails());
+
         return getCallbackRespEntityNoErrors(caseData);
     }
 

@@ -1596,6 +1596,13 @@
     "CRUD": "CRUD"
   },
   {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "nocRequest",
+    "UserRole": "caseworker-employment-legalrep-solicitor",
+    "CRUD": "CRU"
+  },
+  {
     "LiveFrom": "04/08/2025",
     "CaseTypeId": "ET_EnglandWales",
     "CaseEventID": "applyNocDecision",

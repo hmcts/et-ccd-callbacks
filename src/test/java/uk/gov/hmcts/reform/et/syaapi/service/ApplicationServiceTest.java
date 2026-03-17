@@ -13,6 +13,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import uk.gov.hmcts.ecm.common.service.pdf.PdfDecodedMultipartFile;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
@@ -28,6 +29,7 @@ import uk.gov.hmcts.reform.et.syaapi.models.ChangeApplicationStatusRequest;
 import uk.gov.hmcts.reform.et.syaapi.models.RespondToApplicationRequest;
 import uk.gov.hmcts.reform.et.syaapi.models.TribunalResponseViewedRequest;
 import uk.gov.hmcts.reform.et.syaapi.service.NotificationService.CoreEmailDetails;
+import uk.gov.hmcts.reform.et.syaapi.service.pdf.PdfUploadService;
 import uk.gov.service.notify.NotificationClientException;
 
 import java.util.stream.Stream;
@@ -71,6 +73,8 @@ class ApplicationServiceTest {
     private CaseDetailsConverter caseDetailsConverter;
     @MockBean
     private FeatureToggleService featureToggleService;
+    @MockBean
+    private PdfUploadService pdfUploadService;
 
     private final TestData testData;
 
@@ -85,18 +89,23 @@ class ApplicationServiceTest {
         caseDocumentService = mock(CaseDocumentService.class);
         caseDetailsConverter = mock(CaseDetailsConverter.class);
         featureToggleService = mock(FeatureToggleService.class);
+        pdfUploadService = mock(PdfUploadService.class);
 
         applicationService = new ApplicationService(
             caseService,
             notificationService,
             caseDocumentService,
             caseDetailsConverter,
-            featureToggleService);
+            featureToggleService,
+            pdfUploadService);
 
         when(featureToggleService.isWorkAllocationEnabled()).thenReturn(true);
+        when(pdfUploadService.convertClaimantTseIntoMultipartFile(any(), any(), any()))
+            .thenReturn(new PdfDecodedMultipartFile(
+                "test".getBytes(), "test.pdf", "application/pdf", "test description"));
 
         doNothing().when(caseService).uploadTseSupportingDocument(any(), any(), any(), any(), any());
-        doNothing().when(caseService).uploadTseCyaAsPdf(any(), any(), any(), any());
+        doNothing().when(caseService).uploadTseCyaAsPdf(any(), any(), any(), any(), any());
 
         when(caseService.triggerEvent(
             eq(TEST_SERVICE_AUTH_TOKEN),
@@ -167,12 +176,6 @@ class ApplicationServiceTest {
     class SubmitApplication {
         @Test
         void shouldSendRespondentEmailWithCorrectParameters() throws NotificationClientException {
-            byte[] bytes = "Sample".getBytes();
-            ResponseEntity<ByteArrayResource> responseEntity =
-                new ResponseEntity<>(new ByteArrayResource(bytes), HttpStatus.OK);
-
-            when(caseDocumentService.downloadDocument(eq(TEST_SERVICE_AUTH_TOKEN), any())).thenReturn(responseEntity);
-
             applicationService.submitApplication(TEST_SERVICE_AUTH_TOKEN,
                                                  testData.getClaimantApplicationRequest());
 
@@ -200,7 +203,7 @@ class ApplicationServiceTest {
             ArgumentCaptor<CoreEmailDetails> argument = ArgumentCaptor.forClass(CoreEmailDetails.class);
             verify(notificationService, times(1)).sendAcknowledgementEmailToRespondents(
                 argument.capture(),
-                eq(null),
+                any(),
                 any()
             );
 

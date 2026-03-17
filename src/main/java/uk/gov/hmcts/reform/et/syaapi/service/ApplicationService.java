@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.json.JSONObject;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.stereotype.Service;
+import uk.gov.hmcts.ecm.common.service.pdf.PdfDecodedMultipartFile;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
@@ -28,6 +29,7 @@ import uk.gov.hmcts.reform.et.syaapi.models.RespondToApplicationRequest;
 import uk.gov.hmcts.reform.et.syaapi.models.RespondentApplicationRequest;
 import uk.gov.hmcts.reform.et.syaapi.models.TribunalResponseViewedRequest;
 import uk.gov.hmcts.reform.et.syaapi.service.NotificationService.CoreEmailDetails;
+import uk.gov.hmcts.reform.et.syaapi.service.pdf.PdfUploadService;
 import uk.gov.service.notify.NotificationClient;
 import uk.gov.service.notify.NotificationClientException;
 
@@ -59,6 +61,7 @@ public class ApplicationService {
     private final CaseDocumentService caseDocumentService;
     private final CaseDetailsConverter caseDetailsConverter;
     private final FeatureToggleService featureToggleService;
+    private final PdfUploadService pdfUploadService;
 
     /**
      * Get the next application number for the case.
@@ -94,10 +97,20 @@ public class ApplicationService {
         CaseDetails caseDetails = startEventResponse.getCaseDetails();
         ClaimantTse claimantTse = request.getClaimantTse();
         caseDetails.getData().put("claimantTse", claimantTse);
-
+        PdfDecodedMultipartFile generatedPdf = null;
         try {
             log.info("Uploading pdf of TSE application");
-            caseService.uploadTseCyaAsPdf(authorization, caseDetails, claimantTse, caseTypeId);
+            CaseData caseData = EmployeeObjectMapper.convertCaseDataMapToCaseDataObject(caseDetails.getData());
+
+            String docName = "Application %d - %s.pdf".formatted(
+                    ApplicationService.getNextApplicationNumber(caseData),
+                    ClaimantTse.APP_TYPE_MAP.get(claimantTse.getContactApplicationType()))
+                .replace("/", " or ");
+            generatedPdf = pdfUploadService.convertClaimantTseIntoMultipartFile(claimantTse,
+                    caseData.getEthosCaseReference(),
+                    docName);
+
+            caseService.uploadTseCyaAsPdf(authorization, caseDetails, claimantTse, caseTypeId, generatedPdf);
         } catch (CaseDocumentException | DocumentGenerationException e) {
             logTseApplicationDocumentUploadError(e);
         }
@@ -123,7 +136,7 @@ public class ApplicationService {
             request.getCaseTypeId()
         );
 
-        sendAcknowledgementEmails(authorization, request, finalCaseDetails);
+        sendAcknowledgementEmails(request, finalCaseDetails, generatedPdf);
 
         return finalCaseDetails;
     }
@@ -257,16 +270,21 @@ public class ApplicationService {
     }
 
     private void sendAcknowledgementEmails(
-        String authorization,
         ClaimantApplicationRequest request,
-        CaseDetails finalCaseDetails
+        CaseDetails finalCaseDetails,
+        PdfDecodedMultipartFile generatedPdf
     ) throws NotificationClientException {
         CaseData caseData = EmployeeObjectMapper.convertCaseDataMapToCaseDataObject(finalCaseDetails.getData());
         String caseId = finalCaseDetails.getId().toString();
         CoreEmailDetails details = prepareCoreEmailDetails(caseData, caseId);
 
         ClaimantTse claimantTse = request.getClaimantTse();
-        JSONObject documentJson = getDocumentDownload(authorization, caseData);
+        JSONObject documentJson = NotificationClient.prepareUpload(
+            generatedPdf.getBytes(),
+            "respondent-tse.pdf",
+            false,
+            WEEKS_78
+        );
 
         notificationService.sendAcknowledgementEmailToClaimant(details, claimantTse);
         notificationService.sendAcknowledgementEmailToRespondents(details, documentJson, claimantTse);

@@ -455,7 +455,8 @@ public class CaseService {
         String authorization,
         CaseDetails caseDetails,
         ClaimantTse claimantTse,
-        String caseType
+        String caseType,
+        PdfDecodedMultipartFile pdfDecodedMultipartFile
     ) throws DocumentGenerationException, CaseDocumentException {
 
         CaseData caseData = EmployeeObjectMapper.convertCaseDataMapToCaseDataObject(caseDetails.getData());
@@ -465,14 +466,6 @@ public class CaseService {
             docList = new ArrayList<>();
         }
 
-        String docName = "Application %d - %s.pdf".formatted(
-            ApplicationService.getNextApplicationNumber(caseData),
-            ClaimantTse.APP_TYPE_MAP.get(claimantTse.getContactApplicationType()))
-            .replace("/", " or ");
-        PdfDecodedMultipartFile pdfDecodedMultipartFile =
-            pdfUploadService.convertClaimantTseIntoMultipartFile(claimantTse,
-                                                                 caseData.getEthosCaseReference(),
-                                                                 docName);
         String applicationDocMapping =
             DocumentHelper.claimantApplicationTypeToDocType(claimantTse.getContactApplicationType());
         String topLevel = DocumentHelper.getTopLevelDocument(applicationDocMapping);

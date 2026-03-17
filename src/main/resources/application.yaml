@@ -283,7 +283,7 @@ caching:
   adminUserService: ${CACHING_ADMIN_USER_SERVICE:21600000}
 
 notifications:
-  govNotifyApiKey: ${GOV_NOTIFY_API_KEY:AAAAAAAAAAAAAAAAA}
+  govNotifyApiKey: ${GOV_NOTIFY_API_KEY}
   citizenPortalLink: ${CITIZEN_PORTAL_LINK:${CITIZEN_CASE_DETAILS_URL:https://localhost:3001/citizen-hub/}}
   respondentPortalLink: ${RESPONDENT_PORTAL_LINK:http://localhost:3003/case-details/}
   exuiCaseDetailsLink: ${EXUI_CASE_DETAILS_URL:http://localhost:3455/cases/case-details/}

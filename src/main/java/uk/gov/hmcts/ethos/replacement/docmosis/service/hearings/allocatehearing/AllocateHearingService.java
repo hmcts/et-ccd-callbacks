@@ -77,22 +77,17 @@ public class AllocateHearingService {
     public void updateSelectedHearing(CaseData caseData) {
         HearingType selectedHearing = getSelectedHearing(caseData);
         selectedHearing.setHearingSitAlone(caseData.getAllocateHearingSitAlone());
-
         selectedHearing.setJudge(caseData.getAllocateHearingJudge());
-        selectedHearing.getJudge().setListItems(null);
 
         if (TWO_JUDGES.equals(caseData.getAllocateHearingSitAlone())) {
             selectedHearing.setAdditionalJudge(caseData.getAllocateHearingAdditionalJudge());
-            selectedHearing.getAdditionalJudge().setListItems(null);
         } else {
             selectedHearing.setAdditionalJudge(null);
         }
 
         if (FULL_PANEL.equals(caseData.getAllocateHearingSitAlone())) {
             selectedHearing.setHearingERMember(caseData.getAllocateHearingEmployerMember());
-            selectedHearing.getHearingERMember().setListItems(null);
             selectedHearing.setHearingEEMember(caseData.getAllocateHearingEmployeeMember());
-            selectedHearing.getHearingEEMember().setListItems(null);
         } else {
             selectedHearing.setHearingERMember(null);
             selectedHearing.setHearingEEMember(null);

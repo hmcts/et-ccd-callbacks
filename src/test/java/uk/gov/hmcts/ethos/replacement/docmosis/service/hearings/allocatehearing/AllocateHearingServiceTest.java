@@ -237,6 +237,19 @@ class AllocateHearingServiceTest {
     }
 
     @Test
+    void testUpdateSelectedHearing_NoJudgeSelected() {
+        caseData.setAllocateHearingSitAlone(FULL_PANEL);
+
+        allocateHearingService.updateSelectedHearing(caseData);
+
+        assertThat(selectedHearing.getHearingSitAlone()).isEqualTo(FULL_PANEL);
+        assertThat(selectedHearing.getJudge()).isNull();
+        assertThat(selectedHearing.getAdditionalJudge()).isNull();
+        assertThat(selectedHearing.getHearingERMember()).isNull();
+        assertThat(selectedHearing.getHearingEEMember()).isNull();
+    }
+
+    @Test
     void testUpdateCase() {
         // Arrange
         String hearingStatus = Constants.HEARING_STATUS_POSTPONED;

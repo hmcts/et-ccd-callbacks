@@ -56,3 +56,63 @@ resource "azurerm_key_vault_secret" "et_cos_s2s_secret" {
   value        = data.azurerm_key_vault_secret.et_cos_s2s_key.value
   key_vault_id = module.key-vault.key_vault_id
 }
+
+data "azurerm_key_vault" "et_sya_api_vault" {
+  name                = "et-sya-api-${var.env}"
+  resource_group_name = "et-sya-api-${var.env}"
+}
+
+data "azurerm_key_vault_secret" "sya_api_idam_client_secret" {
+  name         = "acas-idam-client-secret"
+  key_vault_id = data.azurerm_key_vault.et_sya_api_vault.id
+}
+
+data "azurerm_key_vault_secret" "sya_et1_service_owner_email" {
+  name         = "et1-service-owner-notification-email"
+  key_vault_id = data.azurerm_key_vault.et_sya_api_vault.id
+}
+
+data "azurerm_key_vault_secret" "sya_et1_core_team_slack_email" {
+  name         = "et1-ecm-dts-core-team-slack-notification-email"
+  key_vault_id = data.azurerm_key_vault.et_sya_api_vault.id
+}
+
+data "azurerm_key_vault_secret" "et_api_caseworker_username" {
+  name         = "cos-system-user"
+  key_vault_id = module.key-vault.key_vault_id
+}
+
+data "azurerm_key_vault_secret" "et_api_caseworker_password" {
+  name         = "cos-system-user-password"
+  key_vault_id = module.key-vault.key_vault_id
+}
+
+resource "azurerm_key_vault_secret" "et_caseworker_user_name" {
+  key_vault_id = module.key-vault.key_vault_id
+  name         = "et-api-caseworker-user-name"
+  value        = data.azurerm_key_vault_secret.et_api_caseworker_username.value
+}
+
+resource "azurerm_key_vault_secret" "et_caseworker_password" {
+  key_vault_id = module.key-vault.key_vault_id
+  name         = "et-api-caseworker-password"
+  value        = data.azurerm_key_vault_secret.et_api_caseworker_password.value
+}
+
+resource "azurerm_key_vault_secret" "sya_idam_client_secret" {
+  key_vault_id = module.key-vault.key_vault_id
+  name         = "acas-idam-client-secret"
+  value        = data.azurerm_key_vault_secret.sya_api_idam_client_secret.value
+}
+
+resource "azurerm_key_vault_secret" "sya_et1_service_owner_notification_email" {
+  key_vault_id = module.key-vault.key_vault_id
+  name         = "et1-service-owner-notification-email"
+  value        = data.azurerm_key_vault_secret.sya_et1_service_owner_email.value
+}
+
+resource "azurerm_key_vault_secret" "sya_et1_core_team_slack_notification_email" {
+  key_vault_id = module.key-vault.key_vault_id
+  name         = "et1-ecm-dts-core-team-slack-notification-email"
+  value        = data.azurerm_key_vault_secret.sya_et1_core_team_slack_email.value
+}

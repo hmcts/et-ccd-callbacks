@@ -51,7 +51,8 @@ def sonarExclusions =
          'et-shared/src/main/java/**/configuration/**',
          'et-shared/src/main/java/**/helpers/**',
          'et-shared/src/main/java/**/launchdarkly/**',
-         'et-shared/src/main/java/**/servicebus/**'
+         'et-shared/src/main/java/**/servicebus/**',
+		 'et-shared/src/main/java/uk/gov/hmcts/ecm/compat/common/client/CcdClient.java'
 ]
 
 def duplicateCodeExclusionList = [
@@ -210,8 +211,8 @@ tasks.register('functional', Test) {
     classpath = sourceSets.apiTest.runtimeClasspath
 
     exclude '**/multiples/**'
-    
-    useJUnitPlatform()
+
+    useJUnitPlatform ()
     testLogging {
         events "passed", "skipped", "failed"
     }
@@ -489,6 +490,9 @@ dependencies {
     implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.11.0'
     implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
     implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.10.2'
+
+    // CVE-2025-7962
+    implementation group: 'org.eclipse.angus', name: 'angus-mail', version: '2.0.4'
 
     runtimeOnly group: 'com.squareup.okio', name: 'okio-jvm', version: '3.16.4'
     compileOnly 'org.projectlombok:lombok'

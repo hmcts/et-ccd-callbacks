@@ -5,6 +5,7 @@ import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import io.restassured.http.Header;
 import org.apache.http.HttpStatus;
+import org.junit.jupiter.api.Tag;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
@@ -18,6 +19,7 @@ public class AcasCertificateFunctionalTest extends BaseFunctionalTest {
     private static final String RETRIEVE_ACAS_CERTIFICATE_URL = "/acasCertificate/retrieveCertificate";
 
     @Test
+    @Tag("acasTesting")
     public void retrieveAcasCertificateSuccessResponse() {
         CCDRequest ccdRequest = CCDRequestBuilder.builder()
             .withCaseData(CaseDataBuilder.builder().build())

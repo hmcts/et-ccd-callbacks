@@ -40,7 +40,7 @@ public class NocRemoveRepresentationController {
     private final NocRemoveRepresentationService nocRemoveRepresentationService;
 
     @PostMapping(value = "/claimant/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "nocRemoveRepresentation submitted page")
+    @Operation(summary = "nocRemoveRepresentation about to submit page")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -55,6 +55,42 @@ public class NocRemoveRepresentationController {
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         nocRemoveRepresentationService.revokeClaimantLegalRep(caseDetails, userToken);
+        return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
+    }
+
+    @PostMapping(value = "/respondent/aboutToStart", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "nocRequest about to start page")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> aboutToStartRespondent(
+        @RequestBody CCDRequest ccdRequest,
+        @RequestHeader("Authorization") String userToken) {
+
+        CaseDetails caseDetails = ccdRequest.getCaseDetails();
+        return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
+    }
+
+    @PostMapping(value = "/respondent/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "nocRequest about to submit page")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> aboutToSubmitRespondent(
+        @RequestBody CCDRequest ccdRequest,
+        @RequestHeader("Authorization") String userToken) {
+
+        CaseDetails caseDetails = ccdRequest.getCaseDetails();
         return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
     }
 

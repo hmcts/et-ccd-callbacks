@@ -17,6 +17,14 @@
   },
   {
     "CaseTypeID": "ET_EnglandWales",
+    "ID": "nocRemoveRepresentationRespondentSignLabel",
+    "Label": "You should tick to 'sign' when<br>Your organisation will no longer be representing respondent.<br>You have served notice of this change to your former client.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
     "ID": "nocRemoveRepresentationConfirmNoLonger",
     "Label": " ",
     "FieldType": "MultiSelectList",

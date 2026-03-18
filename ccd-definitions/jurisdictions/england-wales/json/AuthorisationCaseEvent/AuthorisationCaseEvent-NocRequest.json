@@ -4,5 +4,22 @@
     "CaseEventID": "nocRemoveRepresentationClaimant",
     "UserRole": "[CLAIMANTSOLICITOR]",
     "CRUD": "CRU"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "nocRemoveRepresentationRespondent",
+    "UserRole": [
+      "[SOLICITORA]",
+      "[SOLICITORB]",
+      "[SOLICITORC]",
+      "[SOLICITORD]",
+      "[SOLICITORE]",
+      "[SOLICITORF]",
+      "[SOLICITORG]",
+      "[SOLICITORH]",
+      "[SOLICITORI]",
+      "[SOLICITORJ]"
+    ],
+    "CRUD": "CRU"
   }
 ]

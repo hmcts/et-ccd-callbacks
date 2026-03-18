@@ -32,6 +32,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantHearingPreference;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
+import uk.gov.hmcts.et.common.model.ccd.types.DigitalCaseFileType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.Et3VettingType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
@@ -74,6 +75,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET3;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.APPLICATIONS_FOR_STRIKE_OUT_OR_DEPOSIT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.BEFORE_LABEL_DCF_IC;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CLAIMANT_HEARING_PANEL_PREFERENCE_MISSING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CODES_URL_ENGLAND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CODES_URL_SCOTLAND;
@@ -94,6 +96,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsidera
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.TIME_POINTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.UDL_HEARING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.VIDEO;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.VIEW_ALL_DOCUMENTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_LABEL_ET1_IC;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_LABEL_ET3_IC;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.CASE_DETAILS_URL_PARTIAL;
@@ -2562,5 +2565,107 @@ class InitialConsiderationServiceTest {
         String result = service.setIcEt1VettingIssuesDetails(caseDataWithNoEt1SuggestedHearingVenue);
 
         assertEquals("", result);
+    }
+
+    @Test
+    void initialiseInitialConsideration_shouldIncludeDcfLink_whenDigitalCaseFileHasUploadedDocument_EW() {
+        List<DocumentTypeItem> documentCollection = new ArrayList<>();
+        DocumentTypeItem et1Document = new DocumentTypeItem();
+        et1Document.setValue(DocumentType.from(new UploadedDocumentType()));
+        et1Document.getValue().setDocumentType(ET1);
+        documentCollection.add(et1Document);
+
+        UploadedDocumentType uploadedDocument = new UploadedDocumentType();
+        uploadedDocument.setDocumentBinaryUrl("http://dm-store:8080/documents/some-uuid/binary");
+        DigitalCaseFileType digitalCaseFile = new DigitalCaseFileType();
+        digitalCaseFile.setUploadedDocument(uploadedDocument);
+
+        CaseData caseDataWithDcf = new CaseData();
+        caseDataWithDcf.setDocumentCollection(documentCollection);
+        caseDataWithDcf.setDigitalCaseFile(digitalCaseFile);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
+        caseDetails.setCaseId("12345");
+        caseDetails.setCaseData(caseDataWithDcf);
+
+        initialConsiderationService.initialiseInitialConsideration(caseDetails);
+
+        assertThat(caseDetails.getCaseData().getInitialConsiderationBeforeYouStart())
+                .contains(String.format(BEFORE_LABEL_DCF_IC, "/documents/some-uuid/binary"));
+    }
+
+    @Test
+    void initialiseInitialConsideration_shouldIncludeViewAllDocumentsLink_whenDigitalCaseFileIsNull_EW() {
+        List<DocumentTypeItem> documentCollection = new ArrayList<>();
+        DocumentTypeItem et1Document = new DocumentTypeItem();
+        et1Document.setValue(DocumentType.from(new UploadedDocumentType()));
+        et1Document.getValue().setDocumentType(ET1);
+        documentCollection.add(et1Document);
+
+        CaseData caseDataWithNullDcf = new CaseData();
+        caseDataWithNullDcf.setDocumentCollection(documentCollection);
+        caseDataWithNullDcf.setDigitalCaseFile(null);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
+        caseDetails.setCaseId("12345");
+        caseDetails.setCaseData(caseDataWithNullDcf);
+
+        initialConsiderationService.initialiseInitialConsideration(caseDetails);
+
+        assertThat(caseDetails.getCaseData().getInitialConsiderationBeforeYouStart())
+                .contains(String.format(VIEW_ALL_DOCUMENTS, "12345"));
+    }
+
+    @Test
+    void initialiseInitialConsideration_shouldIncludeViewAllDocumentsLink_whenUploadedDocumentIsNull_EW() {
+        List<DocumentTypeItem> documentCollection = new ArrayList<>();
+        DocumentTypeItem et1Document = new DocumentTypeItem();
+        et1Document.setValue(DocumentType.from(new UploadedDocumentType()));
+        et1Document.getValue().setDocumentType(ET1);
+        documentCollection.add(et1Document);
+
+        DigitalCaseFileType digitalCaseFileWithNullUpload = new DigitalCaseFileType();
+        digitalCaseFileWithNullUpload.setUploadedDocument(null);
+
+        CaseData caseDataWithNullUpload = new CaseData();
+        caseDataWithNullUpload.setDocumentCollection(documentCollection);
+        caseDataWithNullUpload.setDigitalCaseFile(digitalCaseFileWithNullUpload);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
+        caseDetails.setCaseId("67890");
+        caseDetails.setCaseData(caseDataWithNullUpload);
+
+        initialConsiderationService.initialiseInitialConsideration(caseDetails);
+
+        assertThat(caseDetails.getCaseData().getInitialConsiderationBeforeYouStart())
+                .contains(String.format(VIEW_ALL_DOCUMENTS, "67890"));
+    }
+
+    @Test
+    void initialiseInitialConsideration_shouldNotIncludeDcfLink_whenCaseTypeIsScotland() {
+        List<DocumentTypeItem> documentCollection = new ArrayList<>();
+        DocumentTypeItem tribunalCaseFileDocument = new DocumentTypeItem();
+        tribunalCaseFileDocument.setValue(DocumentType.from(new UploadedDocumentType()));
+        tribunalCaseFileDocument.getValue().setDocumentType("Tribunal case file");
+        documentCollection.add(tribunalCaseFileDocument);
+
+        UploadedDocumentType uploadedDocument = new UploadedDocumentType();
+        uploadedDocument.setDocumentBinaryUrl("http://dm-store:8080/documents/some-uuid/binary");
+        DigitalCaseFileType digitalCaseFile = new DigitalCaseFileType();
+        digitalCaseFile.setUploadedDocument(uploadedDocument);
+
+        CaseData caseDataScotland = new CaseData();
+        caseDataScotland.setDocumentCollection(documentCollection);
+        caseDataScotland.setDigitalCaseFile(digitalCaseFile);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseTypeId(SCOTLAND_CASE_TYPE_ID);
+        caseDetails.setCaseId("12345");
+        caseDetails.setCaseData(caseDataScotland);
+
+        initialConsiderationService.initialiseInitialConsideration(caseDetails);
+
+        String beforeYouStart = caseDetails.getCaseData().getInitialConsiderationBeforeYouStart();
+        assertThat(beforeYouStart).doesNotContain(">DCF</a>");
+        assertThat(beforeYouStart).doesNotContain("View all documents");
     }
 }

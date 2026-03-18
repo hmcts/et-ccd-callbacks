@@ -20,7 +20,7 @@
     "ID": "nocRemoveRepresentationChoose",
     "Label": " ",
     "FieldType": "FixedList",
-    "FieldTypeParameter": "fl_NoCRequest_ChooseYourselfOrWhole",
+    "FieldTypeParameter": "fl_NocRemove_ChooseYourselfOrWhole",
     "SecurityClassification": "Public",
     "Searchable": "N"
   },
@@ -45,7 +45,7 @@
     "ID": "nocRemoveRepresentationConfirmNoLonger",
     "Label": " ",
     "FieldType": "MultiSelectList",
-    "FieldTypeParameter": "msl_NoCRequest_NoLonger",
+    "FieldTypeParameter": "msl_NocRemove_NoLonger",
     "SecurityClassification": "Public",
     "Searchable": "N"
   },
@@ -54,7 +54,7 @@
     "ID": "nocRemoveRepresentationConfirmNotice",
     "Label": " ",
     "FieldType": "MultiSelectList",
-    "FieldTypeParameter": "msl_NoCRequest_Notice",
+    "FieldTypeParameter": "msl_NocRemove_Notice",
     "SecurityClassification": "Public",
     "Searchable": "N"
   }

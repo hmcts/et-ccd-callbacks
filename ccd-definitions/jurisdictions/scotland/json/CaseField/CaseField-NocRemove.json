@@ -20,7 +20,7 @@
     "ID": "nocRemoveRepresentationConfirmNoLonger",
     "Label": " ",
     "FieldType": "MultiSelectList",
-    "FieldTypeParameter": "msl_NoCRequest_NoLonger",
+    "FieldTypeParameter": "msl_NocRemove_NoLonger",
     "SecurityClassification": "Public",
     "Searchable": "N"
   },
@@ -29,7 +29,7 @@
     "ID": "nocRemoveRepresentationConfirmNotice",
     "Label": " ",
     "FieldType": "MultiSelectList",
-    "FieldTypeParameter": "msl_NoCRequest_Notice",
+    "FieldTypeParameter": "msl_NocRemove_Notice",
     "SecurityClassification": "Public",
     "Searchable": "N"
   }

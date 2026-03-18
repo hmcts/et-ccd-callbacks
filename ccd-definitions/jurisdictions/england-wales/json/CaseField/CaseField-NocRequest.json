@@ -9,6 +9,23 @@
   },
   {
     "CaseTypeID": "ET_EnglandWales",
+    "ID": "nocRemoveRepresentationChooseLabel",
+    "Label": "There is more than one representative from your organisation on this case.<br>Choose whether you want to remove only yourself or the whole organisation.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "nocRemoveRepresentationChoose",
+    "Label": " ",
+    "FieldType": "FixedList",
+    "FieldTypeParameter": "fl_NoCRequest_ChooseYourselfOrWhole",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
     "ID": "nocRemoveRepresentationClaimantSignLabel",
     "Label": "You should tick to 'sign' when<br>Your organisation will no longer be representing claimant.<br>You have served notice of this change to your former client.",
     "FieldType": "Label",

@@ -8,18 +8,22 @@
   {
     "CaseTypeId": "ET_EnglandWales",
     "CaseEventID": "nocRemoveRepresentationRespondent",
-    "UserRole": [
-      "[SOLICITORA]",
-      "[SOLICITORB]",
-      "[SOLICITORC]",
-      "[SOLICITORD]",
-      "[SOLICITORE]",
-      "[SOLICITORF]",
-      "[SOLICITORG]",
-      "[SOLICITORH]",
-      "[SOLICITORI]",
-      "[SOLICITORJ]"
-    ],
-    "CRUD": "CRU"
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[SOLICITORA]",
+          "[SOLICITORB]",
+          "[SOLICITORC]",
+          "[SOLICITORD]",
+          "[SOLICITORE]",
+          "[SOLICITORF]",
+          "[SOLICITORG]",
+          "[SOLICITORH]",
+          "[SOLICITORI]",
+          "[SOLICITORJ]"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
   }
 ]

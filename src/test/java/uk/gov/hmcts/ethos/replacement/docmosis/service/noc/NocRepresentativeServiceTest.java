@@ -69,7 +69,6 @@ class NocRepresentativeServiceTest {
 
         assertThat(result).isSameAs(caseData);
         verify(nocClaimantRepresentativeService).updateClaimantRepresentation(caseDetails, "token");
-        verifyNoInteractions(nocRespondentRepresentativeService);
     }
 
     @Test

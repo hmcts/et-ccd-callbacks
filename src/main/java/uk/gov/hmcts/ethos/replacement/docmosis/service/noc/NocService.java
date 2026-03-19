@@ -30,6 +30,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXC
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_INVALID_GRANT_ACCESS_PARAMETER;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_UNABLE_TO_FIND_ORGANISATION_BY_USER_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_UNABLE_TO_GET_ACCOUNT_ID_BY_EMAIL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_UNABLE_TO_GET_ACCOUNT_ID_BY_EMAIL_WITH_IO_EXCEPTION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_USER_AND_SELECTED_ORGANISATIONS_NOT_MATCH;
 
 @RequiredArgsConstructor
@@ -121,7 +122,7 @@ public class NocService {
                 throw new GenericServiceException(exceptionMessage);
             }
             grantCaseAccess(userResponse.getUserIdentifier(), submissionReference, role);
-        } catch (IOException | GenericServiceException exception) {
+        } catch (GenericServiceException exception) {
             String exceptionMessage = String.format(EXCEPTION_FAILED_TO_ASSIGN_ROLE, role, submissionReference,
                     exception.getMessage());
             throw new GenericServiceException(exceptionMessage, new Exception(exception),
@@ -170,15 +171,20 @@ public class NocService {
      * @param email the email address of the user to be looked up
      * @param submissionReference the submission reference used to provide context in error messages
      * @return the {@link AccountIdByEmailResponse} containing the user's account identifier
-     * @throws IOException if an I/O error occurs while calling the Organisation service
      * @throws GenericServiceException if the user cannot be found or the response is invalid
      */
     public AccountIdByEmailResponse findUserByEmail(String accessToken,
                                                     String email,
-                                                    String submissionReference)
-            throws IOException, GenericServiceException {
-        ResponseEntity<AccountIdByEmailResponse> userResponseEntity =
-                organisationClient.getAccountIdByEmail(accessToken, authTokenGenerator.generate(), email);
+                                                    String submissionReference)  throws GenericServiceException {
+        ResponseEntity<AccountIdByEmailResponse> userResponseEntity;
+        try {
+            userResponseEntity =
+                    organisationClient.getAccountIdByEmail(accessToken, authTokenGenerator.generate(), email);
+        } catch (RuntimeException re) {
+            String exceptionMessage = String.format(EXCEPTION_UNABLE_TO_GET_ACCOUNT_ID_BY_EMAIL_WITH_IO_EXCEPTION,
+                    submissionReference, re);
+            throw new GenericServiceException(exceptionMessage);
+        }
         if (ObjectUtils.isEmpty(userResponseEntity)
                 || ObjectUtils.isEmpty(userResponseEntity.getBody())
                 || StringUtils.isBlank(userResponseEntity.getBody().getUserIdentifier())) {

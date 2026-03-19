@@ -51,6 +51,7 @@ import static org.apache.commons.lang3.ObjectUtils.getIfNull;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.CASE_DETAILS_OR_CASE_DATA_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_INVALID_CASE_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_INVALID_INPUTS;
@@ -381,8 +382,11 @@ public class NocRespondentRepresentativeService {
     public void revokeRespondentRepresentativesWithSameOrganisationAsClaimant(CaseDetails caseDetails) {
         if (ObjectUtils.isEmpty(caseDetails)
                 || StringUtils.isEmpty(caseDetails.getCaseId())
-                || ObjectUtils.isEmpty(caseDetails.getCaseData())
-                || ObjectUtils.isEmpty(caseDetails.getCaseData().getRepresentativeClaimantType())
+                || ObjectUtils.isEmpty(caseDetails.getCaseData())) {
+            log.error(CASE_DETAILS_OR_CASE_DATA_NOT_FOUND);
+            return;
+        }
+        if (ObjectUtils.isEmpty(caseDetails.getCaseData().getRepresentativeClaimantType())
                 || CollectionUtils.isEmpty(caseDetails.getCaseData().getRepCollection())) {
             return;
         }

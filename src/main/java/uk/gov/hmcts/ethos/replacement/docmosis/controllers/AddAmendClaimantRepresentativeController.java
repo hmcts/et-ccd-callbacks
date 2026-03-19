@@ -63,7 +63,7 @@ public class AddAmendClaimantRepresentativeController {
     public ResponseEntity<CCDCallbackResponse> amendClaimantRepresentativeMidEvent(
             @RequestBody CCDRequest ccdRequest) {
         CaseDataUtils.validateCCDRequest(ccdRequest);
-        log.info("CHECKING RESPONDENT REPRESENTATIVE ORGANISATION ---> " + LOG_MESSAGE + "{}",
+        log.info("CHECKING CLAIMANT REPRESENTATIVE ORGANISATION ---> " + LOG_MESSAGE + "{}",
                 ccdRequest.getCaseDetails().getCaseId());
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         NocUtils.clearNocWarningIfPresent(caseData);

@@ -8,6 +8,7 @@ import org.apache.pdfbox.cos.COSName;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.PDResources;
+import org.apache.pdfbox.pdmodel.font.PDType0Font;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
 import org.apache.pdfbox.pdmodel.interactive.form.PDField;
@@ -82,20 +83,45 @@ public class PdfService {
                 Objects.requireNonNull(stream))) {
                 Set<Map.Entry<String, Optional<String>>> pdfEntriesMap =
                         buildPdfEntriesMap(caseData, pdfType, clientType, event);
+
                 PDDocumentCatalog pdDocumentCatalog = pdfDocument.getDocumentCatalog();
                 PDAcroForm pdfForm = pdDocumentCatalog.getAcroForm();
-                PDResources defaultResources = pdfForm.getDefaultResources();
-                defaultResources.put(COSName.getPDFName(TIMES_NEW_ROMAN_PDFBOX_CHARACTER_CODE),
-                        PDType1Font.TIMES_ROMAN);
-                defaultResources.put(COSName.getPDFName(HELVETICA_PDFBOX_CHARACTER_CODE_1),
-                        PDType1Font.HELVETICA);
-                defaultResources.put(COSName.getPDFName(HELVETICA_PDFBOX_CHARACTER_CODE_2),
-                        PDType1Font.HELVETICA);
-                applyPdfEntries(pdfForm, pdfEntriesMap, caseData);
-                ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                pdfForm.setNeedAppearances(true);
-                pdfDocument.save(byteArrayOutputStream);
-                return byteArrayOutputStream.toByteArray();
+                if (pdfForm != null) {
+                    PDResources defaultResources = pdfForm.getDefaultResources();
+                    // Ensure default resources exist before adding font mapping to it
+                    if (defaultResources == null) {
+                        defaultResources = new PDResources();
+                        pdfForm.setDefaultResources(defaultResources);
+                    }
+
+                    //load Noto Sans resource
+                    InputStream fontStream = getClass()
+                            .getResourceAsStream("/fonts/NotoSans-Regular.ttf");
+                    PDType0Font notoFont = PDType0Font.load(pdfDocument, fontStream, true);
+
+                    COSName notoFontName = COSName.getPDFName("F_NotoSans");
+                    defaultResources.put(notoFontName, notoFont);
+
+                    defaultResources.put(COSName.getPDFName(TIMES_NEW_ROMAN_PDFBOX_CHARACTER_CODE), notoFont);
+                    defaultResources.put(COSName.getPDFName(HELVETICA_PDFBOX_CHARACTER_CODE_1), notoFont);
+                    defaultResources.put(COSName.getPDFName(HELVETICA_PDFBOX_CHARACTER_CODE_2), notoFont);
+
+                    // Force PDFBox to not reference Helvetica via DA(default appearance) strings
+                    // and rather use "/F_NotoSans 0 Tf 0 g" which is mapped to Noto Sans font. This is because some
+                    // PDF viewers (e.g. Adobe) will not render the text if Helvetica is referenced
+                    // but not embedded in the PDF.
+                    pdfForm.setDefaultAppearance("/F_NotoSans 0 Tf 0 g");
+
+                    applyPdfEntries(pdfForm, pdfEntriesMap, caseData);
+                    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+                    pdfForm.setNeedAppearances(true);
+                    pdfForm.refreshAppearances();
+                    pdfDocument.save(byteArrayOutputStream);
+                    return byteArrayOutputStream.toByteArray();
+                } else {
+                    throw new PdfServiceException("Failed to convert to PDF",
+                            new Exception("PDF template does not contain a form"));
+                }
             } finally {
                 safeClose(stream, caseData);
             }

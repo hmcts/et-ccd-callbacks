@@ -1,8 +1,11 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.service;
+package uk.gov.hmcts.ethos.replacement.docmosis.service.noc;
 
+import lombok.SneakyThrows;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -15,6 +18,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -29,15 +33,24 @@ class NocRepresentativeServiceTest {
     @Mock
     private NocClaimantRepresentativeService nocClaimantRepresentativeService;
 
+    @InjectMocks
     private NocRepresentativeService nocRepresentativeService;
+
+    AutoCloseable closeable;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this);
+        closeable = MockitoAnnotations.openMocks(this);
         nocRepresentativeService = new NocRepresentativeService(
                 nocRespondentRepresentativeService,
                 nocClaimantRepresentativeService
         );
+    }
+
+    @AfterEach
+    @SneakyThrows
+    void tearDown() {
+        closeable.close();
     }
 
     @Test
@@ -67,11 +80,12 @@ class NocRepresentativeServiceTest {
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
 
-        when(nocRespondentRepresentativeService.updateRespondentRepresentation(any()))
+        when(nocRespondentRepresentativeService.updateRespondentRepresentation(any(CaseDetails.class)))
                 .thenReturn(caseData);
-        when(nocRespondentRepresentativeService.prepopulateOrgAddress(any(), any()))
+        when(nocRespondentRepresentativeService.prepopulateOrgAddress(any(CaseData.class), anyString()))
                 .thenReturn(caseData);
-
+        when(nocRespondentRepresentativeService.removeConflictingClaimantRepresentation(any(CaseDetails.class)))
+                .thenReturn(caseData);
         CaseData result = nocRepresentativeService.updateRepresentation(caseDetails, "token");
 
         assertThat(result).isSameAs(caseData);

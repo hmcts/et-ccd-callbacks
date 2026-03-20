@@ -1,4 +1,4 @@
-package uk.gov.hmcts.ethos.replacement.docmosis.service;
+package uk.gov.hmcts.ethos.replacement.docmosis.service.noc;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -8,6 +8,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
+
 import java.io.IOException;
 import java.util.Objects;
 
@@ -15,6 +16,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 @Slf4j
 public class NocRepresentativeService {
+
     private final NocRespondentRepresentativeService nocRespondentRepresentativeService;
     private final NocClaimantRepresentativeService nocClaimantRepresentativeService;
 
@@ -28,6 +30,8 @@ public class NocRepresentativeService {
         } else {
             caseData = nocRespondentRepresentativeService.updateRespondentRepresentation(caseDetails);
             caseData = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, userToken);
+            caseDetails.setCaseData(caseData);
+            caseData = nocRespondentRepresentativeService.removeConflictingClaimantRepresentation(caseDetails);
         }
         return caseData;
     }

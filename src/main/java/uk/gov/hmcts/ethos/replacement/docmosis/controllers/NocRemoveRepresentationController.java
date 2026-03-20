@@ -15,10 +15,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRemoveRepresentationService;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @Slf4j
@@ -40,7 +42,7 @@ public class NocRemoveRepresentationController {
     private final NocRemoveRepresentationService nocRemoveRepresentationService;
 
     @PostMapping(value = "/claimant/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "nocRemoveRepresentation about to submit page")
+    @Operation(summary = "nocRemoveRep claimant about to submit page")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -59,7 +61,7 @@ public class NocRemoveRepresentationController {
     }
 
     @PostMapping(value = "/respondent/aboutToStart", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "nocRequest about to start page")
+    @Operation(summary = "nocRemoveRep respondent about to start page")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -72,12 +74,13 @@ public class NocRemoveRepresentationController {
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
 
-        CaseDetails caseDetails = ccdRequest.getCaseDetails();
-        return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseData.setNocRemoveRepIsMoreThanOneFlag(YES); // TODO
+        return getCallbackRespEntityNoErrors(caseData);
     }
 
     @PostMapping(value = "/respondent/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "nocRequest about to submit page")
+    @Operation(summary = "nocRemoveRep respondent about to submit page")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -90,12 +93,13 @@ public class NocRemoveRepresentationController {
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
 
-        CaseDetails caseDetails = ccdRequest.getCaseDetails();
-        return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        // TODO
+        return getCallbackRespEntityNoErrors(caseData);
     }
 
     @PostMapping(value = "/submitted", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "nocRemoveRepresentation submitted page")
+    @Operation(summary = "nocRemoveRep submitted page")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",
             content = {
@@ -108,10 +112,13 @@ public class NocRemoveRepresentationController {
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
 
+        CaseDetails caseDetails = ccdRequest.getCaseDetails();
+        CaseData caseData = caseDetails.getCaseData();
+        caseData.setNocRemoveRepIsMoreThanOneFlag(null);
         return ResponseEntity.ok(CCDCallbackResponse.builder()
-            .data(ccdRequest.getCaseDetails().getCaseData())
+            .data(caseData)
             .confirmation_header(GREEN_BANNER_HEADING
-                + String.format(GREEN_BANNER_TEXT_TEMPLATE, ccdRequest.getCaseDetails().getCaseId()))
+                + String.format(GREEN_BANNER_TEXT_TEMPLATE, caseDetails.getCaseId()))
             .confirmation_body(CONFIRM_HEADING + CONFIRM_TEXT_1 + CONFIRM_TEXT_2 + CONFIRM_TEXT_3)
             .build());
     }

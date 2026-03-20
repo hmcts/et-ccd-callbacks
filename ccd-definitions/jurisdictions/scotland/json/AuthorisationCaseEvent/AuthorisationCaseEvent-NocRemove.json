@@ -1,13 +1,13 @@
 [
   {
     "CaseTypeId": "ET_Scotland",
-    "CaseEventID": "nocRemoveRepresentationClaimant",
+    "CaseEventID": "nocRemoveRepClaimant",
     "UserRole": "[CLAIMANTSOLICITOR]",
     "CRUD": "CRU"
   },
   {
     "CaseTypeId": "ET_Scotland",
-    "CaseEventID": "nocRemoveRepresentationRespondent",
+    "CaseEventID": "nocRemoveRepRespondent",
     "AccessControl": [
       {
         "UserRoles": [

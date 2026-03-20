@@ -1,0 +1,71 @@
+[
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "nocRemoveRepLandingPageLabel",
+    "Label": "This will remove you and your organisation from the case. You will no longer represent the client.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "nocRemoveRepIsMoreThanOneFlag",
+    "Label": " ",
+    "FieldType": "YesOrNo",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "nocRemoveRepOptionLabel",
+    "Label": "There is more than one representative from your organisation on this case.<br>Choose whether you want to remove only yourself or the whole organisation.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "nocRemoveRepOption",
+    "Label": " ",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "frl_NocRemove_ChooseYourselfOrWhole",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "nocRemoveRepClaimantSignLabel",
+    "Label": "You should tick to 'sign' when<br>Your organisation will no longer be representing claimant.<br>You have served notice of this change to your former client.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "nocRemoveRepRespondentSignLabel",
+    "Label": "You should tick to 'sign' when<br>Your organisation will no longer be representing respondent.<br>You have served notice of this change to your former client.",
+    "FieldType": "Label",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "nocRemoveRepConfirmNoLonger",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "msl_NocRemove_NoLonger",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "nocRemoveRepConfirmNotice",
+    "Label": " ",
+    "FieldType": "MultiSelectList",
+    "FieldTypeParameter": "msl_NocRemove_Notice",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]
+
+

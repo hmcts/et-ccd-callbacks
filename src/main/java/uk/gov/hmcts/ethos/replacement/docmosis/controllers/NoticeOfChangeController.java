@@ -72,7 +72,7 @@ public class NoticeOfChangeController {
             }
             String caseReference = caseData.getEthosCaseReference();
             callbackResponse.setConfirmation_header(
-                    "# You're now representing a client on case " + caseReference
+                "# You're now representing a client on case " + caseReference
             );
         }
 

@@ -356,7 +356,7 @@ class NocServiceTest {
     @SneakyThrows
     void theFindUserByEmail() {
         when(authTokenGenerator.generate()).thenReturn(AUTH_TOKEN);
-
+        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
         // when organisation client returns empty response should throw exception
         when(organisationClient.getAccountIdByEmail(ADMIN_USER_TOKEN, AUTH_TOKEN, REPRESENTATIVE_EMAIL))
                 .thenReturn(null);
@@ -365,7 +365,6 @@ class NocServiceTest {
         verify(organisationClient, times(NumberUtils.INTEGER_ONE))
                 .getAccountIdByEmail(ADMIN_USER_TOKEN, AUTH_TOKEN, REPRESENTATIVE_EMAIL);
         assertThat(gse.getMessage()).contains(EXPECTED_EXCEPTION_ACCOUNT_NOT_FOUND_BY_EMAIL);
-
         // when organisation client returns no-body response should throw exception
         ResponseEntity<AccountIdByEmailResponse> userResponse = new ResponseEntity<>(HttpStatus.OK);
         when(organisationClient.getAccountIdByEmail(ADMIN_USER_TOKEN, AUTH_TOKEN, REPRESENTATIVE_EMAIL))
@@ -397,6 +396,13 @@ class NocServiceTest {
         verify(organisationClient, times(LoggerTestUtils.INTEGER_FOUR))
                 .getAccountIdByEmail(ADMIN_USER_TOKEN, AUTH_TOKEN, REPRESENTATIVE_EMAIL);
         assertThat(actualAccountIdByEmailResponse).isEqualTo(userResponse.getBody());
+        when(organisationClient.getAccountIdByEmail(ADMIN_USER_TOKEN, AUTH_TOKEN, REPRESENTATIVE_EMAIL))
+                .thenThrow(new RuntimeException());
+        gse = assertThrows(GenericServiceException.class,
+                () -> nocService.findUserByEmail(ADMIN_USER_TOKEN, REPRESENTATIVE_EMAIL, SUBMISSION_REFERENCE));
+        verify(organisationClient, times(LoggerTestUtils.INTEGER_FIVE))
+                .getAccountIdByEmail(ADMIN_USER_TOKEN, AUTH_TOKEN, REPRESENTATIVE_EMAIL);
+        assertThat(gse.getMessage()).contains(EXPECTED_EXCEPTION_ACCOUNT_NOT_FOUND_BY_EMAIL);
     }
 
     @Test
@@ -418,7 +424,7 @@ class NocServiceTest {
                 .retrieveOrganisationDetailsByUserId(ADMIN_USER_TOKEN, AUTH_TOKEN, REPRESENTATIVE_ID);
         assertThat(gse.getMessage()).contains(EXPECTED_EXCEPTION_ORGANISATION_DETAILS_NOT_FOUND_BY_USER_ID);
 
-        // when organisation client returns empty body response for organisation detils should throw exception
+        // when organisation client returns empty body response for organisation details should throw exception
         ResponseEntity<OrganisationsResponse> organisationsResponseEntity = new ResponseEntity<>(HttpStatus.OK);
         when(organisationClient.retrieveOrganisationDetailsByUserId(ADMIN_USER_TOKEN, AUTH_TOKEN, REPRESENTATIVE_ID))
                 .thenReturn(organisationsResponseEntity);

@@ -295,20 +295,16 @@ public class NocRespondentRepresentativeService {
         if (StringUtils.isBlank(email)) {
             return false;
         }
-        ResponseEntity<AccountIdByEmailResponse> response =
-                organisationClient.getAccountIdByEmail(
-                        adminUserService.getAdminUserToken(),
-                        authTokenGenerator.generate(),
-                        email
-                );
+        ResponseEntity<AccountIdByEmailResponse> response = organisationClient.getAccountIdByEmail(
+                adminUserService.getAdminUserToken(),
+                authTokenGenerator.generate(),
+                email
+        );
         if (response == null || !response.getStatusCode().is2xxSuccessful()) {
             return false;
         }
         AccountIdByEmailResponse body = response.getBody();
-        if (body == null) {
-            return false;
-        }
-        return StringUtils.isNotBlank(body.getUserIdentifier());
+        return body != null && StringUtils.isNotBlank(body.getUserIdentifier());
     }
 
     /**

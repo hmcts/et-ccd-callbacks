@@ -11,7 +11,6 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
-import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
@@ -36,7 +35,6 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -45,7 +43,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.test.utils.NocClaimantRepresentativeServiceTestUtils.DUMMY_CASE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.test.utils.NocClaimantRepresentativeServiceTestUtils.REPRESENTATIVE_EMAIL_1;
 import static uk.gov.hmcts.ethos.replacement.docmosis.test.utils.NocClaimantRepresentativeServiceTestUtils.createCaseData;
 import static uk.gov.hmcts.ethos.replacement.docmosis.test.utils.NocClaimantRepresentativeServiceTestUtils.createCaseDetailsWithCaseData;
@@ -81,8 +78,6 @@ class NocClaimantRepresentativeServiceTest {
     @Mock
     private CcdCaseAssignment ccdCaseAssignment;
     @Mock
-    private CcdClient ccdClient;
-    @Mock
     private NocService nocService;
     @Mock
     private OrganisationService organisationService;
@@ -106,8 +101,6 @@ class NocClaimantRepresentativeServiceTest {
                 adminUserService,
                 nocCcdService,
                 nocNotificationService,
-                ccdCaseAssignment,
-                ccdClient,
                 nocService,
                 organisationService
         );
@@ -168,7 +161,6 @@ class NocClaimantRepresentativeServiceTest {
     @Test
     void updateRepresentativesAccess() throws IOException {
         CCDRequest ccdRequest = getCCDRequest();
-
         when(adminUserService.getAdminUserToken()).thenReturn("AUTH_TOKEN");
         when(nocCcdService.startEventForUpdateRepresentation(any(), any(), any(), any())).thenReturn(ccdRequest);
         when(nocCcdService.retrieveCaseUserAssignments(any(), any())).thenReturn(
@@ -178,17 +170,9 @@ class NocClaimantRepresentativeServiceTest {
                 .build());
         when(NocUtils.buildApprovedChangeOrganisationRequest(any(), any(), any()))
                 .thenReturn(createChangeOrganisationRequest());
-
         nocClaimantRepresentativeService.updateClaimantRepAccess(getCallBackCallbackRequest());
-
-        verify(nocCcdService, times(1))
-                .startEventForUpdateRepresentation(any(), any(), any(), any());
-
         verify(nocNotificationService, times(1))
                 .sendNotificationOfChangeEmails(any(), any(), any());
-
-        verify(ccdClient, times(1))
-                .submitUpdateRepEvent(any(), any(), any(), any(), any(), any());
     }
 
     @Test
@@ -210,19 +194,11 @@ class NocClaimantRepresentativeServiceTest {
                 .retrieveOrganisationDetailsByUserId(DUMMY_ADMIN_USER_TOKEN, S2S_TOKEN, DUMMY_ORGANISATION_USER_ID);
         // Act
         nocClaimantRepresentativeService.updateClaimantRepAccess(callbackRequest);
-
         // Assert
         verify(nocNotificationService, times(NumberUtils.INTEGER_ONE)).sendNotificationOfChangeEmails(
                 any(), any(), any());
         verify(nocService, times(NumberUtils.INTEGER_ONE)).removeOrganisationRepresentativeAccess(
                 anyString(), any(ChangeOrganisationRequest.class));
-        verify(ccdClient, times(NumberUtils.INTEGER_ONE)).submitUpdateRepEvent(
-                eq(DUMMY_ADMIN_USER_TOKEN),
-                anyMap(),
-                anyString(),
-                anyString(),
-                eq(ccdRequest),
-                eq(DUMMY_CASE_ID));
     }
 
     @Test

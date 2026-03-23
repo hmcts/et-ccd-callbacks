@@ -8,6 +8,7 @@ import org.webjars.NotFoundException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
+import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
@@ -252,27 +253,39 @@ public final class ClaimantRepresentativeUtils {
      * @param caseData the case data containing claimant representative information to update
      */
     public static void addAmendClaimantRepresentative(CaseData caseData) {
-        if (NO.equals(caseData.getClaimantRepresentedQuestion())
-                && caseData.getRepresentativeClaimantType() != null) {
+        if (NO.equals(caseData.getClaimantRepresentedQuestion()) || caseData.getRepresentativeClaimantType() == null) {
+            if (caseData.getRepresentativeClaimantType() != null) {
+                caseData.setClaimantRepresentativeRemoved(YES);
+            }
             caseData.setRepresentativeClaimantType(null);
-            caseData.setClaimantRepresentativeRemoved(YES);
+            caseData.setClaimantRepresentativeOrganisationPolicy(OrganisationPolicy.builder().organisation(null)
+                    .orgPolicyCaseAssignedRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()).build());
+
             return;
         }
         caseData.setClaimantRepresentativeRemoved(NO);
-        setRepresentativeId(caseData);
+        setRepresentativeId(caseData.getRepresentativeClaimantType());
+        setClaimantRepresentativeOrganisationPolicy(caseData);
     }
 
-    private static void setRepresentativeId(CaseData caseData) {
-        RepresentedTypeC claimantRep = caseData.getRepresentativeClaimantType();
-        if (ObjectUtils.isEmpty(claimantRep)) {
-            return;
+    private static void setRepresentativeId(RepresentedTypeC claimantRepresentative) {
+        if (StringUtils.isBlank(claimantRepresentative.getRepresentativeId())) {
+            claimantRepresentative.setRepresentativeId(UUID.randomUUID().toString());
         }
-        if (StringUtils.isBlank(claimantRep.getRepresentativeId())) {
-            claimantRep.setRepresentativeId(UUID.randomUUID().toString());
+        if (ObjectUtils.isNotEmpty(claimantRepresentative.getMyHmctsOrganisation())
+                && StringUtils.isNotBlank(claimantRepresentative.getMyHmctsOrganisation().getOrganisationID())) {
+            claimantRepresentative.setOrganisationId(
+                    claimantRepresentative.getMyHmctsOrganisation().getOrganisationID());
         }
-        if (StringUtils.isBlank(claimantRep.getOrganisationId())) {
-            claimantRep.setOrganisationId(UUID.randomUUID().toString());
+        if (StringUtils.isBlank(claimantRepresentative.getOrganisationId())) {
+            claimantRepresentative.setOrganisationId(UUID.randomUUID().toString());
         }
+    }
+
+    private static void setClaimantRepresentativeOrganisationPolicy(CaseData caseData) {
+        caseData.setClaimantRepresentativeOrganisationPolicy(OrganisationPolicy.builder().organisation(Organisation
+                .builder().organisationID(caseData.getRepresentativeClaimantType().getOrganisationId()).build())
+                .orgPolicyCaseAssignedRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()).build());
     }
 
 }

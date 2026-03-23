@@ -51,6 +51,8 @@ public final class NOCConstants {
             "There are missing parameters; submission reference: %s, role: %s.";
     public static final String EXCEPTION_UNABLE_TO_GET_ACCOUNT_ID_BY_EMAIL =
             "Unable to get account id by email for case %s.";
+    public static final String EXCEPTION_UNABLE_TO_GET_ACCOUNT_ID_BY_EMAIL_WITH_IO_EXCEPTION =
+            "Unable to get account id by email for case %s. Exception message: %s";
     public static final String EXCEPTION_UNABLE_TO_FIND_ORGANISATION_BY_USER_ID =
             "Unable to find organisation by user id for case %s.";
     public static final String EXCEPTION_USER_AND_SELECTED_ORGANISATIONS_NOT_MATCH =
@@ -148,13 +150,6 @@ public final class NOCConstants {
             "Failed to send email to claimant for removal of representative, case id: {}, error: {}";
     public static final String WARNING_FAILED_TO_RETRIEVE_CASE_ASSIGNMENTS =
             "Failed to retrieve case assignments for case id: {}, error: {}";
-
-    public static final String WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_TO_REMOVED_REPRESENTATIVE =
-        "Failed to send email to removed legal representative, case id: {}, error: {}";
-    public static final String WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_TO_UNREPRESENTED_PARTY =
-        "Failed to send email to unrepresented party, case id: {}, error: {}";
-    public static final String WARNING_FAILED_TO_GET_CASE_ASSIGNMENTS_BY_ID =
-        "Failed to get case assignments by id for case id: {}";
 
     public static final int MAX_NOC_ANSWERS = 10;
 

@@ -63,7 +63,7 @@ public class AddAmendClaimantRepresentativeController {
     public ResponseEntity<CCDCallbackResponse> amendClaimantRepresentativeMidEvent(
             @RequestBody CCDRequest ccdRequest) {
         CaseDataUtils.validateCCDRequest(ccdRequest);
-        log.info("CHECKING RESPONDENT REPRESENTATIVE ORGANISATION ---> " + LOG_MESSAGE + "{}",
+        log.info("CHECKING CLAIMANT REPRESENTATIVE ORGANISATION ---> " + LOG_MESSAGE + "{}",
                 ccdRequest.getCaseDetails().getCaseId());
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         NocUtils.clearNocWarningIfPresent(caseData);
@@ -107,7 +107,6 @@ public class AddAmendClaimantRepresentativeController {
         ClaimantRepresentativeUtils.addAmendClaimantRepresentative(caseData);
         nocRespondentRepresentativeService.revokeRespondentRepresentativesWithSameOrganisationAsClaimant(
                 ccdRequest.getCaseDetails());
-
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -125,7 +124,6 @@ public class AddAmendClaimantRepresentativeController {
                 callbackRequest.getCaseDetails().getCaseId());
         try {
             nocClaimantRepresentativeService.updateClaimantRepAccess(callbackRequest);
-
         } catch (IOException e) {
             throw new CcdInputOutputException("Failed to update claimant representatives access", e);
         }

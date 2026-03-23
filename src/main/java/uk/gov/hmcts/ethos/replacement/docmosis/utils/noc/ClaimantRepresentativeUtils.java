@@ -8,12 +8,14 @@ import org.webjars.NotFoundException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
+import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.ClaimantUtils;
 
 import java.util.List;
+import java.util.UUID;
 
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
@@ -178,4 +180,112 @@ public final class ClaimantRepresentativeUtils {
         caseData.setClaimantRepresentativeOrganisationPolicy(OrganisationPolicy.builder()
                 .orgPolicyCaseAssignedRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()).build());
     }
+
+    /**
+     * Checks whether a claimant representative is present.
+     *
+     * @param claimantRepresentative the claimant's representative object to evaluate
+     * @return {@code true} if the representative is not empty; {@code false} otherwise
+     */
+    public static boolean hasRepresentative(RepresentedTypeC claimantRepresentative) {
+        return ObjectUtils.isNotEmpty(claimantRepresentative);
+    }
+
+    /**
+     * Determines whether the claimant representative has an HMCTS organisation ID.
+     *
+     * <p>An HMCTS organisation ID is considered present if the representative has a
+     * {@code myHmctsOrganisation} object and its {@code organisationID} field is not blank.</p>
+     *
+     * <p><strong>Assumption:</strong> The provided {@code claimantRepresentative} is not {@code null}.</p>
+     *
+     * @param claimantRepresentative the claimant representative whose HMCTS organisation details are evaluated
+     * @return {@code true} if an HMCTS organisation ID is present; {@code false} otherwise
+     */
+    public static boolean hasHmctsOrganisationId(RepresentedTypeC claimantRepresentative) {
+        return ObjectUtils.isNotEmpty(claimantRepresentative.getMyHmctsOrganisation())
+                && StringUtils.isNotBlank(claimantRepresentative.getMyHmctsOrganisation().getOrganisationID());
+    }
+
+    /**
+     * Returns the HMCTS organisation ID for the given claimant representative.
+     * <p>
+     * If the representative has an associated HMCTS organisation ID, the ID is returned.
+     * Otherwise, an empty string is returned.
+     *
+     * @param claimantRepresentative the claimant representative whose HMCTS organisation ID is to be retrieved
+     * @return the HMCTS organisation ID if present; otherwise {@link StringUtils#EMPTY}
+     */
+    public static String getHmctsOrganisationIdOrEmpty(RepresentedTypeC claimantRepresentative) {
+        return hasHmctsOrganisationId(claimantRepresentative)
+                ? claimantRepresentative.getMyHmctsOrganisation().getOrganisationID() : StringUtils.EMPTY;
+    }
+
+    /**
+     * Determines whether the claimant representative has an email address.
+     *
+     * <p>An email address is considered present if the {@code representativeEmailAddress}
+     * field is not blank.</p>
+     *
+     * <p><strong>Assumption:</strong> The provided {@code claimantRepresentative} is not {@code null}.</p>
+     *
+     * @param claimantRepresentative the claimant representative whose email address is evaluated
+     * @return {@code true} if the representative email address is not blank; {@code false} otherwise
+     */
+    public static boolean hasRepresentativeEmail(RepresentedTypeC claimantRepresentative) {
+        return StringUtils.isNotBlank(claimantRepresentative.getRepresentativeEmailAddress());
+    }
+
+    /**
+     * Adds, amends, or removes the claimant representative details on the given case.
+     *
+     * <p>If the claimant is no longer represented ({@code claimantRepresentedQuestion = NO})
+     * and a representative currently exists, the representative information is removed and
+     * the {@code claimantRepresentativeRemoved} flag is set to {@code YES}.</p>
+     *
+     * <p>Otherwise, the method ensures the representative details remain on the case and
+     * marks the representative as not removed. It also ensures that the representative has
+     * both a {@code representativeId} and an {@code organisationId}. If either identifier
+     * is missing, a new UUID is generated and assigned.</p>
+     *
+     * <p><strong>Assumption:</strong> The provided {@code caseData} is not {@code null}.</p>
+     *
+     * @param caseData the case data containing claimant representative information to update
+     */
+    public static void addAmendClaimantRepresentative(CaseData caseData) {
+        if (NO.equals(caseData.getClaimantRepresentedQuestion()) || caseData.getRepresentativeClaimantType() == null) {
+            if (caseData.getRepresentativeClaimantType() != null) {
+                caseData.setClaimantRepresentativeRemoved(YES);
+            }
+            caseData.setRepresentativeClaimantType(null);
+            caseData.setClaimantRepresentativeOrganisationPolicy(OrganisationPolicy.builder().organisation(null)
+                    .orgPolicyCaseAssignedRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()).build());
+
+            return;
+        }
+        caseData.setClaimantRepresentativeRemoved(NO);
+        setRepresentativeId(caseData.getRepresentativeClaimantType());
+        setClaimantRepresentativeOrganisationPolicy(caseData);
+    }
+
+    private static void setRepresentativeId(RepresentedTypeC claimantRepresentative) {
+        if (StringUtils.isBlank(claimantRepresentative.getRepresentativeId())) {
+            claimantRepresentative.setRepresentativeId(UUID.randomUUID().toString());
+        }
+        if (ObjectUtils.isNotEmpty(claimantRepresentative.getMyHmctsOrganisation())
+                && StringUtils.isNotBlank(claimantRepresentative.getMyHmctsOrganisation().getOrganisationID())) {
+            claimantRepresentative.setOrganisationId(
+                    claimantRepresentative.getMyHmctsOrganisation().getOrganisationID());
+        }
+        if (StringUtils.isBlank(claimantRepresentative.getOrganisationId())) {
+            claimantRepresentative.setOrganisationId(UUID.randomUUID().toString());
+        }
+    }
+
+    private static void setClaimantRepresentativeOrganisationPolicy(CaseData caseData) {
+        caseData.setClaimantRepresentativeOrganisationPolicy(OrganisationPolicy.builder().organisation(Organisation
+                .builder().organisationID(caseData.getRepresentativeClaimantType().getOrganisationId()).build())
+                .orgPolicyCaseAssignedRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()).build());
+    }
+
 }

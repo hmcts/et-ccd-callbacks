@@ -33,6 +33,11 @@ dependencies:
     version: ~1.0.1
     repository: 'oci://hmctsprod.azurecr.io/helm'
     condition: et-syr.enabled
+    ## et-sya-api to be removed once repo merge has been completed
+  - name: et-sya-api
+    version: ~0.0.29
+    repository: 'oci://hmctsprod.azurecr.io/helm'
+    condition: et-sya-api.enabled
   - name: aac-manage-case-assignment
     version: ~0.2.11
     repository: 'oci://hmctsprod.azurecr.io/helm'

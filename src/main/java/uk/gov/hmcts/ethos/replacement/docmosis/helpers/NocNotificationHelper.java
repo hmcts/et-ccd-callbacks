@@ -57,7 +57,7 @@ public final class NocNotificationHelper {
 
     public static RespondentSumType getRespondent(ChangeOrganisationRequest changeRequest, CaseData caseData,
                                                   NocRespondentHelper nocRespondentHelper) {
-        if (changeRequest == null || changeRequest.getCaseRoleId() == null
+        if (changeRequest == null || changeRequest.getCaseRoleId() == null 
                 || caseData == null || nocRespondentHelper == null) {
             return null;
         }

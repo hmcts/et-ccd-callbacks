@@ -80,6 +80,8 @@ public final class NOCConstants {
                     + "case: {}";
     public static final String ERROR_REPRESENTATIVE_ORGANISATION_AND_EMAIL_NOT_MATCHED =
             "Failed to validate representative organisation and email. %s";
+    public static final String ERROR_UNABLE_TO_MODIFY_REPRESENTATIVE_ACCESS =
+            "Unable to revoke/assign representative access. CaseId: {}, Exception: {}";
 
     public static final String WARNING_INVALID_CASE_DETAILS_TO_NOTIFY_CLAIMANT_FOR_RESPONDENT_REP_UPDATE =
             "Invalid case details. Unable to notify claimant for respondent representative update. Case id: {}";

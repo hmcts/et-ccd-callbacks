@@ -17,8 +17,11 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Locale.UK;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CCD_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.DATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CIT_UI;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.PARTY_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
 
 @Slf4j
@@ -54,7 +57,7 @@ public final class NocNotificationHelper {
 
     public static RespondentSumType getRespondent(ChangeOrganisationRequest changeRequest, CaseData caseData,
                                                   NocRespondentHelper nocRespondentHelper) {
-        if (changeRequest == null || changeRequest.getCaseRoleId() == null 
+        if (changeRequest == null || changeRequest.getCaseRoleId() == null
                 || caseData == null || nocRespondentHelper == null) {
             return null;
         }
@@ -76,9 +79,9 @@ public final class NocNotificationHelper {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
 
         addCommonValues(caseDetails.getCaseData(), personalisation);
-        personalisation.put("party_name", partyName);
-        personalisation.put("ccdId", caseDetails.getCaseId());
-        personalisation.put("linkToCitUI", linkToCitUI);
+        personalisation.put(PARTY_NAME, partyName);
+        personalisation.put(CCD_ID, caseDetails.getCaseId());
+        personalisation.put(LINK_TO_CIT_UI, linkToCitUI);
 
         return personalisation;
     }

@@ -15,10 +15,9 @@ public final class GenericConstants {
     public static final String ERROR_FAILED_TO_SEND_EMAIL_CLAIMANT = "Failed to send email to claimant, error: {}";
     public static final String ERROR_FAILED_TO_SEND_EMAIL_ORGANISATION_ADMIN =
             "Failed to send email to organisation admin, error: {}";
-    public static final String ERROR_EMAIL_NOT_FOUND = "Email not found. Error message: {}";
     public static final String WARNING_CLAIMANT_EMAIL_NOT_FOUND = "Claimant email not found for case {}";
     public static final String EMPTY_LOWERCASE = "empty";
-    public static final String QUERY_LABELS = "QUERY Labels: {}";
+    public static final String CASE_DETAILS_OR_CASE_DATA_NOT_FOUND = "Case details or case data not found";
 
     private GenericConstants() {
         // Final classes should not have a public or default constructor.

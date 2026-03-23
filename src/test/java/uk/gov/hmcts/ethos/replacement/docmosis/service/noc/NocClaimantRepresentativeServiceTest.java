@@ -11,7 +11,6 @@ import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
-import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
@@ -27,15 +26,16 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.OrganisationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.NocUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Optional;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
@@ -44,7 +44,6 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.test.utils.NocClaimantRepresentativeServiceTestUtils.DUMMY_CASE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.test.utils.NocClaimantRepresentativeServiceTestUtils.REPRESENTATIVE_EMAIL_1;
 import static uk.gov.hmcts.ethos.replacement.docmosis.test.utils.NocClaimantRepresentativeServiceTestUtils.createCaseData;
 import static uk.gov.hmcts.ethos.replacement.docmosis.test.utils.NocClaimantRepresentativeServiceTestUtils.createCaseDetailsWithCaseData;
@@ -61,7 +60,11 @@ class NocClaimantRepresentativeServiceTest {
     private static final String DUMMY_ADMIN_USER_TOKEN = "dummyAdminUserToken";
     private static final String DUMMY_ORGANISATION_USER_ID = "dummyOrganisationUserId";
     private static final String ORGANISATION_ID_NEW = "ORG3_NEW";
+    private static final String REPRESENTATIVE_NAME_1 = "Representative Name 1";
     private static final String S2S_TOKEN = "s2sToken";
+    private static final String EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL =
+            "Representative 'Representative Name 1' could not be found using representative_1@hmcts.org. Case access "
+                    + "will not be defined for this representative.\n";
 
     @Mock
     private AuthTokenGenerator authTokenGenerator;
@@ -76,9 +79,9 @@ class NocClaimantRepresentativeServiceTest {
     @Mock
     private CcdCaseAssignment ccdCaseAssignment;
     @Mock
-    private CcdClient ccdClient;
-    @Mock
     private NocService nocService;
+    @Mock
+    private OrganisationService organisationService;
 
     private CaseData caseData;
     private CaseDetails caseDetails;
@@ -99,9 +102,8 @@ class NocClaimantRepresentativeServiceTest {
                 adminUserService,
                 nocCcdService,
                 nocNotificationService,
-                ccdCaseAssignment,
-                ccdClient,
-                nocService
+                nocService,
+                organisationService
         );
         when(adminUserService.getAdminUserToken()).thenReturn(DUMMY_ADMIN_USER_TOKEN);
         when(authTokenGenerator.generate()).thenReturn(S2S_TOKEN);
@@ -160,7 +162,6 @@ class NocClaimantRepresentativeServiceTest {
     @Test
     void updateRepresentativesAccess() throws IOException {
         CCDRequest ccdRequest = getCCDRequest();
-
         when(adminUserService.getAdminUserToken()).thenReturn("AUTH_TOKEN");
         when(nocCcdService.startEventForUpdateRepresentation(any(), any(), any(), any())).thenReturn(ccdRequest);
         when(nocCcdService.retrieveCaseUserAssignments(any(), any())).thenReturn(
@@ -170,17 +171,9 @@ class NocClaimantRepresentativeServiceTest {
                 .build());
         when(NocUtils.buildApprovedChangeOrganisationRequest(any(), any(), any()))
                 .thenReturn(createChangeOrganisationRequest());
-
         nocClaimantRepresentativeService.updateClaimantRepAccess(getCallBackCallbackRequest());
-
-        verify(nocCcdService, times(1))
-                .startEventForUpdateRepresentation(any(), any(), any(), any());
-
         verify(nocNotificationService, times(1))
                 .sendNotificationOfChangeEmails(any(), any(), any());
-
-        verify(ccdClient, times(1))
-                .submitUpdateRepEvent(any(), any(), any(), any(), any(), any());
     }
 
     @Test
@@ -202,27 +195,19 @@ class NocClaimantRepresentativeServiceTest {
                 .retrieveOrganisationDetailsByUserId(DUMMY_ADMIN_USER_TOKEN, S2S_TOKEN, DUMMY_ORGANISATION_USER_ID);
         // Act
         nocClaimantRepresentativeService.updateClaimantRepAccess(callbackRequest);
-
         // Assert
         verify(nocNotificationService, times(NumberUtils.INTEGER_ONE)).sendNotificationOfChangeEmails(
                 any(), any(), any());
         verify(nocService, times(NumberUtils.INTEGER_ONE)).removeOrganisationRepresentativeAccess(
                 anyString(), any(ChangeOrganisationRequest.class));
-        verify(ccdClient, times(NumberUtils.INTEGER_ONE)).submitUpdateRepEvent(
-                eq(DUMMY_ADMIN_USER_TOKEN),
-                anyMap(),
-                anyString(),
-                anyString(),
-                eq(ccdRequest),
-                eq(DUMMY_CASE_ID));
     }
 
     @Test
     void shouldReturnChangeRequestWhenOrganisationChanged() {
         CaseData after = new CaseData();
         CaseData before = new CaseData();
-        after.setRepresentativeClaimantType(new uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC());
-        before.setRepresentativeClaimantType(new uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC());
+        after.setRepresentativeClaimantType(new RepresentedTypeC());
+        before.setRepresentativeClaimantType(new RepresentedTypeC());
         Organisation newOrg = Organisation.builder().organisationID("NEW").build();
         after.getRepresentativeClaimantType().setMyHmctsOrganisation(newOrg);
         Organisation oldOrg = Organisation.builder().organisationID("OLD").build();
@@ -243,8 +228,8 @@ class NocClaimantRepresentativeServiceTest {
         Organisation org = Organisation.builder().organisationID("SAME").build();
         CaseData after = new CaseData();
         CaseData before = new CaseData();
-        after.setRepresentativeClaimantType(new uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC());
-        before.setRepresentativeClaimantType(new uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC());
+        after.setRepresentativeClaimantType(new RepresentedTypeC());
+        before.setRepresentativeClaimantType(new RepresentedTypeC());
         after.getRepresentativeClaimantType().setMyHmctsOrganisation(org);
         before.getRepresentativeClaimantType().setMyHmctsOrganisation(org);
 
@@ -268,5 +253,30 @@ class NocClaimantRepresentativeServiceTest {
                 nocClaimantRepresentativeService.identifyRepresentationChanges(after, before);
 
         assertThat(result).isEqualTo(expected);
+    }
+
+    @Test
+    void theValidateRepresentativeOrganisationAndEmail() {
+        // when representative claimant type is empty should not set noc warning
+        CaseData tmpCaseData = new CaseData();
+        nocClaimantRepresentativeService.validateRepresentativeOrganisationAndEmail(tmpCaseData);
+        assertThat(tmpCaseData.getNocWarning()).isNull();
+        // when representative does not have email should not set noc warning
+        RepresentedTypeC claimantRepresentative = RepresentedTypeC.builder().build();
+        tmpCaseData.setRepresentativeClaimantType(claimantRepresentative);
+        nocClaimantRepresentativeService.validateRepresentativeOrganisationAndEmail(tmpCaseData);
+        assertThat(tmpCaseData.getNocWarning()).isNull();
+        // when representative does not have hmcts organisation id should not set noc warning
+        claimantRepresentative.setRepresentativeEmailAddress(REPRESENTATIVE_EMAIL_1);
+        nocClaimantRepresentativeService.validateRepresentativeOrganisationAndEmail(tmpCaseData);
+        assertThat(tmpCaseData.getNocWarning()).isNull();
+        // when representative has hmcts organisation id and email should set noc warning
+        claimantRepresentative.setMyHmctsOrganisation(Organisation.builder().organisationID(ORGANISATION_ID_NEW)
+                .build());
+        claimantRepresentative.setNameOfRepresentative(REPRESENTATIVE_NAME_1);
+        when(organisationService.checkRepresentativeAccountByEmail(REPRESENTATIVE_NAME_1, REPRESENTATIVE_EMAIL_1))
+                .thenReturn(EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL);
+        nocClaimantRepresentativeService.validateRepresentativeOrganisationAndEmail(tmpCaseData);
+        assertThat(tmpCaseData.getNocWarning()).isEqualTo(EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL);
     }
 }

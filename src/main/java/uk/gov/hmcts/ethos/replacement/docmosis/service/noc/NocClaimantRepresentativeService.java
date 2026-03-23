@@ -3,10 +3,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.noc;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
-import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -27,7 +25,6 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
@@ -44,8 +41,6 @@ public class NocClaimantRepresentativeService {
     private final AdminUserService adminUserService;
     private final NocCcdService nocCcdService;
     private final NocNotificationService nocNotificationService;
-    private final CcdCaseAssignment ccdCaseAssignment;
-    private final CcdClient ccdClient;
     private final NocService nocService;
     private final OrganisationService organisationService;
 
@@ -151,16 +146,13 @@ public class NocClaimantRepresentativeService {
         CaseDetails caseDetailsBefore = callbackRequest.getCaseDetailsBefore();
         CaseData caseDataBefore = caseDetailsBefore.getCaseData();
         CaseData caseData = caseDetails.getCaseData();
-
         ChangeOrganisationRequest changeRequest = identifyRepresentationChanges(caseData,
                 caseDataBefore);
-
         try {
             nocNotificationService.sendNotificationOfChangeEmails(caseDetailsBefore, caseDetails, changeRequest);
         } catch (Exception exception) {
             log.error(exception.getMessage(), exception);
         }
-
         if (changeRequest != null
                 && changeRequest.getOrganisationToRemove() != null) {
             try {
@@ -169,13 +161,7 @@ public class NocClaimantRepresentativeService {
                 throw new CcdInputOutputException("Failed to remove organisation representative access", e);
             }
         }
-
         String accessToken = adminUserService.getAdminUserToken();
-        CCDRequest ccdRequest = nocCcdService.startEventForUpdateRepresentation(accessToken,
-                caseDetails.getJurisdiction(), caseDetails.getCaseTypeId(), caseDetails.getCaseId());
-        callbackRequest.getCaseDetails().getCaseData().setChangeOrganisationRequestField(changeRequest);
-        ccdRequest.getCaseDetails().setCaseData(ccdCaseAssignment.applyNocAsAdmin(callbackRequest).getData());
-
         if (YES.equals(caseData.getClaimantRepresentedQuestion())) {
             RepresentedTypeC claimantRep = caseData.getRepresentativeClaimantType();
             if (claimantRep != null && claimantRep.getRepresentativeEmailAddress() != null) {
@@ -190,15 +176,6 @@ public class NocClaimantRepresentativeService {
                 }
             }
         }
-
-        ccdClient.submitUpdateRepEvent(
-                accessToken,
-                    Map.of("changeOrganisationRequestField",
-                            callbackRequest.getCaseDetails().getCaseData().getChangeOrganisationRequestField()),
-                    caseDetails.getCaseTypeId(),
-                    caseDetails.getJurisdiction(),
-                    ccdRequest,
-                    caseDetails.getCaseId());
     }
 
     public ChangeOrganisationRequest identifyRepresentationChanges(CaseData  after, CaseData before) {

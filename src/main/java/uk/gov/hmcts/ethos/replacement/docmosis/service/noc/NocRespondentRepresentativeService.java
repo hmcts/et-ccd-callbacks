@@ -51,6 +51,7 @@ import static org.apache.commons.lang3.ObjectUtils.getIfNull;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.CASE_DETAILS_OR_CASE_DATA_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_INVALID_CASE_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_INVALID_INPUTS;
@@ -381,8 +382,11 @@ public class NocRespondentRepresentativeService {
     public void revokeRespondentRepresentativesWithSameOrganisationAsClaimant(CaseDetails caseDetails) {
         if (ObjectUtils.isEmpty(caseDetails)
                 || StringUtils.isEmpty(caseDetails.getCaseId())
-                || ObjectUtils.isEmpty(caseDetails.getCaseData())
-                || ObjectUtils.isEmpty(caseDetails.getCaseData().getRepresentativeClaimantType())
+                || ObjectUtils.isEmpty(caseDetails.getCaseData())) {
+            log.error(CASE_DETAILS_OR_CASE_DATA_NOT_FOUND);
+            return;
+        }
+        if (ObjectUtils.isEmpty(caseDetails.getCaseData().getRepresentativeClaimantType())
                 || CollectionUtils.isEmpty(caseDetails.getCaseData().getRepCollection())) {
             return;
         }
@@ -391,6 +395,43 @@ public class NocRespondentRepresentativeService {
         if (StringUtils.isEmpty(organisationId)) {
             return;
         }
+        revokeAndRemoveRepresentativesByOrganisation(caseDetails, organisationId);
+    }
+
+    /**
+     * Revokes and removes all respondent representatives associated with the given organisation
+     * from the provided case.
+     *
+     * <p>This method performs the following steps:
+     * <ol>
+     *     <li>Finds all respondent representatives linked to the specified organisation ID.</li>
+     *     <li>If no representatives are found, the method exits without making changes.</li>
+     *     <li>Revokes the identified representatives.</li>
+     *     <li>Resets any organisation-related policies associated with the revoked representatives.</li>
+     *     <li>Removes the representatives from the case data.</li>
+     * </ol>
+     *
+     * <p><strong>Assumptions:</strong>
+     * <ul>
+     *     <li>The {@code caseDetails} object contains valid and non-null case data.</li>
+     *     <li>The {@code organisationId} corresponds to a valid organisation identifier.</li>
+     *     <li>All representatives associated with the organisation should be revoked and removed.</li>
+     *     <li>Policy reset is required for all successfully revoked representatives.</li>
+     *     <li>Helper methods invoked (e.g. revoke, reset, remove) handle their own internal validation
+     *     and do not return null collections.</li>
+     * </ul>
+     *
+     * <p><strong>Side effects:</strong>
+     * <ul>
+     *     <li>Modifies the case data within {@code caseDetails}.</li>
+     *     <li>Removes respondent representatives associated with the given organisation.</li>
+     *     <li>Updates organisation policies related to the revoked representatives.</li>
+     * </ul>
+     *
+     * @param caseDetails   the case details containing the case data to be updated
+     * @param organisationId the identifier of the organisation whose representatives are to be revoked and removed
+     */
+    public void revokeAndRemoveRepresentativesByOrganisation(CaseDetails caseDetails, String organisationId) {
         List<RepresentedTypeRItem> respondentRepresentativesToRevoke = RespondentRepresentativeUtils
                 .findRepresentativesByOrganisationId(caseDetails.getCaseData(), organisationId);
         if (CollectionUtils.isEmpty(respondentRepresentativesToRevoke)) {

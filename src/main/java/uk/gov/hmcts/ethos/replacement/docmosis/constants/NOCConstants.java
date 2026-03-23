@@ -51,6 +51,8 @@ public final class NOCConstants {
             "There are missing parameters; submission reference: %s, role: %s.";
     public static final String EXCEPTION_UNABLE_TO_GET_ACCOUNT_ID_BY_EMAIL =
             "Unable to get account id by email for case %s.";
+    public static final String EXCEPTION_UNABLE_TO_GET_ACCOUNT_ID_BY_EMAIL_WITH_IO_EXCEPTION =
+            "Unable to get account id by email for case %s. Exception message: %s";
     public static final String EXCEPTION_UNABLE_TO_FIND_ORGANISATION_BY_USER_ID =
             "Unable to find organisation by user id for case %s.";
     public static final String EXCEPTION_USER_AND_SELECTED_ORGANISATIONS_NOT_MATCH =

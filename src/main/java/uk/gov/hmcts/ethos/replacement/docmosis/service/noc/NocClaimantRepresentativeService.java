@@ -3,10 +3,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.noc;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
-import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -19,13 +17,14 @@ import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputExceptio
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.OrganisationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.OrganisationUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.ClaimantRepresentativeUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.NocUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
@@ -42,9 +41,42 @@ public class NocClaimantRepresentativeService {
     private final AdminUserService adminUserService;
     private final NocCcdService nocCcdService;
     private final NocNotificationService nocNotificationService;
-    private final CcdCaseAssignment ccdCaseAssignment;
-    private final CcdClient ccdClient;
     private final NocService nocService;
+    private final OrganisationService organisationService;
+
+    /**
+     * Validates the representative organisation and email associated with the given case data.
+     * <p>
+     * This method performs preliminary checks to ensure that the claimant representative,
+     * their email address, and the HMCTS organisation ID are present. If any of these
+     * required details are missing, the validation is skipped and the method returns
+     * without performing further checks.
+     * </p>
+     *
+     * <p>
+     * If all required representative details are available, the method verifies whether
+     * a representative account exists for the provided email address by calling the
+     * organisation service. Any warning returned from the service is stored in the
+     * {@code nocWarning} field of the {@link CaseData}.
+     * </p>
+     *
+     * <p>
+     * <strong>Assumption:</strong> The {@code caseData} parameter is expected to be non-null
+     * when this method is invoked.
+     * </p>
+     *
+     * @param caseData the case data containing representative details to validate
+     */
+    public void validateRepresentativeOrganisationAndEmail(CaseData caseData) {
+        if (!ClaimantRepresentativeUtils.hasRepresentative(caseData.getRepresentativeClaimantType())
+                || !ClaimantRepresentativeUtils.hasRepresentativeEmail(caseData.getRepresentativeClaimantType())
+                || !ClaimantRepresentativeUtils.hasHmctsOrganisationId(caseData.getRepresentativeClaimantType())) {
+            return;
+        }
+        caseData.setNocWarning(organisationService.checkRepresentativeAccountByEmail(
+                caseData.getRepresentativeClaimantType().getNameOfRepresentative(),
+                caseData.getRepresentativeClaimantType().getRepresentativeEmailAddress()));
+    }
 
     /**
      * Update claimant representation based on NoC request.
@@ -114,16 +146,13 @@ public class NocClaimantRepresentativeService {
         CaseDetails caseDetailsBefore = callbackRequest.getCaseDetailsBefore();
         CaseData caseDataBefore = caseDetailsBefore.getCaseData();
         CaseData caseData = caseDetails.getCaseData();
-
         ChangeOrganisationRequest changeRequest = identifyRepresentationChanges(caseData,
                 caseDataBefore);
-
         try {
             nocNotificationService.sendNotificationOfChangeEmails(caseDetailsBefore, caseDetails, changeRequest);
         } catch (Exception exception) {
             log.error(exception.getMessage(), exception);
         }
-
         if (changeRequest != null
                 && changeRequest.getOrganisationToRemove() != null) {
             try {
@@ -132,13 +161,7 @@ public class NocClaimantRepresentativeService {
                 throw new CcdInputOutputException("Failed to remove organisation representative access", e);
             }
         }
-
         String accessToken = adminUserService.getAdminUserToken();
-        CCDRequest ccdRequest = nocCcdService.startEventForUpdateRepresentation(accessToken,
-                caseDetails.getJurisdiction(), caseDetails.getCaseTypeId(), caseDetails.getCaseId());
-        callbackRequest.getCaseDetails().getCaseData().setChangeOrganisationRequestField(changeRequest);
-        ccdRequest.getCaseDetails().setCaseData(ccdCaseAssignment.applyNocAsAdmin(callbackRequest).getData());
-
         if (YES.equals(caseData.getClaimantRepresentedQuestion())) {
             RepresentedTypeC claimantRep = caseData.getRepresentativeClaimantType();
             if (claimantRep != null && claimantRep.getRepresentativeEmailAddress() != null) {
@@ -153,15 +176,6 @@ public class NocClaimantRepresentativeService {
                 }
             }
         }
-
-        ccdClient.submitUpdateRepEvent(
-                accessToken,
-                    Map.of("changeOrganisationRequestField",
-                            callbackRequest.getCaseDetails().getCaseData().getChangeOrganisationRequestField()),
-                    caseDetails.getCaseTypeId(),
-                    caseDetails.getJurisdiction(),
-                    ccdRequest,
-                    caseDetails.getCaseId());
     }
 
     public ChangeOrganisationRequest identifyRepresentationChanges(CaseData  after, CaseData before) {

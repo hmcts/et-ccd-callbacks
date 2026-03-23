@@ -66,5 +66,4 @@ variable "et_ccd_callbacks_s2s_client_id" {
 
 variable "acas_swagger_url" {
   default = "https://raw.githubusercontent.com/hmcts/reform-api-docs/master/docs/specs/et-acas-api-nonprod.json"
-  default = "https://raw.githubusercontent.com/hmcts/reform-api-docs/master/docs/specs/et-acas-api.json"
 }

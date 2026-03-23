@@ -15,7 +15,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.TokenResponse;
 
 import java.util.List;
 
-@FeignClient(name = "idam-api", url = "${idam.api.url}")
+@FeignClient(name = "idam-api", contextId = "docmosisIdamApi", url = "${idam.api.url}")
 public interface IdamApi {
     @GetMapping("/o/userinfo")
     UserDetails retrieveUserDetails(@RequestHeader(HttpHeaders.AUTHORIZATION) String authorisation);

@@ -17,6 +17,7 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.CcdCaseAssignment;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocNotificationService;
@@ -49,6 +50,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class NoticeOfChangeControllerTest {
 
     @MockBean
+    private VerifyTokenService verifyTokenService;
+    @MockBean
     private NocRespondentRepresentativeService nocRespondentRepresentativeService;
     @MockBean
     private NocRepresentativeService nocRepresentativeService;
@@ -57,6 +60,9 @@ class NoticeOfChangeControllerTest {
 
     @MockBean
     private NocNotificationService notificationService;
+
+    @MockBean
+    private UserIdamService userIdamService;
 
     @Autowired
     private WebApplicationContext applicationContext;
@@ -84,6 +90,7 @@ class NoticeOfChangeControllerTest {
 
     @Test
     void handleAboutToSubmit_RespondentRep() throws Exception {
+        when(verifyTokenService.isTokenSignatureValid(AUTH_TOKEN)).thenReturn(true);
         when(nocRespondentRepresentativeService
             .updateRespondentRepresentation(any())).thenReturn(caseData);
         when(ccdCaseAssignment.applyNoc(any(), any())).thenReturn(CCDCallbackResponse.builder()
@@ -102,6 +109,7 @@ class NoticeOfChangeControllerTest {
 
     @Test
     void nocSubmitted() throws Exception {
+        when(verifyTokenService.isTokenSignatureValid(AUTH_TOKEN)).thenReturn(true);
         doNothing().when(notificationService).sendNotificationOfChangeEmails(any(),
             any(), any());
 

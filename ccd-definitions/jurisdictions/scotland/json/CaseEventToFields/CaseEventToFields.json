@@ -1594,6 +1594,18 @@
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 1,
     "ShowSummaryChangeOption": "Y",
+    "PageColumnNumber": 1,
+    "CallBackURLMidEvent": "${ET_COS_URL}/addAmendClaimantRepresentative/amendClaimantRepresentativeMidEvent"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "addAmendClaimantRepresentative",
+    "CaseFieldID": "nocWarning",
+    "DisplayContext": "READONLY",
+    "PageID": 2,
+    "PageDisplayOrder": 2,
+    "PageFieldDisplayOrder": 1,
+    "PageShowCondition": "nocWarning!=\"\"",
     "PageColumnNumber": 1
   },
   {

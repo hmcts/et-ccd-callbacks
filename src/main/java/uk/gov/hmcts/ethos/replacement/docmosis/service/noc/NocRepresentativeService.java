@@ -27,6 +27,9 @@ public class NocRepresentativeService {
 
         if (caseRoleId.getValue().getCode().equals(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel())) {
             caseData = nocClaimantRepresentativeService.updateClaimantRepresentation(caseDetails, userToken);
+            caseDetails.setCaseData(caseData);
+            nocRespondentRepresentativeService.revokeRespondentRepresentativesWithSameOrganisationAsClaimant(
+                    caseDetails);
         } else {
             caseData = nocRespondentRepresentativeService.updateRespondentRepresentation(caseDetails);
             caseData = nocRespondentRepresentativeService.prepopulateOrgAddress(caseData, userToken);

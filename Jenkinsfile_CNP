@@ -1,6 +1,6 @@
 #!groovy
 
-@Library("Infrastructure@performance-stages-tidy")
+@Library("Infrastructure")
 
 import uk.gov.hmcts.contino.AppPipelineDsl
 

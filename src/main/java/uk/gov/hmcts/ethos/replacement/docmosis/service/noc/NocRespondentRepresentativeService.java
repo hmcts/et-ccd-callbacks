@@ -139,6 +139,34 @@ public class NocRespondentRepresentativeService {
         caseData.setNocWarning(nocWarnings.toString());
     }
 
+    private String validateRepresentativeOrganisationAndEmail(RepresentedTypeRItem representativeItem)
+            throws GenericServiceException {
+        StringBuilder nocWarnings = new StringBuilder(StringUtils.EMPTY);
+        RepresentedTypeR representative = representativeItem.getValue();
+        final String representativeName = representative.getNameOfRepresentative();
+        // Checking if representative has an organisation
+        if (!RespondentRepresentativeUtils.hasOrganisation(representative)) {
+            throw new GenericServiceException(EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND);
+        }
+        String accessToken = adminUserService.getAdminUserToken();
+        try {
+            ResponseEntity<AccountIdByEmailResponse> userResponse =
+                    organisationClient.getAccountIdByEmail(accessToken, authTokenGenerator.generate(),
+                            representative.getRepresentativeEmailAddress());
+            // checking if representative email address exists in organisation users
+            if (!OrganisationUtils.hasUserIdentifier(userResponse)) {
+                String warningMessage = String.format(WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL,
+                        representativeName);
+                nocWarnings.append(warningMessage).append('\n');
+            }
+        } catch (Exception e) {
+            String warningMessage = String.format(WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL,
+                    representativeName);
+            nocWarnings.append(warningMessage).append('\n');
+        }
+        return nocWarnings.toString();
+    }
+
     /**
      * Identifies and removes respondent representatives that have been deleted between
      * the previous and current versions of a case.

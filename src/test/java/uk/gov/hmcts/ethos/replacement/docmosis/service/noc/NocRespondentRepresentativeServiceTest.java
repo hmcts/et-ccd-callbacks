@@ -157,9 +157,14 @@ class NocRespondentRepresentativeServiceTest {
     private static final String EXPECTED_ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES =
             "Failed to add organisation policy for case 1234567890123456. Exception: Something went wrong";
 
+    private static final String EXPECTED_WARNING_REPRESENTATIVE_EMAIL_ADDRESS_NOT_FOUND =
+            "We have been unable to assign 'Legal One' access to this case via MyHMCTS. They must check with their "
+                    + "organisation administrator to ensure they have a valid MyHMCTS account, who will need to "
+                    + "assign the case to them.\n";
     private static final String EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL =
-            "Representative 'Legal One' could not be found using respondent@rep.email.com. "
-                    + "Case access will not be defined for this representative.\n";
+            "We have been unable to assign 'Legal One' access to this case via MyHMCTS. They must check with their "
+                    + "organisation administrator to ensure they have a valid MyHMCTS account, who will need to "
+                    + "assign the case to them.\n";
     private static final String EXPECTED_WARNING_REPRESENTATIVE_EMAIL_NOT_FOUND =
             "Representative email address not found.\n";
     private static final String EXPECTED_WARNING_FAILED_TO_RETRIEVE_CASE_ASSIGNMENTS =

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.EnumUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -54,6 +55,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_VETTING
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET3;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET3_PROCESSING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.APPLICATIONS_FOR_STRIKE_OUT_OR_DEPOSIT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.BEFORE_LABEL_DCF_IC;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CLAIMANT_HEARING_FORMAT_NEITHER_PREFERENCE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CLAIMANT_HEARING_PANEL_PREFERENCE_MISSING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.CODES_URL_ENGLAND;
@@ -94,6 +96,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsidera
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.TIME_POINTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.UDL_HEARING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.VIDEO;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.VIEW_ALL_DOCUMENTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.WITH_MEMBERS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_LABEL_ET1_IC;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_LABEL_ET1_VETTING_IC;
@@ -139,8 +142,22 @@ public class InitialConsiderationService {
 
         String docLinksMarkUp = formatDocLinks(linksByType);
         String referralLinks = ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId) ? generateReferralLinks(caseDetails) : "";
-        String beforeYouStart = String.format(TO_HELP_YOU_COMPLETE_IC_EVENT_LABEL, docLinksMarkUp, referralLinks);
+        String ewDigitalCaseFile = ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId) ? generateDcfLink(caseDetails) : "";
+        String beforeYouStart = String.format(TO_HELP_YOU_COMPLETE_IC_EVENT_LABEL, ewDigitalCaseFile, docLinksMarkUp,
+            referralLinks);
         caseDetails.getCaseData().setInitialConsiderationBeforeYouStart(beforeYouStart);
+    }
+
+    private String generateDcfLink(CaseDetails caseDetails) {
+        CaseData caseData = caseDetails.getCaseData();
+        if (ObjectUtils.isNotEmpty(caseData.getDigitalCaseFile())
+            && ObjectUtils.isNotEmpty(caseData.getDigitalCaseFile().getUploadedDocument())) {
+            String documentBinaryUrl = caseData.getDigitalCaseFile().getUploadedDocument().getDocumentBinaryUrl();
+            String link = documentBinaryUrl.substring(documentBinaryUrl.indexOf("/documents/"));
+            return String.format(BEFORE_LABEL_DCF_IC, link);
+        } else {
+            return String.format(VIEW_ALL_DOCUMENTS, caseDetails.getCaseId());
+        }
     }
 
     // A method to select documents by type sutable for EW and Scotland

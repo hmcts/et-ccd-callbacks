@@ -699,7 +699,8 @@ class Et3ResponseServiceTest {
         testCaseData.setRepCollection(
                 List.of(RepresentedTypeRItem.builder().value(RepresentedTypeR.builder().build()).build()));
 
-        et3ResponseService.setAmendRespondentRepresentativeContactDetails(VALID_USER_TOKEN, testCaseData, VALID_CASE_ID);
+        et3ResponseService.setAmendRespondentRepresentativeContactDetails(
+                VALID_USER_TOKEN, testCaseData, VALID_CASE_ID);
         assertThat(testCaseData.getRepCollection().getFirst().getValue().getRepresentativePhoneNumber())
                 .isEqualTo(PHONE_NUMBER);
     }
@@ -707,7 +708,8 @@ class Et3ResponseServiceTest {
     @Test
     void testSetAmendRespondentRepresentativeContactDetails_NullCaseData() {
         GenericServiceException ex = assertThrows(GenericServiceException.class, () ->
-                et3ResponseService.setAmendRespondentRepresentativeContactDetails(VALID_USER_TOKEN, null, VALID_CASE_ID));
+                et3ResponseService.setAmendRespondentRepresentativeContactDetails(
+                        VALID_USER_TOKEN, null, VALID_CASE_ID));
         assertThat(ex.getMessage()).isEqualTo(ERROR_CASE_DATA_NOT_FOUND);
     }
 

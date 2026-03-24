@@ -135,10 +135,11 @@ public class FileLocationService {
     public List<String> midEventSelectFileLocation(AdminData adminData) {
         List<String> errors = new ArrayList<>();
         String selectedFileLocationCode = adminData.getFileLocationList().getSelectedCode();
+        String selectedFileLocationName = adminData.getFileLocationList().getSelectedLabel();
         TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(adminData.getTribunalOffice());
 
         FileLocation selectedFileLocation = fileLocationRepository
-                .findByCodeAndTribunalOffice(selectedFileLocationCode, tribunalOffice);
+                .findByCodeAndTribunalOfficeAndName(selectedFileLocationCode, tribunalOffice, selectedFileLocationName);
         if (selectedFileLocation != null) {
             adminData.setFileLocationCode(selectedFileLocation.getCode());
             adminData.setFileLocationName(selectedFileLocation.getName());
@@ -175,8 +176,9 @@ public class FileLocationService {
             return errors;
         }
         String selectedFileLocationCode = adminData.getFileLocationList().getSelectedCode();
+        String selectedFileLocationName = adminData.getFileLocationList().getSelectedLabel();
         FileLocation selectedFileLocation = fileLocationRepository
-                .findByCodeAndTribunalOffice(selectedFileLocationCode, tribunalOffice);
+                .findByCodeAndTribunalOfficeAndName(selectedFileLocationCode, tribunalOffice, selectedFileLocationName);
         if (selectedFileLocation != null) {
             selectedFileLocation.setName(adminData.getFileLocationName());
             fileLocationRepository.save(selectedFileLocation);
@@ -204,9 +206,10 @@ public class FileLocationService {
     public List<String> deleteFileLocation(AdminData adminData) {
         List<String> errors = new ArrayList<>();
         String selectedFileLocationCode = adminData.getFileLocationList().getSelectedCode();
+        String selectedFileLocationName = adminData.getFileLocationList().getSelectedLabel();
         TribunalOffice tribunalOffice = TribunalOffice.valueOfOfficeName(adminData.getTribunalOffice());
         FileLocation selectedFileLocation = fileLocationRepository
-                .findByCodeAndTribunalOffice(selectedFileLocationCode, tribunalOffice);
+                .findByCodeAndTribunalOfficeAndName(selectedFileLocationCode, tribunalOffice, selectedFileLocationName);
         if (selectedFileLocation != null) {
             fileLocationRepository.delete(selectedFileLocation);
             fileLocationRepository.flush();

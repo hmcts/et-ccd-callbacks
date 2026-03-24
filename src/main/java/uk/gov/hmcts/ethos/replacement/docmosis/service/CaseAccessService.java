@@ -10,16 +10,18 @@ import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRolesRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationUsersIdamUser;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationUsersResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -100,13 +102,30 @@ public class CaseAccessService {
         return matcher.group(1);
     }
 
+    /**
+     * Retrieves the list of CaseUserAssignment for a given case ID.
+     * Considers absence of case user roles to be a valid state and handled explicitly.
+     * Handles I/O errors propagation.
+     *
+     * @param caseId the ID of the case
+     * @return a list of CaseUserAssignment
+     * @throws UncheckedIOException if an I/O error occurs during retrieval
+     */
     public List<CaseUserAssignment> getCaseUserAssignmentsById(String caseId) {
         try {
-            return caseAssignment.getCaseUserRoles(caseId).getCaseUserAssignments();
-        } catch (Exception e) {
-            log.error("Error retrieving user assignments for case {}: {}", caseId, e.getMessage());
-            throw new NoSuchElementException(
-                    String.format("No user assignments found for case %s", caseId), e);
+            CaseUserAssignmentData roles = caseAssignment.getCaseUserRoles(caseId);
+
+            if (roles == null || roles.getCaseUserAssignments() == null) {
+                log.info("No user assignments found for case {}", caseId);
+                return List.of();
+            }
+
+            return roles.getCaseUserAssignments();
+
+        } catch (IOException ex) {
+            // Possible remote call failer, service unavailable, etc.
+            log.error("I/O error retrieving user assignments for case {}", caseId, ex);
+            throw new UncheckedIOException("Failed to retrieve user assignments for case " + caseId, ex);
         }
     }
 

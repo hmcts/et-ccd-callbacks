@@ -48,6 +48,7 @@ class TseAdminControllerTest extends BaseControllerTest {
 
     private static final String ABOUT_TO_START_URL = "/tseAdmin/aboutToStart";
     private static final String MID_DETAILS_TABLE = "/tseAdmin/midDetailsTable";
+    private static final String MID_VALIDATE_URL = "/tseAdmin/midValidateInput";
     private static final String ABOUT_TO_SUBMIT_URL = "/tseAdmin/aboutToSubmit";
     private static final String SUBMITTED_URL = "/tseAdmin/submitted";
     private static final String ABOUT_TO_SUBMIT_CLOSE_APP_URL = "/tseAdmin/aboutToSubmitCloseApplication";
@@ -167,6 +168,44 @@ class TseAdminControllerTest extends BaseControllerTest {
         verify(tseAdminService, never()).initialTseAdminTableMarkUp(
                 ccdRequest.getCaseDetails().getCaseData(),
                 AUTH_TOKEN);
+    }
+
+    @Test
+    void midValidateInput_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(MID_VALIDATE_URL)
+                .content(jsonMapper.toJson(ccdRequest))
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+            .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
+            .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+        verify(tseAdminService, times(1))
+            .validateInput(ccdRequest.getCaseDetails().getCaseData());
+    }
+
+    @Test
+    void midValidateInput_tokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mockMvc.perform(post(MID_VALIDATE_URL)
+                .content(jsonMapper.toJson(ccdRequest))
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isForbidden());
+        verify(tseAdminService, never())
+            .validateInput(ccdRequest.getCaseDetails().getCaseData());
+    }
+
+    @Test
+    void midValidateInput_badRequest() throws Exception {
+        mockMvc.perform(post(MID_VALIDATE_URL)
+                .content("garbage content")
+                .header("Authorization", AUTH_TOKEN)
+                .contentType(MediaType.APPLICATION_JSON))
+            .andExpect(status().isBadRequest());
+        verify(tseAdminService, never())
+            .validateInput(ccdRequest.getCaseDetails().getCaseData());
     }
 
     @Test

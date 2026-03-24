@@ -40,12 +40,15 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.createLinkF
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getRespondentNames;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantNonSystemUser;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isRepresentedClaimantWithMyHmctsCase;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.isPartyToNotifyMismatch;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class RespondNotificationService {
     private static final String UPLOAD_DOCUMENT_IS_REQUIRED = "Upload document is required";
+    private static final String ERROR_MSG_PARTY_TO_NOTIFY_MUST_INCLUDE_SELECTED =
+        "Select the party or parties to notify must include the party or parties who must respond";
     private static final String SUPPORTING_MATERIAL = "| Supporting material | |";
     private static final String RESPONSE_DETAILS = """
         |  | |\r
@@ -286,12 +289,23 @@ public class RespondNotificationService {
         }
     }
 
+    /**
+     * Validate user input.
+     * @param caseData in which the case details are extracted from
+     * @return Error message list
+     */
     public List<String> validateInput(CaseData caseData) {
         List<String> errors = new ArrayList<>();
 
         if (YES.equals(caseData.getRespondNotificationResponseRequired())
             && CollectionUtils.isEmpty(caseData.getRespondNotificationUploadDocument())) {
             errors.add(UPLOAD_DOCUMENT_IS_REQUIRED);
+        }
+        if (isPartyToNotifyMismatch(
+            caseData.getRespondNotificationWhoRespond(),
+            caseData.getRespondNotificationPartyToNotify()
+        )) {
+            errors.add(ERROR_MSG_PARTY_TO_NOTIFY_MUST_INCLUDE_SELECTED);
         }
         return errors;
     }

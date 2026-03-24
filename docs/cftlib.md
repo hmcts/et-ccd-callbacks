@@ -41,39 +41,20 @@ The latest version of the RSE CFT lib can be found [here](https://github.com/hmc
 - **Git**: For accessing CCD definition repositories
 
 ### Environment Variables
-| Variable                       | Purpose                                                                               |
-|--------------------------------|---------------------------------------------------------------------------------------|
-| ET_COS_CFTLIB_DB_PASSWORD      | Local et_cos database password<br/>Set to `postgres`                                  |
-| XUI_LD_ID                      | Launch Darkly Client Id                                                               |
-| SPRING_PROFILES_ACTIVE         | Set to ```cftlib``` to use cftlib Spring profile                                      |
-| ENGLANDWALES_CCD_CONFIG_PATH   | Set to the path of your local et-ccd-definitions-englandwales GitHub repository       |
-| SCOTLAND_CCD_CONFIG_PATH       | Set to the path of your local et-ccd-definitions-scotland GitHub repository           |
-| ADMIN_CCD_CONFIG_PATH          | Set to the path of your local et-ccd-definitions-admin GitHub repository              |
-| CFTLIB_IMPORT_CCD_DEFS_ON_BOOT | Optional<br/>Set to `false` to prevent CCD definitions from being imported at startup |
-| ET_LAUNCH_DARKLY_SDK_KEY       | ET Launch Darkly SDK Key - this can be retrieved from the et-aat Key Vault            |
+| Variable                       | Purpose                                                                                |
+|--------------------------------|----------------------------------------------------------------------------------------|
+| ET_COS_CFTLIB_DB_PASSWORD      | Local et_cos database password<br/>Set to `postgres`                                   |
+| XUI_LD_ID                      | Launch Darkly Client Id                                                                |
+| SPRING_PROFILES_ACTIVE         | Set to ```cftlib``` to use cftlib Spring profile                                       |
+| CALLBACKS_PROJECT_PATH         | Set to the path of your local callbacks project. Used to import configuration files.   |
+| CFTLIB_IMPORT_CCD_DEFS_ON_BOOT | Optional<br/>Set to `false` to prevent CCD definitions from being imported at startup  |
+| ET_LAUNCH_DARKLY_SDK_KEY       | ET Launch Darkly SDK Key - this can be retrieved from the et-aat Key Vault             |
 
-These can be set with the ./bin/set-env.sh script. Edit the script to add your own path to config-repos and any missing variables.
+These can be set with the ./bin/set_env.sh script. Edit the script to add your own path to config-repos and any missing variables.
 Run the script with source, so that the environment variables are set in your current shell that you invoke the gradle command from.
 ```bash
-source ./bin/set-env.sh
+source ./bin/set_env.sh
 ```
-
-
-### Azure Service Bus
-You must either provide a connection string in an environment variable to a queue in Azure or
-configure a fake service bus.
-
-If you require a real Azure queue then ask one of the team to set this up.
-
-| Variable | Purpose                                              |
-| -------- |------------------------------------------------------|
-| CREATE_UPDATES_QUEUE_SEND_CONNECTION_STRING | Connection string for create-updates queue in Azure  |
-
-Or, if no development queue is available, set the following environment variable to use the fake.
-
-| Variable | Purpose                                             |
-| -------- |-----------------------------------------------------|
-| SERVICEBUS_FAKE | Set to ```true``` to enable fake service bus client |
 
 ### RSE IdAM Simulator
 

@@ -32,6 +32,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.ET3_RESPONSE;
 
 
 /**
@@ -160,11 +161,13 @@ public class Et3ResponseController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         Et3ResponseHelper.addEt3DataToRespondent(caseData, ccdRequest.getEventId());
         List<String> errors = new ArrayList<>();
-        try {
-            et3ResponseService.setRespondentRepresentsContactDetails(
-                    userToken, caseData, ccdRequest.getCaseDetails().getCaseId());
-        }  catch (GenericServiceException gse) {
-            errors.add(gse.getMessage());
+        if (ET3_RESPONSE.equals(ccdRequest.getEventId())) {
+            try {
+                et3ResponseService.setRespondentRepresentsContactDetails(
+                        userToken, caseData, ccdRequest.getCaseDetails().getCaseId());
+            }  catch (GenericServiceException gse) {
+                errors.add(gse.getMessage());
+            }
         }
         Et3ResponseHelper.resetEt3FormFields(caseData);
         return getCallbackRespEntityErrors(errors, caseData);

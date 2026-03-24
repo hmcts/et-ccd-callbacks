@@ -168,7 +168,8 @@ public class TseClaimantRepReplyService {
     }
 
     private static String getApplicationDoc(GenericTseApplicationType applicationType) {
-        if (RESPONDENT_TITLE.equals(applicationType.getApplicant())) {
+        if (RESPONDENT_TITLE.equals(applicationType.getApplicant())
+            || "Respondent Representative".equals(applicationType.getApplicant())) {
             return uk.gov.hmcts.ecm.common.helpers.DocumentHelper.respondentApplicationToDocType(
                     applicationType.getType());
         } else {

@@ -105,7 +105,8 @@ public class MultipleBatchUpdate3Service {
             ccdClient.submitEventForCase(userToken, caseData, caseTypeId,
                    jurisdiction, returnedRequest, String.valueOf(caseId));
         } catch (Exception e) {
-            throw new CaseCreationException("Error while submitting event for case: " + caseId + e.toString());
+            throw (CaseCreationException) new CaseCreationException(
+                    "Error while submitting event for case: " + caseId + e.toString()).initCause(e);
         }
     }
 

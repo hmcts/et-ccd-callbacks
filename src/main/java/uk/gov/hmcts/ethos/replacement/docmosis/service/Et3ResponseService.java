@@ -3,7 +3,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -17,6 +16,7 @@ import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationAddress;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
@@ -33,6 +33,8 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+import static org.apache.commons.lang3.ObjectUtils.isEmpty;
+import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.RESPONSE_TO_A_CLAIM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_CASE_DATA_NOT_FOUND;
@@ -51,6 +53,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.DATE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.createDocumentTypeItemFromTopLevel;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.findRepresentativeFromCaseData;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.ET3_RESPONSE_PDF_FILE_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils.getOrganisationAddressAsText;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils.mapOrganisationAddressToAddress;
@@ -88,6 +91,13 @@ public class Et3ResponseService {
     public DocumentInfo generateEt3ResponseDocument(CaseData caseData, String userToken, String caseTypeId,
                                                     String event) {
         try {
+            // If the representative address is not set, set it to the organisation's address.
+            RepresentedTypeR representative = findRepresentativeFromCaseData(caseData);
+            if (isNotEmpty(representative) && isEmpty(representative.getRepresentativeAddress())) {
+                OrganisationAddress organisationAddress = myHmctsService.getOrganisationAddress(userToken);
+                representative.setRepresentativeAddress(mapOrganisationAddressToAddress(organisationAddress));
+            }
+
             return pdfBoxService.generatePdfDocumentInfo(
                     caseData, userToken, caseTypeId, ET3_RESPONSE_PDF_FILE_NAME, et3FormTemplate, event);
         } catch (Exception e) {
@@ -230,7 +240,7 @@ public class Et3ResponseService {
             throws GenericServiceException {
 
         UserDetails userDetails = userIdamService.getUserDetails(userToken);
-        if (ObjectUtils.isEmpty(userDetails)) {
+        if (isEmpty(userDetails)) {
             throw new GenericServiceException(ERROR_USER_NOT_FOUND,
                     new Exception(ERROR_USER_NOT_FOUND),
                     ERROR_USER_NOT_FOUND,
@@ -266,7 +276,7 @@ public class Et3ResponseService {
             throws GenericServiceException {
         checkUserTokenAndCaseid(userToken, caseId);
         UserDetails userDetails = userIdamService.getUserDetails(userToken);
-        if (ObjectUtils.isEmpty(userDetails)) {
+        if (isEmpty(userDetails)) {
             throw new GenericServiceException(ERROR_USER_NOT_FOUND,
                     new Exception(ERROR_USER_NOT_FOUND),
                     ERROR_USER_NOT_FOUND,
@@ -293,7 +303,7 @@ public class Et3ResponseService {
                     "Et3ResponseService",
                     "getRepresentedRespondentIndexes");
         }
-        if (ObjectUtils.isEmpty(caseUserAssignmentData)) {
+        if (isEmpty(caseUserAssignmentData)) {
             throw new GenericServiceException(ERROR_CASE_ROLES_NOT_FOUND,
                     new Exception(ERROR_CASE_ROLES_NOT_FOUND),
                     ERROR_CASE_ROLES_NOT_FOUND,
@@ -363,7 +373,7 @@ public class Et3ResponseService {
     public void setRespondentRepresentsContactDetails(String userToken, CaseData caseData, String submissionReference)
             throws GenericServiceException {
         // Set the representative contact details in caseData
-        if (ObjectUtils.isEmpty(caseData)) {
+        if (isEmpty(caseData)) {
             throw new GenericServiceException(ERROR_CASE_DATA_NOT_FOUND,
                     new Exception(ERROR_CASE_DATA_NOT_FOUND),
                     ERROR_CASE_DATA_NOT_FOUND,
@@ -411,8 +421,8 @@ public class Et3ResponseService {
         }
         for (int i : representedRespondentIndexes) {
             if (i >= representedRespondentIndexes.size()
-                    || ObjectUtils.isEmpty(caseData.getRepCollection().get(i))
-                    || ObjectUtils.isEmpty(caseData.getRepCollection().get(i).getValue())) {
+                    || isEmpty(caseData.getRepCollection().get(i))
+                    || isEmpty(caseData.getRepCollection().get(i).getValue())) {
                 continue;
             }
             caseData.getRepCollection().get(i).getValue().setRepresentativePhoneNumber(caseData.getEt3ResponsePhone());

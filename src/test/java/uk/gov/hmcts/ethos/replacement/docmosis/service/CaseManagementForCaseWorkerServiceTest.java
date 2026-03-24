@@ -12,6 +12,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.InjectMocks;
+import org.mockito.MockedStatic;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.util.Pair;
@@ -48,6 +50,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RestrictedReportingType;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.SubmitMultipleEvent;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCasesSendingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultipleReferenceService;
 
@@ -65,10 +68,12 @@ import java.util.UUID;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -1564,4 +1569,82 @@ class CaseManagementForCaseWorkerServiceTest {
                 )
         );
     }
+
+    @Test
+    void setNextEarliestListedHearing_shouldHandleNullCaseData() {
+        CaseData caseData = null;
+
+        assertDoesNotThrow(() -> caseManagementForCaseWorkerService.setNextEarliestListedHearing(caseData));
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideCaseDataForSetNextEarliestListedHearing")
+    void setNextEarliestListedHearing_handlesVariousCaseDataScenarios(CaseData caseData, boolean shouldInvokeHelper) {
+        try (MockedStatic<HearingsHelper> mockedStatic = Mockito.mockStatic(HearingsHelper.class)) {
+            // Act
+            caseManagementForCaseWorkerService.setNextEarliestListedHearing(caseData);
+
+            // Assert
+            if (shouldInvokeHelper) {
+                mockedStatic.verify(() -> HearingsHelper.setEtInitialConsiderationListedHearingType(caseData),
+                        times(1));
+            } else {
+                mockedStatic.verify(() -> HearingsHelper.setEtInitialConsiderationListedHearingType(caseData), never());
+            }
+        }
+    }
+
+    private static Stream<Arguments> provideCaseDataForSetNextEarliestListedHearing() {
+        CaseData validCaseData = new CaseData();
+        CaseData nullCaseData = null;
+
+        return Stream.of(
+                Arguments.of(validCaseData, true),
+                Arguments.of(nullCaseData, false)
+        );
+    }
+
+    @ParameterizedTest
+    @MethodSource("provideHearingCollectionsForNextListedDate")
+    void setNextListedDate_handlesVariousHearingCollections(List<HearingTypeItem> hearingCollection,
+                                                            String expectedNextListedDate) {
+        CaseData caseData = new CaseData();
+        caseData.setHearingCollection(hearingCollection);
+
+        caseManagementForCaseWorkerService.setNextListedDate(caseData);
+
+        assertThat(caseData.getNextListedDate()).isEqualTo(expectedNextListedDate);
+    }
+
+    private static Stream<Arguments> provideHearingCollectionsForNextListedDate() {
+        HearingTypeItem hearingWithFutureDate = createHearingTypeItem("2030-11-01T10:00:00");
+
+        HearingTypeItem hearingWithPastDate = createHearingTypeItem("2020-01-01T10:00:00");
+        HearingTypeItem hearingWithCurrentDate = createHearingTypeItem(LocalDateTime.now().toString());
+        HearingTypeItem hearingWithInvalidDate = createHearingTypeItem("not-a-date");
+
+        return Stream.of(
+                Arguments.of(List.of(hearingWithFutureDate, hearingWithPastDate), "2030-11-01"),
+                Arguments.of(List.of(hearingWithPastDate, hearingWithCurrentDate), ""),
+                Arguments.of(List.of(hearingWithInvalidDate), ""),
+                Arguments.of(new ArrayList<>(), null),
+                Arguments.of(null, null)
+        );
+    }
+
+    private static HearingTypeItem createHearingTypeItem(String listedDate) {
+        DateListedType dateListedType = new DateListedType();
+        dateListedType.setListedDate(listedDate);
+        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
+        dateListedTypeItem.setValue(dateListedType);
+        dateListedTypeItem.getValue().setHearingStatus(HEARING_STATUS_LISTED);
+
+        HearingType hearingType = new HearingType();
+        hearingType.setHearingDateCollection(List.of(dateListedTypeItem));
+        HearingTypeItem hearingTypeItem = new HearingTypeItem();
+        hearingTypeItem.setValue(hearingType);
+
+        return hearingTypeItem;
+    }
+
 }

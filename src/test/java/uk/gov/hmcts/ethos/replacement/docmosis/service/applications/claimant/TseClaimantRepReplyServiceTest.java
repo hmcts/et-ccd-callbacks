@@ -571,4 +571,25 @@ class TseClaimantRepReplyServiceTest {
 
         tseClaimantRepReplyService.claimantReplyToTse(caseDetails, caseData);
     }
+
+    @Test
+    void addTseRespondentRepresentativeReplyPdfToDocCollection() throws IOException {
+        when(tornadoService.generateEventDocument(any(), anyString(), anyString(), anyString()))
+            .thenReturn(new DocumentInfo());
+        when(documentManagementService.addDocumentToDocumentField(any()))
+            .thenReturn(DocumentFixtures.getUploadedDocumentType());
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseId("caseId");
+        caseData.setClaimantRepResSupportingMaterial(createSupportingMaterial());
+        caseData.getGenericTseApplicationCollection().getFirst().getValue().setApplicant("Respondent Representative");
+        caseDetails.setCaseData(caseData);
+        caseDetails.setCaseTypeId(ENGLANDWALES_CASE_TYPE_ID);
+
+        tseClaimantRepReplyService.addTseClaimantRepReplyPdfToDocCollection(caseData, "testUserToken",
+            caseDetails.getCaseTypeId());
+
+        MatcherAssert.assertThat(caseData.getDocumentCollection().size(), is(2));
+        MatcherAssert.assertThat(caseData.getDocumentCollection().getFirst().getValue().getTopLevelDocuments(),
+            is(CASE_MANAGEMENT));
+    }
 }

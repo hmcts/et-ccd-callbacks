@@ -177,7 +177,8 @@ public class ListingService {
             listingDetails.getCaseData().clearReportFields();
             return listingDetails.getCaseData();
         } catch (Exception ex) {
-            throw new CaseCreationException(MESSAGE + listingDetails.getCaseId() + ex.getMessage());
+            throw (CaseCreationException) new CaseCreationException(
+                    MESSAGE + listingDetails.getCaseId() + ex.getMessage()).initCause(ex);
         }
     }
 

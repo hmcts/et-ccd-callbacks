@@ -111,6 +111,8 @@ class TseAdmReplyServiceTest {
         "The tribunal requires some information from you about an application.";
     private static final String RESPONSE_NOT_REQUIRED =
         "You have a new message from HMCTS about a claim made to an employment tribunal.";
+    private static final String ERROR_MSG_PARTY_TO_NOTIFY_MUST_INCLUDE_SELECTED =
+        "Select the party or parties to notify must include the party or parties who must respond";
     private static final String RESPONDENT_1 = "Respondent 1";
     private static final String RESPONDENT_2 = "Respondent 2";
     private static final String REP_EMAIL = "rep@test.com";
@@ -202,6 +204,42 @@ class TseAdmReplyServiceTest {
         caseData.setTseAdmReplyIsCmoOrRequest(NEITHER);
         List<String> errors = tseAdmReplyService.validateInput(caseData);
         assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void validateInput_shouldReturnNoError_whenPartyToRespondIsNull() {
+        caseData.setSendNotificationSelectParties(null);
+        caseData.setSendNotificationNotify(CLAIMANT_ONLY);
+        List<String> errors = tseAdmReplyService.validateInput(caseData);
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void validateInput_shouldReturnNoError_whenPartyToNotifyIsBothParties() {
+        caseData.setSendNotificationSelectParties(CLAIMANT_TITLE);
+        caseData.setSendNotificationNotify(BOTH_PARTIES);
+        List<String> errors = tseAdmReplyService.validateInput(caseData);
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void validateInput_shouldReturnError_whenPartyToNotifyDoesNotMatchPartyToRespond_CMO() {
+        caseData.setTseAdmReplyIsCmoOrRequest(CASE_MANAGEMENT_ORDER);
+        caseData.setTseAdmReplyCmoSelectPartyRespond(CLAIMANT_TITLE);
+        caseData.setTseAdmReplySelectPartyNotify(RESPONDENT_ONLY);
+        List<String> errors = tseAdmReplyService.validateInput(caseData);
+        assertThat(errors).hasSize(1);
+        assertThat(errors.getFirst()).isEqualTo(ERROR_MSG_PARTY_TO_NOTIFY_MUST_INCLUDE_SELECTED);
+    }
+
+    @Test
+    void validateInput_shouldReturnError_whenPartyToNotifyDoesNotMatchPartyToRespond_Request() {
+        caseData.setTseAdmReplyIsCmoOrRequest(REQUEST);
+        caseData.setTseAdmReplyRequestSelectPartyRespond(CLAIMANT_TITLE);
+        caseData.setTseAdmReplySelectPartyNotify(RESPONDENT_ONLY);
+        List<String> errors = tseAdmReplyService.validateInput(caseData);
+        assertThat(errors).hasSize(1);
+        assertThat(errors.getFirst()).isEqualTo(ERROR_MSG_PARTY_TO_NOTIFY_MUST_INCLUDE_SELECTED);
     }
 
     @Nested

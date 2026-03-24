@@ -27,6 +27,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.core.Is.is;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
@@ -37,6 +38,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.ET3_RESPONSE_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.ET3_RESPONSE_EMPLOYMENT_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.NO_RESPONDENTS_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.addEt3DataToRespondent;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.findRepresentativeFromCaseData;
 
 class Et3ResponseHelperTest {
@@ -166,9 +168,9 @@ class Et3ResponseHelperTest {
         caseData.setEt3ResponseEmploymentCount("10");
         caseData.setEt3ResponseContactPreference("Post");
         caseData.setEt3ResponseReference("REF1234");
-        Et3ResponseHelper.addEt3DataToRespondent(caseData, ET3_RESPONSE);
-        Et3ResponseHelper.addEt3DataToRespondent(caseData, ET3_RESPONSE_EMPLOYMENT_DETAILS);
-        Et3ResponseHelper.addEt3DataToRespondent(caseData, ET3_RESPONSE_DETAILS);
+        addEt3DataToRespondent(caseData, ET3_RESPONSE);
+        addEt3DataToRespondent(caseData, ET3_RESPONSE_EMPLOYMENT_DETAILS);
+        addEt3DataToRespondent(caseData, ET3_RESPONSE_DETAILS);
         RespondentSumType respondentSumType = caseData.getRespondentCollection().getFirst().getValue();
         assertThat(respondentSumType.getEt3ResponseIsClaimantNameCorrect()).isEqualTo(YES);
         RepresentedTypeR representative = findRepresentativeFromCaseData(caseData);
@@ -238,6 +240,41 @@ class Et3ResponseHelperTest {
         List<String> errors = Et3ResponseHelper.et3SubmitRespondents(caseData);
         assertThat(errors, hasSize(1));
         assertThat(errors.getFirst()).isEqualTo(ALL_RESPONDENTS_INCOMPLETE_SECTIONS);
+    }
+
+    @Test
+    void shouldAddPersonalDetailsToRespondentForEt3Response() {
+        caseData.setEt3ResponseIsClaimantNameCorrect("Yes");
+        addEt3DataToRespondent(caseData, ET3_RESPONSE);
+        RespondentSumType respondent = caseData.getRespondentCollection().getFirst().getValue();
+        assertThat(respondent.getEt3ResponseIsClaimantNameCorrect()).isEqualTo("Yes");
+        assertThat(respondent.getPersonalDetailsSection()).isEqualTo("Yes");
+    }
+
+    @Test
+    void shouldAddClaimDetailsToRespondentForEt3ResponseDetails() {
+        caseData.setEt3ResponseAcasAgree("Yes");
+        addEt3DataToRespondent(caseData, ET3_RESPONSE_DETAILS);
+        RespondentSumType respondent = caseData.getRespondentCollection().getFirst().getValue();
+        assertThat(respondent.getEt3ResponseAcasAgree()).isEqualTo("Yes");
+        assertThat(respondent.getClaimDetailsSection()).isEqualTo("Yes");
+    }
+
+    @Test
+    void shouldAddEmploymentDetailsToRespondentForEt3ResponseEmploymentDetails() {
+        caseData.setEt3ResponseEmploymentCount("5");
+        addEt3DataToRespondent(caseData, ET3_RESPONSE_EMPLOYMENT_DETAILS);
+        RespondentSumType respondent = caseData.getRespondentCollection().getFirst().getValue();
+        assertThat(respondent.getEt3ResponseEmploymentCount()).isEqualTo("5");
+        assertThat(respondent.getEmploymentDetailsSection()).isEqualTo("Yes");
+    }
+
+    @Test
+    void shouldThrowExceptionForInvalidEventId() {
+        String invalidEventId = "invalid";
+        assertThrows(IllegalArgumentException.class, () ->
+                addEt3DataToRespondent(caseData, invalidEventId)
+        );
     }
 
     @ParameterizedTest

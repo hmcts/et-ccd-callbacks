@@ -186,9 +186,8 @@ public class MultipleLetterService {
                     multipleDetails.getCaseData());
 
         } catch (Exception ex) {
-
-            throw new DocumentManagementException(MESSAGE + multipleDetails.getCaseId() + ex.getMessage());
-
+            throw (DocumentManagementException) new DocumentManagementException(
+                    MESSAGE + multipleDetails.getCaseId() + ex.getMessage()).initCause(ex);
         }
 
         return documentInfo;

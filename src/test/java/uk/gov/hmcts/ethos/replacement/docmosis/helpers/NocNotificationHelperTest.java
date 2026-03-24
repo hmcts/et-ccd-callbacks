@@ -1,33 +1,48 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.Constants;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith({SpringExtension.class, MockitoExtension.class})
 class NocNotificationHelperTest {
     private static final String RESPONDENT_NAME = "Respondent";
     private static final String NEW_REP_EMAIL = "rep1@test.com";
     private static final String OLD_REP_EMAIL = "rep2@test.com";
     private static final String NEW_ORG_ID = "1";
     private static final String OLD_ORG_ID = "2";
+
+    @Mock
+    private NocRespondentHelper nocRespondentHelper;
 
     private CaseData caseData;
     private CaseDetails caseDetails;
@@ -145,5 +160,85 @@ class NocNotificationHelperTest {
         String respondentName = NocNotificationHelper
                 .getRespondentNameForNewSolicitor(caseData.getChangeOrganisationRequestField(), caseData);
         assertThat(respondentName, is(RESPONDENT_NAME));
+    }
+
+    @Test
+    void testGetRespondentNameForNewSolicitor_nullChangeRequest() {
+        String respondentName = NocNotificationHelper.getRespondentNameForNewSolicitor(null, caseData);
+        assertThat(respondentName, is("Unknown"));
+    }
+
+    @Test
+    void testGetRespondentNameForNewSolicitor_nullCaseRoleId() {
+        caseData.getChangeOrganisationRequestField().setCaseRoleId(null);
+        String respondentName = NocNotificationHelper
+                .getRespondentNameForNewSolicitor(caseData.getChangeOrganisationRequestField(), caseData);
+        assertThat(respondentName, is("Unknown"));
+    }
+
+    @Test
+    void testGetRespondent_nullChangeRequest() {
+        RespondentSumType result = NocNotificationHelper.getRespondent(null, caseData, nocRespondentHelper);
+        assertNull(result);
+    }
+
+    @Test
+    void testGetRespondent_nullCaseRoleId() {
+        caseData.getChangeOrganisationRequestField().setCaseRoleId(null);
+        RespondentSumType result = NocNotificationHelper.getRespondent(
+                caseData.getChangeOrganisationRequestField(), caseData, nocRespondentHelper);
+        assertNull(result);
+    }
+
+    @Test
+    void testGetRespondent_ReturnsCorrectRespondent() {
+        ChangeOrganisationRequest changeRequest = mock(ChangeOrganisationRequest.class);
+        DynamicFixedListType caseRoleId = mock(DynamicFixedListType.class);
+        CaseData caseDataLocal = mock(CaseData.class);
+        RespondentSumType respondentSumType2 = mock(RespondentSumType.class);
+        RespondentSumTypeItem item = new RespondentSumTypeItem();
+        item.setValue(respondentSumType2);
+        caseDataLocal.setRespondentCollection(List.of(item));
+        when(changeRequest.getCaseRoleId()).thenReturn(caseRoleId);
+        when(caseRoleId.getSelectedCode()).thenReturn("SOLICITORA");
+        when(respondentSumType2.getRespondentName()).thenReturn("Respondent Name");
+
+        NocRespondentHelper nocRespondentHelperLocal = mock(NocRespondentHelper.class);
+        when(nocRespondentHelperLocal.getRespondent("Respondent Name", caseDataLocal))
+                .thenReturn(respondentSumType2);
+        when(caseDataLocal.getRespondentCollection()).thenReturn(List.of(item));
+        try (var mocked = Mockito.mockStatic(SolicitorRole.class)) {
+            mocked.when(() -> SolicitorRole.from("SOLICITORA"))
+                    .thenReturn(Optional.of(SolicitorRole.SOLICITORA));
+
+            RespondentSumType result = NocNotificationHelper.getRespondent(changeRequest, caseDataLocal,
+                    nocRespondentHelperLocal);
+
+            Assertions.assertNotNull(result);
+            Assertions.assertEquals(respondentSumType2, result);
+        }
+    }
+
+    @Test
+    void testGetRespondent_ReturnsNullOnNullInputs() {
+        assertNull(NocNotificationHelper.getRespondent(null, null, null));
+    }
+
+    @Test
+    void testGetRespondent_ReturnsNullOnMissingCaseRoleId() {
+        ChangeOrganisationRequest changeRequest = mock(ChangeOrganisationRequest.class);
+        when(changeRequest.getCaseRoleId()).thenReturn(null);
+        assertNull(NocNotificationHelper.getRespondent(changeRequest, mock(CaseData.class),
+                mock(NocRespondentHelper.class)));
+    }
+
+    @Test
+    void testGetRespondent_ReturnsNullOnNullSelectedRole() {
+        ChangeOrganisationRequest changeRequest = mock(ChangeOrganisationRequest.class);
+        DynamicFixedListType caseRoleId = mock(DynamicFixedListType.class);
+        when(changeRequest.getCaseRoleId()).thenReturn(caseRoleId);
+        when(caseRoleId.getSelectedCode()).thenReturn(null);
+        assertNull(NocNotificationHelper.getRespondent(changeRequest, mock(CaseData.class),
+                mock(NocRespondentHelper.class)));
     }
 }

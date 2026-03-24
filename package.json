@@ -12,7 +12,7 @@
         "@wdio/sauce-service": "9.19.2",
         "@wdio/selenium-standalone-service": "8.15.0",
         "@wdio/types": "9.19.2",
-        "axios": "1.12.2",
+        "axios": "1.13.5",
         "codeceptjs-saucehelper": "1.4.0",
         "cross-env": "7.0.3",
         "eslint": "9.35.0",
@@ -103,20 +103,23 @@
         "when": "3.7.8"
     },
     "resolutions": {
+        "ajv": "^6.14.0",
         "async": "^3.2.3",
+        "flatted": "^3.4.2",
         "ansi-regex": "^6.0.0",
         "http-cache-semantics": "^4.1.1",
         "json-schema": "^0.4.0",
         "lodash": "^4.17.21",
         "mem": "^10.0.0",
         "merge": "^2.1.1",
-        "minimatch": "^3.1.2",
+        "minimatch": "^10.0.0",
         "minimist": "^1.2.6",
         "moment": "^2.29.2",
         "vm2": "^3.9.17",
         "yargs-parser": "^21.0.1",
         "qs": ">=6.10.3",
-        "ua-parser-js": "^1.0.33"
+        "ua-parser-js": "^1.0.33",
+        "form-data": "^4.0.4"
     },
-    "packageManager": "yarn@3.8.7"
+    "packageManager": "yarn@4.13.0"
 }

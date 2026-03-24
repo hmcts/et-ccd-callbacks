@@ -37,9 +37,12 @@ public interface FileLocationRepository extends JpaRepository<FileLocation, Inte
      *
      * @param fileLocationCode file location code,
      * @param tribunalOffice tribunal office
+     * @param name file location name
      * @return file location
      */
-    FileLocation findByCodeAndTribunalOffice(String fileLocationCode, TribunalOffice tribunalOffice);
+    FileLocation findByCodeAndTribunalOfficeAndName(String fileLocationCode,
+                                                    TribunalOffice tribunalOffice,
+                                                    String name);
 
     /**
      * Returns a long value which is the

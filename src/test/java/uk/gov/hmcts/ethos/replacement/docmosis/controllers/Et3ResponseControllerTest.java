@@ -31,6 +31,7 @@ import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
@@ -303,6 +304,49 @@ class Et3ResponseControllerTest extends BaseControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    void submitSection_withEt3ResponseEvent_setsRepresentativeContactDetails() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        ccdRequest.setEventId(ET3_RESPONSE);
+        doNothing().when(et3ResponseService).setRespondentRepresentsContactDetails(
+                anyString(), any(CaseData.class), anyString());
+
+        mvc.perform(post(SUBMIT_SECTION_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+
+        verify(et3ResponseService).setRespondentRepresentsContactDetails(
+                anyString(), any(CaseData.class), anyString());
+    }
+
+    @Test
+    void submitSection_withEt3ResponseEvent_handlesException() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        ccdRequest.setEventId(ET3_RESPONSE);
+        doThrow(new GenericServiceException(ERROR_CASE_DATA_NOT_FOUND,
+                new Exception(ERROR_CASE_DATA_NOT_FOUND),
+                ERROR_CASE_DATA_NOT_FOUND,
+                ccdRequest.getCaseDetails().getCaseId(),
+                "Et3ResponseService",
+                "setRespondentRepresentsContactDetails"))
+                .when(et3ResponseService).setRespondentRepresentsContactDetails(
+                        anyString(), any(CaseData.class), anyString());
+
+        mvc.perform(post(SUBMIT_SECTION_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath("$.errors.size()", is(1)))
+                .andExpect(jsonPath("$.errors[0]", is(ERROR_CASE_DATA_NOT_FOUND)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 

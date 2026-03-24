@@ -24,7 +24,8 @@ public class CaseCreationForCaseWorkerService {
             return ccdClient.submitCaseCreation(userToken, caseDetails,
                    ccdClient.startCaseCreation(userToken, caseDetails));
         } catch (Exception ex) {
-            throw new CaseCreationException(MESSAGE + caseDetails.getCaseId() + ex.getMessage());
+            throw (CaseCreationException) new CaseCreationException(
+                    MESSAGE + caseDetails.getCaseId() + ex.getMessage()).initCause(ex);
         }
     }
 }

@@ -33,6 +33,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -93,6 +95,8 @@ class SendNotificationServiceTest {
             "bundlesSubmittedNotificationForClaimantTemplateId";
     private static final String BUNDLES_SUBMITTED_NOTIFICATION_FOR_TRIBUNAL_TEMPLATE_ID =
             "bundlesSubmittedNotificationForTribunalTemplateId";
+    private static final String ERROR_MSG_PARTY_TO_NOTIFY_MUST_INCLUDE_SELECTED =
+        "Select the party or parties to notify must include the party or parties who must respond";
     private static final String CLAIMANT_ONLY = "Claimant only";
     private static final String DUMMY_ADMIN_USER_TOKEN = "DUMMY_ADMIN_USER_TOKEN";
 
@@ -249,24 +253,36 @@ class SendNotificationServiceTest {
     @Test
     void sendNotifyEmails_bothParties() {
         caseData.setSendNotificationNotify(BOTH_PARTIES);
+        CaseUserAssignment caseUserAssignment = new CaseUserAssignment();
+        caseUserAssignment.setCaseId("1234");
+        caseUserAssignment.setOrganisationId("orgId");
+        caseUserAssignment.setCaseRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
+        when(caseAccessService.getCaseUserAssignmentsById(any())).thenReturn(List.of(caseUserAssignment));
+
         sendNotificationService.sendNotifyEmails(caseDetails);
         verify(emailService, times(1))
                 .sendEmail(eq(CLAIMANT_SEND_NOTIFICATION_TEMPLATE_ID), any(), personalisationCaptor.capture());
         verify(emailService, times(1))
                 .sendEmail(eq(RESPONDENT_SEND_NOTIFICATION_TEMPLATE_ID), any(), personalisationCaptor.capture());
-        Map<String, String> val = personalisationCaptor.getValue();
-        assertEquals("exuiUrl1234", val.get("environmentUrl"));
+        Map<String, String> persVal = personalisationCaptor.getValue();
+        assertEquals("exuiUrl1234", persVal.get("environmentUrl"));
     }
 
     @Test
     void sendNotifyEmails_noClaimantEmail_onlySendsRespondentEmail() {
         caseData.setSendNotificationNotify(BOTH_PARTIES);
         caseData.getClaimantType().setClaimantEmailAddress(null);
+        CaseUserAssignment caseUserAssignment = new CaseUserAssignment();
+        caseUserAssignment.setCaseId("1234");
+        caseUserAssignment.setOrganisationId("orgId");
+        caseUserAssignment.setCaseRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
+        when(caseAccessService.getCaseUserAssignmentsById(any())).thenReturn(List.of(caseUserAssignment));
+
         sendNotificationService.sendNotifyEmails(caseDetails);
         verify(emailService, times(1))
                 .sendEmail(eq(RESPONDENT_SEND_NOTIFICATION_TEMPLATE_ID), any(), personalisationCaptor.capture());
-        Map<String, String> val = personalisationCaptor.getValue();
-        assertEquals("exuiUrl1234", val.get("environmentUrl"));
+        Map<String, String> valueMe = personalisationCaptor.getValue();
+        assertEquals("exuiUrl1234", valueMe.get("environmentUrl"));
     }
 
     @Test
@@ -274,6 +290,11 @@ class SendNotificationServiceTest {
         caseData.setSendNotificationNotify(BOTH_PARTIES);
         caseData.getRespondentCollection().forEach(o -> o.getValue().setRespondentEmail(null));
         caseData.getRepCollection().forEach(o -> o.getValue().setRepresentativeEmailAddress(null));
+        CaseUserAssignment caseUserAssignment = new CaseUserAssignment();
+        caseUserAssignment.setCaseId("1234");
+        caseUserAssignment.setOrganisationId("orgId");
+        caseUserAssignment.setCaseRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
+        when(caseAccessService.getCaseUserAssignmentsById(any())).thenReturn(List.of(caseUserAssignment));
         sendNotificationService.sendNotifyEmails(caseDetails);
         verify(emailService, times(1)).sendEmail(eq(CLAIMANT_SEND_NOTIFICATION_TEMPLATE_ID), any(), any());
     }
@@ -283,6 +304,12 @@ class SendNotificationServiceTest {
         when(featureToggleService.isEccEnabled()).thenReturn(true);
         caseData.setSendNotificationSubject(List.of("Employer Contract Claim"));
         caseData.setSendNotificationNotify(BOTH_PARTIES);
+        CaseUserAssignment caseUserAssignment = new CaseUserAssignment();
+        caseUserAssignment.setCaseId("1234");
+        caseUserAssignment.setOrganisationId("orgId");
+        caseUserAssignment.setCaseRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
+        when(caseAccessService.getCaseUserAssignmentsById(any())).thenReturn(List.of(caseUserAssignment));
+
         sendNotificationService.sendNotifyEmails(caseDetails);
         verify(emailService, times(1)).sendEmail(eq(CLAIMANT_SEND_NOTIFICATION_TEMPLATE_ID), any(), any());
         verify(emailService, times(1)).sendEmail(eq(RESPONDENT_SEND_NOTIFICATION_TEMPLATE_ID), any(), any());
@@ -301,11 +328,18 @@ class SendNotificationServiceTest {
     @Test
     void sendNotifyEmails_claimantOnly() {
         caseData.setSendNotificationNotify(CLAIMANT_ONLY);
+        CaseUserAssignment caseUserAssignment = new CaseUserAssignment();
+        caseUserAssignment.setCaseId("1234");
+        caseUserAssignment.setOrganisationId("orgId");
+        caseUserAssignment.setCaseRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
+        when(caseAccessService.getCaseUserAssignmentsById(any())).thenReturn(List.of(caseUserAssignment));
+
         sendNotificationService.sendNotifyEmails(caseDetails);
+
         verify(emailService, times(1))
                 .sendEmail(eq(CLAIMANT_SEND_NOTIFICATION_TEMPLATE_ID), any(), personalisationCaptor.capture());
-        Map<String, String> val = personalisationCaptor.getValue();
-        assertEquals("citizenUrl1234", val.get("environmentUrl"));
+        Map<String, String> persVal = personalisationCaptor.getValue();
+        assertEquals("citizenUrl1234", persVal.get("environmentUrl"));
     }
 
     @Test
@@ -317,6 +351,11 @@ class SendNotificationServiceTest {
         mockClaimantType.setClaimantEmailAddress("claimant@example.com");
         caseData.setClaimantType(mockClaimantType);
         when(caseData.getClaimantType().getClaimantEmailAddress()).thenReturn("claimant@example.com");
+
+        CaseUserAssignment caseUserAssignment = mock(CaseUserAssignment.class);
+        when(caseUserAssignment.getCaseRole()).thenReturn(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
+        when(caseUserAssignment.getUserId()).thenReturn("someUserId");
+        when(caseAccessService.getCaseUserAssignmentsById(any())).thenReturn(List.of(new CaseUserAssignment()));
 
         sendNotificationService.sendNotifyEmails(caseDetails);
         verify(emailService, times(1)).sendEmail(
@@ -459,11 +498,16 @@ class SendNotificationServiceTest {
     @Test
     void sendNotifyEmails_respondentOnly() {
         caseData.setSendNotificationNotify(RESPONDENT_ONLY);
+        CaseUserAssignment caseUserAssignment = new CaseUserAssignment();
+        caseUserAssignment.setCaseId("1234");
+        caseUserAssignment.setOrganisationId("orgId");
+        caseUserAssignment.setCaseRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
+        when(caseAccessService.getCaseUserAssignmentsById(any())).thenReturn(List.of(caseUserAssignment));
         sendNotificationService.sendNotifyEmails(caseDetails);
         verify(emailService, times(1))
                 .sendEmail(eq(RESPONDENT_SEND_NOTIFICATION_TEMPLATE_ID), any(), personalisationCaptor.capture());
-        Map<String, String> val = personalisationCaptor.getValue();
-        assertEquals("exuiUrl1234", val.get("environmentUrl"));
+        Map<String, String> persVal = personalisationCaptor.getValue();
+        assertEquals("exuiUrl1234", persVal.get("environmentUrl"));
     }
 
     @Test
@@ -513,29 +557,39 @@ class SendNotificationServiceTest {
         // Should send to all emails in the shared list
         verify(emailService, times(3))
                 .sendEmail(eq(RESPONDENT_SEND_NOTIFICATION_TEMPLATE_ID), any(), personalisationCaptor.capture());
-        Map<String, String> val = personalisationCaptor.getValue();
-        assertEquals("exuiUrl1234", val.get("environmentUrl"));
+        Map<String, String> persVal = personalisationCaptor.getValue();
+        assertEquals("exuiUrl1234", persVal.get("environmentUrl"));
     }
 
     @Test
     void sendNotifyEmails_claimantOnly_hearing() {
         caseData.setSendNotificationNotify(CLAIMANT_ONLY);
         caseData.setSendNotificationSubject(List.of("Hearing"));
+        CaseUserAssignment caseUserAssignment = new CaseUserAssignment();
+        caseUserAssignment.setCaseId("1234");
+        caseUserAssignment.setOrganisationId("orgId");
+        caseUserAssignment.setCaseRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
+        when(caseAccessService.getCaseUserAssignmentsById(any())).thenReturn(List.of(caseUserAssignment));
         sendNotificationService.sendNotifyEmails(caseDetails);
         verify(emailService, times(1))
                 .sendEmail(eq(CLAIMANT_SEND_NOTIFICATION_TEMPLATE_ID),
                         any(), personalisationCaptor.capture());
-        Map<String, String> val = personalisationCaptor.getValue();
-        assertEquals("1234", val.get("caseNumber"));
-        assertEquals("title", val.get("sendNotificationTitle"));
-        assertEquals("citizenUrl1234", val.get("environmentUrl"));
-        assertEquals("1234", val.get("caseId"));
+        Map<String, String> persVal = personalisationCaptor.getValue();
+        assertEquals("1234", persVal.get("caseNumber"));
+        assertEquals("title", persVal.get("sendNotificationTitle"));
+        assertEquals("citizenUrl1234", persVal.get("environmentUrl"));
+        assertEquals("1234", persVal.get("caseId"));
     }
 
     @Test
     void sendNotifyEmails_bothParties_hearing() {
         caseData.setSendNotificationNotify(BOTH_PARTIES);
         caseData.setSendNotificationSubject(List.of("Hearing"));
+        CaseUserAssignment caseUserAssignment = new CaseUserAssignment();
+        caseUserAssignment.setCaseId("1234");
+        caseUserAssignment.setOrganisationId("orgId");
+        caseUserAssignment.setCaseRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel());
+        when(caseAccessService.getCaseUserAssignmentsById(any())).thenReturn(List.of(caseUserAssignment));
         sendNotificationService.sendNotifyEmails(caseDetails);
         verify(emailService, times(1))
                 .sendEmail(eq(RESPONDENT_SEND_NOTIFICATION_TEMPLATE_ID),
@@ -543,11 +597,11 @@ class SendNotificationServiceTest {
         verify(emailService, times(1))
                 .sendEmail(eq(CLAIMANT_SEND_NOTIFICATION_TEMPLATE_ID),
                         any(), personalisationCaptor.capture());
-        Map<String, String> val = personalisationCaptor.getValue();
-        assertEquals("1234", val.get("caseNumber"));
-        assertEquals("title", val.get("sendNotificationTitle"));
-        assertEquals("citizenUrl1234", val.get("environmentUrl"));
-        assertEquals("1234", val.get("caseId"));
+        Map<String, String> persVal = personalisationCaptor.getValue();
+        assertEquals("1234", persVal.get("caseNumber"));
+        assertEquals("title", persVal.get("sendNotificationTitle"));
+        assertEquals("citizenUrl1234", persVal.get("environmentUrl"));
+        assertEquals("1234", persVal.get("caseId"));
     }
 
     @Test
@@ -559,11 +613,11 @@ class SendNotificationServiceTest {
         verify(emailService, times(1))
                 .sendEmail(eq(BUNDLES_SUBMITTED_NOTIFICATION_FOR_TRIBUNAL_TEMPLATE_ID),
                         any(), personalisationCaptor.capture());
-        Map<String, String> val = personalisationCaptor.getValue();
-        assertEquals("1234", val.get("caseNumber"));
-        assertEquals("claimant", val.get("claimant"));
-        assertEquals("claimant", val.get("respondentNames"));
-        assertEquals("2020-01-02", val.get("hearingDate"));
+        Map<String, String> persVal = personalisationCaptor.getValue();
+        assertEquals("1234", persVal.get("caseNumber"));
+        assertEquals("claimant", persVal.get("claimant"));
+        assertEquals("claimant", persVal.get("respondentNames"));
+        assertEquals("2020-01-02", persVal.get("hearingDate"));
 
     }
 
@@ -739,5 +793,47 @@ class SendNotificationServiceTest {
         assertNotNull(bfActionItem.getId());
         assertTrue(bfActionItem.getId().matches(
                 "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"));
+    }
+
+    @Test
+    void validateInput_shouldReturnNoError_whenPartyToRespondIsNull() {
+        caseData.setSendNotificationSelectParties(null);
+        caseData.setSendNotificationNotify(CLAIMANT_ONLY);
+        List<String> errors = sendNotificationService.validateInput(caseData);
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void validateInput_shouldReturnNoError_whenPartyToNotifyIsBothParties() {
+        caseData.setSendNotificationSelectParties(CLAIMANT_ONLY);
+        caseData.setSendNotificationNotify(BOTH_PARTIES);
+        List<String> errors = sendNotificationService.validateInput(caseData);
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void validateInput_shouldReturnNoError_whenPartyToNotifyMatchesPartyToRespond() {
+        caseData.setSendNotificationSelectParties(CLAIMANT_ONLY);
+        caseData.setSendNotificationNotify(CLAIMANT_ONLY);
+        List<String> errors = sendNotificationService.validateInput(caseData);
+        assertThat(errors).isEmpty();
+    }
+
+    @Test
+    void validateInput_shouldReturnError_whenPartyToRespondIsBothPartyButPartyToNotifyNot() {
+        caseData.setSendNotificationSelectParties(BOTH_PARTIES);
+        caseData.setSendNotificationNotify(CLAIMANT_ONLY);
+        List<String> errors = sendNotificationService.validateInput(caseData);
+        assertThat(errors).hasSize(1);
+        assertThat(errors.getFirst()).isEqualTo(ERROR_MSG_PARTY_TO_NOTIFY_MUST_INCLUDE_SELECTED);
+    }
+
+    @Test
+    void validateInput_shouldReturnError_whenPartyToNotifyDoesNotMatchPartyToRespond() {
+        caseData.setSendNotificationSelectParties(CLAIMANT_ONLY);
+        caseData.setSendNotificationNotify(RESPONDENT_ONLY);
+        List<String> errors = sendNotificationService.validateInput(caseData);
+        assertThat(errors).hasSize(1);
+        assertThat(errors.getFirst()).isEqualTo(ERROR_MSG_PARTY_TO_NOTIFY_MUST_INCLUDE_SELECTED);
     }
 }

@@ -75,8 +75,8 @@ class FileLocationServiceTest {
                 TribunalOffice.valueOfOfficeName(TRIBUNAL_OFFICE))).thenReturn(false);
         when(fileLocationRepository.existsByNameAndTribunalOffice(FILE_LOCATION_NAME,
                 TribunalOffice.valueOfOfficeName(TRIBUNAL_OFFICE))).thenReturn(false);
-        when(fileLocationRepository.findByCodeAndTribunalOffice(FILE_LOCATION_CODE,
-                TribunalOffice.valueOfOfficeName(TRIBUNAL_OFFICE))).thenReturn(fileLocation);
+        when(fileLocationRepository.findByCodeAndTribunalOfficeAndName(FILE_LOCATION_CODE,
+                TribunalOffice.valueOfOfficeName(TRIBUNAL_OFFICE), FILE_LOCATION_NAME)).thenReturn(fileLocation);
 
         List<String> errors = fileLocationService.updateFileLocation(adminData);
         verify(fileLocationRepository, times(1)).save(fileLocation);
@@ -89,8 +89,8 @@ class FileLocationServiceTest {
                 TribunalOffice.valueOfOfficeName(TRIBUNAL_OFFICE))).thenReturn(false);
         when(fileLocationRepository.existsByNameAndTribunalOffice(FILE_LOCATION_NAME,
                 TribunalOffice.valueOfOfficeName(TRIBUNAL_OFFICE))).thenReturn(false);
-        when(fileLocationRepository.findByCodeAndTribunalOffice(FILE_LOCATION_CODE,
-                TribunalOffice.valueOfOfficeName(TRIBUNAL_OFFICE))).thenReturn(fileLocation);
+        when(fileLocationRepository.findByCodeAndTribunalOfficeAndName(FILE_LOCATION_CODE,
+            TribunalOffice.valueOfOfficeName(TRIBUNAL_OFFICE), FILE_LOCATION_NAME)).thenReturn(fileLocation);
 
         List<String> errors = fileLocationService.deleteFileLocation(adminData);
         verify(fileLocationRepository, times(1)).delete(fileLocation);
@@ -101,14 +101,14 @@ class FileLocationServiceTest {
     void shouldUpdateFileLocation_ReturnFileLocationNameAndOfficeConflictError() {
         when(fileLocationRepository.existsByNameAndTribunalOffice(FILE_LOCATION_NAME,
                 TribunalOffice.valueOfOfficeName(TRIBUNAL_OFFICE))).thenReturn(true);
-        when(fileLocationRepository.findByCodeAndTribunalOffice(FILE_LOCATION_CODE,
-                TribunalOffice.valueOfOfficeName(TRIBUNAL_OFFICE))).thenReturn(fileLocation);
+        when(fileLocationRepository.findByCodeAndTribunalOfficeAndName(FILE_LOCATION_CODE,
+            TribunalOffice.valueOfOfficeName(TRIBUNAL_OFFICE), FILE_LOCATION_NAME)).thenReturn(fileLocation);
 
         List<String> errors = fileLocationService.updateFileLocation(adminData);
         verify(fileLocationRepository, times(0)).save(fileLocation);
         assertEquals(1, errors.size());
         assertEquals("A file location with the same Name (testName) and Tribunal Office (Aberdeen) already exists.",
-                errors.get(0));
+                errors.getFirst());
     }
 
     @Test
@@ -131,14 +131,15 @@ class FileLocationServiceTest {
 
         List<String> errors = fileLocationService.midEventSelectTribunalOffice(adminData);
         assertEquals(1, errors.size());
-        assertEquals("No file location found in the Aberdeen office", errors.get(0));
+        assertEquals("No file location found in the Aberdeen office", errors.getFirst());
     }
 
     @Test
     void midEventSelectFileLocation_shouldReturnFileLocation() {
-        when(fileLocationRepository.findByCodeAndTribunalOffice(
+        when(fileLocationRepository.findByCodeAndTribunalOfficeAndName(
                 adminData.getFileLocationCode(),
-                TribunalOffice.valueOfOfficeName(adminData.getTribunalOffice())))
+                TribunalOffice.valueOfOfficeName(adminData.getTribunalOffice()),
+                adminData.getFileLocationName()))
                 .thenReturn(fileLocation);
 
         List<String> errors = fileLocationService.midEventSelectFileLocation(adminData);
@@ -157,7 +158,7 @@ class FileLocationServiceTest {
         List<String> errors = fileLocationService.midEventSelectFileLocation(adminData);
 
         assertEquals(1, errors.size());
-        assertEquals("No file location found with the testCode location code", errors.get(0));
+        assertEquals("No file location found with the testCode location code", errors.getFirst());
     }
 
     private AdminData createAdminData() {

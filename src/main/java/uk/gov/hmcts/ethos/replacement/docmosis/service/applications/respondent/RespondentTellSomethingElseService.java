@@ -141,8 +141,14 @@ public class RespondentTellSomethingElseService {
     public void sendEmails(CaseDetails caseDetails, String userToken) {
         List<CaseUserAssignment> caseUserAssignments =
                 caseAccessService.getCaseUserAssignmentsById(caseDetails.getCaseId());
-        sendAcknowledgeEmail(caseDetails, userToken, caseUserAssignments);
-        sendClaimantEmail(caseDetails, caseUserAssignments);
+        if (caseUserAssignments == null || caseUserAssignments.isEmpty()) {
+            log.warn("In RespondentTellSomethingElseService : No case user assignments found for caseId {}",
+                    caseDetails.getCaseId());
+        } else {
+            sendAcknowledgeEmail(caseDetails, userToken, caseUserAssignments);
+            sendClaimantEmail(caseDetails, caseUserAssignments);
+        }
+
         sendAdminEmail(caseDetails);
     }
 

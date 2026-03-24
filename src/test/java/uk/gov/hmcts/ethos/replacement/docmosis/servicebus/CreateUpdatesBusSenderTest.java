@@ -1,14 +1,14 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.servicebus;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.mockito.junit.jupiter.MockitoExtension;
 import uk.gov.hmcts.ecm.common.model.servicebus.CreateUpdatesDto;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.CreationDataModel;
-import uk.gov.hmcts.ecm.common.servicebus.ServiceBusSender;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.messagequeue.CreateUpdatesQueueRepository;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException;
 
 import java.util.ArrayList;
@@ -20,13 +20,14 @@ import static org.mockito.Mockito.doThrow;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.InternalException.ERROR_MESSAGE;
 
-@ExtendWith(SpringExtension.class)
+@ExtendWith(MockitoExtension.class)
 class CreateUpdatesBusSenderTest {
 
-    @InjectMocks
     private CreateUpdatesBusSender createUpdatesBusSender;
     @Mock
-    private ServiceBusSender serviceBusSender;
+    private CreateUpdatesQueueRepository createUpdatesQueueRepository;
+    @Mock
+    private ObjectMapper objectMapper;
 
     private CreateUpdatesDto createUpdatesDto;
 
@@ -35,8 +36,8 @@ class CreateUpdatesBusSenderTest {
     private List<String> ethosCaseRefCollection;
 
     @BeforeEach
-    public void setUp() {
-        createUpdatesBusSender = new CreateUpdatesBusSender(serviceBusSender);
+    void setUp() {
+        createUpdatesBusSender = new CreateUpdatesBusSender(createUpdatesQueueRepository, objectMapper);
         ethosCaseRefCollection = Arrays.asList("4150001/2020", "4150002/2020",
                 "4150003/2020", "4150004/2020", "4150005/2020");
         createUpdatesDto = getCreateUpdatesDto(ethosCaseRefCollection);
@@ -52,7 +53,7 @@ class CreateUpdatesBusSenderTest {
     @Test
     void runMainMethodTestException() {
         doThrow(new InternalException(ERROR_MESSAGE))
-                .when(serviceBusSender).sendMessage(any());
+            .when(createUpdatesQueueRepository).save(any());
         createUpdatesBusSender.sendUpdatesToQueue(createUpdatesDto, creationDataModel,
                 new ArrayList<>(), String.valueOf(ethosCaseRefCollection.size()));
     }
@@ -69,7 +70,7 @@ class CreateUpdatesBusSenderTest {
 
     private CreationDataModel getCreationDataModel(List<String> ethosCaseRefCollection) {
         return CreationDataModel.builder()
-                .lead(ethosCaseRefCollection.get(0))
+                .lead(ethosCaseRefCollection.getFirst())
                 .multipleRef("4150001")
                 .build();
     }

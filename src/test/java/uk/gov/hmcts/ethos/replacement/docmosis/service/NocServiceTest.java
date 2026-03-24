@@ -166,6 +166,27 @@ class NocServiceTest {
     }
 
     @Test
+    void grantClaimantRepAccess_shouldHandleOrganisationToAddMissing() throws IOException {
+        String accessToken = "access";
+        String email = "user@test.com";
+        AccountIdByEmailResponse userResponse = new AccountIdByEmailResponse();
+        userResponse.setUserIdentifier("userId");
+        OrganisationsResponse orgResponse = OrganisationsResponse.builder()
+                .organisationIdentifier(ORGANISATION_ID_NEW)
+                .build();
+        when(organisationClient.getAccountIdByEmail(eq(accessToken), anyString(), eq(email)))
+                .thenReturn(ResponseEntity.ok(userResponse));
+        when(organisationClient.retrieveOrganisationDetailsByUserId(eq(accessToken), anyString(), eq("userId")))
+                .thenReturn(ResponseEntity.ok(orgResponse));
+        when(authTokenGenerator.generate()).thenReturn("serviceToken");
+        String caseId = "case123";
+
+        nocService.grantClaimantRepAccess(accessToken, email, caseId, null);
+
+        verify(caseAssignment, never()).addCaseUserRole(any(CaseAssignmentUserRolesRequest.class));
+    }
+
+    @Test
     void grantCaseAccess_shouldAddCaseUserRole() throws IOException {
         String userId = "userId";
         String caseId = "case123";

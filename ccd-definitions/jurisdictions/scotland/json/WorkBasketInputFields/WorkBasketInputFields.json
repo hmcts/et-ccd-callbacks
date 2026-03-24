@@ -1,0 +1,65 @@
+[
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "ethosCaseReference",
+    "Label": "Case Number",
+    "DisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "receiptDate",
+    "Label": "Receipt Date",
+    "DisplayOrder": 2
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "feeGroupReference",
+    "Label": "Submission Reference",
+    "DisplayOrder": 3
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "claimantIndType",
+    "ListElementCode": "claimant_last_name",
+    "Label": "Claimant Last Name",
+    "DisplayOrder": 4
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "claimantIndType",
+    "ListElementCode": "claimant_first_names",
+    "Label": "Claimant First Name",
+    "DisplayOrder": 5
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "respondent",
+    "Label": "Respondent",
+    "DisplayOrder": 6
+  },
+  {
+    "CaseTypeID": "ET_Scotland_Listings",
+    "CaseFieldID": "managingOffice",
+    "Label": "Managing Office",
+
+    "DisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "ET_Scotland_Listings",
+    "CaseFieldID": "documentName",
+    "Label": "Document Name",
+    "DisplayOrder": 2
+  },
+  {
+    "CaseTypeID": "ET_Scotland_Multiple",
+    "CaseFieldID": "multipleName",
+    "Label": "Multiple Name",
+    "DisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "ET_Scotland_Multiple",
+    "CaseFieldID": "multipleReference",
+    "Label": "Multiple Reference",
+    "DisplayOrder": 2
+  }
+]

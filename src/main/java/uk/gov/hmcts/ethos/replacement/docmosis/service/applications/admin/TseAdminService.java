@@ -38,6 +38,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CITIZEN_HUB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_EXUI;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.MarkdownHelper.createTwoColumnTable;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.isPartyToNotifyMismatch;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.applications.TseHelper.getAdminSelectedApplicationType;
 
 @Slf4j
@@ -45,6 +46,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.applications.TseHe
 @RequiredArgsConstructor
 public class TseAdminService {
     public static final String NOT_VIEWED_YET = "notViewedYet";
+    private static final String ERROR_MSG_PARTY_TO_NOTIFY_MUST_INCLUDE_SELECTED =
+        "Select the party or parties to notify must include the party or parties who must respond";
 
     private final EmailService emailService;
     private final TseService tseService;
@@ -66,6 +69,22 @@ public class TseAdminService {
         List<String[]> applicationResponses = tseService.formatApplicationResponses(applicationType, authToken, false);
         caseData.setTseAdminTableMarkUp(createTwoColumnTable(new String[]{"Application", ""},
             Stream.of(applicationTable, applicationResponses).flatMap(Collection::stream).toList()));
+    }
+
+    /**
+     * Validate user input.
+     * @param caseData in which the case details are extracted from
+     * @return Error message list
+     */
+    public List<String> validateInput(CaseData caseData) {
+        List<String> errors = new ArrayList<>();
+        if (isPartyToNotifyMismatch(
+            caseData.getTseAdminSelectPartyRespond(),
+            caseData.getTseAdminSelectPartyNotify()
+        )) {
+            errors.add(ERROR_MSG_PARTY_TO_NOTIFY_MUST_INCLUDE_SELECTED);
+        }
+        return errors;
     }
 
     /**

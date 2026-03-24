@@ -286,7 +286,6 @@ public class CaseActionsForCaseWorkerController {
             if (featureToggleService.citizenEt1Generation() && SUBMIT_CASE_DRAFT.equals(ccdRequest.getEventId())) {
                 caseDetails.setCaseData(caseData);
                 et1SubmissionService.createAndUploadEt1Docs(caseDetails, userToken);
-                et1SubmissionService.sendEt1ConfirmationClaimant(caseDetails, userToken);
                 et1SubmissionService.vexationCheck(caseDetails, userToken);
             }
         }
@@ -674,8 +673,10 @@ public class CaseActionsForCaseWorkerController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseManagementForCaseWorkerService.amendHearing(caseData, ccdRequest.getCaseDetails().getCaseTypeId());
-        caseManagementForCaseWorkerService.setNextListedDate(caseData);
+        //set the earliest hearing date after today's date. Needed for the Initial Consideration event
+        caseManagementForCaseWorkerService.setNextEarliestListedHearing(caseData);
 
+        caseManagementForCaseWorkerService.setNextListedDate(caseData);
         if (featureToggleService.isMul2Enabled()) {
             caseManagementForCaseWorkerService.setNextListedDateOnMultiple(ccdRequest.getCaseDetails());
         }

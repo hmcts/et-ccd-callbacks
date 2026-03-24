@@ -388,9 +388,41 @@ public class Et3ResponseController {
         try {
             if (REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS.equals(
                     caseData.getRepresentativeContactChangeOption())) {
-                et3ResponseService.setRepresentativeMyHmctsContactAddress(userToken,
-                        caseData, ccdRequest.getCaseDetails().getCaseId());
+                et3ResponseService.setRepresentativeMyHmctsAddress(userToken, caseData);
             }
+        } catch (GenericServiceException gse) {
+            errors.add(gse.getMessage());
+        }
+        return getCallbackRespEntityErrors(errors, caseData);
+    }
+
+    /**
+     * Loads current contact details from the respondent representative model {@link RepresentedTypeR}
+     * into case-level fields ready for the amend contact details form.
+     *
+     * @param ccdRequest generic request from CCD
+     * @param userToken  authentication token to verify the user
+     * @return Callback response entity with case data attached.
+     */
+    @PostMapping(value = "/aboutToStartAmendRespondentRepresentativeContact", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Loads RepresentedTypeR contact values into case-level fields")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+                content = {
+                    @Content(mediaType = "application/json",
+                            schema = @Schema(implementation = CCDCallbackResponse.class))
+                }),
+        @ApiResponse(responseCode = "400", description = "Bad Request"),
+        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    })
+    public ResponseEntity<CCDCallbackResponse> aboutToStartAmendRespondentRepresentativeContact(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader("Authorization") String userToken) {
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        List<String> errors = new ArrayList<>();
+        try {
+            et3ResponseService.loadRespondentRepresentativeValues(
+                    userToken, caseData, ccdRequest.getCaseDetails().getCaseId());
         } catch (GenericServiceException gse) {
             errors.add(gse.getMessage());
         }
@@ -421,7 +453,7 @@ public class Et3ResponseController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>();
         try {
-            et3ResponseService.setRespondentRepresentsContactDetails(
+            et3ResponseService.setAmendRespondentRepresentativeContactDetails(
                     userToken, caseData, ccdRequest.getCaseDetails().getCaseId());
             caseData.setMyHmctsAddressText(null);
         } catch (GenericServiceException gse) {

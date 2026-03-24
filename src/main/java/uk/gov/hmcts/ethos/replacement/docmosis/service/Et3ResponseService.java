@@ -255,6 +255,119 @@ public class Et3ResponseService {
     }
 
     /**
+     * Fetches the organisation address from MyHMCTS and sets it on the case-level
+     * {@code representativeAddress} and {@code myHmctsAddressText} fields.
+     *
+     * @param userToken the authentication token of the currently authenticated user
+     * @param caseData  the case data object to be updated
+     * @throws GenericServiceException if the organisation address cannot be retrieved
+     */
+    public void setRepresentativeMyHmctsAddress(String userToken, CaseData caseData)
+            throws GenericServiceException {
+        OrganisationAddress organisationAddress = myHmctsService.getOrganisationAddress(userToken);
+        caseData.setRepresentativeAddress(mapOrganisationAddressToAddress(organisationAddress));
+        caseData.setMyHmctsAddressText(getOrganisationAddressAsText(organisationAddress));
+    }
+
+    /**
+     * Loads the respondent representative's current phone number and address into the
+     * case-level {@code representativePhoneNumber} and {@code representativeAddress} fields,
+     * ready for display on the amend contact details event form.
+     *
+     * @param userToken the authentication token of the currently authenticated user
+     * @param caseData  the case data object to be updated
+     * @param caseId    the CCD case ID
+     * @throws GenericServiceException if the user's represented respondent cannot be determined
+     */
+    public void loadRespondentRepresentativeValues(String userToken, CaseData caseData, String caseId)
+            throws GenericServiceException {
+        List<Integer> representedRespondentIndexes = getRepresentedRespondentIndexes(userToken, caseId);
+        if (representedRespondentIndexes.isEmpty() || CollectionUtils.isEmpty(caseData.getRepCollection())) {
+            throw new GenericServiceException(ERROR_NO_REPRESENTED_RESPONDENT_FOUND,
+                    new Exception(ERROR_NO_REPRESENTED_RESPONDENT_FOUND),
+                    ERROR_NO_REPRESENTED_RESPONDENT_FOUND,
+                    caseId,
+                    "Et3ResponseService",
+                    "loadRespondentRepresentativeValues - No represented respondents found");
+        }
+        int index = representedRespondentIndexes.get(0);
+        if (index >= caseData.getRepCollection().size()
+                || isEmpty(caseData.getRepCollection().get(index))
+                || isEmpty(caseData.getRepCollection().get(index).getValue())) {
+            return;
+        }
+        RepresentedTypeR rep = caseData.getRepCollection().get(index).getValue();
+        caseData.setRepresentativePhoneNumber(rep.getRepresentativePhoneNumber());
+        caseData.setRepresentativeAddress(rep.getRepresentativeAddress());
+    }
+
+    /**
+     * Sets the respondent representative's phone number and address on all represented respondents
+     * using the case-level {@code representativePhoneNumber} and {@code representativeAddress} fields.
+     *
+     * @param userToken the authentication token of the currently authenticated user
+     * @param caseData  the case data object containing the updated contact details
+     * @param caseId    the CCD case ID
+     * @throws GenericServiceException if validation fails or no represented respondents are found
+     */
+    public void setAmendRespondentRepresentativeContactDetails(String userToken, CaseData caseData, String caseId)
+            throws GenericServiceException {
+        if (isEmpty(caseData)) {
+            throw new GenericServiceException(ERROR_CASE_DATA_NOT_FOUND,
+                    new Exception(ERROR_CASE_DATA_NOT_FOUND),
+                    ERROR_CASE_DATA_NOT_FOUND,
+                    StringUtils.EMPTY,
+                    "Et3ResponseService",
+                    "setAmendRespondentRepresentativeContactDetails - caseData is null or empty");
+        }
+        if (StringUtils.isBlank(userToken)) {
+            throw new GenericServiceException(ERROR_INVALID_USER_TOKEN,
+                    new Exception(ERROR_INVALID_USER_TOKEN),
+                    ERROR_INVALID_USER_TOKEN,
+                    caseId,
+                    "Et3ResponseService",
+                    "setAmendRespondentRepresentativeContactDetails - userToken is blank");
+        }
+        List<Integer> representedRespondentIndexes;
+        try {
+            representedRespondentIndexes = getRepresentedRespondentIndexes(userToken, caseId);
+        } catch (GenericServiceException gex) {
+            throw new GenericServiceException(gex.getMessage(),
+                    new Exception(gex),
+                    gex.getMessage(),
+                    caseId,
+                    "Et3ResponseService",
+                    "setAmendRespondentRepresentativeContactDetails - getRepresentedRespondentIndexes failed");
+        } catch (NoSuchElementException nse) {
+            throw new GenericServiceException(SYSTEM_ERROR,
+                    new Exception(nse),
+                    nse.getMessage(),
+                    caseId,
+                    "Et3ResponseService",
+                    "setAmendRespondentRepresentativeContactDetails - NoSuchElementException");
+        }
+        if (representedRespondentIndexes.isEmpty() || CollectionUtils.isEmpty(caseData.getRepCollection())) {
+            throw new GenericServiceException(ERROR_NO_REPRESENTED_RESPONDENT_FOUND,
+                    new Exception(ERROR_NO_REPRESENTED_RESPONDENT_FOUND),
+                    ERROR_NO_REPRESENTED_RESPONDENT_FOUND,
+                    caseId,
+                    "Et3ResponseService",
+                    "setAmendRespondentRepresentativeContactDetails - No represented respondents found");
+        }
+        for (int i : representedRespondentIndexes) {
+            if (i >= caseData.getRepCollection().size()
+                    || isEmpty(caseData.getRepCollection().get(i))
+                    || isEmpty(caseData.getRepCollection().get(i).getValue())) {
+                continue;
+            }
+            caseData.getRepCollection().get(i).getValue()
+                    .setRepresentativePhoneNumber(caseData.getRepresentativePhoneNumber());
+            caseData.getRepCollection().get(i).getValue()
+                    .setRepresentativeAddress(caseData.getRepresentativeAddress());
+        }
+    }
+
+    /**
      * Determines whether the currently authenticated user, identified by the given token, is
      * a representative (solicitor) for any respondent in the specified case.
      * <p>

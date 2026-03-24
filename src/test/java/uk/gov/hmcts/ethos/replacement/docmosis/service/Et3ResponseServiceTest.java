@@ -636,6 +636,90 @@ class Et3ResponseServiceTest {
 
     @Test
     @SneakyThrows
+    void testSetRepresentativeMyHmctsAddress() {
+        OrganisationAddress organisationAddress = OrganisationAddress.builder()
+                .addressLine1(ADDRESS_LINE_1)
+                .addressLine2(ADDRESS_LINE_2)
+                .addressLine3(ADDRESS_LINE_3)
+                .townCity(POST_TOWN)
+                .postCode(POST_CODE)
+                .county(COUNTY)
+                .country(COUNTRY)
+                .build();
+        when(myHmctsService.getOrganisationAddress(VALID_USER_TOKEN)).thenReturn(organisationAddress);
+        CaseData testCaseData = new CaseData();
+        et3ResponseService.setRepresentativeMyHmctsAddress(VALID_USER_TOKEN, testCaseData);
+        assertThat(testCaseData.getRepresentativeAddress()).isNotNull();
+        assertThat(testCaseData.getRepresentativeAddress().getAddressLine1()).isEqualTo(ADDRESS_LINE_1);
+        assertThat(testCaseData.getMyHmctsAddressText()).isNotNull();
+    }
+
+    @Test
+    @SneakyThrows
+    void testLoadRespondentRepresentativeValues() {
+        UserDetails userDetails = new UserDetails();
+        userDetails.setUid(USER_ID);
+        when(userIdamService.getUserDetails(VALID_USER_TOKEN)).thenReturn(userDetails);
+        CaseUserAssignment caseUserAssignment = new CaseUserAssignment();
+        caseUserAssignment.setCaseId(VALID_CASE_ID);
+        caseUserAssignment.setUserId(USER_ID);
+        caseUserAssignment.setCaseRole("[SOLICITORA]");
+        CaseUserAssignmentData caseUserAssignmentData = new CaseUserAssignmentData();
+        caseUserAssignmentData.setCaseUserAssignments(List.of(caseUserAssignment));
+        when(ccdCaseAssignment.getCaseUserRoles(VALID_CASE_ID)).thenReturn(caseUserAssignmentData);
+
+        RepresentedTypeR rep = RepresentedTypeR.builder()
+                .representativePhoneNumber(PHONE_NUMBER)
+                .build();
+        CaseData testCaseData = new CaseData();
+        testCaseData.setCcdID(VALID_CASE_ID);
+        testCaseData.setRepCollection(List.of(RepresentedTypeRItem.builder().value(rep).build()));
+
+        et3ResponseService.loadRespondentRepresentativeValues(VALID_USER_TOKEN, testCaseData, VALID_CASE_ID);
+        assertThat(testCaseData.getRepresentativePhoneNumber()).isEqualTo(PHONE_NUMBER);
+    }
+
+    @Test
+    @SneakyThrows
+    void testSetAmendRespondentRepresentativeContactDetails() {
+        UserDetails userDetails = new UserDetails();
+        userDetails.setUid(USER_ID);
+        when(userIdamService.getUserDetails(VALID_USER_TOKEN)).thenReturn(userDetails);
+        CaseUserAssignment caseUserAssignment = new CaseUserAssignment();
+        caseUserAssignment.setCaseId(VALID_CASE_ID);
+        caseUserAssignment.setUserId(USER_ID);
+        caseUserAssignment.setCaseRole("[SOLICITORA]");
+        CaseUserAssignmentData caseUserAssignmentData = new CaseUserAssignmentData();
+        caseUserAssignmentData.setCaseUserAssignments(List.of(caseUserAssignment));
+        when(ccdCaseAssignment.getCaseUserRoles(VALID_CASE_ID)).thenReturn(caseUserAssignmentData);
+
+        CaseData testCaseData = new CaseData();
+        testCaseData.setCcdID(VALID_CASE_ID);
+        testCaseData.setRepresentativePhoneNumber(PHONE_NUMBER);
+        testCaseData.setRepCollection(
+                List.of(RepresentedTypeRItem.builder().value(RepresentedTypeR.builder().build()).build()));
+
+        et3ResponseService.setAmendRespondentRepresentativeContactDetails(VALID_USER_TOKEN, testCaseData, VALID_CASE_ID);
+        assertThat(testCaseData.getRepCollection().getFirst().getValue().getRepresentativePhoneNumber())
+                .isEqualTo(PHONE_NUMBER);
+    }
+
+    @Test
+    void testSetAmendRespondentRepresentativeContactDetails_NullCaseData() {
+        GenericServiceException ex = assertThrows(GenericServiceException.class, () ->
+                et3ResponseService.setAmendRespondentRepresentativeContactDetails(VALID_USER_TOKEN, null, VALID_CASE_ID));
+        assertThat(ex.getMessage()).isEqualTo(ERROR_CASE_DATA_NOT_FOUND);
+    }
+
+    @Test
+    void testSetAmendRespondentRepresentativeContactDetails_BlankToken() {
+        GenericServiceException ex = assertThrows(GenericServiceException.class, () ->
+                et3ResponseService.setAmendRespondentRepresentativeContactDetails("", new CaseData(), VALID_CASE_ID));
+        assertThat(ex.getMessage()).isEqualTo(ERROR_INVALID_USER_TOKEN);
+    }
+
+    @Test
+    @SneakyThrows
     void generateEt3ResponseDocument_withEmptyRepresentativeAddress_setsOrganisationAddress() {
         CaseData testCaseData = new CaseData();
         testCaseData.setSubmitEt3Respondent(DynamicFixedListType.of(DynamicValueType.create("test", "test")));

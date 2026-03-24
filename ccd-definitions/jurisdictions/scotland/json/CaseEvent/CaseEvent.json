@@ -152,12 +152,12 @@
     "Name": "Amend contact details",
     "Description": "Amend contact details",
     "DisplayOrder": 53,
-    "PreConditionState(s)": "Accepted",
+    "PreConditionState(s)": "Submitted;Vetted;Accepted;Rejected;",
     "PostConditionState": "*",
     "SecurityClassification": "Public",
-    "EventEnablingCondition": "caseType =\"dummy\"",
     "ShowEventNotes": "N",
     "ShowSummary": "Y",
+    "CallBackURLAboutToStartEvent": "${ET_COS_URL}/et3Response/aboutToStartAmendRespondentRepresentativeContact",
     "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/et3Response/aboutToSubmitAmendRepresentativeContact"
   },
   {

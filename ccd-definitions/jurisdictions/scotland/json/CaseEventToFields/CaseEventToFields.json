@@ -5140,7 +5140,7 @@
   {
     "CaseTypeID": "ET_Scotland",
     "CaseEventID": "amendRespondentRepresentativeContact",
-    "CaseFieldID": "et3ResponsePhone",
+    "CaseFieldID": "representativePhoneNumber",
     "DisplayContext": "OPTIONAL",
     "PageID": 2,
     "PageDisplayOrder": 2,
@@ -5152,7 +5152,7 @@
   {
     "CaseTypeID": "ET_Scotland",
     "CaseEventID": "amendRespondentRepresentativeContact",
-    "CaseFieldID": "et3ResponseAddress",
+    "CaseFieldID": "representativeAddress",
     "DisplayContext": "OPTIONAL",
     "PageID": 2,
     "PageDisplayOrder": 2,

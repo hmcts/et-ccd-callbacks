@@ -215,7 +215,7 @@
     "DisplayOrder": 53,
     "PreConditionState(s)": "Submitted;Vetted;Accepted;Rejected;",
     "PostConditionState": "*",
-    "CallBackURLAboutToStartEvent": "${ET_COS_URL}/et3Response/aboutToStartAmendRespondentRepresentativeContact",
+    "CallBackURLAboutToStartEvent": "${ET_COS_URL}/respondentRepresentative/aboutToStartAmendRespondentRepresentativeContact",
     "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/et3Response/aboutToSubmitAmendRepresentativeContact",
     "SecurityClassification": "Public",
     "ShowEventNotes": "N",

@@ -44,6 +44,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -295,16 +296,20 @@ public class NocRespondentRepresentativeService {
         if (StringUtils.isBlank(email)) {
             return false;
         }
-        ResponseEntity<AccountIdByEmailResponse> response = organisationClient.getAccountIdByEmail(
-                adminUserService.getAdminUserToken(),
-                authTokenGenerator.generate(),
-                email
-        );
+        ResponseEntity<AccountIdByEmailResponse> response =
+                organisationClient.getAccountIdByEmail(
+                        adminUserService.getAdminUserToken(),
+                        authTokenGenerator.generate(),
+                        email
+                );
         if (response == null || !response.getStatusCode().is2xxSuccessful()) {
             return false;
         }
         AccountIdByEmailResponse body = response.getBody();
-        return body != null && StringUtils.isNotBlank(body.getUserIdentifier());
+        if (body == null) {
+            return false;
+        }
+        return StringUtils.isNotBlank(body.getUserIdentifier());
     }
 
     /**
@@ -441,11 +446,46 @@ public class NocRespondentRepresentativeService {
         if (CollectionUtils.isEmpty(respondentRepresentativesToRevoke)) {
             return;
         }
+        revokeAndRemoveRespondentRepresentatives(caseDetails, respondentRepresentativesToRevoke);
+    }
+
+    /**
+     * Revokes the specified respondent representatives, resets their associated organisation
+     * policies, and then removes them from the case data.
+     *
+     * <p>This method performs the following operations in order:
+     * <ol>
+     *     <li>Revokes the provided respondent representatives (e.g. updates their status so they no longer act on
+     *     the case).</li>
+     *     <li>Resets organisation policies associated with the successfully revoked representatives.</li>
+     *     <li>Removes the original list of respondent representatives from the case data.</li>
+     * </ol>
+     * </p>
+     *
+     * <p><strong>Assumptions:</strong>
+     * <ul>
+     *     <li>{@code caseDetails} is not {@code null} and contains valid {@code caseData}.</li>
+     *     <li>{@code representatives} represents the respondent representatives intended for revocation and removal.
+     *     </li>
+     *     <li>{@link #revokeRespondentRepresentatives(CaseDetails, List)} returns a non-null list
+     *         of representatives that were successfully revoked (possibly empty).</li>
+     *     <li>Organisation policies are reset only for those representatives that were successfully revoked.</li>
+     *     <li>Removal is attempted regardless of whether all representatives were successfully revoked.</li>
+     *     <li>If {@code representatives} is {@code null} or empty, no changes are applied.</li>
+     * </ul>
+     * </p>
+     *
+     * @param caseDetails the case details containing case data and respondent representatives; must not be {@code null}
+     * @param representatives the list of respondent representatives to revoke and remove; may be {@code null} or empty
+     *
+     * @throws IllegalArgumentException if {@code caseDetails} or its {@code caseData} is invalid
+     */
+    public void revokeAndRemoveRespondentRepresentatives(CaseDetails caseDetails,
+                                                         List<RepresentedTypeRItem> representatives) {
         List<RepresentedTypeRItem> revokedRepresentatives = revokeRespondentRepresentatives(caseDetails,
-                respondentRepresentativesToRevoke);
+                representatives);
         NocUtils.resetOrganisationPolicies(caseDetails.getCaseData(), revokedRepresentatives);
-        RespondentRepresentativeUtils.removeRespondentRepresentatives(caseDetails.getCaseData(),
-                respondentRepresentativesToRevoke);
+        RespondentRepresentativeUtils.removeRespondentRepresentatives(caseDetails.getCaseData(), representatives);
     }
 
     /**
@@ -847,38 +887,36 @@ public class NocRespondentRepresentativeService {
     }
 
     /**
-     * Finds the respondent representative associated with the authenticated user for the specified case.
+     * Finds all respondent representatives linked to the given user for a specific case.
      *
-     * <p>The method validates the provided inputs and retrieves {@link UserDetails} using the
-     * supplied user token. It then retrieves the {@link CaseUserAssignmentData} for the given
-     * case and iterates through the user's case role assignments.</p>
+     * <p>The method performs a series of validations on the input parameters. If the user token,
+     * case details, case ID, case data, or representative collection is missing or invalid,
+     * an empty list is returned.</p>
      *
-     * <p>If an assignment corresponds to a respondent representative role and belongs to the
-     * authenticated user, the method attempts to locate the corresponding
-     * {@link RepresentedTypeRItem} in the case data using
-     * {@link RespondentRepresentativeUtils#findRepresentativeByRoleOrRespondentName(CaseData, String)}.
-     * The first matching representative found is returned.</p>
+     * <p>It retrieves the user details using the provided token and then looks up the case user
+     * assignments. From these assignments, it filters those where the user has a respondent
+     * representative role. For each matching assignment, the corresponding representative
+     * is located within the case data and added to the result.</p>
      *
-     * <p>If the user token is invalid, the case details are incomplete, the case assignments
-     * cannot be retrieved, or no matching representative can be resolved, the method returns
-     * {@code null}. Any failure while retrieving case assignments is logged as a warning.</p>
+     * <p>If any step fails (e.g. user details not found, assignments not available, or no matching
+     * representatives), the method safely returns an empty list.</p>
      *
-     * @param userToken the authentication token used to retrieve user details and case assignments
-     * @param caseDetails the case details containing the case ID and case data
-     * @return the matching {@link RepresentedTypeRItem} associated with the authenticated user,
-     *         or {@code null} if no representative can be found
+     * @param userToken   the IDAM user authentication token
+     * @param caseDetails the case details containing case ID and case data
+     * @return a list of {@link RepresentedTypeRItem} representing the respondent representatives
+     *         associated with the user; returns an empty list if none are found or inputs are invalid
      */
-    public RepresentedTypeRItem findRepresentativeByToken(String userToken, CaseDetails caseDetails) {
+    public List<RepresentedTypeRItem> findRepresentativesByToken(String userToken, CaseDetails caseDetails) {
         if (StringUtils.isBlank(userToken)
                 || ObjectUtils.isEmpty(caseDetails)
                 || StringUtils.isBlank(caseDetails.getCaseId())
                 || ObjectUtils.isEmpty(caseDetails.getCaseData())
                 || CollectionUtils.isEmpty(caseDetails.getCaseData().getRepCollection())) {
-            return null;
+            return Collections.emptyList();
         }
         UserDetails userDetails = userIdamService.getUserDetails(userToken);
         if (ObjectUtils.isEmpty(userDetails) || StringUtils.isBlank(userDetails.getUid())) {
-            return null;
+            return Collections.emptyList();
         }
         CaseUserAssignmentData caseUserAssignmentData = null;
         try {
@@ -889,8 +927,9 @@ public class NocRespondentRepresentativeService {
         }
         if (ObjectUtils.isEmpty(caseUserAssignmentData)
                 || CollectionUtils.isEmpty(caseUserAssignmentData.getCaseUserAssignments())) {
-            return null;
+            return Collections.emptyList();
         }
+        List<RepresentedTypeRItem> representatives = new ArrayList<>();
         for (CaseUserAssignment caseUserAssignment : caseUserAssignmentData.getCaseUserAssignments()) {
             if (!RoleUtils.isRespondentRepresentativeRole(caseUserAssignment.getCaseRole())
                     || !userDetails.getUid().equals(caseUserAssignment.getUserId())) {
@@ -900,10 +939,10 @@ public class NocRespondentRepresentativeService {
                     RespondentRepresentativeUtils.findRepresentativeByRoleOrRespondentName(caseDetails.getCaseData(),
                             caseUserAssignment.getCaseRole());
             if (ObjectUtils.isNotEmpty(representative)) {
-                return representative;
+                representatives.add(representative);
             }
         }
-        return null;
+        return representatives;
     }
 
     /**

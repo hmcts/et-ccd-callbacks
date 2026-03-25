@@ -97,7 +97,9 @@ public final class NOCConstants {
     public static final String WARNING_REPRESENTATIVE_EMAIL_ADDRESS_NOT_FOUND =
             "Representative email address not found.";
     public static final String WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL =
-            "Representative '%s' could not be found using %s. Case access will not be defined for this representative.";
+            "We have been unable to assign '%s' access to this case via MyHMCTS. They must check with their "
+                    + "organisation administrator to ensure they have a valid MyHMCTS account, who will need to "
+                    + "assign the case to them.";
     public static final String WARNING_MISSING_RESPONDENT_EMAIL_ADDRESS =
             "Missing respondent email address while sending Notice of Change (NoC) respondent representative removal "
                     + NOTIFICATION_FOR_CASE;

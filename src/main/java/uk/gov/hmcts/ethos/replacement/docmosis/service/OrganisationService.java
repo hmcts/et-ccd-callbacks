@@ -49,12 +49,12 @@ public class OrganisationService {
             // checking if representative email address exists in organisation users
             if (!OrganisationUtils.hasUserIdentifier(userResponse)) {
                 String warningMessage = String.format(WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL,
-                        representativeName, email);
+                        representativeName);
                 nocWarnings.append(warningMessage).append('\n');
             }
         } catch (Exception e) {
             String warningMessage = String.format(WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL,
-                    representativeName, email);
+                    representativeName);
             nocWarnings.append(warningMessage).append('\n');
         }
         return nocWarnings.toString();

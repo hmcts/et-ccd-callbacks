@@ -46,6 +46,11 @@ public class NocRemoveRepresentationService {
     private final EmailNotificationService emailNotificationService;
     private final NocRespondentRepresentativeService nocRespondentRepresentativeService;
 
+    private static final String ORG_NAME = "orgName";
+    private static final String ORG_EMAIL_ADDRESS = "orgEmailAddress";
+    private static final String REP_NAME = "repName";
+    private static final String REP_EMAIL_ADDRESS = "repEmailAddress";
+
     @Value("${template.nocNotification.org-admin-not-representing}")
     private String nocOrgAdminNotRepresentingTemplateId;
     @Value("${template.nocNotification.noc-legal-rep-no-longer-assigned}")
@@ -62,24 +67,31 @@ public class NocRemoveRepresentationService {
      */
     public void revokeClaimantLegalRep(CaseDetails caseDetails, String userToken) {
         // create a copy of existing claimant legal rep details
-        RepresentedTypeC existingClaimantRep = caseDetails.getCaseData().getRepresentativeClaimantType();
-        final String orgName = existingClaimantRep.getNameOfOrganisation();
-        final String orgEmailAddress = nocNotificationService.findClaimantRepOrgSuperUserEmail(existingClaimantRep);
-        final String repName = existingClaimantRep.getNameOfRepresentative();
-        final String repEmailAddress = existingClaimantRep.getRepresentativeEmailAddress();
+        Map<String, String> claimantRepDetails = getClaimantRepDetails(caseDetails);
 
         // revoke claimant legal rep
         nocCcdService.revokeClaimantRepresentation(userToken, caseDetails);
         ClaimantRepresentativeUtils.markClaimantAsUnrepresented(caseDetails.getCaseData());
 
         // send email to organisation admin
-        sendNocRequestEmailToOrgAdmin(caseDetails, orgEmailAddress, repName);
+        sendNocRequestEmailToOrgAdmin(
+            caseDetails, claimantRepDetails.get(ORG_EMAIL_ADDRESS), claimantRepDetails.get(REP_NAME));
         // send email to removed legal rep
-        sendNocRequestEmailToRemovedLegalRep(caseDetails, repEmailAddress);
+        sendNocRequestEmailToRemovedLegalRep(caseDetails, claimantRepDetails.get(REP_EMAIL_ADDRESS));
         // send email to unrepresented party, i.e. claimant
-        sendClaimantNocRequestEmailToUnrepresentedParty(caseDetails, orgName);
+        sendClaimantNocRequestEmailToUnrepresentedParty(caseDetails, claimantRepDetails.get(ORG_NAME));
         // send email to other party, i.e. respondents
         sendClaimantNocRequestEmailToOtherParty(caseDetails);
+    }
+
+    private Map<String, String> getClaimantRepDetails(CaseDetails caseDetails) {
+        RepresentedTypeC existingClaimantRep = caseDetails.getCaseData().getRepresentativeClaimantType();
+        return Map.of(
+            ORG_NAME, existingClaimantRep.getNameOfOrganisation(),
+            ORG_EMAIL_ADDRESS, nocNotificationService.findClaimantRepOrgSuperUserEmail(existingClaimantRep),
+            REP_NAME, existingClaimantRep.getNameOfRepresentative(),
+            REP_EMAIL_ADDRESS, existingClaimantRep.getRepresentativeEmailAddress()
+        );
     }
 
     private void sendNocRequestEmailToOrgAdmin(
@@ -207,45 +219,43 @@ public class NocRemoveRepresentationService {
      * @param userToken the user token of the requester
      */
     public void revokeRespondentLegalRep(CaseDetails caseDetails, String userToken) {
-        // create a copy of existing claimant legal rep details
-        RepresentedTypeRItem respRepToRevoke =
-            nocRespondentRepresentativeService.findRepresentativeByToken(userToken, caseDetails);
-        String respRepIdToRevoke = respRepToRevoke.getId();
-        RepresentedTypeR respRepToRevokeValue = respRepToRevoke.getValue();
-        final String orgId = orgIdToDo;
-        final String orgName = respRepToRevokeValue.getNameOfOrganisation();
-        final String orgEmailAddress = orgEmailAddressToDo;
-        final String repName = respRepToRevokeValue.getNameOfRepresentative();
-        final String repEmailAddress = respRepToRevokeValue.getRepresentativeEmailAddress();
-
+        // create a copy of existing respondent legal rep details
         List<RepresentedTypeRItem> representatives =
             RespondentRepresentativeUtils.findRepresentativesByOrganisationId(
                 caseDetails.getCaseData(),
-                orgId
+                "orgId" // TODO
             );
+        Map<String, String> respondentRepDetails = getRespondentRepDetails(representatives.getFirst().getValue());
 
         // revoke respondent legal rep
-        // TODO
         nocRespondentRepresentativeService.revokeAndRemoveRepresentativesByOrganisation(
             caseDetails,
-            orgId
+            "orgId" // TODO
         );
 
         // send email to organisation admin
-        sendNocRequestEmailToOrgAdmin(caseDetails, orgEmailAddress, repName);
+        sendNocRequestEmailToOrgAdmin(
+            caseDetails, respondentRepDetails.get(ORG_EMAIL_ADDRESS), respondentRepDetails.get(REP_NAME));
         // send email to removed legal rep
-        sendNocRequestEmailToRemovedLegalRep(caseDetails, repEmailAddress);
+        sendNocRequestEmailToRemovedLegalRep(caseDetails, respondentRepDetails.get(REP_EMAIL_ADDRESS));
         // send email to unrepresented party, i.e. this respondent
-        sendRespondentNocRequestEmailToUnrepresentedParty(caseDetails, orgName);
+        sendRespondentNocRequestEmailToUnrepresentedParty(caseDetails, respondentRepDetails.get(ORG_NAME));
         // send email to claimant representative or claimant
         sendRespondentNocRequestEmailToClaimant(caseDetails);
-        // send email to other respondents
-        sendRespondentNocRequestEmailToOtherParty(caseDetails);
+    }
+
+    private Map<String, String> getRespondentRepDetails(RepresentedTypeR representedTypeR) {
+        return Map.of(
+            ORG_NAME, representedTypeR.getNameOfOrganisation(),
+            ORG_EMAIL_ADDRESS, "orgEmailAddress", // TODO
+            REP_NAME, representedTypeR.getNameOfRepresentative(),
+            REP_EMAIL_ADDRESS, representedTypeR.getRepresentativeEmailAddress()
+        );
     }
 
     private void sendRespondentNocRequestEmailToUnrepresentedParty(CaseDetails caseDetails, String orgName) {
-        String respondentEmailAddress = emailToDo;
-        String linkToCitUI = linkToDo;
+        String respondentEmailAddress = "emailToDo"; // TODO
+        String linkToCitUI = "linkToDo"; // TODO
         sendNocRequestEmailToUnrepresentedParty(caseDetails, orgName, linkToCitUI, respondentEmailAddress);
     }
 
@@ -255,7 +265,7 @@ public class NocRemoveRepresentationService {
         String emailToSend = isClaimantRepresented
             ? representativeClaimantType.getRepresentativeEmailAddress()
             : caseDetails.getCaseData().getClaimantType().getClaimantEmailAddress();
-        String partyName = partyNameToDo;
+        String partyName = "partyNameToDo"; // TODO
         String caseLink = isClaimantRepresented
             ? emailService.getExuiCaseLink(caseDetails.getCaseId())
             : emailService.getCitizenCaseLink(caseDetails.getCaseId());
@@ -272,13 +282,5 @@ public class NocRemoveRepresentationService {
                 e.getMessage()
             );
         }
-    }
-
-    private void sendRespondentNocRequestEmailToOtherParty(CaseDetails caseDetails) {
-        // TODO
-        // partyName
-        // linkToCitUI
-        log.info("sendRespondentNocRequestEmailToOtherParty is not implemented yet for caseId {}",
-            caseDetails.getCaseId());
     }
 }

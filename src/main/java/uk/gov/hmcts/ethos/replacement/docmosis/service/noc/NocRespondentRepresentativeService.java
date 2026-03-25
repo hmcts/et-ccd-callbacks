@@ -446,11 +446,46 @@ public class NocRespondentRepresentativeService {
         if (CollectionUtils.isEmpty(respondentRepresentativesToRevoke)) {
             return;
         }
+        revokeAndRemoveRespondentRepresentatives(caseDetails, respondentRepresentativesToRevoke);
+    }
+
+    /**
+     * Revokes the specified respondent representatives, resets their associated organisation
+     * policies, and then removes them from the case data.
+     *
+     * <p>This method performs the following operations in order:
+     * <ol>
+     *     <li>Revokes the provided respondent representatives (e.g. updates their status so they no longer act on
+     *     the case).</li>
+     *     <li>Resets organisation policies associated with the successfully revoked representatives.</li>
+     *     <li>Removes the original list of respondent representatives from the case data.</li>
+     * </ol>
+     * </p>
+     *
+     * <p><strong>Assumptions:</strong>
+     * <ul>
+     *     <li>{@code caseDetails} is not {@code null} and contains valid {@code caseData}.</li>
+     *     <li>{@code representatives} represents the respondent representatives intended for revocation and removal.
+     *     </li>
+     *     <li>{@link #revokeRespondentRepresentatives(CaseDetails, List)} returns a non-null list
+     *         of representatives that were successfully revoked (possibly empty).</li>
+     *     <li>Organisation policies are reset only for those representatives that were successfully revoked.</li>
+     *     <li>Removal is attempted regardless of whether all representatives were successfully revoked.</li>
+     *     <li>If {@code representatives} is {@code null} or empty, no changes are applied.</li>
+     * </ul>
+     * </p>
+     *
+     * @param caseDetails the case details containing case data and respondent representatives; must not be {@code null}
+     * @param representatives the list of respondent representatives to revoke and remove; may be {@code null} or empty
+     *
+     * @throws IllegalArgumentException if {@code caseDetails} or its {@code caseData} is invalid
+     */
+    public void revokeAndRemoveRespondentRepresentatives(CaseDetails caseDetails,
+                                                         List<RepresentedTypeRItem> representatives) {
         List<RepresentedTypeRItem> revokedRepresentatives = revokeRespondentRepresentatives(caseDetails,
-                respondentRepresentativesToRevoke);
+                representatives);
         NocUtils.resetOrganisationPolicies(caseDetails.getCaseData(), revokedRepresentatives);
-        RespondentRepresentativeUtils.removeRespondentRepresentatives(caseDetails.getCaseData(),
-                respondentRepresentativesToRevoke);
+        RespondentRepresentativeUtils.removeRespondentRepresentatives(caseDetails.getCaseData(), representatives);
     }
 
     /**

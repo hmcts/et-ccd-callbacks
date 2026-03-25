@@ -42,6 +42,10 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
+
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_CASE_DATA_NOT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_INVALID_USER_TOKEN;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_NO_REPRESENTED_RESPONDENT_FOUND;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator;
@@ -168,6 +172,7 @@ class NocRespondentRepresentativeServiceTest {
 
     private static final String CASE_ID_1 = "1234567890123456";
     private static final String REPRESENTATIVE_NAME = "Representative Name";
+    private static final String PHONE_NUMBER = "01234567890";
     private static final String RESPONDENT_REPRESENTATIVE_EMAIL = "respondentRepresentative@gmail.com";
     private static final String CLAIMANT_REPRESENTATIVE_EMAIL = "claimantRepresentative@gmail.com";
     private static final String REPRESENTATIVE_EMAIL_1 = "representative1@gmail.com";
@@ -1284,6 +1289,50 @@ class NocRespondentRepresentativeServiceTest {
         assertThat(nocRespondentRepresentativeService.findRepresentativesByToken(USER_TOKEN, caseDetails)).isEmpty();
         LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_ONE,
                 EXPECTED_WARNING_FAILED_TO_RETRIEVE_CASE_ASSIGNMENTS);
+    }
+
+    @Test
+    void updateRespondentRepresentativeContactDetails_NullCaseData() {
+        GenericServiceException ex = assertThrows(GenericServiceException.class, () ->
+                nocRespondentRepresentativeService.updateRespondentRepresentativeContactDetails(
+                        USER_TOKEN, null, CASE_ID_1));
+        assertThat(ex.getMessage()).isEqualTo(ERROR_CASE_DATA_NOT_FOUND);
+    }
+
+    @Test
+    void updateRespondentRepresentativeContactDetails_BlankToken() {
+        GenericServiceException ex = assertThrows(GenericServiceException.class, () ->
+                nocRespondentRepresentativeService.updateRespondentRepresentativeContactDetails(
+                        StringUtils.EMPTY, new CaseData(), CASE_ID_1));
+        assertThat(ex.getMessage()).isEqualTo(ERROR_INVALID_USER_TOKEN);
+    }
+
+    @Test
+    @SneakyThrows
+    void updateRespondentRepresentativeContactDetails_Success() {
+        RepresentedTypeRItem representative = RepresentedTypeRItem.builder()
+                .id(REPRESENTATIVE_ID_ONE)
+                .value(RepresentedTypeR.builder().role(ROLE_SOLICITORA).build())
+                .build();
+        CaseData tmpCaseData = new CaseData();
+        tmpCaseData.setRepCollection(List.of(representative));
+        tmpCaseData.setRepresentativePhoneNumber(PHONE_NUMBER);
+
+        UserDetails userDetails = new UserDetails();
+        userDetails.setUid(REPRESENTATIVE_ID_ONE);
+        when(userIdamService.getUserDetails(USER_TOKEN)).thenReturn(userDetails);
+
+        CaseUserAssignment caseUserAssignment = new CaseUserAssignment();
+        caseUserAssignment.setCaseRole(ROLE_SOLICITORA);
+        caseUserAssignment.setUserId(REPRESENTATIVE_ID_ONE);
+        CaseUserAssignmentData caseUserAssignmentData = new CaseUserAssignmentData();
+        caseUserAssignmentData.setCaseUserAssignments(List.of(caseUserAssignment));
+        when(nocCcdService.retrieveCaseUserAssignments(USER_TOKEN, CASE_ID_1)).thenReturn(caseUserAssignmentData);
+
+        nocRespondentRepresentativeService.updateRespondentRepresentativeContactDetails(
+                USER_TOKEN, tmpCaseData, CASE_ID_1);
+
+        assertThat(representative.getValue().getRepresentativePhoneNumber()).isEqualTo(PHONE_NUMBER);
     }
 
     @Test

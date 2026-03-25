@@ -23,6 +23,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et3ResponseService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +62,7 @@ public class Et3ResponseController {
         <br><a href="/cases/case-details/%s/trigger/downloadDraftEt3/downloadDraftEt31">Download draft ET3 Form</a>""";
     private final Et3ResponseService et3ResponseService;
     private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
+    private final NocRespondentRepresentativeService nocRespondentRepresentativeService;
 
     /**
      * Called at the start of the ET3 Response journey.
@@ -397,39 +399,6 @@ public class Et3ResponseController {
     }
 
     /**
-     * Loads current contact details from the respondent representative model {@link RepresentedTypeR}
-     * into case-level fields ready for the amend contact details form.
-     *
-     * @param ccdRequest generic request from CCD
-     * @param userToken  authentication token to verify the user
-     * @return Callback response entity with case data attached.
-     */
-    @PostMapping(value = "/aboutToStartAmendRespondentRepresentativeContact", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Loads RepresentedTypeR contact values into case-level fields")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully",
-                content = {
-                    @Content(mediaType = "application/json",
-                            schema = @Schema(implementation = CCDCallbackResponse.class))
-                }),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
-    })
-    public ResponseEntity<CCDCallbackResponse> aboutToStartAmendRespondentRepresentativeContact(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        List<String> errors = new ArrayList<>();
-        try {
-            et3ResponseService.loadRespondentRepresentativeValues(
-                    userToken, caseData, ccdRequest.getCaseDetails().getCaseId());
-        } catch (GenericServiceException gse) {
-            errors.add(gse.getMessage());
-        }
-        return getCallbackRespEntityErrors(errors, caseData);
-    }
-
-    /**
      * Sets new values to respondent representative model {@link RepresentedTypeR}.
      *
      * @param ccdRequest generic request from CCD
@@ -453,7 +422,7 @@ public class Et3ResponseController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>();
         try {
-            et3ResponseService.setAmendRespondentRepresentativeContactDetails(
+            nocRespondentRepresentativeService.updateRespondentRepresentativeContactDetails(
                     userToken, caseData, ccdRequest.getCaseDetails().getCaseId());
             caseData.setMyHmctsAddressText(null);
         } catch (GenericServiceException gse) {

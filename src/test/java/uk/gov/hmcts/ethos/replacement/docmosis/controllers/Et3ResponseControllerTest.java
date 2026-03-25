@@ -24,6 +24,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et3ResponseService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
@@ -69,8 +70,6 @@ class Et3ResponseControllerTest extends BaseControllerTest {
     private static final String DOWNLOAD_DRAFT_ABOUT_TO_START = "/et3Response/downloadDraft/aboutToStart";
     private static final String DOWNLOAD_DRAFT_ABOUT_TO_SUBMIT = "/et3Response/downloadDraft/aboutToSubmit";
     private static final String DOWNLOAD_DRAFT_SUBMITTED = "/et3Response/downloadDraft/submitted";
-    private static final String ABOUT_TO_START_AMEND_RESPONDENT_REPRESENTATIVE_CONTACT =
-            "/et3Response/aboutToStartAmendRespondentRepresentativeContact";
     private static final String ABOUT_TO_SUBMIT_AMEND_REPRESENTATIVE_CONTACT =
             "/et3Response/aboutToSubmitAmendRepresentativeContact";
     private static final String MID_EVENT_AMEND_REPRESENTATIVE_CONTACT =
@@ -82,6 +81,8 @@ class Et3ResponseControllerTest extends BaseControllerTest {
     private Et3ResponseService  et3ResponseService;
     @MockBean
     private CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
+    @MockBean
+    private NocRespondentRepresentativeService nocRespondentRepresentativeService;
     private MockMvc mvc;
     private CCDRequest ccdRequest;
 
@@ -508,44 +509,6 @@ class Et3ResponseControllerTest extends BaseControllerTest {
 
     @Test
     @SneakyThrows
-    void theAboutToStartAmendRespondentRepresentativeContact() {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        doNothing().when(et3ResponseService).loadRespondentRepresentativeValues(anyString(),
-                any(CaseData.class), anyString());
-        mvc.perform(post(ABOUT_TO_START_AMEND_RESPONDENT_REPRESENTATIVE_CONTACT)
-                        .contentType(APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath("$.errors.size()", is(0)))
-                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    @SneakyThrows
-    void theAboutToStartAmendRespondentRepresentativeContact_WithException() {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        doThrow(new GenericServiceException(ERROR_CASE_DATA_NOT_FOUND,
-                new Exception(ERROR_CASE_DATA_NOT_FOUND),
-                ERROR_CASE_DATA_NOT_FOUND,
-                StringUtils.EMPTY,
-                "Et3ResponseService",
-                "loadRespondentRepresentativeValues")).when(et3ResponseService)
-                .loadRespondentRepresentativeValues(anyString(), any(CaseData.class), anyString());
-        mvc.perform(post(ABOUT_TO_START_AMEND_RESPONDENT_REPRESENTATIVE_CONTACT)
-                        .contentType(APPLICATION_JSON)
-                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
-                        .content(jsonMapper.toJson(ccdRequest)))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath("$.errors.size()", is(1)))
-                .andExpect(jsonPath("$.errors[0]", is(ERROR_CASE_DATA_NOT_FOUND)))
-                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
-    }
-
-    @Test
-    @SneakyThrows
     void theMidEventAmendRepresentativeContact() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         doNothing().when(et3ResponseService).setRepresentativeMyHmctsAddress(anyString(), any(CaseData.class));
@@ -591,8 +554,8 @@ class Et3ResponseControllerTest extends BaseControllerTest {
     @SneakyThrows
     void theAboutToSubmitRepresentativeContactDetails() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        doNothing().when(et3ResponseService).setAmendRespondentRepresentativeContactDetails(anyString(),
-                any(CaseData.class), anyString());
+        doNothing().when(nocRespondentRepresentativeService).updateRespondentRepresentativeContactDetails(
+                anyString(), any(CaseData.class), anyString());
         mvc.perform(post(ABOUT_TO_SUBMIT_AMEND_REPRESENTATIVE_CONTACT)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -611,9 +574,9 @@ class Et3ResponseControllerTest extends BaseControllerTest {
                 new Exception(ERROR_CASE_DATA_NOT_FOUND),
                 ERROR_CASE_DATA_NOT_FOUND,
                 StringUtils.EMPTY,
-                "Et3ResponseService",
-                "setAmendRespondentRepresentativeContactDetails")).when(et3ResponseService)
-                .setAmendRespondentRepresentativeContactDetails(anyString(), any(CaseData.class), anyString());
+                "NocRespondentRepresentativeService",
+                "updateRespondentRepresentativeContactDetails")).when(nocRespondentRepresentativeService)
+                .updateRespondentRepresentativeContactDetails(anyString(), any(CaseData.class), anyString());
         mvc.perform(post(ABOUT_TO_SUBMIT_AMEND_REPRESENTATIVE_CONTACT)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)

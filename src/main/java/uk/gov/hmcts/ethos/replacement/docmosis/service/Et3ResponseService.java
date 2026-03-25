@@ -16,10 +16,12 @@ import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationAddress;
+import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.CcdCaseAssignment;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxService;
@@ -73,6 +75,7 @@ public class Et3ResponseService {
     private final UserIdamService userIdamService;
     private final CcdCaseAssignment ccdCaseAssignment;
     private final MyHmctsService myHmctsService;
+    private final NocRespondentRepresentativeService nocRespondentRepresentativeService;
 
     @Value("${template.et3Response.tribunal}")
     private String et3EmailTribunalTemplateId;
@@ -281,8 +284,12 @@ public class Et3ResponseService {
      */
     public void loadRespondentRepresentativeValues(String userToken, CaseData caseData, String caseId)
             throws GenericServiceException {
-        List<Integer> representedRespondentIndexes = getRepresentedRespondentIndexes(userToken, caseId);
-        if (representedRespondentIndexes.isEmpty() || CollectionUtils.isEmpty(caseData.getRepCollection())) {
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseId(caseId);
+        caseDetails.setCaseData(caseData);
+        List<RepresentedTypeRItem> representatives = nocRespondentRepresentativeService
+                .findRepresentativesByToken(userToken, caseDetails);
+        if (representatives.isEmpty()) {
             throw new GenericServiceException(ERROR_NO_REPRESENTED_RESPONDENT_FOUND,
                     new Exception(ERROR_NO_REPRESENTED_RESPONDENT_FOUND),
                     ERROR_NO_REPRESENTED_RESPONDENT_FOUND,
@@ -290,81 +297,13 @@ public class Et3ResponseService {
                     "Et3ResponseService",
                     "loadRespondentRepresentativeValues - No represented respondents found");
         }
-        int index = representedRespondentIndexes.get(0);
-        if (index >= caseData.getRepCollection().size()
-                || isEmpty(caseData.getRepCollection().get(index))
-                || isEmpty(caseData.getRepCollection().get(index).getValue())) {
+        RepresentedTypeRItem repItem = representatives.get(0);
+        if (isEmpty(repItem) || isEmpty(repItem.getValue())) {
             return;
         }
-        RepresentedTypeR rep = caseData.getRepCollection().get(index).getValue();
+        RepresentedTypeR rep = repItem.getValue();
         caseData.setRepresentativePhoneNumber(rep.getRepresentativePhoneNumber());
         caseData.setRepresentativeAddress(rep.getRepresentativeAddress());
-    }
-
-    /**
-     * Sets the respondent representative's phone number and address on all represented respondents
-     * using the case-level {@code representativePhoneNumber} and {@code representativeAddress} fields.
-     *
-     * @param userToken the authentication token of the currently authenticated user
-     * @param caseData  the case data object containing the updated contact details
-     * @param caseId    the CCD case ID
-     * @throws GenericServiceException if validation fails or no represented respondents are found
-     */
-    public void setAmendRespondentRepresentativeContactDetails(String userToken, CaseData caseData, String caseId)
-            throws GenericServiceException {
-        if (isEmpty(caseData)) {
-            throw new GenericServiceException(ERROR_CASE_DATA_NOT_FOUND,
-                    new Exception(ERROR_CASE_DATA_NOT_FOUND),
-                    ERROR_CASE_DATA_NOT_FOUND,
-                    StringUtils.EMPTY,
-                    "Et3ResponseService",
-                    "setAmendRespondentRepresentativeContactDetails - caseData is null or empty");
-        }
-        if (StringUtils.isBlank(userToken)) {
-            throw new GenericServiceException(ERROR_INVALID_USER_TOKEN,
-                    new Exception(ERROR_INVALID_USER_TOKEN),
-                    ERROR_INVALID_USER_TOKEN,
-                    caseId,
-                    "Et3ResponseService",
-                    "setAmendRespondentRepresentativeContactDetails - userToken is blank");
-        }
-        List<Integer> representedRespondentIndexes;
-        try {
-            representedRespondentIndexes = getRepresentedRespondentIndexes(userToken, caseId);
-        } catch (GenericServiceException gex) {
-            throw new GenericServiceException(gex.getMessage(),
-                    new Exception(gex),
-                    gex.getMessage(),
-                    caseId,
-                    "Et3ResponseService",
-                    "setAmendRespondentRepresentativeContactDetails - getRepresentedRespondentIndexes failed");
-        } catch (NoSuchElementException nse) {
-            throw new GenericServiceException(SYSTEM_ERROR,
-                    new Exception(nse),
-                    nse.getMessage(),
-                    caseId,
-                    "Et3ResponseService",
-                    "setAmendRespondentRepresentativeContactDetails - NoSuchElementException");
-        }
-        if (representedRespondentIndexes.isEmpty() || CollectionUtils.isEmpty(caseData.getRepCollection())) {
-            throw new GenericServiceException(ERROR_NO_REPRESENTED_RESPONDENT_FOUND,
-                    new Exception(ERROR_NO_REPRESENTED_RESPONDENT_FOUND),
-                    ERROR_NO_REPRESENTED_RESPONDENT_FOUND,
-                    caseId,
-                    "Et3ResponseService",
-                    "setAmendRespondentRepresentativeContactDetails - No represented respondents found");
-        }
-        for (int i : representedRespondentIndexes) {
-            if (i >= caseData.getRepCollection().size()
-                    || isEmpty(caseData.getRepCollection().get(i))
-                    || isEmpty(caseData.getRepCollection().get(i).getValue())) {
-                continue;
-            }
-            caseData.getRepCollection().get(i).getValue()
-                    .setRepresentativePhoneNumber(caseData.getRepresentativePhoneNumber());
-            caseData.getRepCollection().get(i).getValue()
-                    .setRepresentativeAddress(caseData.getRepresentativeAddress());
-        }
     }
 
     /**

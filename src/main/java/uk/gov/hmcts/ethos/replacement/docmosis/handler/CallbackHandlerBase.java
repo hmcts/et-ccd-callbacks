@@ -1,0 +1,95 @@
+package uk.gov.hmcts.ethos.replacement.docmosis.handler;
+
+import org.springframework.http.ResponseEntity;
+import uk.gov.hmcts.ccd.sdk.CallbackHandler;
+import uk.gov.hmcts.ccd.sdk.CallbackResponse;
+import uk.gov.hmcts.ccd.sdk.SubmittedCallbackResponse;
+import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
+import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.listing.ListingDetails;
+import uk.gov.hmcts.et.common.model.listing.ListingRequest;
+import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
+import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseDetailsConverter;
+import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
+import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+
+public abstract class CallbackHandlerBase implements CallbackHandler<CaseData> {
+
+    private final CaseDetailsConverter caseDetailsConverter;
+
+    protected CallbackHandlerBase(CaseDetailsConverter caseDetailsConverter) {
+        this.caseDetailsConverter = caseDetailsConverter;
+    }
+
+    @Override
+    public CallbackResponse<CaseData> aboutToSubmit(CallbackRequest data) {
+        var caseDetails = data == null ? null : data.getCaseDetails();
+        return aboutToSubmit(caseDetails);
+    }
+
+    abstract CallbackResponse<CaseData> aboutToSubmit(CaseDetails caseDetails);
+
+    @Override
+    public SubmittedCallbackResponse submitted(CallbackRequest data) {
+        var caseDetails = data == null ? null : data.getCaseDetails();
+        return submitted(caseDetails);
+    }
+
+    abstract SubmittedCallbackResponse submitted(CaseDetails caseDetails);
+
+    protected uk.gov.hmcts.et.common.model.ccd.CaseDetails toCaseDetails(CaseDetails caseDetails) {
+        return caseDetailsConverter.convert(caseDetails);
+    }
+
+    protected CCDRequest toCcdRequest(CaseDetails caseDetails) {
+        return new CCDRequest(toCaseDetails(caseDetails));
+    }
+
+    protected uk.gov.hmcts.et.common.model.ccd.CallbackRequest toCallbackRequest(CaseDetails caseDetails) {
+        return uk.gov.hmcts.et.common.model.ccd.CallbackRequest.builder()
+            .caseDetails(toCaseDetails(caseDetails))
+            .build();
+    }
+
+    protected MultipleRequest toMultipleRequest(CaseDetails caseDetails) {
+        MultipleDetails multipleDetails = caseDetailsConverter.convert(caseDetails, MultipleDetails.class);
+        return new MultipleRequest(multipleDetails);
+    }
+
+    protected ListingRequest toListingRequest(CaseDetails caseDetails) {
+        ListingDetails listingDetails = caseDetailsConverter.convert(caseDetails, ListingDetails.class);
+        return new ListingRequest(listingDetails);
+    }
+
+    protected CallbackResponse<CaseData> toCallbackResponse(Object result) {
+        return toCcdCallbackResponse(result);
+    }
+
+    protected SubmittedCallbackResponse toSubmittedCallbackResponse(Object result) {
+        return toCcdCallbackResponse(result);
+    }
+
+    protected CCDCallbackResponse emptyResponse() {
+        return CCDCallbackResponse.builder().build();
+    }
+
+    private CCDCallbackResponse toCcdCallbackResponse(Object result) {
+        Object responseBody = result;
+        if (result instanceof ResponseEntity<?> responseEntity) {
+            responseBody = responseEntity.getBody();
+        }
+
+        if (responseBody == null) {
+            return emptyResponse();
+        }
+
+        if (responseBody instanceof CCDCallbackResponse callbackResponse) {
+            return callbackResponse;
+        }
+
+        return caseDetailsConverter.getObjectMapper().convertValue(responseBody, CCDCallbackResponse.class);
+    }
+
+}

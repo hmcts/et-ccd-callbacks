@@ -44,6 +44,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -872,17 +873,17 @@ public class NocRespondentRepresentativeService {
      * @return the matching {@link RepresentedTypeRItem} associated with the authenticated user,
      *         or {@code null} if no representative can be found
      */
-    public RepresentedTypeRItem findRepresentativeByToken(String userToken, CaseDetails caseDetails) {
+    public List<RepresentedTypeRItem> findRepresentativesByToken(String userToken, CaseDetails caseDetails) {
         if (StringUtils.isBlank(userToken)
                 || ObjectUtils.isEmpty(caseDetails)
                 || StringUtils.isBlank(caseDetails.getCaseId())
                 || ObjectUtils.isEmpty(caseDetails.getCaseData())
                 || CollectionUtils.isEmpty(caseDetails.getCaseData().getRepCollection())) {
-            return null;
+            return Collections.emptyList();
         }
         UserDetails userDetails = userIdamService.getUserDetails(userToken);
         if (ObjectUtils.isEmpty(userDetails) || StringUtils.isBlank(userDetails.getUid())) {
-            return null;
+            return Collections.emptyList();
         }
         CaseUserAssignmentData caseUserAssignmentData = null;
         try {
@@ -893,8 +894,9 @@ public class NocRespondentRepresentativeService {
         }
         if (ObjectUtils.isEmpty(caseUserAssignmentData)
                 || CollectionUtils.isEmpty(caseUserAssignmentData.getCaseUserAssignments())) {
-            return null;
+            return Collections.emptyList();
         }
+        List<RepresentedTypeRItem> representatives = new ArrayList<>();
         for (CaseUserAssignment caseUserAssignment : caseUserAssignmentData.getCaseUserAssignments()) {
             if (!RoleUtils.isRespondentRepresentativeRole(caseUserAssignment.getCaseRole())
                     || !userDetails.getUid().equals(caseUserAssignment.getUserId())) {
@@ -904,10 +906,10 @@ public class NocRespondentRepresentativeService {
                     RespondentRepresentativeUtils.findRepresentativeByRoleOrRespondentName(caseDetails.getCaseData(),
                             caseUserAssignment.getCaseRole());
             if (ObjectUtils.isNotEmpty(representative)) {
-                return representative;
+                representatives.add(representative);
             }
         }
-        return null;
+        return representatives;
     }
 
     /**

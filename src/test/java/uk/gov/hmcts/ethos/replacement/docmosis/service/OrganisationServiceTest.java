@@ -39,6 +39,7 @@ class OrganisationServiceTest {
 
     @Test
     void theCheckRepresentativeAccountByEmail() {
+
         // when user response not has user identifier should return warning message
         when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
         when(authTokenGenerator.generate()).thenReturn(AUTHORISATION_TOKEN);

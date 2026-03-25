@@ -67,6 +67,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EVE
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REQUEST;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_TYPE_REMOVAL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_CASE_DATA_NOT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_INVALID_USER_TOKEN;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_NO_REPRESENTED_RESPONDENT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_RETRIEVE_CASE_ASSIGNMENTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_REPRESENTATIVE_EMAIL_ADDRESS_NOT_FOUND;
 
@@ -908,6 +911,59 @@ public class NocRespondentRepresentativeService {
             }
         }
         return representatives;
+    }
+
+    /**
+     * Updates the contact details (phone number and address) of the representatives for all
+     * represented respondents linked to the authenticated user within the given {@link CaseData}.
+     *
+     * <p>This method delegates representative lookup to {@link #findRepresentativesByToken} and
+     * updates each found representative with the phone number and address stored in the case-level
+     * {@code representativePhoneNumber} and {@code representativeAddress} fields.</p>
+     *
+     * @param userToken the authentication token of the currently authenticated user
+     * @param caseData  the case data containing the updated contact details
+     * @param caseId    the CCD case ID
+     * @throws GenericServiceException if caseData is null, userToken is blank, or no representatives
+     *                                 are found for the user
+     */
+    public void updateRespondentRepresentativeContactDetails(String userToken, CaseData caseData, String caseId)
+            throws GenericServiceException {
+        if (isEmpty(caseData)) {
+            throw new GenericServiceException(ERROR_CASE_DATA_NOT_FOUND,
+                    new Exception(ERROR_CASE_DATA_NOT_FOUND),
+                    ERROR_CASE_DATA_NOT_FOUND,
+                    StringUtils.EMPTY,
+                    "NocRespondentRepresentativeService",
+                    "updateRespondentRepresentativeContactDetails - caseData is null or empty");
+        }
+        if (StringUtils.isBlank(userToken)) {
+            throw new GenericServiceException(ERROR_INVALID_USER_TOKEN,
+                    new Exception(ERROR_INVALID_USER_TOKEN),
+                    ERROR_INVALID_USER_TOKEN,
+                    caseId,
+                    "NocRespondentRepresentativeService",
+                    "updateRespondentRepresentativeContactDetails - userToken is blank");
+        }
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseId(caseId);
+        caseDetails.setCaseData(caseData);
+        List<RepresentedTypeRItem> representatives = findRepresentativesByToken(userToken, caseDetails);
+        if (representatives.isEmpty()) {
+            throw new GenericServiceException(ERROR_NO_REPRESENTED_RESPONDENT_FOUND,
+                    new Exception(ERROR_NO_REPRESENTED_RESPONDENT_FOUND),
+                    ERROR_NO_REPRESENTED_RESPONDENT_FOUND,
+                    caseId,
+                    "NocRespondentRepresentativeService",
+                    "updateRespondentRepresentativeContactDetails - No represented respondents found");
+        }
+        for (RepresentedTypeRItem repItem : representatives) {
+            if (isEmpty(repItem) || isEmpty(repItem.getValue())) {
+                continue;
+            }
+            repItem.getValue().setRepresentativePhoneNumber(caseData.getRepresentativePhoneNumber());
+            repItem.getValue().setRepresentativeAddress(caseData.getRepresentativeAddress());
+        }
     }
 
     /**

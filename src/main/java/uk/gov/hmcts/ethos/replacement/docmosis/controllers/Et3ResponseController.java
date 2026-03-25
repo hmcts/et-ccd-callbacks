@@ -23,6 +23,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et3ResponseService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,6 +62,7 @@ public class Et3ResponseController {
         <br><a href="/cases/case-details/%s/trigger/downloadDraftEt3/downloadDraftEt31">Download draft ET3 Form</a>""";
     private final Et3ResponseService et3ResponseService;
     private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
+    private final NocRespondentRepresentativeService nocRespondentRepresentativeService;
 
     /**
      * Called at the start of the ET3 Response journey.
@@ -388,8 +390,7 @@ public class Et3ResponseController {
         try {
             if (REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS.equals(
                     caseData.getRepresentativeContactChangeOption())) {
-                et3ResponseService.setRepresentativeMyHmctsContactAddress(userToken,
-                        caseData, ccdRequest.getCaseDetails().getCaseId());
+                et3ResponseService.setRepresentativeMyHmctsAddress(userToken, caseData);
             }
         } catch (GenericServiceException gse) {
             errors.add(gse.getMessage());
@@ -421,7 +422,7 @@ public class Et3ResponseController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>();
         try {
-            et3ResponseService.setRespondentRepresentsContactDetails(
+            nocRespondentRepresentativeService.updateRespondentRepresentativeContactDetails(
                     userToken, caseData, ccdRequest.getCaseDetails().getCaseId());
             caseData.setMyHmctsAddressText(null);
         } catch (GenericServiceException gse) {

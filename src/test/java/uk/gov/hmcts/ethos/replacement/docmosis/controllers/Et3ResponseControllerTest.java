@@ -24,6 +24,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et3ResponseService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
@@ -80,6 +81,8 @@ class Et3ResponseControllerTest extends BaseControllerTest {
     private Et3ResponseService  et3ResponseService;
     @MockBean
     private CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
+    @MockBean
+    private NocRespondentRepresentativeService nocRespondentRepresentativeService;
     private MockMvc mvc;
     private CCDRequest ccdRequest;
 
@@ -508,8 +511,7 @@ class Et3ResponseControllerTest extends BaseControllerTest {
     @SneakyThrows
     void theMidEventAmendRepresentativeContact() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        doNothing().when(et3ResponseService).setRespondentRepresentsContactDetails(AUTH_TOKEN,
-                ccdRequest.getCaseDetails().getCaseData(), ccdRequest.getCaseDetails().getCaseId());
+        doNothing().when(et3ResponseService).setRepresentativeMyHmctsAddress(anyString(), any(CaseData.class));
         ccdRequest.getCaseDetails().getCaseData().setRepresentativeContactChangeOption(
                 REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS);
         mvc.perform(post(MID_EVENT_AMEND_REPRESENTATIVE_CONTACT)
@@ -532,8 +534,8 @@ class Et3ResponseControllerTest extends BaseControllerTest {
                 ERROR_CASE_DATA_NOT_FOUND,
                 StringUtils.EMPTY,
                 "Et3ResponseService",
-                "setRespondentRepresentsContactDetails")).when(et3ResponseService)
-                .setRepresentativeMyHmctsContactAddress(anyString(), any(CaseData.class), anyString());
+                "setRepresentativeMyHmctsAddress")).when(et3ResponseService)
+                .setRepresentativeMyHmctsAddress(anyString(), any(CaseData.class));
         ccdRequest.getCaseDetails().getCaseData().setRepresentativeContactChangeOption(
                 REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS);
         mvc.perform(post(MID_EVENT_AMEND_REPRESENTATIVE_CONTACT)
@@ -552,8 +554,8 @@ class Et3ResponseControllerTest extends BaseControllerTest {
     @SneakyThrows
     void theAboutToSubmitRepresentativeContactDetails() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        doNothing().when(et3ResponseService).setRespondentRepresentsContactDetails(AUTH_TOKEN,
-                ccdRequest.getCaseDetails().getCaseData(), ccdRequest.getCaseDetails().getCaseId());
+        doNothing().when(nocRespondentRepresentativeService).updateRespondentRepresentativeContactDetails(
+                anyString(), any(CaseData.class), anyString());
         mvc.perform(post(ABOUT_TO_SUBMIT_AMEND_REPRESENTATIVE_CONTACT)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -572,9 +574,9 @@ class Et3ResponseControllerTest extends BaseControllerTest {
                 new Exception(ERROR_CASE_DATA_NOT_FOUND),
                 ERROR_CASE_DATA_NOT_FOUND,
                 StringUtils.EMPTY,
-                "Et3ResponseService",
-                "setRespondentRepresentsContactDetails")).when(et3ResponseService)
-                .setRespondentRepresentsContactDetails(anyString(), any(CaseData.class), anyString());
+                "NocRespondentRepresentativeService",
+                "updateRespondentRepresentativeContactDetails")).when(nocRespondentRepresentativeService)
+                .updateRespondentRepresentativeContactDetails(anyString(), any(CaseData.class), anyString());
         mvc.perform(post(ABOUT_TO_SUBMIT_AMEND_REPRESENTATIVE_CONTACT)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)

@@ -23,8 +23,11 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericRuntimeException;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.Et3ResponseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
+
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_NO_REPRESENTED_RESPONDENT_FOUND;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -32,6 +35,7 @@ import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import java.util.List;
 
 import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
@@ -67,6 +71,8 @@ class RespondentRepresentativeControllerTest {
             "/respondentRepresentative/amendRespondentRepresentativeAboutToSubmit";
     private static final String URL_AMEND_RESPONDENT_REPRESENTATIVE_SUBMITTED =
             "/respondentRepresentative/amendRespondentRepresentativeSubmitted";
+    private static final String URL_ABOUT_TO_START_AMEND_RESPONDENT_REPRESENTATIVE_CONTACT =
+            "/respondentRepresentative/aboutToStartAmendRespondentRepresentativeContact";
 
     @Autowired
     private MockMvc mockMvc;
@@ -76,6 +82,8 @@ class RespondentRepresentativeControllerTest {
     private NocRespondentHelper nocRespondentHelper;
     @MockBean
     private NocRespondentRepresentativeService nocRespondentRepresentativeService;
+    @MockBean
+    private Et3ResponseService et3ResponseService;
 
     @Autowired
     private JsonMapper jsonMapper;
@@ -373,6 +381,46 @@ class RespondentRepresentativeControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
 
+    }
+
+    @Test
+    @SneakyThrows
+    void aboutToStartAmendRespondentRepresentativeContact() {
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
+        ccdRequest.getCaseDetails().setCaseId(DUMMY_SUBMISSION_REFERENCE);
+        doNothing().when(et3ResponseService).loadRespondentRepresentativeValues(
+                anyString(), any(CaseData.class), anyString());
+        mockMvc.perform(post(URL_ABOUT_TO_START_AMEND_RESPONDENT_REPRESENTATIVE_CONTACT)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header(HEADER_AUTHORIZATION, DUMMY_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath("$.errors.size()", is(0)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    @SneakyThrows
+    void aboutToStartAmendRespondentRepresentativeContact_WithException() {
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
+        ccdRequest.getCaseDetails().setCaseId(DUMMY_SUBMISSION_REFERENCE);
+        doThrow(new GenericServiceException(ERROR_NO_REPRESENTED_RESPONDENT_FOUND,
+                new Exception(ERROR_NO_REPRESENTED_RESPONDENT_FOUND),
+                ERROR_NO_REPRESENTED_RESPONDENT_FOUND,
+                DUMMY_SUBMISSION_REFERENCE,
+                "Et3ResponseService",
+                "loadRespondentRepresentativeValues")).when(et3ResponseService)
+                .loadRespondentRepresentativeValues(anyString(), any(CaseData.class), anyString());
+        mockMvc.perform(post(URL_ABOUT_TO_START_AMEND_RESPONDENT_REPRESENTATIVE_CONTACT)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header(HEADER_AUTHORIZATION, DUMMY_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath("$.errors.size()", is(1)))
+                .andExpect(jsonPath("$.errors[0]", is(ERROR_NO_REPRESENTED_RESPONDENT_FOUND)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
 }

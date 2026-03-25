@@ -25,6 +25,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericRuntimeExceptio
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicRespondentRepresentative;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.Et3ResponseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.NocUtils;
@@ -67,6 +68,7 @@ public class RespondentRepresentativeController {
 
     private final NocRespondentHelper nocRespondentHelper;
     private final NocRespondentRepresentativeService nocRespondentRepresentativeService;
+    private final Et3ResponseService et3ResponseService;
 
     @PostMapping(value = "/amendRespondentRepresentativeAboutToStart", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Populates the respondents names into a dynamic list")
@@ -195,6 +197,36 @@ public class RespondentRepresentativeController {
             log.error(ERROR_UNABLE_TO_MODIFY_REPRESENTATIVE_ACCESS,
                     callbackRequest.getCaseDetails().getCaseId(), e.getMessage());
         }
+    }
+
+    @PostMapping(value = "/aboutToStartAmendRespondentRepresentativeContact", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Loads RepresentedTypeR contact values into case-level fields")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = HTTP_CODE_TWO_HUNDRED, description = HTTP_MESSAGE_TWO_HUNDRED,
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = HTTP_CODE_FOUR_HUNDRED, description = HTTP_MESSAGE_FOUR_HUNDRED),
+        @ApiResponse(responseCode = HTTP_CODE_FOUR_ZERO_ONE, description = HTTP_MESSAGE_FOUR_ZERO_ONE),
+        @ApiResponse(responseCode = HTTP_CODE_FOUR_ZERO_THREE, description = HTTP_MESSAGE_FOUR_ZERO_THREE),
+        @ApiResponse(responseCode = HTTP_CODE_FOUR_ZERO_FOUR, description = HTTP_MESSAGE_FOUR_ZERO_FOUR),
+        @ApiResponse(responseCode = HTTP_CODE_FIVE_HUNDRED, description = HTTP_MESSAGE_FIVE_HUNDRED),
+        @ApiResponse(responseCode = HTTP_CODE_FIVE_ZERO_ONE, description = HTTP_MESSAGE_FIVE_ZERO_ONE),
+        @ApiResponse(responseCode = HTTP_CODE_FIVE_ZERO_THREE, description = HTTP_MESSAGE_FIVE_ZERO_THREE)
+    })
+    public ResponseEntity<CCDCallbackResponse> aboutToStartAmendRespondentRepresentativeContact(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(AUTHORIZATION) String userToken) {
+        CaseDataUtils.validateCCDRequest(ccdRequest);
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        List<String> errors = new ArrayList<>();
+        try {
+            et3ResponseService.loadRespondentRepresentativeValues(
+                    userToken, caseData, ccdRequest.getCaseDetails().getCaseId());
+        } catch (GenericServiceException gse) {
+            errors.add(gse.getMessage());
+        }
+        return getCallbackRespEntityErrors(errors, caseData);
     }
 
     @PostMapping(value = "/removeOwnRepresentative", consumes = APPLICATION_JSON_VALUE)

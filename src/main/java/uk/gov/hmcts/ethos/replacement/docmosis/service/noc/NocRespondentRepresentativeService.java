@@ -852,26 +852,24 @@ public class NocRespondentRepresentativeService {
     }
 
     /**
-     * Finds the respondent representative associated with the authenticated user for the specified case.
+     * Finds all respondent representatives linked to the given user for a specific case.
      *
-     * <p>The method validates the provided inputs and retrieves {@link UserDetails} using the
-     * supplied user token. It then retrieves the {@link CaseUserAssignmentData} for the given
-     * case and iterates through the user's case role assignments.</p>
+     * <p>The method performs a series of validations on the input parameters. If the user token,
+     * case details, case ID, case data, or representative collection is missing or invalid,
+     * an empty list is returned.</p>
      *
-     * <p>If an assignment corresponds to a respondent representative role and belongs to the
-     * authenticated user, the method attempts to locate the corresponding
-     * {@link RepresentedTypeRItem} in the case data using
-     * {@link RespondentRepresentativeUtils#findRepresentativeByRoleOrRespondentName(CaseData, String)}.
-     * The first matching representative found is returned.</p>
+     * <p>It retrieves the user details using the provided token and then looks up the case user
+     * assignments. From these assignments, it filters those where the user has a respondent
+     * representative role. For each matching assignment, the corresponding representative
+     * is located within the case data and added to the result.</p>
      *
-     * <p>If the user token is invalid, the case details are incomplete, the case assignments
-     * cannot be retrieved, or no matching representative can be resolved, the method returns
-     * {@code null}. Any failure while retrieving case assignments is logged as a warning.</p>
+     * <p>If any step fails (e.g. user details not found, assignments not available, or no matching
+     * representatives), the method safely returns an empty list.</p>
      *
-     * @param userToken the authentication token used to retrieve user details and case assignments
-     * @param caseDetails the case details containing the case ID and case data
-     * @return the matching {@link RepresentedTypeRItem} associated with the authenticated user,
-     *         or {@code null} if no representative can be found
+     * @param userToken   the IDAM user authentication token
+     * @param caseDetails the case details containing case ID and case data
+     * @return a list of {@link RepresentedTypeRItem} representing the respondent representatives
+     *         associated with the user; returns an empty list if none are found or inputs are invalid
      */
     public List<RepresentedTypeRItem> findRepresentativesByToken(String userToken, CaseDetails caseDetails) {
         if (StringUtils.isBlank(userToken)

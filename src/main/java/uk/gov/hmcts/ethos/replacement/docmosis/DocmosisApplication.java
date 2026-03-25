@@ -8,6 +8,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cloud.openfeign.EnableFeignClients;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ScheduledTaskRunner;
 
 import java.util.TimeZone;
@@ -28,6 +29,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EUROPE_L
     "uk.gov.hmcts.reform.ccd.client"
 })
 @EnableCaching
+@EnableAspectJAutoProxy
 @SuppressWarnings("HideUtilityClassConstructor") // Spring needs a constructor, this is not a utility class
 @Slf4j
 public class DocmosisApplication implements CommandLineRunner {

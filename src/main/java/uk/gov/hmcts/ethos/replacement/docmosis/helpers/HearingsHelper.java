@@ -37,6 +37,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LIST
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HearingConstants.TWO_JUDGES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EMPTY_STRING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EUROPE_LONDON;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.InitialConsiderationService.getAdjustedHearingTypeName;
@@ -68,7 +69,6 @@ public final class HearingsHelper {
             .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
             .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
             .toFormatter();
-    private static final String TWO_JUDGES = "Two Judges";
     public static final String BREAK_TIME_VALIDATION_MESSAGE =
             "%s break time must be after the start time and "
         + "before resume time.";

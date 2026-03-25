@@ -16,7 +16,7 @@
 	this.dynatraceEntitySelectorAAT = 'type(service),tag(\\"[Kubernetes]namespace:et\\"),tag(\\"Environment:AAT\\"),entityName.equals(\\"Et1ReppedController (AAT)\\")'
     
 	//Perftest Config
-	this.dynatraceSyntheticTest = "SYNTHETIC_TEST-56EFA62BA8AA9B13"
+	this.dynatraceSyntheticTestPerfTest = "SYNTHETIC_TEST-56EFA62BA8AA9B13"
 	this.dynatraceDashboardIdPerfTest = "a4576442-06a9-4a76-baa5-5342a525679f"
 	this.dynatraceDashboardURLPerfTest = "https://yrk32651.live.dynatrace.com/#dashboard;id=a4576442-06a9-4a76-baa5-5342a525679f;applyDashboardDefaults=true"
 	this.dynatraceEntitySelectorPerfTest = 'type(service),tag(\\"[Kubernetes]namespace:et\\"),tag(\\"Environment:PERF\\"),entityName.equals(\\"Et1ReppedController (PERF)\\")'

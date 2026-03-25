@@ -33,11 +33,13 @@ class OrganisationServiceTest {
     private static final String REPRESENTATIVE_ID_1 = "representative_id_1";
 
     private static final String EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL =
-            "Representative 'Representative Name 1' could not be found using representative_1@hmcts.org. Case access "
-                    + "will not be defined for this representative.\n";
+            "We have been unable to assign 'Representative Name 1' access to this case via MyHMCTS. They must "
+                    + "check with their organisation administrator to ensure they have a valid MyHMCTS account, who "
+                    + "will need to assign the case to them.\n";
 
     @Test
     void theCheckRepresentativeAccountByEmail() {
+
         // when user response not has user identifier should return warning message
         when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
         when(authTokenGenerator.generate()).thenReturn(AUTHORISATION_TOKEN);

@@ -158,8 +158,9 @@ class NocRespondentRepresentativeServiceTest {
             "Failed to add organisation policy for case 1234567890123456. Exception: Something went wrong";
 
     private static final String EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL =
-            "Representative 'Legal One' could not be found using respondent@rep.email.com. "
-                    + "Case access will not be defined for this representative.\n";
+            "We have been unable to assign 'Legal One' access to this case via MyHMCTS. They must check with their "
+                    + "organisation administrator to ensure they have a valid MyHMCTS account, who will need to "
+                    + "assign the case to them.\n";
     private static final String EXPECTED_WARNING_REPRESENTATIVE_EMAIL_NOT_FOUND =
             "Representative email address not found.\n";
     private static final String EXPECTED_WARNING_FAILED_TO_RETRIEVE_CASE_ASSIGNMENTS =
@@ -1226,61 +1227,61 @@ class NocRespondentRepresentativeServiceTest {
     }
 
     @Test
-    void theFindRepresentativeByToken() {
+    void theFindRepresentativesByToken() {
         // when user token is empty should return null
         CaseDetails caseDetails = new CaseDetails();
-        assertThat(nocRespondentRepresentativeService.findRepresentativeByToken(StringUtils.EMPTY, caseDetails))
-                .isNull();
+        assertThat(nocRespondentRepresentativeService.findRepresentativesByToken(StringUtils.EMPTY, caseDetails))
+                .isEmpty();
         // when case details is empty should return null
-        assertThat(nocRespondentRepresentativeService.findRepresentativeByToken(USER_TOKEN, null)).isNull();
+        assertThat(nocRespondentRepresentativeService.findRepresentativesByToken(USER_TOKEN, null)).isEmpty();
         // when case details not have case id should return null
-        assertThat(nocRespondentRepresentativeService.findRepresentativeByToken(USER_TOKEN, caseDetails)).isNull();
+        assertThat(nocRespondentRepresentativeService.findRepresentativesByToken(USER_TOKEN, caseDetails)).isEmpty();
         // when case data is empty should return null
         caseDetails.setCaseId(CASE_ID_1);
-        assertThat(nocRespondentRepresentativeService.findRepresentativeByToken(USER_TOKEN, caseDetails)).isNull();
+        assertThat(nocRespondentRepresentativeService.findRepresentativesByToken(USER_TOKEN, caseDetails)).isEmpty();
         // when representative collection is empty should return null
         CaseData tmpCaseData = new CaseData();
         caseDetails.setCaseData(tmpCaseData);
-        assertThat(nocRespondentRepresentativeService.findRepresentativeByToken(USER_TOKEN, caseDetails)).isNull();
+        assertThat(nocRespondentRepresentativeService.findRepresentativesByToken(USER_TOKEN, caseDetails)).isEmpty();
         // when user details are empty should return null
         RepresentedTypeRItem representative = RepresentedTypeRItem.builder().id(REPRESENTATIVE_ID_ONE).value(
                 RepresentedTypeR.builder().build()).build();
         tmpCaseData.setRepCollection(List.of(representative));
         when(userIdamService.getUserDetails(USER_TOKEN)).thenReturn(null);
-        assertThat(nocRespondentRepresentativeService.findRepresentativeByToken(USER_TOKEN, caseDetails)).isNull();
+        assertThat(nocRespondentRepresentativeService.findRepresentativesByToken(USER_TOKEN, caseDetails)).isEmpty();
         // when user details not have id should return null
         UserDetails userDetails = new UserDetails();
         when(userIdamService.getUserDetails(USER_TOKEN)).thenReturn(userDetails);
-        assertThat(nocRespondentRepresentativeService.findRepresentativeByToken(USER_TOKEN, caseDetails)).isNull();
+        assertThat(nocRespondentRepresentativeService.findRepresentativesByToken(USER_TOKEN, caseDetails)).isEmpty();
         // when there is no case user assignment data should return null
         userDetails.setUid(REPRESENTATIVE_ID_ONE);
         when(nocCcdService.retrieveCaseUserAssignments(USER_TOKEN, CASE_ID_1)).thenReturn(null);
-        assertThat(nocRespondentRepresentativeService.findRepresentativeByToken(USER_TOKEN, caseDetails)).isNull();
+        assertThat(nocRespondentRepresentativeService.findRepresentativesByToken(USER_TOKEN, caseDetails)).isEmpty();
         // when case user assignment data not has any case user assignment should return null
         CaseUserAssignmentData caseUserAssignmentData = new CaseUserAssignmentData();
         when(nocCcdService.retrieveCaseUserAssignments(USER_TOKEN, CASE_ID_1)).thenReturn(caseUserAssignmentData);
-        assertThat(nocRespondentRepresentativeService.findRepresentativeByToken(USER_TOKEN, caseDetails)).isNull();
+        assertThat(nocRespondentRepresentativeService.findRepresentativesByToken(USER_TOKEN, caseDetails)).isEmpty();
         // when case user assignment role is not respondent solicitor should return null
         CaseUserAssignment caseUserAssignment = new CaseUserAssignment();
         caseUserAssignment.setCaseRole(ROLE_CLAIMANT_SOLICITOR);
         caseUserAssignmentData.setCaseUserAssignments(List.of(caseUserAssignment));
-        assertThat(nocRespondentRepresentativeService.findRepresentativeByToken(USER_TOKEN, caseDetails)).isNull();
+        assertThat(nocRespondentRepresentativeService.findRepresentativesByToken(USER_TOKEN, caseDetails)).isEmpty();
         // when case user assignment role user id is not same with representative user id should return null
         caseUserAssignment.setCaseRole(ROLE_SOLICITORA);
         caseUserAssignment.setUserId(REPRESENTATIVE_ID_TWO);
-        assertThat(nocRespondentRepresentativeService.findRepresentativeByToken(USER_TOKEN, caseDetails)).isNull();
+        assertThat(nocRespondentRepresentativeService.findRepresentativesByToken(USER_TOKEN, caseDetails)).isEmpty();
         // when representative not found by role should return null
         caseUserAssignment.setUserId(REPRESENTATIVE_ID_ONE);
-        assertThat(nocRespondentRepresentativeService.findRepresentativeByToken(USER_TOKEN, caseDetails)).isNull();
+        assertThat(nocRespondentRepresentativeService.findRepresentativesByToken(USER_TOKEN, caseDetails)).isEmpty();
         // when representative found by role should return that representative
         representative.getValue().setRole(ROLE_SOLICITORA);
         caseUserAssignment.setCaseRole(ROLE_SOLICITORA);
-        assertThat(nocRespondentRepresentativeService.findRepresentativeByToken(USER_TOKEN, caseDetails))
-                .isEqualTo(representative);
+        assertThat(nocRespondentRepresentativeService.findRepresentativesByToken(USER_TOKEN, caseDetails))
+                .isEqualTo(List.of(representative));
         // when gets exception while retrieving case user assignment should log that exception and return null
         when(nocCcdService.retrieveCaseUserAssignments(USER_TOKEN, CASE_ID_1)).thenThrow(
                 new CcdInputOutputException(EXCEPTION_DUMMY_MESSAGE, new IOException(EXCEPTION_DUMMY_MESSAGE)));
-        assertThat(nocRespondentRepresentativeService.findRepresentativeByToken(USER_TOKEN, caseDetails)).isNull();
+        assertThat(nocRespondentRepresentativeService.findRepresentativesByToken(USER_TOKEN, caseDetails)).isEmpty();
         LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_ONE,
                 EXPECTED_WARNING_FAILED_TO_RETRIEVE_CASE_ASSIGNMENTS);
     }

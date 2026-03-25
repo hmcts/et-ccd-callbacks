@@ -83,7 +83,7 @@ public class AllocateHearingController {
         } else if (Constants.SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
             scotlandAllocateHearingService.handleListingSelected(caseData);
         } else {
-            log.error("Unexpected case type id " + caseTypeId);
+            log.error("Unexpected case type id {}", caseTypeId);
             return ResponseEntity.badRequest().build();
         }
 
@@ -163,12 +163,15 @@ public class AllocateHearingController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         String caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();
         if (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId)) {
+            allocateHearingService.updateSelectedHearing(caseData);
             allocateHearingService.updateCase(caseData);
         } else if (SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)) {
+            allocateHearingService.updateSelectedHearing(caseData);
             scotlandAllocateHearingService.updateCase(caseData);
         }
         caseManagementForCaseWorkerService.setNextListedDate(caseData);
         HearingsHelper.setHearingDaysAndDates(caseData);
+        allocateHearingService.clearDynamicFixedList(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
     }

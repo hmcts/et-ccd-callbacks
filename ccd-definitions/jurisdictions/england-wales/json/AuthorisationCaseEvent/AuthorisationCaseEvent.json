@@ -937,6 +937,12 @@
   },
   {
     "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "caseTransferECM",
+    "UserRole": "caseworker-wa-task-configuration",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
     "CaseEventID": "uploadDocumentForServing",
     "UserRole": "caseworker-employment",
     "CRUD": "R"

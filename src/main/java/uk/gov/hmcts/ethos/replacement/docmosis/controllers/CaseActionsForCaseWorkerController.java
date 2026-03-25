@@ -673,6 +673,9 @@ public class CaseActionsForCaseWorkerController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseManagementForCaseWorkerService.amendHearing(caseData, ccdRequest.getCaseDetails().getCaseTypeId());
+        //set the earliest hearing date after today's date. Needed for the Initial Consideration event
+        caseManagementForCaseWorkerService.setNextEarliestListedHearing(caseData);
+
         caseManagementForCaseWorkerService.setNextListedDate(caseData);
         HearingsHelper.setHearingDaysAndDates(caseData);
         if (featureToggleService.isMul2Enabled()) {

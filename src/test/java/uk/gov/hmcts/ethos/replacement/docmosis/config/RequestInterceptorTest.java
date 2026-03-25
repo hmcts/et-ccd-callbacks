@@ -9,6 +9,7 @@ import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockHttpServletResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.interceptors.RequestInterceptor;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
+import uk.gov.hmcts.reform.authorisation.validators.AuthTokenValidator;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -22,6 +23,9 @@ class RequestInterceptorTest {
     @Mock
     private VerifyTokenService verifyTokenService;
 
+    @Mock
+    private AuthTokenValidator tokenValidator;
+
     private RequestInterceptor requestInterceptor;
 
     private MockHttpServletRequest request;
@@ -30,7 +34,7 @@ class RequestInterceptorTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this);
-        requestInterceptor = new RequestInterceptor(verifyTokenService);
+        requestInterceptor = new RequestInterceptor(verifyTokenService, tokenValidator);
         request = new MockHttpServletRequest();
         response = new MockHttpServletResponse();
     }

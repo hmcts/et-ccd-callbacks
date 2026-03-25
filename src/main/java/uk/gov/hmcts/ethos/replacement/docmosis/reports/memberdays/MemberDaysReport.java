@@ -22,12 +22,12 @@ import static java.util.stream.Collectors.groupingBy;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MEMBER_DAYS_REPORT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_HEARING_DATE_TYPE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HearingConstants.FULL_PANEL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.reports.ReportCommonMethods.getHearingDurationInMinutes;
 
 @Slf4j
 public class MemberDaysReport {
     private static final int MINUTES = 60;
-    private static final String FULL_PANEL = "Full Panel";
     public static final DateTimeFormatter OLD_DATE_TIME_PATTERN3 =
         DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
 

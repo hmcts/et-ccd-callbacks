@@ -11,11 +11,13 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocNotificationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseAccessService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.ClaimantRepresentativeUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.RespondentRepresentativeUtils;
 
 import java.util.List;
 import java.util.Map;
@@ -209,13 +211,25 @@ public class NocRemoveRepresentationService {
         RepresentedTypeRItem respRepToRevoke =
             nocRespondentRepresentativeService.findRepresentativeByToken(userToken, caseDetails);
         String respRepIdToRevoke = respRepToRevoke.getId();
-        final String orgName = orgNameToDo;
+        RepresentedTypeR respRepToRevokeValue = respRepToRevoke.getValue();
+        final String orgId = orgIdToDo;
+        final String orgName = respRepToRevokeValue.getNameOfOrganisation();
         final String orgEmailAddress = orgEmailAddressToDo;
-        final String repName = repNameToDo;
-        final String repEmailAddress = repEmailAddressToDo;
+        final String repName = respRepToRevokeValue.getNameOfRepresentative();
+        final String repEmailAddress = respRepToRevokeValue.getRepresentativeEmailAddress();
+
+        List<RepresentedTypeRItem> representatives =
+            RespondentRepresentativeUtils.findRepresentativesByOrganisationId(
+                caseDetails.getCaseData(),
+                orgId
+            );
 
         // revoke respondent legal rep
         // TODO
+        nocRespondentRepresentativeService.revokeAndRemoveRepresentativesByOrganisation(
+            caseDetails,
+            orgId
+        );
 
         // send email to organisation admin
         sendNocRequestEmailToOrgAdmin(caseDetails, orgEmailAddress, repName);

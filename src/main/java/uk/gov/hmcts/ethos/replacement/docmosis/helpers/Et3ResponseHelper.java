@@ -29,6 +29,8 @@ import static org.apache.commons.lang3.StringUtils.isBlank;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ET3_RESPONSE_STATUS_ACCEPTED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ET3_RESUBMIT_STATUSES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ET3DocumentHelper.isET3NotificationDocumentTypeResponseAccepted;
 
 /**
@@ -142,6 +144,15 @@ public final class Et3ResponseHelper {
                 && YES.equals(respondent.getExtensionGranted())
                 && extensionDate.isAfter(LocalDate.now())
                 && !YES.equals(respondent.getExtensionResubmitted());
+        }
+
+        if (YES.equals(respondent.getResponseReceived())) {
+            if (isNullOrEmpty(respondent.getResponseStatus()) || ET3_RESPONSE_STATUS_ACCEPTED.equals(
+                    respondent.getResponseStatus())) {
+                return false;
+            } else {
+                return ET3_RESUBMIT_STATUSES.contains(respondent.getResponseStatus());
+            }
         }
         return false;
     }

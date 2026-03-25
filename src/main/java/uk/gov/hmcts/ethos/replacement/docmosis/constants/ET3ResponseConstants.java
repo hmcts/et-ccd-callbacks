@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.constants;
 
+import java.util.List;
+
 public final class ET3ResponseConstants {
 
     public static final String ET3_ATTACHMENT = "ET3 Attachment";
@@ -16,6 +18,12 @@ public final class ET3ResponseConstants {
     // TODO: https://tools.hmcts.net/jira/browse/RET-5960
     public static final String ERROR_ORGANISATION_DETAILS_NOT_FOUND = "Organisation details not found";
     public static final String REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS = "Use MyHMCTS details";
+    public static final String ET3_RESPONSE_STATUS_ACCEPTED = "Accepted";
+    public static final String ET3_RESPONSE_STATUS_NOT_RECEIVED = "Not Received";
+    public static final String ET3_RESPONSE_STATUS_REJECTED = "Rejected";
+    public static final String ET3_RESPONSE_STATUS_NOT_ACCEPTED = "Not Accepted";
+    public static final List<String> ET3_RESUBMIT_STATUSES = List.of(ET3_RESPONSE_STATUS_NOT_ACCEPTED,
+            ET3_RESPONSE_STATUS_NOT_RECEIVED, ET3_RESPONSE_STATUS_REJECTED);
 
     private ET3ResponseConstants() {
         // Access through static methods

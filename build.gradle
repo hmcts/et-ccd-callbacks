@@ -51,7 +51,8 @@ def sonarExclusions =
          'et-shared/src/main/java/**/configuration/**',
          'et-shared/src/main/java/**/helpers/**',
          'et-shared/src/main/java/**/launchdarkly/**',
-         'et-shared/src/main/java/**/servicebus/**'
+         'et-shared/src/main/java/**/servicebus/**',
+		 'et-shared/src/main/java/uk/gov/hmcts/ecm/compat/common/client/CcdClient.java'
 ]
 
 def duplicateCodeExclusionList = [
@@ -210,8 +211,8 @@ tasks.register('functional', Test) {
     classpath = sourceSets.apiTest.runtimeClasspath
 
     exclude '**/multiples/**'
-    
-    useJUnitPlatform()
+
+    useJUnitPlatform ()
     testLogging {
         events "passed", "skipped", "failed"
     }
@@ -431,6 +432,9 @@ dependencies {
 
     implementation project(':et-shared')
     implementation group: 'uk.gov.dwp.regex', name: 'postcode-validation', version: '1.1.0'
+    implementation group: 'com.github.hmcts', name: 'core-case-data-store-client', version: '4.9.2'
+    implementation group: 'com.github.hmcts', name: 'idam-java-client', version: '3.0.4'
+    implementation group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.1.2'
     implementation group: 'com.github.hmcts', name: 'ccd-case-document-am-client', version: '1.59.2'
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '8.0.0'
@@ -490,6 +494,9 @@ dependencies {
     implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
     implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.10.2'
 
+    // CVE-2025-7962
+    implementation group: 'org.eclipse.angus', name: 'angus-mail', version: '2.0.4'
+
     runtimeOnly group: 'com.squareup.okio', name: 'okio-jvm', version: '3.16.4'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
@@ -519,6 +526,7 @@ dependencies {
     testImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
     testImplementation group: 'org.testcontainers', name: 'postgresql', version: '1.21.3'
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.4'
+    testImplementation group: 'nl.jqno.equalsverifier', name: 'equalsverifier', version: '3.17.5'
     // Mockito 5.0.0+ has merged mockito-inline into mockito-core
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.19.0'
     testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '5.19.0'

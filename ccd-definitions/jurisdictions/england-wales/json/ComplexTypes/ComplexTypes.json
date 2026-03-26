@@ -5498,6 +5498,13 @@
   },
   {
     "ID": "Hearing",
+    "ListElementCode": "hearingDates",
+    "FieldType": "Text",
+    "ElementLabel": "Hearing Dates",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "Hearing",
     "ListElementCode": "hearingFormat",
     "FieldType": "MultiSelectList",
     "ElementLabel": "Hearing Format",
@@ -7237,5 +7244,5 @@
     "FieldOrder": 2,
     "ElementLabel": " ",
     "SecurityClassification": "Public"
-}
+  }
 ]

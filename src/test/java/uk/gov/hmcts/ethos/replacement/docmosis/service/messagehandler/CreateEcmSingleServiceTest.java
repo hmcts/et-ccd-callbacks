@@ -11,6 +11,8 @@ import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ecm.common.model.servicebus.CreateUpdatesMsg;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
@@ -18,6 +20,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MessageHandlerTestHelper;
 import java.io.IOException;
 import java.util.ArrayList;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.times;
@@ -109,5 +112,66 @@ class CreateEcmSingleServiceTest {
         verify(ccdClient, times(1))
             .submitEcmCaseCreation(eq(TEST_AUTH_TOKEN), ccdRequestCaptor.capture(), any());
         assertEquals(ecmCaseDetails.getCaseTypeId(), ccdRequestCaptor.getValue().getCaseTypeId());
+    }
+
+    @Test
+    @SuppressWarnings({"PMD.LawOfDemeter"})
+    void transferToEcmShouldClearOfficeSpecificFields() throws IOException {
+        ReflectionTestUtils.setField(createEcmSingleService, "ccdGatewayBaseUrl", "http://ccd-gateway");
+
+        CaseData caseData = new CaseData();
+        caseData.setEthosCaseReference("4150001/2020");
+        caseData.setManagingOffice(TribunalOffice.MANCHESTER.getOfficeName());
+        caseData.setFileLocation(DynamicFixedListType.of(DynamicValueType.create("Case Work Team",
+                                                                                  "Case Work Team")));
+        caseData.setClerkResponsible(DynamicFixedListType.of(DynamicValueType.create("Case Work Team",
+                                                                                      "Case Work Team")));
+        caseData.setFileLocationGlasgow(DynamicFixedListType.of(DynamicValueType.create("Glasgow Team",
+                                                                                         "Glasgow Team")));
+        caseData.setFileLocationAberdeen(DynamicFixedListType.of(DynamicValueType.create("Aberdeen Team",
+                                                                                          "Aberdeen Team")));
+        caseData.setFileLocationDundee(DynamicFixedListType.of(DynamicValueType.create("Dundee Team",
+                                                                                        "Dundee Team")));
+        caseData.setFileLocationEdinburgh(DynamicFixedListType.of(DynamicValueType.create("Edinburgh Team",
+                                                                                           "Edinburgh Team")));
+
+        SubmitEvent submitEvent = new SubmitEvent();
+        submitEvent.setState(ACCEPTED_STATE);
+        submitEvent.setCaseData(caseData);
+
+        var returnedEcmCcdRequest = new uk.gov.hmcts.ecm.common.model.ccd.CCDRequest();
+        returnedEcmCcdRequest.setCaseDetails(new CaseDetails());
+        when(ccdClient.startEcmCaseCreationTransfer(eq(TEST_AUTH_TOKEN), any(CaseDetails.class)))
+            .thenReturn(returnedEcmCcdRequest);
+
+        var ecmCaseData = new uk.gov.hmcts.ecm.common.model.ccd.CaseData();
+        ecmCaseData.setEthosCaseReference("18850001/2020");
+        var ecmSubmitEvent = new uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent();
+        ecmSubmitEvent.setCaseData(ecmCaseData);
+        when(ccdClient.submitEcmCaseCreation(eq(TEST_AUTH_TOKEN),
+            any(CaseDetails.class), any(uk.gov.hmcts.ecm.common.model.ccd.CCDRequest.class)))
+            .thenReturn(ecmSubmitEvent);
+
+        var ccdRequest = new CCDRequest();
+        var requestCaseDetails = new uk.gov.hmcts.et.common.model.ccd.CaseDetails();
+        requestCaseDetails.setCaseData(new uk.gov.hmcts.et.common.model.ccd.CaseData());
+        ccdRequest.setCaseDetails(requestCaseDetails);
+        when(ccdClient.startEventForCase(eq(TEST_AUTH_TOKEN), any(), any(), any())).thenReturn(ccdRequest);
+
+        createEcmSingleService.sendCreation(
+            submitEvent,
+            TEST_AUTH_TOKEN,
+            MessageHandlerTestHelper.transferToEcmMessage()
+        );
+
+        ArgumentCaptor<CaseDetails> detailsCaptor = ArgumentCaptor.forClass(CaseDetails.class);
+        verify(ccdClient).submitEcmCaseCreation(eq(TEST_AUTH_TOKEN), detailsCaptor.capture(), any());
+        uk.gov.hmcts.ecm.common.model.ccd.CaseData sentCaseData = detailsCaptor.getValue().getCaseData();
+        assertNull(sentCaseData.getClerkResponsible());
+        assertNull(sentCaseData.getFileLocation());
+        assertNull(sentCaseData.getFileLocationGlasgow());
+        assertNull(sentCaseData.getFileLocationAberdeen());
+        assertNull(sentCaseData.getFileLocationDundee());
+        assertNull(sentCaseData.getFileLocationEdinburgh());
     }
 }

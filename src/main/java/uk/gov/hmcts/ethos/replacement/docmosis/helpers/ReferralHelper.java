@@ -410,9 +410,13 @@ public final class ReferralHelper {
     }
 
     public static boolean isValidReferralStatus(BaseCaseData caseData) {
-        ReferralType referral = caseData.getReferralCollection()
-                .get(Integer.parseInt(caseData.getSelectReferral().getValue().getCode()) - 1).getValue();
-        return ReferralStatus.AWAITING_INSTRUCTIONS.equals(referral.getReferralStatus());
+        List<ReferralTypeItem> referralTypeItems = caseData.getReferralCollection();
+        if (referralTypeItems != null && !referralTypeItems.isEmpty()) {
+            var referralTypeItem = referralTypeItems.get(Integer.parseInt(
+                    caseData.getSelectReferral().getValue().getCode()) - 1).getValue();
+            return ReferralStatus.AWAITING_INSTRUCTIONS.equals(referralTypeItem.getReferralStatus());
+        }
+        return false;
     }
 
     /**

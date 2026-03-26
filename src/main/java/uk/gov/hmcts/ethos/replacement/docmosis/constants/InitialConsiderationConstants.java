@@ -135,6 +135,11 @@ public final class InitialConsiderationConstants {
             </tbody>
             </table>
             """;
+    public static final String BEFORE_LABEL_DCF_IC = "<br><a target=\"_blank\" "
+        + "href=\"%s\">DCF</a>";
+    public static final String VIEW_ALL_DOCUMENTS =
+        "<br><a target=\"_blank\" href=\"/cases/case-details/%s#Documents\">"
+            + "View all documents</a>";
 
     private InitialConsiderationConstants() {
         // Access through static methods

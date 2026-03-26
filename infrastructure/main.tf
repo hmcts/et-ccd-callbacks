@@ -9,6 +9,12 @@ provider "azurerm" {
   subscription_id            = var.aks_subscription_id
 }
 
+provider "azurerm" {
+  alias           = "aks-cftapps"
+  subscription_id = var.aks_subscription_id
+  features {}
+}
+
 locals {
   tagEnv = var.env == "aat" ? "staging" : var.env == "perftest" ? "testing" : var.env
   tags = merge(var.common_tags,
@@ -21,6 +27,11 @@ locals {
       "builtFrom"    = "et-ccd-callbacks"
     })
   )
+  api_mgmt_suffix      = var.apim_suffix == "" ? var.env : var.apim_suffix
+  api_mgmt_name        = "cft-api-mgmt-${local.api_mgmt_suffix}"
+  api_mgmt_rg          = join("-", ["cft", var.env, "network-rg"])
+  et_ccd_callbacks_url = join("", ["http://et-cos-", var.env, ".service.core-compute-", var.env, ".internal"])
+  s2sUrl               = join("", ["http://rpe-service-auth-provider-", var.env, ".service.core-compute-", var.env, ".internal"])
 }
 
 

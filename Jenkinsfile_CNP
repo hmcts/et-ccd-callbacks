@@ -104,6 +104,15 @@ withPipeline(type, product, component) {
   syncBranchesWithMaster(branchesToSync)
   enableSlackNotifications('#et-builds')
 
+  // Enable Performance Test Stages
+  enablePerformanceTestStages(timeout: 10, perfTestEnvironments: ['preview','aat','perftest'])
+  enableGatlingLoadTests([
+    repo: 'https://github.com/hmcts/performance-testing.git',
+    branch: 'add-et-tests', 
+    simulation: 'et.simulations.EtCosApiBuildSimulation', 
+    timeout: 10
+  ])
+
   afterAlways('test') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/**/*'
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/pmd/*'

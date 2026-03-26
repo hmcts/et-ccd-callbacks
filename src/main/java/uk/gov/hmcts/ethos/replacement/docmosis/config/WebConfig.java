@@ -39,7 +39,31 @@ public class WebConfig implements WebMvcConfigurer {
                 "/metrics",
                 "/metrics/**",
                 "/v3/**",
-                "/"
+                "/",
+                "/bundles/**",
+                "/cases/**",
+                "/document/**",
+                "/documents/**",
+                "/et3/**",
+                "/generate-pdf",
+                "/getAcasDocuments",
+                "/getCaseData",
+                "/getLastModifiedCaseList",
+                "/downloadAcasDocuments",
+                "/manageCaseRole/**",
+                "/respondentTSE/submit-respondent-application",
+                "/respondentTSE/store-respondent-application",
+                "/respondentTSE/respond-to-claimant-application",
+                "/respondentTSE/change-respondent-application-status",
+                "/sendNotification/update-notification-state",
+                "/sendNotification/add-response-send-notification",
+                "/sendNotification/change-respondent-notification-status",
+                "/sendNotification/add-respondent-respond-to-notification",
+                "/sendNotification/store-respondent-respond-to-notification",
+                "/sendNotification/submit-respondent-respond-to-notification",
+                "/store/**",
+                "/tseAdmin/update-admin-decision-state",
+                "/vetAndAcceptCase"
             );
     }
 }

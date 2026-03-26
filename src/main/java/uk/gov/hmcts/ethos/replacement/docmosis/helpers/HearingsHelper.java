@@ -31,12 +31,14 @@ import java.util.Optional;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HearingConstants.TWO_JUDGES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EMPTY_STRING;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EUROPE_LONDON;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.InitialConsiderationService.getAdjustedHearingTypeName;
@@ -68,7 +70,6 @@ public final class HearingsHelper {
             .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
             .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
             .toFormatter();
-    private static final String TWO_JUDGES = "Two Judges";
     public static final String BREAK_TIME_VALIDATION_MESSAGE =
             "%s break time must be after the start time and "
         + "before resume time.";
@@ -402,5 +403,49 @@ public final class HearingsHelper {
             dateListedType.setPostponedBy(null);
             dateListedType.setPostponedDate(null);
         }
+    }
+
+    /**
+     * Sets the hearing days and dates for each hearing in the case data. This method processes the hearing
+     * collection in the provided case data. For each hearing, it calculates the number
+     * of days and formats the hearing dates based on the listed and heard statuses.
+     * If there are no hearing dates with the listed or heard status, it sets the number of days to "-" and the
+     * hearing dates to "TBC". Otherwise, it sets the number of days to the count of valid hearing dates and
+     * the hearing dates to a formatted string of the first and last valid dates.
+     *
+     * @param caseData The case data containing the hearing collection to process.
+     */
+    public static void setHearingDaysAndDates(CaseData caseData) {
+        if (isEmpty(caseData.getHearingCollection())) {
+            return;
+        }
+        caseData.getHearingCollection().stream()
+            .map(HearingTypeItem::getValue)
+            .forEach(hearingType -> {
+                List<DateListedTypeItem> dateListedTypeItems = hearingType.getHearingDateCollection();
+                if (isEmpty(dateListedTypeItems)) {
+                    return;
+                }
+                List<String> hearingDates = dateListedTypeItems.stream()
+                    .filter(Objects::nonNull)
+                    .map(DateListedTypeItem::getValue)
+                    .filter(dateListedType ->
+                        HEARING_STATUS_LISTED.equals(dateListedType.getHearingStatus())
+                        || HEARING_STATUS_HEARD.equals(dateListedType.getHearingStatus()))
+                    .map(dateListedType -> LocalDate.parse(dateListedType.getListedDate().substring(0, 10))
+                        .format(DateTimeFormatter.ofPattern("d MMM yyyy")))
+                    .sorted(Comparator.comparing(date ->
+                        LocalDate.parse(date, DateTimeFormatter.ofPattern("d MMM yyyy"))))
+                    .toList();
+
+                if (isNotEmpty(hearingDates)) {
+                    hearingType.setHearingDates(
+                        hearingDates.size() == 1
+                            ? hearingDates.getFirst()
+                            : hearingDates.getFirst() + " - " + hearingDates.getLast());
+                } else {
+                    hearingType.setHearingDates("-");
+                }
+            });
     }
 }

@@ -688,8 +688,12 @@ class NocRespondentRepresentativeServiceTest {
         assertThat(nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(callbackRequest,
                 USER_TOKEN, representativesToRemove)).hasSize(LoggerTestUtils.INTEGER_ONE)
                 .isEqualTo(List.of(tmpRepresentative));
-        verify(ccdClient, times(LoggerTestUtils.INTEGER_TWO)).revokeCaseAssignments(USER_TOKEN,
-                caseUserAssignmentData);
+        // when respondent name is found and same with the name of the represented respondent but not able to revoke
+        // assignment should return empty list
+        when(ccdClient.revokeCaseAssignments(eq(USER_TOKEN), any(CaseUserAssignmentData.class)))
+                .thenThrow(new IOException(EXCEPTION_DUMMY_MESSAGE));
+        assertThat(nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(callbackRequest,
+                USER_TOKEN, representativesToRemove)).isEmpty();
     }
 
     private void verifyNocCcdServiceCaseAssignmentsCall(int callNumber) {
@@ -1404,8 +1408,17 @@ class NocRespondentRepresentativeServiceTest {
         // when representative is found should revoke case user assignment
         when(ccdClient.revokeCaseAssignments(eq(ADMIN_USER_TOKEN), any(CaseUserAssignmentData.class)))
                 .thenReturn(StringUtils.EMPTY);
-        nocRespondentRepresentativeService.revokeRespondentRepresentatives(caseDetails, List.of(representative));
-        verify(ccdClient).revokeCaseAssignments(eq(ADMIN_USER_TOKEN), any(CaseUserAssignmentData.class));
+        assertThat(nocRespondentRepresentativeService.revokeRespondentRepresentatives(caseDetails,
+                List.of(representative))).isNotEmpty().isEqualTo(List.of(representative));
+        verify(ccdClient, times(LoggerTestUtils.INTEGER_ONE)).revokeCaseAssignments(eq(ADMIN_USER_TOKEN),
+                any(CaseUserAssignmentData.class));
+        // when representative is found but not able to revoke case user assignment should return empty list.
+        when(ccdClient.revokeCaseAssignments(eq(ADMIN_USER_TOKEN), any(CaseUserAssignmentData.class)))
+                .thenThrow(new IOException(EXCEPTION_DUMMY_MESSAGE));
+        assertThat(nocRespondentRepresentativeService.revokeRespondentRepresentatives(caseDetails,
+                List.of(representative))).isEmpty();
+        verify(ccdClient, times(LoggerTestUtils.INTEGER_TWO)).revokeCaseAssignments(eq(ADMIN_USER_TOKEN),
+                any(CaseUserAssignmentData.class));
     }
 
     @Test

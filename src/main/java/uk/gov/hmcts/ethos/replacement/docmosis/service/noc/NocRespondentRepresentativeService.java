@@ -62,6 +62,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_REPRESENTATIVE_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_FAILED_TO_REMOVE_ORGANISATION_POLICIES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_SOLICITOR_ROLE_NOT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_MODIFY_REPRESENTATIVE_ACCESS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_NOTIFY_REPRESENTATION_REMOVAL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_SET_ROLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND;
@@ -374,7 +375,12 @@ public class NocRespondentRepresentativeService {
                 caseUserAssignmentsToRevoke.add(caseUserAssignment);
             }
         }
-        revokeCaseAssignments(userToken, caseUserAssignmentsToRevoke);
+        try {
+            revokeCaseAssignments(userToken, caseUserAssignmentsToRevoke);
+        } catch (GenericRuntimeException e) {
+            log.error(ERROR_UNABLE_TO_NOTIFY_REPRESENTATION_REMOVAL, oldCaseDetails.getCaseId(), e.getMessage(), e);
+            return new ArrayList<>();
+        }
         return representativesToRevoke;
     }
 
@@ -550,17 +556,23 @@ public class NocRespondentRepresentativeService {
                 representativesToRemove.add(representedTypeRItem);
             }
         }
-        revokeCaseAssignments(adminUserService.getAdminUserToken(), caseUserAssignmentsToRevoke);
+        try {
+            revokeCaseAssignments(adminUserService.getAdminUserToken(), caseUserAssignmentsToRevoke);
+        } catch (GenericRuntimeException e) {
+            log.error(ERROR_UNABLE_TO_MODIFY_REPRESENTATIVE_ACCESS, caseDetails.getCaseId(), e.getMessage(), e);
+            return new ArrayList<>();
+        }
         return representativesToRemove;
     }
 
-    private void revokeCaseAssignments(String userToken, List<CaseUserAssignment> caseUserAssignmentsToRevoke) {
+    private void revokeCaseAssignments(String userToken,
+                                       List<CaseUserAssignment> caseUserAssignmentsToRevoke) {
         if (CollectionUtils.isNotEmpty(caseUserAssignmentsToRevoke)) {
             try {
                 ccdClient.revokeCaseAssignments(userToken, CaseUserAssignmentData.builder().caseUserAssignments(
                         caseUserAssignmentsToRevoke).build());
             } catch (IOException exception) {
-                log.info(exception.getMessage(), exception);
+                throw new GenericRuntimeException(exception);
             }
         }
     }
@@ -612,7 +624,7 @@ public class NocRespondentRepresentativeService {
 
     private static @NonNull CaseData getCCDRequestCaseData(CaseDetails caseDetails, CCDRequest ccdRequest)
             throws GenericServiceException {
-        final String methodName = "getCaseData";
+        final String methodName = "getCCDRequestCaseData";
         if (ObjectUtils.isEmpty(ccdRequest)
                 || ObjectUtils.isEmpty(ccdRequest.getCaseDetails())
                 || StringUtils.isBlank(ccdRequest.getCaseDetails().getCaseId())) {

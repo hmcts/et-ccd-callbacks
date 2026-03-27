@@ -22,12 +22,9 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
-import java.util.ArrayList;
-
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -80,8 +77,8 @@ class AddAmendClaimantRepresentativeControllerTest {
     @Test
     void testAboutToSubmitSetsClaimantRepresentativeId() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(nocRespondentRepresentativeService.revokeRespondentRepresentatives(any(CaseDetails.class),
-                anyList())).thenReturn(new ArrayList<>());
+        doNothing().when(nocRespondentRepresentativeService)
+                .revokeRespondentRepresentativesWithSameOrganisationAsClaimant(any(CaseDetails.class));
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
                         .content(jsonMapper.toJson(ccdRequest))
                         .header("Authorization", AUTH_TOKEN)

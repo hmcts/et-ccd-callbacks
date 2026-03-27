@@ -66,6 +66,46 @@ public class NocRepresentativeService {
         return change;
     }
 
+    /**
+     * Validates that each eligible representative's selected respondent organisation matches
+     * the organisation associated with that representative's user account.
+     *
+     * <p><strong>Assumptions:</strong>
+     * <ul>
+     *   <li>{@code caseDetails}, {@code caseDetails.getCaseData()}, and the representative entries
+     *       in {@code repCollection} are non-null.</li>
+     *   <li>{@code RespondentRepresentativeUtils.isValidRepresentative(...)} safely determines
+     *       whether a representative has the minimum required data for validation.</li>
+     *   <li>A representative should only be organisation-validated when they have a non-blank
+     *       email address, {@code myHmctsYesNo} is {@code YES}, and a respondent organisation
+     *       has been selected.</li>
+     *   <li>If a user cannot be found in IDAM or their organisation cannot be retrieved,
+     *       the method treats that representative as not valid for organisation comparison
+     *       and does not add a validation error.</li>
+     *   <li>{@code OrganisationUtils.hasMatchingOrganisationId(...)} performs the authoritative
+     *       comparison between the selected organisation and the organisation returned for the user.</li>
+     * </ul>
+     *
+     * <p>The validation is performed only for representatives that:
+     * <ul>
+     *   <li>are considered valid representatives,</li>
+     *   <li>have a non-blank representative email address,</li>
+     *   <li>have MyHMCTS enabled, and</li>
+     *   <li>have a respondent organisation present.</li>
+     * </ul>
+     *
+     * <p>For each such representative, the method looks up the user by email address and then
+     * retrieves the organisation linked to that user. If the selected respondent organisation
+     * does not match the organisation returned for the user, a validation error is added.
+     *
+     * <p>If the representative cannot be found or their organisation cannot be retrieved
+     * (for example, due to a {@code GenericServiceException}), organisation matching is skipped
+     * for that representative and no error is added.
+     *
+     * @param caseDetails the case details containing representative information to validate
+     * @return a list of validation error messages; empty if there are no representatives to
+     *     validate or no organisation mismatches are found
+     */
     public List<String> validateRepresentativesOrganisation(CaseDetails caseDetails) {
         List<String> errors = new ArrayList<>();
         if (CollectionUtils.isEmpty(caseDetails.getCaseData().getRepCollection())) {

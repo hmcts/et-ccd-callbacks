@@ -8,6 +8,8 @@ public final class GenericConstants {
     public static final String EXCEPTION_CASE_DATA_NOT_FOUND = "Case data not found for submission reference, %s.";
     public static final String EXCEPTION_CALLBACK_REQUEST_NOT_FOUND = "Callback request not found.";
     public static final String EXCEPTION_CLAIMANT_EMAIL_NOT_FOUND = "Could not find claimant email address.";
+    public static final String EXCEPTION_UNABLE_TO_START_EVENT_WITHOUT_CASE_ID = "Unable to start event %s.";
+    public static final String EXCEPTION_UNABLE_TO_START_EVENT_WITH_CASE_ID = "Unable to start event %s for case %s";
 
     public static final String EVENT_FIELDS_VALIDATION = "Event fields validation: ";
 

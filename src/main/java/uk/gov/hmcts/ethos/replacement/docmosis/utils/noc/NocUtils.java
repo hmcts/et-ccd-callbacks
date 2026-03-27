@@ -480,7 +480,6 @@ public final class NocUtils {
         }
         for (RepresentedTypeRItem representative : representatives) {
             RoleUtils.resetOrganisationPolicyByRepresentative(caseData, representative);
-
         }
     }
 

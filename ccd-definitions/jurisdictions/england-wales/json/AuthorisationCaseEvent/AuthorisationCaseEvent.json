@@ -103,6 +103,18 @@
   },
   {
     "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "UPDATE_RESP_ORG_POLICY",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseEventID": "UPDATE_RESP_ORG_POLICY",
+    "UserRole": "caseworker-employment",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
     "CaseEventID": "REMOVE_OWN_REP_AS_RESPONDENT",
     "UserRole": "[DEFENDANT]",
     "CRUD": "CRUD"

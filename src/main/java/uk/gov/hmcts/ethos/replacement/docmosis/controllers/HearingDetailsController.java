@@ -101,6 +101,7 @@ public class HearingDetailsController {
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         hearingDetailsService.updateCase(caseDetails);
         caseManagementForCaseWorkerService.setNextListedDate(caseDetails.getCaseData());
+        HearingsHelper.setHearingDaysAndDates(caseDetails.getCaseData());
         return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
     }
 }

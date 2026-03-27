@@ -21,6 +21,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericRuntimeException;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
@@ -28,6 +29,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.dynamiclists.DynamicRespo
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.NocUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.RespondentRepresentativeUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -189,12 +191,58 @@ public class RespondentRepresentativeController {
                 callbackRequest.getCaseDetails().getCaseId());
         try {
             NocUtils.validateCallbackRequest(callbackRequest);
-            nocRespondentRepresentativeService.removeOldRepresentatives(callbackRequest, userToken);
-            nocRespondentRepresentativeService.addNewRepresentatives(callbackRequest);
+            nocRespondentRepresentativeService.updateRepresentativesAccess(callbackRequest, userToken);
         } catch (GenericServiceException e) {
             log.error(ERROR_UNABLE_TO_MODIFY_REPRESENTATIVE_ACCESS,
                     callbackRequest.getCaseDetails().getCaseId(), e.getMessage());
         }
+    }
+
+    @PostMapping(value = "/updateRespOrgPolicyAboutToStart", consumes = APPLICATION_JSON_VALUE)
+    @Operation(summary = "Updates respondent's organisation policy, representatives' roles and resets change"
+            + "organisation request field after representation amended(revoked/assigned)")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = HTTP_CODE_TWO_HUNDRED, description = HTTP_MESSAGE_TWO_HUNDRED,
+            content = {
+                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = HTTP_CODE_FOUR_HUNDRED, description = HTTP_MESSAGE_FOUR_HUNDRED),
+        @ApiResponse(responseCode = HTTP_CODE_FOUR_ZERO_ONE, description = HTTP_MESSAGE_FOUR_ZERO_ONE),
+        @ApiResponse(responseCode = HTTP_CODE_FOUR_ZERO_THREE, description = HTTP_MESSAGE_FOUR_ZERO_THREE),
+        @ApiResponse(responseCode = HTTP_CODE_FOUR_ZERO_FOUR, description = HTTP_MESSAGE_FOUR_ZERO_FOUR),
+        @ApiResponse(responseCode = HTTP_CODE_FIVE_HUNDRED, description = HTTP_MESSAGE_FIVE_HUNDRED),
+        @ApiResponse(responseCode = HTTP_CODE_FIVE_ZERO_ONE, description = HTTP_MESSAGE_FIVE_ZERO_ONE),
+        @ApiResponse(responseCode = HTTP_CODE_FIVE_ZERO_THREE, description = HTTP_MESSAGE_FIVE_ZERO_THREE)
+    })
+    public ResponseEntity<CCDCallbackResponse> updateRespOrgPolicyAboutToStart(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(AUTHORIZATION) String userToken) {
+        log.info("UPDATE RESPONDENT ORGANISATION POLICIES AND ROLES FOR REMOVED REPRESENTATIVES ---> {}{}",
+                LOG_MESSAGE, ccdRequest.getCaseDetails().getCaseId());
+        CaseDetails caseDetails = ccdRequest.getCaseDetails();
+        CaseData caseData = caseDetails.getCaseData();
+        if (CollectionUtils.isNotEmpty(caseData.getRepCollectionToRemove())) {
+            NocUtils.resetOrganisationPolicies(caseData, caseData.getRepCollectionToRemove());
+            RespondentRepresentativeUtils.clearRolesForRepresentatives(caseData, caseData.getRepCollectionToRemove());
+            // reset field repCollectionToRemove
+            caseData.setRepCollectionToRemove(null);
+        }
+        if (CollectionUtils.isNotEmpty(caseData.getRepCollectionToAdd())) {
+            for (RepresentedTypeRItem representative : caseData.getRepCollectionToAdd()) {
+                NocUtils.applyRespondentOrganisationPolicyForRole(caseData, representative);
+                for (RepresentedTypeRItem caseRepresentative : caseData.getRepCollection()) {
+                    if (caseRepresentative.getId().equals(representative.getId())) {
+                        caseRepresentative.getValue().setRole(representative.getValue().getRole());
+                    }
+                }
+            }
+            // reset field repCollectionToAdd
+            caseData.setRepCollectionToAdd(null);
+        }
+        // Clears the changeOrganisationRequestField to prevent errors in the existing representative process
+        // and to allow further changes to be made
+        caseData.setChangeOrganisationRequestField(null);
+        return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
     }
 
     @PostMapping(value = "/removeOwnRepresentative", consumes = APPLICATION_JSON_VALUE)

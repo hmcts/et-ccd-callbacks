@@ -1,8 +1,0 @@
-[
-  {
-    "CaseTypeId": "ET_Scotland",
-    "CaseEventID": "nocRemoveRepresentationClaimant",
-    "UserRole": "[CLAIMANTSOLICITOR]",
-    "CRUD": "CRU"
-  }
-]

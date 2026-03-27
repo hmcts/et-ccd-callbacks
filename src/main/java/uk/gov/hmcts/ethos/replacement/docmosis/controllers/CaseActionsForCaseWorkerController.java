@@ -677,6 +677,7 @@ public class CaseActionsForCaseWorkerController {
         caseManagementForCaseWorkerService.setNextEarliestListedHearing(caseData);
 
         caseManagementForCaseWorkerService.setNextListedDate(caseData);
+        HearingsHelper.setHearingDaysAndDates(caseData);
         if (featureToggleService.isMul2Enabled()) {
             caseManagementForCaseWorkerService.setNextListedDateOnMultiple(ccdRequest.getCaseDetails());
         }

@@ -44,6 +44,20 @@
   {
     "CaseTypeID": "ET_Scotland",
     "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDates",
+    "UserRole": "caseworker-employment",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDates",
+    "UserRole": "caseworker-employment-legalrep-solicitor",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseFieldID": "hearingCollection",
     "ListElementCode": "hearingFormat",
     "UserRole": "caseworker-employment",
     "CRUD": "CRU"

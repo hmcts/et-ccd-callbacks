@@ -67,8 +67,7 @@ public class GenerateListingCallbackHandler extends ListingCallbackHandlerBase {
     @Override
     Object aboutToSubmit(ListingRequest listingRequest) {
         String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
-        var request = listingRequest;
-        log.info("LISTING HEARINGS ---> " + LOG_MESSAGE + request.getCaseDetails().getCaseId());
+        log.info("LISTING HEARINGS ---> " + LOG_MESSAGE + listingRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(authorizationToken)) {
             log.error(INVALID_TOKEN, authorizationToken);
@@ -76,11 +75,11 @@ public class GenerateListingCallbackHandler extends ListingCallbackHandlerBase {
         }
 
         List<String> errors = new ArrayList<>();
-        ListingData listingData = request.getCaseDetails().getCaseData();
+        ListingData listingData = listingRequest.getCaseDetails().getCaseData();
 
         if (ListingHelper.isListingRangeValid(listingData, errors)) {
-            listingData = listingService.processListingHearingsRequest(request.getCaseDetails(), authorizationToken);
-            DefaultValues defaultValues = defaultValuesReaderService.getListingDefaultValues(request.getCaseDetails());
+            listingData = listingService.processListingHearingsRequest(listingRequest.getCaseDetails(), authorizationToken);
+            DefaultValues defaultValues = defaultValuesReaderService.getListingDefaultValues(listingRequest.getCaseDetails());
             log.info("Post Default values loaded: " + defaultValues);
             listingData = defaultValuesReaderService.getListingData(listingData, defaultValues);
         }

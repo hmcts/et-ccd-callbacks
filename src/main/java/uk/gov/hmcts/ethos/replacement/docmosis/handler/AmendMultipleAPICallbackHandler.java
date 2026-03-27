@@ -55,8 +55,7 @@ public class AmendMultipleAPICallbackHandler extends MultipleCallbackHandlerBase
     @Override
     Object aboutToSubmit(MultipleRequest multipleRequest) {
         String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
-        MultipleRequest request = multipleRequest;
-        log.info("AMEND MULTIPLE API" + LOG_MESSAGE, request.getCaseDetails().getCaseId());
+        log.info("AMEND MULTIPLE API" + LOG_MESSAGE, multipleRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(authorizationToken)) {
             log.error(INVALID_TOKEN, authorizationToken);
@@ -64,7 +63,7 @@ public class AmendMultipleAPICallbackHandler extends MultipleCallbackHandlerBase
         }
 
         return ResponseEntity.ok(MultipleCallbackResponse.builder()
-            .data(request.getCaseDetails().getCaseData())
+            .data(multipleRequest.getCaseDetails().getCaseData())
             .build());
     }
 }

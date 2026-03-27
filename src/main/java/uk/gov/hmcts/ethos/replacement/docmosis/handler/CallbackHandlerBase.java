@@ -55,10 +55,6 @@ public abstract class CallbackHandlerBase implements CallbackHandler<CaseData> {
             .build();
     }
 
-    protected <T> T convertTo(CaseDetails caseDetails, Class<T> type) {
-        return caseDetailsConverter.convert(caseDetails, type);
-    }
-
     protected CallbackResponse<CaseData> toCallbackResponse(Object result) {
         return toCcdCallbackResponse(result);
     }

@@ -58,8 +58,7 @@ public class ListingCaseCreationCallbackHandler extends ListingCallbackHandlerBa
     @Override
     Object aboutToSubmit(ListingRequest listingRequest) {
         String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
-        var request = listingRequest;
-        log.info("LISTING CASE CREATION ---> " + LOG_MESSAGE + request.getCaseDetails().getCaseId());
+        log.info("LISTING CASE CREATION ---> " + LOG_MESSAGE + listingRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(authorizationToken)) {
             log.error(INVALID_TOKEN, authorizationToken);
@@ -68,7 +67,7 @@ public class ListingCaseCreationCallbackHandler extends ListingCallbackHandlerBa
 
         return ResponseEntity.ok(
             uk.gov.hmcts.et.common.model.listing.ListingCallbackResponse.builder()
-                .data(listingService.listingCaseCreation(request.getCaseDetails()))
+                .data(listingService.listingCaseCreation(listingRequest.getCaseDetails()))
                 .build()
         );
     }

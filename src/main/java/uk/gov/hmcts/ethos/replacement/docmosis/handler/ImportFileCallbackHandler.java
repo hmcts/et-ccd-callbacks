@@ -60,8 +60,7 @@ public class ImportFileCallbackHandler extends MultipleCallbackHandlerBase {
     @Override
     Object aboutToSubmit(MultipleRequest multipleRequest) {
         String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
-        var request = multipleRequest;
-        log.info("IMPORT MULTIPLE" + LOG_MESSAGE, request.getCaseDetails().getCaseId());
+        log.info("IMPORT MULTIPLE" + LOG_MESSAGE, multipleRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(authorizationToken)) {
             log.error(INVALID_TOKEN, authorizationToken);
@@ -69,7 +68,7 @@ public class ImportFileCallbackHandler extends MultipleCallbackHandlerBase {
         }
 
         List<String> errors = new ArrayList<>();
-        var multipleDetails = request.getCaseDetails();
+        var multipleDetails = multipleRequest.getCaseDetails();
         multipleUploadService.bulkUploadLogic(authorizationToken, multipleDetails, errors);
 
         return getMultipleCallbackRespEntity(errors, multipleDetails);

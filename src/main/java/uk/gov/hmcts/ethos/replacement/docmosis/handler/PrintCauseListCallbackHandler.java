@@ -69,20 +69,19 @@ public class PrintCauseListCallbackHandler extends ListingCallbackHandlerBase {
     @Override
     Object aboutToSubmit(ListingRequest listingRequest) {
         String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
-        var request = listingRequest;
-        log.info("GENERATE HEARING DOCUMENT ---> " + LOG_MESSAGE + request.getCaseDetails().getCaseId());
+        log.info("GENERATE HEARING DOCUMENT ---> " + LOG_MESSAGE + listingRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(authorizationToken)) {
             log.error(INVALID_TOKEN, authorizationToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        ListingData listingData = request.getCaseDetails().getCaseData();
-        String caseTypeId = request.getCaseDetails().getCaseTypeId();
+        ListingData listingData = listingRequest.getCaseDetails().getCaseData();
+        String caseTypeId = listingRequest.getCaseDetails().getCaseTypeId();
 
         List<String> errorsList = new ArrayList<>();
         boolean invalidCharsExist = InvalidCharacterCheck.invalidCharactersExistAllListingTypes(
-            request.getCaseDetails(),
+            listingRequest.getCaseDetails(),
             errorsList
         );
 

@@ -64,12 +64,6 @@ public abstract class ListingCallbackHandlerBase implements CallbackHandler<Case
         return new CCDRequest(toCaseDetails(caseDetails));
     }
 
-    protected uk.gov.hmcts.et.common.model.ccd.CallbackRequest toCallbackRequest(CaseDetails caseDetails) {
-        return uk.gov.hmcts.et.common.model.ccd.CallbackRequest.builder()
-            .caseDetails(toCaseDetails(caseDetails))
-            .build();
-    }
-
     protected <T> T convertTo(CaseDetails caseDetails, Class<T> type) {
         return caseDetailsConverter.convert(caseDetails, type);
     }

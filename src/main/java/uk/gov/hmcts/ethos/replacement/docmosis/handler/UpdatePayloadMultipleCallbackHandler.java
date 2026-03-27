@@ -56,15 +56,14 @@ public class UpdatePayloadMultipleCallbackHandler extends MultipleCallbackHandle
     @Override
     Object aboutToSubmit(MultipleRequest multipleRequest) {
         String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
-        var request = multipleRequest;
-        log.info("UPDATE PAYLOAD MULTIPLE" + LOG_MESSAGE, request.getCaseDetails().getCaseId());
+        log.info("UPDATE PAYLOAD MULTIPLE" + LOG_MESSAGE, multipleRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(authorizationToken)) {
             log.error(INVALID_TOKEN, authorizationToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        var multipleDetails = request.getCaseDetails();
+        var multipleDetails = multipleRequest.getCaseDetails();
         MultiplesHelper.updatePayloadMultiple(multipleDetails.getCaseData());
 
         return ResponseEntity.ok(MultipleCallbackResponse.builder()

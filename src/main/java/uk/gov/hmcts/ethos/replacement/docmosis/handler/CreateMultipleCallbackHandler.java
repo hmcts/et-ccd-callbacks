@@ -61,8 +61,7 @@ public class CreateMultipleCallbackHandler extends MultipleCallbackHandlerBase {
     @Override
     Object aboutToSubmit(MultipleRequest multipleRequest) {
         String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
-        var request = multipleRequest;
-        log.info("CREATE MULTIPLE" + LOG_MESSAGE, request.getCaseDetails().getCaseId());
+        log.info("CREATE MULTIPLE" + LOG_MESSAGE, multipleRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(authorizationToken)) {
             log.error(INVALID_TOKEN, authorizationToken);
@@ -70,7 +69,7 @@ public class CreateMultipleCallbackHandler extends MultipleCallbackHandlerBase {
         }
 
         List<String> errors = new ArrayList<>();
-        var multipleDetails = request.getCaseDetails();
+        var multipleDetails = multipleRequest.getCaseDetails();
 
         try {
             multipleCreationService.bulkCreationLogic(authorizationToken, multipleDetails, errors);

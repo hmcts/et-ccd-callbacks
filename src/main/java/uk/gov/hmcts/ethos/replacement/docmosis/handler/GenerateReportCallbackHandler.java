@@ -78,16 +78,15 @@ public class GenerateReportCallbackHandler extends ListingCallbackHandlerBase {
     @Override
     Object aboutToSubmit(ListingRequest listingRequest) {
         String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
-        var request = listingRequest;
-        log.info("GENERATE REPORT ---> " + LOG_MESSAGE + request.getCaseDetails().getCaseId());
+        log.info("GENERATE REPORT ---> " + LOG_MESSAGE + listingRequest.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(authorizationToken)) {
             log.error(INVALID_TOKEN, authorizationToken);
             return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        ListingData listingData = reportDataService.generateReportData(request.getCaseDetails(), authorizationToken);
-        return getResponseEntity(listingData, request.getCaseDetails().getCaseTypeId(), authorizationToken);
+        ListingData listingData = reportDataService.generateReportData(listingRequest.getCaseDetails(), authorizationToken);
+        return getResponseEntity(listingData, listingRequest.getCaseDetails().getCaseTypeId(), authorizationToken);
     }
 
     @Override

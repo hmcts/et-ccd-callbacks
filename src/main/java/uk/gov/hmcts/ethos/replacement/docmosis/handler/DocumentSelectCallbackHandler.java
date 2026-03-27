@@ -46,8 +46,7 @@ public class DocumentSelectCallbackHandler extends MultipleCallbackHandlerBase {
 
     @Override
     Object aboutToSubmit(MultipleRequest multipleRequest) {
-        var ccdRequest = multipleRequest;
-        var multipleData = ccdRequest.getCaseDetails().getCaseData();
+        var multipleData = multipleRequest.getCaseDetails().getCaseData();
         multiplesDocumentAccessService.setMultipleDocumentsToCorrectTab(multipleData);
         return multipleResponse(multipleData, null);
     }

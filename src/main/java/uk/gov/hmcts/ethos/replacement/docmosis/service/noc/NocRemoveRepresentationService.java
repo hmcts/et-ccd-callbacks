@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.noc;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_GET_CASE_ASSIGNMENTS_BY_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_ORGANISATION;
@@ -66,7 +69,7 @@ public class NocRemoveRepresentationService {
      * @param userToken the user token of the requester
      */
     public void revokeClaimantLegalRep(CaseDetails caseDetails, String userToken) {
-        // create a copy of existing claimant legal rep details
+        // get existing rep and organisation details for sending emails
         Map<String, String> claimantRepDetails = getClaimantRepDetails(caseDetails);
 
         // revoke claimant legal rep
@@ -214,23 +217,71 @@ public class NocRemoveRepresentationService {
     }
 
     /**
+     * Mid-event to check if more than 1 representative from the organisation.
+     * @param caseDetails the case details of the case to revoke respondent legal rep
+     * @param userToken the user token of the requester
+     * @return return Yes if more than 1 representative from the organisation, else return No
+     */
+    public String isMoreThanOneRespondent(CaseDetails caseDetails, String userToken) {
+        List<RepresentedTypeRItem> currentRepList =
+            nocRespondentRepresentativeService.findRepresentativesByToken(userToken, caseDetails);
+        if (CollectionUtils.isEmpty(currentRepList)) {
+            return NO;
+        }
+
+        String orgId = getOrganisationID(currentRepList);
+        if (isNullOrEmpty(orgId)) {
+            return NO;
+        }
+
+        List<RepresentedTypeRItem> orgRepList =
+            RespondentRepresentativeUtils.findRepresentativesByOrganisationId(
+                caseDetails.getCaseData(),
+                orgId
+            );
+        return orgRepList.size() > currentRepList.size()
+            ? YES
+            : NO;
+    }
+
+    private String getOrganisationID(List<RepresentedTypeRItem> currentRepList) {
+        if (CollectionUtils.isEmpty(currentRepList)) {
+            return null;
+        }
+        RepresentedTypeR currentRep = currentRepList.getFirst().getValue();
+        if (currentRep.getRespondentOrganisation() == null
+            || currentRep.getRespondentOrganisation().getOrganisationID() == null) {
+            return null;
+        }
+        return currentRep.getRespondentOrganisation().getOrganisationID();
+    }
+
+    /**
      * Revoke respondent legal rep and send email notifications to related parties.
      * @param caseDetails the case details of the case to revoke respondent legal rep
      * @param userToken the user token of the requester
      */
     public void revokeRespondentLegalRep(CaseDetails caseDetails, String userToken) {
         // create a copy of existing respondent legal rep details
-        List<RepresentedTypeRItem> representatives =
+        List<RepresentedTypeRItem> currentRepList =
+            nocRespondentRepresentativeService.findRepresentativesByToken(userToken, caseDetails);
+        // TODO: if empty, return
+        RepresentedTypeR currentRep = currentRepList.getFirst().getValue();
+        String orgId = currentRep.getRespondentOrganisation().getOrganisationID(); // TODO
+
+        List<RepresentedTypeRItem> orgRepList =
             RespondentRepresentativeUtils.findRepresentativesByOrganisationId(
                 caseDetails.getCaseData(),
-                "orgId" // TODO
+                orgId
             );
-        Map<String, String> respondentRepDetails = getRespondentRepDetails(representatives.getFirst().getValue());
+
+        // get existing rep and organisation details for sending emails
+        Map<String, String> respondentRepDetails = getRespondentRepDetails(orgRepList.getFirst().getValue());
 
         // revoke respondent legal rep
         nocRespondentRepresentativeService.revokeAndRemoveRepresentativesByOrganisation(
             caseDetails,
-            "orgId" // TODO
+            orgId
         );
 
         // send email to organisation admin
@@ -240,8 +291,10 @@ public class NocRemoveRepresentationService {
         sendNocRequestEmailToRemovedLegalRep(caseDetails, respondentRepDetails.get(REP_EMAIL_ADDRESS));
         // send email to unrepresented party, i.e. this respondent
         sendRespondentNocRequestEmailToUnrepresentedParty(caseDetails, respondentRepDetails.get(ORG_NAME));
-        // send email to claimant representative or claimant
+        // send email to claimant
         sendRespondentNocRequestEmailToClaimant(caseDetails);
+        // send email to other respondent
+        // TODO
     }
 
     private Map<String, String> getRespondentRepDetails(RepresentedTypeR representedTypeR) {

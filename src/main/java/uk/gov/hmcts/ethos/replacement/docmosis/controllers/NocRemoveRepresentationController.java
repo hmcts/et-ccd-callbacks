@@ -74,8 +74,10 @@ public class NocRemoveRepresentationController {
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
 
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setNocRemoveRepIsMoreThanOneFlag(YES); // TODO
+        CaseDetails caseDetails = ccdRequest.getCaseDetails();
+        CaseData caseData = caseDetails.getCaseData();
+        caseData.setNocRemoveRepIsMoreThanOneFlag(
+            nocRemoveRepresentationService.isMoreThanOneRespondent(caseDetails, userToken)); // TODO
         return getCallbackRespEntityNoErrors(caseData);
     }
 

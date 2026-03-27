@@ -18,15 +18,12 @@ import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.generic.GenericCallbackResponse;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CcdCaseAssignment;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.NocNotificationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.NocRepresentativeService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.CcdCaseAssignment;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocNotificationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRepresentativeService;
 
 import java.io.IOException;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
@@ -34,25 +31,17 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequiredArgsConstructor
 @Slf4j
 public class NoticeOfChangeController {
-    private final VerifyTokenService verifyTokenService;
     private final NocNotificationService nocNotificationService;
-    private final NocRepresentativeService noCRepresentativeService;
+    private final NocRepresentativeService nocRepresentativeService;
     private final CcdCaseAssignment ccdCaseAssignment;
-    private final UserIdamService userIdamService;
 
-    private static final String INVALID_TOKEN = "Invalid Token {}";
     private static final String APPLY_NOC_DECISION = "applyNocDecision";
 
     @PostMapping("/about-to-submit")
     public ResponseEntity<CCDCallbackResponse> handleAboutToSubmit(
             @RequestHeader("Authorization") String userToken,
             @RequestBody CallbackRequest callbackRequest) throws IOException {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
-        CaseData caseData = noCRepresentativeService
+        CaseData caseData = nocRepresentativeService
                 .updateRepresentation(callbackRequest.getCaseDetails(), userToken);
         callbackRequest.getCaseDetails().setCaseData(caseData);
         return ResponseEntity.ok(ccdCaseAssignment.applyNoc(callbackRequest, userToken));
@@ -67,10 +56,6 @@ public class NoticeOfChangeController {
     public GenericCallbackResponse nocSubmitted(
             @RequestHeader("Authorization") String userToken,
             @RequestBody CallbackRequest callbackRequest) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-        }
-
         GenericCallbackResponse callbackResponse = new GenericCallbackResponse();
 
         if (APPLY_NOC_DECISION.equals(callbackRequest.getEventId())) {
@@ -85,9 +70,7 @@ public class NoticeOfChangeController {
             } catch (Exception exception) {
                 log.error(exception.getMessage(), exception);
             }
-
             String caseReference = caseData.getEthosCaseReference();
-
             callbackResponse.setConfirmation_header(
                 "# You're now representing a client on case " + caseReference
             );

@@ -515,10 +515,10 @@ xui-webapp:
     releaseNameOverride: ${SERVICE_NAME}-xui-webapp
     image: hmctsprod.azurecr.io/xui/webapp:latest
     ingressHost: xui-${SERVICE_FQDN}
-    devcpuRequests: 500m
-    devmemoryRequests: 1Gi
-    devcpuLimits: 1
-    devmemoryLimits: 4Gi
+    devcpuRequests: 1
+    devmemoryRequests: 3Gi
+    devcpuLimits: 2
+    devmemoryLimits: 5Gi
     environment:
       SERVICES_CCD_CASE_ASSIGNMENT_API: https://aac-${SERVICE_FQDN}
       SERVICES_CCD_COMPONENT_API: https://gateway-${SERVICE_FQDN}

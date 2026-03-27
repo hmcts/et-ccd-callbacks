@@ -6,12 +6,15 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
 import uk.gov.hmcts.et.common.model.ccd.types.UpdateRespondentRepresentativeRequest;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -26,6 +29,7 @@ final class OrganisationUtilsTest {
             "Update respondent representative request is empty";
     private static final String EXCEPTION_RESPONDENT_NAME_EMPTY = "Respondent name is empty";
     private static final String TEST_RESPONDENT_NAME_1 = "Test Respondent Name 1";
+    private static final String TEST_REPRESENTATIVE_ID = "tes_representative_id";
     private static final String TEST_RESPONDENT_NAME_2 = "Test Respondent Name 2";
     private static final String TEST_ORGANISATION_ID_1 = "Test Organisation ID 1";
     private static final String TEST_ORGANISATION_ID_2 = "Test Organisation ID 2";
@@ -263,5 +267,23 @@ final class OrganisationUtilsTest {
         OrganisationUtils.removeRespondentOrganisationPolicyByRespondentName(caseData,
                 updateRespondentRepresentativeRequest);
         assertThat(caseData.getRespondentOrganisationPolicy0()).isEqualTo(OrganisationPolicy.builder().build());
+    }
+
+    @Test
+    void theHasUserIdentifier() {
+        organisationUtils.close();
+        // when user response is empty should return false
+        assertThat(OrganisationUtils.hasUserIdentifier(null)).isFalse();
+        // when user response not has body should return false
+        ResponseEntity<AccountIdByEmailResponse> userResponse = new ResponseEntity<>(null, HttpStatus.OK);
+        assertThat(OrganisationUtils.hasUserIdentifier(userResponse)).isFalse();
+        // when user response not has user identifier should return false
+        userResponse = new ResponseEntity<>(new AccountIdByEmailResponse(), HttpStatus.OK);
+        assertThat(OrganisationUtils.hasUserIdentifier(userResponse)).isFalse();
+        // when user response has user identifier should return true
+        AccountIdByEmailResponse accountIdByEmailResponse = new AccountIdByEmailResponse();
+        accountIdByEmailResponse.setUserIdentifier(TEST_REPRESENTATIVE_ID);
+        userResponse = new ResponseEntity<>(accountIdByEmailResponse, HttpStatus.OK);
+        assertThat(OrganisationUtils.hasUserIdentifier(userResponse)).isTrue();
     }
 }

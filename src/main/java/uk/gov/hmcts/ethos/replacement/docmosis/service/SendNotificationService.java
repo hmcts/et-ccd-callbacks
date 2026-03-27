@@ -56,7 +56,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServ
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.DOCGEN_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.createLinkForUploadedDocument;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantNonSystemUser;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isRepresentedClaimantWithMyHmctsCase;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.isClaimantRepresentedByMyHmctsOrganisation;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.PseHelper.isPartyToNotifyMismatch;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService.NOTIFICATION_SUMMARY_PDF;
 
@@ -264,7 +264,7 @@ public class SendNotificationService {
         if (!RESPONDENT_ONLY.equals(caseData.getSendNotificationNotify())) {
             // If represented, send notification to claimant representative Only
             Map<String, String> personalisation;
-            if (isRepresentedClaimantWithMyHmctsCase(caseDetails.getCaseData())) {
+            if (isClaimantRepresentedByMyHmctsOrganisation(caseDetails.getCaseData())) {
                 String linkEnv = emailService.getClaimantRepExuiCaseNotificationsLink(
                         caseDetails.getCaseId());
                 personalisation = buildPersonalisation(caseDetails, linkEnv);

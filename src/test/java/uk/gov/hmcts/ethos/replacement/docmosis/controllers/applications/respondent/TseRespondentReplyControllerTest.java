@@ -106,7 +106,7 @@ class TseRespondentReplyControllerTest extends BaseControllerTest {
     void aboutToStart_tokenOk_isClaimantNonSystemUser_isRepresentedClaimantWithMyHmctsCase_true() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(Helper.isClaimantNonSystemUser(any())).thenReturn(true);
-        when(Helper.isRepresentedClaimantWithMyHmctsCase(any())).thenReturn(true);
+        when(Helper.isClaimantRepresentedByMyHmctsOrganisation(any())).thenReturn(true);
         mockMvc.perform(post(ABOUT_TO_START_URL)
                         .content(jsonMapper.toJson(ccdRequest))
                         .header("Authorization", AUTH_TOKEN)
@@ -123,7 +123,7 @@ class TseRespondentReplyControllerTest extends BaseControllerTest {
     void aboutToStart_tokenOk_isRepresentedClaimantWithMyHmctsCase_false() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(Helper.isClaimantNonSystemUser(any())).thenReturn(true);
-        when(Helper.isRepresentedClaimantWithMyHmctsCase(any())).thenReturn(false);
+        when(Helper.isClaimantRepresentedByMyHmctsOrganisation(any())).thenReturn(false);
         mockMvc.perform(post(ABOUT_TO_START_URL)
                         .content(jsonMapper.toJson(ccdRequest))
                         .header("Authorization", AUTH_TOKEN)
@@ -138,7 +138,7 @@ class TseRespondentReplyControllerTest extends BaseControllerTest {
     void aboutToStart_tokenOk_isClaimantNonSystemUser_false() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(Helper.isClaimantNonSystemUser(any())).thenReturn(false);
-        when(Helper.isRepresentedClaimantWithMyHmctsCase(any())).thenReturn(true);
+        when(Helper.isClaimantRepresentedByMyHmctsOrganisation(any())).thenReturn(true);
         mockMvc.perform(post(ABOUT_TO_START_URL)
                         .content(jsonMapper.toJson(ccdRequest))
                         .header("Authorization", AUTH_TOKEN)
@@ -190,7 +190,7 @@ class TseRespondentReplyControllerTest extends BaseControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockHelper.when(() -> Helper.isClaimantNonSystemUser(any()))
                 .thenReturn(false);
-        mockHelper.when(() -> Helper.isRepresentedClaimantWithMyHmctsCase(any()))
+        mockHelper.when(() -> Helper.isClaimantRepresentedByMyHmctsOrganisation(any()))
                 .thenReturn(true);
         mockMvc.perform(post(SHOW_ERROR_URL)
                         .content(jsonMapper.toJson(ccdRequest))

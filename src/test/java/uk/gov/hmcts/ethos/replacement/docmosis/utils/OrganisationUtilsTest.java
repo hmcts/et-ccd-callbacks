@@ -13,6 +13,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
+import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.UpdateRespondentRepresentativeRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
@@ -37,7 +38,7 @@ final class OrganisationUtilsTest {
     private MockedStatic<OrganisationUtils> organisationUtils;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         organisationUtils = mockStatic(OrganisationUtils.class);
     }
 
@@ -285,5 +286,27 @@ final class OrganisationUtilsTest {
         accountIdByEmailResponse.setUserIdentifier(TEST_REPRESENTATIVE_ID);
         userResponse = new ResponseEntity<>(accountIdByEmailResponse, HttpStatus.OK);
         assertThat(OrganisationUtils.hasUserIdentifier(userResponse)).isTrue();
+    }
+
+    @Test
+    void theHasMatchingOrganisationId() {
+        organisationUtils.close();
+        // when organisation is empty should return true
+        assertThat(OrganisationUtils.hasMatchingOrganisationId(null, null)).isTrue();
+        // when organisation response is empty should return true
+        Organisation organisation = Organisation.builder().build();
+        assertThat(OrganisationUtils.hasMatchingOrganisationId(organisation, null)).isTrue();
+        // when organisation does not have id should return true
+        OrganisationsResponse organisationsResponse = OrganisationsResponse.builder().build();
+        assertThat(OrganisationUtils.hasMatchingOrganisationId(organisation, organisationsResponse)).isTrue();
+        // when organisation response does not have id should return true
+        organisation.setOrganisationID(TEST_ORGANISATION_ID_1);
+        assertThat(OrganisationUtils.hasMatchingOrganisationId(organisation, organisationsResponse)).isTrue();
+        // when organisation id and organisation response identification are different should return false
+        organisationsResponse.setOrganisationIdentifier(TEST_ORGANISATION_ID_2);
+        assertThat(OrganisationUtils.hasMatchingOrganisationId(organisation, organisationsResponse)).isFalse();
+        // when organisation id and organisation response identification are same should return true
+        organisationsResponse.setOrganisationIdentifier(TEST_ORGANISATION_ID_1);
+        assertThat(OrganisationUtils.hasMatchingOrganisationId(organisation, organisationsResponse)).isTrue();
     }
 }

@@ -24,6 +24,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericRuntimeExceptio
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
@@ -74,6 +75,8 @@ class RespondentRepresentativeControllerTest {
     private VerifyTokenService verifyTokenService;
     @MockBean
     private NocRespondentHelper nocRespondentHelper;
+    @MockBean
+    private NocRepresentativeService nocRepresentativeService;
     @MockBean
     private NocRespondentRepresentativeService nocRespondentRepresentativeService;
 

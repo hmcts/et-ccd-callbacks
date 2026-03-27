@@ -5,7 +5,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Strings;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseAssignmentUserRole;
@@ -19,6 +18,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.OrganisationUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.RoleUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
@@ -76,25 +76,54 @@ public class NocService {
     }
 
     /**
-     * Grants case access to a legal representative for a given case submission.
-     * <p>
-     * This method validates the provided input parameters and ensures that the user
-     * identified by the given email address exists and belongs to the specified
-     * organisation. If validation succeeds, the appropriate case role is granted
-     * to the user for the case identified by the submission reference.
-     * <p>
-     * The method interacts with external organisation and identity services to
-     * resolve the user and organisation details before assigning the case role.
+     * Grants case access to a representative after validating the input parameters,
+     * resolving the user by email, and confirming that the user's organisation matches
+     * the selected organisation.
      *
-     * @param accessToken the user access token used to authorise downstream service calls
-     * @param email the email address of the legal representative to be granted access
-     * @param submissionReference the submission reference identifying the case
-     * @param organisationToAdd the organisation the representative must belong to
-     * @param role the case role to be assigned to the representative
+     * <p>This method first validates the supplied access token, email address,
+     * submission reference, organisation, and role. If any required value is missing
+     * or invalid, it throws a {@link GenericServiceException}.</p>
      *
-     * @throws GenericServiceException if any input parameter is invalid, the user or
-     *         organisation cannot be resolved, the organisation does not match, or
-     *         if an error occurs while granting case access
+     * <p>When validation succeeds, the method retrieves the target user using the
+     * supplied email address, then looks up the organisation associated with that user.
+     * It verifies that the resolved organisation matches the provided
+     * {@code organisationToAdd}. If the organisations do not match, the method throws
+     * a {@link GenericServiceException}.</p>
+     *
+     * <p>If all checks pass, the method grants the requested case role to the user by
+     * calling {@code grantCaseAccess(...)}.</p>
+     *
+     * <h3>Assumptions:</h3>
+     * <ul>
+     *   <li>{@code accessToken} is a valid token with permission to query users,
+     *       retrieve organisation details, and assign case access.</li>
+     *   <li>{@code email} belongs to an existing user in the identity/access management system.</li>
+     *   <li>{@code submissionReference} uniquely identifies the case or submission and is suitable
+     *       for logging, tracing, and error reporting.</li>
+     *   <li>{@code organisationToAdd} is non-null and contains a valid organisation ID.</li>
+     *   <li>{@code role} is expected to be a valid role recognised by
+     *       {@link RoleUtils#isValidRole(String)}.</li>
+     *   <li>{@link #findUserByEmail(String, String, String)} returns a non-null
+     *       {@link AccountIdByEmailResponse} containing a valid user identifier.</li>
+     *   <li>{@link #findOrganisationByUserId(String, String, String)} returns a non-null
+     *       {@link OrganisationsResponse} containing the user's organisation identifier.</li>
+     *   <li>{@link OrganisationUtils#hasMatchingOrganisationId(Organisation, OrganisationsResponse)}
+     *       performs permissive matching and only returns {@code false} when both organisation IDs
+     *       are present and do not match.</li>
+     *   <li>{@code grantCaseAccess(...)} performs the actual role assignment and may throw
+     *       a {@link GenericServiceException} if the operation fails.</li>
+     * </ul>
+     *
+     * @param accessToken the authorisation token used to perform user, organisation,
+     *                    and access-management operations
+     * @param email the email address of the representative to whom access will be granted
+     * @param submissionReference the submission or case reference used for lookup,
+     *                            traceability, and error reporting
+     * @param organisationToAdd the organisation that the representative is expected to belong to
+     * @param role the case role to assign to the representative
+     * @throws GenericServiceException if any input parameter is invalid, the user's organisation
+     *                                 does not match the selected organisation, or the access
+     *                                 grant process fails
      */
     public void grantRepresentativeAccess(String accessToken, String email,
                                           String submissionReference, Organisation organisationToAdd,
@@ -115,8 +144,7 @@ public class NocService {
                     submissionReference);
             OrganisationsResponse organisationsResponse = findOrganisationByUserId(accessToken,
                     userResponse.getUserIdentifier(), submissionReference);
-            if (!Strings.CS.equals(organisationsResponse.getOrganisationIdentifier(),
-                    organisationToAdd.getOrganisationID())) {
+            if (!OrganisationUtils.hasMatchingOrganisationId(organisationToAdd, organisationsResponse)) {
                 String exceptionMessage = String.format(EXCEPTION_USER_AND_SELECTED_ORGANISATIONS_NOT_MATCH,
                         submissionReference);
                 throw new GenericServiceException(exceptionMessage);

@@ -395,6 +395,14 @@
   },
   {
     "CaseTypeID": "ET_EnglandWales",
+    "ID": "repCollectionToAdd",
+    "Label": "Respondent representative(s) to add",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "RespondentRepresentative",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
     "ID": "jurCodesCollection",
     "Label": "Jurisdiction",
     "FieldType": "Collection",

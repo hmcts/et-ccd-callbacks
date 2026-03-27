@@ -2630,6 +2630,30 @@
   {
     "CaseTypeId": "ET_Scotland",
     "CaseFieldID": "repCollectionToRemove",
+    "UserRole": "caseworker-employment",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "repCollectionToRemove",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "repCollectionToAdd",
+    "UserRole": "citizen",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "repCollectionToAdd",
+    "UserRole": "caseworker-employment",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "repCollectionToAdd",
     "UserRole": "caseworker-employment-api",
     "CRUD": "CRUD"
   },

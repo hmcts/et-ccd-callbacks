@@ -3,20 +3,17 @@ package uk.gov.hmcts.ethos.replacement.docmosis.handler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.sdk.CallbackRequestContext;
-import uk.gov.hmcts.ccd.sdk.CallbackResponse;
-import uk.gov.hmcts.ccd.sdk.SubmittedCallbackResponse;
-import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
+import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseNotesService;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 
 import java.util.List;
 
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.multipleResponse;
 
 @Component
-public class AddCaseNoteCaseNotesMultiplesCallbackHandler extends CallbackHandlerBase {
+public class AddCaseNoteCaseNotesMultiplesCallbackHandler extends MultipleCallbackHandlerBase {
 
     private final CaseNotesService caseNotesService;
 
@@ -50,16 +47,10 @@ public class AddCaseNoteCaseNotesMultiplesCallbackHandler extends CallbackHandle
     }
 
     @Override
-    CallbackResponse<CaseData> aboutToSubmit(CaseDetails caseDetails) {
+    Object aboutToSubmit(MultipleRequest multipleRequest) {
         String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
-        MultipleData multipleData = toMultipleRequest(caseDetails).getCaseDetails().getCaseData();
+        MultipleData multipleData = multipleRequest.getCaseDetails().getCaseData();
         caseNotesService.addCaseNote(multipleData, authorizationToken);
-        return toCallbackResponse(multipleResponse(multipleData, null));
-    }
-
-    @Override
-    SubmittedCallbackResponse submitted(CaseDetails caseDetails) {
-        throw new IllegalStateException("Handler does not support submitted callbacks for events: "
-            + getHandledEventIds());
+        return multipleResponse(multipleData, null);
     }
 }

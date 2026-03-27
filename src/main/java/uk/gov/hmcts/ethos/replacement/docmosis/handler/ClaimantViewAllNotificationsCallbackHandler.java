@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.sdk.CallbackResponse;
-import uk.gov.hmcts.ccd.sdk.SubmittedCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -46,12 +45,6 @@ public class ClaimantViewAllNotificationsCallbackHandler extends CallbackHandler
     @Override
     CallbackResponse<CaseData> aboutToSubmit(CaseDetails caseDetails) {
         return toCallbackResponse(allNotificationsAboutToSubmit(toCcdRequest(caseDetails)));
-    }
-
-    @Override
-    SubmittedCallbackResponse submitted(CaseDetails caseDetails) {
-        throw new IllegalStateException("Handler does not support submitted callbacks for events: "
-            + getHandledEventIds());
     }
 
     private ResponseEntity<CCDCallbackResponse> allNotificationsAboutToSubmit(CCDRequest ccdRequest) {

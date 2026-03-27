@@ -6,12 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.sdk.CallbackRequestContext;
-import uk.gov.hmcts.ccd.sdk.CallbackResponse;
-import uk.gov.hmcts.ccd.sdk.SubmittedCallbackResponse;
-import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.listing.ListingCallbackResponse;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
+import uk.gov.hmcts.et.common.model.listing.ListingRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingHelper;
@@ -23,7 +21,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.ListingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReportDataService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.callback.ListingGenerationCallbackService;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +30,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SERVING_CLAIMS_REPO
 
 @Slf4j
 @Component
-public class GenerateReportCallbackHandler extends CallbackHandlerBase {
+public class GenerateReportCallbackHandler extends ListingCallbackHandlerBase {
 
     private static final String LOG_MESSAGE = "received notification request for case reference : ";
     private static final String INVALID_TOKEN = "Invalid Token {}";
@@ -79,29 +76,27 @@ public class GenerateReportCallbackHandler extends CallbackHandlerBase {
     }
 
     @Override
-    CallbackResponse<CaseData> aboutToSubmit(CaseDetails caseDetails) {
+    Object aboutToSubmit(ListingRequest listingRequest) {
         String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
-        var request = toListingRequest(caseDetails);
+        var request = listingRequest;
         log.info("GENERATE REPORT ---> " + LOG_MESSAGE + request.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(authorizationToken)) {
             log.error(INVALID_TOKEN, authorizationToken);
-            return toCallbackResponse(ResponseEntity.status(FORBIDDEN.value()).build());
+            return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
         ListingData listingData = reportDataService.generateReportData(request.getCaseDetails(), authorizationToken);
-        return toCallbackResponse(
-            getResponseEntity(listingData, request.getCaseDetails().getCaseTypeId(), authorizationToken)
-        );
+        return getResponseEntity(listingData, request.getCaseDetails().getCaseTypeId(), authorizationToken);
     }
 
     @Override
-    SubmittedCallbackResponse submitted(CaseDetails caseDetails) {
+    Object submitted(ListingRequest listingRequest) {
         String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
-        return toSubmittedCallbackResponse(listingGenerationCallbackService.generateHearingDocumentConfirmation(
-            toListingRequest(caseDetails),
+        return listingGenerationCallbackService.generateHearingDocumentConfirmation(
+            listingRequest,
             authorizationToken
-        ));
+        );
     }
 
     private ResponseEntity<ListingCallbackResponse> getResponseEntity(

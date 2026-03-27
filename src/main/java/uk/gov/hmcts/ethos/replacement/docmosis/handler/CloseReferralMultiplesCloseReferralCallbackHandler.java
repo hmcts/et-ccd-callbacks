@@ -3,23 +3,18 @@ package uk.gov.hmcts.ethos.replacement.docmosis.handler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.ccd.sdk.CallbackResponse;
-import uk.gov.hmcts.ccd.sdk.SubmittedCallbackResponse;
-import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
-import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleCallbackResponse;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 
 import java.util.List;
 
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.multipleResponse;
 
 @Component
-public class CloseReferralMultiplesCloseReferralCallbackHandler extends CallbackHandlerBase {
+public class CloseReferralMultiplesCloseReferralCallbackHandler extends MultipleCallbackHandlerBase {
 
     private static final String CLOSE_REFERRAL_BODY = "<hr>"
         + "<h3>What happens next</h3>"
@@ -54,17 +49,17 @@ public class CloseReferralMultiplesCloseReferralCallbackHandler extends Callback
     }
 
     @Override
-    CallbackResponse<CaseData> aboutToSubmit(CaseDetails caseDetails) {
-        return toCallbackResponse(aboutToSubmitCloseReferral(
-                    toMultipleRequest(caseDetails)
-                ));
+    Object aboutToSubmit(MultipleRequest multipleRequest) {
+        return aboutToSubmitCloseReferral(
+                    multipleRequest
+                );
     }
 
     @Override
-    SubmittedCallbackResponse submitted(CaseDetails caseDetails) {
-        return toSubmittedCallbackResponse(completeInitialConsideration(
-                    toCcdRequest(caseDetails)
-                ));
+    Object submitted(MultipleRequest multipleRequest) {
+        return completeInitialConsideration(
+                    multipleRequest
+                );
     }
 
     private ResponseEntity<MultipleCallbackResponse> aboutToSubmitCloseReferral(MultipleRequest multipleRequest) {
@@ -75,7 +70,7 @@ public class CloseReferralMultiplesCloseReferralCallbackHandler extends Callback
         return multipleResponse(multipleData, null);
     }
 
-    private ResponseEntity<MultipleCallbackResponse> completeInitialConsideration(CCDRequest multipleRequest) {
+    private ResponseEntity<MultipleCallbackResponse> completeInitialConsideration(MultipleRequest multipleRequest) {
         String body = String.format(CLOSE_REFERRAL_BODY, multipleRequest.getCaseDetails().getCaseId());
         return ResponseEntity.ok(MultipleCallbackResponse.builder().confirmation_body(body).build());
     }

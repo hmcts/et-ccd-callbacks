@@ -258,6 +258,28 @@ Generated on 2026-03-19 from CCD CaseEvent definitions.
   - token-gated about-to-submit/submitted flows
   - unsupported callback type exceptions
   - referral update/close state mutation and document linking
+
+## 2026-03-27 Base Class Conversion Refactor
+
+- Removed `AbstractCallbackHandlerBase` and flattened callback base hierarchy to three concrete bases:
+  - `CallbackHandlerBase` (single-case callbacks)
+  - `ListingCallbackHandlerBase`
+  - `MultipleCallbackHandlerBase`
+- Centralized start/end conversion flow in all three bases so listing/multiple child handlers no longer need
+  `toCallbackResponse(...)` / `toSubmittedCallbackResponse(...)` wrapper calls.
+- Confirmed no remaining child-level response conversion wrappers in handlers extending
+  `ListingCallbackHandlerBase` or `MultipleCallbackHandlerBase`.
+- Re-verified with Java 21:
+  - `./gradlew checkstyleMain checkstyleTest --no-daemon` passed.
+  - `./gradlew :test --tests "uk.gov.hmcts.ethos.replacement.docmosis.handler.*" -x et-shared:test --no-daemon` passed.
+
+## 2026-03-27 Test Suite Cleanup
+
+- Removed `GeneratedCallbackHandlersTest` as redundant after broad per-handler unit test coverage was added.
+- Kept `generated-callback-handlers-phase2.tsv` as migration-reference data.
+- Re-verified with Java 21:
+  - `./gradlew compileTestJava --no-daemon` passed.
+  - `./gradlew :test --tests "uk.gov.hmcts.ethos.replacement.docmosis.handler.*" -x et-shared:test --no-daemon` passed.
   - multiples notification delegation and submitted confirmation body
 - Re-verified with Java 21:
   - `./gradlew -q :test --tests "uk.gov.hmcts.ethos.replacement.docmosis.handler.*" --no-daemon` passed.
@@ -589,3 +611,45 @@ Generated on 2026-03-19 from CCD CaseEvent definitions.
   - `checkstyleTest` green
   - `build integration` green (pre-existing `et-shared` javadoc warnings only)
 - Checklist retained as the migration audit trail and updated through completion of handler test coverage.
+
+## 2026-03-26 Callback Base Refactor (Post-Rollback Reapply)
+
+- Reapplied the callback-base refactor after handler rollback:
+  - kept `CallbackHandlerBase` as the standard `CaseDetails` base with shared conversion helpers.
+  - introduced typed derived bases:
+    - `ListingCallbackHandlerBase` for `ListingDetails`/`ListingRequest` conversion.
+    - `MultipleCallbackHandlerBase` for `MultipleDetails`/`MultipleRequest` conversion.
+  - migrated listing/multiple handlers to the new typed bases.
+- Removed child-handler boilerplate unsupported callback implementations:
+  - deleted throw-only `aboutToSubmit(CaseDetails)` / `submitted(CaseDetails)` overrides where the callback type is not accepted.
+  - unsupported callback behavior is now centralized in `CallbackHandlerBase`.
+- Mechanical cleanup after reapply:
+  - removed newly-unused `SubmittedCallbackResponse` imports.
+  - fixed method indentation/spacing in affected handlers after override removal.
+  - fixed one checkstyle line-length issue in `RequestInterceptor`.
+- Validation (Java 21):
+  - `./gradlew checkstyleMain --no-daemon` passed.
+  - `./gradlew checkstyleTest --no-daemon` passed.
+  - `./gradlew :test --tests "uk.gov.hmcts.ethos.replacement.docmosis.handler.*" -x et-shared:test --no-daemon` passed.
+  - `./gradlew test --no-daemon` still reports existing non-handler failures in this branch context (legacy context-load failures, including duplicate YAML key errors).
+
+## 2026-03-27 Typed Conversion Centralisation Pass
+
+- Refactored handler base hierarchy to centralise conversion logic more aggressively:
+  - added `AbstractCallbackHandlerBase` as shared conversion/response base.
+  - made `CallbackHandlerBase`, `ListingCallbackHandlerBase`, and `MultipleCallbackHandlerBase` sibling bases (listing/multiple no longer inherit from `CallbackHandlerBase`).
+- Moved request conversion boundaries into listing/multiple base classes:
+  - `ListingCallbackHandlerBase` now converts `CaseDetails -> ListingRequest` in base callback entrypoints.
+  - `MultipleCallbackHandlerBase` now converts `CaseDetails -> MultipleRequest` in base callback entrypoints.
+  - child listing/multiple handlers now implement typed hooks (`aboutToSubmit(ListingRequest|MultipleRequest)` / `submitted(...)`) instead of doing request conversion in the method body.
+- Removed remaining child-level response wrapping for listing/multiple handlers:
+  - eliminated `toCallbackResponse(...)` / `toSubmittedCallbackResponse(...)` from listing/multiple child handlers.
+  - return conversion is now base-driven for both entry and exit in listing/multiple callback flow.
+- Updated affected handler tests for new hierarchy/typed conversion path:
+  - `GeneratedCallbackHandlersTest` now instantiates/asserts against `AbstractCallbackHandlerBase`.
+  - `CloseReferralMultiplesCloseReferralCallbackHandlerTest` updated stubbing to `MultipleDetails` conversion path.
+- Validation (Java 21):
+  - `./gradlew -q compileJava --no-daemon` passed.
+  - `./gradlew checkstyleMain --no-daemon` passed.
+  - `./gradlew checkstyleTest --no-daemon` passed.
+  - `./gradlew :test --tests "uk.gov.hmcts.ethos.replacement.docmosis.handler.*" -x et-shared:test --no-daemon` passed.

@@ -3,21 +3,18 @@ package uk.gov.hmcts.ethos.replacement.docmosis.handler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.sdk.CallbackRequestContext;
-import uk.gov.hmcts.ccd.sdk.CallbackResponse;
-import uk.gov.hmcts.ccd.sdk.SubmittedCallbackResponse;
-import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseLookupService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReferralService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 
 import java.io.IOException;
 import java.util.List;
 
 @Component
-public class UpdateReferralMultiplesUpdateReferralCallbackHandler extends CallbackHandlerBase {
+public class UpdateReferralMultiplesUpdateReferralCallbackHandler extends MultipleCallbackHandlerBase {
 
     private static final String NONE = "None";
     private final UserIdamService userIdamService;
@@ -61,22 +58,16 @@ public class UpdateReferralMultiplesUpdateReferralCallbackHandler extends Callba
     }
 
     @Override
-    CallbackResponse<CaseData> aboutToSubmit(CaseDetails caseDetails) {
+    Object aboutToSubmit(MultipleRequest multipleRequest) {
         String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
         try {
-            return toCallbackResponse(aboutToSubmitUpdateReferralDetails(
-                    toMultipleRequest(caseDetails),
+            return aboutToSubmitUpdateReferralDetails(
+                    multipleRequest,
                     authorizationToken
-                ));
+                );
         } catch (IOException exception) {
             throw new IllegalStateException("Failed to update referral details for multiple", exception);
         }
-    }
-
-    @Override
-    SubmittedCallbackResponse submitted(CaseDetails caseDetails) {
-        throw new IllegalStateException("Handler does not support submitted callbacks for events: "
-            + getHandledEventIds());
     }
 
     private Object aboutToSubmitUpdateReferralDetails(

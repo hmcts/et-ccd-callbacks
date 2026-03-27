@@ -4,7 +4,6 @@ import io.micrometer.common.util.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.sdk.CallbackResponse;
-import uk.gov.hmcts.ccd.sdk.SubmittedCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
@@ -60,11 +59,5 @@ public class RemoveOwnRepAsClaimantCallbackHandler extends CallbackHandlerBase {
             );
         }
         return toCallbackResponse(getCallbackRespEntityNoErrors(caseData));
-    }
-
-    @Override
-    SubmittedCallbackResponse submitted(CaseDetails caseDetails) {
-        throw new IllegalStateException("Handler does not support submitted callbacks for events: "
-            + getHandledEventIds());
     }
 }

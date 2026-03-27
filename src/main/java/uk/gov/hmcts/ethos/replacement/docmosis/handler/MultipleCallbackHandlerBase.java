@@ -7,15 +7,17 @@ import uk.gov.hmcts.ccd.sdk.SubmittedCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.multiples.MultipleDetails;
+import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 
-public abstract class CallbackHandlerBase implements CallbackHandler<CaseData> {
+public abstract class MultipleCallbackHandlerBase implements CallbackHandler<CaseData> {
 
     private final CaseDetailsConverter caseDetailsConverter;
 
-    protected CallbackHandlerBase(CaseDetailsConverter caseDetailsConverter) {
+    protected MultipleCallbackHandlerBase(CaseDetailsConverter caseDetailsConverter) {
         this.caseDetailsConverter = caseDetailsConverter;
     }
 
@@ -26,6 +28,10 @@ public abstract class CallbackHandlerBase implements CallbackHandler<CaseData> {
     }
 
     CallbackResponse<CaseData> aboutToSubmit(CaseDetails caseDetails) {
+        return toCallbackResponse(aboutToSubmit(toMultipleRequest(caseDetails)));
+    }
+
+    Object aboutToSubmit(MultipleRequest multipleRequest) {
         throw new IllegalStateException("Handler does not support about-to-submit callbacks for events: "
             + getHandledEventIds());
     }
@@ -37,8 +43,17 @@ public abstract class CallbackHandlerBase implements CallbackHandler<CaseData> {
     }
 
     SubmittedCallbackResponse submitted(CaseDetails caseDetails) {
+        return toSubmittedCallbackResponse(submitted(toMultipleRequest(caseDetails)));
+    }
+
+    Object submitted(MultipleRequest multipleRequest) {
         throw new IllegalStateException("Handler does not support submitted callbacks for events: "
             + getHandledEventIds());
+    }
+
+    protected MultipleRequest toMultipleRequest(CaseDetails caseDetails) {
+        MultipleDetails multipleDetails = convertTo(caseDetails, MultipleDetails.class);
+        return new MultipleRequest(multipleDetails);
     }
 
     protected uk.gov.hmcts.et.common.model.ccd.CaseDetails toCaseDetails(CaseDetails caseDetails) {
@@ -87,5 +102,4 @@ public abstract class CallbackHandlerBase implements CallbackHandler<CaseData> {
 
         return caseDetailsConverter.getObjectMapper().convertValue(responseBody, CCDCallbackResponse.class);
     }
-
 }

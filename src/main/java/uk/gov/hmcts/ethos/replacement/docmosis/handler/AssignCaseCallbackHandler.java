@@ -5,7 +5,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.sdk.CallbackRequestContext;
 import uk.gov.hmcts.ccd.sdk.CallbackResponse;
-import uk.gov.hmcts.ccd.sdk.SubmittedCallbackResponse;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -73,12 +72,6 @@ public class AssignCaseCallbackHandler extends CallbackHandlerBase {
                     toCcdRequest(caseDetails),
                     authorizationToken
                 ));
-    }
-
-    @Override
-    SubmittedCallbackResponse submitted(CaseDetails caseDetails) {
-        throw new IllegalStateException("Handler does not support submitted callbacks for events: "
-            + getHandledEventIds());
     }
 
     private ResponseEntity<CCDCallbackResponse> assignCase(

@@ -4,8 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.sdk.CallbackRequestContext;
-import uk.gov.hmcts.ccd.sdk.CallbackResponse;
-import uk.gov.hmcts.ccd.sdk.SubmittedCallbackResponse;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
@@ -21,7 +19,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReferralService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 
 import java.io.IOException;
 import java.util.List;
@@ -30,7 +27,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.clearReferralReplyDataFromCaseData;
 
 @Component
-public class ReplyToReferralMultiplesReplyReferralCallbackHandler extends CallbackHandlerBase {
+public class ReplyToReferralMultiplesReplyReferralCallbackHandler extends MultipleCallbackHandlerBase {
 
     private static final String REPLY_REFERRAL_BODY = "<hr>"
         + "<h3>What happens next</h3>"
@@ -80,23 +77,23 @@ public class ReplyToReferralMultiplesReplyReferralCallbackHandler extends Callba
     }
 
     @Override
-    CallbackResponse<CaseData> aboutToSubmit(CaseDetails caseDetails) {
+    Object aboutToSubmit(MultipleRequest multipleRequest) {
         String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
         try {
-            return toCallbackResponse(aboutToSubmitReferralReply(
-                    toMultipleRequest(caseDetails),
+            return aboutToSubmitReferralReply(
+                    multipleRequest,
                     authorizationToken
-                ));
+                );
         } catch (IOException exception) {
             throw new IllegalStateException("Failed to reply to referral for multiple", exception);
         }
     }
 
     @Override
-    SubmittedCallbackResponse submitted(CaseDetails caseDetails) {
-        return toSubmittedCallbackResponse(completeReplyToReferral(
-                    toMultipleRequest(caseDetails)
-                ));
+    Object submitted(MultipleRequest multipleRequest) {
+        return completeReplyToReferral(
+                    multipleRequest
+                );
     }
 
     private ResponseEntity<MultipleCallbackResponse> aboutToSubmitReferralReply(

@@ -2,12 +2,9 @@ package uk.gov.hmcts.ethos.replacement.docmosis.handler;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.ccd.sdk.CallbackResponse;
-import uk.gov.hmcts.ccd.sdk.SubmittedCallbackResponse;
-import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 
 import java.util.List;
 
@@ -15,7 +12,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.UploadDocumentHelper.setDocumentTypeForDocumentCollection;
 
 @Component
-public class UploadDocumentMultiplesUploadDocumentCallbackHandler extends CallbackHandlerBase {
+public class UploadDocumentMultiplesUploadDocumentCallbackHandler extends MultipleCallbackHandlerBase {
 
     private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
 
@@ -49,17 +46,10 @@ public class UploadDocumentMultiplesUploadDocumentCallbackHandler extends Callba
     }
 
     @Override
-    CallbackResponse<CaseData> aboutToSubmit(CaseDetails caseDetails) {
-        var multipleRequest = toMultipleRequest(caseDetails);
+    Object aboutToSubmit(MultipleRequest multipleRequest) {
         var caseData = multipleRequest.getCaseDetails().getCaseData();
         setDocumentTypeForDocumentCollection(caseData);
         caseManagementForCaseWorkerService.addClaimantDocuments(caseData);
-        return toCallbackResponse(multipleResponse(caseData, null));
-    }
-
-    @Override
-    SubmittedCallbackResponse submitted(CaseDetails caseDetails) {
-        throw new IllegalStateException("Handler does not support submitted callbacks for events: "
-            + getHandledEventIds());
+        return multipleResponse(caseData, null);
     }
 }

@@ -5,14 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.sdk.CallbackRequestContext;
-import uk.gov.hmcts.ccd.sdk.CallbackResponse;
-import uk.gov.hmcts.ccd.sdk.SubmittedCallbackResponse;
-import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleCallbackResponse;
 import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 
 import java.util.List;
 
@@ -20,7 +16,7 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 
 @Slf4j
 @Component
-public class AmendMultipleAPICallbackHandler extends CallbackHandlerBase {
+public class AmendMultipleAPICallbackHandler extends MultipleCallbackHandlerBase {
 
     private static final String LOG_MESSAGE = " ---> received notification request for multiple reference : {}";
     private static final String INVALID_TOKEN = "Invalid Token {}";
@@ -57,24 +53,18 @@ public class AmendMultipleAPICallbackHandler extends CallbackHandlerBase {
     }
 
     @Override
-    CallbackResponse<CaseData> aboutToSubmit(CaseDetails caseDetails) {
+    Object aboutToSubmit(MultipleRequest multipleRequest) {
         String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
-        MultipleRequest request = toMultipleRequest(caseDetails);
+        MultipleRequest request = multipleRequest;
         log.info("AMEND MULTIPLE API" + LOG_MESSAGE, request.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(authorizationToken)) {
             log.error(INVALID_TOKEN, authorizationToken);
-            return toCallbackResponse(ResponseEntity.status(FORBIDDEN.value()).build());
+            return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
-        return toCallbackResponse(ResponseEntity.ok(MultipleCallbackResponse.builder()
+        return ResponseEntity.ok(MultipleCallbackResponse.builder()
             .data(request.getCaseDetails().getCaseData())
-            .build()));
-    }
-
-    @Override
-    SubmittedCallbackResponse submitted(CaseDetails caseDetails) {
-        throw new IllegalStateException("Handler does not support submitted callbacks for events: "
-            + getHandledEventIds());
+            .build());
     }
 }

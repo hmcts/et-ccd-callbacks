@@ -6,19 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.sdk.CallbackRequestContext;
-import uk.gov.hmcts.ccd.sdk.CallbackResponse;
-import uk.gov.hmcts.ccd.sdk.SubmittedCallbackResponse;
-import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.listing.ListingCallbackResponse;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
+import uk.gov.hmcts.et.common.model.listing.ListingRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.letters.InvalidCharacterCheck;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ListingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.callback.ListingGenerationCallbackService;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -27,7 +24,7 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 
 @Slf4j
 @Component
-public class PrintCauseListCallbackHandler extends CallbackHandlerBase {
+public class PrintCauseListCallbackHandler extends ListingCallbackHandlerBase {
 
     private static final String LOG_MESSAGE = "received notification request for case reference : ";
     private static final String INVALID_TOKEN = "Invalid Token {}";
@@ -70,14 +67,14 @@ public class PrintCauseListCallbackHandler extends CallbackHandlerBase {
     }
 
     @Override
-    CallbackResponse<CaseData> aboutToSubmit(CaseDetails caseDetails) {
+    Object aboutToSubmit(ListingRequest listingRequest) {
         String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
-        var request = toListingRequest(caseDetails);
+        var request = listingRequest;
         log.info("GENERATE HEARING DOCUMENT ---> " + LOG_MESSAGE + request.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(authorizationToken)) {
             log.error(INVALID_TOKEN, authorizationToken);
-            return toCallbackResponse(ResponseEntity.status(FORBIDDEN.value()).build());
+            return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
         ListingData listingData = request.getCaseDetails().getCaseData();
@@ -100,16 +97,16 @@ public class PrintCauseListCallbackHandler extends CallbackHandlerBase {
                 authorizationToken
             );
             listingData.setDocMarkUp(documentInfo.getMarkUp());
-            return toCallbackResponse(ResponseEntity.ok(ListingCallbackResponse.builder()
+            return ResponseEntity.ok(ListingCallbackResponse.builder()
                 .data(listingData)
                 .significant_item(Helper.generateSignificantItem(documentInfo, errorsList))
-                .build()));
+                .build());
         }
 
-        return toCallbackResponse(ResponseEntity.ok(ListingCallbackResponse.builder()
+        return ResponseEntity.ok(ListingCallbackResponse.builder()
             .errors(errorsList)
             .data(listingData)
-            .build()));
+            .build());
     }
 
     private boolean hasListings(ListingData listingData) {
@@ -117,11 +114,11 @@ public class PrintCauseListCallbackHandler extends CallbackHandlerBase {
     }
 
     @Override
-    SubmittedCallbackResponse submitted(CaseDetails caseDetails) {
+    Object submitted(ListingRequest listingRequest) {
         String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
-        return toSubmittedCallbackResponse(listingGenerationCallbackService.generateHearingDocumentConfirmation(
-            toListingRequest(caseDetails),
+        return listingGenerationCallbackService.generateHearingDocumentConfirmation(
+            listingRequest,
             authorizationToken
-        ));
+        );
     }
 }

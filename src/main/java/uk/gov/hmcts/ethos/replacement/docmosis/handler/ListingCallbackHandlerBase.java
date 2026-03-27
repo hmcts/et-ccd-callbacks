@@ -7,15 +7,17 @@ import uk.gov.hmcts.ccd.sdk.SubmittedCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.listing.ListingDetails;
+import uk.gov.hmcts.et.common.model.listing.ListingRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.ccd.client.model.CallbackRequest;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 
-public abstract class CallbackHandlerBase implements CallbackHandler<CaseData> {
+public abstract class ListingCallbackHandlerBase implements CallbackHandler<CaseData> {
 
     private final CaseDetailsConverter caseDetailsConverter;
 
-    protected CallbackHandlerBase(CaseDetailsConverter caseDetailsConverter) {
+    protected ListingCallbackHandlerBase(CaseDetailsConverter caseDetailsConverter) {
         this.caseDetailsConverter = caseDetailsConverter;
     }
 
@@ -26,6 +28,10 @@ public abstract class CallbackHandlerBase implements CallbackHandler<CaseData> {
     }
 
     CallbackResponse<CaseData> aboutToSubmit(CaseDetails caseDetails) {
+        return toCallbackResponse(aboutToSubmit(toListingRequest(caseDetails)));
+    }
+
+    Object aboutToSubmit(ListingRequest listingRequest) {
         throw new IllegalStateException("Handler does not support about-to-submit callbacks for events: "
             + getHandledEventIds());
     }
@@ -37,8 +43,17 @@ public abstract class CallbackHandlerBase implements CallbackHandler<CaseData> {
     }
 
     SubmittedCallbackResponse submitted(CaseDetails caseDetails) {
+        return toSubmittedCallbackResponse(submitted(toListingRequest(caseDetails)));
+    }
+
+    Object submitted(ListingRequest listingRequest) {
         throw new IllegalStateException("Handler does not support submitted callbacks for events: "
             + getHandledEventIds());
+    }
+
+    protected ListingRequest toListingRequest(CaseDetails caseDetails) {
+        ListingDetails listingDetails = convertTo(caseDetails, ListingDetails.class);
+        return new ListingRequest(listingDetails);
     }
 
     protected uk.gov.hmcts.et.common.model.ccd.CaseDetails toCaseDetails(CaseDetails caseDetails) {
@@ -87,5 +102,4 @@ public abstract class CallbackHandlerBase implements CallbackHandler<CaseData> {
 
         return caseDetailsConverter.getObjectMapper().convertValue(responseBody, CCDCallbackResponse.class);
     }
-
 }

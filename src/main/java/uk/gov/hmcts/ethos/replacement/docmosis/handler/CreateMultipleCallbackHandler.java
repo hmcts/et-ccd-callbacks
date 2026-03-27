@@ -5,13 +5,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.sdk.CallbackRequestContext;
-import uk.gov.hmcts.ccd.sdk.CallbackResponse;
-import uk.gov.hmcts.ccd.sdk.SubmittedCallbackResponse;
-import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultipleCreationService;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -22,7 +19,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 
 @Slf4j
 @Component
-public class CreateMultipleCallbackHandler extends CallbackHandlerBase {
+public class CreateMultipleCallbackHandler extends MultipleCallbackHandlerBase {
 
     private static final String LOG_MESSAGE = " ---> received notification request for multiple reference : {}";
     private static final String INVALID_TOKEN = "Invalid Token {}";
@@ -62,14 +59,14 @@ public class CreateMultipleCallbackHandler extends CallbackHandlerBase {
     }
 
     @Override
-    CallbackResponse<CaseData> aboutToSubmit(CaseDetails caseDetails) {
+    Object aboutToSubmit(MultipleRequest multipleRequest) {
         String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
-        var request = toMultipleRequest(caseDetails);
+        var request = multipleRequest;
         log.info("CREATE MULTIPLE" + LOG_MESSAGE, request.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(authorizationToken)) {
             log.error(INVALID_TOKEN, authorizationToken);
-            return toCallbackResponse(ResponseEntity.status(FORBIDDEN.value()).build());
+            return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
         List<String> errors = new ArrayList<>();
@@ -81,12 +78,6 @@ public class CreateMultipleCallbackHandler extends CallbackHandlerBase {
             throw new IllegalStateException("Failed to create multiple", exception);
         }
 
-        return toCallbackResponse(getMultipleCallbackRespEntity(errors, multipleDetails));
-    }
-
-    @Override
-    SubmittedCallbackResponse submitted(CaseDetails caseDetails) {
-        throw new IllegalStateException("Handler does not support submitted callbacks for events: "
-            + getHandledEventIds());
+        return getMultipleCallbackRespEntity(errors, multipleDetails);
     }
 }

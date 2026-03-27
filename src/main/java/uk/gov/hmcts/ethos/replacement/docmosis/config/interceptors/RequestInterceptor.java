@@ -63,7 +63,8 @@ public class RequestInterceptor implements HandlerInterceptor {
             serviceName = tokenValidator.getServiceName(serviceAuthToken);
         }
 
-        if (request.getRequestURI().startsWith(CCD_PERSISTENCE_ENDPOINT_PREFIX) && !CCD_DATA_SERVICE.equals(serviceName)) {
+        if (request.getRequestURI().startsWith(CCD_PERSISTENCE_ENDPOINT_PREFIX)
+            && !CCD_DATA_SERVICE.equals(serviceName)) {
             log.error(CCD_PERSISTENCE_UNAUTHORISED);
             throw new UnAuthorisedServiceException(CCD_PERSISTENCE_UNAUTHORISED);
         }

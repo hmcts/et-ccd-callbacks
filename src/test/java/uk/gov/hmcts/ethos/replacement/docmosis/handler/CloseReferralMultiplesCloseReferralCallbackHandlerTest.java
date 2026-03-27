@@ -56,7 +56,9 @@ class CloseReferralMultiplesCloseReferralCallbackHandlerTest {
 
     @Test
     void submittedShouldReturnConfirmationBody() {
-        stubCcdConverter("123");
+        MultipleData caseData = new MultipleData();
+        MultipleDetails multipleDetails = multipleDetails(caseData, "ET_EnglandWales_Multiple", "123");
+        stubMultipleConverter(multipleDetails);
         when(caseDetailsConverter.getObjectMapper()).thenReturn(new ObjectMapper());
 
         CCDCallbackResponse response = (CCDCallbackResponse) handler.submitted(callbackCaseDetails());
@@ -67,14 +69,6 @@ class CloseReferralMultiplesCloseReferralCallbackHandlerTest {
     private void stubMultipleConverter(MultipleDetails multipleDetails) {
         when(caseDetailsConverter.convert(any(CaseDetails.class), eq(MultipleDetails.class)))
             .thenReturn(multipleDetails);
-    }
-
-    private void stubCcdConverter(String caseId) {
-        uk.gov.hmcts.et.common.model.ccd.CaseDetails ccdCaseDetails =
-            new uk.gov.hmcts.et.common.model.ccd.CaseDetails();
-        ccdCaseDetails.setCaseId(caseId);
-        ccdCaseDetails.setCaseTypeId("ET_EnglandWales_Multiple");
-        when(caseDetailsConverter.convert(any(CaseDetails.class))).thenReturn(ccdCaseDetails);
     }
 
     private MultipleData multipleData() {

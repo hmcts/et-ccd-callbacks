@@ -4,13 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.sdk.CallbackRequestContext;
-import uk.gov.hmcts.ccd.sdk.CallbackResponse;
-import uk.gov.hmcts.ccd.sdk.SubmittedCallbackResponse;
-import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleCallbackResponse;
+import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.NotificationsExcelReportService;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +15,7 @@ import java.util.List;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getMultipleCallbackRespEntity;
 
 @Component
-public class ExtractNotificationsCallbackHandler extends CallbackHandlerBase {
+public class ExtractNotificationsCallbackHandler extends MultipleCallbackHandlerBase {
 
     private final NotificationsExcelReportService notificationsExcelReportService;
 
@@ -52,27 +49,26 @@ public class ExtractNotificationsCallbackHandler extends CallbackHandlerBase {
     }
 
     @Override
-    CallbackResponse<CaseData> aboutToSubmit(CaseDetails caseDetails) {
+    Object aboutToSubmit(MultipleRequest multipleRequest) {
         String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
-        var multipleRequest = toMultipleRequest(caseDetails);
         List<String> errors = new ArrayList<>();
         var multipleDetails = multipleRequest.getCaseDetails();
         notificationsExcelReportService.generateReportAsync(multipleDetails, authorizationToken, errors);
-        return toCallbackResponse(getMultipleCallbackRespEntity(errors, multipleDetails));
+        return getMultipleCallbackRespEntity(errors, multipleDetails);
     }
 
     @Override
-    SubmittedCallbackResponse submitted(CaseDetails caseDetails) {
+    Object submitted(MultipleRequest multipleRequest) {
         String body = """
                 ### Extract task submitted
                 Once completed the generated extract will be available to download on the </br>
                 notifications tab of the multiple. </br>
                 """;
 
-        return toSubmittedCallbackResponse(ResponseEntity.ok(
+        return ResponseEntity.ok(
             MultipleCallbackResponse.builder()
                 .confirmation_body(body)
                 .build()
-        ));
+        );
     }
 }

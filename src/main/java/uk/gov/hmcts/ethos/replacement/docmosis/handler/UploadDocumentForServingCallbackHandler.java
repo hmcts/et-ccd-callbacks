@@ -3,11 +3,9 @@ package uk.gov.hmcts.ethos.replacement.docmosis.handler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.ccd.sdk.CallbackResponse;
 import uk.gov.hmcts.ccd.sdk.SubmittedCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
-import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ServingService;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
@@ -48,12 +46,6 @@ public class UploadDocumentForServingCallbackHandler extends CallbackHandlerBase
     @Override
     public boolean acceptsSubmitted() {
         return true;
-    }
-
-    @Override
-    CallbackResponse<CaseData> aboutToSubmit(CaseDetails caseDetails) {
-        throw new IllegalStateException("Handler does not support about-to-submit callbacks for events: "
-            + getHandledEventIds());
     }
 
     @Override

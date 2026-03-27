@@ -5,17 +5,14 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.sdk.CallbackRequestContext;
-import uk.gov.hmcts.ccd.sdk.CallbackResponse;
-import uk.gov.hmcts.ccd.sdk.SubmittedCallbackResponse;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
-import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.listing.ListingData;
+import uk.gov.hmcts.et.common.model.listing.ListingRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ListingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DefaultValuesReaderService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ListingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
-import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +22,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 
 @Slf4j
 @Component
-public class GenerateListingCallbackHandler extends CallbackHandlerBase {
+public class GenerateListingCallbackHandler extends ListingCallbackHandlerBase {
 
     private static final String LOG_MESSAGE = "received notification request for case reference : ";
     private static final String INVALID_TOKEN = "Invalid Token {}";
@@ -68,14 +65,14 @@ public class GenerateListingCallbackHandler extends CallbackHandlerBase {
     }
 
     @Override
-    CallbackResponse<CaseData> aboutToSubmit(CaseDetails caseDetails) {
+    Object aboutToSubmit(ListingRequest listingRequest) {
         String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
-        var request = toListingRequest(caseDetails);
+        var request = listingRequest;
         log.info("LISTING HEARINGS ---> " + LOG_MESSAGE + request.getCaseDetails().getCaseId());
 
         if (!verifyTokenService.verifyTokenSignature(authorizationToken)) {
             log.error(INVALID_TOKEN, authorizationToken);
-            return toCallbackResponse(ResponseEntity.status(FORBIDDEN.value()).build());
+            return ResponseEntity.status(FORBIDDEN.value()).build();
         }
 
         List<String> errors = new ArrayList<>();
@@ -88,12 +85,6 @@ public class GenerateListingCallbackHandler extends CallbackHandlerBase {
             listingData = defaultValuesReaderService.getListingData(listingData, defaultValues);
         }
 
-        return toCallbackResponse(getListingCallbackRespEntityErrors(errors, listingData));
-    }
-
-    @Override
-    SubmittedCallbackResponse submitted(CaseDetails caseDetails) {
-        throw new IllegalStateException("Handler does not support submitted callbacks for events: "
-            + getHandledEventIds());
+        return getListingCallbackRespEntityErrors(errors, listingData);
     }
 }

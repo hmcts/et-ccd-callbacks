@@ -1,6 +1,24 @@
 [
   {
     "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "hasCaseLinks",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
+    "CaseFieldID": "hasCaseLinks",
+    "UserRole": "caseworker-employment-legalrep-solicitor",
+    "CRUD": "CRUD"
+  },
+  {
+  "CaseTypeId": "ET_EnglandWales",
+  "CaseFieldID": "hasCaseLinks",
+  "UserRole": "caseworker-employment-englandwales",
+  "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_EnglandWales",
     "CaseFieldID": "caseFlags",
     "UserRole": "caseworker-employment-api",
     "CRUD": "CRUD"

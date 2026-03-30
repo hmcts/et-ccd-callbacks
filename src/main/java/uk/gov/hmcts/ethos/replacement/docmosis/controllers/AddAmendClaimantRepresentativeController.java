@@ -35,7 +35,6 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_REPRESENTATIVE_ORGANISATION_AND_EMAIL_NOT_MATCHED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 /**
  * REST controller for the addAmendClaimantRepresentative event.
@@ -102,12 +101,21 @@ public class AddAmendClaimantRepresentativeController {
     })
     public ResponseEntity<CCDCallbackResponse> aboutToSubmit(
             @RequestBody CCDRequest ccdRequest) {
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        NocUtils.clearNocWarningIfPresent(caseData);
-        ClaimantRepresentativeUtils.addAmendClaimantRepresentative(caseData);
-        nocRespondentRepresentativeService.revokeRespondentRepresentativesWithSameOrganisationAsClaimant(
+        CaseDataUtils.validateCCDRequest(ccdRequest);
+        List<String> errors = new ArrayList<>();
+        String error = nocClaimantRepresentativeService.validateClaimantRepresentativeOrganisationMatch(
                 ccdRequest.getCaseDetails());
-        return getCallbackRespEntityNoErrors(caseData);
+        if (StringUtils.isNotBlank(error)) {
+            errors.add(error);
+        }
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        if (!errors.isEmpty()) {
+            NocUtils.clearNocWarningIfPresent(caseData);
+            ClaimantRepresentativeUtils.addAmendClaimantRepresentative(caseData);
+            nocRespondentRepresentativeService.revokeRespondentRepresentativesWithSameOrganisationAsClaimant(
+                    ccdRequest.getCaseDetails());
+        }
+        return getCallbackRespEntityErrors(errors, caseData);
     }
 
     @PostMapping("/amendClaimantRepSubmitted")

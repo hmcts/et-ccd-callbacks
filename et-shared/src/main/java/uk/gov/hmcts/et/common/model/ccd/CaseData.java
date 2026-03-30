@@ -1648,9 +1648,6 @@ public class CaseData extends Et1CaseData {
     @JsonProperty("vocabulary")
     private List<Vocabulary> vocabulary;
 
-    @JsonProperty("hasCaseLinks")
-    private String hasCaseLinks;
-
     @JsonProperty("caseLinks")
     private ListTypeItem<CaseLink> caseLinks;
 
@@ -1683,6 +1680,11 @@ public class CaseData extends Et1CaseData {
         this.repCollection = repCollection.stream()
                 .map(o -> RepresentedTypeRItem.builder().id(o.getId()).value(o.getValue()).build())
                 .toList();
+    }
+
+    @JsonProperty("hasCaseLinks")
+    public String getHasCaseLinks() {
+        return (caseLinks != null && !caseLinks.isEmpty()) ? "Yes" : "No";
     }
 
     @JsonProperty("et1ReppedTriageAddress")

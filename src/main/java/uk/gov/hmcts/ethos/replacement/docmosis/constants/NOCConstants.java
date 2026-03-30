@@ -69,17 +69,10 @@ public final class NOCConstants {
             "Unable to send notification for representative removal for case: {}. Exception: {}";
     public static final String ERROR_FAILED_TO_REMOVE_ORGANISATION_POLICIES =
             "Failed to remove organisation policies for case {}. Exception: {}";
-    public static final String ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES =
-            "Failed to add organisation policy for case {}. Exception: {}";
-    public static final String ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_INVALID_CASE_DETAILS =
-            "Failed to add organisation policy. Reason: invalid case details";
-    public static final String ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_INVALID_INPUTS =
-            "Failed to add organisation policy for case{}. Reason: invalid inputs";
     public static final String ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_REPRESENTATIVE_NOT_FOUND =
             "Failed to add organisation policy for case {}. Reason: representative not found";
-    public static final String ERROR_UNABLE_TO_START_EVENT_TO_UPDATE_REPRESENTATIVE_AND_ORGANISATION_POLICY =
-            "Unable to start update case submitted event to update representative role and organisation policy for "
-                    + "case: {}";
+    public static final String ERROR_SELECTED_ORGANISATION_REPRESENTATIVE_ORGANISATION_NOT_MATCHES =
+            "Representative %s organisation does not match with selected organisation %s";
     public static final String ERROR_REPRESENTATIVE_ORGANISATION_AND_EMAIL_NOT_MATCHED =
             "Failed to validate representative organisation and email. %s";
     public static final String ERROR_UNABLE_TO_MODIFY_REPRESENTATIVE_ACCESS =

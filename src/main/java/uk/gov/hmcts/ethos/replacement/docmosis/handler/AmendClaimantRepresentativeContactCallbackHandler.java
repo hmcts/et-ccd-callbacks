@@ -5,28 +5,23 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.sdk.CallbackRequestContext;
 import uk.gov.hmcts.ccd.sdk.CallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
+import uk.gov.hmcts.ethos.replacement.docmosis.controllers.Et1ReppedController;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1ReppedService;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-
-import java.util.ArrayList;
 import java.util.List;
-
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 
 @Component
 public class AmendClaimantRepresentativeContactCallbackHandler extends CallbackHandlerBase {
 
-    private final Et1ReppedService et1ReppedService;
+    private final Et1ReppedController aboutController;
 
     @Autowired
     public AmendClaimantRepresentativeContactCallbackHandler(
         CaseDetailsConverter caseDetailsConverter,
-        Et1ReppedService et1ReppedService
+        Et1ReppedController aboutController
     ) {
         super(caseDetailsConverter);
-        this.et1ReppedService = et1ReppedService;
+        this.aboutController = aboutController;
     }
 
     @Override
@@ -52,14 +47,11 @@ public class AmendClaimantRepresentativeContactCallbackHandler extends CallbackH
     @Override
     CallbackResponse<CaseData> aboutToSubmit(CaseDetails caseDetails) {
         String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
-        CaseData caseData = toCcdRequest(caseDetails).getCaseDetails().getCaseData();
-        List<String> errors = new ArrayList<>();
-        try {
-            et1ReppedService.setClaimantRepresentativeValues(authorizationToken, caseData);
-            caseData.setMyHmctsAddressText(null);
-        } catch (GenericServiceException genericServiceException) {
-            errors.add(genericServiceException.getMessage());
-        }
-        return toCallbackResponse(getCallbackRespEntityErrors(errors, caseData));
+        return toCallbackResponse(
+            aboutController.aboutToSubmitAmendClaimantRepresentativeContact(
+                toCcdRequest(caseDetails),
+                authorizationToken
+            )
+        );
     }
 }

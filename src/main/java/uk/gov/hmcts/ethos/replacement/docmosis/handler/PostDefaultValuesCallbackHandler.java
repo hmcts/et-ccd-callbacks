@@ -5,24 +5,23 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.sdk.CallbackRequestContext;
 import uk.gov.hmcts.ccd.sdk.CallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.ethos.replacement.docmosis.controllers.CaseActionsForCaseWorkerController;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.callback.CaseActionsForCaseWorkerCallbackService;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-
 import java.util.List;
 
 @Component
 public class PostDefaultValuesCallbackHandler extends CallbackHandlerBase {
 
-    private final CaseActionsForCaseWorkerCallbackService caseActionsForCaseWorkerCallbackService;
+    private final CaseActionsForCaseWorkerController aboutController;
 
     @Autowired
     public PostDefaultValuesCallbackHandler(
         CaseDetailsConverter caseDetailsConverter,
-        CaseActionsForCaseWorkerCallbackService caseActionsForCaseWorkerCallbackService
+        CaseActionsForCaseWorkerController aboutController
     ) {
         super(caseDetailsConverter);
-        this.caseActionsForCaseWorkerCallbackService = caseActionsForCaseWorkerCallbackService;
+        this.aboutController = aboutController;
     }
 
     @Override
@@ -54,9 +53,11 @@ public class PostDefaultValuesCallbackHandler extends CallbackHandlerBase {
     @Override
     CallbackResponse<CaseData> aboutToSubmit(CaseDetails caseDetails) {
         String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
-        return toCallbackResponse(caseActionsForCaseWorkerCallbackService.postDefaultValues(
-                    toCcdRequest(caseDetails),
-                    authorizationToken
-                ));
+        return toCallbackResponse(
+            aboutController.postDefaultValues(
+                toCcdRequest(caseDetails),
+                authorizationToken
+            )
+        );
     }
 }

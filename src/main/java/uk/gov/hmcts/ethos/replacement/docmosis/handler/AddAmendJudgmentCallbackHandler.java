@@ -1,34 +1,27 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.handler;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.ccd.sdk.CallbackRequestContext;
 import uk.gov.hmcts.ccd.sdk.CallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.ethos.replacement.docmosis.controllers.CaseActionsForCaseWorkerController;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.JudgmentValidationService;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-
-import java.text.ParseException;
 import java.util.List;
 
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
-
-@Slf4j
 @Component
 public class AddAmendJudgmentCallbackHandler extends CallbackHandlerBase {
 
-    private static final String LOG_MESSAGE = "received notification request for case reference :    ";
-
-    private final JudgmentValidationService judgmentValidationService;
+    private final CaseActionsForCaseWorkerController aboutController;
 
     @Autowired
     public AddAmendJudgmentCallbackHandler(
         CaseDetailsConverter caseDetailsConverter,
-        JudgmentValidationService judgmentValidationService
+        CaseActionsForCaseWorkerController aboutController
     ) {
         super(caseDetailsConverter);
-        this.judgmentValidationService = judgmentValidationService;
+        this.aboutController = aboutController;
     }
 
     @Override
@@ -53,16 +46,16 @@ public class AddAmendJudgmentCallbackHandler extends CallbackHandlerBase {
 
     @Override
     CallbackResponse<CaseData> aboutToSubmit(CaseDetails caseDetails) {
-        var request = toCcdRequest(caseDetails);
-        log.info("JUDGEMENT SUBMITTED ---> " + LOG_MESSAGE + "{}", request.getCaseDetails().getCaseId());
-
-        CaseData caseData = request.getCaseDetails().getCaseData();
+        String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
         try {
-            judgmentValidationService.validateJudgments(caseData);
-        } catch (ParseException exception) {
-            throw new IllegalStateException("Failed to validate judgments", exception);
+            return toCallbackResponse(
+                aboutController.judgmentSubmitted(
+                    toCcdRequest(caseDetails),
+                    authorizationToken
+                )
+            );
+        } catch (Exception exception) {
+            throw new IllegalStateException("Failed to delegate callback to controller", exception);
         }
-        caseData.setDraftAndSignJudgement(null);
-        return toCallbackResponse(getCallbackRespEntityNoErrors(caseData));
     }
 }

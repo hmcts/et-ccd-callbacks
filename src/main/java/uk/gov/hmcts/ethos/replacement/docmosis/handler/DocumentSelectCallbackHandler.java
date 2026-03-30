@@ -3,25 +3,22 @@ package uk.gov.hmcts.ethos.replacement.docmosis.handler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
+import uk.gov.hmcts.ethos.replacement.docmosis.controllers.multiples.MultiplesDocumentAccessController;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultiplesDocumentAccessService;
-
 import java.util.List;
-
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.multipleResponse;
 
 @Component
 public class DocumentSelectCallbackHandler extends MultipleCallbackHandlerBase {
 
-    private final MultiplesDocumentAccessService multiplesDocumentAccessService;
+    private final MultiplesDocumentAccessController aboutController;
 
     @Autowired
     public DocumentSelectCallbackHandler(
         CaseDetailsConverter caseDetailsConverter,
-        MultiplesDocumentAccessService multiplesDocumentAccessService
+        MultiplesDocumentAccessController aboutController
     ) {
         super(caseDetailsConverter);
-        this.multiplesDocumentAccessService = multiplesDocumentAccessService;
+        this.aboutController = aboutController;
     }
 
     @Override
@@ -46,8 +43,6 @@ public class DocumentSelectCallbackHandler extends MultipleCallbackHandlerBase {
 
     @Override
     Object aboutToSubmit(MultipleRequest multipleRequest) {
-        var multipleData = multipleRequest.getCaseDetails().getCaseData();
-        multiplesDocumentAccessService.setMultipleDocumentsToCorrectTab(multipleData);
-        return multipleResponse(multipleData, null);
+        return aboutController.aboutToSubmit(multipleRequest);
     }
 }

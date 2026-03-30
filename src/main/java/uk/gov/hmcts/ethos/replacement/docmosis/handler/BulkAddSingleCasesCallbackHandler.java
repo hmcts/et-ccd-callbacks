@@ -1,34 +1,25 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.handler;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.sdk.CallbackRequestContext;
 import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
+import uk.gov.hmcts.ethos.replacement.docmosis.controllers.BulkAddSinglesController;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.bulkaddsingles.BulkAddSinglesService;
-
 import java.util.List;
-
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getMultipleCallbackRespEntity;
 
 @Component
 public class BulkAddSingleCasesCallbackHandler extends MultipleCallbackHandlerBase {
 
-    private final BulkAddSinglesService bulkAddSinglesService;
-    private final VerifyTokenService verifyTokenService;
+    private final BulkAddSinglesController aboutController;
 
     @Autowired
     public BulkAddSingleCasesCallbackHandler(
         CaseDetailsConverter caseDetailsConverter,
-        BulkAddSinglesService bulkAddSinglesService,
-        VerifyTokenService verifyTokenService
+        BulkAddSinglesController aboutController
     ) {
         super(caseDetailsConverter);
-        this.bulkAddSinglesService = bulkAddSinglesService;
-        this.verifyTokenService = verifyTokenService;
+        this.aboutController = aboutController;
     }
 
     @Override
@@ -54,13 +45,9 @@ public class BulkAddSingleCasesCallbackHandler extends MultipleCallbackHandlerBa
     @Override
     Object aboutToSubmit(MultipleRequest multipleRequest) {
         String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
-
-        if (!verifyTokenService.verifyTokenSignature(authorizationToken)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
-        }
-
-        var multipleDetails = multipleRequest.getCaseDetails();
-        List<String> errors = bulkAddSinglesService.execute(multipleDetails, authorizationToken);
-        return getMultipleCallbackRespEntity(errors, multipleDetails);
+        return aboutController.bulkAddSingleCasesToMultiple(
+            multipleRequest,
+            authorizationToken
+        );
     }
 }

@@ -2,29 +2,26 @@ package uk.gov.hmcts.ethos.replacement.docmosis.handler;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.ccd.sdk.CallbackRequestContext;
 import uk.gov.hmcts.ccd.sdk.CallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.ethos.replacement.docmosis.controllers.MigrationController;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.EcmMigrationService;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-
-import java.io.IOException;
 import java.util.List;
-
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @Component
 public class RollbackMigrateCaseCallbackHandler extends CallbackHandlerBase {
 
-    private final EcmMigrationService ecmMigrationService;
+    private final MigrationController aboutController;
 
     @Autowired
     public RollbackMigrateCaseCallbackHandler(
         CaseDetailsConverter caseDetailsConverter,
-        EcmMigrationService ecmMigrationService
+        MigrationController aboutController
     ) {
         super(caseDetailsConverter);
-        this.ecmMigrationService = ecmMigrationService;
+        this.aboutController = aboutController;
     }
 
     @Override
@@ -49,13 +46,16 @@ public class RollbackMigrateCaseCallbackHandler extends CallbackHandlerBase {
 
     @Override
     CallbackResponse<CaseData> aboutToSubmit(CaseDetails caseDetails) {
+        String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
         try {
-            var ccdRequest = toCcdRequest(caseDetails);
-            CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-            ecmMigrationService.rollbackEcmMigration(ccdRequest.getCaseDetails());
-            return toCallbackResponse(getCallbackRespEntityNoErrors(caseData));
-        } catch (IOException exception) {
-            throw new IllegalStateException("Failed to rollback migrated case", exception);
+            return toCallbackResponse(
+                aboutController.rollbackAboutToSubmit(
+                    toCcdRequest(caseDetails),
+                    authorizationToken
+                )
+            );
+        } catch (Exception exception) {
+            throw new IllegalStateException("Failed to delegate callback to controller", exception);
         }
     }
 }

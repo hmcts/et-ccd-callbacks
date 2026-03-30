@@ -1,34 +1,28 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.handler;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.sdk.CallbackRequestContext;
 import uk.gov.hmcts.ccd.sdk.CallbackResponse;
 import uk.gov.hmcts.ccd.sdk.SubmittedCallbackResponse;
-import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.ethos.replacement.docmosis.controllers.Et1ReppedController;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1ReppedHelper;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1ReppedService;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-
 import java.util.List;
-
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @Component
 public class Et1ReppedAboutToSubmitSectionCallbackHandler extends CallbackHandlerBase {
 
-    private final Et1ReppedService et1ReppedService;
+    private final Et1ReppedController et1ReppedController;
 
     @Autowired
     public Et1ReppedAboutToSubmitSectionCallbackHandler(
         CaseDetailsConverter caseDetailsConverter,
-        Et1ReppedService et1ReppedService
+        Et1ReppedController et1ReppedController
     ) {
         super(caseDetailsConverter);
-        this.et1ReppedService = et1ReppedService;
+        this.et1ReppedController = et1ReppedController;
     }
 
     @Override
@@ -54,19 +48,22 @@ public class Et1ReppedAboutToSubmitSectionCallbackHandler extends CallbackHandle
     @Override
     CallbackResponse<CaseData> aboutToSubmit(CaseDetails caseDetails) {
         String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
-        var request = toCcdRequest(caseDetails);
-        Et1ReppedHelper.setEt1SectionStatuses(request);
-        et1ReppedService.addClaimantRepresentativeDetails(request.getCaseDetails().getCaseData(), authorizationToken);
-        return toCallbackResponse(getCallbackRespEntityNoErrors(request.getCaseDetails().getCaseData()));
+        return toCallbackResponse(
+            et1ReppedController.aboutToSubmitSection(
+                toCcdRequest(caseDetails),
+                authorizationToken
+            )
+        );
     }
 
     @Override
     SubmittedCallbackResponse submitted(CaseDetails caseDetails) {
-        CaseData caseData = toCcdRequest(caseDetails).getCaseDetails().getCaseData();
-        return toSubmittedCallbackResponse(ResponseEntity.ok(CCDCallbackResponse.builder()
-            .data(caseData)
-            .confirmation_body(Et1ReppedHelper.getSectionCompleted(caseData, toCcdRequest(caseDetails)
-                .getCaseDetails().getCaseId()))
-            .build()));
+        String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
+        return toSubmittedCallbackResponse(
+            et1ReppedController.sectionCompleted(
+                toCcdRequest(caseDetails),
+                authorizationToken
+            )
+        );
     }
 }

@@ -3,27 +3,23 @@ package uk.gov.hmcts.ethos.replacement.docmosis.handler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.sdk.CallbackRequestContext;
-import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
+import uk.gov.hmcts.ethos.replacement.docmosis.controllers.CaseNotesController;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseNotesService;
-
 import java.util.List;
-
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.multipleResponse;
 
 @Component
 public class AddCaseNoteCaseNotesMultiplesCallbackHandler extends MultipleCallbackHandlerBase {
 
-    private final CaseNotesService caseNotesService;
+    private final CaseNotesController aboutController;
 
     @Autowired
     public AddCaseNoteCaseNotesMultiplesCallbackHandler(
         CaseDetailsConverter caseDetailsConverter,
-        CaseNotesService caseNotesService
+        CaseNotesController aboutController
     ) {
         super(caseDetailsConverter);
-        this.caseNotesService = caseNotesService;
+        this.aboutController = aboutController;
     }
 
     @Override
@@ -49,8 +45,9 @@ public class AddCaseNoteCaseNotesMultiplesCallbackHandler extends MultipleCallba
     @Override
     Object aboutToSubmit(MultipleRequest multipleRequest) {
         String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
-        MultipleData multipleData = multipleRequest.getCaseDetails().getCaseData();
-        caseNotesService.addCaseNote(multipleData, authorizationToken);
-        return multipleResponse(multipleData, null);
+        return aboutController.aboutToSubmitMultiplesCaseNotes(
+            multipleRequest,
+            authorizationToken
+        );
     }
 }

@@ -1,35 +1,28 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.handler;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.sdk.CallbackRequestContext;
 import uk.gov.hmcts.ccd.sdk.CallbackResponse;
 import uk.gov.hmcts.ccd.sdk.SubmittedCallbackResponse;
-import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
-import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
+import uk.gov.hmcts.ethos.replacement.docmosis.controllers.notifications.admin.NotificationDocumentController;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.SendNotificationService;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-
 import java.util.List;
-
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @Component
 public class GenerateNotificationSummaryCallbackHandler extends CallbackHandlerBase {
 
-    private final SendNotificationService sendNotificationService;
+    private final NotificationDocumentController notificationDocumentController;
 
     @Autowired
     public GenerateNotificationSummaryCallbackHandler(
         CaseDetailsConverter caseDetailsConverter,
-        SendNotificationService sendNotificationService
+        NotificationDocumentController notificationDocumentController
     ) {
         super(caseDetailsConverter);
-        this.sendNotificationService = sendNotificationService;
+        this.notificationDocumentController = notificationDocumentController;
     }
 
     @Override
@@ -55,35 +48,22 @@ public class GenerateNotificationSummaryCallbackHandler extends CallbackHandlerB
     @Override
     CallbackResponse<CaseData> aboutToSubmit(CaseDetails caseDetails) {
         String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
-        return toCallbackResponse(aboutToSubmitNotificationDocument(
-                    toCcdRequest(caseDetails),
-                    authorizationToken
-                ));
+        return toCallbackResponse(
+            notificationDocumentController.aboutToSubmit(
+                toCcdRequest(caseDetails),
+                authorizationToken
+            )
+        );
     }
 
     @Override
     SubmittedCallbackResponse submitted(CaseDetails caseDetails) {
-        return toSubmittedCallbackResponse(submittedNotificationDocument(toCcdRequest(caseDetails)));
-    }
-
-    private ResponseEntity<CCDCallbackResponse> aboutToSubmitNotificationDocument(
-        CCDRequest ccdRequest,
-        String userToken
-    ) {
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        DocumentInfo documentInfo = sendNotificationService.createNotificationSummary(caseData, userToken,
-            ccdRequest.getCaseDetails().getCaseTypeId());
-        caseData.setDocMarkUp(documentInfo.getMarkUp());
-        return getCallbackRespEntityNoErrors(caseData);
-    }
-
-    private ResponseEntity<CCDCallbackResponse> submittedNotificationDocument(CCDRequest ccdRequest) {
-        return ResponseEntity.ok(
-            CCDCallbackResponse.builder()
-                .data(ccdRequest.getCaseDetails().getCaseData())
-                .confirmation_body("Download the notification summary from this link: "
-                    + ccdRequest.getCaseDetails().getCaseData().getDocMarkUp())
-                .build()
+        String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
+        return toSubmittedCallbackResponse(
+            notificationDocumentController.submitted(
+                toCcdRequest(caseDetails),
+                authorizationToken
+            )
         );
     }
 }

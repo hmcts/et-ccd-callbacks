@@ -5,24 +5,23 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.sdk.CallbackRequestContext;
 import uk.gov.hmcts.ccd.sdk.CallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.ethos.replacement.docmosis.controllers.notifications.admin.SendNotificationController;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.callback.SendNotificationCallbackService;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-
 import java.util.List;
 
 @Component
 public class SendNotificationMultipleCallbackHandler extends CallbackHandlerBase {
 
-    private final SendNotificationCallbackService sendNotificationCallbackService;
+    private final SendNotificationController aboutController;
 
     @Autowired
     public SendNotificationMultipleCallbackHandler(
         CaseDetailsConverter caseDetailsConverter,
-        SendNotificationCallbackService sendNotificationCallbackService
+        SendNotificationController aboutController
     ) {
         super(caseDetailsConverter);
-        this.sendNotificationCallbackService = sendNotificationCallbackService;
+        this.aboutController = aboutController;
     }
 
     @Override
@@ -48,9 +47,11 @@ public class SendNotificationMultipleCallbackHandler extends CallbackHandlerBase
     @Override
     CallbackResponse<CaseData> aboutToSubmit(CaseDetails caseDetails) {
         String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
-        return toCallbackResponse(sendNotificationCallbackService.aboutToSubmit(
-                    toCcdRequest(caseDetails),
-                    authorizationToken
-                ));
+        return toCallbackResponse(
+            aboutController.aboutToSubmit(
+                toCcdRequest(caseDetails),
+                authorizationToken
+            )
+        );
     }
 }

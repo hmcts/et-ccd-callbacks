@@ -2,21 +2,26 @@ package uk.gov.hmcts.ethos.replacement.docmosis.handler;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.ccd.sdk.CallbackRequestContext;
 import uk.gov.hmcts.ccd.sdk.CallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.ethos.replacement.docmosis.controllers.LegalRepDocumentsController;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-
 import java.util.List;
-
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @Component
 public class LegalrepDocumentsCallbackHandler extends CallbackHandlerBase {
 
+    private final LegalRepDocumentsController aboutController;
+
     @Autowired
-    public LegalrepDocumentsCallbackHandler(CaseDetailsConverter caseDetailsConverter) {
+    public LegalrepDocumentsCallbackHandler(
+        CaseDetailsConverter caseDetailsConverter,
+        LegalRepDocumentsController aboutController
+    ) {
         super(caseDetailsConverter);
+        this.aboutController = aboutController;
     }
 
     @Override
@@ -41,10 +46,12 @@ public class LegalrepDocumentsCallbackHandler extends CallbackHandlerBase {
 
     @Override
     CallbackResponse<CaseData> aboutToSubmit(CaseDetails caseDetails) {
-        var ccdRequest = toCcdRequest(caseDetails);
-        var caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setLegalrepDocumentCollection(null);
-        caseData.setLegalRepDocumentsMarkdown(null);
-        return toCallbackResponse(getCallbackRespEntityNoErrors(caseData));
+        String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
+        return toCallbackResponse(
+            aboutController.aboutToSubmit(
+                toCcdRequest(caseDetails),
+                authorizationToken
+            )
+        );
     }
 }

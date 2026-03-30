@@ -1,43 +1,27 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.handler;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.ccd.sdk.CallbackRequestContext;
 import uk.gov.hmcts.ccd.sdk.CallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.ethos.replacement.docmosis.controllers.CaseActionsForCaseWorkerController;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-
 import java.util.List;
 
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.FlagsImageHelper.buildFlagsImageFileName;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.removeSpacesFromPartyNames;
-
-@Slf4j
 @Component
 public class AmendClaimantDetailsCallbackHandler extends CallbackHandlerBase {
 
-    private static final String LOG_MESSAGE = "received notification request for case reference :    ";
-
-    private final FeatureToggleService featureToggleService;
-    private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
-    private final CaseFlagsService caseFlagsService;
+    private final CaseActionsForCaseWorkerController aboutController;
 
     @Autowired
     public AmendClaimantDetailsCallbackHandler(
         CaseDetailsConverter caseDetailsConverter,
-        FeatureToggleService featureToggleService,
-        CaseManagementForCaseWorkerService caseManagementForCaseWorkerService,
-        CaseFlagsService caseFlagsService
+        CaseActionsForCaseWorkerController aboutController
     ) {
         super(caseDetailsConverter);
-        this.featureToggleService = featureToggleService;
-        this.caseManagementForCaseWorkerService = caseManagementForCaseWorkerService;
-        this.caseFlagsService = caseFlagsService;
+        this.aboutController = aboutController;
     }
 
     @Override
@@ -62,25 +46,12 @@ public class AmendClaimantDetailsCallbackHandler extends CallbackHandlerBase {
 
     @Override
     CallbackResponse<CaseData> aboutToSubmit(CaseDetails caseDetails) {
-        var request = toCcdRequest(caseDetails);
-        log.info("AMEND CLAIMANT DETAILS ---> " + LOG_MESSAGE + request.getCaseDetails().getCaseId());
-
-        CaseData caseData = request.getCaseDetails().getCaseData();
-        buildFlagsImageFileName(request.getCaseDetails());
-
-        if (featureToggleService.isGlobalSearchEnabled()) {
-            caseManagementForCaseWorkerService.setCaseNameHmctsInternal(caseData);
-        }
-
-        caseManagementForCaseWorkerService.claimantDefaults(caseData);
-
-        if (featureToggleService.isHmcEnabled()) {
-            caseManagementForCaseWorkerService.setPublicCaseName(caseData);
-        }
-
-        caseFlagsService.setupCaseFlags(caseData);
-        caseManagementForCaseWorkerService.setNextListedDate(caseData);
-        removeSpacesFromPartyNames(caseData);
-        return toCallbackResponse(getCallbackRespEntityNoErrors(caseData));
+        String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
+        return toCallbackResponse(
+            aboutController.amendClaimantDetails(
+                toCcdRequest(caseDetails),
+                authorizationToken
+            )
+        );
     }
 }

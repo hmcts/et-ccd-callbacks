@@ -1,25 +1,27 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.handler;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.ccd.sdk.CallbackRequestContext;
 import uk.gov.hmcts.ccd.sdk.CallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.ethos.replacement.docmosis.controllers.RespondentRepresentativeController;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-
 import java.util.List;
-
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @Component
 public class RemoveOwnRepAsRespondentCallbackHandler extends CallbackHandlerBase {
 
+    private final RespondentRepresentativeController aboutController;
+
     @Autowired
     public RemoveOwnRepAsRespondentCallbackHandler(
-        CaseDetailsConverter caseDetailsConverter
+        CaseDetailsConverter caseDetailsConverter,
+        RespondentRepresentativeController aboutController
     ) {
         super(caseDetailsConverter);
+        this.aboutController = aboutController;
     }
 
     @Override
@@ -44,13 +46,12 @@ public class RemoveOwnRepAsRespondentCallbackHandler extends CallbackHandlerBase
 
     @Override
     CallbackResponse<CaseData> aboutToSubmit(CaseDetails caseDetails) {
-        var ccdRequest = toCcdRequest(caseDetails);
-        var caseData = ccdRequest.getCaseDetails().getCaseData();
-        if (CollectionUtils.isNotEmpty(caseData.getRepCollection())
-                && CollectionUtils.isNotEmpty(caseData.getRepCollectionToRemove())) {
-            caseData.getRepCollection().removeAll(caseData.getRepCollectionToRemove());
-            caseData.setRepCollectionToRemove(null);
-        }
-        return toCallbackResponse(getCallbackRespEntityNoErrors(caseData));
+        String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
+        return toCallbackResponse(
+            aboutController.removeOwnRepresentative(
+                toCcdRequest(caseDetails),
+                authorizationToken
+            )
+        );
     }
 }

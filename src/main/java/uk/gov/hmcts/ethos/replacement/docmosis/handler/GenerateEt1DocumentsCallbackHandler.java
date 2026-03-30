@@ -5,30 +5,23 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.sdk.CallbackRequestContext;
 import uk.gov.hmcts.ccd.sdk.CallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.ethos.replacement.docmosis.controllers.Et1ReppedController;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1SubmissionService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-
 import java.util.List;
-
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @Component
 public class GenerateEt1DocumentsCallbackHandler extends CallbackHandlerBase {
 
-    private final FeatureToggleService featureToggleService;
-    private final Et1SubmissionService et1SubmissionService;
+    private final Et1ReppedController aboutController;
 
     @Autowired
     public GenerateEt1DocumentsCallbackHandler(
         CaseDetailsConverter caseDetailsConverter,
-        FeatureToggleService featureToggleService,
-        Et1SubmissionService et1SubmissionService
+        Et1ReppedController aboutController
     ) {
         super(caseDetailsConverter);
-        this.featureToggleService = featureToggleService;
-        this.et1SubmissionService = et1SubmissionService;
+        this.aboutController = aboutController;
     }
 
     @Override
@@ -54,12 +47,11 @@ public class GenerateEt1DocumentsCallbackHandler extends CallbackHandlerBase {
     @Override
     CallbackResponse<CaseData> aboutToSubmit(CaseDetails caseDetails) {
         String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
-        var request = toCcdRequest(caseDetails);
-        var details = request.getCaseDetails();
-        if (featureToggleService.isEt1DocGenEnabled()) {
-            et1SubmissionService.createAndUploadEt1Docs(details, authorizationToken);
-            details.getCaseData().setRequiresSubmissionDocuments(null);
-        }
-        return toCallbackResponse(getCallbackRespEntityNoErrors(details.getCaseData()));
+        return toCallbackResponse(
+            aboutController.generateDocuments(
+                toCcdRequest(caseDetails),
+                authorizationToken
+            )
+        );
     }
 }

@@ -5,26 +5,23 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.sdk.CallbackRequestContext;
 import uk.gov.hmcts.ccd.sdk.CallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.ethos.replacement.docmosis.controllers.CaseNotesController;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseNotesService;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-
 import java.util.List;
-
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @Component
 public class AddCaseNoteCaseNotesSinglesCallbackHandler extends CallbackHandlerBase {
 
-    private final CaseNotesService caseNotesService;
+    private final CaseNotesController aboutController;
 
     @Autowired
     public AddCaseNoteCaseNotesSinglesCallbackHandler(
         CaseDetailsConverter caseDetailsConverter,
-        CaseNotesService caseNotesService
+        CaseNotesController aboutController
     ) {
         super(caseDetailsConverter);
-        this.caseNotesService = caseNotesService;
+        this.aboutController = aboutController;
     }
 
     @Override
@@ -50,8 +47,11 @@ public class AddCaseNoteCaseNotesSinglesCallbackHandler extends CallbackHandlerB
     @Override
     CallbackResponse<CaseData> aboutToSubmit(CaseDetails caseDetails) {
         String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
-        CaseData caseData = toCcdRequest(caseDetails).getCaseDetails().getCaseData();
-        caseNotesService.addCaseNote(caseData, authorizationToken);
-        return toCallbackResponse(getCallbackRespEntityNoErrors(caseData));
+        return toCallbackResponse(
+            aboutController.aboutToSubmitSinglesCaseNotes(
+                toCcdRequest(caseDetails),
+                authorizationToken
+            )
+        );
     }
 }

@@ -1,38 +1,25 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.handler;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.sdk.CallbackRequestContext;
 import uk.gov.hmcts.et.common.model.listing.ListingRequest;
+import uk.gov.hmcts.ethos.replacement.docmosis.controllers.ListingGenerationController;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.ListingService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
-
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
-
-@Slf4j
 @Component
 public class ListingCaseCreationCallbackHandler extends ListingCallbackHandlerBase {
 
-    private static final String LOG_MESSAGE = "received notification request for case reference : ";
-    private static final String INVALID_TOKEN = "Invalid Token {}";
-
-    private final ListingService listingService;
-    private final VerifyTokenService verifyTokenService;
+    private final ListingGenerationController aboutController;
 
     @Autowired
     public ListingCaseCreationCallbackHandler(
         CaseDetailsConverter caseDetailsConverter,
-        ListingService listingService,
-        VerifyTokenService verifyTokenService
+        ListingGenerationController aboutController
     ) {
         super(caseDetailsConverter);
-        this.listingService = listingService;
-        this.verifyTokenService = verifyTokenService;
+        this.aboutController = aboutController;
     }
 
     @Override
@@ -58,17 +45,9 @@ public class ListingCaseCreationCallbackHandler extends ListingCallbackHandlerBa
     @Override
     Object aboutToSubmit(ListingRequest listingRequest) {
         String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
-        log.info("LISTING CASE CREATION ---> " + LOG_MESSAGE + listingRequest.getCaseDetails().getCaseId());
-
-        if (!verifyTokenService.verifyTokenSignature(authorizationToken)) {
-            log.error(INVALID_TOKEN, authorizationToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
-        return ResponseEntity.ok(
-            uk.gov.hmcts.et.common.model.listing.ListingCallbackResponse.builder()
-                .data(listingService.listingCaseCreation(listingRequest.getCaseDetails()))
-                .build()
+        return aboutController.listingCaseCreation(
+            listingRequest,
+            authorizationToken
         );
     }
 }

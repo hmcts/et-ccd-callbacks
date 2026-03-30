@@ -1,40 +1,27 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.handler;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.server.ResponseStatusException;
+import uk.gov.hmcts.ccd.sdk.CallbackRequestContext;
 import uk.gov.hmcts.ccd.sdk.CallbackResponse;
-import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.ethos.replacement.docmosis.controllers.BundlesRespondentController;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.BundlesRespondentService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-
 import java.util.List;
-
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @Component
 public class RemoveHearingBundlesCallbackHandler extends CallbackHandlerBase {
 
-    private static final String BUNDLES_FEATURE_IS_NOT_AVAILABLE = "Bundles feature is not available";
-
-    private final BundlesRespondentService bundlesRespondentService;
-    private final FeatureToggleService featureToggleService;
+    private final BundlesRespondentController aboutController;
 
     @Autowired
     public RemoveHearingBundlesCallbackHandler(
         CaseDetailsConverter caseDetailsConverter,
-        BundlesRespondentService bundlesRespondentService,
-        FeatureToggleService featureToggleService
+        BundlesRespondentController aboutController
     ) {
         super(caseDetailsConverter);
-        this.bundlesRespondentService = bundlesRespondentService;
-        this.featureToggleService = featureToggleService;
+        this.aboutController = aboutController;
     }
 
     @Override
@@ -59,28 +46,12 @@ public class RemoveHearingBundlesCallbackHandler extends CallbackHandlerBase {
 
     @Override
     CallbackResponse<CaseData> aboutToSubmit(CaseDetails caseDetails) {
-        return toCallbackResponse(removeHearingBundle(
-                    toCcdRequest(caseDetails)
-                ));
-    }
-
-    private ResponseEntity<CCDCallbackResponse> removeHearingBundle(
-        uk.gov.hmcts.et.common.model.ccd.CCDRequest request
-    ) {
-        throwIfBundlesFlagDisabled();
-        CaseData caseData = request.getCaseDetails().getCaseData();
-        try {
-            bundlesRespondentService.removeHearingBundles(caseData);
-            bundlesRespondentService.clearInputData(caseData);
-            return getCallbackRespEntityNoErrors(caseData);
-        } catch (Exception exception) {
-            return getCallbackRespEntityErrors(List.of(exception.getMessage()), caseData);
-        }
-    }
-
-    private void throwIfBundlesFlagDisabled() {
-        if (!featureToggleService.isBundlesEnabled()) {
-            throw new ResponseStatusException(HttpStatus.SERVICE_UNAVAILABLE, BUNDLES_FEATURE_IS_NOT_AVAILABLE);
-        }
+        String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
+        return toCallbackResponse(
+            aboutController.removeHearingBundle(
+                toCcdRequest(caseDetails),
+                authorizationToken
+            )
+        );
     }
 }

@@ -2,28 +2,26 @@ package uk.gov.hmcts.ethos.replacement.docmosis.handler;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.ccd.sdk.CallbackRequestContext;
 import uk.gov.hmcts.ccd.sdk.CallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.ethos.replacement.docmosis.controllers.CaseAccessController;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseAccessService;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-
 import java.util.List;
-
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 
 @Component
 public class ClaimantTransferredCaseAccessCallbackHandler extends CallbackHandlerBase {
 
-    private final CaseAccessService caseAccessService;
+    private final CaseAccessController aboutController;
 
     @Autowired
     public ClaimantTransferredCaseAccessCallbackHandler(
         CaseDetailsConverter caseDetailsConverter,
-        CaseAccessService caseAccessService
+        CaseAccessController aboutController
     ) {
         super(caseDetailsConverter);
-        this.caseAccessService = caseAccessService;
+        this.aboutController = aboutController;
     }
 
     @Override
@@ -48,9 +46,12 @@ public class ClaimantTransferredCaseAccessCallbackHandler extends CallbackHandle
 
     @Override
     CallbackResponse<CaseData> aboutToSubmit(CaseDetails caseDetails) {
-        var ccdRequest = toCcdRequest(caseDetails);
-        var convertedCaseDetails = ccdRequest.getCaseDetails();
-        List<String> errors = caseAccessService.assignExistingCaseRoles(convertedCaseDetails);
-        return toCallbackResponse(getCallbackRespEntityErrors(errors, convertedCaseDetails.getCaseData()));
+        String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
+        return toCallbackResponse(
+            aboutController.claimantTransferredCase(
+                toCcdRequest(caseDetails),
+                authorizationToken
+            )
+        );
     }
 }

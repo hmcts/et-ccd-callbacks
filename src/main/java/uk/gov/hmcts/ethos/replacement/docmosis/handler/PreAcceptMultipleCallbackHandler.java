@@ -1,40 +1,25 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.handler;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.sdk.CallbackRequestContext;
 import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
+import uk.gov.hmcts.ethos.replacement.docmosis.controllers.ExcelActionsController;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.excel.MultiplePreAcceptService;
-
-import java.util.ArrayList;
 import java.util.List;
 
-import static org.springframework.http.HttpStatus.FORBIDDEN;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getMultipleCallbackRespEntity;
-
-@Slf4j
 @Component
 public class PreAcceptMultipleCallbackHandler extends MultipleCallbackHandlerBase {
 
-    private static final String LOG_MESSAGE = " ---> received notification request for multiple reference : {}";
-    private static final String INVALID_TOKEN = "Invalid Token {}";
-
-    private final VerifyTokenService verifyTokenService;
-    private final MultiplePreAcceptService multiplePreAcceptService;
+    private final ExcelActionsController aboutController;
 
     @Autowired
     public PreAcceptMultipleCallbackHandler(
         CaseDetailsConverter caseDetailsConverter,
-        VerifyTokenService verifyTokenService,
-        MultiplePreAcceptService multiplePreAcceptService
+        ExcelActionsController aboutController
     ) {
         super(caseDetailsConverter);
-        this.verifyTokenService = verifyTokenService;
-        this.multiplePreAcceptService = multiplePreAcceptService;
+        this.aboutController = aboutController;
     }
 
     @Override
@@ -60,17 +45,9 @@ public class PreAcceptMultipleCallbackHandler extends MultipleCallbackHandlerBas
     @Override
     Object aboutToSubmit(MultipleRequest multipleRequest) {
         String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
-        log.info("PRE ACCEPT MULTIPLE" + LOG_MESSAGE, multipleRequest.getCaseDetails().getCaseId());
-
-        if (!verifyTokenService.verifyTokenSignature(authorizationToken)) {
-            log.error(INVALID_TOKEN, authorizationToken);
-            return ResponseEntity.status(FORBIDDEN.value()).build();
-        }
-
-        List<String> errors = new ArrayList<>();
-        var multipleDetails = multipleRequest.getCaseDetails();
-        multiplePreAcceptService.bulkPreAcceptLogic(authorizationToken, multipleDetails, errors);
-
-        return getMultipleCallbackRespEntity(errors, multipleDetails);
+        return aboutController.preAcceptMultiple(
+            multipleRequest,
+            authorizationToken
+        );
     }
 }

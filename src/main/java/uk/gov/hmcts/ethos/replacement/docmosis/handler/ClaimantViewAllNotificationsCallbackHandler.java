@@ -1,25 +1,27 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.handler;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.ccd.sdk.CallbackRequestContext;
 import uk.gov.hmcts.ccd.sdk.CallbackResponse;
-import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
-import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.ethos.replacement.docmosis.controllers.notifications.claimant.ViewNotificationController;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseDetailsConverter;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-
 import java.util.List;
-
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @Component
 public class ClaimantViewAllNotificationsCallbackHandler extends CallbackHandlerBase {
 
+    private final ViewNotificationController aboutController;
+
     @Autowired
-    public ClaimantViewAllNotificationsCallbackHandler(CaseDetailsConverter caseDetailsConverter) {
+    public ClaimantViewAllNotificationsCallbackHandler(
+        CaseDetailsConverter caseDetailsConverter,
+        ViewNotificationController aboutController
+    ) {
         super(caseDetailsConverter);
+        this.aboutController = aboutController;
     }
 
     @Override
@@ -44,12 +46,12 @@ public class ClaimantViewAllNotificationsCallbackHandler extends CallbackHandler
 
     @Override
     CallbackResponse<CaseData> aboutToSubmit(CaseDetails caseDetails) {
-        return toCallbackResponse(allNotificationsAboutToSubmit(toCcdRequest(caseDetails)));
-    }
-
-    private ResponseEntity<CCDCallbackResponse> allNotificationsAboutToSubmit(CCDRequest ccdRequest) {
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setPseViewNotifications(null);
-        return getCallbackRespEntityNoErrors(caseData);
+        String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
+        return toCallbackResponse(
+            aboutController.allNotificationsAboutToSubmit(
+                toCcdRequest(caseDetails),
+                authorizationToken
+            )
+        );
     }
 }

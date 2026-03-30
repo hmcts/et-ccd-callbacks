@@ -1,31 +1,25 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.handler;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.sdk.CallbackRequestContext;
-import uk.gov.hmcts.et.common.model.multiples.MultipleCallbackResponse;
 import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
+import uk.gov.hmcts.ethos.replacement.docmosis.controllers.multiples.ExtractNotificationsController;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.NotificationsExcelReportService;
-
-import java.util.ArrayList;
 import java.util.List;
-
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getMultipleCallbackRespEntity;
 
 @Component
 public class ExtractNotificationsCallbackHandler extends MultipleCallbackHandlerBase {
 
-    private final NotificationsExcelReportService notificationsExcelReportService;
+    private final ExtractNotificationsController extractNotificationsController;
 
     @Autowired
     public ExtractNotificationsCallbackHandler(
         CaseDetailsConverter caseDetailsConverter,
-        NotificationsExcelReportService notificationsExcelReportService
+        ExtractNotificationsController extractNotificationsController
     ) {
         super(caseDetailsConverter);
-        this.notificationsExcelReportService = notificationsExcelReportService;
+        this.extractNotificationsController = extractNotificationsController;
     }
 
     @Override
@@ -51,24 +45,18 @@ public class ExtractNotificationsCallbackHandler extends MultipleCallbackHandler
     @Override
     Object aboutToSubmit(MultipleRequest multipleRequest) {
         String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
-        List<String> errors = new ArrayList<>();
-        var multipleDetails = multipleRequest.getCaseDetails();
-        notificationsExcelReportService.generateReportAsync(multipleDetails, authorizationToken, errors);
-        return getMultipleCallbackRespEntity(errors, multipleDetails);
+        try {
+            return extractNotificationsController.aboutToSubmit(
+                multipleRequest,
+                authorizationToken
+            );
+        } catch (Exception exception) {
+            throw new IllegalStateException("Failed to delegate callback to controller", exception);
+        }
     }
 
     @Override
     Object submitted(MultipleRequest multipleRequest) {
-        String body = """
-                ### Extract task submitted
-                Once completed the generated extract will be available to download on the </br>
-                notifications tab of the multiple. </br>
-                """;
-
-        return ResponseEntity.ok(
-            MultipleCallbackResponse.builder()
-                .confirmation_body(body)
-                .build()
-        );
+        return extractNotificationsController.submitted();
     }
 }

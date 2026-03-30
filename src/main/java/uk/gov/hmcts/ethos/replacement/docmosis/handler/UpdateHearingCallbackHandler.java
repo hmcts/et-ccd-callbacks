@@ -2,32 +2,26 @@ package uk.gov.hmcts.ethos.replacement.docmosis.handler;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.ccd.sdk.CallbackRequestContext;
 import uk.gov.hmcts.ccd.sdk.CallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.ethos.replacement.docmosis.controllers.HearingDetailsController;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.hearingdetails.HearingDetailsService;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-
 import java.util.List;
-
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @Component
 public class UpdateHearingCallbackHandler extends CallbackHandlerBase {
 
-    private final HearingDetailsService hearingDetailsService;
-    private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
+    private final HearingDetailsController aboutController;
 
     @Autowired
     public UpdateHearingCallbackHandler(
         CaseDetailsConverter caseDetailsConverter,
-        HearingDetailsService hearingDetailsService,
-        CaseManagementForCaseWorkerService caseManagementForCaseWorkerService
+        HearingDetailsController aboutController
     ) {
         super(caseDetailsConverter);
-        this.hearingDetailsService = hearingDetailsService;
-        this.caseManagementForCaseWorkerService = caseManagementForCaseWorkerService;
+        this.aboutController = aboutController;
     }
 
     @Override
@@ -52,10 +46,12 @@ public class UpdateHearingCallbackHandler extends CallbackHandlerBase {
 
     @Override
     CallbackResponse<CaseData> aboutToSubmit(CaseDetails caseDetails) {
-        var ccdRequest = toCcdRequest(caseDetails);
-        var ccdCaseDetails = ccdRequest.getCaseDetails();
-        hearingDetailsService.updateCase(ccdCaseDetails);
-        caseManagementForCaseWorkerService.setNextListedDate(ccdCaseDetails.getCaseData());
-        return toCallbackResponse(getCallbackRespEntityNoErrors(ccdCaseDetails.getCaseData()));
+        String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
+        return toCallbackResponse(
+            aboutController.aboutToSubmit(
+                toCcdRequest(caseDetails),
+                authorizationToken
+            )
+        );
     }
 }

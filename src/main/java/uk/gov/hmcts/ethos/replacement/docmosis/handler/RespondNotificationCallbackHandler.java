@@ -1,39 +1,28 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.handler;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.ccd.sdk.CallbackRequestContext;
 import uk.gov.hmcts.ccd.sdk.CallbackResponse;
 import uk.gov.hmcts.ccd.sdk.SubmittedCallbackResponse;
-import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
-import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.ethos.replacement.docmosis.controllers.notifications.admin.RespondNotificationController;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.RespondNotificationService;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-
 import java.util.List;
-
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @Component
 public class RespondNotificationCallbackHandler extends CallbackHandlerBase {
 
-    private static final String RESPOND_SUBMITTED_BODY_TEMPLATE = """
-        ### What happens next
-
-        You can still view the response in the <a href="/cases/case-details/%s#Notifications" target="_blank">
-        Notifications tab (opens in a new tab)</a>
-        """;
-    private final RespondNotificationService respondNotificationService;
+    private final RespondNotificationController respondNotificationController;
 
     @Autowired
     public RespondNotificationCallbackHandler(
         CaseDetailsConverter caseDetailsConverter,
-        RespondNotificationService respondNotificationService
+        RespondNotificationController respondNotificationController
     ) {
         super(caseDetailsConverter);
-        this.respondNotificationService = respondNotificationService;
+        this.respondNotificationController = respondNotificationController;
     }
 
     @Override
@@ -58,22 +47,23 @@ public class RespondNotificationCallbackHandler extends CallbackHandlerBase {
 
     @Override
     CallbackResponse<CaseData> aboutToSubmit(CaseDetails caseDetails) {
-        return toCallbackResponse(aboutToSubmitRespondNotification(toCcdRequest(caseDetails)));
+        String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
+        return toCallbackResponse(
+            respondNotificationController.aboutToSubmit(
+                toCcdRequest(caseDetails),
+                authorizationToken
+            )
+        );
     }
 
     @Override
     SubmittedCallbackResponse submitted(CaseDetails caseDetails) {
-        return toSubmittedCallbackResponse(submittedRespondNotification(toCcdRequest(caseDetails)));
-    }
-
-    private ResponseEntity<CCDCallbackResponse> aboutToSubmitRespondNotification(CCDRequest ccdRequest) {
-        var details = ccdRequest.getCaseDetails();
-        respondNotificationService.handleAboutToSubmit(details);
-        return getCallbackRespEntityNoErrors(details.getCaseData());
-    }
-
-    private ResponseEntity<CCDCallbackResponse> submittedRespondNotification(CCDRequest ccdRequest) {
-        String body = String.format(RESPOND_SUBMITTED_BODY_TEMPLATE, ccdRequest.getCaseDetails().getCaseId());
-        return ResponseEntity.ok(CCDCallbackResponse.builder().confirmation_body(body).build());
+        String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
+        return toSubmittedCallbackResponse(
+            respondNotificationController.submitted(
+                toCcdRequest(caseDetails),
+                authorizationToken
+            )
+        );
     }
 }

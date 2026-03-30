@@ -5,26 +5,23 @@ import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.sdk.CallbackRequestContext;
 import uk.gov.hmcts.ccd.sdk.CallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.ethos.replacement.docmosis.controllers.DigitalCaseFileController;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.DigitalCaseFileService;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-
 import java.util.List;
-
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @Component
 public class CreateDcfDcfAsyncAboutToSubmitCallbackHandler extends CallbackHandlerBase {
 
-    private final DigitalCaseFileService digitalCaseFileService;
+    private final DigitalCaseFileController aboutController;
 
     @Autowired
     public CreateDcfDcfAsyncAboutToSubmitCallbackHandler(
         CaseDetailsConverter caseDetailsConverter,
-        DigitalCaseFileService digitalCaseFileService
+        DigitalCaseFileController aboutController
     ) {
         super(caseDetailsConverter);
-        this.digitalCaseFileService = digitalCaseFileService;
+        this.aboutController = aboutController;
     }
 
     @Override
@@ -50,9 +47,11 @@ public class CreateDcfDcfAsyncAboutToSubmitCallbackHandler extends CallbackHandl
     @Override
     CallbackResponse<CaseData> aboutToSubmit(CaseDetails caseDetails) {
         String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
-        var ccdRequest = toCcdRequest(caseDetails);
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        digitalCaseFileService.createUploadRemoveDcf(authorizationToken, ccdRequest.getCaseDetails());
-        return toCallbackResponse(getCallbackRespEntityNoErrors(caseData));
+        return toCallbackResponse(
+            aboutController.aboutToSubmitAsync(
+                toCcdRequest(caseDetails),
+                authorizationToken
+            )
+        );
     }
 }

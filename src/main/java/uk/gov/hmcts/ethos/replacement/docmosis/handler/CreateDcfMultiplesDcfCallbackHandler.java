@@ -4,26 +4,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.sdk.CallbackRequestContext;
 import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
+import uk.gov.hmcts.ethos.replacement.docmosis.controllers.multiples.MultiplesDigitalCaseFileController;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseDetailsConverter;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.MultiplesDigitalCaseFileService;
-
 import java.util.List;
-
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.multipleResponse;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DigitalCaseFileHelper.addDcfToDocumentCollection;
 
 @Component
 public class CreateDcfMultiplesDcfCallbackHandler extends MultipleCallbackHandlerBase {
 
-    private final MultiplesDigitalCaseFileService multiplesDigitalCaseFileService;
+    private final MultiplesDigitalCaseFileController aboutController;
 
     @Autowired
     public CreateDcfMultiplesDcfCallbackHandler(
         CaseDetailsConverter caseDetailsConverter,
-        MultiplesDigitalCaseFileService multiplesDigitalCaseFileService
+        MultiplesDigitalCaseFileController aboutController
     ) {
         super(caseDetailsConverter);
-        this.multiplesDigitalCaseFileService = multiplesDigitalCaseFileService;
+        this.aboutController = aboutController;
     }
 
     @Override
@@ -49,13 +45,9 @@ public class CreateDcfMultiplesDcfCallbackHandler extends MultipleCallbackHandle
     @Override
     Object aboutToSubmit(MultipleRequest multipleRequest) {
         String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
-        var multipleData = multipleRequest.getCaseDetails().getCaseData();
-        multipleData.setCaseBundles(multiplesDigitalCaseFileService.stitchCaseFile(
-            multipleRequest.getCaseDetails(),
+        return aboutController.aboutToSubmit(
+            multipleRequest,
             authorizationToken
-        ));
-        addDcfToDocumentCollection(multipleData);
-        multipleData.setCaseBundles(null);
-        return multipleResponse(multipleData, null);
+        );
     }
 }

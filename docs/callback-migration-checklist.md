@@ -653,3 +653,17 @@ Generated on 2026-03-19 from CCD CaseEvent definitions.
   - `./gradlew checkstyleMain --no-daemon` passed.
   - `./gradlew checkstyleTest --no-daemon` passed.
   - `./gradlew :test --tests "uk.gov.hmcts.ethos.replacement.docmosis.handler.*" -x et-shared:test --no-daemon` passed.
+
+## 2026-03-30 Interim Delegation Pass (Two-Stage Refactor)
+
+- Reworked phase-2 migrated handlers to delegate directly to the controller methods they replace as an interim no-duplication step.
+- Used `src/test/resources/generated-callback-handlers-phase2.tsv` mapping to align each handler with the correct controller method pair.
+- Preserved handler routing metadata (`getHandledCaseTypeIds`, `getHandledEventIds`, `acceptsAboutToSubmit`, `acceptsSubmitted`) and replaced in-handler business logic with controller delegation.
+- Added callback auth-token propagation where mapped controller signatures require it.
+- Replaced per-handler logic tests with matrix-driven delegation verification:
+  - removed generated per-handler test classes for phase-2 mapped handlers.
+  - added `GeneratedCallbackHandlersTest` to assert metadata and controller-method invocation for all mapped handlers.
+  - retained bespoke non-generated handler tests (for example `ClaimantRespondToNotificationHandlerTest`).
+- Validation (Java 21):
+  - `./gradlew compileJava compileTestJava checkstyleMain checkstyleTest --no-daemon` passed.
+  - `./gradlew :test --tests "uk.gov.hmcts.ethos.replacement.docmosis.handler.*" -x et-shared:test --no-daemon` passed.

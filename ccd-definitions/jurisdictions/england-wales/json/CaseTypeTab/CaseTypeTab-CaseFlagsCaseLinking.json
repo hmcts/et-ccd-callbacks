@@ -5,7 +5,8 @@
     "TabLabel": "Has CaseLinks",
     "CaseFieldID": "hasCaseLinks",
     "TabDisplayOrder": 72,
-    "TabFieldDisplayOrder": 1
+    "TabFieldDisplayOrder": 1,
+    "FieldShowCondition": "stateLabel=\"dummy\""
   },
   {
     "CaseTypeID": "ET_EnglandWales",

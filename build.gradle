@@ -441,6 +441,9 @@ dependencies {
     implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '8.1'
     implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.5'
 
+    implementation 'com.github.hmcts:decentralised-runtime:json-runtime'
+    implementation 'com.github.hmcts:ccd-config-generator:json-runtime'
+
     // Log4J core added to remove startup error message
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4JVersion
     // CVE-2025-54988

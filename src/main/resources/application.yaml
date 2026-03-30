@@ -26,6 +26,20 @@ spring:
     username: ${ET_COS_DB_USER_NAME:et_cos}
   config:
     import: optional:configtree:/mnt/secrets/et-cos/,optional:configtree:/mnt/secrets/et/
+  jms:
+    servicebus:
+      enabled: true
+      connection-string: ${AZURE_SERVICE_BUS_CONNECTION_STRING:${AZURE_SERVICE_BUS_PREVIEW_CONNECTION_STRING:dummy}}
+      pricing-tier: standard
+      pool:
+        enabled: true
+  cloud:
+    azure:
+      credential:
+        managed-identity-enabled: true
+        client-id: 34df67df-77f4-4c8d-9e89-d59a86ef9ffe
+  autoconfigure:
+    exclude: com.azure.spring.cloud.autoconfigure.implementation.context.AzureTokenCredentialAutoConfiguration
 
 server:
   port: '8081'
@@ -281,6 +295,14 @@ pdf:
 
 caching:
   adminUserService: ${CACHING_ADMIN_USER_SERVICE:21600000}
+
+ccd:
+  servicebus:
+    destination: ${CCD_SERVICEBUS_DESTINATION:${AZURE_SERVICE_BUS_TOPIC_NAME:ccd-case-events-aat}}
+    scheduler-enabled: ${ET_SERVICEBUS_SCHEDULER_ENABLED:false}
+    batch-size: ${ET_SERVICEBUS_BATCH_SIZE:1000}
+    published-retention-days: ${ET_SERVICEBUS_PUBLISHED_RETENTION_DAYS:7}
+    schedule: ${ET_SERVICEBUS_SCHEDULE:*/30 * * * * *}
 
 notifications:
   govNotifyApiKey: ${GOV_NOTIFY_API_KEY}

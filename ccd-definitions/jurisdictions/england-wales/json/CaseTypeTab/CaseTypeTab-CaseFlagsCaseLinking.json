@@ -6,7 +6,7 @@
     "CaseFieldID": "hasCaseLinks",
     "TabDisplayOrder": 72,
     "TabFieldDisplayOrder": 1,
-    "FieldShowCondition": "LinkedCasesComponentLauncher=\"dummy\""
+    "FieldShowCondition": "caseNameHmctsInternal=\"dummy\""
   },
   {
     "CaseTypeID": "ET_EnglandWales",

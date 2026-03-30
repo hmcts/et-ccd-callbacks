@@ -159,7 +159,7 @@ public class RespondentRepresentativeController {
         NocUtils.clearNocWarningIfPresent(caseData);
         List<String> errors = new ArrayList<>(NocUtils.validateNocCaseData(caseData));
         errors.addAll(nocRespondentRepresentativeService
-                .validateRespondentRepresentativesOrganisation(ccdRequest.getCaseDetails()));
+                .validateRespondentRepresentativesOrganisationMatch(ccdRequest.getCaseDetails()));
         if (errors.isEmpty()) {
             try {
                 NocUtils.mapRepresentativesToRespondents(caseData, ccdRequest.getCaseDetails().getCaseId());

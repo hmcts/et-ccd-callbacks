@@ -83,7 +83,7 @@ class AddAmendClaimantRepresentativeControllerTest {
     @Test
     void testAboutToSubmitSetsClaimantRepresentativeId() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(nocClaimantRepresentativeService.validateClaimantRepresentativeOrganisation(any(CaseDetails.class)))
+        when(nocClaimantRepresentativeService.validateClaimantRepresentativeOrganisationMatch(any(CaseDetails.class)))
                 .thenReturn(StringUtils.EMPTY);
         doNothing().when(nocRespondentRepresentativeService)
                 .revokeRespondentRepresentativesWithSameOrganisationAsClaimant(any(CaseDetails.class));
@@ -100,7 +100,7 @@ class AddAmendClaimantRepresentativeControllerTest {
     @Test
     void testAboutToSubmitSetsClaimantRepresentativeId_WithErrors() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        when(nocClaimantRepresentativeService.validateClaimantRepresentativeOrganisation(any(CaseDetails.class)))
+        when(nocClaimantRepresentativeService.validateClaimantRepresentativeOrganisationMatch(any(CaseDetails.class)))
                 .thenReturn(EXPECTED_ERROR_SELECTED_ORGANISATION_REPRESENTATIVE_ORGANISATION_NOT_MATCHES);
         doNothing().when(nocRespondentRepresentativeService)
                 .revokeRespondentRepresentativesWithSameOrganisationAsClaimant(any(CaseDetails.class));

@@ -1088,7 +1088,7 @@ public class NocRespondentRepresentativeService {
      * @return a list of validation error messages; empty if there are no representatives to
      *     validate or no organisation mismatches are found
      */
-    public List<String> validateRespondentRepresentativesOrganisation(CaseDetails caseDetails) {
+    public List<String> validateRespondentRepresentativesOrganisationMatch(CaseDetails caseDetails) {
         List<String> errors = new ArrayList<>();
         if (CollectionUtils.isEmpty(caseDetails.getCaseData().getRepCollection())) {
             return errors;

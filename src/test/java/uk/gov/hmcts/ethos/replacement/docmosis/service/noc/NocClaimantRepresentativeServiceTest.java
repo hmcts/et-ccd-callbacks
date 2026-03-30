@@ -24,6 +24,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.OrganisationService;
@@ -44,6 +45,7 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.test.utils.NocClaimantRepresentativeServiceTestUtils.DUMMY_CASE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.test.utils.NocClaimantRepresentativeServiceTestUtils.REPRESENTATIVE_EMAIL_1;
 import static uk.gov.hmcts.ethos.replacement.docmosis.test.utils.NocClaimantRepresentativeServiceTestUtils.createCaseData;
 import static uk.gov.hmcts.ethos.replacement.docmosis.test.utils.NocClaimantRepresentativeServiceTestUtils.createCaseDetailsWithCaseData;
@@ -62,9 +64,15 @@ class NocClaimantRepresentativeServiceTest {
     private static final String ORGANISATION_ID_NEW = "ORG3_NEW";
     private static final String REPRESENTATIVE_NAME_1 = "Representative Name 1";
     private static final String S2S_TOKEN = "s2sToken";
+    private static final String DUMMY_EXCEPTION_MESSAGE = "System error!...";
+
     private static final String EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL =
             "Representative 'Representative Name 1' could not be found using representative_1@hmcts.org. Case access "
                     + "will not be defined for this representative.\n";
+
+    private static final String EXPECTED_ERROR_SELECTED_ORGANISATION_REPRESENTATIVE_ORGANISATION_NOT_MATCHES =
+            "Representative Representative Name 1 organisation does not match with selected organisation "
+                    + "dummyOrganisationUserId";
 
     @Mock
     private AuthTokenGenerator authTokenGenerator;
@@ -278,5 +286,54 @@ class NocClaimantRepresentativeServiceTest {
                 .thenReturn(EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL);
         nocClaimantRepresentativeService.validateRepresentativeOrganisationAndEmail(tmpCaseData);
         assertThat(tmpCaseData.getNocWarning()).isEqualTo(EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL);
+    }
+
+    @Test
+    @SneakyThrows
+    void theValidateClaimantRepresentativeOrganisationMatch() {
+        // when there is no claimant representative should return empty error list
+        CaseData tmpCaseData = new CaseData();
+        CaseDetails tmpCaseDetails = new CaseDetails();
+        tmpCaseDetails.setCaseData(tmpCaseData);
+        tmpCaseDetails.setCaseId(DUMMY_CASE_ID);
+        assertThat(nocClaimantRepresentativeService.validateClaimantRepresentativeOrganisationMatch(tmpCaseDetails))
+                .isEmpty();
+        // when claimant representative does not have email address should return empty error list
+        RepresentedTypeC claimantRepresentative = RepresentedTypeC.builder().build();
+        tmpCaseData.setRepresentativeClaimantType(claimantRepresentative);
+        assertThat(nocClaimantRepresentativeService.validateClaimantRepresentativeOrganisationMatch(tmpCaseDetails))
+                .isEmpty();
+        // when claimant representative does not have hmcts organisation should return empty error list
+        claimantRepresentative.setRepresentativeEmailAddress(REPRESENTATIVE_EMAIL_1);
+        assertThat(nocClaimantRepresentativeService.validateClaimantRepresentativeOrganisationMatch(tmpCaseDetails))
+                .isEmpty();
+        // when claimant representative does not have hmcts organisation id should return empty error list
+        claimantRepresentative.setMyHmctsOrganisation(Organisation.builder().build());
+        claimantRepresentative.setNameOfRepresentative(REPRESENTATIVE_NAME_1);
+        assertThat(nocClaimantRepresentativeService.validateClaimantRepresentativeOrganisationMatch(tmpCaseDetails))
+                .isEmpty();
+        // when organisation of representative and organisation response have same id should return empty error list
+        claimantRepresentative.getMyHmctsOrganisation().setOrganisationID(DUMMY_ORGANISATION_USER_ID);
+        when(adminUserService.getAdminUserToken()).thenReturn(DUMMY_ADMIN_USER_TOKEN);
+        AccountIdByEmailResponse accountIdByEmailResponse = new AccountIdByEmailResponse();
+        accountIdByEmailResponse.setUserIdentifier(DUMMY_ORGANISATION_USER_ID);
+        when(nocService.findUserByEmail(DUMMY_ADMIN_USER_TOKEN, REPRESENTATIVE_EMAIL_1, DUMMY_CASE_ID))
+                .thenReturn(accountIdByEmailResponse);
+        OrganisationsResponse tmpOrganisationsResponse = OrganisationsResponse.builder()
+                .organisationIdentifier(DUMMY_ORGANISATION_USER_ID).build();
+        when(nocService.findOrganisationByUserId(DUMMY_ADMIN_USER_TOKEN, DUMMY_ORGANISATION_USER_ID, DUMMY_CASE_ID))
+                .thenReturn(tmpOrganisationsResponse);
+        assertThat(nocClaimantRepresentativeService.validateClaimantRepresentativeOrganisationMatch(tmpCaseDetails))
+                .isEmpty();
+        // when organisation of representative and organisation response have different id should return error list
+        // with error message
+        tmpOrganisationsResponse.setOrganisationIdentifier(ORGANISATION_ID_NEW);
+        assertThat(nocClaimantRepresentativeService.validateClaimantRepresentativeOrganisationMatch(tmpCaseDetails))
+                .isNotEmpty().isEqualTo(EXPECTED_ERROR_SELECTED_ORGANISATION_REPRESENTATIVE_ORGANISATION_NOT_MATCHES);
+        // when findUserByEmail throws exception should return empty error list
+        when(nocService.findUserByEmail(DUMMY_ADMIN_USER_TOKEN, REPRESENTATIVE_EMAIL_1, DUMMY_CASE_ID))
+                .thenThrow(new GenericServiceException(DUMMY_EXCEPTION_MESSAGE));
+        assertThat(nocClaimantRepresentativeService.validateClaimantRepresentativeOrganisationMatch(tmpCaseDetails))
+                .isEmpty();
     }
 }

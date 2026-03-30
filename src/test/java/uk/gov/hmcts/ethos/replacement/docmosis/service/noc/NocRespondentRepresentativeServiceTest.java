@@ -1488,32 +1488,32 @@ class NocRespondentRepresentativeServiceTest {
 
     @Test
     @SneakyThrows
-    void theValidateRespondentRepresentativesOrganisation() {
+    void theValidateRespondentRepresentativesOrganisationMatch() {
         // when there is no representative in rep collection should return empty list
         CaseData tmpCaseData = new CaseData();
         tmpCaseData.setRepCollection(new ArrayList<>());
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseId(CASE_ID);
         caseDetails.setCaseData(tmpCaseData);
-        assertThat(nocRespondentRepresentativeService.validateRespondentRepresentativesOrganisation(caseDetails))
+        assertThat(nocRespondentRepresentativeService.validateRespondentRepresentativesOrganisationMatch(caseDetails))
                 .isEmpty();
         // when representative in rep collection is not valid should return empty list
         RepresentedTypeRItem representative = RepresentedTypeRItem.builder().build();
         tmpCaseData.getRepCollection().add(representative);
-        assertThat(nocRespondentRepresentativeService.validateRespondentRepresentativesOrganisation(caseDetails))
+        assertThat(nocRespondentRepresentativeService.validateRespondentRepresentativesOrganisationMatch(caseDetails))
                 .isEmpty();
         // when representative not has email address should return empty list
         representative.setId(REPRESENTATIVE_ID_ONE);
         representative.setValue(RepresentedTypeR.builder().build());
-        assertThat(nocRespondentRepresentativeService.validateRespondentRepresentativesOrganisation(caseDetails))
+        assertThat(nocRespondentRepresentativeService.validateRespondentRepresentativesOrganisationMatch(caseDetails))
                 .isEmpty();
         // when representative not has my hmcts selection should return empty list
         representative.getValue().setRepresentativeEmailAddress(REPRESENTATIVE_EMAIL_1_CAPITALISED);
-        assertThat(nocRespondentRepresentativeService.validateRespondentRepresentativesOrganisation(caseDetails))
+        assertThat(nocRespondentRepresentativeService.validateRespondentRepresentativesOrganisationMatch(caseDetails))
                 .isEmpty();
         // when representative not has any organisation should return empty list
         representative.getValue().setMyHmctsYesNo(YES);
-        assertThat(nocRespondentRepresentativeService.validateRespondentRepresentativesOrganisation(caseDetails))
+        assertThat(nocRespondentRepresentativeService.validateRespondentRepresentativesOrganisationMatch(caseDetails))
                 .isEmpty();
         // when organisation response and representative organisation not matches should return error
         representative.getValue().setNameOfRepresentative(REPRESENTATIVE_NAME);
@@ -1527,16 +1527,16 @@ class NocRespondentRepresentativeServiceTest {
         OrganisationsResponse organisationsResponse = OrganisationsResponse.builder()
                 .organisationIdentifier(ORGANISATION_ID_TWO).build();
         when(nocService.findOrganisationByUserId(ADMIN_USER_TOKEN, USER_ID, CASE_ID)).thenReturn(organisationsResponse);
-        assertThat(nocRespondentRepresentativeService.validateRespondentRepresentativesOrganisation(caseDetails))
+        assertThat(nocRespondentRepresentativeService.validateRespondentRepresentativesOrganisationMatch(caseDetails))
                 .isNotEmpty().contains(EXPECTED_ERROR_SELECTED_ORGANISATION_REPRESENTATIVE_ORGANISATION_NOT_MATCHES);
         // when organisation response and representative organisation matches should return empty list
         organisationsResponse.setOrganisationIdentifier(ORGANISATION_ID_ONE);
-        assertThat(nocRespondentRepresentativeService.validateRespondentRepresentativesOrganisation(caseDetails))
+        assertThat(nocRespondentRepresentativeService.validateRespondentRepresentativesOrganisationMatch(caseDetails))
                 .isEmpty();
         // when user response not found should return empty list
         when(nocService.findUserByEmail(ADMIN_USER_TOKEN, REPRESENTATIVE_EMAIL_1_CAPITALISED, CASE_ID))
                 .thenThrow(new GenericServiceException(EXCEPTION_DUMMY_MESSAGE));
-        assertThat(nocRespondentRepresentativeService.validateRespondentRepresentativesOrganisation(caseDetails))
+        assertThat(nocRespondentRepresentativeService.validateRespondentRepresentativesOrganisationMatch(caseDetails))
                 .isEmpty();
     }
 }

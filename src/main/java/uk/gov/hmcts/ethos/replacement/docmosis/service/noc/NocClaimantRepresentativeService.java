@@ -82,13 +82,15 @@ public class NocClaimantRepresentativeService {
                 caseData.getRepresentativeClaimantType().getRepresentativeEmailAddress()));
     }
 
-    public String validateClaimantRepresentativeOrganisation(CaseDetails caseDetails) {
+    public String validateClaimantRepresentativeOrganisationMatch(CaseDetails caseDetails) {
         String error = StringUtils.EMPTY;
         if (ObjectUtils.isEmpty(caseDetails.getCaseData().getRepresentativeClaimantType())
                 || StringUtils.isBlank(caseDetails.getCaseData().getRepresentativeClaimantType()
                 .getRepresentativeEmailAddress())
                 || ObjectUtils.isEmpty(caseDetails.getCaseData().getRepresentativeClaimantType()
-                .getMyHmctsOrganisation())) {
+                .getMyHmctsOrganisation())
+                || ObjectUtils.isEmpty(caseDetails.getCaseData().getRepresentativeClaimantType()
+                .getMyHmctsOrganisation().getOrganisationID())) {
             return error;
         }
         AccountIdByEmailResponse userResponse;

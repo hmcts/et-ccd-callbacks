@@ -101,8 +101,9 @@ public class AddAmendClaimantRepresentativeController {
     })
     public ResponseEntity<CCDCallbackResponse> aboutToSubmit(
             @RequestBody CCDRequest ccdRequest) {
+        CaseDataUtils.validateCCDRequest(ccdRequest);
         List<String> errors = new ArrayList<>();
-        String error = nocClaimantRepresentativeService.validateClaimantRepresentativeOrganisation(
+        String error = nocClaimantRepresentativeService.validateClaimantRepresentativeOrganisationMatch(
                 ccdRequest.getCaseDetails());
         if (StringUtils.isNotBlank(error)) {
             errors.add(error);

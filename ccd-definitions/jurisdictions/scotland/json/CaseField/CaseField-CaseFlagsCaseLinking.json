@@ -46,14 +46,5 @@
     "FieldType": "ComponentLauncher",
     "SecurityClassification": "Public",
     "Searchable": "N"
-  },
-  {
-    "LiveFrom": "03/11/2023",
-    "CaseTypeID": "ET_Scotland",
-    "ID": "hasCaseLinks",
-    "Label": "Has Case Links",
-    "FieldType": "YesOrNo",
-    "SecurityClassification": "Public",
-    "Searchable": "N"
   }
 ]

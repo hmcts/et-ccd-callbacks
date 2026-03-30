@@ -1648,9 +1648,6 @@ public class CaseData extends Et1CaseData {
     @JsonProperty("vocabulary")
     private List<Vocabulary> vocabulary;
 
-    @JsonProperty("hasCaseLinks")
-    private String hasCaseLinks;
-
     @JsonProperty("caseLinks")
     private ListTypeItem<CaseLink> caseLinks;
 

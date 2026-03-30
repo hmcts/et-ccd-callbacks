@@ -30,15 +30,6 @@
   {
     "LiveFrom": "03/11/2022",
     "CaseTypeID": "ET_EnglandWales",
-    "ID": "hasCaseLinks",
-    "Label": "Has Case Links",
-    "FieldType": "YesOrNo",
-    "SecurityClassification": "Public",
-    "Searchable": "N"
-  },
-  {
-    "LiveFrom": "03/11/2022",
-    "CaseTypeID": "ET_EnglandWales",
     "ID": "caseLinks",
     "Label": " ",
     "FieldType": "Collection",

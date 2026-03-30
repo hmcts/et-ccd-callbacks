@@ -39,6 +39,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.OrganisationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.OrganisationUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.ClaimantRepresentativeUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.NocUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.RespondentRepresentativeUtils;
@@ -61,6 +62,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.CASE_DETAILS_OR_CASE_DATA_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_REPRESENTATIVE_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_FAILED_TO_REMOVE_ORGANISATION_POLICIES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_SELECTED_ORGANISATION_REPRESENTATIVE_ORGANISATION_NOT_MATCHES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_SOLICITOR_ROLE_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_MODIFY_REPRESENTATIVE_ACCESS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_NOTIFY_REPRESENTATION_REMOVAL;
@@ -1044,5 +1046,80 @@ public class NocRespondentRepresentativeService {
                 repDetails.setRepresentativeAddress(repAddress);
             }
         }
+    }
+
+    /**
+     * Validates that each eligible representative's selected respondent organisation matches
+     * the organisation associated with that representative's user account.
+     *
+     * <p><strong>Assumptions:</strong>
+     * <ul>
+     *   <li>{@code caseDetails}, {@code caseDetails.getCaseData()}, and the representative entries
+     *       in {@code repCollection} are non-null.</li>
+     *   <li>{@code RespondentRepresentativeUtils.isValidRepresentative(...)} safely determines
+     *       whether a representative has the minimum required data for validation.</li>
+     *   <li>A representative should only be organisation-validated when they have a non-blank
+     *       email address, {@code myHmctsYesNo} is {@code YES}, and a respondent organisation
+     *       has been selected.</li>
+     *   <li>If a user cannot be found in IDAM or their organisation cannot be retrieved,
+     *       the method treats that representative as not valid for organisation comparison
+     *       and does not add a validation error.</li>
+     *   <li>{@code OrganisationUtils.hasMatchingOrganisationId(...)} performs the authoritative
+     *       comparison between the selected organisation and the organisation returned for the user.</li>
+     * </ul>
+     *
+     * <p>The validation is performed only for representatives that:
+     * <ul>
+     *   <li>are considered valid representatives,</li>
+     *   <li>have a non-blank representative email address,</li>
+     *   <li>have MyHMCTS enabled, and</li>
+     *   <li>have a respondent organisation present.</li>
+     * </ul>
+     *
+     * <p>For each such representative, the method looks up the user by email address and then
+     * retrieves the organisation linked to that user. If the selected respondent organisation
+     * does not match the organisation returned for the user, a validation error is added.
+     *
+     * <p>If the representative cannot be found or their organisation cannot be retrieved
+     * (for example, due to a {@code GenericServiceException}), organisation matching is skipped
+     * for that representative and no error is added.
+     *
+     * @param caseDetails the case details containing representative information to validate
+     * @return a list of validation error messages; empty if there are no representatives to
+     *     validate or no organisation mismatches are found
+     */
+    public List<String> validateRespondentRepresentativesOrganisation(CaseDetails caseDetails) {
+        List<String> errors = new ArrayList<>();
+        if (CollectionUtils.isEmpty(caseDetails.getCaseData().getRepCollection())) {
+            return errors;
+        }
+        for (RepresentedTypeRItem representative : caseDetails.getCaseData().getRepCollection()) {
+            if (RespondentRepresentativeUtils.isValidRepresentative(representative)
+                    && StringUtils.isNotBlank(representative.getValue().getRepresentativeEmailAddress())
+                    && YES.equals(representative.getValue().getMyHmctsYesNo())
+                    && ObjectUtils.isNotEmpty(representative.getValue().getRespondentOrganisation())) {
+                AccountIdByEmailResponse userResponse;
+                OrganisationsResponse organisationsResponse = null;
+                boolean isValidUserAndOrganisation = true;
+                try {
+                    String accessToken = adminUserService.getAdminUserToken();
+                    userResponse = nocService.findUserByEmail(accessToken,
+                            representative.getValue().getRepresentativeEmailAddress(), caseDetails.getCaseId());
+                    organisationsResponse = nocService.findOrganisationByUserId(accessToken,
+                            userResponse.getUserIdentifier(), caseDetails.getCaseId());
+                } catch (GenericServiceException e) {
+                    // if user is not defined on idam should not check for organisation.
+                    isValidUserAndOrganisation = false;
+                }
+                if (isValidUserAndOrganisation
+                        && !OrganisationUtils.hasMatchingOrganisationId(
+                        representative.getValue().getRespondentOrganisation(), organisationsResponse)) {
+                    errors.add(String.format(ERROR_SELECTED_ORGANISATION_REPRESENTATIVE_ORGANISATION_NOT_MATCHES,
+                            representative.getValue().getNameOfRepresentative(),
+                            representative.getValue().getRespondentOrganisation().getOrganisationID()));
+                }
+            }
+        }
+        return errors;
     }
 }

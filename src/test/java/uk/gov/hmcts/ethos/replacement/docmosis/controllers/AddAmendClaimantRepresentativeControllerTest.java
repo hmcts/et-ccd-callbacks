@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
+import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -22,6 +23,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
@@ -44,6 +47,9 @@ class AddAmendClaimantRepresentativeControllerTest {
             "/addAmendClaimantRepresentative/amendClaimantRepresentativeMidEvent";
     private static final String CASE_ID = "1234567890123456";
     private static final String TEST_USER_EMAIL = "test@test.com";
+
+    private static final String EXPECTED_ERROR_SELECTED_ORGANISATION_REPRESENTATIVE_ORGANISATION_NOT_MATCHES =
+            "Representative Representative Name organisation does not match with selected organisation ORG1";
 
     @MockBean
     private VerifyTokenService verifyTokenService;
@@ -77,6 +83,8 @@ class AddAmendClaimantRepresentativeControllerTest {
     @Test
     void testAboutToSubmitSetsClaimantRepresentativeId() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(nocClaimantRepresentativeService.validateClaimantRepresentativeOrganisation(any(CaseDetails.class)))
+                .thenReturn(StringUtils.EMPTY);
         doNothing().when(nocRespondentRepresentativeService)
                 .revokeRespondentRepresentativesWithSameOrganisationAsClaimant(any(CaseDetails.class));
         mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
@@ -85,7 +93,25 @@ class AddAmendClaimantRepresentativeControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data", notNullValue()))
-                .andExpect(jsonPath("$.errors", nullValue()))
+                .andExpect(jsonPath("$.errors", empty()))
+                .andExpect(jsonPath("$.warnings", nullValue()));
+    }
+
+    @Test
+    void testAboutToSubmitSetsClaimantRepresentativeId_WithErrors() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(nocClaimantRepresentativeService.validateClaimantRepresentativeOrganisation(any(CaseDetails.class)))
+                .thenReturn(EXPECTED_ERROR_SELECTED_ORGANISATION_REPRESENTATIVE_ORGANISATION_NOT_MATCHES);
+        doNothing().when(nocRespondentRepresentativeService)
+                .revokeRespondentRepresentativesWithSameOrganisationAsClaimant(any(CaseDetails.class));
+        mockMvc.perform(post(ABOUT_TO_SUBMIT_URL)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", contains(
+                        EXPECTED_ERROR_SELECTED_ORGANISATION_REPRESENTATIVE_ORGANISATION_NOT_MATCHES)))
                 .andExpect(jsonPath("$.warnings", nullValue()));
     }
 

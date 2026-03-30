@@ -2,6 +2,8 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.noc;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
@@ -12,6 +14,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
@@ -29,6 +32,7 @@ import java.util.Objects;
 import java.util.Optional;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_SELECTED_ORGANISATION_REPRESENTATIVE_ORGANISATION_NOT_MATCHES;
 
 @Service
 @RequiredArgsConstructor
@@ -76,6 +80,39 @@ public class NocClaimantRepresentativeService {
         caseData.setNocWarning(organisationService.checkRepresentativeAccountByEmail(
                 caseData.getRepresentativeClaimantType().getNameOfRepresentative(),
                 caseData.getRepresentativeClaimantType().getRepresentativeEmailAddress()));
+    }
+
+    public String validateClaimantRepresentativeOrganisation(CaseDetails caseDetails) {
+        String error = StringUtils.EMPTY;
+        if (ObjectUtils.isEmpty(caseDetails.getCaseData().getRepresentativeClaimantType())
+                || StringUtils.isBlank(caseDetails.getCaseData().getRepresentativeClaimantType()
+                .getRepresentativeEmailAddress())
+                || ObjectUtils.isEmpty(caseDetails.getCaseData().getRepresentativeClaimantType()
+                .getMyHmctsOrganisation())) {
+            return error;
+        }
+        AccountIdByEmailResponse userResponse;
+        OrganisationsResponse organisationsResponse = null;
+        boolean isValidUserAndOrganisation = true;
+        RepresentedTypeC representative = caseDetails.getCaseData().getRepresentativeClaimantType();
+        try {
+            String accessToken = adminUserService.getAdminUserToken();
+            userResponse = nocService.findUserByEmail(accessToken,
+                    representative.getRepresentativeEmailAddress(), caseDetails.getCaseId());
+            organisationsResponse = nocService.findOrganisationByUserId(accessToken,
+                    userResponse.getUserIdentifier(), caseDetails.getCaseId());
+        } catch (GenericServiceException e) {
+            // if user is not defined on idam should not check for organisation.
+            isValidUserAndOrganisation = false;
+        }
+        if (isValidUserAndOrganisation
+                && !OrganisationUtils.hasMatchingOrganisationId(
+                representative.getMyHmctsOrganisation(), organisationsResponse)) {
+            error = String.format(ERROR_SELECTED_ORGANISATION_REPRESENTATIVE_ORGANISATION_NOT_MATCHES,
+                    representative.getNameOfRepresentative(),
+                    representative.getMyHmctsOrganisation().getOrganisationID());
+        }
+        return error;
     }
 
     /**

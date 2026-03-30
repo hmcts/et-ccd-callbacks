@@ -6,6 +6,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Component;
+import org.springframework.lang.Nullable;
 import org.springframework.web.servlet.HandlerInterceptor;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.UnAuthorisedServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -35,7 +36,7 @@ public class RequestInterceptor implements HandlerInterceptor {
 
     @Autowired
     public RequestInterceptor(VerifyTokenService verifyTokenService,
-                              AuthTokenValidator tokenValidator) {
+                              @Lazy @Nullable AuthTokenValidator tokenValidator) {
         this.verifyTokenService = verifyTokenService;
         this.tokenValidator = tokenValidator;
     }
@@ -56,17 +57,21 @@ public class RequestInterceptor implements HandlerInterceptor {
             return false;
         }
 
-        String serviceName;
-        if (!serviceAuthToken.startsWith(BEARER_PREFIX)) {
-            serviceName = tokenValidator.getServiceName(BEARER_PREFIX + serviceAuthToken);
-        } else {
-            serviceName = tokenValidator.getServiceName(serviceAuthToken);
-        }
+        if (request.getRequestURI().startsWith(CCD_PERSISTENCE_ENDPOINT_PREFIX)) {
+            String serviceName;
+            if (serviceAuthToken == null || serviceAuthToken.isBlank()) {
+                serviceName = null;
+            } else if (!serviceAuthToken.startsWith(BEARER_PREFIX)) {
+                serviceName = tokenValidator == null ? null
+                    : tokenValidator.getServiceName(BEARER_PREFIX + serviceAuthToken);
+            } else {
+                serviceName = tokenValidator == null ? null : tokenValidator.getServiceName(serviceAuthToken);
+            }
 
-        if (request.getRequestURI().startsWith(CCD_PERSISTENCE_ENDPOINT_PREFIX)
-            && !CCD_DATA_SERVICE.equals(serviceName)) {
-            log.error(CCD_PERSISTENCE_UNAUTHORISED);
-            throw new UnAuthorisedServiceException(CCD_PERSISTENCE_UNAUTHORISED);
+            if (!CCD_DATA_SERVICE.equals(serviceName)) {
+                log.error(CCD_PERSISTENCE_UNAUTHORISED);
+                throw new UnAuthorisedServiceException(CCD_PERSISTENCE_UNAUTHORISED);
+            }
         }
 
         return true;

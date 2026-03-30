@@ -9,13 +9,17 @@ import uk.gov.hmcts.et.common.model.ccd.items.FlagDetailType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.ListTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.TseAdminRecordDecisionTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.CaseFlagsType;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.RestrictedReportingType;
 import uk.gov.hmcts.et.common.model.ccd.types.TseAdminRecordDecisionType;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -29,6 +33,10 @@ import static uk.gov.hmcts.ecm.common.model.helper.CaseFlagConstants.VEXATIOUS_L
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.TSE_APP_RESTRICT_PUBLICITY;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService.CLAIMANT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService.EXTERNAL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService.INTERNAL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService.RESPONDENT;
 
 @ExtendWith(SpringExtension.class)
 class CaseFlagsServiceTest {
@@ -43,6 +51,17 @@ class CaseFlagsServiceTest {
         caseData = CaseDataBuilder.builder().build();
         caseData.setClaimant(CLAIMANT_NAME);
         caseData.setRespondent(RESPONDENT_NAME);
+
+        List<RespondentSumTypeItem> respondentCollection = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+            RespondentSumType respondentSumType = new RespondentSumType();
+            respondentSumType.setRespondentName(i == 0 ? RESPONDENT_NAME : RESPONDENT_NAME + " " + (i + 1));
+            respondentSumTypeItem.setId(UUID.randomUUID().toString());
+            respondentSumTypeItem.setValue(respondentSumType);
+            respondentCollection.add(respondentSumTypeItem);
+        }
+        caseData.setRespondentCollection(respondentCollection);
     }
 
     @Test
@@ -62,11 +81,27 @@ class CaseFlagsServiceTest {
 
         CaseFlagsType claimantFlags = caseData.getClaimantFlags();
         assertThat(claimantFlags.getPartyName(), is(CLAIMANT_NAME));
-        assertThat(claimantFlags.getRoleOnCase(), is("claimant"));
+        assertThat(claimantFlags.getRoleOnCase(), is(CLAIMANT));
+        assertThat(claimantFlags.getGroupId(), is(CLAIMANT));
+        assertThat(claimantFlags.getVisibility(), is(INTERNAL));
 
         CaseFlagsType respondentFlags = caseData.getRespondentFlags();
         assertThat(respondentFlags.getPartyName(), is(RESPONDENT_NAME));
-        assertThat(respondentFlags.getRoleOnCase(), is("respondent"));
+        assertThat(respondentFlags.getRoleOnCase(), is(RESPONDENT));
+        assertThat(respondentFlags.getGroupId(), is(RESPONDENT));
+        assertThat(respondentFlags.getVisibility(), is(INTERNAL));
+
+        CaseFlagsType claimantExternalFlags = caseData.getClaimantExternalFlags();
+        assertThat(claimantExternalFlags.getPartyName(), is(CLAIMANT_NAME));
+        assertThat(claimantExternalFlags.getRoleOnCase(), is(CLAIMANT));
+        assertThat(claimantExternalFlags.getGroupId(), is(CLAIMANT));
+        assertThat(claimantExternalFlags.getVisibility(), is(EXTERNAL));
+
+        CaseFlagsType respondentExternalFlags = caseData.getRespondentExternalFlags();
+        assertThat(respondentExternalFlags.getPartyName(), is(RESPONDENT_NAME));
+        assertThat(respondentExternalFlags.getRoleOnCase(), is(RESPONDENT));
+        assertThat(respondentExternalFlags.getGroupId(), is(RESPONDENT));
+        assertThat(respondentExternalFlags.getVisibility(), is(EXTERNAL));
     }
 
     @Test
@@ -77,6 +112,8 @@ class CaseFlagsServiceTest {
         assertThat(caseData.getCaseFlags(), is(nullValue()));
         assertThat(caseData.getClaimantFlags(), is(nullValue()));
         assertThat(caseData.getRespondentFlags(), is(nullValue()));
+        assertThat(caseData.getClaimantExternalFlags(), is(nullValue()));
+        assertThat(caseData.getRespondentExternalFlags(), is(nullValue()));
     }
 
     @Test
@@ -88,19 +125,33 @@ class CaseFlagsServiceTest {
         caseFlagsService.setupCaseFlags(caseData);
 
         assertEquals(updatedClaimantName, caseData.getClaimantFlags().getPartyName());
-        assertEquals("claimant", caseData.getClaimantFlags().getRoleOnCase());
+        assertEquals(CLAIMANT, caseData.getClaimantFlags().getRoleOnCase());
+        assertEquals(CLAIMANT, caseData.getClaimantFlags().getGroupId());
+        assertEquals(INTERNAL, caseData.getClaimantFlags().getVisibility());
+
+        assertEquals(updatedClaimantName, caseData.getClaimantExternalFlags().getPartyName());
+        assertEquals(CLAIMANT, caseData.getClaimantExternalFlags().getRoleOnCase());
+        assertEquals(CLAIMANT, caseData.getClaimantExternalFlags().getGroupId());
+        assertEquals(EXTERNAL, caseData.getClaimantExternalFlags().getVisibility());
     }
 
     @Test
     void setupCaseFlags_shouldUpdateRespondentFlagsWhenNameChanges() {
         caseFlagsService.setupCaseFlags(caseData);
         String updatedRespondentName = "Updated Respondent Name";
-        caseData.setRespondent(updatedRespondentName);
+        caseData.getRespondentCollection().getFirst().getValue().setRespondentName(updatedRespondentName);
 
         caseFlagsService.setupCaseFlags(caseData);
 
         assertEquals(updatedRespondentName, caseData.getRespondentFlags().getPartyName());
-        assertEquals("respondent", caseData.getRespondentFlags().getRoleOnCase());
+        assertEquals(RESPONDENT, caseData.getRespondentFlags().getRoleOnCase());
+        assertEquals(RESPONDENT, caseData.getRespondentFlags().getGroupId());
+        assertEquals(INTERNAL, caseData.getRespondentFlags().getVisibility());
+
+        assertEquals(updatedRespondentName, caseData.getRespondentExternalFlags().getPartyName());
+        assertEquals(RESPONDENT, caseData.getRespondentExternalFlags().getRoleOnCase());
+        assertEquals(RESPONDENT, caseData.getRespondentExternalFlags().getGroupId());
+        assertEquals(EXTERNAL, caseData.getRespondentExternalFlags().getVisibility());
     }
 
     @Test
@@ -115,6 +166,8 @@ class CaseFlagsServiceTest {
                                         .flagCode("RA00010")
                                         .build()))
                 .build());
+        caseData.setClaimantExternalFlags(CaseFlagsType.builder().build());
+
         caseFlagsService.processNewlySetCaseFlags(caseData);
 
         assertEquals(YES, caseData.getCaseInterpreterRequiredFlag());
@@ -132,6 +185,8 @@ class CaseFlagsServiceTest {
                                         .flagCode("CA00010")
                                         .build()))
                 .build());
+        caseData.setClaimantExternalFlags(CaseFlagsType.builder().build());
+
         caseFlagsService.processNewlySetCaseFlags(caseData);
 
         assertEquals(YES, caseData.getCaseAdditionalSecurityFlag());

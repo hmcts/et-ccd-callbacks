@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.handler;
 
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.sdk.CallbackRequestContext;
@@ -43,19 +44,17 @@ public class CreateReferralMultiplesCreateReferralCallbackHandler extends Multip
     }
 
     @Override
+    @SneakyThrows
     Object aboutToSubmit(MultipleRequest multipleRequest) {
         String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
-        try {
-            return createReferralMultiplesController.aboutToSubmitReferralDetails(
+        return createReferralMultiplesController.aboutToSubmitReferralDetails(
                 multipleRequest,
                 authorizationToken
             );
-        } catch (Exception exception) {
-            throw new IllegalStateException("Failed to delegate callback to controller", exception);
-        }
     }
 
     @Override
+    @SneakyThrows
     Object submitted(MultipleRequest multipleRequest) {
         return createReferralMultiplesController.completeCreateReferral(multipleRequest);
     }

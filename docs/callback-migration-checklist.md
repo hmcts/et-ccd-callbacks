@@ -667,3 +667,16 @@ Generated on 2026-03-19 from CCD CaseEvent definitions.
 - Validation (Java 21):
   - `./gradlew compileJava compileTestJava checkstyleMain checkstyleTest --no-daemon` passed.
   - `./gradlew :test --tests "uk.gov.hmcts.ethos.replacement.docmosis.handler.*" -x et-shared:test --no-daemon` passed.
+
+## 2026-03-30 Delegation Cleanup (Exception Flow + Unused Services)
+
+- Removed handler-level `try/catch` wrappers that rethrew `IllegalStateException("Failed to delegate callback to controller", ...)`.
+- Delegated callback failures now propagate original exceptions; checked exception boundaries are handled with `@SneakyThrows` on affected handler methods.
+- Deleted unused callback-only service classes introduced during earlier extraction iterations (no remaining references):
+  - `service/callback/CaseActionsForCaseWorkerCallbackService`
+  - `service/callback/ListingGenerationCallbackService`
+  - `service/callback/MultipleDocGenerationCallbackService`
+  - `service/callback/SendNotificationCallbackService`
+- Validation (Java 21):
+  - `./gradlew compileJava checkstyleMain --no-daemon` passed.
+  - `./gradlew :test --tests "uk.gov.hmcts.ethos.replacement.docmosis.handler.*" -x et-shared:test --no-daemon` passed.

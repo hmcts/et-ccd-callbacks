@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.handler;
 
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.sdk.CallbackRequestContext;
@@ -46,6 +47,7 @@ public class InitiateCaseCallbackHandler extends CallbackHandlerBase {
     }
 
     @Override
+    @SneakyThrows
     CallbackResponse<CaseData> aboutToSubmit(CaseDetails caseDetails) {
         String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
         return toCallbackResponse(
@@ -57,17 +59,14 @@ public class InitiateCaseCallbackHandler extends CallbackHandlerBase {
     }
 
     @Override
+    @SneakyThrows
     SubmittedCallbackResponse submitted(CaseDetails caseDetails) {
         String authorizationToken = CallbackRequestContext.getAuthorizationToken().orElse(null);
-        try {
-            return toSubmittedCallbackResponse(
+        return toSubmittedCallbackResponse(
                 caseActionsForCaseWorkerController.addServiceId(
                     toCcdRequest(caseDetails),
                     authorizationToken
                 )
             );
-        } catch (Exception exception) {
-            throw new IllegalStateException("Failed to delegate callback to controller", exception);
-        }
     }
 }

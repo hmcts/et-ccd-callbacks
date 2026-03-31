@@ -15,7 +15,7 @@
     "CaseFieldID": "caseLinks",
     "TabDisplayOrder": 71,
     "TabFieldDisplayOrder": 1,
-    "TabShowCondition": "hasCaseLinks=\"Yes\""
+    "FieldShowCondition": "caseLinks!=\"\""
   },
   {
     "CaseTypeID": "ET_EnglandWales",

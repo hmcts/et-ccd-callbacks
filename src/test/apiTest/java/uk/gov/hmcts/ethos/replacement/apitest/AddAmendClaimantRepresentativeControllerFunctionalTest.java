@@ -20,6 +20,7 @@ public class AddAmendClaimantRepresentativeControllerFunctionalTest extends Base
     public void setUpCaseData() {
         ccdRequest = CCDRequestBuilder.builder()
                 .withCaseData(CaseDataBuilder.builder().build())
+                .withCaseId("1234567890123456")
                 .build();
     }
 

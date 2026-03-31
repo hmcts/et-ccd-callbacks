@@ -69,6 +69,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERR
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_SET_ROLE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REQUEST;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_TYPE_ADDITION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_TYPE_REMOVAL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_RETRIEVE_CASE_ASSIGNMENTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_REPRESENTATIVE_EMAIL_ADDRESS_NOT_FOUND;
@@ -688,6 +689,8 @@ public class NocRespondentRepresentativeService {
         List<RepresentedTypeRItem> newOrUpdatedRepresentatives = RespondentRepresentativeUtils
                 .findNewOrUpdatedRepresentatives(newCaseDetails.getCaseData().getRepCollection(),
                         oldCaseDetails.getCaseData().getRepCollection());
+        nocNotificationService.sendRespondentRepresentationUpdateNotifications(newCaseDetails,
+                newOrUpdatedRepresentatives, NOC_TYPE_ADDITION);
         List<RepresentedTypeRItem> representativesToAssign = findRepresentativesToAssign(newCaseDetails,
                 newOrUpdatedRepresentatives);
         grantRespondentRepresentativesAccess(newCaseDetails, representativesToAssign);

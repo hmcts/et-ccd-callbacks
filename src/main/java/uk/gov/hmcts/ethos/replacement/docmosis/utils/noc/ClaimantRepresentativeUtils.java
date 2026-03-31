@@ -269,7 +269,7 @@ public final class ClaimantRepresentativeUtils {
     }
 
     private static void setRepresentativeId(RepresentedTypeC claimantRepresentative) {
-        if (ObjectUtils.isEmpty(claimantRepresentative)) {
+        if (claimantRepresentative == null) {
             return;
         }
         if (StringUtils.isBlank(claimantRepresentative.getRepresentativeId())) {

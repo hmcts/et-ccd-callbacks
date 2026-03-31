@@ -269,6 +269,9 @@ public final class ClaimantRepresentativeUtils {
     }
 
     private static void setRepresentativeId(RepresentedTypeC claimantRepresentative) {
+        if (ObjectUtils.isEmpty(claimantRepresentative)) {
+            return;
+        }
         if (StringUtils.isBlank(claimantRepresentative.getRepresentativeId())) {
             claimantRepresentative.setRepresentativeId(UUID.randomUUID().toString());
         }

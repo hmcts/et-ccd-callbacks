@@ -1479,6 +1479,8 @@ class NocRespondentRepresentativeServiceTest {
                 List.of(CaseUserAssignment.builder().caseId(CASE_ID_1).caseRole(ROLE_SOLICITORA)
                         .organisationId(ORGANISATION_ID_ONE).build())).build();
         when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, CASE_ID_1)).thenReturn(caseUserAssignmentData);
+        doNothing().when(nocNotificationService).notifyRespondentOfRepresentativeUpdate(any(CaseDetails.class),
+                any(RespondentSumTypeItem.class));
         nocRespondentRepresentativeService.revokeRespondentRepresentativesWithSameOrganisationAsClaimant(caseDetails);
         verify(ccdClient, times(LoggerTestUtils.INTEGER_ONE)).revokeCaseAssignments(eq(ADMIN_USER_TOKEN),
                 any(CaseUserAssignmentData.class));

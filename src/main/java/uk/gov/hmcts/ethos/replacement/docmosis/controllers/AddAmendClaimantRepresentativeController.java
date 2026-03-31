@@ -109,7 +109,7 @@ public class AddAmendClaimantRepresentativeController {
             errors.add(error);
         }
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        if (!errors.isEmpty()) {
+        if (errors.isEmpty()) {
             NocUtils.clearNocWarningIfPresent(caseData);
             ClaimantRepresentativeUtils.addAmendClaimantRepresentative(caseData);
             nocRespondentRepresentativeService.revokeRespondentRepresentativesWithSameOrganisationAsClaimant(

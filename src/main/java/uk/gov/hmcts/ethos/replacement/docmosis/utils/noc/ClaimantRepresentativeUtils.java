@@ -217,8 +217,6 @@ public final class ClaimantRepresentativeUtils {
      * @return the HMCTS organisation ID if present; otherwise {@link StringUtils#EMPTY}
      */
     public static String getHmctsOrganisationIdOrEmpty(RepresentedTypeC claimantRepresentative) {
-        log.info("************ claimant representative organisation id: {}",
-                claimantRepresentative.getMyHmctsOrganisation());
         return hasHmctsOrganisationId(claimantRepresentative)
                 ? claimantRepresentative.getMyHmctsOrganisation().getOrganisationID() : StringUtils.EMPTY;
     }
@@ -274,11 +272,8 @@ public final class ClaimantRepresentativeUtils {
         if (StringUtils.isBlank(claimantRepresentative.getRepresentativeId())) {
             claimantRepresentative.setRepresentativeId(UUID.randomUUID().toString());
         }
-        log.info(" ****************  --setRepresentativeId: {}", claimantRepresentative.getRepresentativeId());
         if (ObjectUtils.isNotEmpty(claimantRepresentative.getMyHmctsOrganisation())
                 && StringUtils.isNotBlank(claimantRepresentative.getMyHmctsOrganisation().getOrganisationID())) {
-            log.info(" ****************  --organisationid: {}", claimantRepresentative
-                    .getMyHmctsOrganisation().getOrganisationID());
             claimantRepresentative.setOrganisationId(
                     claimantRepresentative.getMyHmctsOrganisation().getOrganisationID());
         }

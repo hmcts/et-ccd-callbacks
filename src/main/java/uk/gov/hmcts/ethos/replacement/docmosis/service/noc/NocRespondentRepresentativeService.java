@@ -465,6 +465,11 @@ public class NocRespondentRepresentativeService {
         if (CollectionUtils.isEmpty(respondentRepresentativesToRevoke)) {
             return;
         }
+        for (RepresentedTypeRItem representative : respondentRepresentativesToRevoke) {
+            RespondentSumTypeItem respondent = RespondentRepresentativeUtils.findRespondentByRepresentative(
+                    caseDetails.getCaseData(), representative);
+            nocNotificationService.notifyRespondentOfRepresentativeUpdate(caseDetails, respondent);
+        }
         revokeAndRemoveRespondentRepresentatives(caseDetails, respondentRepresentativesToRevoke);
     }
 

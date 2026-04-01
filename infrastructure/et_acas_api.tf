@@ -22,7 +22,7 @@ module "et-ccd-callbacks-mgmt-api" {
   product_id     = module.api-et-ccd-callbacks-mgmt-product.product_id
   name           = join("-", [var.et_ccd_callbacks_product_name, "api"])
   display_name   = "ET CCD Callbacks ACAS Api"
-  path           = "et-ccd-callbacks"
+  path           = "et-cos"
   protocols      = ["http", "https"]
   swagger_url    = var.acas_swagger_url
   content_format = "openapi-link"

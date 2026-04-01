@@ -6,7 +6,7 @@
     "CaseFieldID": "caseLinks",
     "TabDisplayOrder": 71,
     "TabFieldDisplayOrder": 1,
-    "TabShowCondition": "caseType=\"dummy\""
+    "TabShowCondition": "caseLinks!=\"\""
   },
   {
     "CaseTypeID": "ET_Scotland",

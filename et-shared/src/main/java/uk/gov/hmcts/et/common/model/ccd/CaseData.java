@@ -1682,11 +1682,6 @@ public class CaseData extends Et1CaseData {
                 .toList();
     }
 
-    @JsonProperty("hasCaseLinks")
-    public String getHasCaseLinks() {
-        return (caseLinks != null && !caseLinks.isEmpty()) ? "Yes" : "No";
-    }
-
     @JsonProperty("et1ReppedTriageAddress")
     private Address et1ReppedTriageAddress;
     @JsonProperty("et1ReppedTriageYesNo")

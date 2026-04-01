@@ -2,15 +2,6 @@
   {
     "CaseTypeID": "ET_EnglandWales",
     "TabID": "caseLinksTab",
-    "TabLabel": "Has CaseLinks",
-    "CaseFieldID": "hasCaseLinks",
-    "TabDisplayOrder": 72,
-    "TabFieldDisplayOrder": 1,
-    "FieldShowCondition": "caseNameHmctsInternal=\"dummy\""
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "TabID": "caseLinksTab",
     "TabLabel": "Linked cases",
     "CaseFieldID": "caseLinks",
     "TabDisplayOrder": 71,

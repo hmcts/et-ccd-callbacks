@@ -34,6 +34,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WAR
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LEGAL_REP_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LEGAL_REP_ORG;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CIT_UI;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.PARTY_NAME;
 
 @Slf4j
 @Service
@@ -47,11 +48,11 @@ public class NocRemoveRepresentationService {
     private final EmailNotificationService emailNotificationService;
     private final NocRespondentRepresentativeService nocRespondentRepresentativeService;
 
-    private static final String ORG_NAME = "orgName";
-    private static final String ORG_EMAIL_ADDRESS = "orgEmailAddress";
-    private static final String REP_NAME = "repName";
-    private static final String REP_EMAIL_ADDRESS = "repEmailAddress";
-    private static final String PARTY_NAME = "partyName";
+    private static final String MAP_ORG_NAME = "orgName";
+    private static final String MAP_ORG_EMAIL_ADDRESS = "orgEmailAddress";
+    private static final String MAP_REP_NAME = "repName";
+    private static final String MAP_REP_EMAIL_ADDRESS = "repEmailAddress";
+    private static final String MAP_PARTY_NAME = "partyName";
 
     @Value("${template.nocNotification.org-admin-not-representing}")
     private String nocOrgAdminNotRepresentingTemplateId;
@@ -77,11 +78,11 @@ public class NocRemoveRepresentationService {
 
         // send email to organisation admin
         sendNocRequestEmailToOrgAdmin(
-            caseDetails, claimantRepDetails.get(ORG_EMAIL_ADDRESS), claimantRepDetails.get(REP_NAME));
+            caseDetails, claimantRepDetails.get(MAP_ORG_EMAIL_ADDRESS), claimantRepDetails.get(MAP_REP_NAME));
         // send email to removed legal rep
-        sendNocRequestEmailToRemovedLegalRep(caseDetails, claimantRepDetails.get(REP_EMAIL_ADDRESS));
+        sendNocRequestEmailToRemovedLegalRep(caseDetails, claimantRepDetails.get(MAP_REP_EMAIL_ADDRESS));
         // send email to unrepresented party, i.e. claimant
-        sendClaimantNocRequestEmailToUnrepresentedParty(caseDetails, claimantRepDetails.get(ORG_NAME));
+        sendClaimantNocRequestEmailToUnrepresentedParty(caseDetails, claimantRepDetails.get(MAP_ORG_NAME));
         // send email to other party, i.e. respondents
         sendClaimantNocRequestEmailToOtherParty(caseDetails);
     }
@@ -89,10 +90,10 @@ public class NocRemoveRepresentationService {
     private Map<String, String> getClaimantRepDetails(CaseDetails caseDetails) {
         RepresentedTypeC existingClaimantRep = caseDetails.getCaseData().getRepresentativeClaimantType();
         return Map.of(
-            ORG_NAME, existingClaimantRep.getNameOfOrganisation(),
-            ORG_EMAIL_ADDRESS, nocNotificationService.findClaimantRepOrgSuperUserEmail(existingClaimantRep),
-            REP_NAME, existingClaimantRep.getNameOfRepresentative(),
-            REP_EMAIL_ADDRESS, existingClaimantRep.getRepresentativeEmailAddress()
+            MAP_ORG_NAME, existingClaimantRep.getNameOfOrganisation(),
+            MAP_ORG_EMAIL_ADDRESS, nocNotificationService.findClaimantRepOrgSuperUserEmail(existingClaimantRep),
+            MAP_REP_NAME, existingClaimantRep.getNameOfRepresentative(),
+            MAP_REP_EMAIL_ADDRESS, existingClaimantRep.getRepresentativeEmailAddress()
         );
     }
 
@@ -216,7 +217,7 @@ public class NocRemoveRepresentationService {
     }
 
     /**
-     * Mid-event to check if more than 1 representative from the organisation.
+     * About to start event to check if more than 1 representative from the organisation.
      * @param caseDetails the case details of the case to revoke respondent legal rep
      * @param userToken the user token of the requester
      * @return return Yes if more than 1 representative from the organisation, else return No

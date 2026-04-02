@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.jspecify.annotations.NonNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
@@ -24,9 +25,11 @@ import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationAddress;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationsResponse;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
+import uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericRuntimeException;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.CaseConverter;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
@@ -36,11 +39,13 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.OrganisationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.OrganisationUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.ClaimantRepresentativeUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.NocUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.RespondentRepresentativeUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.RoleUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.et.syaapi.enums.CaseEvent;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -52,20 +57,19 @@ import java.util.Optional;
 import static org.apache.commons.lang3.ObjectUtils.getIfNull;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_ALLOCATED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.CASE_DETAILS_OR_CASE_DATA_NOT_FOUND;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_INVALID_CASE_DETAILS;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_INVALID_INPUTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_REPRESENTATIVE_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_FAILED_TO_REMOVE_ORGANISATION_POLICIES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_SELECTED_ORGANISATION_REPRESENTATIVE_ORGANISATION_NOT_MATCHES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_SOLICITOR_ROLE_NOT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_MODIFY_REPRESENTATIVE_ACCESS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_NOTIFY_REPRESENTATION_REMOVAL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_SET_ROLE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_START_EVENT_TO_UPDATE_REPRESENTATIVE_AND_ORGANISATION_POLICY;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EVENT_UPDATE_CASE_SUBMITTED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REQUEST;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_TYPE_ADDITION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_TYPE_REMOVAL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_CASE_DATA_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_INVALID_USER_TOKEN;
@@ -90,6 +94,8 @@ public class NocRespondentRepresentativeService {
     private final NocService nocService;
     private final UserIdamService userIdamService;
     private final OrganisationService organisationService;
+
+    private static final String CLASS_NAME = NocRespondentRepresentativeService.class.getSimpleName();
 
     /**
      * Validates that each representative marked as an HMCTS organisation user
@@ -143,29 +149,41 @@ public class NocRespondentRepresentativeService {
         caseData.setNocWarning(nocWarnings.toString());
     }
 
+    public void updateRepresentativesAccess(CallbackRequest callbackRequest, String userToken) {
+        revokeOldRepresentatives(callbackRequest, userToken);
+        addNewRepresentatives(callbackRequest);
+        resetOrganisationPolicies(callbackRequest.getCaseDetails());
+    }
+
     /**
-     * Identifies and removes respondent representatives that have been deleted between
-     * the previous and current versions of a case.
-     * <p>
-     * The method compares the representative collections from the case details before
-     * and after the callback, and for any representatives that have been removed it:
-     * <ul>
-     *   <li>sends representation removal notifications</li>
-     *   <li>revokes the representatives' access to the case</li>
-     *   <li>resets associated organisation policies</li>
-     * </ul>
-     * <p>
-     * If no representatives are identified for removal, or if revocation produces no
-     * revoked representatives, the method exits without further action.
-     * <p>
-     * Any exceptions raised while sending notifications are caught and logged to prevent
-     * disruption to the removal process.
+     * Identifies respondent representatives removed between the previous and current case states,
+     * sends removal notifications, and revokes their access by updating the case data.
      *
-     * @param callbackRequest the callback request containing both the previous and current
-     *                        case details
-     * @param userToken       the user authentication token used to revoke representative access
+     * <p>This method compares the representative collections from {@code caseDetailsBefore}
+     * and {@code caseDetails} to determine which representatives are no longer present.
+     * For any identified representatives:
+     * <ul>
+     *     <li>Attempts to send representation removal notifications.</li>
+     *     <li>Revokes their access to the case.</li>
+     *     <li>Stores the revoked representatives in {@code repCollectionToRemove} on the updated case data.</li>
+     * </ul>
+     *
+     * <p>If no representatives are identified for removal, the method exits without performing any action.
+     * Failures during notification are logged but do not interrupt the revocation process.
+     *
+     * <p><b>Assumptions:</b>
+     * <ul>
+     *     <li>{@link CallbackRequest} contains both {@code caseDetailsBefore} and {@code caseDetails}.</li>
+     *     <li>Both case details include non-null {@code CaseData} with representative collections.</li>
+     *     <li>The representative collections accurately reflect the state before and after the update.</li>
+     *     <li>{@code userToken} is valid and authorised to perform revocation operations.</li>
+     * </ul>
+     *
+     * @param callbackRequest the callback request containing previous and updated case details
+     * @param userToken the user authorisation token used to revoke representative access
      */
-    public void removeOldRepresentatives(CallbackRequest callbackRequest, String userToken) {
+    public void revokeOldRepresentatives(CallbackRequest callbackRequest,
+                                                               String userToken) {
         CaseDetails oldCaseDetails = callbackRequest.getCaseDetailsBefore();
         CaseDetails newCaseDetails = callbackRequest.getCaseDetails();
 
@@ -182,12 +200,8 @@ public class NocRespondentRepresentativeService {
         } catch (Exception e) {
             log.info(ERROR_UNABLE_TO_NOTIFY_REPRESENTATION_REMOVAL, oldCaseDetails.getCaseId(), e.getMessage());
         }
-        List<RepresentedTypeRItem> revokedRepresentatives = revokeOldRespondentRepresentativeAccess(callbackRequest,
-                userToken, representativesToRemove);
-        if (CollectionUtils.isEmpty(revokedRepresentatives)) {
-            return;
-        }
-        resetOrganisationPolicies(callbackRequest.getCaseDetails(), revokedRepresentatives);
+        callbackRequest.getCaseDetails().getCaseData().setRepCollectionToRemove(
+                revokeOldRespondentRepresentativeAccess(callbackRequest, userToken, representativesToRemove));
     }
 
     /**
@@ -340,14 +354,14 @@ public class NocRespondentRepresentativeService {
     public List<RepresentedTypeRItem> revokeOldRespondentRepresentativeAccess(
             CallbackRequest callbackRequest, String userToken, List<RepresentedTypeRItem> representativesToRemove) {
         if (!NocUtils.canRevokeRepresentativeAccess(callbackRequest, userToken, representativesToRemove)) {
-            return new  ArrayList<>();
+            return Collections.emptyList();
         }
         CaseDetails oldCaseDetails = callbackRequest.getCaseDetailsBefore();
         CaseUserAssignmentData caseUserAssignments = nocCcdService.retrieveCaseUserAssignments(
                 adminUserService.getAdminUserToken(), oldCaseDetails.getCaseId());
         if (ObjectUtils.isEmpty(caseUserAssignments)
                 || CollectionUtils.isEmpty(caseUserAssignments.getCaseUserAssignments())) {
-            return new ArrayList<>();
+            return Collections.emptyList();
         }
         // finds list of representatives whose assignment is revoked
         List<RepresentedTypeRItem> representativesToRevoke = new ArrayList<>();
@@ -367,7 +381,12 @@ public class NocRespondentRepresentativeService {
                 caseUserAssignmentsToRevoke.add(caseUserAssignment);
             }
         }
-        revokeCaseAssignments(userToken, caseUserAssignmentsToRevoke);
+        try {
+            revokeCaseAssignments(userToken, caseUserAssignmentsToRevoke);
+        } catch (GenericRuntimeException e) {
+            log.error(ERROR_UNABLE_TO_NOTIFY_REPRESENTATION_REMOVAL, oldCaseDetails.getCaseId(), e.getMessage(), e);
+            return new ArrayList<>();
+        }
         return representativesToRevoke;
     }
 
@@ -449,11 +468,51 @@ public class NocRespondentRepresentativeService {
         if (CollectionUtils.isEmpty(respondentRepresentativesToRevoke)) {
             return;
         }
+        for (RepresentedTypeRItem representative : respondentRepresentativesToRevoke) {
+            RespondentSumTypeItem respondent = RespondentRepresentativeUtils.findRespondentByRepresentative(
+                    caseDetails.getCaseData(), representative);
+            nocNotificationService.notifyRespondentOfRepresentativeUpdate(caseDetails, respondent);
+        }
+        revokeAndRemoveRespondentRepresentatives(caseDetails, respondentRepresentativesToRevoke);
+    }
+
+    /**
+     * Revokes the specified respondent representatives, resets their associated organisation
+     * policies, and then removes them from the case data.
+     *
+     * <p>This method performs the following operations in order:
+     * <ol>
+     *     <li>Revokes the provided respondent representatives (e.g. updates their status so they no longer act on
+     *     the case).</li>
+     *     <li>Resets organisation policies associated with the successfully revoked representatives.</li>
+     *     <li>Removes the original list of respondent representatives from the case data.</li>
+     * </ol>
+     * </p>
+     *
+     * <p><strong>Assumptions:</strong>
+     * <ul>
+     *     <li>{@code caseDetails} is not {@code null} and contains valid {@code caseData}.</li>
+     *     <li>{@code representatives} represents the respondent representatives intended for revocation and removal.
+     *     </li>
+     *     <li>{@link #revokeRespondentRepresentatives(CaseDetails, List)} returns a non-null list
+     *         of representatives that were successfully revoked (possibly empty).</li>
+     *     <li>Organisation policies are reset only for those representatives that were successfully revoked.</li>
+     *     <li>Removal is attempted regardless of whether all representatives were successfully revoked.</li>
+     *     <li>If {@code representatives} is {@code null} or empty, no changes are applied.</li>
+     * </ul>
+     * </p>
+     *
+     * @param caseDetails the case details containing case data and respondent representatives; must not be {@code null}
+     * @param representatives the list of respondent representatives to revoke and remove; may be {@code null} or empty
+     *
+     * @throws IllegalArgumentException if {@code caseDetails} or its {@code caseData} is invalid
+     */
+    public void revokeAndRemoveRespondentRepresentatives(CaseDetails caseDetails,
+                                                         List<RepresentedTypeRItem> representatives) {
         List<RepresentedTypeRItem> revokedRepresentatives = revokeRespondentRepresentatives(caseDetails,
-                respondentRepresentativesToRevoke);
+                representatives);
         NocUtils.resetOrganisationPolicies(caseDetails.getCaseData(), revokedRepresentatives);
-        RespondentRepresentativeUtils.removeRespondentRepresentatives(caseDetails.getCaseData(),
-                respondentRepresentativesToRevoke);
+        RespondentRepresentativeUtils.removeRespondentRepresentatives(caseDetails.getCaseData(), representatives);
     }
 
     /**
@@ -508,52 +567,53 @@ public class NocRespondentRepresentativeService {
                 representativesToRemove.add(representedTypeRItem);
             }
         }
-        revokeCaseAssignments(adminUserService.getAdminUserToken(), caseUserAssignmentsToRevoke);
+        try {
+            revokeCaseAssignments(adminUserService.getAdminUserToken(), caseUserAssignmentsToRevoke);
+        } catch (GenericRuntimeException e) {
+            log.error(ERROR_UNABLE_TO_MODIFY_REPRESENTATIVE_ACCESS, caseDetails.getCaseId(), e.getMessage(), e);
+            return new ArrayList<>();
+        }
         return representativesToRemove;
     }
 
-    private void revokeCaseAssignments(String userToken, List<CaseUserAssignment> caseUserAssignmentsToRevoke) {
+    private void revokeCaseAssignments(String userToken,
+                                       List<CaseUserAssignment> caseUserAssignmentsToRevoke) {
         if (CollectionUtils.isNotEmpty(caseUserAssignmentsToRevoke)) {
             try {
                 ccdClient.revokeCaseAssignments(userToken, CaseUserAssignmentData.builder().caseUserAssignments(
                         caseUserAssignmentsToRevoke).build());
             } catch (IOException exception) {
-                log.info(exception.getMessage(), exception);
+                throw new GenericRuntimeException(exception);
             }
         }
     }
 
     /**
-     * Resets respondent organisation policies and Notice of Change (NoC) answers for the given case
-     * based on the provided list of revoked representatives.
-     * <p>
-     * This method:
-     * <ul>
-     *   <li>starts an {@code UPDATE_CASE_SUBMITTED} event as an admin user</li>
-     *   <li>clears the {@code changeOrganisationRequestField} to avoid conflicts with existing
-     *       representative changes</li>
-     *   <li>removes organisation policies and related NoC answers for each revoked representative</li>
-     *   <li>submits the updated case data back to CCD</li>
-     * </ul>
-     * <p>
-     * If any required case details are missing (case data, case type, jurisdiction, or case ID),
-     * or if the list of revoked representatives is {@code null} or empty, the method performs
-     * no action.
-     * <p>
-     * Any {@link IOException} encountered while communicating with CCD is caught and logged.
+     * Resets organisation policies for a case by removing or updating the representative
+     * roles associated with the provided revoked representatives.
      *
-     * @param caseDetails           the CCD case details for which organisation policies should be reset
-     * @param revokedRepresentatives the representatives whose organisation policies and NoC
-     *                               answers should be removed
+     * <p>This method performs the following steps:
+     * <ul>
+     *     <li>Validates the input {@link CaseDetails} and revoked representatives list.</li>
+     *     <li>Obtains an admin user token to perform privileged operations.</li>
+     *     <li>Starts a CCD event to update organisation policy representative roles.</li>
+     *     <li>Builds updated case data with the revoked representatives removed or updated.</li>
+     *     <li>Submits the event to persist the changes in CCD.</li>
+     * </ul>
+     *
+     * <p>If any required input is missing or invalid, the method exits without performing any action.
+     *
+     * @param caseDetails the case details containing case ID, type, jurisdiction, and existing case data
+     * @throws GenericRuntimeException if an error occurs while communicating with CCD services
      */
-    public void resetOrganisationPolicies(CaseDetails caseDetails,
-                                          List<RepresentedTypeRItem> revokedRepresentatives) {
+    public void resetOrganisationPolicies(CaseDetails caseDetails) {
         if (ObjectUtils.isEmpty(caseDetails)
                 || ObjectUtils.isEmpty(caseDetails.getCaseData())
                 || StringUtils.isBlank(caseDetails.getCaseTypeId())
                 || StringUtils.isBlank(caseDetails.getJurisdiction())
                 || StringUtils.isEmpty(caseDetails.getCaseId())
-                || CollectionUtils.isEmpty(revokedRepresentatives)) {
+                || (CollectionUtils.isEmpty(caseDetails.getCaseData().getRepCollectionToAdd())
+                && CollectionUtils.isEmpty(caseDetails.getCaseData().getRepCollectionToRemove()))) {
             return;
         }
         String adminUserToken = adminUserService.getAdminUserToken();
@@ -562,20 +622,40 @@ public class NocRespondentRepresentativeService {
                     caseDetails.getCaseTypeId(),
                     caseDetails.getJurisdiction(),
                     caseDetails.getCaseId(),
-                    EVENT_UPDATE_CASE_SUBMITTED);
-            CaseData ccdRequestCaseData = ccdRequest.getCaseDetails().getCaseData();
-            // Clears the changeOrganisationRequestField to prevent errors in the existing representative process
-            // and to allow further changes to be made
-            ccdRequestCaseData.setChangeOrganisationRequestField(null);
-            // Removes organisation policies & notice of change answers
-            NocUtils.resetOrganisationPolicies(ccdRequestCaseData, revokedRepresentatives);
-            RespondentRepresentativeUtils.clearRolesForRepresentatives(ccdRequestCaseData, revokedRepresentatives);
+                    CaseEvent.UPDATE_RESP_ORG_POLICY.name());
+            CaseData ccdRequestCaseData = getCCDRequestCaseData(caseDetails, ccdRequest);
             ccdClient.submitEventForCase(adminUserToken, ccdRequestCaseData, caseDetails.getCaseTypeId(),
                     caseDetails.getJurisdiction(), ccdRequest, caseDetails.getCaseId());
-        } catch (IOException exception) {
+        } catch (IOException | GenericServiceException exception) {
             log.error(ERROR_FAILED_TO_REMOVE_ORGANISATION_POLICIES, caseDetails.getCaseId(),
                     exception.getMessage());
+            throw new GenericRuntimeException(exception);
         }
+    }
+
+    private static @NonNull CaseData getCCDRequestCaseData(CaseDetails caseDetails, CCDRequest ccdRequest)
+            throws GenericServiceException {
+        final String methodName = "getCCDRequestCaseData";
+        if (ObjectUtils.isEmpty(ccdRequest)
+                || ObjectUtils.isEmpty(ccdRequest.getCaseDetails())
+                || StringUtils.isBlank(ccdRequest.getCaseDetails().getCaseId())) {
+            String exceptionMessage = String.format(GenericConstants.EXCEPTION_UNABLE_TO_START_EVENT_WITHOUT_CASE_ID,
+                    CaseEvent.UPDATE_RESP_ORG_POLICY.name());
+            throw new GenericServiceException(exceptionMessage, new Exception(exceptionMessage), exceptionMessage,
+                    NOT_ALLOCATED, CLASS_NAME, methodName);
+        }
+        if (ObjectUtils.isEmpty(ccdRequest.getCaseDetails().getCaseData())) {
+            String exceptionMessage = String.format(GenericConstants.EXCEPTION_UNABLE_TO_START_EVENT_WITH_CASE_ID,
+                    CaseEvent.UPDATE_RESP_ORG_POLICY.name(), ccdRequest.getCaseDetails().getCaseId());
+            throw new GenericServiceException(exceptionMessage, new Exception(exceptionMessage), exceptionMessage,
+                    NOT_ALLOCATED, CLASS_NAME, methodName);
+        }
+        CaseData ccdRequestCaseData = ccdRequest.getCaseDetails().getCaseData();
+        // Sets representatives to remove their remaining organisation policies, roles and
+        // changeOrganisationRequestField from case data
+        ccdRequestCaseData.setRepCollectionToRemove(caseDetails.getCaseData().getRepCollectionToRemove());
+        ccdRequestCaseData.setRepCollectionToAdd(caseDetails.getCaseData().getRepCollectionToAdd());
+        return ccdRequestCaseData;
     }
 
     /**
@@ -617,6 +697,8 @@ public class NocRespondentRepresentativeService {
         List<RepresentedTypeRItem> newOrUpdatedRepresentatives = RespondentRepresentativeUtils
                 .findNewOrUpdatedRepresentatives(newCaseDetails.getCaseData().getRepCollection(),
                         oldCaseDetails.getCaseData().getRepCollection());
+        nocNotificationService.sendRespondentRepresentationUpdateNotifications(newCaseDetails,
+                newOrUpdatedRepresentatives, NOC_TYPE_ADDITION);
         List<RepresentedTypeRItem> representativesToAssign = findRepresentativesToAssign(newCaseDetails,
                 newOrUpdatedRepresentatives);
         grantRespondentRepresentativesAccess(newCaseDetails, representativesToAssign);
@@ -708,6 +790,7 @@ public class NocRespondentRepresentativeService {
                 || CollectionUtils.isEmpty(representatives)) {
             return;
         }
+        caseDetails.getCaseData().setRepCollectionToAdd(new ArrayList<>());
         for (RepresentedTypeRItem representative : representatives) {
             if (RespondentRepresentativeUtils.isValidRepresentative(representative)) {
                 String role = RoleUtils.deriveSolicitorRoleToAssign(caseDetails.getCaseData(), representative);
@@ -719,81 +802,20 @@ public class NocRespondentRepresentativeService {
                     nocService.grantRepresentativeAccess(adminUserService.getAdminUserToken(),
                             representative.getValue().getRepresentativeEmailAddress(), caseDetails.getCaseId(),
                             representative.getValue().getRespondentOrganisation(), role);
-                    updateRepresentativeRoleAndOrganisationPolicy(caseDetails, representative.getId(), role);
+                    RepresentedTypeRItem caseRepresentative = RespondentRepresentativeUtils.findRepresentativeById(
+                            caseDetails.getCaseData(), representative.getId());
+                    if (RespondentRepresentativeUtils.isValidRepresentative(caseRepresentative)) {
+                        representative.getValue().setRole(role);
+                        caseDetails.getCaseData().getRepCollectionToAdd().add(caseRepresentative);
+                    } else {
+                        log.error(ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_REPRESENTATIVE_NOT_FOUND,
+                                caseDetails.getCaseId());
+                        return;
+                    }
                 } catch (GenericServiceException gse) {
                     log.error(ERROR_UNABLE_TO_SET_ROLE, role, caseDetails.getCaseId(), gse.getMessage());
                 }
             }
-        }
-    }
-
-    /**
-     * Updates the role of an existing representative on a case and reapplies the
-     * respondent organisation policy based on the updated role.
-     * <p>
-     * This method performs an admin-initiated case update which:
-     * <ul>
-     *   <li>Validates the supplied case details and input parameters</li>
-     *   <li>Starts a CCD {@code UPDATE_CASE_SUBMITTED} event</li>
-     *   <li>Finds the representative using the provided identifier</li>
-     *   <li>Updates the representative's role</li>
-     *   <li>Applies the appropriate respondent organisation policy for the updated role</li>
-     *   <li>Submits the updated case data back to CCD</li>
-     * </ul>
-     * <p>
-     * If validation fails, the representative cannot be found, or the CCD event cannot be
-     * started or submitted, the method logs an error and exits without persisting any changes.
-     * No exceptions are propagated to the caller.
-     *
-     * @param caseDetails       the case details containing the identifiers and data required
-     *                          to update the representative and organisation policy
-     * @param representativeId the unique identifier of the representative whose role is to be updated
-     * @param role              the new role to assign to the representative
-     */
-    public void updateRepresentativeRoleAndOrganisationPolicy(CaseDetails caseDetails,
-                                                              String representativeId,
-                                                              String role) {
-        if (ObjectUtils.isEmpty(caseDetails)
-                || StringUtils.isBlank(caseDetails.getCaseId())
-                || StringUtils.isBlank(caseDetails.getCaseTypeId())
-                || StringUtils.isBlank(caseDetails.getJurisdiction())) {
-            log.error(ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_INVALID_CASE_DETAILS);
-            return;
-        }
-        if (StringUtils.isBlank(representativeId) || StringUtils.isBlank(role)) {
-            log.error(ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_INVALID_INPUTS, caseDetails.getCaseId());
-            return;
-        }
-        String adminUserToken = adminUserService.getAdminUserToken();
-        try {
-            CCDRequest ccdRequest = nocCcdService.startEventForUpdateCaseSubmitted(adminUserToken,
-                    caseDetails.getCaseTypeId(),
-                    caseDetails.getJurisdiction(),
-                    caseDetails.getCaseId());
-            if (ObjectUtils.isEmpty(ccdRequest)) {
-                log.error(ERROR_UNABLE_TO_START_EVENT_TO_UPDATE_REPRESENTATIVE_AND_ORGANISATION_POLICY,
-                        caseDetails.getCaseId());
-                return;
-            }
-            CaseDetails ccdRequestCaseDetails = ccdRequest.getCaseDetails();
-            RepresentedTypeRItem representative = RespondentRepresentativeUtils.findRepresentativeById(
-                    ccdRequestCaseDetails.getCaseData(), representativeId);
-            if (!RespondentRepresentativeUtils.isValidRepresentative(representative)) {
-                log.error(ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_REPRESENTATIVE_NOT_FOUND, caseDetails.getCaseId());
-                return;
-            }
-            assert representative != null;
-            representative.getValue().setRole(role);
-            NocUtils.applyRespondentOrganisationPolicyForRole(ccdRequestCaseDetails.getCaseData(), representative);
-            ccdClient.submitEventForCase(adminUserToken,
-                    ccdRequestCaseDetails.getCaseData(),
-                    ccdRequestCaseDetails.getCaseTypeId(),
-                    ccdRequestCaseDetails.getJurisdiction(),
-                    ccdRequest,
-                    ccdRequestCaseDetails.getCaseId());
-        } catch (IOException exception) {
-            log.error(ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES, caseDetails.getCaseId(),
-                    exception.getMessage());
         }
     }
 
@@ -1088,5 +1110,80 @@ public class NocRespondentRepresentativeService {
                 repDetails.setRepresentativeAddress(repAddress);
             }
         }
+    }
+
+    /**
+     * Validates that each eligible representative's selected respondent organisation matches
+     * the organisation associated with that representative's user account.
+     *
+     * <p><strong>Assumptions:</strong>
+     * <ul>
+     *   <li>{@code caseDetails}, {@code caseDetails.getCaseData()}, and the representative entries
+     *       in {@code repCollection} are non-null.</li>
+     *   <li>{@code RespondentRepresentativeUtils.isValidRepresentative(...)} safely determines
+     *       whether a representative has the minimum required data for validation.</li>
+     *   <li>A representative should only be organisation-validated when they have a non-blank
+     *       email address, {@code myHmctsYesNo} is {@code YES}, and a respondent organisation
+     *       has been selected.</li>
+     *   <li>If a user cannot be found in IDAM or their organisation cannot be retrieved,
+     *       the method treats that representative as not valid for organisation comparison
+     *       and does not add a validation error.</li>
+     *   <li>{@code OrganisationUtils.hasMatchingOrganisationId(...)} performs the authoritative
+     *       comparison between the selected organisation and the organisation returned for the user.</li>
+     * </ul>
+     *
+     * <p>The validation is performed only for representatives that:
+     * <ul>
+     *   <li>are considered valid representatives,</li>
+     *   <li>have a non-blank representative email address,</li>
+     *   <li>have MyHMCTS enabled, and</li>
+     *   <li>have a respondent organisation present.</li>
+     * </ul>
+     *
+     * <p>For each such representative, the method looks up the user by email address and then
+     * retrieves the organisation linked to that user. If the selected respondent organisation
+     * does not match the organisation returned for the user, a validation error is added.
+     *
+     * <p>If the representative cannot be found or their organisation cannot be retrieved
+     * (for example, due to a {@code GenericServiceException}), organisation matching is skipped
+     * for that representative and no error is added.
+     *
+     * @param caseDetails the case details containing representative information to validate
+     * @return a list of validation error messages; empty if there are no representatives to
+     *     validate or no organisation mismatches are found
+     */
+    public List<String> validateRespondentRepresentativesOrganisationMatch(CaseDetails caseDetails) {
+        List<String> errors = new ArrayList<>();
+        if (CollectionUtils.isEmpty(caseDetails.getCaseData().getRepCollection())) {
+            return errors;
+        }
+        for (RepresentedTypeRItem representative : caseDetails.getCaseData().getRepCollection()) {
+            if (RespondentRepresentativeUtils.isValidRepresentative(representative)
+                    && StringUtils.isNotBlank(representative.getValue().getRepresentativeEmailAddress())
+                    && YES.equals(representative.getValue().getMyHmctsYesNo())
+                    && ObjectUtils.isNotEmpty(representative.getValue().getRespondentOrganisation())) {
+                AccountIdByEmailResponse userResponse;
+                OrganisationsResponse organisationsResponse = null;
+                boolean isValidUserAndOrganisation = true;
+                try {
+                    String accessToken = adminUserService.getAdminUserToken();
+                    userResponse = nocService.findUserByEmail(accessToken,
+                            representative.getValue().getRepresentativeEmailAddress(), caseDetails.getCaseId());
+                    organisationsResponse = nocService.findOrganisationByUserId(accessToken,
+                            userResponse.getUserIdentifier(), caseDetails.getCaseId());
+                } catch (GenericServiceException e) {
+                    // if user is not defined on idam should not check for organisation.
+                    isValidUserAndOrganisation = false;
+                }
+                if (isValidUserAndOrganisation
+                        && !OrganisationUtils.hasMatchingOrganisationId(
+                        representative.getValue().getRespondentOrganisation(), organisationsResponse)) {
+                    errors.add(String.format(ERROR_SELECTED_ORGANISATION_REPRESENTATIVE_ORGANISATION_NOT_MATCHES,
+                            representative.getValue().getNameOfRepresentative(),
+                            representative.getValue().getRespondentOrganisation().getOrganisationID()));
+                }
+            }
+        }
+        return errors;
     }
 }

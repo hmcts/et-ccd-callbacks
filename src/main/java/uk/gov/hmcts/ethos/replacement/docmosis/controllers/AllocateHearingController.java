@@ -17,6 +17,8 @@ import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing.AllocateHearingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.hearings.allocatehearing.ScotlandAllocateHearingService;
 
@@ -31,12 +33,14 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper.validateTwoJudges;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/allocatehearing")
 @Slf4j
-@RequiredArgsConstructor
 public class AllocateHearingController {
+
     private final AllocateHearingService allocateHearingService;
     private final ScotlandAllocateHearingService scotlandAllocateHearingService;
+    private final CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
 
     @PostMapping(value = "/initialiseHearings", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Initialise hearings selection list")
@@ -165,6 +169,8 @@ public class AllocateHearingController {
             allocateHearingService.updateSelectedHearing(caseData);
             scotlandAllocateHearingService.updateCase(caseData);
         }
+        caseManagementForCaseWorkerService.setNextListedDate(caseData);
+        HearingsHelper.setHearingDaysAndDates(caseData);
         allocateHearingService.clearDynamicFixedList(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);

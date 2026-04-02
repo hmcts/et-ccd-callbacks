@@ -41,6 +41,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericRuntimeException;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_CASE_DATA_NOT_FOUND;
@@ -55,6 +56,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.OrganisationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.test.utils.LoggerTestUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
+import uk.gov.hmcts.reform.et.syaapi.enums.CaseEvent;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -86,8 +88,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @ContextConfiguration(classes = {CaseConverter.class, NoticeOfChangeFieldPopulator.class, ObjectMapper.class})
 @SuppressWarnings({"PMD.ExcessiveImports", "PMD.TooManyMethods", "PMD.ExcessiveMethodLength"})
 class NocRespondentRepresentativeServiceTest {
-    private static final String JURISDICTION_EMPLOYMENT = "EMPLOYMENT";
+    private static final String CASE_ID = "1234567890123456";
     private static final String CASE_TYPE_ID_ENGLAND_WALES = "ET_EnglandWales";
+    private static final String JURISDICTION_EMPLOYMENT = "EMPLOYMENT";
     private static final String RESPONDENT_NAME_ONE = "Harry Johnson";
     private static final String RESPONDENT_NAME_TWO = "Jane Green";
     private static final String RESPONDENT_NAME_THREE = "Bad Company Inc";
@@ -121,6 +124,7 @@ class NocRespondentRepresentativeServiceTest {
     private static final String ET_ORG_2 = "ET Org 2";
     private static final String ET_ORG_3 = "ET Org 3";
     private static final String ET_ORG_NEW = "ET Org New";
+    private static final String USER_ID = "test_user_id";
     private static final String USER_EMAIL = "test@hmcts.net";
     private static final String USER_FIRST_NAME = "John";
     private static final String USER_LAST_NAME = "Brown";
@@ -139,6 +143,12 @@ class NocRespondentRepresentativeServiceTest {
 
     private static final String EXPECTED_EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND =
             "Organisation not found for representative.";
+    private static final String EXPECTED_EXCEPTION_UNABLE_TO_START_EVENT_WITHOUT_CASE_ID =
+            "uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException: Unable to start event "
+                    + "UPDATE_RESP_ORG_POLICY.";
+    private static final String EXPECTED_EXCEPTION_UNABLE_TO_START_EVENT_WITH_CASE_ID =
+            "uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException: Unable to start event "
+                    + "UPDATE_RESP_ORG_POLICY for case 1234567890123456";
 
     private static final String EXPECTED_ERROR_UNABLE_TO_NOTIFY_REPRESENTATION_REMOVAL =
             "Unable to send notification for representative removal for case: 1234567890123456. Exception: Something "
@@ -149,17 +159,8 @@ class NocRespondentRepresentativeServiceTest {
             "Unable to set role [SOLICITORA]. Case Id: 1234567890123456. Error: Something went wrong";
     private static final String EXPECTED_ERROR_FAILED_TO_REMOVE_ORGANISATION_POLICIES =
             "Failed to remove organisation policies for case 1234567890123456. Exception: Something went wrong";
-    private static final String EXPECTED_ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_INVALID_CASE_DETAILS =
-            "Failed to add organisation policy. Reason: invalid case details";
-    private static final String EXPECTED_ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_INVALID_INPUTS =
-            "Failed to add organisation policy for case1234567890123456. Reason: invalid inputs";
-    private static final String EXPECTED_ERROR_UNABLE_TO_START_EVENT_TO_UPDATE_REPRESENTATIVE_AND_ORGANISATION_POLICY =
-            "Unable to start update case submitted event to update representative role and organisation policy for "
-                    + "case: 1234567890123456";
-    private static final String EXPECTED_ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_REPRESENTATIVE_NOT_FOUND =
-            "Failed to add organisation policy for case 1234567890123456. Reason: representative not found";
-    private static final String EXPECTED_ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES =
-            "Failed to add organisation policy for case 1234567890123456. Exception: Something went wrong";
+    private static final String EXPECTED_ERROR_SELECTED_ORGANISATION_REPRESENTATIVE_ORGANISATION_NOT_MATCHES =
+            "Representative Representative Name organisation does not match with selected organisation ORG1";
 
     private static final String EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL =
             "We have been unable to assign 'Legal One' access to this case via MyHMCTS. They must check with their "
@@ -696,8 +697,12 @@ class NocRespondentRepresentativeServiceTest {
         assertThat(nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(callbackRequest,
                 USER_TOKEN, representativesToRemove)).hasSize(LoggerTestUtils.INTEGER_ONE)
                 .isEqualTo(List.of(tmpRepresentative));
-        verify(ccdClient, times(LoggerTestUtils.INTEGER_TWO)).revokeCaseAssignments(USER_TOKEN,
-                caseUserAssignmentData);
+        // when respondent name is found and same with the name of the represented respondent but not able to revoke
+        // assignment should return empty list
+        when(ccdClient.revokeCaseAssignments(eq(USER_TOKEN), any(CaseUserAssignmentData.class)))
+                .thenThrow(new IOException(EXCEPTION_DUMMY_MESSAGE));
+        assertThat(nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(callbackRequest,
+                USER_TOKEN, representativesToRemove)).isEmpty();
     }
 
     private void verifyNocCcdServiceCaseAssignmentsCall(int callNumber) {
@@ -707,7 +712,7 @@ class NocRespondentRepresentativeServiceTest {
 
     @Test
     @SneakyThrows
-    void theRemoveOldRepresentatives() {
+    void theRevokeOldRepresentatives() {
         CaseDetails oldCaseDetails = new CaseDetails();
         oldCaseDetails.setCaseId(CASE_ID_1);
         oldCaseDetails.setCaseData(new CaseData());
@@ -717,9 +722,10 @@ class NocRespondentRepresentativeServiceTest {
         newCaseDetails.setCaseData(new CaseData());
         callbackRequest.setCaseDetails(newCaseDetails);
         // when representatives to remove is empty should not send any email
-        nocRespondentRepresentativeService.removeOldRepresentatives(callbackRequest, USER_TOKEN);
+        nocRespondentRepresentativeService.revokeOldRepresentatives(callbackRequest, USER_TOKEN);
         verify(nocNotificationService, times(LoggerTestUtils.INTEGER_ZERO))
                 .sendRespondentRepresentationUpdateNotifications(eq(oldCaseDetails), anyList(), anyString());
+        assertThat(newCaseDetails.getCaseData().getRepCollectionToRemove()).isNull();
         // when representatives to remove is not empty should send email
         RepresentedTypeRItem representative1 = RepresentedTypeRItem.builder().id(REPRESENTATIVE_ID_ONE).value(
                 RepresentedTypeR.builder().respondentId(RESPONDENT_ID_ONE).build()).build();
@@ -729,17 +735,19 @@ class NocRespondentRepresentativeServiceTest {
         newCaseDetails.getCaseData().setRepCollection(List.of(representative2));
         doNothing().when(nocNotificationService).sendRespondentRepresentationUpdateNotifications(
                 any(CaseDetails.class), anyList(), anyString());
-        nocRespondentRepresentativeService.removeOldRepresentatives(callbackRequest, USER_TOKEN);
+        nocRespondentRepresentativeService.revokeOldRepresentatives(callbackRequest, USER_TOKEN);
         verify(nocNotificationService, times(LoggerTestUtils.INTEGER_ONE))
                 .sendRespondentRepresentationUpdateNotifications(any(CaseDetails.class), anyList(), anyString());
+        assertThat(newCaseDetails.getCaseData().getRepCollectionToRemove()).isEmpty();
         // when unable to send removed representation emails should log error.
         doThrow(new RuntimeException(EXCEPTION_DUMMY_MESSAGE)).when(nocNotificationService)
                 .sendRespondentRepresentationUpdateNotifications(any(CaseDetails.class), anyList(), anyString());
-        nocRespondentRepresentativeService.removeOldRepresentatives(callbackRequest, USER_TOKEN);
+        nocRespondentRepresentativeService.revokeOldRepresentatives(callbackRequest, USER_TOKEN);
         verify(nocNotificationService, times(LoggerTestUtils.INTEGER_TWO))
                 .sendRespondentRepresentationUpdateNotifications(any(CaseDetails.class), anyList(), anyString());
         LoggerTestUtils.checkLog(Level.INFO, LoggerTestUtils.INTEGER_ONE,
                 EXPECTED_ERROR_UNABLE_TO_NOTIFY_REPRESENTATION_REMOVAL);
+        assertThat(newCaseDetails.getCaseData().getRepCollectionToRemove()).isEmpty();
         // when representatives revoked is not empty should remove organisation policies and noc answers
         when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
         CaseUserAssignmentData caseUserAssignmentData = new CaseUserAssignmentData();
@@ -771,13 +779,12 @@ class NocRespondentRepresentativeServiceTest {
         when(ccdClient.submitEventForCase(eq(ADMIN_USER_TOKEN), any(CaseData.class),
                 eq(CASE_TYPE_ID_ENGLAND_WALES), eq(JURISDICTION_EMPLOYMENT), any(CCDRequest.class), eq(CASE_ID_1)))
                 .thenReturn(new SubmitEvent());
-        nocRespondentRepresentativeService.removeOldRepresentatives(callbackRequest, USER_TOKEN);
+        nocRespondentRepresentativeService.revokeOldRepresentatives(callbackRequest, USER_TOKEN);
         verify(nocNotificationService, times(LoggerTestUtils.INTEGER_THREE))
                 .sendRespondentRepresentationUpdateNotifications(any(CaseDetails.class), anyList(), anyString());
-        assertThat(newCaseDetails.getCaseData().getRespondentOrganisationPolicy0()).isEqualTo(OrganisationPolicy
-                .builder().orgPolicyCaseAssignedRole(ROLE_SOLICITORA).build());
         assertThat(newCaseDetails.getCaseData().getNoticeOfChangeAnswers0()).isEqualTo(
                 NoticeOfChangeAnswers.builder().respondentName(RESPONDENT_NAME_ONE).build());
+        assertThat(newCaseDetails.getCaseData().getRepCollectionToRemove()).isEqualTo(List.of(representative1));
     }
 
     @Test
@@ -947,191 +954,90 @@ class NocRespondentRepresentativeServiceTest {
     @SneakyThrows
     void theResetOrganisationPolicies() {
         // when case details is empty should not do anything
-        List<RepresentedTypeRItem> representatives = new ArrayList<>();
         assertDoesNotThrow(() -> nocRespondentRepresentativeService
-                .resetOrganisationPolicies(null, representatives));
-        verifyNoInteractions(ccdClient);
+                .resetOrganisationPolicies(null));
         // when case details not have case data should not do anything
         CaseDetails caseDetails = new CaseDetails();
         assertDoesNotThrow(() -> nocRespondentRepresentativeService.resetOrganisationPolicies(
-                caseDetails, representatives));
-        verifyNoInteractions(ccdClient);
+                caseDetails));
         // when case details not have case type id should not do anything
         caseDetails.setCaseData(new CaseData());
         assertDoesNotThrow(() -> nocRespondentRepresentativeService.resetOrganisationPolicies(
-                caseDetails, representatives));
-        verifyNoInteractions(ccdClient);
+                caseDetails));
         // when case details not have jurisdiction should not do anything
         caseDetails.setCaseTypeId(CASE_TYPE_ID_ENGLAND_WALES);
         assertDoesNotThrow(() -> nocRespondentRepresentativeService.resetOrganisationPolicies(
-                caseDetails, representatives));
-        verifyNoInteractions(ccdClient);
+                caseDetails));
         // when case details not have case id should not do anything
         caseDetails.setJurisdiction(JURISDICTION_EMPLOYMENT);
         assertDoesNotThrow(() -> nocRespondentRepresentativeService.resetOrganisationPolicies(
-                caseDetails, representatives));
-        verifyNoInteractions(ccdClient);
+                caseDetails));
         // where there is no revoked representatives should not do anything
         caseDetails.setCaseId(CASE_ID_1);
         assertDoesNotThrow(() -> nocRespondentRepresentativeService.resetOrganisationPolicies(
-                caseDetails, null));
-        verifyNoInteractions(ccdClient);
+                caseDetails));
         // when not able to startEventForCase should log exception
-        representatives.add(RepresentedTypeRItem.builder().id(REPRESENTATIVE_ID_ONE).value(RepresentedTypeR.builder()
-                .build()).build());
+
+        RepresentedTypeRItem representative1 = RepresentedTypeRItem.builder().id(REPRESENTATIVE_ID_ONE)
+                .value(RepresentedTypeR.builder().build()).build();
+        RepresentedTypeRItem representative2 = RepresentedTypeRItem.builder().id(REPRESENTATIVE_ID_TWO)
+                .value(RepresentedTypeR.builder().build()).build();
+
+        caseDetails.getCaseData().setRepCollectionToRemove(List.of(representative1));
+        caseDetails.getCaseData().setRepCollectionToAdd(List.of(representative2));
         when(ccdClient.startEventForCase(ADMIN_USER_TOKEN, CASE_TYPE_ID_ENGLAND_WALES, JURISDICTION_EMPLOYMENT,
-                CASE_ID_1, EVENT_UPDATE_CASE_SUBMITTED)).thenThrow(new IOException(EXCEPTION_DUMMY_MESSAGE));
-        assertDoesNotThrow(() -> nocRespondentRepresentativeService.resetOrganisationPolicies(
-                caseDetails, representatives));
-        verify(ccdClient, times(LoggerTestUtils.INTEGER_ONE)).startEventForCase(ADMIN_USER_TOKEN,
-                CASE_TYPE_ID_ENGLAND_WALES, JURISDICTION_EMPLOYMENT, CASE_ID_1, EVENT_UPDATE_CASE_SUBMITTED);
+                CASE_ID_1, CaseEvent.UPDATE_RESP_ORG_POLICY.name()))
+                .thenThrow(new IOException(EXCEPTION_DUMMY_MESSAGE));
+        assertThrows(GenericRuntimeException.class, () -> nocRespondentRepresentativeService
+                .resetOrganisationPolicies(caseDetails));
         LoggerTestUtils.checkLog(Level.ERROR, LoggerTestUtils.INTEGER_ONE,
                 EXPECTED_ERROR_FAILED_TO_REMOVE_ORGANISATION_POLICIES);
-        // when not able to submitEventForCase should log exception
-        CCDRequest ccdRequest = new CCDRequest();
-        ccdRequest.setCaseDetails(caseDetails);
-        representatives.getFirst().getValue().setRole(ROLE_SOLICITORA);
-        caseDetails.getCaseData().setRepCollection(representatives);
-        caseDetails.getCaseData().setRespondentOrganisationPolicy0(OrganisationPolicy.builder()
-                .orgPolicyCaseAssignedRole(ROLE_SOLICITORA).organisation(Organisation.builder().organisationID(
-                        ORGANISATION_ID_ONE).build()).build());
-        doReturn(ccdRequest).when(ccdClient).startEventForCase(ADMIN_USER_TOKEN, CASE_TYPE_ID_ENGLAND_WALES,
-                JURISDICTION_EMPLOYMENT, CASE_ID_1, EVENT_UPDATE_CASE_SUBMITTED);
-        when(ccdClient.submitEventForCase(eq(ADMIN_USER_TOKEN), any(CaseData.class), eq(CASE_TYPE_ID_ENGLAND_WALES),
-                eq(JURISDICTION_EMPLOYMENT), any(CCDRequest.class), eq(CASE_ID_1)))
-                .thenThrow(new IOException(EXCEPTION_DUMMY_MESSAGE));
-        assertDoesNotThrow(() -> nocRespondentRepresentativeService.resetOrganisationPolicies(caseDetails,
-                representatives));
-        verify(ccdClient, times(LoggerTestUtils.INTEGER_TWO)).startEventForCase(ADMIN_USER_TOKEN,
-                CASE_TYPE_ID_ENGLAND_WALES, JURISDICTION_EMPLOYMENT, CASE_ID_1, EVENT_UPDATE_CASE_SUBMITTED);
-        verify(ccdClient, times(LoggerTestUtils.INTEGER_ONE)).submitEventForCase(eq(ADMIN_USER_TOKEN),
-                any(CaseData.class),
-                eq(CASE_TYPE_ID_ENGLAND_WALES), eq(JURISDICTION_EMPLOYMENT), any(CCDRequest.class), eq(CASE_ID_1));
+        // when startEventForCase returns null value should log exception
+        doReturn(null).when(ccdClient).startEventForCase(ADMIN_USER_TOKEN, CASE_TYPE_ID_ENGLAND_WALES,
+                JURISDICTION_EMPLOYMENT, CASE_ID_1, CaseEvent.UPDATE_RESP_ORG_POLICY.name());
+        GenericRuntimeException genericRuntimeException = assertThrows(GenericRuntimeException.class,
+                () -> nocRespondentRepresentativeService.resetOrganisationPolicies(caseDetails));
+        assertThat(genericRuntimeException.getMessage()).isEqualTo(
+                EXPECTED_EXCEPTION_UNABLE_TO_START_EVENT_WITHOUT_CASE_ID);
         LoggerTestUtils.checkLog(Level.ERROR, LoggerTestUtils.INTEGER_TWO,
                 EXPECTED_ERROR_FAILED_TO_REMOVE_ORGANISATION_POLICIES);
-        // removes organisation policies and noc answers successfully
+        // when startEventForCase returns CCD request without case details should log exception
+        CCDRequest ccdRequest = new CCDRequest();
+        doReturn(ccdRequest).when(ccdClient).startEventForCase(ADMIN_USER_TOKEN, CASE_TYPE_ID_ENGLAND_WALES,
+                JURISDICTION_EMPLOYMENT, CASE_ID_1, CaseEvent.UPDATE_RESP_ORG_POLICY.name());
+        genericRuntimeException = assertThrows(GenericRuntimeException.class,
+                () -> nocRespondentRepresentativeService.resetOrganisationPolicies(caseDetails));
+        assertThat(genericRuntimeException.getMessage()).isEqualTo(
+                EXPECTED_EXCEPTION_UNABLE_TO_START_EVENT_WITHOUT_CASE_ID);
+        LoggerTestUtils.checkLog(Level.ERROR, LoggerTestUtils.INTEGER_THREE,
+                EXPECTED_ERROR_FAILED_TO_REMOVE_ORGANISATION_POLICIES);
+        // when startEventForCase returns case details without id should log exception
+        ccdRequest.setCaseDetails(new  CaseDetails());
+        genericRuntimeException = assertThrows(GenericRuntimeException.class,
+                () -> nocRespondentRepresentativeService.resetOrganisationPolicies(caseDetails));
+        assertThat(genericRuntimeException.getMessage()).isEqualTo(
+                EXPECTED_EXCEPTION_UNABLE_TO_START_EVENT_WITHOUT_CASE_ID);
+        LoggerTestUtils.checkLog(Level.ERROR, LoggerTestUtils.INTEGER_FOUR,
+                EXPECTED_ERROR_FAILED_TO_REMOVE_ORGANISATION_POLICIES);
+        // when startEventForCase returns case details without case data should log exception
+        ccdRequest.setCaseDetails(new  CaseDetails());
+        ccdRequest.getCaseDetails().setCaseId(CASE_ID_1);
+        genericRuntimeException = assertThrows(GenericRuntimeException.class,
+                () -> nocRespondentRepresentativeService.resetOrganisationPolicies(caseDetails));
+        assertThat(genericRuntimeException.getMessage()).isEqualTo(
+                EXPECTED_EXCEPTION_UNABLE_TO_START_EVENT_WITH_CASE_ID);
+        LoggerTestUtils.checkLog(Level.ERROR, LoggerTestUtils.INTEGER_FIVE,
+                EXPECTED_ERROR_FAILED_TO_REMOVE_ORGANISATION_POLICIES);
+        // when startEventForCase returns valid case details should run submit event and update repCollectionToRemove
+        // and repCollectionToAdd collections on CCD Request
+        ccdRequest.getCaseDetails().setCaseData(new CaseData());
         doReturn(new SubmitEvent()).when(ccdClient).submitEventForCase(eq(ADMIN_USER_TOKEN), any(CaseData.class),
                 eq(CASE_TYPE_ID_ENGLAND_WALES), eq(JURISDICTION_EMPLOYMENT), any(CCDRequest.class), eq(CASE_ID_1));
-        assertDoesNotThrow(() -> nocRespondentRepresentativeService.resetOrganisationPolicies(caseDetails,
-                representatives));
-        verify(ccdClient, times(LoggerTestUtils.INTEGER_THREE)).startEventForCase(ADMIN_USER_TOKEN,
-                CASE_TYPE_ID_ENGLAND_WALES, JURISDICTION_EMPLOYMENT, CASE_ID_1, EVENT_UPDATE_CASE_SUBMITTED);
-        verify(ccdClient, times(LoggerTestUtils.INTEGER_TWO)).submitEventForCase(eq(ADMIN_USER_TOKEN),
-                any(CaseData.class),
-                eq(CASE_TYPE_ID_ENGLAND_WALES), eq(JURISDICTION_EMPLOYMENT), any(CCDRequest.class), eq(CASE_ID_1));
-        assertThat(caseDetails.getCaseData().getRespondentOrganisationPolicy0()).isEqualTo(OrganisationPolicy.builder()
-                .orgPolicyCaseAssignedRole(ROLE_SOLICITORA).build());
-    }
-
-    @Test
-    @SneakyThrows
-    void theUpdateRepresentativeRoleAndOrganisationPolicy() {
-        // when case details is empty should log invalid case details error
-        nocRespondentRepresentativeService.updateRepresentativeRoleAndOrganisationPolicy(null,
-                REPRESENTATIVE_ID_ONE, ROLE_SOLICITORA);
-        LoggerTestUtils.checkLog(Level.ERROR, LoggerTestUtils.INTEGER_ONE,
-                EXPECTED_ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_INVALID_CASE_DETAILS);
-        // when case details not have case id should log invalid case details error
-        CaseDetails caseDetails = new CaseDetails();
-        nocRespondentRepresentativeService.updateRepresentativeRoleAndOrganisationPolicy(caseDetails,
-                REPRESENTATIVE_ID_ONE, ROLE_SOLICITORA);
-        LoggerTestUtils.checkLog(Level.ERROR, LoggerTestUtils.INTEGER_TWO,
-                EXPECTED_ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_INVALID_CASE_DETAILS);
-        // when case details not have case type id should log invalid case details error
-        caseDetails.setCaseId(CASE_ID_1);
-        nocRespondentRepresentativeService.updateRepresentativeRoleAndOrganisationPolicy(caseDetails,
-                REPRESENTATIVE_ID_ONE, ROLE_SOLICITORA);
-        LoggerTestUtils.checkLog(Level.ERROR, LoggerTestUtils.INTEGER_THREE,
-                EXPECTED_ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_INVALID_CASE_DETAILS);
-        // when case details not have jurisdiction id should log invalid case details error
-        caseDetails.setCaseTypeId(CASE_TYPE_ID_ENGLAND_WALES);
-        nocRespondentRepresentativeService.updateRepresentativeRoleAndOrganisationPolicy(caseDetails,
-                REPRESENTATIVE_ID_ONE, ROLE_SOLICITORA);
-        LoggerTestUtils.checkLog(Level.ERROR, LoggerTestUtils.INTEGER_FOUR,
-                EXPECTED_ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_INVALID_CASE_DETAILS);
-        // when representative id is empty should log invalid inputs error
-        caseDetails.setJurisdiction(JURISDICTION_EMPLOYMENT);
-        nocRespondentRepresentativeService.updateRepresentativeRoleAndOrganisationPolicy(caseDetails,
-                StringUtils.EMPTY, ROLE_SOLICITORA);
-        LoggerTestUtils.checkLog(Level.ERROR, LoggerTestUtils.INTEGER_FIVE,
-                EXPECTED_ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_INVALID_INPUTS);
-        // when role is empty should log invalid inputs error
-        nocRespondentRepresentativeService.updateRepresentativeRoleAndOrganisationPolicy(caseDetails,
-                REPRESENTATIVE_ID_ONE, StringUtils.EMPTY);
-        LoggerTestUtils.checkLog(Level.ERROR, LoggerTestUtils.INTEGER_SIX,
-                EXPECTED_ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_INVALID_INPUTS);
-        // when start event for update organisation policies and representative role returns empty CCD request should
-        // log unable to start event error
-        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
-        when(ccdClient.startEventForCase(ADMIN_USER_TOKEN,
-                CASE_TYPE_ID_ENGLAND_WALES,
-                JURISDICTION_EMPLOYMENT,
-                CASE_ID_1,
-                EVENT_UPDATE_CASE_SUBMITTED)).thenReturn(null);
-        nocRespondentRepresentativeService.updateRepresentativeRoleAndOrganisationPolicy(caseDetails,
-                REPRESENTATIVE_ID_ONE, ROLE_SOLICITORA);
-        LoggerTestUtils.checkLog(Level.ERROR, LoggerTestUtils.INTEGER_SEVEN,
-                EXPECTED_ERROR_UNABLE_TO_START_EVENT_TO_UPDATE_REPRESENTATIVE_AND_ORGANISATION_POLICY);
-        // when CCD request not has case details should log unable to start event error
-        CCDRequest ccdRequest = new CCDRequest();
-        ccdRequest.setCaseDetails(new CaseDetails());
-        when(nocCcdService.startEventForUpdateCaseSubmitted(ADMIN_USER_TOKEN,
-                CASE_TYPE_ID_ENGLAND_WALES,
-                JURISDICTION_EMPLOYMENT,
-                CASE_ID_1)).thenReturn(ccdRequest);
-        nocRespondentRepresentativeService.updateRepresentativeRoleAndOrganisationPolicy(caseDetails,
-                REPRESENTATIVE_ID_ONE, ROLE_SOLICITORA);
-        LoggerTestUtils.checkLog(Level.ERROR, LoggerTestUtils.INTEGER_EIGHT,
-                EXPECTED_ERROR_UNABLE_TO_START_EVENT_TO_UPDATE_REPRESENTATIVE_AND_ORGANISATION_POLICY);
-        // when case details not have case data should log unable to start event error
-        ccdRequest.setCaseDetails(new CaseDetails());
-        when(nocCcdService.startEventForUpdateCaseSubmitted(ADMIN_USER_TOKEN,
-                CASE_TYPE_ID_ENGLAND_WALES,
-                JURISDICTION_EMPLOYMENT,
-                CASE_ID_1)).thenReturn(ccdRequest);
-        nocRespondentRepresentativeService.updateRepresentativeRoleAndOrganisationPolicy(caseDetails,
-                REPRESENTATIVE_ID_ONE, ROLE_SOLICITORA);
-        LoggerTestUtils.checkLog(Level.ERROR, LoggerTestUtils.INTEGER_NINE,
-                EXPECTED_ERROR_UNABLE_TO_START_EVENT_TO_UPDATE_REPRESENTATIVE_AND_ORGANISATION_POLICY);
-        // when representative in the case data is not a valid representative should log representative not found error
-        ccdRequest.setCaseDetails(caseDetails);
-        CaseData tmpCaseData = new CaseData();
-        caseDetails.setCaseData(tmpCaseData);
-        nocRespondentRepresentativeService.updateRepresentativeRoleAndOrganisationPolicy(caseDetails,
-                REPRESENTATIVE_ID_ONE, ROLE_SOLICITORA);
-        LoggerTestUtils.checkLog(Level.ERROR, LoggerTestUtils.INTEGER_TEN,
-                EXPECTED_ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_REPRESENTATIVE_NOT_FOUND);
-        // when submit event for case to update role and organisation policy throws exception should log that exception
-        RepresentedTypeRItem representative = RepresentedTypeRItem.builder().build();
-        representative.setValue(RepresentedTypeR.builder().respondentId(RESPONDENT_ID_ONE).build());
-        representative.setId(REPRESENTATIVE_ID_ONE);
-        Organisation organisation = Organisation.builder().organisationID(ORGANISATION_ID_ONE).build();
-        representative.getValue().setRespondentOrganisation(organisation);
-        tmpCaseData.setRepCollection(List.of(representative));
-        when(ccdClient.submitEventForCase(eq(ADMIN_USER_TOKEN),
-                any(CaseData.class),
-                eq(CASE_TYPE_ID_ENGLAND_WALES),
-                eq(JURISDICTION_EMPLOYMENT),
-                any(CCDRequest.class),
-                eq(CASE_ID_1))).thenThrow(new IOException(EXCEPTION_DUMMY_MESSAGE));
-        nocRespondentRepresentativeService.updateRepresentativeRoleAndOrganisationPolicy(caseDetails,
-                REPRESENTATIVE_ID_ONE, ROLE_SOLICITORA);
-        LoggerTestUtils.checkLog(Level.ERROR, LoggerTestUtils.INTEGER_ELEVEN,
-                EXPECTED_ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES);
-        // should successfully add organisation policy, role and reset Noc Warning
-        tmpCaseData.setRespondentOrganisationPolicy0(null);
-        representative.getValue().setRole(null);
-        when(ccdClient.submitEventForCase(eq(ADMIN_USER_TOKEN),
-                any(CaseData.class),
-                eq(CASE_TYPE_ID_ENGLAND_WALES),
-                eq(JURISDICTION_EMPLOYMENT),
-                any(CCDRequest.class),
-                eq(CASE_ID_1))).thenReturn(new SubmitEvent());
-        nocRespondentRepresentativeService.updateRepresentativeRoleAndOrganisationPolicy(caseDetails,
-                REPRESENTATIVE_ID_ONE, ROLE_SOLICITORA);
-        assertThat(representative.getValue().getRole()).isEqualTo(ROLE_SOLICITORA);
-        assertThat(tmpCaseData.getRespondentOrganisationPolicy0()).isEqualTo(OrganisationPolicy.builder()
-                .organisation(organisation).orgPolicyCaseAssignedRole(ROLE_SOLICITORA).build());
+        assertDoesNotThrow(() -> nocRespondentRepresentativeService.resetOrganisationPolicies(caseDetails));
+        assertThat(ccdRequest.getCaseDetails().getCaseData().getRepCollectionToRemove()).isEqualTo(caseDetails
+                .getCaseData().getRepCollectionToRemove());
+        assertThat(ccdRequest.getCaseDetails().getCaseData().getRepCollectionToRemove()).isEqualTo(caseDetails
+                .getCaseData().getRepCollectionToRemove());
     }
 
     @Test
@@ -1555,8 +1461,17 @@ class NocRespondentRepresentativeServiceTest {
         // when representative is found should revoke case user assignment
         when(ccdClient.revokeCaseAssignments(eq(ADMIN_USER_TOKEN), any(CaseUserAssignmentData.class)))
                 .thenReturn(StringUtils.EMPTY);
-        nocRespondentRepresentativeService.revokeRespondentRepresentatives(caseDetails, List.of(representative));
-        verify(ccdClient).revokeCaseAssignments(eq(ADMIN_USER_TOKEN), any(CaseUserAssignmentData.class));
+        assertThat(nocRespondentRepresentativeService.revokeRespondentRepresentatives(caseDetails,
+                List.of(representative))).isNotEmpty().isEqualTo(List.of(representative));
+        verify(ccdClient, times(LoggerTestUtils.INTEGER_ONE)).revokeCaseAssignments(eq(ADMIN_USER_TOKEN),
+                any(CaseUserAssignmentData.class));
+        // when representative is found but not able to revoke case user assignment should return empty list.
+        when(ccdClient.revokeCaseAssignments(eq(ADMIN_USER_TOKEN), any(CaseUserAssignmentData.class)))
+                .thenThrow(new IOException(EXCEPTION_DUMMY_MESSAGE));
+        assertThat(nocRespondentRepresentativeService.revokeRespondentRepresentatives(caseDetails,
+                List.of(representative))).isEmpty();
+        verify(ccdClient, times(LoggerTestUtils.INTEGER_TWO)).revokeCaseAssignments(eq(ADMIN_USER_TOKEN),
+                any(CaseUserAssignmentData.class));
     }
 
     @Test
@@ -1613,10 +1528,66 @@ class NocRespondentRepresentativeServiceTest {
                 List.of(CaseUserAssignment.builder().caseId(CASE_ID_1).caseRole(ROLE_SOLICITORA)
                         .organisationId(ORGANISATION_ID_ONE).build())).build();
         when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, CASE_ID_1)).thenReturn(caseUserAssignmentData);
+        doNothing().when(nocNotificationService).notifyRespondentOfRepresentativeUpdate(any(CaseDetails.class),
+                any(RespondentSumTypeItem.class));
         nocRespondentRepresentativeService.revokeRespondentRepresentativesWithSameOrganisationAsClaimant(caseDetails);
         verify(ccdClient, times(LoggerTestUtils.INTEGER_ONE)).revokeCaseAssignments(eq(ADMIN_USER_TOKEN),
                 any(CaseUserAssignmentData.class));
         assertThat(tmpCaseData.getRespondentOrganisationPolicy0()).isEqualTo(OrganisationPolicy.builder()
                 .orgPolicyCaseAssignedRole(ROLE_SOLICITORA).build());
+    }
+
+    @Test
+    @SneakyThrows
+    void theValidateRespondentRepresentativesOrganisationMatch() {
+        // when there is no representative in rep collection should return empty list
+        CaseData tmpCaseData = new CaseData();
+        tmpCaseData.setRepCollection(new ArrayList<>());
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseId(CASE_ID);
+        caseDetails.setCaseData(tmpCaseData);
+        assertThat(nocRespondentRepresentativeService.validateRespondentRepresentativesOrganisationMatch(caseDetails))
+                .isEmpty();
+        // when representative in rep collection is not valid should return empty list
+        RepresentedTypeRItem representative = RepresentedTypeRItem.builder().build();
+        tmpCaseData.getRepCollection().add(representative);
+        assertThat(nocRespondentRepresentativeService.validateRespondentRepresentativesOrganisationMatch(caseDetails))
+                .isEmpty();
+        // when representative not has email address should return empty list
+        representative.setId(REPRESENTATIVE_ID_ONE);
+        representative.setValue(RepresentedTypeR.builder().build());
+        assertThat(nocRespondentRepresentativeService.validateRespondentRepresentativesOrganisationMatch(caseDetails))
+                .isEmpty();
+        // when representative not has my hmcts selection should return empty list
+        representative.getValue().setRepresentativeEmailAddress(REPRESENTATIVE_EMAIL_1_CAPITALISED);
+        assertThat(nocRespondentRepresentativeService.validateRespondentRepresentativesOrganisationMatch(caseDetails))
+                .isEmpty();
+        // when representative not has any organisation should return empty list
+        representative.getValue().setMyHmctsYesNo(YES);
+        assertThat(nocRespondentRepresentativeService.validateRespondentRepresentativesOrganisationMatch(caseDetails))
+                .isEmpty();
+        // when organisation response and representative organisation not matches should return error
+        representative.getValue().setNameOfRepresentative(REPRESENTATIVE_NAME);
+        representative.getValue().setRespondentOrganisation(Organisation.builder().organisationID(ORGANISATION_ID_ONE)
+                .build());
+        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
+        AccountIdByEmailResponse accountIdByEmailResponse = new AccountIdByEmailResponse();
+        accountIdByEmailResponse.setUserIdentifier(USER_ID);
+        when(nocService.findUserByEmail(ADMIN_USER_TOKEN, REPRESENTATIVE_EMAIL_1_CAPITALISED, CASE_ID))
+                .thenReturn(accountIdByEmailResponse);
+        OrganisationsResponse organisationsResponse = OrganisationsResponse.builder()
+                .organisationIdentifier(ORGANISATION_ID_TWO).build();
+        when(nocService.findOrganisationByUserId(ADMIN_USER_TOKEN, USER_ID, CASE_ID)).thenReturn(organisationsResponse);
+        assertThat(nocRespondentRepresentativeService.validateRespondentRepresentativesOrganisationMatch(caseDetails))
+                .isNotEmpty().contains(EXPECTED_ERROR_SELECTED_ORGANISATION_REPRESENTATIVE_ORGANISATION_NOT_MATCHES);
+        // when organisation response and representative organisation matches should return empty list
+        organisationsResponse.setOrganisationIdentifier(ORGANISATION_ID_ONE);
+        assertThat(nocRespondentRepresentativeService.validateRespondentRepresentativesOrganisationMatch(caseDetails))
+                .isEmpty();
+        // when user response not found should return empty list
+        when(nocService.findUserByEmail(ADMIN_USER_TOKEN, REPRESENTATIVE_EMAIL_1_CAPITALISED, CASE_ID))
+                .thenThrow(new GenericServiceException(EXCEPTION_DUMMY_MESSAGE));
+        assertThat(nocRespondentRepresentativeService.validateRespondentRepresentativesOrganisationMatch(caseDetails))
+                .isEmpty();
     }
 }

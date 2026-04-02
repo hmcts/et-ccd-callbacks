@@ -33,6 +33,8 @@ class NocRemoveRepresentationControllerTest extends BaseControllerTest {
 
     private static final String NOC_REQUEST_CLAIMANT_ABOUT_TO_SUBMIT =
         "/nocRemoveRepresentation/claimant/aboutToSubmit";
+    private static final String NOC_REQUEST_RESPONDENT_ABOUT_TO_START =
+        "/nocRemoveRepresentation/respondent/aboutToStart";
     private static final String NOC_REQUEST_SUBMITTED = "/nocRemoveRepresentation/submitted";
 
     private CCDRequest ccdRequest;
@@ -54,7 +56,7 @@ class NocRemoveRepresentationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void nocRemoveRepresentationAboutToSubmit_tokenOk() throws Exception {
+    void aboutToSubmitClaimant_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(NOC_REQUEST_CLAIMANT_ABOUT_TO_SUBMIT)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -67,7 +69,7 @@ class NocRemoveRepresentationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void nocRemoveRepresentationAboutToSubmit_tokenFail() throws Exception {
+    void aboutToSubmitClaimant_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(NOC_REQUEST_CLAIMANT_ABOUT_TO_SUBMIT)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -77,7 +79,7 @@ class NocRemoveRepresentationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void nocRemoveRepresentationAboutToSubmit_badRequest() throws Exception {
+    void aboutToSubmitClaimant_badRequest() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(NOC_REQUEST_CLAIMANT_ABOUT_TO_SUBMIT)
                 .content("garbage content")
@@ -87,7 +89,40 @@ class NocRemoveRepresentationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void nocRemoveRepresentationSubmitted_tokenOk() throws Exception {
+    void aboutToStartRespondent_tokenOk() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(NOC_REQUEST_RESPONDENT_ABOUT_TO_START)
+                .content(jsonMapper.toJson(ccdRequest))
+                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                .contentType(APPLICATION_JSON))
+            .andExpect(status().isOk())
+            .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+            .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+            .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    void aboutToStartRespondent_tokenFail() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        mockMvc.perform(post(NOC_REQUEST_RESPONDENT_ABOUT_TO_START)
+                .content(jsonMapper.toJson(ccdRequest))
+                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                .contentType(APPLICATION_JSON))
+            .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void aboutToStartRespondent_badRequest() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        mockMvc.perform(post(NOC_REQUEST_RESPONDENT_ABOUT_TO_START)
+                .content("garbage content")
+                .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                .contentType(APPLICATION_JSON))
+            .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void submitted_tokenOk() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(NOC_REQUEST_SUBMITTED)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -100,7 +135,7 @@ class NocRemoveRepresentationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void nocRemoveRepresentationSubmitted_tokenFail() throws Exception {
+    void submitted_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
         mockMvc.perform(post(NOC_REQUEST_SUBMITTED)
                 .content(jsonMapper.toJson(ccdRequest))
@@ -110,7 +145,7 @@ class NocRemoveRepresentationControllerTest extends BaseControllerTest {
     }
 
     @Test
-    void nocRemoveRepresentationSubmitted_badRequest() throws Exception {
+    void submitted_badRequest() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(post(NOC_REQUEST_SUBMITTED)
                 .content("garbage content")

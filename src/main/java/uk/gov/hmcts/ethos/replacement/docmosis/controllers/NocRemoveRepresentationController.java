@@ -20,7 +20,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRemoveRepresentationService;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @Slf4j
@@ -74,8 +73,10 @@ public class NocRemoveRepresentationController {
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
 
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        caseData.setNocRemoveRepIsMoreThanOneFlag(YES); // TODO
+        CaseDetails caseDetails = ccdRequest.getCaseDetails();
+        CaseData caseData = caseDetails.getCaseData();
+        caseData.setNocRemoveRepIsMoreThanOneFlag(
+            nocRemoveRepresentationService.isMoreThanOneRespondent(caseDetails, userToken));
         return getCallbackRespEntityNoErrors(caseData);
     }
 

@@ -22,6 +22,9 @@ es:
   partition:
     notifications: ${ES_NOTIFICATIONS_PARTITION_SIZE:3000}
 
+decentralisation:
+  legacy-json-service: true
+
 cron:
   bfActionTask: ${CRON_BFACTION_TASK:0 0 * * * ?}
   caseTypeId: ${CRON_CASE_TYPE_ID:ET_EnglandWales,ET_Scotland}
@@ -29,3 +32,13 @@ cron:
   acasCertSubmission: ${CRON_ACAS_CERT_SUBMISSION_TASK:0 */5 * * * ?}
 
 etcos.url: ${ET_COS_URL:http://localhost:8080}
+
+spring:
+  main:
+    allow-bean-definition-overriding: true
+  autoconfigure:
+    exclude:
+      - com.azure.spring.cloud.autoconfigure.implementation.context.AzureTokenCredentialAutoConfiguration
+  jms:
+    servicebus:
+      enabled: false

@@ -21,7 +21,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EUROPE_L
     "uk.gov.hmcts.reform.document",
     "uk.gov.hmcts.reform.authorisation",
     "uk.gov.hmcts.reform.ccd.document",
-    "uk.gov.hmcts.reform.et.syaapi"
+    "uk.gov.hmcts.reform.et.syaapi",
+    "uk.gov.hmcts.ccd.sdk"
 })
 @EnableFeignClients(basePackages = {
     "uk.gov.hmcts.ethos.replacement",

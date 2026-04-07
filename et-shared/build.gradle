@@ -140,7 +140,7 @@ dependencies {
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.18.3'
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.18.3'
     implementation group: 'org.springframework', name: 'spring-core', version: '6.2.11'
-    implementation 'com.github.hmcts:decentralised-runtime:json-runtime'
+    implementation 'com.github.hmcts:decentralised-runtime:json-runtime-test-artifact-20260401-095021'
 
     compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.42'
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.42'

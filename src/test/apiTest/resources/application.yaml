@@ -8,6 +8,13 @@ spring:
     enabled: false
   main:
     lazy-initialization: true
+    allow-bean-definition-overriding: true
+  autoconfigure:
+    exclude:
+      - com.azure.spring.cloud.autoconfigure.implementation.context.AzureTokenCredentialAutoConfiguration
+  jms:
+    servicebus:
+      enabled: false
 
 ft:
   base:
@@ -237,6 +244,9 @@ feature-flags:
 
 caching:
   adminUserService: ${CACHING_ADMIN_USER_SERVICE:21600000}
+
+decentralisation:
+  legacy-json-service: true
 
 queue:
   create-updates:

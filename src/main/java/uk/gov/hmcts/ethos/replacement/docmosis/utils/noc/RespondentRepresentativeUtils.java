@@ -13,6 +13,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentUtils;
+import uk.gov.hmcts.reform.et.syaapi.service.utils.NoticeOfChangeUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -812,7 +813,8 @@ public final class RespondentRepresentativeUtils {
         if (roleIndex == -1) {
             return null;
         }
-        NoticeOfChangeAnswers noticeOfChangeAnswers = RoleUtils.getNoticeOfChangeAnswersAtIndex(caseData, roleIndex);
+        NoticeOfChangeAnswers noticeOfChangeAnswers = NoticeOfChangeUtils
+                .getNoticeOfChangeAnswersAtIndex(caseData, roleIndex);
         if (ObjectUtils.isEmpty(noticeOfChangeAnswers)
                 || ObjectUtils.isEmpty(noticeOfChangeAnswers.getRespondentName())) {
             return null;

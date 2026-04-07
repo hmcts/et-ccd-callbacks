@@ -509,25 +509,6 @@ final class RoleUtilsTest {
     }
 
     @Test
-    void theGetNoticeOfChangeAnswersAtIndex() {
-        // when there case data is empty should return null
-        assertThat(RoleUtils.getNoticeOfChangeAnswersAtIndex(null, NumberUtils.INTEGER_ZERO)).isNull();
-        // when index is less than zero should return null
-        CaseData caseData = CaseDataBuilder.builder().build();
-        assertThat(RoleUtils.getNoticeOfChangeAnswersAtIndex(caseData, NumberUtils.INTEGER_MINUS_ONE)).isNull();
-        // when index is equal to max number of noc answers
-        assertThat(RoleUtils.getNoticeOfChangeAnswersAtIndex(caseData, INTEGER_TEN)).isNull();
-        // when index is zero but there is no notice of change answers should return null
-        assertThat(RoleUtils.getNoticeOfChangeAnswersAtIndex(caseData, NumberUtils.INTEGER_ZERO)).isNull();
-        // when there is notice of change answer by the given index should return it
-        NoticeOfChangeAnswers noticeOfChangeAnswers =
-                NoticeOfChangeAnswers.builder().respondentName(RESPONDENT_NAME_ONE).build();
-        caseData.setNoticeOfChangeAnswers0(noticeOfChangeAnswers);
-        assertThat(RoleUtils.getNoticeOfChangeAnswersAtIndex(caseData, NumberUtils.INTEGER_ZERO))
-                .isEqualTo(noticeOfChangeAnswers);
-    }
-
-    @Test
     void theIsValidNoticeOfChangeAnswersByIndex() {
         // when answer is null should return false
         assertThat(RoleUtils.isValidNoticeOfChangeAnswers(null)).isFalse();

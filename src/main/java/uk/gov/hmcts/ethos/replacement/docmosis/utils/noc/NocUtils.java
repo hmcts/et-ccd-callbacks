@@ -18,6 +18,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.CallbackObjectUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CallbacksCollectionUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.LoggingUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentUtils;
+import uk.gov.hmcts.reform.et.syaapi.service.utils.NoticeOfChangeUtils;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -550,7 +551,7 @@ public final class NocUtils {
             return;
         }
         for (int i = 0; i < caseData.getRespondentCollection().size(); i++) {
-            NoticeOfChangeAnswers answers = RoleUtils.getNoticeOfChangeAnswersAtIndex(caseData, i);
+            NoticeOfChangeAnswers answers = NoticeOfChangeUtils.getNoticeOfChangeAnswersAtIndex(caseData, i);
             if (!RoleUtils.isValidNoticeOfChangeAnswers(answers)) {
                 RespondentSumTypeItem respondent = RespondentUtils.getRespondentAtIndex(caseData, i);
                 if (!RespondentUtils.isValidRespondent(respondent)) {

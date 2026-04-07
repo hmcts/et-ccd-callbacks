@@ -427,14 +427,12 @@ public class NocRespondentRepresentativeService {
     }
 
     /**
-     * Finds respondent representatives associated with the given organisation and
-     * delegates revocation/removal to
+     * Finds respondent representatives associated with the given organisation,
+     * notifies the corresponding respondents, and delegates access revocation
+     * and case-data removal to
      * {@link #revokeAndRemoveRespondentRepresentatives(CaseDetails, List)}.
      *
      * <p>If no matching representatives are found, this method makes no changes.</p>
-     *
-     * <p>Representatives are removed from case data only when their access
-     * revocation succeeds.</p>
      *
      * @param caseDetails the case details containing the case data to update
      * @param organisationId the organisation identifier used to find matching
@@ -455,21 +453,21 @@ public class NocRespondentRepresentativeService {
     }
 
     /**
-     * Attempts to revoke access for the specified respondent representatives and
-     * removes from case data only those representatives whose access was
-     * successfully revoked.
+     * Attempts to revoke access for the specified respondent representatives,
+     * resets organisation policies for representatives whose access was
+     * successfully revoked, and removes the supplied representatives from
+     * case data.
      *
      * <p>Processing order:</p>
      * <ol>
      *   <li>Attempt to revoke access for the supplied representatives.</li>
      *   <li>Reset organisation policies for the representatives whose access was
      *       successfully revoked.</li>
-     *   <li>Remove from case data only the representatives whose access was
-     *       successfully revoked.</li>
+     *   <li>Remove the supplied representatives from case data.</li>
      * </ol>
      *
-     * <p>If no access revocations succeed, this method leaves respondent
-     * representatives in case data unchanged.</p>
+     * <p>If no access revocations succeed, no organisation policies are reset,
+     * but the supplied representatives are still removed from case data.</p>
      *
      * @param caseDetails the case details containing the case data to update;
      *                    must not be {@code null}

@@ -14,6 +14,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentUtils;
+import uk.gov.hmcts.reform.et.syaapi.service.utils.NoticeOfChangeUtils;
 
 import java.util.List;
 
@@ -92,7 +93,7 @@ public final class RoleUtils {
             return NumberUtils.INTEGER_MINUS_ONE;
         }
         for (int i = 0; i < MAX_NOC_ANSWERS; i++) {
-            NoticeOfChangeAnswers answer = getNoticeOfChangeAnswersAtIndex(caseData, i);
+            NoticeOfChangeAnswers answer = NoticeOfChangeUtils.getNoticeOfChangeAnswersAtIndex(caseData, i);
             if (ObjectUtils.isNotEmpty(answer) && Strings.CI.equals(answer.getRespondentName(), respondentName)) {
                 return i;
             }
@@ -112,42 +113,6 @@ public final class RoleUtils {
             }
         }
         return NumberUtils.INTEGER_MINUS_ONE;
-    }
-
-    /**
-     * Returns the Notice of Change answers associated with the given index
-     * from the provided case data.
-     *
-     * <p>The index corresponds to the numbered Notice of Change answer fields
-     * on the case data (e.g. {@code noticeOfChangeAnswers0} through
-     * {@code noticeOfChangeAnswers9}).</p>
-     *
-     * <p>If the case data is null, or if the index is outside the supported
-     * range (0 to {@code MAX_NOC_ANSWERS - 1}), the method returns {@code null}.</p>
-     *
-     * @param caseData the case data containing Notice of Change answer fields
-     * @param index the zero-based index identifying which Notice of Change
-     *              answers to retrieve
-     * @return the Notice of Change answers for the given index, or {@code null}
-     *         if the input is invalid or no answers exist at that index
-     */
-    public static NoticeOfChangeAnswers getNoticeOfChangeAnswersAtIndex(CaseData caseData, int index) {
-        if (ObjectUtils.isEmpty(caseData) || index < 0 || index >= MAX_NOC_ANSWERS) {
-            return null;
-        }
-        return switch (index) {
-            case 0 -> caseData.getNoticeOfChangeAnswers0();
-            case 1 -> caseData.getNoticeOfChangeAnswers1();
-            case 2 -> caseData.getNoticeOfChangeAnswers2();
-            case 3 -> caseData.getNoticeOfChangeAnswers3();
-            case 4 -> caseData.getNoticeOfChangeAnswers4();
-            case 5 -> caseData.getNoticeOfChangeAnswers5();
-            case 6 -> caseData.getNoticeOfChangeAnswers6();
-            case 7 -> caseData.getNoticeOfChangeAnswers7();
-            case 8 -> caseData.getNoticeOfChangeAnswers8();
-            case 9 -> caseData.getNoticeOfChangeAnswers9();
-            default -> null;
-        };
     }
 
     /**
@@ -249,7 +214,7 @@ public final class RoleUtils {
         if (ObjectUtils.isEmpty(caseData) || index < 0 || index >= MAX_NOC_ANSWERS) {
             return StringUtils.EMPTY;
         }
-        NoticeOfChangeAnswers answers = RoleUtils.getNoticeOfChangeAnswersAtIndex(caseData, index);
+        NoticeOfChangeAnswers answers = NoticeOfChangeUtils.getNoticeOfChangeAnswersAtIndex(caseData, index);
         if (ObjectUtils.isNotEmpty(answers) && StringUtils.isNotBlank(answers.getRespondentName())) {
             return answers.getRespondentName();
         }

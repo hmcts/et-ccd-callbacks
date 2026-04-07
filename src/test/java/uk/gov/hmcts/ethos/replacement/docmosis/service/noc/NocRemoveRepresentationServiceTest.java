@@ -9,8 +9,10 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
+import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseAccessService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.EmailNotificationService;
@@ -20,6 +22,8 @@ import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 import java.util.List;
 import java.util.Map;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -43,6 +47,8 @@ class NocRemoveRepresentationServiceTest {
     private CaseAccessService caseAccessService;
     @Mock
     private EmailNotificationService emailNotificationService;
+    @Mock
+    private NocRespondentRepresentativeService nocRespondentRepresentativeService;
 
     private static final String USER_TOKEN = "userToken";
     private static final String TEMPLATE_NOC_ORG_ADMIN_NOT_REPRESENTING = "nocOrgAdminNotRepresentingTemplateId";
@@ -56,8 +62,11 @@ class NocRemoveRepresentationServiceTest {
     private static final String CASE_REFERENCE = "123456789/1234";
     private static final String CASE_ID = "caseId";
     private static final String CLAIMANT_NAME = "Claimant Name";
-    private static final String RESPONDENT_NAME = "Respondent Name";
+    private static final String RESPONDENT_A_NAME = "Respondent Name A";
     private static final String CLAIMANT_LEGAL_REP_NAME = "Claimant Legal Rep Name";
+    private static final String RESPONDENT_A_LEGAL_REP_NAME = "Respondent A Legal Rep Name";
+    private static final String RESPONDENT_B_LEGAL_REP_NAME = "Respondent A Legal Rep Name";
+    private static final String ORGANISATION_ID = "orgId";
     private static final String ORGANISATION_NAME = "Org Name";
     private static final String LINK_CITIZEN_CASE = "claimantCitizenCaseLink";
     private static final String LINK_RESP_EXUI_CASE = "respondentExUICaseLink";
@@ -82,7 +91,7 @@ class NocRemoveRepresentationServiceTest {
             .withClaimant(CLAIMANT_NAME)
             .withClaimantType(EMAIL_CLAIMANT)
             .withRespondent(RespondentSumType.builder()
-                .respondentName(RESPONDENT_NAME)
+                .respondentName(RESPONDENT_A_NAME)
                 .respondentEmail("respondent@test.com")
                 .build())
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
@@ -117,7 +126,7 @@ class NocRemoveRepresentationServiceTest {
             eq(Map.of(
                 "case_number", CASE_REFERENCE,
                 "claimant", CLAIMANT_NAME,
-                "list_of_respondents", RESPONDENT_NAME,
+                "list_of_respondents", RESPONDENT_A_NAME,
                 "legalRepName", CLAIMANT_LEGAL_REP_NAME
             ))
         );
@@ -127,7 +136,7 @@ class NocRemoveRepresentationServiceTest {
             eq(Map.of(
                 "case_number", CASE_REFERENCE,
                 "claimant", CLAIMANT_NAME,
-                "list_of_respondents", RESPONDENT_NAME
+                "list_of_respondents", RESPONDENT_A_NAME
             ))
         );
         verify(emailService, times(1)).sendEmail(
@@ -136,7 +145,7 @@ class NocRemoveRepresentationServiceTest {
             eq(Map.of(
                 "case_number", CASE_REFERENCE,
                 "claimant", CLAIMANT_NAME,
-                "list_of_respondents", RESPONDENT_NAME,
+                "list_of_respondents", RESPONDENT_A_NAME,
                 "legalRepOrg", ORGANISATION_NAME,
                 "linkToCitUI", LINK_CITIZEN_CASE
             ))
@@ -147,10 +156,106 @@ class NocRemoveRepresentationServiceTest {
             eq(Map.of(
                 "case_number", CASE_REFERENCE,
                 "claimant", CLAIMANT_NAME,
-                "list_of_respondents", RESPONDENT_NAME,
+                "list_of_respondents", RESPONDENT_A_NAME,
                 "party_name", CLAIMANT_NAME,
                 "linkToCitUI", LINK_RESP_CITIZEN_CASE
             ))
         );
+    }
+
+    @Test
+    void shouldRevokeClaimantLegalRep_missingRepresentativeClaimantType() {
+        CaseDetails caseDetails = CaseDataBuilder.builder()
+            .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
+        caseDetails.getCaseData().setRepresentativeClaimantType(null);
+
+        IllegalStateException exception = assertThrows(
+            IllegalStateException.class,
+            () -> nocRemoveRepresentationService.revokeClaimantLegalRep(caseDetails, USER_TOKEN)
+        );
+        assertThat(exception.getMessage()).isEqualTo("Missing RepresentativeClaimantType");
+        verify(nocCcdService, times(0))
+            .revokeClaimantRepresentation(USER_TOKEN, caseDetails);
+    }
+
+    @Test
+    void isMoreThanOneRespondent_shouldReturnNo_whenNoRepresentatives() {
+        CaseDetails caseDetails = CaseDataBuilder.builder()
+            .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
+        when(nocRespondentRepresentativeService.findRepresentativesByToken(anyString(), any()))
+            .thenReturn(List.of());
+
+        String result = nocRemoveRepresentationService.isMoreThanOneRespondent(caseDetails, USER_TOKEN);
+
+        assertThat(result).isEqualTo("No");
+    }
+
+    @Test
+    void isMoreThanOneRespondent_shouldReturnNo_whenNoOrganisationId() {
+        CaseDetails caseDetails = CaseDataBuilder.builder()
+            .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
+        RepresentedTypeRItem item = RepresentedTypeRItem.builder()
+            .id("1")
+            .value(RepresentedTypeR.builder().build())
+            .build();
+        when(nocRespondentRepresentativeService.findRepresentativesByToken(anyString(), any()))
+            .thenReturn(List.of(item));
+
+        String result = nocRemoveRepresentationService.isMoreThanOneRespondent(caseDetails, USER_TOKEN);
+
+        assertThat(result).isEqualTo("No");
+    }
+
+    @Test
+    void isMoreThanOneRespondent_shouldReturnNo_whenOnlyOneRepresentative() {
+        RepresentedTypeRItem item = RepresentedTypeRItem.builder()
+            .id("1")
+            .value(RepresentedTypeR.builder()
+                .nameOfRepresentative(RESPONDENT_A_LEGAL_REP_NAME)
+                .respondentOrganisation(Organisation.builder()
+                    .organisationID(ORGANISATION_ID)
+                    .build())
+                .build())
+            .build();
+        CaseDetails caseDetails = CaseDataBuilder.builder()
+            .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
+        caseDetails.getCaseData().setRepCollection(List.of(item));
+        when(nocRespondentRepresentativeService.findRepresentativesByToken(anyString(), any()))
+            .thenReturn(List.of(item));
+
+        String result = nocRemoveRepresentationService.isMoreThanOneRespondent(caseDetails, USER_TOKEN);
+
+        assertThat(result).isEqualTo("No");
+    }
+
+    @Test
+    void isMoreThanOneRespondent_shouldReturnYes_whenMoreThanOneRepresentative() {
+        RepresentedTypeRItem item1 = RepresentedTypeRItem.builder()
+            .id("1")
+            .value(RepresentedTypeR.builder()
+                .nameOfRepresentative(RESPONDENT_A_LEGAL_REP_NAME)
+                .respondentOrganisation(Organisation.builder()
+                    .organisationID(ORGANISATION_ID)
+                    .build())
+                .build())
+            .build();
+        RepresentedTypeRItem item2 = RepresentedTypeRItem.builder()
+            .id("2")
+            .value(RepresentedTypeR.builder()
+                .nameOfRepresentative(RESPONDENT_B_LEGAL_REP_NAME)
+                .respondentOrganisation(Organisation.builder()
+                    .organisationID(ORGANISATION_ID)
+                    .build())
+                .build())
+            .build();
+        CaseDetails caseDetails = CaseDataBuilder.builder()
+            .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
+        caseDetails.getCaseData().setRepCollection(List.of(item1, item2));
+        when(nocRespondentRepresentativeService.findRepresentativesByToken(anyString(), any()))
+            .thenReturn(List.of(item1));
+
+        String result = nocRemoveRepresentationService.isMoreThanOneRespondent(caseDetails, USER_TOKEN);
+
+        assertThat(result).isEqualTo("Yes");
     }
 }

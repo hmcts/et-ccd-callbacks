@@ -89,6 +89,10 @@ public class NocRemoveRepresentationService {
 
     private Map<String, String> getClaimantRepDetails(CaseDetails caseDetails) {
         RepresentedTypeC existingClaimantRep = caseDetails.getCaseData().getRepresentativeClaimantType();
+        if (existingClaimantRep == null) {
+            throw new IllegalStateException("Missing RepresentativeClaimantType");
+        }
+
         return Map.of(
             MAP_ORG_NAME, existingClaimantRep.getNameOfOrganisation(),
             MAP_ORG_EMAIL_ADDRESS, nocNotificationService.findClaimantRepOrgSuperUserEmail(existingClaimantRep),

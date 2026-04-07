@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
@@ -160,6 +161,21 @@ class NocRemoveRepresentationServiceTest {
                 "linkToCitUI", LINK_RESP_CITIZEN_CASE
             ))
         );
+    }
+
+    @Test
+    void shouldRevokeClaimantLegalRep_missingRepresentativeClaimantType() {
+        CaseDetails caseDetails = CaseDataBuilder.builder()
+            .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
+        caseDetails.getCaseData().setRepresentativeClaimantType(null);
+
+        IllegalStateException exception = assertThrows(
+            IllegalStateException.class,
+            () -> nocRemoveRepresentationService.revokeClaimantLegalRep(caseDetails, USER_TOKEN)
+        );
+        assertThat(exception.getMessage()).isEqualTo("Missing RepresentativeClaimantType");
+        verify(nocCcdService, times(0))
+            .revokeClaimantRepresentation(USER_TOKEN, caseDetails);
     }
 
     @Test

@@ -75,9 +75,11 @@ class ManageCaseRoleServiceUtilTest {
         "java.lang.Exception: Respondent solicitor type not found for case with id, 1646225213651590 and "
             + "respondent organisation policy index, 10";
 
-    private static final String EXPECTED_EXCEPTION_MODIFY_CASE_ROLE_EMPTY_REQUEST = "Request to modify roles is empty";
+    private static final String EXPECTED_EXCEPTION_MODIFY_CASE_ROLE_EMPTY_REQUEST =
+            "java.lang.Exception: Request to modify roles is empty";
 
     private static final Long TEST_CASE_ID = 1_646_225_213_651_590L;
+    private static final String STRING_MINUS_ONE = "-1";
     private static final String STRING_ZERO = "0";
     private static final String STRING_ONE = "1";
     private static final String STRING_TEN = "10";
@@ -335,7 +337,7 @@ class ManageCaseRoleServiceUtilTest {
         // Should throw ManageCaseRoleException when respondentIndex is negative
         manageCaseRoleException = assertThrows(
             ManageCaseRoleException.class, () -> ManageCaseRoleServiceUtil
-                .getRespondentSolicitorType(caseDetails, STRING_ZERO));
+                .getRespondentSolicitorType(caseDetails, STRING_MINUS_ONE));
         assertThat(manageCaseRoleException.getMessage()).isEqualTo(EXCEPTION_INVALID_RESPONDENT_INDEX_NEGATIVE);
 
         // Should throw ManageCaseRoleException when not able to map case details' case data map to case data object

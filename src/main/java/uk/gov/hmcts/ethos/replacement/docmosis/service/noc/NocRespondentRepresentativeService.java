@@ -463,7 +463,8 @@ public class NocRespondentRepresentativeService {
      *   <li>Attempt to revoke access for the supplied representatives.</li>
      *   <li>Reset organisation policies for the representatives whose access was
      *       successfully revoked.</li>
-     *   <li>Remove the supplied representatives from case data.</li>
+     *   <li>Remove the supplied representatives from case data. These representatives may not be revoked if no roles
+     *   are assigned to them.</li>
      * </ol>
      *
      * <p>If no access revocations succeed, no organisation policies are reset,

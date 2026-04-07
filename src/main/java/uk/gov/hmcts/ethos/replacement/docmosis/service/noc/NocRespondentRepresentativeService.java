@@ -427,37 +427,16 @@ public class NocRespondentRepresentativeService {
     }
 
     /**
-     * Revokes and removes all respondent representatives associated with the given organisation
-     * from the provided case.
+     * Finds respondent representatives associated with the given organisation,
+     * notifies the corresponding respondents, and delegates access revocation
+     * and case-data removal to
+     * {@link #revokeAndRemoveRespondentRepresentatives(CaseDetails, List)}.
      *
-     * <p>This method performs the following steps:
-     * <ol>
-     *     <li>Finds all respondent representatives linked to the specified organisation ID.</li>
-     *     <li>If no representatives are found, the method exits without making changes.</li>
-     *     <li>Revokes the identified representatives.</li>
-     *     <li>Resets any organisation-related policies associated with the revoked representatives.</li>
-     *     <li>Removes the representatives from the case data.</li>
-     * </ol>
+     * <p>If no matching representatives are found, this method makes no changes.</p>
      *
-     * <p><strong>Assumptions:</strong>
-     * <ul>
-     *     <li>The {@code caseDetails} object contains valid and non-null case data.</li>
-     *     <li>The {@code organisationId} corresponds to a valid organisation identifier.</li>
-     *     <li>All representatives associated with the organisation should be revoked and removed.</li>
-     *     <li>Policy reset is required for all successfully revoked representatives.</li>
-     *     <li>Helper methods invoked (e.g. revoke, reset, remove) handle their own internal validation
-     *     and do not return null collections.</li>
-     * </ul>
-     *
-     * <p><strong>Side effects:</strong>
-     * <ul>
-     *     <li>Modifies the case data within {@code caseDetails}.</li>
-     *     <li>Removes respondent representatives associated with the given organisation.</li>
-     *     <li>Updates organisation policies related to the revoked representatives.</li>
-     * </ul>
-     *
-     * @param caseDetails   the case details containing the case data to be updated
-     * @param organisationId the identifier of the organisation whose representatives are to be revoked and removed
+     * @param caseDetails the case details containing the case data to update
+     * @param organisationId the organisation identifier used to find matching
+     *                       respondent representatives
      */
     public void revokeAndRemoveRepresentativesByOrganisation(CaseDetails caseDetails, String organisationId) {
         List<RepresentedTypeRItem> respondentRepresentativesToRevoke = RespondentRepresentativeUtils
@@ -474,35 +453,30 @@ public class NocRespondentRepresentativeService {
     }
 
     /**
-     * Revokes the specified respondent representatives, resets their associated organisation
-     * policies, and then removes them from the case data.
+     * Attempts to revoke access for the specified respondent representatives,
+     * resets organisation policies for representatives whose access was
+     * successfully revoked, and removes the supplied representatives from
+     * case data.
      *
-     * <p>This method performs the following operations in order:
+     * <p>Processing order:</p>
      * <ol>
-     *     <li>Revokes the provided respondent representatives (e.g. updates their status so they no longer act on
-     *     the case).</li>
-     *     <li>Resets organisation policies associated with the successfully revoked representatives.</li>
-     *     <li>Removes the original list of respondent representatives from the case data.</li>
+     *   <li>Attempt to revoke access for the supplied representatives.</li>
+     *   <li>Reset organisation policies for the representatives whose access was
+     *       successfully revoked.</li>
+     *   <li>Remove the supplied representatives from case data. These representatives may not be revoked if no roles
+     *   are assigned to them.</li>
      * </ol>
-     * </p>
      *
-     * <p><strong>Assumptions:</strong>
-     * <ul>
-     *     <li>{@code caseDetails} is not {@code null} and contains valid {@code caseData}.</li>
-     *     <li>{@code representatives} represents the respondent representatives intended for revocation and removal.
-     *     </li>
-     *     <li>{@link #revokeRespondentRepresentatives(CaseDetails, List)} returns a non-null list
-     *         of representatives that were successfully revoked (possibly empty).</li>
-     *     <li>Organisation policies are reset only for those representatives that were successfully revoked.</li>
-     *     <li>Removal is attempted regardless of whether all representatives were successfully revoked.</li>
-     *     <li>If {@code representatives} is {@code null} or empty, no changes are applied.</li>
-     * </ul>
-     * </p>
+     * <p>If no access revocations succeed, no organisation policies are reset,
+     * but the supplied representatives are still removed from case data.</p>
      *
-     * @param caseDetails the case details containing case data and respondent representatives; must not be {@code null}
-     * @param representatives the list of respondent representatives to revoke and remove; may be {@code null} or empty
-     *
-     * @throws IllegalArgumentException if {@code caseDetails} or its {@code caseData} is invalid
+     * @param caseDetails the case details containing the case data to update;
+     *                    must not be {@code null}
+     * @param representatives the respondent representatives for which access
+     *                        revocation should be attempted; may be {@code null}
+     *                        or empty
+     * @throws IllegalArgumentException if {@code caseDetails} or its
+     *                                  {@code caseData} is invalid
      */
     public void revokeAndRemoveRespondentRepresentatives(CaseDetails caseDetails,
                                                          List<RepresentedTypeRItem> representatives) {

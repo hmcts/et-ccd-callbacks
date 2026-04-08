@@ -268,11 +268,12 @@ public class RespondentRepresentativeController {
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(AUTHORIZATION) String userToken) {
         CaseDataUtils.validateCCDRequest(ccdRequest);
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        CaseDetails caseDetails = ccdRequest.getCaseDetails();
+        CaseData caseData = caseDetails.getCaseData();
         List<String> errors = new ArrayList<>();
         try {
             nocRespondentRepresentativeService.loadRespondentRepresentativeValues(
-                    userToken, caseData, ccdRequest.getCaseDetails().getCaseId());
+                    userToken, caseDetails);
         } catch (GenericServiceException gse) {
             errors.add(gse.getMessage());
         }

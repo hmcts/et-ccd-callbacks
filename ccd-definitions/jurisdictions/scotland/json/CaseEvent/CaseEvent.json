@@ -166,7 +166,7 @@
     "Name": "Amend contact details",
     "Description": "Amend contact details",
     "DisplayOrder": 53,
-    "PreConditionState(s)": "Submitted;Vetted;Accepted;Rejected;",
+    "PreConditionState(s)": "Accepted;",
     "PostConditionState": "*",
     "SecurityClassification": "Public",
     "ShowEventNotes": "N",

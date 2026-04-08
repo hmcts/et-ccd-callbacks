@@ -149,25 +149,25 @@ allprojects {
             'org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.1.0',
             'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.0',
             'org.bouncycastle:bcprov-jdk15on:1.70',
-            'io.netty:netty-buffer:4.2.9.Final',
-            'io.netty:netty-codec:4.2.9.Final',
-            'io.netty:netty-codec-dns:4.2.9.Final',
-            'io.netty:netty-codec-http:4.2.9.Final',
-            'io.netty:netty-codec-http2:4.2.9.Final',
-            'io.netty:netty-codec-socks:4.2.9.Final',
-            'io.netty:netty-common:4.2.9.Final',
-            'io.netty:netty-handler:4.2.9.Final',
-            'io.netty:netty-handler-proxy:4.2.9.Final',
-            'io.netty:netty-resolver:4.2.9.Final',
-            'io.netty:netty-resolver-dns:4.2.9.Final',
-            'io.netty:netty-resolver-dns-classes-macos:4.2.9.Final',
-            'io.netty:netty-resolver-dns-native-macos:4.2.9.Final',
-            'io.netty:netty-transport:4.2.9.Final',
-            'io.netty:netty-transport-native-epoll:4.2.9.Final',
-            'io.netty:netty-transport-native-kqueue:4.2.9.Final',
-            'io.netty:netty-transport-native-unix-common:4.2.9.Final',
-            'io.netty:netty-transport-classes-epoll:4.2.9.Final',
-            'io.netty:netty-transport-classes-kqueue:4.2.9.Final'
+            'io.netty:netty-buffer:4.2.12.Final',
+            'io.netty:netty-codec:4.2.12.Final',
+            'io.netty:netty-codec-dns:4.2.12.Final',
+            'io.netty:netty-codec-http:4.2.12.Final',
+            'io.netty:netty-codec-http2:4.2.12.Final',
+            'io.netty:netty-codec-socks:4.2.12.Final',
+            'io.netty:netty-common:4.2.12.Final',
+            'io.netty:netty-handler:4.2.12.Final',
+            'io.netty:netty-handler-proxy:4.2.12.Final',
+            'io.netty:netty-resolver:4.2.12.Final',
+            'io.netty:netty-resolver-dns:4.2.12.Final',
+            'io.netty:netty-resolver-dns-classes-macos:4.2.12.Final',
+            'io.netty:netty-resolver-dns-native-macos:4.2.12.Final',
+            'io.netty:netty-transport:4.2.12.Final',
+            'io.netty:netty-transport-native-epoll:4.2.12.Final',
+            'io.netty:netty-transport-native-kqueue:4.2.12.Final',
+            'io.netty:netty-transport-native-unix-common:4.2.12.Final',
+            'io.netty:netty-transport-classes-epoll:4.2.12.Final',
+            'io.netty:netty-transport-classes-kqueue:4.2.12.Final'
         )
     }
 }
@@ -404,7 +404,7 @@ dependencyManagement {
         dependencySet(group: 'com.google.guava', version: '33.4.8-jre') {
             entry 'guava'
         }
-        dependencySet(group: 'io.netty', version: '4.2.9.Final') {
+        dependencySet(group: 'io.netty', version: '4.2.12.Final') {
             entry 'netty-buffer'
             entry 'netty-codec'
             entry 'netty-codec-dns'
@@ -448,7 +448,7 @@ dependencies {
 
     implementation group: 'commons-io', name: 'commons-io', version: '2.21.0'
     implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.6.0'
-    implementation group: 'io.netty', name: 'netty-tcnative-classes', version: '2.0.74.Final'
+    implementation group: 'io.netty', name: 'netty-tcnative-classes', version: '2.0.75.Final'
     implementation group: 'org.json', name: 'json', version: '20250107'
     implementation group: 'org.apache.commons', name: 'commons-compress', version: '1.28.0'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.18.0'
@@ -505,7 +505,7 @@ dependencies {
         exclude module: 'commons-io'
     }
 
-    testImplementation group: 'com.auth0', name: 'java-jwt', version: '4.5.0'
+    testImplementation group: 'com.auth0', name: 'java-jwt', version: '4.5.1'
     testImplementation group: 'com.warrenstrange', name: 'googleauth', version: '1.5.0'
     testImplementation group: 'net.serenity-bdd', name: 'serenity-core', version: serenity
     testImplementation group: 'net.serenity-bdd', name: 'serenity-junit', version: serenity
@@ -537,7 +537,7 @@ dependencies {
     testRuntimeOnly 'com.h2database:h2:2.2.224'
 
     // Contract Tests
-    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.6.18'
+    contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.6.20'
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.43'
     contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '3.3.0'
 

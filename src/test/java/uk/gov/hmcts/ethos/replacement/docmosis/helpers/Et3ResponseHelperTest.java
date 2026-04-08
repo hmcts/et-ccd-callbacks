@@ -34,6 +34,10 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ET3_RESPONSE_STATUS_ACCEPTED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ET3_RESPONSE_STATUS_NOT_ACCEPTED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ET3_RESPONSE_STATUS_NOT_RECEIVED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ET3_RESPONSE_STATUS_REJECTED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.ALL_RESPONDENTS_INCOMPLETE_SECTIONS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.ET3_RESPONSE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.ET3_RESPONSE_DETAILS;
@@ -303,6 +307,51 @@ class Et3ResponseHelperTest {
             Arguments.of(YES, YES, YES, "2999-12-31", null, 1, 0),
             Arguments.of(YES, YES, YES, "2999-12-31", YES, 1, 1)
         );
+    }
+
+    @ParameterizedTest
+    @MethodSource("createDynamicListSelectionWithResponseStatus")
+    void createDynamicListSelection_responseReceivedYes_statusBased(String responseStatus, boolean shouldAllowSubmit) {
+        RespondentSumType respondentSumType = caseData.getRespondentCollection().getFirst().getValue();
+        respondentSumType.setResponseContinue(YES);
+        respondentSumType.setResponseReceived(YES);
+        respondentSumType.setResponseStatus(responseStatus);
+
+        List<String> errors = Et3ResponseHelper.createDynamicListSelection(caseData);
+
+        if (shouldAllowSubmit) {
+            assertThat(errors).isEmpty();
+            assertThat(caseData.getEt3RepresentingRespondent().getFirst().getValue().getDynamicList().getListItems(),
+                    hasSize(1));
+        } else {
+            assertThat(errors, hasSize(1));
+            assertThat(errors.getFirst()).isEqualTo("There are no respondents that require an ET3");
+        }
+    }
+
+    private static Stream<Arguments> createDynamicListSelectionWithResponseStatus() {
+        return Stream.of(
+            Arguments.of(null, false),
+            Arguments.of("", false),
+            Arguments.of(ET3_RESPONSE_STATUS_ACCEPTED, false),
+            Arguments.of(ET3_RESPONSE_STATUS_NOT_ACCEPTED, true),
+            Arguments.of(ET3_RESPONSE_STATUS_NOT_RECEIVED, true),
+            Arguments.of(ET3_RESPONSE_STATUS_REJECTED, true)
+        );
+    }
+
+    @Test
+    void et3SubmitRespondents_allSectionsCompleted_butResponseReceivedAccepted_returnsError() {
+        RespondentSumType respondentSumType = caseData.getRespondentCollection().getFirst().getValue();
+        respondentSumType.setPersonalDetailsSection(YES);
+        respondentSumType.setClaimDetailsSection(YES);
+        respondentSumType.setEmploymentDetailsSection(YES);
+        respondentSumType.setResponseReceived(YES);
+        respondentSumType.setResponseStatus(ET3_RESPONSE_STATUS_ACCEPTED);
+
+        List<String> errors = Et3ResponseHelper.et3SubmitRespondents(caseData);
+
+        assertThat(errors, hasSize(1));
     }
 
     @Test

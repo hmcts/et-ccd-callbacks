@@ -1,5 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.constants;
 
+import java.util.List;
+
 public final class ET3ResponseConstants {
 
     public static final String ET3_ATTACHMENT = "ET3 Attachment";
@@ -38,6 +40,12 @@ public final class ET3ResponseConstants {
                 \r
                 You should receive confirmation from the tribunal office to process your application within 5
                  working days. If you have not heard from them within 5 days, contact the office directly.""";
+    public static final String ET3_RESPONSE_STATUS_ACCEPTED = "Accepted";
+    public static final String ET3_RESPONSE_STATUS_NOT_RECEIVED = "Not Received";
+    public static final String ET3_RESPONSE_STATUS_REJECTED = "Rejected";
+    public static final String ET3_RESPONSE_STATUS_NOT_ACCEPTED = "Not Accepted";
+    public static final List<String> ET3_RESUBMIT_STATUSES = List.of(ET3_RESPONSE_STATUS_NOT_ACCEPTED,
+            ET3_RESPONSE_STATUS_NOT_RECEIVED, ET3_RESPONSE_STATUS_REJECTED);
 
     private ET3ResponseConstants() {
         // Access through static methods

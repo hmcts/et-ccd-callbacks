@@ -35,7 +35,7 @@ dependencyManagement {
         dependency 'com.squareup.okhttp3:okhttp-urlconnection:4.12.0'
         dependency 'com.squareup.okio:okio:3.16.4'
         dependency 'org.bouncycastle:bcprov-jdk15on:1.70'
-        dependencySet(group: 'io.netty', version: '4.2.9.Final') {
+        dependencySet(group: 'io.netty', version: '4.2.12.Final') {
             entry 'netty-buffer'
             entry 'netty-codec'
             entry 'netty-codec-dns'
@@ -154,7 +154,7 @@ dependencies {
     testRuntimeOnly group: 'org.junit.vintage', name: 'junit-vintage-engine', version: '5.11.4'
     testImplementation group: 'junit', name: 'junit', version: '4.13.2'
     testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '3.0'
-    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.6'
+    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.7'
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.6'
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.19.0'
     testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '5.19.0'
@@ -185,25 +185,25 @@ configurations.configureEach {
         'org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.1.0',
         'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.0',
         'org.bouncycastle:bcprov-jdk15on:1.70',
-        'io.netty:netty-buffer:4.2.9.Final',
-        'io.netty:netty-codec:4.2.9.Final',
-        'io.netty:netty-codec-dns:4.2.9.Final',
-        'io.netty:netty-codec-http:4.2.9.Final',
-        'io.netty:netty-codec-http2:4.2.9.Final',
-        'io.netty:netty-codec-socks:4.2.9.Final',
-        'io.netty:netty-common:4.2.9.Final',
-        'io.netty:netty-handler:4.2.9.Final',
-        'io.netty:netty-handler-proxy:4.2.9.Final',
-        'io.netty:netty-resolver:4.2.9.Final',
-        'io.netty:netty-resolver-dns:4.2.9.Final',
-        'io.netty:netty-resolver-dns-classes-macos:4.2.9.Final',
-        'io.netty:netty-resolver-dns-native-macos:4.2.9.Final',
-        'io.netty:netty-transport:4.2.9.Final',
-        'io.netty:netty-transport-native-epoll:4.2.9.Final',
-        'io.netty:netty-transport-native-kqueue:4.2.9.Final',
-        'io.netty:netty-transport-native-unix-common:4.2.9.Final',
-        'io.netty:netty-transport-classes-epoll:4.2.9.Final',
-        'io.netty:netty-transport-classes-kqueue:4.2.9.Final'
+        'io.netty:netty-buffer:4.2.12.Final',
+        'io.netty:netty-codec:4.2.12.Final',
+        'io.netty:netty-codec-dns:4.2.12.Final',
+        'io.netty:netty-codec-http:4.2.12.Final',
+        'io.netty:netty-codec-http2:4.2.12.Final',
+        'io.netty:netty-codec-socks:4.2.12.Final',
+        'io.netty:netty-common:4.2.12.Final',
+        'io.netty:netty-handler:4.2.12.Final',
+        'io.netty:netty-handler-proxy:4.2.12.Final',
+        'io.netty:netty-resolver:4.2.12.Final',
+        'io.netty:netty-resolver-dns:4.2.12.Final',
+        'io.netty:netty-resolver-dns-classes-macos:4.2.12.Final',
+        'io.netty:netty-resolver-dns-native-macos:4.2.12.Final',
+        'io.netty:netty-transport:4.2.12.Final',
+        'io.netty:netty-transport-native-epoll:4.2.12.Final',
+        'io.netty:netty-transport-native-kqueue:4.2.12.Final',
+        'io.netty:netty-transport-native-unix-common:4.2.12.Final',
+        'io.netty:netty-transport-classes-epoll:4.2.12.Final',
+        'io.netty:netty-transport-classes-kqueue:4.2.12.Final'
     )
 }
 

@@ -17,13 +17,13 @@ import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.AddressLabelType;
 import uk.gov.hmcts.et.common.model.ccd.types.AddressLabelsAttributesType;
-import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceScotType;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceType;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
+import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
@@ -38,9 +38,12 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADDRESS_LABELS_PAGE_SIZE;
@@ -161,6 +164,7 @@ public final class DocumentHelper {
         sb.append("\"Clerk\":\"").append(nullCheck(userName)).append(NEW_LINE).append("\"Today_date\":\"")
                 .append(UtilHelper.formatCurrentDate(LocalDate.now())).append(NEW_LINE).append("\"TodayPlus28Days\":\"")
                 .append(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28)).append(NEW_LINE)
+                .append(getNoticeOfChangeAnswers(caseData)).append(NEW_LINE)
                 .append("\"Case_No\":\"").append(nullCheck(caseData.getEthosCaseReference())).append(NEW_LINE)
                 .append("\"submission_reference\":\"").append(nullCheck(caseData.getFeeGroupReference()))
                 .append(NEW_LINE).append("}\n}\n");
@@ -235,7 +239,8 @@ public final class DocumentHelper {
                 .filter(COMPANY_TYPE_CLAIMANT::equals)
                 .map(type -> caseData.getClaimantCompany())
                 .orElseGet(() -> Optional.ofNullable(caseData.getClaimantIndType())
-                        .map(ClaimantIndType::claimantFullName).orElse(""));
+                        .map(ind -> ind.getClaimantFirstNames() + " " + ind.getClaimantLastName())
+                        .orElse(""));
     }
 
     private static StringBuilder getClaimantOrRepAddressUK(Address address) {
@@ -1435,5 +1440,27 @@ public final class DocumentHelper {
     static boolean isEccDocumentTemplate(String caseTypeId, String templateName) {
         return (SCOTLAND_CASE_TYPE_ID.equals(caseTypeId) && templateName.contains(ECC_DOCUMENT_SCOT_TEMPLATE))
                 || (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId) && templateName.contains(ECC_DOCUMENT_ENG_TEMPLATE));
+    }
+
+    private static StringBuilder getNoticeOfChangeAnswers(CaseData caseData) {
+        String noticeOfChangeRespondentName = Stream.of(
+                caseData.getNoticeOfChangeAnswers0(),
+                caseData.getNoticeOfChangeAnswers1(),
+                caseData.getNoticeOfChangeAnswers2(),
+                caseData.getNoticeOfChangeAnswers3(),
+                caseData.getNoticeOfChangeAnswers4(),
+                caseData.getNoticeOfChangeAnswers5(),
+                caseData.getNoticeOfChangeAnswers6(),
+                caseData.getNoticeOfChangeAnswers7(),
+                caseData.getNoticeOfChangeAnswers8(),
+                caseData.getNoticeOfChangeAnswers9())
+            .filter(java.util.Objects::nonNull)
+            .map(NoticeOfChangeAnswers::getRespondentName)
+            .filter(Objects::nonNull)
+            .collect(Collectors.joining(", "));
+
+        StringBuilder stringBuilder = new StringBuilder();
+        return stringBuilder.append("\"noticeOfChangeRespondentName\":\"")
+            .append(nullCheck(noticeOfChangeRespondentName));
     }
 }

@@ -14,7 +14,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationAddress;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
@@ -24,7 +23,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.CcdCaseAssignment;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxService;
 
 import java.io.IOException;
@@ -75,7 +73,6 @@ public class Et3ResponseService {
     private final UserIdamService userIdamService;
     private final CcdCaseAssignment ccdCaseAssignment;
     private final MyHmctsService myHmctsService;
-    private final NocRespondentRepresentativeService nocRespondentRepresentativeService;
 
     @Value("${template.et3Response.tribunal}")
     private String et3EmailTribunalTemplateId;
@@ -257,55 +254,6 @@ public class Et3ResponseService {
         OrganisationAddress organisationAddress = myHmctsService.getOrganisationAddress(userToken);
         caseData.setEt3ResponseAddress(mapOrganisationAddressToAddress(organisationAddress));
         caseData.setMyHmctsAddressText(getOrganisationAddressAsText(organisationAddress));
-    }
-
-    /**
-     * Fetches the organisation address from MyHMCTS and sets it on the case-level
-     * {@code representativeAddress} and {@code myHmctsAddressText} fields.
-     *
-     * @param userToken the authentication token of the currently authenticated user
-     * @param caseData  the case data object to be updated
-     * @throws GenericServiceException if the organisation address cannot be retrieved
-     */
-    public void setRepresentativeMyHmctsAddress(String userToken, CaseData caseData)
-            throws GenericServiceException {
-        OrganisationAddress organisationAddress = myHmctsService.getOrganisationAddress(userToken);
-        caseData.setRepresentativeAddress(mapOrganisationAddressToAddress(organisationAddress));
-        caseData.setMyHmctsAddressText(getOrganisationAddressAsText(organisationAddress));
-    }
-
-    /**
-     * Loads the respondent representative's current phone number and address into the
-     * case-level {@code representativePhoneNumber} and {@code representativeAddress} fields,
-     * ready for display on the amend contact details event form.
-     *
-     * @param userToken the authentication token of the currently authenticated user
-     * @param caseData  the case data object to be updated
-     * @param caseId    the CCD case ID
-     * @throws GenericServiceException if the user's represented respondent cannot be determined
-     */
-    public void loadRespondentRepresentativeValues(String userToken, CaseData caseData, String caseId)
-            throws GenericServiceException {
-        CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setCaseId(caseId);
-        caseDetails.setCaseData(caseData);
-        List<RepresentedTypeRItem> representatives = nocRespondentRepresentativeService
-                .findRepresentativesByToken(userToken, caseDetails);
-        if (representatives.isEmpty()) {
-            throw new GenericServiceException(ERROR_NO_REPRESENTED_RESPONDENT_FOUND,
-                    new Exception(ERROR_NO_REPRESENTED_RESPONDENT_FOUND),
-                    ERROR_NO_REPRESENTED_RESPONDENT_FOUND,
-                    caseId,
-                    "Et3ResponseService",
-                    "loadRespondentRepresentativeValues - No represented respondents found");
-        }
-        RepresentedTypeRItem repItem = representatives.get(0);
-        if (isEmpty(repItem) || isEmpty(repItem.getValue())) {
-            return;
-        }
-        RepresentedTypeR rep = repItem.getValue();
-        caseData.setRepresentativePhoneNumber(rep.getRepresentativePhoneNumber());
-        caseData.setRepresentativeAddress(rep.getRepresentativeAddress());
     }
 
     /**

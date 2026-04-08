@@ -387,7 +387,7 @@ class RespondentRepresentativeControllerTest {
     void aboutToStartAmendRespondentRepresentativeContact() {
         CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         ccdRequest.getCaseDetails().setCaseId(DUMMY_SUBMISSION_REFERENCE);
-        doNothing().when(et3ResponseService).loadRespondentRepresentativeValues(
+        doNothing().when(nocRespondentRepresentativeService).loadRespondentRepresentativeValues(
                 anyString(), any(CaseData.class), anyString());
         mockMvc.perform(post(URL_ABOUT_TO_START_AMEND_RESPONDENT_REPRESENTATIVE_CONTACT)
                         .content(jsonMapper.toJson(ccdRequest))
@@ -409,7 +409,7 @@ class RespondentRepresentativeControllerTest {
                 ERROR_NO_REPRESENTED_RESPONDENT_FOUND,
                 DUMMY_SUBMISSION_REFERENCE,
                 "Et3ResponseService",
-                "loadRespondentRepresentativeValues")).when(et3ResponseService)
+                "loadRespondentRepresentativeValues")).when(nocRespondentRepresentativeService)
                 .loadRespondentRepresentativeValues(anyString(), any(CaseData.class), anyString());
         mockMvc.perform(post(URL_ABOUT_TO_START_AMEND_RESPONDENT_REPRESENTATIVE_CONTACT)
                         .content(jsonMapper.toJson(ccdRequest))

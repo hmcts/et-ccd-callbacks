@@ -25,14 +25,12 @@ import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceExceptio
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et3ResponseService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
@@ -81,8 +79,6 @@ class Et3ResponseControllerTest extends BaseControllerTest {
     private Et3ResponseService  et3ResponseService;
     @MockBean
     private CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
-    @MockBean
-    private NocRespondentRepresentativeService nocRespondentRepresentativeService;
     private MockMvc mvc;
     private CCDRequest ccdRequest;
 
@@ -511,7 +507,8 @@ class Et3ResponseControllerTest extends BaseControllerTest {
     @SneakyThrows
     void theMidEventAmendRepresentativeContact() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        doNothing().when(et3ResponseService).setRepresentativeMyHmctsAddress(anyString(), any(CaseData.class));
+        doNothing().when(et3ResponseService).setRespondentRepresentsContactDetails(AUTH_TOKEN,
+                ccdRequest.getCaseDetails().getCaseData(), ccdRequest.getCaseDetails().getCaseId());
         ccdRequest.getCaseDetails().getCaseData().setRepresentativeContactChangeOption(
                 REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS);
         mvc.perform(post(MID_EVENT_AMEND_REPRESENTATIVE_CONTACT)
@@ -534,7 +531,7 @@ class Et3ResponseControllerTest extends BaseControllerTest {
                 ERROR_CASE_DATA_NOT_FOUND,
                 StringUtils.EMPTY,
                 "Et3ResponseService",
-                "setRepresentativeMyHmctsContactAddress")).when(et3ResponseService)
+                "setRespondentRepresentsContactDetails")).when(et3ResponseService)
                 .setRepresentativeMyHmctsContactAddress(anyString(), any(CaseData.class), anyString());
         ccdRequest.getCaseDetails().getCaseData().setRepresentativeContactChangeOption(
                 REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS);
@@ -554,8 +551,8 @@ class Et3ResponseControllerTest extends BaseControllerTest {
     @SneakyThrows
     void theAboutToSubmitRepresentativeContactDetails() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        doNothing().when(et3ResponseService).setRespondentRepresentsContactDetails(
-                anyString(), any(CaseData.class), anyString());
+        doNothing().when(et3ResponseService).setRespondentRepresentsContactDetails(AUTH_TOKEN,
+                ccdRequest.getCaseDetails().getCaseData(), ccdRequest.getCaseDetails().getCaseId());
         mvc.perform(post(ABOUT_TO_SUBMIT_AMEND_REPRESENTATIVE_CONTACT)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)

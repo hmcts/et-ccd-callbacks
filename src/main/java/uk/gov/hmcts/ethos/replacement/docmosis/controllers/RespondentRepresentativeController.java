@@ -271,7 +271,7 @@ public class RespondentRepresentativeController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>();
         try {
-            et3ResponseService.loadRespondentRepresentativeValues(
+            nocRespondentRepresentativeService.loadRespondentRepresentativeValues(
                     userToken, caseData, ccdRequest.getCaseDetails().getCaseId());
         } catch (GenericServiceException gse) {
             errors.add(gse.getMessage());

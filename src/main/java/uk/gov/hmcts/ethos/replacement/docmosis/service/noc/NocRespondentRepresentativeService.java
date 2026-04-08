@@ -1186,4 +1186,37 @@ public class NocRespondentRepresentativeService {
         }
         return errors;
     }
+
+    /**
+     * Loads the respondent representative's current phone number and address into the
+     * case-level {@code representativePhoneNumber} and {@code representativeAddress} fields,
+     * ready for display on the amend contact details event form.
+     *
+     * @param userToken the authentication token of the currently authenticated user
+     * @param caseData  the case data object to be updated
+     * @param caseId    the CCD case ID
+     * @throws GenericServiceException if the user's represented respondent cannot be determined
+     */
+    public void loadRespondentRepresentativeValues(String userToken, CaseData caseData, String caseId)
+            throws GenericServiceException {
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseId(caseId);
+        caseDetails.setCaseData(caseData);
+        List<RepresentedTypeRItem> representatives = findRepresentativesByToken(userToken, caseDetails);
+        if (representatives.isEmpty()) {
+            throw new GenericServiceException(ERROR_NO_REPRESENTED_RESPONDENT_FOUND,
+                    new Exception(ERROR_NO_REPRESENTED_RESPONDENT_FOUND),
+                    ERROR_NO_REPRESENTED_RESPONDENT_FOUND,
+                    caseId,
+                    "Et3ResponseService",
+                    "loadRespondentRepresentativeValues - No represented respondents found");
+        }
+        RepresentedTypeRItem repItem = representatives.get(0);
+        if (isEmpty(repItem) || isEmpty(repItem.getValue())) {
+            return;
+        }
+        RepresentedTypeR rep = repItem.getValue();
+        caseData.setRepresentativePhoneNumber(rep.getRepresentativePhoneNumber());
+        caseData.setRepresentativeAddress(rep.getRepresentativeAddress());
+    }
 }

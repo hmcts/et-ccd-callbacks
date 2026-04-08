@@ -35,7 +35,6 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.enums.RespondentSolicitorType;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.CcdCaseAssignment;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormMapper;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.DocumentFixtures;
@@ -52,7 +51,6 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -100,8 +98,6 @@ class Et3ResponseServiceTest {
     private AuthTokenGenerator authTokenGenerator;
     @MockBean
     private MyHmctsService myHmctsService;
-    @MockBean
-    private NocRespondentRepresentativeService nocRespondentRepresentativeService;
 
     private static final String INVALID_USER_TOKEN = "invalidUserToken";
     private static final String VALID_USER_TOKEN = "validUserToken";
@@ -133,7 +129,7 @@ class Et3ResponseServiceTest {
         emailService = spy(new EmailUtils());
 
         et3ResponseService = new Et3ResponseService(documentManagementService, pdfBoxService, emailService,
-                userIdamService, ccdCaseAssignment, myHmctsService, nocRespondentRepresentativeService);
+                userIdamService, ccdCaseAssignment, myHmctsService);
         caseData = CaseDataBuilder.builder()
             .withClaimantIndType("Doris", "Johnson")
             .withClaimantType("232 Petticoat Square", "3 House", null,
@@ -635,43 +631,6 @@ class Et3ResponseServiceTest {
         GenericServiceException organisationNotFound = assertThrows(GenericServiceException.class, () ->
                 et3ResponseService.setRespondentRepresentsContactDetails(userToken, caseData4, submissionReference));
         assertThat(organisationNotFound.getMessage()).isEqualTo("Organisation details not found");
-    }
-
-    @Test
-    @SneakyThrows
-    void testSetRepresentativeMyHmctsAddress() {
-        OrganisationAddress organisationAddress = OrganisationAddress.builder()
-                .addressLine1(ADDRESS_LINE_1)
-                .addressLine2(ADDRESS_LINE_2)
-                .addressLine3(ADDRESS_LINE_3)
-                .townCity(POST_TOWN)
-                .postCode(POST_CODE)
-                .county(COUNTY)
-                .country(COUNTRY)
-                .build();
-        when(myHmctsService.getOrganisationAddress(VALID_USER_TOKEN)).thenReturn(organisationAddress);
-        CaseData testCaseData = new CaseData();
-        et3ResponseService.setRepresentativeMyHmctsAddress(VALID_USER_TOKEN, testCaseData);
-        assertThat(testCaseData.getRepresentativeAddress()).isNotNull();
-        assertThat(testCaseData.getRepresentativeAddress().getAddressLine1()).isEqualTo(ADDRESS_LINE_1);
-        assertThat(testCaseData.getMyHmctsAddressText()).isNotNull();
-    }
-
-    @Test
-    @SneakyThrows
-    void testLoadRespondentRepresentativeValues() {
-        RepresentedTypeR rep = RepresentedTypeR.builder()
-                .representativePhoneNumber(PHONE_NUMBER)
-                .build();
-        RepresentedTypeRItem repItem = RepresentedTypeRItem.builder().value(rep).build();
-        when(nocRespondentRepresentativeService.findRepresentativesByToken(
-                eq(VALID_USER_TOKEN), any(CaseDetails.class))).thenReturn(List.of(repItem));
-
-        CaseData testCaseData = new CaseData();
-        testCaseData.setCcdID(VALID_CASE_ID);
-
-        et3ResponseService.loadRespondentRepresentativeValues(VALID_USER_TOKEN, testCaseData, VALID_CASE_ID);
-        assertThat(testCaseData.getRepresentativePhoneNumber()).isEqualTo(PHONE_NUMBER);
     }
 
     @Test

@@ -10,7 +10,7 @@ import uk.gov.hmcts.et.common.model.enums.RespondentSolicitorType;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class NoticeOfChangeUtilTest {
+final class NoticeOfChangeUtilsTest {
 
     private static final String TEST_INVALID_RESPONDENT_NAME = "Test invalid respondent name";
     private static final String TEST_RESPONDENT_NAME_0 = "Test respondent name 0";
@@ -87,33 +87,33 @@ public class NoticeOfChangeUtilTest {
     void theFindNoticeOfChangeAnswerIndex() {
 
         // Should return -1 if caseData is null
-        assertThat(NoticeOfChangeUtil.findNoticeOfChangeAnswerIndex(null, TEST_RESPONDENT_NAME_0))
+        assertThat(NoticeOfChangeUtils.findNoticeOfChangeAnswerIndex(null, TEST_RESPONDENT_NAME_0))
             .isEqualTo(NumberUtils.INTEGER_MINUS_ONE);
 
         // Should return -1 if respondentName is blank
-        assertThat(NoticeOfChangeUtil.findNoticeOfChangeAnswerIndex(TEST_CASE_DATA_WITH_NOTICE_OF_CHANGE_ANSWERS,
+        assertThat(NoticeOfChangeUtils.findNoticeOfChangeAnswerIndex(TEST_CASE_DATA_WITH_NOTICE_OF_CHANGE_ANSWERS,
                                                                     StringUtils.EMPTY))
             .isEqualTo(NumberUtils.INTEGER_MINUS_ONE);
 
         // Should return -1 if no answers are present in the case data
-        assertThat(NoticeOfChangeUtil.findNoticeOfChangeAnswerIndex(new CaseData(),
+        assertThat(NoticeOfChangeUtils.findNoticeOfChangeAnswerIndex(new CaseData(),
                                                                     TEST_RESPONDENT_NAME_0))
             .isEqualTo(NumberUtils.INTEGER_MINUS_ONE);
 
         // Should return -1 if no matching answer is found
-        assertThat(NoticeOfChangeUtil.findNoticeOfChangeAnswerIndex(TEST_CASE_DATA_WITH_NOTICE_OF_CHANGE_ANSWERS,
+        assertThat(NoticeOfChangeUtils.findNoticeOfChangeAnswerIndex(TEST_CASE_DATA_WITH_NOTICE_OF_CHANGE_ANSWERS,
                                                                     TEST_INVALID_RESPONDENT_NAME))
             .isEqualTo(NumberUtils.INTEGER_MINUS_ONE);
         // Should return index of matching notice of change answer when respondent name found
-        assertThat(NoticeOfChangeUtil.findNoticeOfChangeAnswerIndex(TEST_CASE_DATA_WITH_NOTICE_OF_CHANGE_ANSWERS,
+        assertThat(NoticeOfChangeUtils.findNoticeOfChangeAnswerIndex(TEST_CASE_DATA_WITH_NOTICE_OF_CHANGE_ANSWERS,
                                                                     TEST_RESPONDENT_NAME_1))
             .isEqualTo(NumberUtils.INTEGER_ONE);
         // Should return index of matching notice of change answer when respondent name found
-        assertThat(NoticeOfChangeUtil.findNoticeOfChangeAnswerIndex(TEST_CASE_DATA_WITH_NOTICE_OF_CHANGE_ANSWERS,
+        assertThat(NoticeOfChangeUtils.findNoticeOfChangeAnswerIndex(TEST_CASE_DATA_WITH_NOTICE_OF_CHANGE_ANSWERS,
                                                                     TEST_RESPONDENT_NAME_0))
             .isEqualTo(NumberUtils.INTEGER_ZERO);
         // Should return index of matching notice of change answer when respondent name found
-        assertThat(NoticeOfChangeUtil.findNoticeOfChangeAnswerIndex(TEST_CASE_DATA_WITH_NOTICE_OF_CHANGE_ANSWERS,
+        assertThat(NoticeOfChangeUtils.findNoticeOfChangeAnswerIndex(TEST_CASE_DATA_WITH_NOTICE_OF_CHANGE_ANSWERS,
                                                                     TEST_RESPONDENT_NAME_2))
             .isEqualTo(NumberUtils.INTEGER_TWO);
     }
@@ -121,37 +121,38 @@ public class NoticeOfChangeUtilTest {
     @Test
     void theGetNoticeOfChangeAnswers() {
         // Should return null if caseData is null
-        assertThat(NoticeOfChangeUtil.getNoticeOfChangeAnswers(null)).isNull();
+        assertThat(NoticeOfChangeUtils.getNoticeOfChangeAnswers(null)).isEmpty();
 
         // Should return a size of 1 list if there is only 1 answer present
         CaseData caseDataWithOneAnswer = new CaseData();
         caseDataWithOneAnswer.setNoticeOfChangeAnswers0(
             NoticeOfChangeAnswers.builder().respondentName(TEST_RESPONDENT_NAME_0)
                 .claimantFirstName(TEST_CLAIMANT_FIRST_NAME_0).claimantLastName(TEST_CLAIMANT_LAST_NAME_0).build());
-        assertThat(NoticeOfChangeUtil.getNoticeOfChangeAnswers(caseDataWithOneAnswer)).hasSize(NumberUtils.INTEGER_ONE);
+        assertThat(NoticeOfChangeUtils.getNoticeOfChangeAnswers(caseDataWithOneAnswer))
+                .hasSize(NumberUtils.INTEGER_ONE);
 
         // Should return a size of 10 list if all notice of change answers present
-        assertThat(NoticeOfChangeUtil.getNoticeOfChangeAnswers(TEST_CASE_DATA_WITH_NOTICE_OF_CHANGE_ANSWERS))
+        assertThat(NoticeOfChangeUtils.getNoticeOfChangeAnswers(TEST_CASE_DATA_WITH_NOTICE_OF_CHANGE_ANSWERS))
             .hasSize(INTEGER_TEN);
     }
 
     @Test
-    void theGetNoticeOfChangeAnswer() {
+    void theGetNoticeOfChangeAnswersAtIndex() {
         // Should return null if caseData is null
-        assertThat(NoticeOfChangeUtil.getNoticeOfChangeAnswer(null, NumberUtils.INTEGER_ZERO)).isNull();
+        assertThat(NoticeOfChangeUtils.getNoticeOfChangeAnswersAtIndex(null, NumberUtils.INTEGER_ZERO)).isNull();
 
         // Should return null if index is less than 0
-        assertThat(NoticeOfChangeUtil.getNoticeOfChangeAnswer(TEST_CASE_DATA_WITH_NOTICE_OF_CHANGE_ANSWERS,
+        assertThat(NoticeOfChangeUtils.getNoticeOfChangeAnswersAtIndex(TEST_CASE_DATA_WITH_NOTICE_OF_CHANGE_ANSWERS,
                                                               NumberUtils.INTEGER_MINUS_ONE)).isNull();
 
         // Should return null if index is greater than 9
-        assertThat(NoticeOfChangeUtil.getNoticeOfChangeAnswer(TEST_CASE_DATA_WITH_NOTICE_OF_CHANGE_ANSWERS,
+        assertThat(NoticeOfChangeUtils.getNoticeOfChangeAnswersAtIndex(TEST_CASE_DATA_WITH_NOTICE_OF_CHANGE_ANSWERS,
                                                               INTEGER_TEN
         )).isNull();
 
         // Should return the correct notice of change answer for the given index
         for (int i = 0; i < INTEGER_TEN; i++) {
-            NoticeOfChangeAnswers answer = NoticeOfChangeUtil.getNoticeOfChangeAnswer(
+            NoticeOfChangeAnswers answer = NoticeOfChangeUtils.getNoticeOfChangeAnswersAtIndex(
                 TEST_CASE_DATA_WITH_NOTICE_OF_CHANGE_ANSWERS, i);
             assertThat(answer).isNotNull();
             assertThat(answer.getRespondentName()).isEqualTo("Test respondent name " + i);
@@ -163,14 +164,14 @@ public class NoticeOfChangeUtilTest {
     @Test
     void theFindRespondentSolicitorTypeByIndex() {
         // Should return null if respondent solicitor type index is less than 0
-        assertThat(NoticeOfChangeUtil.findRespondentSolicitorTypeByIndex(NumberUtils.INTEGER_MINUS_ONE)).isNull();
+        assertThat(NoticeOfChangeUtils.findRespondentSolicitorTypeByIndex(NumberUtils.INTEGER_MINUS_ONE)).isNull();
 
         // Should return null if respondent solicitor type index is greater than 9
-        assertThat(NoticeOfChangeUtil.findRespondentSolicitorTypeByIndex(INTEGER_TEN)).isNull();
+        assertThat(NoticeOfChangeUtils.findRespondentSolicitorTypeByIndex(INTEGER_TEN)).isNull();
 
         // Should return the correct respondent solicitor type for the given index
         for (int i = 0; i < INTEGER_TEN; i++) {
-            RespondentSolicitorType respondentSolicitorType = NoticeOfChangeUtil.findRespondentSolicitorTypeByIndex(i);
+            RespondentSolicitorType respondentSolicitorType = NoticeOfChangeUtils.findRespondentSolicitorTypeByIndex(i);
             assertThat(respondentSolicitorType).isEqualTo(RespondentSolicitorType.values()[i]);
         }
     }
@@ -178,14 +179,14 @@ public class NoticeOfChangeUtilTest {
     @Test
     void theResetNoticeOfChangeAnswerByIndex() {
         // Should do nothing if caseData is null
-        NoticeOfChangeUtil.resetNoticeOfChangeAnswerByIndex(null, NumberUtils.INTEGER_ZERO);
+        NoticeOfChangeUtils.resetNoticeOfChangeAnswerByIndex(null, NumberUtils.INTEGER_ZERO);
 
         // Should do nothing if index is less than 0
-        NoticeOfChangeUtil.resetNoticeOfChangeAnswerByIndex(TEST_CASE_DATA_WITH_NOTICE_OF_CHANGE_ANSWERS,
+        NoticeOfChangeUtils.resetNoticeOfChangeAnswerByIndex(TEST_CASE_DATA_WITH_NOTICE_OF_CHANGE_ANSWERS,
                                                             NumberUtils.INTEGER_MINUS_ONE);
 
         // Should do nothing if index is greater than 9
-        NoticeOfChangeUtil.resetNoticeOfChangeAnswerByIndex(TEST_CASE_DATA_WITH_NOTICE_OF_CHANGE_ANSWERS,
+        NoticeOfChangeUtils.resetNoticeOfChangeAnswerByIndex(TEST_CASE_DATA_WITH_NOTICE_OF_CHANGE_ANSWERS,
                                                             INTEGER_TEN);
 
         // Should reset the correct notice of change answer for the given index
@@ -221,9 +222,9 @@ public class NoticeOfChangeUtilTest {
             caseDataCopy.setNoticeOfChangeAnswers9(
                 NoticeOfChangeAnswers.builder().respondentName(TEST_RESPONDENT_NAME_9)
                     .claimantFirstName(TEST_CLAIMANT_FIRST_NAME_9).claimantLastName(TEST_CLAIMANT_LAST_NAME_9).build());
-            NoticeOfChangeUtil.resetNoticeOfChangeAnswerByIndex(caseDataCopy, i);
+            NoticeOfChangeUtils.resetNoticeOfChangeAnswerByIndex(caseDataCopy, i);
             for (int j = 0; j < INTEGER_TEN; j++) {
-                NoticeOfChangeAnswers answer = NoticeOfChangeUtil.getNoticeOfChangeAnswer(caseDataCopy, j);
+                NoticeOfChangeAnswers answer = NoticeOfChangeUtils.getNoticeOfChangeAnswersAtIndex(caseDataCopy, j);
                 if (i == j) {
                     assertThat(answer).isNull();
                 } else {

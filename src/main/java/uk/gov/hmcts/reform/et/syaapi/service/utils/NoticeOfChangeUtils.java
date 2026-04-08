@@ -8,15 +8,15 @@ import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 import uk.gov.hmcts.et.common.model.enums.RespondentSolicitorType;
 import uk.gov.hmcts.reform.et.syaapi.exception.ManageCaseRoleException;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.MAX_NOC_ANSWERS;
 import static uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants.INVALID_NOTICE_OF_CHANGE_ANSWER_INDEX;
 
-public final class NoticeOfChangeUtil {
+public final class NoticeOfChangeUtils {
 
-    private NoticeOfChangeUtil() {
+    private NoticeOfChangeUtils() {
         // restrict instantiation
     }
 
@@ -80,16 +80,20 @@ public final class NoticeOfChangeUtil {
      * @return a list of non-empty {@link NoticeOfChangeAnswers}, never {@code null};
      *         the list may be empty if no valid answers exist
      *
-     * @see #getNoticeOfChangeAnswer(CaseData, int)
+     * @see #getNoticeOfChangeAnswersAtIndex(CaseData, int)
      */
     public static List<NoticeOfChangeAnswers> getNoticeOfChangeAnswers(CaseData caseData) {
+        List<NoticeOfChangeAnswers> answers = new ArrayList<>();
         if (ObjectUtils.isEmpty(caseData)) {
-            return null;
+            return answers;
         }
-        return IntStream.rangeClosed(0, 9)
-            .mapToObj(i -> getNoticeOfChangeAnswer(caseData, i))
-            .filter(ObjectUtils::isNotEmpty)
-            .collect(Collectors.toList());
+        for (int index = 0; index < MAX_NOC_ANSWERS; index++) {
+            NoticeOfChangeAnswers answer = getNoticeOfChangeAnswersAtIndex(caseData, index);
+            if (ObjectUtils.isNotEmpty(answer)) {
+                answers.add(answer);
+            }
+        }
+        return answers;
     }
 
     /**
@@ -121,8 +125,8 @@ public final class NoticeOfChangeUtil {
      * @param index    the index of the Notice of Change answer to retrieve (0–9)
      * @return the {@link NoticeOfChangeAnswers} at the given index, or {@code null} if the index is out of range
      */
-    public static NoticeOfChangeAnswers getNoticeOfChangeAnswer(CaseData caseData, int index) {
-        if (ObjectUtils.isEmpty(caseData) || index < 0 || index > 9) {
+    public static NoticeOfChangeAnswers getNoticeOfChangeAnswersAtIndex(CaseData caseData, int index) {
+        if (ObjectUtils.isEmpty(caseData) || index < 0 || index >= MAX_NOC_ANSWERS) {
             return null;
         }
         return switch (index) {

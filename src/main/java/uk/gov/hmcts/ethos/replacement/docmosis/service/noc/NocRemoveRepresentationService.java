@@ -202,10 +202,10 @@ public class NocRemoveRepresentationService {
 
         emailNotificationService.getRespondentsAndRepsEmailAddresses(caseDetails.getCaseData(), caseUserAssignments)
             .forEach((email, respondentId) ->
-                sendClaimantEmailToEachRespondent(caseDetails, email, partyName, respondentId));
+                sendEmailToEachRespondent(caseDetails, email, partyName, respondentId));
     }
 
-    private void sendClaimantEmailToEachRespondent(
+    private void sendEmailToEachRespondent(
         CaseDetails caseDetails,
         String emailToSend,
         String partyName,
@@ -380,7 +380,7 @@ public class NocRemoveRepresentationService {
             String linkToCitUI = emailService.getSyrCaseLink(caseDetails.getCaseId(), respondent.getId());
 
             // send email to unrepresented respondent
-            sendEmailToUnrepresentedParty(caseDetails, orgName, linkToCitUI, respondentEmailAddress);
+            sendEmailToUnrepresentedParty(caseDetails, respondentEmailAddress, orgName, linkToCitUI);
         }
     }
 
@@ -397,17 +397,20 @@ public class NocRemoveRepresentationService {
             return;
         }
 
-        // get link to ExUI or Citizen
-        String caseLink = isClaimantRepresented
+        // get email personalisation
+        Map<String, String> personalisation =
+            NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation(caseDetails.getCaseData());
+        personalisation.put(PARTY_NAME, partyName);
+        personalisation.put(LINK_TO_CIT_UI, isClaimantRepresented
             ? emailService.getExuiCaseLink(caseDetails.getCaseId())
-            : emailService.getCitizenCaseLink(caseDetails.getCaseId());
+            : emailService.getCitizenCaseLink(caseDetails.getCaseId()));
 
         // send email to claimant or claimant legal rep
         try {
             emailService.sendEmail(
                 nocOtherPartyNotRepresentedTemplateId,
                 emailToSend,
-                NocNotificationHelper.buildPersonalisationWithPartyName(caseDetails, partyName, caseLink)
+                personalisation
             );
         } catch (Exception e) {
             log.warn(

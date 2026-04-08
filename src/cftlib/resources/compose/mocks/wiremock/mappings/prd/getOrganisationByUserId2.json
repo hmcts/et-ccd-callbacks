@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "urlPathPattern": "/refdata/internal/v1/organisations/orgDetails/112b0bdd-5e58-32f1-8c51-6e71f5f90bc5"
+    "urlPathPattern": "/refdata/internal/v1/organisations/orgDetails/007b5478-775b-387e-a7f6-19f7be483c8e"
   },
   "response": {
     "status": 200,

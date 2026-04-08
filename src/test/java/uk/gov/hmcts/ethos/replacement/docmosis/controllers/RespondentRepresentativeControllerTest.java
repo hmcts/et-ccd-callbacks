@@ -388,7 +388,7 @@ class RespondentRepresentativeControllerTest {
         CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         ccdRequest.getCaseDetails().setCaseId(DUMMY_SUBMISSION_REFERENCE);
         doNothing().when(nocRespondentRepresentativeService).loadRespondentRepresentativeValues(
-                anyString(), any(CaseData.class), anyString());
+                anyString(), any(CaseDetails.class));
         mockMvc.perform(post(URL_ABOUT_TO_START_AMEND_RESPONDENT_REPRESENTATIVE_CONTACT)
                         .content(jsonMapper.toJson(ccdRequest))
                         .header(HEADER_AUTHORIZATION, DUMMY_TOKEN)
@@ -410,7 +410,7 @@ class RespondentRepresentativeControllerTest {
                 DUMMY_SUBMISSION_REFERENCE,
                 "Et3ResponseService",
                 "loadRespondentRepresentativeValues")).when(nocRespondentRepresentativeService)
-                .loadRespondentRepresentativeValues(anyString(), any(CaseData.class), anyString());
+                .loadRespondentRepresentativeValues(anyString(), any(CaseDetails.class));
         mockMvc.perform(post(URL_ABOUT_TO_START_AMEND_RESPONDENT_REPRESENTATIVE_CONTACT)
                         .content(jsonMapper.toJson(ccdRequest))
                         .header(HEADER_AUTHORIZATION, DUMMY_TOKEN)

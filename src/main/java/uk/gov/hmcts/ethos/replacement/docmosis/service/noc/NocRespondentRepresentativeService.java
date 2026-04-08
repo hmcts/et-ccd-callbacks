@@ -1111,8 +1111,7 @@ public class NocRespondentRepresentativeService {
      * ready for display on the amend contact details event form.
      *
      * @param userToken the authentication token of the currently authenticated user
-     * @param caseData  the case data object to be updated
-     * @param caseId    the CCD case ID
+     * @param caseDetails case details
      * @throws GenericServiceException if the user's represented respondent cannot be determined
      */
     public void loadRespondentRepresentativeValues(String userToken, CaseDetails caseDetails)

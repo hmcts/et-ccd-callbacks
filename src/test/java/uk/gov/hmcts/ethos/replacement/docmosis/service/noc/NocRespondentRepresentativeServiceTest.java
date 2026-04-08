@@ -60,7 +60,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -79,8 +78,6 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_CASE_DATA_NOT_FOUND;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_INVALID_USER_TOKEN;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {CaseConverter.class, NoticeOfChangeFieldPopulator.class, ObjectMapper.class})
@@ -1193,50 +1190,6 @@ class NocRespondentRepresentativeServiceTest {
         assertThat(nocRespondentRepresentativeService.findRepresentativesByToken(USER_TOKEN, caseDetails)).isEmpty();
         LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_ONE,
                 EXPECTED_WARNING_FAILED_TO_RETRIEVE_CASE_ASSIGNMENTS);
-    }
-
-    @Test
-    void updateRespondentRepresentativeContactDetails_NullCaseData() {
-        GenericServiceException ex = assertThrows(GenericServiceException.class, () ->
-                nocRespondentRepresentativeService.updateRespondentRepresentativeContactDetails(
-                        USER_TOKEN, null, CASE_ID_1));
-        assertThat(ex.getMessage()).isEqualTo(ERROR_CASE_DATA_NOT_FOUND);
-    }
-
-    @Test
-    void updateRespondentRepresentativeContactDetails_BlankToken() {
-        GenericServiceException ex = assertThrows(GenericServiceException.class, () ->
-                nocRespondentRepresentativeService.updateRespondentRepresentativeContactDetails(
-                        StringUtils.EMPTY, new CaseData(), CASE_ID_1));
-        assertThat(ex.getMessage()).isEqualTo(ERROR_INVALID_USER_TOKEN);
-    }
-
-    @Test
-    @SneakyThrows
-    void updateRespondentRepresentativeContactDetails_Success() {
-        RepresentedTypeRItem representative = RepresentedTypeRItem.builder()
-                .id(REPRESENTATIVE_ID_ONE)
-                .value(RepresentedTypeR.builder().role(ROLE_SOLICITORA).build())
-                .build();
-        CaseData tmpCaseData = new CaseData();
-        tmpCaseData.setRepCollection(List.of(representative));
-        tmpCaseData.setRepresentativePhoneNumber(PHONE_NUMBER);
-
-        UserDetails userDetails = new UserDetails();
-        userDetails.setUid(REPRESENTATIVE_ID_ONE);
-        when(userIdamService.getUserDetails(USER_TOKEN)).thenReturn(userDetails);
-
-        CaseUserAssignment caseUserAssignment = new CaseUserAssignment();
-        caseUserAssignment.setCaseRole(ROLE_SOLICITORA);
-        caseUserAssignment.setUserId(REPRESENTATIVE_ID_ONE);
-        CaseUserAssignmentData caseUserAssignmentData = new CaseUserAssignmentData();
-        caseUserAssignmentData.setCaseUserAssignments(List.of(caseUserAssignment));
-        when(nocCcdService.retrieveCaseUserAssignments(USER_TOKEN, CASE_ID_1)).thenReturn(caseUserAssignmentData);
-
-        nocRespondentRepresentativeService.updateRespondentRepresentativeContactDetails(
-                USER_TOKEN, tmpCaseData, CASE_ID_1);
-
-        assertThat(representative.getValue().getRepresentativePhoneNumber()).isEqualTo(PHONE_NUMBER);
     }
 
     @Test

@@ -154,6 +154,18 @@ withPipeline(type, product, component) {
     before('smoketest:preview') {
       sh """
         ./bin/pull-latest-e2e-tests.sh
+      cd ccd-definitions && yarn install && yarn setup && yarn scripts:preview ${CHANGE_ID}
+      """
+
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'ccd-definitions/jurisdictions/admin/xlsx/et-admin-ccd-config-preview.xlsx'
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'ccd-definitions/jurisdictions/england-wales/xlsx/et-englandwales-ccd-config-preview.xlsx'
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'ccd-definitions/jurisdictions/scotland/xlsx/et-scotland-ccd-config-preview.xlsx'
+
+    sh """
+        echo "Creating CCD roles"
+        ./bin/preview/create-ccd-roles.sh
+        echo "Importing CCD definitions"
+        ./bin/preview/import-ccd-definitions.sh
       """
     }
 
@@ -214,18 +226,6 @@ withPipeline(type, product, component) {
 
     sh """
       ./bin/pull-latest-e2e-tests.sh
-      cd ccd-definitions && yarn install && yarn setup && yarn scripts:preview ${CHANGE_ID}
-      """
-
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'ccd-definitions/jurisdictions/admin/xlsx/et-admin-ccd-config-preview.xlsx'
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'ccd-definitions/jurisdictions/england-wales/xlsx/et-englandwales-ccd-config-preview.xlsx'
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'ccd-definitions/jurisdictions/scotland/xlsx/et-scotland-ccd-config-preview.xlsx'
-
-    sh """
-        echo "Creating CCD roles"
-        ./bin/preview/create-ccd-roles.sh
-        echo "Importing CCD definitions"
-        ./bin/preview/import-ccd-definitions.sh
     """
   }
 

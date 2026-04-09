@@ -5,7 +5,7 @@ LABEL maintainer="https://github.com/hmcts/et-ccd-callbacks"
 COPY lib/applicationinsights.json /opt/app/
 COPY build/libs/et-cos.jar /opt/app/
 
-FROM debian:bullseye-20260406 AS builder
+FROM hmctsprod.azurecr.io/base/node:18-debian AS builder
 
 USER root
 RUN apt update && apt install --yes libharfbuzz-dev

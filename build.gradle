@@ -451,7 +451,7 @@ dependencies {
 
     implementation group: 'commons-io', name: 'commons-io', version: '2.21.0'
     implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.6.0'
-    implementation group: 'io.netty', name: 'netty-tcnative-classes', version: '2.0.74.Final'
+    implementation group: 'io.netty', name: 'netty-tcnative-classes', version: '2.0.75.Final'
     implementation group: 'org.json', name: 'json', version: '20250107'
     implementation group: 'org.apache.commons', name: 'commons-compress', version: '1.28.0'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.18.0'
@@ -497,6 +497,14 @@ dependencies {
     implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
     implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.10.2'
 
+    implementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.2.4', {
+        exclude group: 'org.apache.commons', module: 'commons-compress'
+        exclude group: 'com.google.guava', module: 'guava'
+        exclude group: 'org.apache.poi', module: 'poi-ooxml'
+        exclude group: 'org.apache.poi', module: 'poi'
+        exclude group: 'com.launchdarkly', module: 'launchdarkly-java-server-sdk'
+        exclude group: 'org.codehaus.groovy', module: 'groovy-xml'
+    }
     // CVE-2025-7962
     implementation group: 'org.eclipse.angus', name: 'angus-mail', version: '2.0.4'
 
@@ -624,6 +632,12 @@ bootWithCCD {
     //environment 'SERVICEBUS_FAKE', 'true'*
     environment 'CFTLIB_EXTRA_COMPOSE_FILES', ''
 
+}
+
+tasks.register('highLevelDataSetup', JavaExec) {
+    mainClass = "uk.gov.hmcts.ethos.replacement.docmosis.config.HighLevelDataSetupConfiguration"
+    classpath += sourceSets.main.runtimeClasspath
+    jvmArgs = ['--add-opens=java.base/java.lang.reflect=ALL-UNNAMED']
 }
 
 pmdMain.maxFailures = 0

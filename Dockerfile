@@ -6,7 +6,7 @@ COPY lib/applicationinsights.json /opt/app/
 COPY build/libs/et-cos.jar /opt/app/
 COPY build/cftlib/definition-snapshots /opt/app/build/cftlib/definition-snapshots
 
-FROM debian:bullseye-20260316 AS builder
+FROM debian:bullseye-20260406 AS builder
 
 USER root
 RUN apt update && apt install --yes libharfbuzz-dev

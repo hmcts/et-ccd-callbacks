@@ -227,7 +227,7 @@
     "Name": "Amend contact details",
     "Description": "Amend contact details",
     "DisplayOrder": 53,
-    "PreConditionState(s)": "Accepted;",
+    "PreConditionState(s)": "Accepted",
     "PostConditionState": "*",
     "CallBackURLAboutToStartEvent": "${ET_COS_URL}/respondentRepresentative/aboutToStartAmendRespondentRepresentativeContact",
     "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/et3Response/aboutToSubmitAmendRepresentativeContact",

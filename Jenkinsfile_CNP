@@ -81,7 +81,7 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 withPipeline(type, product, component) {
   env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
   loadVaultSecrets(secrets)
-  enableHighLevelDataSetup()
+  //enableHighLevelDataSetup()
   enableAksStagingDeployment()
   onMaster {
     disableLegacyDeployment()

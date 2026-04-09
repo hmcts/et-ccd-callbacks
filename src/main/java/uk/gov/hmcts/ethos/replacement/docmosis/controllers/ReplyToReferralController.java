@@ -236,8 +236,7 @@ public class ReplyToReferralController {
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
         log.info("COMPLETE REPLY TO REFERRAL ---> " + LOG_MESSAGE + "{}", ccdRequest.getCaseDetails().getCaseId());
-        String body = String.format(REPLY_REFERRAL_BODY,
-            ccdRequest.getCaseDetails().getCaseId());
+        String body = String.format(REPLY_REFERRAL_BODY, ccdRequest.getCaseDetails().getCaseId());
 
         return ResponseEntity.ok(CCDCallbackResponse.builder()
             .confirmation_body(body)

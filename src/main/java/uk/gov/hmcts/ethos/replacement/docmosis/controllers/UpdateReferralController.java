@@ -21,6 +21,7 @@ import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.types.ReferralType;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReferralService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 
@@ -42,10 +43,11 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.upd
 @RequestMapping("/updateReferral")
 @RestController
 @RequiredArgsConstructor
-@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement", "PMD.ExcessiveImports"})
+//@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement", "PMD.ExcessiveImports"})
 public class UpdateReferralController {
     private final UserIdamService userIdamService;
     private final ReferralService referralService;
+    private final FeatureToggleService featureToggleService;
     private final DocumentManagementService documentManagementService;
     private static final String LOG_MESSAGE = "received update referral request for case reference : ";
 
@@ -142,7 +144,7 @@ public class UpdateReferralController {
         UserDetails userDetails = userIdamService.getUserDetails(userToken);
         String nextHearingDate = getNearestHearingToReferral(caseData, "None");
         String name = String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName());
-        updateReferral(caseData, name, nextHearingDate);
+        updateReferral(caseData, name, nextHearingDate, featureToggleService.isWorkAllocationEnabled());
         ReferralType referral = caseData.getReferralCollection()
                 .get(Integer.parseInt(caseData.getSelectReferral().getValue().getCode()) - 1).getValue();
 

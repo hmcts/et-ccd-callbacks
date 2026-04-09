@@ -1,7 +1,7 @@
 {
   "request": {
     "method": "GET",
-    "urlPathPattern": "/refdata/internal/v1/organisations/orgDetails/007b5478-775b-387e-a7f6-19f7be483c8e"
+    "urlPathPattern": "/refdata/internal/v1/organisations/orgDetails/([a-fA-F0-9]{8}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{4}-[a-fA-F0-9]{12})"
   },
   "response": {
     "status": 200,

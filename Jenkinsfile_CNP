@@ -81,7 +81,7 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 withPipeline(type, product, component) {
   env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
   loadVaultSecrets(secrets)
-  //enableHighLevelDataSetup()
+  enableHighLevelDataSetup()
   enableAksStagingDeployment()
   onMaster {
     disableLegacyDeployment()
@@ -234,7 +234,6 @@ withPipeline(type, product, component) {
   afterAlways('functionalTest:aat') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'
-    env.ENVIRONMENT = "prod"
     stage('Functional UI tests chromium') {
       try {
         yarnBuilder.yarn('test:functional-chromium')
@@ -253,6 +252,10 @@ withPipeline(type, product, component) {
       }
     }
   }
+  env.ENVIRONMENT = "prod"
+  env.ET_COS_URL = "http://et-cos-prod.service.core-compute-prod.internal"
+  env.CCD_DEF_URL = "http://ccd-data-store-api-prod.service.core-compute-prod.internal"
+  env.CCD_DEF_AAC_URL = "http://aac-manage-case-assignment-prod.service.core-compute-prod.internal"
 
   onDemo {
     env.ENVIRONMENT = "demo"

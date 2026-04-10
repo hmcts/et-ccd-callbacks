@@ -94,9 +94,9 @@ public class NocRemoveRepresentationController {
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
 
-        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        // TODO
-        return getCallbackRespEntityNoErrors(caseData);
+        CaseDetails caseDetails = ccdRequest.getCaseDetails();
+        nocRemoveRepresentationService.revokeRespondentLegalRep(caseDetails, userToken);
+        return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
     }
 
     @PostMapping(value = "/submitted", consumes = APPLICATION_JSON_VALUE)

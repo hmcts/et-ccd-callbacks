@@ -441,8 +441,8 @@ dependencies {
     implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '8.1'
     implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.5'
 
-    implementation 'com.github.hmcts:decentralised-runtime:json-runtime-test-artifact-20260401-095021'
-    implementation 'com.github.hmcts:ccd-config-generator:json-runtime-test-artifact-20260401-095021'
+    implementation 'com.github.hmcts:decentralised-runtime:json-runtime-legacy-callback-fix-20260410'
+    implementation 'com.github.hmcts:ccd-config-generator:json-runtime-legacy-callback-fix-20260410'
 
     // Log4J core added to remove startup error message
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4JVersion
@@ -466,7 +466,8 @@ dependencies {
     implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.5.3'
     //To Remove vulnerability CVE-2020-11988
     implementation group: 'org.apache.xmlgraphics', name: 'xmlgraphics-commons', version: '2.11'
-    implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.22.3'
+    implementation 'org.flywaydb:flyway-database-postgresql:11.20.3'
+    implementation 'org.flywaydb:flyway-core:11.20.3'
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.7'
     implementation group: 'org.slf4j', name: 'slf4j-ext', version: '2.0.17'
     implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.5.0'
@@ -640,6 +641,8 @@ tasks.named('dumpCCDDefinitions') {
     environment 'SPRING_PROFILES_ACTIVE', 'cftlib'
     environment 'CFTLIB_IMPORT_CCD_DEFS_ON_BOOT', System.getenv('CFTLIB_IMPORT_CCD_DEFS_ON_BOOT') ?: 'true'
     environment 'ET_COS_CFTLIB_DB_PASSWORD', System.getenv('ET_COS_CFTLIB_DB_PASSWORD') ?: 'postgres'
+    environment 'ET_COS_SYSTEM_USER', System.getenv('ET_COS_SYSTEM_USER') ?: 'admin@hmcts.net'
+    environment 'ET_COS_SYSTEM_USER_PASSWORD', System.getenv('ET_COS_SYSTEM_USER_PASSWORD') ?: 'Password'
     environment 'CFTLIB_EXTRA_COMPOSE_FILES', ''
 }
 

@@ -47,7 +47,7 @@ feign:
     enabled: 'true'
 
 tornado:
-  accessKey: ${TORNADO_ACCESS_KEY}
+  accessKey: ${TORNADO_ACCESS_KEY:dummy}
   url: ${TORNADO_URL:https://eu.dws3.docmosis.com/api/render}
 
 ccd:
@@ -119,7 +119,7 @@ springdoc:
   packagesToScan: uk.gov.hmcts.ethos.replacement.docmosis.controllers
   pathsToMatch: /**
 
-gov-notify-api-key: ${GOV_NOTIFY_API_KEY}
+gov-notify-api-key: ${GOV_NOTIFY_API_KEY:dummy}
 
 template:
   referral: ${REFERRAL_TEMPLATE_ID:f975c1cc-e102-472a-a6cb-84dffa0a6d42}
@@ -304,7 +304,7 @@ caching:
   adminUserService: ${CACHING_ADMIN_USER_SERVICE:21600000}
 
 notifications:
-  govNotifyApiKey: ${GOV_NOTIFY_API_KEY}
+  govNotifyApiKey: ${GOV_NOTIFY_API_KEY:dummy}
   citizenPortalLink: ${CITIZEN_PORTAL_LINK:${CITIZEN_CASE_DETAILS_URL:https://localhost:3001/citizen-hub/}}
   respondentPortalLink: ${RESPONDENT_PORTAL_LINK:http://localhost:3003/case-details/}
   exuiCaseDetailsLink: ${EXUI_CASE_DETAILS_URL:http://localhost:3455/cases/case-details/}

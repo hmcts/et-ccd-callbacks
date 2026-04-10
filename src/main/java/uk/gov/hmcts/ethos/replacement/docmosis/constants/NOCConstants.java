@@ -10,6 +10,9 @@ public final class NOCConstants {
     public static final String NOC_TYPE_REMOVAL = "Removal";
     public static final String NOC_TYPE_ADDITION = "Addition";
 
+    public static final String REMOVE_ONLY_ME = "Remove only me";
+    public static final String REMOVE_ORGANISATION = "Remove the organisation";
+
     public static final String EXCEPTION_RESPONDENT_NOT_FOUND = "Respondent not found for case ID %s.";
     public static final String EXCEPTION_RESPONDENT_ID_NOT_FOUND =
             "Respondent ID not found for case ID %s.";

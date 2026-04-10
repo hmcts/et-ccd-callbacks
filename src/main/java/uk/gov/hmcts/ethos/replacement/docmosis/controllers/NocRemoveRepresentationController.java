@@ -116,6 +116,7 @@ public class NocRemoveRepresentationController {
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
         caseData.setNocRemoveRepIsMoreThanOneFlag(null);
+        caseData.setNocRemoveRepOption(null);
         return ResponseEntity.ok(CCDCallbackResponse.builder()
             .data(caseData)
             .confirmation_header(GREEN_BANNER_HEADING

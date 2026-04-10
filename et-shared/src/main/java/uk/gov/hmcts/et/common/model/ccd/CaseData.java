@@ -1931,4 +1931,6 @@ public class CaseData extends Et1CaseData {
     private String nocWarning;
     @JsonProperty("nocRemoveRepIsMoreThanOneFlag")
     private String nocRemoveRepIsMoreThanOneFlag;
+    @JsonProperty("nocRemoveRepOption")
+    private String nocRemoveRepOption;
 }

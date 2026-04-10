@@ -36,6 +36,8 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.REMOVE_ONLY_ME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EMPTY_STRING;
 
 @ExtendWith(SpringExtension.class)
@@ -267,6 +269,9 @@ class NocRemoveRepresentationServiceTest {
 
     @Test
     void shouldRevokeRespondentLegalRep_onlyCurrentRep() {
+        caseDetails.getCaseData().setNocRemoveRepIsMoreThanOneFlag(YES);
+        caseDetails.getCaseData().setNocRemoveRepOption(REMOVE_ONLY_ME);
+
         when(nocRespondentRepresentativeService.findRepresentativesByToken(anyString(), any()))
             .thenReturn(List.of(repR1, repR2));
         when(nocNotificationService

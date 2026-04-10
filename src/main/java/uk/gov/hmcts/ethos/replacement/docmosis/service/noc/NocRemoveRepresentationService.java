@@ -25,6 +25,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.RespondentRepresentativ
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
@@ -291,7 +292,7 @@ public class NocRemoveRepresentationService {
                 NOC_TYPE_REMOVAL
             );
         final String repName = getRespondentEmailRepName(repListToRevoke);
-        final String repEmailAddress = getRespondentEmailRepEmailAddress(repListToRevoke);
+        final List<String> repEmailAddress = getRespondentEmailRepEmailAddress(repListToRevoke);
         final String partyName = getRespondentEmailPartyName(repListToRevoke);
 
         // revoke respondent legal rep
@@ -303,7 +304,7 @@ public class NocRemoveRepresentationService {
         // send email to organisation admin
         sendEmailToOrgAdmin(caseDetails, orgEmailAddress, repName);
         // send email to removed legal rep
-        sendEmailToRemovedLegalRep(caseDetails, repEmailAddress);
+        sendRespondentEmailToRemovedLegalRep(caseDetails, repEmailAddress);
         // send email to unrepresented party, i.e. this respondent
         sendRespondentEmailToUnrepresentedParty(caseDetails, repListToRevoke, orgName);
         // send email to claimant
@@ -332,20 +333,33 @@ public class NocRemoveRepresentationService {
     }
 
     private String getRespondentEmailOrgName(List<RepresentedTypeRItem> repList) {
-        RepresentedTypeRItem firstRepItem = repList.getFirst();
-        return firstRepItem.getValue().getNameOfOrganisation();
+        return repList.stream()
+            .map(RepresentedTypeRItem::getValue)
+            .filter(Objects::nonNull)
+            .map(RepresentedTypeR::getNameOfOrganisation)
+            .filter(name -> !isNullOrEmpty(name))
+            .findFirst()
+            .orElse(null);
     }
 
     private String getRespondentEmailRepName(List<RepresentedTypeRItem> repList) {
-        RepresentedTypeRItem firstRepItem = repList.getFirst();
-        RepresentedTypeR firstRep = firstRepItem.getValue();
-        return firstRep.getNameOfRepresentative();
+        return repList.stream()
+            .map(RepresentedTypeRItem::getValue)
+            .filter(Objects::nonNull)
+            .map(RepresentedTypeR::getNameOfRepresentative)
+            .filter(name -> !isNullOrEmpty(name))
+            .distinct()
+            .collect(Collectors.joining(", "));
     }
 
-    private String getRespondentEmailRepEmailAddress(List<RepresentedTypeRItem> repList) {
-        RepresentedTypeRItem firstRepItem = repList.getFirst();
-        RepresentedTypeR firstRep = firstRepItem.getValue();
-        return firstRep.getRepresentativeEmailAddress();
+    private List<String> getRespondentEmailRepEmailAddress(List<RepresentedTypeRItem> repList) {
+        return repList.stream()
+            .map(RepresentedTypeRItem::getValue)
+            .filter(Objects::nonNull)
+            .map(RepresentedTypeR::getRepresentativeEmailAddress)
+            .filter(email -> !isNullOrEmpty(email))
+            .distinct()
+            .toList();
     }
 
     private String getRespondentEmailPartyName(List<RepresentedTypeRItem> currentRepList) {
@@ -356,6 +370,10 @@ public class NocRemoveRepresentationService {
             .filter(Objects::nonNull)
             .toList();
         return String.join(", ", respondentNames);
+    }
+
+    private void sendRespondentEmailToRemovedLegalRep(CaseDetails caseDetails, List<String> repEmailAddress) {
+        repEmailAddress.forEach(email -> sendEmailToRemovedLegalRep(caseDetails, email));
     }
 
     private void sendRespondentEmailToUnrepresentedParty(

@@ -38,6 +38,7 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.REMOVE_ONLY_ME;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.REMOVE_ORGANISATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EMPTY_STRING;
 
 @ExtendWith(SpringExtension.class)
@@ -71,6 +72,7 @@ class NocRemoveRepresentationServiceTest {
     private static final String ORG_CLAIMANT_EMAIL = "org.c@test.com";
     private static final String REP_A1_NAME = "Legal Rep A1";
     private static final String REP_A1_EMAIL = "rep.a1@test.com";
+    private static final String REP_A2_NAME = "Legal Rep A2";
     private static final String REP_A2_EMAIL = "rep.a2@test.com";
     private static final String REP_B_EMAIL = "rep.b@test.com";
     private static final String REP_CLAIMANT_NAME = "Legal Rep C";
@@ -82,7 +84,9 @@ class NocRemoveRepresentationServiceTest {
     private static final String RESPONDENT_2_NAME = "Robert Respondent";
     private static final String RESPONDENT_2_EMAIL = "robert@test.com";
     private static final String RESPONDENT_3_NAME = "Rachel Respondent";
+    private static final String RESPONDENT_3_EMAIL = "rachel@test.com";
     private static final String RESPONDENT_4_NAME = "Ryan Respondent";
+    private static final String RESPONDENT_4_EMAIL = "ryan@test.com";
     private static final String RESPONDENT_5_ID = "53f2060b-d0ce-4e73-bfbe-9b50e2af62d2";
     private static final String RESPONDENT_5_NAME = "Ruth Respondent";
     private static final String RESPONDENT_5_EMAIL = "ruth@test.com";
@@ -95,6 +99,7 @@ class NocRemoveRepresentationServiceTest {
     private CaseDetails caseDetails;
     private RepresentedTypeRItem repR1;
     private RepresentedTypeRItem repR2;
+    private RepresentedTypeRItem repR3;
 
     @BeforeEach
     void setUp() throws URISyntaxException, IOException {
@@ -110,6 +115,7 @@ class NocRemoveRepresentationServiceTest {
         caseDetails = generateCaseDetails();
         repR1 = caseDetails.getCaseData().getRepCollection().get(0);
         repR2 = caseDetails.getCaseData().getRepCollection().get(1);
+        repR3 = caseDetails.getCaseData().getRepCollection().get(2);
     }
 
     private CaseDetails generateCaseDetails() throws URISyntaxException, IOException {
@@ -297,61 +303,78 @@ class NocRemoveRepresentationServiceTest {
         verify(nocRespondentRepresentativeService, times(1))
             .revokeAndRemoveRespondentRepresentatives(caseDetails, List.of(repR1, repR2));
         // send email to organisation admin
-        verify(emailService, times(1)).sendEmail(
-            eq(TEMPLATE_NOC_ORG_ADMIN_NOT_REPRESENTING),
-            eq(ORG_A_EMAIL),
-            eq(Map.of(
-                "case_number", CASE_REFERENCE,
-                "claimant", CLAIMANT_NAME,
-                "list_of_respondents", RESPONDENT_LIST,
-                "legalRepName", REP_A1_NAME
-            ))
-        );
+        verify(emailService, times(1))
+            .sendEmail(
+                eq(TEMPLATE_NOC_ORG_ADMIN_NOT_REPRESENTING),
+                eq(ORG_A_EMAIL),
+                eq(Map.of(
+                    "case_number", CASE_REFERENCE,
+                    "claimant", CLAIMANT_NAME,
+                    "list_of_respondents", RESPONDENT_LIST,
+                    "legalRepName", REP_A1_NAME
+                ))
+            );
         // send email to removed legal rep
-        verify(emailService, times(1)).sendEmail(
-            eq(TEMPLATE_NOC_LEGAL_REP_NO_LONGER_ASSIGNED),
-            eq(REP_A1_EMAIL),
-            eq(Map.of(
-                "case_number", CASE_REFERENCE,
-                "claimant", CLAIMANT_NAME,
-                "list_of_respondents", RESPONDENT_LIST
-            ))
-        );
+        verify(emailService, times(1))
+            .sendEmail(
+                eq(TEMPLATE_NOC_LEGAL_REP_NO_LONGER_ASSIGNED),
+                eq(REP_A1_EMAIL),
+                eq(Map.of(
+                    "case_number", CASE_REFERENCE,
+                    "claimant", CLAIMANT_NAME,
+                    "list_of_respondents", RESPONDENT_LIST
+                ))
+            );
+        verify(emailService, times(0))
+            .sendEmail(
+                eq(TEMPLATE_NOC_LEGAL_REP_NO_LONGER_ASSIGNED),
+                eq(REP_A2_EMAIL),
+                any()
+            );
         // send email to unrepresented party
-        verify(emailService, times(1)).sendEmail(
-            eq(TEMPLATE_NOC_CITIZEN_NO_LONGER_REPRESENTED),
-            eq(RESPONDENT_1_EMAIL),
-            eq(Map.of(
-                "case_number", CASE_REFERENCE,
-                "claimant", CLAIMANT_NAME,
-                "list_of_respondents", RESPONDENT_LIST,
-                "legalRepOrg", ORG_A_NAME,
-                "linkToCitUI", LINK_SYR_CITIZEN_CASE
-            ))
-        );
-        verify(emailService, times(1)).sendEmail(
-            eq(TEMPLATE_NOC_CITIZEN_NO_LONGER_REPRESENTED),
-            eq(RESPONDENT_2_EMAIL),
-            eq(Map.of(
-                "case_number", CASE_REFERENCE,
-                "claimant", CLAIMANT_NAME,
-                "list_of_respondents", RESPONDENT_LIST,
-                "legalRepOrg", ORG_A_NAME,
-                "linkToCitUI", LINK_SYR_CITIZEN_CASE
-            ))
-        );
+        verify(emailService, times(1))
+            .sendEmail(
+                eq(TEMPLATE_NOC_CITIZEN_NO_LONGER_REPRESENTED),
+                eq(RESPONDENT_1_EMAIL),
+                eq(Map.of(
+                    "case_number", CASE_REFERENCE,
+                    "claimant", CLAIMANT_NAME,
+                    "list_of_respondents", RESPONDENT_LIST,
+                    "legalRepOrg", ORG_A_NAME,
+                    "linkToCitUI", LINK_SYR_CITIZEN_CASE
+                ))
+            );
+        verify(emailService, times(1))
+            .sendEmail(
+                eq(TEMPLATE_NOC_CITIZEN_NO_LONGER_REPRESENTED),
+                eq(RESPONDENT_2_EMAIL),
+                eq(Map.of(
+                    "case_number", CASE_REFERENCE,
+                    "claimant", CLAIMANT_NAME,
+                    "list_of_respondents", RESPONDENT_LIST,
+                    "legalRepOrg", ORG_A_NAME,
+                    "linkToCitUI", LINK_SYR_CITIZEN_CASE
+                ))
+            );
+        verify(emailService, times(0))
+            .sendEmail(
+                eq(TEMPLATE_NOC_CITIZEN_NO_LONGER_REPRESENTED),
+                eq(RESPONDENT_3_EMAIL),
+                any()
+            );
         // send email to claimant
-        verify(emailService, times(1)).sendEmail(
-            eq(TEMPLATE_NOC_OTHER_PARTY_NOT_REPRESENTED),
-            eq(REP_CLAIMANT_EMAIL),
-            eq(Map.of(
-                "case_number", CASE_REFERENCE,
-                "claimant", CLAIMANT_NAME,
-                "list_of_respondents", RESPONDENT_LIST,
-                "party_name", RESPONDENT_1_NAME + ", " + RESPONDENT_2_NAME,
-                "linkToCitUI", LINK_EXUI_CASE
-            ))
-        );
+        verify(emailService, times(1))
+            .sendEmail(
+                eq(TEMPLATE_NOC_OTHER_PARTY_NOT_REPRESENTED),
+                eq(REP_CLAIMANT_EMAIL),
+                eq(Map.of(
+                    "case_number", CASE_REFERENCE,
+                    "claimant", CLAIMANT_NAME,
+                    "list_of_respondents", RESPONDENT_LIST,
+                    "party_name", RESPONDENT_1_NAME + ", " + RESPONDENT_2_NAME,
+                    "linkToCitUI", LINK_EXUI_CASE
+                ))
+            );
         // send email to other respondent
         verify(emailService, times(1))
             .sendEmail(
@@ -386,6 +409,145 @@ class NocRemoveRepresentationServiceTest {
                     "claimant", CLAIMANT_NAME,
                     "list_of_respondents", RESPONDENT_LIST,
                     "party_name", RESPONDENT_1_NAME + ", " + RESPONDENT_2_NAME,
+                    "linkToCitUI", LINK_SYR_CITIZEN_CASE
+                ))
+            );
+    }
+
+    @Test
+    void shouldRevokeRespondentLegalRep_removeOrg() {
+        caseDetails.getCaseData().setNocRemoveRepIsMoreThanOneFlag(YES);
+        caseDetails.getCaseData().setNocRemoveRepOption(REMOVE_ORGANISATION);
+
+        when(nocRespondentRepresentativeService.findRepresentativesByToken(anyString(), any()))
+            .thenReturn(List.of(repR1, repR2));
+        when(nocNotificationService
+            .resolveRespondentRepresentativeOrganisationSuperuserEmail(any(), any(), anyString()))
+            .thenReturn(ORG_A_EMAIL);
+        when(caseAccessService.getCaseUserAssignmentsById(any()))
+            .thenReturn(List.of(CaseUserAssignment.builder().build()));
+        when(emailNotificationService.getRespondentsAndRepsEmailAddresses(any(), any()))
+            .thenReturn(Map.of(
+                REP_A2_EMAIL, EMPTY_STRING,
+                REP_B_EMAIL, EMPTY_STRING,
+                RESPONDENT_5_EMAIL, RESPONDENT_5_ID
+            ));
+        when(emailService.getCitizenCaseLink(anyString()))
+            .thenReturn(LINK_SYA_CITIZEN_CASE);
+        when(emailService.getSyrCaseLink(anyString(), anyString()))
+            .thenReturn(LINK_SYR_CITIZEN_CASE);
+        when(emailService.getExuiCaseLink(anyString()))
+            .thenReturn(LINK_EXUI_CASE);
+
+        nocRemoveRepresentationService.revokeRespondentLegalRep(caseDetails, USER_TOKEN);
+
+        verify(nocRespondentRepresentativeService, times(1))
+            .revokeAndRemoveRespondentRepresentatives(caseDetails, List.of(repR1, repR2, repR3));
+        // send email to organisation admin
+        verify(emailService, times(1))
+            .sendEmail(
+                eq(TEMPLATE_NOC_ORG_ADMIN_NOT_REPRESENTING),
+                eq(ORG_A_EMAIL),
+                eq(Map.of(
+                    "case_number", CASE_REFERENCE,
+                    "claimant", CLAIMANT_NAME,
+                    "list_of_respondents", RESPONDENT_LIST,
+                    "legalRepName", REP_A1_NAME + ", " + REP_A2_NAME
+                ))
+            );
+        // send email to removed legal rep
+        verify(emailService, times(1))
+            .sendEmail(
+                eq(TEMPLATE_NOC_LEGAL_REP_NO_LONGER_ASSIGNED),
+                eq(REP_A1_EMAIL),
+                eq(Map.of(
+                    "case_number", CASE_REFERENCE,
+                    "claimant", CLAIMANT_NAME,
+                    "list_of_respondents", RESPONDENT_LIST
+                ))
+            );
+        verify(emailService, times(1))
+            .sendEmail(
+                eq(TEMPLATE_NOC_LEGAL_REP_NO_LONGER_ASSIGNED),
+                eq(REP_A2_EMAIL),
+                eq(Map.of(
+                    "case_number", CASE_REFERENCE,
+                    "claimant", CLAIMANT_NAME,
+                    "list_of_respondents", RESPONDENT_LIST
+                ))
+            );
+        // send email to unrepresented party
+        verify(emailService, times(1))
+            .sendEmail(
+                eq(TEMPLATE_NOC_CITIZEN_NO_LONGER_REPRESENTED),
+                eq(RESPONDENT_1_EMAIL),
+                eq(Map.of(
+                    "case_number", CASE_REFERENCE,
+                    "claimant", CLAIMANT_NAME,
+                    "list_of_respondents", RESPONDENT_LIST,
+                    "legalRepOrg", ORG_A_NAME,
+                    "linkToCitUI", LINK_SYR_CITIZEN_CASE
+                ))
+            );
+        verify(emailService, times(1))
+            .sendEmail(
+                eq(TEMPLATE_NOC_CITIZEN_NO_LONGER_REPRESENTED),
+                eq(RESPONDENT_2_EMAIL),
+                eq(Map.of(
+                    "case_number", CASE_REFERENCE,
+                    "claimant", CLAIMANT_NAME,
+                    "list_of_respondents", RESPONDENT_LIST,
+                    "legalRepOrg", ORG_A_NAME,
+                    "linkToCitUI", LINK_SYR_CITIZEN_CASE
+                ))
+            );
+        verify(emailService, times(1))
+            .sendEmail(
+                eq(TEMPLATE_NOC_CITIZEN_NO_LONGER_REPRESENTED),
+                eq(RESPONDENT_3_EMAIL),
+                eq(Map.of(
+                    "case_number", CASE_REFERENCE,
+                    "claimant", CLAIMANT_NAME,
+                    "list_of_respondents", RESPONDENT_LIST,
+                    "legalRepOrg", ORG_A_NAME,
+                    "linkToCitUI", LINK_SYR_CITIZEN_CASE
+                ))
+            );
+        // send email to claimant
+        verify(emailService, times(1))
+            .sendEmail(
+                eq(TEMPLATE_NOC_OTHER_PARTY_NOT_REPRESENTED),
+                eq(REP_CLAIMANT_EMAIL),
+                eq(Map.of(
+                    "case_number", CASE_REFERENCE,
+                    "claimant", CLAIMANT_NAME,
+                    "list_of_respondents", RESPONDENT_LIST,
+                    "party_name", RESPONDENT_1_NAME + ", " + RESPONDENT_2_NAME + ", " + RESPONDENT_3_NAME,
+                    "linkToCitUI", LINK_EXUI_CASE
+                ))
+            );
+        // send email to other respondent
+        verify(emailService, times(1))
+            .sendEmail(
+                eq(TEMPLATE_NOC_OTHER_PARTY_NOT_REPRESENTED),
+                eq(REP_B_EMAIL),
+                eq(Map.of(
+                    "case_number", CASE_REFERENCE,
+                    "claimant", CLAIMANT_NAME,
+                    "list_of_respondents", RESPONDENT_LIST,
+                    "party_name", RESPONDENT_1_NAME + ", " + RESPONDENT_2_NAME + ", " + RESPONDENT_3_NAME,
+                    "linkToCitUI", LINK_EXUI_CASE
+                ))
+            );
+        verify(emailService, times(1))
+            .sendEmail(
+                eq(TEMPLATE_NOC_OTHER_PARTY_NOT_REPRESENTED),
+                eq(RESPONDENT_5_EMAIL),
+                eq(Map.of(
+                    "case_number", CASE_REFERENCE,
+                    "claimant", CLAIMANT_NAME,
+                    "list_of_respondents", RESPONDENT_LIST,
+                    "party_name", RESPONDENT_1_NAME + ", " + RESPONDENT_2_NAME + ", " + RESPONDENT_3_NAME,
                     "linkToCitUI", LINK_SYR_CITIZEN_CASE
                 ))
             );

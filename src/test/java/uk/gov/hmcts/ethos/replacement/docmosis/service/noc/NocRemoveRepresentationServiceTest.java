@@ -86,7 +86,6 @@ class NocRemoveRepresentationServiceTest {
     private static final String RESPONDENT_3_NAME = "Rachel Respondent";
     private static final String RESPONDENT_3_EMAIL = "rachel@test.com";
     private static final String RESPONDENT_4_NAME = "Ryan Respondent";
-    private static final String RESPONDENT_4_EMAIL = "ryan@test.com";
     private static final String RESPONDENT_5_ID = "53f2060b-d0ce-4e73-bfbe-9b50e2af62d2";
     private static final String RESPONDENT_5_NAME = "Ruth Respondent";
     private static final String RESPONDENT_5_EMAIL = "ruth@test.com";
@@ -203,7 +202,8 @@ class NocRemoveRepresentationServiceTest {
             IllegalStateException.class,
             () -> nocRemoveRepresentationService.revokeClaimantLegalRep(caseDetails, USER_TOKEN)
         );
-        assertThat(exception.getMessage()).isEqualTo("Missing RepresentativeClaimantType");
+        assertThat(exception.getMessage())
+            .isEqualTo("Missing RepresentativeClaimantType for case id: 1775651960650043");
         verify(nocCcdService, times(0))
             .revokeClaimantRepresentation(USER_TOKEN, caseDetails);
     }
@@ -551,5 +551,20 @@ class NocRemoveRepresentationServiceTest {
                     "linkToCitUI", LINK_SYR_CITIZEN_CASE
                 ))
             );
+    }
+
+    @Test
+    void shouldRevokeRespondentLegalRep_currentRepNotFound() {
+        when(nocRespondentRepresentativeService.findRepresentativesByToken(anyString(), any()))
+            .thenReturn(List.of());
+
+        IllegalStateException exception = assertThrows(
+            IllegalStateException.class,
+            () -> nocRemoveRepresentationService.revokeRespondentLegalRep(caseDetails, USER_TOKEN)
+        );
+        assertThat(exception.getMessage())
+            .isEqualTo("Missing RepresentedTypeRItem list for case id: 1775651960650043");
+        verify(nocRespondentRepresentativeService, times(0))
+            .revokeAndRemoveRespondentRepresentatives(any(), any());
     }
 }

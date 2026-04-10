@@ -152,6 +152,11 @@ public final class NOCConstants {
     public static final String WARNING_FAILED_TO_GET_CASE_ASSIGNMENTS_BY_ID =
         "Failed to get case assignments by id for case id: {}";
 
+    public static final String MISSING_REP_CLAIMANT_TYPE =
+        "Missing RepresentativeClaimantType for case id: ";
+    public static final String MISSING_REP_TYPE_R_ITEM =
+        "Missing RepresentedTypeRItem list for case id: ";
+
     public static final int MAX_NOC_ANSWERS = 10;
 
     private NOCConstants() {

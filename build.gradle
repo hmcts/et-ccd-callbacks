@@ -634,6 +634,14 @@ bootWithCCD {
 
 }
 
+tasks.named('dumpCCDDefinitions') {
+    authMode = uk.gov.hmcts.rse.AuthMode.Local
+    environment 'SPRING_PROFILES_ACTIVE', 'cftlib'
+    environment 'CFTLIB_IMPORT_CCD_DEFS_ON_BOOT', System.getenv('CFTLIB_IMPORT_CCD_DEFS_ON_BOOT') ?: 'true'
+    environment 'ET_COS_CFTLIB_DB_PASSWORD', System.getenv('ET_COS_CFTLIB_DB_PASSWORD') ?: 'postgres'
+    environment 'CFTLIB_EXTRA_COMPOSE_FILES', ''
+}
+
 tasks.register('highLevelDataSetup', JavaExec) {
     mainClass = "uk.gov.hmcts.ethos.replacement.docmosis.config.HighLevelDataSetupConfiguration"
     classpath += sourceSets.main.runtimeClasspath

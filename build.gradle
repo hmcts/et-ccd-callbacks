@@ -622,6 +622,8 @@ bootWithCCD {
     environment 'XUI_DOCUMENTS_API', 'http://host.docker.internal:5005'
     environment 'XUI_DOCUMENTS_API_V2', 'http://host.docker.internal:4455'
     environment 'XUI_LD_ID', System.getenv('XUI_LD_ID')
+    environment 'APPINSIGHTS_CONNECTION_STRING', System.getenv('APPINSIGHTS_CONNECTION_STRING')
+        ?: 'InstrumentationKey=00000000-0000-0000-0000-000000000000;IngestionEndpoint=http://localhost'
     environment 'SERVICES_PRD_COMMONDATA_API', 'http://wiremock:8080'
     // Allows latest XUI image without WA by not specifying EMPLOYMENT. Add EMPLOYMENT to enable WA.
     environment 'WA_SUPPORTED_JURISDICTIONS', 'IA,CIVIL,PRIVATELAW,PUBLICLAW'
@@ -633,9 +635,18 @@ bootWithCCD {
     environment 'XUI_MANAGE_ORGANISATIONS_CASETYPES', 'ET_EnglandWales,ET_Scotland'
 
     environment 'SPRING_PROFILES_ACTIVE', 'cftlib'
+    environment 'ET_COS_SYSTEM_USER', System.getenv('ET_COS_SYSTEM_USER') ?: 'admin@hmcts.net'
+    environment 'ET_COS_SYSTEM_USER_PASSWORD', System.getenv('ET_COS_SYSTEM_USER_PASSWORD') ?: 'Password'
     // et-ccd-callbacks
     //environment 'SERVICEBUS_FAKE', 'true'*
     environment 'CFTLIB_EXTRA_COMPOSE_FILES', ''
+    environment 'CCD_DECENTRALISED_CASE-TYPE-SERVICE-URLS_ET_EnglandWales', 'https://localhost:8081'
+    environment 'CCD_DECENTRALISED_CASE-TYPE-SERVICE-URLS_ET_Scotland', 'https://localhost:8081'
+    environment 'CCD_DECENTRALISED_CASE-TYPE-SERVICE-URLS_ET_EnglandWales_Listings', 'https://localhost:8081'
+    environment 'CCD_DECENTRALISED_CASE-TYPE-SERVICE-URLS_ET_Scotland_Listings', 'https://localhost:8081'
+    environment 'CCD_DECENTRALISED_CASE-TYPE-SERVICE-URLS_ET_EnglandWales_Multiple', 'https://localhost:8081'
+    environment 'CCD_DECENTRALISED_CASE-TYPE-SERVICE-URLS_ET_Scotland_Multiple', 'https://localhost:8081'
+    environment 'CCD_DECENTRALISED_CASE-TYPE-SERVICE-URLS_ET_Admin', 'https://localhost:8081'
 
 }
 

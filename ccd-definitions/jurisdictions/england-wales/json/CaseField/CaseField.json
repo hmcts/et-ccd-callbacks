@@ -6593,5 +6593,13 @@
     "FieldType": "Text",
     "SecurityClassification": "Public",
     "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales_Multiple",
+    "ID": "batchUpdateJurisdictionList",
+    "Label": "Jurisdictions",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "DynamicListCollection",
+    "SecurityClassification": "Public"
   }
 ]

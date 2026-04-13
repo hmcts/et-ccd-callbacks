@@ -6853,10 +6853,17 @@
     "SecurityClassification": "Public"
   },
   {
-    "ID": "referralDetails",
+    "ID": "updateReferralDetails",
     "ListElementCode": "referralNumber",
     "FieldType": "Text",
     "ElementLabel": "No",
+    "SecurityClassification": "Public"
+  },
+  {
+    "ID": "referralDetails",
+    "ListElementCode": "updateReferralDateTime",
+    "FieldType": "Text",
+    "ElementLabel": "Update Referral DateTime",
     "SecurityClassification": "Public"
   },
   {

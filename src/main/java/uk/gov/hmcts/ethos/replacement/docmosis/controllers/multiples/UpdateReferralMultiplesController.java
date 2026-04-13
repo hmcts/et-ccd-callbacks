@@ -23,6 +23,7 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseLookupService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReferralService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 
@@ -49,6 +50,7 @@ public class UpdateReferralMultiplesController {
     private final UserIdamService userIdamService;
     private final ReferralService referralService;
     private final DocumentManagementService documentManagementService;
+    private final FeatureToggleService featureToggleService;
     private final CaseLookupService caseLookupService;
     private static final String LOG_MESSAGE = "received update multiples referral request for case reference : ";
 
@@ -150,7 +152,7 @@ public class UpdateReferralMultiplesController {
         CaseData leadCase = caseLookupService.getLeadCaseFromMultipleAsAdmin(ccdRequest.getCaseDetails());
         String nextHearingDate = getNearestHearingToReferral(leadCase, "None");
         String name = String.format("%s %s", userDetails.getFirstName(), userDetails.getLastName());
-        updateReferral(caseData, name, nextHearingDate);
+        updateReferral(caseData, name, nextHearingDate, featureToggleService.isWorkAllocationEnabled());
         ReferralType referral = caseData.getReferralCollection()
                 .get(Integer.parseInt(caseData.getSelectReferral().getValue().getCode()) - 1).getValue();
 

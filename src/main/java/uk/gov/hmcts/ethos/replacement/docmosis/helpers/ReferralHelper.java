@@ -410,9 +410,13 @@ public final class ReferralHelper {
     }
 
     public static boolean isValidReferralStatus(BaseCaseData caseData) {
-        ReferralType referral = caseData.getReferralCollection()
-                .get(Integer.parseInt(caseData.getSelectReferral().getValue().getCode()) - 1).getValue();
-        return ReferralStatus.AWAITING_INSTRUCTIONS.equals(referral.getReferralStatus());
+        List<ReferralTypeItem> referralTypeItems = caseData.getReferralCollection();
+        if (referralTypeItems != null && !referralTypeItems.isEmpty()) {
+            var referralTypeItem = referralTypeItems.get(Integer.parseInt(
+                    caseData.getSelectReferral().getValue().getCode()) - 1).getValue();
+            return ReferralStatus.AWAITING_INSTRUCTIONS.equals(referralTypeItem.getReferralStatus());
+        }
+        return false;
     }
 
     /**
@@ -420,7 +424,8 @@ public final class ReferralHelper {
      * @param caseData contains all the case data
      * @param userFullName Full name of the logged-in user
      */
-    public static void updateReferral(BaseCaseData caseData, String userFullName, String nextHearingDate) {
+    public static void updateReferral(BaseCaseData caseData, String userFullName, String nextHearingDate,
+                                      boolean waEnabled) {
         ReferralType referral = caseData.getReferralCollection()
                 .get(Integer.parseInt(caseData.getSelectReferral().getValue().getCode()) - 1).getValue();
         if (CollectionUtils.isEmpty(referral.getUpdateReferralCollection())) {
@@ -440,6 +445,12 @@ public final class ReferralHelper {
         updateReferralType.setUpdateReferredBy(userFullName);
         updateReferralType.setUpdateReferentEmail(caseData.getUpdateReferentEmail());
         updateReferralType.setUpdateReferralHearingDate(nextHearingDate);
+
+        if (waEnabled) {
+            // for Work Allocation DMNs only
+            updateReferralType.setUpdateReferralDateTime(Helper.getCurrentDateTime());
+        }
+
         ListTypeItem<UpdateReferralType> updateReferralCollection = referral.getUpdateReferralCollection();
         updateReferralCollection.add(GenericTypeItem.from(UUID.randomUUID().toString(), updateReferralType));
         referral.setUpdateReferralCollection(updateReferralCollection);

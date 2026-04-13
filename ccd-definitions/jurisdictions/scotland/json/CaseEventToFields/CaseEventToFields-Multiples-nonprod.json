@@ -893,17 +893,6 @@
   },
   {
     "CaseTypeID": "ET_Scotland_Multiple",
-    "CaseEventID": "batchUpdateCases",
-    "CaseFieldID": "batchUpdateJurisdictionList",
-    "DisplayContext": "MANDATORY",
-    "PageID": 5,
-    "PageDisplayOrder": 5,
-    "PageFieldDisplayOrder": 2,
-    "ShowSummaryChangeOption": "Y",
-    "Publish": "N"
-  },
-  {
-    "CaseTypeID": "ET_Scotland_Multiple",
     "CaseEventID": "printSchedule",
     "CaseFieldID": "liveCases",
     "DisplayContext": "MANDATORY",

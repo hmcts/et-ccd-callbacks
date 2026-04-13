@@ -1,9 +1,10 @@
 package uk.gov.hmcts.ethos.replacement.docmosis;
 
-import com.ibm.icu.util.TimeZone;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
+
+import java.util.TimeZone;
 
 @ExtendWith(SpringExtension.class)
 class DocmosisApplicationTest {
@@ -20,10 +21,7 @@ class DocmosisApplicationTest {
     }
 
     @Test
-    void setsDefaultTimeZoneToEuropeLondonOnInit() {
-        DocmosisApplication application = new DocmosisApplication();
-        application.init();
-
+    void getDefaultTimeZoneIsLondon() {
         assert (TimeZone.getDefault().getID().equalsIgnoreCase("Europe/London"));
     }
 }

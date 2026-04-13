@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis;
 
-import jakarta.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -40,6 +39,7 @@ public class DocmosisApplication implements CommandLineRunner {
 
     @SuppressWarnings("PMD.CloseResource") // Context is intentionally closed only when TASK_NAME env var is set
     public static void main(String[] args) {
+        TimeZone.setDefault(TimeZone.getTimeZone(EUROPE_LONDON));
         final var application = new SpringApplication(DocmosisApplication.class);
         final var instance = application.run(args);
 
@@ -59,8 +59,4 @@ public class DocmosisApplication implements CommandLineRunner {
         this.taskRunner = taskRunner;
     }
 
-    @PostConstruct
-    public void init() {
-        TimeZone.setDefault(TimeZone.getTimeZone(EUROPE_LONDON));
-    }
 }

@@ -14,14 +14,23 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.MultipleUtil;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseNotesService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.when;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EUROPE_LONDON;
 
 @ExtendWith(SpringExtension.class)
 class CaseNotesServiceTest {
@@ -109,6 +118,28 @@ class CaseNotesServiceTest {
         assertEquals(NAME, createdNote.getAuthor());
         assertNotNull(createdNote.getDate());
         assertNull(caseData.getAddCaseNote());
+    }
+
+    @Test
+    void verifyDateIsFormattedInEuropeLondonTimezone() throws ParseException {
+        CaseData caseData = new CaseData();
+        caseData.setAddCaseNote(caseNote);
+        caseNotesService.addCaseNote(caseData, userToken);
+
+        String dateStr = caseData.getCaseNotesCollection().getFirst().getValue().getDate();
+        assertNotNull(dateStr);
+
+        SimpleDateFormat formatter = new SimpleDateFormat("dd MMM yyyy HH:mm", Locale.ENGLISH);
+        formatter.setTimeZone(TimeZone.getTimeZone(EUROPE_LONDON));
+        Date parsedDate = formatter.parse(dateStr);
+
+        ZonedDateTime londonNow = ZonedDateTime.now(ZoneId.of(EUROPE_LONDON));
+        LocalDateTime parsedLocal = parsedDate.toInstant()
+                .atZone(ZoneId.of(EUROPE_LONDON)).toLocalDateTime();
+
+        // Parsed date should be within 1 minute of now in Europe/London time
+        assertEquals(londonNow.getHour(), parsedLocal.getHour());
+        assertEquals(londonNow.getMinute(), parsedLocal.getMinute());
     }
 
     @Test

@@ -165,6 +165,10 @@ dependencies {
 
 configurations.configureEach {
     resolutionStrategy.eachDependency { details ->
+        if (details.requested.group == "org.apache.tomcat.embed"
+            && ["tomcat-embed-core", "tomcat-embed-websocket"].contains(details.requested.name)) {
+            details.useVersion("10.1.52")
+        }
         // CVE-2020-29582 - Force Kotlin to 2.1.0+
         if (details.requested.group == "org.jetbrains.kotlin"
             && details.requested.name.startsWith("kotlin-stdlib")) {
@@ -181,8 +185,6 @@ configurations.configureEach {
         'com.squareup.okhttp3:okhttp:4.12.0',
         'com.squareup.okhttp3:okhttp-urlconnection:4.12.0',
         'com.squareup.okio:okio:3.16.4',
-        'org.apache.tomcat.embed:tomcat-embed-core:10.1.52',
-        'org.apache.tomcat.embed:tomcat-embed-websocket:10.1.52',
         // CVE-2020-29582 - Fixed in Kotlin 2.1.0+
         'org.jetbrains.kotlin:kotlin-stdlib:2.1.0',
         'org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.1.0',

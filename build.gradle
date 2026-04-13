@@ -128,6 +128,10 @@ allprojects {
             if (details.requested.group.startsWith("com.fasterxml.jackson")) {
                 details.useVersion("$jacksonVersion")
             }
+            if (details.requested.group == "org.apache.tomcat.embed"
+                && ["tomcat-embed-core", "tomcat-embed-websocket"].contains(details.requested.name)) {
+                details.useVersion(tomcatEmbedVersion)
+            }
             // CVE-2020-29582 - Force Kotlin to 2.1.0+
             if (details.requested.group == "org.jetbrains.kotlin"
                 && details.requested.name.startsWith("kotlin-stdlib")) {
@@ -144,8 +148,6 @@ allprojects {
             'com.squareup.okhttp3:okhttp:4.12.0',
             'com.squareup.okhttp3:okhttp-urlconnection:4.12.0',
             'com.squareup.okio:okio:3.16.4',
-            'org.apache.tomcat.embed:tomcat-embed-core:10.1.52',
-            'org.apache.tomcat.embed:tomcat-embed-websocket:10.1.52',
             // CVE-2020-29582 - Fixed in Kotlin 2.1.0+
             'org.jetbrains.kotlin:kotlin-stdlib:2.1.0',
             'org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.1.0',
@@ -463,8 +465,8 @@ dependencies {
     implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: log4JVersion
     implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '3.0.0-RC1'
     implementation group: 'org.apache.santuario', name: 'xmlsec', version: '4.0.4'
-    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: { strictly tomcatEmbedVersion }
-    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: { strictly tomcatEmbedVersion }
+    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: tomcatEmbedVersion
+    implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: tomcatEmbedVersion
     implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.5.3'
     //To Remove vulnerability CVE-2020-11988
     implementation group: 'org.apache.xmlgraphics', name: 'xmlgraphics-commons', version: '2.11'

@@ -57,23 +57,22 @@ public class RequestInterceptor implements HandlerInterceptor {
             return false;
         }
 
-        if (request.getRequestURI().startsWith(CCD_PERSISTENCE_ENDPOINT_PREFIX)) {
-            String serviceName;
-            if (serviceAuthToken == null || serviceAuthToken.isBlank()) {
-                serviceName = null;
-            } else if (!serviceAuthToken.startsWith(BEARER_PREFIX)) {
-                serviceName = tokenValidator == null ? null
-                    : tokenValidator.getServiceName(BEARER_PREFIX + serviceAuthToken);
-            } else {
-                serviceName = tokenValidator == null ? null : tokenValidator.getServiceName(serviceAuthToken);
-            }
-
-            if (!CCD_DATA_SERVICE.equals(serviceName)) {
-                log.error(CCD_PERSISTENCE_UNAUTHORISED);
-                throw new UnAuthorisedServiceException(CCD_PERSISTENCE_UNAUTHORISED);
-            }
+        if (request.getRequestURI().startsWith(CCD_PERSISTENCE_ENDPOINT_PREFIX)
+            && !CCD_DATA_SERVICE.equals(getServiceName(serviceAuthToken))) {
+            log.error(CCD_PERSISTENCE_UNAUTHORISED);
+            throw new UnAuthorisedServiceException(CCD_PERSISTENCE_UNAUTHORISED);
         }
 
         return true;
+    }
+
+    private String getServiceName(String serviceAuthToken) {
+        if (serviceAuthToken == null || serviceAuthToken.isBlank() || tokenValidator == null) {
+            return "";
+        }
+
+        String formattedServiceToken = serviceAuthToken.startsWith(BEARER_PREFIX)
+            ? serviceAuthToken : BEARER_PREFIX + serviceAuthToken;
+        return tokenValidator.getServiceName(formattedServiceToken);
     }
 }

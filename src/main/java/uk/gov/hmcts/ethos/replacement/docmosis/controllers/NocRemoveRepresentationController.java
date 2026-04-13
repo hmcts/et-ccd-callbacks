@@ -76,7 +76,7 @@ public class NocRemoveRepresentationController {
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         CaseData caseData = caseDetails.getCaseData();
         caseData.setNocRemoveRepIsMoreThanOneFlag(
-            nocRemoveRepresentationService.isMoreThanOneRespondent(caseDetails, userToken));
+            nocRemoveRepresentationService.hasMultipleRepresentativesForOrg(caseDetails, userToken));
         return getCallbackRespEntityNoErrors(caseData);
     }
 

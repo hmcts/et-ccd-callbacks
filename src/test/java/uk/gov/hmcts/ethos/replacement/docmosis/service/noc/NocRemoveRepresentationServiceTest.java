@@ -209,19 +209,19 @@ class NocRemoveRepresentationServiceTest {
     }
 
     @Test
-    void isMoreThanOneRespondent_shouldReturnNo_whenNoRepresentatives() {
+    void hasMultipleRepresentativesForOrg_shouldReturnNo_whenNoRepresentatives() {
         CaseDetails caseDetails = CaseDataBuilder.builder()
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
         when(nocRespondentRepresentativeService.findRepresentativesByToken(anyString(), any()))
             .thenReturn(List.of());
 
-        String result = nocRemoveRepresentationService.isMoreThanOneRespondent(caseDetails, USER_TOKEN);
+        String result = nocRemoveRepresentationService.hasMultipleRepresentativesForOrg(caseDetails, USER_TOKEN);
 
         assertThat(result).isEqualTo("No");
     }
 
     @Test
-    void isMoreThanOneRespondent_shouldReturnNo_whenNoOrganisationId() {
+    void hasMultipleRepresentativesForOrg_shouldReturnNo_whenNoOrganisationId() {
         CaseDetails caseDetails = CaseDataBuilder.builder()
             .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
         RepresentedTypeRItem repRx = RepresentedTypeRItem.builder()
@@ -231,20 +231,20 @@ class NocRemoveRepresentationServiceTest {
         when(nocRespondentRepresentativeService.findRepresentativesByToken(anyString(), any()))
             .thenReturn(List.of(repRx));
 
-        String result = nocRemoveRepresentationService.isMoreThanOneRespondent(caseDetails, USER_TOKEN);
+        String result = nocRemoveRepresentationService.hasMultipleRepresentativesForOrg(caseDetails, USER_TOKEN);
 
         assertThat(result).isEqualTo("No");
     }
 
     @Test
-    void isMoreThanOneRespondent_shouldReturnNo_whenBothSameRepresentative() {
+    void hasMultipleRepresentativesForOrg_shouldReturnNo_whenBothSameRepresentative() {
         RepresentedTypeRItem repR1 = getTypeRItemWithSameOrgId();
         RepresentedTypeRItem repR2 = getTypeRItemWithSameOrgId();
         caseDetails.getCaseData().setRepCollection(List.of(repR1, repR2));
         when(nocRespondentRepresentativeService.findRepresentativesByToken(anyString(), any()))
             .thenReturn(List.of(repR1, repR2));
 
-        String result = nocRemoveRepresentationService.isMoreThanOneRespondent(caseDetails, USER_TOKEN);
+        String result = nocRemoveRepresentationService.hasMultipleRepresentativesForOrg(caseDetails, USER_TOKEN);
 
         assertThat(result).isEqualTo("No");
     }
@@ -257,7 +257,7 @@ class NocRemoveRepresentationServiceTest {
         when(nocRespondentRepresentativeService.findRepresentativesByToken(anyString(), any()))
             .thenReturn(List.of(repR1));
 
-        String result = nocRemoveRepresentationService.isMoreThanOneRespondent(caseDetails, USER_TOKEN);
+        String result = nocRemoveRepresentationService.hasMultipleRepresentativesForOrg(caseDetails, USER_TOKEN);
 
         assertThat(result).isEqualTo("Yes");
     }

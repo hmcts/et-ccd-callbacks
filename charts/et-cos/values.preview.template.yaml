@@ -404,7 +404,7 @@ ccd:
       01_input.conf: |
         input  {
           jdbc {
-            jdbc_connection_string => "jdbc:postgresql://et-preview.postgres.database.azure.com:5432/pr-${CHANGE_ID}-et_cos?sslmode=require"
+            jdbc_connection_string => "jdbc:postgresql://et-cos-postgres-v15-aat.postgres.database.azure.com:5432/et_cos?sslmode=require"
             jdbc_user => "hmcts"
             jdbc_password_filepath => "/etc/logstash/secrets/PASSWORD"
             jdbc_validate_connection => true
@@ -427,6 +427,7 @@ ccd:
                             RETURNING q.reference, q.case_revision
                           )
                           SELECT
+                            cd.id AS id,
                             cd.id AS case_data_id,
                             cd.reference,
                             ce.id AS event_id,

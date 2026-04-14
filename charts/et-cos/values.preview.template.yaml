@@ -369,7 +369,8 @@ ccd:
     image: "hmctsprod.azurecr.io/imported/logstash/logstash"
     imageTag: "7.16.1"
     imagePullPolicy: "IfNotPresent"
-    serviceAccountName: et
+    rbac:
+      serviceAccountName: et
     labels:
       azure.workload.identity/use: "true"
     logstashJavaOpts: "-Xmx1g -Xms512M"

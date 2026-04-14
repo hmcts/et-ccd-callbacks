@@ -370,12 +370,6 @@ ccd:
     imageTag: "7.16.1"
     imagePullPolicy: "IfNotPresent"
     logstashJavaOpts: "-Xmx1g -Xms512M"
-    extraEnvs:
-      - name: ET_COS_DB_PASSWORD
-        valueFrom:
-          secretKeyRef:
-            name: postgres
-            key: PASSWORD
     extraInitContainers: |
       - name: download-postgres-jdbc
         image: hmctsprod.azurecr.io/curl:7.70.0
@@ -386,14 +380,17 @@ ccd:
     extraVolumes: |
       - name: logstash-lib
         emptyDir: {}
-      - name: database-secret-volume
-        secret:
-          secretName: postgres
+      - name: vault-et-cos
+        csi:
+          driver: "secrets-store.csi.k8s.io"
+          readOnly: true
+          volumeAttributes:
+            secretProviderClass: ${SERVICE_NAME}-java-et-cos
     extraVolumeMounts: |
       - name: logstash-lib
         mountPath: /usr/share/logstash/ccd
-      - name: database-secret-volume
-        mountPath: /etc/logstash/secrets
+      - name: vault-et-cos
+        mountPath: /mnt/secrets/et-cos
         readOnly: true
     logstashConfig:
       logstash.yml: |
@@ -412,7 +409,7 @@ ccd:
           jdbc {
             jdbc_connection_string => "jdbc:postgresql://et-cos-postgres-v15-aat.postgres.database.azure.com:5432/et_cos?sslmode=require"
             jdbc_user => "pgadmin"
-            jdbc_password => "${ET_COS_DB_PASSWORD}"
+            jdbc_password_filepath => "/mnt/secrets/et-cos/ET_COS_DB_PASSWORD"
             jdbc_validate_connection => true
             jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"
             jdbc_driver_class => "org.postgresql.Driver"

@@ -33,9 +33,17 @@ public class NocRemoveRepresentationService {
     private final NocRemoveRepresentationEmailService nocRemoveRepresentationEmailService;
 
     /**
-     * Revoke claimant legal rep and send email notifications to related parties.
-     * @param caseDetails the case details of the case to revoke claimant legal rep
-     * @param userToken the user token of the requester
+     * Revokes the claimant's legal representative from the case and sends notification emails to all relevant parties.
+     * This method performs the following actions:
+     * - Retrieves the current claimant representative and organisation details.
+     * - Revokes the claimant's legal representation in CCD.
+     * - Marks the claimant as unrepresented in the case data.
+     * - Sends notification emails to the organisation admin, removed legal representative, claimant, and all other
+     *   respondents.
+     *
+     * @param caseDetails The case details containing the case data and ID.
+     * @param userToken The user token of the requester performing the revocation.
+     * @throws IllegalStateException if the claimant representative is missing in the case data.
      */
     public void revokeClaimantLegalRep(CaseDetails caseDetails, String userToken) {
         CaseData caseData = caseDetails.getCaseData();
@@ -66,10 +74,14 @@ public class NocRemoveRepresentationService {
     }
 
     /**
-     * About to start event to check if more than 1 representative from the organisation.
-     * @param caseDetails the case details of the case to revoke respondent legal rep
-     * @param userToken the user token of the requester
-     * @return return Yes if more than 1 representative from the organisation, else return No
+     * Checks if there are multiple representatives from the same organisation for the respondent.
+     * This method determines whether more than one representative from the same organisation is present
+     * for the respondent associated with the provided user token.
+     * Returns "Yes" if there are multiple representatives, otherwise returns "No".
+     *
+     * @param caseDetails The case details containing the case data and ID.
+     * @param userToken The user token of the requester.
+     * @return "Yes" if more than one representative from the organisation exists, otherwise "No".
      */
     public String hasMultipleRepresentativesForOrg(CaseDetails caseDetails, String userToken) {
         // get list of RepresentedTypeRItem that represented by this legal rep
@@ -96,9 +108,17 @@ public class NocRemoveRepresentationService {
     }
 
     /**
-     * Revoke respondent legal rep and send email notifications to related parties.
-     * @param caseDetails the case details of the case to revoke respondent legal rep
-     * @param userToken the user token of the requester
+     * Revokes the respondent's legal representative(s) from the case and sends notification emails to all relevant
+     * parties.
+     * This method performs the following actions:
+     * - Identifies the respondent representatives to be revoked based on the user token and case data.
+     * - Revokes and removes the respondent representatives from the case.
+     * - Sends notification emails to the organisation admin, removed legal representatives, unrepresented respondents,
+     *   claimant, and other respondents.
+     *
+     * @param caseDetails The case details containing the case data and ID.
+     * @param userToken The user token of the requester performing the revocation.
+     * @throws IllegalStateException if no respondent representatives are found to revoke.
      */
     public void revokeRespondentLegalRep(CaseDetails caseDetails, String userToken) {
         // get a list of RepresentedTypeRItem to be revoked

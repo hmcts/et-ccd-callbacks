@@ -53,6 +53,13 @@ public class NocRemoveRepresentationEmailService {
     @Value("${template.nocNotification.noc-other-party-not-represented}")
     private String nocOtherPartyNotRepresentedTemplateId;
 
+    /**
+     * Sends an email to the organisation admin when a representative is no longer representing a party.
+     *
+     * @param caseDetails The case details containing case data and ID
+     * @param emailToSend The email address of the organisation admin
+     * @param repName The name of the representative
+     */
     public void sendEmailToOrgAdmin(CaseDetails caseDetails, String emailToSend, String repName) {
         if (isNullOrEmpty(emailToSend)) {
             return;
@@ -75,10 +82,22 @@ public class NocRemoveRepresentationEmailService {
         }
     }
 
+    /**
+     * Sends emails to a list of removed legal representatives.
+     *
+     * @param caseDetails The case details containing case data and ID
+     * @param repEmailAddress List of email addresses of removed legal representatives
+     */
     public void sendEmailToListOfRemovedLegalRep(CaseDetails caseDetails, List<String> repEmailAddress) {
         repEmailAddress.forEach(email -> sendEmailToRemovedLegalRep(caseDetails, email));
     }
 
+    /**
+     * Sends an email to a removed legal representative.
+     *
+     * @param caseDetails The case details containing case data and ID
+     * @param emailToSend The email address of the removed legal representative
+     */
     public void sendEmailToRemovedLegalRep(CaseDetails caseDetails, String emailToSend) {
         try {
             Map<String, String> personalisation =
@@ -95,6 +114,12 @@ public class NocRemoveRepresentationEmailService {
         }
     }
 
+    /**
+     * Sends an email to an unrepresented claimant when their legal representative is removed.
+     *
+     * @param caseDetails The case details containing case data and ID
+     * @param orgName The name of the removed organisation
+     */
     public void sendEmailToUnrepresentedClaimant(CaseDetails caseDetails, String orgName) {
         CaseData caseData = caseDetails.getCaseData();
         if (ObjectUtils.isEmpty(caseData.getClaimantType())
@@ -107,6 +132,13 @@ public class NocRemoveRepresentationEmailService {
         sendEmailToUnrepresentedParty(caseDetails, emailToSend, orgName, linkToCitUI);
     }
 
+    /**
+     * Sends emails to unrepresented respondents when their legal representatives are removed.
+     *
+     * @param caseDetails The case details containing case data and ID
+     * @param repListToRevoke List of representatives whose representation is being revoked
+     * @param orgName The name of the removed organisation
+     */
     public void sendEmailToUnrepresentedRespondent(
         CaseDetails caseDetails,
         List<RepresentedTypeRItem> repListToRevoke,
@@ -153,6 +185,13 @@ public class NocRemoveRepresentationEmailService {
         }
     }
 
+    /**
+     * Sends an email to the claimant or their legal representative as other party
+     * when a respondent's representation is removed.
+     *
+     * @param caseDetails The case details containing case data and ID
+     * @param partyName The name of the party whose representation was removed
+     */
     public void sendEmailToOtherPartyClaimant(CaseDetails caseDetails, String partyName) {
         CaseData caseData = caseDetails.getCaseData();
 
@@ -192,6 +231,14 @@ public class NocRemoveRepresentationEmailService {
         }
     }
 
+    /**
+     * Sends emails to other party respondents (both represented and unrepresented)
+     * when a respondent's representation is removed.
+     *
+     * @param caseDetails The case details containing case data and ID
+     * @param respondentIdInRevokeList List of respondent IDs whose representation is being revoked
+     * @param partyName The name of the party whose representation was removed
+     */
     public void sendEmailToOtherPartyRespondent(
         CaseDetails caseDetails,
         List<String> respondentIdInRevokeList,

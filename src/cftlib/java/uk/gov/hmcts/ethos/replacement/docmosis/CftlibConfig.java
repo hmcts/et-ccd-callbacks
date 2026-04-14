@@ -175,12 +175,17 @@ public class CftlibConfig implements CFTLibConfigurer {
     @Value("${cftlib.import-ccd-defs-on-boot}")
     private boolean importCcdDefsOnBoot;
 
+    @Value("${rse.lib.dump_definitions:false}")
+    private boolean dumpDefinitions;
+
     @Override
     public void configure(CFTLib lib) throws IOException, URISyntaxException {
         createRoles(lib);
         createUsers(lib);
         importCcdDefinitions(lib);
-        startDockerCompose();
+        if (!dumpDefinitions) {
+            startDockerCompose();
+        }
     }
 
     private void createRoles(CFTLib lib) {

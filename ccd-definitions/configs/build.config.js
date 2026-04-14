@@ -42,6 +42,16 @@ module.exports = {
       suffix: 'preview',
       excludePatterns: ['*-prod.json'],
       isProd: false
+    },
+    perftest: {
+      suffix: 'perftest',
+      excludePatterns: ['*-prod.json'],
+      isProd: false
+    },
+    ithc: {
+      suffix: 'ithc',
+      excludePatterns: ['*-prod.json'],
+      isProd: false
     }
   },
 

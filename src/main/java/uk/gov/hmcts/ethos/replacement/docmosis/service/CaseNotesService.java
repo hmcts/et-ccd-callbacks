@@ -14,10 +14,12 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import static java.util.UUID.randomUUID;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EUROPE_LONDON;
 
 /**
  * Service for managing case notes in multiple data and case data.
@@ -64,6 +66,7 @@ public class CaseNotesService {
 
     private GenericTypeItem<CaseNote> getCaseNoteGenericTypeItem(String userToken, CaseNote caseNote) {
         DateFormat formatter = new SimpleDateFormat("dd MMM yyyy HH:mm", Locale.ENGLISH);
+        formatter.setTimeZone(TimeZone.getTimeZone(EUROPE_LONDON));
         caseNote.setDate(formatter.format(new Date()));
 
         try {

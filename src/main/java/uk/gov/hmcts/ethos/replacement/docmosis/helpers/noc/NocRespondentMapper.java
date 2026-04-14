@@ -17,7 +17,7 @@ import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.constants.PdfMapperConstants.STRING_EMPTY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.STRING_COMMA_WITH_SPACE;
 
-public class NocRespondentMapper {
+public final class NocRespondentMapper {
 
     private NocRespondentMapper() {
         // access through static methods

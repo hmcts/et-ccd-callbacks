@@ -347,8 +347,7 @@
     "ListElementCode": "responseRespondentAddress",
     "EventElementLabel": "Respondent Address (from the ET3 form)",
     "FieldDisplayOrder": 39,
-    "DisplayContext": "MANDATORY",
-    "RetainHiddenValue": "No"
+    "DisplayContext": "MANDATORY"
   },
   {
     "ID": "Respondent",
@@ -357,8 +356,7 @@
     "ListElementCode": "responseRespondentAddress.AddressLine1",
     "EventElementLabel": "Building and Street",
     "FieldDisplayOrder": 40,
-    "DisplayContext": "MANDATORY",
-    "RetainHiddenValue": "No"
+    "DisplayContext": "MANDATORY"
   },
   {
     "ID": "Respondent",
@@ -366,8 +364,7 @@
     "CaseFieldID": "respondentCollection",
     "ListElementCode": "responseRespondentAddress.AddressLine2",
     "FieldDisplayOrder": 41,
-    "DisplayContext": "OPTIONAL",
-    "RetainHiddenValue": "No"
+    "DisplayContext": "OPTIONAL"
   },
   {
     "ID": "Respondent",
@@ -375,8 +372,7 @@
     "CaseFieldID": "respondentCollection",
     "ListElementCode": "responseRespondentAddress.AddressLine3",
     "FieldDisplayOrder": 42,
-    "DisplayContext": "OPTIONAL",
-    "RetainHiddenValue": "No"
+    "DisplayContext": "OPTIONAL"
   },
   {
     "ID": "Respondent",
@@ -385,8 +381,7 @@
     "ListElementCode": "responseRespondentAddress.PostTown",
     "EventElementLabel": "Town or City",
     "FieldDisplayOrder": 43,
-    "DisplayContext": "OPTIONAL",
-    "RetainHiddenValue": "No"
+    "DisplayContext": "OPTIONAL"
   },
   {
     "ID": "Respondent",
@@ -395,8 +390,7 @@
     "ListElementCode": "responseRespondentAddress.County",
     "EventElementLabel": "County",
     "FieldDisplayOrder": 44,
-    "DisplayContext": "OPTIONAL",
-    "RetainHiddenValue": "No"
+    "DisplayContext": "OPTIONAL"
   },
   {
     "ID": "Respondent",
@@ -405,8 +399,7 @@
     "ListElementCode": "responseRespondentAddress.Country",
     "EventElementLabel": "Country",
     "FieldDisplayOrder": 45,
-    "DisplayContext": "OPTIONAL",
-    "RetainHiddenValue": "No"
+    "DisplayContext": "OPTIONAL"
   },
   {
     "ID": "Respondent",
@@ -415,8 +408,7 @@
     "ListElementCode": "responseRespondentAddress.PostCode",
     "EventElementLabel": "Postcode",
     "FieldDisplayOrder": 46,
-    "DisplayContext": "MANDATORY",
-    "RetainHiddenValue": "No"
+    "DisplayContext": "MANDATORY"
   },
   {
     "ID": "Respondent",

@@ -6595,6 +6595,14 @@
     "SecurityClassification": "Public"
   },
   {
+    "CaseTypeID": "ET_EnglandWales_Multiple",
+    "ID": "batchUpdateJurisdictionList",
+    "Label": "Jurisdictions",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "DynamicListCollection",
+    "SecurityClassification": "Public"
+  },
+  {
     "CaseTypeID": "ET_EnglandWales",
     "ID": "nocWarning",
     "Label": " ",

@@ -1,4 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.domain.caseview;
 
-public enum State {
+public enum AdminCaseState {
+    Open
 }

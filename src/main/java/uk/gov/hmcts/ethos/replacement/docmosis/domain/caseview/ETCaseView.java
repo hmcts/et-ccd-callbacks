@@ -11,7 +11,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 
 @Component
-public class ETCaseView implements CaseView<CaseData, State> {
+public class ETCaseView implements CaseView<CaseData, CaseState> {
 
     @Override
     public Set<String> caseTypeIds() {
@@ -19,7 +19,7 @@ public class ETCaseView implements CaseView<CaseData, State> {
     }
 
     @Override
-    public CaseData getCase(CaseViewRequest<State> request, CaseData blobCase) {
+    public CaseData getCase(CaseViewRequest<CaseState> request, CaseData blobCase) {
         return blobCase;
     }
 }

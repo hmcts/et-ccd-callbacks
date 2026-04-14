@@ -11,7 +11,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_C
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
 
 @Component
-public class MultipleCaseView implements CaseView<MultipleData, State> {
+public class MultipleCaseView implements CaseView<MultipleData, MultipleCaseState> {
 
     @Override
     public Set<String> caseTypeIds() {
@@ -19,7 +19,7 @@ public class MultipleCaseView implements CaseView<MultipleData, State> {
     }
 
     @Override
-    public MultipleData getCase(CaseViewRequest<State> request, MultipleData blobCase) {
+    public MultipleData getCase(CaseViewRequest<MultipleCaseState> request, MultipleData blobCase) {
         return blobCase;
     }
 }

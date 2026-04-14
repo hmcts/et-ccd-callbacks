@@ -11,14 +11,14 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_LISTIN
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 
 @Component
-public class ListingCaseView implements CaseView<ListingData, State> {
+public class ListingCaseView implements CaseView<ListingData, ListingCaseState> {
     @Override
     public Set<String> caseTypeIds() {
         return Set.of(ENGLANDWALES_LISTING_CASE_TYPE_ID, SCOTLAND_LISTING_CASE_TYPE_ID);
     }
 
     @Override
-    public ListingData getCase(CaseViewRequest<State> request, ListingData blobCase) {
+    public ListingData getCase(CaseViewRequest<ListingCaseState> request, ListingData blobCase) {
         return blobCase;
     }
 }

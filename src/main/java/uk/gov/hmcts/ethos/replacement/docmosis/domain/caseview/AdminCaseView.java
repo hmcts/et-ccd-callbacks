@@ -10,14 +10,14 @@ import java.util.Set;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADMIN_CASE_TYPE_ID;
 
 @Component
-public class AdminCaseView implements CaseView<AdminData, State> {
+public class AdminCaseView implements CaseView<AdminData, AdminCaseState> {
     @Override
     public Set<String> caseTypeIds() {
         return Set.of(ADMIN_CASE_TYPE_ID);
     }
 
     @Override
-    public AdminData getCase(CaseViewRequest<State> request, AdminData blobCase) {
+    public AdminData getCase(CaseViewRequest<AdminCaseState> request, AdminData blobCase) {
         return blobCase;
     }
 }

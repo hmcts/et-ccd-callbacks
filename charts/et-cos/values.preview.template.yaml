@@ -370,6 +370,12 @@ ccd:
     imageTag: "7.16.1"
     imagePullPolicy: "IfNotPresent"
     logstashJavaOpts: "-Xmx1g -Xms512M"
+    extraEnvs:
+      - name: ET_COS_DB_PASSWORD
+        valueFrom:
+          secretKeyRef:
+            name: postgres
+            key: PASSWORD
     extraInitContainers: |
       - name: download-postgres-jdbc
         image: hmctsprod.azurecr.io/curl:7.70.0
@@ -406,7 +412,7 @@ ccd:
           jdbc {
             jdbc_connection_string => "jdbc:postgresql://et-cos-postgres-v15-aat.postgres.database.azure.com:5432/et_cos?sslmode=require"
             jdbc_user => "pgadmin"
-            jdbc_password_filepath => "/etc/logstash/secrets/PASSWORD"
+            jdbc_password => "${ET_COS_DB_PASSWORD}"
             jdbc_validate_connection => true
             jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"
             jdbc_driver_class => "org.postgresql.Driver"

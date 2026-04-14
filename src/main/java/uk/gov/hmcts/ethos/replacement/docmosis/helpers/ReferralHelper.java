@@ -410,10 +410,9 @@ public final class ReferralHelper {
     }
 
     public static boolean isValidReferralStatus(BaseCaseData caseData) {
-        List<ReferralTypeItem> referralTypeItems = caseData.getReferralCollection();
-        if (referralTypeItems != null && !referralTypeItems.isEmpty()) {
-            var referralTypeItem = referralTypeItems.get(Integer.parseInt(
-                    caseData.getSelectReferral().getValue().getCode()) - 1).getValue();
+        if (CollectionUtils.isNotEmpty(caseData.getReferralCollection())) {
+            ReferralType referralTypeItem = caseData.getReferralCollection()
+                .get(Integer.parseInt(caseData.getSelectReferral().getSelectedCode()) - 1).getValue();
             return ReferralStatus.AWAITING_INSTRUCTIONS.equals(referralTypeItem.getReferralStatus());
         }
         return false;

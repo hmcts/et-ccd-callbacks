@@ -892,17 +892,6 @@
   },
   {
     "CaseTypeID": "ET_EnglandWales_Multiple",
-    "CaseEventID": "batchUpdateCases",
-    "CaseFieldID": "batchUpdateJurisdictionList",
-    "DisplayContext": "MANDATORY",
-    "PageID": 5,
-    "PageDisplayOrder": 2,
-    "PageFieldDisplayOrder": 5,
-    "ShowSummaryChangeOption": "Y",
-    "Publish": "N"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales_Multiple",
     "CaseEventID": "printSchedule",
     "CaseFieldID": "liveCases",
     "DisplayContext": "MANDATORY",

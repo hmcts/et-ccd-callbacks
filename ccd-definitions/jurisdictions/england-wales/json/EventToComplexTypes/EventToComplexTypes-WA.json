@@ -766,6 +766,185 @@
     "Publish": "Y"
   },
   {
+    "ID": "UpdateReferralDetails",
+    "CaseEventID": "updateReferral",
+    "CaseFieldID": "referralCollection",
+    "ListElementCode": "referralSubject",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 1,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "UpdateReferralDetails",
+    "CaseEventID": "updateReferral",
+    "CaseFieldID": "referralCollection",
+    "ListElementCode": "referralSubjectSpecify",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 2,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "UpdateReferralDetails",
+    "CaseEventID": "updateReferral",
+    "CaseFieldID": "referralCollection",
+    "ListElementCode": "referCaseTo",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "UpdateReferralDetails",
+    "CaseEventID": "updateReferral",
+    "CaseFieldID": "referralCollection",
+    "ListElementCode": "referralNumber",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 4,
+    "DisplayContext": "READONLY",
+    "Publish": "Y"
+  },
+  {
+    "ID": "UpdateReferralDetails",
+    "CaseEventID": "updateReferral",
+    "CaseFieldID": "referralCollection",
+    "ListElementCode": "updateReferralCollection",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 5,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "UpdateReferralDetails",
+    "CaseEventID": "updateReferral",
+    "CaseFieldID": "referralCollection",
+    "ListElementCode": "updateReferralCollection.updateReferralNumber",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 6,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "UpdateReferralDetails",
+    "CaseEventID": "updateReferral",
+    "CaseFieldID": "referralCollection",
+    "ListElementCode": "updateReferralCollection.updateReferralHearingDate",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 7,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "UpdateReferralDetails",
+    "CaseEventID": "updateReferral",
+    "CaseFieldID": "referralCollection",
+    "ListElementCode": "updateReferralCollection.updateReferCaseTo",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 8,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "UpdateReferralDetails",
+    "CaseEventID": "updateReferral",
+    "CaseFieldID": "referralCollection",
+    "ListElementCode": "updateReferralCollection.updateReferentEmail",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 9,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "UpdateReferralDetails",
+    "CaseEventID": "updateReferral",
+    "CaseFieldID": "referralCollection",
+    "ListElementCode": "updateReferralCollection.updateReferralDetails",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 10,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "UpdateReferralDetails",
+    "CaseEventID": "updateReferral",
+    "CaseFieldID": "referralCollection",
+    "ListElementCode": "updateReferralCollection.updateIsUrgent",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 11,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "UpdateReferralDetails",
+    "CaseEventID": "updateReferral",
+    "CaseFieldID": "referralCollection",
+    "ListElementCode": "updateReferralCollection.updateReferralSubject",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 12,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "UpdateReferralDetails",
+    "CaseEventID": "updateReferral",
+    "CaseFieldID": "referralCollection",
+    "ListElementCode": "updateReferralCollection.updateReferralSubjectSpecify",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 13,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "UpdateReferralDetails",
+    "CaseEventID": "updateReferral",
+    "CaseFieldID": "referralCollection",
+    "ListElementCode": "updateReferralCollection.updateReferralDocument",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 14,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "UpdateReferralDetails",
+    "CaseEventID": "updateReferral",
+    "CaseFieldID": "referralCollection",
+    "ListElementCode": "updateReferralCollection.updateReferralInstruction",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 15,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "UpdateReferralDetails",
+    "CaseEventID": "updateReferral",
+    "CaseFieldID": "referralCollection",
+    "ListElementCode": "updateReferralCollection.updateReferredBy",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 16,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "UpdateReferralDetails",
+    "CaseEventID": "updateReferral",
+    "CaseFieldID": "referralCollection",
+    "ListElementCode": "updateReferralCollection.updateReferralDate",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 17,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
+    "ID": "UpdateReferralDetails",
+    "CaseEventID": "updateReferral",
+    "CaseFieldID": "referralCollection",
+    "ListElementCode": "updateReferralCollection.updateReferralDateTime",
+    "EventElementLabel": " ",
+    "FieldDisplayOrder": 18,
+    "DisplayContext": "OPTIONAL",
+    "Publish": "Y"
+  },
+  {
     "ID": "genericTseDetails",
     "CaseEventID": "SUBMIT_CLAIMANT_TSE",
     "CaseFieldID": "genericTseApplicationCollection",

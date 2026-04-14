@@ -405,7 +405,7 @@ ccd:
         input  {
           jdbc {
             jdbc_connection_string => "jdbc:postgresql://et-cos-postgres-v15-aat.postgres.database.azure.com:5432/et_cos?sslmode=require"
-            jdbc_user => "hmcts"
+            jdbc_user => "pgadmin"
             jdbc_password_filepath => "/etc/logstash/secrets/PASSWORD"
             jdbc_validate_connection => true
             jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"

@@ -256,13 +256,22 @@ ccd:
         DEFINITION_STORE_HOST: https://ccd-definition-store-${SERVICE_FQDN}
         USER_PROFILE_HOST: https://ccd-user-profile-api-${SERVICE_FQDN}
         ROLE_ASSIGNMENT_URL: https://am-role-assignment-${SERVICE_FQDN}
-        CCD_DECENTRALISED_CASE-TYPE-SERVICE-URLS_ET_EnglandWales: https://${SERVICE_FQDN}
-        CCD_DECENTRALISED_CASE-TYPE-SERVICE-URLS_ET_Scotland: https://${SERVICE_FQDN}
-        CCD_DECENTRALISED_CASE-TYPE-SERVICE-URLS_ET_EnglandWales_Listings: https://${SERVICE_FQDN}
-        CCD_DECENTRALISED_CASE-TYPE-SERVICE-URLS_ET_Scotland_Listings: https://${SERVICE_FQDN}
-        CCD_DECENTRALISED_CASE-TYPE-SERVICE-URLS_ET_EnglandWales_Multiple: https://${SERVICE_FQDN}
-        CCD_DECENTRALISED_CASE-TYPE-SERVICE-URLS_ET_Scotland_Multiple: https://${SERVICE_FQDN}
-        CCD_DECENTRALISED_CASE-TYPE-SERVICE-URLS_ET_Admin: https://${SERVICE_FQDN}
+        SPRING_APPLICATION_JSON: |
+          {
+            "ccd": {
+              "decentralised": {
+                "case-type-service-urls": {
+                  "ET_EnglandWales": "https://${SERVICE_FQDN}",
+                  "ET_Scotland": "https://${SERVICE_FQDN}",
+                  "ET_EnglandWales_Listings": "https://${SERVICE_FQDN}",
+                  "ET_Scotland_Listings": "https://${SERVICE_FQDN}",
+                  "ET_EnglandWales_Multiple": "https://${SERVICE_FQDN}",
+                  "ET_Scotland_Multiple": "https://${SERVICE_FQDN}",
+                  "ET_Admin": "https://${SERVICE_FQDN}"
+                }
+              }
+            }
+          }
       ingressHost: ccd-data-store-api-${SERVICE_FQDN}
 
   am-role-assignment-service:

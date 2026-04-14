@@ -43,7 +43,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper.upd
 @RequestMapping("/updateReferral")
 @RestController
 @RequiredArgsConstructor
-//@SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement", "PMD.ExcessiveImports"})
 public class UpdateReferralController {
     private final UserIdamService userIdamService;
     private final ReferralService referralService;

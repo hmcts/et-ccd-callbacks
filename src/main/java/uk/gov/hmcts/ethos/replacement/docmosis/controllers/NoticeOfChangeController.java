@@ -25,6 +25,22 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRepresentativeServ
 import java.io.IOException;
 
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_CODE_FIVE_HUNDRED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_CODE_FIVE_ZERO_ONE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_CODE_FIVE_ZERO_THREE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_CODE_FOUR_HUNDRED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_CODE_FOUR_ZERO_FOUR;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_CODE_FOUR_ZERO_ONE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_CODE_FOUR_ZERO_THREE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_CODE_TWO_HUNDRED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_MESSAGE_FIVE_HUNDRED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_MESSAGE_FIVE_ZERO_ONE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_MESSAGE_FIVE_ZERO_THREE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_MESSAGE_FOUR_HUNDRED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_MESSAGE_FOUR_ZERO_FOUR;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_MESSAGE_FOUR_ZERO_ONE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_MESSAGE_FOUR_ZERO_THREE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_MESSAGE_TWO_HUNDRED;
 
 @RestController
 @RequestMapping("/noc-decision")
@@ -38,9 +54,21 @@ public class NoticeOfChangeController {
     private static final String APPLY_NOC_DECISION = "applyNocDecision";
 
     @PostMapping("/about-to-submit")
-    public ResponseEntity<CCDCallbackResponse> handleAboutToSubmit(
-            @RequestHeader("Authorization") String userToken,
-            @RequestBody CallbackRequest callbackRequest) throws IOException {
+    @Operation(summary = "updates representation values and sets existing and added assignments to "
+            + "the case data before the case is submitted to check if any unapproved assignment provided by noc")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = HTTP_CODE_TWO_HUNDRED, description = HTTP_MESSAGE_TWO_HUNDRED),
+        @ApiResponse(responseCode = HTTP_CODE_FOUR_HUNDRED, description = HTTP_MESSAGE_FOUR_HUNDRED),
+        @ApiResponse(responseCode = HTTP_CODE_FOUR_ZERO_ONE, description = HTTP_MESSAGE_FOUR_ZERO_ONE),
+        @ApiResponse(responseCode = HTTP_CODE_FOUR_ZERO_THREE, description = HTTP_MESSAGE_FOUR_ZERO_THREE),
+        @ApiResponse(responseCode = HTTP_CODE_FOUR_ZERO_FOUR, description = HTTP_MESSAGE_FOUR_ZERO_FOUR),
+        @ApiResponse(responseCode = HTTP_CODE_FIVE_HUNDRED, description = HTTP_MESSAGE_FIVE_HUNDRED),
+        @ApiResponse(responseCode = HTTP_CODE_FIVE_ZERO_ONE, description = HTTP_MESSAGE_FIVE_ZERO_ONE),
+        @ApiResponse(responseCode = HTTP_CODE_FIVE_ZERO_THREE, description = HTTP_MESSAGE_FIVE_ZERO_THREE)
+    })
+    public ResponseEntity<CCDCallbackResponse> handleAboutToSubmit(@RequestHeader("Authorization") String userToken,
+                                                                   @RequestBody CallbackRequest callbackRequest)
+            throws IOException {
         CaseData caseData = nocRepresentativeService
                 .updateRepresentation(callbackRequest.getCaseDetails(), userToken);
         callbackRequest.getCaseDetails().setCaseData(caseData);
@@ -53,15 +81,12 @@ public class NoticeOfChangeController {
         @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))}),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")})
-    public GenericCallbackResponse nocSubmitted(
-            @RequestHeader("Authorization") String userToken,
-            @RequestBody CallbackRequest callbackRequest) {
+    public GenericCallbackResponse nocSubmitted(@RequestHeader("Authorization") String userToken,
+                                                @RequestBody CallbackRequest callbackRequest) {
         GenericCallbackResponse callbackResponse = new GenericCallbackResponse();
-
         if (APPLY_NOC_DECISION.equals(callbackRequest.getEventId())) {
             CaseDetails caseDetails = callbackRequest.getCaseDetails();
             CaseData caseData = caseDetails.getCaseData();
-
             //send emails here
             try {
                 nocNotificationService.sendNotificationOfChangeEmails(
@@ -75,7 +100,6 @@ public class NoticeOfChangeController {
                 "# You're now representing a client on case " + caseReference
             );
         }
-
         return callbackResponse;
     }
 }

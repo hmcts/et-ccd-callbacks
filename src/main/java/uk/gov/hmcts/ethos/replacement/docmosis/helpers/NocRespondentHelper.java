@@ -224,7 +224,7 @@ public class NocRespondentHelper {
                 .respondentOrganisation(change.getOrganisationToAdd())
                 .respRepName(respondent.getValue().getRespondentName())
                 .respondentId(respondent.getId())
-                .myHmctsYesNo("Yes")
+                .myHmctsYesNo(YES)
                 .build();
     }
 }

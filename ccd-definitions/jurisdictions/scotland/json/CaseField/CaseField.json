@@ -387,22 +387,6 @@
   },
   {
     "CaseTypeID": "ET_Scotland",
-    "ID": "repCollectionToRemove",
-    "Label": "Respondent representative(s) to remove",
-    "FieldType": "Collection",
-    "FieldTypeParameter": "RespondentRepresentative",
-    "SecurityClassification": "Public"
-  },
-  {
-    "CaseTypeID": "ET_Scotland",
-    "ID": "repCollectionToAdd",
-    "Label": "Respondent representative(s) to add",
-    "FieldType": "Collection",
-    "FieldTypeParameter": "RespondentRepresentative",
-    "SecurityClassification": "Public"
-  },
-  {
-    "CaseTypeID": "ET_Scotland",
     "ID": "jurCodesCollection",
     "Label": "Jurisdiction",
     "FieldType": "Collection",
@@ -6765,13 +6749,5 @@
     "FieldType": "Collection",
     "FieldTypeParameter": "DynamicListCollection",
     "SecurityClassification": "Public"
-  },
-  {
-    "CaseTypeID": "ET_Scotland",
-    "ID": "nocWarning",
-    "Label": " ",
-    "FieldType": "Text",
-    "SecurityClassification": "Public",
-    "Searchable": "N"
   }
 ]

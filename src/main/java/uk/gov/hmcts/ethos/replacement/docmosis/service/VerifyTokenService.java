@@ -1,82 +1,49 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
-import com.nimbusds.jose.JOSEException;
-import com.nimbusds.jose.JWSHeader;
-import com.nimbusds.jose.JWSVerifier;
-import com.nimbusds.jose.crypto.factories.DefaultJWSVerifierFactory;
-import com.nimbusds.jose.jwk.AsymmetricJWK;
-import com.nimbusds.jose.jwk.JWK;
-import com.nimbusds.jose.jwk.JWKSet;
-import com.nimbusds.jose.jwk.SecretJWK;
-import com.nimbusds.jose.proc.JWSVerifierFactory;
-import com.nimbusds.jwt.SignedJWT;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtException;
 import org.springframework.stereotype.Service;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.exceptions.VerifyTokenServiceException;
 
-import java.net.URL;
-import java.security.Key;
-
+/**
+ * Verifies incoming JWT bearer tokens using Spring Security's {@link JwtDecoder}.
+ *
+ * <p>Validation covers:
+ * <ul>
+ *   <li>Cryptographic signature – verified against IDAM's JWKS endpoint</li>
+ *   <li>Expiry / not-before – via {@code JwtTimestampValidator}</li>
+ *   <li>Issuer – via {@code MultiIssuerValidator} (configurable list)</li>
+ *   <li>Audience – verified against the configured client ID</li>
+ * </ul>
+ */
 @Slf4j
 @Service("verifyTokenService")
+@RequiredArgsConstructor
 public class VerifyTokenService {
 
-    @Value("${idam.api.jwkUrl}")
-    private String idamJwkUrl;
-
-    private final JWSVerifierFactory jwsVerifierFactory;
     public static final String INVALID_TOKEN = "Invalid Token {}";
 
-    public VerifyTokenService() {
-        this.jwsVerifierFactory = new DefaultJWSVerifierFactory();
-    }
+    private final JwtDecoder jwtDecoder;
 
+    /**
+     * Validates the supplied bearer token.
+     *
+     * @param token the raw {@code Authorization} header value, with or without the
+     *              {@code Bearer } prefix
+     * @return {@code true} if the token passes all validation checks; {@code false} otherwise
+     */
     public boolean verifyTokenSignature(String token) {
+        if (token == null) {
+            return false;
+        }
         try {
-            String tokenTocheck = token.replace("Bearer ", "");
-            SignedJWT signedJwt = SignedJWT.parse(tokenTocheck);
-
-            JWKSet jsonWebKeySet = loadJsonWebKeySet(idamJwkUrl);
-
-            JWSHeader jwsHeader = signedJwt.getHeader();
-            Key key = findKeyById(jsonWebKeySet, jwsHeader.getKeyID());
-
-            JWSVerifier jwsVerifier = jwsVerifierFactory.createJWSVerifier(jwsHeader, key);
-
-            return signedJwt.verify(jwsVerifier);
-        } catch (Exception e) {
-            log.error("Token validation error:", e);
+            String tokenValue = token.startsWith("Bearer ") ? token.substring(7) : token;
+            jwtDecoder.decode(tokenValue);
+            return true;
+        } catch (JwtException e) {
+            log.error(INVALID_TOKEN, e.getMessage());
             return false;
         }
     }
-
-    private JWKSet loadJsonWebKeySet(String jwksUrl) {
-        try {
-            return JWKSet.load(new URL(jwksUrl));
-        } catch (Exception e) {
-            log.error("JWKS key loading error", e);
-            throw new VerifyTokenServiceException("JWKS error", e);
-        }
-    }
-
-    private Key findKeyById(JWKSet jsonWebKeySet, String keyId) {
-        try {
-            JWK jsonWebKey = jsonWebKeySet.getKeyByKeyId(keyId);
-            if (jsonWebKey == null) {
-                throw new VerifyTokenServiceException("JWK does not exist in the key set");
-            }
-            if (jsonWebKey instanceof SecretJWK secretJWK) {
-                return secretJWK.toSecretKey();
-            }
-            if (jsonWebKey instanceof AsymmetricJWK asymmetricJWK) {
-                return asymmetricJWK.toPublicKey();
-            }
-            throw new VerifyTokenServiceException("Unsupported JWK " + jsonWebKey.getClass().getName());
-        } catch (JOSEException e) {
-            log.error("Invalid JWK key", e);
-            throw new VerifyTokenServiceException("Invalid JWK", e);
-        }
-    }
-
 }

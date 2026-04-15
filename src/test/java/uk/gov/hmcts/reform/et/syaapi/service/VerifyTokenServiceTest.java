@@ -1,38 +1,48 @@
 package uk.gov.hmcts.reform.et.syaapi.service;
 
-import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.security.oauth2.jwt.JwtException;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class VerifyTokenServiceTest {
 
-    @InjectMocks
+    @Mock
+    private JwtDecoder jwtDecoder;
+
     private VerifyTokenService verifyTokenService;
 
     @BeforeEach
-    public void setUp() {
-        verifyTokenService = new VerifyTokenService();
-        ReflectionTestUtils.setField(verifyTokenService, "idamJwkUrl", "http://localhost:5555/o/jwks");
+    void setUp() {
+        verifyTokenService = new VerifyTokenService(jwtDecoder);
     }
 
     @Test
-    @SneakyThrows
-    void verifyTokenSignature() {
-        assertFalse(verifyTokenService.verifyTokenSignature(
-            "Bearer eyJraWQiOiIyMzQ1Njc4OSIsImFsZyI6IlJTMjU2In0."
-                + "eyJzdWIiOiJDQ0RfU3R1YiIsImlzcyI6Imh0dHA6XC9cL2ZyLWFtOjgwODBcL29wZW5hbVwvb2F1dGgyXC9obWN0cyIsIn"
-                + "Rva2VuTmFtZSI6ImFjY2Vzc190b2tlbiIsImV4cCI6MTY0NjY1NzUwNSwiaWF0IjoxNjQ2NjQzMTA1fQ.IFvpJxJl9Qq6dBbN"
-                + "_QazfbbAFztNPEtPa_5qVhPJcTlX2SDPkhYz4EGH4196_YbHmGghLQQpn1lscCb2hq27c3xXrVkYx-h6Dm0RXJXaz8Fktiw4a"
-                + "BkZ4ZvDxSD_3Q1Hj534Qe-XoS5WelXh4xGD2ay4DrPqtlE4BKwfBGTA_Dbpu6Iree7S7e149zzUaXYbJGoyBv9x_j4Zy2advD9"
-                + "FK52R1CXVCHIa-aPmW7vCkucLxKMr8ktyd5NFnAgNo-XqXMmnAmYp-MYf_-6SHaPLsDsHqO18F68-VA2Rj2WG3S58u6XwvRYJ3"
-                + "28R9yqHZVo_fojRY9pRhFzlVr1Yy9FYOg"));
+    void verifyTokenSignature_validToken_returnsTrue() {
+        when(jwtDecoder.decode(anyString())).thenReturn(mock(Jwt.class));
+        assertTrue(verifyTokenService.verifyTokenSignature("Bearer validtoken"));
+    }
+
+    @Test
+    void verifyTokenSignature_invalidToken_returnsFalse() {
+        when(jwtDecoder.decode(anyString())).thenThrow(new JwtException("bad token"));
+        assertFalse(verifyTokenService.verifyTokenSignature("Bearer badtoken"));
+    }
+
+    @Test
+    void verifyTokenSignature_nullToken_returnsFalse() {
+        assertFalse(verifyTokenService.verifyTokenSignature(null));
     }
 }

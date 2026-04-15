@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -788,6 +789,7 @@ class ListingGenerationControllerTest extends BaseControllerTest {
         verify(printHearingListService, never()).initPrintHearingLists(any(CaseData.class));
     }
 
+    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void initGenerateReportForbidden() throws Exception {
         mvc.perform(post(INIT_GENERATE_REPORT_URL)

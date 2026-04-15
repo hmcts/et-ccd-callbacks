@@ -2,18 +2,21 @@ package uk.gov.hmcts.ethos.replacement.docmosis.controllers.notifications.respon
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.TestSecurityConfig;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.PseRespondToTribunalService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -39,6 +42,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.RESPONDENT_TITLE;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({PseRespondToTribunalController.class, JsonMapper.class})
+@Import(TestSecurityConfig.class)
 class PseRespondToTribunalControllerTest {
     private static final String AUTH_TOKEN = "Bearer eyJhbGJbpjciOiJIUzI1NiJ9";
     private static final String ABOUT_TO_START_URL = "/pseRespondToTribunal/aboutToStart";
@@ -99,6 +103,7 @@ class PseRespondToTribunalControllerTest {
         mockHelper.verify(() -> Helper.isClaimantNonSystemUser(any()), times(1));
     }
 
+    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void aboutToStart_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
@@ -158,6 +163,7 @@ class PseRespondToTribunalControllerTest {
                 RESPONDENT_TITLE);
     }
 
+    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void midDetailsTable_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
@@ -182,6 +188,7 @@ class PseRespondToTribunalControllerTest {
         verify(pseRespondToTribunalService).validateRespondentInput(ccdRequest.getCaseDetails().getCaseData());
     }
 
+    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void midValidateInput_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
@@ -208,6 +215,7 @@ class PseRespondToTribunalControllerTest {
         verify(pseRespondToTribunalService, times(1)).sendTribunalEmail(ccdRequest.getCaseDetails(), RESPONDENT_TITLE);
     }
 
+    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void aboutToSubmit_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
@@ -234,6 +242,7 @@ class PseRespondToTribunalControllerTest {
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
+    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void submitted_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);

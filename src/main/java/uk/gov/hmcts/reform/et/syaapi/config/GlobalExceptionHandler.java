@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.et.syaapi.config;
 import feign.FeignException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.server.ResponseStatusException;
@@ -37,6 +38,25 @@ public class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             ErrorResponse.builder()
                 .message(exception.getMessage())
                 .code(UNAUTHORIZED.value())
+                .build()
+        );
+    }
+
+    /**
+     * Handles {@link AccessDeniedException} thrown by {@code @PreAuthorize} method-security checks.
+     * Returns HTTP 403 so that Spring Security's AOP-based role enforcement produces the same
+     * response shape as other authorisation failures in this handler.
+     *
+     * @param exception the access-denied exception
+     * @return {@link ErrorResponse} with the Forbidden (403) response
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException exception) {
+        log.warn("Access denied: {}", exception.getMessage());
+        return ResponseEntity.status(FORBIDDEN).body(
+            ErrorResponse.builder()
+                .message(exception.getMessage())
+                .code(FORBIDDEN.value())
                 .build()
         );
     }

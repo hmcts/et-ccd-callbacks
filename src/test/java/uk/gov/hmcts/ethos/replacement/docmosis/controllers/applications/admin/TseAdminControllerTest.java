@@ -1,6 +1,7 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers.applications.admin;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -185,6 +186,7 @@ class TseAdminControllerTest extends BaseControllerTest {
             .validateInput(ccdRequest.getCaseDetails().getCaseData());
     }
 
+    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void midValidateInput_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);

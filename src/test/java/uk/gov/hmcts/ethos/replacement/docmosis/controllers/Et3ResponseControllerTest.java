@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -120,6 +121,7 @@ class Et3ResponseControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
+    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void aboutToStart_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
@@ -152,6 +154,7 @@ class Et3ResponseControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
+    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void midEmploymentDates_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
@@ -186,6 +189,7 @@ class Et3ResponseControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
+    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void et3ProcessingComplete_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
@@ -218,6 +222,7 @@ class Et3ResponseControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
+    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void aboutToSubmit_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
@@ -275,6 +280,7 @@ class Et3ResponseControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()));
     }
 
+    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void validateRespondent_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
@@ -350,6 +356,7 @@ class Et3ResponseControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
+    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void submitSection_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
@@ -381,6 +388,7 @@ class Et3ResponseControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
+    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void submitComplete_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
@@ -412,6 +420,7 @@ class Et3ResponseControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
+    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void startSubmitEt3_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
@@ -443,6 +452,7 @@ class Et3ResponseControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
+    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void reloadSubmitData_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);

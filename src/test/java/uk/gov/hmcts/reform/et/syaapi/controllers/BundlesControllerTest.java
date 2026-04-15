@@ -10,6 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingBundleType;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.TestSecurityConfig;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.et.syaapi.models.ClaimantBundlesRequest;
@@ -28,7 +29,7 @@ import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.TEST_SER
 @WebMvcTest(
     controllers = {BundlesController.class}
 )
-@Import(BundlesController.class)
+@Import({BundlesController.class, TestSecurityConfig.class})
 class BundlesControllerTest {
     private static final String CASE_ID = "1646225213651590";
     private static final String CASE_TYPE = "ET_Scotland";

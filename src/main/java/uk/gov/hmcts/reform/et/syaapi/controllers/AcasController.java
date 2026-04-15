@@ -7,6 +7,7 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -19,8 +20,10 @@ import uk.gov.hmcts.reform.et.syaapi.service.AcasCaseService;
 import uk.gov.hmcts.reform.et.syaapi.service.AdminUserService;
 import uk.gov.hmcts.reform.et.syaapi.service.CaseDocumentService;
 import uk.gov.hmcts.reform.et.syaapi.service.FeatureToggleService;
+import uk.gov.hmcts.reform.et.syaapi.service.RoleValidationService;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,16 +39,22 @@ import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.AUTHORIZATI
 @SuppressWarnings({"PMD.UnnecessaryAnnotationValueElement"})
 public class AcasController {
 
+    private static final List<String> ACAS_ALLOWED_ROLES =
+        Arrays.asList("caseworker-employment-api", "et-acas-api");
+    private static final String ACCESS_DENIED_MSG =
+        "User does not have required role to access this endpoint";
+
     private final AcasCaseService acasCaseService;
     private final CaseDocumentService caseDocumentService;
     private final AdminUserService adminUserService;
     private final FeatureToggleService featureToggleService;
+    private final RoleValidationService roleValidationService;
 
     /**
      * Given a datetime, this method will return a list of caseIds which have been modified since the datetime
      * provided.
      *
-     * @param userToken       used for IDAM Authentication
+     * @param authToken       used for IDAM Authentication
      * @param requestDateTime used for querying when a case was last updated
      * @return a list of case ids
      */
@@ -54,17 +63,18 @@ public class AcasController {
     @ApiResponseGroup
     @RequiresAcasRole
     public ResponseEntity<Object> getLastModifiedCaseList(
-        @RequestHeader(value = HttpHeaders.AUTHORIZATION) String userToken,
+        @RequestHeader(value = HttpHeaders.AUTHORIZATION) String authToken,
         @RequestParam(name = "datetime")
         @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime requestDateTime) {
-        return ok(acasCaseService.getLastModifiedCasesId(userToken, requestDateTime));
+        checkAcasRole(authToken);
+        return ok(acasCaseService.getLastModifiedCasesId(authToken, requestDateTime));
     }
 
     /**
      * This method is used to fetch the raw case data from CCD from a list of CaseIds.
      *
-     * @param authorisation used for IDAM authentication
-     * @param caseIds       a list of CCD ids
+     * @param authToken used for IDAM authentication
+     * @param caseIds   a list of CCD ids
      * @return a list of case data
      */
     @GetMapping(value = "/getCaseData")
@@ -72,16 +82,17 @@ public class AcasController {
     @ApiResponseGroup
     @RequiresAcasRole
     public ResponseEntity<Object> getCaseData(
-        @RequestHeader(value = HttpHeaders.AUTHORIZATION) String authorisation,
+        @RequestHeader(value = HttpHeaders.AUTHORIZATION) String authToken,
         @RequestParam(name = "caseIds") List<String> caseIds) {
-        return ok(acasCaseService.getCaseData(authorisation, caseIds));
+        checkAcasRole(authToken);
+        return ok(acasCaseService.getCaseData(authToken, caseIds));
     }
 
     /**
      * This method is used to retrieve a list of documents which are available to ACAS.
      *
-     * @param authorisation used for IDAM authentication
-     * @param caseId        ccd case id
+     * @param authToken used for IDAM authentication
+     * @param caseId    ccd case id
      * @return a multi valued map containing a list of documents for ACAS
      */
     @GetMapping(value = "/getAcasDocuments")
@@ -89,8 +100,9 @@ public class AcasController {
     @ApiResponseGroup
     @RequiresAcasRole
     public ResponseEntity<Object> getAcasDocuments(
-        @RequestHeader(value = HttpHeaders.AUTHORIZATION) String authorisation,
+        @RequestHeader(value = HttpHeaders.AUTHORIZATION) String authToken,
         @RequestParam(name = "caseId") String caseId) {
+        checkAcasRole(authToken);
         List<CaseDocumentAcasResponse> body = acasCaseService.retrieveAcasDocuments(caseId);
         return ok(body);
     }
@@ -110,6 +122,7 @@ public class AcasController {
     public ResponseEntity<ByteArrayResource> getDocumentBinaryContent(
         @RequestParam(name = "documentId") final UUID documentId,
         @RequestHeader(AUTHORIZATION) String authToken) {
+        checkAcasRole(authToken);
         String accessToken = adminUserService.getAdminUserToken();
         return caseDocumentService.downloadDocument(accessToken, documentId);
     }
@@ -129,6 +142,7 @@ public class AcasController {
     public ResponseEntity<Object> vetAndAcceptCase(
         @RequestParam(name = "caseId") final String caseId,
         @RequestHeader(AUTHORIZATION) String authToken) {
+        checkAcasRole(authToken);
         // Feature flag in place to disable access in Production
         if (featureToggleService.isAcasVetAndAcceptEnabled()) {
             return 16 == caseId.length()
@@ -136,6 +150,20 @@ public class AcasController {
                 : ResponseEntity.badRequest().body("Invalid caseId");
         } else {
             return ResponseEntity.status(403).body("Feature is disabled");
+        }
+    }
+
+    /**
+     * Verifies the caller holds at least one of the ACAS-permitted IDAM roles.
+     * Throws {@link AccessDeniedException} (converted to HTTP 403 by
+     * {@link uk.gov.hmcts.reform.et.syaapi.config.GlobalExceptionHandler}) if the
+     * role check fails, eliminating the need for a separate AOP aspect.
+     *
+     * @param authToken the raw {@code Authorization} header value
+     */
+    private void checkAcasRole(String authToken) {
+        if (!roleValidationService.hasAnyRole(authToken, ACAS_ALLOWED_ROLES)) {
+            throw new AccessDeniedException(ACCESS_DENIED_MSG);
         }
     }
 }

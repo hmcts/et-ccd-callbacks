@@ -1,10 +1,10 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.config;
 
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
-
 import org.junit.jupiter.api.Test;
 import org.springframework.jdbc.core.JdbcTemplate;
+
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class PreviewDataStoreCaseIdSequenceInitialiserTest {
 

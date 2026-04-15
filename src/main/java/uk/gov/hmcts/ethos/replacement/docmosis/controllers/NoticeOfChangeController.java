@@ -85,6 +85,7 @@ public class NoticeOfChangeController {
                                                 @RequestBody CallbackRequest callbackRequest) {
         GenericCallbackResponse callbackResponse = new GenericCallbackResponse();
         if (APPLY_NOC_DECISION.equals(callbackRequest.getEventId())) {
+            nocRepresentativeService.removeUnexpectedAssignments(callbackRequest.getCaseDetails());
             CaseDetails caseDetails = callbackRequest.getCaseDetails();
             CaseData caseData = caseDetails.getCaseData();
             //send emails here

@@ -1617,4 +1617,49 @@ class NocRespondentRepresentativeServiceTest {
         assertThat(actualCaseUserAssignments.get(LoggerTestUtils.INTEGER_ZERO).getValue())
                 .isEqualTo(caseUserAssignment1);
     }
+
+    @Test
+    @SneakyThrows
+    void theRemoveUnexpectedAssignments() {
+        // when no case assignment was found with the given case details should not revoke any case assignment(s)
+        CaseDetails caseDetails = new  CaseDetails();
+        caseDetails.setCaseId(CASE_ID_1);
+        CaseData tmpCaseData = new CaseData();
+        GenericTypeItem<CaseUserAssignment> caseUserAssignment1 = GenericTypeItem.<CaseUserAssignment>builder()
+                .id(String.valueOf(randomUUID())).value(CaseUserAssignment.builder().caseRole(ROLE_SOLICITORA)
+                        .userId(REPRESENTATIVE_ID_ONE).caseId(CASE_ID_1).organisationId(ORGANISATION_ID_ONE).build())
+                .build();
+        GenericTypeItem<CaseUserAssignment> caseUserAssignment2 = GenericTypeItem.<CaseUserAssignment>builder()
+                .id(String.valueOf(randomUUID())).value(CaseUserAssignment.builder().caseRole(ROLE_SOLICITORA)
+                        .userId(REPRESENTATIVE_ID_TWO).caseId(CASE_ID_1).organisationId(ORGANISATION_ID_ONE).build())
+                .build();
+        tmpCaseData.setExpectedCaseUserAssignments(List.of(caseUserAssignment1, caseUserAssignment2));
+        caseDetails.setCaseData(tmpCaseData);
+        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
+        when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, CASE_ID_1)).thenReturn(null);
+        nocRespondentRepresentativeService.removeUnexpectedAssignments(caseDetails);
+        verifyNoInteractions(ccdClient);
+        // when case user assignment data does not have any assignment should not revoke any case assignment(s)
+        CaseUserAssignmentData caseUserAssignmentData = CaseUserAssignmentData.builder().build();
+        when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, CASE_ID_1)).thenReturn(caseUserAssignmentData);
+        nocRespondentRepresentativeService.removeUnexpectedAssignments(caseDetails);
+        verifyNoInteractions(ccdClient);
+        // when existing case assignments does not have any unexpected assignment should not revoke any case
+        // assignment(s)
+        caseUserAssignmentData.setCaseUserAssignments(new ArrayList<>());
+        caseUserAssignmentData.getCaseUserAssignments().addAll(List.of(caseUserAssignment1.getValue(),
+                caseUserAssignment2.getValue()));
+        nocRespondentRepresentativeService.removeUnexpectedAssignments(caseDetails);
+        verifyNoInteractions(ccdClient);
+        // when existing case assignments have unexpected assignment should revoke that case assignment.
+        CaseUserAssignment caseUserAssignment3 = CaseUserAssignment.builder().caseRole(ROLE_SOLICITORB)
+                .userId(REPRESENTATIVE_ID_TWO).caseId(CASE_ID_1).organisationId(ORGANISATION_ID_ONE).build();
+        caseUserAssignmentData.getCaseUserAssignments().add(caseUserAssignment3);
+        when(ccdClient.revokeCaseAssignments(eq(ADMIN_USER_TOKEN), any(CaseUserAssignmentData.class)))
+                .thenReturn(StringUtils.EMPTY);
+        nocRespondentRepresentativeService.removeUnexpectedAssignments(caseDetails);
+        verify(ccdClient, times(LoggerTestUtils.INTEGER_ONE)).revokeCaseAssignments(eq(ADMIN_USER_TOKEN),
+                any(CaseUserAssignmentData.class));
+
+    }
 }

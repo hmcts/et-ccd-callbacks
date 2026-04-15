@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.jspecify.annotations.NonNull;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -1195,6 +1196,41 @@ public class NocRespondentRepresentativeService {
         } catch (CcdInputOutputException exception) {
             log.warn(WARNING_FAILED_TO_RETRIEVE_CASE_ASSIGNMENTS, caseId, exception.getMessage());
             return Optional.empty();
+        }
+    }
+
+    public void removeUnexpectedAssignments(CaseDetails caseDetails) {
+        CaseUserAssignmentData existingCaseUserAssignmentData = getCaseUserAssignmentData(
+                adminUserService.getAdminUserToken(), caseDetails.getCaseId()).orElse(null);
+        if (ObjectUtils.isEmpty(existingCaseUserAssignmentData)
+                || CollectionUtils.isEmpty(existingCaseUserAssignmentData.getCaseUserAssignments())) {
+            return;
+        }
+        List<CaseUserAssignment> caseUserAssignmentsToRevoke = new ArrayList<>();
+        for (CaseUserAssignment existingAssignment : existingCaseUserAssignmentData.getCaseUserAssignments()) {
+            boolean assignmentFound = false;
+            for (GenericTypeItem<CaseUserAssignment> expectedAssignmentItem
+                    : caseDetails.getCaseData().getExpectedCaseUserAssignments()) {
+                CaseUserAssignment expectedAssignment = expectedAssignmentItem.getValue();
+                if (ObjectUtils.isNotEmpty(expectedAssignment)
+                        && Strings.CS.equals(existingAssignment.getUserId(), expectedAssignment.getUserId())
+                        && Strings.CS.equals(existingAssignment.getCaseRole(), expectedAssignment.getCaseRole())
+                        && Strings.CS.equals(existingAssignment.getOrganisationId(),
+                        expectedAssignment.getOrganisationId())) {
+                    assignmentFound = true;
+                    break;
+                }
+            }
+            if (!assignmentFound) {
+                caseUserAssignmentsToRevoke.add(existingAssignment);
+            }
+        }
+        if (CollectionUtils.isNotEmpty(caseUserAssignmentsToRevoke)) {
+            try {
+                revokeCaseAssignments(adminUserService.getAdminUserToken(), caseUserAssignmentsToRevoke);
+            } catch (GenericRuntimeException e) {
+                log.error(ERROR_UNABLE_TO_MODIFY_REPRESENTATIVE_ACCESS, caseDetails.getCaseId(), e.getMessage(), e);
+            }
         }
     }
 }

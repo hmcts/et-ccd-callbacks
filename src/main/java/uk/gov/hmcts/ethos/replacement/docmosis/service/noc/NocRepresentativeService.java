@@ -2,6 +2,9 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.noc;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ObjectUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -47,5 +50,14 @@ public class NocRepresentativeService {
             throw new IllegalStateException("Invalid or missing ChangeOrganisationRequest: " + change);
         }
         return change;
+    }
+
+    public void removeUnexpectedAssignments(CaseDetails caseDetails) {
+        if (ObjectUtils.isEmpty(caseDetails) || ObjectUtils.isEmpty(caseDetails.getCaseData())
+                || StringUtils.isBlank(caseDetails.getCaseId())
+                || CollectionUtils.isEmpty(caseDetails.getCaseData().getExpectedCaseUserAssignments())) {
+            return;
+        }
+        nocRespondentRepresentativeService.removeUnexpectedAssignments(caseDetails);
     }
 }

@@ -137,7 +137,7 @@ allprojects {
         resolutionStrategy.force(
             'commons-fileupload:commons-fileupload:1.6.0',
             'org.apache.httpcomponents:httpclient:4.5.14',
-            'org.apache.logging.log4j:log4j-core:2.25.3',
+            'org.apache.logging.log4j:log4j-core:2.25.4',
             'com.nimbusds:nimbus-jose-jwt:10.5',
             'net.minidev:json-smart:2.5.2',
             'com.squareup.okhttp3:logging-interceptor:4.12.0',
@@ -388,7 +388,7 @@ integration.shouldRunAfter(test)
 ext {
     junitJupiterVersion = '5.13.4'
     junitPlatformVersion = '1.13.4'
-    log4JVersion = '2.25.3'
+    log4JVersion = '2.25.4'
     pact_version = '4.3.10'
     reformLoggingVersion = '6.0.1'
     serenity = '3.9.8'

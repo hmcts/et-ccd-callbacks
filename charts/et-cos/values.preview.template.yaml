@@ -46,7 +46,6 @@ java:
     PREVIEW_DATA_STORE_DB_NAME: "pr-${CHANGE_ID}-data-store"
     PREVIEW_DATA_STORE_DB_USERNAME: hmcts
     PREVIEW_DATA_STORE_DB_CONN_OPTIONS: "?sslmode=require"
-    ET_PREVIEW_FLEXI_DB_PASSWORD: ""
   keyVaults:
     et-cos:
       secrets:
@@ -84,6 +83,8 @@ java:
           alias: LAUNCH_DARKLY_SDK_KEY
         - name: app-insights-connection-string
           alias: app-insights-connection-string
+        - name: et-preview-flexi-db-password
+          alias: ET_PREVIEW_FLEXI_DB_PASSWORD
   postgresql:
     enabled: false
 

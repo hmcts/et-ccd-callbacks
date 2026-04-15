@@ -392,7 +392,7 @@ ext {
     pact_version = '4.3.10'
     reformLoggingVersion = '6.0.1'
     serenity = '3.9.8'
-    tomcatEmbedVersion = '10.1.52'
+    tomcatEmbedVersion = '10.1.54'
     jacksonVersion = '2.18.3'
 }
 
@@ -487,8 +487,8 @@ dependencies {
     implementation group: 'com.fasterxml.woodstox', name: 'woodstox-core', version: '7.1.1'
     implementation group: 'com.squareup.okio', name: 'okio', version: '3.16.4'
     // Updated from 1.5.6 to fix CVE-2024-12798, CVE-2024-12801, CVE-2025-11226, CVE-2026-1225
-    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.26'
-    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.5.26'
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.32'
+    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.5.32'
     // CVE-2025-48734
     implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.11.0'
     implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'

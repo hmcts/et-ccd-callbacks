@@ -233,7 +233,7 @@ tasks.register('yarnInstall', Exec) {
 
 tasks.register('setupCcdDefinitionsWorkspace', Exec) {
     workingDir 'ccd-definitions'
-    commandLine 'yarn', 'setup'
+    commandLine 'yarn', 'install'
 }
 
 tasks.register('generateCftlibCcdDefinitions', Exec) {

@@ -928,7 +928,10 @@ public class NocRespondentRepresentativeService {
         resetRespondentRepresentativeRemovedField(caseData);
         Map<String, Object> caseDataAsMap = caseConverter.toMap(caseData);
         Map<String, Object> repCollection = updateRepresentationMap(caseData, caseDetails.getCaseId());
+        Map<String, Object> expectedCaseUserAssignments = Map.of("expectedCaseUserAssignments",
+                caseData.getExpectedCaseUserAssignments());
         caseDataAsMap.putAll(repCollection);
+        caseDataAsMap.putAll(expectedCaseUserAssignments);
         return  caseConverter.convert(caseDataAsMap, CaseData.class);
     }
 

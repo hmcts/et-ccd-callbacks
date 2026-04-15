@@ -1141,8 +1141,8 @@ public class NocRespondentRepresentativeService {
     public List<GenericTypeItem<CaseUserAssignment>> buildExpectedCaseUserAssignments(String caseId,
                                                                      RepresentedTypeR addedRepresentative) {
         List<GenericTypeItem<CaseUserAssignment>> expectedCaseUserAssignments = new ArrayList<>();
-        CaseUserAssignmentData caseUserAssignmentData = getCaseUserAssignmentData(caseId,
-                adminUserService.getAdminUserToken()).orElse(null);
+        CaseUserAssignmentData caseUserAssignmentData = getCaseUserAssignmentData(adminUserService.getAdminUserToken(),
+                caseId).orElse(null);
         if (ObjectUtils.isNotEmpty(caseUserAssignmentData)
                 && CollectionUtils.isNotEmpty(caseUserAssignmentData.getCaseUserAssignments())) {
             for (CaseUserAssignment caseUserAssignment : caseUserAssignmentData.getCaseUserAssignments()) {

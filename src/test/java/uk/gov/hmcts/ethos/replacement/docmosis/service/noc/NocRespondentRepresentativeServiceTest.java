@@ -1553,14 +1553,14 @@ class NocRespondentRepresentativeServiceTest {
         // when case user assignment data and added solicitor's organisation not hmcts organisation should return empty
         // list.
         RepresentedTypeR representative = RepresentedTypeR.builder().build();
-        when(nocCcdService.retrieveCaseUserAssignments(CASE_ID_1, ADMIN_USER_TOKEN)).thenReturn(null);
+        when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, CASE_ID_1)).thenReturn(null);
         assertThat(nocRespondentRepresentativeService.buildExpectedCaseUserAssignments(CASE_ID_1, representative))
                 .isEmpty();
         // when case user assignment data does not have any case user assignment and added solicitor's organisation is
         // empty should return empty list.
         CaseUserAssignmentData caseUserAssignmentData = new CaseUserAssignmentData();
         representative.setMyHmctsYesNo(YES);
-        when(nocCcdService.retrieveCaseUserAssignments(CASE_ID_1, ADMIN_USER_TOKEN)).thenReturn(caseUserAssignmentData);
+        when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, CASE_ID_1)).thenReturn(caseUserAssignmentData);
         assertThat(nocRespondentRepresentativeService.buildExpectedCaseUserAssignments(CASE_ID_1, representative))
                 .isEmpty();
         // when case user assignment data has case user assignments but added solicitor's organisation id is blank

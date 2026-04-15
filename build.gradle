@@ -231,6 +231,17 @@ tasks.register('yarnInstall', Exec) {
     commandLine 'yarn', 'install'
 }
 
+tasks.register('setupCcdDefinitionsWorkspace', Exec) {
+    workingDir 'ccd-definitions'
+    commandLine 'yarn', 'setup'
+}
+
+tasks.register('generateCftlibCcdDefinitions', Exec) {
+    dependsOn 'setupCcdDefinitionsWorkspace'
+    workingDir 'ccd-definitions'
+    commandLine 'yarn', 'generate-excel:cftlib'
+}
+
 tasks.register('yarnAudit', Exec) {
     dependsOn ':yarnInstall'
     workingDir '.'
@@ -658,6 +669,7 @@ bootWithCCD {
 }
 
 tasks.named('dumpCCDDefinitions') {
+    dependsOn 'generateCftlibCcdDefinitions'
     authMode = uk.gov.hmcts.rse.AuthMode.Local
     environment 'RSE_LIB_ADDITIONAL_DATABASES', 'et_cos,et_msg_handler,evidence,ethos,camunda,role_assignment,wa_workflow_api,cft_task_db,wa_case_event_messages_db,ccd_data,emstitch'
     environment 'SPRING_PROFILES_ACTIVE', 'cftlib'

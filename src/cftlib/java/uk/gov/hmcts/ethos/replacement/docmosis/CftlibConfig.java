@@ -302,7 +302,7 @@ public class CftlibConfig implements CFTLibConfigurer {
             WA_TASK_CONFIGURATION, CASEWORKER_EMPLOYMENT_ETJUDGE, TASK_SUPERVISOR);
     }
 
-    private void importCcdDefinitions(CFTLib lib) {
+    private void importCcdDefinitions(CFTLib lib) throws IOException {
         if (importCcdDefsOnBoot) {
             importEnglandWales(lib);
             importScotland(lib);
@@ -310,25 +310,49 @@ public class CftlibConfig implements CFTLibConfigurer {
         }
     }
 
-    private void importEnglandWales(CFTLib lib) {
+    private void importEnglandWales(CFTLib lib) throws IOException {
         importCcdDefinition(lib, ENGLANGWALES_CONFIG_FILE);
     }
 
-    private void importScotland(CFTLib lib) {
+    private void importScotland(CFTLib lib) throws IOException {
         importCcdDefinition(lib, SCOTLAND_CONFIG_FILE);
     }
 
-    private void importAdmin(CFTLib lib) {
+    private void importAdmin(CFTLib lib) throws IOException {
         importCcdDefinition(lib, ADMIN_CONFIG_FILE);
     }
 
-    private void importCcdDefinition(CFTLib lib, String file) {
+    private void importCcdDefinition(CFTLib lib, String file) throws IOException {
+        Path definitionFile = resolveDefinitionFile(file);
         try {
-            byte[] def = Files.readAllBytes(Path.of(file));
+            byte[] def = Files.readAllBytes(definitionFile);
             lib.importDefinition(def);
-        } catch (IOException e) {
-            log.error("Unable to import {},", file);
+        } catch (Exception e) {
+            log.error("Unable to import {} from {}", file, definitionFile, e);
+            throw new IOException("Unable to import CCD definition " + definitionFile, e);
         }
+    }
+
+    private Path resolveDefinitionFile(String file) throws IOException {
+        Path configuredPath = Path.of(file).normalize();
+        if (Files.exists(configuredPath)) {
+            return configuredPath.toAbsolutePath().normalize();
+        }
+
+        String relativePath = file.startsWith("./") ? file.substring(2) : file;
+        Path currentDirectory = Path.of("").toAbsolutePath().normalize();
+        while (currentDirectory != null) {
+            Path candidate = currentDirectory.resolve(relativePath).normalize();
+            if (Files.exists(candidate)) {
+                return candidate;
+            }
+            currentDirectory = currentDirectory.getParent();
+        }
+
+        throw new IOException(
+            "Unable to locate CCD definition file '%s' from working directory '%s'"
+                .formatted(file, Path.of("").toAbsolutePath().normalize())
+        );
     }
 
     private void startDockerCompose() {

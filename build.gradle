@@ -447,8 +447,8 @@ dependencies {
     implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '8.1'
     implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.5'
 
-    implementation 'com.github.hmcts:decentralised-runtime:codex-20260414-case-submission'
-    implementation 'com.github.hmcts:ccd-config-generator:codex-20260414-case-submission'
+    implementation 'com.github.hmcts:decentralised-runtime:definition-snapshot-fallback-20260415-1038'
+    implementation 'com.github.hmcts:ccd-config-generator:definition-snapshot-fallback-20260415-1038'
 
     // Log4J core added to remove startup error message
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4JVersion
@@ -586,6 +586,11 @@ bootJar {
     getArchiveFileName().set(provider {
         'et-cos.jar'
     })
+
+    dependsOn dumpCCDDefinitions
+    from("$buildDir/cftlib/definition-snapshots") {
+        into 'BOOT-INF/classes/definition-snapshots'
+    }
 
     manifest {
         attributes('Implementation-Version': project.version.toString())

@@ -140,7 +140,7 @@ dependencies {
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.18.3'
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.18.3'
     implementation group: 'org.springframework', name: 'spring-core', version: '6.2.11'
-    implementation 'com.github.hmcts:decentralised-runtime:codex-20260414-case-submission'
+    implementation 'com.github.hmcts:decentralised-runtime:definition-snapshot-fallback-20260415-1038'
 
     compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.42'
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.42'

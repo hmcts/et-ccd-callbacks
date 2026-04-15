@@ -397,7 +397,8 @@ ext {
     pact_version = '4.3.10'
     reformLoggingVersion = '6.0.1'
     serenity = '3.9.8'
-    tomcatEmbedVersion = '10.1.52'
+    // Apache Tomcat 10.1.54+ addresses 2026 CVEs (e.g. CVE-2026-29145 chain, CVE-2026-34486 bypass in 10.1.53); see https://tomcat.apache.org/security-10.html
+    tomcatEmbedVersion = '10.1.54'
     jacksonVersion = '2.18.3'
 }
 

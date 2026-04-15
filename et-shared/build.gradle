@@ -167,7 +167,7 @@ configurations.configureEach {
     resolutionStrategy.eachDependency { details ->
         if (details.requested.group == "org.apache.tomcat.embed"
             && ["tomcat-embed-core", "tomcat-embed-websocket"].contains(details.requested.name)) {
-            details.useVersion("10.1.52")
+            details.useVersion("10.1.54")
         }
         // CVE-2020-29582 - Force Kotlin to 2.1.0+
         if (details.requested.group == "org.jetbrains.kotlin"

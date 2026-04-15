@@ -7,6 +7,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class PreviewDataStoreCaseIdSequenceInitialiserTest {
+    private static final long SEQUENCE_BASE = 91_304_100_000_000_000L;
 
     @Test
     void shouldAlignSequenceUsingConfiguredBase() throws Exception {
@@ -14,12 +15,12 @@ class PreviewDataStoreCaseIdSequenceInitialiserTest {
         when(jdbcTemplate.queryForObject(
             PreviewDataStoreCaseIdSequenceInitialiser.ALIGN_SEQUENCE_SQL,
             Long.class,
-            91304100000000000L
-        )).thenReturn(91304100000000000L);
+            SEQUENCE_BASE
+        )).thenReturn(SEQUENCE_BASE);
 
         PreviewDataStoreCaseIdSequenceInitialiser initialiser =
             new PreviewDataStoreCaseIdSequenceInitialiser(
-                91304100000000000L,
+                SEQUENCE_BASE,
                 "host",
                 5432,
                 "db",
@@ -38,7 +39,7 @@ class PreviewDataStoreCaseIdSequenceInitialiserTest {
         verify(jdbcTemplate).queryForObject(
             PreviewDataStoreCaseIdSequenceInitialiser.ALIGN_SEQUENCE_SQL,
             Long.class,
-            91304100000000000L
+            SEQUENCE_BASE
         );
     }
 }

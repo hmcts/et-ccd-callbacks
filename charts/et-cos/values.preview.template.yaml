@@ -19,6 +19,7 @@ java:
     RESPONDENT_PORTAL_LINK: "https://et-syr-${SERVICE_FQDN}/"
     LAUNCH_DARKLY_ENV: '{{ .Values.global.environment }}'
     ET_COS_URL: "https://${SERVICE_NAME}"
+    DECENTRALISATION_LOCAL_CALLBACK_BASE_URLS: "https://${SERVICE_FQDN},http://localhost:8081"
     AAC_URL: "https://aac-${SERVICE_FQDN}"
     TORNADO_URL: "https://docmosis.aat.platform.hmcts.net/rs/render"
     IDAM_API_URL: "https://idam-api.aat.platform.hmcts.net"

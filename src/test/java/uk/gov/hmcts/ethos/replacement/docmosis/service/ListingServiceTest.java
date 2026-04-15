@@ -1140,7 +1140,7 @@ class ListingServiceTest {
         RespondentSumType respondentSumType = new RespondentSumType();
         respondentSumType.setRespondentAddress(address);
         respondentSumType.setRespondentName("Royal McDonal");
-        respondentSumType.setResponseStruckOut(NO);
+        respondentSumType.setResponseContinue(YES);
         respondentSumTypeItem.setValue(respondentSumType);
         RespondentSumTypeItem respondentSumTypeItem1 = new RespondentSumTypeItem();
         RespondentSumType respondentSumType1 = new RespondentSumType();

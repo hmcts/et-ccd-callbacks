@@ -882,8 +882,8 @@ public class NocRespondentRepresentativeService {
         if (ObjectUtils.isEmpty(userDetails) || StringUtils.isBlank(userDetails.getUid())) {
             return Collections.emptyList();
         }
-        CaseUserAssignmentData caseUserAssignmentData = getCaseUserAssignmentData(userToken, caseDetails.getCaseId())
-                .orElse(null);
+        CaseUserAssignmentData caseUserAssignmentData = getCaseUserAssignmentData(adminUserService.getAdminUserToken(),
+                caseDetails.getCaseId()).orElse(null);
         if (ObjectUtils.isEmpty(caseUserAssignmentData)
                 || CollectionUtils.isEmpty(caseUserAssignmentData.getCaseUserAssignments())) {
             return Collections.emptyList();

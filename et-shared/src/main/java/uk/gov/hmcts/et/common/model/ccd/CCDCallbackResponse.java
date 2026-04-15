@@ -21,20 +21,12 @@ import java.util.Map;
 public class CCDCallbackResponse extends GenericCallbackResponse implements CallbackResponse<CaseData>, SubmittedCallbackResponse {
 
     private CaseData data;
+    private Map<String, Object> dataClassification;
+    private String securityClassification;
+    private String errorMessageOverride;
 
-    @Override
-    public Map<String, Object> getDataClassification() {
-        return Map.of();
-    }
-
-    @Override
-    public String getSecurityClassification() {
-        return "";
-    }
-
-    @Override
-    public String getErrorMessageOverride() {
-        return "";
+    public CCDCallbackResponse(CaseData data) {
+        this.data = data;
     }
 
     @Override
@@ -47,4 +39,3 @@ public class CCDCallbackResponse extends GenericCallbackResponse implements Call
         return this.getConfirmation_body();
     }
 }
-

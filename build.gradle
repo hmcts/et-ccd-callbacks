@@ -458,8 +458,8 @@ dependencies {
     implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '8.1'
     implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.5'
 
-    implementation 'com.github.hmcts:decentralised-runtime:definition-snapshot-fallback-20260415-1155'
-    implementation 'com.github.hmcts:ccd-config-generator:definition-snapshot-fallback-20260415-1155'
+    implementation 'com.github.hmcts:decentralised-runtime:definition-snapshot-fallback-20260415-143022'
+    implementation 'com.github.hmcts:ccd-config-generator:definition-snapshot-fallback-20260415-143022'
 
     // Log4J core added to remove startup error message
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4JVersion

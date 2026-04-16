@@ -9,7 +9,6 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import uk.gov.hmcts.ethos.replacement.docmosis.config.SecurityConfig;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.security.JwtAuthenticationFilter;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 

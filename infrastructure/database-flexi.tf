@@ -12,7 +12,7 @@ locals {
       name  = "azure.extensions"
       value = "postgres_fdw"
     }
-  ]
+  ])
 }
 
 module "postgres" {

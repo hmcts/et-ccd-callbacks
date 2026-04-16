@@ -126,6 +126,8 @@ public class NocRemoveRepresentationService {
      * @throws IllegalStateException if no respondent representatives are found to revoke.
      */
     public void revokeRespondentLegalRep(CaseDetails caseDetails, String userToken) {
+        log.info("revokeRespondentLegalRep - start");
+
         // get a list of RepresentedTypeRItem to be revoked
         List<RepresentedTypeRItem> repListToRevoke = getRespondentRepListToRevoke(caseDetails, userToken);
         if (CollectionUtils.isEmpty(repListToRevoke)) {

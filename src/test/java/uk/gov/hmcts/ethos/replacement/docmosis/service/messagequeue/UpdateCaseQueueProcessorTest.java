@@ -8,7 +8,10 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.ecm.common.model.servicebus.UpdateCaseMsg;
 import uk.gov.hmcts.ecm.common.model.servicebus.datamodel.CloseDataModel;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.QueueMessageStatus;
@@ -17,6 +20,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.messagequeue.Up
 import uk.gov.hmcts.ethos.replacement.docmosis.service.messagehandler.UpdateManagementService;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
@@ -121,6 +125,64 @@ class UpdateCaseQueueProcessorTest {
                 any()
         );
         verify(updateManagementService).addUnrecoverableErrorToDatabase(msg);
+    }
+
+    @Test
+    void shouldHandleBadRequestWithNoRetry() throws Exception {
+        // Given
+        UpdateCaseMsg msg = generateUpdateCaseMsg();
+        UpdateCaseQueueMessage queueMessage = createQueueMessage(msg);
+
+        HttpClientErrorException exception = HttpClientErrorException.create(
+                HttpStatus.BAD_REQUEST,
+                "Bad Request",
+                HttpHeaders.EMPTY,
+                "{\"message\":\"No value specified for terms query\"}".getBytes(StandardCharsets.UTF_8),
+                StandardCharsets.UTF_8
+        );
+
+        // When
+        processor.handleError(queueMessage, exception);
+
+        // Then - marked as FAILED immediately with no retry logic
+        verify(updateCaseQueueRepository).markAsFailed(
+                eq(queueMessage.getMessageId()),
+                anyString(),
+                eq(1),
+                eq(QueueMessageStatus.FAILED),
+                any()
+        );
+        verify(updateManagementService, never()).addUnrecoverableErrorToDatabase(any());
+        verify(updateManagementService, never()).checkIfFinish(any());
+    }
+
+    @Test
+    void shouldHandleUnprocessableEntityWithNoRetry() throws Exception {
+        // Given
+        UpdateCaseMsg msg = generateUpdateCaseMsg();
+        UpdateCaseQueueMessage queueMessage = createQueueMessage(msg);
+
+        HttpClientErrorException exception = HttpClientErrorException.create(
+                HttpStatus.UNPROCESSABLE_ENTITY,
+                "Unprocessable Entity",
+                HttpHeaders.EMPTY,
+                "{\"message\":\"Validation failed\"}".getBytes(StandardCharsets.UTF_8),
+                StandardCharsets.UTF_8
+        );
+
+        // When
+        processor.handleError(queueMessage, exception);
+
+        // Then - marked as FAILED immediately with no retry logic
+        verify(updateCaseQueueRepository).markAsFailed(
+                eq(queueMessage.getMessageId()),
+                anyString(),
+                eq(1),
+                eq(QueueMessageStatus.FAILED),
+                any()
+        );
+        verify(updateManagementService, never()).addUnrecoverableErrorToDatabase(any());
+        verify(updateManagementService, never()).checkIfFinish(any());
     }
 
     @Test

@@ -2,7 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.controllers.notifications.respon
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
@@ -103,7 +102,6 @@ class PseRespondToTribunalControllerTest {
         mockHelper.verify(() -> Helper.isClaimantNonSystemUser(any()), times(1));
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void aboutToStart_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
@@ -163,7 +161,6 @@ class PseRespondToTribunalControllerTest {
                 RESPONDENT_TITLE);
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void midDetailsTable_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
@@ -188,7 +185,6 @@ class PseRespondToTribunalControllerTest {
         verify(pseRespondToTribunalService).validateRespondentInput(ccdRequest.getCaseDetails().getCaseData());
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void midValidateInput_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
@@ -215,7 +211,6 @@ class PseRespondToTribunalControllerTest {
         verify(pseRespondToTribunalService, times(1)).sendTribunalEmail(ccdRequest.getCaseDetails(), RESPONDENT_TITLE);
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void aboutToSubmit_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
@@ -242,7 +237,6 @@ class PseRespondToTribunalControllerTest {
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void submitted_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);

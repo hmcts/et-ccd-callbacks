@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -250,7 +249,6 @@ class BundlesRespondentControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath("$.warnings", nullValue()));
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void removeHearingBundle_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
@@ -287,7 +285,6 @@ class BundlesRespondentControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath("$.warnings", nullValue()));
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void midPopulateRemoveHearingBundles_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);

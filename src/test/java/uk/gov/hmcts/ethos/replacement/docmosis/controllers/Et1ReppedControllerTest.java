@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -304,7 +303,6 @@ class Et1ReppedControllerTest {
         verify(et1ReppedService, times(1)).validatePostcode(any(), anyString());
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void validatePostcode_badToken() {
@@ -332,7 +330,6 @@ class Et1ReppedControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void officeError_badToken() {
@@ -358,7 +355,6 @@ class Et1ReppedControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void aboutToSubmit_Error() {
@@ -384,7 +380,6 @@ class Et1ReppedControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void validateClaimantSex_badToken() {
@@ -426,7 +421,6 @@ class Et1ReppedControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void validateClaimantSupport_badToken() {
@@ -452,7 +446,6 @@ class Et1ReppedControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void validateRepresentativeInformation_badToken() {
@@ -480,7 +473,6 @@ class Et1ReppedControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @ParameterizedTest
     @CsvSource({"et1SectionOne", "et1SectionTwo", "et1SectionThree"})
     @SneakyThrows
@@ -508,7 +500,6 @@ class Et1ReppedControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void validateClaimantWorked_badToken() {
@@ -534,7 +525,6 @@ class Et1ReppedControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void validateClaimantWorking_badToken() {
@@ -560,7 +550,6 @@ class Et1ReppedControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void validateClaimantWrittenNoticePeriod_badToken() {
@@ -586,7 +575,6 @@ class Et1ReppedControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void validateClaimantWorkingNoticePeriod_badToken() {
@@ -612,7 +600,6 @@ class Et1ReppedControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void validateClaimantNoLongerWorking_badToken() {
@@ -653,7 +640,6 @@ class Et1ReppedControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void validateClaimantPay_badToken() {
@@ -694,7 +680,6 @@ class Et1ReppedControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void validateClaimantPensionBenefits_badToken() {
@@ -735,7 +720,6 @@ class Et1ReppedControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void validateClaimantNewJob_badToken() {
@@ -761,7 +745,6 @@ class Et1ReppedControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void validateClaimantNewJobPay_badToken() {
@@ -787,7 +770,6 @@ class Et1ReppedControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void generateRespondentPreamble_badToken() {
@@ -813,7 +795,6 @@ class Et1ReppedControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void generateWorkAddressLabel_badToken() {
@@ -839,7 +820,6 @@ class Et1ReppedControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void sectionCompleted_badToken() {

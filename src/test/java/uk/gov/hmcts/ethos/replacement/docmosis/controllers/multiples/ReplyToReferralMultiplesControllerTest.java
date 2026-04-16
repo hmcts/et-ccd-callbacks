@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers.multiples;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -184,7 +183,6 @@ class ReplyToReferralMultiplesControllerTest extends BaseControllerTest {
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void aboutToStartReferralReply_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
@@ -195,7 +193,6 @@ class ReplyToReferralMultiplesControllerTest extends BaseControllerTest {
             .andExpect(status().isForbidden());
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void initHearingAndReferralDetails_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
@@ -206,7 +203,6 @@ class ReplyToReferralMultiplesControllerTest extends BaseControllerTest {
             .andExpect(status().isForbidden());
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void aboutToSubmitReferralReply_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
@@ -229,7 +225,6 @@ class ReplyToReferralMultiplesControllerTest extends BaseControllerTest {
             .andExpect(jsonPath("$.confirmation_body", notNullValue()));
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void completeReplyToReferral_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
@@ -261,7 +256,6 @@ class ReplyToReferralMultiplesControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)));
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void validateReplyToEmail_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);

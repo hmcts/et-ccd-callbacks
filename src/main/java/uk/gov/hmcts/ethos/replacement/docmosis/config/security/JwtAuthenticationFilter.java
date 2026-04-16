@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -45,7 +46,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                     new UsernamePasswordAuthenticationToken(
                         token, null, List.of(new SimpleGrantedAuthority("ROLE_USER"))
                     );
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                // Create a fresh SecurityContext and set it directly.  Using setContext()
+                // rather than getContext().setAuthentication() ensures the context is
+                // fully replaced, avoiding interference from spring-security-test's
+                // SecurityMockMvcConfigurer which manipulates the deferred context holder.
+                SecurityContext context = SecurityContextHolder.createEmptyContext();
+                context.setAuthentication(authentication);
+                SecurityContextHolder.setContext(context);
             }
             filterChain.doFilter(request, response);
         } finally {

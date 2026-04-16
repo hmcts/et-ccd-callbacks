@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -17,6 +16,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
@@ -235,7 +235,9 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
     @SneakyThrows
     public void setUp() {
         super.setUp();
-        mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
+        mvc = MockMvcBuilders.webAppContextSetup(applicationContext)
+            .apply(SecurityMockMvcConfigurers.springSecurity())
+            .build();
         when(featureToggleService.isHmcEnabled()).thenReturn(true);
 
         doRequestSetUp();
@@ -788,7 +790,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void aboutToStartDisposal()  {
@@ -1361,7 +1362,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(status().isInternalServerError());
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void createCaseErrorForbidden()  {
@@ -1373,7 +1373,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(status().isForbidden());
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void retrieveCaseForbidden()  {
@@ -1385,7 +1384,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(status().isForbidden());
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void retrieveCasesForbidden()  {
@@ -1397,7 +1395,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(status().isForbidden());
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void updateCaseForbidden()  {
@@ -1409,7 +1406,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(status().isForbidden());
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void preDefaultValuesForbidden()  {
@@ -1421,7 +1417,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(status().isForbidden());
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void postDefaultValuesForbidden()  {
@@ -1433,7 +1428,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(status().isForbidden());
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void amendCaseDetailsForbidden()  {
@@ -1445,7 +1439,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(status().isForbidden());
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void amendClaimantDetailsForbidden()  {
@@ -1457,7 +1450,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(status().isForbidden());
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void amendRespondentDetailsForbidden()  {
@@ -1469,7 +1461,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(status().isForbidden());
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void amendRespondentRepresentativeForbidden()  {
@@ -1481,7 +1472,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(status().isForbidden());
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void updateHearingForbidden()  {
@@ -1493,7 +1483,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(status().isForbidden());
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void restrictedCasesForbidden()  {
@@ -1505,7 +1494,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(status().isForbidden());
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void amendHearingForbidden()  {
@@ -1517,7 +1505,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(status().isForbidden());
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void midEventAmendHearingForbidden()  {
@@ -1529,7 +1516,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(status().isForbidden());
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void amendCaseStateForbidden()  {
@@ -1541,7 +1527,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(status().isForbidden());
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void midRespondentAddressForbidden()  {
@@ -1553,7 +1538,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(status().isForbidden());
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void jurisdictionValidationForbidden()  {
@@ -1565,7 +1549,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(status().isForbidden());
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void judgementValidationForbidden()  {
@@ -1577,7 +1560,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(status().isForbidden());
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void depositValidationForbidden()  {
@@ -1589,7 +1571,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(status().isForbidden());
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void midRespondentAddressPopulatedForbidden()  {
@@ -1601,7 +1582,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(status().isForbidden());
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void singleCaseMultipleMidEventValidationForbidden()  {
@@ -1613,7 +1593,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(status().isForbidden());
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void hearingMidEventValidationForbidden()  {
@@ -1625,7 +1604,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(status().isForbidden());
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void bfActionsForbidden()  {
@@ -1637,7 +1615,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(status().isForbidden());
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void dynamicListBfActionsForbidden()  {
@@ -1649,7 +1626,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(status().isForbidden());
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void aboutToStartDisposalForbidden()  {
@@ -1663,7 +1639,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
         verify(fileLocationSelectionService, never()).initialiseFileLocation(any(CaseData.class));
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void dynamicRespondentRepresentativeNamesUrlForbidden()  {
@@ -1675,7 +1650,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(status().isForbidden());
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void dynamicDepositOrderUrlForbidden()  {
@@ -1687,7 +1661,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(status().isForbidden());
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void dynamicRestrictedReportingUrlForbidden()  {
@@ -1699,7 +1672,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(status().isForbidden());
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void dynamicJudgmentUrlForbidden()  {
@@ -1711,7 +1683,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(status().isForbidden());
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void judgmentSubmittedUrlForbidden()  {
@@ -1723,7 +1694,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .andExpect(status().isForbidden());
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void dynamicFixCaseAPIForbidden()  {
@@ -1737,7 +1707,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
         verify(fixCaseApiService, never()).checkUpdateMultipleReference(caseDetails, AUTH_TOKEN);
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void reinstateClosedCaseForbidden()  {
@@ -1751,7 +1720,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
         verify(caseCloseValidator, never()).validateReinstateClosedCaseMidEvent(caseData);
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void initialiseAmendCaseDetailsForbidden()  {
@@ -1782,7 +1750,6 @@ class CaseActionsForCaseWorkerControllerTest extends BaseControllerTest {
                 .setHmctsServiceIdSupplementary(any(CaseDetails.class));
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     @SneakyThrows
     void addServiceIdUrl_tokenFail()  {

@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers.notifications.admin;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -77,7 +76,6 @@ class RespondNotificationControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void aboutToStart_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
@@ -110,7 +108,6 @@ class RespondNotificationControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void aboutToSubmit_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
@@ -144,7 +141,6 @@ class RespondNotificationControllerTest extends BaseControllerTest {
         verify(respondNotificationService, times(1)).getNotificationMarkDown(any());
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void midGetNotification_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
@@ -178,7 +174,6 @@ class RespondNotificationControllerTest extends BaseControllerTest {
         verify(respondNotificationService, times(1)).validateInput(any());
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void midValidateInput_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
@@ -212,7 +207,6 @@ class RespondNotificationControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void submitted_tokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);

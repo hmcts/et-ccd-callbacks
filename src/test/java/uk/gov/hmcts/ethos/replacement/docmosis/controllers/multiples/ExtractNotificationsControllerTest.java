@@ -3,7 +3,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.controllers.multiples;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ethos.replacement.docmosis.controllers.BaseControllerTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.multiples.NotificationsExcelReportService;
@@ -56,7 +56,9 @@ class ExtractNotificationsControllerTest extends BaseControllerTest {
     @BeforeEach
     void setUpTests() throws URISyntaxException, IOException {
         super.setUp();
-        mockMvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
+        mockMvc = MockMvcBuilders.webAppContextSetup(applicationContext)
+            .apply(SecurityMockMvcConfigurers.springSecurity())
+            .build();
         doRequestSetUp();
     }
 
@@ -73,7 +75,6 @@ class ExtractNotificationsControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void aboutToSubmit_badToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
@@ -97,7 +98,6 @@ class ExtractNotificationsControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void submitted_badToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);

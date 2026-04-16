@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +14,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ecm.common.model.helper.DefaultValues;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
@@ -224,7 +224,9 @@ class ListingGenerationControllerTest extends BaseControllerTest {
     @Override
     public void setUp() throws URISyntaxException, IOException {
         super.setUp();
-        mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
+        mvc = MockMvcBuilders.webAppContextSetup(applicationContext)
+            .apply(SecurityMockMvcConfigurers.springSecurity())
+            .build();
         doRequestSetUp();
         listingDetails = new ListingDetails();
         listingDetails.setCaseTypeId(SCOTLAND_LISTING_CASE_TYPE_ID);
@@ -789,7 +791,6 @@ class ListingGenerationControllerTest extends BaseControllerTest {
         verify(printHearingListService, never()).initPrintHearingLists(any(CaseData.class));
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void initGenerateReportForbidden() throws Exception {
         mvc.perform(post(INIT_GENERATE_REPORT_URL)

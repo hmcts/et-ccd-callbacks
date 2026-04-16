@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -127,7 +126,6 @@ class CreateReferralControllerTest {
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void initReferralHearingDetails_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
@@ -178,7 +176,6 @@ class CreateReferralControllerTest {
         verify(emailService, never()).sendEmail(any(), any(), any());
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void aboutToSubmit_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
@@ -200,7 +197,6 @@ class CreateReferralControllerTest {
             .andExpect(jsonPath("$.confirmation_body", notNullValue()));
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void completeCreateReferral_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
@@ -235,7 +231,6 @@ class CreateReferralControllerTest {
             .andExpect(jsonPath(JsonMapper.ERRORS, hasSize(0)));
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void validateReferentEmail_invalidToken() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);

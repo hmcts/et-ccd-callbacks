@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,7 +65,6 @@ class HearingDetailsControllerTest {
         verify(hearingDetailsService, times(1)).initialiseHearingDetails(ccdRequest.getCaseDetails().getCaseData());
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void testInitialiseHearingDynamicListInvalidToken() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
@@ -100,7 +98,6 @@ class HearingDetailsControllerTest {
         verify(hearingDetailsService, times(1)).handleListingSelected(ccdRequest.getCaseDetails().getCaseData());
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void testHandleListingSelectedInvalidToken() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
@@ -133,7 +130,6 @@ class HearingDetailsControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void testhearingMidEventValidationInvalidToken() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
@@ -167,7 +163,6 @@ class HearingDetailsControllerTest {
         verify(hearingDetailsService, times(1)).updateCase(ccdRequest.getCaseDetails());
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void testAboutToSubmitInvalidToken() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder().build();

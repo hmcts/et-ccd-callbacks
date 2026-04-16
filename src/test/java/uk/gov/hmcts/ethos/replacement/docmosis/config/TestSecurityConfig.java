@@ -6,19 +6,27 @@ import org.springframework.core.annotation.Order;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.security.JwtAuthenticationFilter;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.SecurityConfig;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 /**
- * Overrides the production {@link SecurityConfig} for all Spring test slices.
+ * Replaces the production {@link SecurityConfig} for all Spring test slices.
  *
- * <p>Placing a permit-all {@link SecurityFilterChain} at order 1 ensures it is selected
- * before the production chain for every request dispatched via {@code MockMvc}.  This
- * lets controller tests exercise their own internal {@code verifyTokenService} checks
- * (which are already mocked) without the Spring Security filter chain interfering with
- * the {@code SecurityContextHolder} state in the test thread.
+ * <p>Uses the real {@link JwtAuthenticationFilter} (which delegates to the mocked
+ * {@link VerifyTokenService}) so that controller tests exercise genuine token
+ * validation without relying on Spring Security's deferred-context infrastructure.
+ * When the mock returns {@code true} the filter creates a fresh
+ * {@code SecurityContext} via {@code SecurityContextHolder.setContext()}, bypassing
+ * {@code spring-security-test}'s {@code SecurityMockMvcConfigurer} interference.
+ * When the mock returns {@code false} no context is set and the
+ * {@code .anyRequest().authenticated()} rule returns 403.
  *
- * <p>Security-filter behaviour is covered separately by
- * {@code JwtAuthenticationFilterTest} and {@code MultiIssuerValidatorTest}.
+ * <p>The permit-all paths mirror {@link SecurityConfig#PERMIT_ALL_PATHS} so that
+ * management and public endpoints remain accessible in tests.
  */
 @Configuration
 @EnableWebSecurity
@@ -27,10 +35,19 @@ public class TestSecurityConfig {
 
     @Bean
     @Order(1)
-    public SecurityFilterChain testSecurityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain testSecurityFilterChain(HttpSecurity http,
+                                                       VerifyTokenService verifyTokenService) throws Exception {
         return http
             .csrf(AbstractHttpConfigurer::disable)
-            .authorizeHttpRequests(auth -> auth.anyRequest().permitAll())
+            .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .addFilterBefore(
+                new JwtAuthenticationFilter(verifyTokenService),
+                UsernamePasswordAuthenticationFilter.class
+            )
+            .authorizeHttpRequests(auth -> auth
+                .requestMatchers(SecurityConfig.PERMIT_ALL_PATHS).permitAll()
+                .anyRequest().authenticated()
+            )
             .build();
     }
 }

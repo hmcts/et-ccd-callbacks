@@ -1,7 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,6 +11,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
@@ -69,7 +69,9 @@ class AddLegalRepToMultipleControllerTest extends BaseControllerTest {
     @Override
     protected void setUp() throws IOException, URISyntaxException {
         super.setUp();
-        mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
+        mvc = MockMvcBuilders.webAppContextSetup(applicationContext)
+            .apply(SecurityMockMvcConfigurers.springSecurity())
+            .build();
 
         CaseDetails caseDetails = CaseDataBuilder.builder()
             .withChooseEt3Respondent("Cosmo")
@@ -96,7 +98,6 @@ class AddLegalRepToMultipleControllerTest extends BaseControllerTest {
             .andExpect(jsonPath(JsonMapper.DATA, notNullValue()));
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void startAddLegalRepToMultiple_TokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
@@ -130,7 +131,6 @@ class AddLegalRepToMultipleControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void submitAddLegalRepToMultiple_TokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
@@ -161,7 +161,6 @@ class AddLegalRepToMultipleControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath("$.confirmation_header", notNullValue()));
     }
 
-    @Disabled("Token validation is now enforced by Spring Security filter chain")
     @Test
     void completeAddLegalRepToMultiple_TokenFail() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);

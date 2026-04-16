@@ -70,6 +70,12 @@
     <suppress>
         <cve>CVE-2024-38810</cve>
     </suppress>
+    <suppress>
+        <cve>CVE-2026-22732</cve>
+    </suppress>
+    <suppress>
+        <cve>CVE-2026-22731</cve>
+    </suppress>
     <!-- Above suppressed due to dependency on other services as we use CFTLib-->
     <suppress>
        <cve>CVE-2025-15104</cve>

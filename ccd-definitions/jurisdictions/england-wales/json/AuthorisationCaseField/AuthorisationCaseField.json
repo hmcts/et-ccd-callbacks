@@ -2617,42 +2617,6 @@
   },
   {
     "CaseTypeId": "ET_EnglandWales",
-    "CaseFieldID": "repCollectionToRemove",
-    "UserRole": "citizen",
-    "CRUD": "CRUD"
-  },
-  {
-    "CaseTypeId": "ET_EnglandWales",
-    "CaseFieldID": "repCollectionToRemove",
-    "UserRole": "caseworker-employment",
-    "CRUD": "CRUD"
-  },
-  {
-    "CaseTypeId": "ET_EnglandWales",
-    "CaseFieldID": "repCollectionToRemove",
-    "UserRole": "caseworker-employment-api",
-    "CRUD": "CRUD"
-  },
-  {
-    "CaseTypeId": "ET_EnglandWales",
-    "CaseFieldID": "repCollectionToAdd",
-    "UserRole": "citizen",
-    "CRUD": "CRUD"
-  },
-  {
-    "CaseTypeId": "ET_EnglandWales",
-    "CaseFieldID": "repCollectionToAdd",
-    "UserRole": "caseworker-employment",
-    "CRUD": "CRUD"
-  },
-  {
-    "CaseTypeId": "ET_EnglandWales",
-    "CaseFieldID": "repCollectionToAdd",
-    "UserRole": "caseworker-employment-api",
-    "CRUD": "CRUD"
-  },
-  {
-    "CaseTypeId": "ET_EnglandWales",
     "CaseFieldID": "jurCodesCollection",
     "UserRole": "caseworker-employment-etjudge",
     "CRUD": "R"
@@ -7109,19 +7073,6 @@
           "[SOLICITORI]",
           "[SOLICITORJ]",
           "[CLAIMANTSOLICITOR]",
-          "caseworker-employment-api"
-        ],
-        "CRUD": "CRUD"
-      }
-    ]
-  },
-  {
-    "CaseTypeId": "ET_EnglandWales",
-    "CaseFieldID": "nocWarning",
-    "AccessControl": [
-      {
-        "UserRoles": [
-          "caseworker-employment-englandwales",
           "caseworker-employment-api"
         ],
         "CRUD": "CRUD"

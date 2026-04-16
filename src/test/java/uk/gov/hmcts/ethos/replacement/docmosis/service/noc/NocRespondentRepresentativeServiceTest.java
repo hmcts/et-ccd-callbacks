@@ -28,6 +28,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.ccd.SubmitEvent;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
@@ -61,6 +62,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
+import static java.util.UUID.randomUUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
@@ -84,7 +86,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @ContextConfiguration(classes = {CaseConverter.class, NoticeOfChangeFieldPopulator.class, ObjectMapper.class})
 @SuppressWarnings({"PMD.ExcessiveImports", "PMD.TooManyMethods", "PMD.ExcessiveMethodLength"})
 class NocRespondentRepresentativeServiceTest {
-    private static final String CASE_ID = "1234567890123456";
+    private static final String CASE_ID_1 = "1234567890123456";
     private static final String CASE_TYPE_ID_ENGLAND_WALES = "ET_EnglandWales";
     private static final String JURISDICTION_EMPLOYMENT = "EMPLOYMENT";
     private static final String RESPONDENT_NAME_ONE = "Harry Johnson";
@@ -126,7 +128,11 @@ class NocRespondentRepresentativeServiceTest {
     private static final String USER_LAST_NAME = "Brown";
     private static final String USER_FULL_NAME = "John Brown";
     private static final String REPRESENTATIVE_EMAIL_1_CAPITALISED = "REPRESENTATIVE1@TESTMAIL.COM";
-
+    private static final String REPRESENTATIVE_NAME = "Representative Name";
+    private static final String RESPONDENT_REPRESENTATIVE_EMAIL = "respondentRepresentative@gmail.com";
+    private static final String CLAIMANT_REPRESENTATIVE_EMAIL = "claimantRepresentative@gmail.com";
+    private static final String REPRESENTATIVE_EMAIL_1 = "representative1@gmail.com";
+    private static final String REPRESENTATIVE_EMAIL_2 = "representative2@gmail.com";
     private static final String RESPONDENT_ID_ONE = "106001";
     private static final String RESPONDENT_ID_TWO = "106002";
     private static final String RESPONDENT_ID_THREE = "106003";
@@ -166,13 +172,6 @@ class NocRespondentRepresentativeServiceTest {
             "Representative email address not found.\n";
     private static final String EXPECTED_WARNING_FAILED_TO_RETRIEVE_CASE_ASSIGNMENTS =
             "Failed to retrieve case assignments for case id: 1234567890123456, error: Something went wrong";
-
-    private static final String CASE_ID_1 = "1234567890123456";
-    private static final String REPRESENTATIVE_NAME = "Representative Name";
-    private static final String RESPONDENT_REPRESENTATIVE_EMAIL = "respondentRepresentative@gmail.com";
-    private static final String CLAIMANT_REPRESENTATIVE_EMAIL = "claimantRepresentative@gmail.com";
-    private static final String REPRESENTATIVE_EMAIL_1 = "representative1@gmail.com";
-    private static final String REPRESENTATIVE_EMAIL_2 = "representative2@gmail.com";
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -328,7 +327,8 @@ class NocRespondentRepresentativeServiceTest {
     }
 
     @Test
-    void shouldUpdateRespondentRepresentationDetails() throws IOException {
+    @SneakyThrows
+    void shouldUpdateRespondentRepresentationDetails() {
         CaseDetails caseDetails = new CaseDetails();
         Organisation oldOrganisation =
                 Organisation.builder().organisationID(ORGANISATION_ID_TWO).organisationName(ET_ORG_2).build();
@@ -344,11 +344,14 @@ class NocRespondentRepresentativeServiceTest {
         UserDetails mockUser = getMockUser();
 
         when(adminUserService.getUserDetails(anyString(), any())).thenReturn(mockUser);
-        caseDetails.setCaseId("111-222-111-333");
+        caseDetails.setCaseId(CASE_ID_1);
         caseDetails.setCaseData(caseData);
         when(nocCcdService.getLatestAuditEventByName(any(), any(), any())).thenReturn(
                 Optional.of(mockAuditEvent()));
-
+        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
+        AccountIdByEmailResponse accountIdByEmailResponse = new AccountIdByEmailResponse();
+        accountIdByEmailResponse.setUserIdentifier(USER_ID);
+        when(nocService.findUserByEmail(ADMIN_USER_TOKEN, USER_EMAIL, CASE_ID_1)).thenReturn(accountIdByEmailResponse);
         nocRespondentRepresentativeService.updateRespondentRepresentation(caseDetails);
 
         assertThat(caseData.getRepCollection().get(1).getValue().getRespondentOrganisation().getOrganisationID())
@@ -1161,11 +1164,12 @@ class NocRespondentRepresentativeServiceTest {
         assertThat(nocRespondentRepresentativeService.findRepresentativesByToken(USER_TOKEN, caseDetails)).isEmpty();
         // when there is no case user assignment data should return null
         userDetails.setUid(REPRESENTATIVE_ID_ONE);
-        when(nocCcdService.retrieveCaseUserAssignments(USER_TOKEN, CASE_ID_1)).thenReturn(null);
+        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
+        when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, CASE_ID_1)).thenReturn(null);
         assertThat(nocRespondentRepresentativeService.findRepresentativesByToken(USER_TOKEN, caseDetails)).isEmpty();
         // when case user assignment data not has any case user assignment should return null
         CaseUserAssignmentData caseUserAssignmentData = new CaseUserAssignmentData();
-        when(nocCcdService.retrieveCaseUserAssignments(USER_TOKEN, CASE_ID_1)).thenReturn(caseUserAssignmentData);
+        when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, CASE_ID_1)).thenReturn(caseUserAssignmentData);
         assertThat(nocRespondentRepresentativeService.findRepresentativesByToken(USER_TOKEN, caseDetails)).isEmpty();
         // when case user assignment role is not respondent solicitor should return null
         CaseUserAssignment caseUserAssignment = new CaseUserAssignment();
@@ -1185,7 +1189,7 @@ class NocRespondentRepresentativeServiceTest {
         assertThat(nocRespondentRepresentativeService.findRepresentativesByToken(USER_TOKEN, caseDetails))
                 .isEqualTo(List.of(representative));
         // when gets exception while retrieving case user assignment should log that exception and return null
-        when(nocCcdService.retrieveCaseUserAssignments(USER_TOKEN, CASE_ID_1)).thenThrow(
+        when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, CASE_ID_1)).thenThrow(
                 new CcdInputOutputException(EXCEPTION_DUMMY_MESSAGE, new IOException(EXCEPTION_DUMMY_MESSAGE)));
         assertThat(nocRespondentRepresentativeService.findRepresentativesByToken(USER_TOKEN, caseDetails)).isEmpty();
         LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_ONE,
@@ -1495,7 +1499,7 @@ class NocRespondentRepresentativeServiceTest {
         CaseData tmpCaseData = new CaseData();
         tmpCaseData.setRepCollection(new ArrayList<>());
         CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setCaseId(CASE_ID);
+        caseDetails.setCaseId(CASE_ID_1);
         caseDetails.setCaseData(tmpCaseData);
         assertThat(nocRespondentRepresentativeService.validateRespondentRepresentativesOrganisationMatch(caseDetails))
                 .isEmpty();
@@ -1524,11 +1528,12 @@ class NocRespondentRepresentativeServiceTest {
         when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
         AccountIdByEmailResponse accountIdByEmailResponse = new AccountIdByEmailResponse();
         accountIdByEmailResponse.setUserIdentifier(USER_ID);
-        when(nocService.findUserByEmail(ADMIN_USER_TOKEN, REPRESENTATIVE_EMAIL_1_CAPITALISED, CASE_ID))
+        when(nocService.findUserByEmail(ADMIN_USER_TOKEN, REPRESENTATIVE_EMAIL_1_CAPITALISED, CASE_ID_1))
                 .thenReturn(accountIdByEmailResponse);
         OrganisationsResponse organisationsResponse = OrganisationsResponse.builder()
                 .organisationIdentifier(ORGANISATION_ID_TWO).build();
-        when(nocService.findOrganisationByUserId(ADMIN_USER_TOKEN, USER_ID, CASE_ID)).thenReturn(organisationsResponse);
+        when(nocService.findOrganisationByUserId(ADMIN_USER_TOKEN, USER_ID, CASE_ID_1))
+                .thenReturn(organisationsResponse);
         assertThat(nocRespondentRepresentativeService.validateRespondentRepresentativesOrganisationMatch(caseDetails))
                 .isNotEmpty().contains(EXPECTED_ERROR_SELECTED_ORGANISATION_REPRESENTATIVE_ORGANISATION_NOT_MATCHES);
         // when organisation response and representative organisation matches should return empty list
@@ -1536,9 +1541,80 @@ class NocRespondentRepresentativeServiceTest {
         assertThat(nocRespondentRepresentativeService.validateRespondentRepresentativesOrganisationMatch(caseDetails))
                 .isEmpty();
         // when user response not found should return empty list
-        when(nocService.findUserByEmail(ADMIN_USER_TOKEN, REPRESENTATIVE_EMAIL_1_CAPITALISED, CASE_ID))
+        when(nocService.findUserByEmail(ADMIN_USER_TOKEN, REPRESENTATIVE_EMAIL_1_CAPITALISED, CASE_ID_1))
                 .thenThrow(new GenericServiceException(EXCEPTION_DUMMY_MESSAGE));
         assertThat(nocRespondentRepresentativeService.validateRespondentRepresentativesOrganisationMatch(caseDetails))
                 .isEmpty();
+    }
+
+    @Test
+    @SneakyThrows
+    void theBuildExpectedCaseUserAssignments() {
+        // when case user assignment data and added solicitor's organisation not hmcts organisation should return empty
+        // list.
+        RepresentedTypeR representative = RepresentedTypeR.builder().build();
+        when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, CASE_ID_1)).thenReturn(null);
+        assertThat(nocRespondentRepresentativeService.buildExpectedCaseUserAssignments(CASE_ID_1, representative))
+                .isEmpty();
+        // when case user assignment data does not have any case user assignment and added solicitor's organisation is
+        // empty should return empty list.
+        CaseUserAssignmentData caseUserAssignmentData = new CaseUserAssignmentData();
+        representative.setMyHmctsYesNo(YES);
+        when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, CASE_ID_1)).thenReturn(caseUserAssignmentData);
+        assertThat(nocRespondentRepresentativeService.buildExpectedCaseUserAssignments(CASE_ID_1, representative))
+                .isEmpty();
+        // when case user assignment data has case user assignments but added solicitor's organisation id is blank
+        // should return case user assignment data's assignments list.
+        CaseUserAssignment caseUserAssignment1 = CaseUserAssignment.builder().caseId(CASE_ID_1)
+                .userId(REPRESENTATIVE_ID_ONE).caseRole(ROLE_SOLICITORA).organisationId(ORGANISATION_ID_ONE).build();
+        caseUserAssignmentData.setCaseUserAssignments(List.of(caseUserAssignment1));
+        Organisation organisation = Organisation.builder().build();
+        representative.setRespondentOrganisation(organisation);
+        List<GenericTypeItem<CaseUserAssignment>> actualCaseUserAssignments = nocRespondentRepresentativeService
+                .buildExpectedCaseUserAssignments(CASE_ID_1, representative);
+
+        assertThat(actualCaseUserAssignments).hasSize(LoggerTestUtils.INTEGER_ONE);
+        assertThat(actualCaseUserAssignments.get(LoggerTestUtils.INTEGER_ZERO).getValue())
+                .isEqualTo(caseUserAssignment1);
+        // when added solicitor does not have role should return case user assignment data's assignments list.
+        organisation.setOrganisationID(ORGANISATION_ID_TWO);
+        actualCaseUserAssignments = nocRespondentRepresentativeService
+                .buildExpectedCaseUserAssignments(CASE_ID_1, representative);
+        assertThat(actualCaseUserAssignments).hasSize(LoggerTestUtils.INTEGER_ONE);
+        assertThat(actualCaseUserAssignments.get(LoggerTestUtils.INTEGER_ZERO).getValue())
+                .isEqualTo(caseUserAssignment1);
+        // when added solicitor does not have email address should return case user assignment data's assignment list.
+        representative.setRole(ROLE_SOLICITORB);
+        actualCaseUserAssignments = nocRespondentRepresentativeService
+                .buildExpectedCaseUserAssignments(CASE_ID_1, representative);
+        assertThat(actualCaseUserAssignments).hasSize(LoggerTestUtils.INTEGER_ONE);
+        assertThat(actualCaseUserAssignments.get(LoggerTestUtils.INTEGER_ZERO).getValue())
+                .isEqualTo(caseUserAssignment1);
+        // when account is found by email should add solicitor to the list of case user assignment data's assignment
+        // list and return it.
+        representative.setRepresentativeEmailAddress(REPRESENTATIVE_EMAIL_2);
+        AccountIdByEmailResponse accountIdByEmailResponse = new  AccountIdByEmailResponse();
+        accountIdByEmailResponse.setUserIdentifier(REPRESENTATIVE_ID_TWO);
+        when(nocService.findUserByEmail(ADMIN_USER_TOKEN, REPRESENTATIVE_EMAIL_2, CASE_ID_1))
+                .thenReturn(accountIdByEmailResponse);
+        actualCaseUserAssignments = nocRespondentRepresentativeService
+                .buildExpectedCaseUserAssignments(CASE_ID_1, representative);
+        assertThat(actualCaseUserAssignments).hasSize(LoggerTestUtils.INTEGER_TWO);
+        assertThat(actualCaseUserAssignments.get(LoggerTestUtils.INTEGER_ZERO).getValue())
+                .isEqualTo(caseUserAssignment1);
+        GenericTypeItem<CaseUserAssignment> addedAssignment = GenericTypeItem.<CaseUserAssignment>builder()
+                .id(String.valueOf(randomUUID())).value(CaseUserAssignment.builder().caseId(CASE_ID_1)
+                        .userId(REPRESENTATIVE_ID_TWO).caseRole(ROLE_SOLICITORB)
+                        .organisationId(ORGANISATION_ID_TWO).build()).build();
+        assertThat(actualCaseUserAssignments.get(LoggerTestUtils.INTEGER_ONE).getValue())
+                .isEqualTo(addedAssignment.getValue());
+        // when unable to find account id by email should return case user assignment data's assignment list.
+        when(nocService.findUserByEmail(ADMIN_USER_TOKEN, REPRESENTATIVE_EMAIL_2, CASE_ID_1)).thenThrow(
+                new GenericServiceException(EXCEPTION_DUMMY_MESSAGE));
+        actualCaseUserAssignments = nocRespondentRepresentativeService
+                .buildExpectedCaseUserAssignments(CASE_ID_1, representative);
+        assertThat(actualCaseUserAssignments).hasSize(LoggerTestUtils.INTEGER_ONE);
+        assertThat(actualCaseUserAssignments.get(LoggerTestUtils.INTEGER_ZERO).getValue())
+                .isEqualTo(caseUserAssignment1);
     }
 }

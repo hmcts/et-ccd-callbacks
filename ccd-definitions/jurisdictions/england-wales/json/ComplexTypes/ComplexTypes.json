@@ -3663,7 +3663,7 @@
     "ListElementCode": "dynamicRespondentsWithEcc",
     "FieldType": "DynamicList",
     "ElementLabel": "Respondents with ECC",
-    "FieldShowCondition": "topLevel_Documents=\"EM-TRB-EGW-ENG-00028\"",
+    "FieldShowCondition": "topLevel_Documents=\"EM-TRB-EGW-ENG-00028\" AND part_3_Documents != \"3.1\" AND part_3_Documents != \"3.2\" AND part_3_Documents != \"3.3\" AND part_3_Documents != \"3.4\" AND part_3_Documents != \"3.5\" AND part_3_Documents != \"3.6\" AND part_3_Documents != \"3.7\" AND part_3_Documents != \"3.22\" AND part_3_Documents != \"3.23\"",
     "RetainHiddenValue": "No",
     "SecurityClassification": "Public",
     "Searchable": "N"

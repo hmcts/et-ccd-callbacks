@@ -90,16 +90,19 @@ public class NocRemoveRepresentationService {
         if (CollectionUtils.isEmpty(currentRepList)) {
             return NO;
         }
+        log.info("hasMultipleRepresentativesForOrg - findRepresentativesByToken");
 
         // get the organisation id for this legal rep
         String orgId = NocRespondentMapper.getFirstRepOrganisationId(currentRepList);
         if (isNullOrEmpty(orgId)) {
             return NO;
         }
+        log.info("hasMultipleRepresentativesForOrg - getFirstRepOrganisationId");
 
         // get all legal reps who are under the same organisation
         List<RepresentedTypeRItem> orgRepList =
             RespondentRepresentativeUtils.findRepresentativesByOrganisationId(caseDetails.getCaseData(), orgId);
+        log.info("hasMultipleRepresentativesForOrg - findRepresentativesByOrganisationId");
 
         // compare and see if other legal reps involved in this case
         return orgRepList.size() > currentRepList.size()
@@ -139,23 +142,30 @@ public class NocRemoveRepresentationService {
         final List<String> repEmailAddress = NocRespondentMapper.getRepresentativeEmails(repListToRevoke);
         final String partyName = NocRespondentMapper.getRespondentPartyNames(repListToRevoke);
         final List<String> respondentIdRevoke = NocRespondentMapper.getRespondentIds(repListToRevoke);
+        log.info("revokeRespondentLegalRep - get existing rep and organisation details for sending emails");
 
         // revoke respondent legal rep
         nocRespondentRepresentativeService.revokeAndRemoveRespondentRepresentatives(
             caseDetails,
             repListToRevoke
         );
+        log.info("revokeRespondentLegalRep - revokeAndRemoveRespondentRepresentatives");
 
         // send email to organisation admin
         nocRemoveRepresentationEmailService.sendEmailToOrgAdmin(caseDetails, orgEmailAddress, repName);
+        log.info("revokeRespondentLegalRep - sendEmailToOrgAdmin");
         // send email to removed legal rep
         nocRemoveRepresentationEmailService.sendEmailToListOfRemovedLegalRep(caseDetails, repEmailAddress);
+        log.info("revokeRespondentLegalRep - sendEmailToListOfRemovedLegalRep");
         // send email to unrepresented party, i.e. this respondent
         nocRemoveRepresentationEmailService.sendEmailToUnrepresentedRespondent(caseDetails, repListToRevoke, orgName);
+        log.info("revokeRespondentLegalRep - sendEmailToUnrepresentedRespondent");
         // send email to claimant
         nocRemoveRepresentationEmailService.sendEmailToOtherPartyClaimant(caseDetails, partyName);
+        log.info("revokeRespondentLegalRep - sendEmailToOtherPartyClaimant");
         // send email to other respondent
         nocRemoveRepresentationEmailService.sendEmailToOtherPartyRespondent(caseDetails, respondentIdRevoke, partyName);
+        log.info("revokeRespondentLegalRep - sendEmailToOtherPartyRespondent");
     }
 
     private List<RepresentedTypeRItem> getRespondentRepListToRevoke(CaseDetails caseDetails, String userToken) {

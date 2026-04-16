@@ -2,12 +2,17 @@
 locals {
   db_base_config = [
     {
+      "name" : "backslash_quote",
+      "value" : "on"
+    }
+  ]
+
+  db_config = var.env != "aat" ? local.db_base_config : concat(local.db_base_config, [
+    {
       name  = "azure.extensions"
       value = "postgres_fdw"
     }
   ]
-
-  db_config = var.env == "aat" ? local.db_base_config : []
 }
 
 module "postgres" {

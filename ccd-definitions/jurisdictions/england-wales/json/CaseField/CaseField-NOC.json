@@ -1,0 +1,34 @@
+[
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "nocWarning",
+    "Label": " ",
+    "FieldType": "Text",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "repCollectionToRemove",
+    "Label": "Respondent representative(s) to remove",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "RespondentRepresentative",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "repCollectionToAdd",
+    "Label": "Respondent representative(s) to add",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "RespondentRepresentative",
+    "SecurityClassification": "Public"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "expectedCaseUserAssignments",
+    "Label": "Expected case user assignment(s) after NOC",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "CaseUserAssignment",
+    "SecurityClassification": "Public"
+  }
+]

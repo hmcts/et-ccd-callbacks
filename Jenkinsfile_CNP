@@ -153,6 +153,16 @@ withPipeline(type, product, component) {
     env.ROLE_ASSIGNMENT_URL = "https://am-role-assignment-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.RUNNING_ENV = "aat"
 
+    afterSuccess('akschartsinstall') {
+      env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
+      env.CAMUNDA_BASE_URL = "https://camunda-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+      env.SERVICE_AUTH_PROVIDER_API_BASE_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+      sh """
+        ./bin/wa/pull-latest-dmn-files.sh ${dmnBranch}
+       ./bin/wa/pull-latest-camunda-wa-files.sh ${bpmnBranch}
+      """
+    }
+
     before('smoketest:preview') {
       sh """
         ./bin/pull-latest-e2e-tests.sh
@@ -168,26 +178,9 @@ withPipeline(type, product, component) {
         ./bin/preview/create-ccd-roles.sh
         echo "Importing CCD definitions"
         ./bin/preview/import-ccd-definitions.sh
+        echo "Setting up WA users and roles"
+        ./bin/wa/add-org-roles-to-users.sh
       """
-    }
-
-    afterSuccess('akschartsinstall') {
-
-      onPR {
-        try {
-            env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
-            env.CAMUNDA_BASE_URL = "https://camunda-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-            env.SERVICE_AUTH_PROVIDER_API_BASE_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
-            sh """
-              ./bin/wa/pull-latest-dmn-files.sh ${dmnBranch}
-             ./bin/wa/pull-latest-camunda-wa-files.sh ${bpmnBranch}
-            """
-        } catch (error) {
-          onMaster {
-            slackSend(channel: '#et-builds', color: 'warning', message: "DMN upload for in ${env.JOB_NAME} has failed. If this is expected, please ignore, build details here: <${env.RUN_DISPLAY_URL}|Build ${env.BUILD_DISPLAY_NAME}>.")
-          }
-        }
-      }
     }
 
     afterAlways('smoketest:preview') {

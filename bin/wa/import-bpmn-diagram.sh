@@ -3,7 +3,7 @@
 set -eu
 workspace=${1}
 
-serviceToken=$($(realpath $workspace)/bin/utils/idam-lease-service-token.sh et_cos \
+serviceToken=$($(realpath $workspace)/bin/preview/idam-lease-service-token.sh et_cos \
   $(docker run --rm toolbelt/oathtool --totp -b ${ET_COS_S2S_KEY:-AABBCCDDEEFFGGHH}))
 filepath="$(realpath $workspace)/camunda"
 

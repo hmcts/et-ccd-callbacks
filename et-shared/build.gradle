@@ -22,7 +22,7 @@ repositories {
 
 dependencyManagement {
     imports {
-        mavenBom "org.springframework.boot:spring-boot-dependencies:3.5.5"
+        mavenBom "org.springframework.boot:spring-boot-dependencies:3.5.12"
     }
     dependencies {
         dependency 'commons-fileupload:commons-fileupload:1.6.0'
@@ -139,7 +139,7 @@ dependencies {
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.18.3'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.18.3'
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.18.3'
-    implementation group: 'org.springframework', name: 'spring-core', version: '6.2.11'
+    implementation group: 'org.springframework', name: 'spring-core', version: '6.2.17'
 
     compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.42'
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.42'
@@ -158,7 +158,7 @@ dependencies {
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.7'
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.19.0'
     testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '5.19.0'
-    testImplementation group: 'org.springframework', name: 'spring-test', version: '6.2.10'
+    testImplementation group: 'org.springframework', name: 'spring-test', version: '6.2.17'
     testImplementation group: 'pl.pragmatists', name: 'JUnitParams', version: '1.1.1'
 }
 

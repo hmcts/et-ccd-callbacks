@@ -84,6 +84,8 @@ public class NocRemoveRepresentationService {
      * @return "Yes" if more than one representative from the organisation exists, otherwise "No".
      */
     public String hasMultipleRepresentativesForOrg(CaseDetails caseDetails, String userToken) {
+        log.info("hasMultipleRepresentativesForOrg - start");
+
         // get list of RepresentedTypeRItem that represented by this legal rep
         List<RepresentedTypeRItem> currentRepList =
             nocRespondentRepresentativeService.findRepresentativesByToken(userToken, caseDetails);

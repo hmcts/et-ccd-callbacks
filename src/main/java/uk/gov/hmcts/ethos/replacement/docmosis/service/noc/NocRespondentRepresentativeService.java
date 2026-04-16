@@ -1137,8 +1137,10 @@ public class NocRespondentRepresentativeService {
         RepresentedTypeR rep = repItem.getValue();
         caseData.setRepresentativePhoneNumber(rep.getRepresentativePhoneNumber());
         caseData.setRepresentativeAddress(rep.getRepresentativeAddress());
-     * Builds the expected list of wrapped case user assignments for the given case.
-     *
+    }
+
+    /**
+     * * Builds the expected list of wrapped case user assignments for the given case.
      * <p>The method first retrieves any existing {@link CaseUserAssignment case user assignments}
      * for the supplied case and converts each one into a {@link GenericTypeItem} with a newly
      * generated identifier. It then evaluates the supplied representative and, where the

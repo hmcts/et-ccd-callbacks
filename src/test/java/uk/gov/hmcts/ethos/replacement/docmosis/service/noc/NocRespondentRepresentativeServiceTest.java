@@ -173,14 +173,6 @@ class NocRespondentRepresentativeServiceTest {
     private static final String EXPECTED_WARNING_FAILED_TO_RETRIEVE_CASE_ASSIGNMENTS =
             "Failed to retrieve case assignments for case id: 1234567890123456, error: Something went wrong";
 
-    private static final String CASE_ID_1 = "1234567890123456";
-    private static final String REPRESENTATIVE_NAME = "Representative Name";
-    private static final String PHONE_NUMBER = "01234567890";
-    private static final String RESPONDENT_REPRESENTATIVE_EMAIL = "respondentRepresentative@gmail.com";
-    private static final String CLAIMANT_REPRESENTATIVE_EMAIL = "claimantRepresentative@gmail.com";
-    private static final String REPRESENTATIVE_EMAIL_1 = "representative1@gmail.com";
-    private static final String REPRESENTATIVE_EMAIL_2 = "representative2@gmail.com";
-
     @Autowired
     private ObjectMapper objectMapper;
 

@@ -19,24 +19,6 @@
   },
   {
     "CaseTypeId": "ET_Scotland",
-    "CaseFieldID": "expectedCaseUserAssignments",
-    "UserRole": "citizen",
-    "CRUD": "CRUD"
-  },
-  {
-    "CaseTypeId": "ET_Scotland",
-    "CaseFieldID": "expectedCaseUserAssignments",
-    "UserRole": "caseworker-employment",
-    "CRUD": "CRUD"
-  },
-  {
-    "CaseTypeId": "ET_Scotland",
-    "CaseFieldID": "expectedCaseUserAssignments",
-    "UserRole": "caseworker-employment-api",
-    "CRUD": "CRUD"
-  },
-  {
-    "CaseTypeId": "ET_Scotland",
     "CaseFieldID": "repCollectionToAdd",
     "UserRole": "citizen",
     "CRUD": "CRUD"

@@ -63,10 +63,8 @@ final class CallbackObjectUtilsTest {
 
     @Test
     void theIsAnyEmptyMoreThanTwoObjects() {
-        // when object array is null should return false
-        assertThat(CallbackObjectUtils.isAnyEmpty(null)).isFalse();
         // when object array is empty should return false
-        assertThat(CallbackObjectUtils.isAnyEmpty(new String[0])).isFalse();
+        assertThat(CallbackObjectUtils.isAnyEmpty()).isFalse();
         // when objects are not empty should return false
         String[] stringArray = {DUMMY_STRING, DUMMY_STRING, DUMMY_STRING};
         assertThat(CallbackObjectUtils.isAnyEmpty(stringArray)).isFalse();

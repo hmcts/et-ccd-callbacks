@@ -418,7 +418,7 @@ ext["rest-assured.version"] = '5.1.0'
 dependencyManagement {
     dependencies {
         dependency 'org.apache.httpcomponents.core5:httpcore5:5.4.2'
-        dependencySet(group: 'com.google.guava', version: '33.4.8-jre') {
+        dependencySet(group: 'com.google.guava', version: '33.6.0-jre') {
             entry 'guava'
         }
         dependencySet(group: 'io.netty', version: '4.2.12.Final') {
@@ -480,7 +480,8 @@ dependencies {
     implementation group: 'org.apache.santuario', name: 'xmlsec', version: '4.0.4'
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: tomcatEmbedVersion
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: tomcatEmbedVersion
-    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.5.3'
+    // CVE-2026-22732
+    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.5.9'
     //To Remove vulnerability CVE-2020-11988
     implementation group: 'org.apache.xmlgraphics', name: 'xmlgraphics-commons', version: '2.11'
     implementation 'org.flywaydb:flyway-database-postgresql:11.20.3'

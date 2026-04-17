@@ -22,13 +22,5 @@
     "FieldType": "Collection",
     "FieldTypeParameter": "RespondentRepresentative",
     "SecurityClassification": "Public"
-  },
-  {
-    "CaseTypeID": "ET_Scotland",
-    "ID": "expectedCaseUserAssignments",
-    "Label": "Expected case user assignment(s) after NOC",
-    "FieldType": "Collection",
-    "FieldTypeParameter": "CaseUserAssignment",
-    "SecurityClassification": "Public"
   }
 ]

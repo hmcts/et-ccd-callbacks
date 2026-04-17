@@ -1933,6 +1933,4 @@ public class CaseData extends Et1CaseData {
     private String nocRemoveRepIsMoreThanOneFlag;
     @JsonProperty("nocRemoveRepOption")
     private String nocRemoveRepOption;
-    @JsonProperty("expectedCaseUserAssignments")
-    private List<GenericTypeItem<CaseUserAssignment>> expectedCaseUserAssignments;
 }

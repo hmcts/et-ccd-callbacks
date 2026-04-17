@@ -18,7 +18,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
@@ -55,7 +54,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static java.util.UUID.randomUUID;
 import static org.apache.commons.lang3.ObjectUtils.getIfNull;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
@@ -75,7 +73,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_TYPE_REMOVAL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_RETRIEVE_CASE_ASSIGNMENTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_REPRESENTATIVE_EMAIL_ADDRESS_NOT_FOUND;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_UNABLE_TO_FIND_ACCOUNT_ID_BY_EMAIL_WITH_IO_EXCEPTION;
 
 @Service
 @RequiredArgsConstructor
@@ -928,10 +925,7 @@ public class NocRespondentRepresentativeService {
         resetRespondentRepresentativeRemovedField(caseData);
         Map<String, Object> caseDataAsMap = caseConverter.toMap(caseData);
         Map<String, Object> repCollection = updateRepresentationMap(caseData, caseDetails.getCaseId());
-        Map<String, Object> expectedCaseUserAssignments = Map.of("expectedCaseUserAssignments",
-                caseData.getExpectedCaseUserAssignments());
         caseDataAsMap.putAll(repCollection);
-        caseDataAsMap.putAll(expectedCaseUserAssignments);
         return  caseConverter.convert(caseDataAsMap, CaseData.class);
     }
 
@@ -973,7 +967,6 @@ public class NocRespondentRepresentativeService {
             representedTypeRItem.setValue(addedSolicitor);
             repCollection.add(representedTypeRItem);
         }
-        caseData.setExpectedCaseUserAssignments(buildExpectedCaseUserAssignments(caseId, addedSolicitor));
         return Map.of(SolicitorRole.CASE_FIELD, repCollection);
     }
 
@@ -1105,77 +1098,6 @@ public class NocRespondentRepresentativeService {
             }
         }
         return errors;
-    }
-
-    /**
-     * Builds the expected list of wrapped case user assignments for the given case.
-     *
-     * <p>The method first retrieves any existing {@link CaseUserAssignment case user assignments}
-     * for the supplied case and converts each one into a {@link GenericTypeItem} with a newly
-     * generated identifier. It then evaluates the supplied representative and, where the
-     * representative is marked as a My HMCTS user and contains the required organisation ID,
-     * case role, and email address, attempts to resolve the representative's user identifier
-     * and append a corresponding expected {@link CaseUserAssignment}, also wrapped in a
-     * {@link GenericTypeItem}.
-     *
-     * <p>If existing case assignments cannot be retrieved, or if the representative's account
-     * cannot be resolved by email, the exception is logged and the method returns the items
-     * collected up to that point.
-     *
-     * <p><strong>Assumptions:</strong>
-     * <ul>
-     *   <li>{@code caseId} is not blank and identifies a valid case.</li>
-     *   <li>{@code addedRepresentative} is not {@code null}.</li>
-     *   <li>When user lookup succeeds, {@link AccountIdByEmailResponse} is returned with a
-     *       non-null user identifier.</li>
-     *   <li>The generated list represents the expected state only and is not de-duplicated
-     *       against existing assignments.</li>
-     *   <li>Each returned {@link GenericTypeItem} is assigned a randomly generated UUID as
-     *       its item identifier.</li>
-     * </ul>
-     *
-     * @param caseId the ID of the case for which expected case user assignments are built
-     * @param addedRepresentative the representative whose details may be used to create an
-     *     additional expected case user assignment
-     * @return a list of {@link GenericTypeItem} entries containing the existing case user
-     *     assignments and, where applicable, an additional expected assignment for the
-     *     supplied representative
-     */
-    public List<GenericTypeItem<CaseUserAssignment>> buildExpectedCaseUserAssignments(String caseId,
-                                                                     RepresentedTypeR addedRepresentative) {
-        List<GenericTypeItem<CaseUserAssignment>> expectedCaseUserAssignments = new ArrayList<>();
-        CaseUserAssignmentData caseUserAssignmentData = getCaseUserAssignmentData(adminUserService.getAdminUserToken(),
-                caseId).orElse(null);
-        if (ObjectUtils.isNotEmpty(caseUserAssignmentData)
-                && CollectionUtils.isNotEmpty(caseUserAssignmentData.getCaseUserAssignments())) {
-            for (CaseUserAssignment caseUserAssignment : caseUserAssignmentData.getCaseUserAssignments()) {
-                GenericTypeItem.builder().id(String.valueOf(randomUUID())).value(caseUserAssignment).build();
-                expectedCaseUserAssignments.add(GenericTypeItem.<CaseUserAssignment>builder().id(
-                        String.valueOf(randomUUID())).value(caseUserAssignment).build());
-            }
-        }
-        if (!YES.equals(addedRepresentative.getMyHmctsYesNo())
-                || ObjectUtils.isEmpty(addedRepresentative.getRespondentOrganisation())
-                || StringUtils.isBlank(addedRepresentative.getRespondentOrganisation().getOrganisationID())
-                || StringUtils.isBlank(addedRepresentative.getRole())
-                || StringUtils.isBlank(addedRepresentative.getRepresentativeEmailAddress())
-        ) {
-            return expectedCaseUserAssignments;
-        }
-        AccountIdByEmailResponse accountIdByEmailResponse;
-        try {
-            accountIdByEmailResponse = nocService.findUserByEmail(adminUserService.getAdminUserToken(),
-                    addedRepresentative.getRepresentativeEmailAddress(), caseId);
-        } catch (GenericServiceException gse) {
-            log.warn(WARNING_UNABLE_TO_FIND_ACCOUNT_ID_BY_EMAIL_WITH_IO_EXCEPTION, caseId, gse.getMessage());
-            return expectedCaseUserAssignments;
-        }
-        CaseUserAssignment caseUserAssignment = CaseUserAssignment.builder().userId(accountIdByEmailResponse
-                .getUserIdentifier()).caseRole(addedRepresentative.getRole()).caseId(caseId).organisationId(
-                addedRepresentative.getRespondentOrganisation().getOrganisationID()).build();
-        expectedCaseUserAssignments.add(GenericTypeItem.<CaseUserAssignment>builder().id(String.valueOf(randomUUID()))
-                .value(caseUserAssignment).build());
-        return expectedCaseUserAssignments;
     }
 
     /**

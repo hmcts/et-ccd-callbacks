@@ -1,22 +1,22 @@
 #!/usr/bin/env bash
 
-# Usage: ./add-new-user.sh <first_name> <last_name> <email_id> <region_id> <location_id> <location> <service_code> <user_type> <task_supervisor> <case_allocator> <staff_admin> <suspended> <up_idam_status> <region>
+# Usage: ./add-wa-admin-user.sh <email_id> <region_id> <location_id> <location> <service_code> <user_type> <task_supervisor> <case_allocator> <staff_admin> <suspended> <up_idam_status> <region>
 # All arguments are optional and have defaults.
 
-FIRST_NAME=${1:-"WA-User"}
-LAST_NAME=${2:-"WA-ET"}
-EMAIL_ID=${3:-"et.caseworker.3@hmcts.net"}
-REGION_ID=${4:-12}
-LOCATION_ID=${5:-"819890"}
-LOCATION=${6:-"Bristol"}
-USER_TYPE=${7:-"CTSC"}
-TASK_SUPERVISOR=${8:-true}
-CASE_ALLOCATOR=${9:-true}
-STAFF_ADMIN=${10:-true}
-SUSPENDED=${11:-false}
-UP_IDAM_STATUS=${12:-"PENDING"}
-REGION=${13:-"National"}
-SERVICE_CODE=${14:-"BHA1"}
+FIRST_NAME="ET"
+LAST_NAME="Admin"
+EMAIL_ID=${1:-"et.caseworker.3@hmcts.net"}
+REGION_ID=${2:-12}
+LOCATION_ID=${3:-"819890"}
+LOCATION=${4:-"Bristol"}
+USER_TYPE=${5:-"CTSC"}
+TASK_SUPERVISOR=${6:-true}
+CASE_ALLOCATOR=${7:-true}
+STAFF_ADMIN=${8:-true}
+SUSPENDED=${9:-false}
+UP_IDAM_STATUS=${10:-"PENDING"}
+REGION=${11:-"National"}
+SERVICE_CODE=${12:-"BHA1"}
 
 # Get the directory of this script
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -30,38 +30,8 @@ USER_TOKEN=$(get_staff_admin_token)
 echo "Retrieving S2S service token for xui_webapp"
 SERVICE_TOKEN=$(get_service_token "xui_webapp")
 
-# Function to check if user exists by name/email/service
-check_user_exists() {
-  local search_term="$1"
-  local email_to_check="$2"
-  local service_to_check="$3"
-  local search_url="${REF_DATA_URL}/refdata/case-worker/profile/search-by-name?search=${search_term}"
-
-  local result=$(curl -s -X GET "$search_url" \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer ${USER_TOKEN}" \
-    -H "ServiceAuthorization: Bearer ${SERVICE_TOKEN}")
-
-  local found=$(echo "$result" | jq -e --arg email "$email_to_check" --arg service "$service_to_check" '
-    if type == "array" then . else [.] end
-    | map(select(.email_id == $email and (.services // [] | map(.service == $service) | any)))
-    | length > 0')
-
-  if [ "$found" = "true" ]; then
-    echo "User with name/email/service $search_term/$email_to_check/$service_to_check already exists. Skipping creation."
-    return 0
-  fi
-  return 1
-}
-
-# Check for existing user before creation (by first name/email/service)
-if check_user_exists "$FIRST_NAME" "$EMAIL_ID" "Employment Claims"; then
-  echo "User already exists. Exiting."
-  exit 0
-fi
-
 echo "Creating user ${FIRST_NAME} ${LAST_NAME} with email ${EMAIL_ID}"
-response=$(curl -f -s -w "\n%{http_code}" -X POST "${REF_DATA_URL}/refdata/case-worker/profile" \
+response=$(curl -s -w "\n%{http_code}" -X POST "${REF_DATA_URL}/refdata/case-worker/profile" \
   -H "Content-Type: application/json" \
   -H "Authorization: Bearer ${USER_TOKEN}" \
   -H "ServiceAuthorization: Bearer ${SERVICE_TOKEN}" \
@@ -91,10 +61,8 @@ response=$(curl -f -s -w "\n%{http_code}" -X POST "${REF_DATA_URL}/refdata/case-
         {"role_id": "9", "role": "CTSC Team Leader", "is_primary": true},
         {"role_id": "4", "role": "Hearing Centre Administrator", "is_primary": true},
         {"role_id": "3", "role": "Hearing Centre Team Leader", "is_primary": true},
-        {"role_id": "2", "role": "Legal Caseworker", "is_primary": true},
         {"role_id": "13", "role": "Regional Centre Administrator", "is_primary": true},
-        {"role_id": "12", "role": "Regional Centre Team Leader", "is_primary": true},
-        {"role_id": "1", "role": "Senior Legal Caseworker", "is_primary": true}
+        {"role_id": "12", "role": "Regional Centre Team Leader", "is_primary": true}
       ],
       "skills": [],
       "region": "'"${REGION}"'"
@@ -105,5 +73,5 @@ http_code=$(echo "$response" | tail -n1)
 body=$(echo "$response" | head -n-1)
 if [ "$http_code" -ge 400 ]; then
   echo "POST failed with status $http_code: $body"
-  exit 1
 fi
+exit 0

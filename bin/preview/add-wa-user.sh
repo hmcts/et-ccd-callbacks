@@ -30,36 +30,6 @@ USER_TOKEN=$(get_staff_admin_token)
 echo "Retrieving S2S service token for xui_webapp"
 SERVICE_TOKEN=$(get_service_token "xui_webapp")
 
-# Function to check if user exists by name/email/service
-check_user_exists() {
-  local search_term="$1"
-  local email_to_check="$2"
-  local service_to_check="$3"
-  local search_url="${REF_DATA_URL}/refdata/case-worker/profile/search-by-name?search=${search_term}"
-
-  local result=$(curl -s -X GET "$search_url" \
-    -H "Content-Type: application/json" \
-    -H "Authorization: Bearer ${USER_TOKEN}" \
-    -H "ServiceAuthorization: Bearer ${SERVICE_TOKEN}")
-
-  local found=$(echo "$result" | jq -e --arg email "$email_to_check" --arg service "$service_to_check" '
-    if type == "array" then . else [.] end
-    | map(select(.email_id == $email and (.services // [] | map(.service == $service) | any)))
-    | length > 0')
-
-  if [ "$found" = "true" ]; then
-    echo "User with name/email/service $search_term/$email_to_check/$service_to_check already exists. Skipping creation."
-    return 0
-  fi
-  return 1
-}
-
-# Check for existing user before creation (by first name/email/service)
-if check_user_exists "$FIRST_NAME" "$EMAIL_ID" "Employment Claims"; then
-  echo "User already exists. Exiting."
-  exit 0
-fi
-
 echo "Creating user ${FIRST_NAME} ${LAST_NAME} with email ${EMAIL_ID}"
 response=$(curl -f -s -w "\n%{http_code}" -X POST "${REF_DATA_URL}/refdata/case-worker/profile" \
   -H "Content-Type: application/json" \
@@ -105,5 +75,5 @@ http_code=$(echo "$response" | tail -n1)
 body=$(echo "$response" | head -n-1)
 if [ "$http_code" -ge 400 ]; then
   echo "POST failed with status $http_code: $body"
-  exit 1
 fi
+exit 0

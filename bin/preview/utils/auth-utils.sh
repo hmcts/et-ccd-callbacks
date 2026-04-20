@@ -48,7 +48,7 @@ get_user_token_from_email_password() {
 
 # Get Staff user token for preview environment
 get_staff_admin_token() {
-      echo "🔐 Getting Staff Admin user token..."
+      echo "🔐 Getting Staff Admin user token..." >&2
       local username="${ET_STAFF_USER_ADMIN_USER_NAME:-}"
       local password="${ET_STAFF_USER_ADMIN_USER_NAME_PASSWORD:-}"
       local idam_uri="${IDAM_API_URL:-}"

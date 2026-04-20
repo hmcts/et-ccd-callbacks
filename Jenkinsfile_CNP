@@ -28,6 +28,8 @@ def secrets = [
     secret('et-cos-s2s-secret', 'ET_COS_S2S_SECRET'),
     secret('cos-system-user', 'ET_COS_SYSTEM_USER'),
     secret('cos-system-user-password', 'ET_COS_SYSTEM_USER_PASSWORD'),
+    secret('cos-system-user', 'DEFINITION_IMPORTER_USERNAME'),
+    secret('cos-system-user-password', 'DEFINITION_IMPORTER_PASSWORD'),
     secret('cos-system-user', 'ET_SYSTEM_USER'),
     secret('cos-system-user-password', 'ET_SYSTEM_USER_PASSWORD'),
     secret('et-staff-user-admin-user-name', 'ET_STAFF_USER_ADMIN_USER_NAME'),
@@ -50,7 +52,11 @@ def secrets = [
     secret('microservicekey-ccd-ps', 'PRINT_S2S_KEY'),
     secret('microservicekey-ccd-admin', 'ADMIN_S2S_KEY'),
     secret('microservicekey-et-cos', 'ET_COS_S2S_KEY'),
-    secret('microservicekey-xui-webapp', 'XUI_S2S_KEY')
+    secret('microservicekey-xui-webapp', 'XUI_S2S_KEY'),
+    secret('microservicekey-ccd-gw', 'CCD_API_GATEWAY_S2S_SECRET'),
+    secret('microservicekey-ccd-data', 'CCD_DATA_STORE_S2S_SECRET'),
+    secret('microservicekey-ccd-definition', 'CCD_DEFINITION_STORE_S2S_SECRET'),
+    secret('microservicekey-ccd-admin', 'ADMIN_S2S_KEY')
   ],
   'ccd-${env}': [
     secret('ccd-api-gateway-oauth2-client-secret', 'API_GATEWAY_IDAM_SECRET'),
@@ -75,6 +81,7 @@ static LinkedHashMap<String, Object> secret(String secretName, String envVar) {
 withPipeline(type, product, component) {
   env.PACT_BROKER_FULL_URL = 'https://pact-broker.platform.hmcts.net'
   loadVaultSecrets(secrets)
+//  enableHighLevelDataSetup()
   enableAksStagingDeployment()
   onMaster {
     disableLegacyDeployment()
@@ -126,6 +133,7 @@ withPipeline(type, product, component) {
     env.XUI_URL="https://xui-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.CCD_ADMIN_URL="https://admin-web-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.CCD_DEFINITION_STORE_API_BASE_URL="https://ccd-definition-store-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.DEFINITION_STORE_URL_BASE="https://ccd-definition-store-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.IMPORT_PREVIEW=true
     env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
     env.SERVICE_AUTH_PROVIDER_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
@@ -146,14 +154,14 @@ withPipeline(type, product, component) {
     before('smoketest:preview') {
       sh """
         ./bin/pull-latest-e2e-tests.sh
-        cd ccd-definitions && yarn install && yarn setup && yarn scripts:preview ${CHANGE_ID}
+      cd ccd-definitions && yarn install && yarn setup && yarn scripts:preview ${CHANGE_ID}
       """
 
-      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'ccd-definitions/jurisdictions/admin/xlsx/et-admin-ccd-config-preview.xlsx'
-      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'ccd-definitions/jurisdictions/england-wales/xlsx/et-englandwales-ccd-config-preview.xlsx'
-      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'ccd-definitions/jurisdictions/scotland/xlsx/et-scotland-ccd-config-preview.xlsx'
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'ccd-definitions/jurisdictions/admin/xlsx/et-admin-ccd-config-preview.xlsx'
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'ccd-definitions/jurisdictions/england-wales/xlsx/et-englandwales-ccd-config-preview.xlsx'
+    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'ccd-definitions/jurisdictions/scotland/xlsx/et-scotland-ccd-config-preview.xlsx'
 
-      sh """
+    sh """
         echo "Creating CCD roles"
         ./bin/preview/create-ccd-roles.sh
         echo "Importing CCD definitions"
@@ -238,7 +246,6 @@ withPipeline(type, product, component) {
   afterAlways('functionalTest:aat') {
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'functional-output/**/*'
     steps.archiveArtifacts allowEmptyArchive: true, artifacts: '**/reports/tests/functional/**/*'
-
     stage('Functional UI tests chromium') {
       try {
         yarnBuilder.yarn('test:functional-chromium')
@@ -257,4 +264,32 @@ withPipeline(type, product, component) {
       }
     }
   }
+//  env.ENVIRONMENT = "prod"
+//  env.ET_COS_URL = "http://et-cos-prod.service.core-compute-prod.internal"
+//  env.CCD_DEF_URL = "http://ccd-data-store-api-prod.service.core-compute-prod.internal"
+//  env.CCD_DEF_AAC_URL = "http://aac-manage-case-assignment-prod.service.core-compute-prod.internal"
+//
+//  onDemo {
+//    env.ENVIRONMENT = "demo"
+//  }
+//  onPerftest {
+//    env.ENVIRONMENT = "perftest"
+//  }
+//  onIthc {
+//    env.ENVIRONMENT = "ithc"
+//  }
+//  onMaster {
+//    env.ENVIRONMENT = "aat"
+//  }
+//
+//  before('highleveldatasetup') {
+//    stageWithAgent('Generate ET CCD configs - all', product) {
+//      yarnBuilder.yarn('install')
+//      onPR{
+//        yarnBuilder.yarn('generate-excel:preview' + " ${CHANGE_ID}")
+//      }
+//      yarnBuilder.yarn('generate-excel:all-envs')
+//    }
+//    steps.archiveArtifacts artifacts: "ccd-definitions/dist/**"
+//  }
 }

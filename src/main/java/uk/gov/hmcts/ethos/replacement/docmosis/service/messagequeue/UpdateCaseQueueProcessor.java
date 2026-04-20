@@ -9,6 +9,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.HttpClientErrorException;
 import uk.gov.hmcts.ecm.common.model.servicebus.UpdateCaseMsg;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.QueueMessageStatus;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.UpdateCaseQueueMessage;
@@ -144,6 +145,17 @@ public class UpdateCaseQueueProcessor {
         log.error("Error processing update-case message {}: {}",
                 queueMessage.getMessageId(), exception.getMessage(), exception);
 
+        if (isNonRetryableClientError(exception)) {
+            updateCaseQueueRepository.markAsFailed(
+                    queueMessage.getMessageId(),
+                    exception.getMessage(),
+                    queueMessage.getRetryCount() + 1,
+                    QueueMessageStatus.FAILED,
+                    LocalDateTime.now()
+            );
+            return;
+        }
+
         int newRetryCount = queueMessage.getRetryCount() + 1;
         boolean isLastRetry = newRetryCount >= MAX_RETRIES;
         
@@ -193,6 +205,12 @@ public class UpdateCaseQueueProcessor {
         checkIfFinishWhenError(updateCaseMsg);
     }
     
+    private boolean isNonRetryableClientError(Exception ex) {
+        return ex instanceof HttpClientErrorException httpException
+                && (httpException.getStatusCode().value() == 422
+                    || httpException.getStatusCode().value() == 400);
+    }
+
     private void checkIfFinishWhenError(UpdateCaseMsg updateCaseMsg) {
         try {
             log.info("Adding unrecoverable error to database");

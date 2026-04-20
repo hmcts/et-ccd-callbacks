@@ -153,7 +153,7 @@ withPipeline(type, product, component) {
     env.ROLE_ASSIGNMENT_URL = "https://am-role-assignment-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.RUNNING_ENV = "aat"
 
-    afterSuccess('akschartsinstall') {
+    before('smoketest:preview') {
       env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
       env.CAMUNDA_BASE_URL = "https://camunda-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
       env.SERVICE_AUTH_PROVIDER_API_BASE_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
@@ -161,26 +161,28 @@ withPipeline(type, product, component) {
         ./bin/wa/pull-latest-dmn-files.sh ${dmnBranch}
        ./bin/wa/pull-latest-camunda-wa-files.sh ${bpmnBranch}
       """
-    }
 
-    before('smoketest:preview') {
       sh """
         ./bin/pull-latest-e2e-tests.sh
       cd ccd-definitions && yarn install && yarn setup && yarn scripts:preview ${CHANGE_ID}
       """
 
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'ccd-definitions/jurisdictions/admin/xlsx/et-admin-ccd-config-preview.xlsx'
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'ccd-definitions/jurisdictions/england-wales/xlsx/et-englandwales-ccd-config-preview.xlsx'
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'ccd-definitions/jurisdictions/scotland/xlsx/et-scotland-ccd-config-preview.xlsx'
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'ccd-definitions/jurisdictions/admin/xlsx/et-admin-ccd-config-preview.xlsx'
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'ccd-definitions/jurisdictions/england-wales/xlsx/et-englandwales-ccd-config-preview.xlsx'
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'ccd-definitions/jurisdictions/scotland/xlsx/et-scotland-ccd-config-preview.xlsx'
 
-    sh """
-        echo "Creating CCD roles"
-        ./bin/preview/create-ccd-roles.sh
-        echo "Importing CCD definitions"
-        ./bin/preview/import-ccd-definitions.sh
-        echo "Setting up WA users and roles"
-        ./bin/wa/add-org-roles-to-users.sh
-      """
+      sh """
+          echo "Creating CCD roles"
+          ./bin/preview/create-ccd-roles.sh
+        """
+      sh """
+          echo "Importing CCD definitions"
+          ./bin/preview/import-ccd-definitions.sh
+        """
+      sh """
+          echo "Setting up WA users and roles"
+          ./bin/wa/add-org-roles-to-users.sh
+        """
     }
 
     afterAlways('smoketest:preview') {

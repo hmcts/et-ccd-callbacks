@@ -200,7 +200,7 @@ public class RespondentRepresentativeController {
         }
     }
 
-    @PostMapping(value = "/updateRespOrgPolicyAboutToStart", consumes = APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/updateRespOrgPolicyAboutToSubmit", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Updates respondent's organisation policy, representatives' roles and resets change"
             + "organisation request field after representation amended(revoked/assigned)")
     @ApiResponses(value = {
@@ -216,7 +216,7 @@ public class RespondentRepresentativeController {
         @ApiResponse(responseCode = HTTP_CODE_FIVE_ZERO_ONE, description = HTTP_MESSAGE_FIVE_ZERO_ONE),
         @ApiResponse(responseCode = HTTP_CODE_FIVE_ZERO_THREE, description = HTTP_MESSAGE_FIVE_ZERO_THREE)
     })
-    public ResponseEntity<CCDCallbackResponse> updateRespOrgPolicyAboutToStart(
+    public ResponseEntity<CCDCallbackResponse> updateRespOrgPolicyAboutToSubmit(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(AUTHORIZATION) String userToken) {
         log.info("UPDATE RESPONDENT ORGANISATION POLICIES AND ROLES FOR REMOVED REPRESENTATIVES ---> {}{}",

@@ -37,7 +37,7 @@ class OrganisationServiceTest {
     private static final String EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL =
             "We have been unable to assign 'Representative Name 1' access to this case via MyHMCTS. They must "
                     + "check with their organisation administrator to ensure they have a valid MyHMCTS account, who "
-                    + "will need to assign the case to them. To continue please click Ignore and Continue.";
+                    + "will need to assign the case to them. To continue, please click Ignore and Continue.";
 
     @Test
     void theCheckRepresentativeAccountByEmail() {

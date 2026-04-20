@@ -167,7 +167,7 @@ class NocRespondentRepresentativeServiceTest {
                     + "organisation administrator to ensure they have a valid MyHMCTS account, who will need to "
                     + "assign the case to them.";
     private static final String EXPECTED_WARNING_REPRESENTATIVE_EMAIL_NOT_FOUND =
-            "Representative email address not found. To continue please click Ignore and Continue.";
+            "Representative email address not found. To continue, please click Ignore and Continue.";
     private static final String EXPECTED_WARNING_FAILED_TO_RETRIEVE_CASE_ASSIGNMENTS =
             "Failed to retrieve case assignments for case id: 1234567890123456, error: Something went wrong";
 

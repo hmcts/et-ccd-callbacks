@@ -68,11 +68,13 @@ public class OrganisationService {
             if (!OrganisationUtils.hasUserIdentifier(userResponse)) {
                 String warningMessage = String.format(WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL,
                         representativeName);
+                log.warn(warningMessage);
                 nocWarnings.add(warningMessage);
             }
         } catch (Exception e) {
             String warningMessage = String.format(WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL,
                     representativeName);
+            log.warn(warningMessage);
             nocWarnings.add(warningMessage);
         }
         return nocWarnings;

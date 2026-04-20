@@ -1451,17 +1451,6 @@
   },
   {
     "CaseTypeID": "ET_EnglandWales",
-    "CaseEventID": "addAmendClaimantRepresentative",
-    "CaseFieldID": "claimantRepresentedQuestion",
-    "DisplayContext": "OPTIONAL",
-    "PageID": 1,
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 1,
-    "PageColumnNumber": 1,
-    "ShowSummaryChangeOption": "Y"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
     "CaseEventID": "amendRespondentDetails",
     "CaseFieldID": "respondentCollection",
     "DisplayContext": "COMPLEX",

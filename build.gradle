@@ -401,7 +401,7 @@ ext["rest-assured.version"] = '5.1.0'
 dependencyManagement {
     dependencies {
         dependency 'org.apache.httpcomponents.core5:httpcore5:5.4.2'
-        dependencySet(group: 'com.google.guava', version: '33.4.8-jre') {
+        dependencySet(group: 'com.google.guava', version: '33.6.0-jre') {
             entry 'guava'
         }
         dependencySet(group: 'io.netty', version: '4.2.12.Final') {
@@ -460,7 +460,8 @@ dependencies {
     implementation group: 'org.apache.santuario', name: 'xmlsec', version: '4.0.4'
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: tomcatEmbedVersion
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: tomcatEmbedVersion
-    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.5.3'
+    // CVE-2026-22732
+    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.5.9'
     //To Remove vulnerability CVE-2020-11988
     implementation group: 'org.apache.xmlgraphics', name: 'xmlgraphics-commons', version: '2.11'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.22.3'
@@ -492,7 +493,7 @@ dependencies {
     // CVE-2025-48734
     implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.11.0'
     implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
-    implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.10.2'
+    implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.13.2'
 
     implementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.2.4', {
         exclude group: 'org.apache.commons', module: 'commons-compress'
@@ -542,7 +543,7 @@ dependencies {
     testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.17.7'
     testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.17.7'
     testImplementation group: 'com.squareup.okhttp3', name: 'mockwebserver', version: '4.12.0'
-    testRuntimeOnly 'com.h2database:h2:2.2.224'
+    testRuntimeOnly 'com.h2database:h2:2.4.240'
 
     // Contract Tests
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.6.20'

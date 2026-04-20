@@ -344,22 +344,6 @@
   },
   {
     "CaseTypeID": "ET_EnglandWales",
-    "ID": "amendRespondentRepresentative",
-    "Name": "Respondent Representative",
-    "Description": "Add or Amend a Respondent Representative",
-    "DisplayOrder": 17,
-    "PreConditionState(s)": "Accepted;Closed",
-    "PostConditionState": "*",
-    "CallBackURLAboutToStartEvent": "${ET_COS_URL}/respondentRepresentative/amendRespondentRepresentativeAboutToStart",
-    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/respondentRepresentative/amendRespondentRepresentativeAboutToSubmit",
-    "CallBackURLSubmittedEvent": "${ET_COS_URL}/respondentRepresentative/amendRespondentRepresentativeSubmitted",
-    "EventEnablingCondition": "managingOffice !=\"Unassigned\"",
-    "SecurityClassification": "Public",
-    "ShowEventNotes": "N",
-    "ShowSummary": "N"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
     "ID": "allocateHearing",
     "Name": "Allocate Hearing",
     "Description": "Allocate a Hearing",

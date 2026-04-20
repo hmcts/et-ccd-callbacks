@@ -25,7 +25,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocClaimantRepresenta
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CaseDataUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.ClaimantRepresentativeUtils;
-import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.NocUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -35,6 +34,7 @@ import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_REPRESENTATIVE_ORGANISATION_AND_EMAIL_NOT_MATCHED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrorsAndWarnings;
 
 /**
  * REST controller for the addAmendClaimantRepresentative event.
@@ -65,10 +65,10 @@ public class AddAmendClaimantRepresentativeController {
         log.info("CHECKING CLAIMANT REPRESENTATIVE ORGANISATION ---> " + LOG_MESSAGE + "{}",
                 ccdRequest.getCaseDetails().getCaseId());
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        NocUtils.clearNocWarningIfPresent(caseData);
         List<String> errors = new ArrayList<>();
+        List<String> warnings = new ArrayList<>();
         try {
-            nocClaimantRepresentativeService.validateRepresentativeOrganisationAndEmail(caseData);
+            warnings.addAll(nocClaimantRepresentativeService.validateRepresentativeOrganisationAndEmail(caseData));
         } catch (GenericRuntimeException gse) {
             String errorMessage = String.format(ERROR_REPRESENTATIVE_ORGANISATION_AND_EMAIL_NOT_MATCHED,
                     StringUtils.EMPTY);
@@ -78,7 +78,7 @@ public class AddAmendClaimantRepresentativeController {
             }
             errors.add(errorMessage);
         }
-        return getCallbackRespEntityErrors(errors, caseData);
+        return getCallbackRespEntityErrorsAndWarnings(warnings, errors, caseData);
     }
 
 
@@ -109,7 +109,6 @@ public class AddAmendClaimantRepresentativeController {
             errors.add(error);
         }
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
-        NocUtils.clearNocWarningIfPresent(caseData);
         if (errors.isEmpty()) {
             ClaimantRepresentativeUtils.addAmendClaimantRepresentative(caseData);
             nocRespondentRepresentativeService.revokeRespondentRepresentativesWithSameOrganisationAsClaimant(

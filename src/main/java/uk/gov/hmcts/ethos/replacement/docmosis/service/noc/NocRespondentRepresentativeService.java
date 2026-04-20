@@ -122,28 +122,28 @@ public class NocRespondentRepresentativeService {
      * @throws GenericServiceException if a representative marked as an HMCTS
      *         organisation user does not have a valid organisation or organisation ID
      */
-    public void validateRepresentativesOrganisationsAndEmails(CaseData caseData)
+    public List<String> validateRepresentativesOrganisationsAndEmails(CaseData caseData)
             throws GenericServiceException {
+        List<String> warnings = new ArrayList<>();
         if (!RespondentRepresentativeUtils.hasRepresentatives(caseData)) {
-            return;
+            return warnings;
         }
-        StringBuilder nocWarnings = new StringBuilder(StringUtils.EMPTY);
         for (RepresentedTypeRItem representativeItem :  caseData.getRepCollection()) {
             if (RespondentRepresentativeUtils.isValidRepresentative(representativeItem)
                     && YES.equals(representativeItem.getValue().getMyHmctsYesNo())) {
                 if (StringUtils.isBlank(representativeItem.getValue().getRepresentativeEmailAddress())) {
-                    nocWarnings.append(WARNING_REPRESENTATIVE_EMAIL_ADDRESS_NOT_FOUND).append('\n');
+                    warnings.add(WARNING_REPRESENTATIVE_EMAIL_ADDRESS_NOT_FOUND);
                     continue;
                 }
                 if (!RespondentRepresentativeUtils.hasOrganisation(representativeItem.getValue())) {
                     throw new GenericServiceException(EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND);
                 }
-                nocWarnings.append(organisationService.checkRepresentativeAccountByEmail(
+                warnings.addAll(organisationService.checkRepresentativeAccountByEmail(
                         representativeItem.getValue().getNameOfRepresentative(),
                         representativeItem.getValue().getRepresentativeEmailAddress()));
             }
         }
-        caseData.setNocWarning(nocWarnings.toString());
+        return warnings;
     }
 
     public void updateRepresentativesAccess(CallbackRequest callbackRequest, String userToken) {

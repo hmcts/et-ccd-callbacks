@@ -34,18 +34,5 @@
     "CaseFieldID": "repCollectionToAdd",
     "UserRole": "caseworker-employment-api",
     "CRUD": "CRUD"
-  },
-  {
-    "CaseTypeId": "ET_EnglandWales",
-    "CaseFieldID": "nocWarning",
-    "AccessControl": [
-      {
-        "UserRoles": [
-          "caseworker-employment-englandwales",
-          "caseworker-employment-api"
-        ],
-        "CRUD": "CRUD"
-      }
-    ]
   }
 ]

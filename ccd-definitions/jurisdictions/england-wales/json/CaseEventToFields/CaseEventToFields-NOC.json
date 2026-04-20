@@ -14,17 +14,6 @@
   },
   {
     "CaseTypeID": "ET_EnglandWales",
-    "CaseEventID": "addAmendClaimantRepresentative",
-    "CaseFieldID": "nocWarning",
-    "DisplayContext": "READONLY",
-    "PageID": 2,
-    "PageDisplayOrder": 2,
-    "PageFieldDisplayOrder": 1,
-    "PageShowCondition": "nocWarning!=\"\"",
-    "PageColumnNumber": 1
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
     "CaseEventID": "amendRespondentRepresentative",
     "CaseFieldID": "repCollection",
     "DisplayContext": "COMPLEX",
@@ -34,17 +23,5 @@
     "ShowSummaryChangeOption": "Y",
     "CallBackURLMidEvent": "${ET_COS_URL}/respondentRepresentative/amendRespondentRepresentativeMidEvent",
     "PageColumnNumber": 1
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseEventID": "amendRespondentRepresentative",
-    "CaseFieldID": "nocWarning",
-    "DisplayContext": "READONLY",
-    "PageID": 2,
-    "PageDisplayOrder": 2,
-    "PageFieldDisplayOrder": 1,
-    "PageColumnNumber": 1,
-    "PageShowCondition": "nocWarning!=\"\"",
-    "ShowSummaryChangeOption": "Y"
   }
 ]

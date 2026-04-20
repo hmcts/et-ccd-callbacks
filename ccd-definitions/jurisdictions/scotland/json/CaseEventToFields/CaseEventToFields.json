@@ -1600,17 +1600,6 @@
   {
     "CaseTypeID": "ET_Scotland",
     "CaseEventID": "addAmendClaimantRepresentative",
-    "CaseFieldID": "nocWarning",
-    "DisplayContext": "READONLY",
-    "PageID": 2,
-    "PageDisplayOrder": 2,
-    "PageFieldDisplayOrder": 1,
-    "PageShowCondition": "nocWarning!=\"\"",
-    "PageColumnNumber": 1
-  },
-  {
-    "CaseTypeID": "ET_Scotland",
-    "CaseEventID": "addAmendClaimantRepresentative",
     "CaseFieldID": "representativeClaimantType",
     "DisplayContext": "COMPLEX",
     "PageID": 1,
@@ -1642,18 +1631,6 @@
     "ShowSummaryChangeOption": "Y",
     "CallBackURLMidEvent": "${ET_COS_URL}/respondentRepresentative/amendRespondentRepresentativeMidEvent",
     "PageColumnNumber": 1
-  },
-  {
-    "CaseTypeID": "ET_Scotland",
-    "CaseEventID": "amendRespondentRepresentative",
-    "CaseFieldID": "nocWarning",
-    "DisplayContext": "READONLY",
-    "PageID": 2,
-    "PageDisplayOrder": 2,
-    "PageFieldDisplayOrder": 1,
-    "PageColumnNumber": 1,
-    "PageShowCondition": "nocWarning!=\"\"",
-    "ShowSummaryChangeOption": "Y"
   },
   {
     "CaseTypeID": "ET_Scotland",

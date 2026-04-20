@@ -88,11 +88,11 @@ public final class NOCConstants {
             "Failed to send noc notification email to claimant, case id: {}, error: {}";
 
     public static final String WARNING_REPRESENTATIVE_EMAIL_ADDRESS_NOT_FOUND =
-            "Representative email address not found.";
+            "Representative email address not found. To continue please click Ignore and Continue.";
     public static final String WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL =
             "We have been unable to assign '%s' access to this case via MyHMCTS. They must check with their "
                     + "organisation administrator to ensure they have a valid MyHMCTS account, who will need to "
-                    + "assign the case to them.";
+                    + "assign the case to them. To continue please click Ignore and Continue.";
     public static final String WARNING_MISSING_RESPONDENT_EMAIL_ADDRESS =
             "Missing respondent email address while sending Notice of Change (NoC) respondent representative removal "
                     + NOTIFICATION_FOR_CASE;
@@ -141,8 +141,6 @@ public final class NOCConstants {
             "Failed to send email to claimant for removal of representative, case id: {}, error: {}";
     public static final String WARNING_FAILED_TO_RETRIEVE_CASE_ASSIGNMENTS =
             "Failed to retrieve case assignments for case id: {}, error: {}";
-    public static final String WARNING_UNABLE_TO_FIND_ACCOUNT_ID_BY_EMAIL_WITH_IO_EXCEPTION =
-            "Unable to find account by email for case {}. Exception message: {}";
 
     public static final int MAX_NOC_ANSWERS = 10;
 

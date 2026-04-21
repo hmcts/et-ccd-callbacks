@@ -95,32 +95,28 @@ public class NocRespondentRepresentativeService {
     private static final String CLASS_NAME = NocRespondentRepresentativeService.class.getSimpleName();
 
     /**
-     * Validates that each representative marked as an HMCTS organisation user
-     * has a valid organisation and a resolvable email address within the
-     * organisation service.
+     * Validates respondent representatives' organisation and email details and returns
+     * any warning messages identified during validation.
      *
-     * <p>The validation performs the following checks for each representative in the case data:</p>
+     * <p>This method iterates through the respondent representatives in the case data and
+     * checks only those representatives who are valid and marked as MyHMCTS users.
+     *
+     * <p>For each applicable representative:
      * <ul>
-     *     <li>If the representative is marked as an HMCTS organisation user.</li>
-     *     <li>Ensures the representative has a non-null organisation with a valid organisation ID.
-     *         If not, a {@link GenericServiceException} is thrown.</li>
-     *     <li>Checks that the representative has a non-blank email address.
-     *         If missing, a warning message is added to the case data.</li>
-     *     <li>Attempts to resolve the representative’s account via the organisation service
-     *         using the provided email address. If no matching account is found or the lookup
-     *         fails, a warning message is added to the case data.</li>
+     *   <li>if the representative email address is missing, a warning is added and
+     *       validation continues with the next representative;</li>
+     *   <li>if the representative organisation is missing, a
+     *       {@link GenericServiceException} is thrown;</li>
+     *   <li>otherwise, the representative account is checked by email and any warnings
+     *       returned by the organisation service are added to the result.</li>
      * </ul>
      *
-     * <p>If {@code caseData} or its representative collection is null or empty,
-     * the method exits without performing any validation.</p>
-     *
-     * <p>All warnings generated during validation are aggregated and stored in
-     * {@code caseData.setNocWarning(...)}. The method does not fail on missing
-     * email accounts but records them as warnings instead.</p>
-     *
-     * @param caseData the case data containing representative details to validate
-     * @throws GenericServiceException if a representative marked as an HMCTS
-     *         organisation user does not have a valid organisation or organisation ID
+     * @param caseData the case data containing the respondent representatives to validate
+     * @return a list of warning messages for representatives whose email address is missing
+     *     or whose account could not be confirmed by email; an empty list if no warnings
+     *     are identified
+     * @throws GenericServiceException if a valid MyHMCTS representative does not have an
+     *     associated organisation
      */
     public List<String> validateRepresentativesOrganisationsAndEmails(CaseData caseData)
             throws GenericServiceException {

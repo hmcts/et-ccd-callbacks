@@ -86,6 +86,8 @@ public final class NOCConstants {
             "Claimant email not found. Unable to notify claimant for respondent representative update. Case id: {}";
     public static final String WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_CLAIMANT =
             "Failed to send noc notification email to claimant, case id: {}, error: {}";
+    public static final String WARNING_FAILED_TO_FIND_ORGANISATION_BY_EMAIL_SYSTEM_ERROR =
+            "A system error occurred while trying to find an organisation by email address. Exception: {}";
 
     public static final String WARNING_REPRESENTATIVE_EMAIL_ADDRESS_NOT_FOUND =
             "Representative email address not found. To continue, please click Ignore and Continue.";

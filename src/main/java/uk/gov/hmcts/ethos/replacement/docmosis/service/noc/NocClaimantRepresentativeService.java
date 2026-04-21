@@ -34,6 +34,7 @@ import java.util.Optional;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_SELECTED_ORGANISATION_REPRESENTATIVE_ORGANISATION_NOT_MATCHES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_FIND_ORGANISATION_BY_EMAIL_SYSTEM_ERROR;
 
 @Service
 @RequiredArgsConstructor
@@ -153,6 +154,7 @@ public class NocClaimantRepresentativeService {
                     userResponse.getUserIdentifier(), caseDetails.getCaseId());
         } catch (GenericServiceException e) {
             // if user is not defined on idam should not check for organisation.
+            log.warn(WARNING_FAILED_TO_FIND_ORGANISATION_BY_EMAIL_SYSTEM_ERROR, e.getMessage());
             isValidUserAndOrganisation = false;
         }
         if (isValidUserAndOrganisation

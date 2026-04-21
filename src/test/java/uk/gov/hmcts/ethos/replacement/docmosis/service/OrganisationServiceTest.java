@@ -7,12 +7,14 @@ import org.mockito.Mock;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericRuntimeException;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(SpringExtension.class)
@@ -41,7 +43,6 @@ class OrganisationServiceTest {
 
     @Test
     void theCheckRepresentativeAccountByEmail() {
-
         // when user response not has user identifier should return warning message
         when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
         when(authTokenGenerator.generate()).thenReturn(AUTHORISATION_TOKEN);
@@ -60,7 +61,7 @@ class OrganisationServiceTest {
         // when exception is thrown should return warning message
         when(organisationClient.getAccountIdByEmail(ADMIN_USER_TOKEN, AUTHORISATION_TOKEN, REPRESENTATIVE_EMAIL_1))
                 .thenThrow(new RuntimeException());
-        assertThat(organisationService.checkRepresentativeAccountByEmail(REPRESENTATIVE_NAME_1, REPRESENTATIVE_EMAIL_1))
-                .isEqualTo(List.of(EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL));
+        assertThrows(GenericRuntimeException.class, () -> organisationService.checkRepresentativeAccountByEmail(
+                        REPRESENTATIVE_NAME_1, REPRESENTATIVE_EMAIL_1));
     }
 }

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericRuntimeException;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.OrganisationUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
@@ -12,6 +13,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import java.util.ArrayList;
 import java.util.List;
 
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_CHECK_REPRESENTATIVE_ACCOUNT_BY_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL;
 
 @Service
@@ -58,7 +60,8 @@ public class OrganisationService {
      * @return a list of warning messages, or an empty list if the representative account
      *     is found successfully
      */
-    public List<String> checkRepresentativeAccountByEmail(String representativeName, String email) {
+    public List<String> checkRepresentativeAccountByEmail(String representativeName, String email)
+            throws GenericRuntimeException {
         List<String> nocWarnings = new ArrayList<>();
         try {
             ResponseEntity<AccountIdByEmailResponse> userResponse =
@@ -72,10 +75,8 @@ public class OrganisationService {
                 nocWarnings.add(warningMessage);
             }
         } catch (Exception e) {
-            String warningMessage = String.format(WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL,
-                    representativeName);
-            log.warn(warningMessage);
-            nocWarnings.add(warningMessage);
+            log.error(ERROR_UNABLE_TO_CHECK_REPRESENTATIVE_ACCOUNT_BY_EMAIL, e.getMessage());
+            throw new GenericRuntimeException(e);
         }
         return nocWarnings;
     }

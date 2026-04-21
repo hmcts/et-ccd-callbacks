@@ -17,6 +17,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericRuntimeException;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
@@ -76,7 +77,7 @@ public class NocClaimantRepresentativeService {
      * @return a list of warning messages, or an empty list if the representative details
      *     are incomplete or no warnings are identified
      */
-    public List<String> validateRepresentativeOrganisationAndEmail(CaseData caseData) {
+    public List<String> validateRepresentativeOrganisationAndEmail(CaseData caseData) throws GenericRuntimeException {
         List<String> warnings = new ArrayList<>();
         if (!ClaimantRepresentativeUtils.hasRepresentative(caseData.getRepresentativeClaimantType())
                 || !ClaimantRepresentativeUtils.hasRepresentativeEmail(caseData.getRepresentativeClaimantType())

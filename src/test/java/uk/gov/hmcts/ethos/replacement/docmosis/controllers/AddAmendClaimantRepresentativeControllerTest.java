@@ -19,7 +19,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocClaimantRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
-import uk.gov.hmcts.ethos.replacement.docmosis.test.utils.LoggerTestUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -143,7 +142,7 @@ class AddAmendClaimantRepresentativeControllerTest {
 
     @Test
     @SneakyThrows
-    void testAmendClaimantRepSubmitted() {
+    void testAmendClaimantRepMidEvent() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         UserDetails userDetails = new UserDetails();
         userDetails.setEmail(TEST_USER_EMAIL);
@@ -154,9 +153,10 @@ class AddAmendClaimantRepresentativeControllerTest {
                         .content(jsonMapper.toJson(ccdRequest))
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-        verify(nocClaimantRepresentativeService, times(LoggerTestUtils.INTEGER_ONE))
-                .validateRepresentativeOrganisationAndEmail(any(CaseData.class));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", empty()))
+                .andExpect(jsonPath("$.warnings", empty()));
     }
 
     @Test

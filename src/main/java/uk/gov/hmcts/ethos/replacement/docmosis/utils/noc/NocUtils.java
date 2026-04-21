@@ -652,23 +652,6 @@ public final class NocUtils {
     }
 
     /**
-     * Clears the Notice of Change (NoC) warning from the given {@link CaseData},
-     * if one is present.
-     *
-     * <p>If the {@code caseData} is {@code null} or empty, or if no NoC warning
-     * is currently set, this method performs no action.</p>
-     *
-     * @param caseData the case data from which the NoC warning should be cleared;
-     *                 may be {@code null}
-     */
-    public static void clearNocWarningIfPresent(CaseData caseData) {
-        if (ObjectUtils.isEmpty(caseData) || StringUtils.isBlank(caseData.getNocWarning())) {
-            return;
-        }
-        caseData.setNocWarning(null);
-    }
-
-    /**
      * Determines whether sufficient data is available to proceed with
      * revoking representative access.
      *

@@ -62,8 +62,6 @@ final class NocUtilsTest {
     private static final String EXPECTED_EXCEPTION_OLD_AND_NEW_RESPONDENTS_ARE_DIFFERENT =
             "Old and new respondent collections contain different respondents for case ID 1234567890123456.";
 
-    private static final String NOC_WARNING = "Dummy NOC warning";
-
     private static final String REPRESENTATIVE_NAME = "Representative Name";
     private static final String RESPONDENT_NAME_ONE = "Respondent Name One";
     private static final String RESPONDENT_NAME_TWO = "Respondent Name Two";
@@ -712,20 +710,6 @@ final class NocUtilsTest {
                 .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_I).organisation(organisation9).build());
         assertThat(caseData.getRespondentOrganisationPolicy9()).isEqualTo(OrganisationPolicy.builder()
                 .orgPolicyCaseAssignedRole(ROLE_SOLICITOR_J).organisation(organisation10).build());
-    }
-
-    @Test
-    void theClearNocWarningIfPresent() {
-        // when case data is empty should not throw any exception
-        assertDoesNotThrow(() -> NocUtils.clearNocWarningIfPresent(null));
-        // when case data does not have any noc warning should not throw any exception
-        CaseData caseData = new CaseData();
-        assertDoesNotThrow(() -> NocUtils.clearNocWarningIfPresent(caseData));
-        assertThat(caseData.getNocWarning()).isNull();
-        // when case data has noc warning should clear it
-        caseData.setNocWarning(NOC_WARNING);
-        assertDoesNotThrow(() -> NocUtils.clearNocWarningIfPresent(caseData));
-        assertThat(caseData.getNocWarning()).isNull();
     }
 
     @Test

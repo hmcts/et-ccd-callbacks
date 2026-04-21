@@ -27,6 +27,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.NocUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -49,39 +50,86 @@ public class NocClaimantRepresentativeService {
     private final OrganisationService organisationService;
 
     /**
-     * Validates the representative organisation and email associated with the given case data.
-     * <p>
-     * This method performs preliminary checks to ensure that the claimant representative,
-     * their email address, and the HMCTS organisation ID are present. If any of these
-     * required details are missing, the validation is skipped and the method returns
-     * without performing further checks.
-     * </p>
+     * Validates whether the claimant representative has the minimum details required for
+     * an organisation account check and, where so, performs the check using the
+     * representative's email address.
      *
-     * <p>
-     * If all required representative details are available, the method verifies whether
-     * a representative account exists for the provided email address by calling the
-     * organisation service. Any warning returned from the service is stored in the
-     * {@code nocWarning} field of the {@link CaseData}.
-     * </p>
+     * <p>If the claimant representative is missing, or does not have an email address or
+     * HMCTS organisation ID, no validation is performed and an empty list is returned.
      *
-     * <p>
-     * <strong>Assumption:</strong> The {@code caseData} parameter is expected to be non-null
-     * when this method is invoked.
-     * </p>
+     * <p>Where all required representative details are present, this method delegates to
+     * the organisation service to check whether the representative account can be resolved
+     * by email and returns any warning messages produced by that check.
      *
-     * @param caseData the case data containing representative details to validate
+     * <p><strong>Assumptions:</strong>
+     * <ul>
+     *   <li>{@code caseData} is not {@code null}.</li>
+     *   <li>{@code caseData.getRepresentativeClaimantType()} may be absent, and this is
+     *       treated as a non-validation scenario rather than an error.</li>
+     *   <li>The organisation service returns a non-null list of warning messages.</li>
+     *   <li>An empty returned list means either the required representative details were
+     *       not present or no warnings were identified by the account check.</li>
+     * </ul>
+     *
+     * @param caseData the case data containing the claimant representative details
+     * @return a list of warning messages, or an empty list if the representative details
+     *     are incomplete or no warnings are identified
      */
-    public void validateRepresentativeOrganisationAndEmail(CaseData caseData) {
+    public List<String> validateRepresentativeOrganisationAndEmail(CaseData caseData) {
+        List<String> warnings = new ArrayList<>();
         if (!ClaimantRepresentativeUtils.hasRepresentative(caseData.getRepresentativeClaimantType())
                 || !ClaimantRepresentativeUtils.hasRepresentativeEmail(caseData.getRepresentativeClaimantType())
                 || !ClaimantRepresentativeUtils.hasHmctsOrganisationId(caseData.getRepresentativeClaimantType())) {
-            return;
+            return warnings;
         }
-        caseData.setNocWarning(organisationService.checkRepresentativeAccountByEmail(
+        return organisationService.checkRepresentativeAccountByEmail(
                 caseData.getRepresentativeClaimantType().getNameOfRepresentative(),
-                caseData.getRepresentativeClaimantType().getRepresentativeEmailAddress()));
+                caseData.getRepresentativeClaimantType().getRepresentativeEmailAddress());
     }
 
+    /**
+     * Validates that the selected My HMCTS organisation for the claimant representative
+     * matches the organisation associated with the representative's My HMCTS account.
+     *
+     * <p>If the claimant representative details are incomplete, no validation is performed
+     * and an empty string is returned.
+     *
+     * <p>Where the representative email address and selected organisation details are present,
+     * this method attempts to:
+     * <ol>
+     *   <li>find the representative's user account by email address, and</li>
+     *   <li>retrieve the organisation associated with that user account.</li>
+     * </ol>
+     *
+     * <p>If both lookups succeed, the selected organisation is compared with the
+     * representative's registered organisation. If they do not match, a formatted error
+     * message is returned. If the lookups fail, no organisation mismatch validation is
+     * applied and an empty string is returned.
+     *
+     * <p><strong>Assumptions:</strong>
+     * <ul>
+     *   <li>{@code caseDetails} is not {@code null}.</li>
+     *   <li>{@code caseDetails.getCaseData()} is not {@code null}.</li>
+     *   <li>{@code caseDetails.getCaseId()} contains a valid case identifier for logging and service calls.</li>
+     *   <li>{@code adminUserService.getAdminUserToken()} returns a valid access token.</li>
+     *   <li>If the representative cannot be found in IDAM, organisation validation is skipped.</li>
+     *   <li>{@code nocService.findUserByEmail(...)} returns a response with a non-null user identifier when successful.
+     *   </li>
+     *   <li>{@code OrganisationUtils.hasMatchingOrganisationId(...)} safely handles the returned
+     *       {@code organisationsResponse} when present.</li>
+     *   <li>An empty return value means either:
+     *     <ul>
+     *       <li>the representative details required for validation were missing,</li>
+     *       <li>the representative account and organisation could not be resolved, or</li>
+     *       <li>the selected organisation matched the representative's organisation.</li>
+     *     </ul>
+     *   </li>
+     * </ul>
+     *
+     * @param caseDetails the case details containing the claimant representative information
+     * @return a formatted error message if the selected organisation does not match the
+     *     representative's organisation, or an empty string if no validation error is found
+     */
     public String validateClaimantRepresentativeOrganisationMatch(CaseDetails caseDetails) {
         String error = StringUtils.EMPTY;
         if (ObjectUtils.isEmpty(caseDetails.getCaseData().getRepresentativeClaimantType())

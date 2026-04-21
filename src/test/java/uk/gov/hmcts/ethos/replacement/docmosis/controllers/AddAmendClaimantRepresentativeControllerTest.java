@@ -23,6 +23,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
+import java.util.ArrayList;
+
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.notNullValue;
@@ -137,8 +139,8 @@ class AddAmendClaimantRepresentativeControllerTest {
         UserDetails userDetails = new UserDetails();
         userDetails.setEmail(TEST_USER_EMAIL);
         when(userIdamService.getUserDetails(any())).thenReturn(userDetails);
-        doNothing().when(nocClaimantRepresentativeService).validateRepresentativeOrganisationAndEmail(any(
-                CaseData.class));
+        when(nocClaimantRepresentativeService.validateRepresentativeOrganisationAndEmail(any(
+                CaseData.class))).thenReturn(new ArrayList<>());
         mockMvc.perform(post(AMEND_CLAIMANT_REPRESENTATIVE_MID_EVENT)
                         .content(jsonMapper.toJson(ccdRequest))
                         .header("Authorization", AUTH_TOKEN)

@@ -5,7 +5,7 @@
 
 FIRST_NAME="ET"
 LAST_NAME="LegalOps"
-EMAIL_ID=${1:-"et.caseworker.3@hmcts.net"}
+EMAIL_ID=${1:-"et.caseworker011@hmcts.net"}
 REGION_ID=${2:-12}
 LOCATION_ID=${3:-"819890"}
 LOCATION=${4:-"Bristol"}

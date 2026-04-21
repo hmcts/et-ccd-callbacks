@@ -32,16 +32,21 @@ get_user_token_from_email_password() {
       local idam_uri="${IDAM_API_URL:-}"
 
     if [[ -z "${username}" || -z "${password}" ]]; then
-        echo "❌ Error: CCD_ADMIN_USERNAME and CCD_ADMIN_PASSWORD must be set" >&2
+        echo "❌ Error: username and password must be provided" >&2
         exit 1
     fi
 
     # Get access token
-    local token=
-    curl --silent --location "${idam_uri}/loginUser" \
+    local token
+    token=$(curl --silent --location "${idam_uri}/loginUser" \
     --header 'Content-Type: application/x-www-form-urlencoded' \
       --data-urlencode "username=${username}" \
-       --data-urlencode "password=${password}" | jq -r .access_token
+       --data-urlencode "password=${password}" | jq -r .access_token)
+
+    if [[ -z "${token}" || "${token}" == "null" ]]; then
+        echo "❌ Error: Failed to get IDAM token for user '${username}'" >&2
+        exit 1
+    fi
 
     echo "${token}"
 }
@@ -59,11 +64,16 @@ get_staff_admin_token() {
     fi
 
     # Get access token
-    local token=
-    curl --silent --location "${idam_uri}/loginUser" \
+    local token
+    token=$(curl --silent --location "${idam_uri}/loginUser" \
     --header 'Content-Type: application/x-www-form-urlencoded' \
       --data-urlencode "username=${username}" \
-       --data-urlencode "password=${password}" | jq -r .access_token
+       --data-urlencode "password=${password}" | jq -r .access_token)
+
+    if [[ -z "${token}" || "${token}" == "null" ]]; then
+        echo "❌ Error: Failed to get IDAM token for staff admin user '${username}'" >&2
+        exit 1
+    fi
 
     echo "${token}"
 }
@@ -183,7 +193,7 @@ get_idam_id_from_token() {
     fi
 
     local idam_user_id
-    idam_user_id=$(curl --silent -v --show-error -X GET "${IDAM_API_URL}/details" \
+    idam_user_id=$(curl --silent --show-error -X GET "${IDAM_API_URL}/details" \
         -H "accept: application/json" \
         -H "authorization: Bearer ${user_token}" | jq -r .id)
     echo "${idam_user_id}"

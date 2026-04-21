@@ -1060,8 +1060,6 @@ public class CaseData extends Et1CaseData {
     private List<DocumentTypeItem> updateReferralDocument;
     @JsonProperty("updateReferralInstruction")
     private String updateReferralInstruction;
-    @JsonProperty("updateReferralDateTime")
-    private String updateReferralDateTime;
 
     //Referral Reply
     @JsonProperty("hearingAndReferralDetails")

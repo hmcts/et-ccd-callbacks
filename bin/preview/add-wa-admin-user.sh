@@ -1,22 +1,22 @@
 #!/usr/bin/env bash
 
-# Usage: ./add-wa-admin-user.sh <email_id> <region_id> <location_id> <location> <service_code> <user_type> <task_supervisor> <case_allocator> <staff_admin> <suspended> <up_idam_status> <region>
+# Usage: ./add-wa-admin-user.sh <region_id> <location_id> <location> <service_code> <user_type> <task_supervisor> <case_allocator> <staff_admin> <suspended> <up_idam_status> <region>
 # All arguments are optional and have defaults.
 
 FIRST_NAME="ET"
 LAST_NAME="Admin"
-EMAIL_ID=${1:-"et.caseworker.3@hmcts.net"}
-REGION_ID=${2:-12}
-LOCATION_ID=${3:-"819890"}
-LOCATION=${4:-"Bristol"}
-USER_TYPE=${5:-"CTSC"}
-TASK_SUPERVISOR=${6:-true}
-CASE_ALLOCATOR=${7:-true}
-STAFF_ADMIN=${8:-true}
-SUSPENDED=${9:-false}
-UP_IDAM_STATUS=${10:-"PENDING"}
-REGION=${11:-"National"}
-SERVICE_CODE=${12:-"BHA1"}
+EMAIL_ID="et.caseworker.3@hmcts.net"
+REGION_ID=${1:-12}
+LOCATION_ID=${2:-"819890"}
+LOCATION=${3:-"Bristol"}
+USER_TYPE=${4:-"CTSC"}
+TASK_SUPERVISOR=${5:-true}
+CASE_ALLOCATOR=${6:-true}
+STAFF_ADMIN=${7:-true}
+SUSPENDED=${8:-false}
+UP_IDAM_STATUS=${9:-"PENDING"}
+REGION=${10:-"National"}
+SERVICE_CODE=${11:-"BHA1"}
 
 # Get the directory of this script
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

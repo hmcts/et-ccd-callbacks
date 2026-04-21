@@ -271,8 +271,6 @@ public class MultipleData extends BaseCaseData {
     private List<DocumentTypeItem> updateReferralDocument;
     @JsonProperty("updateReferralInstruction")
     private String updateReferralInstruction;
-    @JsonProperty("updateReferralDateTime")
-    private String updateReferralDateTime;
 
     //Referral Reply
     @JsonProperty("hearingAndReferralDetails")

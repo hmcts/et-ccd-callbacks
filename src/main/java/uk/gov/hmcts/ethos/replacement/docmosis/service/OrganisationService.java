@@ -1,7 +1,9 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
@@ -60,8 +62,7 @@ public class OrganisationService {
      * @return a list of warning messages, or an empty list if the representative account
      *     is found successfully
      */
-    public List<String> checkRepresentativeAccountByEmail(String representativeName, String email)
-            throws GenericRuntimeException {
+    public List<String> checkRepresentativeAccountByEmail(String representativeName, String email) {
         List<String> nocWarnings = new ArrayList<>();
         try {
             ResponseEntity<AccountIdByEmailResponse> userResponse =
@@ -74,9 +75,16 @@ public class OrganisationService {
                 log.warn(warningMessage);
                 nocWarnings.add(warningMessage);
             }
-        } catch (Exception e) {
-            log.error(ERROR_UNABLE_TO_CHECK_REPRESENTATIVE_ACCOUNT_BY_EMAIL, e.getMessage());
-            throw new GenericRuntimeException(e);
+        } catch (FeignException e) {
+            if (e.status() == HttpStatus.NOT_FOUND.value()) {
+                String warningMessage = String.format(WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL,
+                        representativeName);
+                log.warn(warningMessage);
+                nocWarnings.add(warningMessage);
+            } else {
+                log.error(ERROR_UNABLE_TO_CHECK_REPRESENTATIVE_ACCOUNT_BY_EMAIL, e.getMessage());
+                throw new GenericRuntimeException(e);
+            }
         }
         return nocWarnings;
     }

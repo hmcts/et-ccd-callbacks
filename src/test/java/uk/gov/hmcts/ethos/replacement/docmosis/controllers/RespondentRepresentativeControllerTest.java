@@ -66,6 +66,9 @@ class RespondentRepresentativeControllerTest {
     private static final String URL_AMEND_RESPONDENT_REPRESENTATIVE_SUBMITTED =
             "/respondentRepresentative/amendRespondentRepresentativeSubmitted";
 
+    private static final String EXPECTED_WARNING_REPRESENTATIVE_EMAIL_NOT_FOUND =
+            "Representative email not exist";
+
     @Autowired
     private MockMvc mockMvc;
     @MockBean
@@ -316,8 +319,8 @@ class RespondentRepresentativeControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
-                .andExpect(jsonPath(JsonMapper.WARNINGS, notNullValue()));
+                .andExpect(jsonPath(JsonMapper.ERRORS, empty()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, empty()));
     }
 
     @Test
@@ -350,6 +353,34 @@ class RespondentRepresentativeControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, empty()));
+    }
+
+    @Test
+    @SneakyThrows
+    void amendRespondentRepresentativeMidEventWithWarning() {
+        CaseData caseData = new CaseData();
+        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
+        respondent.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_1).build());
+        respondent.setId(ID_RESPONDENT_1);
+        caseData.setRespondentCollection(List.of(respondent));
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
+        DynamicValueType dynamicValueType = new DynamicValueType();
+        dynamicValueType.setLabel(RESPONDENT_NAME_1);
+        dynamicFixedListType.setValue(dynamicValueType);
+        caseData.setRepCollection(List.of(RepresentedTypeRItem.builder().id(ID_REPRESENTATIVE_1).value(
+                RepresentedTypeR.builder().dynamicRespRepName(dynamicFixedListType).build()).build()));
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().withCaseData(caseData).build();
+        ccdRequest.getCaseDetails().setCaseId(DUMMY_SUBMISSION_REFERENCE);
+        when(nocRespondentRepresentativeService.validateRepresentativesOrganisationsAndEmails(
+                any(CaseData.class))).thenReturn(List.of(EXPECTED_WARNING_REPRESENTATIVE_EMAIL_NOT_FOUND));
+        mockMvc.perform(post(URL_AMEND_RESPONDENT_REPRESENTATIVE_MID_EVENT)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header(HEADER_AUTHORIZATION, DUMMY_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, empty()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, notNullValue()));
     }
 

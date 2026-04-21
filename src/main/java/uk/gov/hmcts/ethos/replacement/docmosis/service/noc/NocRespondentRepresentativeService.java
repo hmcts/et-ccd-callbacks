@@ -724,31 +724,29 @@ public class NocRespondentRepresentativeService {
     }
 
     /**
-     * Grants case access to valid respondent representatives by assigning them the next available
-     * respondent solicitor role via Notice of Change (NoC).
-     * <p>
-     * The method iterates over the provided list of representatives and, for each valid representative:
-     * <ul>
-     *     <li>Determines the next available respondent solicitor role on the case</li>
-     *     <li>Grants access to the case using the representative's email and organisation details</li>
-     * </ul>
-     * </p>
-     * <p>
-     * Processing will stop if no respondent solicitor roles are available on the case.
-     * Invalid representatives are skipped. Any failures when granting access are logged and do not
-     * prevent processing of subsequent representatives.
-     * </p>
-     * <p>
-     * The method performs no action if:
-     * <ul>
-     *     <li>{@code caseDetails} or its case data is {@code null}</li>
-     *     <li>The case ID is blank</li>
-     *     <li>The representatives list is {@code null} or empty</li>
-     * </ul>
-     * </p>
+     * Grants MyHMCTS access to the supplied respondent representatives and records the
+     * successfully processed representatives for later organisation policy updates.
      *
-     * @param caseDetails     the case details containing the case ID and case data
-     * @param representatives a list of respondent representatives to be granted access
+     * <p>This method first validates the input and returns immediately if the case details,
+     * case data, case ID, or representatives list is missing. It then resets
+     * {@code repCollectionToAdd} on the case data and processes each supplied representative.
+     *
+     * <p>For each valid representative, the method:
+     * <ul>
+     *   <li>derives the solicitor role to assign;</li>
+     *   <li>grants representative access through the NOC service;</li>
+     *   <li>locates the corresponding representative in the case data; and</li>
+     *   <li>adds that representative to {@code repCollectionToAdd} after setting the derived role.</li>
+     * </ul>
+     *
+     * <p>If no role can be derived for a representative, an error is logged and processing
+     * stops for any remaining representatives. If access cannot be granted for a specific
+     * representative, the error is logged and processing continues with the next one. If the
+     * matching representative cannot be found in the case data after access is granted, an
+     * error is logged and the method exits.
+     *
+     * @param caseDetails the case details containing the case ID and case data to update
+     * @param representatives the respondent representatives to be granted access
      */
     public void grantRespondentRepresentativesAccess(CaseDetails caseDetails,
                                                      List<RepresentedTypeRItem> representatives) {

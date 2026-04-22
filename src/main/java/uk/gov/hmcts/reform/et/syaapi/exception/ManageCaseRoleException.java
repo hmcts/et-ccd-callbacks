@@ -16,6 +16,14 @@ public class ManageCaseRoleException extends RuntimeException {
     private static final long serialVersionUID = Long.MIN_VALUE;
 
     /**
+     *   Creates an {@link ManageCaseRoleException} with a message.
+     *   @param message exception message
+     */
+    public ManageCaseRoleException(String message) {
+        super(message);
+    }
+
+    /**
      *   Creates an {@link ManageCaseRoleException} with a cause.
      *   @param cause while trying to modify case role management
      */

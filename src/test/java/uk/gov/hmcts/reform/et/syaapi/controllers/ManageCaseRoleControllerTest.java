@@ -44,9 +44,11 @@ import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.ENGLAND_CAS
 class ManageCaseRoleControllerTest {
     private static final String CASE_ID = "1646225213651590";
     private static final String USER_ID = "1234564789";
-    private static final String CASE_ROLE = "[DEFENDANT]";
+    private static final String CREATOR_ROLE = "[CREATOR]";
+    private static final String DEFENDANT_ROLE = "[DEFENDANT]";
     private static final String AUTH_TOKEN = "some-token";
     private static final String POST_MODIFY_CASE_USER_ROLE_URL = "/manageCaseRole/modifyCaseUserRoles";
+    private static final String POST_ASSIGN_CREATOR_ROLE_URL = "/manageCaseRole/assignCreatorRole";
     private static final String REVOKE_CLAIMANT_SOLICITOR_ROLE_URL = "/manageCaseRole/revokeClaimantSolicitorRole";
     private static final String REVOKE_RESPONDENT_SOLICITOR_ROLE_URL = "/manageCaseRole/revokeRespondentSolicitorRole";
     private static final String POST_FIND_CASE_FOR_ROLE_MODIFICATION
@@ -57,6 +59,7 @@ class ManageCaseRoleControllerTest {
     private static final String RESPONDENT_NAME = "Respondent Name";
     private static final String CLAIMANT_FIRST_NAMES = "Claimant First Names";
     private static final String CLAIMANT_LAST_NAME = "Claimant Last Name";
+    private static final String APPLICATION_NAME_VALUE = "et-sya-frontend";
     private static final String STRING_ZERO = "0";
 
     @Autowired
@@ -81,7 +84,7 @@ class ManageCaseRoleControllerTest {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         ModifyCaseUserRole modifyCaseUserRole = ModifyCaseUserRole
             .builder()
-            .caseRole(CASE_ROLE)
+            .caseRole(DEFENDANT_ROLE)
             .caseDataId(CASE_ID)
             .userId(USER_ID)
             .caseTypeId(ENGLAND_CASE_TYPE)
@@ -109,7 +112,7 @@ class ManageCaseRoleControllerTest {
     void modifyUserRolesWithoutUserId() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         CaseAssignmentUserRole caseAssignmentUserRole = CaseAssignmentUserRole
-            .builder().caseRole(CASE_ROLE).caseDataId(CASE_ID).userId(null).build();
+            .builder().caseRole(DEFENDANT_ROLE).caseDataId(CASE_ID).userId(null).build();
         CaseAssignmentUserRolesRequest caseAssignmentUserRolesRequest = CaseAssignmentUserRolesRequest.builder()
             .caseAssignmentUserRoles(List.of(caseAssignmentUserRole))
             .build();
@@ -135,11 +138,13 @@ class ManageCaseRoleControllerTest {
         FindCaseForRoleModificationRequest findCaseForRoleModificationRequest = FindCaseForRoleModificationRequest
             .builder()
             .caseSubmissionReference(CASE_SUBMISSION_REFERENCE)
+            .ethosCaseReference(CASE_SUBMISSION_REFERENCE)
             .respondentName(RESPONDENT_NAME)
             .claimantFirstNames(CLAIMANT_FIRST_NAMES)
             .claimantLastName(CLAIMANT_LAST_NAME)
+            .applicationName(APPLICATION_NAME_VALUE)
             .build();
-        when(manageCaseRoleService.findCaseForRoleModification(findCaseForRoleModificationRequest, AUTH_TOKEN))
+        when(manageCaseRoleService.findCaseForRoleModification(any(), any()))
             .thenReturn(CaseDetails.builder()
                             .id(Long.parseLong(CASE_ID))
                             .caseTypeId(ENGLAND_CASE_TYPE)
@@ -148,6 +153,33 @@ class ManageCaseRoleControllerTest {
                             .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(ResourceLoader.toJson(findCaseForRoleModificationRequest)))
+            .andExpect(status().isOk());
+    }
+
+    @Test
+    @SneakyThrows
+    void assignCreatorRole() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        ModifyCaseUserRole modifyCaseUserRole = ModifyCaseUserRole.builder()
+            .caseRole(CREATOR_ROLE)
+            .caseDataId(CASE_ID)
+            .userId(USER_ID)
+            .caseTypeId(ENGLAND_CASE_TYPE)
+            .respondentName(RESPONDENT_NAME)
+            .build();
+        ModifyCaseUserRolesRequest modifyCaseUserRolesRequest = ModifyCaseUserRolesRequest.builder()
+            .modifyCaseUserRoles(List.of(modifyCaseUserRole))
+            .build();
+        when(manageCaseRoleService.assignCreatorRole(any(), any())).thenReturn(
+            CaseAssignmentResponse.builder()
+                .caseDetails(List.of(new CaseTestData().getCaseDetails()))
+                .status(CaseAssignmentResponse.AssignmentStatus.ASSIGNED)
+                .message("User successfully assigned to case as creator")
+                .build());
+        mockMvc.perform(post(POST_ASSIGN_CREATOR_ROLE_URL)
+                            .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(ResourceLoader.toJson(modifyCaseUserRolesRequest)))
             .andExpect(status().isOk());
     }
 

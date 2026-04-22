@@ -291,7 +291,9 @@ public final class RespondentUtil {
             return respondentSumTypeItem;
         } catch (NumberFormatException | IndexOutOfBoundsException e) {
             throw new CaseUserRoleValidationException(
-                String.format(EXCEPTION_INVALID_RESPONDENT_INDEX, respondentIndex, caseId));
+                String.format(EXCEPTION_INVALID_RESPONDENT_INDEX, respondentIndex, caseId),
+                e
+            );
         }
     }
 

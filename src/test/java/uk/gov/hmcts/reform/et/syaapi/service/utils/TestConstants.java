@@ -120,6 +120,7 @@ public final class TestConstants {
     public static final String TEST_MODIFICATION_TYPE_REVOKE = "Revoke";
     public static final String TEST_JURISDICTION_ID_EMPLOYMENT = "EMPLOYMENT";
     public static final String TEST_ETHOS_CASE_REFERENCE = "6000032/2024";
+    public static final String TEST_APPLICATION_NAME = "et-sya-frontend";
     public static final String EXPECTED_QUERY_BY_ETHOS_CASE_REFERENCE = """
         {
           "size": 1,
@@ -140,6 +141,15 @@ public final class TestConstants {
                     "data.migratedFromEcm": {
                       "query": "Yes"
                     }
+                  }
+                },
+                {
+                  "terms": {
+                    "state.keyword": [
+                      "Delete",
+                      "Transferred",
+                      "AWAITING_SUBMISSION_TO_HMCTS"
+                    ]
                   }
                 }
               ]
@@ -165,6 +175,18 @@ public final class TestConstants {
             + "\"boost\":1.0}}],\"boost\":1.0}},{\"bool\":{\"filter\":[{\"term\":{\"data.claimant.keyword\":"
             + "{\"value\":\"claimant_first_names claimant_last_name\",\"case_insensitive\":true}}}],\"boost\":1.0}}],"
             + "\"boost\":1.0}}],\"boost\":1.0}}}";
+    public static final String EXPECTED_QUERY_BY_ROLE_MODIFICATION_REQUEST_CLAIMANT =
+        "{\"size\":1,\"query\":{\"bool\":{\"must\":[{\"match\":{\"reference.keyword\":{\"query\":"
+            + "\"case_submission_reference\"}}},{\"match\":{\"data.ethosCaseReference.keyword\":{\"query\":"
+            + "\"6000032/2024\"}}}],\"must_not\":[{\"terms\":{\"state.keyword\":[\"Delete\",\"Transferred\","
+            + "\"AWAITING_SUBMISSION_TO_HMCTS\"]}}],\"filter\":[{\"bool\":{\"must\":[{\"bool\":{\"filter\":[{\"term\":"
+            + "{\"data.ethosCaseReference.keyword\":{\"value\":\"6000032/2024\"}}}],\"boost\":1.0}},"
+            + "{\"bool\":{\"filter\":[{\"term\":{\"data.claimantIndType.claimant_first_names.keyword\":"
+            + "{\"value\":\"claimant_first_names\"}}}],\"boost\":1.0}},{\"bool\":{\"filter\":[{\"term\":"
+            + "{\"data.claimantIndType.claimant_last_name.keyword\":{\"value\":\"claimant_last_name\"}}}],"
+            + "\"boost\":1.0}},{\"bool\":{\"filter\":[{\"term\":{\"data.claimant.keyword\":"
+            + "{\"value\":\"claimant_first_names claimant_last_name\",\"case_insensitive\":true}}}],"
+            + "\"boost\":1.0}}],\"boost\":1.0}}],\"boost\":1.0}}}";
     public static final String EXPECTED_QUERY_BY_SUBMISSION_REFERENCE = "{\"size\":1,\"query\":{\"bool\":{\"must\":"
         + "[{\"match\":{\"reference.keyword\":{\"query\":\"case_submission_reference\"}}}],\"boost\":1.0}}}";
     public static final String TEST_CASE_STATE_ACCEPTED = "Accepted";

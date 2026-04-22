@@ -36,4 +36,18 @@ public class ManageCaseRoleException extends RuntimeException {
         log.error(errorMessage);
     }
 
+    /**
+     * Creates a {@link ManageCaseRoleException} with a message and cause.
+     * @param message exception message
+     * @param cause underlying cause
+     */
+    public ManageCaseRoleException(String message, Throwable cause) {
+        super(message, cause);
+        String errorMessage = "************ ManageCaseRoleException ************"
+            + "Error occurred while modifying case role: " + message
+            + "\nStack trace: " + Arrays.toString(cause.getStackTrace())
+            + "***************************************************";
+        log.error(errorMessage);
+    }
+
 }

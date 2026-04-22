@@ -17,4 +17,13 @@ public class CaseUserRoleValidationException extends ManageCaseRoleException {
     public CaseUserRoleValidationException(String message) {
         super(message);
     }
+
+    /**
+     * Creates a {@link CaseUserRoleValidationException} with a message and cause.
+     * @param message the exception message
+     * @param cause the underlying cause
+     */
+    public CaseUserRoleValidationException(String message, Throwable cause) {
+        super(message, cause);
+    }
 }

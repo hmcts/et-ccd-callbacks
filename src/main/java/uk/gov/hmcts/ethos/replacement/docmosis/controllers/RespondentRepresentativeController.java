@@ -194,7 +194,7 @@ public class RespondentRepresentativeController {
         try {
             NocUtils.validateCallbackRequest(callbackRequest);
             nocRespondentRepresentativeService.updateRepresentativesAccess(callbackRequest, userToken);
-        } catch (GenericServiceException e) {
+        } catch (GenericServiceException | GenericRuntimeException e) {
             log.error(ERROR_UNABLE_TO_MODIFY_REPRESENTATIVE_ACCESS,
                     callbackRequest.getCaseDetails().getCaseId(), e.getMessage());
         }

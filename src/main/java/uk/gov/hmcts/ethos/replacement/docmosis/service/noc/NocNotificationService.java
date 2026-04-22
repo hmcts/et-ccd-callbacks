@@ -173,9 +173,9 @@ public class NocNotificationService {
             log.warn(WARNING_MISSING_RESPONDENT_EMAIL_ADDRESS, caseDetails.getCaseId());
             return;
         }
-        Map<String, String> personalisation = buildNoCPersonalisation(caseDetails,
-                respondent.getValue().getRespondentName());
         try {
+            Map<String, String> personalisation = buildNoCPersonalisation(caseDetails,
+                    respondent.getValue().getRespondentName());
             emailService.sendEmail(respondentTemplateId, respondent.getValue().getRespondentEmail(),
                     personalisation);
         } catch (Exception e) {

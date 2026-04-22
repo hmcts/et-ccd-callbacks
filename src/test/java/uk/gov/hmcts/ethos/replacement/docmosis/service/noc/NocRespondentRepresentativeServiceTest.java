@@ -1546,4 +1546,47 @@ class NocRespondentRepresentativeServiceTest {
         assertThat(nocRespondentRepresentativeService.validateRespondentRepresentativesOrganisationMatch(caseDetails))
                 .isEmpty();
     }
+
+    @Test
+    @SneakyThrows
+    void theRevokeAndRemoveRespondentRepresentatives() {
+        RepresentedTypeRItem representative = RepresentedTypeRItem.builder().id(REPRESENTATIVE_ID_ONE)
+                .value(RepresentedTypeR.builder().role(ROLE_SOLICITORA).build()).build();
+        List<RepresentedTypeRItem> representatives = List.of(representative);
+        CaseData tmpCaseData = new CaseData();
+        tmpCaseData.setRepCollection(representatives);
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(tmpCaseData);
+        caseDetails.setCaseId(CASE_ID_1);
+        // when no representative case assignment is revoked should not reset organisation policies but remove
+        // representatives that does not have organisation.
+        nocRespondentRepresentativeService.revokeAndRemoveRespondentRepresentatives(caseDetails, representatives);
+        assertThat(caseDetails.getCaseData().getRepCollection()).isEmpty();
+        // when representative case assignment is revoked should reset organisation policy and remove representatives
+        caseDetails.getCaseData().getRepCollection().add(representative);
+        OrganisationPolicy tmpOrganisationPolicy = OrganisationPolicy.builder().organisation(Organisation.builder()
+                        .organisationID(ORGANISATION_ID_ONE).build()).orgPolicyCaseAssignedRole(ROLE_SOLICITORA)
+                .build();
+        caseDetails.getCaseData().setRespondentOrganisationPolicy0(tmpOrganisationPolicy);
+        CaseUserAssignmentData caseUserAssignmentsData = CaseUserAssignmentData.builder().caseUserAssignments(
+                List.of(CaseUserAssignment.builder().caseId(CASE_ID_1).caseRole(ROLE_SOLICITORA)
+                        .organisationId(ORGANISATION_ID_ONE).userId(REPRESENTATIVE_ID_ONE).build())).build();
+        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
+        when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, CASE_ID_1))
+                .thenReturn(caseUserAssignmentsData);
+        nocRespondentRepresentativeService.revokeAndRemoveRespondentRepresentatives(caseDetails, representatives);
+        assertThat(caseDetails.getCaseData().getRepCollection()).isEmpty();
+        assertThat(caseDetails.getCaseData().getRespondentOrganisationPolicy0())
+                .isEqualTo(OrganisationPolicy.builder().orgPolicyCaseAssignedRole(ROLE_SOLICITORA).build());
+        // when representative case assignment is not revoked should not reset organisation policy and not remove
+        // representatives
+        caseDetails.getCaseData().getRepCollection().add(representative);
+        caseDetails.getCaseData().setRespondentOrganisationPolicy0(tmpOrganisationPolicy);
+        when(ccdClient.revokeCaseAssignments(ADMIN_USER_TOKEN, caseUserAssignmentsData)).thenThrow(
+                new IOException(EXCEPTION_DUMMY_MESSAGE));
+        nocRespondentRepresentativeService.revokeAndRemoveRespondentRepresentatives(caseDetails, representatives);
+        assertThat(caseDetails.getCaseData().getRepCollection()).hasSize(LoggerTestUtils.INTEGER_ONE)
+                .isEqualTo(List.of(representative));
+        assertThat(caseDetails.getCaseData().getRespondentOrganisationPolicy0()).isEqualTo(tmpOrganisationPolicy);
+    }
 }

@@ -48,7 +48,7 @@ public class AddAmendClaimantRepresentativeController {
     private final NocClaimantRepresentativeService nocClaimantRepresentativeService;
     private final NocRespondentRepresentativeService nocRespondentRepresentativeService;
 
-    @PostMapping(value = "/amendClaimantRepresentativeMidEvent", consumes = APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/midEvent", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "checks claimant representative's organisation and email address")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "Accessed successfully",

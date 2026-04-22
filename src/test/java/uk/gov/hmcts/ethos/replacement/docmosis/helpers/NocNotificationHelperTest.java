@@ -131,9 +131,9 @@ class NocNotificationHelperTest {
     }
 
     @Test
-    void testBuildPreviousRespondentSolicitorPersonalisation() {
+    void testBuildBasePersonalisation() {
         Map<String, String> claimantPersonalisation =
-            NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation(caseData);
+            NocNotificationHelper.buildBasePersonalisation(caseData);
         assertThat(claimantPersonalisation).hasSize(LoggerTestUtils.INTEGER_THREE);
         for (String value : claimantPersonalisation.values()) {
             assertThat(value).isNotNull();

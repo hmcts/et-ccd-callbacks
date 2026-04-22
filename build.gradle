@@ -567,7 +567,7 @@ dependencies {
     integrationTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-launcher', version: junitPlatformVersion
     integrationTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-engine', version: junitPlatformVersion
     integrationTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-commons', version: junitPlatformVersion
-    integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.40'
+    integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.46'
 
     cftlibImplementation group: 'org.mockito', name: 'mockito-core', version: '5.19.0'
     cftlibImplementation 'org.springframework.boot:spring-boot-devtools'

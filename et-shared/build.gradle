@@ -22,12 +22,12 @@ repositories {
 
 dependencyManagement {
     imports {
-        mavenBom "org.springframework.boot:spring-boot-dependencies:3.5.5"
+        mavenBom "org.springframework.boot:spring-boot-dependencies:3.5.12"
     }
     dependencies {
         dependency 'commons-fileupload:commons-fileupload:1.6.0'
         dependency 'org.apache.httpcomponents:httpclient:4.5.14'
-        dependency 'org.apache.logging.log4j:log4j-core:2.25.3'
+        dependency 'org.apache.logging.log4j:log4j-core:2.25.4'
         dependency 'com.nimbusds:nimbus-jose-jwt:10.5'
         dependency 'net.minidev:json-smart:2.5.2'
         dependency 'com.squareup.okhttp3:logging-interceptor:4.12.0'
@@ -35,7 +35,7 @@ dependencyManagement {
         dependency 'com.squareup.okhttp3:okhttp-urlconnection:4.12.0'
         dependency 'com.squareup.okio:okio:3.16.4'
         dependency 'org.bouncycastle:bcprov-jdk15on:1.70'
-        dependencySet(group: 'io.netty', version: '4.2.9.Final') {
+        dependencySet(group: 'io.netty', version: '4.2.12.Final') {
             entry 'netty-buffer'
             entry 'netty-codec'
             entry 'netty-codec-dns'
@@ -110,21 +110,21 @@ dependencies {
     implementation group: 'uk.gov.dwp.regex', name: 'postcode-validation', version: '1.1.0'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.18.0'
     implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.5.0'
-    implementation group: 'com.google.guava', name: 'guava', version: '33.4.8-jre'
+    implementation group: 'com.google.guava', name: 'guava', version: '33.6.0-jre'
     implementation group: 'org.apache.tika', name: 'tika-core', version: '3.2.3'
     implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '3.0.0-RC1'
 
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '6.1.9'
     implementation group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: '6.1.9'
     implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '8.0'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.25.3'
-    implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.25.3'
-    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.14'
-    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.5.14'
-    implementation group: 'ch.qos.logback', name: 'logback-access', version: '1.5.14'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: '2.25.4'
+    implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: '2.25.4'
+    implementation group: 'ch.qos.logback', name: 'logback-classic', version: '1.5.32'
+    implementation group: 'ch.qos.logback', name: 'logback-core', version: '1.5.32'
+    implementation group: 'ch.qos.logback', name: 'logback-access', version: '1.5.32'
     implementation group: 'org.slf4j', name: 'slf4j-ext', version: '2.0.17'
 
-    implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.10.2'
+    implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.13.2'
 
     implementation 'org.springframework:spring-web'
     implementation 'org.springframework:spring-context'
@@ -139,12 +139,12 @@ dependencies {
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.18.3'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.18.3'
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.18.3'
-    implementation group: 'org.springframework', name: 'spring-core', version: '6.2.11'
+    implementation group: 'org.springframework', name: 'spring-core', version: '6.2.18'
 
-    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.42'
-    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.42'
-    testCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.42'
-    testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.42'
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.46'
+    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.46'
+    testCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.46'
+    testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.46'
 
     testImplementation(platform('org.junit:junit-bom:5.11.4'))
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.11.4'
@@ -154,11 +154,11 @@ dependencies {
     testRuntimeOnly group: 'org.junit.vintage', name: 'junit-vintage-engine', version: '5.11.4'
     testImplementation group: 'junit', name: 'junit', version: '4.13.2'
     testImplementation group: 'org.hamcrest', name: 'hamcrest', version: '3.0'
-    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.6'
-    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.6'
+    testImplementation group: 'io.rest-assured', name: 'rest-assured', version: '5.5.7'
+    testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.7'
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.19.0'
     testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '5.19.0'
-    testImplementation group: 'org.springframework', name: 'spring-test', version: '6.2.10'
+    testImplementation group: 'org.springframework', name: 'spring-test', version: '6.2.18'
     testImplementation group: 'pl.pragmatists', name: 'JUnitParams', version: '1.1.1'
 }
 
@@ -173,7 +173,7 @@ configurations.configureEach {
     resolutionStrategy.force(
         'commons-fileupload:commons-fileupload:1.6.0',
         'org.apache.httpcomponents:httpclient:4.5.14',
-        'org.apache.logging.log4j:log4j-core:2.25.3',
+        'org.apache.logging.log4j:log4j-core:2.25.4',
         'com.nimbusds:nimbus-jose-jwt:10.5',
         'net.minidev:json-smart:2.5.2',
         'com.squareup.okhttp3:logging-interceptor:4.12.0',
@@ -185,25 +185,25 @@ configurations.configureEach {
         'org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.1.0',
         'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.0',
         'org.bouncycastle:bcprov-jdk15on:1.70',
-        'io.netty:netty-buffer:4.2.9.Final',
-        'io.netty:netty-codec:4.2.9.Final',
-        'io.netty:netty-codec-dns:4.2.9.Final',
-        'io.netty:netty-codec-http:4.2.9.Final',
-        'io.netty:netty-codec-http2:4.2.9.Final',
-        'io.netty:netty-codec-socks:4.2.9.Final',
-        'io.netty:netty-common:4.2.9.Final',
-        'io.netty:netty-handler:4.2.9.Final',
-        'io.netty:netty-handler-proxy:4.2.9.Final',
-        'io.netty:netty-resolver:4.2.9.Final',
-        'io.netty:netty-resolver-dns:4.2.9.Final',
-        'io.netty:netty-resolver-dns-classes-macos:4.2.9.Final',
-        'io.netty:netty-resolver-dns-native-macos:4.2.9.Final',
-        'io.netty:netty-transport:4.2.9.Final',
-        'io.netty:netty-transport-native-epoll:4.2.9.Final',
-        'io.netty:netty-transport-native-kqueue:4.2.9.Final',
-        'io.netty:netty-transport-native-unix-common:4.2.9.Final',
-        'io.netty:netty-transport-classes-epoll:4.2.9.Final',
-        'io.netty:netty-transport-classes-kqueue:4.2.9.Final'
+        'io.netty:netty-buffer:4.2.12.Final',
+        'io.netty:netty-codec:4.2.12.Final',
+        'io.netty:netty-codec-dns:4.2.12.Final',
+        'io.netty:netty-codec-http:4.2.12.Final',
+        'io.netty:netty-codec-http2:4.2.12.Final',
+        'io.netty:netty-codec-socks:4.2.12.Final',
+        'io.netty:netty-common:4.2.12.Final',
+        'io.netty:netty-handler:4.2.12.Final',
+        'io.netty:netty-handler-proxy:4.2.12.Final',
+        'io.netty:netty-resolver:4.2.12.Final',
+        'io.netty:netty-resolver-dns:4.2.12.Final',
+        'io.netty:netty-resolver-dns-classes-macos:4.2.12.Final',
+        'io.netty:netty-resolver-dns-native-macos:4.2.12.Final',
+        'io.netty:netty-transport:4.2.12.Final',
+        'io.netty:netty-transport-native-epoll:4.2.12.Final',
+        'io.netty:netty-transport-native-kqueue:4.2.12.Final',
+        'io.netty:netty-transport-native-unix-common:4.2.12.Final',
+        'io.netty:netty-transport-classes-epoll:4.2.12.Final',
+        'io.netty:netty-transport-classes-kqueue:4.2.12.Final'
     )
 }
 

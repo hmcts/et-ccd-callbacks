@@ -6585,5 +6585,13 @@
     "Label": "Once deleted, you will not be able to recover it.",
     "FieldType": "Label",
     "SecurityClassification": "Public"
-  }
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales_Multiple",
+    "ID": "batchUpdateJurisdictionList",
+    "Label": "Jurisdictions",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "DynamicListCollection",
+    "SecurityClassification": "Public"
+}
 ]

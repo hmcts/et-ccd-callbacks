@@ -17,13 +17,13 @@ import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.AddressLabelType;
 import uk.gov.hmcts.et.common.model.ccd.types.AddressLabelsAttributesType;
-import uk.gov.hmcts.et.common.model.ccd.types.ClaimantIndType;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceScotType;
 import uk.gov.hmcts.et.common.model.ccd.types.CorrespondenceType;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
+import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
@@ -38,11 +38,16 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADDRESS_LABELS_PAGE_SIZE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADDRESS_LABELS_TEMPLATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.COMPANY_TYPE_CLAIMANT;
@@ -83,6 +88,8 @@ public final class DocumentHelper {
     public static final String CLAIMANT_OR_REP_FULL_NAME = "\"claimant_or_rep_full_name\":\"";
     public static final String CLAIMANT_REP_ORG = "\"claimant_rep_organisation\":\"";
     private static final Double DOUBLE_ONE = 1d;
+    private static final List<String> EW_ECC_REJECTION_SECTIONS = List.of("3.1", "3.2", "3.3", "3.4", "3.5",
+        "3.6", "3.7", "3.22", "3.23");
 
     private DocumentHelper() {
     }
@@ -125,7 +132,7 @@ public final class DocumentHelper {
         } else if (templateName.equals(ADDRESS_LABELS_TEMPLATE)) {
             sb.append(getAddressLabelsDataMultipleCase(multipleData));
         } else {
-            if (isEccDocumentTemplate(caseTypeId, templateName)) {
+            if (isEccDocumentTemplate(caseTypeId, correspondenceType, correspondenceScotType)) {
                 processECCData(caseData, correspondenceType, correspondenceScotType, caseTypeId, sb);
             } else {
                 sb.append(getClaimantData(caseData)).append(getRespondentData(caseData));
@@ -161,6 +168,7 @@ public final class DocumentHelper {
         sb.append("\"Clerk\":\"").append(nullCheck(userName)).append(NEW_LINE).append("\"Today_date\":\"")
                 .append(UtilHelper.formatCurrentDate(LocalDate.now())).append(NEW_LINE).append("\"TodayPlus28Days\":\"")
                 .append(UtilHelper.formatCurrentDatePlusDays(LocalDate.now(), 28)).append(NEW_LINE)
+                .append(getNoticeOfChangeAnswers(caseData)).append(NEW_LINE)
                 .append("\"Case_No\":\"").append(nullCheck(caseData.getEthosCaseReference())).append(NEW_LINE)
                 .append("\"submission_reference\":\"").append(nullCheck(caseData.getFeeGroupReference()))
                 .append(NEW_LINE).append("}\n}\n");
@@ -235,7 +243,8 @@ public final class DocumentHelper {
                 .filter(COMPANY_TYPE_CLAIMANT::equals)
                 .map(type -> caseData.getClaimantCompany())
                 .orElseGet(() -> Optional.ofNullable(caseData.getClaimantIndType())
-                        .map(ClaimantIndType::claimantFullName).orElse(""));
+                        .map(ind -> ind.getClaimantFirstNames() + " " + ind.getClaimantLastName())
+                        .orElse(""));
     }
 
     private static StringBuilder getClaimantOrRepAddressUK(Address address) {
@@ -1432,8 +1441,46 @@ public final class DocumentHelper {
         }
     }
 
-    static boolean isEccDocumentTemplate(String caseTypeId, String templateName) {
-        return (SCOTLAND_CASE_TYPE_ID.equals(caseTypeId) && templateName.contains(ECC_DOCUMENT_SCOT_TEMPLATE))
-                || (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId) && templateName.contains(ECC_DOCUMENT_ENG_TEMPLATE));
+    /**
+     * Checks if the document is an ECC template based on the case type and letter type. If the ECC letter is of a
+     * rejection letter type, it will return false and use the default logic as opposed to the ECC specific logic.
+     *
+     * @param caseTypeId     the case type ID
+     * @param ewLetterType   the England/Wales letter type
+     * @param scotlandLetterType the Scotland letter type
+     * @return true if the document is an ECC template, false if it's an ECC rejection letter or any other template
+     */
+    static boolean isEccDocumentTemplate(String caseTypeId, CorrespondenceType ewLetterType,
+                                         CorrespondenceScotType scotlandLetterType) {
+        return (SCOTLAND_CASE_TYPE_ID.equals(caseTypeId)
+            && isNotEmpty(scotlandLetterType)
+            && defaultIfEmpty(scotlandLetterType.getTopLevelScotDocuments(), "").contains(ECC_DOCUMENT_SCOT_TEMPLATE)
+            && !"19".equals(defaultIfEmpty(scotlandLetterType.getPart3ScotDocuments(), "")))
+            || (ENGLANDWALES_CASE_TYPE_ID.equals(caseTypeId)
+            && isNotEmpty(ewLetterType)
+            && defaultIfEmpty(ewLetterType.getTopLevelDocuments(), "").contains(ECC_DOCUMENT_ENG_TEMPLATE)
+            && !EW_ECC_REJECTION_SECTIONS.contains(defaultIfEmpty(ewLetterType.getPart3Documents(), "")));
+    }
+
+    private static StringBuilder getNoticeOfChangeAnswers(CaseData caseData) {
+        String noticeOfChangeRespondentName = Stream.of(
+                caseData.getNoticeOfChangeAnswers0(),
+                caseData.getNoticeOfChangeAnswers1(),
+                caseData.getNoticeOfChangeAnswers2(),
+                caseData.getNoticeOfChangeAnswers3(),
+                caseData.getNoticeOfChangeAnswers4(),
+                caseData.getNoticeOfChangeAnswers5(),
+                caseData.getNoticeOfChangeAnswers6(),
+                caseData.getNoticeOfChangeAnswers7(),
+                caseData.getNoticeOfChangeAnswers8(),
+                caseData.getNoticeOfChangeAnswers9())
+            .filter(java.util.Objects::nonNull)
+            .map(NoticeOfChangeAnswers::getRespondentName)
+            .filter(Objects::nonNull)
+            .collect(Collectors.joining(", "));
+
+        StringBuilder stringBuilder = new StringBuilder();
+        return stringBuilder.append("\"noticeOfChangeRespondentName\":\"")
+            .append(nullCheck(noticeOfChangeRespondentName));
     }
 }

@@ -44,6 +44,20 @@
   {
     "CaseTypeID": "ET_EnglandWales",
     "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDates",
+    "UserRole": "caseworker-employment",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
+    "ListElementCode": "hearingDates",
+    "UserRole": "caseworker-employment-legalrep-solicitor",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseFieldID": "hearingCollection",
     "ListElementCode": "hearingFormat",
     "UserRole": "caseworker-employment",
     "CRUD": "CRU"

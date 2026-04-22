@@ -47,7 +47,7 @@ class AddAmendClaimantRepresentativeControllerTest {
     private static final String ABOUT_TO_SUBMIT_URL = "/addAmendClaimantRepresentative/aboutToSubmit";
     private static final String SUBMITTED_URL = "/addAmendClaimantRepresentative/amendClaimantRepSubmitted";
     private static final String AMEND_CLAIMANT_REPRESENTATIVE_MID_EVENT =
-            "/addAmendClaimantRepresentative/amendClaimantRepresentativeMidEvent";
+            "/addAmendClaimantRepresentative/midEvent";
     private static final String CASE_ID = "1234567890123456";
     private static final String TEST_USER_EMAIL = "test@test.com";
 

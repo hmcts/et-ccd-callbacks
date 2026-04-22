@@ -18,6 +18,8 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
+import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericRuntimeException;
@@ -55,6 +57,9 @@ class RespondentRepresentativeControllerTest {
     private static final String RESPONDENT_NAME_2 = "Respondent Name 2";
     private static final String DUMMY_EXCEPTION_MESSAGE = "dummy exception message";
     private static final String REPRESENTATIVE_NAME = "Representative Name";
+    private static final String ORGANISATION_ID_1 = "Organisation Id 1";
+    private static final String ROLE_SOLICITOR_A = "[SOLICITORA]";
+    private static final String ROLE_SOLICITOR_B = "[SOLICITORB]";
 
     private static final String URL_REMOVE_OWN_REPRESENTATIVE = "/respondentRepresentative/removeOwnRepresentative";
     private static final String URL_AMEND_RESPONDENT_REPRESENTATIVE_ABOUT_TO_START =
@@ -65,6 +70,11 @@ class RespondentRepresentativeControllerTest {
             "/respondentRepresentative/amendRespondentRepresentativeAboutToSubmit";
     private static final String URL_AMEND_RESPONDENT_REPRESENTATIVE_SUBMITTED =
             "/respondentRepresentative/amendRespondentRepresentativeSubmitted";
+    private static final String URL_UPDATE_RESP_ORG_POLICY_ABOUT_TO_SUBMIT =
+            "/respondentRepresentative/updateRespOrgPolicyAboutToSubmit";
+
+    private static final String EXPECTED_WARNING_REPRESENTATIVE_EMAIL_NOT_FOUND =
+            "Representative email not exist";
 
     @Autowired
     private MockMvc mockMvc;
@@ -316,8 +326,8 @@ class RespondentRepresentativeControllerTest {
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
-                .andExpect(jsonPath(JsonMapper.WARNINGS, notNullValue()));
+                .andExpect(jsonPath(JsonMapper.ERRORS, empty()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, empty()));
     }
 
     @Test
@@ -350,6 +360,34 @@ class RespondentRepresentativeControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.ERRORS, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, empty()));
+    }
+
+    @Test
+    @SneakyThrows
+    void amendRespondentRepresentativeMidEventWithWarning() {
+        CaseData caseData = new CaseData();
+        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
+        respondent.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_1).build());
+        respondent.setId(ID_RESPONDENT_1);
+        caseData.setRespondentCollection(List.of(respondent));
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
+        DynamicValueType dynamicValueType = new DynamicValueType();
+        dynamicValueType.setLabel(RESPONDENT_NAME_1);
+        dynamicFixedListType.setValue(dynamicValueType);
+        caseData.setRepCollection(List.of(RepresentedTypeRItem.builder().id(ID_REPRESENTATIVE_1).value(
+                RepresentedTypeR.builder().dynamicRespRepName(dynamicFixedListType).build()).build()));
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().withCaseData(caseData).build();
+        ccdRequest.getCaseDetails().setCaseId(DUMMY_SUBMISSION_REFERENCE);
+        when(nocRespondentRepresentativeService.validateRepresentativesOrganisationsAndEmails(
+                any(CaseData.class))).thenReturn(List.of(EXPECTED_WARNING_REPRESENTATIVE_EMAIL_NOT_FOUND));
+        mockMvc.perform(post(URL_AMEND_RESPONDENT_REPRESENTATIVE_MID_EVENT)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header(HEADER_AUTHORIZATION, DUMMY_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, empty()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, notNullValue()));
     }
 
@@ -381,4 +419,40 @@ class RespondentRepresentativeControllerTest {
 
     }
 
+    @Test
+    @SneakyThrows
+    void testUpdateRespOrgPolicyAboutToSubmit_RepCollectionToRemoveAndAddAreEmpty() {
+        CaseData caseData = new CaseData();
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+        CallbackRequest callbackRequest = CallbackRequest.builder().caseDetails(caseDetails).build();
+        mockMvc.perform(post(URL_UPDATE_RESP_ORG_POLICY_ABOUT_TO_SUBMIT)
+                        .content(jsonMapper.toJson(callbackRequest))
+                        .header(HEADER_AUTHORIZATION, DUMMY_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    @SneakyThrows
+    void testUpdateRespOrgPolicyAboutToSubmit_RepCollectionToRemoveAndAddAreNotEmpty() {
+        CaseData caseData = new CaseData();
+        caseData.setRespondentOrganisationPolicy0(OrganisationPolicy.builder().organisation(Organisation.builder()
+                .organisationID(ORGANISATION_ID_1).build()).build());
+        RepresentedTypeRItem representativeToRemove = RepresentedTypeRItem.builder().value(
+                RepresentedTypeR.builder().role(ROLE_SOLICITOR_A).build()).id(ID_REPRESENTATIVE_1).build();
+        caseData.setRepCollection(List.of(representativeToRemove));
+        caseData.setRepCollectionToRemove(List.of(representativeToRemove));
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+        CallbackRequest callbackRequest = CallbackRequest.builder().caseDetails(caseDetails).build();
+        RepresentedTypeRItem representativeToAdd = RepresentedTypeRItem.builder().value(
+                RepresentedTypeR.builder().role(ROLE_SOLICITOR_B).build()).id(ID_REPRESENTATIVE_2).build();
+        caseData.setRepCollectionToAdd(List.of(representativeToAdd));
+        mockMvc.perform(post(URL_UPDATE_RESP_ORG_POLICY_ABOUT_TO_SUBMIT)
+                        .content(jsonMapper.toJson(callbackRequest))
+                        .header(HEADER_AUTHORIZATION, DUMMY_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
 }

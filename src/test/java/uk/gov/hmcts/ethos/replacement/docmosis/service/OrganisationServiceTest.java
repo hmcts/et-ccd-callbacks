@@ -1,5 +1,8 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import feign.FeignException;
+import feign.Request;
+import feign.RequestTemplate;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -10,6 +13,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -41,7 +46,6 @@ class OrganisationServiceTest {
 
     @Test
     void theCheckRepresentativeAccountByEmail() {
-
         // when user response not has user identifier should return warning message
         when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
         when(authTokenGenerator.generate()).thenReturn(AUTHORISATION_TOKEN);
@@ -57,10 +61,26 @@ class OrganisationServiceTest {
                 .thenReturn(userResponse);
         assertThat(organisationService.checkRepresentativeAccountByEmail(REPRESENTATIVE_NAME_1, REPRESENTATIVE_EMAIL_1))
                 .isEmpty();
-        // when exception is thrown should return warning message
+        // when feign exception 404 is thrown should return warning message
+        Request request = Request.create(
+                Request.HttpMethod.GET,
+                "http://localhost/users/test@example.com",
+                Collections.emptyMap(),
+                null,
+                StandardCharsets.UTF_8,
+                new RequestTemplate()
+        );
+
+        FeignException.NotFound notFound = new FeignException.NotFound(
+                "status 404 reading UserClient#getUser(String)",
+                request,
+                new byte[0],
+                Collections.emptyMap()
+        );
         when(organisationClient.getAccountIdByEmail(ADMIN_USER_TOKEN, AUTHORISATION_TOKEN, REPRESENTATIVE_EMAIL_1))
-                .thenThrow(new RuntimeException());
+                .thenThrow(notFound);
         assertThat(organisationService.checkRepresentativeAccountByEmail(REPRESENTATIVE_NAME_1, REPRESENTATIVE_EMAIL_1))
                 .isEqualTo(List.of(EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL));
+
     }
 }

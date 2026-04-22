@@ -21,7 +21,7 @@
     "FieldShowCondition": "claimantRepresentedQuestion=\"Yes\"",
     "ShowSummaryChangeOption": "Y",
     "PageColumnNumber": 1,
-    "CallBackURLMidEvent": "${ET_COS_URL}/addAmendClaimantRepresentative/amendClaimantRepresentativeMidEvent"
+    "CallBackURLMidEvent": "${ET_COS_URL}/addAmendClaimantRepresentative/midEvent"
   },
   {
     "CaseTypeID": "ET_EnglandWales",

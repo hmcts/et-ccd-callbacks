@@ -11,6 +11,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.io.IOException;
@@ -44,11 +45,14 @@ class NocRemoveRepresentationServiceTest {
     private NocRespondentRepresentativeService nocRespondentRepresentativeService;
     @Mock
     private NocRemoveRepresentationEmailService nocRemoveRepresentationEmailService;
+    @Mock
+    private AdminUserService adminUserService;
 
     @InjectMocks
     private NocRemoveRepresentationService nocRemoveRepresentationService;
 
     private static final String USER_TOKEN = "userToken";
+    private static final String ADMIN_TOKEN = "adminToken";
 
     private static final String ORG_A_NAME = "Org A";
     private static final String ORG_A_EMAIL = "org.a@test.com";
@@ -92,11 +96,13 @@ class NocRemoveRepresentationServiceTest {
     void shouldRevokeClaimantLegalRep_happyPath() {
         when(nocNotificationService.findClaimantRepOrgSuperUserEmail(any()))
             .thenReturn(ORG_CLAIMANT_EMAIL);
+        when(adminUserService.getAdminUserToken())
+            .thenReturn(ADMIN_TOKEN);
 
-        nocRemoveRepresentationService.revokeClaimantLegalRep(caseDetails, USER_TOKEN);
+        nocRemoveRepresentationService.revokeClaimantLegalRep(caseDetails);
 
         verify(nocCcdService, times(1))
-            .revokeClaimantRepresentation(USER_TOKEN, caseDetails);
+            .revokeClaimantRepresentation(ADMIN_TOKEN, caseDetails);
         // send email to organisation admin
         verify(nocRemoveRepresentationEmailService, times(1))
             .sendEmailToOrgAdmin(
@@ -131,12 +137,12 @@ class NocRemoveRepresentationServiceTest {
 
         IllegalStateException exception = assertThrows(
             IllegalStateException.class,
-            () -> nocRemoveRepresentationService.revokeClaimantLegalRep(caseDetails, USER_TOKEN)
+            () -> nocRemoveRepresentationService.revokeClaimantLegalRep(caseDetails)
         );
         assertThat(exception.getMessage())
             .isEqualTo("Missing RepresentativeClaimantType for case id: 1775651960650043");
         verify(nocCcdService, times(0))
-            .revokeClaimantRepresentation(USER_TOKEN, caseDetails);
+            .revokeClaimantRepresentation(anyString(), any());
     }
 
     @Test

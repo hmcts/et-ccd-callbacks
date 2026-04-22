@@ -9,6 +9,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.noc.NocRespondentMapper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.ClaimantRepresentativeUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.RespondentRepresentativeUtils;
 
@@ -31,6 +32,7 @@ public class NocRemoveRepresentationService {
     private final NocNotificationService nocNotificationService;
     private final NocRespondentRepresentativeService nocRespondentRepresentativeService;
     private final NocRemoveRepresentationEmailService nocRemoveRepresentationEmailService;
+    private final AdminUserService adminUserService;
 
     /**
      * Revokes the claimant's legal representative from the case and sends notification emails to all relevant parties.
@@ -42,10 +44,9 @@ public class NocRemoveRepresentationService {
      *   respondents.
      *
      * @param caseDetails The case details containing the case data and ID.
-     * @param userToken The user token of the requester performing the revocation.
      * @throws IllegalStateException if the claimant representative is missing in the case data.
      */
-    public void revokeClaimantLegalRep(CaseDetails caseDetails, String userToken) {
+    public void revokeClaimantLegalRep(CaseDetails caseDetails) {
         CaseData caseData = caseDetails.getCaseData();
 
         // get existing rep and organisation details for sending emails
@@ -60,7 +61,8 @@ public class NocRemoveRepresentationService {
         final String partyName = caseData.getClaimant();
 
         // revoke claimant legal rep
-        nocCcdService.revokeClaimantRepresentation(userToken, caseDetails);
+        final String adminUserToken = adminUserService.getAdminUserToken();
+        nocCcdService.revokeClaimantRepresentation(adminUserToken, caseDetails);
         ClaimantRepresentativeUtils.markClaimantAsUnrepresented(caseData);
 
         // send email to organisation admin

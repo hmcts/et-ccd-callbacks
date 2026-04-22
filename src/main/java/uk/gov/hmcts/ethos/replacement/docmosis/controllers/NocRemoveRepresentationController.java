@@ -55,7 +55,7 @@ public class NocRemoveRepresentationController {
         @RequestHeader("Authorization") String userToken) {
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
-        nocRemoveRepresentationService.revokeClaimantLegalRep(caseDetails, userToken);
+        nocRemoveRepresentationService.revokeClaimantLegalRep(caseDetails);
         return getCallbackRespEntityNoErrors(caseDetails.getCaseData());
     }
 

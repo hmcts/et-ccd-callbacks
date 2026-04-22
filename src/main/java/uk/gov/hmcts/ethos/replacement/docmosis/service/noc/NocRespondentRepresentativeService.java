@@ -491,14 +491,13 @@ public class NocRespondentRepresentativeService {
                                                          List<RepresentedTypeRItem> representatives) {
         RepresentativesCaseAssignments representativesCaseAssignments = revokeRespondentRepresentatives(caseDetails,
                 representatives);
-        List<RepresentedTypeRItem> revokedRepresentatives = new  ArrayList<>();
         List<RepresentedTypeRItem> representativesToRemove = new ArrayList<>(representatives);
         if (CollectionUtils.isNotEmpty(representativesCaseAssignments.getRevokedCaseUserAssignments())) {
-            revokedRepresentatives.addAll(representativesCaseAssignments.getRepresentativesToRemove());
+            NocUtils.resetOrganisationPolicies(caseDetails.getCaseData(),
+                    representativesCaseAssignments.getRepresentativesToRemove());
         } else {
             representativesToRemove.removeAll(representativesCaseAssignments.getRepresentativesToRemove());
         }
-        NocUtils.resetOrganisationPolicies(caseDetails.getCaseData(), revokedRepresentatives);
         RespondentRepresentativeUtils.removeRespondentRepresentatives(caseDetails.getCaseData(),
                 representativesToRemove);
     }

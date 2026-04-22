@@ -28,6 +28,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.noc.RepresentativesCaseAssignments;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericRuntimeException;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
@@ -477,8 +478,14 @@ public class NocRespondentRepresentativeService {
      */
     public void revokeAndRemoveRespondentRepresentatives(CaseDetails caseDetails,
                                                          List<RepresentedTypeRItem> representatives) {
-        List<RepresentedTypeRItem> revokedRepresentatives = revokeRespondentRepresentatives(caseDetails,
+        RepresentativesCaseAssignments representativesCaseAssignments = revokeRespondentRepresentatives(caseDetails,
                 representatives);
+        List<RepresentedTypeRItem> revokedRepresentatives = new  ArrayList<>();
+        if (CollectionUtils.isNotEmpty(representativesCaseAssignments.getRevokedCaseUserAssignments())) {
+            revokedRepresentatives.addAll(representativesCaseAssignments.getRepresentativesToRemove());
+        } else {
+            representatives.removeAll(representativesCaseAssignments.getRepresentativesToRemove());
+        }
         NocUtils.resetOrganisationPolicies(caseDetails.getCaseData(), revokedRepresentatives);
         RespondentRepresentativeUtils.removeRespondentRepresentatives(caseDetails.getCaseData(), representatives);
     }
@@ -513,16 +520,17 @@ public class NocRespondentRepresentativeService {
      * @param representativesToRevoke the list of respondent representatives whose case assignments
      *                                should be revoked
      */
-    public List<RepresentedTypeRItem> revokeRespondentRepresentatives(
+    public RepresentativesCaseAssignments revokeRespondentRepresentatives(
             CaseDetails caseDetails, List<RepresentedTypeRItem> representativesToRevoke) {
         CaseUserAssignmentData caseUserAssignmentsData = nocCcdService.retrieveCaseUserAssignments(
                 adminUserService.getAdminUserToken(), caseDetails.getCaseId());
-        List<RepresentedTypeRItem> representativesToRemove = new ArrayList<>();
+        RepresentativesCaseAssignments representativesCaseAssignments = RepresentativesCaseAssignments.builder()
+                .representativesToRemove(new ArrayList<>()).revokedCaseUserAssignments(new ArrayList<>()).build();
         if (ObjectUtils.isEmpty(caseUserAssignmentsData)
                 || CollectionUtils.isEmpty(caseUserAssignmentsData.getCaseUserAssignments())) {
-            return  representativesToRemove;
+            return  representativesCaseAssignments;
         }
-        List<CaseUserAssignment> caseUserAssignmentsToRevoke = new ArrayList<>();
+
         for (CaseUserAssignment caseUserAssignment : caseUserAssignmentsData.getCaseUserAssignments()) {
             if (!RoleUtils.isRespondentRepresentativeRole(caseUserAssignment.getCaseRole())) {
                 continue;
@@ -531,17 +539,18 @@ public class NocRespondentRepresentativeService {
                     .findRepresentativeInListByRoleOrRespondentName(caseDetails.getCaseData(),
                             caseUserAssignment.getCaseRole(), representativesToRevoke);
             if (ObjectUtils.isNotEmpty(representedTypeRItem)) {
-                caseUserAssignmentsToRevoke.add(caseUserAssignment);
-                representativesToRemove.add(representedTypeRItem);
+                representativesCaseAssignments.getRevokedCaseUserAssignments().add(caseUserAssignment);
+                representativesCaseAssignments.getRepresentativesToRemove().add(representedTypeRItem);
             }
         }
         try {
-            revokeCaseAssignments(adminUserService.getAdminUserToken(), caseUserAssignmentsToRevoke);
+            revokeCaseAssignments(adminUserService.getAdminUserToken(),
+                    representativesCaseAssignments.getRevokedCaseUserAssignments());
         } catch (GenericRuntimeException e) {
             log.error(ERROR_UNABLE_TO_MODIFY_REPRESENTATIVE_ACCESS, caseDetails.getCaseId(), e.getMessage(), e);
-            return new ArrayList<>();
+            representativesCaseAssignments.setRevokedCaseUserAssignments(Collections.emptyList());
         }
-        return representativesToRemove;
+        return representativesCaseAssignments;
     }
 
     private void revokeCaseAssignments(String userToken,

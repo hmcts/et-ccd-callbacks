@@ -1417,14 +1417,14 @@ class NocRespondentRepresentativeServiceTest {
         when(ccdClient.revokeCaseAssignments(eq(ADMIN_USER_TOKEN), any(CaseUserAssignmentData.class)))
                 .thenReturn(StringUtils.EMPTY);
         assertThat(nocRespondentRepresentativeService.revokeRespondentRepresentatives(caseDetails,
-                List.of(representative))).isNotEmpty().isEqualTo(List.of(representative));
+                List.of(representative)).getRepresentativesToRemove()).isNotEmpty().isEqualTo(List.of(representative));
         verify(ccdClient, times(LoggerTestUtils.INTEGER_ONE)).revokeCaseAssignments(eq(ADMIN_USER_TOKEN),
                 any(CaseUserAssignmentData.class));
         // when representative is found but not able to revoke case user assignment should return empty list.
         when(ccdClient.revokeCaseAssignments(eq(ADMIN_USER_TOKEN), any(CaseUserAssignmentData.class)))
                 .thenThrow(new IOException(EXCEPTION_DUMMY_MESSAGE));
         assertThat(nocRespondentRepresentativeService.revokeRespondentRepresentatives(caseDetails,
-                List.of(representative))).isEmpty();
+                List.of(representative)).getRepresentativesToRemove()).isNotEmpty().isEqualTo(List.of(representative));
         verify(ccdClient, times(LoggerTestUtils.INTEGER_TWO)).revokeCaseAssignments(eq(ADMIN_USER_TOKEN),
                 any(CaseUserAssignmentData.class));
     }

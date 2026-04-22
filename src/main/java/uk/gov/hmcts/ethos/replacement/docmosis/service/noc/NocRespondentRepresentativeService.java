@@ -73,6 +73,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_TYPE_REMOVAL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_FIND_ORGANISATION_BY_EMAIL_SYSTEM_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_RETRIEVE_CASE_ASSIGNMENTS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_RESPONDENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_REPRESENTATIVE_EMAIL_ADDRESS_NOT_FOUND;
 
 @Service
@@ -444,7 +445,12 @@ public class NocRespondentRepresentativeService {
         for (RepresentedTypeRItem representative : respondentRepresentativesToRevoke) {
             RespondentSumTypeItem respondent = RespondentRepresentativeUtils.findRespondentByRepresentative(
                     caseDetails.getCaseData(), representative);
-            nocNotificationService.notifyRespondentOfRepresentativeUpdate(caseDetails, respondent);
+            try {
+                nocNotificationService.notifyRespondentOfRepresentativeUpdate(caseDetails, respondent);
+            } catch (RuntimeException e) {
+                log.warn(WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_RESPONDENT, caseDetails.getCaseId(),
+                        e.getMessage());
+            }
         }
         revokeAndRemoveRespondentRepresentatives(caseDetails, respondentRepresentativesToRevoke);
     }

@@ -54,14 +54,19 @@ get_user_token_from_email_password() {
 # Get Staff user token for preview environment
 # Uses OAuth2 /o/token with manage-user/create-user/search-user scopes required by Ref Data API.
 # Parameters are sent in the POST body (not the URL) to avoid curl mis-parsing '@' in the email.
+#
+# IMPORTANT: IDAM_CLIENT_ID must match the secret stored in IDAM_CLIENT_SECRET.
+# In this preview chart, IDAM_CLIENT_SECRET is aliased from et-cos/idam-client-secret
+# (see charts/et-cos/values.preview.template.yaml) which belongs to the 'et_cos' IDAM client.
+# The redirect URI is therefore the one registered for that client.
 get_staff_admin_token() {
       echo "🔐 Getting Staff Admin user token..." >&2
       local username="${ET_STAFF_USER_ADMIN_USER_NAME:-}"
       local password="${ET_STAFF_USER_ADMIN_USER_NAME_PASSWORD:-}"
       local idam_uri="${IDAM_API_URL:-}"
       local client_secret="${IDAM_CLIENT_SECRET:-}"
-      local redirect_uri="https://manage-case.aat.platform.hmcts.net/oauth2/callback"
-      local client_id="xuiwebapp"
+      local redirect_uri="${IDAM_CLIENT_REDIRECT_URI:-https://et-cos-aat.service.core-compute-aat.internal/oauth2/callback}"
+      local client_id="${IDAM_CLIENT_ID:-et_cos}"
       local scope="profile openid roles manage-user create-user search-user"
 
     if [[ -z "${username}" || -z "${password}" ]]; then

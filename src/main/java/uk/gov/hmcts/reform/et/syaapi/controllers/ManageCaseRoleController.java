@@ -74,14 +74,15 @@ public class ManageCaseRoleController {
                 authorisation, manageCaseRoleService.generateModifyCaseUserRolesRequest(authorisation,
                                                                                         modifyCaseUserRolesRequest),
                 modificationType);
-        } catch (IOException e) {
-            throw new ManageCaseRoleException(e);
+        } catch (Exception e) {
+            throw buildManageCaseRoleException(e);
         }
         return ok(response);
     }
 
     /**
-     * Assigns the creator role to a claimant for a case.
+     * Assigns the creator role to a claimant for a case. Performs data setup and validation
+     * before assigning the role.
      * @param modifyCaseUserRolesRequest request object which contains modify user case roles
      * @return CaseAssignmentResponse containing case details and assignment status
      */
@@ -92,10 +93,15 @@ public class ManageCaseRoleController {
         @RequestHeader(AUTHORIZATION) String authorisation,
         @NotNull @RequestBody ModifyCaseUserRolesRequest modifyCaseUserRolesRequest
     ) {
-        CaseAssignmentResponse response = manageCaseRoleService.assignCreatorRole(
-            authorisation,
-            manageCaseRoleService.generateModifyCaseUserRolesRequest(authorisation, modifyCaseUserRolesRequest)
-        );
+        CaseAssignmentResponse response;
+        try {
+            response = manageCaseRoleService.assignCreatorRole(
+                authorisation,
+                manageCaseRoleService.generateModifyCaseUserRolesRequest(authorisation, modifyCaseUserRolesRequest)
+            );
+        } catch (Exception e) {
+            throw buildManageCaseRoleException(e);
+        }
         return ok(response);
     }
 
@@ -108,8 +114,8 @@ public class ManageCaseRoleController {
         CaseDetails caseDetails;
         try {
             caseDetails = manageCaseRoleService.revokeClaimantSolicitorRole(authorisation, caseSubmissionReference);
-        } catch (IOException e) {
-            throw new ManageCaseRoleException(e);
+        } catch (Exception e) {
+            throw buildManageCaseRoleException(e);
         }
         return ok(caseDetails);
     }
@@ -121,9 +127,21 @@ public class ManageCaseRoleController {
         @RequestHeader(AUTHORIZATION) String authorisation,
         @RequestParam(name = "caseSubmissionReference") String caseSubmissionReference,
         @RequestParam(name = "respondentIndex") String respondentIndex) {
-        CaseDetails caseDetails = manageCaseRoleService.revokeRespondentSolicitorRole(authorisation,
-                                                                                      caseSubmissionReference,
-                                                                                      respondentIndex);
+        CaseDetails caseDetails;
+        try {
+            caseDetails = manageCaseRoleService.revokeRespondentSolicitorRole(authorisation,
+                                                                              caseSubmissionReference,
+                                                                              respondentIndex);
+        } catch (Exception e) {
+            throw buildManageCaseRoleException(e);
+        }
         return ok(caseDetails);
+    }
+
+    private static ManageCaseRoleException buildManageCaseRoleException(Exception exception) {
+        if (exception instanceof ManageCaseRoleException manageCaseRoleException) {
+            return manageCaseRoleException;
+        }
+        return new ManageCaseRoleException(exception);
     }
 }

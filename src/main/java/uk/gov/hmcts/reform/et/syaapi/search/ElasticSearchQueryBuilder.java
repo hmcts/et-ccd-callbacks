@@ -131,36 +131,54 @@ public final class ElasticSearchQueryBuilder {
     }
 
     /**
-     * Generates query to search case by submission reference, ethos reference and claimant details.
-     * This is used by the SYA claimant self-assignment path.
-     * @param findCaseForRoleModificationRequest request containing claimant search criteria
+     * Generates query to search case by caseSubmissionReference, claimantFirstNames,
+     * and claimantLastName. This query is used to check if the claimant's entered data for self
+     * assignment exists or not.
+     * Compares claimant name with the fields, claimant first names, claimant last name, and full name.
+     * @param findCaseForRoleModificationRequest is the parameter object which has caseSubmissionReference,
+     *                                           claimantFirstNames and claimantLastName
      * @return the string value of the elastic search query
      */
     public static String buildByFindCaseForRoleModificationRequestClaimant(
         FindCaseForRoleModificationRequest findCaseForRoleModificationRequest
     ) {
         return "{\"size\":1,\"query\":{\"bool\":{"
+            // --- MUST MATCH SECTION ---
             + "\"must\":["
             + "{\"match\":{\"" + FIELD_NAME_SUBMISSION_REFERENCE + "\":{\"query\":\""
             + findCaseForRoleModificationRequest.getCaseSubmissionReference() + "\"}}},"
             + "{\"match\":{\"" + FIELD_NAME_ETHOS_CASE_REFERENCE + "\":{\"query\":\""
             + findCaseForRoleModificationRequest.getEthosCaseReference() + "\"}}}"
             + "],"
+
+            // --- EXCLUSION SECTION ---
             + "\"must_not\":["
-            + "{\"terms\":{\"" + FIELD_NAME_STATE + "\":[\"Delete\",\"Transferred\","
-            + "\"AWAITING_SUBMISSION_TO_HMCTS\"]}}"
+            + "{\"terms\":{\"" + FIELD_NAME_STATE + "\": ["
+            + "\"Delete\", \"Transferred\", \"AWAITING_SUBMISSION_TO_HMCTS\""
+            + "]}}"
             + "],"
+
+            // --- FILTER SECTION ---
             + "\"filter\":[{\"bool\":{\"must\":["
+
+            // 1. Ethos Case Reference
             + "{\"bool\":{\"filter\":[{\"term\":{\"" + FIELD_NAME_ETHOS_CASE_REFERENCE + "\":{\"value\":\""
             + findCaseForRoleModificationRequest.getEthosCaseReference() + "\"}}}],\"boost\":1.0}},"
+
+            // 2. Claimant First Names
             + "{\"bool\":{\"filter\":[{\"term\":{\"" + FIELD_NAME_CLAIMANT_FIRST_NAMES + "\":{\"value\":\""
             + findCaseForRoleModificationRequest.getClaimantFirstNames() + "\"}}}],\"boost\":1.0}},"
+
+            // 3. Claimant Last Name
             + "{\"bool\":{\"filter\":[{\"term\":{\"" + FIELD_NAME_CLAIMANT_LAST_NAME + "\":{\"value\":\""
             + findCaseForRoleModificationRequest.getClaimantLastName() + "\"}}}],\"boost\":1.0}},"
+
+            // 4. Claimant Full Name (Case Insensitive)
             + "{\"bool\":{\"filter\":[{\"term\":{\"" + FIELD_NAME_CLAIMANT_FULL_NAME + "\":{\"value\":\""
             + findCaseForRoleModificationRequest.getClaimantFirstNames() + StringUtils.SPACE
             + findCaseForRoleModificationRequest.getClaimantLastName()
             + "\",\"case_insensitive\":true}}}],\"boost\":1.0}}"
+
             + "],\"boost\":1.0}}],\"boost\":1.0}}}";
     }
 
@@ -189,40 +207,40 @@ public final class ElasticSearchQueryBuilder {
      */
     public static String buildByEthosCaseReference(String ethosCaseReference) {
         return """
-            {
-              "size": 1,
-              "query": {
-                "bool": {
-                  "must": [
-                    {
-                      "match": {
-                        "data.ethosCaseReference.keyword": {
-                          "query": "%s"
-                        }
-                      }
+        {
+          "size": 1,
+          "query": {
+            "bool": {
+              "must": [
+                {
+                  "match": {
+                    "data.ethosCaseReference.keyword": {
+                      "query": "%s"
                     }
-                  ],
-                  "must_not": [
-                    {
-                      "match": {
-                        "data.migratedFromEcm": {
-                          "query": "Yes"
-                        }
-                      }
-                    },
-                    {
-                      "terms": {
-                        "state.keyword": [
-                          "Delete",
-                          "Transferred",
-                          "AWAITING_SUBMISSION_TO_HMCTS"
-                        ]
-                      }
-                    }
-                  ]
+                  }
                 }
-              }
+              ],
+              "must_not": [
+                {
+                  "match": {
+                    "data.migratedFromEcm": {
+                      "query": "Yes"
+                    }
+                  }
+                },
+                {
+                  "terms": {
+                    "state.keyword": [
+                      "Delete",
+                      "Transferred",
+                      "AWAITING_SUBMISSION_TO_HMCTS"
+                    ]
+                  }
+                }
+              ]
             }
-            """.formatted(ethosCaseReference);
+          }
+        }
+        """.formatted(ethosCaseReference);
     }
 }

@@ -30,9 +30,13 @@ import uk.gov.hmcts.reform.et.syaapi.models.FindCaseForRoleModificationRequest;
 import uk.gov.hmcts.reform.et.syaapi.service.ManageCaseRoleService;
 import uk.gov.hmcts.reform.et.syaapi.service.utils.ResourceLoader;
 
+import java.io.IOException;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -70,6 +74,9 @@ class ManageCaseRoleControllerTest {
 
     @MockBean
     private ManageCaseRoleService manageCaseRoleService;
+
+    @Autowired
+    private ManageCaseRoleController manageCaseRoleController;
 
     private MockMvc mockMvc;
 
@@ -264,5 +271,174 @@ class ManageCaseRoleControllerTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(ResourceLoader.toJson(modifyCaseUserRolesRequest)))
             .andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    @SneakyThrows
+    void modifyUserRolesRuntimeExceptionIsWrapped() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        ModifyCaseUserRolesRequest modifyCaseUserRolesRequest = ModifyCaseUserRolesRequest.builder()
+            .modifyCaseUserRoles(List.of(ModifyCaseUserRole.builder().build()))
+            .build();
+
+        when(manageCaseRoleService.modifyUserCaseRoles(any(), any(), any()))
+            .thenThrow(new RuntimeException("Runtime Error"));
+
+        mockMvc.perform(post(POST_MODIFY_CASE_USER_ROLE_URL)
+                            .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                            .param(MODIFICATION_TYPE_PARAMETER_NAME, MODIFICATION_TYPE_PARAMETER_VALUE_REVOKE)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(ResourceLoader.toJson(modifyCaseUserRolesRequest)))
+            .andExpect(status().isInternalServerError());
+    }
+
+    @Test
+    @SneakyThrows
+    void findCaseForRoleModificationWrapsIoException() {
+        when(manageCaseRoleService.findCaseForRoleModification(any(), anyString()))
+            .thenThrow(new IOException("io error"));
+
+        ManageCaseRoleException exception = assertThrows(
+            ManageCaseRoleException.class,
+            () -> manageCaseRoleController.findCaseForRoleModification(AUTH_TOKEN, buildFindCaseRequest())
+        );
+
+        assertThat(exception.getCause()).isInstanceOf(IOException.class);
+    }
+
+    @Test
+    @SneakyThrows
+    void assignCreatorRoleRethrowsManageCaseRoleException() {
+        ModifyCaseUserRolesRequest request = buildModifyCaseUserRolesRequest();
+        ManageCaseRoleException expectedException = new ManageCaseRoleException(new Exception("existing"));
+
+        when(manageCaseRoleService.generateModifyCaseUserRolesRequest(AUTH_TOKEN, request)).thenReturn(request);
+        when(manageCaseRoleService.assignCreatorRole(AUTH_TOKEN, request)).thenThrow(expectedException);
+
+        ManageCaseRoleException actualException = assertThrows(
+            ManageCaseRoleException.class,
+            () -> manageCaseRoleController.assignCreatorRole(AUTH_TOKEN, request)
+        );
+
+        assertThat(actualException).isSameAs(expectedException);
+    }
+
+    @Test
+    @SneakyThrows
+    void assignCreatorRoleWrapsRuntimeException() {
+        ModifyCaseUserRolesRequest request = buildModifyCaseUserRolesRequest();
+        RuntimeException expectedException = new RuntimeException("runtime");
+
+        when(manageCaseRoleService.generateModifyCaseUserRolesRequest(AUTH_TOKEN, request)).thenReturn(request);
+        when(manageCaseRoleService.assignCreatorRole(AUTH_TOKEN, request)).thenThrow(expectedException);
+
+        ManageCaseRoleException actualException = assertThrows(
+            ManageCaseRoleException.class,
+            () -> manageCaseRoleController.assignCreatorRole(AUTH_TOKEN, request)
+        );
+
+        assertThat(actualException.getCause()).isSameAs(expectedException);
+    }
+
+    @Test
+    @SneakyThrows
+    void revokeClaimantSolicitorRoleRethrowsManageCaseRoleException() {
+        ManageCaseRoleException expectedException = new ManageCaseRoleException(new Exception("existing"));
+
+        when(manageCaseRoleService.revokeClaimantSolicitorRole(AUTH_TOKEN, CASE_SUBMISSION_REFERENCE))
+            .thenThrow(expectedException);
+
+        ManageCaseRoleException actualException = assertThrows(
+            ManageCaseRoleException.class,
+            () -> manageCaseRoleController.revokeClaimantSolicitorRole(AUTH_TOKEN, CASE_SUBMISSION_REFERENCE)
+        );
+
+        assertThat(actualException).isSameAs(expectedException);
+    }
+
+    @Test
+    @SneakyThrows
+    void revokeClaimantSolicitorRoleWrapsRuntimeException() {
+        RuntimeException expectedException = new RuntimeException("runtime");
+
+        when(manageCaseRoleService.revokeClaimantSolicitorRole(AUTH_TOKEN, CASE_SUBMISSION_REFERENCE))
+            .thenThrow(expectedException);
+
+        ManageCaseRoleException actualException = assertThrows(
+            ManageCaseRoleException.class,
+            () -> manageCaseRoleController.revokeClaimantSolicitorRole(AUTH_TOKEN, CASE_SUBMISSION_REFERENCE)
+        );
+
+        assertThat(actualException.getCause()).isSameAs(expectedException);
+    }
+
+    @Test
+    @SneakyThrows
+    void revokeRespondentSolicitorRoleRethrowsManageCaseRoleException() {
+        ManageCaseRoleException expectedException = new ManageCaseRoleException(new Exception("existing"));
+
+        when(manageCaseRoleService.revokeRespondentSolicitorRole(
+            AUTH_TOKEN,
+            CASE_SUBMISSION_REFERENCE,
+            STRING_ZERO
+        )).thenThrow(expectedException);
+
+        ManageCaseRoleException actualException = assertThrows(
+            ManageCaseRoleException.class,
+            () -> manageCaseRoleController.revokeRespondentSolicitorRole(
+                AUTH_TOKEN,
+                CASE_SUBMISSION_REFERENCE,
+                STRING_ZERO
+            )
+        );
+
+        assertThat(actualException).isSameAs(expectedException);
+    }
+
+    @Test
+    @SneakyThrows
+    void revokeRespondentSolicitorRoleWrapsRuntimeException() {
+        RuntimeException expectedException = new RuntimeException("runtime");
+
+        when(manageCaseRoleService.revokeRespondentSolicitorRole(
+            AUTH_TOKEN,
+            CASE_SUBMISSION_REFERENCE,
+            STRING_ZERO
+        )).thenThrow(expectedException);
+
+        ManageCaseRoleException actualException = assertThrows(
+            ManageCaseRoleException.class,
+            () -> manageCaseRoleController.revokeRespondentSolicitorRole(
+                AUTH_TOKEN,
+                CASE_SUBMISSION_REFERENCE,
+                STRING_ZERO
+            )
+        );
+
+        assertThat(actualException.getCause()).isSameAs(expectedException);
+    }
+
+    private static ModifyCaseUserRolesRequest buildModifyCaseUserRolesRequest() {
+        return ModifyCaseUserRolesRequest.builder()
+            .modifyCaseUserRoles(List.of(
+                ModifyCaseUserRole.builder()
+                    .caseRole(CREATOR_ROLE)
+                    .caseDataId(CASE_ID)
+                    .userId(USER_ID)
+                    .caseTypeId(ENGLAND_CASE_TYPE)
+                    .respondentName(RESPONDENT_NAME)
+                    .build()
+            ))
+            .build();
+    }
+
+    private static FindCaseForRoleModificationRequest buildFindCaseRequest() {
+        return FindCaseForRoleModificationRequest.builder()
+            .caseSubmissionReference(CASE_SUBMISSION_REFERENCE)
+            .respondentName(RESPONDENT_NAME)
+            .claimantFirstNames(CLAIMANT_FIRST_NAMES)
+            .claimantLastName(CLAIMANT_LAST_NAME)
+            .applicationName(APPLICATION_NAME_VALUE)
+            .build();
     }
 }

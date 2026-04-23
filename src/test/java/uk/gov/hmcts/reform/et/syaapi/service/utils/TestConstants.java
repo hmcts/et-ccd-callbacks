@@ -178,7 +178,7 @@ public final class TestConstants {
     public static final String EXPECTED_QUERY_BY_ROLE_MODIFICATION_REQUEST_CLAIMANT =
         "{\"size\":1,\"query\":{\"bool\":{\"must\":[{\"match\":{\"reference.keyword\":{\"query\":"
             + "\"case_submission_reference\"}}},{\"match\":{\"data.ethosCaseReference.keyword\":{\"query\":"
-            + "\"6000032/2024\"}}}],\"must_not\":[{\"terms\":{\"state.keyword\":[\"Delete\",\"Transferred\","
+            + "\"6000032/2024\"}}}],\"must_not\":[{\"terms\":{\"state.keyword\": [\"Delete\", \"Transferred\", "
             + "\"AWAITING_SUBMISSION_TO_HMCTS\"]}}],\"filter\":[{\"bool\":{\"must\":[{\"bool\":{\"filter\":[{\"term\":"
             + "{\"data.ethosCaseReference.keyword\":{\"value\":\"6000032/2024\"}}}],\"boost\":1.0}},"
             + "{\"bool\":{\"filter\":[{\"term\":{\"data.claimantIndType.claimant_first_names.keyword\":"

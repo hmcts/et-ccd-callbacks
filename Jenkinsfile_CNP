@@ -37,6 +37,11 @@ def secrets = [
     secret('et-staff-user-admin-user-name', 'ET_STAFF_USER_ADMIN_USER_NAME'),
     secret('et-staff-user-admin-user-name-password', 'ET_STAFF_USER_ADMIN_USER_NAME_PASSWORD')
   ],
+  'rpx-${env}': [
+    // xuiwebapp IDAM client secret - required for obtaining user tokens with
+    // manage-user/create-user/search-user scopes (used when provisioning WA users).
+    secret('mc-idam-client-secret', 'XUI_IDAM_CLIENT_SECRET'),
+  ],
   'et-${env}': [
     secret('ccd-admin-username', 'CCD_ADMIN_USERNAME'),
     secret('ccd-admin-password', 'CCD_ADMIN_PASSWORD'),

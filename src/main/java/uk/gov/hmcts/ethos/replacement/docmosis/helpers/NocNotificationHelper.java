@@ -86,7 +86,7 @@ public final class NocNotificationHelper {
         return personalisation;
     }
 
-    public static Map<String, String> buildPreviousRespondentSolicitorPersonalisation(CaseData caseData) {
+    public static Map<String, String> buildBasePersonalisation(CaseData caseData) {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
 
         addCommonValues(caseData, personalisation);
@@ -118,7 +118,7 @@ public final class NocNotificationHelper {
     }
 
     public static Map<String, String> buildTribunalPersonalisation(CaseData caseData) {
-        Map<String, String> personalisation = buildPreviousRespondentSolicitorPersonalisation(caseData);
+        Map<String, String> personalisation = buildBasePersonalisation(caseData);
         personalisation.put(DATE, ReferralHelper.getNearestHearingToReferral(caseData, NOT_SET));
         personalisation.put(TRIBUNAL, isNullOrEmpty(caseData.getTribunalAndOfficeLocation()) ? UNKNOWN :
                 caseData.getTribunalAndOfficeLocation());

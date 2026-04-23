@@ -81,7 +81,7 @@ class NocRespondentMapperTest {
     void getRespondentCollectionToEmail_emptyCollections() {
         CaseData caseData = new CaseData();
         caseData.setRespondentCollection(new ArrayList<>());
-        caseData.setRepCollection(new ArrayList<>());
+        caseData.setRepCollection(null);
 
         List<RespondentSumTypeItem> actual = NocRespondentMapper.getRespondentCollectionToEmail(caseData, List.of());
 

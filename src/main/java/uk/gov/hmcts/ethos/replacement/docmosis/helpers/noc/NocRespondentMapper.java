@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers.noc;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
@@ -60,6 +61,9 @@ public final class NocRespondentMapper {
     }
 
     private static Set<String> getRespondentIdsWithRepresentation(CaseData caseData) {
+        if (CollectionUtils.isEmpty(caseData.getRepCollection())) {
+            return Set.of();
+        }
         return caseData.getRepCollection().stream()
             .map(RepresentedTypeRItem::getValue)
             .filter(Objects::nonNull)

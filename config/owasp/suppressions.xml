@@ -77,4 +77,16 @@
     <suppress>
         <cve>CVE-2026-33871</cve>
     </suppress>
+    <suppress>
+        <cve>CVE-2026-22737</cve>
+    </suppress>
+    <suppress>
+        <cve>CVE-2026-22735</cve>
+    </suppress>
+    <suppress>
+        <cve>CVE-2026-22733</cve>
+    </suppress>
+    <suppress>
+        <cve>CVE-2026-33929</cve>
+    </suppress>
 </suppressions>

@@ -2,18 +2,15 @@ package uk.gov.hmcts.ethos.replacement.docmosis.tasks;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ecm.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.ecm.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.ecm.common.model.ccd.CaseData;
-import uk.gov.hmcts.ecm.common.model.ccd.items.BFActionTypeItem;
 import uk.gov.hmcts.ecm.compat.common.client.CcdClient;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -93,12 +90,6 @@ public class CaseTransferTask implements Runnable {
                 caseData.setOfficeCT(new DynamicFixedListType(details.newCaseTypeId));
                 caseData.setPositionTypeCT(POSITION_TYPE_CASE_TRANSFERRED_SAME_COUNTRY);
                 caseData.setReasonForCT("ET Data Quality");
-                if (CollectionUtils.isNotEmpty(caseData.getBfActions())) {
-                    caseData.getBfActions().stream()
-                        .map(BFActionTypeItem::getValue)
-                        .filter(value -> isNullOrEmpty(value.getCleared()))
-                        .forEach(value -> value.setCleared(LocalDate.now().toString()));
-                }
                 ccdClient.submitEventForCase(adminUserToken,
                     caseData,
                     details.oldCaseTypeId,

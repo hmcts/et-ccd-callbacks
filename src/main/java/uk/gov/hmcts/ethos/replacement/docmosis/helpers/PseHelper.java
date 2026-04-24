@@ -132,24 +132,23 @@ public final class PseHelper {
             return "";
         }
         IntWrapper respondCount = new IntWrapper(0);
-        String notificationToDisplay = sendNotificationType.getRespondCollection().stream()
+        return detailsWrapper("Responses", sendNotificationType.getRespondCollection().stream()
                 .filter(sn -> shouldDisplayResponse(sn, party))
                 .map(r -> formatPartyReply(r.getValue(),
                         respondCount,
                         sendNotificationType.getSendNotificationSubject()))
-                .collect(Collectors.joining(""));
-        return notificationToDisplay.isEmpty()
-                ? ""
-                : detailsWrapper("Responses", notificationToDisplay);
+                .collect(Collectors.joining("")));
     }
 
     private static boolean shouldDisplayResponse(PseResponseTypeItem sn, String party) {
         final PseResponseType value = sn.getValue();
         return switch (party) {
             case RESPONDENT_TITLE ->
-                YES.equals(value.getCopyToOtherParty());
+                    (CLAIMANT_TITLE.equals(value.getFrom()) || CLAIMANT_REPRESENTATIVE.equals(value.getFrom()))
+                     && YES.equals(value.getCopyToOtherParty())
+                    || RESPONDENT_TITLE.equals(value.getFrom());
             case CLAIMANT_TITLE ->
-                (RESPONDENT_TITLE.equals(value.getFrom()) && YES.equals(value.getCopyToOtherParty()))
+                    (RESPONDENT_TITLE.equals(value.getFrom()) && YES.equals(value.getCopyToOtherParty()))
                     || CLAIMANT_TITLE.equals(value.getFrom())
                     || CLAIMANT_REPRESENTATIVE.equals(value.getFrom());
             default -> throw new IllegalArgumentException(INVALID_PARTY_SELECTION);
@@ -195,12 +194,12 @@ public final class PseHelper {
     private static boolean filterTribunalResponse(RespondNotificationType value, String party) {
         return switch (party) {
             case CLAIMANT_TITLE ->
-                value.getRespondNotificationPartyToNotify().equals(CLAIMANT_ONLY)
+                    value.getRespondNotificationPartyToNotify().equals(CLAIMANT_ONLY)
                     || value.getRespondNotificationPartyToNotify().equals(BOTH_PARTIES)
                     || value.getRespondNotificationWhoRespond().equals(CLAIMANT_ONLY)
                     || value.getRespondNotificationWhoRespond().equals(BOTH_PARTIES);
             case RESPONDENT_TITLE ->
-                value.getRespondNotificationPartyToNotify().equals(RESPONDENT_ONLY)
+                    value.getRespondNotificationPartyToNotify().equals(RESPONDENT_ONLY)
                     || value.getRespondNotificationPartyToNotify().equals(BOTH_PARTIES)
                     || value.getRespondNotificationWhoRespond().equals(RESPONDENT_ONLY)
                     || value.getRespondNotificationWhoRespond().equals(BOTH_PARTIES);

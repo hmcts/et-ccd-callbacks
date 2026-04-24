@@ -192,8 +192,7 @@
     "ElementLabel": "Hearing panel preference",
     "FieldTypeParameter": "fl_HearingPanelPreference",
     "SecurityClassification": "Public",
-    "Searchable": "N",
-    "FieldShowCondition": "responseReceived=\"Yes\""
+    "Searchable": "N"
   },
   {
     "ID": "Respondent",
@@ -236,7 +235,7 @@
     "ListElementCode": "extensionDate",
     "FieldType": "Date",
     "ElementLabel": "Enter the extension date",
-    "FieldShowCondition": "extensionGranted=\"Yes\" AND extensionRequested=\"Yes\"",
+    "FieldShowCondition": "extensionGranted=\"Yes\"",
     "RetainHiddenValue": "Yes",
     "SecurityClassification": "Public",
     "Searchable": "N"
@@ -577,7 +576,7 @@
     "ListElementCode": "response_referred_to_judge",
     "FieldType": "Date",
     "ElementLabel": "Date referred to Judge",
-    "FieldShowCondition": "responseStruckOut !=\"Yes\" AND responseReceived=\"Yes\"",
+    "FieldShowCondition": "responseStruckOut !=\"Yes\"",
     "RetainHiddenValue": "No",
     "SecurityClassification": "Public",
     "Searchable": "N"
@@ -587,7 +586,7 @@
     "ListElementCode": "response_returned_from_judge",
     "FieldType": "Date",
     "ElementLabel": "Date returned from Judge",
-    "FieldShowCondition": "responseStruckOut !=\"Yes\" AND responseReceived=\"Yes\"",
+    "FieldShowCondition": "responseStruckOut !=\"Yes\"",
     "RetainHiddenValue": "No",
     "SecurityClassification": "Public",
     "Searchable": "N"
@@ -1030,8 +1029,7 @@
     "FieldTypeParameter": "DocumentUpload",
     "CategoryID": "C18",
     "SecurityClassification": "Public",
-    "Searchable": "N",
-    "FieldShowCondition": "responseReceived=\"Yes\""
+    "Searchable": "N"
   },
   {
     "ID": "Respondent",

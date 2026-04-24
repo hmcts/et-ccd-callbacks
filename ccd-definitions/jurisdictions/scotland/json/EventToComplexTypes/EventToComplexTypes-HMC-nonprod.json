@@ -42,8 +42,7 @@
     "ListElementCode": "respondentType",
     "EventElementLabel": "Type of respondent",
     "FieldDisplayOrder": 2,
-    "DisplayContext": "MANDATORY",
-    "FieldShowCondition": "responseReceived=\"dummy\""
+    "DisplayContext": "MANDATORY"
   },
   {
     "ID": "CreateCase",
@@ -53,7 +52,7 @@
     "EventElementLabel": "Organisation or business name",
     "FieldDisplayOrder": 3,
     "DisplayContext": "MANDATORY",
-    "FieldShowCondition": "responseReceived=\"dummy\""
+    "RetainHiddenValue": "No"
   },
   {
     "ID": "CreateCase",
@@ -63,7 +62,7 @@
     "EventElementLabel": "Respondent first name",
     "FieldDisplayOrder": 4,
     "DisplayContext": "MANDATORY",
-    "FieldShowCondition": "responseReceived=\"dummy\""
+    "RetainHiddenValue": "No"
   },
   {
     "ID": "CreateCase",
@@ -73,7 +72,7 @@
     "EventElementLabel": "Respondent last name",
     "FieldDisplayOrder": 5,
     "DisplayContext": "MANDATORY",
-    "FieldShowCondition": "responseReceived=\"dummy\""
+    "RetainHiddenValue": "No"
   },
   {
     "ID": "CreateDraftCase",
@@ -82,8 +81,7 @@
     "ListElementCode": "respondentType",
     "EventElementLabel": "Type of respondent",
     "FieldDisplayOrder": 2,
-    "DisplayContext": "MANDATORY",
-    "FieldShowCondition": "responseReceived=\"dummy\""
+    "DisplayContext": "MANDATORY"
   },
   {
     "ID": "CreateDraftCase",
@@ -93,7 +91,7 @@
     "EventElementLabel": "Organisation or business name",
     "FieldDisplayOrder": 3,
     "DisplayContext": "MANDATORY",
-    "FieldShowCondition": "responseReceived=\"dummy\""
+    "RetainHiddenValue": "No"
   },
   {
     "ID": "CreateDraftCase",
@@ -103,7 +101,7 @@
     "EventElementLabel": "Respondent first name",
     "FieldDisplayOrder": 4,
     "DisplayContext": "MANDATORY",
-    "FieldShowCondition": "responseReceived=\"dummy\""
+    "RetainHiddenValue": "No"
   },
   {
     "ID": "CreateDraftCase",
@@ -113,7 +111,7 @@
     "EventElementLabel": "Respondent last name",
     "FieldDisplayOrder": 5,
     "DisplayContext": "MANDATORY",
-    "FieldShowCondition": "responseReceived=\"dummy\""
+    "RetainHiddenValue": "No"
   },
   {
     "ID": "UpdateCase",
@@ -122,8 +120,7 @@
     "ListElementCode": "respondentType",
     "EventElementLabel": "Type of respondent",
     "FieldDisplayOrder": 2,
-    "DisplayContext": "MANDATORY",
-    "FieldShowCondition": "responseReceived=\"dummy\""
+    "DisplayContext": "MANDATORY"
   },
   {
     "ID": "UpdateCase",
@@ -133,7 +130,7 @@
     "EventElementLabel": "Organisation or business name",
     "FieldDisplayOrder": 3,
     "DisplayContext": "MANDATORY",
-    "FieldShowCondition": "responseReceived=\"dummy\""
+    "RetainHiddenValue": "No"
   },
   {
     "ID": "UpdateCase",
@@ -143,7 +140,7 @@
     "EventElementLabel": "Respondent first name",
     "FieldDisplayOrder": 4,
     "DisplayContext": "MANDATORY",
-    "FieldShowCondition": "responseReceived=\"dummy\""
+    "RetainHiddenValue": "No"
   },
   {
     "ID": "UpdateCase",
@@ -153,7 +150,7 @@
     "EventElementLabel": "Respondent last name",
     "FieldDisplayOrder": 5,
     "DisplayContext": "MANDATORY",
-    "FieldShowCondition": "responseReceived=\"dummy\""
+    "RetainHiddenValue": "No"
   },
   {
     "ID": "Respondent",
@@ -162,8 +159,7 @@
     "ListElementCode": "respondentType",
     "EventElementLabel": "Type of respondent",
     "FieldDisplayOrder": 5,
-    "DisplayContext": "MANDATORY",
-    "FieldShowCondition": "responseReceived=\"dummy\""
+    "DisplayContext": "MANDATORY"
   },
   {
     "ID": "Respondent",
@@ -173,7 +169,7 @@
     "EventElementLabel": "Organisation or business name",
     "FieldDisplayOrder": 6,
     "DisplayContext": "MANDATORY",
-    "FieldShowCondition": "responseReceived=\"dummy\""
+    "RetainHiddenValue": "No"
   },
   {
     "ID": "Respondent",
@@ -183,7 +179,7 @@
     "EventElementLabel": "Respondent first name",
     "FieldDisplayOrder": 7,
     "DisplayContext": "MANDATORY",
-    "FieldShowCondition": "responseReceived=\"dummy\""
+    "RetainHiddenValue": "No"
   },
   {
     "ID": "Respondent",
@@ -193,6 +189,6 @@
     "EventElementLabel": "Respondent last name",
     "FieldDisplayOrder": 8,
     "DisplayContext": "MANDATORY",
-    "FieldShowCondition": "responseReceived=\"dummy\""
+    "RetainHiddenValue": "No"
   }
 ]

@@ -57,7 +57,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERR
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_MODIFY_REPRESENTATIVE_ACCESS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrorsAndWarnings;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @Slf4j
@@ -121,10 +120,10 @@ public class RespondentRepresentativeController {
         log.info("CHECKING RESPONDENT REPRESENTATIVE ORGANISATION ---> " + LOG_MESSAGE + "{}",
                 ccdRequest.getCaseDetails().getCaseId());
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        NocUtils.clearNocWarningIfPresent(caseData);
         List<String> errors = new ArrayList<>();
-        List<String> warnings = new ArrayList<>();
         try {
-            warnings.addAll(nocRespondentRepresentativeService.validateRepresentativesOrganisationsAndEmails(caseData));
+            nocRespondentRepresentativeService.validateRepresentativesOrganisationsAndEmails(caseData);
         } catch (GenericRuntimeException | GenericServiceException gse) {
             String errorMessage = String.format(ERROR_REPRESENTATIVE_ORGANISATION_AND_EMAIL_NOT_MATCHED,
                     StringUtils.EMPTY);
@@ -134,7 +133,7 @@ public class RespondentRepresentativeController {
             }
             errors.add(errorMessage);
         }
-        return getCallbackRespEntityErrorsAndWarnings(warnings, errors, caseData);
+        return getCallbackRespEntityErrors(errors, caseData);
     }
 
     @PostMapping(value = "/amendRespondentRepresentativeAboutToSubmit", consumes = APPLICATION_JSON_VALUE)
@@ -159,6 +158,7 @@ public class RespondentRepresentativeController {
         log.info("AMEND RESPONDENT REPRESENTATIVE ABOUT TO SUBMIT ---> " + LOG_MESSAGE + "{}",
                 ccdRequest.getCaseDetails().getCaseId());
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        NocUtils.clearNocWarningIfPresent(caseData);
         List<String> errors = new ArrayList<>(NocUtils.validateNocCaseData(caseData));
         errors.addAll(nocRespondentRepresentativeService
                 .validateRespondentRepresentativesOrganisationMatch(ccdRequest.getCaseDetails()));
@@ -196,13 +196,13 @@ public class RespondentRepresentativeController {
         try {
             NocUtils.validateCallbackRequest(callbackRequest);
             nocRespondentRepresentativeService.updateRepresentativesAccess(callbackRequest, userToken);
-        } catch (GenericServiceException | GenericRuntimeException e) {
+        } catch (GenericServiceException e) {
             log.error(ERROR_UNABLE_TO_MODIFY_REPRESENTATIVE_ACCESS,
                     callbackRequest.getCaseDetails().getCaseId(), e.getMessage());
         }
     }
 
-    @PostMapping(value = "/updateRespOrgPolicyAboutToSubmit", consumes = APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/updateRespOrgPolicyAboutToStart", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Updates respondent's organisation policy, representatives' roles and resets change"
             + "organisation request field after representation amended(revoked/assigned)")
     @ApiResponses(value = {
@@ -218,7 +218,7 @@ public class RespondentRepresentativeController {
         @ApiResponse(responseCode = HTTP_CODE_FIVE_ZERO_ONE, description = HTTP_MESSAGE_FIVE_ZERO_ONE),
         @ApiResponse(responseCode = HTTP_CODE_FIVE_ZERO_THREE, description = HTTP_MESSAGE_FIVE_ZERO_THREE)
     })
-    public ResponseEntity<CCDCallbackResponse> updateRespOrgPolicyAboutToSubmit(
+    public ResponseEntity<CCDCallbackResponse> updateRespOrgPolicyAboutToStart(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(AUTHORIZATION) String userToken) {
         log.info("UPDATE RESPONDENT ORGANISATION POLICIES AND ROLES FOR REMOVED REPRESENTATIVES ---> {}{}",

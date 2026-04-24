@@ -120,11 +120,6 @@ public final class InvalidCharacterCheck {
         for (String charToReplace : DOCUMENT_CHARS_TO_REPLACE) {
             sanitizedName = sanitizedName.replace(charToReplace, " ");
         }
-        // Replace em dash with hyphen to prevent issues with document generation
-        if (sanitizedName.contains("—")) {
-            sanitizedName = sanitizedName.replace("—", "-");
-        }
-
         return sanitizedName.trim();
     }
 }

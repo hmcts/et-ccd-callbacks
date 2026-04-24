@@ -15,7 +15,6 @@ import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
-import uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.time.LocalDate;
@@ -45,7 +44,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.NO_RESPONDENTS_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.addEt3DataToRespondent;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.findRepresentativeFromCaseData;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.generateEventHyperlinks;
 
 class Et3ResponseHelperTest {
 
@@ -392,46 +390,5 @@ class Et3ResponseHelperTest {
         RespondentSumTypeItem respondentSumTypeItemValueNull = caseData.getRespondentCollection().getFirst();
         respondentSumTypeItemValueNull.setValue(null);
         assertDoesNotThrow(() -> Et3ResponseHelper.setEt3NotificationAcceptedDates(caseData));
-    }
-
-    @Test
-    void generateEventHyperlinks_noRespondents_throws() {
-        caseData.setRespondentCollection(null);
-        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
-                () -> generateEventHyperlinks(caseData, "1234123412341234"));
-        assertThat(exception.getMessage()).isEqualTo(NO_RESPONDENTS_FOUND);
-    }
-
-    @Test
-    void generateEventHyperlinks_noEligibleRespondents_excludesSubmitButton() {
-        String ccdId = "1234123412341234";
-        String expected = ET3ResponseConstants.SECTION_COMPLETE_BODY.formatted(ccdId, ccdId, ccdId, ccdId, "");
-
-        String actual = generateEventHyperlinks(caseData, ccdId);
-
-        assertThat(actual).isEqualTo(expected);
-    }
-
-    @Test
-    void generateEventHyperlinks_eligibleRespondent_includesSubmitButton() {
-        String ccdId = "1234123412341234";
-        RespondentSumType respondent = caseData.getRespondentCollection().getFirst().getValue();
-        respondent.setPersonalDetailsSection(YES);
-        respondent.setEmploymentDetailsSection(YES);
-        respondent.setClaimDetailsSection(YES);
-        respondent.setResponseContinue(YES);
-        respondent.setResponseReceived(NO);
-
-        String expected = ET3ResponseConstants.SECTION_COMPLETE_BODY.formatted(
-                ccdId,
-                ccdId,
-                ccdId,
-                ccdId,
-                ET3ResponseConstants.SUBMIT_ET3_BUTTON.formatted(ccdId)
-        );
-
-        String actual = generateEventHyperlinks(caseData, ccdId);
-
-        assertThat(actual).isEqualTo(expected);
     }
 }

@@ -1,0 +1,34 @@
+[
+  {
+    "ID": "CaseUserAssignment",
+    "ListElementCode": "organisation_id",
+    "FieldType": "Text",
+    "ElementLabel": "Organisation Id",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "CaseUserAssignment",
+    "ListElementCode": "case_id",
+    "FieldType": "Text",
+    "ElementLabel": "Case Id",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "CaseUserAssignment",
+    "ListElementCode": "user_id",
+    "FieldType": "Text",
+    "ElementLabel": "User Id",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "ID": "CaseUserAssignment",
+    "ListElementCode": "case_role",
+    "FieldType": "Text",
+    "ElementLabel": "User Id",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

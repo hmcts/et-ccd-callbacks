@@ -2,8 +2,15 @@
   {
     "CaseTypeId": "ET_Scotland",
     "CaseEventID": "nocRemoveRepClaimant",
-    "UserRole": "[CLAIMANTSOLICITOR]",
-    "CRUD": "CRU"
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[CLAIMANTSOLICITOR]",
+          "caseworker-employment-scotland"
+        ],
+        "CRUD": "CRU"
+      }
+    ]
   },
   {
     "CaseTypeId": "ET_Scotland",

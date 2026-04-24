@@ -2,8 +2,20 @@
   {
     "CaseTypeId": "ET_EnglandWales",
     "CaseEventID": "nocRemoveRepClaimant",
-    "UserRole": "[CLAIMANTSOLICITOR]",
-    "CRUD": "CRU"
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[CLAIMANTSOLICITOR]"
+        ],
+        "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-employment-englandwales"
+        ],
+        "CRUD": "R"
+      }
+    ]
   },
   {
     "CaseTypeId": "ET_EnglandWales",
@@ -20,10 +32,15 @@
           "[SOLICITORG]",
           "[SOLICITORH]",
           "[SOLICITORI]",
-          "[SOLICITORJ]",
-          "caseworker-employment-englandwales"
+          "[SOLICITORJ]"
         ],
         "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-employment-englandwales"
+        ],
+        "CRUD": "R"
       }
     ]
   }

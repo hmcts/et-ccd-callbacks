@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.noc;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_GET_CASE_ASSIGNMENTS_BY_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_ORGANISATION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_RESPONDENT;
@@ -241,20 +241,16 @@ public class NocRemoveRepresentationEmailService {
         List<String> respondentIdInRevokeList,
         String partyName
     ) {
+        // send email to other respondent legal rep
         List<CaseUserAssignment> caseUserAssignments =
             caseAccessService.getCaseUserAssignmentsById(caseDetails.getCaseId());
-        if (caseUserAssignments == null || caseUserAssignments.isEmpty()) {
-            log.warn(WARNING_FAILED_TO_GET_CASE_ASSIGNMENTS_BY_ID,
-                caseDetails.getCaseId());
-            return;
+        if (CollectionUtils.isNotEmpty(caseUserAssignments)) {
+            emailNotificationService.getRespondentSolicitorEmails(caseUserAssignments)
+                .forEach(email -> {
+                    String linkToCitUI = emailService.getExuiCaseLink(caseDetails.getCaseId());
+                    sendEmailToEachRespondent(caseDetails, email, partyName, linkToCitUI);
+                });
         }
-
-        // send email to other respondent legal rep
-        emailNotificationService.getRespondentSolicitorEmails(caseUserAssignments)
-            .forEach(email -> {
-                String linkToCitUI = emailService.getExuiCaseLink(caseDetails.getCaseId());
-                sendEmailToEachRespondent(caseDetails, email, partyName, linkToCitUI);
-            });
 
         // send email to other respondent with no rep and not revoke
         NocRespondentMapper.getRespondentCollectionToEmail(caseDetails.getCaseData(), respondentIdInRevokeList)

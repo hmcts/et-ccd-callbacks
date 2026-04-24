@@ -347,4 +347,30 @@ class NocRemoveRepresentationEmailServiceTest {
                 ))
             );
     }
+
+    @Test
+    void sendEmailToOtherPartyRespondent_onlyRespondentExist() {
+        caseDetails.getCaseData().setRespondentCollection(List.of(
+            caseDetails.getCaseData().getRespondentCollection().get(4)
+        ));
+        when(caseAccessService.getCaseUserAssignmentsById(any()))
+            .thenReturn(List.of());
+        when(emailService.getSyrCaseLink(anyString(), anyString()))
+            .thenReturn(LINK_SYR_CITIZEN_CASE);
+
+        nocRemoveRepresentationEmailService.sendEmailToOtherPartyRespondent(caseDetails, List.of(), PARTY_NAME);
+
+        verify(emailService, times(1))
+            .sendEmail(
+                eq(TEMPLATE_NOC_OTHER_PARTY_NOT_REPRESENTED),
+                eq(RESPONDENT_5_EMAIL),
+                eq(Map.of(
+                    "case_number", CASE_REFERENCE,
+                    "claimant", CLAIMANT_NAME,
+                    "list_of_respondents", RESPONDENT_5_NAME,
+                    "party_name", PARTY_NAME,
+                    "linkToCitUI", LINK_SYR_CITIZEN_CASE
+                ))
+            );
+    }
 }

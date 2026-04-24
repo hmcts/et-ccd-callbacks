@@ -29,6 +29,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
+import uk.gov.hmcts.ethos.replacement.docmosis.domain.noc.RepresentativesCaseAssignments;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.CcdInputOutputException;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericRuntimeException;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
@@ -73,7 +74,9 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXC
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_REQUEST;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_TYPE_ADDITION;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.NOC_TYPE_REMOVAL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_FIND_ORGANISATION_BY_EMAIL_SYSTEM_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_RETRIEVE_CASE_ASSIGNMENTS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_RESPONDENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_REPRESENTATIVE_EMAIL_ADDRESS_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_UNABLE_TO_FIND_ACCOUNT_ID_BY_EMAIL_WITH_IO_EXCEPTION;
 
@@ -98,55 +101,51 @@ public class NocRespondentRepresentativeService {
     private static final String CLASS_NAME = NocRespondentRepresentativeService.class.getSimpleName();
 
     /**
-     * Validates that each representative marked as an HMCTS organisation user
-     * has a valid organisation and a resolvable email address within the
-     * organisation service.
+     * Validates respondent representatives' organisation and email details and returns
+     * any warning messages identified during validation.
      *
-     * <p>The validation performs the following checks for each representative in the case data:</p>
+     * <p>This method iterates through the respondent representatives in the case data and
+     * checks only those representatives who are valid and marked as MyHMCTS users.
+     *
+     * <p>For each applicable representative:
      * <ul>
-     *     <li>If the representative is marked as an HMCTS organisation user.</li>
-     *     <li>Ensures the representative has a non-null organisation with a valid organisation ID.
-     *         If not, a {@link GenericServiceException} is thrown.</li>
-     *     <li>Checks that the representative has a non-blank email address.
-     *         If missing, a warning message is added to the case data.</li>
-     *     <li>Attempts to resolve the representative’s account via the organisation service
-     *         using the provided email address. If no matching account is found or the lookup
-     *         fails, a warning message is added to the case data.</li>
+     *   <li>if the representative email address is missing, a warning is added and
+     *       validation continues with the next representative;</li>
+     *   <li>if the representative organisation is missing, a
+     *       {@link GenericServiceException} is thrown;</li>
+     *   <li>otherwise, the representative account is checked by email and any warnings
+     *       returned by the organisation service are added to the result.</li>
      * </ul>
      *
-     * <p>If {@code caseData} or its representative collection is null or empty,
-     * the method exits without performing any validation.</p>
-     *
-     * <p>All warnings generated during validation are aggregated and stored in
-     * {@code caseData.setNocWarning(...)}. The method does not fail on missing
-     * email accounts but records them as warnings instead.</p>
-     *
-     * @param caseData the case data containing representative details to validate
-     * @throws GenericServiceException if a representative marked as an HMCTS
-     *         organisation user does not have a valid organisation or organisation ID
+     * @param caseData the case data containing the respondent representatives to validate
+     * @return a list of warning messages for representatives whose email address is missing
+     *     or whose account could not be confirmed by email; an empty list if no warnings
+     *     are identified
+     * @throws GenericServiceException if a valid MyHMCTS representative does not have an
+     *     associated organisation
      */
-    public void validateRepresentativesOrganisationsAndEmails(CaseData caseData)
+    public List<String> validateRepresentativesOrganisationsAndEmails(CaseData caseData)
             throws GenericServiceException {
+        List<String> warnings = new ArrayList<>();
         if (!RespondentRepresentativeUtils.hasRepresentatives(caseData)) {
-            return;
+            return warnings;
         }
-        StringBuilder nocWarnings = new StringBuilder(StringUtils.EMPTY);
         for (RepresentedTypeRItem representativeItem :  caseData.getRepCollection()) {
             if (RespondentRepresentativeUtils.isValidRepresentative(representativeItem)
                     && YES.equals(representativeItem.getValue().getMyHmctsYesNo())) {
                 if (StringUtils.isBlank(representativeItem.getValue().getRepresentativeEmailAddress())) {
-                    nocWarnings.append(WARNING_REPRESENTATIVE_EMAIL_ADDRESS_NOT_FOUND).append('\n');
+                    warnings.add(WARNING_REPRESENTATIVE_EMAIL_ADDRESS_NOT_FOUND);
                     continue;
                 }
                 if (!RespondentRepresentativeUtils.hasOrganisation(representativeItem.getValue())) {
                     throw new GenericServiceException(EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND);
                 }
-                nocWarnings.append(organisationService.checkRepresentativeAccountByEmail(
+                warnings.addAll(organisationService.checkRepresentativeAccountByEmail(
                         representativeItem.getValue().getNameOfRepresentative(),
                         representativeItem.getValue().getRepresentativeEmailAddress()));
             }
         }
-        caseData.setNocWarning(nocWarnings.toString());
+        return warnings;
     }
 
     public void updateRepresentativesAccess(CallbackRequest callbackRequest, String userToken) {
@@ -450,85 +449,109 @@ public class NocRespondentRepresentativeService {
         for (RepresentedTypeRItem representative : respondentRepresentativesToRevoke) {
             RespondentSumTypeItem respondent = RespondentRepresentativeUtils.findRespondentByRepresentative(
                     caseDetails.getCaseData(), representative);
-            nocNotificationService.notifyRespondentOfRepresentativeUpdate(caseDetails, respondent);
+            try {
+                nocNotificationService.notifyRespondentOfRepresentativeUpdate(caseDetails, respondent);
+            } catch (Exception e) {
+                log.warn(WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_RESPONDENT, caseDetails.getCaseId(),
+                        e.getMessage());
+            }
         }
         revokeAndRemoveRespondentRepresentatives(caseDetails, respondentRepresentativesToRevoke);
     }
 
     /**
-     * Attempts to revoke access for the specified respondent representatives,
-     * resets organisation policies for representatives whose access was
-     * successfully revoked, and removes the supplied representatives from
-     * case data.
+     * Revokes and removes respondent representatives from the case, assuming that
+     * revocation must be attempted before any representative is removed from case data.
      *
-     * <p>Processing order:</p>
-     * <ol>
-     *   <li>Attempt to revoke access for the supplied representatives.</li>
-     *   <li>Reset organisation policies for the representatives whose access was
-     *       successfully revoked.</li>
-     *   <li>Remove the supplied representatives from case data. These representatives may not be revoked if no roles
-     *   are assigned to them.</li>
-     * </ol>
+     * <p>Assumptions:</p>
+     * <ul>
+     *   <li>{@code caseDetails} is not {@code null} and contains valid case data.</li>
+     *   <li>{@code representatives} is not {@code null} and contains the respondent
+     *       representatives being processed.</li>
+     *   <li>{@link #revokeRespondentRepresentatives(CaseDetails, List)} returns a non-null
+     *       {@code RepresentativesCaseAssignments} result.</li>
+     *   <li>If revoked case-user assignments are present, the corresponding representatives in
+     *       {@code getRepresentativesToRemove()} are considered successfully revoked and should
+     *       have their organisation policies reset.</li>
+     *   <li>If no revoked case-user assignments are present, the representatives returned in
+     *       {@code getRepresentativesToRemove()} should not be removed from case data in this call.</li>
+     *   <li>Resetting organisation policies is only required for representatives whose assignments
+     *       were successfully revoked.</li>
+     * </ul>
      *
-     * <p>If no access revocations succeed, no organisation policies are reset,
-     * but the supplied representatives are still removed from case data.</p>
+     * <p>Behaviour:</p>
+     * <ul>
+     *   <li>Attempts to revoke case-user assignments for the supplied representatives.</li>
+     *   <li>Builds the final list of representatives to remove from case data based on the revocation result.</li>
+     *   <li>Resets organisation policies for revoked representatives.</li>
+     *   <li>Removes the remaining applicable representatives from the case data.</li>
+     * </ul>
      *
-     * @param caseDetails the case details containing the case data to update;
-     *                    must not be {@code null}
-     * @param representatives the respondent representatives for which access
-     *                        revocation should be attempted; may be {@code null}
-     *                        or empty
-     * @throws IllegalArgumentException if {@code caseDetails} or its
-     *                                  {@code caseData} is invalid
+     * @param caseDetails the case details containing the case data to update
+     * @param representatives the respondent representatives to be revoked and removed
      */
     public void revokeAndRemoveRespondentRepresentatives(CaseDetails caseDetails,
                                                          List<RepresentedTypeRItem> representatives) {
-        List<RepresentedTypeRItem> revokedRepresentatives = revokeRespondentRepresentatives(caseDetails,
+        RepresentativesCaseAssignments representativesCaseAssignments = revokeRespondentRepresentatives(caseDetails,
                 representatives);
-        NocUtils.resetOrganisationPolicies(caseDetails.getCaseData(), revokedRepresentatives);
-        RespondentRepresentativeUtils.removeRespondentRepresentatives(caseDetails.getCaseData(), representatives);
+        List<RepresentedTypeRItem> representativesToRemove = new ArrayList<>(representatives);
+        if (CollectionUtils.isNotEmpty(representativesCaseAssignments.getRevokedCaseUserAssignments())) {
+            NocUtils.resetOrganisationPolicies(caseDetails.getCaseData(),
+                    representativesCaseAssignments.getRepresentativesToRemove());
+        } else {
+            representativesToRemove.removeAll(representativesCaseAssignments.getRepresentativesToRemove());
+        }
+        RespondentRepresentativeUtils.removeRespondentRepresentatives(caseDetails.getCaseData(),
+                representativesToRemove);
     }
 
     /**
-     * Revokes respondent representative case assignments for the specified representatives.
+     * Revokes respondent representative case-user assignments for the given case and
+     * returns the representatives and assignments identified for removal.
      *
-     * <p>This method retrieves all current case user assignments for the given case and
-     * identifies those associated with respondent representative roles. If a representative
-     * corresponding to the assignment exists in the provided list of representatives to revoke,
-     * the assignment is marked for revocation.</p>
+     * <p>The method retrieves all case-user assignments for the case, filters them to
+     * respondent representative roles, and attempts to match each assignment against the
+     * supplied list of representatives to revoke. Where a match is found, both the
+     * corresponding {@link CaseUserAssignment} and {@link RepresentedTypeRItem} are collected
+     * into the returned {@link RepresentativesCaseAssignments}.
      *
-     * <p>Only assignments linked to respondent representative roles are considered. Matching
-     * representatives are resolved using
-     * {@link RespondentRepresentativeUtils#findRepresentativeInListByRoleOrRespondentName(CaseData, String, List)}.</p>
+     * <p>If no case-user assignments exist for the case, an empty
+     * {@link RepresentativesCaseAssignments} is returned.
      *
-     * <p>If no case user assignments are found for the case, the method exits without performing
-     * any revocation.</p>
+     * <p>Once matching assignments have been identified, the method attempts to revoke them.
+     * If revocation fails with a {@link GenericRuntimeException}, the error is logged and the
+     * returned {@code revokedCaseUserAssignments} list is reset to empty. The matched
+     * {@code representativesToRemove} list remains unchanged.
      *
-     * <h3>Assumptions</h3>
+     * <p><strong>Assumptions:</strong>
      * <ul>
-     *     <li>{@code caseDetails} contains valid case data and a case identifier.</li>
-     *     <li>The list {@code representativesToRevoke} contains representatives whose access
-     *     should be removed from the case.</li>
-     *     <li>Only assignments associated with respondent representative roles are eligible
-     *     for revocation.</li>
-     *     <li>Role validation is performed using {@link RoleUtils#isRespondentRepresentativeRole(String)}.</li>
-     *     <li>Case assignments are revoked using an administrative user token.</li>
+     *   <li>{@code caseDetails} is non-null and contains a valid case ID and case data.</li>
+     *   <li>{@code representativesToRevoke} is expected to contain respondent representatives
+     *       relevant to the case.</li>
+     *   <li>{@link RespondentRepresentativeUtils#findRepresentativeInListByRoleOrRespondentName}
+     *       can safely evaluate the provided representative list for matching by case role or
+     *       respondent name.</li>
+     *   <li>Only case-user assignments with respondent representative roles are eligible
+     *       for revocation.</li>
      * </ul>
      *
-     * @param caseDetails the case details containing the case identifier and associated case data
-     * @param representativesToRevoke the list of respondent representatives whose case assignments
-     *                                should be revoked
+     * @param caseDetails the case whose respondent representative assignments are to be evaluated
+     * @param representativesToRevoke the list of respondent representatives that should be matched
+     *                                and revoked where corresponding case-user assignments exist
+     * @return a {@link RepresentativesCaseAssignments} containing the matched representatives to remove
+     *         and the case-user assignments identified for revocation
      */
-    public List<RepresentedTypeRItem> revokeRespondentRepresentatives(
+    public RepresentativesCaseAssignments revokeRespondentRepresentatives(
             CaseDetails caseDetails, List<RepresentedTypeRItem> representativesToRevoke) {
         CaseUserAssignmentData caseUserAssignmentsData = nocCcdService.retrieveCaseUserAssignments(
                 adminUserService.getAdminUserToken(), caseDetails.getCaseId());
-        List<RepresentedTypeRItem> representativesToRemove = new ArrayList<>();
+        RepresentativesCaseAssignments representativesCaseAssignments = RepresentativesCaseAssignments.builder()
+                .representativesToRemove(new ArrayList<>()).revokedCaseUserAssignments(new ArrayList<>()).build();
         if (ObjectUtils.isEmpty(caseUserAssignmentsData)
                 || CollectionUtils.isEmpty(caseUserAssignmentsData.getCaseUserAssignments())) {
-            return  representativesToRemove;
+            return  representativesCaseAssignments;
         }
-        List<CaseUserAssignment> caseUserAssignmentsToRevoke = new ArrayList<>();
+
         for (CaseUserAssignment caseUserAssignment : caseUserAssignmentsData.getCaseUserAssignments()) {
             if (!RoleUtils.isRespondentRepresentativeRole(caseUserAssignment.getCaseRole())) {
                 continue;
@@ -537,17 +560,18 @@ public class NocRespondentRepresentativeService {
                     .findRepresentativeInListByRoleOrRespondentName(caseDetails.getCaseData(),
                             caseUserAssignment.getCaseRole(), representativesToRevoke);
             if (ObjectUtils.isNotEmpty(representedTypeRItem)) {
-                caseUserAssignmentsToRevoke.add(caseUserAssignment);
-                representativesToRemove.add(representedTypeRItem);
+                representativesCaseAssignments.getRevokedCaseUserAssignments().add(caseUserAssignment);
+                representativesCaseAssignments.getRepresentativesToRemove().add(representedTypeRItem);
             }
         }
         try {
-            revokeCaseAssignments(adminUserService.getAdminUserToken(), caseUserAssignmentsToRevoke);
+            revokeCaseAssignments(adminUserService.getAdminUserToken(),
+                    representativesCaseAssignments.getRevokedCaseUserAssignments());
         } catch (GenericRuntimeException e) {
             log.error(ERROR_UNABLE_TO_MODIFY_REPRESENTATIVE_ACCESS, caseDetails.getCaseId(), e.getMessage(), e);
-            return new ArrayList<>();
+            representativesCaseAssignments.setRevokedCaseUserAssignments(Collections.emptyList());
         }
-        return representativesToRemove;
+        return representativesCaseAssignments;
     }
 
     private void revokeCaseAssignments(String userToken,
@@ -730,31 +754,29 @@ public class NocRespondentRepresentativeService {
     }
 
     /**
-     * Grants case access to valid respondent representatives by assigning them the next available
-     * respondent solicitor role via Notice of Change (NoC).
-     * <p>
-     * The method iterates over the provided list of representatives and, for each valid representative:
-     * <ul>
-     *     <li>Determines the next available respondent solicitor role on the case</li>
-     *     <li>Grants access to the case using the representative's email and organisation details</li>
-     * </ul>
-     * </p>
-     * <p>
-     * Processing will stop if no respondent solicitor roles are available on the case.
-     * Invalid representatives are skipped. Any failures when granting access are logged and do not
-     * prevent processing of subsequent representatives.
-     * </p>
-     * <p>
-     * The method performs no action if:
-     * <ul>
-     *     <li>{@code caseDetails} or its case data is {@code null}</li>
-     *     <li>The case ID is blank</li>
-     *     <li>The representatives list is {@code null} or empty</li>
-     * </ul>
-     * </p>
+     * Grants MyHMCTS access to the supplied respondent representatives and records the
+     * successfully processed representatives for later organisation policy updates.
      *
-     * @param caseDetails     the case details containing the case ID and case data
-     * @param representatives a list of respondent representatives to be granted access
+     * <p>This method first validates the input and returns immediately if the case details,
+     * case data, case ID, or representatives list is missing. It then resets
+     * {@code repCollectionToAdd} on the case data and processes each supplied representative.
+     *
+     * <p>For each valid representative, the method:
+     * <ul>
+     *   <li>derives the solicitor role to assign;</li>
+     *   <li>grants representative access through the NOC service;</li>
+     *   <li>locates the corresponding representative in the case data; and</li>
+     *   <li>adds that representative to {@code repCollectionToAdd} after setting the derived role.</li>
+     * </ul>
+     *
+     * <p>If no role can be derived for a representative, an error is logged and processing
+     * stops for any remaining representatives. If access cannot be granted for a specific
+     * representative, the error is logged and processing continues with the next one. If the
+     * matching representative cannot be found in the case data after access is granted, an
+     * error is logged and the method exits.
+     *
+     * @param caseDetails the case details containing the case ID and case data to update
+     * @param representatives the respondent representatives to be granted access
      */
     public void grantRespondentRepresentativesAccess(CaseDetails caseDetails,
                                                      List<RepresentedTypeRItem> representatives) {
@@ -1088,6 +1110,7 @@ public class NocRespondentRepresentativeService {
                     organisationsResponse = nocService.findOrganisationByUserId(accessToken,
                             userResponse.getUserIdentifier(), caseDetails.getCaseId());
                 } catch (GenericServiceException e) {
+                    log.warn(WARNING_FAILED_TO_FIND_ORGANISATION_BY_EMAIL_SYSTEM_ERROR, e.getMessage());
                     // if user is not defined on idam should not check for organisation.
                     isValidUserAndOrganisation = false;
                 }

@@ -1,15 +1,21 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
+import feign.FeignException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.AccountIdByEmailResponse;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericRuntimeException;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.OrganisationUtils;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_CHECK_REPRESENTATIVE_ACCOUNT_BY_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL;
 
 @Service
@@ -22,26 +28,42 @@ public class OrganisationService {
     private final OrganisationClient organisationClient;
 
     /**
-     * Checks whether a representative account exists in the organisation system using the provided email address.
-     * <p>
-     * This method calls the organisation service to retrieve an account identifier associated with the given
-     * email address. If no user identifier is found in the response, or if an exception occurs during the call,
-     * a warning message indicating that the representative account could not be found is added to the returned
-     * warning string.
-     * </p>
+     * Checks whether a representative account can be found using the supplied email address.
      *
-     * <p>
-     * <strong>Assumption:</strong> Both {@code representativeName} and {@code email} parameters are expected
-     * to be non-null and non-empty when this method is invoked.
-     * </p>
+     * <p>This method calls the organisation service to look up an account by email. If no
+     * user identifier is found in the response, a warning message is added to the returned
+     * list for the named representative.
      *
-     * @param representativeName the name of the representative whose account is being validated
-     * @param email the email address of the representative used to look up the account
-     * @return a string containing warning messages if the representative account cannot be found,
-     *         or an empty string if the account exists
+     * <p>If the lookup fails for any reason, the same warning message is returned. This
+     * means the method treats both "account not found" and lookup errors as the same
+     * warning condition.
+     *
+     * <p><strong>Assumptions:</strong>
+     * <ul>
+     *   <li>{@code representativeName} is not {@code null} or blank and is suitable for
+     *       inclusion in a user-facing warning message.</li>
+     *   <li>{@code email} is not {@code null} or blank and represents the email address
+     *       to be checked.</li>
+     *   <li>{@code adminUserService.getAdminUserToken()} returns a valid admin access token.</li>
+     *   <li>{@code authTokenGenerator.generate()} returns a valid service authentication token.</li>
+     *   <li>{@code organisationClient.getAccountIdByEmail(...)} may either return a response
+     *       without a user identifier or throw an exception when the account cannot be resolved.</li>
+     *   <li>{@code OrganisationUtils.hasUserIdentifier(...)} safely handles the returned
+     *       {@link ResponseEntity}.</li>
+     *   <li>An empty returned list means the representative account was successfully found
+     *       by email.</li>
+     *   <li>A non-empty returned list contains a warning indicating that the representative
+     *       account could not be confirmed by email.</li>
+     * </ul>
+     *
+     * @param representativeName the representative name used in the warning message if no
+     *     account can be found
+     * @param email the email address used to look up the representative account
+     * @return a list of warning messages, or an empty list if the representative account
+     *     is found successfully
      */
-    public String checkRepresentativeAccountByEmail(String representativeName, String email) {
-        StringBuilder nocWarnings = new StringBuilder(StringUtils.EMPTY);
+    public List<String> checkRepresentativeAccountByEmail(String representativeName, String email) {
+        List<String> nocWarnings = new ArrayList<>();
         try {
             ResponseEntity<AccountIdByEmailResponse> userResponse =
                     organisationClient.getAccountIdByEmail(adminUserService.getAdminUserToken(),
@@ -50,13 +72,20 @@ public class OrganisationService {
             if (!OrganisationUtils.hasUserIdentifier(userResponse)) {
                 String warningMessage = String.format(WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL,
                         representativeName);
-                nocWarnings.append(warningMessage).append('\n');
+                log.warn(warningMessage);
+                nocWarnings.add(warningMessage);
             }
-        } catch (Exception e) {
-            String warningMessage = String.format(WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL,
-                    representativeName);
-            nocWarnings.append(warningMessage).append('\n');
+        } catch (FeignException e) {
+            if (e.status() == HttpStatus.NOT_FOUND.value()) {
+                String warningMessage = String.format(WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL,
+                        representativeName);
+                log.warn(warningMessage);
+                nocWarnings.add(warningMessage);
+            } else {
+                log.error(ERROR_UNABLE_TO_CHECK_REPRESENTATIVE_ACCOUNT_BY_EMAIL, e.getMessage());
+                throw new GenericRuntimeException(e);
+            }
         }
-        return nocWarnings.toString();
+        return nocWarnings;
     }
 }

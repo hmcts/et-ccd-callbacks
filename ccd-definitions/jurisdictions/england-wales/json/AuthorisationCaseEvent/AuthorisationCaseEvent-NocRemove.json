@@ -5,10 +5,15 @@
     "AccessControl": [
       {
         "UserRoles": [
-          "[CLAIMANTSOLICITOR]",
-          "caseworker-employment-englandwales"
+          "[CLAIMANTSOLICITOR]"
         ],
         "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-employment-englandwales"
+        ],
+        "CRUD": "R"
       }
     ]
   },
@@ -27,10 +32,15 @@
           "[SOLICITORG]",
           "[SOLICITORH]",
           "[SOLICITORI]",
-          "[SOLICITORJ]",
-          "caseworker-employment-englandwales"
+          "[SOLICITORJ]"
         ],
         "CRUD": "CRU"
+      },
+      {
+        "UserRoles": [
+          "caseworker-employment-englandwales"
+        ],
+        "CRUD": "R"
       }
     ]
   }

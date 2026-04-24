@@ -20,7 +20,8 @@
           "[SOLICITORG]",
           "[SOLICITORH]",
           "[SOLICITORI]",
-          "[SOLICITORJ]"
+          "[SOLICITORJ]",
+          "caseworker-employment-scotland"
         ],
         "CRUD": "CRU"
       }

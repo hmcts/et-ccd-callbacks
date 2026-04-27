@@ -25,6 +25,8 @@ dependencyManagement {
         mavenBom "org.springframework.boot:spring-boot-dependencies:3.5.12"
     }
     dependencies {
+        // CVE-2026-22748, CVE-2026-22746 - override above the Spring Boot BOM
+        dependency 'org.springframework.security:spring-security-crypto:6.5.10'
         dependency 'commons-fileupload:commons-fileupload:1.6.0'
         dependency 'org.apache.httpcomponents:httpclient:4.5.14'
         dependency 'org.apache.logging.log4j:log4j-core:2.25.4'

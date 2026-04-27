@@ -403,6 +403,8 @@ ext["rest-assured.version"] = '5.1.0'
 dependencyManagement {
     dependencies {
         dependency 'org.apache.httpcomponents.core5:httpcore5:5.4.2'
+        // CVE-2026-22748, CVE-2026-22746 - force override above the Spring Boot BOM
+        dependency 'org.springframework.security:spring-security-crypto:6.5.10'
         dependencySet(group: 'com.google.guava', version: '33.6.0-jre') {
             entry 'guava'
         }

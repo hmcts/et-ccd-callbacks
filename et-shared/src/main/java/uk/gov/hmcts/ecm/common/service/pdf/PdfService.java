@@ -9,6 +9,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.PDResources;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
 import org.apache.pdfbox.pdmodel.interactive.form.PDField;
 import org.springframework.stereotype.Service;
@@ -79,21 +80,21 @@ public class PdfService {
                 : cl.getResourceAsStream(pdfSource);
         if (!ObjectUtils.isEmpty(stream)) {
             try (PDDocument pdfDocument = Loader.loadPDF(
-                Objects.requireNonNull(stream))) {
-                Set<Map.Entry<String, Optional<String>>> pdfEntriesMap =
-                        buildPdfEntriesMap(caseData, pdfType, clientType, event);
+                Objects.requireNonNull(stream.readAllBytes()))) {
                 PDDocumentCatalog pdDocumentCatalog = pdfDocument.getDocumentCatalog();
                 PDAcroForm pdfForm = pdDocumentCatalog.getAcroForm();
                 PDResources defaultResources = pdfForm.getDefaultResources();
                 defaultResources.put(COSName.getPDFName(TIMES_NEW_ROMAN_PDFBOX_CHARACTER_CODE),
-                        PDType1Font.TIMES_ROMAN);
+                        new PDType1Font(Standard14Fonts.FontName.TIMES_ROMAN));
                 defaultResources.put(COSName.getPDFName(HELVETICA_PDFBOX_CHARACTER_CODE_1),
-                        PDType1Font.HELVETICA);
+                        new PDType1Font(Standard14Fonts.FontName.HELVETICA));
                 defaultResources.put(COSName.getPDFName(HELVETICA_PDFBOX_CHARACTER_CODE_2),
-                        PDType1Font.HELVETICA);
+                        new PDType1Font(Standard14Fonts.FontName.HELVETICA));
+                Set<Map.Entry<String, Optional<String>>> pdfEntriesMap =
+                        buildPdfEntriesMap(caseData, pdfType, clientType, event);
                 applyPdfEntries(pdfForm, pdfEntriesMap, caseData);
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                pdfForm.setNeedAppearances(true);
+                pdfForm.flatten();
                 pdfDocument.save(byteArrayOutputStream);
                 return byteArrayOutputStream.toByteArray();
             } finally {

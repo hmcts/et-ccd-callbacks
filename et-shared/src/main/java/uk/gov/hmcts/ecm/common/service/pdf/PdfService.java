@@ -146,7 +146,7 @@ public class PdfService {
             if (entryValue.isPresent()) {
                 try {
                     PDField pdfField = pdfForm.getField(entryKey);
-                    pdfField.setValue(entryValue.get());
+                    pdfField.setValue(sanitiseForPdf(entryValue.get()));
                 } catch (Exception e) {
                     GenericServiceUtil.logException("Error while parsing PDF file for entry key \""
                                     + entryKey, caseData.getEthosCaseReference(), e.getMessage(),
@@ -154,6 +154,22 @@ public class PdfService {
                 }
             }
         }
+    }
+
+    /**
+     * Strips invisible Unicode format characters that are not encodable in WinAnsiEncoding
+     * (e.g. zero-width spaces inserted by browsers or rich-text editors) to prevent
+     * PDFBox from failing when generating appearance streams during flattening.
+     */
+    private static String sanitiseForPdf(String value) {
+        if (value == null) {
+            return null;
+        }
+        // Strip invisible Unicode format characters (zero-width spaces, directional marks, BOM, etc.)
+        String sanitised = value.replaceAll("\\p{Cf}", "");
+        // Replace typographic Unicode space variants not in WinAnsiEncoding with a regular space
+        // e.g. figure space (U+2007), thin space (U+2009), em space (U+2003), narrow no-break space (U+202F)
+        return sanitised.replaceAll("[\\u2000-\\u200A\\u202F\\u205F\\u3000]", " ");
     }
 
     public static void safeClose(InputStream is, CaseData caseData) {

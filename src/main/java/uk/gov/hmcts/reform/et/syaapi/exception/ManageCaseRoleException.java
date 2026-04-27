@@ -16,6 +16,14 @@ public class ManageCaseRoleException extends RuntimeException {
     private static final long serialVersionUID = Long.MIN_VALUE;
 
     /**
+     *   Creates an {@link ManageCaseRoleException} with a message.
+     *   @param message exception message
+     */
+    public ManageCaseRoleException(String message) {
+        super(message);
+    }
+
+    /**
      *   Creates an {@link ManageCaseRoleException} with a cause.
      *   @param cause while trying to modify case role management
      */
@@ -23,6 +31,20 @@ public class ManageCaseRoleException extends RuntimeException {
         super(cause);
         String errorMessage = "************ ManageCaseRoleException ************"
             + "Error occurred while modifying case role: " + cause.getMessage()
+            + "\nStack trace: " + Arrays.toString(cause.getStackTrace())
+            + "***************************************************";
+        log.error(errorMessage);
+    }
+
+    /**
+     * Creates a {@link ManageCaseRoleException} with a message and cause.
+     * @param message exception message
+     * @param cause underlying cause
+     */
+    public ManageCaseRoleException(String message, Throwable cause) {
+        super(message, cause);
+        String errorMessage = "************ ManageCaseRoleException ************"
+            + "Error occurred while modifying case role: " + message
             + "\nStack trace: " + Arrays.toString(cause.getStackTrace())
             + "***************************************************";
         log.error(errorMessage);

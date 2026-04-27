@@ -109,7 +109,7 @@ public final class ManageCaseRoleServiceUtil {
 
     /**
      * This service is used to create CaseAssignmentUserRoles request with the given ModifyCaseUserRoles request to
-     * call case assignment service case-users of aac(assign case access API URrl) with POST method.
+     * call case assignment service case-users of aac(assign case access API URL) with POST method.
      * @param modifyCaseUserRolesRequest is the parameter that has the required fields for creating
      *                                   {@link CaseAssignmentUserRolesRequest} for modifying case role.
      * @return                           {@link CaseAssignmentUserRolesRequest} to use for assigning case user roles.

@@ -6335,7 +6335,7 @@
   {
     "ID": "tseAdminDecision",
     "ListElementCode": "decisionDetails",
-    "FieldType": "Text",
+    "FieldType": "TextArea",
     "ElementLabel": "Decision details",
     "SecurityClassification": "Public"
   },
@@ -6363,7 +6363,7 @@
   {
     "ID": "tseAdminDecision",
     "ListElementCode": "additionalInformation",
-    "FieldType": "Text",
+    "FieldType": "TextArea",
     "ElementLabel": "Additional information",
     "SecurityClassification": "Public"
   },
@@ -6428,7 +6428,7 @@
   {
     "ID": "tseReply",
     "ListElementCode": "response",
-    "FieldType": "Text",
+    "FieldType": "TextArea",
     "ElementLabel": "What's your response to the claimant's application",
     "SecurityClassification": "Public"
   },
@@ -6459,7 +6459,7 @@
   {
     "ID": "tseReply",
     "ListElementCode": "copyNoGiveDetails",
-    "FieldType": "Text",
+    "FieldType": "TextArea",
     "ElementLabel": "Give details",
     "SecurityClassification": "Public"
   },
@@ -6483,7 +6483,7 @@
   {
     "ID": "tseReply",
     "ListElementCode": "additionalInformation",
-    "FieldType": "Text",
+    "FieldType": "TextArea",
     "ElementLabel": "Additional information",
     "SecurityClassification": "Public"
   },
@@ -6604,7 +6604,7 @@
   {
     "ID": "genericTseDetails",
     "ListElementCode": "details",
-    "FieldType": "Text",
+    "FieldType": "TextArea",
     "ElementLabel": "What do you want to tell or ask the tribunal?",
     "SecurityClassification": "Public"
   },
@@ -6626,7 +6626,7 @@
   {
     "ID": "genericTseDetails",
     "ListElementCode": "copyToOtherPartyText",
-    "FieldType": "Text",
+    "FieldType": "TextArea",
     "ElementLabel": "Details of why you do not want to inform the other party",
     "FieldShowCondition": "copyToOtherPartyYesOrNo=\"No\"",
     "SecurityClassification": "Public"
@@ -6732,7 +6732,7 @@
   {
     "ID": "pseRespondCollection",
     "ListElementCode": "response",
-    "FieldType": "Text",
+    "FieldType": "TextArea",
     "ElementLabel": "What's your response to the tribunal?",
     "SecurityClassification": "Public",
     "DisplayOrder": 3
@@ -6774,7 +6774,7 @@
   {
     "ID": "pseRespondCollection",
     "ListElementCode": "copyNoGiveDetails",
-    "FieldType": "Text",
+    "FieldType": "TextArea",
     "ElementLabel": " ",
     "FieldShowCondition": "copyToOtherParty=\"dummy\"",
     "SecurityClassification": "Public"

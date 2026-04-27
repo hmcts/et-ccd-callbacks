@@ -258,6 +258,7 @@ public final class ClaimantRepresentativeUtils {
                 caseData.setClaimantRepresentativeRemoved(YES);
             }
             caseData.setRepresentativeClaimantType(null);
+            caseData.setClaimantRepresentedQuestion(NO);
             caseData.setClaimantRepresentativeOrganisationPolicy(OrganisationPolicy.builder().organisation(null)
                     .orgPolicyCaseAssignedRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()).build());
 

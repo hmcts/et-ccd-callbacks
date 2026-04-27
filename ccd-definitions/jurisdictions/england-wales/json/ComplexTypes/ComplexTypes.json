@@ -6900,7 +6900,7 @@
   {
     "ID": "sendNotificationCollection",
     "ListElementCode": "sendNotificationAdditionalInfo",
-    "FieldType": "Text",
+    "FieldType": "TextArea",
     "ElementLabel": "Additional information",
     "SecurityClassification": "Public",
     "DisplayOrder": 6
@@ -6986,7 +6986,7 @@
   {
     "ID": "sendNotificationCollection",
     "ListElementCode": "sendNotificationDetails",
-    "FieldType": "Text",
+    "FieldType": "TextArea",
     "ElementLabel": "Details",
     "FieldShowCondition": "date=\"dummy\"",
     "SecurityClassification": "Public"
@@ -7110,7 +7110,7 @@
   {
     "ID": "respondNotificationTypeCollection",
     "ListElementCode": "respondNotificationAdditionalInfo",
-    "FieldType": "Text",
+    "FieldType": "TextArea",
     "ElementLabel": "Additional information",
     "SecurityClassification": "Public",
     "DisplayOrder": 4

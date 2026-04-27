@@ -4,7 +4,7 @@ plugins {
     id 'checkstyle'
     id 'jacoco'
     id 'io.spring.dependency-management' version '1.1.5'
-    id 'org.springframework.boot' version '3.3.0'
+    id 'org.springframework.boot' version '3.5.12'
     id 'org.owasp.dependencycheck' version '9.2.0'
     id 'com.github.ben-manes.versions' version '0.51.0'
     id 'au.com.dius.pact' version '4.3.15'
@@ -167,7 +167,9 @@ allprojects {
             'io.netty:netty-transport-native-kqueue:4.2.12.Final',
             'io.netty:netty-transport-native-unix-common:4.2.12.Final',
             'io.netty:netty-transport-classes-epoll:4.2.12.Final',
-            'io.netty:netty-transport-classes-kqueue:4.2.12.Final'
+            'io.netty:netty-transport-classes-kqueue:4.2.12.Final',
+            // CVE-2026-22748, CVE-2026-22746
+            'org.springframework.security:spring-security-crypto:6.5.10'
         )
     }
 }
@@ -401,6 +403,8 @@ ext["rest-assured.version"] = '5.1.0'
 dependencyManagement {
     dependencies {
         dependency 'org.apache.httpcomponents.core5:httpcore5:5.4.2'
+        // CVE-2026-22748, CVE-2026-22746 - force override above the Spring Boot BOM
+        dependency 'org.springframework.security:spring-security-crypto:6.5.10'
         dependencySet(group: 'com.google.guava', version: '33.6.0-jre') {
             entry 'guava'
         }
@@ -460,7 +464,7 @@ dependencies {
     implementation group: 'org.apache.santuario', name: 'xmlsec', version: '4.0.4'
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: tomcatEmbedVersion
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: tomcatEmbedVersion
-    // CVE-2026-22732
+    // CVE-2026-22732, CVE-2026-22748, CVE-2026-22746
     implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.5.10'
     //To Remove vulnerability CVE-2020-11988
     implementation group: 'org.apache.xmlgraphics', name: 'xmlgraphics-commons', version: '2.11'
@@ -475,7 +479,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'jakarta.servlet:jakarta.servlet-api:6.1.0'
     implementation 'javax.servlet:javax.servlet-api:4.0.1'
-    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.1.2'
+    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.3.0'
     implementation group: 'org.springframework.retry', name: 'spring-retry', version: '2.0.12'
     // CVE-2022-25857
     implementation group: 'org.yaml', name: 'snakeyaml', version: '2.5'
@@ -548,7 +552,7 @@ dependencies {
     // Contract Tests
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.6.20'
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.43'
-    contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '3.3.0'
+    contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
 
     contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitJupiterVersion
     contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: junitJupiterVersion
@@ -556,7 +560,7 @@ dependencies {
     contractTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-commons', version: junitPlatformVersion
     contractTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-launcher', version: junitPlatformVersion
     contractTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-engine', version: junitPlatformVersion
-    contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.1.2'
+    contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.3.0'
     contractTestImplementation sourceSets.main.runtimeClasspath
     contractTestImplementation sourceSets.test.runtimeClasspath
 

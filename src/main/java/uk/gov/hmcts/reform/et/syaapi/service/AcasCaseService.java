@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.task.TaskExecutor;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -59,6 +60,7 @@ public class AcasCaseService {
     private final AdminUserService adminUserService;
     private final IdamClient idamClient;
     private final CaseDocumentService caseDocumentService;
+    @Qualifier("applicationTaskExecutor")
     private final TaskExecutor taskExecutor;
 
     /**

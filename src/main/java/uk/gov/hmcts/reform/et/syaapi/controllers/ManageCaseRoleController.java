@@ -75,7 +75,32 @@ public class ManageCaseRoleController {
                                                                                         modifyCaseUserRolesRequest),
                 modificationType);
         } catch (Exception e) {
-            throw new ManageCaseRoleException(e);
+            throw buildManageCaseRoleException(e);
+        }
+        return ok(response);
+    }
+
+    /**
+     * Assigns the creator role to a claimant for a case. Performs data setup and validation
+     * before assigning the role.
+     * @param modifyCaseUserRolesRequest request object which contains modify user case roles
+     * @return CaseAssignmentResponse containing case details and assignment status
+     */
+    @PostMapping("/assignCreatorRole")
+    @Operation(summary = "Assigns creator role to a claimant for a case")
+    @ApiResponseGroup
+    public ResponseEntity<CaseAssignmentResponse> assignCreatorRole(
+        @RequestHeader(AUTHORIZATION) String authorisation,
+        @NotNull @RequestBody ModifyCaseUserRolesRequest modifyCaseUserRolesRequest
+    ) {
+        CaseAssignmentResponse response;
+        try {
+            response = manageCaseRoleService.assignCreatorRole(
+                authorisation,
+                manageCaseRoleService.generateModifyCaseUserRolesRequest(authorisation, modifyCaseUserRolesRequest)
+            );
+        } catch (Exception e) {
+            throw buildManageCaseRoleException(e);
         }
         return ok(response);
     }
@@ -90,7 +115,7 @@ public class ManageCaseRoleController {
         try {
             caseDetails = manageCaseRoleService.revokeClaimantSolicitorRole(authorisation, caseSubmissionReference);
         } catch (Exception e) {
-            throw new ManageCaseRoleException(e);
+            throw buildManageCaseRoleException(e);
         }
         return ok(caseDetails);
     }
@@ -108,8 +133,15 @@ public class ManageCaseRoleController {
                                                                               caseSubmissionReference,
                                                                               respondentIndex);
         } catch (Exception e) {
-            throw new ManageCaseRoleException(e);
+            throw buildManageCaseRoleException(e);
         }
         return ok(caseDetails);
+    }
+
+    private static ManageCaseRoleException buildManageCaseRoleException(Exception exception) {
+        if (exception instanceof ManageCaseRoleException manageCaseRoleException) {
+            return manageCaseRoleException;
+        }
+        return new ManageCaseRoleException(exception);
     }
 }

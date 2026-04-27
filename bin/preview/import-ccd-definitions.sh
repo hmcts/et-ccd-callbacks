@@ -2,6 +2,11 @@
 
 set -eu
 
+CURL_CONNECT_TIMEOUT_SECONDS=30
+CURL_MAX_TIME_SECONDS=600
+CURL_RETRY_COUNT=3
+CURL_RETRY_DELAY_SECONDS=5
+
 echo "📥 Importing CCD Definitions via API"
 echo "===================================="
 
@@ -29,29 +34,55 @@ declare -a DEFINITION_FILES=(
 import_definition() {
     local file_path="$1"
     local full_path="${REPO_ROOT}/${file_path}"
+    local file_name
+    file_name="$(basename "${file_path}")"
     if [[ ! -f "${full_path}" ]]; then
         echo "❌ Error: Definition file not found: ${full_path}"
         return 1
     fi
-    
+
     local file_size=$(du -h "${full_path}" | cut -f1)
-    echo "  📋 Importing: $(basename "${file_path}") (${file_size})"
-    local response
-    response=$(curl -s -w "%{http_code}" \
+    local response_body_file
+    response_body_file=$(mktemp)
+    echo "  📋 Importing: ${file_name} (${file_size})"
+    echo "    Using HTTP/1.1 with ${CURL_RETRY_COUNT} retries, ${CURL_CONNECT_TIMEOUT_SECONDS}s connect timeout, ${CURL_MAX_TIME_SECONDS}s max time"
+
+    local http_code
+    if http_code=$(curl --silent --show-error --location \
+        --http1.1 \
+        --retry "${CURL_RETRY_COUNT}" \
+        --retry-delay "${CURL_RETRY_DELAY_SECONDS}" \
+        --retry-all-errors \
+        --connect-timeout "${CURL_CONNECT_TIMEOUT_SECONDS}" \
+        --max-time "${CURL_MAX_TIME_SECONDS}" \
+        --output "${response_body_file}" \
+        --write-out "%{http_code}" \
         -X POST \
         "${CCD_DEFINITION_STORE_API_BASE_URL}/import" \
         -H "Authorization: Bearer ${USER_TOKEN}" \
         -H "ServiceAuthorization: ${SERVICE_TOKEN}" \
-        -F "file=@${full_path}")
-    
-    local http_code="${response: -3}"
-    local response_body="${response%???}"
-    
-    if [[ "${http_code}" == "201" ]] || [[ "${http_code}" == "200" ]]; then
-        echo "    ✅ Successfully imported $(basename "${file_path}")"
+        -F "file=@${full_path}"); then
+        :
     else
-        echo "    ❌ Failed to import $(basename "${file_path}") (HTTP ${http_code})"
+        local curl_exit_code="$?"
+        echo "    ❌ curl failed to import ${file_name} (exit ${curl_exit_code})"
+        if [[ -s "${response_body_file}" ]]; then
+            echo "    Response: $(cat "${response_body_file}")"
+        fi
+        rm -f "${response_body_file}"
+        return "${curl_exit_code}"
+    fi
+
+    local response_body
+    response_body=$(cat "${response_body_file}")
+    rm -f "${response_body_file}"
+
+    if [[ "${http_code}" == "201" ]] || [[ "${http_code}" == "200" ]]; then
+        echo "    ✅ Successfully imported ${file_name}"
+    else
+        echo "    ❌ Failed to import ${file_name} (HTTP ${http_code})"
         echo "    Response: ${response_body}"
+        return 1
     fi
 }
 
@@ -64,4 +95,3 @@ for file_path in "${DEFINITION_FILES[@]}"; do
 done
 
 echo "✅ CCD definitions import completed!"
-

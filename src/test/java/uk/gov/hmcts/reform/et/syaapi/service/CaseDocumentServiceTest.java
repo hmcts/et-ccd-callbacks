@@ -396,7 +396,9 @@ class CaseDocumentServiceTest {
             ResourceNotFoundException.class, () -> caseDocumentService.downloadDocument(MOCK_TOKEN, DOCUMENT_ID));
 
         assertThat(resourceNotFoundException.getMessage())
-            .isEqualTo(String.format(RESOURCE_NOT_FOUND, DOCUMENT_ID, "404 Not Found: [no body]"));
+            .isEqualTo(String.format(RESOURCE_NOT_FOUND, DOCUMENT_ID,
+                "404 Not Found on GET request for \""
+                    + DOCUMENT_API_URL_WITH_SLASH + DOCUMENT_ID + "/binary\": [no body]"));
     }
 
     @Test
@@ -429,7 +431,9 @@ class CaseDocumentServiceTest {
             ResourceNotFoundException.class, () -> caseDocumentService.getDocumentDetails(MOCK_TOKEN, DOCUMENT_ID));
 
         assertThat(resourceNotFoundException.getMessage())
-            .isEqualTo(String.format(RESOURCE_NOT_FOUND, DOCUMENT_ID, "404 Not Found: [no body]"));
+            .isEqualTo(String.format(RESOURCE_NOT_FOUND, DOCUMENT_ID,
+                "404 Not Found on GET request for \""
+                    + DOCUMENT_API_URL_WITH_SLASH + DOCUMENT_ID + "\": [no body]"));
     }
 
     @Test

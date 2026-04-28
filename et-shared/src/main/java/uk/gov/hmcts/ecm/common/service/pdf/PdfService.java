@@ -23,6 +23,8 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -174,7 +176,23 @@ public class PdfService {
         // U+2010 hyphen, U+2011 non-breaking hyphen, U+2012 figure dash → regular hyphen-minus
         // U+2015 horizontal bar, U+2E3A two-em dash, U+2E3B three-em dash → regular hyphen-minus
         sanitised = sanitised.replaceAll("[\\u2010-\\u2012\\uFE58\\uFE63\\uFF0D]", "-");
-        return sanitised.replaceAll("[\\u2015\\u2E3A\\u2E3B]", "-");
+        sanitised = sanitised.replaceAll("[\\u2015\\u2E3A\\u2E3B]", "-");
+        // Replace mathematical minus sign (U+2212) with hyphen-minus
+        sanitised = sanitised.replace("−", "-");
+        // Final catch-all: strip any character still not encodable in Windows-1252 (WinAnsiEncoding).
+        // This covers symbols, emoji, CJK, Arabic, Cyrillic, and any future edge-case characters.
+        CharsetEncoder winAnsi = Charset.forName("windows-1252").newEncoder();
+        StringBuilder result = new StringBuilder(sanitised.length());
+        for (int i = 0; i < sanitised.length();) {
+            int codePoint = sanitised.codePointAt(i);
+            int charCount = Character.charCount(codePoint);
+            if (codePoint < 0x10000 && winAnsi.canEncode((char) codePoint)) {
+                result.append((char) codePoint);
+            }
+            // else: supplementary character or unencodable in WinAnsiEncoding — drop it
+            i += charCount;
+        }
+        return result.toString();
     }
 
     public static void safeClose(InputStream is, CaseData caseData) {

@@ -756,4 +756,16 @@ final class RespondentRepresentativeUtilsTest {
         assertThat(caseData.getRespondentCollection().getFirst().getValue().getRepresented()).isEqualTo(NO);
         assertThat(caseData.getRespondentCollection().getFirst().getValue().getRepresentativeRemoved()).isEqualTo(YES);
     }
+
+    @Test
+    void theFindCaseUserAssignmentsByRepresentativeId() {
+        // when representative not found should return empty list
+        CaseUserAssignment caseUserAssignment = CaseUserAssignment.builder().userId(REPRESENTATIVE_ID_1).build();
+        List<CaseUserAssignment> caseUserAssignments = List.of(caseUserAssignment);
+        assertThat(RespondentRepresentativeUtils.findCaseUserAssignmentsByRepresentativeId(caseUserAssignments,
+                REPRESENTATIVE_ID_2)).isEmpty();
+        // when representative found should return a list with that representative
+        assertThat(RespondentRepresentativeUtils.findCaseUserAssignmentsByRepresentativeId(caseUserAssignments,
+                REPRESENTATIVE_ID_1)).hasSize(NumberUtils.INTEGER_ONE).contains(caseUserAssignment);
+    }
 }

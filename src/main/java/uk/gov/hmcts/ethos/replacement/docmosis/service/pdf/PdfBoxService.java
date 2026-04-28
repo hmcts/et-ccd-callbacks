@@ -191,7 +191,12 @@ public class PdfBoxService {
         String sanitised = value.replaceAll("\\p{Cf}", "");
         // Replace typographic Unicode space variants not in WinAnsiEncoding with a regular space
         // e.g. figure space (U+2007), thin space (U+2009), em space (U+2003), narrow no-break space (U+202F)
-        return sanitised.replaceAll("[\\u2000-\\u200A\\u202F\\u205F\\u3000]", " ");
+        sanitised = sanitised.replaceAll("[\\u2000-\\u200A\\u202F\\u205F\\u3000]", " ");
+        // Replace unsupported hyphen/dash variants with the nearest WinAnsiEncoding equivalent
+        // U+2010 hyphen, U+2011 non-breaking hyphen, U+2012 figure dash → regular hyphen-minus
+        // U+2015 horizontal bar, U+2E3A two-em dash, U+2E3B three-em dash → regular hyphen-minus
+        sanitised = sanitised.replaceAll("[\\u2010-\\u2012\\uFE58\\uFE63\\uFF0D]", "-");
+        return sanitised.replaceAll("[\\u2015\\u2E3A\\u2E3B]", "-");
     }
 
     private static void safeClose(InputStream is, CaseData caseData) {

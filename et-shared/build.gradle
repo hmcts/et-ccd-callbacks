@@ -22,7 +22,7 @@ repositories {
 
 dependencyManagement {
     imports {
-        mavenBom "org.springframework.boot:spring-boot-dependencies:3.5.12"
+        mavenBom "org.springframework.boot:spring-boot-dependencies:3.5.14"
     }
     dependencies {
         // CVE-2026-22748, CVE-2026-22746 - override above the Spring Boot BOM

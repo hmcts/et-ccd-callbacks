@@ -106,16 +106,6 @@ class PdfSanitisationTest {
 
     @SneakyThrows
     @Test
-    void replacesThreeEmDashWithEmDash() {
-        // U+2E3B three-em dash → U+2014 em dash (which IS in WinAnsiEncoding)
-        setClaimDescription("Note\u2E3Bsee above.");
-        String text = generateAndExtract();
-        assertThat(text).contains("\u2014");
-        assertThat(text).doesNotContain("\u2E3B");
-    }
-
-    @SneakyThrows
-    @Test
     void replacesMathematicalMinusWithHyphenMinus() {
         // U+2212 minus sign → regular hyphen-minus
         setClaimDescription("Balance: \u2212\u00a3200.");

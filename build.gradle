@@ -4,7 +4,7 @@ plugins {
     id 'checkstyle'
     id 'jacoco'
     id 'io.spring.dependency-management' version '1.1.5'
-    id 'org.springframework.boot' version '3.5.12'
+    id 'org.springframework.boot' version '3.5.14'
     id 'org.owasp.dependencycheck' version '9.2.0'
     id 'com.github.ben-manes.versions' version '0.51.0'
     id 'au.com.dius.pact' version '4.3.15'
@@ -138,7 +138,7 @@ allprojects {
             'commons-fileupload:commons-fileupload:1.6.0',
             'org.apache.httpcomponents:httpclient:4.5.14',
             'org.apache.logging.log4j:log4j-core:2.25.4',
-            'com.nimbusds:nimbus-jose-jwt:10.5',
+            'com.nimbusds:nimbus-jose-jwt:10.9',
             'net.minidev:json-smart:2.5.2',
             'com.squareup.okhttp3:logging-interceptor:4.12.0',
             'com.squareup.okhttp3:okhttp:4.12.0',
@@ -443,7 +443,7 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '8.0.0'
     implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '8.1'
-    implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.5'
+    implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.9'
 
     // Log4J core added to remove startup error message
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4JVersion
@@ -479,7 +479,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'jakarta.servlet:jakarta.servlet-api:6.1.0'
     implementation 'javax.servlet:javax.servlet-api:4.0.1'
-    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.3.0'
+    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.3.2'
     implementation group: 'org.springframework.retry', name: 'spring-retry', version: '2.0.12'
     // CVE-2022-25857
     implementation group: 'org.yaml', name: 'snakeyaml', version: '2.5'
@@ -499,7 +499,7 @@ dependencies {
     implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
     implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.13.2'
 
-    implementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.2.4', {
+    implementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.2.6_CCD-7522', {
         exclude group: 'org.apache.commons', module: 'commons-compress'
         exclude group: 'com.google.guava', module: 'guava'
         exclude group: 'org.apache.poi', module: 'poi-ooxml'
@@ -560,7 +560,7 @@ dependencies {
     contractTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-commons', version: junitPlatformVersion
     contractTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-launcher', version: junitPlatformVersion
     contractTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-engine', version: junitPlatformVersion
-    contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.3.0'
+    contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.3.2'
     contractTestImplementation sourceSets.main.runtimeClasspath
     contractTestImplementation sourceSets.test.runtimeClasspath
 

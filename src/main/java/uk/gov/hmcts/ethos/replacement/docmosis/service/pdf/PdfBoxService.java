@@ -205,15 +205,9 @@ public class PdfBoxService {
         // This covers symbols, emoji, CJK, Arabic, Cyrillic, and any future edge-case characters.
         CharsetEncoder winAnsi = Charset.forName("windows-1252").newEncoder();
         StringBuilder result = new StringBuilder(sanitised.length());
-        for (int i = 0; i < sanitised.length();) {
-            int codePoint = sanitised.codePointAt(i);
-            int charCount = Character.charCount(codePoint);
-            if (codePoint < 0x10000 && winAnsi.canEncode((char) codePoint)) {
-                result.append((char) codePoint);
-            }
-            // else: supplementary character or unencodable in WinAnsiEncoding — drop it
-            i += charCount;
-        }
+        sanitised.codePoints()
+                .filter(cp -> cp < 0x10000 && winAnsi.canEncode((char) cp))
+                .forEach(result::appendCodePoint);
         return result.toString();
     }
 

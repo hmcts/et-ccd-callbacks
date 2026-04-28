@@ -9,6 +9,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.PDResources;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
 import org.apache.pdfbox.pdmodel.interactive.form.PDField;
 import org.springframework.stereotype.Service;
@@ -79,21 +80,21 @@ public class PdfService {
                 : cl.getResourceAsStream(pdfSource);
         if (!ObjectUtils.isEmpty(stream)) {
             try (PDDocument pdfDocument = Loader.loadPDF(
-                Objects.requireNonNull(stream))) {
-                Set<Map.Entry<String, Optional<String>>> pdfEntriesMap =
-                        buildPdfEntriesMap(caseData, pdfType, clientType, event);
+                Objects.requireNonNull(stream.readAllBytes()))) {
                 PDDocumentCatalog pdDocumentCatalog = pdfDocument.getDocumentCatalog();
                 PDAcroForm pdfForm = pdDocumentCatalog.getAcroForm();
                 PDResources defaultResources = pdfForm.getDefaultResources();
                 defaultResources.put(COSName.getPDFName(TIMES_NEW_ROMAN_PDFBOX_CHARACTER_CODE),
-                        PDType1Font.TIMES_ROMAN);
+                        new PDType1Font(Standard14Fonts.FontName.TIMES_ROMAN));
                 defaultResources.put(COSName.getPDFName(HELVETICA_PDFBOX_CHARACTER_CODE_1),
-                        PDType1Font.HELVETICA);
+                        new PDType1Font(Standard14Fonts.FontName.HELVETICA));
                 defaultResources.put(COSName.getPDFName(HELVETICA_PDFBOX_CHARACTER_CODE_2),
-                        PDType1Font.HELVETICA);
+                        new PDType1Font(Standard14Fonts.FontName.HELVETICA));
+                Set<Map.Entry<String, Optional<String>>> pdfEntriesMap =
+                        buildPdfEntriesMap(caseData, pdfType, clientType, event);
                 applyPdfEntries(pdfForm, pdfEntriesMap, caseData);
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                pdfForm.setNeedAppearances(true);
+                pdfForm.flatten();
                 pdfDocument.save(byteArrayOutputStream);
                 return byteArrayOutputStream.toByteArray();
             } finally {
@@ -145,7 +146,7 @@ public class PdfService {
             if (entryValue.isPresent()) {
                 try {
                     PDField pdfField = pdfForm.getField(entryKey);
-                    pdfField.setValue(entryValue.get());
+                    pdfField.setValue(sanitiseForPdf(entryValue.get()));
                 } catch (Exception e) {
                     GenericServiceUtil.logException("Error while parsing PDF file for entry key \""
                                     + entryKey, caseData.getEthosCaseReference(), e.getMessage(),
@@ -153,6 +154,27 @@ public class PdfService {
                 }
             }
         }
+    }
+
+    /**
+     * Strips invisible Unicode format characters that are not encodable in WinAnsiEncoding
+     * (e.g. zero-width spaces inserted by browsers or rich-text editors) to prevent
+     * PDFBox from failing when generating appearance streams during flattening.
+     */
+    private static String sanitiseForPdf(String value) {
+        if (value == null) {
+            return null;
+        }
+        // Strip invisible Unicode format characters (zero-width spaces, directional marks, BOM, etc.)
+        String sanitised = value.replaceAll("\\p{Cf}", "");
+        // Replace typographic Unicode space variants not in WinAnsiEncoding with a regular space
+        // e.g. figure space (U+2007), thin space (U+2009), em space (U+2003), narrow no-break space (U+202F)
+        sanitised = sanitised.replaceAll("[\\u2000-\\u200A\\u202F\\u205F\\u3000]", " ");
+        // Replace unsupported hyphen/dash variants with the nearest WinAnsiEncoding equivalent
+        // U+2010 hyphen, U+2011 non-breaking hyphen, U+2012 figure dash → regular hyphen-minus
+        // U+2015 horizontal bar, U+2E3A two-em dash, U+2E3B three-em dash → regular hyphen-minus
+        sanitised = sanitised.replaceAll("[\\u2010-\\u2012\\uFE58\\uFE63\\uFF0D]", "-");
+        return sanitised.replaceAll("[\\u2015\\u2E3A\\u2E3B]", "-");
     }
 
     public static void safeClose(InputStream is, CaseData caseData) {

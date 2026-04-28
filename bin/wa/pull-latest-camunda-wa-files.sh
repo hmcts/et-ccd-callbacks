@@ -11,7 +11,7 @@ git checkout ${branchName}
 cd ..
 
 #Copy camunda folder which contains bpmn files
-cp -r ./wa-standalone-task-bpmn/src/main/resources .
+cp -r ./wa-standalone-task-bpmn/src/main/resources ./camunda
 rm -rf ./wa-standalone-task-bpmn
 
 #upload bpmn files to environment

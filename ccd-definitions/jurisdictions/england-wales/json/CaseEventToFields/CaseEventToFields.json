@@ -5372,13 +5372,38 @@
   {
     "CaseTypeID": "ET_EnglandWales",
     "CaseEventID": "updateReferral",
+    "CaseFieldID": "referralCollection",
+    "DisplayContext": "COMPLEX",
+    "FieldShowCondition": "selectReferral=\"dummy\"",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 3,
+    "ShowSummaryChangeOption": "Y",
+    "PageColumnNumber": 1
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseEventID": "updateReferral",
+    "CaseFieldID": "nextListedDate",
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "selectReferral=\"dummy\"",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 4,
+    "Publish": "Y",
+    "PageColumnNumber": 1
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseEventID": "updateReferral",
     "CaseFieldID": "selectReferral",
     "DisplayContext": "MANDATORY",
     "PageID": 1,
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 1,
     "CallBackURLMidEvent": "${ET_COS_URL}/updateReferral/initHearingAndReferralDetails",
-    "PageLabel": "Update Referral"
+    "PageLabel": "Update Referral",
+    "PageColumnNumber": 1
   },
   {
     "CaseTypeID": "ET_EnglandWales",

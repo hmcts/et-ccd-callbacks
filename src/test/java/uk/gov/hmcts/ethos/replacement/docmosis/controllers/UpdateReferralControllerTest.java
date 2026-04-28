@@ -23,6 +23,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.config.TestSecurityConfig;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReferralService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -62,6 +63,8 @@ class UpdateReferralControllerTest {
     private DocumentManagementService documentManagementService;
     @MockBean
     private ReferralService referralService;
+    @MockBean
+    private FeatureToggleService featureToggleService;
     @Autowired
     private MockMvc mockMvc;
     @Autowired

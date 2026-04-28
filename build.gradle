@@ -499,7 +499,7 @@ dependencies {
     implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
     implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.13.2'
 
-    implementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.2.4', {
+    implementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.2.6_CCD-7522', {
         exclude group: 'org.apache.commons', module: 'commons-compress'
         exclude group: 'com.google.guava', module: 'guava'
         exclude group: 'org.apache.poi', module: 'poi-ooxml'

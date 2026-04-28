@@ -943,4 +943,35 @@ public final class RespondentRepresentativeUtils {
         }
         caseData.setRepCollection(repCollection);
     }
+
+    /**
+     * Finds all case user assignments that belong to the given representative ID.
+     *
+     * <p>This method iterates through the provided list of case user assignments and returns a new list
+     * containing only the assignments where the assignment user ID matches the given representative ID.</p>
+     *
+     * <p>Assumptions:</p>
+     * <ul>
+     *     <li>{@code caseUserAssignments} is not {@code null}.</li>
+     *     <li>{@code caseUserAssignments} does not contain {@code null} items.</li>
+     *     <li>{@code representativeId} is not {@code null}.</li>
+     *     <li>The comparison is an exact {@link String#equals(Object)} match.</li>
+     *     <li>The order of matching assignments is preserved.</li>
+     * </ul>
+     *
+     * @param caseUserAssignments the list of case user assignments to search
+     * @param representativeId the user ID of the representative whose assignments should be returned
+     * @return a new list containing the case user assignments for the given representative ID;
+     *         an empty list if no matching assignments are found
+     */
+    public static List<CaseUserAssignment> findCaseUserAssignmentsByRepresentativeId(
+            List<CaseUserAssignment> caseUserAssignments, String representativeId) {
+        List<CaseUserAssignment> tmpCaseUserAssignments = new ArrayList<>();
+        for (CaseUserAssignment caseUserAssignment : caseUserAssignments) {
+            if (representativeId.equals(caseUserAssignment.getUserId())) {
+                tmpCaseUserAssignments.add(caseUserAssignment);
+            }
+        }
+        return tmpCaseUserAssignments;
+    }
 }

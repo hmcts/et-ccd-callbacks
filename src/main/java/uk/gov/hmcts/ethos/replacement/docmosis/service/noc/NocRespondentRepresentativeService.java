@@ -379,6 +379,18 @@ public class NocRespondentRepresentativeService {
                 }
                 representativesToRevoke.add(representative);
                 caseUserAssignmentsToRevoke.add(caseUserAssignment);
+                // Assignments automatically created by CCD for representatives linked to other respondents.
+                // These are not recorded in the representative collection, but are added to support same company's
+                // representatives. This auto assignments business is still in architectural design check.
+                List<CaseUserAssignment> remainingCaseUserAssignments = new ArrayList<>(caseUserAssignments
+                        .getCaseUserAssignments());
+                remainingCaseUserAssignments.remove(caseUserAssignment);
+                List<CaseUserAssignment> otherAssignmentsOfRepresentative =
+                        findCaseAssignmentsToRevokeForRep(callbackRequest.getCaseDetails(),
+                                remainingCaseUserAssignments, representative);
+                if (CollectionUtils.isNotEmpty(otherAssignmentsOfRepresentative)) {
+                    caseUserAssignmentsToRevoke.addAll(otherAssignmentsOfRepresentative);
+                }
             }
         }
         try {
@@ -388,6 +400,74 @@ public class NocRespondentRepresentativeService {
             return new ArrayList<>();
         }
         return representativesToRevoke;
+    }
+
+    /**
+     * Finds the case user assignments that should be revoked for the given representative.
+     *
+     * <p>The method looks up the representative's user identifier using their email address, then
+     * filters the provided case user assignments to find assignments belonging to that representative.
+     * If the case no longer contains a matching representative with the same respondent ID and email
+     * address, those existing assignments are returned for revocation.</p>
+     *
+     * <p>If the case details, representative details, case assignments, or representative email address
+     * are missing, an empty list is returned. An empty list is also returned if the representative user
+     * lookup fails.</p>
+     *
+     * <p>If the case representative collection is empty, all existing assignments for the representative
+     * are returned, as there are no remaining representative records on the case.</p>
+     *
+     * @param caseDetails the case details containing case data and representative collection
+     * @param caseUserAssignments the existing case user assignments for the case
+     * @param representative the representative whose assignments should be checked for revocation
+     * @return a list of case user assignments that should be revoked for the representative, or an empty
+     *         list if none are found or the required data is unavailable
+     */
+    public List<CaseUserAssignment> findCaseAssignmentsToRevokeForRep(CaseDetails caseDetails,
+                                                                      List<CaseUserAssignment> caseUserAssignments,
+                                                                      RepresentedTypeRItem representative) {
+        if (ObjectUtils.isEmpty(caseDetails)
+                || StringUtils.isBlank(caseDetails.getCaseId())
+                || ObjectUtils.isEmpty(caseDetails.getCaseData())
+                || CollectionUtils.isEmpty(caseUserAssignments)
+                || ObjectUtils.isEmpty(representative)
+                || ObjectUtils.isEmpty(representative.getValue())
+                || StringUtils.isEmpty(representative.getValue().getRepresentativeEmailAddress())) {
+            return new ArrayList<>();
+        }
+        AccountIdByEmailResponse accountIdByEmailResponse;
+        try {
+            accountIdByEmailResponse = nocService.findUserByEmail(
+                    adminUserService.getAdminUserToken(), representative.getValue().getRepresentativeEmailAddress(),
+                    caseDetails.getCaseId());
+        } catch (GenericServiceException e) {
+            log.warn(e.getMessage());
+            return new ArrayList<>();
+        }
+        List<CaseUserAssignment> representativeRemainingAssignments = RespondentRepresentativeUtils
+                .findCaseUserAssignmentsByRepresentativeId(caseUserAssignments,
+                        accountIdByEmailResponse.getUserIdentifier());
+        if (CollectionUtils.isEmpty(caseDetails.getCaseData().getRepCollection())) {
+            return representativeRemainingAssignments;
+        }
+        List<CaseUserAssignment> caseUserAssignmentsToRevoke = new ArrayList<>();
+        for (CaseUserAssignment caseUserAssignment : representativeRemainingAssignments) {
+            boolean representativeFound = false;
+            for (RepresentedTypeRItem tmpRepresentative : caseDetails.getCaseData().getRepCollection()) {
+                if (ObjectUtils.isNotEmpty(tmpRepresentative.getValue())
+                        && StringUtils.isNotBlank(representative.getValue().getRespondentId())
+                        && representative.getValue().getRespondentId()
+                        .equals(tmpRepresentative.getValue().getRespondentId())
+                        && representative.getValue().getRepresentativeEmailAddress().equals(
+                        tmpRepresentative.getValue().getRepresentativeEmailAddress())) {
+                    representativeFound = true;
+                }
+            }
+            if (!representativeFound) {
+                caseUserAssignmentsToRevoke.add(caseUserAssignment);
+            }
+        }
+        return caseUserAssignmentsToRevoke;
     }
 
     /**

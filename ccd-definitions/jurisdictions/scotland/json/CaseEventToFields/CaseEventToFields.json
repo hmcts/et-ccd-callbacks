@@ -5610,6 +5610,30 @@
   {
     "CaseTypeID": "ET_Scotland",
     "CaseEventID": "updateReferral",
+    "CaseFieldID": "referralCollection",
+    "DisplayContext": "COMPLEX",
+    "FieldShowCondition": "selectReferral=\"dummy\"",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 3,
+    "ShowSummaryChangeOption": "Y",
+    "PageColumnNumber": 1
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "updateReferral",
+    "CaseFieldID": "nextListedDate",
+    "DisplayContext": "OPTIONAL",
+    "FieldShowCondition": "selectReferral=\"dummy\"",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 4,
+    "Publish": "Y",
+    "PageColumnNumber": 1
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "CaseEventID": "updateReferral",
     "CaseFieldID": "referralHearingDetails",
     "FieldShowCondition": "referralHearingDetailsLabel=\"dummy\"",
     "DisplayContext": "READONLY",

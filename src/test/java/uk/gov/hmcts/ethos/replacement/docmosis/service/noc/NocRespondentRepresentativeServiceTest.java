@@ -701,6 +701,88 @@ class NocRespondentRepresentativeServiceTest {
                 USER_TOKEN, representativesToRemove)).isEmpty();
     }
 
+    @Test
+    @SneakyThrows
+    void theFindCaseAssignmentsToRevokeForRep() {
+        // when case details is empty should return an empty list.
+        CaseUserAssignment caseUserAssignment = CaseUserAssignment.builder().userId(REPRESENTATIVE_ID_ONE)
+                .caseId(CASE_ID_1).caseRole(ROLE_SOLICITORA).build();
+        List<CaseUserAssignment> caseUserAssignments = List.of(caseUserAssignment);
+        RepresentedTypeRItem representativeAsParameter = RepresentedTypeRItem.builder().build();
+        assertThat(nocRespondentRepresentativeService.findCaseAssignmentsToRevokeForRep(null,
+                caseUserAssignments, representativeAsParameter)).isEmpty();
+        // when case details does not have case id should return an empty list
+        CaseDetails caseDetails = new CaseDetails();
+        assertThat(nocRespondentRepresentativeService.findCaseAssignmentsToRevokeForRep(caseDetails,
+                caseUserAssignments, representativeAsParameter)).isEmpty();
+        // when case details does not have case data should return an empty list
+        caseDetails.setCaseId(CASE_ID_1);
+        assertThat(nocRespondentRepresentativeService.findCaseAssignmentsToRevokeForRep(caseDetails,
+                caseUserAssignments, representativeAsParameter)).isEmpty();
+        // when case user assignments are empty should return an empty list
+        CaseData tmpCaseData = new CaseData();
+        caseDetails.setCaseData(tmpCaseData);
+        assertThat(nocRespondentRepresentativeService.findCaseAssignmentsToRevokeForRep(caseDetails,
+                List.of(), representativeAsParameter)).isEmpty();
+        // when representativeAsParameter is empty should return an empty list
+        assertThat(nocRespondentRepresentativeService.findCaseAssignmentsToRevokeForRep(caseDetails,
+                caseUserAssignments, null)).isEmpty();
+        // when representativeAsParameter does not have value should return an empty list
+        assertThat(nocRespondentRepresentativeService.findCaseAssignmentsToRevokeForRep(caseDetails,
+                caseUserAssignments, representativeAsParameter)).isEmpty();
+        // when representativeAsParameter does not have email address should return an empty list
+        RepresentedTypeR representativeAsParameterValue = RepresentedTypeR.builder().build();
+        representativeAsParameter.setValue(representativeAsParameterValue);
+        assertThat(nocRespondentRepresentativeService.findCaseAssignmentsToRevokeForRep(caseDetails,
+                caseUserAssignments, representativeAsParameter)).isEmpty();
+        // when both case data representative collection and representatives remaining assignments are empty should
+        // return empty list.
+        representativeAsParameterValue.setRepresentativeEmailAddress(REPRESENTATIVE_EMAIL_1);
+        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
+        AccountIdByEmailResponse accountIdByEmailResponse = new  AccountIdByEmailResponse();
+        accountIdByEmailResponse.setUserIdentifier(REPRESENTATIVE_ID_TWO);
+        when(nocService.findUserByEmail(ADMIN_USER_TOKEN, REPRESENTATIVE_EMAIL_1, CASE_ID_1)).thenReturn(
+            accountIdByEmailResponse);
+        assertThat(nocRespondentRepresentativeService.findCaseAssignmentsToRevokeForRep(caseDetails,
+                caseUserAssignments, representativeAsParameter)).isEmpty();
+        // when case data representative collection is empty should return remaining assignments.
+        accountIdByEmailResponse.setUserIdentifier(REPRESENTATIVE_ID_ONE);
+        assertThat(nocRespondentRepresentativeService.findCaseAssignmentsToRevokeForRep(caseDetails,
+                caseUserAssignments, representativeAsParameter)).isNotEmpty().isEqualTo(List.of(caseUserAssignment));
+        // when case data representative collection exists with a non value should return remaining
+        // assignments.
+        RepresentedTypeRItem representativeInRepCollection = RepresentedTypeRItem.builder().build();
+        tmpCaseData.setRepCollection(List.of(representativeInRepCollection));
+        assertThat(nocRespondentRepresentativeService.findCaseAssignmentsToRevokeForRep(caseDetails,
+                caseUserAssignments, representativeAsParameter)).isNotEmpty().isEqualTo(List.of(caseUserAssignment));
+        // when representative in rep collection not has respondent id should return remaining assignments
+        representativeInRepCollection.setValue(RepresentedTypeR.builder().build());
+        assertThat(nocRespondentRepresentativeService.findCaseAssignmentsToRevokeForRep(caseDetails,
+                caseUserAssignments, representativeAsParameter)).isNotEmpty().isEqualTo(List.of(caseUserAssignment));
+        // when representative in rep collection does not have same respondent id as representativeAsParameter should
+        // return remaining assignments
+        representativeAsParameterValue.setRespondentId(RESPONDENT_ID_ONE);
+        representativeInRepCollection.getValue().setRespondentId(RESPONDENT_ID_TWO);
+        assertThat(nocRespondentRepresentativeService.findCaseAssignmentsToRevokeForRep(caseDetails,
+                caseUserAssignments, representativeAsParameter)).isNotEmpty().isEqualTo(List.of(caseUserAssignment));
+        // when representative in rep collection has different email address than the email address of
+        // representativeAsParameter should return remaining assignments
+        representativeInRepCollection.getValue().setRespondentId(RESPONDENT_ID_ONE);
+        representativeInRepCollection.getValue().setRepresentativeEmailAddress(REPRESENTATIVE_EMAIL_2);
+        assertThat(nocRespondentRepresentativeService.findCaseAssignmentsToRevokeForRep(caseDetails,
+                caseUserAssignments, representativeAsParameter)).isNotEmpty().isEqualTo(List.of(caseUserAssignment));
+        // when representative in rep collection is the same as the representative as parameter should return
+        // empty list.
+        representativeInRepCollection.getValue().setRepresentativeEmailAddress(REPRESENTATIVE_EMAIL_1);
+        assertThat(nocRespondentRepresentativeService.findCaseAssignmentsToRevokeForRep(caseDetails,
+                caseUserAssignments, representativeAsParameter)).isEmpty();
+        // when user not found by email address should return empty list
+        when(nocService.findUserByEmail(ADMIN_USER_TOKEN, REPRESENTATIVE_EMAIL_1, CASE_ID_1)).thenThrow(
+                new GenericServiceException(EXCEPTION_DUMMY_MESSAGE));
+        assertThat(nocRespondentRepresentativeService.findCaseAssignmentsToRevokeForRep(caseDetails,
+                caseUserAssignments, representativeAsParameter)).isEmpty();
+    }
+
     private void verifyNocCcdServiceCaseAssignmentsCall(int callNumber) {
         verify(nocCcdService, times(callNumber)).retrieveCaseUserAssignments(ADMIN_USER_TOKEN,
                 CASE_ID_1);

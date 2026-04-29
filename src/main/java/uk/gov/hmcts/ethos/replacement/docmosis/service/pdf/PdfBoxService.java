@@ -10,6 +10,7 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.PDResources;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
 import org.apache.pdfbox.pdmodel.interactive.form.PDField;
 import org.springframework.stereotype.Service;
@@ -21,6 +22,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
+import java.nio.charset.CharsetEncoder;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -133,9 +136,12 @@ public class PdfBoxService {
         if (stream != null) {
             try (PDDocument pdfDocument = Loader.loadPDF(Objects.requireNonNull(stream.readAllBytes()))) {
                 PDResources resources = new PDResources();
-                resources.put(COSName.getPDFName(TIMES_NEW_ROMAN_PDFBOX_CHARACTER_CODE), PDType1Font.TIMES_ROMAN);
-                resources.put(COSName.getPDFName(HELVETICA_PDFBOX_CHARACTER_CODE_1), PDType1Font.HELVETICA);
-                resources.put(COSName.getPDFName(HELVETICA_PDFBOX_CHARACTER_CODE_2), PDType1Font.HELVETICA);
+                resources.put(COSName.getPDFName(TIMES_NEW_ROMAN_PDFBOX_CHARACTER_CODE),
+                        new PDType1Font(Standard14Fonts.FontName.TIMES_ROMAN));
+                resources.put(COSName.getPDFName(HELVETICA_PDFBOX_CHARACTER_CODE_1),
+                        new PDType1Font(Standard14Fonts.FontName.HELVETICA));
+                resources.put(COSName.getPDFName(HELVETICA_PDFBOX_CHARACTER_CODE_2),
+                        new PDType1Font(Standard14Fonts.FontName.HELVETICA));
                 PDDocumentCatalog pdDocumentCatalog = pdfDocument.getDocumentCatalog();
                 PDAcroForm pdfForm = pdDocumentCatalog.getAcroForm();
                 pdfForm.setDefaultResources(resources);
@@ -147,7 +153,7 @@ public class PdfBoxService {
                     }
                 }
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                pdfForm.setNeedAppearances(true);
+                pdfForm.flatten();
                 pdfDocument.save(byteArrayOutputStream);
                 return byteArrayOutputStream.toByteArray();
             } catch (GenericServiceException e) {
@@ -166,12 +172,43 @@ public class PdfBoxService {
                                     String entryKey) {
         try {
             PDField pdfField = pdfForm.getField(entryKey);
-            pdfField.setValue(entryValue.orElse(STRING_EMPTY));
+            pdfField.setValue(sanitiseForPdf(entryValue.orElse(STRING_EMPTY)));
         } catch (Exception ex) {
             logException(String.format(PDF_SERVICE_EXCEPTION_FIRST_WORD_WHEN_UNABLE_TO_PUT_FIELD_TO_PDF_FILE, entryKey),
                     caseData.getEthosCaseReference(), ex.getMessage(),
                     PDF_SERVICE_CLASS_NAME, PUT_PDF_FIELD_METHOD_NAME);
         }
+    }
+
+    /**
+     * Strips invisible Unicode format characters that are not encodable in WinAnsiEncoding
+     * (e.g. zero-width spaces inserted by browsers or rich-text editors) to prevent
+     * PDFBox from failing when generating appearance streams during flattening.
+     */
+    private static String sanitiseForPdf(String value) {
+        if (value == null) {
+            return null;
+        }
+        // Strip invisible Unicode format characters (zero-width spaces, directional marks, BOM, etc.)
+        String sanitised = value.replaceAll("\\p{Cf}", "");
+        // Replace typographic Unicode space variants not in WinAnsiEncoding with a regular space
+        // e.g. figure space (U+2007), thin space (U+2009), em space (U+2003), narrow no-break space (U+202F)
+        sanitised = sanitised.replaceAll("[\\u2000-\\u200A\\u202F\\u205F\\u3000]", " ");
+        // Replace unsupported hyphen/dash variants with the nearest WinAnsiEncoding equivalent
+        // U+2010 hyphen, U+2011 non-breaking hyphen, U+2012 figure dash → regular hyphen-minus
+        // U+2015 horizontal bar, U+2E3A two-em dash, U+2E3B three-em dash → regular hyphen-minus
+        sanitised = sanitised.replaceAll("[\\u2010-\\u2012\\uFE58\\uFE63\\uFF0D]", "-");
+        sanitised = sanitised.replaceAll("[\\u2015\\u2E3A\\u2E3B]", "-");
+        // Replace mathematical minus sign (U+2212) with hyphen-minus
+        sanitised = sanitised.replace("−", "-");
+        // Final catch-all: strip any character still not encodable in Windows-1252 (WinAnsiEncoding).
+        // This covers symbols, emoji, CJK, Arabic, Cyrillic, and any future edge-case characters.
+        CharsetEncoder winAnsi = Charset.forName("windows-1252").newEncoder();
+        StringBuilder result = new StringBuilder(sanitised.length());
+        sanitised.codePoints()
+                .filter(cp -> cp < 0x10000 && winAnsi.canEncode((char) cp))
+                .forEach(result::appendCodePoint);
+        return result.toString();
     }
 
     private static void safeClose(InputStream is, CaseData caseData) {

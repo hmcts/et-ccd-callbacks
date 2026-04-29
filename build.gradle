@@ -4,7 +4,7 @@ plugins {
     id 'checkstyle'
     id 'jacoco'
     id 'io.spring.dependency-management' version '1.1.5'
-    id 'org.springframework.boot' version '3.3.0'
+    id 'org.springframework.boot' version '3.5.14'
     id 'org.owasp.dependencycheck' version '9.2.0'
     id 'com.github.ben-manes.versions' version '0.51.0'
     id 'au.com.dius.pact' version '4.3.15'
@@ -138,7 +138,7 @@ allprojects {
             'commons-fileupload:commons-fileupload:1.6.0',
             'org.apache.httpcomponents:httpclient:4.5.14',
             'org.apache.logging.log4j:log4j-core:2.25.4',
-            'com.nimbusds:nimbus-jose-jwt:10.5',
+            'com.nimbusds:nimbus-jose-jwt:10.9',
             'net.minidev:json-smart:2.5.2',
             'com.squareup.okhttp3:logging-interceptor:4.12.0',
             'com.squareup.okhttp3:okhttp:4.12.0',
@@ -167,7 +167,9 @@ allprojects {
             'io.netty:netty-transport-native-kqueue:4.2.12.Final',
             'io.netty:netty-transport-native-unix-common:4.2.12.Final',
             'io.netty:netty-transport-classes-epoll:4.2.12.Final',
-            'io.netty:netty-transport-classes-kqueue:4.2.12.Final'
+            'io.netty:netty-transport-classes-kqueue:4.2.12.Final',
+            // CVE-2026-22748, CVE-2026-22746
+            'org.springframework.security:spring-security-crypto:6.5.10'
         )
     }
 }
@@ -401,6 +403,8 @@ ext["rest-assured.version"] = '5.1.0'
 dependencyManagement {
     dependencies {
         dependency 'org.apache.httpcomponents.core5:httpcore5:5.4.2'
+        // CVE-2026-22748, CVE-2026-22746 - force override above the Spring Boot BOM
+        dependency 'org.springframework.security:spring-security-crypto:6.5.10'
         dependencySet(group: 'com.google.guava', version: '33.6.0-jre') {
             entry 'guava'
         }
@@ -439,7 +443,7 @@ dependencies {
     implementation group: 'com.github.hmcts', name: 'document-management-client', version: '7.0.1'
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '8.0.0'
     implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '8.1'
-    implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.5'
+    implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.9'
 
     // Log4J core added to remove startup error message
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4JVersion
@@ -448,7 +452,7 @@ dependencies {
 
     implementation group: 'commons-io', name: 'commons-io', version: '2.21.0'
     implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.6.0'
-    implementation group: 'io.netty', name: 'netty-tcnative-classes', version: '2.0.75.Final'
+    implementation group: 'io.netty', name: 'netty-tcnative-classes', version: '2.0.77.Final'
     implementation group: 'org.json', name: 'json', version: '20250107'
     implementation group: 'org.apache.commons', name: 'commons-compress', version: '1.28.0'
     implementation group: 'org.apache.commons', name: 'commons-lang3', version: '3.18.0'
@@ -456,12 +460,12 @@ dependencies {
     implementation group: 'org.apache.httpcomponents.core5', name: 'httpcore5', version: '5.4.2'
     implementation group: 'org.apache.logging.log4j', name: 'log4j-api', version: log4JVersion
     implementation group: 'org.apache.logging.log4j', name: 'log4j-to-slf4j', version: log4JVersion
-    implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '3.0.0-RC1'
+    implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '3.0.7'
     implementation group: 'org.apache.santuario', name: 'xmlsec', version: '4.0.4'
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-core', version: tomcatEmbedVersion
     implementation group: 'org.apache.tomcat.embed', name: 'tomcat-embed-websocket', version: tomcatEmbedVersion
-    // CVE-2026-22732
-    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.5.9'
+    // CVE-2026-22732, CVE-2026-22748, CVE-2026-22746
+    implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.5.10'
     //To Remove vulnerability CVE-2020-11988
     implementation group: 'org.apache.xmlgraphics', name: 'xmlgraphics-commons', version: '2.11'
     implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.22.3'
@@ -475,7 +479,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'jakarta.servlet:jakarta.servlet-api:6.1.0'
     implementation 'javax.servlet:javax.servlet-api:4.0.1'
-    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.1.2'
+    implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.3.2'
     implementation group: 'org.springframework.retry', name: 'spring-retry', version: '2.0.12'
     // CVE-2022-25857
     implementation group: 'org.yaml', name: 'snakeyaml', version: '2.5'
@@ -493,9 +497,9 @@ dependencies {
     // CVE-2025-48734
     implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.11.0'
     implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
-    implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.13.2'
+    implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.13.4'
 
-    implementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.2.4', {
+    implementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.2.6_CCD-7522', {
         exclude group: 'org.apache.commons', module: 'commons-compress'
         exclude group: 'com.google.guava', module: 'guava'
         exclude group: 'org.apache.poi', module: 'poi-ooxml'
@@ -548,7 +552,7 @@ dependencies {
     // Contract Tests
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'junit5', version: '4.6.20'
     contractTestImplementation group: 'au.com.dius.pact.consumer', name: 'java8', version: '4.1.43'
-    contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test', version: '3.3.0'
+    contractTestImplementation group: 'org.springframework.boot', name: 'spring-boot-starter-test'
 
     contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: junitJupiterVersion
     contractTestImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-params', version: junitJupiterVersion
@@ -556,7 +560,7 @@ dependencies {
     contractTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-commons', version: junitPlatformVersion
     contractTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-launcher', version: junitPlatformVersion
     contractTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-engine', version: junitPlatformVersion
-    contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.1.2'
+    contractTestImplementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-openfeign', version: '4.3.2'
     contractTestImplementation sourceSets.main.runtimeClasspath
     contractTestImplementation sourceSets.test.runtimeClasspath
 
@@ -567,7 +571,7 @@ dependencies {
     integrationTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-launcher', version: junitPlatformVersion
     integrationTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-engine', version: junitPlatformVersion
     integrationTestRuntimeOnly group: 'org.junit.platform', name: 'junit-platform-commons', version: junitPlatformVersion
-    integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.40'
+    integrationTestAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.46'
 
     cftlibImplementation group: 'org.mockito', name: 'mockito-core', version: '5.19.0'
     cftlibImplementation 'org.springframework.boot:spring-boot-devtools'

@@ -26,6 +26,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.controllers.BaseControllerTest;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseLookupService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.FeatureToggleService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReferralService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
@@ -72,6 +73,8 @@ class UpdateReferralMultiplesControllerTest extends BaseControllerTest {
     private JsonMapper jsonMapper;
     private CCDRequest ccdRequest;
     private MultipleRequest request;
+    @MockBean
+    private FeatureToggleService featureToggleService;
 
     @BeforeEach
     @Override

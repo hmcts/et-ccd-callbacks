@@ -22,13 +22,15 @@ repositories {
 
 dependencyManagement {
     imports {
-        mavenBom "org.springframework.boot:spring-boot-dependencies:3.5.12"
+        mavenBom "org.springframework.boot:spring-boot-dependencies:3.5.14"
     }
     dependencies {
+        // CVE-2026-22748, CVE-2026-22746 - override above the Spring Boot BOM
+        dependency 'org.springframework.security:spring-security-crypto:6.5.10'
         dependency 'commons-fileupload:commons-fileupload:1.6.0'
         dependency 'org.apache.httpcomponents:httpclient:4.5.14'
         dependency 'org.apache.logging.log4j:log4j-core:2.25.4'
-        dependency 'com.nimbusds:nimbus-jose-jwt:10.5'
+        dependency 'com.nimbusds:nimbus-jose-jwt:10.9'
         dependency 'net.minidev:json-smart:2.5.2'
         dependency 'com.squareup.okhttp3:logging-interceptor:4.12.0'
         dependency 'com.squareup.okhttp3:okhttp:4.12.0'
@@ -112,7 +114,7 @@ dependencies {
     implementation group: 'org.apache.commons', name: 'commons-collections4', version: '4.5.0'
     implementation group: 'com.google.guava', name: 'guava', version: '33.6.0-jre'
     implementation group: 'org.apache.tika', name: 'tika-core', version: '3.2.3'
-    implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '3.0.0-RC1'
+    implementation group: 'org.apache.pdfbox', name: 'pdfbox', version: '3.0.7'
 
     implementation group: 'com.github.hmcts.java-logging', name: 'logging', version: '6.1.9'
     implementation group: 'com.github.hmcts.java-logging', name: 'logging-appinsights', version: '6.1.9'
@@ -124,7 +126,7 @@ dependencies {
     implementation group: 'ch.qos.logback', name: 'logback-access', version: '1.5.32'
     implementation group: 'org.slf4j', name: 'slf4j-ext', version: '2.0.17'
 
-    implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.13.2'
+    implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.13.4'
 
     implementation 'org.springframework:spring-web'
     implementation 'org.springframework:spring-context'
@@ -139,12 +141,12 @@ dependencies {
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.18.3'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.18.3'
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.18.3'
-    implementation group: 'org.springframework', name: 'spring-core', version: '6.2.17'
+    implementation group: 'org.springframework', name: 'spring-core', version: '6.2.18'
 
-    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.42'
-    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.42'
-    testCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.42'
-    testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.42'
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.46'
+    annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.46'
+    testCompileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.46'
+    testAnnotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.46'
 
     testImplementation(platform('org.junit:junit-bom:5.11.4'))
     testImplementation group: 'org.junit.jupiter', name: 'junit-jupiter-api', version: '5.11.4'
@@ -158,7 +160,7 @@ dependencies {
     testImplementation group: 'org.assertj', name: 'assertj-core', version: '3.27.7'
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.19.0'
     testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '5.19.0'
-    testImplementation group: 'org.springframework', name: 'spring-test', version: '6.2.17'
+    testImplementation group: 'org.springframework', name: 'spring-test', version: '6.2.18'
     testImplementation group: 'pl.pragmatists', name: 'JUnitParams', version: '1.1.1'
 }
 
@@ -174,7 +176,7 @@ configurations.configureEach {
         'commons-fileupload:commons-fileupload:1.6.0',
         'org.apache.httpcomponents:httpclient:4.5.14',
         'org.apache.logging.log4j:log4j-core:2.25.4',
-        'com.nimbusds:nimbus-jose-jwt:10.5',
+        'com.nimbusds:nimbus-jose-jwt:10.9',
         'net.minidev:json-smart:2.5.2',
         'com.squareup.okhttp3:logging-interceptor:4.12.0',
         'com.squareup.okhttp3:okhttp:4.12.0',

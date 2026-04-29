@@ -497,7 +497,7 @@ dependencies {
     // CVE-2025-48734
     implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.11.0'
     implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
-    implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.13.2'
+    implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.13.4'
 
     implementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.2.6_CCD-7522', {
         exclude group: 'org.apache.commons', module: 'commons-compress'

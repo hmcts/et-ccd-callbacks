@@ -7,6 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.webjars.NotFoundException;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
@@ -292,4 +293,29 @@ public final class ClaimantRepresentativeUtils {
                 .orgPolicyCaseAssignedRole(ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()).build());
     }
 
+    /**
+     * Removes claimant solicitor representative assignments from the supplied list of case user assignments.
+     *
+     * <p>This method mutates the supplied {@code caseUserAssignments} list by removing any assignment
+     * whose case role matches {@link ClaimantSolicitorRole#CLAIMANTSOLICITOR}.</p>
+     *
+     * <p>If the supplied list is {@code null} or empty, no action is taken.</p>
+     *
+     * <p>Assumptions:</p>
+     * <ul>
+     *     <li>Each {@link CaseUserAssignment} in the list is expected to be non-null.</li>
+     *     <li>The role comparison is case-sensitive and requires an exact match.</li>
+     *     <li>The supplied list supports removal operations.</li>
+     * </ul>
+     *
+     * @param caseUserAssignments the list of case user assignments from which claimant solicitor
+     *                            representative assignments should be removed
+     */
+    public static void removeClaimantRepresentativeAssignment(List<CaseUserAssignment> caseUserAssignments) {
+        if (CollectionUtils.isNotEmpty(caseUserAssignments)) {
+            caseUserAssignments.removeIf(assignment ->
+                    ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()
+                    .equals(assignment.getCaseRole()));
+        }
+    }
 }

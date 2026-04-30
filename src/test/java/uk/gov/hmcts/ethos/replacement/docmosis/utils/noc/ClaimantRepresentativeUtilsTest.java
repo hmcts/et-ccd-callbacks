@@ -6,6 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.testcontainers.shaded.org.apache.commons.lang3.StringUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
@@ -32,6 +33,9 @@ final class ClaimantRepresentativeUtilsTest {
     private static final String RESPONDENT_REPRESENTATIVE_ID = "respondentRepresentativeId";
     private static final String CLAIMANT_REPRESENTATIVE_ID = "claimantRepresentativeId";
     private static final String CLAIMANT_REPRESENTATIVE_NAME = "claimantRepresentativeName";
+    private static final String ROLE_SOLICITORA = "[SOLICITORA]";
+    private static final String ROLE_SOLICITORB = "[SOLICITORB]";
+    private static final String ROLE_CLAIMANT_SOLICITOR = "[CLAIMANTSOLICITOR]";
 
     private static final String EXPECTED_WARNING_CLAIMANT_EMAIL_NOT_FOUND = "Could not find claimant email address.";
     private static final String EXPECTED_WARNING_WITHOUT_CASE_ID = "Claimant email not found for case ";
@@ -250,5 +254,36 @@ final class ClaimantRepresentativeUtilsTest {
         assertThat(caseData.getClaimantRepresentativeOrganisationPolicy().getOrganisation()).isNotNull();
         assertThat(caseData.getClaimantRepresentativeOrganisationPolicy().getOrganisation().getOrganisationID())
                 .isEqualTo(ORGANISATION_ID_2);
+    }
+
+    @Test
+    void theRemoveClaimantRepresentativeAssignment() {
+        List<CaseUserAssignment> caseUserAssignments = new ArrayList<>();
+        // when case user assignments is empty should not remove anything
+        ClaimantRepresentativeUtils.removeClaimantRepresentativeAssignment(caseUserAssignments);
+        assertThat(caseUserAssignments).isEmpty();
+        // when there is claimant solicitor role should remove that role
+        CaseUserAssignment caseUserAssignmentSolicitorA1 = CaseUserAssignment.builder()
+                .userId(RESPONDENT_REPRESENTATIVE_ID).caseId(CASE_ID).caseRole(ROLE_SOLICITORA)
+                .organisationId(ORGANISATION_ID_1).build();
+        caseUserAssignments.add(caseUserAssignmentSolicitorA1);
+        CaseUserAssignment caseUserAssignmentSolicitorA2 = CaseUserAssignment.builder()
+                .userId(RESPONDENT_REPRESENTATIVE_ID).caseId(CASE_ID).caseRole(ROLE_SOLICITORB)
+                .organisationId(ORGANISATION_ID_1).build();
+        caseUserAssignments.add(caseUserAssignmentSolicitorA2);
+        CaseUserAssignment caseUserAssignmentClaimantSolicitor = CaseUserAssignment.builder()
+                .userId(RESPONDENT_REPRESENTATIVE_ID).caseId(CASE_ID).caseRole(ROLE_CLAIMANT_SOLICITOR)
+                .organisationId(ORGANISATION_ID_1).build();
+        caseUserAssignments.add(caseUserAssignmentClaimantSolicitor);
+        ClaimantRepresentativeUtils.removeClaimantRepresentativeAssignment(caseUserAssignments);
+        assertThat(caseUserAssignments).isEqualTo(List.of(caseUserAssignmentSolicitorA1,
+                caseUserAssignmentSolicitorA2));
+        // when there is no claimant solicitor should not remove any role
+        caseUserAssignments.clear();
+        caseUserAssignments.add(caseUserAssignmentSolicitorA1);
+        caseUserAssignments.add(caseUserAssignmentSolicitorA2);
+        ClaimantRepresentativeUtils.removeClaimantRepresentativeAssignment(caseUserAssignments);
+        assertThat(caseUserAssignments).isEqualTo(List.of(caseUserAssignmentSolicitorA1,
+                caseUserAssignmentSolicitorA2));
     }
 }

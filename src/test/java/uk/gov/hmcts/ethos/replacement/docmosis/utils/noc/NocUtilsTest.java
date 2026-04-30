@@ -9,6 +9,7 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
@@ -750,5 +751,35 @@ final class NocUtilsTest {
         assertThat(NocUtils.canRevokeRepresentativeAccess(callbackRequest, USER_TOKEN, new ArrayList<>())).isFalse();
         // when all parameters are valid should return true
         assertThat(NocUtils.canRevokeRepresentativeAccess(callbackRequest, USER_TOKEN, representatives)).isTrue();
+    }
+
+    @Test
+    void theCountAssignmentsByRole() {
+        // when case user assignments is empty should return integer zero
+        List<CaseUserAssignment> caseUserAssignments = new ArrayList<>();
+        assertThat(NocUtils.countAssignmentsByRole(caseUserAssignments, ROLE_SOLICITOR_A))
+                .isEqualTo(LoggerTestUtils.INTEGER_ZERO);
+        // when role is blank should return integer zero
+        caseUserAssignments.add(CaseUserAssignment.builder().caseRole(ROLE_SOLICITOR_B).build());
+        assertThat(NocUtils.countAssignmentsByRole(caseUserAssignments, StringUtils.EMPTY))
+                .isEqualTo(LoggerTestUtils.INTEGER_ZERO);
+        // when role not found in case user assignments should return integer zero
+        assertThat(NocUtils.countAssignmentsByRole(caseUserAssignments, ROLE_SOLICITOR_A))
+                .isEqualTo(LoggerTestUtils.INTEGER_ZERO);
+        // when role found in case user assignments should return integer one
+        assertThat(NocUtils.countAssignmentsByRole(caseUserAssignments, ROLE_SOLICITOR_B))
+                .isEqualTo(LoggerTestUtils.INTEGER_ONE);
+    }
+
+    @Test
+    void theFilterCaseUserAssignmentsByRole() {
+        // when case role is different from the role in the case user assignments should return empty list
+        CaseUserAssignment caseUserAssignment = CaseUserAssignment.builder().caseRole(ROLE_SOLICITOR_A).build();
+        List<CaseUserAssignment> caseUserAssignments = new ArrayList<>();
+        caseUserAssignments.add(caseUserAssignment);
+        assertThat(NocUtils.filterCaseUserAssignmentsByRole(caseUserAssignments, ROLE_SOLICITOR_B)).isEmpty();
+        // when case role is same with the role in the case user assignments should return list with that case
+        assertThat(NocUtils.filterCaseUserAssignmentsByRole(caseUserAssignments, ROLE_SOLICITOR_A)).isNotEmpty()
+                .hasSize(LoggerTestUtils.INTEGER_ONE).isEqualTo(List.of(caseUserAssignment));
     }
 }

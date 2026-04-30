@@ -8,6 +8,8 @@ def type = "java"
 def product = "et"
 def component = "cos"
 def branchesToSync = ['demo', 'perftest', 'ithc']
+def dmnBranch = "master"
+def bpmnBranch = "master"
 def yarnBuilder = new uk.gov.hmcts.contino.YarnBuilder(this)
 
 def secrets = [
@@ -16,8 +18,8 @@ def secrets = [
     secret('et-ccd-caseworker-password', 'ET_CCD_CASEWORKER_PASSWORD'),
     secret('et-ccd-api-user-name', 'ET_CCD_API_USER_NAME'),
     secret('et-ccd-api-password', 'ET_CCD_API_PASSWORD'),
-    secret('et-caseworker-4-username', 'ET_CASEWORKER_USER_NAME'),
-    secret('et-caseworker-4-password', 'ET_CASEWORKER_PASSWORD'),
+    secret('et-caseworker-5-username', 'ET_CASEWORKER_USER_NAME'),
+    secret('et-caseworker-5-password', 'ET_CASEWORKER_PASSWORD'),
     secret('et-judge-4-username', 'ET_JUDGE_4_USER_NAME'),
     secret('et-judge-4-password', 'ET_JUDGE_4_PASSWORD'),
     secret('et-judge-user-name-eng','ET_JUDGE_USER_NAME_ENG'),
@@ -34,6 +36,11 @@ def secrets = [
     secret('cos-system-user-password', 'ET_SYSTEM_USER_PASSWORD'),
     secret('et-staff-user-admin-user-name', 'ET_STAFF_USER_ADMIN_USER_NAME'),
     secret('et-staff-user-admin-user-name-password', 'ET_STAFF_USER_ADMIN_USER_NAME_PASSWORD')
+  ],
+  'rpx-${env}': [
+    // xuiwebapp IDAM client secret - required for obtaining user tokens with
+    // manage-user/create-user/search-user scopes (used when provisioning WA users).
+    secret('mc-idam-client-secret', 'XUI_IDAM_CLIENT_SECRET'),
   ],
   'et-${env}': [
     secret('ccd-admin-username', 'CCD_ADMIN_USERNAME'),
@@ -152,21 +159,35 @@ withPipeline(type, product, component) {
     env.RUNNING_ENV = "aat"
 
     before('smoketest:preview') {
+      env.IDAM_API_URL = "https://idam-api.aat.platform.hmcts.net"
+      env.CAMUNDA_BASE_URL = "https://camunda-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+      env.SERVICE_AUTH_PROVIDER_API_BASE_URL = "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
+      sh """
+        ./bin/wa/pull-latest-dmn-files.sh ${dmnBranch}
+       ./bin/wa/pull-latest-camunda-wa-files.sh ${bpmnBranch}
+      """
+
       sh """
         ./bin/pull-latest-e2e-tests.sh
       cd ccd-definitions && yarn install && yarn setup && yarn scripts:preview ${CHANGE_ID}
       """
 
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'ccd-definitions/jurisdictions/admin/xlsx/et-admin-ccd-config-preview.xlsx'
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'ccd-definitions/jurisdictions/england-wales/xlsx/et-englandwales-ccd-config-preview.xlsx'
-    steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'ccd-definitions/jurisdictions/scotland/xlsx/et-scotland-ccd-config-preview.xlsx'
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'ccd-definitions/jurisdictions/admin/xlsx/et-admin-ccd-config-preview.xlsx'
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'ccd-definitions/jurisdictions/england-wales/xlsx/et-englandwales-ccd-config-preview.xlsx'
+      steps.archiveArtifacts allowEmptyArchive: true, artifacts: 'ccd-definitions/jurisdictions/scotland/xlsx/et-scotland-ccd-config-preview.xlsx'
 
-    sh """
-        echo "Creating CCD roles"
-        ./bin/preview/create-ccd-roles.sh
-        echo "Importing CCD definitions"
-        ./bin/preview/import-ccd-definitions.sh
-      """
+      sh """
+          echo "Creating CCD roles"
+          ./bin/preview/create-ccd-roles.sh
+        """
+      sh """
+          echo "Importing CCD definitions"
+          ./bin/preview/import-ccd-definitions.sh
+        """
+      sh """
+          echo "Setting up WA users and roles"
+          ./bin/wa/add-org-roles-to-users.sh
+        """
     }
 
     afterAlways('smoketest:preview') {

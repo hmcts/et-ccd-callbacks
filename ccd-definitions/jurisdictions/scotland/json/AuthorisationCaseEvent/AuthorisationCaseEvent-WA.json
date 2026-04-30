@@ -61,6 +61,12 @@
   },
   {
     "CaseTypeId": "ET_Scotland",
+    "CaseEventID": "updateReferral",
+    "UserRole": "caseworker-wa-task-configuration",
+    "CRUD": "CRU"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
     "CaseEventID": "issueInitialConsiderationDirectionsWA",
     "UserRole": "caseworker-employment-scotland",
     "CRUD": "CRU"

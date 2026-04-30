@@ -5,10 +5,8 @@ import org.apache.pdfbox.Loader;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
-import org.apache.pdfbox.pdmodel.interactive.form.PDField;
-import org.apache.pdfbox.pdmodel.interactive.form.PDNonTerminalField;
+import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.tika.Tika;
-import org.elasticsearch.core.Tuple;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -28,7 +26,6 @@ import uk.gov.hmcts.ecm.common.service.pdf.et1.GenericServiceUtil;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -79,32 +76,19 @@ class PdfServiceTest {
                 SUBMIT_ET1
         );
         try (PDDocument actualPdf = Loader.loadPDF(pdfBytes)) {
-            Map<String, Optional<String>> actualPdfValues = processPdf(actualPdf);
-            PDF_VALUES.forEach((k, v) -> assertThat(actualPdfValues).containsEntry(k, v));
+            // After flattening, interactive fields are converted to static page content
+            PDDocumentCatalog catalog = actualPdf.getDocumentCatalog();
+            PDAcroForm acroForm = catalog.getAcroForm();
+            assertThat(acroForm == null || acroForm.getFields().isEmpty())
+                    .as("AcroForm should have no interactive fields after flattening")
+                    .isTrue();
+            // Verify field values are baked into the page as static text
+            String pageText = new PDFTextStripper().getText(actualPdf);
+            PDF_VALUES.values().stream()
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .forEach(value -> assertThat(pageText).contains(value));
         }
-    }
-
-    private Map<String, Optional<String>> processPdf(PDDocument pdDocument) {
-        PDDocumentCatalog pdDocumentCatalog = pdDocument.getDocumentCatalog();
-        PDAcroForm pdfForm = pdDocumentCatalog.getAcroForm();
-        Map<String, Optional<String>> returnFields = new ConcurrentHashMap<>();
-        pdfForm.getFields().forEach(
-            field -> {
-                Tuple<String, String> fieldTuple = processField(field);
-                returnFields.put(fieldTuple.v1(), Optional.ofNullable(fieldTuple.v2()));
-            }
-        );
-        return returnFields;
-    }
-
-    private Tuple<String, String> processField(PDField field) {
-        if (field instanceof PDNonTerminalField) {
-            for (PDField child : ((PDNonTerminalField) field).getChildren()) {
-                processField(child);
-            }
-        }
-
-        return new Tuple<>(field.getFullyQualifiedName(), field.getValueAsString());
     }
 
     @SneakyThrows

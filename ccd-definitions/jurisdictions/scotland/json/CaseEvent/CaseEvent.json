@@ -104,6 +104,20 @@
   },
   {
     "CaseTypeID": "ET_Scotland",
+    "ID": "UPDATE_RESP_ORG_POLICY",
+    "Name": "UPDATE_RESP_ORG_POLICY",
+    "Description": "Updates respondent organisation policy, rep roles and resets change organisation request fields",
+    "DisplayOrder": 32,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/respondentRepresentative/updateRespOrgPolicyAboutToSubmit",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "N",
+    "ShowSummary": "N",
+    "EventEnablingCondition": "caseType =\"dummy\""
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
     "ID": "REMOVE_OWN_REP_AS_RESPONDENT",
     "Name": "REMOVE_OWN_REP_AS_RESPONDENT",
     "Description": "enables respondent citizen to remove his/her own representative via et-syr-frontend project",

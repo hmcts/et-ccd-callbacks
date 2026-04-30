@@ -51,6 +51,8 @@ public final class NOCConstants {
             "There are missing parameters; submission reference: %s, role: %s.";
     public static final String EXCEPTION_UNABLE_TO_GET_ACCOUNT_ID_BY_EMAIL =
             "Unable to get account id by email for case %s.";
+    public static final String EXCEPTION_UNABLE_TO_GET_ACCOUNT_ID_BY_EMAIL_WITH_IO_EXCEPTION =
+            "Unable to get account id by email for case %s. Exception message: %s";
     public static final String EXCEPTION_UNABLE_TO_FIND_ORGANISATION_BY_USER_ID =
             "Unable to find organisation by user id for case %s.";
     public static final String EXCEPTION_USER_AND_SELECTED_ORGANISATIONS_NOT_MATCH =
@@ -67,17 +69,10 @@ public final class NOCConstants {
             "Unable to send notification for representative removal for case: {}. Exception: {}";
     public static final String ERROR_FAILED_TO_REMOVE_ORGANISATION_POLICIES =
             "Failed to remove organisation policies for case {}. Exception: {}";
-    public static final String ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES =
-            "Failed to add organisation policy for case {}. Exception: {}";
-    public static final String ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_INVALID_CASE_DETAILS =
-            "Failed to add organisation policy. Reason: invalid case details";
-    public static final String ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_INVALID_INPUTS =
-            "Failed to add organisation policy for case{}. Reason: invalid inputs";
     public static final String ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_REPRESENTATIVE_NOT_FOUND =
             "Failed to add organisation policy for case {}. Reason: representative not found";
-    public static final String ERROR_UNABLE_TO_START_EVENT_TO_UPDATE_REPRESENTATIVE_AND_ORGANISATION_POLICY =
-            "Unable to start update case submitted event to update representative role and organisation policy for "
-                    + "case: {}";
+    public static final String ERROR_SELECTED_ORGANISATION_REPRESENTATIVE_ORGANISATION_NOT_MATCHES =
+            "Representative %s organisation does not match with selected organisation %s";
     public static final String ERROR_REPRESENTATIVE_ORGANISATION_AND_EMAIL_NOT_MATCHED =
             "Failed to validate representative organisation and email. %s";
     public static final String ERROR_UNABLE_TO_MODIFY_REPRESENTATIVE_ACCESS =
@@ -91,13 +86,17 @@ public final class NOCConstants {
             "Claimant email not found. Unable to notify claimant for respondent representative update. Case id: {}";
     public static final String WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_CLAIMANT =
             "Failed to send noc notification email to claimant, case id: {}, error: {}";
+    public static final String WARNING_FAILED_TO_FIND_ORGANISATION_BY_EMAIL_SYSTEM_ERROR =
+            "A system error occurred while trying to find an organisation by email address. Exception: {}";
 
     public static final String WARNING_REPRESENTATIVE_EMAIL_ADDRESS_NOT_FOUND =
-            "Representative email address not found.";
+            "Representative email address not found. To continue, please click Ignore and Continue.";
     public static final String WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL =
             "We have been unable to assign '%s' access to this case via MyHMCTS. They must check with their "
                     + "organisation administrator to ensure they have a valid MyHMCTS account, who will need to "
-                    + "assign the case to them.";
+                    + "assign the case to them. To continue, please click Ignore and Continue.";
+    public static final String ERROR_UNABLE_TO_CHECK_REPRESENTATIVE_ACCOUNT_BY_EMAIL =
+            "Failed to check representative account by email. Exception is {}";
     public static final String WARNING_MISSING_RESPONDENT_EMAIL_ADDRESS =
             "Missing respondent email address while sending Notice of Change (NoC) respondent representative removal "
                     + NOTIFICATION_FOR_CASE;

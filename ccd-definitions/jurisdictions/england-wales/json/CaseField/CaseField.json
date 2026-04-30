@@ -387,14 +387,6 @@
   },
   {
     "CaseTypeID": "ET_EnglandWales",
-    "ID": "repCollectionToRemove",
-    "Label": "Respondent representative(s) to remove",
-    "FieldType": "Collection",
-    "FieldTypeParameter": "RespondentRepresentative",
-    "SecurityClassification": "Public"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
     "ID": "jurCodesCollection",
     "Label": "Jurisdiction",
     "FieldType": "Collection",
@@ -6593,13 +6585,5 @@
     "FieldType": "Collection",
     "FieldTypeParameter": "DynamicListCollection",
     "SecurityClassification": "Public"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "ID": "nocWarning",
-    "Label": " ",
-    "FieldType": "Text",
-    "SecurityClassification": "Public",
-    "Searchable": "N"
   }
 ]

@@ -3,9 +3,11 @@ package uk.gov.hmcts.ethos.replacement.docmosis.utils.noc;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.math.NumberUtils;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
@@ -18,6 +20,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.CallbackObjectUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.CallbacksCollectionUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.LoggingUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentUtils;
+import uk.gov.hmcts.reform.et.syaapi.service.utils.NoticeOfChangeUtils;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -480,7 +483,6 @@ public final class NocUtils {
         }
         for (RepresentedTypeRItem representative : representatives) {
             RoleUtils.resetOrganisationPolicyByRepresentative(caseData, representative);
-
         }
     }
 
@@ -551,7 +553,7 @@ public final class NocUtils {
             return;
         }
         for (int i = 0; i < caseData.getRespondentCollection().size(); i++) {
-            NoticeOfChangeAnswers answers = RoleUtils.getNoticeOfChangeAnswersAtIndex(caseData, i);
+            NoticeOfChangeAnswers answers = NoticeOfChangeUtils.getNoticeOfChangeAnswersAtIndex(caseData, i);
             if (!RoleUtils.isValidNoticeOfChangeAnswers(answers)) {
                 RespondentSumTypeItem respondent = RespondentUtils.getRespondentAtIndex(caseData, i);
                 if (!RespondentUtils.isValidRespondent(respondent)) {
@@ -652,23 +654,6 @@ public final class NocUtils {
     }
 
     /**
-     * Clears the Notice of Change (NoC) warning from the given {@link CaseData},
-     * if one is present.
-     *
-     * <p>If the {@code caseData} is {@code null} or empty, or if no NoC warning
-     * is currently set, this method performs no action.</p>
-     *
-     * @param caseData the case data from which the NoC warning should be cleared;
-     *                 may be {@code null}
-     */
-    public static void clearNocWarningIfPresent(CaseData caseData) {
-        if (ObjectUtils.isEmpty(caseData) || StringUtils.isBlank(caseData.getNocWarning())) {
-            return;
-        }
-        caseData.setNocWarning(null);
-    }
-
-    /**
      * Determines whether sufficient data is available to proceed with
      * revoking representative access.
      *
@@ -701,5 +686,60 @@ public final class NocUtils {
                 && ObjectUtils.isNotEmpty(callbackRequest.getCaseDetailsBefore().getCaseData())
                 && StringUtils.isNotBlank(userToken)
                 && CollectionUtils.isNotEmpty(representativesToRemove);
+    }
+
+    /**
+     * Counts the number of case user assignments that match the specified role.
+     *
+     * <p>If the assignment list is empty or the role is blank, this method returns zero.</p>
+     *
+     * <p>Assumptions:</p>
+     * <ul>
+     *     <li>{@code caseUserAssignments} may be {@code null} or empty.</li>
+     *     <li>{@code role} may be {@code null} or blank.</li>
+     *     <li>Each {@link CaseUserAssignment} in the list is expected to be non-null.</li>
+     *     <li>The role is matched exactly against {@link CaseUserAssignment#getCaseRole()}.</li>
+     * </ul>
+     *
+     * @param caseUserAssignments the list of case user assignments to check
+     * @param role the case role to count
+     * @return the number of assignments matching the specified role, or zero if the input list is empty
+     *         or the role is blank
+     */
+    public static int countAssignmentsByRole(List<CaseUserAssignment> caseUserAssignments, String role) {
+        int roleCount = NumberUtils.INTEGER_ZERO;
+        if (CollectionUtils.isEmpty(caseUserAssignments) || StringUtils.isBlank(role)) {
+            return roleCount;
+        }
+        for (CaseUserAssignment caseUserAssignment : caseUserAssignments) {
+            if (role.equals(caseUserAssignment.getCaseRole())) {
+                roleCount++;
+            }
+        }
+        return roleCount;
+    }
+
+    /**
+     * Filters the supplied case user assignments by the specified case role.
+     *
+     * <p>Only assignments whose case role exactly matches the supplied {@code role} are returned.</p>
+     *
+     * <p>Assumptions:</p>
+     * <ul>
+     *     <li>{@code caseUserAssignments} is not {@code null}.</li>
+     *     <li>{@code role} is not {@code null}.</li>
+     *     <li>Each {@link CaseUserAssignment} in the list is expected to be non-null.</li>
+     *     <li>The role comparison is case-sensitive and requires an exact match.</li>
+     * </ul>
+     *
+     * @param caseUserAssignments the list of case user assignments to filter
+     * @param role the case role to filter by
+     * @return a list of case user assignments matching the specified role
+     */
+    public static List<CaseUserAssignment> filterCaseUserAssignmentsByRole(
+            List<CaseUserAssignment> caseUserAssignments, String role) {
+        return caseUserAssignments.stream()
+                .filter(caseUserAssignment -> role.equals(caseUserAssignment.getCaseRole()))
+                .toList();
     }
 }

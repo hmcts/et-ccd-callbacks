@@ -15,6 +15,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
+import uk.gov.hmcts.ethos.replacement.docmosis.test.utils.LoggerTestUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 final class RespondentRepresentativeUtilsTest {
@@ -612,6 +614,34 @@ final class RespondentRepresentativeUtilsTest {
     }
 
     @Test
+    void theFindRepresentativesByOrganisationId() {
+        // when representative is not valid should return empty list
+        CaseData caseData = new CaseData();
+        RepresentedTypeRItem representative = new RepresentedTypeRItem();
+        representative.setValue(RepresentedTypeR.builder().build());
+        caseData.setRepCollection(List.of(representative));
+        assertThat(RespondentRepresentativeUtils.findRepresentativesByOrganisationId(caseData, ORGANISATION_ID_1))
+                .hasSize(LoggerTestUtils.INTEGER_ZERO);
+        // when representative does not have organisation should return empty list
+        representative.setId(REPRESENTATIVE_ID_1);
+        assertThat(RespondentRepresentativeUtils.findRepresentativesByOrganisationId(caseData, ORGANISATION_ID_1))
+                .hasSize(LoggerTestUtils.INTEGER_ZERO);
+        // when representative does not have organisation id should return empty list
+        representative.getValue().setRespondentOrganisation(Organisation.builder().build());
+        assertThat(RespondentRepresentativeUtils.findRepresentativesByOrganisationId(caseData, ORGANISATION_ID_1))
+                .hasSize(LoggerTestUtils.INTEGER_ZERO);
+        // when representative organisation id not equals to the parameter organisation id should return empty list
+        representative.getValue().getRespondentOrganisation().setOrganisationID(ORGANISATION_ID_2);
+        assertThat(RespondentRepresentativeUtils.findRepresentativesByOrganisationId(caseData, ORGANISATION_ID_1))
+                .hasSize(LoggerTestUtils.INTEGER_ZERO);
+        // when representative organisation id equals to the parameter organisation id should return list with
+        // representative
+        representative.getValue().getRespondentOrganisation().setOrganisationID(ORGANISATION_ID_1);
+        assertThat(RespondentRepresentativeUtils.findRepresentativesByOrganisationId(caseData, ORGANISATION_ID_1))
+                .hasSize(LoggerTestUtils.INTEGER_ONE).contains(representative);
+    }
+
+    @Test
     void theFindRespondentNameByRole() {
         // when role index is -1 should return null
         CaseData caseData = new CaseData();
@@ -660,5 +690,82 @@ final class RespondentRepresentativeUtilsTest {
         caseData.setRepCollection(List.of(representative));
         assertThat(RespondentRepresentativeUtils.findRepresentativeByRoleOrRespondentName(caseData, ROLE_SOLICITOR_A))
                 .isEqualTo(representative);
+    }
+
+    @Test
+    void theFindRepresentativeInListByRoleOrRespondentName() {
+        // when representative not found in case data should return null
+        CaseData caseData = new CaseData();
+        caseData.setRepCollection(new ArrayList<>());
+        assertThat(RespondentRepresentativeUtils.findRepresentativeInListByRoleOrRespondentName(caseData,
+                ROLE_SOLICITOR_A, new ArrayList<>())).isNull();
+        // when representative in list is not valid should return null
+        RepresentedTypeRItem representative1 = new  RepresentedTypeRItem();
+        representative1.setId(REPRESENTATIVE_ID_1);
+        representative1.setValue(RepresentedTypeR.builder().role(ROLE_SOLICITOR_A).build());
+        caseData.setRepCollection(List.of(representative1));
+        RepresentedTypeRItem representative2 = new  RepresentedTypeRItem();
+        List<RepresentedTypeRItem> representedTypeRItems = List.of(representative2);
+        assertThat(RespondentRepresentativeUtils.findRepresentativeInListByRoleOrRespondentName(caseData,
+                ROLE_SOLICITOR_A, representedTypeRItems)).isNull();
+        // when representative in case data has different representative id should return null
+        representative2.setId(REPRESENTATIVE_ID_2);
+        representative2.setValue(RepresentedTypeR.builder().role(ROLE_SOLICITOR_A).build());
+        assertThat(RespondentRepresentativeUtils.findRepresentativeInListByRoleOrRespondentName(caseData,
+                ROLE_SOLICITOR_A, representedTypeRItems)).isNull();
+        // when representative in case data has same representative id in list should return representative
+        representative2.setId(REPRESENTATIVE_ID_1);
+        assertThat(RespondentRepresentativeUtils.findRepresentativeInListByRoleOrRespondentName(caseData,
+                ROLE_SOLICITOR_A, representedTypeRItems)).isNotNull().isEqualTo(representative1);
+    }
+
+    @Test
+    void theRemoveRespondentRepresentatives() {
+        // when representative list is empty should not remove any representative
+        RepresentedTypeRItem representative1 = new  RepresentedTypeRItem();
+        representative1.setId(REPRESENTATIVE_ID_1);
+        representative1.setValue(RepresentedTypeR.builder().role(ROLE_SOLICITOR_A).build());
+        CaseData caseData = new CaseData();
+        caseData.setRepCollection(List.of(representative1));
+        RespondentRepresentativeUtils.removeRespondentRepresentatives(caseData, new  ArrayList<>());
+        assertThat(caseData.getRepCollection()).hasSize(LoggerTestUtils.INTEGER_ONE);
+        // when respondent not found should not reset respondent representation
+        RespondentSumTypeItem  respondent = new RespondentSumTypeItem();
+        respondent.setId(RESPONDENT_ID_1);
+        RespondentSumType respondentValue = RespondentSumType.builder().respondentName(RESPONDENT_NAME_1)
+                .representativeId(REPRESENTATIVE_ID_1).represented(YES).representativeRemoved(NO).build();
+        respondent.setValue(respondentValue);
+        caseData.setRespondentCollection(List.of(respondent));
+        RepresentedTypeRItem representative2 = new  RepresentedTypeRItem();
+        representative2.setId(REPRESENTATIVE_ID_2);
+        representative2.setValue(RepresentedTypeR.builder().role(ROLE_SOLICITOR_A).respondentId(RESPONDENT_ID_2)
+                .build());
+        List<RepresentedTypeRItem> representedTypeRItems = List.of(representative2);
+        RespondentRepresentativeUtils.removeRespondentRepresentatives(caseData, representedTypeRItems);
+        assertThat(caseData.getRepCollection()).hasSize(LoggerTestUtils.INTEGER_ONE);
+        assertThat(caseData.getRespondentCollection().getFirst().getValue().getRepresentativeId())
+                .isEqualTo(REPRESENTATIVE_ID_1);
+        assertThat(caseData.getRespondentCollection().getFirst().getValue().getRepresented()).isEqualTo(YES);
+        assertThat(caseData.getRespondentCollection().getFirst().getValue().getRepresentativeRemoved()).isEqualTo(NO);
+        // when respondent found should reset respondent representation
+        representative2.getValue().setRespondentId(RESPONDENT_ID_1);
+        representative2.setId(REPRESENTATIVE_ID_1);
+        RespondentRepresentativeUtils.removeRespondentRepresentatives(caseData, representedTypeRItems);
+        assertThat(caseData.getRepCollection()).hasSize(LoggerTestUtils.INTEGER_ZERO);
+        assertThat(caseData.getRespondentCollection().getFirst().getValue().getRepresentativeId()).isNull();
+        assertThat(caseData.getRespondentCollection().getFirst().getValue().getRepresented()).isEqualTo(NO);
+        assertThat(caseData.getRespondentCollection().getFirst().getValue().getRepresentativeRemoved()).isEqualTo(YES);
+    }
+
+    @Test
+    void theFindCaseUserAssignmentsByRepresentativeId() {
+        // when representative not found should return empty list
+        CaseUserAssignment caseUserAssignment = CaseUserAssignment.builder().userId(REPRESENTATIVE_ID_1).build();
+        List<CaseUserAssignment> caseUserAssignments = List.of(caseUserAssignment);
+        assertThat(RespondentRepresentativeUtils.findCaseUserAssignmentsByRepresentativeId(caseUserAssignments,
+                REPRESENTATIVE_ID_2)).isEmpty();
+        // when representative found should return a list with that representative
+        assertThat(RespondentRepresentativeUtils.findCaseUserAssignmentsByRepresentativeId(caseUserAssignments,
+                REPRESENTATIVE_ID_1)).hasSize(NumberUtils.INTEGER_ONE).contains(caseUserAssignment);
     }
 }

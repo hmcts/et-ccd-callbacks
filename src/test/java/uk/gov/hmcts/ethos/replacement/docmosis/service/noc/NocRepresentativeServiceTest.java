@@ -38,6 +38,9 @@ class NocRepresentativeServiceTest {
 
     AutoCloseable closeable;
 
+    private static final String RESPONDENT_SOLICITOR_ROLE_A = "[SOLICITORA]";
+    private static final String USER_TOKEN = "userToken";
+
     @BeforeEach
     void setUp() {
         closeable = MockitoAnnotations.openMocks(this);
@@ -65,17 +68,16 @@ class NocRepresentativeServiceTest {
         when(nocClaimantRepresentativeService.updateClaimantRepresentation(any(), any()))
                 .thenReturn(caseData);
 
-        CaseData result = nocRepresentativeService.updateRepresentation(caseDetails, "token");
+        CaseData result = nocRepresentativeService.updateRepresentation(caseDetails, USER_TOKEN);
 
         assertThat(result).isSameAs(caseData);
-        verify(nocClaimantRepresentativeService).updateClaimantRepresentation(caseDetails, "token");
-        verifyNoInteractions(nocRespondentRepresentativeService);
+        verify(nocClaimantRepresentativeService).updateClaimantRepresentation(caseDetails, USER_TOKEN);
     }
 
     @Test
     void updateRepresentation_shouldCallRespondentService_whenNotClaimantSolicitorRole() throws Exception {
         CaseData caseData = new CaseData();
-        ChangeOrganisationRequest change = buildChangeRequest("RESPONDENTSOLICITOR");
+        ChangeOrganisationRequest change = buildChangeRequest(RESPONDENT_SOLICITOR_ROLE_A);
         caseData.setChangeOrganisationRequestField(change);
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseData(caseData);
@@ -86,11 +88,11 @@ class NocRepresentativeServiceTest {
                 .thenReturn(caseData);
         when(nocRespondentRepresentativeService.removeConflictingClaimantRepresentation(any(CaseDetails.class)))
                 .thenReturn(caseData);
-        CaseData result = nocRepresentativeService.updateRepresentation(caseDetails, "token");
+        CaseData result = nocRepresentativeService.updateRepresentation(caseDetails, USER_TOKEN);
 
         assertThat(result).isSameAs(caseData);
         verify(nocRespondentRepresentativeService).updateRespondentRepresentation(caseDetails);
-        verify(nocRespondentRepresentativeService).prepopulateOrgAddress(caseData, "token");
+        verify(nocRespondentRepresentativeService).prepopulateOrgAddress(caseData, USER_TOKEN);
         verifyNoInteractions(nocClaimantRepresentativeService);
     }
 
@@ -101,7 +103,7 @@ class NocRepresentativeServiceTest {
         caseDetails.setCaseData(caseData);
 
         assertThrows(IllegalStateException.class, () ->
-                nocRepresentativeService.updateRepresentation(caseDetails, "token"));
+                nocRepresentativeService.updateRepresentation(caseDetails, USER_TOKEN));
     }
 
     @Test
@@ -112,7 +114,7 @@ class NocRepresentativeServiceTest {
         caseDetails.setCaseData(caseData);
 
         assertThrows(IllegalStateException.class, () ->
-                nocRepresentativeService.updateRepresentation(caseDetails, "token"));
+                nocRepresentativeService.updateRepresentation(caseDetails, USER_TOKEN));
     }
 
     @Test
@@ -127,7 +129,7 @@ class NocRepresentativeServiceTest {
         caseDetails.setCaseData(caseData);
 
         assertThrows(IllegalStateException.class, () ->
-                nocRepresentativeService.updateRepresentation(caseDetails, "token"));
+                nocRepresentativeService.updateRepresentation(caseDetails, USER_TOKEN));
     }
 
     @Test
@@ -142,7 +144,7 @@ class NocRepresentativeServiceTest {
         caseDetails.setCaseData(caseData);
 
         assertThrows(IllegalStateException.class, () ->
-                nocRepresentativeService.updateRepresentation(caseDetails, "token"));
+                nocRepresentativeService.updateRepresentation(caseDetails, USER_TOKEN));
     }
 
     private ChangeOrganisationRequest buildChangeRequest(String caseRoleLabel) {

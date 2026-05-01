@@ -10,6 +10,9 @@ public final class NOCConstants {
     public static final String NOC_TYPE_REMOVAL = "Removal";
     public static final String NOC_TYPE_ADDITION = "Addition";
 
+    public static final String REMOVE_ONLY_ME = "Remove only me";
+    public static final String REMOVE_ORGANISATION = "Remove the organisation";
+
     public static final String EXCEPTION_RESPONDENT_NOT_FOUND = "Respondent not found for case ID %s.";
     public static final String EXCEPTION_RESPONDENT_ID_NOT_FOUND =
             "Respondent ID not found for case ID %s.";
@@ -145,6 +148,18 @@ public final class NOCConstants {
             "Failed to send email to claimant for removal of representative, case id: {}, error: {}";
     public static final String WARNING_FAILED_TO_RETRIEVE_CASE_ASSIGNMENTS =
             "Failed to retrieve case assignments for case id: {}, error: {}";
+
+    public static final String WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_TO_REMOVED_REPRESENTATIVE =
+        "Failed to send email to removed legal representative, case id: {}, error: {}";
+    public static final String WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_TO_UNREPRESENTED_PARTY =
+        "Failed to send email to unrepresented party, case id: {}, error: {}";
+    public static final String WARNING_FAILED_TO_GET_CASE_ASSIGNMENTS_BY_ID =
+        "Failed to get case assignments by id for case id: {}";
+
+    public static final String MISSING_REP_CLAIMANT_TYPE =
+        "Missing RepresentativeClaimantType for case id: ";
+    public static final String MISSING_REP_TYPE_R_ITEM =
+        "Missing RepresentedTypeRItem list for case id: ";
 
     public static final int MAX_NOC_ANSWERS = 10;
 

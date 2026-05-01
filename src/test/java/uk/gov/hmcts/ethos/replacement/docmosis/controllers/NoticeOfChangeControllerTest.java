@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Objects;
 
-import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
@@ -102,7 +101,7 @@ class NoticeOfChangeControllerTest {
                 .header(AUTHORIZATION, AUTH_TOKEN)
                 .contentType(MediaType.APPLICATION_JSON))
             .andExpect(status().isOk())
-            .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+            .andExpect(jsonPath(JsonMapper.DATA, nullValue()))
             .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
             .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }

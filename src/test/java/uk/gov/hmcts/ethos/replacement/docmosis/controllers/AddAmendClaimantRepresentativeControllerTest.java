@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
+import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -18,10 +19,12 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocClaimantRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
-import uk.gov.hmcts.ethos.replacement.docmosis.test.utils.LoggerTestUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.empty;
@@ -44,12 +47,15 @@ class AddAmendClaimantRepresentativeControllerTest {
     private static final String ABOUT_TO_SUBMIT_URL = "/addAmendClaimantRepresentative/aboutToSubmit";
     private static final String SUBMITTED_URL = "/addAmendClaimantRepresentative/amendClaimantRepSubmitted";
     private static final String AMEND_CLAIMANT_REPRESENTATIVE_MID_EVENT =
-            "/addAmendClaimantRepresentative/amendClaimantRepresentativeMidEvent";
+            "/addAmendClaimantRepresentative/midEvent";
     private static final String CASE_ID = "1234567890123456";
     private static final String TEST_USER_EMAIL = "test@test.com";
 
     private static final String EXPECTED_ERROR_SELECTED_ORGANISATION_REPRESENTATIVE_ORGANISATION_NOT_MATCHES =
             "Representative Representative Name organisation does not match with selected organisation ORG1";
+
+    private static final String EXPECTED_WARNING_REPRESENTATIVE_EMAIL_NOT_FOUND =
+            "Representative email not exist";
 
     @MockBean
     private VerifyTokenService verifyTokenService;
@@ -81,7 +87,8 @@ class AddAmendClaimantRepresentativeControllerTest {
     }
 
     @Test
-    void testAboutToSubmitSetsClaimantRepresentativeId() throws Exception {
+    @SneakyThrows
+    void testAboutToSubmitSetsClaimantRepresentativeId() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(nocClaimantRepresentativeService.validateClaimantRepresentativeOrganisationMatch(any(CaseDetails.class)))
                 .thenReturn(StringUtils.EMPTY);
@@ -98,7 +105,8 @@ class AddAmendClaimantRepresentativeControllerTest {
     }
 
     @Test
-    void testAboutToSubmitSetsClaimantRepresentativeId_WithErrors() throws Exception {
+    @SneakyThrows
+    void testAboutToSubmitSetsClaimantRepresentativeId_WithErrors() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         when(nocClaimantRepresentativeService.validateClaimantRepresentativeOrganisationMatch(any(CaseDetails.class)))
                 .thenReturn(EXPECTED_ERROR_SELECTED_ORGANISATION_REPRESENTATIVE_ORGANISATION_NOT_MATCHES);
@@ -116,7 +124,8 @@ class AddAmendClaimantRepresentativeControllerTest {
     }
 
     @Test
-    void testAmendClaimantRepresentativeMidEvent() throws Exception {
+    @SneakyThrows
+    void testAmendClaimantRepresentativeSubmitted() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         UserDetails userDetails = new UserDetails();
         userDetails.setEmail("test@test.com");
@@ -132,19 +141,40 @@ class AddAmendClaimantRepresentativeControllerTest {
     }
 
     @Test
-    void testAmendClaimantRepSubmitted() throws Exception {
+    @SneakyThrows
+    void testAmendClaimantRepMidEvent() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         UserDetails userDetails = new UserDetails();
         userDetails.setEmail(TEST_USER_EMAIL);
         when(userIdamService.getUserDetails(any())).thenReturn(userDetails);
-        doNothing().when(nocClaimantRepresentativeService).validateRepresentativeOrganisationAndEmail(any(
-                CaseData.class));
+        when(nocClaimantRepresentativeService.validateRepresentativeOrganisationAndEmail(any(
+                CaseData.class))).thenReturn(new ArrayList<>());
         mockMvc.perform(post(AMEND_CLAIMANT_REPRESENTATIVE_MID_EVENT)
                         .content(jsonMapper.toJson(ccdRequest))
                         .header("Authorization", AUTH_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
-        verify(nocClaimantRepresentativeService, times(LoggerTestUtils.INTEGER_ONE))
-                .validateRepresentativeOrganisationAndEmail(any(CaseData.class));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", empty()))
+                .andExpect(jsonPath("$.warnings", empty()));
+    }
+
+    @Test
+    @SneakyThrows
+    void testAmendClaimantRepSubmitted_WithWarning() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        UserDetails userDetails = new UserDetails();
+        userDetails.setEmail(TEST_USER_EMAIL);
+        when(userIdamService.getUserDetails(any())).thenReturn(userDetails);
+        when(nocClaimantRepresentativeService.validateRepresentativeOrganisationAndEmail(any(
+                CaseData.class))).thenReturn(List.of(EXPECTED_WARNING_REPRESENTATIVE_EMAIL_NOT_FOUND));
+        mockMvc.perform(post(AMEND_CLAIMANT_REPRESENTATIVE_MID_EVENT)
+                        .content(jsonMapper.toJson(ccdRequest))
+                        .header("Authorization", AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data", notNullValue()))
+                .andExpect(jsonPath("$.errors", empty()))
+                .andExpect(jsonPath("$.warnings", notNullValue()));
     }
 }

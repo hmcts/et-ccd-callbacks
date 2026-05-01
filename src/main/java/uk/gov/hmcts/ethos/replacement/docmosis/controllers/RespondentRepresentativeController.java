@@ -57,6 +57,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERR
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_MODIFY_REPRESENTATIVE_ACCESS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_REPRESENTATIVE_ORGANISATION_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrorsAndWarnings;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 
 @Slf4j
@@ -122,8 +123,9 @@ public class RespondentRepresentativeController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         NocUtils.clearNocWarningIfPresent(caseData);
         List<String> errors = new ArrayList<>();
+        List<String> warnings = new ArrayList<>();
         try {
-            nocRespondentRepresentativeService.validateRepresentativesOrganisationsAndEmails(caseData);
+            warnings.addAll(nocRespondentRepresentativeService.validateRepresentativesOrganisationsAndEmails(caseData));
         } catch (GenericRuntimeException | GenericServiceException gse) {
             String errorMessage = String.format(ERROR_REPRESENTATIVE_ORGANISATION_AND_EMAIL_NOT_MATCHED,
                     StringUtils.EMPTY);
@@ -133,7 +135,7 @@ public class RespondentRepresentativeController {
             }
             errors.add(errorMessage);
         }
-        return getCallbackRespEntityErrors(errors, caseData);
+        return getCallbackRespEntityErrorsAndWarnings(warnings, errors, caseData);
     }
 
     @PostMapping(value = "/amendRespondentRepresentativeAboutToSubmit", consumes = APPLICATION_JSON_VALUE)
@@ -196,13 +198,13 @@ public class RespondentRepresentativeController {
         try {
             NocUtils.validateCallbackRequest(callbackRequest);
             nocRespondentRepresentativeService.updateRepresentativesAccess(callbackRequest, userToken);
-        } catch (GenericServiceException e) {
+        } catch (GenericServiceException | GenericRuntimeException e) {
             log.error(ERROR_UNABLE_TO_MODIFY_REPRESENTATIVE_ACCESS,
                     callbackRequest.getCaseDetails().getCaseId(), e.getMessage());
         }
     }
 
-    @PostMapping(value = "/updateRespOrgPolicyAboutToStart", consumes = APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/updateRespOrgPolicyAboutToSubmit", consumes = APPLICATION_JSON_VALUE)
     @Operation(summary = "Updates respondent's organisation policy, representatives' roles and resets change"
             + "organisation request field after representation amended(revoked/assigned)")
     @ApiResponses(value = {
@@ -218,7 +220,7 @@ public class RespondentRepresentativeController {
         @ApiResponse(responseCode = HTTP_CODE_FIVE_ZERO_ONE, description = HTTP_MESSAGE_FIVE_ZERO_ONE),
         @ApiResponse(responseCode = HTTP_CODE_FIVE_ZERO_THREE, description = HTTP_MESSAGE_FIVE_ZERO_THREE)
     })
-    public ResponseEntity<CCDCallbackResponse> updateRespOrgPolicyAboutToStart(
+    public ResponseEntity<CCDCallbackResponse> updateRespOrgPolicyAboutToSubmit(
             @RequestBody CCDRequest ccdRequest,
             @RequestHeader(AUTHORIZATION) String userToken) {
         log.info("UPDATE RESPONDENT ORGANISATION POLICIES AND ROLES FOR REMOVED REPRESENTATIVES ---> {}{}",
@@ -247,37 +249,6 @@ public class RespondentRepresentativeController {
         // and to allow further changes to be made
         caseData.setChangeOrganisationRequestField(null);
         return getCallbackRespEntityNoErrors(ccdRequest.getCaseDetails().getCaseData());
-    }
-
-    @PostMapping(value = "/aboutToStartAmendRespondentRepresentativeContact", consumes = APPLICATION_JSON_VALUE)
-    @Operation(summary = "Loads RepresentedTypeR contact values into case-level fields")
-    @ApiResponses(value = {
-        @ApiResponse(responseCode = HTTP_CODE_TWO_HUNDRED, description = HTTP_MESSAGE_TWO_HUNDRED,
-            content = {
-                @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))
-            }),
-        @ApiResponse(responseCode = HTTP_CODE_FOUR_HUNDRED, description = HTTP_MESSAGE_FOUR_HUNDRED),
-        @ApiResponse(responseCode = HTTP_CODE_FOUR_ZERO_ONE, description = HTTP_MESSAGE_FOUR_ZERO_ONE),
-        @ApiResponse(responseCode = HTTP_CODE_FOUR_ZERO_THREE, description = HTTP_MESSAGE_FOUR_ZERO_THREE),
-        @ApiResponse(responseCode = HTTP_CODE_FOUR_ZERO_FOUR, description = HTTP_MESSAGE_FOUR_ZERO_FOUR),
-        @ApiResponse(responseCode = HTTP_CODE_FIVE_HUNDRED, description = HTTP_MESSAGE_FIVE_HUNDRED),
-        @ApiResponse(responseCode = HTTP_CODE_FIVE_ZERO_ONE, description = HTTP_MESSAGE_FIVE_ZERO_ONE),
-        @ApiResponse(responseCode = HTTP_CODE_FIVE_ZERO_THREE, description = HTTP_MESSAGE_FIVE_ZERO_THREE)
-    })
-    public ResponseEntity<CCDCallbackResponse> aboutToStartAmendRespondentRepresentativeContact(
-            @RequestBody CCDRequest ccdRequest,
-            @RequestHeader(AUTHORIZATION) String userToken) {
-        CaseDataUtils.validateCCDRequest(ccdRequest);
-        CaseDetails caseDetails = ccdRequest.getCaseDetails();
-        CaseData caseData = caseDetails.getCaseData();
-        List<String> errors = new ArrayList<>();
-        try {
-            nocRespondentRepresentativeService.loadRespondentRepresentativeValues(
-                    userToken, caseDetails);
-        } catch (GenericServiceException gse) {
-            errors.add(gse.getMessage());
-        }
-        return getCallbackRespEntityErrors(errors, caseData);
     }
 
     @PostMapping(value = "/removeOwnRepresentative", consumes = APPLICATION_JSON_VALUE)

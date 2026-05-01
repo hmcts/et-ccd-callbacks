@@ -33,6 +33,7 @@ import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -68,7 +69,7 @@ class NocClaimantRepresentativeServiceTest {
 
     private static final String EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL =
             "Representative 'Representative Name 1' could not be found using representative_1@hmcts.org. Case access "
-                    + "will not be defined for this representative.\n";
+                    + "will not be defined for this representative.";
 
     private static final String EXPECTED_ERROR_SELECTED_ORGANISATION_REPRESENTATIVE_ORGANISATION_NOT_MATCHES =
             "Representative Representative Name 1 organisation does not match with selected organisation "
@@ -267,25 +268,22 @@ class NocClaimantRepresentativeServiceTest {
     void theValidateRepresentativeOrganisationAndEmail() {
         // when representative claimant type is empty should not set noc warning
         CaseData tmpCaseData = new CaseData();
-        nocClaimantRepresentativeService.validateRepresentativeOrganisationAndEmail(tmpCaseData);
-        assertThat(tmpCaseData.getNocWarning()).isNull();
+        assertThat(nocClaimantRepresentativeService.validateRepresentativeOrganisationAndEmail(tmpCaseData)).isEmpty();
         // when representative does not have email should not set noc warning
         RepresentedTypeC claimantRepresentative = RepresentedTypeC.builder().build();
         tmpCaseData.setRepresentativeClaimantType(claimantRepresentative);
-        nocClaimantRepresentativeService.validateRepresentativeOrganisationAndEmail(tmpCaseData);
-        assertThat(tmpCaseData.getNocWarning()).isNull();
+        assertThat(nocClaimantRepresentativeService.validateRepresentativeOrganisationAndEmail(tmpCaseData)).isEmpty();
         // when representative does not have hmcts organisation id should not set noc warning
         claimantRepresentative.setRepresentativeEmailAddress(REPRESENTATIVE_EMAIL_1);
-        nocClaimantRepresentativeService.validateRepresentativeOrganisationAndEmail(tmpCaseData);
-        assertThat(tmpCaseData.getNocWarning()).isNull();
+        assertThat(nocClaimantRepresentativeService.validateRepresentativeOrganisationAndEmail(tmpCaseData)).isEmpty();
         // when representative has hmcts organisation id and email should set noc warning
         claimantRepresentative.setMyHmctsOrganisation(Organisation.builder().organisationID(ORGANISATION_ID_NEW)
                 .build());
         claimantRepresentative.setNameOfRepresentative(REPRESENTATIVE_NAME_1);
         when(organisationService.checkRepresentativeAccountByEmail(REPRESENTATIVE_NAME_1, REPRESENTATIVE_EMAIL_1))
-                .thenReturn(EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL);
-        nocClaimantRepresentativeService.validateRepresentativeOrganisationAndEmail(tmpCaseData);
-        assertThat(tmpCaseData.getNocWarning()).isEqualTo(EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL);
+                .thenReturn(List.of(EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL));
+        assertThat(nocClaimantRepresentativeService.validateRepresentativeOrganisationAndEmail(tmpCaseData))
+                .isEqualTo(List.of(EXPECTED_WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL));
     }
 
     @Test

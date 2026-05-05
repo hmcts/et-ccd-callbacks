@@ -9,7 +9,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
@@ -52,9 +52,9 @@ class ServingServiceTest {
 
     private static EmailService emailService;
     private static ServingService servingService;
-    @MockBean
+    @MockitoBean
     private EmailNotificationService emailNotificationService;
-    @MockBean
+    @MockitoBean
     private CaseAccessService caseAccessService;
 
     @Captor

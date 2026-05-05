@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
@@ -48,7 +48,7 @@ class JudgeControllerTest {
     private static final String AUTH_TOKEN = "some-token";
     private CCDRequest ccdRequest;
 
-    @MockBean
+    @MockitoBean
     private VerifyTokenService verifyTokenService;
 
     @Autowired
@@ -57,7 +57,7 @@ class JudgeControllerTest {
     @Autowired
     private JsonMapper jsonMapper;
 
-    @MockBean
+    @MockitoBean
     private JudgeService judgeService;
 
     @BeforeEach

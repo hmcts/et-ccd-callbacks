@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.model.ccd.CCDRequest;
@@ -32,9 +32,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 @ExtendWith(SpringExtension.class)
 class EcmMigrationServiceTest {
 
-    @MockBean
+    @MockitoBean
     private CcdClient ccdClient;
-    @MockBean
+    @MockitoBean
     private AdminUserService adminUserService;
     private EcmMigrationService ecmMigrationService;
     private CaseDetails caseDetails;

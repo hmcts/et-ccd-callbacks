@@ -15,9 +15,9 @@ import org.mockito.InjectMocks;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.data.util.Pair;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.web.client.RestClientResponseException;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
@@ -123,21 +123,21 @@ class CaseManagementForCaseWorkerServiceTest {
     private CCDRequest manchesterCcdRequest;
     private SubmitEvent submitEvent;
 
-    @MockBean
+    @MockitoBean
     private CaseRetrievalForCaseWorkerService caseRetrievalForCaseWorkerService;
-    @MockBean
+    @MockitoBean
     private CcdClient ccdClient;
-    @MockBean
+    @MockitoBean
     private ClerkService clerkService;
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
-    @MockBean
+    @MockitoBean
     private AdminUserService adminUserService;
-    @MockBean
+    @MockitoBean
     private CaseManagementLocationService caseManagementLocationService;
-    @MockBean
+    @MockitoBean
     private MultipleReferenceService multipleReferenceService;
-    @MockBean
+    @MockitoBean
     private MultipleCasesSendingService multipleCasesSendingService;
 
     @BeforeEach

@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import uk.gov.hmcts.ecm.common.service.PostcodeToOfficeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -40,33 +40,33 @@ import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.USER_ID;
 class CaseServiceBootTest {
     @Autowired
     CaseService caseService;
-    @MockBean
+    @MockitoBean
     private AuthTokenGenerator authTokenGenerator;
-    @MockBean
+    @MockitoBean
     private IdamClient idamClient;
-    @MockBean
+    @MockitoBean
     private IdamApi idamApi;
-    @MockBean
+    @MockitoBean
     private CoreCaseDataApi ccdApiClient;
-    @MockBean
+    @MockitoBean
     private CaseDocumentService caseDocumentService;
-    @MockBean
+    @MockitoBean
     private NotificationService notificationService;
-    @MockBean
+    @MockitoBean
     private AcasService acasService;
-    @MockBean
+    @MockitoBean
     BundlesService bundlesService;
-    @MockBean
+    @MockitoBean
     private PostcodeToOfficeService postcodeToOfficeService;
-    @MockBean
+    @MockitoBean
     private PdfUploadService pdfUploadService;
-    @MockBean
+    @MockitoBean
     private JurisdictionCodesMapper jurisdictionCodesMapper;
-    @MockBean
+    @MockitoBean
     private CaseOfficeService caseOfficeService;
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
-    @MockBean
+    @MockitoBean
     private VerifyTokenService verifyTokenService;
     private CaseTestData caseTestData;
 

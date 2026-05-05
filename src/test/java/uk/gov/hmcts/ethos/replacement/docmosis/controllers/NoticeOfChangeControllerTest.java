@@ -7,9 +7,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -50,21 +50,21 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 })
 class NoticeOfChangeControllerTest {
 
-    @MockBean
+    @MockitoBean
     private VerifyTokenService verifyTokenService;
-    @MockBean
+    @MockitoBean
     private NocRespondentRepresentativeService nocRespondentRepresentativeService;
-    @MockBean
+    @MockitoBean
     private NocClaimantRepresentativeService nocClaimantRepresentativeService;
-    @MockBean
+    @MockitoBean
     private NocRepresentativeService nocRepresentativeService;
-    @MockBean
+    @MockitoBean
     private CcdCaseAssignment ccdCaseAssignment;
 
-    @MockBean
+    @MockitoBean
     private NocNotificationService notificationService;
 
-    @MockBean
+    @MockitoBean
     private UserIdamService userIdamService;
 
     @Autowired

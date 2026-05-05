@@ -13,7 +13,7 @@ import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.RoomRepository;
@@ -38,10 +38,10 @@ class VenueFixedListSheetImporterTest {
     @Autowired
     private VenueFixedListSheetImporter venueFixedListSheetImporter;
 
-    @MockBean
+    @MockitoBean
     private VenueRepository venueRepository;
 
-    @MockBean
+    @MockitoBean
     private RoomRepository roomRepository;
 
     @Autowired

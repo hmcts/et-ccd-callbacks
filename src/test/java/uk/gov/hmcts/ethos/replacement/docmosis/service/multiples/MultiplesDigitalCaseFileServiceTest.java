@@ -3,7 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.multiples;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.bundle.Bundle;
 import uk.gov.hmcts.et.common.model.multiples.MultipleData;
@@ -28,9 +28,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_C
 @ExtendWith(SpringExtension.class)
 class MultiplesDigitalCaseFileServiceTest {
     private static final String ET_DCF_2_YAML = "et-dcf-2.yaml";
-    @MockBean
+    @MockitoBean
     private AuthTokenGenerator authTokenGenerator;
-    @MockBean
+    @MockitoBean
     private BundleApiClient bundleApiClient;
 
     private MultiplesDigitalCaseFileService multiplesDigitalCaseFileService;

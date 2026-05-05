@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.et.syaapi.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.HubLinksStatuses;
 import uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants;
 import uk.gov.hmcts.reform.et.syaapi.enums.CaseEvent;
@@ -23,15 +23,15 @@ class HubLinkServiceTest {
     private static final String CASE_TYPE = "ET_Scotland";
     private static final String CASE_ID = "1646225213651590";
 
-    @MockBean
+    @MockitoBean
     CaseService caseService;
-    @MockBean
+    @MockitoBean
     CaseDetailsConverter caseDetailsConverter;
-    @MockBean
+    @MockitoBean
     private HubLinkService hubLinkService;
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
-    @MockBean
+    @MockitoBean
     private ManageCaseRoleService manageCaseRoleService;
 
     private final TestData testData;

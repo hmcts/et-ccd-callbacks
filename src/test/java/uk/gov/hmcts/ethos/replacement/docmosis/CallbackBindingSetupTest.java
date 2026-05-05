@@ -10,12 +10,11 @@ import org.springframework.context.annotation.ClassPathScanningCandidateComponen
 import org.springframework.core.annotation.AnnotatedElementUtils;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
 import org.springframework.stereotype.Controller;
+import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.web.bind.annotation.RestController;
-import sun.misc.Unsafe;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -37,7 +36,8 @@ class CallbackBindingSetupTest {
     private static final String LOCAL_CALLBACK_BASE_URL = "http://localhost:8081";
 
     @Test
-    void callbackBindingsFromCcdDefinitionsResolveAgainstEtControllers() throws Exception {
+    void callbackBindingsFromCcdDefinitionsResolveAgainstEtControllers()
+        throws IOException, ReflectiveOperationException {
         Map<String, Object> definitions = loadCaseTypeDefinitions();
         List<Class<?>> controllerClasses = discoverControllerClasses();
 
@@ -45,12 +45,11 @@ class CallbackBindingSetupTest {
         assertThat(controllerClasses).isNotEmpty();
 
         Object callbackDispatchService = createCallbackDispatchService(definitions, controllerClasses);
-        Method initialiseHandlerMaps = callbackDispatchService.getClass().getDeclaredMethod("initialiseHandlerMaps");
-        initialiseHandlerMaps.setAccessible(true);
-        initialiseHandlerMaps.invoke(callbackDispatchService);
+        ReflectionTestUtils.invokeMethod(callbackDispatchService, "initialiseHandlerMaps");
     }
 
-    private static Map<String, Object> loadCaseTypeDefinitions() throws Exception {
+    private static Map<String, Object> loadCaseTypeDefinitions()
+        throws IOException, ReflectiveOperationException {
         Map<String, Object> definitions = new LinkedHashMap<>();
         Class<?> caseTypeDefinitionClass = Class.forName("uk.gov.hmcts.ccd.domain.model.definition.CaseTypeDefinition");
 
@@ -90,12 +89,12 @@ class CallbackBindingSetupTest {
     private static Object createCallbackDispatchService(
         Map<String, Object> definitions,
         List<Class<?>> controllerClasses
-    ) throws Exception {
+    ) throws ReflectiveOperationException {
         ListableBeanFactory beanFactory = Mockito.mock(ListableBeanFactory.class);
         Map<String, Object> restControllers = new LinkedHashMap<>();
         Map<String, Object> controllers = new LinkedHashMap<>();
         for (Class<?> controllerClass : controllerClasses) {
-            Object controllerInstance = allocateWithoutConstructor(controllerClass);
+            Object controllerInstance = Mockito.mock(controllerClass);
             String beanName = controllerClass.getSimpleName();
             if (AnnotatedElementUtils.hasAnnotation(controllerClass, RestController.class)) {
                 restControllers.put(beanName, controllerInstance);
@@ -110,12 +109,11 @@ class CallbackBindingSetupTest {
 
         Class<?> callbackDispatchServiceClass = Class.forName("uk.gov.hmcts.ccd.sdk.impl.CallbackDispatchService");
         Class<?> definitionRegistryClass = Class.forName("uk.gov.hmcts.ccd.sdk.impl.DefinitionRegistry");
-        Constructor<?> constructor = callbackDispatchServiceClass.getDeclaredConstructor(
+        Constructor<?> constructor = callbackDispatchServiceClass.getConstructor(
             definitionRegistryClass,
             ListableBeanFactory.class,
             ObjectMapper.class
         );
-        constructor.setAccessible(true);
         Object definitionRegistry = Mockito.mock((Class<Object>) definitionRegistryClass, invocation -> {
             if ("loadDefinitions".equals(invocation.getMethod().getName())) {
                 return definitions;
@@ -123,16 +121,7 @@ class CallbackBindingSetupTest {
             return Answers.RETURNS_DEFAULTS.answer(invocation);
         });
         Object service = constructor.newInstance(definitionRegistry, beanFactory, OBJECT_MAPPER);
-        Field localCallbackBaseUrls = callbackDispatchServiceClass.getDeclaredField("localCallbackBaseUrls");
-        localCallbackBaseUrls.setAccessible(true);
-        localCallbackBaseUrls.set(service, LOCAL_CALLBACK_BASE_URL);
+        ReflectionTestUtils.setField(service, "localCallbackBaseUrls", LOCAL_CALLBACK_BASE_URL);
         return service;
-    }
-
-    private static Object allocateWithoutConstructor(Class<?> type) throws Exception {
-        Field unsafeField = Unsafe.class.getDeclaredField("theUnsafe");
-        unsafeField.setAccessible(true);
-        Unsafe unsafe = (Unsafe) unsafeField.get(null);
-        return unsafe.allocateInstance(type);
     }
 }

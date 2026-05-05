@@ -9,6 +9,7 @@ if (!prId) {
 console.log(prId);
 const vars = {
   ET_COS_URL: `https://et-cos-pr-${prId}.preview.platform.hmcts.net`,
+  CCD_DEF_BASE_URL: `https://et-cos-pr-${prId}.preview.platform.hmcts.net`,
   CCD_DEF_URL: `https://ccd-data-store-api-et-cos-pr-${prId}.preview.platform.hmcts.net`,
   CCD_DEF_AAC_URL: `https://aac-et-cos-pr-${prId}.preview.platform.hmcts.net`,
 };

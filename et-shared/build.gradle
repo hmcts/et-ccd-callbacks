@@ -37,6 +37,8 @@ dependencyManagement {
         dependency 'com.squareup.okhttp3:okhttp-urlconnection:4.12.0'
         dependency 'com.squareup.okio:okio:3.17.0'
         dependency 'org.bouncycastle:bcprov-jdk15on:1.70'
+        // CVE-2026-42198 - override above the Spring Boot BOM
+        dependency 'org.postgresql:postgresql:42.7.11'
         dependencySet(group: 'io.netty', version: '4.2.12.Final') {
             entry 'netty-buffer'
             entry 'netty-codec'
@@ -142,6 +144,7 @@ dependencies {
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.18.3'
     implementation group: 'com.fasterxml.jackson.datatype', name: 'jackson-datatype-jsr310', version: '2.18.3'
     implementation group: 'org.springframework', name: 'spring-core', version: '6.2.18'
+    implementation 'com.github.hmcts:decentralised-runtime:callback-dispatch-refactor-20260415-1610'
 
     compileOnly group: 'org.projectlombok', name: 'lombok', version: '1.18.46'
     annotationProcessor group: 'org.projectlombok', name: 'lombok', version: '1.18.46'
@@ -166,6 +169,10 @@ dependencies {
 
 configurations.configureEach {
     resolutionStrategy.eachDependency { details ->
+        if (details.requested.group == "org.apache.tomcat.embed"
+            && ["tomcat-embed-core", "tomcat-embed-websocket"].contains(details.requested.name)) {
+            details.useVersion("10.1.54")
+        }
         // CVE-2020-29582 - Force Kotlin to 2.1.0+
         if (details.requested.group == "org.jetbrains.kotlin"
             && details.requested.name.startsWith("kotlin-stdlib")) {
@@ -205,7 +212,9 @@ configurations.configureEach {
         'io.netty:netty-transport-native-kqueue:4.2.12.Final',
         'io.netty:netty-transport-native-unix-common:4.2.12.Final',
         'io.netty:netty-transport-classes-epoll:4.2.12.Final',
-        'io.netty:netty-transport-classes-kqueue:4.2.12.Final'
+        'io.netty:netty-transport-classes-kqueue:4.2.12.Final',
+        // CVE-2026-42198
+        'org.postgresql:postgresql:42.7.11'
     )
 }
 

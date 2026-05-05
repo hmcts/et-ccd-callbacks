@@ -3,6 +3,16 @@ spring:
     password: ${DB_PASSWORD}
     url: ${DB_URL}
     username: ${DB_USERNAME}
+  main:
+    allow-bean-definition-overriding: true
+  messages:
+    encoding: ISO-8859-1
+  autoconfigure:
+    exclude:
+      - com.azure.spring.cloud.autoconfigure.implementation.context.AzureTokenCredentialAutoConfiguration
+  jms:
+    servicebus:
+      enabled: false
 
 ccd:
   client:
@@ -23,6 +33,9 @@ idam:
   api:
     url: http://localhost:5000
     jwkUrl: http://localhost:5000/jwks
+
+decentralisation:
+  legacy-json-service: true
 
 ccd_gateway_base_url: http://127.0.0.1:3453
 

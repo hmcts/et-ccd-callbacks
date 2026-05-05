@@ -52,7 +52,8 @@ def sonarExclusions =
          'et-shared/src/main/java/**/helpers/**',
          'et-shared/src/main/java/**/launchdarkly/**',
          'et-shared/src/main/java/**/servicebus/**',
-		 'et-shared/src/main/java/uk/gov/hmcts/ecm/compat/common/client/CcdClient.java'
+		 'et-shared/src/main/java/uk/gov/hmcts/ecm/compat/common/client/CcdClient.java',
+         '**/uk/gov/hmcts/ethos/replacement/docmosis/domain/caseview/state/**'
 ]
 
 def duplicateCodeExclusionList = [
@@ -128,6 +129,10 @@ allprojects {
             if (details.requested.group.startsWith("com.fasterxml.jackson")) {
                 details.useVersion("$jacksonVersion")
             }
+            if (details.requested.group == "org.apache.tomcat.embed"
+                && ["tomcat-embed-core", "tomcat-embed-websocket"].contains(details.requested.name)) {
+                details.useVersion(tomcatEmbedVersion)
+            }
             // CVE-2020-29582 - Force Kotlin to 2.1.0+
             if (details.requested.group == "org.jetbrains.kotlin"
                 && details.requested.name.startsWith("kotlin-stdlib")) {
@@ -168,6 +173,8 @@ allprojects {
             'io.netty:netty-transport-native-unix-common:4.2.12.Final',
             'io.netty:netty-transport-classes-epoll:4.2.12.Final',
             'io.netty:netty-transport-classes-kqueue:4.2.12.Final',
+            // CVE-2026-42198
+            'org.postgresql:postgresql:42.7.11',
             // CVE-2026-22748, CVE-2026-22746
             'org.springframework.security:spring-security-crypto:6.5.10'
         )
@@ -226,6 +233,17 @@ tasks.register('functional', Test) {
 tasks.register('yarnInstall', Exec) {
     workingDir '.'
     commandLine 'yarn', 'install'
+}
+
+tasks.register('setupCcdDefinitionsWorkspace', Exec) {
+    workingDir 'ccd-definitions'
+    commandLine 'yarn', 'install'
+}
+
+tasks.register('generateCftlibCcdDefinitions', Exec) {
+    dependsOn 'setupCcdDefinitionsWorkspace'
+    workingDir 'ccd-definitions'
+    commandLine 'yarn', 'generate-excel:cftlib'
 }
 
 tasks.register('yarnAudit', Exec) {
@@ -394,6 +412,7 @@ ext {
     pact_version = '4.3.10'
     reformLoggingVersion = '6.0.1'
     serenity = '3.9.8'
+    // Apache Tomcat 10.1.54+ addresses 2026 CVEs (e.g. CVE-2026-29145 chain, CVE-2026-34486 bypass in 10.1.53); see https://tomcat.apache.org/security-10.html
     tomcatEmbedVersion = '10.1.54'
     jacksonVersion = '2.18.3'
 }
@@ -403,6 +422,8 @@ ext["rest-assured.version"] = '5.1.0'
 dependencyManagement {
     dependencies {
         dependency 'org.apache.httpcomponents.core5:httpcore5:5.4.2'
+        // CVE-2026-42198 - override above the Spring Boot BOM
+        dependency 'org.postgresql:postgresql:42.7.11'
         // CVE-2026-22748, CVE-2026-22746 - force override above the Spring Boot BOM
         dependency 'org.springframework.security:spring-security-crypto:6.5.10'
         dependencySet(group: 'com.google.guava', version: '33.6.0-jre') {
@@ -445,6 +466,9 @@ dependencies {
     implementation group: 'net.logstash.logback', name: 'logstash-logback-encoder', version: '8.1'
     implementation group: 'com.nimbusds', name: 'nimbus-jose-jwt', version: '10.9'
 
+    implementation 'com.github.hmcts:decentralised-runtime:callback-dispatch-refactor-20260415-1610'
+    implementation 'com.github.hmcts:ccd-config-generator:callback-dispatch-refactor-20260415-1610'
+
     // Log4J core added to remove startup error message
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4JVersion
     // CVE-2025-54988
@@ -468,7 +492,9 @@ dependencies {
     implementation group: 'org.springframework.security', name: 'spring-security-crypto', version: '6.5.10'
     //To Remove vulnerability CVE-2020-11988
     implementation group: 'org.apache.xmlgraphics', name: 'xmlgraphics-commons', version: '2.11'
-    implementation group: 'org.flywaydb', name: 'flyway-core', version: '9.22.3'
+    implementation 'org.flywaydb:flyway-database-postgresql:11.20.3'
+    implementation 'org.flywaydb:flyway-core:11.20.3'
+    // CVE-2026-42198
     implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.11'
     implementation group: 'org.slf4j', name: 'slf4j-ext', version: '2.0.17'
     implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.5.0'
@@ -582,6 +608,11 @@ bootJar {
         'et-cos.jar'
     })
 
+    dependsOn dumpCCDDefinitions
+    from("$buildDir/cftlib/definition-snapshots") {
+        into 'BOOT-INF/classes/definition-snapshots'
+    }
+
     manifest {
         attributes('Implementation-Version': project.version.toString())
     }
@@ -590,6 +621,8 @@ bootJar {
 wrapper {
     distributionType = Wrapper.DistributionType.ALL
 }
+
+assemble.dependsOn(dumpCCDDefinitions)
 
 bootWithCCD {
     // Simulates idam and s2s locally.
@@ -617,6 +650,8 @@ bootWithCCD {
     environment 'XUI_DOCUMENTS_API', 'http://host.docker.internal:5005'
     environment 'XUI_DOCUMENTS_API_V2', 'http://host.docker.internal:4455'
     environment 'XUI_LD_ID', System.getenv('XUI_LD_ID')
+    environment 'APPINSIGHTS_CONNECTION_STRING', System.getenv('APPINSIGHTS_CONNECTION_STRING')
+        ?: 'InstrumentationKey=00000000-0000-0000-0000-000000000000;IngestionEndpoint=http://localhost'
     environment 'SERVICES_PRD_COMMONDATA_API', 'http://wiremock:8080'
     // Allows latest XUI image without WA by not specifying EMPLOYMENT. Add EMPLOYMENT to enable WA.
     environment 'WA_SUPPORTED_JURISDICTIONS', 'IA,CIVIL,PRIVATELAW,PUBLICLAW'
@@ -628,10 +663,32 @@ bootWithCCD {
     environment 'XUI_MANAGE_ORGANISATIONS_CASETYPES', 'ET_EnglandWales,ET_Scotland'
 
     environment 'SPRING_PROFILES_ACTIVE', 'cftlib'
+    environment 'ET_COS_SYSTEM_USER', System.getenv('ET_COS_SYSTEM_USER') ?: 'admin@hmcts.net'
+    environment 'ET_COS_SYSTEM_USER_PASSWORD', System.getenv('ET_COS_SYSTEM_USER_PASSWORD') ?: 'Password'
     // et-ccd-callbacks
     //environment 'SERVICEBUS_FAKE', 'true'*
     environment 'CFTLIB_EXTRA_COMPOSE_FILES', ''
+    environment 'CCD_DECENTRALISED_CASE-TYPE-SERVICE-URLS_ET_EnglandWales', 'https://localhost:8081'
+    environment 'CCD_DECENTRALISED_CASE-TYPE-SERVICE-URLS_ET_Scotland', 'https://localhost:8081'
+    environment 'CCD_DECENTRALISED_CASE-TYPE-SERVICE-URLS_ET_EnglandWales_Listings', 'https://localhost:8081'
+    environment 'CCD_DECENTRALISED_CASE-TYPE-SERVICE-URLS_ET_Scotland_Listings', 'https://localhost:8081'
+    environment 'CCD_DECENTRALISED_CASE-TYPE-SERVICE-URLS_ET_EnglandWales_Multiple', 'https://localhost:8081'
+    environment 'CCD_DECENTRALISED_CASE-TYPE-SERVICE-URLS_ET_Scotland_Multiple', 'https://localhost:8081'
+    environment 'CCD_DECENTRALISED_CASE-TYPE-SERVICE-URLS_ET_Admin', 'https://localhost:8081'
 
+}
+
+tasks.named('dumpCCDDefinitions') {
+    dependsOn 'generateCftlibCcdDefinitions'
+    authMode = uk.gov.hmcts.rse.AuthMode.Local
+    environment 'RSE_LIB_ADDITIONAL_DATABASES', 'et_cos,et_msg_handler,evidence,ethos,camunda,role_assignment,wa_workflow_api,cft_task_db,wa_case_event_messages_db,ccd_data,emstitch'
+    environment 'SPRING_PROFILES_ACTIVE', 'cftlib'
+    environment 'SPRING_MAIN_LAZY_INITIALIZATION', 'true'
+    environment 'CFTLIB_IMPORT_CCD_DEFS_ON_BOOT', System.getenv('CFTLIB_IMPORT_CCD_DEFS_ON_BOOT') ?: 'true'
+    environment 'ET_COS_CFTLIB_DB_PASSWORD', System.getenv('ET_COS_CFTLIB_DB_PASSWORD') ?: 'postgres'
+    environment 'ET_COS_SYSTEM_USER', System.getenv('ET_COS_SYSTEM_USER') ?: 'admin@hmcts.net'
+    environment 'ET_COS_SYSTEM_USER_PASSWORD', System.getenv('ET_COS_SYSTEM_USER_PASSWORD') ?: 'Password'
+    environment 'CFTLIB_EXTRA_COMPOSE_FILES', ''
 }
 
 tasks.register('highLevelDataSetup', JavaExec) {

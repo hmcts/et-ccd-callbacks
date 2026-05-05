@@ -6,12 +6,20 @@ java:
   devcpuLimits: 1024m
   devmemoryRequests: 1536Mi
   devmemoryLimits: 3Gi
+  secrets:
+      AZURE_SERVICE_BUS_CONNECTION_STRING:
+        secretRef: et-sb-preview
+        key: connectionString
+      AZURE_SERVICE_BUS_PREVIEW_CONNECTION_STRING:
+        secretRef: et-sb-preview
+        key: connectionString
   environment:
     EXUI_CASE_DETAILS_URL: "https://xui-${SERVICE_FQDN}/cases/case-details/"
     CITIZEN_CASE_DETAILS_URL: "https://et-sya-${SERVICE_FQDN}/citizen-hub/"
     RESPONDENT_PORTAL_LINK: "https://et-syr-${SERVICE_FQDN}/"
     LAUNCH_DARKLY_ENV: '{{ .Values.global.environment }}'
     ET_COS_URL: "https://${SERVICE_NAME}"
+    DECENTRALISATION_LOCAL_CALLBACK_BASE_URLS: "https://${SERVICE_FQDN},http://localhost:8081"
     AAC_URL: "https://aac-${SERVICE_FQDN}"
     TORNADO_URL: "https://docmosis.aat.platform.hmcts.net/rs/render"
     IDAM_API_URL: "https://idam-api.aat.platform.hmcts.net"
@@ -28,6 +36,17 @@ java:
     SECURE_DOC_STORE_FEATURE: true
     EM_CCD_ORCHESTRATOR_URL: http://em-ccd-orchestrator-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     ACAS_BASE_URL: "https://api-dev-acas-01.azure-api.net/ECCLUAT"
+    CCD_SERVICEBUS_DESTINATION: ${SERVICE_NAME}-asb-ccd-case-events
+    SPRING_JMS_SERVICEBUS_ENABLED: true
+    ET_SERVICEBUS_SCHEDULER_ENABLED: true
+    AZURE_SERVICE_BUS_TOPIC_NAME: ${SERVICE_NAME}-asb-ccd-case-events
+    AZURE_SERVICE_BUS_SUBSCRIPTION_NAME: ${SERVICE_NAME}-asb-ccd-case-events
+    PREVIEW_DATA_STORE_CASE_ID_SEQUENCE_BASE: "91${CHANGE_ID}000000000000"
+    PREVIEW_DATA_STORE_DB_HOST: et-preview.postgres.database.azure.com
+    PREVIEW_DATA_STORE_DB_PORT: 5432
+    PREVIEW_DATA_STORE_DB_NAME: "pr-${CHANGE_ID}-data-store"
+    PREVIEW_DATA_STORE_DB_USERNAME: hmcts
+    PREVIEW_DATA_STORE_DB_CONN_OPTIONS: "?sslmode=require"
   keyVaults:
     et-cos:
       secrets:
@@ -65,6 +84,8 @@ java:
           alias: LAUNCH_DARKLY_SDK_KEY
         - name: app-insights-connection-string
           alias: app-insights-connection-string
+        - name: et-preview-flexi-db-password
+          alias: ET_PREVIEW_FLEXI_DB_PASSWORD
   postgresql:
     enabled: false
 
@@ -252,6 +273,22 @@ ccd:
         DEFINITION_STORE_HOST: https://ccd-definition-store-${SERVICE_FQDN}
         USER_PROFILE_HOST: https://ccd-user-profile-api-${SERVICE_FQDN}
         ROLE_ASSIGNMENT_URL: https://am-role-assignment-${SERVICE_FQDN}
+        SPRING_APPLICATION_JSON: |
+          {
+            "ccd": {
+              "decentralised": {
+                "case-type-service-urls": {
+                  "ET_EnglandWales": "https://${SERVICE_FQDN}",
+                  "ET_Scotland": "https://${SERVICE_FQDN}",
+                  "ET_EnglandWales_Listings": "https://${SERVICE_FQDN}",
+                  "ET_Scotland_Listings": "https://${SERVICE_FQDN}",
+                  "ET_EnglandWales_Multiple": "https://${SERVICE_FQDN}",
+                  "ET_Scotland_Multiple": "https://${SERVICE_FQDN}",
+                  "ET_Admin": "https://${SERVICE_FQDN}"
+                }
+              }
+            }
+          }
       ingressHost: ccd-data-store-api-${SERVICE_FQDN}
 
   am-role-assignment-service:
@@ -374,25 +411,32 @@ ccd:
     image: "hmctsprod.azurecr.io/imported/logstash/logstash"
     imageTag: "7.16.1"
     imagePullPolicy: "IfNotPresent"
+    rbac:
+      serviceAccountName: et
+    labels:
+      azure.workload.identity/use: "true"
     logstashJavaOpts: "-Xmx1g -Xms512M"
     extraInitContainers: |
       - name: download-postgres-jdbc
         image: hmctsprod.azurecr.io/curl:7.70.0
-        command: ['curl', '-L', 'https://jdbc.postgresql.org/download/postgresql-42.2.18.jar', '-o', '/logstash-lib/postgresql.jar']
+        command: ['curl', '-L', 'https://jdbc.postgresql.org/download/postgresql-42.7.11.jar', '-o', '/logstash-lib/postgresql.jar']
         volumeMounts:
         - name: logstash-lib
           mountPath: /logstash-lib
     extraVolumes: |
       - name: logstash-lib
         emptyDir: {}
-      - name: database-secret-volume
-        secret:
-          secretName: postgres
+      - name: vault-et-cos
+        csi:
+          driver: "secrets-store.csi.k8s.io"
+          readOnly: true
+          volumeAttributes:
+            secretProviderClass: ${SERVICE_NAME}-java-et-cos
     extraVolumeMounts: |
       - name: logstash-lib
         mountPath: /usr/share/logstash/ccd
-      - name: database-secret-volume
-        mountPath: /etc/logstash/secrets
+      - name: vault-et-cos
+        mountPath: /mnt/secrets/et-cos
         readOnly: true
     logstashConfig:
       logstash.yml: |
@@ -409,14 +453,55 @@ ccd:
       01_input.conf: |
         input  {
           jdbc {
-            jdbc_connection_string => "jdbc:postgresql://et-preview.postgres.database.azure.com:5432/pr-${CHANGE_ID}-data-store?sslmode=require&stringtype=unspecified"
-            jdbc_user => "hmcts"
-            jdbc_password_filepath => "/etc/logstash/secrets/PASSWORD"
+            jdbc_connection_string => "jdbc:postgresql://et-cos-postgres-v15-aat.postgres.database.azure.com:5432/et_cos?sslmode=require"
+            jdbc_user => "pgadmin"
+            jdbc_password_filepath => "/mnt/secrets/et-cos/ET_COS_DB_PASSWORD"
             jdbc_validate_connection => true
             jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"
             jdbc_driver_class => "org.postgresql.Driver"
             jdbc_default_timezone => "UTC"
-            statement => "UPDATE case_data SET marked_by_logstash = true WHERE marked_by_logstash = false RETURNING id, created_date, last_modified, jurisdiction, case_type_id, state, last_state_modified_date, data::TEXT as json_data, data_classification::TEXT as json_data_classification, reference, security_classification, supplementary_data::TEXT as json_supplementary_data"
+            statement => "
+                          WITH next_batch AS (
+                            SELECT reference, case_revision
+                            FROM ccd.es_queue
+                            ORDER BY enqueued_at
+                            LIMIT 100
+                            FOR UPDATE SKIP LOCKED
+                          ),
+                          deleted AS (
+                            DELETE FROM ccd.es_queue q
+                            USING next_batch nb
+                            WHERE q.reference = nb.reference
+                              AND q.case_revision = nb.case_revision
+                            RETURNING q.reference, q.case_revision
+                          )
+                          SELECT
+                            cd.id AS id,
+                            cd.id AS case_data_id,
+                            cd.reference,
+                            ce.id AS event_id,
+                            cd.case_type_id,
+                            cd.created_date,
+                            ce.created_date AS last_modified,
+                            cd.jurisdiction,
+                            cd.last_state_modified_date,
+                            cd.state,
+                            cd.security_classification::TEXT,
+                            ce.data::TEXT AS json_data,
+                            '{}' AS json_data_classification,
+                            cd.supplementary_data::TEXT AS json_supplementary_data,
+                            cd.case_revision
+                          FROM deleted d
+                          JOIN ccd.case_data cd ON cd.reference = d.reference
+                          JOIN LATERAL (
+                            SELECT ce.*
+                            FROM ccd.case_event ce
+                            WHERE ce.case_data_id = cd.id
+                            ORDER BY ce.id DESC
+                            LIMIT 1
+                          ) ce ON TRUE
+                          WHERE cd.case_revision = d.case_revision
+                        "
             clean_run => false
             schedule => "* * * * * *"
           }
@@ -527,7 +612,9 @@ ccd:
                 sniffing => false
                 index => "%{[index_id]}"
                 document_type => "_doc"
-                document_id => "%{id}"
+                document_id => "%{case_data_id}"
+                version => "%{case_revision}"
+                version_type => "external"
                 timeout => 60
             }
         }
@@ -765,37 +852,6 @@ servicebus:
         subscriptionNeeded: yes
       - name: jrd-topic
         subscriptionNeeded: yes
-
-ccd-message-publisher:
-  enabled: true
-  servicebus:
-    enabled: false
-  java:
-    ingressHost: ccd-message-publisher-${SERVICE_FQDN}
-    releaseNameOverride: ${SERVICE_NAME}-ccd-message-publisher
-    keyVaults:
-      ccd:
-        secrets:
-          - name: AppInsightsInstrumentationKey
-            alias: azure.application-insights.instrumentation-key
-    devcpuRequests: 10m
-    devcpuLimits: 1000m
-    devmemoryRequests: 768Mi
-    devmemoryLimits: 1536Mi
-    environment:
-      DATA_STORE_DB_HOST: et-preview.postgres.database.azure.com
-      DATA_STORE_DB_NAME: "pr-${CHANGE_ID}-data-store"
-      DATA_STORE_DB_USERNAME: hmcts
-      DATA_STORE_DB_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
-      CCD_CASE_EVENTS_DESTINATION: ${SERVICE_NAME}-ccd-case-events
-    secrets:
-      SERVICE_BUS_CONNECTION_STRING:
-        secretRef: et-sb-preview
-        key: connectionString
-      DATA_STORE_DB_PASSWORD:
-        secretRef: postgres
-        key: PASSWORD
-        disabled: false
 
 ccd-case-document-am-api:
   enabled: true

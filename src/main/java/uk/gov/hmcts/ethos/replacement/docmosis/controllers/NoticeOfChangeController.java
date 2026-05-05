@@ -17,7 +17,6 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.generic.GenericCallbackResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CcdCaseAssignment;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.NocNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.NocRepresentativeService;
@@ -64,14 +63,14 @@ public class NoticeOfChangeController {
         @Content(mediaType = "application/json", schema = @Schema(implementation = CCDCallbackResponse.class))}),
         @ApiResponse(responseCode = "400", description = "Bad Request"),
         @ApiResponse(responseCode = "500", description = "Internal Server Error")})
-    public GenericCallbackResponse nocSubmitted(
+    public CCDCallbackResponse nocSubmitted(
             @RequestHeader("Authorization") String userToken,
             @RequestBody CallbackRequest callbackRequest) {
         if (!verifyTokenService.verifyTokenSignature(userToken)) {
             log.error(INVALID_TOKEN, userToken);
         }
 
-        GenericCallbackResponse callbackResponse = new GenericCallbackResponse();
+        CCDCallbackResponse callbackResponse = CCDCallbackResponse.builder().build();
 
         if (APPLY_NOC_DECISION.equals(callbackRequest.getEventId())) {
             CaseDetails caseDetails = callbackRequest.getCaseDetails();

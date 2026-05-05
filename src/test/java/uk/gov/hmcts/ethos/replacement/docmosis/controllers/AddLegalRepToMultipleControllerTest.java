@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -68,7 +69,9 @@ class AddLegalRepToMultipleControllerTest extends BaseControllerTest {
     @Override
     protected void setUp() throws IOException, URISyntaxException {
         super.setUp();
-        mvc = MockMvcBuilders.webAppContextSetup(applicationContext).build();
+        mvc = MockMvcBuilders.webAppContextSetup(applicationContext)
+            .apply(SecurityMockMvcConfigurers.springSecurity())
+            .build();
 
         CaseDetails caseDetails = CaseDataBuilder.builder()
             .withChooseEt3Respondent("Cosmo")

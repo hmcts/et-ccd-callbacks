@@ -6,10 +6,12 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.TestSecurityConfig;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.AdminData;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.admin.CCDRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
@@ -35,6 +37,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.admin.staff.JudgeS
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({JudgeController.class, JsonMapper.class})
+@Import(TestSecurityConfig.class)
 class JudgeControllerTest {
 
     private static final String INIT_ADD_JUDGE_URL = "/admin/staff/initAddJudge";

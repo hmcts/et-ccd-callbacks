@@ -38,10 +38,13 @@ import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({RespondentRepresentativeController.class, JsonMapper.class})
@@ -61,6 +64,12 @@ class RespondentRepresentativeControllerTest {
     private static final String ROLE_SOLICITOR_A = "[SOLICITORA]";
     private static final String ROLE_SOLICITOR_B = "[SOLICITORB]";
 
+    private static final String URL_AMEND_CONTACT_DETAILS_ABOUT_TO_START =
+            "/respondentRepresentative/amendContactDetailsAboutToStart";
+    private static final String URL_AMEND_CONTACT_DETAILS_MID_EVENT =
+            "/respondentRepresentative/amendContactDetailsMidEvent";
+    private static final String URL_AMEND_CONTACT_DETAILS_ABOUT_TO_SUBMIT =
+            "/respondentRepresentative/amendContactDetailsAboutToSubmit";
     private static final String URL_REMOVE_OWN_REPRESENTATIVE = "/respondentRepresentative/removeOwnRepresentative";
     private static final String URL_AMEND_RESPONDENT_REPRESENTATIVE_ABOUT_TO_START =
             "/respondentRepresentative/amendRespondentRepresentativeAboutToStart";
@@ -454,5 +463,91 @@ class RespondentRepresentativeControllerTest {
                         .header(HEADER_AUTHORIZATION, DUMMY_TOKEN)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    @SneakyThrows
+    void amendContactDetailsAboutToStart_prefillsValues() {
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
+        doNothing().when(nocRespondentRepresentativeService)
+                .loadRespondentRepresentativeContactDetails(anyString(), any(CaseDetails.class));
+        mockMvc.perform(post(URL_AMEND_CONTACT_DETAILS_ABOUT_TO_START)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(HEADER_AUTHORIZATION, DUMMY_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, nullValue()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    @SneakyThrows
+    void amendContactDetailsMidEvent_useMyHmcts_populatesAddress() throws Exception {
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
+        ccdRequest.getCaseDetails().getCaseData()
+                .setRepresentativeContactChangeOption(REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS);
+        doNothing().when(nocRespondentRepresentativeService)
+                .populateMyHmctsOrganisationAddress(anyString(), any(CaseData.class));
+        mockMvc.perform(post(URL_AMEND_CONTACT_DETAILS_MID_EVENT)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(HEADER_AUTHORIZATION, DUMMY_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, empty()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    @SneakyThrows
+    void amendContactDetailsMidEvent_withException_returnsError() throws Exception {
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
+        ccdRequest.getCaseDetails().getCaseData()
+                .setRepresentativeContactChangeOption(REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS);
+        doThrow(new GenericServiceException(DUMMY_EXCEPTION_MESSAGE, new Exception(DUMMY_EXCEPTION_MESSAGE),
+                DUMMY_EXCEPTION_MESSAGE, DUMMY_SUBMISSION_REFERENCE,
+                "NocRespondentRepresentativeService", "populateMyHmctsOrganisationAddress"))
+                .when(nocRespondentRepresentativeService)
+                .populateMyHmctsOrganisationAddress(anyString(), any(CaseData.class));
+        mockMvc.perform(post(URL_AMEND_CONTACT_DETAILS_MID_EVENT)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(HEADER_AUTHORIZATION, DUMMY_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.errors[0]").value(DUMMY_EXCEPTION_MESSAGE));
+    }
+
+    @Test
+    @SneakyThrows
+    void amendContactDetailsAboutToSubmit_savesDetails() throws Exception {
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
+        doNothing().when(nocRespondentRepresentativeService)
+                .saveRespondentRepresentativeContactDetails(anyString(), any(CaseDetails.class));
+        mockMvc.perform(post(URL_AMEND_CONTACT_DETAILS_ABOUT_TO_SUBMIT)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(HEADER_AUTHORIZATION, DUMMY_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath(JsonMapper.ERRORS, empty()))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    @SneakyThrows
+    void amendContactDetailsAboutToSubmit_withException_returnsError() throws Exception {
+        CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
+        doThrow(new GenericServiceException(DUMMY_EXCEPTION_MESSAGE, new Exception(DUMMY_EXCEPTION_MESSAGE),
+                DUMMY_EXCEPTION_MESSAGE, DUMMY_SUBMISSION_REFERENCE,
+                "NocRespondentRepresentativeService", "saveRespondentRepresentativeContactDetails"))
+                .when(nocRespondentRepresentativeService)
+                .saveRespondentRepresentativeContactDetails(anyString(), any(CaseDetails.class));
+        mockMvc.perform(post(URL_AMEND_CONTACT_DETAILS_ABOUT_TO_SUBMIT)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .header(HEADER_AUTHORIZATION, DUMMY_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.errors[0]").value(DUMMY_EXCEPTION_MESSAGE));
     }
 }

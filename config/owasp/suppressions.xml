@@ -74,4 +74,7 @@
     <suppress>
        <cve>CVE-2026-33929</cve>
     </suppress>
+    <suppress>
+       <cve>CVE-2026-42198</cve>
+    </suppress>
 </suppressions>

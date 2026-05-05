@@ -17,13 +17,12 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CcdCaseAssignment;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.NocClaimantRepresentativeService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.NocNotificationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.NocRepresentativeService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.CcdCaseAssignment;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocNotificationService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRepresentativeService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRespondentRepresentativeService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 
 import java.io.File;
@@ -54,8 +53,6 @@ class NoticeOfChangeControllerTest {
     private VerifyTokenService verifyTokenService;
     @MockBean
     private NocRespondentRepresentativeService nocRespondentRepresentativeService;
-    @MockBean
-    private NocClaimantRepresentativeService nocClaimantRepresentativeService;
     @MockBean
     private NocRepresentativeService nocRepresentativeService;
     @MockBean
@@ -93,7 +90,7 @@ class NoticeOfChangeControllerTest {
 
     @Test
     void handleAboutToSubmit_RespondentRep() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(verifyTokenService.isTokenSignatureValid(AUTH_TOKEN)).thenReturn(true);
         when(nocRespondentRepresentativeService
             .updateRespondentRepresentation(any())).thenReturn(caseData);
         when(ccdCaseAssignment.applyNoc(any(), any())).thenReturn(CCDCallbackResponse.builder()
@@ -112,7 +109,7 @@ class NoticeOfChangeControllerTest {
 
     @Test
     void nocSubmitted() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        when(verifyTokenService.isTokenSignatureValid(AUTH_TOKEN)).thenReturn(true);
         doNothing().when(notificationService).sendNotificationOfChangeEmails(any(),
             any(), any());
 

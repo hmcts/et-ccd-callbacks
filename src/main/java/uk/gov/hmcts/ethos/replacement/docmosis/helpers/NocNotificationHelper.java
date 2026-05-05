@@ -17,14 +17,19 @@ import java.util.stream.Collectors;
 
 import static com.google.common.base.Strings.isNullOrEmpty;
 import static java.util.Locale.UK;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CCD_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.CLAIMANT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.DATE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.LINK_TO_CIT_UI;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NotificationServiceConstants.PARTY_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_STRING_DATE_FORMAT;
 
 @Slf4j
 public final class NocNotificationHelper {
 
-    public static final String UNKNOWN = "Unknown";
+    private static final String UNKNOWN = "Unknown";
+    private static final String NOT_SET = "Not set";
+    private static final String TRIBUNAL = "tribunal";
 
     private NocNotificationHelper() {
         // Access through static methods
@@ -74,9 +79,9 @@ public final class NocNotificationHelper {
         Map<String, String> personalisation = new ConcurrentHashMap<>();
 
         addCommonValues(caseDetails.getCaseData(), personalisation);
-        personalisation.put("party_name", partyName);
-        personalisation.put("ccdId", caseDetails.getCaseId());
-        personalisation.put("linkToCitUI", linkToCitUI);
+        personalisation.put(PARTY_NAME, partyName);
+        personalisation.put(CCD_ID, caseDetails.getCaseId());
+        personalisation.put(LINK_TO_CIT_UI, linkToCitUI);
 
         return personalisation;
     }
@@ -95,7 +100,7 @@ public final class NocNotificationHelper {
         addCommonValues(caseData, personalisation);
         personalisation.put("respondent_name", partyName);
         personalisation.put("ccdId", detail.getCaseId());
-        personalisation.put("date", "Not set");
+        personalisation.put("date", NOT_SET);
 
         String nextHearingDate = HearingsHelper.getEarliestFutureHearingDate(caseData.getHearingCollection());
 
@@ -113,11 +118,9 @@ public final class NocNotificationHelper {
     }
 
     public static Map<String, String> buildTribunalPersonalisation(CaseData caseData) {
-        Map<String, String> personalisation = new ConcurrentHashMap<>();
-
-        addCommonValues(caseData, personalisation);
-        personalisation.put(DATE, ReferralHelper.getNearestHearingToReferral(caseData, "Not set"));
-        personalisation.put("tribunal", isNullOrEmpty(caseData.getTribunalAndOfficeLocation()) ? UNKNOWN :
+        Map<String, String> personalisation = buildPreviousRespondentSolicitorPersonalisation(caseData);
+        personalisation.put(DATE, ReferralHelper.getNearestHearingToReferral(caseData, NOT_SET));
+        personalisation.put(TRIBUNAL, isNullOrEmpty(caseData.getTribunalAndOfficeLocation()) ? UNKNOWN :
                 caseData.getTribunalAndOfficeLocation());
 
         return personalisation;

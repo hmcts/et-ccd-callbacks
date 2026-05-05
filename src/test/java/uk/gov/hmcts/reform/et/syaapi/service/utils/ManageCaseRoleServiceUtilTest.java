@@ -75,7 +75,13 @@ class ManageCaseRoleServiceUtilTest {
         "java.lang.Exception: Respondent solicitor type not found for case with id, 1646225213651590 and "
             + "respondent organisation policy index, 10";
 
+    private static final String EXPECTED_EXCEPTION_MODIFY_CASE_ROLE_EMPTY_REQUEST =
+            "java.lang.Exception: Request to modify roles is empty";
+
     private static final Long TEST_CASE_ID = 1_646_225_213_651_590L;
+    private static final String STRING_MINUS_ONE = "-1";
+    private static final String STRING_ZERO = "0";
+    private static final String STRING_ONE = "1";
     private static final String STRING_TEN = "10";
     private static final String INVALID_INTEGER = "abc";
     private static final String TEST_RESPONDENT_NAME = "Test respondent name";
@@ -263,8 +269,10 @@ class ManageCaseRoleServiceUtilTest {
         // Should throw exception when modifyCaseUserRolesRequest is invalid
 
         // Should throw exception when modifyCaseUserRolesRequest doesn't have modifyCaseUserRole
-        assertThrows(ManageCaseRoleException.class, () -> ManageCaseRoleServiceUtil.checkModifyCaseUserRolesRequest(
-            ModifyCaseUserRolesRequest.builder().build()));
+        final ModifyCaseUserRolesRequest modifyCaseUserRolesRequest1 = ModifyCaseUserRolesRequest.builder().build();
+        ManageCaseRoleException manageCaseRoleException = assertThrows(ManageCaseRoleException.class,
+                () -> ManageCaseRoleServiceUtil.checkModifyCaseUserRolesRequest(modifyCaseUserRolesRequest1));
+        assertThat(manageCaseRoleException.getMessage()).isEqualTo(EXPECTED_EXCEPTION_MODIFY_CASE_ROLE_EMPTY_REQUEST);
         // Should throw exception when modifyCaseUserRolesRequest have null modifyCaseUserRole
         ModifyCaseUserRolesRequest modifyCaseUserRolesRequestWithNullModifyCaseUserRole =
             ModifyCaseUserRolesRequest.builder().build();
@@ -273,9 +281,8 @@ class ManageCaseRoleServiceUtilTest {
         assertThrows(ManageCaseRoleException.class, () -> ManageCaseRoleServiceUtil.checkModifyCaseUserRolesRequest(
             modifyCaseUserRolesRequestWithNullModifyCaseUserRole));
         // Should throw exception when modifyCaseUserRolesRequest has empty modifyCaseUserRole
-        ModifyCaseUserRolesRequest modifyCaseUserRolesRequest =
-            ModifyCaseUserRolesRequest.builder().modifyCaseUserRoles(
-                List.of(ModifyCaseUserRole.builder().build())).build();
+        ModifyCaseUserRolesRequest modifyCaseUserRolesRequest = ModifyCaseUserRolesRequest.builder()
+                .modifyCaseUserRoles(List.of(ModifyCaseUserRole.builder().build())).build();
         assertThrows(ManageCaseRoleException.class,
                      () -> ManageCaseRoleServiceUtil.checkModifyCaseUserRolesRequest(modifyCaseUserRolesRequest));
         // Should not throw exception when modifyCaseUserRolesRequest has modifyCaseUserRole with not empty userId,
@@ -355,16 +362,14 @@ class ManageCaseRoleServiceUtilTest {
         // Should throw ManageCaseRoleException when caseDetails is null or empty
         ManageCaseRoleException manageCaseRoleException =
             assertThrows(ManageCaseRoleException.class, () ->
-                ManageCaseRoleServiceUtil.getRespondentSolicitorType(null,
-                                                                     NumberUtils.INTEGER_ONE.toString()));
+                ManageCaseRoleServiceUtil.getRespondentSolicitorType(null, STRING_ONE));
         assertThat(manageCaseRoleException.getMessage()).isEqualTo(EXCEPTION_CASE_DETAILS_NOT_FOUND);
 
         // Should throw ManageCaseRoleException when caseDetails not have case data
         final CaseDetails caseDetailsWithoutCaseData = CaseDetails.builder().id(TEST_CASE_ID).build();
         manageCaseRoleException =
             assertThrows(ManageCaseRoleException.class, () ->
-                ManageCaseRoleServiceUtil.getRespondentSolicitorType(caseDetailsWithoutCaseData,
-                                                                     NumberUtils.INTEGER_ONE.toString()));
+                ManageCaseRoleServiceUtil.getRespondentSolicitorType(caseDetailsWithoutCaseData, STRING_ONE));
         assertThat(manageCaseRoleException.getMessage()).isEqualTo(
             String.format(EXCEPTION_CASE_DETAILS_NOT_HAVE_CASE_DATA, TEST_CASE_ID));
 
@@ -384,7 +389,7 @@ class ManageCaseRoleServiceUtilTest {
         // Should throw ManageCaseRoleException when respondentIndex is negative
         manageCaseRoleException = assertThrows(
             ManageCaseRoleException.class, () -> ManageCaseRoleServiceUtil
-                .getRespondentSolicitorType(caseDetails, NumberUtils.INTEGER_MINUS_ONE.toString()));
+                .getRespondentSolicitorType(caseDetails, STRING_MINUS_ONE));
         assertThat(manageCaseRoleException.getMessage()).isEqualTo(EXCEPTION_INVALID_RESPONDENT_INDEX_NEGATIVE);
 
         // Should throw ManageCaseRoleException when not able to map case details' case data map to case data object
@@ -392,7 +397,7 @@ class ManageCaseRoleServiceUtilTest {
             employeeObjectMapper.when(
                 () -> EmployeeObjectMapper.convertCaseDataMapToCaseDataObject(caseDetails.getData())).thenReturn(null);
             manageCaseRoleException = assertThrows(ManageCaseRoleException.class, () -> ManageCaseRoleServiceUtil
-                .getRespondentSolicitorType(caseDetails, NumberUtils.INTEGER_ZERO.toString()));
+                .getRespondentSolicitorType(caseDetails, STRING_ZERO));
             assertThat(manageCaseRoleException.getMessage()).isEqualTo(
                 String.format(EXCEPTION_CASE_DETAILS_NOT_HAVE_CASE_DATA, TEST_CASE_ID));
 
@@ -402,7 +407,7 @@ class ManageCaseRoleServiceUtilTest {
                 () -> EmployeeObjectMapper.convertCaseDataMapToCaseDataObject(caseDetails.getData()))
                 .thenReturn(caseDataWithoutRespondentCollection);
             manageCaseRoleException = assertThrows(ManageCaseRoleException.class, () -> ManageCaseRoleServiceUtil
-                .getRespondentSolicitorType(caseDetails, NumberUtils.INTEGER_ZERO.toString()));
+                .getRespondentSolicitorType(caseDetails, STRING_ZERO));
             assertThat(manageCaseRoleException.getMessage()).isEqualTo(EXCEPTION_EMPTY_RESPONDENT_COLLECTION);
         }
 
@@ -414,29 +419,29 @@ class ManageCaseRoleServiceUtilTest {
 
         // Should throw ManageCaseRoleException when notice of change answer not found
         final CaseData validCaseData = EmployeeObjectMapper.convertCaseDataMapToCaseDataObject(caseDetails.getData());
-        try (MockedStatic<NoticeOfChangeUtil> noticeOfChangeUtil = mockStatic(NoticeOfChangeUtil.class)) {
-            noticeOfChangeUtil.when(() -> NoticeOfChangeUtil.findNoticeOfChangeAnswerIndex(validCaseData,
+        try (MockedStatic<NoticeOfChangeUtils> noticeOfChangeUtil = mockStatic(NoticeOfChangeUtils.class)) {
+            noticeOfChangeUtil.when(() -> NoticeOfChangeUtils.findNoticeOfChangeAnswerIndex(validCaseData,
                                                                                            TEST_RESPONDENT_NAME))
                 .thenReturn(NumberUtils.INTEGER_MINUS_ONE);
             manageCaseRoleException = assertThrows(ManageCaseRoleException.class, () -> ManageCaseRoleServiceUtil
-                .getRespondentSolicitorType(caseDetails, NumberUtils.INTEGER_ZERO.toString()));
+                .getRespondentSolicitorType(caseDetails, STRING_ZERO));
             assertThat(manageCaseRoleException.getMessage()).isEqualTo(
                 EXCEPTION_NOTICE_OF_CHANGE_ANSWER_NOT_FOUND);
 
             // Should throw ManageCaseRoleException when respondent solicitor type not found
-            noticeOfChangeUtil.when(() -> NoticeOfChangeUtil.findNoticeOfChangeAnswerIndex(validCaseData,
+            noticeOfChangeUtil.when(() -> NoticeOfChangeUtils.findNoticeOfChangeAnswerIndex(validCaseData,
                                                                                            TEST_RESPONDENT_NAME))
                 .thenReturn(NumberUtils.createInteger(STRING_TEN));
             manageCaseRoleException = assertThrows(ManageCaseRoleException.class, () -> ManageCaseRoleServiceUtil
-                .getRespondentSolicitorType(caseDetails, NumberUtils.INTEGER_ZERO.toString()));
+                .getRespondentSolicitorType(caseDetails, STRING_ZERO));
             assertThat(manageCaseRoleException.getMessage()).isEqualTo(
                 EXCEPTION_RESPONDENT_SOLICITOR_TYPE_NOT_FOUND);
 
             // Should return valid respondent solicitor type
-            noticeOfChangeUtil.when(() -> NoticeOfChangeUtil.findNoticeOfChangeAnswerIndex(validCaseData,
+            noticeOfChangeUtil.when(() -> NoticeOfChangeUtils.findNoticeOfChangeAnswerIndex(validCaseData,
                                                                                            TEST_RESPONDENT_NAME))
                 .thenReturn(NumberUtils.INTEGER_ZERO);
-            noticeOfChangeUtil.when(() -> NoticeOfChangeUtil.findRespondentSolicitorTypeByIndex(
+            noticeOfChangeUtil.when(() -> NoticeOfChangeUtils.findRespondentSolicitorTypeByIndex(
                 NumberUtils.INTEGER_ZERO)).thenReturn(RespondentSolicitorType.SOLICITORA);
             assertThat(ManageCaseRoleServiceUtil.getRespondentSolicitorType(
                 caseDetails, NumberUtils.INTEGER_ZERO.toString())).isEqualTo(RespondentSolicitorType.SOLICITORA);

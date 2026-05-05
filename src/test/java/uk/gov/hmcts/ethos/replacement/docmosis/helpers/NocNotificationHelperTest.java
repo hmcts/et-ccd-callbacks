@@ -1,5 +1,6 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -8,38 +9,63 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import uk.gov.hmcts.ecm.common.model.helper.Constants;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.ChangeOrganisationRequest;
+import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
+import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
-import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
+import uk.gov.hmcts.ethos.replacement.docmosis.test.utils.JsonParserUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.test.utils.LoggerTestUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
 
 @ExtendWith({SpringExtension.class, MockitoExtension.class})
 class NocNotificationHelperTest {
-    private static final String RESPONDENT_NAME = "Respondent";
-    private static final String NEW_REP_EMAIL = "rep1@test.com";
-    private static final String OLD_REP_EMAIL = "rep2@test.com";
+    private static final String CASE_DETAILS_JSON_FILE = "caseDetailsTest1.json";
+    private static final String RESPONDENT_NAME_1 = "Respondent Name 1";
+    private static final String RESPONDENT_EMAIL = "respondent@hmcts.org";
+    private static final String ROLE_SOLICITOR_A = "[SOLICITORA]";
+    private static final String UNKNOWN = "Unknown";
     private static final String NEW_ORG_ID = "1";
     private static final String OLD_ORG_ID = "2";
+    private static final String HEARING_DATE_UNFORMATTED = "2029-11-25T12:11:00.000";
+    private static final String NOT_SET = "Not set";
+
+    private static final String FIELD_PARTY_NAME = "party_name";
+    private static final String PARTY_NAME = "test_party";
+    private static final String FIELD_CCD_ID = "ccdId";
+    private static final String CASE_ID = "1234567890123456";
+    private static final String FIELD_CLAIMANT = "claimant";
+    private static final String CLAIMANT = "Claimant Name";
+    private static final String FIELD_LIST_OF_RESPONDENTS = "list_of_respondents";
+    private static final String LIST_OF_RESPONDENTS = "Respondent Name 1";
+    private static final String FIELD_CASE_NUMBER = "case_number";
+    private static final String CASE_NUMBER = "600001/2026";
+    private static final String FIELD_LINK_TO_CIT_UI = "linkToCitUI";
+    private static final String LINK_TO_CIT_UI = "http://domain/citizen-hub/1234";
+    private static final String FIELD_HEARING_DATE = "date";
+    private static final String HEARING_DATE = "25 Nov 2029";
+    private static final String TRIBUNAL_CORRESPONDENCE_EMAIL = "tribunal_correspondence@hmcts.org";
+    private static final String TRIBUNAL_AND_OFFICE_LOCATION = "Leeds";
+    private static final String NEW_ORGANISATION_NAME = "New Organisation Name";
+    private static final String OLD_ORGANISATION_NAME = "Old Organisation Name";
 
     @Mock
     private NocRespondentHelper nocRespondentHelper;
@@ -50,77 +76,67 @@ class NocNotificationHelperTest {
     private RespondentSumType respondentSumType;
 
     @BeforeEach
+    @SneakyThrows
     void setUp() {
-
         respondentSumType = new RespondentSumType();
-        respondentSumType.setRespondentName(RESPONDENT_NAME);
-        respondentSumType.setRespondentEmail("res@rep.com");
-
+        respondentSumType.setRespondentName(RESPONDENT_NAME_1);
+        respondentSumType.setRespondentEmail(RESPONDENT_EMAIL);
+        caseDetails = JsonParserUtils.generateCaseDetails(CASE_DETAILS_JSON_FILE);
+        caseDetails.setCaseId(CASE_ID);
+        caseData = caseDetails.getCaseData();
+        DynamicFixedListType dynamicFixedListType = new DynamicFixedListType();
+        dynamicFixedListType.setValue(new DynamicValueType());
+        dynamicFixedListType.getValue().setCode(ROLE_SOLICITOR_A);
+        RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+        respondentSumTypeItem.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_1).build());
+        caseData.setRespondentCollection(List.of(respondentSumTypeItem));
+        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
+        dateListedTypeItem.setValue(new DateListedType());
+        dateListedTypeItem.getValue().setListedDate(HEARING_DATE_UNFORMATTED);
+        dateListedTypeItem.getValue().setHearingStatus(HEARING_STATUS_LISTED);
+        HearingType hearingType = new HearingType();
+        hearingType.setHearingDateCollection(List.of(dateListedTypeItem));
+        HearingTypeItem hearingTypeItem = new HearingTypeItem();
+        hearingTypeItem.setValue(hearingType);
+        caseData.setEthosCaseReference(CASE_NUMBER);
+        caseData.setHearingCollection(List.of(hearingTypeItem));
         Organisation organisationToAdd = Organisation.builder()
                 .organisationID(NEW_ORG_ID)
-                .organisationName("New Organisation").build();
+                .organisationName(NEW_ORGANISATION_NAME).build();
         Organisation organisationToRemove = Organisation.builder()
                 .organisationID(OLD_ORG_ID)
-                .organisationName("Old Organisation").build();
-
-        caseDetails = CaseDataBuilder.builder()
-            .withEthosCaseReference("12345/6789")
-            .withClaimantType("claimant@unrepresented.com")
-            .withRepresentativeClaimantType("Claimant Rep", "claimant@represented.com")
-            .withClaimantIndType("Claimant", "LastName", "Mr", "Mr")
-            .withRespondent(respondentSumType)
-            .withRespondentWithAddress("Respondent Unrepresented",
-                "32 Sweet Street", "14 House", null,
-                "Manchester", "M11 4ED", "United Kingdom",
-                null, "respondent@unrepresented.com")
-            .withRespondentWithAddress("Respondent Represented",
-                "32 Sweet Street", "14 House", null,
-                "Manchester", "M11 4ED", "United Kingdom",
-                null)
-            .withTwoRespondentRepresentative(NEW_ORG_ID, OLD_ORG_ID, NEW_REP_EMAIL, OLD_REP_EMAIL)
-            .withRespondent("Respondent", YES, "2022-03-01", "res@rep.com", false)
-            .withChangeOrganisationRequestField(
-                organisationToAdd,
-                organisationToRemove, null,
-                null)
-            .withHearing("1", "test", "Judy", "Venue", List.of("Telephone", "Video"),
-                        "length num", "type", "Yes")
-            .withHearingSession(
-                        0, "2029-11-25T12:11:00.000",
-                        Constants.HEARING_STATUS_LISTED,
-                        true)
-            .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
-
-        caseDetails.setCaseId("1234");
-        caseData = caseDetails.getCaseData();
-        caseData.setClaimant("Claimant LastName");
-        caseData.setTribunalCorrespondenceEmail("respondent@unrepresented.com");
-        caseData.setTribunalAndOfficeLocation("Leeds");
+                .organisationName(OLD_ORGANISATION_NAME).build();
+        ChangeOrganisationRequest changeOrganisationRequest = ChangeOrganisationRequest.builder()
+                .organisationToAdd(organisationToAdd).organisationToRemove(organisationToRemove)
+                .caseRoleId(dynamicFixedListType).build();
+        caseData.setChangeOrganisationRequestField(changeOrganisationRequest);
+        caseData.setClaimant(CLAIMANT);
+        caseData.setTribunalCorrespondenceEmail(TRIBUNAL_CORRESPONDENCE_EMAIL);
+        caseData.setTribunalAndOfficeLocation(TRIBUNAL_AND_OFFICE_LOCATION);
     }
 
     @Test
-    void testbuildClaimantPersonalisation() {
-        String citLink = "http://domain/citizen-hub/1234";
+    void testBuildClaimantPersonalisation() {
+
         Map<String, String> claimantPersonalisation =
-            NocNotificationHelper.buildPersonalisationWithPartyName(caseDetails, "test_party", citLink);
-        assertThat(claimantPersonalisation.size(), is(6));
-        assertThat(claimantPersonalisation.get("party_name"), is("test_party"));
-        assertThat(claimantPersonalisation.get("ccdId"), is("1234"));
-        assertThat(claimantPersonalisation.get("claimant"), is("Claimant LastName"));
-        assertThat(claimantPersonalisation.get("list_of_respondents"),
-                is("Respondent Respondent Unrepresented Respondent Represented Respondent")
-        );
-        assertThat(claimantPersonalisation.get("case_number"), is("12345/6789"));
-        assertThat(claimantPersonalisation.get("linkToCitUI"), is(citLink));
+            NocNotificationHelper.buildPersonalisationWithPartyName(caseDetails, PARTY_NAME, LINK_TO_CIT_UI);
+        assertThat(claimantPersonalisation)
+                .hasSize(LoggerTestUtils.INTEGER_SIX)
+                .containsEntry(FIELD_PARTY_NAME, PARTY_NAME)
+                .containsEntry(FIELD_CCD_ID, CASE_ID)
+                .containsEntry(FIELD_CLAIMANT, CLAIMANT)
+                .containsEntry(FIELD_LIST_OF_RESPONDENTS, LIST_OF_RESPONDENTS)
+                .containsEntry(FIELD_CASE_NUMBER, CASE_NUMBER)
+                .containsEntry(FIELD_LINK_TO_CIT_UI, LINK_TO_CIT_UI);
     }
 
     @Test
     void testBuildPreviousRespondentSolicitorPersonalisation() {
         Map<String, String> claimantPersonalisation =
             NocNotificationHelper.buildPreviousRespondentSolicitorPersonalisation(caseData);
-        assertThat(claimantPersonalisation.size(), is(3));
+        assertThat(claimantPersonalisation).hasSize(LoggerTestUtils.INTEGER_THREE);
         for (String value : claimantPersonalisation.values()) {
-            assertThat(value, notNullValue());
+            assertThat(value).isNotNull();
         }
     }
 
@@ -128,19 +144,19 @@ class NocNotificationHelperTest {
     void testBuildRespondentPersonalisation() {
         Map<String, String> claimantPersonalisation =
             NocNotificationHelper.buildNoCPersonalisation(caseDetails, respondentSumType.getRespondentName());
-        assertThat(claimantPersonalisation.size(), is(6));
+        assertThat(claimantPersonalisation).hasSize(LoggerTestUtils.INTEGER_SIX);
         for (String value : claimantPersonalisation.values()) {
-            assertThat(value, notNullValue());
+            assertThat(value).isNotNull();
         }
     }
 
     @Test
     void testBuildTribunalPersonalisation() {
         Map<String, String> claimantPersonalisation = NocNotificationHelper.buildTribunalPersonalisation(caseData);
-        assertThat(claimantPersonalisation.size(), is(5));
-        assertThat(claimantPersonalisation.get("date"), is("25 Nov 2029"));
+        assertThat(claimantPersonalisation).hasSize(LoggerTestUtils.INTEGER_FIVE)
+                .containsEntry(FIELD_HEARING_DATE, HEARING_DATE);
         for (String value : claimantPersonalisation.values()) {
-            assertThat(value, notNullValue());
+            assertThat(value).isNotNull();
         }
     }
 
@@ -148,10 +164,10 @@ class NocNotificationHelperTest {
     void testBuildTribunalPersonalisationWithHearingDate() {
         caseData.setHearingCollection(new ArrayList<>());
         Map<String, String> claimantPersonalisation = NocNotificationHelper.buildTribunalPersonalisation(caseData);
-        assertThat(claimantPersonalisation.size(), is(5));
-        assertThat(claimantPersonalisation.get("date"), is("Not set"));
+        assertThat(claimantPersonalisation).hasSize(LoggerTestUtils.INTEGER_FIVE)
+                .containsEntry(FIELD_HEARING_DATE, NOT_SET);
         for (String value : claimantPersonalisation.values()) {
-            assertThat(value, notNullValue());
+            assertThat(value).isNotNull();
         }
     }
 
@@ -159,13 +175,13 @@ class NocNotificationHelperTest {
     void testGetRespondentNameForNewSolicitor() {
         String respondentName = NocNotificationHelper
                 .getRespondentNameForNewSolicitor(caseData.getChangeOrganisationRequestField(), caseData);
-        assertThat(respondentName, is(RESPONDENT_NAME));
+        assertThat(respondentName).isEqualTo(RESPONDENT_NAME_1);
     }
 
     @Test
     void testGetRespondentNameForNewSolicitor_nullChangeRequest() {
         String respondentName = NocNotificationHelper.getRespondentNameForNewSolicitor(null, caseData);
-        assertThat(respondentName, is("Unknown"));
+        assertThat(respondentName).isEqualTo(UNKNOWN);
     }
 
     @Test
@@ -173,13 +189,12 @@ class NocNotificationHelperTest {
         caseData.getChangeOrganisationRequestField().setCaseRoleId(null);
         String respondentName = NocNotificationHelper
                 .getRespondentNameForNewSolicitor(caseData.getChangeOrganisationRequestField(), caseData);
-        assertThat(respondentName, is("Unknown"));
+        assertThat(respondentName).isEqualTo(UNKNOWN);
     }
 
     @Test
     void testGetRespondent_nullChangeRequest() {
-        RespondentSumType result = NocNotificationHelper.getRespondent(null, caseData, nocRespondentHelper);
-        assertNull(result);
+        assertThat(NocNotificationHelper.getRespondent(null, caseData, nocRespondentHelper)).isNull();
     }
 
     @Test

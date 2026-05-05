@@ -136,6 +136,20 @@
   },
   {
     "CaseTypeID": "ET_EnglandWales",
+    "ID": "UPDATE_RESP_ORG_POLICY",
+    "Name": "UPDATE_RESP_ORG_POLICY",
+    "Description": "Updates respondent organisation policy, rep roles and resets change organisation request fields",
+    "DisplayOrder": 32,
+    "PreConditionState(s)": "*",
+    "PostConditionState": "*",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/respondentRepresentative/updateRespOrgPolicyAboutToSubmit",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "N",
+    "ShowSummary": "N",
+    "EventEnablingCondition": "caseType =\"dummy\""
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
     "ID": "REMOVE_OWN_REP_AS_RESPONDENT",
     "Name": "REMOVE_OWN_REP_AS_RESPONDENT",
     "Description": "enables respondent citizen to remove his/her own representative via et-syr-frontend project",
@@ -325,22 +339,6 @@
     "CallBackURLSubmittedEvent": "${ET_COS_URL}/acasCertificate/confirmation",
     "SecurityClassification": "Public",
     "EventEnablingCondition": "managingOffice !=\"Unassigned\"",
-    "ShowEventNotes": "N",
-    "ShowSummary": "N"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "ID": "amendRespondentRepresentative",
-    "Name": "Respondent Representative",
-    "Description": "Add or Amend a Respondent Representative",
-    "DisplayOrder": 17,
-    "PreConditionState(s)": "Accepted;Closed",
-    "PostConditionState": "*",
-    "CallBackURLAboutToStartEvent": "${ET_COS_URL}/dynamicRespondentRepresentativeNames",
-    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/amendRespondentRepresentative",
-    "EventEnablingCondition": "managingOffice !=\"Unassigned\"",
-    "CallBackURLSubmittedEvent": "${ET_COS_URL}/amendRespondentRepSubmitted",
-    "SecurityClassification": "Public",
     "ShowEventNotes": "N",
     "ShowSummary": "N"
   },

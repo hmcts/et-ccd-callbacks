@@ -140,7 +140,7 @@ public class Et1ReppedService {
             caseData.setReceiptDate(null);
             DocumentInfo documentInfo = et1SubmissionService.createEt1(caseDetails, userToken, ET1_EN_PDF);
             documentInfo.setMarkUp(documentInfo.getMarkUp().replace("Document",
-                    "Draft ET1 - " + caseDetails.getCaseId()));
+                    "Draft ET1 - " + caseDetails.getCaseId() + " (opens in a new tab)"));
             caseData.setDocMarkUp(documentInfo.getMarkUp());
             caseData.setDownloadDraftEt1Date(LocalDate.now().toString());
             setEt1Statuses(caseData, caseDetails.getCaseId());

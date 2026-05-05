@@ -173,6 +173,8 @@ allprojects {
             'io.netty:netty-transport-native-unix-common:4.2.12.Final',
             'io.netty:netty-transport-classes-epoll:4.2.12.Final',
             'io.netty:netty-transport-classes-kqueue:4.2.12.Final',
+            // CVE-2026-42198
+            'org.postgresql:postgresql:42.7.11',
             // CVE-2026-22748, CVE-2026-22746
             'org.springframework.security:spring-security-crypto:6.5.10'
         )
@@ -420,6 +422,8 @@ ext["rest-assured.version"] = '5.1.0'
 dependencyManagement {
     dependencies {
         dependency 'org.apache.httpcomponents.core5:httpcore5:5.4.2'
+        // CVE-2026-42198 - override above the Spring Boot BOM
+        dependency 'org.postgresql:postgresql:42.7.11'
         // CVE-2026-22748, CVE-2026-22746 - force override above the Spring Boot BOM
         dependency 'org.springframework.security:spring-security-crypto:6.5.10'
         dependencySet(group: 'com.google.guava', version: '33.6.0-jre') {
@@ -490,7 +494,8 @@ dependencies {
     implementation group: 'org.apache.xmlgraphics', name: 'xmlgraphics-commons', version: '2.11'
     implementation 'org.flywaydb:flyway-database-postgresql:11.20.3'
     implementation 'org.flywaydb:flyway-core:11.20.3'
-    implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.10'
+    // CVE-2026-42198
+    implementation group: 'org.postgresql', name: 'postgresql', version: '42.7.11'
     implementation group: 'org.slf4j', name: 'slf4j-ext', version: '2.0.17'
     implementation group: 'org.springdoc', name: 'springdoc-openapi-starter-webmvc-ui', version: '2.5.0'
     implementation 'org.springframework.boot:spring-boot-configuration-processor'

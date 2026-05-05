@@ -175,6 +175,7 @@ allprojects {
 }
 
 configurations {
+    mockitoAgent
     functionalImplementation.extendsFrom testImplementation
     functionalRuntimeOnly.extendsFrom testRuntimeOnly
     contractTestImplementation.extendsFrom testImplementation
@@ -183,6 +184,18 @@ configurations {
     integrationTestRuntimeOnly.extendsFrom testRuntimeOnly
     apiTestImplementation.extendsFrom testImplementation
     apiTestRuntimeOnly.extendsFrom testRuntimeOnly
+}
+
+tasks.withType(Test).configureEach {
+    jvmArgs += '-Xshare:off'
+
+    doFirst {
+        jvmArgs += "-javaagent:${configurations.mockitoAgent.asPath}"
+    }
+
+    jacoco {
+        excludes = ['uk.gov.hmcts.et.common.model.ccd.CaseData']
+    }
 }
 
 test {
@@ -543,6 +556,9 @@ dependencies {
     // Mockito 5.0.0+ has merged mockito-inline into mockito-core
     testImplementation group: 'org.mockito', name: 'mockito-core', version: '5.19.0'
     testImplementation group: 'org.mockito', name: 'mockito-junit-jupiter', version: '5.19.0'
+    mockitoAgent(group: 'org.mockito', name: 'mockito-core', version: '5.19.0') {
+        transitive = false
+    }
     // ByteBuddy dependencies required for Mockito with Java 21
     testImplementation group: 'net.bytebuddy', name: 'byte-buddy', version: '1.17.7'
     testImplementation group: 'net.bytebuddy', name: 'byte-buddy-agent', version: '1.17.7'

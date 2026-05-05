@@ -229,8 +229,8 @@
     "DisplayOrder": 53,
     "PreConditionState(s)": "Accepted",
     "PostConditionState": "*",
-    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/et3Response/aboutToSubmitAmendRepresentativeContact",
-    "EventEnablingCondition": "caseType =\"dummy\"",
+    "CallBackURLAboutToStartEvent": "${ET_COS_URL}/respondentRepresentative/amendContactDetailsAboutToStart",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/respondentRepresentative/amendContactDetailsAboutToSubmit",
     "SecurityClassification": "Public",
     "ShowEventNotes": "N",
     "ShowSummary": "Y"

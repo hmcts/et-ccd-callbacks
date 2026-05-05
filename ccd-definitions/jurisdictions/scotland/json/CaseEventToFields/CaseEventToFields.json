@@ -5075,7 +5075,7 @@
     "PageID": 1,
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 1,
-    "CallBackURLMidEvent": "${ET_COS_URL}/et3Response/midEventAmendRepresentativeContact",
+    "CallBackURLMidEvent": "${ET_COS_URL}/respondentRepresentative/amendContactDetailsMidEvent",
     "ShowSummaryChangeOption": "N"
   },
   {

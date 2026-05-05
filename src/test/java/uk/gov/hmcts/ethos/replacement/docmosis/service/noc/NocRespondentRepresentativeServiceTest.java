@@ -20,6 +20,7 @@ import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
+import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CallbackRequest;
@@ -79,6 +80,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {CaseConverter.class, NoticeOfChangeFieldPopulator.class, ObjectMapper.class})
@@ -194,6 +196,8 @@ class NocRespondentRepresentativeServiceTest {
     private UserIdamService userIdamService;
     @MockBean
     private OrganisationService organisationService;
+    @MockBean
+    private uk.gov.hmcts.ethos.replacement.docmosis.service.MyHmctsService myHmctsService;
 
     @InjectMocks
     private NocRespondentRepresentativeService nocRespondentRepresentativeService;
@@ -211,7 +215,7 @@ class NocRespondentRepresentativeServiceTest {
         nocRespondentRepresentativeService =
                 new NocRespondentRepresentativeService(noticeOfChangeFieldPopulator, converter, nocCcdService,
                         adminUserService, nocRespondentHelper, nocNotificationService, ccdClient, organisationClient,
-                        authTokenGenerator, nocService, userIdamService, organisationService);
+                        authTokenGenerator, nocService, userIdamService, organisationService, myHmctsService);
 
         // Respondent
         caseData.setRespondentCollection(new ArrayList<>());
@@ -1688,5 +1692,142 @@ class NocRespondentRepresentativeServiceTest {
         assertThat(caseDetails.getCaseData().getRepCollection()).hasSize(LoggerTestUtils.INTEGER_ONE)
                 .isEqualTo(List.of(representative));
         assertThat(caseDetails.getCaseData().getRespondentOrganisationPolicy0()).isEqualTo(tmpOrganisationPolicy);
+    }
+
+    @Test
+    void loadRespondentRepresentativeContactDetails_prefillsPhoneAndAddress() {
+        Address address = new Address();
+        address.setAddressLine1("1 Legal Street");
+        RepresentedTypeRItem repItem = RepresentedTypeRItem.builder()
+                .id(REPRESENTATIVE_ID_ONE)
+                .value(RepresentedTypeR.builder()
+                        .role(ROLE_SOLICITORA)
+                        .representativePhoneNumber("01234567890")
+                        .representativeAddress(address)
+                        .build())
+                .build();
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseId(CASE_ID_1);
+        caseDetails.setCaseData(caseData);
+        caseData.setRepCollection(List.of(repItem));
+
+        UserDetails userDetails = new UserDetails();
+        userDetails.setUid(USER_ID);
+        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
+        when(userIdamService.getUserDetails(USER_TOKEN)).thenReturn(userDetails);
+        CaseUserAssignmentData assignments = CaseUserAssignmentData.builder()
+                .caseUserAssignments(List.of(CaseUserAssignment.builder()
+                        .userId(USER_ID).caseRole(ROLE_SOLICITORA).build()))
+                .build();
+        when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, CASE_ID_1)).thenReturn(assignments);
+
+        nocRespondentRepresentativeService.loadRespondentRepresentativeContactDetails(USER_TOKEN, caseDetails);
+
+        assertThat(caseData.getEt3ResponsePhone()).isEqualTo("01234567890");
+        assertThat(caseData.getEt3ResponseAddress()).isEqualTo(address);
+    }
+
+    @Test
+    void loadRespondentRepresentativeContactDetails_noRep_doesNothing() {
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseId(CASE_ID_1);
+        caseDetails.setCaseData(caseData);
+
+        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
+        when(userIdamService.getUserDetails(USER_TOKEN)).thenReturn(null);
+
+        nocRespondentRepresentativeService.loadRespondentRepresentativeContactDetails(USER_TOKEN, caseDetails);
+
+        assertNull(caseData.getEt3ResponsePhone());
+        assertNull(caseData.getEt3ResponseAddress());
+    }
+
+    @Test
+    void populateMyHmctsOrganisationAddress_setsAddressAndText() throws Exception {
+        OrganisationAddress orgAddress = OrganisationAddress.builder()
+                .addressLine1("Org House").postCode("SW1A 1AA").build();
+        when(myHmctsService.getOrganisationAddress(USER_TOKEN)).thenReturn(orgAddress);
+
+        nocRespondentRepresentativeService.populateMyHmctsOrganisationAddress(USER_TOKEN, caseData);
+
+        assertThat(caseData.getEt3ResponseAddress()).isNotNull();
+        assertThat(caseData.getEt3ResponseAddress().getAddressLine1()).isEqualTo("Org House");
+        assertThat(caseData.getMyHmctsAddressText()).isNotNull();
+    }
+
+    @Test
+    void populateMyHmctsOrganisationAddress_propagatesException() throws Exception {
+        when(myHmctsService.getOrganisationAddress(USER_TOKEN))
+                .thenThrow(new GenericServiceException(EXCEPTION_DUMMY_MESSAGE,
+                        new Exception(EXCEPTION_DUMMY_MESSAGE), EXCEPTION_DUMMY_MESSAGE,
+                        CASE_ID_1, "MyHmctsService", "getOrganisationAddress"));
+
+        assertThrows(GenericServiceException.class,
+                () -> nocRespondentRepresentativeService.populateMyHmctsOrganisationAddress(USER_TOKEN, caseData));
+    }
+
+    @Test
+    void saveRespondentRepresentativeContactDetails_updatesRepCollection() throws Exception {
+        Address newAddress = new Address();
+        newAddress.setAddressLine1("New Address");
+        caseData.setEt3ResponsePhone("09876543210");
+        caseData.setEt3ResponseAddress(newAddress);
+
+        RepresentedTypeRItem repItem = RepresentedTypeRItem.builder()
+                .id(REPRESENTATIVE_ID_ONE)
+                .value(RepresentedTypeR.builder().role(ROLE_SOLICITORA).representativePhoneNumber("old").build())
+                .build();
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseId(CASE_ID_1);
+        caseDetails.setCaseData(caseData);
+        caseData.setRepCollection(List.of(repItem));
+
+        UserDetails userDetails = new UserDetails();
+        userDetails.setUid(USER_ID);
+        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
+        when(userIdamService.getUserDetails(USER_TOKEN)).thenReturn(userDetails);
+        CaseUserAssignmentData assignments = CaseUserAssignmentData.builder()
+                .caseUserAssignments(List.of(CaseUserAssignment.builder()
+                        .userId(USER_ID).caseRole(ROLE_SOLICITORA).build()))
+                .build();
+        when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, CASE_ID_1)).thenReturn(assignments);
+
+        nocRespondentRepresentativeService.saveRespondentRepresentativeContactDetails(USER_TOKEN, caseDetails);
+
+        assertThat(repItem.getValue().getRepresentativePhoneNumber()).isEqualTo("09876543210");
+        assertThat(repItem.getValue().getRepresentativeAddress()).isEqualTo(newAddress);
+        assertNull(caseData.getMyHmctsAddressText());
+    }
+
+    @Test
+    void saveRespondentRepresentativeContactDetails_useMyHmcts_populatesFromOrg() throws Exception {
+        caseData.setRepresentativeContactChangeOption(REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS);
+        OrganisationAddress orgAddress = OrganisationAddress.builder()
+                .addressLine1("Org Street").postCode("EC1A 1BB").build();
+        when(myHmctsService.getOrganisationAddress(USER_TOKEN)).thenReturn(orgAddress);
+
+        RepresentedTypeRItem repItem = RepresentedTypeRItem.builder()
+                .id(REPRESENTATIVE_ID_ONE)
+                .value(RepresentedTypeR.builder().role(ROLE_SOLICITORA).build())
+                .build();
+        CaseDetails caseDetails = new CaseDetails();
+        caseDetails.setCaseId(CASE_ID_1);
+        caseDetails.setCaseData(caseData);
+        caseData.setRepCollection(List.of(repItem));
+
+        UserDetails userDetails = new UserDetails();
+        userDetails.setUid(USER_ID);
+        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
+        when(userIdamService.getUserDetails(USER_TOKEN)).thenReturn(userDetails);
+        CaseUserAssignmentData assignments = CaseUserAssignmentData.builder()
+                .caseUserAssignments(List.of(CaseUserAssignment.builder()
+                        .userId(USER_ID).caseRole(ROLE_SOLICITORA).build()))
+                .build();
+        when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, CASE_ID_1)).thenReturn(assignments);
+
+        nocRespondentRepresentativeService.saveRespondentRepresentativeContactDetails(USER_TOKEN, caseDetails);
+
+        assertThat(repItem.getValue().getRepresentativeAddress().getAddressLine1()).isEqualTo("Org Street");
+        assertNull(caseData.getMyHmctsAddressText());
     }
 }

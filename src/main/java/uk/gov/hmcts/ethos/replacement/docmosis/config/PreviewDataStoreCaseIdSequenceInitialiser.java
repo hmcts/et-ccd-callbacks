@@ -14,6 +14,8 @@ import org.springframework.stereotype.Component;
 @ConditionalOnProperty("preview.data-store-case-id-sequence-base")
 public class PreviewDataStoreCaseIdSequenceInitialiser implements ApplicationRunner {
 
+    static final String LOCAL_MAX_CASE_DATA_ID_SQL = "select coalesce(max(id), 0) from ccd.case_data";
+
     static final String ALIGN_SEQUENCE_SQL = """
         select setval(
             'case_data_id_seq',
@@ -26,6 +28,7 @@ public class PreviewDataStoreCaseIdSequenceInitialiser implements ApplicationRun
         )
         """;
 
+    private final JdbcTemplate applicationJdbcTemplate;
     private final long sequenceBase;
     private final String host;
     private final int port;
@@ -35,6 +38,7 @@ public class PreviewDataStoreCaseIdSequenceInitialiser implements ApplicationRun
     private final String connectionOptions;
 
     public PreviewDataStoreCaseIdSequenceInitialiser(
+        JdbcTemplate applicationJdbcTemplate,
         @Value("${preview.data-store-case-id-sequence-base}") long sequenceBase,
         @Value("${preview.data-store-db-host}") String host,
         @Value("${preview.data-store-db-port}") int port,
@@ -43,6 +47,7 @@ public class PreviewDataStoreCaseIdSequenceInitialiser implements ApplicationRun
         @Value("${preview.data-store-db-password:${ET_PREVIEW_FLEXI_DB_PASSWORD:}}") String password,
         @Value("${preview.data-store-db-conn-options:?sslmode=require}") String connectionOptions
     ) {
+        this.applicationJdbcTemplate = applicationJdbcTemplate;
         this.sequenceBase = sequenceBase;
         this.host = host;
         this.port = port;
@@ -54,11 +59,19 @@ public class PreviewDataStoreCaseIdSequenceInitialiser implements ApplicationRun
 
     @Override
     public void run(ApplicationArguments args) {
-        Long alignedValue = createJdbcTemplate().queryForObject(ALIGN_SEQUENCE_SQL, Long.class, sequenceBase);
-        log.info("Aligned preview data-store case_data_id_seq to {} using base {}", alignedValue, sequenceBase);
+        long localMaxCaseDataId = getLocalMaxCaseDataId();
+        long sequenceFloor = Math.max(sequenceBase, localMaxCaseDataId);
+        Long alignedValue = createDataStoreJdbcTemplate().queryForObject(ALIGN_SEQUENCE_SQL, Long.class, sequenceFloor);
+        log.info("Aligned preview data-store case_data_id_seq to {} using base {} and local max {}",
+            alignedValue, sequenceBase, localMaxCaseDataId);
     }
 
-    JdbcTemplate createJdbcTemplate() {
+    long getLocalMaxCaseDataId() {
+        Long localMaxCaseDataId = applicationJdbcTemplate.queryForObject(LOCAL_MAX_CASE_DATA_ID_SQL, Long.class);
+        return localMaxCaseDataId == null ? 0L : localMaxCaseDataId;
+    }
+
+    JdbcTemplate createDataStoreJdbcTemplate() {
         DriverManagerDataSource dataSource = new DriverManagerDataSource();
         dataSource.setDriverClassName("org.postgresql.Driver");
         dataSource.setUrl("jdbc:postgresql://%s:%s/%s%s".formatted(host, port, databaseName, connectionOptions));

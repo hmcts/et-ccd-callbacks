@@ -11,8 +11,13 @@ class PreviewDataStoreCaseIdSequenceInitialiserTest {
 
     @Test
     void shouldAlignSequenceUsingConfiguredBase() throws Exception {
-        JdbcTemplate jdbcTemplate = org.mockito.Mockito.mock(JdbcTemplate.class);
-        when(jdbcTemplate.queryForObject(
+        JdbcTemplate applicationJdbcTemplate = org.mockito.Mockito.mock(JdbcTemplate.class);
+        JdbcTemplate dataStoreJdbcTemplate = org.mockito.Mockito.mock(JdbcTemplate.class);
+        when(applicationJdbcTemplate.queryForObject(
+            PreviewDataStoreCaseIdSequenceInitialiser.LOCAL_MAX_CASE_DATA_ID_SQL,
+            Long.class
+        )).thenReturn(0L);
+        when(dataStoreJdbcTemplate.queryForObject(
             PreviewDataStoreCaseIdSequenceInitialiser.ALIGN_SEQUENCE_SQL,
             Long.class,
             SEQUENCE_BASE
@@ -20,6 +25,7 @@ class PreviewDataStoreCaseIdSequenceInitialiserTest {
 
         PreviewDataStoreCaseIdSequenceInitialiser initialiser =
             new PreviewDataStoreCaseIdSequenceInitialiser(
+                applicationJdbcTemplate,
                 SEQUENCE_BASE,
                 "host",
                 5432,
@@ -29,17 +35,62 @@ class PreviewDataStoreCaseIdSequenceInitialiserTest {
                 "?sslmode=require"
             ) {
                 @Override
-                JdbcTemplate createJdbcTemplate() {
-                    return jdbcTemplate;
+                JdbcTemplate createDataStoreJdbcTemplate() {
+                    return dataStoreJdbcTemplate;
                 }
             };
 
         initialiser.run(null);
 
-        verify(jdbcTemplate).queryForObject(
+        verify(applicationJdbcTemplate).queryForObject(
+            PreviewDataStoreCaseIdSequenceInitialiser.LOCAL_MAX_CASE_DATA_ID_SQL,
+            Long.class
+        );
+        verify(dataStoreJdbcTemplate).queryForObject(
             PreviewDataStoreCaseIdSequenceInitialiser.ALIGN_SEQUENCE_SQL,
             Long.class,
             SEQUENCE_BASE
+        );
+    }
+
+    @Test
+    void shouldAlignSequenceUsingLocalCaseDataIdWhenHigherThanConfiguredBase() throws Exception {
+        long localMaxCaseDataId = SEQUENCE_BASE + 3;
+        JdbcTemplate applicationJdbcTemplate = org.mockito.Mockito.mock(JdbcTemplate.class);
+        JdbcTemplate dataStoreJdbcTemplate = org.mockito.Mockito.mock(JdbcTemplate.class);
+        when(applicationJdbcTemplate.queryForObject(
+            PreviewDataStoreCaseIdSequenceInitialiser.LOCAL_MAX_CASE_DATA_ID_SQL,
+            Long.class
+        )).thenReturn(localMaxCaseDataId);
+        when(dataStoreJdbcTemplate.queryForObject(
+            PreviewDataStoreCaseIdSequenceInitialiser.ALIGN_SEQUENCE_SQL,
+            Long.class,
+            localMaxCaseDataId
+        )).thenReturn(localMaxCaseDataId);
+
+        PreviewDataStoreCaseIdSequenceInitialiser initialiser =
+            new PreviewDataStoreCaseIdSequenceInitialiser(
+                applicationJdbcTemplate,
+                SEQUENCE_BASE,
+                "host",
+                5432,
+                "db",
+                "user",
+                "password",
+                "?sslmode=require"
+            ) {
+                @Override
+                JdbcTemplate createDataStoreJdbcTemplate() {
+                    return dataStoreJdbcTemplate;
+                }
+            };
+
+        initialiser.run(null);
+
+        verify(dataStoreJdbcTemplate).queryForObject(
+            PreviewDataStoreCaseIdSequenceInitialiser.ALIGN_SEQUENCE_SQL,
+            Long.class,
+            localMaxCaseDataId
         );
     }
 }

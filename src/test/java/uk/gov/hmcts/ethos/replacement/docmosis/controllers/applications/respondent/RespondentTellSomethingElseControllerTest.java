@@ -7,8 +7,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.notNullValue;
@@ -59,11 +60,11 @@ class RespondentTellSomethingElseControllerTest extends BaseControllerTest {
     private static final String ABOUT_TO_START_URL = "/respondentTSE/aboutToStart";
     private static final String SHOW_ERROR_URL = "/respondentTSE/showError";
 
-    @MockBean
+    @MockitoBean
     private CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
-    @MockBean
+    @MockitoBean
     private RespondentTellSomethingElseService resTseService;
-    @MockBean
+    @MockitoBean
     private TseService tseService;
 
     @Autowired

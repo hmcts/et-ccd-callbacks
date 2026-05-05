@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -60,17 +60,17 @@ class CreateReferralControllerTest {
     private static final String SUBMITTED_REFERRAL_URL = "/createReferral/completeCreateReferral";
     private static final String VALIDATE_EMAIL_URL = "/createReferral/validateReferentEmail";
 
-    @MockBean
+    @MockitoBean
     private VerifyTokenService verifyTokenService;
-    @MockBean
+    @MockitoBean
     private UserIdamService userIdamService;
-    @MockBean
+    @MockitoBean
     private DocumentManagementService documentManagementService;
-    @MockBean
+    @MockitoBean
     private ReferralService referralService;
-    @MockBean
+    @MockitoBean
     private EmailService emailService;
-    @MockBean
+    @MockitoBean
     private CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
     @Autowired
     private MockMvc mockMvc;

@@ -7,10 +7,10 @@ import lombok.SneakyThrows;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.types.TseRespondType;
 import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.ClaimantTse;
@@ -76,21 +76,21 @@ class ManageCaseControllerTest {
     @Autowired
     private MockMvc mockMvc;
 
-    @MockBean
+    @MockitoBean
     private CaseService caseService;
 
-    @MockBean
+    @MockitoBean
     private IdamClient idamClient;
 
-    @MockBean
+    @MockitoBean
     private ManageCaseRoleService manageCaseRoleService;
 
-    @MockBean
+    @MockitoBean
     private VerifyTokenService verifyTokenService;
 
-    @MockBean
+    @MockitoBean
     private ApplicationService applicationService;
-    @MockBean
+    @MockitoBean
     private HubLinkService hubLinkService;
 
     ManageCaseControllerTest() {

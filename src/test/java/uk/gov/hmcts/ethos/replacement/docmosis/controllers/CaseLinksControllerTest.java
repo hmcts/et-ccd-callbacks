@@ -8,8 +8,8 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
@@ -45,11 +45,11 @@ class CaseLinksControllerTest {
 
     private static final String MAINTAIN_SUBMITTED_URL = "/caseLinks/maintain/aboutToSubmit";
 
-    @MockBean
+    @MockitoBean
     private VerifyTokenService verifyTokenService;
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
-    @MockBean
+    @MockitoBean
     private CaseLinksEmailService caseLinksEmailService;
 
     @Autowired

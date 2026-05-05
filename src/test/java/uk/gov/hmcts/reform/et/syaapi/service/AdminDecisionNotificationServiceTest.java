@@ -2,7 +2,7 @@ package uk.gov.hmcts.reform.et.syaapi.service;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.reform.et.syaapi.helper.CaseDetailsConverter;
 import uk.gov.hmcts.reform.et.syaapi.model.TestData;
 import uk.gov.hmcts.reform.et.syaapi.models.AdminDecisionNotificationStateUpdateRequest;
@@ -18,11 +18,11 @@ import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.TEST_SER
 
 class AdminDecisionNotificationServiceTest {
 
-    @MockBean
+    @MockitoBean
     private CaseService caseService;
-    @MockBean
+    @MockitoBean
     private CaseDetailsConverter caseDetailsConverter;
-    @MockBean
+    @MockitoBean
     private AdminDecisionNotificationService adminDecisionNotificationService;
 
     private final TestData testData;

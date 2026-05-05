@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.helpers.UtilHelper;
@@ -68,13 +68,13 @@ class RespondNotificationServiceTest {
 
     @Mock
     private HearingSelectionService hearingSelectionService;
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
     @Mock
     private TornadoService tornadoService;
-    @MockBean
+    @MockitoBean
     private CaseAccessService caseAccessService;
-    @MockBean
+    @MockitoBean
     EmailNotificationService emailNotificationService;
 
     private EmailService emailService;

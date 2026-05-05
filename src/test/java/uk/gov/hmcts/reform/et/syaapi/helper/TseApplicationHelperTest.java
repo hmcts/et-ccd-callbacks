@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
@@ -46,7 +46,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.WITHDRAWAL_
 import static uk.gov.hmcts.reform.et.syaapi.helper.TseApplicationHelper.setApplicationWithResponse;
 
 class TseApplicationHelperTest {
-    @MockBean
+    @MockitoBean
     private CaseDocumentService caseDocumentService;
 
     TestData data = new TestData();

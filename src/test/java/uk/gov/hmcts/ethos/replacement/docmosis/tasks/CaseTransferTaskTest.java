@@ -5,7 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Captor;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.model.ccd.CCDRequest;
@@ -37,10 +37,10 @@ class CaseTransferTaskTest {
 
     private CaseTransferTask caseTransferTask;
 
-    @MockBean
+    @MockitoBean
     private AdminUserService adminUserService;
 
-    @MockBean
+    @MockitoBean
     private CcdClient ccdClient;
 
     @Captor

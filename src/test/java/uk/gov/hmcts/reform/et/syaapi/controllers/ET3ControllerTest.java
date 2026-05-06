@@ -5,10 +5,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
@@ -39,10 +39,10 @@ class ET3ControllerTest {
     @Autowired
     private WebApplicationContext webApplicationContext;
 
-    @MockBean
+    @MockitoBean
     private VerifyTokenService verifyTokenService;
 
-    @MockBean
+    @MockitoBean
     private ET3Service et3Service;
 
     private MockMvc mockMvc;

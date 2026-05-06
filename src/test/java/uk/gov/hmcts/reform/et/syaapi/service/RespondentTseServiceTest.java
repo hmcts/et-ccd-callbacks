@@ -3,7 +3,7 @@ package uk.gov.hmcts.reform.et.syaapi.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.reform.et.syaapi.enums.CaseEvent;
 import uk.gov.hmcts.reform.et.syaapi.helper.CaseDetailsConverter;
@@ -19,10 +19,10 @@ import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.TEST_SERVICE_AUTH_TOKEN;
 
 class RespondentTseServiceTest {
-    @MockBean
+    @MockitoBean
     private CaseService caseService;
 
-    @MockBean
+    @MockitoBean
     private CaseDetailsConverter caseDetailsConverter;
 
     private RespondentTseService respondentTseService;

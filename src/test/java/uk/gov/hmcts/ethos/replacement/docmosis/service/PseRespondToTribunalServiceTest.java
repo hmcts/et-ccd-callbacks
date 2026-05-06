@@ -8,7 +8,7 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -91,11 +91,11 @@ class PseRespondToTribunalServiceTest {
     private static final String EXUI_URL = "exuiUrl";
     private static final String AUTHOR = "Barry White";
 
-    @MockBean
+    @MockitoBean
     private UserIdamService userIdamService;
-    @MockBean
+    @MockitoBean
     private HearingSelectionService hearingSelectionService;
-    @MockBean
+    @MockitoBean
     private TribunalOfficesService tribunalOfficesService;
 
     @BeforeEach

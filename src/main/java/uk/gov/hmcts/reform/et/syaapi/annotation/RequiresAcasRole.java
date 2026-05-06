@@ -6,9 +6,12 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation to mark controller methods that require ACAS-specific roles.
- * Methods annotated with this will require the user to have either
- * 'caseworker-employment-api' or 'et-acas-api' role.
+ * Documents that a controller method requires one of the ACAS-specific IDAM roles
+ * ({@code caseworker-employment-api} or {@code et-acas-api}).
+ *
+ * <p>The actual enforcement is applied directly on each annotated method via
+ * {@code @PreAuthorize("@roleValidationService.hasAnyRole(#authToken, ...)")}.
+ * This annotation serves as a readable semantic label.
  */
 @Target(ElementType.METHOD)
 @Retention(RetentionPolicy.RUNTIME)

@@ -10,6 +10,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentTse;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.TestSecurityConfig;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.et.syaapi.models.ChangeRespondentApplicationStatusRequest;
@@ -29,7 +30,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.TEST_SERVICE_AUTH_TOKEN;
 
 @WebMvcTest(controllers = {RespondentTseController.class})
-@Import(RespondentTseController.class)
+@Import({RespondentTseController.class, TestSecurityConfig.class})
 class RespondentTseControllerTest {
     private static final String CASE_ID = "1646225213651590";
     private static final String CASE_TYPE = "ET_Scotland";

@@ -4,12 +4,14 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.TestSecurityConfig;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.reform.et.syaapi.config.interceptors.ResourceNotFoundException;
 import uk.gov.hmcts.reform.et.syaapi.models.CaseDocument;
@@ -30,6 +32,7 @@ import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.TEST_SER
 @WebMvcTest(
     controllers = {DocumentController.class}
 )
+@Import(TestSecurityConfig.class)
 class DocumentControllerTest {
 
     private static final UUID DOCUMENT_ID = UUID.fromString("0d94b4e4-4659-47ad-a640-c63517c76706");

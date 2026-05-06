@@ -65,6 +65,10 @@ idam:
     url: ${IDAM_API_URL:http://sidam-api:5000}
     jwkUrl: ${IDAM_API_JWK_URL:http://sidam-api:5000/jwks}
     jwksUrl: ${IDAM_JWKS_BASEURL:${IDAM_API_JWK_URL:http://sidam-api:5000/jwks}}
+    # Permitted JWT issuers – add one entry per environment issuer URI.
+    # Validation is skipped when the list is empty.
+    issuer-uris:
+      - ${IDAM_ISSUER_URI:${IDAM_API_URL:http://sidam-api:5000}/o}
   client:
     scope: openid profile roles manage-user
     secret: ${IDAM_CLIENT_SECRET:${ET_SYA_API_IDAM_CLIENT_SECRET:AAAAAAAAAAAAAAAA}}

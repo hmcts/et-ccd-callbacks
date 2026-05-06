@@ -18,7 +18,6 @@ import org.springframework.web.context.WebApplicationContext;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
-import uk.gov.hmcts.reform.et.syaapi.config.AcasRoleAuthorizationAspect;
 import uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants;
 import uk.gov.hmcts.reform.et.syaapi.models.CaseDocumentAcasResponse;
 import uk.gov.hmcts.reform.et.syaapi.service.AcasCaseService;
@@ -42,7 +41,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest({AcasController.class, AcasRoleAuthorizationAspect.class})
+@WebMvcTest({AcasController.class})
 @ContextConfiguration(classes = DocmosisApplication.class)
 @SuppressWarnings({"PMD.LinguisticNaming", "PMD.TooManyMethods"})
 class AcasControllerTest {
@@ -111,7 +110,7 @@ class AcasControllerTest {
 
     @Test
     void getLastModifiedCaseListWhenInvalidTokenReturnError() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        when(roleValidationService.hasAnyRole(anyString(), anyList())).thenReturn(false);
         mockMvc.perform(get(GET_LAST_MODIFIED_CASE_LIST_URL)
                             .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                             .param("datetime", REQUEST_DATE_TIME_STRING))
@@ -151,7 +150,7 @@ class AcasControllerTest {
 
     @Test
     void getCaseDataInvalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        when(roleValidationService.hasAnyRole(anyString(), anyList())).thenReturn(false);
         mockMvc.perform(get(GET_CASE_DATA_URL)
                             .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                             .param("caseIds", caseIds.toString()))
@@ -186,7 +185,7 @@ class AcasControllerTest {
 
     @Test
     void getAcasDocumentsInvalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        when(roleValidationService.hasAnyRole(anyString(), anyList())).thenReturn(false);
         mockMvc.perform(get(GET_ACAS_DOCUMENTS_URL)
                             .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                             .param(CASE_ID_PARAM, "dummy"))
@@ -214,7 +213,7 @@ class AcasControllerTest {
 
     @Test
     void downloadAcasDocumentsInvalidToken() throws Exception {
-        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(false);
+        when(roleValidationService.hasAnyRole(anyString(), anyList())).thenReturn(false);
         mockMvc.perform(get(DOWNLOAD_ACAS_DOCUMENTS_URL)
                             .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
                             .param("documentId", UUID.randomUUID().toString()))

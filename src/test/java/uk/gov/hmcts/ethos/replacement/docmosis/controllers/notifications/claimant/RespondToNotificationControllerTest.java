@@ -6,6 +6,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
@@ -13,6 +14,7 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.TestSecurityConfig;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.PseRespondToTribunalService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
@@ -39,6 +41,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.PseRespondToTribun
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({RespondToNotificationController.class, JsonMapper.class})
+@Import(TestSecurityConfig.class)
 class RespondToNotificationControllerTest {
     private static final String ABOUT_TO_START_URL = "/claimantRespondNotification/aboutToStart";
     private static final String MID_DETAILS_TABLE_URL = "/claimantRespondNotification/midDetailsTable";

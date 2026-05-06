@@ -6,12 +6,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.TestSecurityConfig;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ProvideSomethingElseViewService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
@@ -34,6 +36,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.controllers.BaseController
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({ViewNotificationController.class, JsonMapper.class})
+@Import(TestSecurityConfig.class)
 class ViewNotificationControllerTest {
     private static final String ALL_ABOUT_TO_START_URL = "/claimantViewNotification/all/aboutToStart";
     private static final String ALL_ABOUT_TO_SUBMIT_URL = "/claimantViewNotification/all/aboutToSubmit";

@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.TestSecurityConfig;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
 import uk.gov.hmcts.reform.et.syaapi.models.AdminDecisionNotificationStateUpdateRequest;
@@ -29,7 +30,7 @@ import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.TEST_SER
 @WebMvcTest(
     controllers = {AdminDecisionNotificationController.class}
 )
-@Import(AdminDecisionNotificationController.class)
+@Import({AdminDecisionNotificationController.class, TestSecurityConfig.class})
 class AdminDecisionNotificationControllerTest {
 
     @MockBean

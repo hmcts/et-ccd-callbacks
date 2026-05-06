@@ -11,6 +11,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
+import uk.gov.hmcts.ethos.replacement.docmosis.config.TestSecurityConfig;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 import uk.gov.hmcts.reform.et.syaapi.models.CaseDocument;
 import uk.gov.hmcts.reform.et.syaapi.service.CaseDocumentException;
@@ -28,7 +29,7 @@ import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.TEST_SER
 @WebMvcTest(
     controllers = {DocumentUploadController.class}
 )
-@Import(DocumentUploadController.class)
+@Import({DocumentUploadController.class, TestSecurityConfig.class})
 class DocumentUploadControllerTest {
     private static final String DOCUMENT_NAME = "hello.txt";
     private static final String MOCK_FILE_BODY = "Hello, World!";

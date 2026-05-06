@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
@@ -37,9 +37,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_T
 @WebMvcTest({TseClaimantController.class, JsonMapper.class})
 class TseClaimantControllerTest extends BaseControllerTest {
 
-    @MockBean
+    @MockitoBean
     private CaseManagementForCaseWorkerService caseManagementForCaseWorkerService;
-    @MockBean
+    @MockitoBean
     private TseService tseService;
 
     @Autowired

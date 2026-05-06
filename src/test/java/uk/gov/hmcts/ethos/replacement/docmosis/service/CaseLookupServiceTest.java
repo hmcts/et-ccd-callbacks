@@ -3,7 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -24,9 +24,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.MULTIPLE;
 @ExtendWith(SpringExtension.class)
 class CaseLookupServiceTest {
     private CaseLookupService caseLookupService;
-    @MockBean
+    @MockitoBean
     private CcdClient ccdClient;
-    @MockBean
+    @MockitoBean
     private AdminUserService adminUserService;
 
     @BeforeEach

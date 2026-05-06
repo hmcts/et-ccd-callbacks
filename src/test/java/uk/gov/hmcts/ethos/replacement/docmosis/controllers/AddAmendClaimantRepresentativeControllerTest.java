@@ -7,8 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -57,13 +57,13 @@ class AddAmendClaimantRepresentativeControllerTest {
     private static final String EXPECTED_WARNING_REPRESENTATIVE_EMAIL_NOT_FOUND =
             "Representative email not exist";
 
-    @MockBean
+    @MockitoBean
     private VerifyTokenService verifyTokenService;
-    @MockBean
+    @MockitoBean
     private NocClaimantRepresentativeService nocClaimantRepresentativeService;
-    @MockBean
+    @MockitoBean
     private NocRespondentRepresentativeService nocRespondentRepresentativeService;
-    @MockBean
+    @MockitoBean
     private UserIdamService userIdamService;
 
     @Autowired

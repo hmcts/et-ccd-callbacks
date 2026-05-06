@@ -11,10 +11,10 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -174,25 +174,25 @@ class NocRespondentRepresentativeServiceTest {
     @Autowired
     private ObjectMapper objectMapper;
 
-    @MockBean
+    @MockitoBean
     private NoticeOfChangeFieldPopulator noticeOfChangeFieldPopulator;
-    @MockBean
+    @MockitoBean
     private AdminUserService adminUserService;
-    @MockBean
+    @MockitoBean
     private NocCcdService nocCcdService;
-    @MockBean
+    @MockitoBean
     private NocNotificationService nocNotificationService;
-    @MockBean
+    @MockitoBean
     private CcdClient ccdClient;
-    @MockBean
+    @MockitoBean
     private OrganisationClient organisationClient;
-    @MockBean
+    @MockitoBean
     private AuthTokenGenerator authTokenGenerator;
-    @MockBean
+    @MockitoBean
     private NocService nocService;
-    @MockBean
+    @MockitoBean
     private UserIdamService userIdamService;
-    @MockBean
+    @MockitoBean
     private OrganisationService organisationService;
 
     @InjectMocks

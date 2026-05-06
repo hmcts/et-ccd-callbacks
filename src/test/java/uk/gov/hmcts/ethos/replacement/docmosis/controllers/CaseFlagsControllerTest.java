@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
@@ -33,7 +33,7 @@ class CaseFlagsControllerTest extends BaseControllerTest {
 
     private static final String ABOUT_TO_SUBMIT_URL = "/caseFlags/aboutToSubmit";
 
-    @MockBean
+    @MockitoBean
     private CaseFlagsService caseFlagsService;
 
     @Autowired

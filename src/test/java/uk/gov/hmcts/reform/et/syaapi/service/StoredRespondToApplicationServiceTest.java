@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTseApplicationType;
@@ -32,13 +32,13 @@ import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.YES;
 
 class StoredRespondToApplicationServiceTest {
 
-    @MockBean
+    @MockitoBean
     private CaseService caseService;
-    @MockBean
+    @MockitoBean
     private NotificationService notificationService;
-    @MockBean
+    @MockitoBean
     private CaseDocumentService caseDocumentService;
-    @MockBean
+    @MockitoBean
     private CaseDetailsConverter caseDetailsConverter;
     @InjectMocks
     private StoredRespondToApplicationService storedRespondToApplicationService;

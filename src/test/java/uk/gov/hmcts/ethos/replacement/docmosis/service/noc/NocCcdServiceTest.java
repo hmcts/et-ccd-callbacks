@@ -5,8 +5,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.client.CcdClient;
 import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
@@ -52,7 +52,7 @@ class NocCcdServiceTest {
     private static final String ROLE_SOLICITORB = "SOLICITORB";
     private static final String OK = "Ok";
 
-    @MockBean
+    @MockitoBean
     private CcdClient ccdClient;
 
     private NocCcdService nocCcdService;

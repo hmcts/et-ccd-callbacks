@@ -5,12 +5,14 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.et.common.model.ccd.AuditEvent;
 import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
@@ -56,6 +58,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.test.utils.NocClaimantRepr
 import static uk.gov.hmcts.ethos.replacement.docmosis.test.utils.NocClaimantRepresentativeServiceTestUtils.getCaseDataAfter;
 import static uk.gov.hmcts.ethos.replacement.docmosis.test.utils.NocClaimantRepresentativeServiceTestUtils.mockCaseAssignmentData;
 
+@ExtendWith(SpringExtension.class)
 class NocClaimantRepresentativeServiceTest {
     private static final String USER_EMAIL = "test@hmcts.net";
     private static final String USER_FIRST_NAME = "John";
@@ -75,21 +78,21 @@ class NocClaimantRepresentativeServiceTest {
             "Representative Representative Name 1 organisation does not match with selected organisation "
                     + "dummyOrganisationUserId";
 
-    @Mock
+    @MockitoBean
     private AuthTokenGenerator authTokenGenerator;
-    @Mock
+    @MockitoBean
     private OrganisationClient organisationClient;
-    @Mock
+    @MockitoBean
     private AdminUserService adminUserService;
-    @Mock
+    @MockitoBean
     private NocCcdService nocCcdService;
-    @Mock
+    @MockitoBean
     private NocNotificationService nocNotificationService;
-    @Mock
+    @MockitoBean
     private CcdCaseAssignment ccdCaseAssignment;
-    @Mock
+    @MockitoBean
     private NocService nocService;
-    @Mock
+    @MockitoBean
     private OrganisationService organisationService;
 
     private CaseData caseData;

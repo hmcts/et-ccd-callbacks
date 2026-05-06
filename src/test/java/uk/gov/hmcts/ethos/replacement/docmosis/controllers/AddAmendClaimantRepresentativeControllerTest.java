@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -39,15 +39,15 @@ class AddAmendClaimantRepresentativeControllerTest {
     private static final String ABOUT_TO_SUBMIT_URL = "/addAmendClaimantRepresentative/aboutToSubmit";
     private static final String SUBMITTED_URL = "/addAmendClaimantRepresentative/amendClaimantRepSubmitted";
 
-    @MockBean
+    @MockitoBean
     private ScheduledTaskRunner taskRunner;
-    @MockBean
+    @MockitoBean
     private VerifyTokenService verifyTokenService;
-    @MockBean
+    @MockitoBean
     private AddAmendClaimantRepresentativeService addAmendClaimantRepresentativeService;
-    @MockBean
+    @MockitoBean
     private NocClaimantRepresentativeService nocClaimantRepresentativeService;
-    @MockBean
+    @MockitoBean
     private UserIdamService userIdamService;
 
     @Autowired

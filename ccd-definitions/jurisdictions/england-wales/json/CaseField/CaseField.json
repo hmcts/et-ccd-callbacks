@@ -6525,23 +6525,6 @@
   },
   {
     "CaseTypeID": "ET_EnglandWales",
-    "ID": "caseNotesCollection",
-    "Label": "Telephone notes",
-    "FieldType": "Collection",
-    "FieldTypeParameter": "caseNote",
-    "SecurityClassification": "Public",
-    "Searchable": "N"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "ID": "addCaseNote",
-    "Label": "Add telephone note",
-    "FieldType": "caseNote",
-    "SecurityClassification": "Public",
-    "Searchable": "N"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
     "ID": "representativeContactChangeOption",
     "Label": " ",
     "FieldType": "FixedRadioList",

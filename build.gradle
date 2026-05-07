@@ -510,7 +510,7 @@ dependencies {
     // CVE-2025-7962
     implementation group: 'org.eclipse.angus', name: 'angus-mail', version: '2.0.5'
 
-    runtimeOnly group: 'com.squareup.okio', name: 'okio-jvm', version: '3.16.4'
+    runtimeOnly group: 'com.squareup.okio', name: 'okio-jvm', version: '3.17.0'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 

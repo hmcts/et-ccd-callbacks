@@ -43,14 +43,12 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.JurisdictionCode
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.JurisdictionCodeConstants.TRACK_OPEN;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.JurisdictionCodeConstants.TRACK_SHORT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.JurisdictionCodeConstants.TRACK_STANDARD;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ACAS_CERT_LIST_DISPLAY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ACAS_DOC_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_LABEL_ACAS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_LABEL_ACAS_OPEN_TAB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_LABEL_ET1;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_LABEL_ET1_ATTACHMENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BEFORE_LABEL_TEMPLATE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.BR_WITH_TAB;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.CLAIMANT_AND_RESPONDENT_ADDRESSES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.CLAIMANT_AND_RESPONDENT_ADDRESSES_WITHOUT_WORK_ADDRESS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.CLAIMANT_DETAILS_COMPANY;
@@ -63,7 +61,6 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET1_ATTA
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ET1_DOC_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.FIVE_ACAS_DOC_TYPE_ITEMS_COUNT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.JUR_CODE_HTML;
-import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.NO_ACAS_CERT_DISPLAY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.ONE_RESPONDENT_COUNT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.RESPONDENT_ACAS_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.RESPONDENT_DETAILS;
@@ -231,17 +228,15 @@ public class Et1VettingService {
         }
 
         if (caseData.getClaimantIndType() == null) {
-            return String.format(CLAIMANT_DETAILS_PERSON, "Name not specified.", "Name not specified.",
+            return String.format(CLAIMANT_DETAILS_PERSON, "Name not specified.",
                 toAddressWithTab(caseData.getClaimantType().getClaimantAddressUK()));
         }
 
+        String firstName = defaultIfEmpty(caseData.getClaimantIndType().getClaimantFirstNames(), "");
+        String lastName = defaultIfEmpty(caseData.getClaimantIndType().getClaimantLastName(), "");
+        String fullName = (firstName + " " + lastName).trim();
         return String.format(CLAIMANT_DETAILS_PERSON,
-            caseData.getClaimantIndType().getClaimantFirstNames() != null
-                ? caseData.getClaimantIndType().getClaimantFirstNames()
-                : "First name not specified.",
-            caseData.getClaimantIndType().getClaimantLastName() != null
-                ? caseData.getClaimantIndType().getClaimantLastName()
-                : "Last name not specified.",
+            fullName.isEmpty() ? "Name not specified." : fullName,
             toAddressWithTab(caseData.getClaimantType().getClaimantAddressUK()));
     }
 
@@ -296,10 +291,11 @@ public class Et1VettingService {
     }
 
     private String generateRespondentAndAcasDetails(RespondentSumType respondent, int respondentNumber) {
+        String acasStatus = respondent.getRespondentAcas() == null
+            ? "No certificate provided."
+            : String.format("%s", respondent.getRespondentAcas());
         return String.format(RESPONDENT_ACAS_DETAILS, respondentNumber, respondent.getRespondentName(),
-            toAddressWithTab(respondent.getRespondentAddress()))
-            + (respondent.getRespondentAcas() == null
-            ? NO_ACAS_CERT_DISPLAY : String.format(ACAS_CERT_LIST_DISPLAY, respondent.getRespondentAcas()));
+            toAddressWithTab(respondent.getRespondentAddress()), acasStatus);
     }
 
     /**
@@ -412,16 +408,16 @@ public class Et1VettingService {
         StringBuilder claimantAddressStr = new StringBuilder();
         claimantAddressStr.append(defaultIfEmpty(address.getAddressLine1(), ""));
         if (!isNullOrEmpty(address.getAddressLine2())) {
-            claimantAddressStr.append(BR_WITH_TAB).append(address.getAddressLine2());
+            claimantAddressStr.append("<br>").append(address.getAddressLine2());
         }
         if (!isNullOrEmpty(address.getAddressLine3())) {
-            claimantAddressStr.append(BR_WITH_TAB).append(address.getAddressLine3());
+            claimantAddressStr.append("<br>").append(address.getAddressLine3());
         }
         if (!isNullOrEmpty(address.getPostTown())) {
-            claimantAddressStr.append(BR_WITH_TAB).append(address.getPostTown());
+            claimantAddressStr.append("<br>").append(address.getPostTown());
         }
         if (!isNullOrEmpty(address.getPostCode())) {
-            claimantAddressStr.append(BR_WITH_TAB).append(address.getPostCode());
+            claimantAddressStr.append("<br>").append(address.getPostCode());
         }
         return claimantAddressStr.toString();
     }
@@ -441,21 +437,39 @@ public class Et1VettingService {
     }
 
     public String getAddressesHtml(CaseData caseData) {
+        String claimantName = buildClaimantFullName(caseData);
+        String respondentName = caseData.getRespondentCollection().getFirst().getValue().getRespondentName();
         if (caseData.getClaimantWorkAddressQuestion() != null
                 && caseData.getClaimantWorkAddress() != null
                 && NO.equals(caseData.getClaimantWorkAddressQuestion())) {
             return String.format(CLAIMANT_AND_RESPONDENT_ADDRESSES,
+                    claimantName,
                     toAddressWithTab(caseData.getClaimantType().getClaimantAddressUK()),
                     toAddressWithTab(ObjectUtils.isEmpty(caseData.getClaimantWorkAddress().getClaimantWorkAddress())
                             ? new Address()
                             : caseData.getClaimantWorkAddress().getClaimantWorkAddress()),
+                    respondentName,
                     toAddressWithTab(caseData.getRespondentCollection().getFirst().getValue().getRespondentAddress()));
         } else {
             return String.format(CLAIMANT_AND_RESPONDENT_ADDRESSES_WITHOUT_WORK_ADDRESS,
+                    claimantName,
                     toAddressWithTab(caseData.getClaimantType().getClaimantAddressUK()),
+                    respondentName,
                     toAddressWithTab(caseData.getRespondentCollection().getFirst().getValue().getRespondentAddress())
             );
         }
+    }
+
+    private String buildClaimantFullName(CaseData caseData) {
+        if (COMPANY.equals(caseData.getClaimantTypeOfClaimant())) {
+            return defaultIfEmpty(caseData.getClaimantCompany(), "");
+        }
+        if (caseData.getClaimantIndType() == null) {
+            return "";
+        }
+        String firstName = defaultIfEmpty(caseData.getClaimantIndType().getClaimantFirstNames(), "");
+        String lastName = defaultIfEmpty(caseData.getClaimantIndType().getClaimantLastName(), "");
+        return (firstName + " " + lastName).trim();
     }
 
     /**

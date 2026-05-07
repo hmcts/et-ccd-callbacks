@@ -9,10 +9,7 @@ import org.mockito.Mock;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
-import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
-import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
-import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -20,7 +17,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Objects;
-import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -29,7 +25,6 @@ import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.REMOVE_ONLY_ME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.REMOVE_ORGANISATION;
@@ -143,71 +138,6 @@ class NocRemoveRepresentationServiceTest {
             .isEqualTo("Missing RepresentativeClaimantType for case id: 1775651960650043");
         verify(nocCcdService, times(0))
             .revokeClaimantRepresentation(anyString(), any());
-    }
-
-    @Test
-    void hasMultipleRepresentativesForOrg_shouldReturnNo_whenNoRepresentatives() {
-        CaseDetails caseDetails = CaseDataBuilder.builder()
-            .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
-        when(nocRespondentRepresentativeService.findRepresentativesByToken(anyString(), any()))
-            .thenReturn(List.of());
-
-        String result = nocRemoveRepresentationService.hasMultipleRepresentativesForOrg(caseDetails, USER_TOKEN);
-
-        assertThat(result).isEqualTo("No");
-    }
-
-    @Test
-    void hasMultipleRepresentativesForOrg_shouldReturnNo_whenNoOrganisationId() {
-        CaseDetails caseDetails = CaseDataBuilder.builder()
-            .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID);
-        RepresentedTypeRItem repRx = RepresentedTypeRItem.builder()
-            .id("1")
-            .value(RepresentedTypeR.builder().build())
-            .build();
-        when(nocRespondentRepresentativeService.findRepresentativesByToken(anyString(), any()))
-            .thenReturn(List.of(repRx));
-
-        String result = nocRemoveRepresentationService.hasMultipleRepresentativesForOrg(caseDetails, USER_TOKEN);
-
-        assertThat(result).isEqualTo("No");
-    }
-
-    @Test
-    void hasMultipleRepresentativesForOrg_shouldReturnNo_whenBothSameRepresentative() {
-        RepresentedTypeRItem repR1 = getTypeRItemWithSameOrgId();
-        RepresentedTypeRItem repR2 = getTypeRItemWithSameOrgId();
-        caseDetails.getCaseData().setRepCollection(List.of(repR1, repR2));
-        when(nocRespondentRepresentativeService.findRepresentativesByToken(anyString(), any()))
-            .thenReturn(List.of(repR1, repR2));
-
-        String result = nocRemoveRepresentationService.hasMultipleRepresentativesForOrg(caseDetails, USER_TOKEN);
-
-        assertThat(result).isEqualTo("No");
-    }
-
-    @Test
-    void isMoreThanOneRespondent_shouldReturnYes_whenMoreThanOneRepresentative() {
-        RepresentedTypeRItem repR1 = getTypeRItemWithSameOrgId();
-        RepresentedTypeRItem repR2 = getTypeRItemWithSameOrgId();
-        caseDetails.getCaseData().setRepCollection(List.of(repR1, repR2));
-        when(nocRespondentRepresentativeService.findRepresentativesByToken(anyString(), any()))
-            .thenReturn(List.of(repR1));
-
-        String result = nocRemoveRepresentationService.hasMultipleRepresentativesForOrg(caseDetails, USER_TOKEN);
-
-        assertThat(result).isEqualTo("Yes");
-    }
-
-    private RepresentedTypeRItem getTypeRItemWithSameOrgId() {
-        return RepresentedTypeRItem.builder()
-            .id(UUID.randomUUID().toString())
-            .value(RepresentedTypeR.builder()
-                .respondentOrganisation(Organisation.builder()
-                    .organisationID("1")
-                    .build())
-                .build())
-            .build();
     }
 
     @Test

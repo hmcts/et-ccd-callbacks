@@ -15,8 +15,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.RespondentRepresentativ
 
 import java.util.List;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
-import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.MISSING_REP_CLAIMANT_TYPE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.MISSING_REP_TYPE_R_ITEM;
@@ -73,40 +71,6 @@ public class NocRemoveRepresentationService {
         nocRemoveRepresentationEmailService.sendEmailToUnrepresentedClaimant(caseDetails, orgName);
         // send email to other party, i.e. respondents
         nocRemoveRepresentationEmailService.sendEmailToOtherPartyRespondent(caseDetails, List.of(), partyName);
-    }
-
-    /**
-     * Checks if there are multiple representatives from the same organisation for the respondent.
-     * This method determines whether more than one representative from the same organisation is present
-     * for the respondent associated with the provided user token.
-     * Returns "Yes" if there are multiple representatives, otherwise returns "No".
-     *
-     * @param caseDetails The case details containing the case data and ID.
-     * @param userToken The user token of the requester.
-     * @return "Yes" if more than one representative from the organisation exists, otherwise "No".
-     */
-    public String hasMultipleRepresentativesForOrg(CaseDetails caseDetails, String userToken) {
-        // get list of RepresentedTypeRItem that represented by this legal rep
-        List<RepresentedTypeRItem> currentRepList =
-            nocRespondentRepresentativeService.findRepresentativesByToken(userToken, caseDetails);
-        if (CollectionUtils.isEmpty(currentRepList)) {
-            return NO;
-        }
-
-        // get the organisation id for this legal rep
-        String orgId = NocRespondentMapper.getFirstRepOrganisationId(currentRepList);
-        if (isNullOrEmpty(orgId)) {
-            return NO;
-        }
-
-        // get all legal reps who are under the same organisation
-        List<RepresentedTypeRItem> orgRepList =
-            RespondentRepresentativeUtils.findRepresentativesByOrganisationId(caseDetails.getCaseData(), orgId);
-
-        // compare and see if other legal reps involved in this case
-        return orgRepList.size() > currentRepList.size()
-            ? YES
-            : NO;
     }
 
     /**

@@ -317,6 +317,7 @@ public class Et3ResponseService {
         List<Integer> solicitorIndexList = new ArrayList<>();
         for (CaseUserAssignment caseUserAssignment : caseUserAssignmentData.getCaseUserAssignments()) {
             if (userDetails.getUid().equals(caseUserAssignment.getUserId())) {
+                log.info("******* CASE ROLE = {}", caseUserAssignment.getCaseRole());
                 SolicitorRole solicitorRole = SolicitorRole.from(caseUserAssignment.getCaseRole()).orElseThrow();
                 solicitorIndexList.add(solicitorRole.getIndex());
             }

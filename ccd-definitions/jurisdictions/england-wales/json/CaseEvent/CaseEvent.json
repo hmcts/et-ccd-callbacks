@@ -230,6 +230,7 @@
     "PreConditionState(s)": "Accepted",
     "PostConditionState": "*",
     "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/et3Response/aboutToSubmitAmendRepresentativeContact",
+    "EventEnablingCondition": "caseType =\"dummy\"",
     "SecurityClassification": "Public",
     "ShowEventNotes": "N",
     "ShowSummary": "Y"

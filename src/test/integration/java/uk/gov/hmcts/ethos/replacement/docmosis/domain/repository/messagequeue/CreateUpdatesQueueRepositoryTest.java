@@ -1,13 +1,13 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.messagequeue;
 
-import org.junit.ClassRule;
-import org.junit.Test;
-import org.junit.runner.RunWith;
+import jakarta.persistence.EntityManager;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.containers.PostgreSQLContainer;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.CreateUpdatesQueueMessage;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.QueueMessageStatus;
@@ -15,25 +15,38 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.repository.EtCosPostgresql
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.UUID;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest
+@DataJpaTest(properties = "core_case_data.api.url=localhost:4452")
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
 @ActiveProfiles("test")
-public class CreateUpdatesQueueRepositoryTest {
+class CreateUpdatesQueueRepositoryTest {
+
+    private static final PostgreSQLContainer postgreSQLContainer = EtCosPostgresqlContainer.getInstance();
+
+    static {
+        postgreSQLContainer.start();
+    }
 
     @Autowired
     CreateUpdatesQueueRepository createUpdatesQueueRepository;
 
-    @ClassRule
-    public static final PostgreSQLContainer postgreSQLContainer = EtCosPostgresqlContainer.getInstance();
+    @Autowired
+    EntityManager entityManager;
+
+    @BeforeEach
+    void setUp() {
+        createUpdatesQueueRepository.deleteAll();
+    }
 
     @Test
-    public void shouldFindAndLockPendingMessage() {
+    void shouldFindAndLockPendingMessage() {
         CreateUpdatesQueueMessage msg = CreateUpdatesQueueMessage.builder()
-            .messageId("msg-1")
+            .messageId("msg-" + UUID.randomUUID())
             .messageBody("{\"msg\":\"test\"}")
             .status(QueueMessageStatus.PENDING)
             .createdAt(LocalDateTime.now().minusSeconds(5))
@@ -56,9 +69,65 @@ public class CreateUpdatesQueueRepositoryTest {
             LocalDateTime.now()
         );
         assertEquals(1, locked);
+        flushAndClear();
 
         CreateUpdatesQueueMessage updated = createUpdatesQueueRepository.findById(saved.getId()).orElse(null);
         assertNotNull(updated);
         assertEquals(QueueMessageStatus.PROCESSING, updated.getStatus());
+    }
+
+    @Test
+    void shouldIncrementRetryWithoutProcessedAtBeforeMaxRetries() {
+        CreateUpdatesQueueMessage saved = createUpdatesQueueRepository.save(createProcessingMessage(0));
+
+        createUpdatesQueueRepository.incrementRetryAndMarkFailureIfMax(
+            saved.getMessageId(),
+            "Temporary failure",
+            10,
+            null
+        );
+        flushAndClear();
+
+        CreateUpdatesQueueMessage updated = createUpdatesQueueRepository.findById(saved.getId()).orElse(null);
+        assertNotNull(updated);
+        assertEquals(QueueMessageStatus.PENDING, updated.getStatus());
+        assertEquals(Integer.valueOf(1), updated.getRetryCount());
+        assertNull(updated.getProcessedAt());
+    }
+
+    @Test
+    void shouldIncrementRetryAndSetProcessedAtAtMaxRetries() {
+        CreateUpdatesQueueMessage saved = createUpdatesQueueRepository.save(createProcessingMessage(9));
+
+        createUpdatesQueueRepository.incrementRetryAndMarkFailureIfMax(
+            saved.getMessageId(),
+            "Final failure",
+            10,
+            LocalDateTime.now()
+        );
+        flushAndClear();
+
+        CreateUpdatesQueueMessage updated = createUpdatesQueueRepository.findById(saved.getId()).orElse(null);
+        assertNotNull(updated);
+        assertEquals(QueueMessageStatus.FAILED, updated.getStatus());
+        assertEquals(Integer.valueOf(10), updated.getRetryCount());
+        assertNotNull(updated.getProcessedAt());
+    }
+
+    private CreateUpdatesQueueMessage createProcessingMessage(int retryCount) {
+        return CreateUpdatesQueueMessage.builder()
+            .messageId("msg-" + UUID.randomUUID())
+            .messageBody("{\"msg\":\"test\"}")
+            .status(QueueMessageStatus.PROCESSING)
+            .createdAt(LocalDateTime.now().minusSeconds(5))
+            .retryCount(retryCount)
+            .lockedBy("processor-1")
+            .lockedUntil(LocalDateTime.now().plusMinutes(5))
+            .build();
+    }
+
+    private void flushAndClear() {
+        entityManager.flush();
+        entityManager.clear();
     }
 }

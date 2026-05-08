@@ -58,9 +58,7 @@ public interface CreateUpdatesQueueRepository extends JpaRepository<CreateUpdate
            + "m.retryCount = m.retryCount + 1, "
            + "m.lockedBy = NULL, "
            + "m.lockedUntil = NULL, "
-           + "m.processedAt = CASE "
-           + "WHEN (m.retryCount + 1) >= :maxRetries "
-           + "THEN :processedAt ELSE NULL END "
+           + "m.processedAt = :processedAt "
            + "WHERE m.messageId = :messageId")
     int incrementRetryAndMarkFailureIfMax(@Param("messageId") String messageId,
                                           @Param("errorMessage") String errorMessage,

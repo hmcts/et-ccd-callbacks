@@ -162,13 +162,15 @@ public class UpdateCaseQueueProcessor {
         QueueMessageStatus newStatus = isLastRetry
                 ? QueueMessageStatus.FAILED
                 : QueueMessageStatus.PENDING;
-
+        LocalDateTime processedAt = newStatus == QueueMessageStatus.FAILED
+                ? LocalDateTime.now()
+                : null;
         updateCaseQueueRepository.markAsFailed(
                 queueMessage.getMessageId(),
                 exception.getMessage(),
                 newRetryCount,
                 newStatus,
-                LocalDateTime.now()
+                processedAt
         );
         
         // If last retry, check if processing should finish

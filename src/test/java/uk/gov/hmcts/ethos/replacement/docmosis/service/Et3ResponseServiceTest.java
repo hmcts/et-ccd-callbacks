@@ -14,7 +14,7 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.junit.platform.commons.util.StringUtils;
 import org.mockito.MockedStatic;
 import org.mockito.Mockito;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.exceptions.DocumentManagementException;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -86,17 +86,17 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormTes
 @SuppressWarnings({"PMD.ExcessiveImports"})
 class Et3ResponseServiceTest {
     private Et3ResponseService et3ResponseService;
-    @MockBean
+    @MockitoBean
     private DocumentManagementService documentManagementService;
-    @MockBean
+    @MockitoBean
     private PdfBoxService pdfBoxService;
-    @MockBean
+    @MockitoBean
     private UserIdamService userIdamService;
-    @MockBean
+    @MockitoBean
     private CcdCaseAssignment ccdCaseAssignment;
-    @MockBean
+    @MockitoBean
     private AuthTokenGenerator authTokenGenerator;
-    @MockBean
+    @MockitoBean
     private MyHmctsService myHmctsService;
 
     private static final String INVALID_USER_TOKEN = "invalidUserToken";

@@ -8,7 +8,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -24,7 +23,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1VettingHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.DocumentManagementService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1VettingService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.ReportDataService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -43,9 +41,10 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.DocumentHelper.set
 public class Et1VettingController {
     public static final String PROCESSING_COMPLETE_TEXT = "<hr><h2>Do this next</h2>"
         + "<p>You must <a href=\"/cases/case-details/%s/trigger/preAcceptanceCase/preAcceptanceCase1\">"
-        + "accept or reject the case</a> or refer the case.</p>";
+        + "accept or reject the case</a> or "
+        + "<a href=\"/cases/case-details/%s/trigger/createReferral/createReferral1\">"
+        + "refer the case</a>.</p>";
 
-    private final VerifyTokenService verifyTokenService;
     private final Et1VettingService et1VettingService;
     private final DocumentManagementService documentManagementService;
     private final ReportDataService reportDataService;
@@ -69,10 +68,6 @@ public class Et1VettingController {
             @RequestBody CCDRequest ccdRequest) {
 
         log.info("CASE VETTING ABOUT TO START ---> " + ccdRequest.getCaseDetails().getCaseId());
-
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
-        }
 
         CaseDetails caseDetails = ccdRequest.getCaseDetails();
         et1VettingService.initialiseEt1Vetting(caseDetails);
@@ -107,10 +102,6 @@ public class Et1VettingController {
             @RequestHeader(HttpHeaders.AUTHORIZATION) String userToken,
             @RequestBody CCDRequest ccdRequest) {
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
-        }
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = et1VettingService.validateJurisdictionCodes(caseData);
         if (errors.isEmpty() && caseData.getJurCodesCollection() != null) {
@@ -140,10 +131,6 @@ public class Et1VettingController {
         @RequestHeader(HttpHeaders.AUTHORIZATION) String userToken,
         @RequestBody CCDRequest ccdRequest) {
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
-        }
-
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
 
         caseData.setEt1AddressDetails(et1VettingService.getAddressesHtml(caseData));
@@ -169,9 +156,6 @@ public class Et1VettingController {
             @RequestHeader(HttpHeaders.AUTHORIZATION) String userToken,
             @RequestBody CCDRequest ccdRequest) {
         log.info("ET1 CASE VETTING ABOUT TO SUBMIT ---> {}", ccdRequest.getCaseDetails().getCaseId());
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
-        }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseData.setEt1VettingCompletedBy(reportDataService.getUserFullName(userToken));
@@ -206,14 +190,10 @@ public class Et1VettingController {
         @RequestBody CCDRequest ccdRequest,
         @RequestHeader("Authorization") String userToken) {
 
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN.value()).build();
-        }
-
         String caseNumber = ccdRequest.getCaseDetails().getCaseId();
         return ResponseEntity.ok(CCDCallbackResponse.builder()
             .data(ccdRequest.getCaseDetails().getCaseData())
-            .confirmation_body(String.format(PROCESSING_COMPLETE_TEXT, caseNumber))
+            .confirmation_body(String.format(PROCESSING_COMPLETE_TEXT, caseNumber, caseNumber))
             .build());
     }
 }

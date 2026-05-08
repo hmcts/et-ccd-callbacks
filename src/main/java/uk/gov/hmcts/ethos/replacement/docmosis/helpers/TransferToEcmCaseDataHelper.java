@@ -68,7 +68,7 @@ public final class TransferToEcmCaseDataHelper {
         caseData.setClaimantOtherType((ClaimantOtherType) objectMapper(
             oldCaseData.getClaimantOtherType(), ClaimantOtherType.class, mapper));
         caseData.setPreAcceptCase((CasePreAcceptType) objectMapper(
-            oldCaseData.getClaimantType(), CasePreAcceptType.class, mapper));
+            oldCaseData.getPreAcceptCase(), CasePreAcceptType.class, mapper));
         caseData.setReceiptDate(oldCaseData.getReceiptDate());
         caseData.setClaimServedDate(oldCaseData.getClaimServedDate());
         caseData.setFeeGroupReference(oldCaseData.getFeeGroupReference());

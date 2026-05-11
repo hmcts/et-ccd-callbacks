@@ -12,6 +12,7 @@ import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
 import org.apache.pdfbox.pdmodel.interactive.form.PDField;
+import org.apache.pdfbox.pdmodel.interactive.form.PDTextField;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.ecm.common.exceptions.PdfServiceException;
@@ -23,8 +24,6 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -35,6 +34,8 @@ import static uk.gov.hmcts.ecm.common.constants.PdfMapperConstants.HELVETICA_PDF
 import static uk.gov.hmcts.ecm.common.constants.PdfMapperConstants.PDF_TYPE_ET1;
 import static uk.gov.hmcts.ecm.common.constants.PdfMapperConstants.PDF_TYPE_ET3;
 import static uk.gov.hmcts.ecm.common.constants.PdfMapperConstants.TIMES_NEW_ROMAN_PDFBOX_CHARACTER_CODE;
+import static uk.gov.hmcts.ecm.common.service.pdf.PdfBoxUtil.enableTextWrapAndAutoSize;
+import static uk.gov.hmcts.ecm.common.service.pdf.PdfBoxUtil.sanitiseForPdf;
 import static uk.gov.hmcts.ecm.common.service.pdf.et3.ET3FormConstants.UNABLE_TO_MAP_RESPONDENT_TO_ET3_FORM;
 
 @Slf4j
@@ -48,9 +49,9 @@ public class PdfService {
      * Converts a {@link CaseData} class object into a pdf document
      * using template (ver. ET1_0224)
      *
-     * @param caseData  The data that is to be converted into pdf
+     * @param caseData  The data that is to be converted into PDF
      * @param pdfSource The source location of the PDF file to be used as the template
-     * @return A byte array that contains the pdf document.
+     * @return A byte array that contains the PDF document.
      */
     public byte[] convertCaseToPdf(CaseData caseData, String pdfSource, String pdfType, String clientType, String event)
             throws PdfServiceException {
@@ -64,12 +65,12 @@ public class PdfService {
     }
 
     /**
-     * Populates a pdf document with data stored in the case data parameter.
+     * Populates a PDF document with data stored in the case data parameter.
      *
-     * @param caseData  {@link CaseData} object with information in which to populate the pdf with
-     * @param pdfSource file name of the pdf template used to create the pdf
-     * @return a byte array of the generated pdf file.
-     * @throws IOException if there is an issue reading the pdf template
+     * @param caseData  {@link CaseData} object with information in which to populate the PDF with
+     * @param pdfSource file name of the PDF template used to create the PDF
+     * @return a byte array of the generated PDF file.
+     * @throws IOException if there is an issue reading the PDF template
      */
     public byte[] createPdf(CaseData caseData,
                             String pdfSource,
@@ -148,7 +149,11 @@ public class PdfService {
             if (entryValue.isPresent()) {
                 try {
                     PDField pdfField = pdfForm.getField(entryKey);
-                    pdfField.setValue(sanitiseForPdf(entryValue.get()));
+                    String sanitisedValue = sanitiseForPdf(entryValue.get());
+                    if (pdfField instanceof PDTextField textField) {
+                        enableTextWrapAndAutoSize(textField, sanitisedValue);
+                    }
+                    pdfField.setValue(sanitisedValue);
                 } catch (Exception e) {
                     GenericServiceUtil.logException("Error while parsing PDF file for entry key \""
                                     + entryKey, caseData.getEthosCaseReference(), e.getMessage(),
@@ -156,37 +161,6 @@ public class PdfService {
                 }
             }
         }
-    }
-
-    /**
-     * Strips invisible Unicode format characters that are not encodable in WinAnsiEncoding
-     * (e.g. zero-width spaces inserted by browsers or rich-text editors) to prevent
-     * PDFBox from failing when generating appearance streams during flattening.
-     */
-    private static String sanitiseForPdf(String value) {
-        if (value == null) {
-            return null;
-        }
-        // Strip invisible Unicode format characters (zero-width spaces, directional marks, BOM, etc.)
-        String sanitised = value.replaceAll("\\p{Cf}", "");
-        // Replace typographic Unicode space variants not in WinAnsiEncoding with a regular space
-        // e.g. figure space (U+2007), thin space (U+2009), em space (U+2003), narrow no-break space (U+202F)
-        sanitised = sanitised.replaceAll("[\\u2000-\\u200A\\u202F\\u205F\\u3000]", " ");
-        // Replace unsupported hyphen/dash variants with the nearest WinAnsiEncoding equivalent
-        // U+2010 hyphen, U+2011 non-breaking hyphen, U+2012 figure dash → regular hyphen-minus
-        // U+2015 horizontal bar, U+2E3A two-em dash, U+2E3B three-em dash → regular hyphen-minus
-        sanitised = sanitised.replaceAll("[\\u2010-\\u2012\\uFE58\\uFE63\\uFF0D]", "-");
-        sanitised = sanitised.replaceAll("[\\u2015\\u2E3A\\u2E3B]", "-");
-        // Replace mathematical minus sign (U+2212) with hyphen-minus
-        sanitised = sanitised.replace("−", "-");
-        // Final catch-all: strip any character still not encodable in Windows-1252 (WinAnsiEncoding).
-        // This covers symbols, emoji, CJK, Arabic, Cyrillic, and any future edge-case characters.
-        CharsetEncoder winAnsi = Charset.forName("windows-1252").newEncoder();
-        StringBuilder result = new StringBuilder(sanitised.length());
-        sanitised.codePoints()
-                .filter(cp -> cp < 0x10000 && winAnsi.canEncode((char) cp))
-                .forEach(result::appendCodePoint);
-        return result.toString();
     }
 
     public static void safeClose(InputStream is, CaseData caseData) {

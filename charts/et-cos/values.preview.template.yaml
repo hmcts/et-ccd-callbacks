@@ -30,7 +30,11 @@ java:
     SERVICE_AUTH_PROVIDER_URL: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
     CCD_GATEWAY_BASE_URL: "https://xui-${SERVICE_FQDN}"
     MICRO_SERVICE: "et_cos"
-    ET_COS_DB_CONN_OPTIONS: ?sslmode=require
+    ET_COS_DB_HOST: et-preview.postgres.database.azure.com
+    ET_COS_DB_PORT: 5432
+    ET_COS_DB_NAME: "pr-${CHANGE_ID}-et_cos"
+    ET_COS_DB_USER_NAME: hmcts
+    ET_COS_DB_CONN_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
     CASE_DOCUMENT_AM_URL: http://ccd-case-document-am-api-aat.service.core-compute-aat.internal
     RD_PROFESSIONAL_API_URL: http://rd-professional-api-aat.service.core-compute-aat.internal
     SECURE_DOC_STORE_FEATURE: true
@@ -41,12 +45,6 @@ java:
     ET_SERVICEBUS_SCHEDULER_ENABLED: true
     AZURE_SERVICE_BUS_TOPIC_NAME: ${SERVICE_NAME}-asb-ccd-case-events
     AZURE_SERVICE_BUS_SUBSCRIPTION_NAME: ${SERVICE_NAME}-asb-ccd-case-events
-    PREVIEW_DATA_STORE_CASE_ID_SEQUENCE_BASE: "91${CHANGE_ID}000000000000"
-    PREVIEW_DATA_STORE_DB_HOST: et-preview.postgres.database.azure.com
-    PREVIEW_DATA_STORE_DB_PORT: 5432
-    PREVIEW_DATA_STORE_DB_NAME: "pr-${CHANGE_ID}-data-store"
-    PREVIEW_DATA_STORE_DB_USERNAME: hmcts
-    PREVIEW_DATA_STORE_DB_CONN_OPTIONS: "?sslmode=require"
   keyVaults:
     et-cos:
       secrets:
@@ -66,14 +64,6 @@ java:
           alias: ET1_SERVICE_OWNER_NOTIFICATION_EMAIL
         - name: et1-ecm-dts-core-team-slack-notification-email
           alias: ET1_ECM_DTS_CORE_TEAM_SLACK_NOTIFICATION_EMAIL
-        - name: et-cos-postgres-user-v15
-          alias: ET_COS_DB_USER_NAME
-        - name: et-cos-postgres-password-v15
-          alias: ET_COS_DB_PASSWORD
-        - name: et-cos-postgres-host-v15
-          alias: ET_COS_DB_HOST
-        - name: et-cos-postgres-port-v15
-          alias: ET_COS_DB_PORT
     et:
       secrets:
         - name: tornado-access-key
@@ -86,6 +76,8 @@ java:
           alias: app-insights-connection-string
         - name: et-preview-flexi-db-password
           alias: ET_PREVIEW_FLEXI_DB_PASSWORD
+        - name: et-preview-flexi-db-password
+          alias: ET_COS_DB_PASSWORD
   postgresql:
     enabled: false
 
@@ -453,8 +445,8 @@ ccd:
       01_input.conf: |
         input  {
           jdbc {
-            jdbc_connection_string => "jdbc:postgresql://et-cos-postgres-v15-aat.postgres.database.azure.com:5432/et_cos?sslmode=require"
-            jdbc_user => "pgadmin"
+            jdbc_connection_string => "jdbc:postgresql://et-preview.postgres.database.azure.com:5432/pr-${CHANGE_ID}-et_cos?sslmode=require"
+            jdbc_user => "hmcts"
             jdbc_password_filepath => "/mnt/secrets/et-cos/ET_COS_DB_PASSWORD"
             jdbc_validate_connection => true
             jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"

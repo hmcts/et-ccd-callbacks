@@ -30,35 +30,57 @@ public final class Constants {
                     + "Open the Documents tab to view/open Acas certificates (opens in new tab)</a>";
     public static final String CASE_DETAILS_URL_PARTIAL = "/cases/case-details/";
     public static final String CLAIMANT_DETAILS_PERSON = "<hr><h3>Claimant</h3>"
-            + "<pre>First name &#09&#09&#09&#09&nbsp; %s"
-            + "<br><br>Last name &#09&#09&#09&#09&nbsp; %s"
-            + "<br><br>Contact address &#09&#09 %s</pre>";
+            + "<table>"
+            + "<tr><td width=\"200\">Full name</td><td>%s</td></tr>"
+            + "<tr><td width=\"200\">Contact address</td><td>%s</td></tr>"
+            + "</table>";
     public static final String CLAIMANT_DETAILS_COMPANY = "<hr><h3>Claimant</h3>"
-            + "<pre>Company name &#09&#09&nbsp; %s"
-            + "<br><br>Contact address &#09&#09 %s</pre>";
+            + "<table>"
+            + "<tr><td width=\"200\">Company name</td><td>%s</td></tr>"
+            + "<tr><td width=\"200\">Contact address</td><td>%s</td></tr>"
+            + "</table>";
     public static final String CLAIMANT_AND_RESPONDENT_ADDRESSES = "<hr><h2>Listing details<hr><h3>Claimant</h3>"
-            + "<pre>Contact address &#09&#09 %s</pre>"
-            + "<br><pre>Work address &#09&#09&#09 %s</pre><hr>"
+            + "<table>"
+            + "<tr><td width=\"200\">Full name</td><td>%s</td></tr>"
+            + "<tr><td width=\"200\">Contact address</td><td>%s</td></tr>"
+            + "<tr><td width=\"200\">Work address</td><td>%s</td></tr>"
+            + "</table>"
             + "<h3>Respondent</h3>"
-            + "<pre>Contact address &#09&#09 %s</pre><hr>";
+            + "<table>"
+            + "<tr><td width=\"200\">Name</td><td>%s</td></tr>"
+            + "<tr><td width=\"200\">Contact address</td><td>%s</td></tr>"
+            + "</table>";
     public static final String CLAIMANT_AND_RESPONDENT_ADDRESSES_WITHOUT_WORK_ADDRESS =
             "<hr><h2>Listing details<hr><h3>Claimant</h3>"
-                    + "<pre>Contact address &#09&#09 %s</pre>"
-                    + "<hr><h3>Respondent</h3>"
-                    + "<pre>Contact address &#09&#09 %s</pre><hr>";
+                    + "<table>"
+                    + "<tr><td width=\"200\">Full name</td><td>%s</td></tr>"
+                    + "<tr><td width=\"200\">Contact address</td><td>%s</td></tr>"
+                    + "</table>"
+                    + "<h3>Respondent</h3>"
+                    + "<table>"
+                    + "<tr><td width=\"200\">Name</td><td>%s</td></tr>"
+                    + "<tr><td width=\"200\">Contact address</td><td>%s</td></tr>"
+                    + "</table>";
 
     public static final String RESPONDENT_DETAILS = "<h3>Respondent %s</h3>"
-            + "<pre>Name &#09&#09&#09&#09&#09&#09&nbsp; %s"
-            + "<br><br>Contact address &#09&#09 %s</pre><hr>";
-    public static final String RESPONDENT_ACAS_DETAILS = "<hr><h3>Respondent %o</h3>"
-            + "<pre>Name &#09&#09&#09&#09&#09&#09&nbsp; %s"
-            + "<br><br>Contact address &#09&#09 %s</pre><h3>Acas certificate</h3>";
-    public static final String BR_WITH_TAB = "<br>&#09&#09&#09&#09&#09&#09&#09&#09&#09 ";
+            + "<table>"
+            + "<tr><td width=\"200\">Name</td><td>%s</td></tr>"
+            + "<tr><td width=\"200\">Contact address</td><td>%s</td></tr>"
+            + "</table>";
+    public static final String RESPONDENT_ACAS_DETAILS = "<h3>Respondent %o</h3>"
+            + "<table>"
+            + "<tr><td width=\"200\">Name</td><td>%s</td></tr>"
+            + "<tr><td width=\"200\">Contact address</td><td>%s</td></tr>"
+            + "<tr><td width=\"200\">Acas certificate</td><td>%s</td></tr>"
+            + "</table>";
     public static final String TRIBUNAL_OFFICE_LOCATION = "<hr><h3>Tribunal location</h3>"
-            + "<pre>Tribunal &#09&#09&#09&#09&nbsp; %s"
-            + "<br><br>Office &#09&#09&#09&#09&#09 %s</pre><hr>";
+            + "<table>"
+            + "<tr><td width=\"200\">Tribunal</td><td>%s</td></tr>"
+            + "<tr><td width=\"200\">Office</td><td>%s</td></tr>"
+            + "</table>";
     public static final String TRIBUNAL_LOCATION_LABEL = "**<big>%s regional office</big>**";
-    public static final String TRACK_ALLOCATION_HTML = "|||\r\n|--|--|\r\n|Track allocation|%s|\r\n";
+    public static final String TRACK_ALLOCATION_HTML = "<table>"
+            + "<tr><td width=\"200\">Track allocation</td><td>%s</td></tr></table>";
     public static final String JUR_CODE_HTML = "<hr><h3>Jurisdiction Codes</h3>"
             + "<a target=\"_blank\" href=\"https://intranet.justice.gov.uk/documents/2017/11/jurisdiction-list.pdf\">"
             + "View all jurisdiction codes and descriptors (opens in new tab)</a><hr>"
@@ -69,15 +91,10 @@ public final class Constants {
 
     public static final String TRIBUNAL_ENGLAND = "England & Wales";
     public static final String TRIBUNAL_SCOTLAND = "Scotland";
-    public static final String ACAS_CERT_LIST_DISPLAY = "Certificate number %s has been provided.<br><br><br>";
-    public static final String NO_ACAS_CERT_DISPLAY = "No certificate has been provided.<br><br><br>";
     public static final int FIVE_ACAS_DOC_TYPE_ITEMS_COUNT = 5;
     public static final int ONE_RESPONDENT_COUNT = 1;
     public static final String DOCGEN_ERROR = "Failed to generate document for case id: %s";
-    public static final String RECORD_DECISION = "Record decision";
-    public static final String REPLY_TO_APPLICATION = "Reply to application";
     public static final String TSE_ADMIN_CORRESPONDENCE = "Tse admin correspondence";
-    public static final String RESPONDENT_CORRESPONDENCE = "Respondent correspondence";
     public static final String UNEXPECTED_VALUE = "Unexpected value: ";
     public static final String MONTH_STRING_DATE_FORMAT = "dd MMM yyyy";
     public static final String EMPTY_STRING = "";

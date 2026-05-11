@@ -4,10 +4,13 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.core.io.buffer.DataBuffer;
+import org.springframework.core.io.buffer.DataBufferUtils;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -18,6 +21,10 @@ import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 import uk.gov.hmcts.ecm.common.helpers.DocumentHelper;
 import uk.gov.hmcts.ecm.common.service.pdf.PdfDecodedMultipartFile;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
@@ -74,6 +81,7 @@ public class CaseDocumentService {
     private final RestTemplate restTemplate;
     private final AuthTokenGenerator authTokenGenerator;
     private final String caseDocApiUrl;
+    private final WebClient caseDocWebClient;
 
     /**
      * Default constructor with injected parameters.
@@ -82,9 +90,11 @@ public class CaseDocumentService {
      * @param authTokenGenerator the {@link AuthTokenGenerator} used to generate tokens for communicating with the
      *                           Case Document API
      * @param caseDocApiUrl      the URL to call the Case Document API
+     * @param webClientBuilder   the {@link WebClient.Builder} used to create a streaming WebClient
      */
     public CaseDocumentService(RestTemplate restTemplate,
                                AuthTokenGenerator authTokenGenerator,
+                               WebClient.Builder webClientBuilder,
                                @Value("${case_document_am.url}")
                                String caseDocApiUrl,
                                @Value("${case_document_am.max_retries}") Integer maxApiRetries) {
@@ -92,6 +102,7 @@ public class CaseDocumentService {
         this.authTokenGenerator = authTokenGenerator;
         this.caseDocApiUrl = caseDocApiUrl;
         this.maxApiRetries = maxApiRetries;
+        this.caseDocWebClient = webClientBuilder.baseUrl(caseDocApiUrl).build();
     }
 
     /**
@@ -114,36 +125,72 @@ public class CaseDocumentService {
     }
 
     /**
-     * Returns content in binary stream of the given document id.
+     * Returns content of the given document as a streaming response, avoiding buffering the
+     * entire document body in memory. Uses {@link WebClient} to stream bytes from the CCD
+     * document store directly into the servlet output stream chunk by chunk.
      *
      * @param authToken  the caller's bearer token used to verify the caller
      * @param documentId the id of the document
-     * @return the response entity which contains the binary stream
+     * @return the response entity containing a {@link StreamingResponseBody}
      * @throws ResourceNotFoundException if the target API returns 404 response code
      */
-    public ResponseEntity<ByteArrayResource> downloadDocument(String authToken, UUID documentId) {
+    public ResponseEntity<StreamingResponseBody> downloadDocument(String authToken, UUID documentId) {
         log.info("Called downloadDocument");
+
+        ResponseEntity<Flux<DataBuffer>> ccdResponse = caseDocWebClient.get()
+            .uri("/cases/documents/{id}/binary", documentId)
+            .header(HttpHeaders.AUTHORIZATION, authToken)
+            .header(SERVICE_AUTHORIZATION, authTokenGenerator.generate())
+            .retrieve()
+            .onStatus(HttpStatusCode::is4xxClientError, response -> {
+                if (response.statusCode().equals(HttpStatus.NOT_FOUND)) {
+                    return Mono.error(new ResourceNotFoundException(
+                        String.format(RESOURCE_NOT_FOUND, documentId, "404"),
+                        new RuntimeException("404 Not Found from CCD document store")));
+                }
+                return response.createException();
+            })
+            .toEntityFlux(DataBuffer.class)
+            .block();
+
+        StreamingResponseBody body = outputStream ->
+            DataBufferUtils.write(ccdResponse.getBody(), outputStream).then().block();
+
+        return ResponseEntity.status(ccdResponse.getStatusCode())
+            .headers(ccdResponse.getHeaders())
+            .body(body);
+    }
+
+    /**
+     * Downloads the document as a byte array for internal use (e.g. attaching to notification emails).
+     * Uses {@link RestTemplate} directly since the full byte content is required.
+     *
+     * @param authToken  the caller's bearer token used to verify the caller
+     * @param documentId the id of the document
+     * @return the document content as a byte array, or {@code null} if no body was returned
+     * @throws ResourceNotFoundException if the target API returns 404
+     */
+    public byte[] downloadDocumentAsBytes(String authToken, UUID documentId) {
         HttpHeaders headers = new HttpHeaders();
         headers.add(HttpHeaders.AUTHORIZATION, authToken);
         headers.add(SERVICE_AUTHORIZATION, authTokenGenerator.generate());
         HttpEntity<MultiValueMap<String, Object>> request = new HttpEntity<>(headers);
 
         try {
-            return restTemplate.exchange(
+            ByteArrayResource resource = restTemplate.exchange(
                 caseDocApiUrl + "/cases/documents/" + documentId + "/binary",
                 HttpMethod.GET,
                 request,
                 ByteArrayResource.class
-            );
+            ).getBody();
+            return resource != null ? resource.getByteArray() : null;
         } catch (HttpClientErrorException ex) {
             if (NOT_FOUND.equals(ex.getStatusCode())) {
-                throw new ResourceNotFoundException(String.format(RESOURCE_NOT_FOUND,
-                                                                  documentId, ex.getMessage()
-                ), ex);
+                throw new ResourceNotFoundException(
+                    String.format(RESOURCE_NOT_FOUND, documentId, ex.getMessage()), ex);
             }
             throw ex;
         }
-
     }
 
     /**

@@ -3,8 +3,8 @@ package uk.gov.hmcts.reform.et.syaapi.controllers;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -107,7 +107,7 @@ public class AcasController {
     @Operation(summary = "Get a document from CDAM in binary format")
     @ApiResponseGroup
     @RequiresAcasRole
-    public ResponseEntity<ByteArrayResource> getDocumentBinaryContent(
+    public ResponseEntity<StreamingResponseBody> getDocumentBinaryContent(
         @RequestParam(name = "documentId") final UUID documentId,
         @RequestHeader(AUTHORIZATION) String authToken) {
         String accessToken = adminUserService.getAdminUserToken();

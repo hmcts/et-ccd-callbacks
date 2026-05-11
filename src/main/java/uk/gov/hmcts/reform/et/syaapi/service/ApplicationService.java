@@ -403,17 +403,17 @@ public class ApplicationService {
         String docId = documentUrl.substring(documentUrl.lastIndexOf('/') + 1);
 
         log.info("Downloading pdf of TSE application");
-        ByteArrayResource downloadDocument = caseDocumentService.downloadDocument(
+        byte[] documentBytes = caseDocumentService.downloadDocumentAsBytes(
             authorization,
             UUID.fromString(docId)
-        ).getBody();
+        );
 
-        if (downloadDocument == null) {
+        if (documentBytes == null) {
             return null;
         }
 
         return NotificationClient.prepareUpload(
-            downloadDocument.getByteArray(),
+            documentBytes,
             "respondent-tse.pdf",
             false,
             WEEKS_78

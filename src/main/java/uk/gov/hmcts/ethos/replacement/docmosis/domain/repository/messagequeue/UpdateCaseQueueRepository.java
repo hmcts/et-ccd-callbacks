@@ -49,16 +49,20 @@ public interface UpdateCaseQueueRepository extends JpaRepository<UpdateCaseQueue
                          @Param("processedAt") LocalDateTime processedAt);
 
     @Modifying
-    @Query("UPDATE UpdateCaseQueueMessage m "
-           + "SET m.status = :status, "
-           + "m.errorMessage = :errorMessage, "
-           + "m.retryCount = :retryCount, "
-           + "m.lockedBy = NULL, "
-           + "m.lockedUntil = NULL, "
-           + "m.processedAt = CASE "
-           + "WHEN :status = uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.QueueMessageStatus.FAILED "
-           + "THEN :processedAt ELSE m.processedAt END "
-           + "WHERE m.messageId = :messageId")
+    @Query(value = """
+        UPDATE update_case_queue_message
+        SET status = :status,
+            error_message = :errorMessage,
+            retry_count = :retryCount,
+            locked_by = NULL,
+            locked_until = NULL,
+            processed_at = CASE
+                WHEN :status = uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.QueueMessageStatus.FAILED
+                THEN CAST(:processedAt AS timestamp)
+                ELSE processed_at
+            END
+        WHERE message_id = :messageId
+        """, nativeQuery = true)
     void markAsFailed(@Param("messageId") String messageId,
                       @Param("errorMessage") String errorMessage,
                       @Param("retryCount") int retryCount,

@@ -84,6 +84,10 @@ PGPASSWORD="${SOURCE_PASSWORD}" pg_dump \
   --dbname="${SOURCE_URI}" \
   --file="${DUMP_FILE}"
 
+# Newer pg_dump clients emit settings that older preview Postgres servers do not support.
+sed -i.bak '/^SET transaction_timeout = /d' "${DUMP_FILE}"
+rm -f "${DUMP_FILE}.bak"
+
 PGPASSWORD="${TARGET_PASSWORD}" psql \
   --set=ON_ERROR_STOP=1 \
   --dbname="${TARGET_URI}" \

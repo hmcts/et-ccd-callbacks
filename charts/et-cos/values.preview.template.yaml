@@ -424,11 +424,20 @@ ccd:
           readOnly: true
           volumeAttributes:
             secretProviderClass: ${SERVICE_NAME}-java-et-cos
+      - name: vault-et
+        csi:
+          driver: "secrets-store.csi.k8s.io"
+          readOnly: true
+          volumeAttributes:
+            secretProviderClass: ${SERVICE_NAME}-java-et
     extraVolumeMounts: |
       - name: logstash-lib
         mountPath: /usr/share/logstash/ccd
       - name: vault-et-cos
         mountPath: /mnt/secrets/et-cos
+        readOnly: true
+      - name: vault-et
+        mountPath: /mnt/secrets/et
         readOnly: true
     logstashConfig:
       logstash.yml: |
@@ -447,7 +456,7 @@ ccd:
           jdbc {
             jdbc_connection_string => "jdbc:postgresql://et-preview.postgres.database.azure.com:5432/pr-${CHANGE_ID}-et_cos?sslmode=require"
             jdbc_user => "hmcts"
-            jdbc_password_filepath => "/mnt/secrets/et-cos/ET_COS_DB_PASSWORD"
+            jdbc_password_filepath => "/mnt/secrets/et/ET_COS_DB_PASSWORD"
             jdbc_validate_connection => true
             jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"
             jdbc_driver_class => "org.postgresql.Driver"

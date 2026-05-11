@@ -6,7 +6,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
 import uk.gov.hmcts.ecm.common.model.servicebus.CreateUpdatesDto;
@@ -49,23 +49,23 @@ class MultipleNotificationServiceTest {
 
     private static final String EMAIL = "email@email.com";
 
-    @MockBean
+    @MockitoBean
     CreateUpdatesBusSender createUpdatesBusSender;
 
-    @MockBean
+    @MockitoBean
     UserIdamService userIdamService;
 
-    @MockBean
+    @MockitoBean
     ExcelReadingService excelReadingService;
 
-    @MockBean
+    @MockitoBean
     CaseLookupService caseLookupService;
 
-    @MockBean
+    @MockitoBean
     MultipleDynamicListFlagsService multipleDynamicListFlagsService;
-    @MockBean
+    @MockitoBean
     FileLocationSelectionService fileLocationSelectionService;
-    @MockBean
+    @MockitoBean
     ScotlandFileLocationSelectionService scotlandFileLocationSelectionService;
 
     private HearingSelectionService hearingSelectionService;

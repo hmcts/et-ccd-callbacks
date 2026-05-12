@@ -150,7 +150,7 @@ public class UpdateCaseQueueProcessor {
                     queueMessage.getMessageId(),
                     exception.getMessage(),
                     queueMessage.getRetryCount() + 1,
-                    QueueMessageStatus.FAILED,
+                    QueueMessageStatus.FAILED.name(),
                     LocalDateTime.now()
             );
             return;
@@ -169,7 +169,7 @@ public class UpdateCaseQueueProcessor {
                 queueMessage.getMessageId(),
                 exception.getMessage(),
                 newRetryCount,
-                newStatus,
+                newStatus.name(),
                 processedAt
         );
         
@@ -200,7 +200,7 @@ public class UpdateCaseQueueProcessor {
                 queueMessage.getMessageId(),
                 exception.getMessage(),
                 queueMessage.getRetryCount() + 1,
-                QueueMessageStatus.FAILED,
+                QueueMessageStatus.FAILED.name(),
                 LocalDateTime.now()
         );
         

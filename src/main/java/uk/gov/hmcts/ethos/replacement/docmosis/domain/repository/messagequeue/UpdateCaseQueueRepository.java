@@ -6,7 +6,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
-import uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.QueueMessageStatus;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.UpdateCaseQueueMessage;
 
 import java.time.LocalDateTime;
@@ -50,15 +49,15 @@ public interface UpdateCaseQueueRepository extends JpaRepository<UpdateCaseQueue
 
     @Modifying
     @Query(value = """
-        UPDATE update_case_queue_message
+    UPDATE update_case_queue_message
         SET status = :status,
             error_message = :errorMessage,
             retry_count = :retryCount,
             locked_by = NULL,
             locked_until = NULL,
             processed_at = CASE
-                WHEN :status = uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.QueueMessageStatus.FAILED
-                THEN CAST(:processedAt AS timestamp)
+                WHEN :status = 'FAILED'
+                THEN :processedAt::timestamp
                 ELSE processed_at
             END
         WHERE message_id = :messageId
@@ -66,6 +65,6 @@ public interface UpdateCaseQueueRepository extends JpaRepository<UpdateCaseQueue
     void markAsFailed(@Param("messageId") String messageId,
                       @Param("errorMessage") String errorMessage,
                       @Param("retryCount") int retryCount,
-                      @Param("status") QueueMessageStatus status,
+                      @Param("status") String status, // Pass as String for native SQL
                       @Param("processedAt") LocalDateTime processedAt);
 }

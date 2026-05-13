@@ -974,4 +974,55 @@ public final class RespondentRepresentativeUtils {
         }
         return tmpCaseUserAssignments;
     }
+
+    /**
+     * Updates representative contact details for the specified represented respondents
+     * using the ET3 response contact information stored in the case data.
+     * <p>
+     * For each respondent index provided, the method:
+     * <ul>
+     *     <li>Retrieves the corresponding respondent from the respondent collection</li>
+     *     <li>Finds the matching representative in the representative collection
+     *     based on the shared identifier</li>
+     *     <li>Updates the representative phone number and address using
+     *     {@code et3ResponsePhone} and {@code et3ResponseAddress}</li>
+     * </ul>
+     *
+     * <p><strong>Assumptions:</strong></p>
+     * <ul>
+     *     <li>The respondent and representative collections are already initialised</li>
+     *     <li>The respondent index values correspond to positions in the respondent collection</li>
+     *     <li>A representative is associated with a respondent when both share the same identifier</li>
+     *     <li>Invalid respondent indexes, empty respondent entries, or respondents without identifiers
+     *     are ignored</li>
+     *     <li>The ET3 response phone number and address may be null or empty and are copied as-is</li>
+     * </ul>
+     *
+     * @param caseData the case data containing respondent, representative,
+     *                 and ET3 response contact information
+     * @param representedRespondentIndexes indexes of represented respondents
+     *                                     within the respondent collection
+     */
+    public static void updateRepresentativeContactDetails(CaseData caseData,
+                                                          List<Integer> representedRespondentIndexes) {
+        if (CollectionUtils.isEmpty(caseData.getRepCollection())
+                || CollectionUtils.isEmpty(representedRespondentIndexes)
+                || CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
+            return;
+        }
+        for (int i : representedRespondentIndexes) {
+            if (i >= caseData.getRespondentCollection().size()
+                    || StringUtils.isBlank(caseData.getRespondentCollection().get(i).getId())) {
+                continue;
+            }
+            RespondentSumTypeItem respondentSumTypeItem = caseData.getRespondentCollection().get(i);
+            for (RepresentedTypeRItem representative : caseData.getRepCollection()) {
+                if (RespondentRepresentativeUtils.isValidRepresentative(representative)
+                        && representative.getValue().getRespondentId().equals(respondentSumTypeItem.getId())) {
+                    representative.getValue().setRepresentativePhoneNumber(caseData.getEt3ResponsePhone());
+                    representative.getValue().setRepresentativeAddress(caseData.getEt3ResponseAddress());
+                }
+            }
+        }
+    }
 }

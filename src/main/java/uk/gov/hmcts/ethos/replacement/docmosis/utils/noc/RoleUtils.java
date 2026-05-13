@@ -6,6 +6,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.math.NumberUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
@@ -16,7 +18,10 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentUtils;
 import uk.gov.hmcts.reform.et.syaapi.service.utils.NoticeOfChangeUtils;
 
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.MAX_NOC_ANSWERS;
 
@@ -350,5 +355,37 @@ public final class RoleUtils {
             return true;
         }
         return StringUtils.isBlank(organisationPolicy.getOrganisation().getOrganisationID());
+    }
+
+    /**
+     * Finds the first {@link CaseUserAssignment} matching each {@link SolicitorRole}.
+     * <p>
+     * The method iterates through all solicitor roles in their declared enum order
+     * and returns the first matching assignment for each role based on the case role label.
+     * <p>
+     * If the input data or assignment list is null or empty, an empty list is returned.
+     *
+     * @param caseUserAssignmentData the container holding case user assignments
+     * @return a list containing the first matching assignment for each solicitor role,
+     *         in the order defined by {@link SolicitorRole}
+     */
+    public static List<CaseUserAssignment> findLastAssignmentsBySolicitorRole(
+            CaseUserAssignmentData caseUserAssignmentData) {
+
+        if (caseUserAssignmentData == null
+                || CollectionUtils.isEmpty(caseUserAssignmentData.getCaseUserAssignments())) {
+            return Collections.emptyList();
+        }
+
+        List<CaseUserAssignment> assignments = caseUserAssignmentData.getCaseUserAssignments();
+
+        return Arrays.stream(SolicitorRole.values())
+                .map(role -> assignments.stream()
+                        .filter(assignment -> role.getCaseRoleLabel()
+                                .equals(assignment.getCaseRole()))
+                        .reduce((first, second) -> second) // keeps the last matching element
+                        .orElse(null))
+                .filter(Objects::nonNull)
+                .toList();
     }
 }

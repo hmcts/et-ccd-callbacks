@@ -4,6 +4,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
@@ -13,6 +15,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -60,6 +63,8 @@ final class RoleUtilsTest {
     private static final String ROLE_CLAIMANT_SOLICITOR_LOWERCASE = "[claimantsolicitor]";
     private static final String ROLE_CLAIMANT_SOLICITOR_INVALID = "[CLAIMANTSOLICITORINVALID]";
     private static final String ROLE_INVALID = "[INVALIDROLE]";
+    private static final String REPRESENTATIVE_ID_1 = "Representative Id One";
+    private static final String REPRESENTATIVE_ID_2 = "Representative Id Two";
 
     private static final int INTEGER_THREE = 3;
     private static final int INTEGER_FOUR = 4;
@@ -518,5 +523,38 @@ final class RoleUtilsTest {
         // when answer has respondent name should return true
         noticeOfChangeAnswers = NoticeOfChangeAnswers.builder().respondentName(RESPONDENT_NAME_ONE).build();
         assertThat(RoleUtils.isValidNoticeOfChangeAnswers(noticeOfChangeAnswers)).isTrue();
+    }
+
+    @Test
+    void theFindLastAssignmentsBySolicitorRole() {
+        // when case user assignment data is empty should return empty collection
+        assertThat(RoleUtils.findLastAssignmentsBySolicitorRole(null)).isEmpty();
+        // when case user assignment list is empty should return empty collection
+        CaseUserAssignmentData caseUserAssignmentData = CaseUserAssignmentData.builder()
+                .caseUserAssignments(new ArrayList<>()).build();
+        assertThat(RoleUtils.findLastAssignmentsBySolicitorRole(caseUserAssignmentData)).isEmpty();
+        // when there is only one respondent case user assignment should return that assignment
+        CaseUserAssignment caseUserAssignmentSolicitorA1 = CaseUserAssignment.builder().caseRole(ROLE_SOLICITOR_A)
+                .userId(REPRESENTATIVE_ID_1).build();
+        caseUserAssignmentData.getCaseUserAssignments().add(caseUserAssignmentSolicitorA1);
+        assertThat(RoleUtils.findLastAssignmentsBySolicitorRole(caseUserAssignmentData))
+                .isEqualTo(List.of(caseUserAssignmentSolicitorA1));
+        // when there are two respondent case user assignments, returns the first assignment
+        CaseUserAssignment caseUserAssignmentSolicitorA2 = CaseUserAssignment.builder().caseRole(ROLE_SOLICITOR_A)
+                .userId(REPRESENTATIVE_ID_2).build();
+        caseUserAssignmentData.getCaseUserAssignments().add(caseUserAssignmentSolicitorA2);
+        assertThat(RoleUtils.findLastAssignmentsBySolicitorRole(caseUserAssignmentData))
+                .isEqualTo(List.of(caseUserAssignmentSolicitorA2));
+        // when there are more assignments with different roles, should return the first assignments of those roles
+        CaseUserAssignment caseUserAssignmentSolicitorB1 = CaseUserAssignment.builder().caseRole(ROLE_SOLICITOR_B)
+                .userId(REPRESENTATIVE_ID_1).build();
+        caseUserAssignmentData.getCaseUserAssignments().add(caseUserAssignmentSolicitorB1);
+        assertThat(RoleUtils.findLastAssignmentsBySolicitorRole(caseUserAssignmentData))
+                .isEqualTo(List.of(caseUserAssignmentSolicitorA2, caseUserAssignmentSolicitorB1));
+        CaseUserAssignment caseUserAssignmentSolicitorB2 = CaseUserAssignment.builder().caseRole(ROLE_SOLICITOR_B)
+                .userId(REPRESENTATIVE_ID_2).build();
+        caseUserAssignmentData.getCaseUserAssignments().add(caseUserAssignmentSolicitorB2);
+        assertThat(RoleUtils.findLastAssignmentsBySolicitorRole(caseUserAssignmentData))
+                .isEqualTo(List.of(caseUserAssignmentSolicitorA2, caseUserAssignmentSolicitorB2));
     }
 }

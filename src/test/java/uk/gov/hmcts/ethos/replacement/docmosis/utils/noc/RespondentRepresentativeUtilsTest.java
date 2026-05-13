@@ -5,6 +5,7 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
+import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
@@ -39,6 +40,14 @@ final class RespondentRepresentativeUtilsTest {
     private static final String REPRESENTATIVE_EMAIL_1 = "representative1@testmail.com";
     private static final String REPRESENTATIVE_EMAIL_1_CAPITALISED = "REPRESENTATIVE1@TESTMAIL.COM";
     private static final String REPRESENTATIVE_EMAIL_2 = "representative2@testmail.com";
+    private static final String REPRESENTATIVE_1_PHONE = "07444518903";
+    private static final String REPRESENTATIVE_1_ADDRESS_LINE_1 = "50 Tithe";
+    private static final String REPRESENTATIVE_1_ADDRESS_LINE_2 = "Barn";
+    private static final String REPRESENTATIVE_1_ADDRESS_LINE_3 = "Drive";
+    private static final String REPRESENTATIVE_1_POST_TOWN = "Maidenhead";
+    private static final String REPRESENTATIVE_1_COUNTY = "Berkshire";
+    private static final String REPRESENTATIVE_1_COUNTRY = "United Kingdom";
+    private static final String REPRESENTATIVE_1_POSTCODE = "SL6 2DE";
 
     private static final String ORGANISATION_ID_1 = "dummy12_organisation34_id56";
     private static final String ORGANISATION_ID_2 = "dummy65_organisation43_id21";
@@ -767,5 +776,64 @@ final class RespondentRepresentativeUtilsTest {
         // when representative found should return a list with that representative
         assertThat(RespondentRepresentativeUtils.findCaseUserAssignmentsByRepresentativeId(caseUserAssignments,
                 REPRESENTATIVE_ID_1)).hasSize(NumberUtils.INTEGER_ONE).contains(caseUserAssignment);
+    }
+
+    @Test
+    void theUpdateRepresentativeContactDetails() {
+        CaseData caseData = new CaseData();
+        caseData.setEt3ResponsePhone(REPRESENTATIVE_1_PHONE);
+        Address address = new Address();
+        address.setAddressLine1(REPRESENTATIVE_1_ADDRESS_LINE_1);
+        address.setAddressLine2(REPRESENTATIVE_1_ADDRESS_LINE_2);
+        address.setAddressLine3(REPRESENTATIVE_1_ADDRESS_LINE_3);
+        address.setPostTown(REPRESENTATIVE_1_POST_TOWN);
+        address.setCounty(REPRESENTATIVE_1_COUNTY);
+        address.setCountry(REPRESENTATIVE_1_COUNTRY);
+        address.setPostCode(REPRESENTATIVE_1_POSTCODE);
+        caseData.setEt3ResponseAddress(address);
+        // when case data representative collection is empty should not update any representative contact details
+        List<Integer> representedRespondentIndexes = new ArrayList<>();
+        RespondentRepresentativeUtils.updateRepresentativeContactDetails(caseData, representedRespondentIndexes);
+        assertThat(caseData.getRepCollection()).isNull();
+        // when represented respondent indexes is empty should not update any representative contact details
+        RepresentedTypeRItem representative = RepresentedTypeRItem.builder().value(RepresentedTypeR.builder().build())
+                .build();
+        caseData.setRepCollection(List.of(representative));
+        RespondentRepresentativeUtils.updateRepresentativeContactDetails(caseData, representedRespondentIndexes);
+        assertThat(representative.getValue().getRepresentativePhoneNumber()).isNull();
+        assertThat(representative.getValue().getRepresentativeAddress()).isNull();
+        // when case data respondent collection is empty should not update representative contact details
+        representedRespondentIndexes.add(LoggerTestUtils.INTEGER_ONE);
+        RespondentRepresentativeUtils.updateRepresentativeContactDetails(caseData, representedRespondentIndexes);
+        assertThat(representative.getValue().getRepresentativePhoneNumber()).isNull();
+        assertThat(representative.getValue().getRepresentativeAddress()).isNull();
+        // when represented respondent indexes has any value greater than respondent collection size should not update
+        // representative contact details
+        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
+        caseData.setRespondentCollection(List.of(respondent));
+        RespondentRepresentativeUtils.updateRepresentativeContactDetails(caseData, representedRespondentIndexes);
+        // when respondent does not have a valid id should not update representative contact details
+        representedRespondentIndexes.clear();
+        representedRespondentIndexes.add(LoggerTestUtils.INTEGER_ZERO);
+        RespondentRepresentativeUtils.updateRepresentativeContactDetails(caseData, representedRespondentIndexes);
+        assertThat(representative.getValue().getRepresentativePhoneNumber()).isNull();
+        assertThat(representative.getValue().getRepresentativeAddress()).isNull();
+        // when representative in the rep collection is not a valid representative should not update contact details
+        respondent.setId(RESPONDENT_ID_1);
+        RespondentRepresentativeUtils.updateRepresentativeContactDetails(caseData, representedRespondentIndexes);
+        assertThat(representative.getValue().getRepresentativePhoneNumber()).isNull();
+        assertThat(representative.getValue().getRepresentativeAddress()).isNull();
+        // when representative respondent id does not match with respondent id should not update representative contact
+        // details
+        representative.setId(REPRESENTATIVE_ID_1);
+        representative.setValue(RepresentedTypeR.builder().respondentId(RESPONDENT_ID_2).build());
+        RespondentRepresentativeUtils.updateRepresentativeContactDetails(caseData, representedRespondentIndexes);
+        assertThat(representative.getValue().getRepresentativePhoneNumber()).isNull();
+        assertThat(representative.getValue().getRepresentativeAddress()).isNull();
+        // when representative and respondent matches, should update representative contact details
+        representative.setValue(RepresentedTypeR.builder().respondentId(RESPONDENT_ID_1).build());
+        RespondentRepresentativeUtils.updateRepresentativeContactDetails(caseData, representedRespondentIndexes);
+        assertThat(representative.getValue().getRepresentativePhoneNumber()).isEqualTo(REPRESENTATIVE_1_PHONE);
+        assertThat(representative.getValue().getRepresentativeAddress()).isEqualTo(address);
     }
 }

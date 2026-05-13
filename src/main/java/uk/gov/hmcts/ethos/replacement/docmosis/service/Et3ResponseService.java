@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,8 @@ import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceExceptio
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.ReferralHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.CcdCaseAssignment;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxService;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.RespondentRepresentativeUtils;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.RoleUtils;
 
 import java.io.IOException;
 import java.time.LocalDate;
@@ -35,8 +38,6 @@ import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
-import static org.apache.commons.lang3.ObjectUtils.isEmpty;
-import static org.apache.commons.lang3.ObjectUtils.isNotEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.RESPONSE_TO_A_CLAIM;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_CASE_DATA_NOT_FOUND;
@@ -95,7 +96,8 @@ public class Et3ResponseService {
         try {
             // If the representative address is not set, set it to the organisation's address.
             RepresentedTypeR representative = findRepresentativeFromCaseData(caseData);
-            if (isNotEmpty(representative) && isEmpty(representative.getRepresentativeAddress())) {
+            if (ObjectUtils.isNotEmpty(representative)
+                    && ObjectUtils.isEmpty(representative.getRepresentativeAddress())) {
                 OrganisationAddress organisationAddress = myHmctsService.getOrganisationAddress(userToken);
                 representative.setRepresentativeAddress(mapOrganisationAddressToAddress(organisationAddress));
             }
@@ -244,7 +246,7 @@ public class Et3ResponseService {
             throws GenericServiceException {
 
         UserDetails userDetails = userIdamService.getUserDetails(userToken);
-        if (isEmpty(userDetails)) {
+        if (ObjectUtils.isEmpty(userDetails)) {
             throw new GenericServiceException(ERROR_USER_NOT_FOUND,
                     new Exception(ERROR_USER_NOT_FOUND),
                     ERROR_USER_NOT_FOUND,
@@ -280,7 +282,7 @@ public class Et3ResponseService {
             throws GenericServiceException {
         checkUserTokenAndCaseid(userToken, caseId);
         UserDetails userDetails = userIdamService.getUserDetails(userToken);
-        if (isEmpty(userDetails)) {
+        if (ObjectUtils.isEmpty(userDetails)) {
             throw new GenericServiceException(ERROR_USER_NOT_FOUND,
                     new Exception(ERROR_USER_NOT_FOUND),
                     ERROR_USER_NOT_FOUND,
@@ -307,7 +309,7 @@ public class Et3ResponseService {
                     "Et3ResponseService",
                     "getRepresentedRespondentIndexes");
         }
-        if (isEmpty(caseUserAssignmentData)) {
+        if (ObjectUtils.isEmpty(caseUserAssignmentData)) {
             throw new GenericServiceException(ERROR_CASE_ROLES_NOT_FOUND,
                     new Exception(ERROR_CASE_ROLES_NOT_FOUND),
                     ERROR_CASE_ROLES_NOT_FOUND,
@@ -315,7 +317,16 @@ public class Et3ResponseService {
                     "getRepresentedRespondentIndexes");
         }
         List<Integer> solicitorIndexList = new ArrayList<>();
-        for (CaseUserAssignment caseUserAssignment : caseUserAssignmentData.getCaseUserAssignments()) {
+        List<CaseUserAssignment> caseUserAssignments = RoleUtils
+                .findLastAssignmentsBySolicitorRole(caseUserAssignmentData);
+        if (CollectionUtils.isEmpty(caseUserAssignments)) {
+            throw new GenericServiceException(ERROR_CASE_ROLES_NOT_FOUND,
+                    new Exception(ERROR_CASE_ROLES_NOT_FOUND),
+                    ERROR_CASE_ROLES_NOT_FOUND,
+                    caseId, "Et3ResponseService",
+                    "getRepresentedRespondentIndexes");
+        }
+        for (CaseUserAssignment caseUserAssignment : caseUserAssignments) {
             if (userDetails.getUid().equals(caseUserAssignment.getUserId())) {
                 SolicitorRole solicitorRole = SolicitorRole.from(caseUserAssignment.getCaseRole()).orElseThrow();
                 solicitorIndexList.add(solicitorRole.getIndex());
@@ -376,7 +387,7 @@ public class Et3ResponseService {
     public void setRespondentRepresentsContactDetails(String userToken, CaseData caseData, String submissionReference)
             throws GenericServiceException {
         // Set the representative contact details in caseData
-        if (isEmpty(caseData)) {
+        if (ObjectUtils.isEmpty(caseData)) {
             throw new GenericServiceException(ERROR_CASE_DATA_NOT_FOUND,
                     new Exception(ERROR_CASE_DATA_NOT_FOUND),
                     ERROR_CASE_DATA_NOT_FOUND,
@@ -414,7 +425,8 @@ public class Et3ResponseService {
                     "Et3ResponseService",
                     "setRespondentRepresentsContactDetails - NoSuchElementException");
         }
-        if (representedRespondentIndexes.isEmpty() || CollectionUtils.isEmpty(caseData.getRepCollection())) {
+        if (CollectionUtils.isEmpty(representedRespondentIndexes)
+                || CollectionUtils.isEmpty(caseData.getRepCollection())) {
             throw new GenericServiceException(ERROR_NO_REPRESENTED_RESPONDENT_FOUND,
                     new Exception(ERROR_NO_REPRESENTED_RESPONDENT_FOUND),
                     ERROR_NO_REPRESENTED_RESPONDENT_FOUND,
@@ -422,14 +434,6 @@ public class Et3ResponseService {
                     "Et3ResponseService",
                     "setRespondentRepresentsContactDetails - No represented respondents found");
         }
-        for (int i : representedRespondentIndexes) {
-            if (i >= representedRespondentIndexes.size()
-                    || isEmpty(caseData.getRepCollection().get(i))
-                    || isEmpty(caseData.getRepCollection().get(i).getValue())) {
-                continue;
-            }
-            caseData.getRepCollection().get(i).getValue().setRepresentativePhoneNumber(caseData.getEt3ResponsePhone());
-            caseData.getRepCollection().get(i).getValue().setRepresentativeAddress(caseData.getEt3ResponseAddress());
-        }
+        RespondentRepresentativeUtils.updateRepresentativeContactDetails(caseData, representedRespondentIndexes);
     }
 }

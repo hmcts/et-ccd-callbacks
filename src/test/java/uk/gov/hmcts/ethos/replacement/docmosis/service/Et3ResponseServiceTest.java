@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -29,6 +30,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
 import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
+import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationAddress;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
@@ -47,7 +49,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Stream;
@@ -120,6 +121,7 @@ class Et3ResponseServiceTest {
     private static final String COUNTY = "county";
     private static final String POST_TOWN = "postTown";
     private static final String PHONE_NUMBER = "1234567890";
+    private static final String RESPONDENT_ID_1 = "respondentId1";
 
     private EmailService emailService;
     private CaseData caseData;
@@ -187,9 +189,14 @@ class Et3ResponseServiceTest {
         when(pdfBoxService.generatePdfDocumentInfo(any(), anyString(),
                 anyString(), anyString(), eq(null), anyString()))
                 .thenThrow(new IOException(ERROR_PDF_BOX_SERVICE_GENERATE_PDF_DOCUMENT_INFO));
-        assertThrows(DocumentManagementException.class,
-                () -> et3ResponseService.generateEt3ResponseDocument(new CaseData(), "userToken",
-                ENGLANDWALES_CASE_TYPE_ID, SUBMIT_ET3));
+        Executable generateDocument = () ->
+                et3ResponseService.generateEt3ResponseDocument(
+                        new CaseData(),
+                        "userToken",
+                        ENGLANDWALES_CASE_TYPE_ID,
+                        SUBMIT_ET3
+                );
+        assertThrows(DocumentManagementException.class, generateDocument);
     }
 
     /**
@@ -358,8 +365,9 @@ class Et3ResponseServiceTest {
             assertThat(genericServiceException.getMessage()).isEqualTo(ERROR_CASE_ROLES_NOT_FOUND);
         }
         if (VALID_USER_TOKEN.equals(userToken) && VALID_CASE_ID_RETURNS_INVALID_CASE.equals(caseId)) {
-            assertThrows(NoSuchElementException.class,
+            GenericServiceException genericServiceException = assertThrows(GenericServiceException.class,
                     () -> et3ResponseService.getRepresentedRespondentIndexes(userToken, caseId));
+            assertThat(genericServiceException.getMessage()).isEqualTo(ERROR_CASE_ROLES_NOT_FOUND);
         }
         if (VALID_USER_TOKEN.equals(userToken) && INVALID_CASE_ID_FOR_GET_USER_ROLES.equals(caseId)) {
             GenericServiceException genericServiceException = assertThrows(GenericServiceException.class,
@@ -498,8 +506,12 @@ class Et3ResponseServiceTest {
 
         // when case data has representative in representative collection
         if (VALID_USER_TOKEN.equals(userToken) && VALID_CASE_ID.equals(caseData.getCcdID())) {
-            RepresentedTypeR representedTypeR = new RepresentedTypeR();
-            caseData.setRepCollection(List.of(RepresentedTypeRItem.builder().value(representedTypeR).build()));
+            RepresentedTypeR representedTypeR = RepresentedTypeR.builder().respondentId(RESPONDENT_ID_1).build();
+            caseData.setRepCollection(List.of(RepresentedTypeRItem.builder().id(USER_ID)
+                    .value(representedTypeR).build()));
+            RespondentSumTypeItem respondentSumTypeItem = new RespondentSumTypeItem();
+            respondentSumTypeItem.setId(RESPONDENT_ID_1);
+            caseData.setRespondentCollection(List.of(respondentSumTypeItem));
             UserDetails validUserDetails = new UserDetails();
             validUserDetails.setUid(USER_ID);
             when(userIdamService.getUserDetails(VALID_USER_TOKEN)).thenReturn(validUserDetails);

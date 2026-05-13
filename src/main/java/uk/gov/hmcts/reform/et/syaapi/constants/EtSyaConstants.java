@@ -19,6 +19,8 @@ import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_HAVE
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_HAVE_A_LEGAL_OFFICER_DECISION_CONSIDERED_AFRESH_R;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_ORDER_THE_C_TO_DO_SOMETHING;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_ORDER_THE_R_TO_DO_SOMETHING;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_POSTPONE_C;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_POSTPONE_R;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_RESTRICT_PUBLICITY_C;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_RESTRICT_PUBLICITY_R;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_REVOKE_AN_ORDER_C;
@@ -29,6 +31,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_VARY
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_VARY_AN_ORDER_R;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_VARY_OR_REVOKE_AN_ORDER_C;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_VARY_OR_REVOKE_AN_ORDER_R;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.CHANGE_OF_PARTYS_DETAILS;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.CONTACT_THE_TRIBUNAL_C;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.CONTACT_THE_TRIBUNAL_R;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.COT3;
@@ -133,8 +136,8 @@ public final class EtSyaConstants {
         R_HAS_NOT_COMPLIED_WITH_AN_ORDER_C, C_HAS_NOT_COMPLIED_WITH_AN_ORDER_R,
         APP_TO_STRIKE_OUT_ALL_OR_PART_OF_THE_CLAIM, APP_TO_STRIKE_OUT_ALL_OR_PART_OF_THE_RESPONSE,
         APP_TO_HAVE_A_LEGAL_OFFICER_DECISION_CONSIDERED_AFRESH_C, APP_TO_EXTEND_TIME_TO_PRESENT_A_RESPONSE,
-        APP_TO_HAVE_A_LEGAL_OFFICER_DECISION_CONSIDERED_AFRESH_R,
-        CONTACT_THE_TRIBUNAL_C, CONTACT_THE_TRIBUNAL_R, TSE_ADMIN_CORRESPONDENCE);
+        APP_TO_HAVE_A_LEGAL_OFFICER_DECISION_CONSIDERED_AFRESH_R, APP_TO_POSTPONE_C, APP_TO_POSTPONE_R,
+        CONTACT_THE_TRIBUNAL_C, CONTACT_THE_TRIBUNAL_R, TSE_ADMIN_CORRESPONDENCE, CHANGE_OF_PARTYS_DETAILS);
 
     private EtSyaConstants() {
         // restrict instantiation

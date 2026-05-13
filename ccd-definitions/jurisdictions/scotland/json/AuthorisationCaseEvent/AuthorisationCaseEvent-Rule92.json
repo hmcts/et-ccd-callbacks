@@ -30,7 +30,7 @@
     "CRUD": "CRUD"
   },
   {
-    "CaseTypeId": "ET_EnglandWales",
+    "CaseTypeId": "ET_Scotland",
     "CaseEventID": "SUBMIT_STORED_PSE_RESPONSE",
     "UserRole": "caseworker-wa-task-configuration",
     "CRUD": "CRUD"

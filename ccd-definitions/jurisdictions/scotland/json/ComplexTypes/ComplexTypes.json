@@ -1456,6 +1456,14 @@
     "Searchable": "N"
   },
   {
+    "ID": "RespondentRepresentative",
+    "ListElementCode": "idamId",
+    "FieldType": "Text",
+    "ElementLabel": "Respondent representative role",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
     "ID": "acceptOrRejectCase",
     "ListElementCode": "caseAccepted",
     "FieldType": "YesOrNo",

@@ -1358,6 +1358,14 @@
     "Searchable": "N"
   },
   {
+    "ID": "RespondentRepresentative",
+    "ListElementCode": "idamId",
+    "FieldType": "Text",
+    "ElementLabel": "Respondent representative idam id",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
     "ID": "ClaimantRequest",
     "ListElementCode": "claim_outcome",
     "FieldType": "MultiSelectList",

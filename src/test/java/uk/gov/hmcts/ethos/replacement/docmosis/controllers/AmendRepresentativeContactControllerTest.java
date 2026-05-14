@@ -39,7 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_CASE_DATA_NOT_FOUND;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({AmendRepresentativeContactController.class, JsonMapper.class})
@@ -86,10 +86,10 @@ class AmendRepresentativeContactControllerTest extends BaseControllerTest {
     @SneakyThrows
     void theMidEventAmendRepresentativeContact() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        doNothing().when(amendRepresentativeContactService).setRespondentRepresentsContactDetails(AUTH_TOKEN,
+        doNothing().when(amendRepresentativeContactService).updateRepresentativeContactDetails(AUTH_TOKEN,
                 ccdRequest.getCaseDetails().getCaseData(), ccdRequest.getCaseDetails().getCaseId());
         ccdRequest.getCaseDetails().getCaseData().setRepresentativeContactChangeOption(
-                REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS);
+                REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS);
         mvc.perform(post(MID_EVENT)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -113,7 +113,7 @@ class AmendRepresentativeContactControllerTest extends BaseControllerTest {
                 "setRespondentRepresentsContactDetails")).when(amendRepresentativeContactService)
                 .setRepresentativeMyHmctsContactAddress(anyString(), any(CaseData.class), anyString());
         ccdRequest.getCaseDetails().getCaseData().setRepresentativeContactChangeOption(
-                REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS);
+                REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS);
         mvc.perform(post(MID_EVENT)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
@@ -130,7 +130,7 @@ class AmendRepresentativeContactControllerTest extends BaseControllerTest {
     @SneakyThrows
     void theAboutToSubmitRepresentativeContactDetails() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
-        doNothing().when(amendRepresentativeContactService).setRespondentRepresentsContactDetails(AUTH_TOKEN,
+        doNothing().when(amendRepresentativeContactService).updateRepresentativeContactDetails(AUTH_TOKEN,
                 ccdRequest.getCaseDetails().getCaseData(), ccdRequest.getCaseDetails().getCaseId());
         mvc.perform(post(ABOUT_TO_SUBMIT)
                         .contentType(APPLICATION_JSON)
@@ -152,7 +152,7 @@ class AmendRepresentativeContactControllerTest extends BaseControllerTest {
                 StringUtils.EMPTY,
                 "Et3ResponseService",
                 "setRespondentRepresentsContactDetails")).when(amendRepresentativeContactService)
-                .setRespondentRepresentsContactDetails(anyString(), any(CaseData.class), anyString());
+                .updateRepresentativeContactDetails(anyString(), any(CaseData.class), anyString());
         mvc.perform(post(ABOUT_TO_SUBMIT)
                         .contentType(APPLICATION_JSON)
                         .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)

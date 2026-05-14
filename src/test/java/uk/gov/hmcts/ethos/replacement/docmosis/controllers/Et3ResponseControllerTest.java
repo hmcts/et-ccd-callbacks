@@ -305,7 +305,7 @@ class Et3ResponseControllerTest extends BaseControllerTest {
     void submitSection_withEt3ResponseEvent_setsRepresentativeContactDetails() throws Exception {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         ccdRequest.setEventId(ET3_RESPONSE);
-        doNothing().when(amendRepresentativeContactService).setRespondentRepresentsContactDetails(
+        doNothing().when(amendRepresentativeContactService).updateRepresentativeContactDetails(
                 anyString(), any(CaseData.class), anyString());
 
         mvc.perform(post(SUBMIT_SECTION_URL)
@@ -316,7 +316,7 @@ class Et3ResponseControllerTest extends BaseControllerTest {
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
-        verify(amendRepresentativeContactService).setRespondentRepresentsContactDetails(
+        verify(amendRepresentativeContactService).updateRepresentativeContactDetails(
                 anyString(), any(CaseData.class), anyString());
     }
 
@@ -330,7 +330,7 @@ class Et3ResponseControllerTest extends BaseControllerTest {
                 ccdRequest.getCaseDetails().getCaseId(),
                 "Et3ResponseService",
                 "setRespondentRepresentsContactDetails"))
-                .when(amendRepresentativeContactService).setRespondentRepresentsContactDetails(
+                .when(amendRepresentativeContactService).updateRepresentativeContactDetails(
                         anyString(), any(CaseData.class), anyString());
 
         mvc.perform(post(SUBMIT_SECTION_URL)

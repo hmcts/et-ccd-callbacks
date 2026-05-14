@@ -45,7 +45,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConst
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_ORGANISATION_DETAILS_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_USER_ID_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_USER_NOT_FOUND;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.SYSTEM_ERROR;
 
 @ExtendWith(SpringExtension.class)
@@ -185,14 +185,14 @@ class AmendRepresentativeContactServiceTest {
     }
 
     @ParameterizedTest
-    @MethodSource("generateTestSetRespondentRepresentsContactDetails")
+    @MethodSource("generateTestUpdateRepresentativeContactDetails")
     @SneakyThrows
-    void theSetRespondentRepresentsContactDetails(String userToken, CaseData caseData) {
+    void theUpdateRepresentativeContactDetails(String userToken, CaseData caseData) {
         // When both user token and case data are empty
         if (StringUtils.isBlank(userToken) && ObjectUtils.isEmpty(caseData)) {
             GenericServiceException gex = assertThrows(GenericServiceException.class,
                     () -> amendRepresentativeContactService
-                            .setRespondentRepresentsContactDetails(userToken, caseData, null));
+                            .updateRepresentativeContactDetails(userToken, caseData, null));
             assertThat(gex.getMessage()).isEqualTo(ERROR_CASE_DATA_NOT_FOUND);
             return;
         }
@@ -200,14 +200,14 @@ class AmendRepresentativeContactServiceTest {
         if (ObjectUtils.isEmpty(caseData)) {
             GenericServiceException gex = assertThrows(GenericServiceException.class,
                     () -> amendRepresentativeContactService
-                            .setRespondentRepresentsContactDetails(userToken, caseData, null));
+                            .updateRepresentativeContactDetails(userToken, caseData, null));
             assertThat(gex.getMessage()).isEqualTo(ERROR_CASE_DATA_NOT_FOUND);
             return;
         }
         // When only user token is empty
         if (ObjectUtils.isEmpty(userToken)) {
             GenericServiceException gex = assertThrows(GenericServiceException.class,
-                    () -> amendRepresentativeContactService.setRespondentRepresentsContactDetails(
+                    () -> amendRepresentativeContactService.updateRepresentativeContactDetails(
                             userToken, caseData, caseData.getCcdID()));
             assertThat(gex.getMessage()).isEqualTo(ERROR_INVALID_USER_TOKEN);
             return;
@@ -220,7 +220,7 @@ class AmendRepresentativeContactServiceTest {
             when(userIdamService.getUserDetails(VALID_USER_TOKEN)).thenReturn(validUserDetails);
             when(ccdCaseAssignment.getCaseUserRoles(INVALID_CASE_ID)).thenReturn(getInvalidCaseUserAssignmentData());
             GenericServiceException gex = assertThrows(GenericServiceException.class,
-                    () -> amendRepresentativeContactService.setRespondentRepresentsContactDetails(
+                    () -> amendRepresentativeContactService.updateRepresentativeContactDetails(
                             userToken, caseData, caseData.getCcdID()));
             assertThat(gex.getMessage()).isEqualTo(SYSTEM_ERROR);
         }
@@ -232,7 +232,7 @@ class AmendRepresentativeContactServiceTest {
             when(userIdamService.getUserDetails(VALID_USER_TOKEN)).thenReturn(validUserDetails);
             when(ccdCaseAssignment.getCaseUserRoles(VALID_CASE_ID)).thenReturn(getValidCaseUserAssignmentData());
             GenericServiceException gex = assertThrows(GenericServiceException.class,
-                    () -> amendRepresentativeContactService.setRespondentRepresentsContactDetails(
+                    () -> amendRepresentativeContactService.updateRepresentativeContactDetails(
                             userToken, caseData, caseData.getCcdID()));
             assertThat(gex.getMessage()).isEqualTo(ERROR_NO_REPRESENTED_RESPONDENT_FOUND);
         }
@@ -245,7 +245,7 @@ class AmendRepresentativeContactServiceTest {
             when(ccdCaseAssignment.getCaseUserRoles(VALID_CASE_ID_RETURNS_INVALID_USER))
                     .thenReturn(getValidCaseInvalidUserAssignmentData());
             GenericServiceException gex = assertThrows(GenericServiceException.class,
-                    () -> amendRepresentativeContactService.setRespondentRepresentsContactDetails(
+                    () -> amendRepresentativeContactService.updateRepresentativeContactDetails(
                             userToken, caseData, caseData.getCcdID()));
             assertThat(gex.getMessage()).isEqualTo(ERROR_NO_REPRESENTED_RESPONDENT_FOUND);
         }
@@ -258,7 +258,7 @@ class AmendRepresentativeContactServiceTest {
             when(userIdamService.getUserDetails(VALID_USER_TOKEN)).thenReturn(validUserDetails);
             when(ccdCaseAssignment.getCaseUserRoles(VALID_CASE_ID)).thenReturn(getValidCaseUserAssignmentData());
             amendRepresentativeContactService
-                    .setRespondentRepresentsContactDetails(userToken, caseData, caseData.getCcdID());
+                    .updateRepresentativeContactDetails(userToken, caseData, caseData.getCcdID());
             assertThat(caseData.getRepCollection().getFirst().getValue()).isNull();
         }
 
@@ -275,7 +275,7 @@ class AmendRepresentativeContactServiceTest {
             when(userIdamService.getUserDetails(VALID_USER_TOKEN)).thenReturn(validUserDetails);
             when(ccdCaseAssignment.getCaseUserRoles(VALID_CASE_ID)).thenReturn(getValidCaseUserAssignmentData());
             amendRepresentativeContactService
-                    .setRespondentRepresentsContactDetails(userToken, caseData, caseData.getCcdID());
+                    .updateRepresentativeContactDetails(userToken, caseData, caseData.getCcdID());
             assertThat(caseData.getRepCollection().getFirst().getValue().getRepresentativeAddress()
                     .getAddressLine1()).isEqualTo("Address Line 1");
             assertThat(caseData.getRepCollection().getFirst().getValue().getRepresentativePhoneNumber())
@@ -283,7 +283,7 @@ class AmendRepresentativeContactServiceTest {
         }
     }
 
-    private static Stream<Arguments> generateTestSetRespondentRepresentsContactDetails() {
+    private static Stream<Arguments> generateTestUpdateRepresentativeContactDetails() {
         CaseData validCaseData = CaseDataBuilder.builder()
                 .withClaimantIndType("Doris", "Johnson")
                 .withClaimantType("232 Petticoat Square", "3 House", null,
@@ -383,7 +383,7 @@ class AmendRepresentativeContactServiceTest {
         caseData2.setRepCollection(
                 List.of(RepresentedTypeRItem.builder().value(RepresentedTypeR.builder().build()).build()));
         caseData2.setEt3ResponsePhone(PHONE_NUMBER);
-        caseData2.setRepresentativeContactChangeOption(REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS);
+        caseData2.setRepresentativeContactChangeOption(REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS);
         when(userIdamService.getUserDetails(userToken)).thenReturn(userDetails);
         OrganisationAddress organisationAddress = OrganisationAddress.builder()
                 .addressLine1(ADDRESS_LINE_1)
@@ -397,7 +397,7 @@ class AmendRepresentativeContactServiceTest {
         when(authTokenGenerator.generate()).thenReturn(userToken);
         when(myHmctsService.getOrganisationAddress(userToken)).thenReturn(organisationAddress);
         amendRepresentativeContactService
-                .setRespondentRepresentsContactDetails(userToken, caseData2, submissionReference);
+                .updateRepresentativeContactDetails(userToken, caseData2, submissionReference);
         assertThat(caseData2.getEt3ResponseAddress()).isNotNull();
         assertThat(caseData2.getEt3ResponseAddress().getAddressLine1()).isEqualTo(ADDRESS_LINE_1);
         assertThat(caseData2.getEt3ResponseAddress().getAddressLine2()).isEqualTo(ADDRESS_LINE_2);
@@ -410,18 +410,18 @@ class AmendRepresentativeContactServiceTest {
 
         // Scenario 3: Throws when user not found
         CaseData caseData3 = new CaseData();
-        caseData3.setRepresentativeContactChangeOption(REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS);
+        caseData3.setRepresentativeContactChangeOption(REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS);
 
         when(userIdamService.getUserDetails(userToken)).thenReturn(null);
 
         GenericServiceException userNotFound = assertThrows(GenericServiceException.class, () ->
                 amendRepresentativeContactService
-                        .setRespondentRepresentsContactDetails(userToken, caseData3, submissionReference));
+                        .updateRepresentativeContactDetails(userToken, caseData3, submissionReference));
         assertThat(userNotFound.getMessage()).isEqualTo("User not found");
 
         // Scenario 3: Throws when organisation not found
         CaseData caseData4 = new CaseData();
-        caseData4.setRepresentativeContactChangeOption(REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS);
+        caseData4.setRepresentativeContactChangeOption(REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS);
 
         when(userIdamService.getUserDetails(userToken)).thenReturn(userDetails);
         when(authTokenGenerator.generate()).thenReturn(userToken);
@@ -434,7 +434,7 @@ class AmendRepresentativeContactServiceTest {
                 .when(myHmctsService).getOrganisationAddress(userToken);
         GenericServiceException organisationNotFound = assertThrows(GenericServiceException.class, () ->
                 amendRepresentativeContactService
-                        .setRespondentRepresentsContactDetails(userToken, caseData4, submissionReference));
+                        .updateRepresentativeContactDetails(userToken, caseData4, submissionReference));
         assertThat(organisationNotFound.getMessage()).isEqualTo("Organisation details not found");
     }
 

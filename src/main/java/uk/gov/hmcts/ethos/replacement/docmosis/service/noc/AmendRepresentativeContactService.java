@@ -29,7 +29,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConst
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_NO_REPRESENTED_RESPONDENT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_USER_ID_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_USER_NOT_FOUND;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.SYSTEM_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils.getOrganisationAddressAsText;
 import static uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils.mapOrganisationAddressToAddress;
@@ -42,6 +42,8 @@ public class AmendRepresentativeContactService {
     private final UserIdamService userIdamService;
     private final MyHmctsService myHmctsService;
     private final CcdCaseAssignment ccdCaseAssignment;
+
+    private static final String CLASS_NAME = AmendRepresentativeContactService.class.getSimpleName();
 
     /**
      * Updates the contact details (phone number and address) of the representatives for all represented respondents
@@ -73,26 +75,27 @@ public class AmendRepresentativeContactService {
      *          <li>No represented respondents are found or the representative collection is empty.</li>
      *      </ul>
      */
-    public void setRespondentRepresentsContactDetails(String userToken, CaseData caseData, String submissionReference)
+    public void updateRepresentativeContactDetails(String userToken, CaseData caseData, String submissionReference)
             throws GenericServiceException {
+        final String methodName = "updateRepresentativeContactDetails";
         // Set the representative contact details in caseData
         if (ObjectUtils.isEmpty(caseData)) {
             throw new GenericServiceException(ERROR_CASE_DATA_NOT_FOUND,
                     new Exception(ERROR_CASE_DATA_NOT_FOUND),
                     ERROR_CASE_DATA_NOT_FOUND,
                     StringUtils.EMPTY,
-                    "Et3ResponseService",
-                    "setRespondentRepresentsContactDetails - caseData is null or empty");
+                    CLASS_NAME,
+                    methodName + " - caseData is null or empty");
         }
         if (StringUtils.isBlank(userToken)) {
             throw new GenericServiceException(ERROR_INVALID_USER_TOKEN,
                     new Exception(ERROR_INVALID_USER_TOKEN),
                     ERROR_INVALID_USER_TOKEN,
                     submissionReference,
-                    "Et3ResponseService",
-                    "setRespondentRepresentsContactDetails - userToken is blank");
+                    CLASS_NAME,
+                    methodName + " - userToken is blank");
         }
-        if (REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS.equals(
+        if (REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS.equals(
                 caseData.getRepresentativeContactChangeOption())) {
             setRepresentativeMyHmctsContactAddress(userToken, caseData, submissionReference);
         }
@@ -104,15 +107,15 @@ public class AmendRepresentativeContactService {
                     new Exception(gex),
                     gex.getMessage(),
                     submissionReference,
-                    "Et3ResponseService",
-                    "setRespondentRepresentsContactDetails - getRepresentedRespondentIndexes failed");
+                    CLASS_NAME,
+                    methodName + " - getRepresentedRespondentIndexes failed");
         } catch (NoSuchElementException nse) {
             throw new GenericServiceException(SYSTEM_ERROR,
                     new Exception(nse),
                     nse.getMessage(),
                     submissionReference,
-                    "Et3ResponseService",
-                    "setRespondentRepresentsContactDetails - NoSuchElementException");
+                    CLASS_NAME,
+                    methodName + " - NoSuchElementException");
         }
         if (org.apache.commons.collections.CollectionUtils.isEmpty(representedRespondentIndexes)
                 || org.apache.commons.collections.CollectionUtils.isEmpty(caseData.getRepCollection())) {
@@ -120,8 +123,8 @@ public class AmendRepresentativeContactService {
                     new Exception(ERROR_NO_REPRESENTED_RESPONDENT_FOUND),
                     ERROR_NO_REPRESENTED_RESPONDENT_FOUND,
                     submissionReference,
-                    "Et3ResponseService",
-                    "setRespondentRepresentsContactDetails - No represented respondents found");
+                    CLASS_NAME,
+                    methodName + " - No represented respondents found");
         }
         RespondentRepresentativeUtils.updateRepresentativeContactDetails(caseData, representedRespondentIndexes);
     }
@@ -144,15 +147,15 @@ public class AmendRepresentativeContactService {
      */
     public void setRepresentativeMyHmctsContactAddress(String userToken, CaseData caseData, String submissionReference)
             throws GenericServiceException {
-
+        final String methodName = "setRepresentativeMyHmctsContactAddress";
         UserDetails userDetails = userIdamService.getUserDetails(userToken);
         if (ObjectUtils.isEmpty(userDetails)) {
             throw new GenericServiceException(ERROR_USER_NOT_FOUND,
                     new Exception(ERROR_USER_NOT_FOUND),
                     ERROR_USER_NOT_FOUND,
                     submissionReference,
-                    "Et3ResponseService",
-                    "setRepresentativeContactInfo - user not found");
+                    CLASS_NAME,
+                    methodName + " - user not found");
         }
         OrganisationAddress organisationAddress = myHmctsService.getOrganisationAddress(userToken);
         caseData.setEt3ResponseAddress(mapOrganisationAddressToAddress(organisationAddress));
@@ -180,21 +183,22 @@ public class AmendRepresentativeContactService {
      */
     public List<Integer> getRepresentedRespondentIndexes(String userToken, String caseId)
             throws GenericServiceException {
+        final String methodName = "getRepresentedRespondentIndexes";
         if (StringUtils.isBlank(userToken)) {
             throw new GenericServiceException(ERROR_INVALID_USER_TOKEN,
                     new Exception(ERROR_INVALID_USER_TOKEN),
                     ERROR_INVALID_USER_TOKEN,
                     caseId,
-                    "Et3ResponseService",
-                    "checkUserTokenAndCaseid");
+                    CLASS_NAME,
+                    methodName);
         }
         if (StringUtils.isBlank(caseId)) {
             throw new GenericServiceException(ERROR_INVALID_CASE_ID,
                     new Exception(ERROR_INVALID_CASE_ID),
                     ERROR_INVALID_CASE_ID,
                     caseId,
-                    "Et3ResponseService",
-                    "checkUserTokenAndCaseid");
+                    CLASS_NAME,
+                    methodName);
         }
         UserDetails userDetails = userIdamService.getUserDetails(userToken);
         if (ObjectUtils.isEmpty(userDetails)) {
@@ -202,16 +206,16 @@ public class AmendRepresentativeContactService {
                     new Exception(ERROR_USER_NOT_FOUND),
                     ERROR_USER_NOT_FOUND,
                     caseId,
-                    "Et3ResponseService",
-                    "getRepresentedRespondentIndexes");
+                    CLASS_NAME,
+                    methodName);
         }
         if (StringUtils.isBlank(userDetails.getUid())) {
             throw new GenericServiceException(ERROR_USER_ID_NOT_FOUND,
                     new Exception(ERROR_USER_ID_NOT_FOUND),
                     ERROR_USER_ID_NOT_FOUND,
                     caseId,
-                    "Et3ResponseService",
-                    "getRepresentedRespondentIndexes");
+                    CLASS_NAME,
+                    methodName);
         }
         CaseUserAssignmentData caseUserAssignmentData;
         try {
@@ -221,15 +225,15 @@ public class AmendRepresentativeContactService {
                     new Exception(ioe),
                     ioe.getMessage(),
                     caseId,
-                    "Et3ResponseService",
-                    "getRepresentedRespondentIndexes");
+                    CLASS_NAME,
+                    methodName);
         }
         if (ObjectUtils.isEmpty(caseUserAssignmentData)) {
             throw new GenericServiceException(ERROR_CASE_ROLES_NOT_FOUND,
                     new Exception(ERROR_CASE_ROLES_NOT_FOUND),
                     ERROR_CASE_ROLES_NOT_FOUND,
-                    caseId, "Et3ResponseService",
-                    "getRepresentedRespondentIndexes");
+                    caseId, CLASS_NAME,
+                    methodName);
         }
         List<Integer> solicitorIndexList = new ArrayList<>();
         List<CaseUserAssignment> caseUserAssignments = RoleUtils
@@ -238,8 +242,8 @@ public class AmendRepresentativeContactService {
             throw new GenericServiceException(ERROR_CASE_ROLES_NOT_FOUND,
                     new Exception(ERROR_CASE_ROLES_NOT_FOUND),
                     ERROR_CASE_ROLES_NOT_FOUND,
-                    caseId, "Et3ResponseService",
-                    "getRepresentedRespondentIndexes");
+                    caseId, CLASS_NAME,
+                    methodName);
         }
         for (CaseUserAssignment caseUserAssignment : caseUserAssignments) {
             if (userDetails.getUid().equals(caseUserAssignment.getUserId())) {
@@ -249,5 +253,4 @@ public class AmendRepresentativeContactService {
         }
         return solicitorIndexList;
     }
-
 }

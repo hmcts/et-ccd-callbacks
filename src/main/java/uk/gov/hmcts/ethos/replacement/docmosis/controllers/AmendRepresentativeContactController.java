@@ -23,7 +23,24 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.AmendRepresentativeCo
 import java.util.ArrayList;
 import java.util.List;
 
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_CODE_FIVE_HUNDRED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_CODE_FIVE_ZERO_ONE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_CODE_FIVE_ZERO_THREE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_CODE_FOUR_HUNDRED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_CODE_FOUR_ZERO_FOUR;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_CODE_FOUR_ZERO_ONE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_CODE_FOUR_ZERO_THREE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_CODE_TWO_HUNDRED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_HEADER_AUTHORIZATION;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_MESSAGE_FIVE_HUNDRED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_MESSAGE_FIVE_ZERO_ONE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_MESSAGE_FIVE_ZERO_THREE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_MESSAGE_FOUR_HUNDRED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_MESSAGE_FOUR_ZERO_FOUR;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_MESSAGE_FOUR_ZERO_ONE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_MESSAGE_FOUR_ZERO_THREE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_MESSAGE_TWO_HUNDRED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 
 @Slf4j
@@ -34,25 +51,64 @@ public class AmendRepresentativeContactController {
 
     private final AmendRepresentativeContactService amendRepresentativeContactService;
 
-    @PostMapping(value = "/midEvent", consumes = MimeTypeUtils.APPLICATION_JSON_VALUE)
+    @PostMapping(value = "/aboutToStart", consumes = MimeTypeUtils.APPLICATION_JSON_VALUE)
     @Operation(summary = "Updates caseData Et3ResponseAddress and MyHmctsAddressText fields if the user selects the"
             + "option to use MyHmcts details")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+        @ApiResponse(responseCode = HTTP_CODE_TWO_HUNDRED, description = HTTP_MESSAGE_TWO_HUNDRED,
             content = {
                 @Content(mediaType = "application/json",
                     schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+        @ApiResponse(responseCode = HTTP_CODE_FOUR_HUNDRED, description = HTTP_MESSAGE_FOUR_HUNDRED),
+        @ApiResponse(responseCode = HTTP_CODE_FOUR_ZERO_ONE, description = HTTP_MESSAGE_FOUR_ZERO_ONE),
+        @ApiResponse(responseCode = HTTP_CODE_FOUR_ZERO_THREE, description = HTTP_MESSAGE_FOUR_ZERO_THREE),
+        @ApiResponse(responseCode = HTTP_CODE_FOUR_ZERO_FOUR, description = HTTP_MESSAGE_FOUR_ZERO_FOUR),
+        @ApiResponse(responseCode = HTTP_CODE_FIVE_HUNDRED, description = HTTP_MESSAGE_FIVE_HUNDRED),
+        @ApiResponse(responseCode = HTTP_CODE_FIVE_ZERO_ONE, description = HTTP_MESSAGE_FIVE_ZERO_ONE),
+        @ApiResponse(responseCode = HTTP_CODE_FIVE_ZERO_THREE, description = HTTP_MESSAGE_FIVE_ZERO_THREE)
     })
-    public ResponseEntity<CCDCallbackResponse> midEvent(
+    public ResponseEntity<CCDCallbackResponse> aboutToStart(
             @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestHeader(HTTP_HEADER_AUTHORIZATION) String userToken) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>();
         try {
-            if (REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS.equals(
+            if (REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS.equals(
+                    caseData.getRepresentativeContactChangeOption())) {
+                amendRepresentativeContactService.setRepresentativeMyHmctsContactAddress(userToken,
+                        caseData, ccdRequest.getCaseDetails().getCaseId());
+            }
+        } catch (GenericServiceException gse) {
+            errors.add(gse.getMessage());
+        }
+        return getCallbackRespEntityErrors(errors, caseData);
+    }
+
+    @PostMapping(value = "/midEvent", consumes = MimeTypeUtils.APPLICATION_JSON_VALUE)
+    @Operation(summary = "Updates caseData Et3ResponseAddress and MyHmctsAddressText fields if the user selects the"
+            + "option to use MyHmcts details")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = HTTP_CODE_TWO_HUNDRED, description = HTTP_MESSAGE_TWO_HUNDRED,
+            content = {
+                @Content(mediaType = "application/json",
+                    schema = @Schema(implementation = CCDCallbackResponse.class))
+            }),
+        @ApiResponse(responseCode = HTTP_CODE_FOUR_HUNDRED, description = HTTP_MESSAGE_FOUR_HUNDRED),
+        @ApiResponse(responseCode = HTTP_CODE_FOUR_ZERO_ONE, description = HTTP_MESSAGE_FOUR_ZERO_ONE),
+        @ApiResponse(responseCode = HTTP_CODE_FOUR_ZERO_THREE, description = HTTP_MESSAGE_FOUR_ZERO_THREE),
+        @ApiResponse(responseCode = HTTP_CODE_FOUR_ZERO_FOUR, description = HTTP_MESSAGE_FOUR_ZERO_FOUR),
+        @ApiResponse(responseCode = HTTP_CODE_FIVE_HUNDRED, description = HTTP_MESSAGE_FIVE_HUNDRED),
+        @ApiResponse(responseCode = HTTP_CODE_FIVE_ZERO_ONE, description = HTTP_MESSAGE_FIVE_ZERO_ONE),
+        @ApiResponse(responseCode = HTTP_CODE_FIVE_ZERO_THREE, description = HTTP_MESSAGE_FIVE_ZERO_THREE)
+    })
+    public ResponseEntity<CCDCallbackResponse> midEvent(
+            @RequestBody CCDRequest ccdRequest,
+            @RequestHeader(HTTP_HEADER_AUTHORIZATION) String userToken) {
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        List<String> errors = new ArrayList<>();
+        try {
+            if (REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS.equals(
                     caseData.getRepresentativeContactChangeOption())) {
                 amendRepresentativeContactService.setRepresentativeMyHmctsContactAddress(userToken,
                         caseData, ccdRequest.getCaseDetails().getCaseId());
@@ -67,21 +123,26 @@ public class AmendRepresentativeContactController {
     @Operation(summary = "Updates RepresentedTypeR model of the respondent representative with new address and phone"
             + "values")
     @ApiResponses(value = {
-        @ApiResponse(responseCode = "200", description = "Accessed successfully",
+        @ApiResponse(responseCode = HTTP_CODE_TWO_HUNDRED, description = HTTP_MESSAGE_TWO_HUNDRED,
             content = {
                 @Content(mediaType = "application/json",
                     schema = @Schema(implementation = CCDCallbackResponse.class))
             }),
-        @ApiResponse(responseCode = "400", description = "Bad Request"),
-        @ApiResponse(responseCode = "500", description = "Internal Server Error")
+        @ApiResponse(responseCode = HTTP_CODE_FOUR_HUNDRED, description = HTTP_MESSAGE_FOUR_HUNDRED),
+        @ApiResponse(responseCode = HTTP_CODE_FOUR_ZERO_ONE, description = HTTP_MESSAGE_FOUR_ZERO_ONE),
+        @ApiResponse(responseCode = HTTP_CODE_FOUR_ZERO_THREE, description = HTTP_MESSAGE_FOUR_ZERO_THREE),
+        @ApiResponse(responseCode = HTTP_CODE_FOUR_ZERO_FOUR, description = HTTP_MESSAGE_FOUR_ZERO_FOUR),
+        @ApiResponse(responseCode = HTTP_CODE_FIVE_HUNDRED, description = HTTP_MESSAGE_FIVE_HUNDRED),
+        @ApiResponse(responseCode = HTTP_CODE_FIVE_ZERO_ONE, description = HTTP_MESSAGE_FIVE_ZERO_ONE),
+        @ApiResponse(responseCode = HTTP_CODE_FIVE_ZERO_THREE, description = HTTP_MESSAGE_FIVE_ZERO_THREE)
     })
     public ResponseEntity<CCDCallbackResponse> aboutToSubmit(
             @RequestBody CCDRequest ccdRequest,
-            @RequestHeader("Authorization") String userToken) {
+            @RequestHeader(HTTP_HEADER_AUTHORIZATION) String userToken) {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>();
         try {
-            amendRepresentativeContactService.setRespondentRepresentsContactDetails(
+            amendRepresentativeContactService.updateRepresentativeContactDetails(
                     userToken, caseData, ccdRequest.getCaseDetails().getCaseId());
             caseData.setMyHmctsAddressText(null);
         } catch (GenericServiceException gse) {

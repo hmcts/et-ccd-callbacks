@@ -150,7 +150,7 @@ public class Et3ResponseController {
         List<String> errors = new ArrayList<>();
         if (ET3_RESPONSE.equals(ccdRequest.getEventId())) {
             try {
-                amendRepresentativeContactService.setRespondentRepresentsContactDetails(
+                amendRepresentativeContactService.updateRepresentativeContactDetails(
                         userToken, caseData, ccdRequest.getCaseDetails().getCaseId());
             }  catch (GenericServiceException gse) {
                 errors.add(gse.getMessage());

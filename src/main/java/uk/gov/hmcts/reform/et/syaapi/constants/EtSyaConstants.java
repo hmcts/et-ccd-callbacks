@@ -48,6 +48,9 @@ import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.R_HAS_NOT_C
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.SCHEDULE_OF_LOSS;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.TRIBUNAL_CASE_FILE;
 import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.TSE_ADMIN_CORRESPONDENCE;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.WITHDRAWAL_OF_ALL_OR_PART_CLAIM;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.WITHDRAWAL_OF_ENTIRE_CLAIM;
+import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.WITHDRAWAL_OF_PART_OF_CLAIM;
 
 /**
  * Defines attributes used by et-sya-api as constants.
@@ -137,7 +140,8 @@ public final class EtSyaConstants {
         APP_TO_STRIKE_OUT_ALL_OR_PART_OF_THE_CLAIM, APP_TO_STRIKE_OUT_ALL_OR_PART_OF_THE_RESPONSE,
         APP_TO_HAVE_A_LEGAL_OFFICER_DECISION_CONSIDERED_AFRESH_C, APP_TO_EXTEND_TIME_TO_PRESENT_A_RESPONSE,
         APP_TO_HAVE_A_LEGAL_OFFICER_DECISION_CONSIDERED_AFRESH_R, APP_TO_POSTPONE_C, APP_TO_POSTPONE_R,
-        CONTACT_THE_TRIBUNAL_C, CONTACT_THE_TRIBUNAL_R, TSE_ADMIN_CORRESPONDENCE, CHANGE_OF_PARTYS_DETAILS);
+        CONTACT_THE_TRIBUNAL_C, CONTACT_THE_TRIBUNAL_R, TSE_ADMIN_CORRESPONDENCE, CHANGE_OF_PARTYS_DETAILS,
+        WITHDRAWAL_OF_ENTIRE_CLAIM, WITHDRAWAL_OF_PART_OF_CLAIM, WITHDRAWAL_OF_ALL_OR_PART_CLAIM);
 
     private EtSyaConstants() {
         // restrict instantiation

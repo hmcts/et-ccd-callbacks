@@ -30,6 +30,8 @@ TARGET_DB="${ET_COS_PREVIEW_DB_NAME:-pr-${PR_ID}-et_cos}"
 TARGET_USER="${ET_COS_PREVIEW_DB_USER_NAME:-hmcts}"
 TARGET_PASSWORD="${ET_COS_PREVIEW_DB_PASSWORD:-${ET_PREVIEW_FLEXI_DB_PASSWORD:-${2:-}}}"
 TARGET_CONN_OPTIONS="${ET_COS_PREVIEW_DB_CONN_OPTIONS:-sslmode=require}"
+TARGET_TABLES_TIMEOUT_SECONDS="${ET_COS_PREVIEW_TABLES_TIMEOUT_SECONDS:-300}"
+TARGET_TABLES_POLL_SECONDS="${ET_COS_PREVIEW_TABLES_POLL_SECONDS:-10}"
 
 if [[ -z "${SOURCE_PASSWORD}" ]]; then
   echo "Missing source DB password. Set ET_COS_AAT_DB_PASSWORD or SOURCE_ET_COS_DB_PASSWORD."
@@ -61,6 +63,39 @@ connection_uri() {
   fi
 }
 
+target_tables_ready() {
+  local expected_count="${#STATIC_TABLES[@]}"
+  local table_values=()
+  local table
+  for table in "${STATIC_TABLES[@]}"; do
+    table_values+=("('public.${table}')")
+  done
+
+  local existing_count
+  existing_count="$(PGPASSWORD="${TARGET_PASSWORD}" psql \
+    --quiet \
+    --tuples-only \
+    --no-align \
+    --set=ON_ERROR_STOP=1 \
+    --dbname="${TARGET_URI}" \
+    --command="select count(*) from (values $(IFS=, ; echo "${table_values[*]}")) as t(name) where to_regclass(name) is not null")"
+
+  [[ "${existing_count}" == "${expected_count}" ]]
+}
+
+wait_for_target_tables() {
+  local deadline=$((SECONDS + TARGET_TABLES_TIMEOUT_SECONDS))
+  while ! target_tables_ready; do
+    if (( SECONDS >= deadline )); then
+      echo "Timed out waiting for ET COS reference tables in ${TARGET_HOST}/${TARGET_DB}."
+      echo "The ET COS app must start and run Flyway migrations before reference data can be imported."
+      return 1
+    fi
+    echo "Waiting for ET COS reference tables to be created in ${TARGET_HOST}/${TARGET_DB}..."
+    sleep "${TARGET_TABLES_POLL_SECONDS}"
+  done
+}
+
 SOURCE_URI="$(connection_uri "${SOURCE_USER}" "${SOURCE_HOST}" "${SOURCE_PORT}" "${SOURCE_DB}" "${SOURCE_CONN_OPTIONS}")"
 TARGET_URI="$(connection_uri "${TARGET_USER}" "${TARGET_HOST}" "${TARGET_PORT}" "${TARGET_DB}" "${TARGET_CONN_OPTIONS}")"
 
@@ -75,6 +110,7 @@ for table in "${STATIC_TABLES[@]}"; do
 done
 
 echo "Copying ET COS reference data from ${SOURCE_HOST}/${SOURCE_DB} to ${TARGET_HOST}/${TARGET_DB}"
+wait_for_target_tables
 
 PGPASSWORD="${SOURCE_PASSWORD}" pg_dump \
   --data-only \

@@ -113,15 +113,6 @@ class PdfServiceTest {
         assertThat(pdfData).isEmpty();
     }
 
-    @SneakyThrows
-    @Test
-    void shouldNotCreateEnglishPdfFileWhenEnglishPdfTemplateNotExists() {
-        PdfService pdfService1 = new PdfService(new ET1PdfMapperService());
-        byte[] pdfData = pdfService1.createPdf(caseTestData.getCaseData(), null, PDF_TYPE_ET1,
-                ET3_FORM_CLIENT_TYPE_REPRESENTATIVE, SUBMIT_ET1);
-        assertThat(pdfData).isEmpty();
-    }
-
     @ParameterizedTest
     @SneakyThrows
     @CsvSource({

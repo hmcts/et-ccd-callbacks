@@ -39,7 +39,7 @@ def secrets = [
     secret('et-cos-postgres-user-v15', 'ET_COS_AAT_DB_USER_NAME'),
     secret('et-cos-postgres-password-v15', 'ET_COS_AAT_DB_PASSWORD'),
     secret('et-cos-postgres-host-v15', 'ET_COS_AAT_DB_HOST'),
-    secret('et-cos-postgres-port-v15', 'ET_COS_AAT_DB_PORT')
+    secret('et-cos-postgres-port-v15', 'ET_COS_AAT_DB_PORT'),
     secret('et-legalrep-user-name', 'ET_LEGALREP_USER_NAME'),
     secret('et-legalrep-password', 'ET_LEGALREP_PASSWORD'),
     secret('et-resp-user-name','ET_REPSONDENT_USER_NAME'),

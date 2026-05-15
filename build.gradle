@@ -468,6 +468,7 @@ dependencies {
 
     implementation 'com.github.hmcts:decentralised-runtime:callback-dispatch-refactor-20260415-1610'
     implementation 'com.github.hmcts:ccd-config-generator:callback-dispatch-refactor-20260415-1610'
+    implementation 'com.github.hmcts:cftlib-dev-only:callback-dispatch-refactor-20260415-1610'
 
     // Log4J core added to remove startup error message
     implementation group: 'org.apache.logging.log4j', name: 'log4j-core', version: log4JVersion

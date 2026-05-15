@@ -5,7 +5,6 @@ import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
-import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
@@ -16,6 +15,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -526,35 +526,61 @@ final class RoleUtilsTest {
     }
 
     @Test
-    void theFindLastAssignmentsBySolicitorRole() {
+    void theFindFirstAssignmentsGroupedBySolicitorRole() {
         // when case user assignment data is empty should return empty collection
-        assertThat(RoleUtils.findLastAssignmentsBySolicitorRole(null)).isEmpty();
+        assertThat(RoleUtils.findFirstAssignmentsGroupedBySolicitorRole(null)).isEmpty();
         // when case user assignment list is empty should return empty collection
-        CaseUserAssignmentData caseUserAssignmentData = CaseUserAssignmentData.builder()
-                .caseUserAssignments(new ArrayList<>()).build();
-        assertThat(RoleUtils.findLastAssignmentsBySolicitorRole(caseUserAssignmentData)).isEmpty();
+        assertThat(RoleUtils.findFirstAssignmentsGroupedBySolicitorRole(Collections.emptyList())).isEmpty();
         // when there is only one respondent case user assignment should return that assignment
         CaseUserAssignment caseUserAssignmentSolicitorA1 = CaseUserAssignment.builder().caseRole(ROLE_SOLICITOR_A)
                 .userId(REPRESENTATIVE_ID_1).build();
-        caseUserAssignmentData.getCaseUserAssignments().add(caseUserAssignmentSolicitorA1);
-        assertThat(RoleUtils.findLastAssignmentsBySolicitorRole(caseUserAssignmentData))
+        List<CaseUserAssignment> caseUserAssignments = new ArrayList<>();
+        caseUserAssignments.add(caseUserAssignmentSolicitorA1);
+        assertThat(RoleUtils.findFirstAssignmentsGroupedBySolicitorRole(caseUserAssignments))
                 .isEqualTo(List.of(caseUserAssignmentSolicitorA1));
         // when there are two respondent case user assignments, returns the first assignment
         CaseUserAssignment caseUserAssignmentSolicitorA2 = CaseUserAssignment.builder().caseRole(ROLE_SOLICITOR_A)
                 .userId(REPRESENTATIVE_ID_2).build();
-        caseUserAssignmentData.getCaseUserAssignments().add(caseUserAssignmentSolicitorA2);
-        assertThat(RoleUtils.findLastAssignmentsBySolicitorRole(caseUserAssignmentData))
+        caseUserAssignments.add(caseUserAssignmentSolicitorA2);
+        assertThat(RoleUtils.findFirstAssignmentsGroupedBySolicitorRole(caseUserAssignments))
                 .isEqualTo(List.of(caseUserAssignmentSolicitorA2));
         // when there are more assignments with different roles, should return the first assignments of those roles
         CaseUserAssignment caseUserAssignmentSolicitorB1 = CaseUserAssignment.builder().caseRole(ROLE_SOLICITOR_B)
                 .userId(REPRESENTATIVE_ID_1).build();
-        caseUserAssignmentData.getCaseUserAssignments().add(caseUserAssignmentSolicitorB1);
-        assertThat(RoleUtils.findLastAssignmentsBySolicitorRole(caseUserAssignmentData))
+        caseUserAssignments.add(caseUserAssignmentSolicitorB1);
+        assertThat(RoleUtils.findFirstAssignmentsGroupedBySolicitorRole(caseUserAssignments))
                 .isEqualTo(List.of(caseUserAssignmentSolicitorA2, caseUserAssignmentSolicitorB1));
         CaseUserAssignment caseUserAssignmentSolicitorB2 = CaseUserAssignment.builder().caseRole(ROLE_SOLICITOR_B)
                 .userId(REPRESENTATIVE_ID_2).build();
-        caseUserAssignmentData.getCaseUserAssignments().add(caseUserAssignmentSolicitorB2);
-        assertThat(RoleUtils.findLastAssignmentsBySolicitorRole(caseUserAssignmentData))
+        caseUserAssignments.add(caseUserAssignmentSolicitorB2);
+        assertThat(RoleUtils.findFirstAssignmentsGroupedBySolicitorRole(caseUserAssignments))
                 .isEqualTo(List.of(caseUserAssignmentSolicitorA2, caseUserAssignmentSolicitorB2));
     }
+
+    @Test
+    void theGetCaseRolesForUser() {
+        // when case user assignments is empty should return an empty list
+        assertThat(RoleUtils.getCaseRolesForUser(null, REPRESENTATIVE_ID_1)).isEmpty();
+        // when representative id is empty should return an empty list
+        List<CaseUserAssignment> caseUserAssignments = List.of(CaseUserAssignment.builder().caseRole(ROLE_SOLICITOR_A)
+                .userId(REPRESENTATIVE_ID_1).build());
+        assertThat(RoleUtils.getCaseRolesForUser(caseUserAssignments, StringUtils.EMPTY)).isEmpty();
+        // when representative id not exists in the case user assignments should return an empty list
+        assertThat(RoleUtils.getCaseRolesForUser(caseUserAssignments, REPRESENTATIVE_ID_2)).isEmpty();
+        // when representative found should return role list
+        assertThat(RoleUtils.getCaseRolesForUser(caseUserAssignments, REPRESENTATIVE_ID_1))
+                .isEqualTo(List.of(ROLE_SOLICITOR_A));
+    }
+
+    @Test
+    void theFindFirstCaseRolesByUserId() {
+        // when there is no case assignment found for the given user id should return an empty list
+        List<CaseUserAssignment> caseUserAssignments = List.of(CaseUserAssignment.builder().caseRole(ROLE_SOLICITOR_A)
+                .userId(REPRESENTATIVE_ID_1).build());
+        assertThat(RoleUtils.findFirstCaseRolesByUserId(caseUserAssignments, REPRESENTATIVE_ID_2)).isEmpty();
+        // when there are case assignments found for the given user id should return the latest case roles
+        assertThat(RoleUtils.findFirstCaseRolesByUserId(caseUserAssignments, REPRESENTATIVE_ID_1))
+                .isEqualTo(List.of(ROLE_SOLICITOR_A));
+    }
+
 }

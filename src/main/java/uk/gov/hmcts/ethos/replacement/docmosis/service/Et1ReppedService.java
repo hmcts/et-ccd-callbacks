@@ -296,7 +296,7 @@ public class Et1ReppedService {
     public void setMyHmctsOrganisationAddress(String userToken, CaseData caseData)
             throws GenericServiceException {
         checkCaseData(caseData);
-        OrganisationAddress organisationAddress = myHmctsService.getOrganisationAddress(userToken);
+        OrganisationAddress organisationAddress = myHmctsService.getUserOrganisationAddress(userToken);
         caseData.getRepresentativeClaimantType().setRepresentativeAddress(
                 AddressUtils.mapOrganisationAddressToAddress(organisationAddress));
         caseData.setMyHmctsAddressText(AddressUtils.getOrganisationAddressAsText(organisationAddress));

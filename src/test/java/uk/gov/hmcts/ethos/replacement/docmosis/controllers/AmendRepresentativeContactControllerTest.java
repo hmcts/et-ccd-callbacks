@@ -111,7 +111,7 @@ class AmendRepresentativeContactControllerTest extends BaseControllerTest {
                 StringUtils.EMPTY,
                 "Et3ResponseService",
                 "setRespondentRepresentsContactDetails")).when(amendRepresentativeContactService)
-                .setRepresentativeMyHmctsContactAddress(anyString(), any(CaseData.class), anyString());
+                .setRepresentativeMyHmctsContactAddress(anyString(), any(CaseData.class));
         ccdRequest.getCaseDetails().getCaseData().setRepresentativeContactChangeOption(
                 REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS);
         mvc.perform(post(MID_EVENT)

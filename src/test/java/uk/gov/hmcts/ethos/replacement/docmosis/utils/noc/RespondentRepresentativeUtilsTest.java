@@ -53,6 +53,7 @@ final class RespondentRepresentativeUtilsTest {
     private static final String ORGANISATION_ID_2 = "dummy65_organisation43_id21";
 
     private static final String ROLE_SOLICITOR_A = "[SOLICITORA]";
+    private static final String ROLE_SOLICITOR_B = "[SOLICITORB]";
     private static final String ROLE_INVALID = "ROLE_INVALID";
 
     private static final String EXPECTED_EXCEPTION_REPRESENTATIVE_NOT_FOUND =
@@ -792,48 +793,112 @@ final class RespondentRepresentativeUtilsTest {
         address.setPostCode(REPRESENTATIVE_1_POSTCODE);
         caseData.setEt3ResponseAddress(address);
         // when case data representative collection is empty should not update any representative contact details
-        List<Integer> representedRespondentIndexes = new ArrayList<>();
-        RespondentRepresentativeUtils.updateRepresentativeContactDetails(caseData, representedRespondentIndexes);
+        List<String> roles = new ArrayList<>();
+        RespondentRepresentativeUtils.updateRepresentativeContactDetails(caseData, roles);
         assertThat(caseData.getRepCollection()).isNull();
         // when represented respondent indexes is empty should not update any representative contact details
         RepresentedTypeRItem representative = RepresentedTypeRItem.builder().value(RepresentedTypeR.builder().build())
                 .build();
         caseData.setRepCollection(List.of(representative));
-        RespondentRepresentativeUtils.updateRepresentativeContactDetails(caseData, representedRespondentIndexes);
+        RespondentRepresentativeUtils.updateRepresentativeContactDetails(caseData, roles);
         assertThat(representative.getValue().getRepresentativePhoneNumber()).isNull();
         assertThat(representative.getValue().getRepresentativeAddress()).isNull();
         // when case data respondent collection is empty should not update representative contact details
-        representedRespondentIndexes.add(LoggerTestUtils.INTEGER_ONE);
-        RespondentRepresentativeUtils.updateRepresentativeContactDetails(caseData, representedRespondentIndexes);
+        roles.add(ROLE_SOLICITOR_A);
+        RespondentRepresentativeUtils.updateRepresentativeContactDetails(caseData, roles);
         assertThat(representative.getValue().getRepresentativePhoneNumber()).isNull();
         assertThat(representative.getValue().getRepresentativeAddress()).isNull();
         // when represented respondent indexes has any value greater than respondent collection size should not update
         // representative contact details
         RespondentSumTypeItem respondent = new RespondentSumTypeItem();
         caseData.setRespondentCollection(List.of(respondent));
-        RespondentRepresentativeUtils.updateRepresentativeContactDetails(caseData, representedRespondentIndexes);
+        RespondentRepresentativeUtils.updateRepresentativeContactDetails(caseData, roles);
         // when respondent does not have a valid id should not update representative contact details
-        representedRespondentIndexes.clear();
-        representedRespondentIndexes.add(LoggerTestUtils.INTEGER_ZERO);
-        RespondentRepresentativeUtils.updateRepresentativeContactDetails(caseData, representedRespondentIndexes);
+        roles.clear();
+        roles.add(ROLE_SOLICITOR_A);
+        RespondentRepresentativeUtils.updateRepresentativeContactDetails(caseData, roles);
         assertThat(representative.getValue().getRepresentativePhoneNumber()).isNull();
         assertThat(representative.getValue().getRepresentativeAddress()).isNull();
         // when representative in the rep collection is not a valid representative should not update contact details
         respondent.setId(RESPONDENT_ID_1);
-        RespondentRepresentativeUtils.updateRepresentativeContactDetails(caseData, representedRespondentIndexes);
+        RespondentRepresentativeUtils.updateRepresentativeContactDetails(caseData, roles);
         assertThat(representative.getValue().getRepresentativePhoneNumber()).isNull();
         assertThat(representative.getValue().getRepresentativeAddress()).isNull();
         // when representative respondent id does not match with respondent id should not update representative contact
         // details
         representative.setId(REPRESENTATIVE_ID_1);
         representative.setValue(RepresentedTypeR.builder().respondentId(RESPONDENT_ID_2).build());
-        RespondentRepresentativeUtils.updateRepresentativeContactDetails(caseData, representedRespondentIndexes);
+        RespondentRepresentativeUtils.updateRepresentativeContactDetails(caseData, roles);
         assertThat(representative.getValue().getRepresentativePhoneNumber()).isNull();
         assertThat(representative.getValue().getRepresentativeAddress()).isNull();
         // when representative and respondent matches, should update representative contact details
         representative.setValue(RepresentedTypeR.builder().respondentId(RESPONDENT_ID_1).build());
-        RespondentRepresentativeUtils.updateRepresentativeContactDetails(caseData, representedRespondentIndexes);
+        RespondentRepresentativeUtils.updateRepresentativeContactDetails(caseData, roles);
         assertThat(representative.getValue().getRepresentativePhoneNumber()).isEqualTo(REPRESENTATIVE_1_PHONE);
         assertThat(representative.getValue().getRepresentativeAddress()).isEqualTo(address);
+    }
+
+    @Test
+    void theUpdateET3ResponseContactDetails() {
+        // when case data representative collection is empty should not update et3 response address and phone number.
+        List<String> roles = new ArrayList<>();
+        CaseData caseData = new CaseData();
+        RespondentRepresentativeUtils.updateET3ResponseContactDetails(caseData, roles);
+        assertThat(caseData.getEt3ResponseAddress()).isNull();
+        assertThat(caseData.getEt3ResponsePhone()).isNull();
+        // when roles are empty should not update et3 response address and phone number.
+        RepresentedTypeRItem representative = new RepresentedTypeRItem();
+        caseData.setRepCollection(List.of(representative));
+        RespondentRepresentativeUtils.updateET3ResponseContactDetails(caseData, roles);
+        assertThat(caseData.getEt3ResponseAddress()).isNull();
+        assertThat(caseData.getEt3ResponsePhone()).isNull();
+        // when case data respondent collection is empty should not update et3 response address and phone number.
+        roles.add(ROLE_SOLICITOR_B);
+        RespondentRepresentativeUtils.updateET3ResponseContactDetails(caseData, roles);
+        assertThat(caseData.getEt3ResponseAddress()).isNull();
+        assertThat(caseData.getEt3ResponsePhone()).isNull();
+        // when respondent for the role not found should not update et3 response address and phone number
+        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
+        caseData.setRespondentCollection(List.of(respondent));
+        RespondentRepresentativeUtils.updateET3ResponseContactDetails(caseData, roles);
+        assertThat(caseData.getEt3ResponseAddress()).isNull();
+        assertThat(caseData.getEt3ResponsePhone()).isNull();
+        // when respondent does not have a valid id should not update et3 response address and phone number
+        roles.clear();
+        roles.add(ROLE_SOLICITOR_A);
+        RespondentRepresentativeUtils.updateET3ResponseContactDetails(caseData, roles);
+        assertThat(caseData.getEt3ResponseAddress()).isNull();
+        assertThat(caseData.getEt3ResponsePhone()).isNull();
+        // when representative in the rep collection is not a valid representative should not update et3 response
+        // address and phone number
+        respondent.setId(RESPONDENT_ID_1);
+        RespondentRepresentativeUtils.updateET3ResponseContactDetails(caseData, roles);
+        assertThat(caseData.getEt3ResponseAddress()).isNull();
+        assertThat(caseData.getEt3ResponsePhone()).isNull();
+        // when representative respondent id does not match with respondent id should not update should not update et3
+        // response address and phone number
+        Address address = new Address();
+        address.setAddressLine1(REPRESENTATIVE_1_ADDRESS_LINE_1);
+        address.setAddressLine2(REPRESENTATIVE_1_ADDRESS_LINE_2);
+        address.setAddressLine3(REPRESENTATIVE_1_ADDRESS_LINE_3);
+        address.setPostTown(REPRESENTATIVE_1_POST_TOWN);
+        address.setCounty(REPRESENTATIVE_1_COUNTY);
+        address.setCountry(REPRESENTATIVE_1_COUNTRY);
+        address.setPostCode(REPRESENTATIVE_1_POSTCODE);
+        RepresentedTypeR representativeValue = RepresentedTypeR.builder().build();
+        representativeValue.setRepresentativeAddress(address);
+        representativeValue.setRepresentativePhoneNumber(REPRESENTATIVE_1_PHONE);
+        representativeValue.setRespondentId(RESPONDENT_ID_2);
+        representative.setValue(RepresentedTypeR.builder().respondentId(RESPONDENT_ID_1).build());
+        representative.setValue(representativeValue);
+        representative.setId(REPRESENTATIVE_ID_1);
+        RespondentRepresentativeUtils.updateET3ResponseContactDetails(caseData, roles);
+        assertThat(caseData.getEt3ResponseAddress()).isNull();
+        assertThat(caseData.getEt3ResponsePhone()).isNull();
+        // when representative and respondent matches, should update et3 response address and phone number
+        representative.getValue().setRespondentId(RESPONDENT_ID_1);
+        RespondentRepresentativeUtils.updateET3ResponseContactDetails(caseData, roles);
+        assertThat(caseData.getEt3ResponseAddress()).isEqualTo(address);
+        assertThat(caseData.getEt3ResponsePhone()).isEqualTo(REPRESENTATIVE_1_PHONE);
     }
 }

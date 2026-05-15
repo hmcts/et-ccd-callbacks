@@ -1,9 +1,11 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.utils.noc;
 
 import ch.qos.logback.classic.Level;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.testcontainers.shaded.org.apache.commons.lang3.StringUtils;
+import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
@@ -14,18 +16,20 @@ import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.test.utils.LoggerTestUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.Assert.assertThrows;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
 final class ClaimantRepresentativeUtilsTest {
 
-    private static final String CASE_ID = "1234567890123456";
+    private static final String SUBMISSION_REFERENCE = "1234567890123456";
     private static final String CLAIMANT_EMAIL_ADDRESS = "claimant@email.com";
     private static final String CLAIMANT_REPRESENTATIVE_EMAIL_ADDRESS = "claimantrep@email.com";
     private static final String ORGANISATION_ID_1 = "dummy12_organisation34_id56";
@@ -36,7 +40,17 @@ final class ClaimantRepresentativeUtilsTest {
     private static final String ROLE_SOLICITORA = "[SOLICITORA]";
     private static final String ROLE_SOLICITORB = "[SOLICITORB]";
     private static final String ROLE_CLAIMANT_SOLICITOR = "[CLAIMANTSOLICITOR]";
+    private static final String REPRESENTATIVE_ADDRESS_LINE_1 = "Address Line 1";
+    private static final String REPRESENTATIVE_ADDRESS_LINE_2 = "Address Line 2";
+    private static final String REPRESENTATIVE_ADDRESS_LINE_3 = "Address Line 3";
+    private static final String REPRESENTATIVE_POST_TOWN = "Post Town";
+    private static final String REPRESENTATIVE_COUNTY = "County";
+    private static final String REPRESENTATIVE_POSTCODE = "Post Code";
+    private static final String REPRESENTATIVE_COUNTRY = "Country";
+    private static final String REPRESENTATIVE_PHONE = "07444518903";
 
+    private static final String EXPECTED_EXCEPTION_CLAIMANT_REPRESENTATIVE_NOT_FOUND =
+            "Claimant representative not found.";
     private static final String EXPECTED_WARNING_CLAIMANT_EMAIL_NOT_FOUND = "Could not find claimant email address.";
     private static final String EXPECTED_WARNING_WITHOUT_CASE_ID = "Claimant email not found for case ";
     private static final String EXPECTED_WARNING_WITH_CASE_ID = "Claimant email not found for case 1234567890123456";
@@ -53,7 +67,7 @@ final class ClaimantRepresentativeUtilsTest {
         LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_ONE, EXPECTED_WARNING_WITHOUT_CASE_ID);
         // when case details does not have any case data should return empty string
         CaseDetails caseDetails = new CaseDetails();
-        caseDetails.setCaseId(CASE_ID);
+        caseDetails.setCaseId(SUBMISSION_REFERENCE);
         assertThat(ClaimantRepresentativeUtils.getClaimantNocNotificationEmail(caseDetails)).isEmpty();
         LoggerTestUtils.checkLog(Level.WARN, LoggerTestUtils.INTEGER_TWO, EXPECTED_WARNING_WITH_CASE_ID);
         // when claimant representative is empty and not able to find claimant's email should log not found warning.
@@ -264,15 +278,15 @@ final class ClaimantRepresentativeUtilsTest {
         assertThat(caseUserAssignments).isEmpty();
         // when there is claimant solicitor role should remove that role
         CaseUserAssignment caseUserAssignmentSolicitorA1 = CaseUserAssignment.builder()
-                .userId(RESPONDENT_REPRESENTATIVE_ID).caseId(CASE_ID).caseRole(ROLE_SOLICITORA)
+                .userId(RESPONDENT_REPRESENTATIVE_ID).caseId(SUBMISSION_REFERENCE).caseRole(ROLE_SOLICITORA)
                 .organisationId(ORGANISATION_ID_1).build();
         caseUserAssignments.add(caseUserAssignmentSolicitorA1);
         CaseUserAssignment caseUserAssignmentSolicitorA2 = CaseUserAssignment.builder()
-                .userId(RESPONDENT_REPRESENTATIVE_ID).caseId(CASE_ID).caseRole(ROLE_SOLICITORB)
+                .userId(RESPONDENT_REPRESENTATIVE_ID).caseId(SUBMISSION_REFERENCE).caseRole(ROLE_SOLICITORB)
                 .organisationId(ORGANISATION_ID_1).build();
         caseUserAssignments.add(caseUserAssignmentSolicitorA2);
         CaseUserAssignment caseUserAssignmentClaimantSolicitor = CaseUserAssignment.builder()
-                .userId(RESPONDENT_REPRESENTATIVE_ID).caseId(CASE_ID).caseRole(ROLE_CLAIMANT_SOLICITOR)
+                .userId(RESPONDENT_REPRESENTATIVE_ID).caseId(SUBMISSION_REFERENCE).caseRole(ROLE_CLAIMANT_SOLICITOR)
                 .organisationId(ORGANISATION_ID_1).build();
         caseUserAssignments.add(caseUserAssignmentClaimantSolicitor);
         ClaimantRepresentativeUtils.removeClaimantRepresentativeAssignment(caseUserAssignments);
@@ -285,5 +299,56 @@ final class ClaimantRepresentativeUtilsTest {
         ClaimantRepresentativeUtils.removeClaimantRepresentativeAssignment(caseUserAssignments);
         assertThat(caseUserAssignments).isEqualTo(List.of(caseUserAssignmentSolicitorA1,
                 caseUserAssignmentSolicitorA2));
+    }
+
+    @Test
+    @SneakyThrows
+    void theUpdateRepresentativeContactDetails() {
+        // when case data does not have representative claimant type should throw generic service exception
+        Address address = new Address();
+        address.setAddressLine1(REPRESENTATIVE_ADDRESS_LINE_1);
+        address.setAddressLine2(REPRESENTATIVE_ADDRESS_LINE_2);
+        address.setAddressLine3(REPRESENTATIVE_ADDRESS_LINE_3);
+        address.setPostTown(REPRESENTATIVE_POST_TOWN);
+        address.setCounty(REPRESENTATIVE_COUNTY);
+        address.setCountry(REPRESENTATIVE_COUNTRY);
+        address.setPostCode(REPRESENTATIVE_POSTCODE);
+        CaseData caseData = new CaseData();
+        caseData.setEt3ResponseAddress(address);
+        caseData.setEt3ResponsePhone(REPRESENTATIVE_PHONE);
+        GenericServiceException gse = assertThrows(GenericServiceException.class, () -> ClaimantRepresentativeUtils
+                .updateRepresentativeContactDetails(caseData, SUBMISSION_REFERENCE));
+        assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_CLAIMANT_REPRESENTATIVE_NOT_FOUND);
+        // when case data has representative claimant type should update contact details without throwing any exception
+        caseData.setRepresentativeClaimantType(RepresentedTypeC.builder().build());
+        ClaimantRepresentativeUtils
+                .updateRepresentativeContactDetails(caseData, SUBMISSION_REFERENCE);
+        assertThat(caseData.getRepresentativeClaimantType().getRepresentativeAddress()).isEqualTo(address);
+        assertThat(caseData.getRepresentativeClaimantType().getRepresentativePhoneNumber())
+                .isEqualTo(REPRESENTATIVE_PHONE);
+    }
+
+    @Test
+    @SneakyThrows
+    void theUpdateET3ResponseContactDetails() {
+        // when representative claimant type is empty should not update et3 response contact details.
+        CaseData caseData = new CaseData();
+        ClaimantRepresentativeUtils.updateET3ResponseContactDetails(caseData);
+        assertThat(caseData.getRepresentativeClaimantType()).isNull();
+        // when claimant representative type is not empty should update et3 response contact details.
+        Address address = new Address();
+        address.setAddressLine1(REPRESENTATIVE_ADDRESS_LINE_1);
+        address.setAddressLine2(REPRESENTATIVE_ADDRESS_LINE_2);
+        address.setAddressLine3(REPRESENTATIVE_ADDRESS_LINE_3);
+        address.setPostTown(REPRESENTATIVE_POST_TOWN);
+        address.setCounty(REPRESENTATIVE_COUNTY);
+        address.setCountry(REPRESENTATIVE_COUNTRY);
+        address.setPostCode(REPRESENTATIVE_POSTCODE);
+        caseData.setRepresentativeClaimantType(RepresentedTypeC.builder().build());
+        caseData.getRepresentativeClaimantType().setRepresentativeAddress(address);
+        caseData.getRepresentativeClaimantType().setRepresentativePhoneNumber(REPRESENTATIVE_PHONE);
+        ClaimantRepresentativeUtils.updateET3ResponseContactDetails(caseData);
+        assertThat(caseData.getEt3ResponseAddress()).isEqualTo(address);
+        assertThat(caseData.getEt3ResponsePhone()).isEqualTo(REPRESENTATIVE_PHONE);
     }
 }

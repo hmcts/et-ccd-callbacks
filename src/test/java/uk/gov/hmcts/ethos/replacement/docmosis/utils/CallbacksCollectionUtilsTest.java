@@ -4,6 +4,7 @@ import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -12,6 +13,16 @@ public class CallbacksCollectionUtilsTest {
 
     public static final String DUMMY_RESPONDENT_ID_1 = "dummy_respondent_id_1";
     public static final String DUMMY_RESPONDENT_ID_2 = "dummy_respondent_id_2";
+    public static final String ROLE_SOLICITOR_A = "[SOLICITORA]";
+    public static final String ROLE_SOLICITOR_B = "[SOLICITORB]";
+    public static final String ROLE_SOLICITOR_C = "[SOLICITORC]";
+    public static final String ROLE_SOLICITOR_D = "[SOLICITORD]";
+    public static final String ROLE_SOLICITOR_E = "[SOLICITORE]";
+    public static final String ROLE_SOLICITOR_F = "[SOLICITORF]";
+    public static final String ROLE_SOLICITOR_G = "[SOLICITORG]";
+    public static final String ROLE_SOLICITOR_H = "[SOLICITORH]";
+    public static final String ROLE_SOLICITOR_I = "[SOLICITORI]";
+    public static final String ROLE_SOLICITOR_J = "[SOLICITORJ]";
 
     @Test
     void theSameByKey() {
@@ -49,4 +60,28 @@ public class CallbacksCollectionUtilsTest {
                 List.of(respondentSumTypeItem1), RespondentSumTypeItem::getId)).isTrue();
     }
 
+    @Test
+    void theMergeListsWithoutDuplicates() {
+        // when both first and second array lists are empty should return empty list
+        List<String> rolesList1 = new ArrayList<>();
+        List<String> rolesList2 = new ArrayList<>();
+        assertThat(CallbacksCollectionUtils.mergeListsWithoutDuplicates(rolesList1, rolesList2)).isEmpty();
+        // when one of the lists is empty should return the other list without duplicates
+        rolesList1 = List.of(ROLE_SOLICITOR_A, ROLE_SOLICITOR_B, ROLE_SOLICITOR_C, ROLE_SOLICITOR_D, ROLE_SOLICITOR_E);
+        rolesList2 = new ArrayList<>();
+        assertThat(CallbacksCollectionUtils.mergeListsWithoutDuplicates(rolesList1, rolesList2))
+                .containsExactlyInAnyOrder(ROLE_SOLICITOR_E, ROLE_SOLICITOR_A, ROLE_SOLICITOR_B,
+                        ROLE_SOLICITOR_C, ROLE_SOLICITOR_D);
+        // when both lists have same values should return the same list without duplicates
+        rolesList2 = List.of(ROLE_SOLICITOR_A, ROLE_SOLICITOR_B, ROLE_SOLICITOR_C, ROLE_SOLICITOR_D, ROLE_SOLICITOR_E);
+        assertThat(CallbacksCollectionUtils.mergeListsWithoutDuplicates(rolesList1, rolesList2))
+                .containsExactlyInAnyOrder(ROLE_SOLICITOR_E, ROLE_SOLICITOR_A, ROLE_SOLICITOR_B,
+                        ROLE_SOLICITOR_C, ROLE_SOLICITOR_D);
+        // when both lists are different should return all values of both lists without duplicates
+        rolesList2 = List.of(ROLE_SOLICITOR_F, ROLE_SOLICITOR_G, ROLE_SOLICITOR_H, ROLE_SOLICITOR_I, ROLE_SOLICITOR_J);
+        assertThat(CallbacksCollectionUtils.mergeListsWithoutDuplicates(rolesList1, rolesList2))
+                .containsExactlyInAnyOrder(ROLE_SOLICITOR_E, ROLE_SOLICITOR_A, ROLE_SOLICITOR_B, ROLE_SOLICITOR_C,
+                        ROLE_SOLICITOR_D, ROLE_SOLICITOR_F, ROLE_SOLICITOR_G, ROLE_SOLICITOR_H, ROLE_SOLICITOR_I,
+                        ROLE_SOLICITOR_J);
+    }
 }

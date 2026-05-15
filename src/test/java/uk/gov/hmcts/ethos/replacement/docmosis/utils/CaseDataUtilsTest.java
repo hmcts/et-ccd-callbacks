@@ -5,12 +5,15 @@ import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericRuntimeException;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.Assert.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 
 final class CaseDataUtilsTest {
+
+    private static final String DUMMY_SUBMISSION_REFERENCE = "1234567890123456";
 
     private static final String EXPECTED_EXCEPTION_CCD_REQUEST_NOT_FOUND =
             "uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException: CCD request not found.";
@@ -20,10 +23,10 @@ final class CaseDataUtilsTest {
             "uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException: "
                     + "Submission reference not found.";
     private static final String EXPECTED_EXCEPTION_CASE_DATA_NOT_FOUND =
+            "Case data not found for submission reference, " + DUMMY_SUBMISSION_REFERENCE + ".";
+    private static final String EXPECTED_RUNTIME_EXCEPTION_CASE_DATA_NOT_FOUND =
             "uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException: Case data not found for "
-                    + "submission reference, 1234567890123456.";
-
-    private static final String DUMMY_SUBMISSION_REFERENCE = "1234567890123456";
+                    + "submission reference, " + DUMMY_SUBMISSION_REFERENCE + ".";
 
     @Test
     void theValidateCaseDetails() {
@@ -42,7 +45,7 @@ final class CaseDataUtilsTest {
         newCaseDetails.setCaseId(DUMMY_SUBMISSION_REFERENCE);
         genericRuntimeException = assertThrows(GenericRuntimeException.class,
                 () -> CaseDataUtils.validateCaseDetails(newCaseDetails));
-        assertThat(genericRuntimeException.getMessage()).isEqualTo(EXPECTED_EXCEPTION_CASE_DATA_NOT_FOUND);
+        assertThat(genericRuntimeException.getMessage()).isEqualTo(EXPECTED_RUNTIME_EXCEPTION_CASE_DATA_NOT_FOUND);
 
     }
 
@@ -60,5 +63,17 @@ final class CaseDataUtilsTest {
         final CCDRequest ccdRequest = new CCDRequest();
         ccdRequest.setCaseDetails(caseDetails);
         assertDoesNotThrow(() -> CaseDataUtils.validateCCDRequest(ccdRequest));
+    }
+
+    @Test
+    void theValidateCaseData() {
+        // When case data is empty, should throw exception.
+        GenericServiceException gse = assertThrows(GenericServiceException.class,
+                () -> CaseDataUtils.validateCaseData(null, DUMMY_SUBMISSION_REFERENCE));
+        assertThat(gse.getMessage()).isEqualTo(EXPECTED_EXCEPTION_CASE_DATA_NOT_FOUND);
+
+        // When case data is not empty, should not throw exception.
+        final CaseData caseData = new CaseData();
+        assertDoesNotThrow(() -> CaseDataUtils.validateCaseData(caseData, DUMMY_SUBMISSION_REFERENCE));
     }
 }

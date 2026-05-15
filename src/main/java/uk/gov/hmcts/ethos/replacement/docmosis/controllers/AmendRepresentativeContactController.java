@@ -74,11 +74,8 @@ public class AmendRepresentativeContactController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>();
         try {
-            if (REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS.equals(
-                    caseData.getRepresentativeContactChangeOption())) {
-                amendRepresentativeContactService.setRepresentativeMyHmctsContactAddress(userToken,
-                        caseData, ccdRequest.getCaseDetails().getCaseId());
-            }
+            amendRepresentativeContactService.setEt3ResponseContactAddress(userToken, caseData,
+                    ccdRequest.getCaseDetails().getCaseId());
         } catch (GenericServiceException gse) {
             errors.add(gse.getMessage());
         }
@@ -110,8 +107,7 @@ public class AmendRepresentativeContactController {
         try {
             if (REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS.equals(
                     caseData.getRepresentativeContactChangeOption())) {
-                amendRepresentativeContactService.setRepresentativeMyHmctsContactAddress(userToken,
-                        caseData, ccdRequest.getCaseDetails().getCaseId());
+                amendRepresentativeContactService.setRepresentativeMyHmctsContactAddress(userToken, caseData);
             }
         } catch (GenericServiceException gse) {
             errors.add(gse.getMessage());

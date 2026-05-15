@@ -976,51 +976,108 @@ public final class RespondentRepresentativeUtils {
     }
 
     /**
-     * Updates representative contact details for the specified represented respondents
-     * using the ET3 response contact information stored in the case data.
+     * Updates representative contact details for respondents associated with
+     * the specified case roles.
      * <p>
-     * For each respondent index provided, the method:
+     * This method identifies respondents linked to the provided role labels
+     * and updates the matching representative contact details using the ET3
+     * response phone number and address stored in the case data.
+     * <p>
+     * The update is applied only when:
      * <ul>
-     *     <li>Retrieves the corresponding respondent from the respondent collection</li>
-     *     <li>Finds the matching representative in the representative collection
-     *     based on the shared identifier</li>
-     *     <li>Updates the representative phone number and address using
-     *     {@code et3ResponsePhone} and {@code et3ResponseAddress}</li>
+     *     <li>The representative collection is not empty.</li>
+     *     <li>The provided roles collection is not empty.</li>
+     *     <li>The respondent collection is not empty.</li>
+     *     <li>A valid respondent exists for the resolved role index.</li>
+     *     <li>A valid representative is linked to the respondent.</li>
+     * </ul>
+     * <p>
+     * Assumptions:
+     * <ul>
+     *     <li>Role labels map to respondent indexes via
+     *     {@link RoleUtils#findRoleIndexByRoleLabel(String)}.</li>
+     *     <li>The ET3 response address and phone number contain the latest
+     *     representative contact details.</li>
+     *     <li>Representative respondent IDs correctly reference respondent items.</li>
+     *     <li>The representative objects within the collection are mutable.</li>
      * </ul>
      *
-     * <p><strong>Assumptions:</strong></p>
-     * <ul>
-     *     <li>The respondent and representative collections are already initialised</li>
-     *     <li>The respondent index values correspond to positions in the respondent collection</li>
-     *     <li>A representative is associated with a respondent when both share the same identifier</li>
-     *     <li>Invalid respondent indexes, empty respondent entries, or respondents without identifiers
-     *     are ignored</li>
-     *     <li>The ET3 response phone number and address may be null or empty and are copied as-is</li>
-     * </ul>
-     *
-     * @param caseData the case data containing respondent, representative,
-     *                 and ET3 response contact information
-     * @param representedRespondentIndexes indexes of represented respondents
-     *                                     within the respondent collection
+     * @param caseData the case data containing respondent and representative details
+     * @param roles the list of case role labels used to identify respondents
      */
     public static void updateRepresentativeContactDetails(CaseData caseData,
-                                                          List<Integer> representedRespondentIndexes) {
+                                                          List<String> roles) {
         if (CollectionUtils.isEmpty(caseData.getRepCollection())
-                || CollectionUtils.isEmpty(representedRespondentIndexes)
+                || CollectionUtils.isEmpty(roles)
                 || CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
             return;
         }
-        for (int i : representedRespondentIndexes) {
-            if (i >= caseData.getRespondentCollection().size()
-                    || StringUtils.isBlank(caseData.getRespondentCollection().get(i).getId())) {
+        for (String role : roles) {
+            int roleIndex = RoleUtils.findRoleIndexByRoleLabel(role);
+            if (roleIndex >= caseData.getRespondentCollection().size()
+                    || StringUtils.isBlank(caseData.getRespondentCollection().get(roleIndex).getId())) {
                 continue;
             }
-            RespondentSumTypeItem respondentSumTypeItem = caseData.getRespondentCollection().get(i);
+            RespondentSumTypeItem respondentSumTypeItem = caseData.getRespondentCollection().get(roleIndex);
             for (RepresentedTypeRItem representative : caseData.getRepCollection()) {
                 if (RespondentRepresentativeUtils.isValidRepresentative(representative)
                         && representative.getValue().getRespondentId().equals(respondentSumTypeItem.getId())) {
                     representative.getValue().setRepresentativePhoneNumber(caseData.getEt3ResponsePhone());
                     representative.getValue().setRepresentativeAddress(caseData.getEt3ResponseAddress());
+                }
+            }
+        }
+    }
+
+    /**
+     * Updates the ET3 response contact details using representative contact
+     * information associated with the specified respondent roles.
+     * <p>
+     * This method identifies respondents linked to the provided role labels
+     * and populates the ET3 response phone number and address fields from the
+     * matching representative contact details.
+     * <p>
+     * The update is applied only when:
+     * <ul>
+     *     <li>The representative collection is not empty.</li>
+     *     <li>The provided roles collection is not empty.</li>
+     *     <li>The respondent collection is not empty.</li>
+     *     <li>A valid respondent exists for the resolved role index.</li>
+     *     <li>A valid representative is linked to the respondent.</li>
+     * </ul>
+     * <p>
+     * Assumptions:
+     * <ul>
+     *     <li>Role labels map to respondent indexes via
+     *     {@link RoleUtils#findRoleIndexByRoleLabel(String)}.</li>
+     *     <li>Representative respondent IDs correctly reference respondent items.</li>
+     *     <li>The representative contains the latest contact information for the respondent.</li>
+     *     <li>The ET3 response fields within the case data are mutable.</li>
+     * </ul>
+     *
+     * @param caseData the case data containing respondent, representative,
+     *                 and ET3 response details
+     * @param roles the list of case role labels used to identify respondents
+     */
+    public static void updateET3ResponseContactDetails(CaseData caseData,
+                                                       List<String> roles) {
+        if (CollectionUtils.isEmpty(caseData.getRepCollection())
+                || CollectionUtils.isEmpty(roles)
+                || CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
+            return;
+        }
+        for (String role : roles) {
+            int roleIndex = RoleUtils.findRoleIndexByRoleLabel(role);
+            if (roleIndex >= caseData.getRespondentCollection().size()
+                    || StringUtils.isBlank(caseData.getRespondentCollection().get(roleIndex).getId())) {
+                continue;
+            }
+            RespondentSumTypeItem respondentSumTypeItem = caseData.getRespondentCollection().get(roleIndex);
+            for (RepresentedTypeRItem representative : caseData.getRepCollection()) {
+                if (RespondentRepresentativeUtils.isValidRepresentative(representative)
+                        && representative.getValue().getRespondentId().equals(respondentSumTypeItem.getId())) {
+                    caseData.setEt3ResponsePhone(representative.getValue().getRepresentativePhoneNumber());
+                    caseData.setEt3ResponseAddress(representative.getValue().getRepresentativeAddress());
                 }
             }
         }

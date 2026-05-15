@@ -75,7 +75,7 @@ public class Et3ResponseService {
             RepresentedTypeR representative = findRepresentativeFromCaseData(caseData);
             if (ObjectUtils.isNotEmpty(representative)
                     && ObjectUtils.isEmpty(representative.getRepresentativeAddress())) {
-                OrganisationAddress organisationAddress = myHmctsService.getOrganisationAddress(userToken);
+                OrganisationAddress organisationAddress = myHmctsService.getUserOrganisationAddress(userToken);
                 representative.setRepresentativeAddress(mapOrganisationAddressToAddress(organisationAddress));
             }
 

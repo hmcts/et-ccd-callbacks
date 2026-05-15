@@ -7,7 +7,6 @@ import org.apache.commons.lang3.Strings;
 import org.apache.commons.lang3.math.NumberUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
-import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
@@ -18,6 +17,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentUtils;
 import uk.gov.hmcts.reform.et.syaapi.service.utils.NoticeOfChangeUtils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -358,34 +358,101 @@ public final class RoleUtils {
     }
 
     /**
-     * Finds the first {@link CaseUserAssignment} matching each {@link SolicitorRole}.
+     * Retrieves a single case user assignment for each solicitor role from the
+     * provided collection of case user assignments.
      * <p>
-     * The method iterates through all solicitor roles in their declared enum order
-     * and returns the first matching assignment for each role based on the case role label.
+     * For every {@link SolicitorRole}, this method filters the matching
+     * case user assignments and retains the last matching assignment found
+     * in the input collection.
      * <p>
-     * If the input data or assignment list is null or empty, an empty list is returned.
+     * If the provided assignment collection is null or empty, an empty list
+     * is returned.
+     * <p>
+     * Assumptions:
+     * <ul>
+     *     <li>Each solicitor role is identified by its case role label.</li>
+     *     <li>The order of assignments in the input collection is significant.</li>
+     *     <li>When multiple assignments exist for the same solicitor role,
+     *     the last matching assignment represents the effective assignment.</li>
+     *     <li>{@link SolicitorRole#values()} defines the complete set of
+     *     supported solicitor roles.</li>
+     * </ul>
      *
-     * @param caseUserAssignmentData the container holding case user assignments
-     * @return a list containing the first matching assignment for each solicitor role,
-     *         in the order defined by {@link SolicitorRole}
+     * @param caseUserAssignments the list of case user assignments to process
+     * @return a list containing the last matching assignment for each solicitor role;
+     *         returns an empty list if no assignments are provided
      */
-    public static List<CaseUserAssignment> findLastAssignmentsBySolicitorRole(
-            CaseUserAssignmentData caseUserAssignmentData) {
+    public static List<CaseUserAssignment> findFirstAssignmentsGroupedBySolicitorRole(
+            List<CaseUserAssignment> caseUserAssignments) {
 
-        if (caseUserAssignmentData == null
-                || CollectionUtils.isEmpty(caseUserAssignmentData.getCaseUserAssignments())) {
+        if (CollectionUtils.isEmpty(caseUserAssignments)) {
             return Collections.emptyList();
         }
 
-        List<CaseUserAssignment> assignments = caseUserAssignmentData.getCaseUserAssignments();
-
         return Arrays.stream(SolicitorRole.values())
-                .map(role -> assignments.stream()
+                .map(role -> caseUserAssignments.stream()
                         .filter(assignment -> role.getCaseRoleLabel()
                                 .equals(assignment.getCaseRole()))
                         .reduce((first, second) -> second) // keeps the last matching element
                         .orElse(null))
                 .filter(Objects::nonNull)
                 .toList();
+    }
+
+    /**
+     * Retrieves the list of case roles assigned to the specified user.
+     * <p>
+     * This method filters the provided case user assignments by the given user ID
+     * and returns all associated case roles. If the assignment list is empty
+     * or the user ID is blank, an empty list is returned.
+     *
+     * @param caseUserAssignments the list of case user assignments to search
+     * @param userId the unique identifier of the user whose case roles are required
+     * @return a list of case roles associated with the specified user;
+     *         returns an empty list if no matching assignments are found
+     *         or if the input parameters are invalid
+     */
+    public static List<String> getCaseRolesForUser(List<CaseUserAssignment> caseUserAssignments, String userId) {
+        List<String> caseRoles = new ArrayList<>();
+        if (CollectionUtils.isEmpty(caseUserAssignments) || StringUtils.isBlank(userId)) {
+            return caseRoles;
+        }
+        caseRoles.addAll(caseUserAssignments.stream()
+                .filter(assignment -> userId.equals(assignment.getUserId()))
+                .map(CaseUserAssignment::getCaseRole)
+                .toList());
+        return caseRoles;
+    }
+
+    /**
+     * Retrieves the case roles associated with the specified user from the
+     * first matching assignment for each solicitor role.
+     * <p>
+     * Assumptions:
+     * <ul>
+     *     <li>The provided list may contain multiple assignments for the same solicitor role.</li>
+     *     <li>{@link RoleUtils#findFirstAssignmentsGroupedBySolicitorRole(List)}
+     *     returns only the first assignment identified for each solicitor role.</li>
+     *     <li>Each {@link CaseUserAssignment} contains a valid user ID and case role.</li>
+     *     <li>The order of returned roles matches the order produced by the grouped assignments.</li>
+     * </ul>
+     *
+     * @param caseUserAssignments the list of case user assignments to process
+     * @param userId the unique identifier of the user whose case roles are required
+     * @return a list of case roles assigned to the specified user from the
+     *         first assignment of each solicitor role; returns an empty list
+     *         if no matching assignments are found
+     */
+    public static List<String> findFirstCaseRolesByUserId(List<CaseUserAssignment> caseUserAssignments,
+                                                          String userId) {
+        List<CaseUserAssignment> firstCaseUserAssignmentsByRole = RoleUtils
+                .findFirstAssignmentsGroupedBySolicitorRole(caseUserAssignments);
+        List<String> firstCaseUserAssignments = new ArrayList<>();
+        for (CaseUserAssignment caseUserAssignment : firstCaseUserAssignmentsByRole) {
+            if (userId.equals(caseUserAssignment.getUserId())) {
+                firstCaseUserAssignments.add(caseUserAssignment.getCaseRole());
+            }
+        }
+        return firstCaseUserAssignments;
     }
 }

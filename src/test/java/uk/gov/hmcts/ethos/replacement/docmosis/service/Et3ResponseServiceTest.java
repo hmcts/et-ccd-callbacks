@@ -297,7 +297,7 @@ class Et3ResponseServiceTest {
                 .country(COUNTRY)
                 .build();
         
-        when(myHmctsService.getOrganisationAddress(VALID_USER_TOKEN)).thenReturn(organisationAddress);
+        when(myHmctsService.getUserOrganisationAddress(VALID_USER_TOKEN)).thenReturn(organisationAddress);
         when(pdfBoxService.generatePdfDocumentInfo(any(), anyString(), anyString(), 
                 anyString(), anyString(), anyString())).thenReturn(documentInfo);
         
@@ -339,7 +339,7 @@ class Et3ResponseServiceTest {
         assertThat(representative.getRepresentativeAddress()).isNotNull();
         assertThat(representative.getRepresentativeAddress().getAddressLine1()).isEqualTo("Existing Address Line 1");
         assertThat(representative.getRepresentativeAddress().getPostTown()).isEqualTo("Existing Town");
-        verify(myHmctsService, times(0)).getOrganisationAddress(anyString());
+        verify(myHmctsService, times(0)).getUserOrganisationAddress(anyString());
     }
 
     @Test
@@ -360,6 +360,6 @@ class Et3ResponseServiceTest {
         assertDoesNotThrow(() -> et3ResponseService.generateEt3ResponseDocument(
                 caseData, VALID_USER_TOKEN, ENGLANDWALES_CASE_TYPE_ID, SUBMIT_ET3));
         
-        verify(myHmctsService, times(0)).getOrganisationAddress(anyString());
+        verify(myHmctsService, times(0)).getUserOrganisationAddress(anyString());
     }
 }

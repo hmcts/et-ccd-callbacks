@@ -76,56 +76,37 @@ public class NocService {
     }
 
     /**
-     * Grants case access to a representative after validating the input parameters,
-     * resolving the user by email, and confirming that the user's organisation matches
-     * the selected organisation.
-     *
-     * <p>This method first validates the supplied access token, email address,
-     * submission reference, organisation, and role. If any required value is missing
-     * or invalid, it throws a {@link GenericServiceException}.</p>
-     *
-     * <p>When validation succeeds, the method retrieves the target user using the
-     * supplied email address, then looks up the organisation associated with that user.
-     * It verifies that the resolved organisation matches the provided
-     * {@code organisationToAdd}. If the organisations do not match, the method throws
-     * a {@link GenericServiceException}.</p>
-     *
-     * <p>If all checks pass, the method grants the requested case role to the user by
-     * calling {@code grantCaseAccess(...)}.</p>
-     *
-     * <h3>Assumptions:</h3>
+     * Grants case access to a representative user for the specified case and role.
+     * <p>
+     * The method:
      * <ul>
-     *   <li>{@code accessToken} is a valid token with permission to query users,
-     *       retrieve organisation details, and assign case access.</li>
-     *   <li>{@code email} belongs to an existing user in the identity/access management system.</li>
-     *   <li>{@code submissionReference} uniquely identifies the case or submission and is suitable
-     *       for logging, tracing, and error reporting.</li>
-     *   <li>{@code organisationToAdd} is non-null and contains a valid organisation ID.</li>
-     *   <li>{@code role} is expected to be a valid role recognised by
-     *       {@link RoleUtils#isValidRole(String)}.</li>
-     *   <li>{@link #findUserByEmail(String, String, String)} returns a non-null
-     *       {@link AccountIdByEmailResponse} containing a valid user identifier.</li>
-     *   <li>{@link #findOrganisationByUserId(String, String, String)} returns a non-null
-     *       {@link OrganisationsResponse} containing the user's organisation identifier.</li>
-     *   <li>{@link OrganisationUtils#hasMatchingOrganisationId(Organisation, OrganisationsResponse)}
-     *       performs permissive matching and only returns {@code false} when both organisation IDs
-     *       are present and do not match.</li>
-     *   <li>{@code grantCaseAccess(...)} performs the actual role assignment and may throw
-     *       a {@link GenericServiceException} if the operation fails.</li>
+     *     <li>Validates the provided access token, email, case reference,
+     *     organisation, and role</li>
+     *     <li>Finds the user associated with the supplied email address</li>
+     *     <li>Verifies that the user belongs to the selected organisation</li>
+     *     <li>Grants the requested case role access to the user</li>
      * </ul>
      *
-     * @param accessToken the authorisation token used to perform user, organisation,
-     *                    and access-management operations
-     * @param email the email address of the representative to whom access will be granted
-     * @param submissionReference the submission or case reference used for lookup,
-     *                            traceability, and error reporting
-     * @param organisationToAdd the organisation that the representative is expected to belong to
-     * @param role the case role to assign to the representative
-     * @throws GenericServiceException if any input parameter is invalid, the user's organisation
-     *                                 does not match the selected organisation, or the access
-     *                                 grant process fails
+     * <p><strong>Assumptions:</strong></p>
+     * <ul>
+     *     <li>The email address belongs to an existing user account</li>
+     *     <li>The user is associated with the supplied organisation</li>
+     *     <li>The role value is a valid CCD case role</li>
+     *     <li>The submission reference represents a valid case identifier</li>
+     *     <li>The caller has sufficient permissions to grant case access</li>
+     * </ul>
+     *
+     * @param accessToken authentication token used to perform user and case access operations
+     * @param email the email address of the representative user
+     * @param submissionReference the case reference identifier
+     * @param organisationToAdd the organisation expected to be associated with the user
+     * @param role the CCD case role to grant
+     * @return the identifier(idam id) of the user who was granted access
+     * @throws GenericServiceException if validation fails, the user or organisation
+     *                                 cannot be found, the organisation does not match,
+     *                                 or the case access assignment fails
      */
-    public void grantRepresentativeAccess(String accessToken, String email,
+    public String grantRepresentativeAccess(String accessToken, String email,
                                           String submissionReference, Organisation organisationToAdd,
                                           String role) throws GenericServiceException {
         if (StringUtils.isBlank(accessToken)
@@ -139,8 +120,9 @@ public class NocService {
             String exceptionMessage = String.format(EXCEPTION_INVALID_GRANT_ACCESS_PARAMETER, tmpCaseId, tmpRole);
             throw new GenericServiceException(exceptionMessage);
         }
+        AccountIdByEmailResponse userResponse;
         try {
-            AccountIdByEmailResponse userResponse = findUserByEmail(accessToken, email,
+            userResponse = findUserByEmail(accessToken, email,
                     submissionReference);
             OrganisationsResponse organisationsResponse = findOrganisationByUserId(accessToken,
                     userResponse.getUserIdentifier(), submissionReference);
@@ -156,6 +138,7 @@ public class NocService {
             throw new GenericServiceException(exceptionMessage, new Exception(exception),
                     EXCEPTION_FAILED_TO_ASSIGN_ROLE, submissionReference, CLASS_NAME, "grantRepresentativeAccess");
         }
+        return userResponse.getUserIdentifier();
     }
 
     /**

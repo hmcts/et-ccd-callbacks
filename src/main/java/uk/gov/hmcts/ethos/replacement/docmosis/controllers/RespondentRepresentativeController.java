@@ -235,6 +235,7 @@ public class RespondentRepresentativeController {
                 for (RepresentedTypeRItem caseRepresentative : caseData.getRepCollection()) {
                     if (caseRepresentative.getId().equals(representative.getId())) {
                         caseRepresentative.getValue().setRole(representative.getValue().getRole());
+                        caseRepresentative.getValue().setIdamId(representative.getValue().getIdamId());
                     }
                 }
             }

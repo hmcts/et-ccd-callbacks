@@ -1026,7 +1026,8 @@ class NocRespondentRepresentativeServiceTest {
                 any(), any(), any());
         LoggerTestUtils.checkLog(Level.ERROR, LoggerTestUtils.INTEGER_TWO, EXPECTED_ERROR_UNABLE_TO_SET_ROLE);
         // when role successfully assigned should run setRepresentativesAccess without any error
-        doNothing().when(nocService).grantRepresentativeAccess(eq(ADMIN_USER_TOKEN), any(), any(), any(), any());
+        when(nocService.grantRepresentativeAccess(eq(ADMIN_USER_TOKEN), any(), any(), any(), any()))
+                .thenReturn(REPRESENTATIVE_ID_ONE);
         caseDetails.setCaseTypeId(CASE_TYPE_ID_ENGLAND_WALES);
         caseDetails.setJurisdiction(JURISDICTION_EMPLOYMENT);
         CCDRequest ccdRequest = new CCDRequest();

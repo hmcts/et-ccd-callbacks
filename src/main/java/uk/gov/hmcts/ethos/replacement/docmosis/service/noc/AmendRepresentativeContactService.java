@@ -148,10 +148,9 @@ public class AmendRepresentativeContactService {
         List<String> roles = nocRepresentativeService
                 .getValidatedRepresentativeRolesByUserToken(userToken, submissionReference);
         if (roles.contains(CLAIMANTSOLICITOR.getCaseRoleLabel())) {
-            ClaimantRepresentativeUtils.updateRepresentativeContactDetails(caseData, submissionReference);
+            ClaimantRepresentativeUtils.updateET3ResponseContactDetails(caseData);
             return;
         }
         RespondentRepresentativeUtils.updateET3ResponseContactDetails(caseData, roles);
-        // TODO add unit tests
     }
 }

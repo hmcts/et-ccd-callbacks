@@ -1,6 +1,9 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.ccd;
 
 import org.springframework.stereotype.Component;
+import uk.gov.hmcts.ccd.sdk.api.ConfigBuilder;
+import uk.gov.hmcts.ccd.sdk.api.Permission;
+import uk.gov.hmcts.et.common.model.ccd.CaseData;
 
 @Component
 public class EnglandWalesSingleFieldEventsConfig extends SingleFieldEventsConfig<EnglandWalesCaseData> {
@@ -13,6 +16,32 @@ public class EnglandWalesSingleFieldEventsConfig extends SingleFieldEventsConfig
             "Add telephone note",
             2
         );
+    }
+
+    @Override
+    public void configure(ConfigBuilder<EnglandWalesCaseData, EtState, EtUserRole> configBuilder) {
+        super.configure(configBuilder);
+
+        regionalCaseworkerEvent(
+            configBuilder.event("assignCase").forStateTransition(EtState.SUBMITTED, EtState.SUBMITTED)
+        )
+            .name("Assign Case")
+            .description("Assign case to a tribunal office")
+            .displayOrder(7)
+            .showCondition("managingOffice =\"Unassigned\"")
+            .publishToCamunda()
+            .aboutToStartCallbackUrl("${ET_COS_URL}/caseTransfer/initTransferToEnglandWales")
+            .aboutToSubmitCallbackUrl("${ET_COS_URL}/caseTransfer/assignCase")
+            .grant(Permission.CRU, EtUserRole.CASEWORKER_WA_TASK_CONFIGURATION)
+            .fields()
+            .page("1")
+            .field(CaseData::getAssignOffice)
+            .mandatory()
+            .showSummary()
+            .caseEventColumn("PageColumnNumber", 1)
+            .caseEventColumn("Publish", null)
+            .done()
+            .done();
     }
 
     @Override

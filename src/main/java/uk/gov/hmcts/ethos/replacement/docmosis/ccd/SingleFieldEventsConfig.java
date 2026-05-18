@@ -362,7 +362,7 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
 
     protected abstract int appealDocumentsDisplayOrder();
 
-    private Event.EventBuilder<T, EtUserRole, EtState> regionalCaseworkerEvent(
+    protected Event.EventBuilder<T, EtUserRole, EtState> regionalCaseworkerEvent(
         Event.EventBuilder<T, EtUserRole, EtState> event
     ) {
         return event

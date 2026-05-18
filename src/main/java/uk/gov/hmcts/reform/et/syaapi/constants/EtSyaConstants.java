@@ -5,53 +5,6 @@ import uk.gov.hmcts.ecm.common.model.helper.TribunalOffice;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ANONYMITY_ORDER;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_FOR_A_JUDGMENT_TO_BE_RECONSIDERED_C;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_FOR_A_JUDGMENT_TO_BE_RECONSIDERED_R;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_FOR_A_WITNESS_ORDER_C;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_FOR_A_WITNESS_ORDER_R;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_AMEND_CLAIM;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_AMEND_RESPONSE;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_EXTEND_TIME_TO_COMPLY_TO_AN_ORDER_DIRECTIONS_C;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_EXTEND_TIME_TO_COMPLY_TO_AN_ORDER_DIRECTIONS_R;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_EXTEND_TIME_TO_PRESENT_A_RESPONSE;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_HAVE_A_LEGAL_OFFICER_DECISION_CONSIDERED_AFRESH_C;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_HAVE_A_LEGAL_OFFICER_DECISION_CONSIDERED_AFRESH_R;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_ORDER_THE_C_TO_DO_SOMETHING;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_ORDER_THE_R_TO_DO_SOMETHING;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_POSTPONE_C;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_POSTPONE_R;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_RESTRICT_PUBLICITY_C;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_RESTRICT_PUBLICITY_R;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_REVOKE_AN_ORDER_C;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_REVOKE_AN_ORDER_R;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_STRIKE_OUT_ALL_OR_PART_OF_THE_CLAIM;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_STRIKE_OUT_ALL_OR_PART_OF_THE_RESPONSE;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_VARY_AN_ORDER_C;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_VARY_AN_ORDER_R;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_VARY_OR_REVOKE_AN_ORDER_C;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.APP_TO_VARY_OR_REVOKE_AN_ORDER_R;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.CHANGE_OF_PARTYS_DETAILS;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.CONTACT_THE_TRIBUNAL_C;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.CONTACT_THE_TRIBUNAL_R;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.COT3;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.COUNTER_SCHEDULE_OF_LOSS;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.C_HAS_NOT_COMPLIED_WITH_AN_ORDER_R;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET1_VETTING;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.ET3_PROCESSING;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.EXTRACT_OF_JUDGMENT;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.HEARING_BUNDLE;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.INITIAL_CONSIDERATION;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.OTHER;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.REFERRAL_JUDICIAL_DIRECTION;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.R_HAS_NOT_COMPLIED_WITH_AN_ORDER_C;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.SCHEDULE_OF_LOSS;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.TRIBUNAL_CASE_FILE;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.TSE_ADMIN_CORRESPONDENCE;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.WITHDRAWAL_OF_ALL_OR_PART_CLAIM;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.WITHDRAWAL_OF_ENTIRE_CLAIM;
-import static uk.gov.hmcts.ecm.common.model.helper.DocumentConstants.WITHDRAWAL_OF_PART_OF_CLAIM;
-
 /**
  * Defines attributes used by et-sya-api as constants.
  */
@@ -127,21 +80,7 @@ public final class EtSyaConstants {
     public static final String PDF_FILE_TIKA_CONTENT_TYPE = "application/pdf";
     public static final String STRING_DASH = "-";
 
-    public static final List<String> ACAS_HIDDEN_DOCS = List.of(ET1_VETTING, ET3_PROCESSING, INITIAL_CONSIDERATION,
-        APP_FOR_A_WITNESS_ORDER_C, APP_FOR_A_WITNESS_ORDER_R, REFERRAL_JUDICIAL_DIRECTION, COT3,
-        APP_TO_RESTRICT_PUBLICITY_C, APP_TO_RESTRICT_PUBLICITY_R, ANONYMITY_ORDER, HEARING_BUNDLE, SCHEDULE_OF_LOSS,
-        COUNTER_SCHEDULE_OF_LOSS, EXTRACT_OF_JUDGMENT, APP_FOR_A_JUDGMENT_TO_BE_RECONSIDERED_C,
-        APP_FOR_A_JUDGMENT_TO_BE_RECONSIDERED_R, TRIBUNAL_CASE_FILE, OTHER, APP_TO_VARY_AN_ORDER_C,
-        APP_TO_VARY_AN_ORDER_R, APP_TO_REVOKE_AN_ORDER_C, APP_TO_REVOKE_AN_ORDER_R, APP_TO_VARY_OR_REVOKE_AN_ORDER_C,
-        APP_TO_VARY_OR_REVOKE_AN_ORDER_R, APP_TO_EXTEND_TIME_TO_COMPLY_TO_AN_ORDER_DIRECTIONS_C,
-        APP_TO_EXTEND_TIME_TO_COMPLY_TO_AN_ORDER_DIRECTIONS_R, APP_TO_ORDER_THE_R_TO_DO_SOMETHING,
-        APP_TO_ORDER_THE_C_TO_DO_SOMETHING, APP_TO_AMEND_CLAIM, APP_TO_AMEND_RESPONSE,
-        R_HAS_NOT_COMPLIED_WITH_AN_ORDER_C, C_HAS_NOT_COMPLIED_WITH_AN_ORDER_R,
-        APP_TO_STRIKE_OUT_ALL_OR_PART_OF_THE_CLAIM, APP_TO_STRIKE_OUT_ALL_OR_PART_OF_THE_RESPONSE,
-        APP_TO_HAVE_A_LEGAL_OFFICER_DECISION_CONSIDERED_AFRESH_C, APP_TO_EXTEND_TIME_TO_PRESENT_A_RESPONSE,
-        APP_TO_HAVE_A_LEGAL_OFFICER_DECISION_CONSIDERED_AFRESH_R, APP_TO_POSTPONE_C, APP_TO_POSTPONE_R,
-        CONTACT_THE_TRIBUNAL_C, CONTACT_THE_TRIBUNAL_R, TSE_ADMIN_CORRESPONDENCE, CHANGE_OF_PARTYS_DETAILS,
-        WITHDRAWAL_OF_ENTIRE_CLAIM, WITHDRAWAL_OF_PART_OF_CLAIM, WITHDRAWAL_OF_ALL_OR_PART_CLAIM);
+    public static final List<String> ACAS_VISIBLE_DOCS = List.of(ET1, ET1_ATTACHMENT, ET3, ET3_ATTACHMENT);
 
     private EtSyaConstants() {
         // restrict instantiation

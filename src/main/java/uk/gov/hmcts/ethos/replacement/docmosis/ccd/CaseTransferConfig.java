@@ -7,6 +7,7 @@ import uk.gov.hmcts.ccd.sdk.api.Permission;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 
 import java.util.EnumSet;
+import java.util.Set;
 
 public abstract class CaseTransferConfig<T extends CaseData> implements CCDConfig<T, EtState, EtUserRole> {
 
@@ -21,6 +22,9 @@ public abstract class CaseTransferConfig<T extends CaseData> implements CCDConfi
     private final String caseTransferMultipleDescription;
     private final int processCaseTransferDisplayOrder;
     private final int returnCaseTransferDisplayOrder;
+    private final int caseTransferEcmDisplayOrder;
+    private final Set<Permission> caseTransferEcmWaPermissions;
+    private final boolean caseTransferEcmReasonShowsSummary;
     private final int amendSingleDisplayOrder;
     private final boolean includeSameCountryEccLinkedCaseTransfer;
 
@@ -29,6 +33,9 @@ public abstract class CaseTransferConfig<T extends CaseData> implements CCDConfi
         String caseTransferMultipleDescription,
         int processCaseTransferDisplayOrder,
         int returnCaseTransferDisplayOrder,
+        int caseTransferEcmDisplayOrder,
+        Set<Permission> caseTransferEcmWaPermissions,
+        boolean caseTransferEcmReasonShowsSummary,
         int amendSingleDisplayOrder,
         boolean includeSameCountryEccLinkedCaseTransfer
     ) {
@@ -36,6 +43,9 @@ public abstract class CaseTransferConfig<T extends CaseData> implements CCDConfi
         this.caseTransferMultipleDescription = caseTransferMultipleDescription;
         this.processCaseTransferDisplayOrder = processCaseTransferDisplayOrder;
         this.returnCaseTransferDisplayOrder = returnCaseTransferDisplayOrder;
+        this.caseTransferEcmDisplayOrder = caseTransferEcmDisplayOrder;
+        this.caseTransferEcmWaPermissions = caseTransferEcmWaPermissions;
+        this.caseTransferEcmReasonShowsSummary = caseTransferEcmReasonShowsSummary;
         this.amendSingleDisplayOrder = amendSingleDisplayOrder;
         this.includeSameCountryEccLinkedCaseTransfer = includeSameCountryEccLinkedCaseTransfer;
     }
@@ -87,6 +97,23 @@ public abstract class CaseTransferConfig<T extends CaseData> implements CCDConfi
             .aboutToSubmitCallbackUrl("${ET_COS_URL}/postDefaultValues")
             .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API);
 
+        caseTransferEcmFields(
+            configBuilder.event("caseTransferECM")
+                .forStateTransition(EnumSet.allOf(EtState.class), EtState.TRANSFERRED)
+                .name("Case Transfer to ECM")
+                .description("Transfer case to ECM system")
+                .displayOrder(caseTransferEcmDisplayOrder)
+                .caseEventColumn(
+                    "PreConditionState(s)",
+                    "Submitted;AWAITING_SUBMISSION_TO_HMCTS;Vetted;Accepted;Closed;Rejected"
+                )
+                .publishToCamunda()
+                .aboutToSubmitCallbackUrl("${ET_COS_URL}/caseTransfer/transferToEcm")
+        )
+            .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API)
+            .grant(Permission.CRU, regionalCaseworkerRole())
+            .grant(caseTransferEcmWaPermissions, EtUserRole.CASEWORKER_WA_TASK_CONFIGURATION);
+
         apiEvent(
             configBuilder,
             "amendSingle",
@@ -96,6 +123,28 @@ public abstract class CaseTransferConfig<T extends CaseData> implements CCDConfi
         )
             .caseEventColumn("PostConditionState", CLOSED_OR_ANY_POST_CONDITION_STATES)
             .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API);
+    }
+
+    protected abstract EtUserRole regionalCaseworkerRole();
+
+    private Event.EventBuilder<T, EtUserRole, EtState> caseTransferEcmFields(
+        Event.EventBuilder<T, EtUserRole, EtState> event
+    ) {
+        return event.fields()
+            .page("1")
+            .field(CaseData::getEcmOfficeCT)
+            .mandatory()
+            .showSummary()
+            .caseEventColumn("Publish", null)
+            .caseEventColumn("PageColumnNumber", 1)
+            .done()
+            .field(CaseData::getReasonForCT)
+            .mandatory()
+            .caseEventColumn("Publish", null)
+            .caseEventColumn("ShowSummaryChangeOption", caseTransferEcmReasonShowsSummary ? "Y" : null)
+            .caseEventColumn("PageColumnNumber", caseTransferEcmReasonShowsSummary ? 1 : null)
+            .done()
+            .done();
     }
 
     private Event.EventBuilder<T, EtUserRole, EtState> apiEvent(

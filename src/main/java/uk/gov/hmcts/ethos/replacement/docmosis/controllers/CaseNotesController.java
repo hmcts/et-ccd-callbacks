@@ -20,7 +20,10 @@ import uk.gov.hmcts.et.common.model.multiples.MultipleData;
 import uk.gov.hmcts.et.common.model.multiples.MultipleRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseNotesService;
 
+import java.util.List;
+
 import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityNoErrors;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.multipleResponse;
 
@@ -76,6 +79,57 @@ public class CaseNotesController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseNotesService.addCaseNote(caseData, userToken);
+        return getCallbackRespEntityNoErrors(caseData);
+    }
+
+    @PostMapping(value = "/singles/manageCaseNote/aboutToStart", consumes = APPLICATION_JSON_VALUE)
+    @ApiResponse(responseCode = "200", description = "Accessed successfully",
+        content = {
+            @Content(mediaType = "application/json",
+                schema = @Schema(implementation = CCDCallbackResponse.class))
+        })
+    @ApiResponse(responseCode = "400", description = "Bad Request")
+    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    public ResponseEntity<CCDCallbackResponse> manageSinglesCaseNoteAboutToStart(
+        @RequestBody CCDRequest ccdRequest,
+        @RequestHeader("Authorization") String userToken) {
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        List<String> errors = caseNotesService.populateCaseNoteList(caseData);
+        return getCallbackRespEntityErrors(errors, caseData);
+    }
+
+    @PostMapping(value = "/singles/manageCaseNote/midEvent", consumes = APPLICATION_JSON_VALUE)
+    @ApiResponse(responseCode = "200", description = "Accessed successfully",
+        content = {
+            @Content(mediaType = "application/json",
+                schema = @Schema(implementation = CCDCallbackResponse.class))
+        })
+    @ApiResponse(responseCode = "400", description = "Bad Request")
+    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    public ResponseEntity<CCDCallbackResponse> manageSinglesCaseNoteMidEvent(
+        @RequestBody CCDRequest ccdRequest,
+        @RequestHeader("Authorization") String userToken) {
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseNotesService.populateEditCaseNote(caseData);
+        return getCallbackRespEntityNoErrors(caseData);
+    }
+
+    @PostMapping(value = "/singles/manageCaseNote/aboutToSubmit", consumes = APPLICATION_JSON_VALUE)
+    @ApiResponse(responseCode = "200", description = "Accessed successfully",
+        content = {
+            @Content(mediaType = "application/json",
+                schema = @Schema(implementation = CCDCallbackResponse.class))
+        })
+    @ApiResponse(responseCode = "400", description = "Bad Request")
+    @ApiResponse(responseCode = "500", description = "Internal Server Error")
+    public ResponseEntity<CCDCallbackResponse> manageSinglesCaseNoteAboutToSubmit(
+        @RequestBody CCDRequest ccdRequest,
+        @RequestHeader("Authorization") String userToken) {
+
+        CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        caseNotesService.submitCaseNoteUpdate(caseData);
         return getCallbackRespEntityNoErrors(caseData);
     }
 }

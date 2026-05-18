@@ -6463,23 +6463,5 @@
     "FieldDisplayOrder": 2,
     "DisplayContext": "OPTIONAL",
     "RetainHiddenValue": "No"
-  },
-  {
-    "ID": "addCaseNote",
-    "CaseEventID": "addCaseNote",
-    "CaseFieldID": "addCaseNote",
-    "ListElementCode": "title",
-    "EventElementLabel": "Title",
-    "FieldDisplayOrder": 1,
-    "DisplayContext": "MANDATORY"
-  },
-  {
-    "ID": "addCaseNote",
-    "CaseEventID": "addCaseNote",
-    "CaseFieldID": "addCaseNote",
-    "ListElementCode": "note",
-    "EventElementLabel": "Note",
-    "FieldDisplayOrder": 2,
-    "DisplayContext": "MANDATORY"
   }
 ]

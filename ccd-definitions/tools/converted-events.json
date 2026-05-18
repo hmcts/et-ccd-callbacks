@@ -158,6 +158,12 @@
   {
     "jurisdiction": "england-wales",
     "caseType": "ET_EnglandWales",
+    "eventId": "SUBMIT_CLAIMANT_BUNDLES",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
     "eventId": "createDcf",
     "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
     "files": {
@@ -330,6 +336,12 @@
     "jurisdiction": "scotland",
     "caseType": "ET_Scotland",
     "eventId": "UPDATE_ET3_FORM",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "SUBMIT_CLAIMANT_BUNDLES",
     "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
   },
   {

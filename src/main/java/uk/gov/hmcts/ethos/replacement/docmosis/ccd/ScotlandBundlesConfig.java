@@ -6,6 +6,10 @@ import org.springframework.stereotype.Component;
 public class ScotlandBundlesConfig extends BundlesConfig<ScotlandCaseData> {
 
     public ScotlandBundlesConfig() {
-        super(true);
+        super(
+            EtUserRole.CASEWORKER_EMPLOYMENT_SCOTLAND,
+            true,
+            "Remove hearing documents"
+        );
     }
 }

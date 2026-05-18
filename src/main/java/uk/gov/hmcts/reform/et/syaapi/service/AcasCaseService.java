@@ -74,7 +74,7 @@ public class AcasCaseService {
      * @param requestDateTime used as the query parameter; must represent a UTC datetime
      * @return a list of caseIds
      */
-    public List<Long> getLastModifiedCasesId(String authorisation, LocalDateTime requestDateTime) {
+    public List<Long> getLastModifiedCasesId(String authorisation, String requestDateTime) {
         String query = """
             {
               "size": %d,
@@ -102,7 +102,8 @@ public class AcasCaseService {
                 "reference"
               ]
             }
-            """.formatted(MAX_ES_SIZE, requestDateTime.atOffset(ZoneOffset.UTC).toInstant().toString());
+            """.formatted(MAX_ES_SIZE,
+            LocalDateTime.parse(requestDateTime).atOffset(ZoneOffset.UTC).toInstant().toString());
         return searchEnglandScotlandCases(authorisation, query)
             .stream()
             .map(CaseDetails::getId)

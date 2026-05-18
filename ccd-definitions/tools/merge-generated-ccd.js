@@ -28,7 +28,7 @@ function replaceConvertedRows(conversion, sheet) {
 
   const sheetRoot = path.join(outputRoot, conversion.jurisdiction, 'json', sheet);
   const files = sheetFiles(sheetRoot, conversion, sheet);
-  const matches = rowMatcher(sheet, conversion.eventId);
+  const matches = rowMatcher(sheet, conversion);
   const remaining = new Map(rows.map(row => [rowKey(sheet, row), row]));
   let replaced = false;
   let appendFile = null;
@@ -64,7 +64,7 @@ function generatedRows(conversion, sheet) {
   const sheetRoot = path.join(generatedRoot, conversion.caseType, sheet);
   return jsonFiles(sheetRoot)
     .flatMap(file => JSON.parse(fs.readFileSync(file, 'utf8')))
-    .filter(row => rowMatcher(sheet, conversion.eventId)(row))
+    .filter(row => rowMatcher(sheet, conversion)(row))
     .map(row => normaliseGeneratedRow(sheet, row));
 }
 
@@ -151,11 +151,12 @@ function normaliseGeneratedRow(sheet, row) {
   return normalised;
 }
 
-function rowMatcher(sheet, eventId) {
+function rowMatcher(sheet, conversion) {
   if (sheet === 'CaseEvent') {
-    return row => row.ID === eventId;
+    return row => row.CaseTypeID === conversion.caseType && row.ID === conversion.eventId;
   }
-  return row => row.CaseEventID === eventId;
+  return row => (row.CaseTypeID || row.CaseTypeId) === conversion.caseType
+    && row.CaseEventID === conversion.eventId;
 }
 
 function defaultSheetFile(sheetRoot, sheet, eventId) {

@@ -7,6 +7,7 @@ public enum EtUserRole implements HasRole {
     CREATOR("[CREATOR]", "CRUD"),
     DEFENDANT("[DEFENDANT]", "CRU"),
     CASEWORKER_APPROVER("caseworker-approver", "CRU"),
+    CASEWORKER_CAA("caseworker-caa", "CRU"),
     CASEWORKER_EMPLOYMENT("caseworker-employment", "R"),
     CASEWORKER_EMPLOYMENT_API("caseworker-employment-api", "CRUD"),
     CASEWORKER_EMPLOYMENT_ENGLANDWALES("caseworker-employment-englandwales", "CRU"),

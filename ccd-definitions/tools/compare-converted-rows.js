@@ -30,7 +30,7 @@ function selectedRows(root, conversion, sheet) {
   const sheetRoot = path.join(root, conversion.jurisdiction, 'json', sheet);
   const rows = sheetFiles(sheetRoot, conversion, sheet)
     .flatMap(file => JSON.parse(fs.readFileSync(file, 'utf8')))
-    .filter(row => rowMatcher(sheet, conversion.eventId)(row))
+    .filter(row => rowMatcher(sheet, conversion)(row))
     .flatMap(row => normaliseRow(sheet, row));
 
   if (sheet === 'AuthorisationCaseEvent') {
@@ -50,11 +50,12 @@ function sheetFiles(sheetRoot, conversion, sheet) {
   return files.filter(file => allowed.has(path.basename(file)) || allowed.has(path.relative(sheetRoot, file)));
 }
 
-function rowMatcher(sheet, eventId) {
+function rowMatcher(sheet, conversion) {
   if (sheet === 'CaseEvent') {
-    return row => row.ID === eventId;
+    return row => row.CaseTypeID === conversion.caseType && row.ID === conversion.eventId;
   }
-  return row => row.CaseEventID === eventId;
+  return row => (row.CaseTypeID || row.CaseTypeId) === conversion.caseType
+    && row.CaseEventID === conversion.eventId;
 }
 
 function normaliseRow(sheet, row) {

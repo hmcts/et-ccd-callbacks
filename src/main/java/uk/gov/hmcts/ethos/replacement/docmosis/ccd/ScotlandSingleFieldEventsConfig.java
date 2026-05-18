@@ -1,0 +1,16 @@
+package uk.gov.hmcts.ethos.replacement.docmosis.ccd;
+
+import org.springframework.stereotype.Component;
+
+@Component
+public class ScotlandSingleFieldEventsConfig extends SingleFieldEventsConfig<ScotlandCaseData> {
+
+    public ScotlandSingleFieldEventsConfig() {
+        super(
+            EtUserRole.CASEWORKER_EMPLOYMENT_SCOTLAND,
+            EtUserRole.CASEWORKER_EMPLOYMENT_ETJUDGE_SCOTLAND,
+            50,
+            "Add telephone Note"
+        );
+    }
+}

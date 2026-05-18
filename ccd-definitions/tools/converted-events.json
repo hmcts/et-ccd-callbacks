@@ -62,6 +62,18 @@
   {
     "jurisdiction": "england-wales",
     "caseType": "ET_EnglandWales",
+    "eventId": "createEcmCase",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "rollbackMigrateCase",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
     "eventId": "createDcf",
     "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
     "files": {
@@ -138,6 +150,18 @@
     "jurisdiction": "scotland",
     "caseType": "ET_Scotland",
     "eventId": "UPDATE_HUBLINK_STATUS",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "createEcmCase",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "rollbackMigrateCase",
     "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
   },
   {

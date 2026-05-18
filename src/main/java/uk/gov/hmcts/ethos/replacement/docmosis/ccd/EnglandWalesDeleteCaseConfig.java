@@ -19,15 +19,16 @@ public class EnglandWalesDeleteCaseConfig implements CCDConfig<EnglandWalesCaseD
             "${CCD_DEF_URL}/callback/jurisdictions/EMPLOYMENT/case-types/ET_EnglandWales/documents"
         );
         configBuilder.caseTypeColumn("EnableForDeletion", "Yes");
+        configBuilder.eventDefaults()
+            .omitLiveFrom()
+            .omitPublish()
+            .noEndButtonLabel();
 
         configBuilder.event("DELETE_CASE")
             .forStateTransition(EnumSet.allOf(EtState.class), EtState.DELETE)
             .name("Delete Case")
             .description("Delete case")
             .displayOrder(1000)
-            .endButtonLabel("")
-            .omitLiveFrom()
-            .omitPublish()
             .significantEvent()
             .ttlIncrement("0")
             .grant(Permission.CRU, EtUserRole.CASEWORKER_EMPLOYMENT_API);
@@ -38,9 +39,6 @@ public class EnglandWalesDeleteCaseConfig implements CCDConfig<EnglandWalesCaseD
             .description("Manage Case TTL")
             .displayOrder(100)
             .showCondition("caseType=\"dummy\"")
-            .endButtonLabel("")
-            .omitLiveFrom()
-            .omitPublish()
             .fields()
             .page("1")
             .complex(EnglandWalesCaseData::getTtl)

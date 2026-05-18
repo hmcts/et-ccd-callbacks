@@ -16,12 +16,7 @@ public class ScotlandNotificationConfig implements CCDConfig<ScotlandCaseData, E
             .description("Respond to a notification")
             .displayOrder(71)
             .showCondition("caseType=\"dummy\"")
-            .endButtonLabel("")
-            .aboutToStartCallbackUrl("")
-            .aboutToSubmitCallbackUrl("")
-            .submittedCallbackUrl("")
-            .omitLiveFrom()
-            .omitPublish()
+            .blankCallbackUrls()
             .grant(Permission.CRUD, EtUserRole.CITIZEN);
     }
 }

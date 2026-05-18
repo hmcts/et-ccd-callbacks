@@ -38,6 +38,18 @@
   {
     "jurisdiction": "england-wales",
     "caseType": "ET_EnglandWales",
+    "eventId": "UPDATE_APPLICATION_STATE",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "UPDATE_ADMIN_DECISION_STATE",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
     "eventId": "UPDATE_RESPONDENT_PSE_STATE",
     "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
   },
@@ -264,6 +276,12 @@
     "jurisdiction": "scotland",
     "caseType": "ET_Scotland",
     "eventId": "UPDATE_NOTIFICATION_STATE",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "UPDATE_APPLICATION_STATE",
     "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
   },
   {

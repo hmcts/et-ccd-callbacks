@@ -35,6 +35,8 @@ java:
           alias: ET_COS_DB_HOST
         - name: et-cos-postgres-port-v15
           alias: ET_COS_DB_PORT
+        - name: migration-case-ids
+          alias: CRON_RECONFIGURATION_CASE_IDS
     et:
       secrets:
         - name: app-insights-connection-string

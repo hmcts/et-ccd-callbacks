@@ -121,7 +121,7 @@ class UpdateCaseQueueProcessorTest {
                 eq(queueMessage.getMessageId()),
                 anyString(),
                 eq(1),
-                eq(QueueMessageStatus.FAILED),
+                eq(QueueMessageStatus.FAILED.name()),
                 any()
         );
         verify(updateManagementService).addUnrecoverableErrorToDatabase(msg);
@@ -149,7 +149,7 @@ class UpdateCaseQueueProcessorTest {
                 eq(queueMessage.getMessageId()),
                 anyString(),
                 eq(1),
-                eq(QueueMessageStatus.FAILED),
+                eq(QueueMessageStatus.FAILED.name()),
                 any()
         );
         verify(updateManagementService, never()).addUnrecoverableErrorToDatabase(any());
@@ -178,7 +178,7 @@ class UpdateCaseQueueProcessorTest {
                 eq(queueMessage.getMessageId()),
                 anyString(),
                 eq(1),
-                eq(QueueMessageStatus.FAILED),
+                eq(QueueMessageStatus.FAILED.name()),
                 any()
         );
         verify(updateManagementService, never()).addUnrecoverableErrorToDatabase(any());
@@ -204,7 +204,7 @@ class UpdateCaseQueueProcessorTest {
                 eq(queueMessage.getMessageId()),
                 anyString(),
                 eq(1),
-                eq(QueueMessageStatus.PENDING),
+                eq(QueueMessageStatus.PENDING.name()),
                 any()
         );
         verify(updateManagementService, never()).addUnrecoverableErrorToDatabase(any());
@@ -230,7 +230,7 @@ class UpdateCaseQueueProcessorTest {
                 eq(queueMessage.getMessageId()),
                 anyString(),
                 eq(10),
-                eq(QueueMessageStatus.FAILED),
+                eq(QueueMessageStatus.FAILED.name()),
                 any()
         );
         verify(updateManagementService).addUnrecoverableErrorToDatabase(msg);
@@ -255,7 +255,7 @@ class UpdateCaseQueueProcessorTest {
                 eq(queueMessage.getMessageId()),
                 anyString(),
                 eq(1),
-                eq(QueueMessageStatus.PENDING),
+                eq(QueueMessageStatus.PENDING.name()),
                 any()
         );
     }

@@ -13,4 +13,24 @@ public class EnglandWalesSingleFieldEventsConfig extends SingleFieldEventsConfig
             "Add telephone note"
         );
     }
+
+    @Override
+    protected int addAmendJurisdictionDisplayOrder() {
+        return 18;
+    }
+
+    @Override
+    protected int adrDocumentsDisplayOrder() {
+        return 57;
+    }
+
+    @Override
+    protected int piiDocumentsDisplayOrder() {
+        return 58;
+    }
+
+    @Override
+    protected int appealDocumentsDisplayOrder() {
+        return 59;
+    }
 }

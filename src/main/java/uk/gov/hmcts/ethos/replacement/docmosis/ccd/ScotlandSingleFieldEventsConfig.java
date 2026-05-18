@@ -13,4 +13,24 @@ public class ScotlandSingleFieldEventsConfig extends SingleFieldEventsConfig<Sco
             "Add telephone Note"
         );
     }
+
+    @Override
+    protected int addAmendJurisdictionDisplayOrder() {
+        return 21;
+    }
+
+    @Override
+    protected int adrDocumentsDisplayOrder() {
+        return 53;
+    }
+
+    @Override
+    protected int piiDocumentsDisplayOrder() {
+        return 54;
+    }
+
+    @Override
+    protected int appealDocumentsDisplayOrder() {
+        return 55;
+    }
 }

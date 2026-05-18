@@ -1,0 +1,36 @@
+[
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "caseNotesCollection",
+    "Label": "Telephone notes",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "caseNote",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "addCaseNote",
+    "Label": "Telephone note",
+    "FieldType": "caseNote",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "editOrDeleteCaseNote",
+    "Label": "Edit or delete telephone note",
+    "FieldType": "FixedRadioList",
+    "FieldTypeParameter": "frl_editOrDelete",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "caseNoteList",
+    "Label": "Telephone notes to edit or delete",
+    "FieldType": "DynamicList",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

@@ -10,6 +10,7 @@
     "security_level": null,
     "case_data": {
       "caseType": "Single",
+      "receiptDate": "2026-04-01",
       "caseSource": "Manually Created",
       "claimantRequests": {
         "claim_description_document": {

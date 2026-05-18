@@ -7177,5 +7177,17 @@
     "ListElementCode": "Respondent",
     "ListElement": "Respondent(s)",
     "DisplayOrder": 2
+  },
+  {
+    "ID": "frl_editOrDelete",
+    "ListElementCode": "Edit",
+    "ListElement": "Edit",
+    "DisplayOrder": 1
+  },
+  {
+    "ID": "frl_editOrDelete",
+    "ListElementCode": "Delete",
+    "ListElement": "Delete",
+    "DisplayOrder": 2
   }
 ]

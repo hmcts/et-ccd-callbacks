@@ -2430,26 +2430,6 @@
   },
   {
     "CaseTypeId": "ET_EnglandWales",
-    "CaseEventID": "addCaseNote",
-    "AccessControl": [
-      {
-        "UserRoles": [
-          "caseworker-employment-englandwales",
-          "caseworker-employment-etjudge-englandwales",
-          "caseworker-employment-api"
-        ],
-        "CRUD": "CRUD"
-      },
-      {
-        "UserRoles": [
-          "caseworker-employment-etjudge"
-        ],
-        "CRUD": "R"
-      }
-    ]
-  },
-  {
-    "CaseTypeId": "ET_EnglandWales",
     "CaseEventID": "deleteDraftCase",
     "UserRole": "caseworker-employment-legalrep-solicitor",
     "CRUD": "CRUD"

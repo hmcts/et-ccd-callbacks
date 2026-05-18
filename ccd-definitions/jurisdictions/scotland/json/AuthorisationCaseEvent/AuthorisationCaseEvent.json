@@ -2395,26 +2395,6 @@
   },
   {
     "CaseTypeId": "ET_Scotland",
-    "CaseEventID": "addCaseNote",
-    "AccessControl": [
-      {
-        "UserRoles": [
-          "caseworker-employment-scotland",
-          "caseworker-employment-etjudge-scotland",
-          "caseworker-employment-api"
-        ],
-        "CRUD": "CRUD"
-      },
-      {
-        "UserRoles": [
-          "caseworker-employment-etjudge"
-        ],
-        "CRUD": "R"
-      }
-    ]
-  },
-  {
-    "CaseTypeId": "ET_Scotland",
     "CaseEventID": "generateNotificationSummary",
     "AccessControl": [
       {

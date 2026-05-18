@@ -5,7 +5,7 @@ import uk.gov.hmcts.ccd.sdk.api.CCD;
 import uk.gov.hmcts.ccd.sdk.type.FieldType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 
-public class ScotlandCaseData extends CaseData {
+public class ScotlandCaseData extends CaseData implements HasFlagLauncher {
 
     @JsonProperty("flagLauncher")
     @CCD(label = "Flag Launcher", typeOverride = FieldType.FlagLauncher, searchable = false)

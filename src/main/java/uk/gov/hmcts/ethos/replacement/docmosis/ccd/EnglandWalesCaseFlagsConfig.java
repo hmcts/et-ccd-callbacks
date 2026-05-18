@@ -1,50 +1,17 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.ccd;
 
 import org.springframework.stereotype.Component;
-import uk.gov.hmcts.ccd.sdk.api.CCDConfig;
-import uk.gov.hmcts.ccd.sdk.api.ConfigBuilder;
-import uk.gov.hmcts.ccd.sdk.api.Permission;
 
 @Component
-public class EnglandWalesCaseFlagsConfig implements CCDConfig<EnglandWalesCaseData, EtState, EtUserRole> {
+public class EnglandWalesCaseFlagsConfig extends CreateFlagConfig<EnglandWalesCaseData> {
 
-    @Override
-    public void configure(ConfigBuilder<EnglandWalesCaseData, EtState, EtUserRole> configBuilder) {
-        configBuilder.event("createFlag")
-            .forAllStates()
-            .name("Create a case flag")
-            .description("Create Flag")
-            .showSummary()
-            .caseEventColumn("DisplayOrder", null)
-            .caseEventColumn("EventEnablingCondition", "")
-            .blankCallbackUrls()
-            .fields()
-            .page("1")
-            .field(EnglandWalesCaseData::getCaseFlags)
-            .optional()
-            .showCondition("flagLauncher=\"hidden\"")
-            .caseEventColumn("PageColumnNumber", null)
-            .caseEventColumn("RetainHiddenValue", "Yes")
-            .done()
-            .field(EnglandWalesCaseData::getFlagLauncher)
-            .optional()
-            .displayContextParameter("#ARGUMENT(CREATE)")
-            .caseEventColumn("PageColumnNumber", null)
-            .done()
-            .field(EnglandWalesCaseData::getRespondentFlags)
-            .optional()
-            .showCondition("flagLauncher=\"hidden\"")
-            .caseEventColumn("PageColumnNumber", null)
-            .caseEventColumn("RetainHiddenValue", "Yes")
-            .done()
-            .field(EnglandWalesCaseData::getClaimantFlags)
-            .optional()
-            .showCondition("flagLauncher=\"hidden\"")
-            .caseEventColumn("PageColumnNumber", null)
-            .caseEventColumn("RetainHiddenValue", "Yes")
-            .done()
-            .done()
-            .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API)
-            .grant(Permission.CRU, EtUserRole.CASEWORKER_EMPLOYMENT_ENGLANDWALES);
+    public EnglandWalesCaseFlagsConfig() {
+        super(
+            EnglandWalesCaseData::getCaseFlags,
+            EnglandWalesCaseData::getFlagLauncher,
+            EnglandWalesCaseData::getRespondentFlags,
+            EnglandWalesCaseData::getClaimantFlags,
+            EtUserRole.CASEWORKER_EMPLOYMENT_ENGLANDWALES
+        );
     }
 }

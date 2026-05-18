@@ -162,22 +162,34 @@ public class CaseFlagsService {
     }
 
     private void setupClaimantCaseFlags(CaseData caseData) {
-        upsertCaseFlags(caseData, CaseData::getClaimantFlags, CaseData::setClaimantFlags,
-                caseData.getClaimant(), CLAIMANT, CLAIMANT, INTERNAL);
-        upsertCaseFlags(caseData, CaseData::getClaimantExternalFlags, CaseData::setClaimantExternalFlags,
-                caseData.getClaimant(), CLAIMANT, CLAIMANT, EXTERNAL);
+        if (caseData.getClaimantFlags() == null) {
+            upsertCaseFlags(caseData, CaseData::getClaimantFlags, CaseData::setClaimantFlags,
+                    caseData.getClaimant(), CLAIMANT, CLAIMANT, INTERNAL);
+        }
+
+        if (caseData.getClaimantExternalFlags() == null) {
+            upsertCaseFlags(caseData, CaseData::getClaimantExternalFlags, CaseData::setClaimantExternalFlags,
+                    caseData.getClaimant(), CLAIMANT, CLAIMANT, EXTERNAL);
+        }
     }
 
     private void setupRespondentCaseFlags(CaseData caseData) {
         List<RespondentSumTypeItem> respondents = respondentCollection(caseData);
         int respondentsWithCaseFlags = Math.min(respondents.size(), RESPONDENT_CASE_FLAG_FIELDS.size());
+        System.out.println("respondentsWithCaseFlags => " + respondentsWithCaseFlags);
         for (int index = 0; index < respondentsWithCaseFlags; index++) {
             RespondentCaseFlagFields fields = RESPONDENT_CASE_FLAG_FIELDS.get(index);
             String respondentName = respondentName(respondents.get(index));
-            upsertCaseFlags(caseData, fields.internalGetter(), fields.internalSetter(), respondentName, RESPONDENT,
-                    fields.groupId(), INTERNAL);
-            upsertCaseFlags(caseData, fields.externalGetter(), fields.externalSetter(), respondentName, RESPONDENT,
-                    fields.groupId(), EXTERNAL);
+            System.out.println("respondentName => " + respondentName);
+            if (fields.internalGetter.apply(caseData) == null) {
+                upsertCaseFlags(caseData, fields.internalGetter(), fields.internalSetter(), respondentName, RESPONDENT,
+                        fields.groupId(), INTERNAL);
+            }
+
+            if (fields.externalGetter.apply(caseData) == null) {
+                upsertCaseFlags(caseData, fields.externalGetter(), fields.externalSetter(), respondentName, RESPONDENT,
+                        fields.groupId(), EXTERNAL);
+            }
         }
     }
 

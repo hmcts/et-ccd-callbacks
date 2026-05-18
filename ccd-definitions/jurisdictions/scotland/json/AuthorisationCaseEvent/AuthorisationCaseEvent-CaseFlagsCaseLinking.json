@@ -37,6 +37,18 @@
   },
   {
     "CaseTypeId": "ET_Scotland",
+    "CaseEventID": "requestSupport",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseEventID": "manageSupport",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
     "CaseEventID": "UPDATE_HUBLINK_STATUS",
     "UserRole": "citizen",
     "CRUD": "CRUD"

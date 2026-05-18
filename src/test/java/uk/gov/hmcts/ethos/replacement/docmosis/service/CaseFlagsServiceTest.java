@@ -250,83 +250,82 @@ class CaseFlagsServiceTest {
     }
 
     @Test
-    void setupCaseFlags_shouldRepairIncompleteMetadataWithoutLosingDetails() {
-        caseFlagsService.setupCaseFlags(caseData);
+    void setupCaseFlags_shouldCreateMissingClaimantFlagsWithoutReplacingExistingClaimantFlags() {
         ListTypeItem<FlagDetailType> details = ListTypeItem.from(FlagDetailType.builder()
                 .name(SIGN_LANGUAGE_INTERPRETER)
                 .status(ACTIVE)
                 .build());
-        caseData.getClaimantFlags().setDetails(details);
-        caseData.getClaimantFlags().setRoleOnCase(null);
-        caseData.getClaimantFlags().setGroupId(null);
-        caseData.getClaimantFlags().setVisibility(null);
-
-        assertTrue(caseFlagsService.caseFlagsSetupRequired(caseData));
+        CaseFlagsType existingClaimantFlags = CaseFlagsType.builder()
+                .partyName("Existing Claimant")
+                .details(details)
+                .build();
+        caseData.setClaimantFlags(existingClaimantFlags);
+        caseData.setClaimantExternalFlags(null);
+        caseData.setRespondentCollection(List.of());
 
         caseFlagsService.setupCaseFlags(caseData);
 
-        assertFalse(caseFlagsService.caseFlagsSetupRequired(caseData));
-        assertEquals(CLAIMANT, caseData.getClaimantFlags().getRoleOnCase());
-        assertEquals(CLAIMANT, caseData.getClaimantFlags().getGroupId());
-        assertEquals(INTERNAL, caseData.getClaimantFlags().getVisibility());
+        assertSame(existingClaimantFlags, caseData.getClaimantFlags());
+        assertCaseFlags(caseData.getClaimantFlags(), "Existing Claimant", null, null, null);
         assertEquals(details, caseData.getClaimantFlags().getDetails());
-    }
-
-    @Test
-    void setupCaseFlags_shouldRepairRespondentMetadataWithoutLosingDetails() {
-        caseFlagsService.setupCaseFlags(caseData);
-        ListTypeItem<FlagDetailType> details = ListTypeItem.from(flag(LANGUAGE_INTERPRETER, ACTIVE));
-        caseData.getRespondent5ExternalFlags().setDetails(details);
-        caseData.getRespondent5ExternalFlags().setRoleOnCase(null);
-        caseData.getRespondent5ExternalFlags().setGroupId(null);
-        caseData.getRespondent5ExternalFlags().setVisibility(null);
-
+        assertCaseFlags(caseData.getClaimantExternalFlags(), CLAIMANT_NAME, CLAIMANT, CLAIMANT, EXTERNAL);
         assertTrue(caseFlagsService.caseFlagsSetupRequired(caseData));
-
-        caseFlagsService.setupCaseFlags(caseData);
-
-        assertFalse(caseFlagsService.caseFlagsSetupRequired(caseData));
-        assertCaseFlags(caseData.getRespondent5ExternalFlags(), RESPONDENT_NAME + " 6", RESPONDENT,
-                RESPONDENT + "5", EXTERNAL);
-        assertEquals(details, caseData.getRespondent5ExternalFlags().getDetails());
     }
 
     @Test
-    void setupCaseFlags_shouldUpdateClaimantFlagsWhenNameChanges() {
+    void setupCaseFlags_shouldCreateMissingRespondentFlagsWithoutReplacingExistingRespondentFlags() {
+        ListTypeItem<FlagDetailType> details = ListTypeItem.from(flag(LANGUAGE_INTERPRETER, ACTIVE));
+        CaseFlagsType existingRespondentExternalFlags = CaseFlagsType.builder()
+                .partyName("Existing Respondent 6")
+                .roleOnCase("existing-role")
+                .visibility("Existing")
+                .details(details)
+                .build();
+        caseData.setRespondent5ExternalFlags(existingRespondentExternalFlags);
+
         caseFlagsService.setupCaseFlags(caseData);
+
+        assertSame(existingRespondentExternalFlags, caseData.getRespondent5ExternalFlags());
+        assertCaseFlags(caseData.getRespondent5ExternalFlags(), "Existing Respondent 6", "existing-role", null,
+                "Existing");
+        assertEquals(details, caseData.getRespondent5ExternalFlags().getDetails());
+        assertCaseFlags(caseData.getRespondent5Flags(), RESPONDENT_NAME + " 6", RESPONDENT, RESPONDENT + "5",
+                INTERNAL);
+        assertTrue(caseFlagsService.caseFlagsSetupRequired(caseData));
+    }
+
+    @Test
+    void setupCaseFlags_shouldNotUpdateExistingClaimantFlagsWhenNameChanges() {
+        caseFlagsService.setupCaseFlags(caseData);
+        CaseFlagsType claimantFlags = caseData.getClaimantFlags();
+        CaseFlagsType claimantExternalFlags = caseData.getClaimantExternalFlags();
         String updatedClaimantName = "Updated Claimant Name";
         caseData.setClaimant(updatedClaimantName);
 
         caseFlagsService.setupCaseFlags(caseData);
 
-        assertEquals(updatedClaimantName, caseData.getClaimantFlags().getPartyName());
-        assertEquals(CLAIMANT, caseData.getClaimantFlags().getRoleOnCase());
-        assertEquals(CLAIMANT, caseData.getClaimantFlags().getGroupId());
-        assertEquals(INTERNAL, caseData.getClaimantFlags().getVisibility());
-
-        assertEquals(updatedClaimantName, caseData.getClaimantExternalFlags().getPartyName());
-        assertEquals(CLAIMANT, caseData.getClaimantExternalFlags().getRoleOnCase());
-        assertEquals(CLAIMANT, caseData.getClaimantExternalFlags().getGroupId());
-        assertEquals(EXTERNAL, caseData.getClaimantExternalFlags().getVisibility());
+        assertSame(claimantFlags, caseData.getClaimantFlags());
+        assertCaseFlags(caseData.getClaimantFlags(), CLAIMANT_NAME, CLAIMANT, CLAIMANT, INTERNAL);
+        assertSame(claimantExternalFlags, caseData.getClaimantExternalFlags());
+        assertCaseFlags(caseData.getClaimantExternalFlags(), CLAIMANT_NAME, CLAIMANT, CLAIMANT, EXTERNAL);
+        assertTrue(caseFlagsService.caseFlagsSetupRequired(caseData));
     }
 
     @Test
-    void setupCaseFlags_shouldUpdateRespondentFlagsWhenNameChanges() {
+    void setupCaseFlags_shouldNotUpdateExistingRespondentFlagsWhenNameChanges() {
         caseFlagsService.setupCaseFlags(caseData);
+        CaseFlagsType respondentFlags = caseData.getRespondentFlags();
+        CaseFlagsType respondentExternalFlags = caseData.getRespondentExternalFlags();
         String updatedRespondentName = "Updated Respondent Name";
         caseData.getRespondentCollection().getFirst().getValue().setRespondentName(updatedRespondentName);
 
         caseFlagsService.setupCaseFlags(caseData);
 
-        assertEquals(updatedRespondentName, caseData.getRespondentFlags().getPartyName());
-        assertEquals(RESPONDENT, caseData.getRespondentFlags().getRoleOnCase());
-        assertEquals(RESPONDENT, caseData.getRespondentFlags().getGroupId());
-        assertEquals(INTERNAL, caseData.getRespondentFlags().getVisibility());
-
-        assertEquals(updatedRespondentName, caseData.getRespondentExternalFlags().getPartyName());
-        assertEquals(RESPONDENT, caseData.getRespondentExternalFlags().getRoleOnCase());
-        assertEquals(RESPONDENT, caseData.getRespondentExternalFlags().getGroupId());
-        assertEquals(EXTERNAL, caseData.getRespondentExternalFlags().getVisibility());
+        assertSame(respondentFlags, caseData.getRespondentFlags());
+        assertCaseFlags(caseData.getRespondentFlags(), RESPONDENT_NAME, RESPONDENT, RESPONDENT, INTERNAL);
+        assertSame(respondentExternalFlags, caseData.getRespondentExternalFlags());
+        assertCaseFlags(caseData.getRespondentExternalFlags(), RESPONDENT_NAME, RESPONDENT, RESPONDENT, EXTERNAL);
+        assertTrue(caseFlagsService.caseFlagsSetupRequired(caseData));
     }
 
     @Test

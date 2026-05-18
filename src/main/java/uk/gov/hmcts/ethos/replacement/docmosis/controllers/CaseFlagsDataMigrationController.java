@@ -23,6 +23,9 @@ import java.util.List;
 import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.CallbackRespHelper.getCallbackRespEntityErrors;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService.CLAIMANT;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService.INTERNAL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService.RESPONDENT;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -56,6 +59,19 @@ public class CaseFlagsDataMigrationController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         caseFlagsService.setupCaseFlags(caseData);
+
+        /* Add visibility and group ID fields for the claimant and the first respondent records
+           that were already migrated in Case Flag v1.0. */
+        if (caseData.getClaimantFlags().getGroupId() == null) {
+            caseData.getClaimantFlags().setGroupId(CLAIMANT);
+            caseData.getClaimantFlags().setVisibility(INTERNAL);
+        }
+
+        if (caseData.getRespondentFlags().getGroupId() == null) {
+            caseData.getRespondentFlags().setGroupId(RESPONDENT);
+            caseData.getRespondentFlags().setVisibility(INTERNAL);
+        }
+
         log.info("Migrating existing case: {} for claimant: {},  respondent: {},",
                 ccdRequest.getCaseDetails().getCaseTypeId(),
                 caseData.getClaimantFlags().getPartyName(),

@@ -496,6 +496,28 @@
   {
     "jurisdiction": "england-wales",
     "caseType": "ET_EnglandWales",
+    "eventId": "submitEt1Draft",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-RetainAndDispose.json"],
+      "CaseEventToFields": ["CaseEventToFields-ET1Repped.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent-ET1Repped.json"]
+    }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "SUBMIT_CASE_DRAFT",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-RetainAndDispose.json"],
+      "CaseEventToFields": ["CaseEventToFields-WA-hearingdate.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json", "AuthorisationCaseEvent-WA.json"]
+    }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
     "eventId": "downloadDraftEt3",
     "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
     "files": {
@@ -1144,6 +1166,28 @@
       "CaseEvent": ["CaseEvent-ET1Repped.json"],
       "CaseEventToFields": ["CaseEventToFields-ET1Repped.json"],
       "AuthorisationCaseEvent": ["AuthorisationCaseEvent-ET1Repped.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "submitEt1Draft",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-RetainAndDispose.json"],
+      "CaseEventToFields": ["CaseEventToFields-ET1Repped.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent-ET1Repped.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "SUBMIT_CASE_DRAFT",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-RetainAndDispose.json"],
+      "CaseEventToFields": ["CaseEventToFields-WA-hearingdate.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json", "AuthorisationCaseEvent-WA.json"]
     }
   },
   {

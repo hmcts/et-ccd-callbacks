@@ -1856,6 +1856,10 @@ public class CaseData extends Et1CaseData {
     private String downloadDraftEt1Date;
     @JsonProperty("et1DoNotSubmitDraftMessage")
     private String et1DoNotSubmitDraftMessage;
+    @JsonProperty("submitEt1Preamble")
+    private String submitEt1Preamble;
+    @JsonProperty("submitEt1Confirmation")
+    private List<String> submitEt1Confirmation;
     @JsonProperty("hearingContactLanguage")
     private List<String> hearingContactLanguage;
     @JsonProperty("claimantHearingContactLanguage")

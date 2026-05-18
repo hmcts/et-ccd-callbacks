@@ -325,6 +325,51 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .grant(Permission.CRU, EtUserRole.CLAIMANT_SOLICITOR)
             .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API);
 
+        configBuilder.event("submitEt1Draft")
+            .forStateTransition(EtState.AWAITING_SUBMISSION_TO_HMCTS, EtState.SUBMITTED)
+            .name("Submit ET1 Claim")
+            .description("Submit ET1 Claim")
+            .displayOrder(57)
+            .showCondition("et1ReppedSectionOne = \"Yes\" AND et1ReppedSectionTwo = \"Yes\" "
+                               + "AND et1ReppedSectionThree = \"Yes\"")
+            .publishToCamunda()
+            .significantEvent()
+            .ttlIncrement("36524")
+            .aboutToSubmitCallbackUrl("${ET_COS_URL}/et1Repped/submitClaim")
+            .submittedCallbackUrl("${ET_COS_URL}/et1Repped/submitted")
+            .endButtonLabel("Submit ET1")
+            .fields()
+            .page("1")
+            .field(CaseData::getSubmitEt1Preamble)
+            .readOnly()
+            .caseEventColumn("Publish", null)
+            .caseEventColumn("PageColumnNumber", null)
+            .done()
+            .field(CaseData::getSubmitEt1Confirmation)
+            .mandatory()
+            .caseEventColumn("Publish", null)
+            .caseEventColumn("PageColumnNumber", null)
+            .done()
+            .done()
+            .grant(Permission.CRU, EtUserRole.CLAIMANT_SOLICITOR)
+            .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API, EtUserRole.CASEWORKER_WA_TASK_CONFIGURATION);
+
+        hearingDateFields(
+            configBuilder.event("SUBMIT_CASE_DRAFT")
+                .forStateTransition(EtState.AWAITING_SUBMISSION_TO_HMCTS, EtState.SUBMITTED)
+                .name("Submit Draft")
+                .description("Submit a draft case")
+                .displayOrder(6)
+                .publishToCamunda()
+                .significantEvent()
+                .ttlIncrement("36524")
+                .aboutToStartCallbackUrl("${ET_COS_URL}/preDefaultValues")
+                .aboutToSubmitCallbackUrl("${ET_COS_URL}/postDefaultValues")
+                .submittedCallbackUrl("${ET_COS_URL}/et1Submission/submitted")
+        )
+            .grant(Permission.CRUD, EtUserRole.CREATOR, EtUserRole.CASEWORKER_EMPLOYMENT_API)
+            .grant(Permission.CRU, EtUserRole.CASEWORKER_WA_TASK_CONFIGURATION);
+
         grantRespondentSolicitors(
             configBuilder.event("downloadDraftEt3")
                 .forState(EtState.ACCEPTED)
@@ -374,33 +419,18 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .done()
             .done();
 
-        configBuilder.event("issueInitialConsiderationDirectionsWA")
-            .forState(EtState.ACCEPTED)
-            .name("Issue IC Directions WA")
-            .description("Issue IC Directions WA")
-            .caseEventColumn("DisplayOrder", null)
-            .caseEventColumn("PostConditionState", "*")
-            .publishToCamunda()
-            .aboutToStartCallbackUrl("${ET_COS_URL}/startIssueInitialConsiderationDirectionsWA")
-            .aboutToSubmitCallbackUrl("${ET_COS_URL}/submitIssueInitialConsiderationDirectionsWA")
-            .submittedCallbackUrl("${ET_COS_URL}/completeIssueInitialConsiderationDirectionsWA")
-            .fields()
-            .page("1")
-            .pageLabel(" ")
-            .field(CaseData::getHorizontalLine)
-            .readOnly()
-            .caseEventColumn("Publish", null)
-            .caseEventColumn("PageColumnNumber", null)
-            .done()
-            .field(CaseData::getNextListedDate)
-            .optional()
-            .showCondition("horizontalLine=\"dummy\"")
-            .caseEventColumn("ShowSummaryChangeOption", "N")
-            .caseEventColumn("Publish", "Y")
-            .caseEventColumn("PageLabel", null)
-            .caseEventColumn("PageColumnNumber", 1)
-            .done()
-            .done()
+        hearingDateFields(
+            configBuilder.event("issueInitialConsiderationDirectionsWA")
+                .forState(EtState.ACCEPTED)
+                .name("Issue IC Directions WA")
+                .description("Issue IC Directions WA")
+                .caseEventColumn("DisplayOrder", null)
+                .caseEventColumn("PostConditionState", "*")
+                .publishToCamunda()
+                .aboutToStartCallbackUrl("${ET_COS_URL}/startIssueInitialConsiderationDirectionsWA")
+                .aboutToSubmitCallbackUrl("${ET_COS_URL}/submitIssueInitialConsiderationDirectionsWA")
+                .submittedCallbackUrl("${ET_COS_URL}/completeIssueInitialConsiderationDirectionsWA")
+        )
             .grant(Permission.CRU, regionalCaseworkerRole, EtUserRole.CASEWORKER_EMPLOYMENT_API)
             .grant(Permission.R, EtUserRole.CASEWORKER_WA_TASK_CONFIGURATION);
 
@@ -592,6 +622,28 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .readOnly()
             .caseEventColumn("PageLabel", null)
             .caseEventColumn("PageColumnNumber", null)
+            .done()
+            .done();
+    }
+
+    private Event.EventBuilder<T, EtUserRole, EtState> hearingDateFields(
+        Event.EventBuilder<T, EtUserRole, EtState> event
+    ) {
+        return event.fields()
+            .page("1")
+            .pageLabel(" ")
+            .field(CaseData::getHorizontalLine)
+            .readOnly()
+            .caseEventColumn("Publish", null)
+            .caseEventColumn("PageColumnNumber", null)
+            .done()
+            .field(CaseData::getNextListedDate)
+            .optional()
+            .showCondition("horizontalLine=\"dummy\"")
+            .caseEventColumn("ShowSummaryChangeOption", "N")
+            .caseEventColumn("Publish", "Y")
+            .caseEventColumn("PageLabel", null)
+            .caseEventColumn("PageColumnNumber", 1)
             .done()
             .done();
     }

@@ -7,6 +7,8 @@ import uk.gov.hmcts.ccd.sdk.api.Permission;
 import uk.gov.hmcts.ccd.sdk.api.TypedPropertyGetter;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 
+import java.util.Set;
+
 public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCDConfig<T, EtState, EtUserRole> {
 
     private static final String ACTIVE_CASE_STATES = "Submitted;Vetted;Accepted;Rejected;Closed";
@@ -21,6 +23,7 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
     private final String addCaseNoteDescription;
     private final int amendRespondentRepresentativeFieldDisplayOrder;
     private final int legalRepDocumentsDisplayOrder;
+    private final int downloadDraftEt3DisplayOrder;
     private final String viewAllNotificationsName;
     private final String viewAllNotificationsDescription;
 
@@ -31,6 +34,7 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
         String addCaseNoteDescription,
         int amendRespondentRepresentativeFieldDisplayOrder,
         int legalRepDocumentsDisplayOrder,
+        int downloadDraftEt3DisplayOrder,
         String viewAllNotificationsName,
         String viewAllNotificationsDescription
     ) {
@@ -40,6 +44,7 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
         this.addCaseNoteDescription = addCaseNoteDescription;
         this.amendRespondentRepresentativeFieldDisplayOrder = amendRespondentRepresentativeFieldDisplayOrder;
         this.legalRepDocumentsDisplayOrder = legalRepDocumentsDisplayOrder;
+        this.downloadDraftEt3DisplayOrder = downloadDraftEt3DisplayOrder;
         this.viewAllNotificationsName = viewAllNotificationsName;
         this.viewAllNotificationsDescription = viewAllNotificationsDescription;
     }
@@ -269,32 +274,22 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API)
             .grant(Permission.CRU, EtUserRole.CASEWORKER_EMPLOYMENT_LEGALREP_SOLICITOR);
 
-        pseViewNotificationsFields(
-            configBuilder.event("viewAllNotifications")
-                .forAllStates()
-                .name(viewAllNotificationsName)
-                .description(viewAllNotificationsDescription)
-                .showCondition("caseType=\"dummy\"")
-                .caseEventColumn("DisplayOrder", null)
-                .aboutToStartCallbackUrl("${ET_COS_URL}/pseViewNotifications/aboutToStart")
-                .aboutToSubmitCallbackUrl("")
-                .submittedCallbackUrl("")
-                .endButtonLabel("Close and return to case details")
+        grantRespondentSolicitors(
+            pseViewNotificationsFields(
+                configBuilder.event("viewAllNotifications")
+                    .forAllStates()
+                    .name(viewAllNotificationsName)
+                    .description(viewAllNotificationsDescription)
+                    .showCondition("caseType=\"dummy\"")
+                    .caseEventColumn("DisplayOrder", null)
+                    .aboutToStartCallbackUrl("${ET_COS_URL}/pseViewNotifications/aboutToStart")
+                    .aboutToSubmitCallbackUrl("")
+                    .submittedCallbackUrl("")
+                    .endButtonLabel("Close and return to case details")
+            ),
+            Permission.CRUD
         )
-            .grant(
-                Permission.CRUD,
-                EtUserRole.SOLICITOR_A,
-                EtUserRole.SOLICITOR_B,
-                EtUserRole.SOLICITOR_C,
-                EtUserRole.SOLICITOR_D,
-                EtUserRole.SOLICITOR_E,
-                EtUserRole.SOLICITOR_F,
-                EtUserRole.SOLICITOR_G,
-                EtUserRole.SOLICITOR_H,
-                EtUserRole.SOLICITOR_I,
-                EtUserRole.SOLICITOR_J,
-                EtUserRole.CASEWORKER_EMPLOYMENT_API
-            )
+            .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API)
             .grant(Permission.D, EtUserRole.CLAIMANT_SOLICITOR);
 
         pseViewNotificationsFields(
@@ -308,6 +303,53 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
         )
             .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API)
             .grant(Permission.CRU, EtUserRole.CLAIMANT_SOLICITOR);
+
+        configBuilder.event("createDraftEt1")
+            .forState(EtState.AWAITING_SUBMISSION_TO_HMCTS)
+            .name("Download draft ET1 Form")
+            .description("Download draft ET1 form")
+            .displayOrder(58)
+            .showCondition("et1ReppedSectionOne = \"Yes\" OR et1ReppedSectionTwo = \"Yes\" "
+                               + "OR et1ReppedSectionThree = \"Yes\"")
+            .aboutToSubmitCallbackUrl("${ET_COS_URL}/et1Repped/createDraftEt1")
+            .submittedCallbackUrl("${ET_COS_URL}/et1Repped/createDraftEt1Submitted")
+            .endButtonLabel("Download draft ET1")
+            .fields()
+            .page("1")
+            .field(CaseData::getEt1DoNotSubmitDraftMessage)
+            .readOnly()
+            .caseEventColumn("PageFieldDisplayOrder", 2)
+            .caseEventColumn("PageColumnNumber", null)
+            .done()
+            .done()
+            .grant(Permission.CRU, EtUserRole.CLAIMANT_SOLICITOR)
+            .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API);
+
+        grantRespondentSolicitors(
+            configBuilder.event("downloadDraftEt3")
+                .forState(EtState.ACCEPTED)
+                .name("Download draft ET3 Form")
+                .description("Download draft ET3 Form")
+                .displayOrder(downloadDraftEt3DisplayOrder)
+                .caseEventColumn("PostConditionState", "*")
+                .aboutToStartCallbackUrl("${ET_COS_URL}/et3Response/downloadDraft/aboutToStart")
+                .aboutToSubmitCallbackUrl("${ET_COS_URL}/et3Response/downloadDraft/aboutToSubmit")
+                .submittedCallbackUrl("${ET_COS_URL}/et3Response/downloadDraft/submitted")
+                .endButtonLabel("Download draft ET3 form")
+                .fields()
+                .page("1")
+                .field(CaseData::getDownloadDraftEt3Label)
+                .readOnly()
+                .caseEventColumn("PageColumnNumber", 1)
+                .done()
+                .field(CaseData::getSubmitEt3Respondent)
+                .mandatory()
+                .caseEventColumn("PageColumnNumber", 1)
+                .done()
+                .done(),
+            Permission.CRU
+        )
+            .grant(Permission.CRU, EtUserRole.CASEWORKER_EMPLOYMENT_API);
 
         regionalCaseworkerEvent(configBuilder.event("recordDeposit").forState(EtState.ACCEPTED))
             .name("Deposit Order")
@@ -499,5 +541,24 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .caseEventColumn("PageColumnNumber", null)
             .done()
             .done();
+    }
+
+    private Event.EventBuilder<T, EtUserRole, EtState> grantRespondentSolicitors(
+        Event.EventBuilder<T, EtUserRole, EtState> event,
+        Set<Permission> permissions
+    ) {
+        return event.grant(
+            permissions,
+            EtUserRole.SOLICITOR_A,
+            EtUserRole.SOLICITOR_B,
+            EtUserRole.SOLICITOR_C,
+            EtUserRole.SOLICITOR_D,
+            EtUserRole.SOLICITOR_E,
+            EtUserRole.SOLICITOR_F,
+            EtUserRole.SOLICITOR_G,
+            EtUserRole.SOLICITOR_H,
+            EtUserRole.SOLICITOR_I,
+            EtUserRole.SOLICITOR_J
+        );
     }
 }

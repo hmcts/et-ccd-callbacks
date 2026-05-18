@@ -1523,6 +1523,8 @@ public class CaseData extends Et1CaseData {
 
     @JsonProperty("submitEt3Respondent")
     private DynamicFixedListType submitEt3Respondent;
+    @JsonProperty("downloadDraftEt3Label")
+    private String downloadDraftEt3Label;
 
     @JsonProperty("bundlesRespondentWhatDocuments")
     private String bundlesRespondentWhatDocuments;
@@ -1852,6 +1854,8 @@ public class CaseData extends Et1CaseData {
     private OrganisationPolicy claimantRepresentativeOrganisationPolicy;
     @JsonProperty("downloadDraftEt1Date")
     private String downloadDraftEt1Date;
+    @JsonProperty("et1DoNotSubmitDraftMessage")
+    private String et1DoNotSubmitDraftMessage;
     @JsonProperty("hearingContactLanguage")
     private List<String> hearingContactLanguage;
     @JsonProperty("claimantHearingContactLanguage")

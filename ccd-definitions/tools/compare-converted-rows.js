@@ -27,9 +27,21 @@ if (failures.length > 0) {
 }
 
 function selectedRows(root, conversion, sheet) {
-  return jsonFiles(path.join(root, conversion.jurisdiction, 'json', sheet))
+  const sheetRoot = path.join(root, conversion.jurisdiction, 'json', sheet);
+  return sheetFiles(sheetRoot, conversion, sheet)
     .flatMap(file => JSON.parse(fs.readFileSync(file, 'utf8')))
     .filter(row => rowMatcher(sheet, conversion.eventId)(row));
+}
+
+function sheetFiles(sheetRoot, conversion, sheet) {
+  const files = jsonFiles(sheetRoot);
+  const configured = conversion.files && conversion.files[sheet];
+  if (!configured) {
+    return files;
+  }
+
+  const allowed = new Set(configured);
+  return files.filter(file => allowed.has(path.basename(file)) || allowed.has(path.relative(sheetRoot, file)));
 }
 
 function rowMatcher(sheet, eventId) {

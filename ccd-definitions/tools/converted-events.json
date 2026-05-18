@@ -60,6 +60,27 @@
     "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
   },
   {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "createDcf",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-DCF2.json"],
+      "CaseEventToFields": ["CaseEventToFields-DCF2.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent-DCF2.json"]
+    }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "asyncStitchingComplete",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-DCF2.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent-DCF2.json"]
+    }
+  },
+  {
     "jurisdiction": "scotland",
     "caseType": "ET_Scotland",
     "eventId": "DELETE_CASE",
@@ -118,5 +139,26 @@
     "caseType": "ET_Scotland",
     "eventId": "UPDATE_HUBLINK_STATUS",
     "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "createDcf",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-DCF2.json"],
+      "CaseEventToFields": ["CaseEventToFields-DCF2.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent-DCF2.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "asyncStitchingComplete",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-DCF2.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent-DCF2.json"]
+    }
   }
 ]

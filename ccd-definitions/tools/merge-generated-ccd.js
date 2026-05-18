@@ -27,7 +27,7 @@ function replaceConvertedRows(conversion, sheet) {
   }
 
   const sheetRoot = path.join(outputRoot, conversion.jurisdiction, 'json', sheet);
-  const files = jsonFiles(sheetRoot);
+  const files = sheetFiles(sheetRoot, conversion, sheet);
   const matches = rowMatcher(sheet, conversion.eventId);
   let replaced = false;
 
@@ -55,6 +55,17 @@ function generatedRows(conversion, sheet) {
     .flatMap(file => JSON.parse(fs.readFileSync(file, 'utf8')))
     .filter(row => rowMatcher(sheet, conversion.eventId)(row))
     .map(row => normaliseGeneratedRow(sheet, row));
+}
+
+function sheetFiles(sheetRoot, conversion, sheet) {
+  const files = jsonFiles(sheetRoot);
+  const configured = conversion.files && conversion.files[sheet];
+  if (!configured) {
+    return files;
+  }
+
+  const allowed = new Set(configured);
+  return files.filter(file => allowed.has(path.basename(file)) || allowed.has(path.relative(sheetRoot, file)));
 }
 
 function replaceRowsInPlace(sheet, existing, rows, matches) {

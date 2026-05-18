@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.ccd;
 import uk.gov.hmcts.ccd.sdk.api.HasRole;
 
 public enum EtUserRole implements HasRole {
+    CITIZEN("citizen", "CRUD"),
     CREATOR("[CREATOR]", "CRUD"),
     CASEWORKER_EMPLOYMENT_API("caseworker-employment-api", "CRUD"),
     CASEWORKER_WA_TASK_CONFIGURATION("caseworker-wa-task-configuration", "CRU");

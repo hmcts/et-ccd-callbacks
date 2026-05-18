@@ -12,6 +12,12 @@
     "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"]
   },
   {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "UPDATE_NOTIFICATION_STATE",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
     "jurisdiction": "scotland",
     "caseType": "ET_Scotland",
     "eventId": "DELETE_CASE",
@@ -22,5 +28,11 @@
     "caseType": "ET_Scotland",
     "eventId": "manageCaseTTL",
     "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "UPDATE_NOTIFICATION_STATE",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
   }
 ]

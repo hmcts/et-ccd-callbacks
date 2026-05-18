@@ -3,7 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.ccd;
 import org.springframework.stereotype.Component;
 
 @Component
-public class EnglandWalesCaseFlagsConfig extends CreateFlagConfig<EnglandWalesCaseData> {
+public class EnglandWalesCaseFlagsConfig extends CaseFlagsConfig<EnglandWalesCaseData> {
 
     public EnglandWalesCaseFlagsConfig() {
         super(

@@ -24,6 +24,12 @@
     "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"]
   },
   {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "manageFlags",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"]
+  },
+  {
     "jurisdiction": "scotland",
     "caseType": "ET_Scotland",
     "eventId": "DELETE_CASE",
@@ -45,6 +51,12 @@
     "jurisdiction": "scotland",
     "caseType": "ET_Scotland",
     "eventId": "createFlag",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "manageFlags",
     "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"]
   }
 ]

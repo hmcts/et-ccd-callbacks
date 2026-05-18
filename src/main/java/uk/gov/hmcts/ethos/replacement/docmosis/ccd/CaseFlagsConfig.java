@@ -2,12 +2,13 @@ package uk.gov.hmcts.ethos.replacement.docmosis.ccd;
 
 import uk.gov.hmcts.ccd.sdk.api.CCDConfig;
 import uk.gov.hmcts.ccd.sdk.api.ConfigBuilder;
+import uk.gov.hmcts.ccd.sdk.api.Event;
 import uk.gov.hmcts.ccd.sdk.api.Permission;
 import uk.gov.hmcts.ccd.sdk.api.TypedPropertyGetter;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.types.CaseFlagsType;
 
-public abstract class CreateFlagConfig<T extends CaseData & HasFlagLauncher>
+public abstract class CaseFlagsConfig<T extends CaseData & HasFlagLauncher>
     implements CCDConfig<T, EtState, EtUserRole> {
 
     private final TypedPropertyGetter<T, CaseFlagsType> caseFlags;
@@ -16,7 +17,7 @@ public abstract class CreateFlagConfig<T extends CaseData & HasFlagLauncher>
     private final TypedPropertyGetter<T, CaseFlagsType> claimantFlags;
     private final EtUserRole regionalCaseworkerRole;
 
-    protected CreateFlagConfig(
+    protected CaseFlagsConfig(
         TypedPropertyGetter<T, CaseFlagsType> caseFlags,
         TypedPropertyGetter<T, String> flagLauncher,
         TypedPropertyGetter<T, CaseFlagsType> respondentFlags,
@@ -32,41 +33,62 @@ public abstract class CreateFlagConfig<T extends CaseData & HasFlagLauncher>
 
     @Override
     public void configure(ConfigBuilder<T, EtState, EtUserRole> configBuilder) {
-        configBuilder.event("createFlag")
-            .forAllStates()
-            .name("Create a case flag")
-            .description("Create Flag")
-            .showSummary()
-            .caseEventColumn("DisplayOrder", null)
-            .caseEventColumn("EventEnablingCondition", "")
-            .blankCallbackUrls()
+        caseFlagEvent(configBuilder, "createFlag", "Create a case flag", "Create Flag")
             .fields()
             .page("1")
             .field(caseFlags)
-            .optional()
-            .showCondition("flagLauncher=\"hidden\"")
-            .caseEventColumn("PageColumnNumber", null)
-            .caseEventColumn("RetainHiddenValue", "Yes")
+            .caseFlagBackingField()
             .done()
             .field(flagLauncher)
-            .optional()
-            .displayContextParameter("#ARGUMENT(CREATE)")
-            .caseEventColumn("PageColumnNumber", null)
+            .flagLauncherCreate()
             .done()
             .field(respondentFlags)
-            .optional()
-            .showCondition("flagLauncher=\"hidden\"")
-            .caseEventColumn("PageColumnNumber", null)
-            .caseEventColumn("RetainHiddenValue", "Yes")
+            .caseFlagBackingField()
             .done()
             .field(claimantFlags)
-            .optional()
-            .showCondition("flagLauncher=\"hidden\"")
-            .caseEventColumn("PageColumnNumber", null)
-            .caseEventColumn("RetainHiddenValue", "Yes")
+            .caseFlagBackingField()
             .done()
             .done()
             .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API)
             .grant(Permission.CRU, regionalCaseworkerRole);
+
+        caseFlagEvent(configBuilder, "manageFlags", "Manage case flags", "Manage Flags")
+            .fields()
+            .page("1")
+            .field(caseFlags)
+            .caseFlagBackingField()
+            .pageFieldDisplayOrder(7)
+            .done()
+            .field(claimantFlags)
+            .caseFlagBackingField()
+            .pageFieldDisplayOrder(4)
+            .done()
+            .field(flagLauncher)
+            .flagLauncherUpdate()
+            .pageFieldDisplayOrder(6)
+            .done()
+            .field(respondentFlags)
+            .caseFlagBackingField()
+            .pageFieldDisplayOrder(5)
+            .done()
+            .done()
+            .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API)
+            .grant(Permission.CRU, regionalCaseworkerRole);
+    }
+
+    private Event.EventBuilder<T, EtUserRole, EtState> caseFlagEvent(
+        ConfigBuilder<T, EtState, EtUserRole> configBuilder,
+        String eventId,
+        String name,
+        String description
+    ) {
+        return configBuilder.event(eventId)
+            .forAllStates()
+            .name(name)
+            .description(description)
+            .showSummary()
+            .caseEventColumn("DisplayOrder", null)
+            .caseEventColumn("EventEnablingCondition", "")
+            .blankCallbackUrls();
     }
 }

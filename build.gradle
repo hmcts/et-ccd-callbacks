@@ -156,6 +156,7 @@ tasks.register('mergeGeneratedCCDConfig') {
     inputs.dir legacyCcdDefinitionsRoot
     inputs.dir layout.buildDirectory.dir('ccd-definitions')
     inputs.file convertedEventsManifest
+    inputs.file file('ccd-definitions/tools/merge-generated-ccd.js')
     outputs.dir layout.buildDirectory.dir('merged-ccd-definitions')
 
     doLast {
@@ -177,6 +178,7 @@ tasks.register('compareConvertedCCDRows') {
     inputs.dir legacyCcdDefinitionsRoot
     inputs.dir layout.buildDirectory.dir('merged-ccd-definitions')
     inputs.file convertedEventsManifest
+    inputs.file file('ccd-definitions/tools/compare-converted-rows.js')
 
     doLast {
         exec {
@@ -207,6 +209,7 @@ tasks.register('compareGeneratedCCDXlsx') {
     description = 'Compare Java-generated ET CCD XLSX workbooks with the legacy JSON-produced workbooks.'
     dependsOn tasks.named('buildLegacyCCDXlsx'), tasks.named('buildGeneratedCCDXlsx'),
         tasks.named('compareConvertedCCDRows')
+    inputs.file file('ccd-definitions/tools/compare-xlsx.js')
 
     doLast {
         ccdDefinitionEnvironments.each { environmentName, environmentConfig ->

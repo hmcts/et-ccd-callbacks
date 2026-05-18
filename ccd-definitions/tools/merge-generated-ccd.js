@@ -38,9 +38,7 @@ function replaceConvertedRows(conversion, sheet) {
       continue;
     }
 
-    const retained = existing.filter(row => !matches(row));
-    retained.splice(firstIndex, 0, ...rows);
-    writeJson(file, retained);
+    writeJson(file, replaceRowsInPlace(sheet, existing, rows, matches));
     replaced = true;
   }
 
@@ -57,6 +55,47 @@ function generatedRows(conversion, sheet) {
     .flatMap(file => JSON.parse(fs.readFileSync(file, 'utf8')))
     .filter(row => rowMatcher(sheet, conversion.eventId)(row))
     .map(row => normaliseGeneratedRow(sheet, row));
+}
+
+function replaceRowsInPlace(sheet, existing, rows, matches) {
+  const remaining = new Map(rows.map(row => [rowKey(sheet, row), row]));
+  const merged = existing.map(row => {
+    if (!matches(row)) {
+      return row;
+    }
+
+    const key = rowKey(sheet, row);
+    if (!remaining.has(key)) {
+      throw new Error(`No generated ${sheet} row for ${key}`);
+    }
+
+    const replacement = remaining.get(key);
+    remaining.delete(key);
+    return replacement;
+  });
+
+  return merged.concat([...remaining.values()]);
+}
+
+function rowKey(sheet, row) {
+  if (sheet === 'CaseEvent') {
+    return row.ID;
+  }
+  if (sheet === 'AuthorisationCaseEvent') {
+    return [row.CaseTypeID || row.CaseTypeId, row.CaseEventID, row.UserRole].join('|');
+  }
+  if (sheet === 'CaseEventToFields' || sheet === 'CaseEventToComplexTypes') {
+    return [
+      row.CaseTypeID,
+      row.CaseEventID,
+      row.CaseFieldID,
+      row.ListElementCode || '',
+      row.PageID || '',
+      row.PageFieldDisplayOrder || '',
+      row.FieldShowCondition || ''
+    ].join('|');
+  }
+  return JSON.stringify(row);
 }
 
 function normaliseGeneratedRow(sheet, row) {

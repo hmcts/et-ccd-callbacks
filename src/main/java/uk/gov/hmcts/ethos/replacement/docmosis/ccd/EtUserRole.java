@@ -6,6 +6,8 @@ public enum EtUserRole implements HasRole {
     CITIZEN("citizen", "CRUD"),
     CREATOR("[CREATOR]", "CRUD"),
     CASEWORKER_EMPLOYMENT_API("caseworker-employment-api", "CRUD"),
+    CASEWORKER_EMPLOYMENT_ENGLANDWALES("caseworker-employment-englandwales", "CRU"),
+    CASEWORKER_EMPLOYMENT_SCOTLAND("caseworker-employment-scotland", "CRU"),
     CASEWORKER_WA_TASK_CONFIGURATION("caseworker-wa-task-configuration", "CRU");
 
     private final String role;

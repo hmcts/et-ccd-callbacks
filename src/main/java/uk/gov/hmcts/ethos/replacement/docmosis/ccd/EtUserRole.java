@@ -5,6 +5,7 @@ import uk.gov.hmcts.ccd.sdk.api.HasRole;
 public enum EtUserRole implements HasRole {
     CITIZEN("citizen", "CRUD"),
     CREATOR("[CREATOR]", "CRUD"),
+    DEFENDANT("[DEFENDANT]", "CRU"),
     CASEWORKER_EMPLOYMENT_API("caseworker-employment-api", "CRUD"),
     CASEWORKER_EMPLOYMENT_ENGLANDWALES("caseworker-employment-englandwales", "CRU"),
     CASEWORKER_EMPLOYMENT_ETJUDGE("caseworker-employment-etjudge", "R"),

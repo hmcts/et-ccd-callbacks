@@ -32,6 +32,30 @@
   {
     "jurisdiction": "england-wales",
     "caseType": "ET_EnglandWales",
+    "eventId": "UPDATE_RESPONDENT_PSE_STATE",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "ADD_RESPONDENT_PSE_RESPONSE",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "STORE_RESPONDENT_PSE_RESPONSE",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "SUBMIT_RESPONDENT_PSE_RESPONSE",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
     "eventId": "createFlag",
     "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"]
   },
@@ -132,6 +156,30 @@
     "jurisdiction": "scotland",
     "caseType": "ET_Scotland",
     "eventId": "UPDATE_NOTIFICATION_STATE",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "UPDATE_RESPONDENT_PSE_STATE",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "ADD_RESPONDENT_PSE_RESPONSE",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "STORE_RESPONDENT_PSE_RESPONSE",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "SUBMIT_RESPONDENT_PSE_RESPONSE",
     "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
   },
   {

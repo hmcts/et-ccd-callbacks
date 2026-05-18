@@ -230,6 +230,76 @@
   {
     "jurisdiction": "england-wales",
     "caseType": "ET_EnglandWales",
+    "eventId": "generateEt1Documents",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-ET1Repped.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent-ET1Repped.json"]
+    }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "WA_REVIEW_RULE21_REFERRAL",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-WA.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent-WA.json"]
+    }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "RECONFIGURE_WA_TASKS",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-WA.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent-WA.json"]
+    }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "REMOVE_OWN_REP_AS_RESPONDENT",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json"]
+    }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "REMOVE_OWN_REP_AS_CLAIMANT",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json"]
+    }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "refreshSharedUsers",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json"]
+    }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "claimantTransferredCaseAccess",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json"]
+    }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
     "eventId": "SUBMIT_ET3_FORM",
     "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
   },
@@ -492,6 +562,76 @@
     "files": {
       "CaseEvent": ["CaseEvent-Multiples2-nonprod.json"],
       "AuthorisationCaseEvent": ["AuthorisationCaseEvent-Multiples2-nonprod.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "generateEt1Documents",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-ET1Repped.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent-ET1Repped.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "WA_REVIEW_RULE21_REFERRAL",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-WA.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent-WA.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "RECONFIGURE_WA_TASKS",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-WA.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent-WA.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "REMOVE_OWN_REP_AS_RESPONDENT",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "REMOVE_OWN_REP_AS_CLAIMANT",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "refreshSharedUsers",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "claimantTransferredCaseAccess",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json"]
     }
   },
   {

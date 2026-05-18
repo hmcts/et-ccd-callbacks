@@ -18,6 +18,15 @@ public abstract class EcmMigrationConfig<T extends CaseData> implements CCDConfi
 
     @Override
     public void configure(ConfigBuilder<T, EtState, EtUserRole> configBuilder) {
+        configBuilder.event("migrateCase")
+            .forAllStates()
+            .name("Migrate Case")
+            .description("Migrate Case")
+            .caseEventColumn("DisplayOrder", null)
+            .aboutToSubmitCallbackUrl("${ET_COS_URL}/global-search-migration/about-to-submit")
+            .submittedCallbackUrl("${ET_COS_URL}/global-search-migration/submitted")
+            .grant(Permission.CRU, EtUserRole.CASEWORKER_EMPLOYMENT_API);
+
         configBuilder.event("createEcmCase")
             .forAllStates()
             .name("Create ECM Case")

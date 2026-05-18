@@ -55,6 +55,15 @@ public class ScotlandDeleteCaseConfig implements CCDConfig<ScotlandCaseData, EtS
         ttlMigrationEvent(configBuilder, "rollbackMigrateCaseTTLDetails", "Rollback Migrate Case TTL", 201)
             .description("Rollback Migrate Case TTL Details")
             .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API);
+
+        configBuilder.event("DELETE_DRAFT_CASE")
+            .forStateTransition(EtState.AWAITING_SUBMISSION_TO_HMCTS, EtState.DELETE)
+            .name("Delete draft case")
+            .description("Delete draft cases as a claimant")
+            .displayOrder(1000)
+            .significantEvent()
+            .ttlIncrement("0")
+            .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API, EtUserRole.CREATOR);
     }
 
     private Event.EventBuilder<ScotlandCaseData, EtUserRole, EtState> ttlMigrationEvent(

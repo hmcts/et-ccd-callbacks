@@ -1146,19 +1146,6 @@
   },
   {
     "CaseTypeID": "ET_EnglandWales",
-    "ID": "addCaseNote",
-    "Name": "Add Telephone Note",
-    "Description": "Add telephone note",
-    "DisplayOrder": 56,
-    "PreConditionState(s)": "*",
-    "PostConditionState": "*",
-    "SecurityClassification": "Public",
-    "ShowEventNotes": "N",
-    "ShowSummary": "N",
-    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/caseNotes/singles/aboutToSubmit"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
     "ID": "generateNotificationSummary",
     "Name": "Generate Notification Summary",
     "Description": "Generate Notification Summary",

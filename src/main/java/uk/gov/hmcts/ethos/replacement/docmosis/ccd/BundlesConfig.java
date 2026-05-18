@@ -6,18 +6,23 @@ import uk.gov.hmcts.ccd.sdk.api.Event;
 import uk.gov.hmcts.ccd.sdk.api.Permission;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 
+import java.util.EnumSet;
+
 public abstract class BundlesConfig<T extends CaseData> implements CCDConfig<T, EtState, EtUserRole> {
 
     private final EtUserRole regionalCaseworkerRole;
+    private final EtUserRole regionalJudgeRole;
     private final boolean grantClaimantSubmissionToApi;
     private final String removeHearingBundlesDescription;
 
     protected BundlesConfig(
         EtUserRole regionalCaseworkerRole,
+        EtUserRole regionalJudgeRole,
         boolean grantClaimantSubmissionToApi,
         String removeHearingBundlesDescription
     ) {
         this.regionalCaseworkerRole = regionalCaseworkerRole;
+        this.regionalJudgeRole = regionalJudgeRole;
         this.grantClaimantSubmissionToApi = grantClaimantSubmissionToApi;
         this.removeHearingBundlesDescription = removeHearingBundlesDescription;
     }
@@ -68,5 +73,60 @@ public abstract class BundlesConfig<T extends CaseData> implements CCDConfig<T, 
             .done()
             .done()
             .grant(Permission.CRUD, regionalCaseworkerRole, EtUserRole.CASEWORKER_EMPLOYMENT_API);
+
+        configBuilder.event("uploadHearingDocuments")
+            .forStateTransition(EtState.ACCEPTED, EnumSet.allOf(EtState.class))
+            .name("Upload Hearing Documents")
+            .description("Upload Hearing Documents")
+            .caseEventColumn("DisplayOrder", null)
+            .aboutToStartCallbackUrl("${ET_COS_URL}/uploadHearingDocuments/aboutToStart")
+            .aboutToSubmitCallbackUrl("${ET_COS_URL}/uploadHearingDocuments/aboutToSubmit")
+            .fields()
+            .page("1")
+            .field(CaseData::getUploadHearingDocumentsSelectPastOrFutureHearing)
+            .mandatory()
+            .showSummary()
+            .caseEventColumn("PageColumnNumber", null)
+            .caseEventColumn("PageLabel", "Upload Hearing Documents")
+            .done()
+            .field(CaseData::getUploadHearingDocumentsSelectPastHearing)
+            .mandatory()
+            .showCondition("uploadHearingDocumentsSelectPastOrFutureHearing=\"Past\"")
+            .showSummary()
+            .caseEventColumn("PageColumnNumber", null)
+            .done()
+            .field(CaseData::getUploadHearingDocumentsSelectFutureHearing)
+            .mandatory()
+            .showCondition("uploadHearingDocumentsSelectPastOrFutureHearing=\"Future\"")
+            .showSummary()
+            .caseEventColumn("PageColumnNumber", null)
+            .caseEventColumn("PageFieldDisplayOrder", 2)
+            .done()
+            .field(CaseData::getUploadHearingDocumentType)
+            .mandatory()
+            .showSummary()
+            .caseEventColumn("PageColumnNumber", null)
+            .caseEventColumn("PageFieldDisplayOrder", 3)
+            .done()
+            .field(CaseData::getUploadHearingDocumentsWhoseDocuments)
+            .mandatory()
+            .showSummary()
+            .caseEventColumn("PageColumnNumber", null)
+            .caseEventColumn("PageFieldDisplayOrder", 4)
+            .done()
+            .field(CaseData::getUploadHearingDocumentsDateSubmitted)
+            .mandatory()
+            .showSummary()
+            .caseEventColumn("PageColumnNumber", null)
+            .caseEventColumn("PageFieldDisplayOrder", 5)
+            .done()
+            .done()
+            .grant(
+                Permission.CRUD,
+                regionalCaseworkerRole,
+                regionalJudgeRole,
+                EtUserRole.CASEWORKER_EMPLOYMENT_API
+            )
+            .grant(Permission.R, EtUserRole.CASEWORKER_EMPLOYMENT_ETJUDGE);
     }
 }

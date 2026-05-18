@@ -170,6 +170,12 @@
   {
     "jurisdiction": "england-wales",
     "caseType": "ET_EnglandWales",
+    "eventId": "uploadHearingDocuments",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
     "eventId": "createDcf",
     "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
     "files": {
@@ -354,6 +360,12 @@
     "jurisdiction": "scotland",
     "caseType": "ET_Scotland",
     "eventId": "removeHearingBundles",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "uploadHearingDocuments",
     "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"]
   },
   {

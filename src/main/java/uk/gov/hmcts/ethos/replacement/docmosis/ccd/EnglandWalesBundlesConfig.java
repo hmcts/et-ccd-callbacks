@@ -8,6 +8,7 @@ public class EnglandWalesBundlesConfig extends BundlesConfig<EnglandWalesCaseDat
     public EnglandWalesBundlesConfig() {
         super(
             EtUserRole.CASEWORKER_EMPLOYMENT_ENGLANDWALES,
+            EtUserRole.CASEWORKER_EMPLOYMENT_ETJUDGE_ENGLANDWALES,
             false,
             "Remove Hearing Documents"
         );

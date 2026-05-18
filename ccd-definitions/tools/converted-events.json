@@ -152,6 +152,36 @@
   {
     "jurisdiction": "england-wales",
     "caseType": "ET_EnglandWales",
+    "eventId": "caseTransferSameCountryEccLinkedCase",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "caseTransferMultiple",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "processCaseTransfer",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "returnCaseTransfer",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "amendSingle",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
     "eventId": "SUBMIT_ET3_FORM",
     "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
   },
@@ -348,6 +378,30 @@
     "jurisdiction": "scotland",
     "caseType": "ET_Scotland",
     "eventId": "rollbackMigrateCase",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "caseTransferMultiple",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "processCaseTransfer",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "returnCaseTransfer",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "amendSingle",
     "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
   },
   {

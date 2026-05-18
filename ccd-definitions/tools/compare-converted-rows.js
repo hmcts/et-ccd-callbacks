@@ -28,9 +28,15 @@ if (failures.length > 0) {
 
 function selectedRows(root, conversion, sheet) {
   const sheetRoot = path.join(root, conversion.jurisdiction, 'json', sheet);
-  return sheetFiles(sheetRoot, conversion, sheet)
+  const rows = sheetFiles(sheetRoot, conversion, sheet)
     .flatMap(file => JSON.parse(fs.readFileSync(file, 'utf8')))
-    .filter(row => rowMatcher(sheet, conversion.eventId)(row));
+    .filter(row => rowMatcher(sheet, conversion.eventId)(row))
+    .flatMap(row => normaliseRow(sheet, row));
+
+  if (sheet === 'AuthorisationCaseEvent') {
+    return rows.sort((left, right) => stableJson(left).localeCompare(stableJson(right)));
+  }
+  return rows;
 }
 
 function sheetFiles(sheetRoot, conversion, sheet) {
@@ -49,6 +55,21 @@ function rowMatcher(sheet, eventId) {
     return row => row.ID === eventId;
   }
   return row => row.CaseEventID === eventId;
+}
+
+function normaliseRow(sheet, row) {
+  if (sheet !== 'AuthorisationCaseEvent' || !row.AccessControl) {
+    return [row];
+  }
+
+  return row.AccessControl.flatMap(accessControl =>
+    accessControl.UserRoles.map(role => ({
+      CaseTypeId: row.CaseTypeID || row.CaseTypeId,
+      CaseEventID: row.CaseEventID,
+      UserRole: role,
+      CRUD: accessControl.CRUD
+    }))
+  );
 }
 
 function stableJson(value) {

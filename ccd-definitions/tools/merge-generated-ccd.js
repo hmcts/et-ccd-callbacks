@@ -70,22 +70,36 @@ function sheetFiles(sheetRoot, conversion, sheet) {
 
 function replaceRowsInPlace(sheet, existing, rows, matches) {
   const remaining = new Map(rows.map(row => [rowKey(sheet, row), row]));
-  const merged = existing.map(row => {
+  const merged = existing.flatMap(row => {
     if (!matches(row)) {
-      return row;
+      return [row];
     }
 
-    const key = rowKey(sheet, row);
-    if (!remaining.has(key)) {
-      throw new Error(`No generated ${sheet} row for ${key}`);
-    }
+    return rowKeys(sheet, row).map(key => {
+      if (!remaining.has(key)) {
+        throw new Error(`No generated ${sheet} row for ${key}`);
+      }
 
-    const replacement = remaining.get(key);
-    remaining.delete(key);
-    return replacement;
+      const replacement = remaining.get(key);
+      remaining.delete(key);
+      return replacement;
+    });
   });
 
   return merged.concat([...remaining.values()]);
+}
+
+function rowKeys(sheet, row) {
+  if (sheet === 'AuthorisationCaseEvent' && row.AccessControl) {
+    return row.AccessControl.flatMap(accessControl =>
+      accessControl.UserRoles.map(role => [
+        row.CaseTypeID || row.CaseTypeId,
+        row.CaseEventID,
+        role
+      ].join('|'))
+    );
+  }
+  return [rowKey(sheet, row)];
 }
 
 function rowKey(sheet, row) {

@@ -1459,7 +1459,8 @@
     "ID": "RespondentRepresentative",
     "ListElementCode": "idamId",
     "FieldType": "Text",
-    "ElementLabel": "Respondent representative role",
+    "ElementLabel": "Respondent representative idam id",
+    "FieldShowCondition": "role=\"dummy\"",
     "SecurityClassification": "Public",
     "Searchable": "N"
   },

@@ -20,6 +20,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.ethos.replacement.docmosis.DocmosisApplication;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.AmendRepresentativeContactService;
+import uk.gov.hmcts.ethos.replacement.docmosis.test.utils.LoggerTestUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
@@ -46,6 +47,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConst
 @ContextConfiguration(classes = DocmosisApplication.class)
 class AmendRepresentativeContactControllerTest extends BaseControllerTest {
 
+    private static final String ABOUT_TO_START = "/amendRepresentativeContact/aboutToStart";
     private static final String ABOUT_TO_SUBMIT = "/amendRepresentativeContact/aboutToSubmit";
     private static final String MID_EVENT = "/amendRepresentativeContact/midEvent";
 
@@ -84,6 +86,44 @@ class AmendRepresentativeContactControllerTest extends BaseControllerTest {
 
     @Test
     @SneakyThrows
+    void theAboutToStart() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        doNothing().when(amendRepresentativeContactService).setEt3ResponseContactAddress(AUTH_TOKEN,
+                ccdRequest.getCaseDetails().getCaseData(), ccdRequest.getCaseDetails().getCaseId());
+        mvc.perform(post(ABOUT_TO_START)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath("$.errors.size()", is(LoggerTestUtils.INTEGER_ZERO)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    @SneakyThrows
+    void theAboutToStart_WithException() {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+        doThrow(new GenericServiceException(ERROR_CASE_DATA_NOT_FOUND,
+                new Exception(ERROR_CASE_DATA_NOT_FOUND),
+                ERROR_CASE_DATA_NOT_FOUND,
+                StringUtils.EMPTY,
+                "amendRepresentativeContactService",
+                "setEt3ResponseContactAddress")).when(amendRepresentativeContactService)
+                .setEt3ResponseContactAddress(anyString(), any(CaseData.class), anyString());
+        mvc.perform(post(ABOUT_TO_START)
+                        .contentType(APPLICATION_JSON)
+                        .header(HttpHeaders.AUTHORIZATION, AUTH_TOKEN)
+                        .content(jsonMapper.toJson(ccdRequest)))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
+                .andExpect(jsonPath("$.errors.size()", is(LoggerTestUtils.INTEGER_ONE)))
+                .andExpect(jsonPath("$.errors[0]", is(ERROR_CASE_DATA_NOT_FOUND)))
+                .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
+    }
+
+    @Test
+    @SneakyThrows
     void theMidEventAmendRepresentativeContact() {
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         doNothing().when(amendRepresentativeContactService).updateRepresentativeContactDetails(AUTH_TOKEN,
@@ -96,7 +136,7 @@ class AmendRepresentativeContactControllerTest extends BaseControllerTest {
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath("$.errors.size()", is(0)))
+                .andExpect(jsonPath("$.errors.size()", is(LoggerTestUtils.INTEGER_ZERO)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         ccdRequest.getCaseDetails().getCaseData().setRepresentativeContactChangeOption("DUMMY");
     }
@@ -109,8 +149,8 @@ class AmendRepresentativeContactControllerTest extends BaseControllerTest {
                 new Exception(ERROR_CASE_DATA_NOT_FOUND),
                 ERROR_CASE_DATA_NOT_FOUND,
                 StringUtils.EMPTY,
-                "Et3ResponseService",
-                "setRespondentRepresentsContactDetails")).when(amendRepresentativeContactService)
+                "amendRepresentativeContactService",
+                "setRepresentativeMyHmctsContactAddress")).when(amendRepresentativeContactService)
                 .setRepresentativeMyHmctsContactAddress(anyString(), any(CaseData.class));
         ccdRequest.getCaseDetails().getCaseData().setRepresentativeContactChangeOption(
                 REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS);
@@ -120,7 +160,7 @@ class AmendRepresentativeContactControllerTest extends BaseControllerTest {
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath("$.errors.size()", is(1)))
+                .andExpect(jsonPath("$.errors.size()", is(LoggerTestUtils.INTEGER_ONE)))
                 .andExpect(jsonPath("$.errors[0]", is(ERROR_CASE_DATA_NOT_FOUND)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
         ccdRequest.getCaseDetails().getCaseData().setRepresentativeContactChangeOption("DUMMY");
@@ -138,7 +178,7 @@ class AmendRepresentativeContactControllerTest extends BaseControllerTest {
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath("$.errors.size()", is(0)))
+                .andExpect(jsonPath("$.errors.size()", is(LoggerTestUtils.INTEGER_ZERO)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }
 
@@ -150,8 +190,8 @@ class AmendRepresentativeContactControllerTest extends BaseControllerTest {
                 new Exception(ERROR_CASE_DATA_NOT_FOUND),
                 ERROR_CASE_DATA_NOT_FOUND,
                 StringUtils.EMPTY,
-                "Et3ResponseService",
-                "setRespondentRepresentsContactDetails")).when(amendRepresentativeContactService)
+                "amendRepresentativeContactService",
+                "updateRepresentativeContactDetails")).when(amendRepresentativeContactService)
                 .updateRepresentativeContactDetails(anyString(), any(CaseData.class), anyString());
         mvc.perform(post(ABOUT_TO_SUBMIT)
                         .contentType(APPLICATION_JSON)
@@ -159,7 +199,7 @@ class AmendRepresentativeContactControllerTest extends BaseControllerTest {
                         .content(jsonMapper.toJson(ccdRequest)))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath(JsonMapper.DATA, notNullValue()))
-                .andExpect(jsonPath("$.errors.size()", is(1)))
+                .andExpect(jsonPath("$.errors.size()", is(LoggerTestUtils.INTEGER_ONE)))
                 .andExpect(jsonPath("$.errors[0]", is(ERROR_CASE_DATA_NOT_FOUND)))
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
     }

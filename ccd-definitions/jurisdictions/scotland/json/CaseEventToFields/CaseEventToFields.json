@@ -5068,7 +5068,7 @@
   },
   {
     "CaseTypeID": "ET_Scotland",
-    "CaseEventID": "amendRespondentRepresentativeContact",
+    "CaseEventID": "amendRepresentativeContact",
     "CaseFieldID": "representativeContactChangeOption",
     "DisplayContext": "OPTIONAL",
     "PageID": 1,
@@ -5079,7 +5079,7 @@
   },
   {
     "CaseTypeID": "ET_Scotland",
-    "CaseEventID": "amendRespondentRepresentativeContact",
+    "CaseEventID": "amendRepresentativeContact",
     "CaseFieldID": "et3ResponsePhone",
     "DisplayContext": "OPTIONAL",
     "PageID": 2,
@@ -5091,7 +5091,7 @@
   },
   {
     "CaseTypeID": "ET_Scotland",
-    "CaseEventID": "amendRespondentRepresentativeContact",
+    "CaseEventID": "amendRepresentativeContact",
     "CaseFieldID": "et3ResponseAddress",
     "DisplayContext": "OPTIONAL",
     "PageID": 2,
@@ -5102,7 +5102,7 @@
   },
   {
     "CaseTypeID": "ET_Scotland",
-    "CaseEventID": "amendRespondentRepresentativeContact",
+    "CaseEventID": "amendRepresentativeContact",
     "CaseFieldID": "myHmctsAddressText",
     "DisplayContext": "READONLY",
     "PageID": 3,

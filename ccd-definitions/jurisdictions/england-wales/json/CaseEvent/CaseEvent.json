@@ -223,13 +223,14 @@
   },
   {
     "CaseTypeID": "ET_EnglandWales",
-    "ID": "amendRespondentRepresentativeContact",
+    "ID": "amendRepresentativeContact",
     "Name": "Amend contact details",
     "Description": "Amend contact details",
     "DisplayOrder": 53,
     "PreConditionState(s)": "Accepted",
     "PostConditionState": "*",
     "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/amendRepresentativeContact/aboutToSubmit",
+    "CallBackURLAboutToStartEvent": "${ET_COS_URL}/amendRepresentativeContact/aboutToStart",
     "SecurityClassification": "Public",
     "ShowEventNotes": "N",
     "ShowSummary": "Y"

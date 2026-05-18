@@ -10,7 +10,8 @@ public class ScotlandSingleFieldEventsConfig extends SingleFieldEventsConfig<Sco
             EtUserRole.CASEWORKER_EMPLOYMENT_SCOTLAND,
             EtUserRole.CASEWORKER_EMPLOYMENT_ETJUDGE_SCOTLAND,
             50,
-            "Add telephone Note"
+            "Add telephone Note",
+            1
         );
     }
 

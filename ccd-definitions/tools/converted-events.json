@@ -419,6 +419,28 @@
   {
     "jurisdiction": "england-wales",
     "caseType": "ET_EnglandWales",
+    "eventId": "draftAndSignJudgement",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-WA.json"],
+      "CaseEventToFields": ["CaseEventToFields-WA.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent-WA.json"]
+    }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "amendRespondentRepresentative",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent.json"],
+      "CaseEventToFields": ["CaseEventToFields.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json"]
+    }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
     "eventId": "recordDeposit",
     "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
     "files": {
@@ -963,6 +985,28 @@
     "jurisdiction": "scotland",
     "caseType": "ET_Scotland",
     "eventId": "addCaseNote",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent.json"],
+      "CaseEventToFields": ["CaseEventToFields.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "draftAndSignJudgement",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-WA.json"],
+      "CaseEventToFields": ["CaseEventToFields-WA.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent-WA.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "amendRespondentRepresentative",
     "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
     "files": {
       "CaseEvent": ["CaseEvent.json"],

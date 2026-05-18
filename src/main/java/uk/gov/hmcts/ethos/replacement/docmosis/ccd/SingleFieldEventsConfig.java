@@ -19,17 +19,20 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
     private final EtUserRole regionalJudgeRole;
     private final int nocRequestDisplayOrder;
     private final String addCaseNoteDescription;
+    private final int amendRespondentRepresentativeFieldDisplayOrder;
 
     protected SingleFieldEventsConfig(
         EtUserRole regionalCaseworkerRole,
         EtUserRole regionalJudgeRole,
         int nocRequestDisplayOrder,
-        String addCaseNoteDescription
+        String addCaseNoteDescription,
+        int amendRespondentRepresentativeFieldDisplayOrder
     ) {
         this.regionalCaseworkerRole = regionalCaseworkerRole;
         this.regionalJudgeRole = regionalJudgeRole;
         this.nocRequestDisplayOrder = nocRequestDisplayOrder;
         this.addCaseNoteDescription = addCaseNoteDescription;
+        this.amendRespondentRepresentativeFieldDisplayOrder = amendRespondentRepresentativeFieldDisplayOrder;
     }
 
     @Override
@@ -191,6 +194,45 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .done()
             .grant(Permission.CRUD, regionalCaseworkerRole, regionalJudgeRole, EtUserRole.CASEWORKER_EMPLOYMENT_API)
             .grant(Permission.R, EtUserRole.CASEWORKER_EMPLOYMENT_ETJUDGE);
+
+        configBuilder.event("draftAndSignJudgement")
+            .forAllStates()
+            .name("Draft and sign judgment/order")
+            .description("Draft and sign judgment/order")
+            .showSummary()
+            .showCondition("caseType =\"dummy\"")
+            .caseEventColumn("DisplayOrder", null)
+            .publishToCamunda()
+            .blankCallbackUrls()
+            .fields()
+            .page("1")
+            .field(CaseData::getDraftAndSignJudgement)
+            .showSummary()
+            .caseEventColumn("PageColumnNumber", 1)
+            .done()
+            .done()
+            .grant(Permission.CRUD, regionalJudgeRole, EtUserRole.CASEWORKER_EMPLOYMENT_API)
+            .grant(Permission.CRU, EtUserRole.CASEWORKER_WA_TASK_CONFIGURATION)
+            .grant(Permission.R, regionalCaseworkerRole);
+
+        regionalCaseworkerEvent(configBuilder.event("amendRespondentRepresentative").forAllStates())
+            .name("Respondent Representative")
+            .description("Add or Amend a Respondent Representative")
+            .displayOrder(17)
+            .showCondition("managingOffice !=\"Unassigned\"")
+            .caseEventColumn("PreConditionState(s)", "Accepted;Closed")
+            .aboutToStartCallbackUrl("${ET_COS_URL}/dynamicRespondentRepresentativeNames")
+            .aboutToSubmitCallbackUrl("${ET_COS_URL}/amendRespondentRepresentative")
+            .submittedCallbackUrl("${ET_COS_URL}/amendRespondentRepSubmitted")
+            .fields()
+            .page("1")
+            .field(CaseData::getRepCollection)
+            .showSummary()
+            .caseEventColumn("PageDisplayOrder", amendRespondentRepresentativeFieldDisplayOrder)
+            .caseEventColumn("PageFieldDisplayOrder", amendRespondentRepresentativeFieldDisplayOrder)
+            .caseEventColumn("PageColumnNumber", 1)
+            .done()
+            .done();
 
         regionalCaseworkerEvent(configBuilder.event("recordDeposit").forState(EtState.ACCEPTED))
             .name("Deposit Order")

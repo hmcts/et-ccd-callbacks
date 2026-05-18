@@ -10,7 +10,8 @@ public class EnglandWalesSingleFieldEventsConfig extends SingleFieldEventsConfig
             EtUserRole.CASEWORKER_EMPLOYMENT_ENGLANDWALES,
             EtUserRole.CASEWORKER_EMPLOYMENT_ETJUDGE_ENGLANDWALES,
             52,
-            "Add telephone note"
+            "Add telephone note",
+            2
         );
     }
 

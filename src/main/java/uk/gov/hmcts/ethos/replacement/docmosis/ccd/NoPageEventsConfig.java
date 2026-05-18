@@ -14,19 +14,22 @@ public abstract class NoPageEventsConfig<T extends CaseData> implements CCDConfi
     private final int applyNocDecisionDisplayOrder;
     private final int updateRepresentationDisplayOrder;
     private final int reconfigureWaTasksDisplayOrder;
+    private final boolean includeAssignCaseToGlasgow;
 
     protected NoPageEventsConfig(
         EtUserRole regionalCaseworkerRole,
         EtUserRole regionalJudgeRole,
         int applyNocDecisionDisplayOrder,
         int updateRepresentationDisplayOrder,
-        int reconfigureWaTasksDisplayOrder
+        int reconfigureWaTasksDisplayOrder,
+        boolean includeAssignCaseToGlasgow
     ) {
         this.regionalCaseworkerRole = regionalCaseworkerRole;
         this.regionalJudgeRole = regionalJudgeRole;
         this.applyNocDecisionDisplayOrder = applyNocDecisionDisplayOrder;
         this.updateRepresentationDisplayOrder = updateRepresentationDisplayOrder;
         this.reconfigureWaTasksDisplayOrder = reconfigureWaTasksDisplayOrder;
+        this.includeAssignCaseToGlasgow = includeAssignCaseToGlasgow;
     }
 
     @Override
@@ -121,5 +124,20 @@ public abstract class NoPageEventsConfig<T extends CaseData> implements CCDConfi
             .displayOrder(updateRepresentationDisplayOrder)
             .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API)
             .authorisationCaseEventColumn(EtUserRole.CASEWORKER_EMPLOYMENT_API, "LiveFrom", "01/01/2017");
+
+        if (includeAssignCaseToGlasgow) {
+            configBuilder.event("assignCase")
+                .forStateTransition(EtState.SUBMITTED, EtState.SUBMITTED)
+                .name("Assign Case to Glasgow")
+                .description("Assign case to Glasgow")
+                .displayOrder(7)
+                .showCondition("managingOffice =\"Unassigned\"")
+                .publishToCamunda()
+                .aboutToSubmitCallbackUrl("${ET_COS_URL}/caseTransfer/assignCase")
+                .grant(Permission.R, EtUserRole.CASEWORKER_EMPLOYMENT, EtUserRole.CASEWORKER_EMPLOYMENT_ETJUDGE)
+                .grant(Permission.CRU, regionalCaseworkerRole, regionalJudgeRole,
+                    EtUserRole.CASEWORKER_WA_TASK_CONFIGURATION)
+                .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API);
+        }
     }
 }

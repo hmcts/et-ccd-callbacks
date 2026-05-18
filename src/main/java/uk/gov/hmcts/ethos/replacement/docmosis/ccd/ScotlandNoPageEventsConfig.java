@@ -11,7 +11,8 @@ public class ScotlandNoPageEventsConfig extends NoPageEventsConfig<ScotlandCaseD
             EtUserRole.CASEWORKER_EMPLOYMENT_ETJUDGE_SCOTLAND,
             51,
             52,
-            59
+            59,
+            true
         );
     }
 }

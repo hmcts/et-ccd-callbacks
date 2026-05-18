@@ -29,23 +29,34 @@ function replaceConvertedRows(conversion, sheet) {
   const sheetRoot = path.join(outputRoot, conversion.jurisdiction, 'json', sheet);
   const files = sheetFiles(sheetRoot, conversion, sheet);
   const matches = rowMatcher(sheet, conversion.eventId);
+  const remaining = new Map(rows.map(row => [rowKey(sheet, row), row]));
   let replaced = false;
+  let appendFile = null;
 
   for (const file of files) {
     const existing = JSON.parse(fs.readFileSync(file, 'utf8'));
-    const firstIndex = existing.findIndex(matches);
-    if (firstIndex === -1) {
+    const fileRows = matchingRowsForFile(sheet, existing, matches, remaining);
+    if (fileRows.length === 0) {
       continue;
     }
 
-    writeJson(file, replaceRowsInPlace(sheet, existing, rows, matches));
+    writeJson(file, replaceRowsInPlace(sheet, existing, fileRows, matches, false));
+    fileRows.forEach(row => remaining.delete(rowKey(sheet, row)));
     replaced = true;
+    appendFile ??= file;
   }
 
-  if (!replaced) {
+  if (remaining.size === 0) {
+    return;
+  }
+
+  if (appendFile) {
+    const existing = JSON.parse(fs.readFileSync(appendFile, 'utf8'));
+    writeJson(appendFile, existing.concat([...remaining.values()]));
+  } else if (!replaced) {
     const target = defaultSheetFile(sheetRoot, sheet, conversion.eventId);
     fs.mkdirSync(path.dirname(target), { recursive: true });
-    writeJson(target, rows);
+    writeJson(target, [...remaining.values()]);
   }
 }
 
@@ -68,7 +79,15 @@ function sheetFiles(sheetRoot, conversion, sheet) {
   return files.filter(file => allowed.has(path.basename(file)) || allowed.has(path.relative(sheetRoot, file)));
 }
 
-function replaceRowsInPlace(sheet, existing, rows, matches) {
+function matchingRowsForFile(sheet, existing, matches, remaining) {
+  return existing
+    .filter(matches)
+    .flatMap(row => rowKeys(sheet, row))
+    .filter(key => remaining.has(key))
+    .map(key => remaining.get(key));
+}
+
+function replaceRowsInPlace(sheet, existing, rows, matches, appendRemaining = true) {
   const remaining = new Map(rows.map(row => [rowKey(sheet, row), row]));
   const merged = existing.flatMap(row => {
     if (!matches(row)) {
@@ -86,7 +105,7 @@ function replaceRowsInPlace(sheet, existing, rows, matches) {
     });
   });
 
-  return merged.concat([...remaining.values()]);
+  return appendRemaining ? merged.concat([...remaining.values()]) : merged;
 }
 
 function rowKeys(sheet, row) {

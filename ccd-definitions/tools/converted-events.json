@@ -677,6 +677,16 @@
   {
     "jurisdiction": "scotland",
     "caseType": "ET_Scotland",
+    "eventId": "assignCase",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json", "AuthorisationCaseEvent-WA.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
     "eventId": "SUBMIT_ET3_FORM",
     "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
   },

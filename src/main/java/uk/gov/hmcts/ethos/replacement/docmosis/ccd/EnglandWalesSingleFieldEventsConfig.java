@@ -15,7 +15,9 @@ public class EnglandWalesSingleFieldEventsConfig extends SingleFieldEventsConfig
             52,
             "Add telephone note",
             2,
-            42
+            42,
+            "Judgment, Order, Notification",
+            "View all judgments, orders and notifications"
         );
     }
 

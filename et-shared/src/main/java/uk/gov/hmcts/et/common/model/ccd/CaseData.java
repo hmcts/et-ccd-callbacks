@@ -1480,6 +1480,8 @@ public class CaseData extends Et1CaseData {
 
     @JsonProperty("pseViewNotifications")
     private String pseViewNotifications;
+    @JsonProperty("pseViewNotificationsLabel")
+    private String pseViewNotificationsLabel;
 
     @JsonProperty("et3RepresentingRespondent")
     private List<DynamicListTypeItem> et3RepresentingRespondent;

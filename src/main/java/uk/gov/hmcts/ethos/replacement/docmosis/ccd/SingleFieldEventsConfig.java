@@ -21,6 +21,8 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
     private final String addCaseNoteDescription;
     private final int amendRespondentRepresentativeFieldDisplayOrder;
     private final int legalRepDocumentsDisplayOrder;
+    private final String viewAllNotificationsName;
+    private final String viewAllNotificationsDescription;
 
     protected SingleFieldEventsConfig(
         EtUserRole regionalCaseworkerRole,
@@ -28,7 +30,9 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
         int nocRequestDisplayOrder,
         String addCaseNoteDescription,
         int amendRespondentRepresentativeFieldDisplayOrder,
-        int legalRepDocumentsDisplayOrder
+        int legalRepDocumentsDisplayOrder,
+        String viewAllNotificationsName,
+        String viewAllNotificationsDescription
     ) {
         this.regionalCaseworkerRole = regionalCaseworkerRole;
         this.regionalJudgeRole = regionalJudgeRole;
@@ -36,6 +40,8 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
         this.addCaseNoteDescription = addCaseNoteDescription;
         this.amendRespondentRepresentativeFieldDisplayOrder = amendRespondentRepresentativeFieldDisplayOrder;
         this.legalRepDocumentsDisplayOrder = legalRepDocumentsDisplayOrder;
+        this.viewAllNotificationsName = viewAllNotificationsName;
+        this.viewAllNotificationsDescription = viewAllNotificationsDescription;
     }
 
     @Override
@@ -263,6 +269,46 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API)
             .grant(Permission.CRU, EtUserRole.CASEWORKER_EMPLOYMENT_LEGALREP_SOLICITOR);
 
+        pseViewNotificationsFields(
+            configBuilder.event("viewAllNotifications")
+                .forAllStates()
+                .name(viewAllNotificationsName)
+                .description(viewAllNotificationsDescription)
+                .showCondition("caseType=\"dummy\"")
+                .caseEventColumn("DisplayOrder", null)
+                .aboutToStartCallbackUrl("${ET_COS_URL}/pseViewNotifications/aboutToStart")
+                .aboutToSubmitCallbackUrl("")
+                .submittedCallbackUrl("")
+                .endButtonLabel("Close and return to case details")
+        )
+            .grant(
+                Permission.CRUD,
+                EtUserRole.SOLICITOR_A,
+                EtUserRole.SOLICITOR_B,
+                EtUserRole.SOLICITOR_C,
+                EtUserRole.SOLICITOR_D,
+                EtUserRole.SOLICITOR_E,
+                EtUserRole.SOLICITOR_F,
+                EtUserRole.SOLICITOR_G,
+                EtUserRole.SOLICITOR_H,
+                EtUserRole.SOLICITOR_I,
+                EtUserRole.SOLICITOR_J,
+                EtUserRole.CASEWORKER_EMPLOYMENT_API
+            )
+            .grant(Permission.D, EtUserRole.CLAIMANT_SOLICITOR);
+
+        pseViewNotificationsFields(
+            configBuilder.event("claimantViewAllNotifications")
+                .forAllStates()
+                .name("View All Notifications")
+                .description("View Notification")
+                .displayOrder(60)
+                .aboutToStartCallbackUrl("${ET_COS_URL}/claimantViewNotification/all/aboutToStart")
+                .aboutToSubmitCallbackUrl("${ET_COS_URL}/claimantViewNotification/all/aboutToSubmit")
+        )
+            .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API)
+            .grant(Permission.CRU, EtUserRole.CLAIMANT_SOLICITOR);
+
         regionalCaseworkerEvent(configBuilder.event("recordDeposit").forState(EtState.ACCEPTED))
             .name("Deposit Order")
             .description("Record a Deposit")
@@ -433,5 +479,25 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .done()
             .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API)
             .grant(Permission.CRU, EtUserRole.CASEWORKER_EMPLOYMENT_ETJUDGE, regionalCaseworkerRole, regionalJudgeRole);
+    }
+
+    private Event.EventBuilder<T, EtUserRole, EtState> pseViewNotificationsFields(
+        Event.EventBuilder<T, EtUserRole, EtState> event
+    ) {
+        return event.fields()
+            .page("1")
+            .pageLabel("All judgments, orders and notifications")
+            .field(CaseData::getPseViewNotifications)
+            .readOnly()
+            .showCondition("pseViewNotificationsLabel=\"dummy\"")
+            .caseEventColumn("RetainHiddenValue", "No")
+            .caseEventColumn("PageColumnNumber", null)
+            .done()
+            .field(CaseData::getPseViewNotificationsLabel)
+            .readOnly()
+            .caseEventColumn("PageLabel", null)
+            .caseEventColumn("PageColumnNumber", null)
+            .done()
+            .done();
     }
 }

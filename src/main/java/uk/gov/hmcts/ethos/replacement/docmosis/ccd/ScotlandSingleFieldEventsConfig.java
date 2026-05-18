@@ -12,7 +12,9 @@ public class ScotlandSingleFieldEventsConfig extends SingleFieldEventsConfig<Sco
             50,
             "Add telephone Note",
             1,
-            40
+            40,
+            "Judgement, Order, Notification",
+            "View all judgement, orders and notifications"
         );
     }
 

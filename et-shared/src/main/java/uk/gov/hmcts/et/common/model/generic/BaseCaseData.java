@@ -102,6 +102,9 @@ public class BaseCaseData {
     private List<DocumentTypeItem> claimantDocumentCollection;
     private List<DocumentTypeItem> legalrepDocumentCollection;
 
+    @JsonProperty("horizontalLine")
+    private String horizontalLine;
+
     @JsonProperty("digitalCaseFile")
     private DigitalCaseFileType digitalCaseFile;
 

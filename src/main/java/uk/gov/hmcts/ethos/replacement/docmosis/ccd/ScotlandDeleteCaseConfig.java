@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.ccd;
 import org.springframework.stereotype.Component;
 import uk.gov.hmcts.ccd.sdk.api.CCDConfig;
 import uk.gov.hmcts.ccd.sdk.api.ConfigBuilder;
+import uk.gov.hmcts.ccd.sdk.api.Event;
 import uk.gov.hmcts.ccd.sdk.api.Permission;
 
 import java.util.EnumSet;
@@ -46,5 +47,25 @@ public class ScotlandDeleteCaseConfig implements CCDConfig<ScotlandCaseData, EtS
             .done()
             .done()
             .grant(Permission.CRU, EtUserRole.CASEWORKER_EMPLOYMENT_API);
+
+        ttlMigrationEvent(configBuilder, "migrateCaseTTLDetails", "Migrate Case TTL", 200)
+            .description("Migrate Case TTL Details")
+            .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API);
+
+        ttlMigrationEvent(configBuilder, "rollbackMigrateCaseTTLDetails", "Rollback Migrate Case TTL", 201)
+            .description("Rollback Migrate Case TTL Details")
+            .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API);
+    }
+
+    private Event.EventBuilder<ScotlandCaseData, EtUserRole, EtState> ttlMigrationEvent(
+        ConfigBuilder<ScotlandCaseData, EtState, EtUserRole> configBuilder,
+        String eventId,
+        String name,
+        int displayOrder
+    ) {
+        return configBuilder.event(eventId)
+            .forAllStates()
+            .name(name)
+            .displayOrder(displayOrder);
     }
 }

@@ -8,6 +8,17 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 
 public abstract class NotificationConfig<T extends CaseData> implements CCDConfig<T, EtState, EtUserRole> {
 
+    private final int updateNotificationResponseHearingDatePage;
+    private final boolean hideUpdateNotificationResponseCollection;
+
+    protected NotificationConfig(
+        int updateNotificationResponseHearingDatePage,
+        boolean hideUpdateNotificationResponseCollection
+    ) {
+        this.updateNotificationResponseHearingDatePage = updateNotificationResponseHearingDatePage;
+        this.hideUpdateNotificationResponseCollection = hideUpdateNotificationResponseCollection;
+    }
+
     @Override
     public void configure(ConfigBuilder<T, EtState, EtUserRole> configBuilder) {
         configBuilder.event("UPDATE_NOTIFICATION_STATE")
@@ -58,6 +69,19 @@ public abstract class NotificationConfig<T extends CaseData> implements CCDConfi
             .publishToCamunda()
             .grant(Permission.CRUD, EtUserRole.DEFENDANT)
             .grant(Permission.CRUD, EtUserRole.CASEWORKER_WA_TASK_CONFIGURATION);
+
+        updateNotificationResponseFields(
+            configBuilder.event("UPDATE_NOTIFICATION_RESPONSE")
+                .forAllStates()
+                .name("UPDATE_NOTIFICATION_RESPONSE")
+                .description("")
+                .displayOrder(9001)
+                .showCondition("caseType=\"Dummy\"")
+                .publishToCamunda()
+                .blankCallbackUrls()
+        )
+            .grant(Permission.CRU, EtUserRole.CITIZEN)
+            .grant(Permission.R, EtUserRole.CASEWORKER_WA_TASK_CONFIGURATION);
     }
 
     private Event.EventBuilder<T, EtUserRole, EtState> hiddenRespondentNotificationEvent(
@@ -73,5 +97,31 @@ public abstract class NotificationConfig<T extends CaseData> implements CCDConfi
             .description(description)
             .showCondition(showCondition)
             .caseEventColumn("DisplayOrder", null);
+    }
+
+    private Event.EventBuilder<T, EtUserRole, EtState> updateNotificationResponseFields(
+        Event.EventBuilder<T, EtUserRole, EtState> event
+    ) {
+        return event.fields()
+            .page("1")
+            .field(CaseData::getSendNotificationCollection)
+            .caseEventColumn("PageShowCondition", updateNotificationResponseCollectionShowCondition())
+            .caseEventColumn("Publish", null)
+            .caseEventColumn("PageColumnNumber", 1)
+            .done()
+            .page(String.valueOf(updateNotificationResponseHearingDatePage))
+            .field(CaseData::getNextListedDate)
+            .optional()
+            .caseEventColumn("ShowSummaryChangeOption", "N")
+            .caseEventColumn("PageDisplayOrder", updateNotificationResponseHearingDatePage)
+            .caseEventColumn("PageFieldDisplayOrder", 2)
+            .caseEventColumn("Publish", "Y")
+            .caseEventColumn("PageColumnNumber", 1)
+            .done()
+            .done();
+    }
+
+    private String updateNotificationResponseCollectionShowCondition() {
+        return hideUpdateNotificationResponseCollection ? "sendNotificationCollection.number=\"dummy\"" : null;
     }
 }

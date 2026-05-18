@@ -551,6 +551,17 @@
   {
     "jurisdiction": "england-wales",
     "caseType": "ET_EnglandWales",
+    "eventId": "UPDATE_NOTIFICATION_RESPONSE",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-WA.json"],
+      "CaseEventToFields": ["CaseEventToFields-ECC.json", "CaseEventToFields-ECC-hearingdate-nonprod.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json", "AuthorisationCaseEvent-ECC.json"]
+    }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
     "eventId": "recordDeposit",
     "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
     "files": {
@@ -1221,6 +1232,17 @@
       "CaseEvent": ["CaseEvent-WA.json"],
       "CaseEventToFields": ["CaseEventToFields-WA-hearingdate.json"],
       "AuthorisationCaseEvent": ["AuthorisationCaseEvent-WA.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "UPDATE_NOTIFICATION_RESPONSE",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-ECC.json"],
+      "CaseEventToFields": ["CaseEventToFields-ECC.json", "CaseEventToFields-ECC-hearingdate-nonprod.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json", "AuthorisationCaseEvent-ECC.json"]
     }
   },
   {

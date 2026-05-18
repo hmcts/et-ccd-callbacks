@@ -61,6 +61,15 @@ public abstract class CaseLinksConfig<T extends CaseData & HasLinkedCasesCompone
             .done()
             .done()
             .grant(Permission.CRUD, regionalCaseworkerRole);
+
+        configBuilder.event("UPDATE_HUBLINK_STATUS")
+            .forAllStates()
+            .name("Update hublink status")
+            .description("Update hublink status")
+            .showCondition("caseType=\"dummy\"")
+            .caseEventColumn("DisplayOrder", null)
+            .blankCallbackUrls()
+            .grant(Permission.CRUD, EtUserRole.CITIZEN);
     }
 
     private Event.EventBuilder<T, EtUserRole, EtState> caseLinkEvent(

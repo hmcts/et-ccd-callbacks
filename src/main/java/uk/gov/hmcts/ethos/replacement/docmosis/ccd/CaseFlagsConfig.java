@@ -74,6 +74,16 @@ public abstract class CaseFlagsConfig<T extends CaseData & HasFlagLauncher>
             .done()
             .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API)
             .grant(Permission.CRU, regionalCaseworkerRole);
+
+        migrationEvent(configBuilder, "migrateCaseFlags", "Migrate Case Flags")
+            .aboutToSubmitCallbackUrl("${ET_COS_URL}/case-flags-migration/about-to-submit")
+            .submittedCallbackUrl("")
+            .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API);
+
+        migrationEvent(configBuilder, "rollbackCaseFlags", "Rollback Case Flags")
+            .aboutToSubmitCallbackUrl("${ET_COS_URL}/case-flags-rollback/about-to-submit")
+            .submittedCallbackUrl("")
+            .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API);
     }
 
     private Event.EventBuilder<T, EtUserRole, EtState> caseFlagEvent(
@@ -90,5 +100,16 @@ public abstract class CaseFlagsConfig<T extends CaseData & HasFlagLauncher>
             .caseEventColumn("DisplayOrder", null)
             .caseEventColumn("EventEnablingCondition", "")
             .blankCallbackUrls();
+    }
+
+    private Event.EventBuilder<T, EtUserRole, EtState> migrationEvent(
+        ConfigBuilder<T, EtState, EtUserRole> configBuilder,
+        String eventId,
+        String name
+    ) {
+        return configBuilder.event(eventId)
+            .forAllStates()
+            .name(name)
+            .caseEventColumn("DisplayOrder", null);
     }
 }

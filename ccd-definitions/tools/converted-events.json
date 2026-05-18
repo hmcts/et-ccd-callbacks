@@ -42,6 +42,24 @@
     "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"]
   },
   {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "migrateCaseFlags",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "rollbackCaseFlags",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "UPDATE_HUBLINK_STATUS",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
     "jurisdiction": "scotland",
     "caseType": "ET_Scotland",
     "eventId": "DELETE_CASE",
@@ -82,5 +100,23 @@
     "caseType": "ET_Scotland",
     "eventId": "maintainCaseLink",
     "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "migrateCaseFlags",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "rollbackCaseFlags",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "UPDATE_HUBLINK_STATUS",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
   }
 ]

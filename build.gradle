@@ -1,3 +1,5 @@
+import groovy.json.JsonSlurper
+
 plugins {
     id 'application'
     id 'java'
@@ -11,6 +13,7 @@ plugins {
     id 'io.freefair.lombok' version '8.14.4'
     id 'org.sonarqube' version '6.3.1.5724'
     id 'pmd'
+    id 'hmcts.ccd.sdk'
     id 'com.github.hmcts.rse-cft-lib' version '0.19.2134'
 }
 
@@ -32,10 +35,195 @@ java {
     }
 }
 
+ccd {
+    configDir = file('build/ccd-definitions')
+    rootPackage = 'uk.gov.hmcts.ethos.replacement.docmosis.ccd'
+}
+
+tasks.named('generateCCDConfig') {
+    doFirst {
+        delete file('build/ccd-definitions')
+    }
+    environment 'SPRING_PROFILES_ACTIVE', 'config-gen'
+    environment 'SPRING_MAIN_WEB_APPLICATION_TYPE', 'none'
+    environment 'SPRING_AUTOCONFIGURE_EXCLUDE', [
+        'org.springframework.boot.autoconfigure.flyway.FlywayAutoConfiguration',
+        'org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration',
+        'org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration',
+        'uk.gov.hmcts.reform.idam.client.IdamClient',
+        'uk.gov.hmcts.reform.idam.client.OAuth2Configuration'
+    ].join(',')
+}
+
 checkstyle {
     maxWarnings = 0
     toolVersion = '10.14.0'
     getConfigDirectory().set(new File(rootDir, 'config/checkstyle'))
+}
+
+tasks.named('checkstyleMain') {
+    exclude '**/uk/gov/hmcts/ethos/replacement/docmosis/ccd/generated/**'
+}
+
+tasks.named('pmdMain') {
+    exclude '**/uk/gov/hmcts/ethos/replacement/docmosis/ccd/generated/**'
+}
+
+def ccdDefinitionEnvironments = [
+    local: [suffix: 'local', excludePatterns: ['*-prod.json']],
+    cftlib: [suffix: 'cftlib', excludePatterns: ['*-prod.json']],
+    demo: [suffix: 'demo', excludePatterns: ['*-prod.json']],
+    aat: [suffix: 'aat', excludePatterns: ['*-prod.json']],
+    perftest: [suffix: 'perftest', excludePatterns: ['*-prod.json']],
+    ithc: [suffix: 'ithc', excludePatterns: ['*-prod.json']],
+    prod: [suffix: 'prod', excludePatterns: ['*-nonprod.json']],
+    preview: [suffix: 'preview', excludePatterns: ['*-prod.json']]
+]
+
+def ccdDefinitionPackages = [
+    admin: [path: 'admin', outputPrefix: 'et-admin-ccd-config'],
+    'england-wales': [path: 'england-wales', outputPrefix: 'et-englandwales-ccd-config'],
+    scotland: [path: 'scotland', outputPrefix: 'et-scotland-ccd-config']
+]
+
+def ccdDefinitionEnvJson =
+    new JsonSlurper().parse(file('ccd-definitions/configs/environment/env.json')) as Map
+def legacyCcdDefinitionsRoot = file('src/test/resources/legacy-ccd-definitions/jurisdictions')
+def convertedEventsManifest = file('ccd-definitions/tools/converted-events.json')
+
+def ccdDefinitionEnvVars = { String environmentName ->
+    def variables = new LinkedHashMap<String, String>()
+    variables.put('ET_ENV', environmentName)
+    variables.putAll((ccdDefinitionEnvJson[environmentName] ?: [:]).collectEntries { key, value ->
+        [(key.toString()): value.toString()]
+    })
+    if (environmentName == 'preview') {
+        def previewPr = (project.findProperty('previewPr') ?: '0').toString()
+        variables.put('ET_COS_URL', "https://et-cos-pr-${previewPr}.preview.platform.hmcts.net".toString())
+        variables.put(
+            'CCD_DEF_URL',
+            "https://ccd-data-store-api-et-cos-pr-${previewPr}.preview.platform.hmcts.net".toString()
+        )
+        variables.put('CCD_DEF_AAC_URL', "https://aac-et-cos-pr-${previewPr}.preview.platform.hmcts.net".toString())
+    }
+    variables
+}
+
+def buildCcdXlsx = { File sourceRoot, File outputRoot ->
+    ccdDefinitionEnvironments.each { environmentName, environmentConfig ->
+        ccdDefinitionPackages.each { jurisdictionName, packageConfig ->
+            def jsonDir = new File(sourceRoot, "${packageConfig.path}/json")
+            def outputFile = new File(
+                outputRoot,
+                "${environmentName}/${packageConfig.outputPrefix}-${environmentConfig.suffix}.xlsx"
+            )
+            outputFile.parentFile.mkdirs()
+
+            def command = [
+                'node',
+                file('ccd-definitions/tools/ccd-definition-processor/bin/json2xlsx').absolutePath,
+                '-D', jsonDir.absolutePath,
+                '-o', outputFile.absolutePath,
+                '-t', file("ccd-definitions/jurisdictions/${jurisdictionName}/data/ccd-template.xlsx").absolutePath
+            ]
+            if (!environmentConfig.excludePatterns.isEmpty()) {
+                command.addAll(['-e', environmentConfig.excludePatterns.join(',')])
+            }
+
+            exec {
+                commandLine command
+                environment ccdDefinitionEnvVars(environmentName.toString())
+            }
+        }
+    }
+}
+
+tasks.register('buildLegacyCCDXlsx') {
+    group = 'CCD tasks'
+    description = 'Build legacy CCD XLSX workbooks from the ET JSON fixture definitions.'
+    inputs.dir legacyCcdDefinitionsRoot
+    outputs.dir layout.buildDirectory.dir('legacy-xlsx')
+
+    doLast {
+        buildCcdXlsx(legacyCcdDefinitionsRoot, layout.buildDirectory.dir('legacy-xlsx').get().asFile)
+    }
+}
+
+tasks.register('mergeGeneratedCCDConfig') {
+    group = 'CCD tasks'
+    description = 'Merge converted Java CCD rows into the legacy fixture definitions for incremental parity.'
+    dependsOn tasks.named('generateCCDConfig')
+    inputs.dir legacyCcdDefinitionsRoot
+    inputs.dir layout.buildDirectory.dir('ccd-definitions')
+    inputs.file convertedEventsManifest
+    outputs.dir layout.buildDirectory.dir('merged-ccd-definitions')
+
+    doLast {
+        exec {
+            commandLine 'node',
+                file('ccd-definitions/tools/merge-generated-ccd.js').absolutePath,
+                legacyCcdDefinitionsRoot.absolutePath,
+                layout.buildDirectory.dir('ccd-definitions').get().asFile.absolutePath,
+                layout.buildDirectory.dir('merged-ccd-definitions').get().asFile.absolutePath,
+                convertedEventsManifest.absolutePath
+        }
+    }
+}
+
+tasks.register('compareConvertedCCDRows') {
+    group = 'verification'
+    description = 'Compare converted Java CCD rows with their legacy JSON fixture rows.'
+    dependsOn tasks.named('mergeGeneratedCCDConfig')
+    inputs.dir legacyCcdDefinitionsRoot
+    inputs.dir layout.buildDirectory.dir('merged-ccd-definitions')
+    inputs.file convertedEventsManifest
+
+    doLast {
+        exec {
+            commandLine 'node',
+                file('ccd-definitions/tools/compare-converted-rows.js').absolutePath,
+                legacyCcdDefinitionsRoot.absolutePath,
+                layout.buildDirectory.dir('merged-ccd-definitions').get().asFile.absolutePath,
+                convertedEventsManifest.absolutePath
+        }
+    }
+}
+
+tasks.register('buildGeneratedCCDXlsx') {
+    group = 'CCD tasks'
+    description = 'Build CCD XLSX workbooks from merged ET Java-generated JSON definitions.'
+    dependsOn tasks.named('mergeGeneratedCCDConfig')
+    inputs.dir layout.buildDirectory.dir('merged-ccd-definitions')
+    outputs.dir layout.buildDirectory.dir('generated-xlsx')
+
+    doLast {
+        buildCcdXlsx(layout.buildDirectory.dir('merged-ccd-definitions').get().asFile,
+            layout.buildDirectory.dir('generated-xlsx').get().asFile)
+    }
+}
+
+tasks.register('compareGeneratedCCDXlsx') {
+    group = 'verification'
+    description = 'Compare Java-generated ET CCD XLSX workbooks with the legacy JSON-produced workbooks.'
+    dependsOn tasks.named('buildLegacyCCDXlsx'), tasks.named('buildGeneratedCCDXlsx'),
+        tasks.named('compareConvertedCCDRows')
+
+    doLast {
+        ccdDefinitionEnvironments.each { environmentName, environmentConfig ->
+            ccdDefinitionPackages.each { jurisdictionName, packageConfig ->
+                exec {
+                    commandLine 'node',
+                        file('ccd-definitions/tools/compare-xlsx.js').absolutePath,
+                        layout.buildDirectory.file(
+                            "legacy-xlsx/${environmentName}/${packageConfig.outputPrefix}-${environmentConfig.suffix}.xlsx"
+                        ).get().asFile.absolutePath,
+                        layout.buildDirectory.file(
+                            "generated-xlsx/${environmentName}/${packageConfig.outputPrefix}-${environmentConfig.suffix}.xlsx"
+                        ).get().asFile.absolutePath
+                }
+            }
+        }
+    }
 }
 
 def sonarExclusions =
@@ -52,7 +240,8 @@ def sonarExclusions =
          'et-shared/src/main/java/**/helpers/**',
          'et-shared/src/main/java/**/launchdarkly/**',
          'et-shared/src/main/java/**/servicebus/**',
-		 'et-shared/src/main/java/uk/gov/hmcts/ecm/compat/common/client/CcdClient.java'
+         '**/uk/gov/hmcts/ethos/replacement/docmosis/ccd/generated/**',
+         'et-shared/src/main/java/uk/gov/hmcts/ecm/compat/common/client/CcdClient.java'
 ]
 
 def duplicateCodeExclusionList = [

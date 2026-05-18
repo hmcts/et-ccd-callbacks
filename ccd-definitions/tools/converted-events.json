@@ -1,0 +1,26 @@
+[
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "DELETE_CASE",
+    "sheets": ["CaseEvent"]
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "manageCaseTTL",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "DELETE_CASE",
+    "sheets": ["CaseEvent"]
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "manageCaseTTL",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"]
+  }
+]

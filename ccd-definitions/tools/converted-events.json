@@ -200,6 +200,36 @@
   {
     "jurisdiction": "england-wales",
     "caseType": "ET_EnglandWales",
+    "eventId": "createLeadCase",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-Multiples-nonprod.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent-Multiples-nonprod.json"]
+    }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "sendNotificationMultiple",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-Multiples-nonprod.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent-Multiples-nonprod.json"]
+    }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "addLegalRepToMultiple",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-Multiples2-nonprod.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent-Multiples2-nonprod.json"]
+    }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
     "eventId": "SUBMIT_ET3_FORM",
     "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
   },
@@ -433,6 +463,36 @@
     "caseType": "ET_Scotland",
     "eventId": "amendSingle",
     "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "createLeadCase",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-Multiples-nonprod.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent-Multiples-nonprod.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "sendNotificationMultiple",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-Multiples-nonprod.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent-Multiples-nonprod.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "addLegalRepToMultiple",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-Multiples2-nonprod.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent-Multiples2-nonprod.json"]
+    }
   },
   {
     "jurisdiction": "scotland",

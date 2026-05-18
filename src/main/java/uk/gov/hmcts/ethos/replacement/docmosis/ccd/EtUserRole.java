@@ -12,6 +12,7 @@ public enum EtUserRole implements HasRole {
     CASEWORKER_EMPLOYMENT_ETJUDGE("caseworker-employment-etjudge", "R"),
     CASEWORKER_EMPLOYMENT_ETJUDGE_ENGLANDWALES("caseworker-employment-etjudge-englandwales", "CRU"),
     CASEWORKER_EMPLOYMENT_ETJUDGE_SCOTLAND("caseworker-employment-etjudge-scotland", "CRU"),
+    CASEWORKER_EMPLOYMENT_LEGALREP_SOLICITOR("caseworker-employment-legalrep-solicitor", "CRU"),
     CASEWORKER_EMPLOYMENT_SCOTLAND("caseworker-employment-scotland", "CRU"),
     CASEWORKER_WA_TASK_CONFIGURATION("caseworker-wa-task-configuration", "CRU");
 

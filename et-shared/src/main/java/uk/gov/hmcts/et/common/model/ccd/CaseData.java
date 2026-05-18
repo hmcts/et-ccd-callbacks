@@ -1944,4 +1944,8 @@ public class CaseData extends Et1CaseData {
     private List<GenericTypeItem<CaseNote>> caseNotesCollection;
     @JsonProperty("addCaseNote")
     private CaseNote addCaseNote;
+    @JsonProperty("editOrDeleteCaseNote")
+    private String editOrDeleteCaseNote;
+    @JsonProperty("caseNoteList")
+    private DynamicFixedListType caseNoteList;
 }

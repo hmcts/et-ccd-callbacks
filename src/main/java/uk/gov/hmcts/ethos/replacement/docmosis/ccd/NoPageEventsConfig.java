@@ -11,15 +11,21 @@ public abstract class NoPageEventsConfig<T extends CaseData> implements CCDConfi
 
     private final EtUserRole regionalCaseworkerRole;
     private final EtUserRole regionalJudgeRole;
+    private final int applyNocDecisionDisplayOrder;
+    private final int updateRepresentationDisplayOrder;
     private final int reconfigureWaTasksDisplayOrder;
 
     protected NoPageEventsConfig(
         EtUserRole regionalCaseworkerRole,
         EtUserRole regionalJudgeRole,
+        int applyNocDecisionDisplayOrder,
+        int updateRepresentationDisplayOrder,
         int reconfigureWaTasksDisplayOrder
     ) {
         this.regionalCaseworkerRole = regionalCaseworkerRole;
         this.regionalJudgeRole = regionalJudgeRole;
+        this.applyNocDecisionDisplayOrder = applyNocDecisionDisplayOrder;
+        this.updateRepresentationDisplayOrder = updateRepresentationDisplayOrder;
         this.reconfigureWaTasksDisplayOrder = reconfigureWaTasksDisplayOrder;
     }
 
@@ -93,5 +99,27 @@ public abstract class NoPageEventsConfig<T extends CaseData> implements CCDConfi
             .caseEventColumn("DisplayOrder", null)
             .aboutToSubmitCallbackUrl("${ET_COS_URL}/caseAccess/claimant/transferredCase")
             .grant(Permission.CRUD, regionalCaseworkerRole, EtUserRole.CASEWORKER_EMPLOYMENT_API);
+
+        configBuilder.event("applyNocDecision")
+            .forAllStates()
+            .name("Apply NoC Decision")
+            .description("Apply Notice of Change Request")
+            .displayOrder(applyNocDecisionDisplayOrder)
+            .showEventNotes()
+            .showSummary()
+            .aboutToSubmitCallbackUrl("${ET_COS_URL}/noc-decision/about-to-submit")
+            .submittedCallbackUrl("${ET_COS_URL}/noc-decision/submitted")
+            .grant(Permission.R, regionalCaseworkerRole)
+            .grant(Permission.CRUD, EtUserRole.CASEWORKER_APPROVER)
+            .authorisationCaseEventColumn(regionalCaseworkerRole, "LiveFrom", "04/08/2025")
+            .authorisationCaseEventColumn(EtUserRole.CASEWORKER_APPROVER, "LiveFrom", "01/01/2017");
+
+        configBuilder.event("updateRepresentation")
+            .forAllStates()
+            .name("Update representation")
+            .description("Update respondent representation via NoC")
+            .displayOrder(updateRepresentationDisplayOrder)
+            .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API)
+            .authorisationCaseEventColumn(EtUserRole.CASEWORKER_EMPLOYMENT_API, "LiveFrom", "01/01/2017");
     }
 }

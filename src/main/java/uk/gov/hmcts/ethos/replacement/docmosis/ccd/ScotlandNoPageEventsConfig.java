@@ -9,6 +9,8 @@ public class ScotlandNoPageEventsConfig extends NoPageEventsConfig<ScotlandCaseD
         super(
             EtUserRole.CASEWORKER_EMPLOYMENT_SCOTLAND,
             EtUserRole.CASEWORKER_EMPLOYMENT_ETJUDGE_SCOTLAND,
+            51,
+            52,
             59
         );
     }

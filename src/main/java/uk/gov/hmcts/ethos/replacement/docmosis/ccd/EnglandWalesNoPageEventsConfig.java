@@ -9,6 +9,8 @@ public class EnglandWalesNoPageEventsConfig extends NoPageEventsConfig<EnglandWa
         super(
             EtUserRole.CASEWORKER_EMPLOYMENT_ENGLANDWALES,
             EtUserRole.CASEWORKER_EMPLOYMENT_ETJUDGE_ENGLANDWALES,
+            53,
+            54,
             63
         );
     }

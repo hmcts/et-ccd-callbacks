@@ -300,6 +300,26 @@
   {
     "jurisdiction": "england-wales",
     "caseType": "ET_EnglandWales",
+    "eventId": "applyNocDecision",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json"]
+    }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "updateRepresentation",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json"]
+    }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
     "eventId": "SUBMIT_ET3_FORM",
     "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
   },
@@ -628,6 +648,26 @@
     "jurisdiction": "scotland",
     "caseType": "ET_Scotland",
     "eventId": "claimantTransferredCaseAccess",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "applyNocDecision",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "updateRepresentation",
     "sheets": ["CaseEvent", "AuthorisationCaseEvent"],
     "files": {
       "CaseEvent": ["CaseEvent.json"],

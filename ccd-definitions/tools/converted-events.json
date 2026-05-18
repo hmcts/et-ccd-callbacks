@@ -170,8 +170,20 @@
   {
     "jurisdiction": "england-wales",
     "caseType": "ET_EnglandWales",
+    "eventId": "caseTransferSameCountry",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
     "eventId": "caseTransferSameCountryEccLinkedCase",
     "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "caseTransferDifferentCountry",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"]
   },
   {
     "jurisdiction": "england-wales",
@@ -865,6 +877,12 @@
     "caseType": "ET_Scotland",
     "eventId": "rollbackMigrateCase",
     "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "caseTransferDifferentCountry",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"]
   },
   {
     "jurisdiction": "scotland",

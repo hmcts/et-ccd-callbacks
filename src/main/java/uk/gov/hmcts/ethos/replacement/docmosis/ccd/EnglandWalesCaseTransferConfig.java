@@ -8,6 +8,16 @@ public class EnglandWalesCaseTransferConfig extends CaseTransferConfig<EnglandWa
 
     public EnglandWalesCaseTransferConfig() {
         super(
+            EtUserRole.CASEWORKER_EMPLOYMENT_ENGLANDWALES,
+            EtUserRole.CASEWORKER_EMPLOYMENT_ETJUDGE_ENGLANDWALES,
+            new SameCountryTransfer(33),
+            new DifferentCountryTransfer(
+                "Case Transfer (Scotland)",
+                "Transfer case to Scotland",
+                35,
+                "${ET_COS_URL}/caseTransfer/initTransferToScotland",
+                true
+            ),
             36,
             "Transfer case to another office (API/Multiples)",
             37,
@@ -18,10 +28,5 @@ public class EnglandWalesCaseTransferConfig extends CaseTransferConfig<EnglandWa
             47,
             true
         );
-    }
-
-    @Override
-    protected EtUserRole regionalCaseworkerRole() {
-        return EtUserRole.CASEWORKER_EMPLOYMENT_ENGLANDWALES;
     }
 }

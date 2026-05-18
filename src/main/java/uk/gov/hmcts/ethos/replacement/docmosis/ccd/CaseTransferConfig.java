@@ -17,7 +17,12 @@ public abstract class CaseTransferConfig<T extends CaseData> implements CCDConfi
             + "Closed(positionType=\"Case closed\"):3;Submitted";
 
     private static final String CLOSED_OR_ANY_POST_CONDITION_STATES = "Closed(positionType=\"Case closed\"):1;*";
+    private static final String SINGLE_CASE_TRANSFER_PRE_CONDITION_STATES = "Submitted;Vetted;Accepted";
 
+    private final EtUserRole regionalCaseworkerRole;
+    private final EtUserRole regionalJudgeRole;
+    private final SameCountryTransfer sameCountryTransfer;
+    private final DifferentCountryTransfer differentCountryTransfer;
     private final int caseTransferMultipleDisplayOrder;
     private final String caseTransferMultipleDescription;
     private final int processCaseTransferDisplayOrder;
@@ -29,6 +34,10 @@ public abstract class CaseTransferConfig<T extends CaseData> implements CCDConfi
     private final boolean includeSameCountryEccLinkedCaseTransfer;
 
     protected CaseTransferConfig(
+        EtUserRole regionalCaseworkerRole,
+        EtUserRole regionalJudgeRole,
+        SameCountryTransfer sameCountryTransfer,
+        DifferentCountryTransfer differentCountryTransfer,
         int caseTransferMultipleDisplayOrder,
         String caseTransferMultipleDescription,
         int processCaseTransferDisplayOrder,
@@ -39,6 +48,10 @@ public abstract class CaseTransferConfig<T extends CaseData> implements CCDConfi
         int amendSingleDisplayOrder,
         boolean includeSameCountryEccLinkedCaseTransfer
     ) {
+        this.regionalCaseworkerRole = regionalCaseworkerRole;
+        this.regionalJudgeRole = regionalJudgeRole;
+        this.sameCountryTransfer = sameCountryTransfer;
+        this.differentCountryTransfer = differentCountryTransfer;
         this.caseTransferMultipleDisplayOrder = caseTransferMultipleDisplayOrder;
         this.caseTransferMultipleDescription = caseTransferMultipleDescription;
         this.processCaseTransferDisplayOrder = processCaseTransferDisplayOrder;
@@ -52,6 +65,23 @@ public abstract class CaseTransferConfig<T extends CaseData> implements CCDConfi
 
     @Override
     public void configure(ConfigBuilder<T, EtState, EtUserRole> configBuilder) {
+        if (sameCountryTransfer != null) {
+            caseTransferFields(
+                singleCaseTransferEvent(
+                    apiEvent(
+                        configBuilder,
+                        "caseTransferSameCountry",
+                        "Case Transfer (Eng/Wales)",
+                        "Transfer cases to another office within England/Wales",
+                        sameCountryTransfer.displayOrder()
+                    ),
+                    "${ET_COS_URL}/caseTransfer/initTransferToEnglandWales",
+                    "${ET_COS_URL}/caseTransfer/transferSameCountry"
+                )
+                    .caseEventColumn("CallBackURLSubmittedEvent", "")
+            );
+        }
+
         if (includeSameCountryEccLinkedCaseTransfer) {
             apiEvent(
                 configBuilder,
@@ -67,6 +97,21 @@ public abstract class CaseTransferConfig<T extends CaseData> implements CCDConfi
                 .endButtonLabel("Transfer Case")
                 .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API);
         }
+
+        caseTransferFields(
+            singleCaseTransferEvent(
+                configBuilder.event("caseTransferDifferentCountry")
+                    .forStateTransition(EnumSet.allOf(EtState.class), EtState.TRANSFERRED)
+                    .name(differentCountryTransfer.name())
+                    .description(differentCountryTransfer.description())
+                    .displayOrder(differentCountryTransfer.displayOrder()),
+                differentCountryTransfer.aboutToStartCallbackUrl(),
+                "${ET_COS_URL}/caseTransfer/transferDifferentCountry"
+            )
+                .caseEventColumn("PostConditionState", "Transferred")
+                .endButtonLabel("Transfer Case"),
+            differentCountryTransfer.officeReadOnly()
+        );
 
         configBuilder.event("caseTransferMultiple")
             .forStateTransition(EnumSet.allOf(EtState.class), EtState.TRANSFERRED)
@@ -111,7 +156,7 @@ public abstract class CaseTransferConfig<T extends CaseData> implements CCDConfi
                 .aboutToSubmitCallbackUrl("${ET_COS_URL}/caseTransfer/transferToEcm")
         )
             .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API)
-            .grant(Permission.CRU, regionalCaseworkerRole())
+            .grant(Permission.CRU, regionalCaseworkerRole)
             .grant(caseTransferEcmWaPermissions, EtUserRole.CASEWORKER_WA_TASK_CONFIGURATION);
 
         apiEvent(
@@ -125,7 +170,87 @@ public abstract class CaseTransferConfig<T extends CaseData> implements CCDConfi
             .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API);
     }
 
-    protected abstract EtUserRole regionalCaseworkerRole();
+    protected record SameCountryTransfer(int displayOrder) {
+    }
+
+    protected record DifferentCountryTransfer(
+        String name,
+        String description,
+        int displayOrder,
+        String aboutToStartCallbackUrl,
+        boolean officeReadOnly
+    ) {
+    }
+
+    private Event.EventBuilder<T, EtUserRole, EtState> singleCaseTransferEvent(
+        Event.EventBuilder<T, EtUserRole, EtState> event,
+        String aboutToStartCallbackUrl,
+        String aboutToSubmitCallbackUrl
+    ) {
+        return regionalCaseworkerEvent(
+            event
+                .showSummary()
+                .showCondition("caseType !=\"Multiple\"")
+                .caseEventColumn("PreConditionState(s)", SINGLE_CASE_TRANSFER_PRE_CONDITION_STATES)
+                .aboutToStartCallbackUrl(aboutToStartCallbackUrl)
+                .aboutToSubmitCallbackUrl(aboutToSubmitCallbackUrl)
+                .publishToCamunda()
+        );
+    }
+
+    private Event.EventBuilder<T, EtUserRole, EtState> regionalCaseworkerEvent(
+        Event.EventBuilder<T, EtUserRole, EtState> event
+    ) {
+        return event
+            .grant(Permission.R, EtUserRole.CASEWORKER_EMPLOYMENT, EtUserRole.CASEWORKER_EMPLOYMENT_ETJUDGE)
+            .grant(Permission.CRU, regionalCaseworkerRole, regionalJudgeRole)
+            .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API);
+    }
+
+    private Event.EventBuilder<T, EtUserRole, EtState> caseTransferFields(
+        Event.EventBuilder<T, EtUserRole, EtState> event
+    ) {
+        return caseTransferFields(event, false);
+    }
+
+    private Event.EventBuilder<T, EtUserRole, EtState> caseTransferFields(
+        Event.EventBuilder<T, EtUserRole, EtState> event,
+        boolean officeReadOnly
+    ) {
+        if (officeReadOnly) {
+            return event.fields()
+                .page("1")
+                .field(CaseData::getOfficeCT)
+                .readOnly()
+                .showSummary()
+                .caseEventColumn("PageColumnNumber", 1)
+                .caseEventColumn("Publish", null)
+                .done()
+                .field(CaseData::getReasonForCT)
+                .mandatory()
+                .showSummary()
+                .caseEventColumn("PageColumnNumber", 1)
+                .caseEventColumn("Publish", null)
+                .done()
+                .done();
+        }
+
+        return event.fields()
+            .page("1")
+            .field(CaseData::getOfficeCT)
+            .mandatory()
+            .showSummary()
+            .caseEventColumn("PageColumnNumber", 1)
+            .caseEventColumn("Publish", null)
+            .done()
+            .field(CaseData::getReasonForCT)
+            .mandatory()
+            .showSummary()
+            .caseEventColumn("PageColumnNumber", 1)
+            .caseEventColumn("Publish", null)
+            .done()
+            .done();
+    }
 
     private Event.EventBuilder<T, EtUserRole, EtState> caseTransferEcmFields(
         Event.EventBuilder<T, EtUserRole, EtState> event

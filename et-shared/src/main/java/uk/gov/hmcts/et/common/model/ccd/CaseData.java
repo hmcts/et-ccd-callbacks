@@ -1860,6 +1860,8 @@ public class CaseData extends Et1CaseData {
     private String requiresSubmissionDocuments;
     @JsonProperty("legalRepDocumentsMarkdown")
     private String legalRepDocumentsMarkdown;
+    @JsonProperty("legalRepDocumentsMarkdownLabel")
+    private String legalRepDocumentsMarkdownLabel;
 
     @JsonProperty("claimantSelectNotification")
     private DynamicFixedListType claimantSelectNotification;

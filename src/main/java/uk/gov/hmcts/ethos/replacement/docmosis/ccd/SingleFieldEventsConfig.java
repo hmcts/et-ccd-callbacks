@@ -20,19 +20,22 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
     private final int nocRequestDisplayOrder;
     private final String addCaseNoteDescription;
     private final int amendRespondentRepresentativeFieldDisplayOrder;
+    private final int legalRepDocumentsDisplayOrder;
 
     protected SingleFieldEventsConfig(
         EtUserRole regionalCaseworkerRole,
         EtUserRole regionalJudgeRole,
         int nocRequestDisplayOrder,
         String addCaseNoteDescription,
-        int amendRespondentRepresentativeFieldDisplayOrder
+        int amendRespondentRepresentativeFieldDisplayOrder,
+        int legalRepDocumentsDisplayOrder
     ) {
         this.regionalCaseworkerRole = regionalCaseworkerRole;
         this.regionalJudgeRole = regionalJudgeRole;
         this.nocRequestDisplayOrder = nocRequestDisplayOrder;
         this.addCaseNoteDescription = addCaseNoteDescription;
         this.amendRespondentRepresentativeFieldDisplayOrder = amendRespondentRepresentativeFieldDisplayOrder;
+        this.legalRepDocumentsDisplayOrder = legalRepDocumentsDisplayOrder;
     }
 
     @Override
@@ -233,6 +236,32 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .caseEventColumn("PageColumnNumber", 1)
             .done()
             .done();
+
+        configBuilder.event("legalrepDocuments")
+            .forAllStates()
+            .name("Case Documents")
+            .description("View case documents")
+            .displayOrder(legalRepDocumentsDisplayOrder)
+            .showCondition("[STATE]!=\"AWAITING_SUBMISSION_TO_HMCTS\"")
+            .aboutToStartCallbackUrl("${ET_COS_URL}/legalrepDocuments/aboutToStart")
+            .aboutToSubmitCallbackUrl("${ET_COS_URL}/legalrepDocuments/aboutToSubmit")
+            .submittedCallbackUrl("")
+            .fields()
+            .page("1")
+            .pageLabel("Case Documents")
+            .field(CaseData::getLegalRepDocumentsMarkdown)
+            .optional()
+            .showCondition("legalRepDocumentsMarkdownLabel=\"dummy\"")
+            .caseEventColumn("PageColumnNumber", null)
+            .done()
+            .field(CaseData::getLegalRepDocumentsMarkdownLabel)
+            .readOnly()
+            .caseEventColumn("PageColumnNumber", null)
+            .done()
+            .done()
+            .grant(Permission.R, EtUserRole.ET_ACAS_API)
+            .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API)
+            .grant(Permission.CRU, EtUserRole.CASEWORKER_EMPLOYMENT_LEGALREP_SOLICITOR);
 
         regionalCaseworkerEvent(configBuilder.event("recordDeposit").forState(EtState.ACCEPTED))
             .name("Deposit Order")

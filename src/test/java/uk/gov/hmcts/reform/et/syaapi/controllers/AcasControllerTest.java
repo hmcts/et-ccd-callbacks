@@ -27,8 +27,6 @@ import uk.gov.hmcts.reform.et.syaapi.service.CaseDocumentService;
 import uk.gov.hmcts.reform.et.syaapi.service.FeatureToggleService;
 import uk.gov.hmcts.reform.et.syaapi.service.RoleValidationService;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -92,7 +90,7 @@ class AcasControllerTest {
     @Test
     void getLastModifiedCaseListWhenSuccessCasesFoundReturnList() throws Exception {
         when(acasCaseService.getLastModifiedCasesId(
-            AUTH_TOKEN, LocalDateTime.parse("2022-09-01T12:34:00", DateTimeFormatter.ISO_LOCAL_DATE_TIME)))
+            AUTH_TOKEN, "2022-09-01T12:34:00"))
             .thenReturn(List.of(1_646_225_213_651_598L, 1_646_225_213_651_533L, 1_646_225_213_651_512L));
         when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
         mockMvc.perform(get(GET_LAST_MODIFIED_CASE_LIST_URL)

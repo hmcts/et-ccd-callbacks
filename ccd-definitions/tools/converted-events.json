@@ -2331,5 +2331,27 @@
       "CaseEventToFields": ["CaseEventToFields-ET1Repped.json"],
       "AuthorisationCaseEvent": ["AuthorisationCaseEvent-ET1Repped.json"]
     }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "et1SectionOne",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-ET1Repped.json"],
+      "CaseEventToFields": ["CaseEventToFields-ET1Repped.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent-ET1Repped.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "et1SectionOne",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-ET1Repped.json"],
+      "CaseEventToFields": ["CaseEventToFields-ET1Repped.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent-ET1Repped.json"]
+    }
   }
 ]

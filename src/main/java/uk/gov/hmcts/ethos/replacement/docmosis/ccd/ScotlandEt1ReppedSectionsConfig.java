@@ -4,4 +4,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ScotlandEt1ReppedSectionsConfig extends Et1ReppedSectionsConfig<ScotlandCaseData> {
+
+    public ScotlandEt1ReppedSectionsConfig() {
+        super(false);
+    }
 }

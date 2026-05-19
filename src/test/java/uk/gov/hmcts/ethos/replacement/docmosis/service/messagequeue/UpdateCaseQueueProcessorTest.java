@@ -30,6 +30,7 @@ import java.util.UUID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.never;
@@ -205,7 +206,7 @@ class UpdateCaseQueueProcessorTest {
                 anyString(),
                 eq(1),
                 eq(QueueMessageStatus.PENDING),
-                any()
+                isNull()
         );
         verify(updateManagementService, never()).addUnrecoverableErrorToDatabase(any());
     }
@@ -256,7 +257,7 @@ class UpdateCaseQueueProcessorTest {
                 anyString(),
                 eq(1),
                 eq(QueueMessageStatus.PENDING),
-                any()
+                isNull()
         );
     }
 

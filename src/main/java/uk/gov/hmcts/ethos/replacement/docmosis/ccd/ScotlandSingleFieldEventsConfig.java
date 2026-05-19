@@ -39,4 +39,14 @@ public class ScotlandSingleFieldEventsConfig extends SingleFieldEventsConfig<Sco
     protected int appealDocumentsDisplayOrder() {
         return 55;
     }
+
+    @Override
+    protected int pseRespondentRespondToTribunalDisplayOrder() {
+        return 3;
+    }
+
+    @Override
+    protected boolean pseRespondentRespondToTribunalUnavailableWarningShowsSummary() {
+        return true;
+    }
 }

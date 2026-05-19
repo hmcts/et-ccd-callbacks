@@ -17,6 +17,18 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
     private static final String ACCEPT_REJECT_POST_CONDITION =
         "Accepted(preAcceptCase.caseAccepted=\"Yes\"):1;Rejected";
     private static final String PAGE_COLUMN_NUMBER = "PageColumnNumber";
+    private static final String RESPOND_TO_TRIBUNAL_NOT_AVAILABLE_LABEL =
+        "<h3>This function is not available for this case, please click cancel to return to the main page, "
+            + "you will need to submit your application outside the portal via email or post.</h3>";
+    private static final String PSE_RESPONDENT_SUPPORTING_MATERIAL_LABEL =
+        "Consider when providing material that:<br><ul><li>you can upload letters, photos or documents to support your "
+            + "application</li><li>if you are taking a picture of a letter, place it on a flat surface and take the "
+            + "picture from above</li><li>if you are uploading written documents with tracked changes, make sure that "
+            + "tracked changes are turned on</li></ul>";
+    private static final String PSE_RESPONDENT_COPY_PARTY_INTRO =
+        "The tribunal must operate in a way fair to both sides. This means that each party must see or hear what the "
+            + "other party tells the tribunal. The rules therefore require all communications with the tribunal to be "
+            + "copied to the other party, apart from in exception circumstances.";
 
     private final EtUserRole regionalCaseworkerRole;
     private final EtUserRole regionalJudgeRole;
@@ -492,6 +504,24 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API)
             .grant(Permission.D, EtUserRole.CLAIMANT_SOLICITOR);
 
+        grantRespondentSolicitors(
+            pseRespondentRespondToTribunalFields(
+                configBuilder.event("pseRespondentRespondToTribunal")
+                    .forAllStates()
+                    .name("Respond to an Order or Request")
+                    .description("Respond to an Order or Request")
+                    .displayOrder(pseRespondentRespondToTribunalDisplayOrder())
+                    .showSummary()
+                    .showCondition("caseType=\"dummy\"")
+                    .aboutToStartCallbackUrl("${ET_COS_URL}/pseRespondToTribunal/aboutToStart")
+                    .aboutToSubmitCallbackUrl("${ET_COS_URL}/pseRespondToTribunal/aboutToSubmit")
+                    .submittedCallbackUrl("${ET_COS_URL}/pseRespondToTribunal/submitted")
+            ),
+            Permission.CRUD
+        )
+            .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API)
+            .grant(Permission.D, EtUserRole.CLAIMANT_SOLICITOR);
+
         configBuilder.event("createDraftEt1")
             .forState(EtState.AWAITING_SUBMISSION_TO_HMCTS)
             .name("Download draft ET1 Form")
@@ -750,6 +780,10 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
 
     protected abstract int appealDocumentsDisplayOrder();
 
+    protected abstract int pseRespondentRespondToTribunalDisplayOrder();
+
+    protected abstract boolean pseRespondentRespondToTribunalUnavailableWarningShowsSummary();
+
     protected Event.EventBuilder<T, EtUserRole, EtState> regionalCaseworkerEvent(
         Event.EventBuilder<T, EtUserRole, EtState> event
     ) {
@@ -875,6 +909,98 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .field(CaseData::getClaimantNotificationTableMarkdownLabel)
             .readOnly()
             .caseEventColumn("PageLabel", null)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .done();
+    }
+
+    private Event.EventBuilder<T, EtUserRole, EtState> pseRespondentRespondToTribunalFields(
+        Event.EventBuilder<T, EtUserRole, EtState> event
+    ) {
+        return event.fields()
+            .page("1")
+            .field("respondToTribunalNotAvailableWarning")
+            .readOnly()
+            .type("Text")
+            .label(" ")
+            .showCondition("pseRespondentSelectOrderOrRequest=\"dummy\"")
+            .caseEventColumn("CallBackURLMidEvent", "${ET_COS_URL}/pseRespondToTribunal/showError")
+            .caseEventColumn(
+                "ShowSummaryChangeOption",
+                pseRespondentRespondToTribunalUnavailableWarningShowsSummary() ? "Y" : null
+            )
+            .caseEventColumn(PAGE_COLUMN_NUMBER, 1)
+            .done()
+            .field("respondToTribunalNotAvailableWarningLabel")
+            .readOnly()
+            .type("Label")
+            .label(RESPOND_TO_TRIBUNAL_NOT_AVAILABLE_LABEL)
+            .showCondition("respondToTribunalNotAvailableWarning=\"Yes\"")
+            .showSummary()
+            .caseEventColumn("PageShowCondition", "respondToTribunalNotAvailableWarning=\"Yes\"")
+            .caseEventColumn("PageDisplayOrder", null)
+            .caseEventColumn("PageFieldDisplayOrder", 1)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, 1)
+            .done()
+            .page("2")
+            .field(CaseData::getPseRespondentSelectOrderOrRequest)
+            .mandatory()
+            .caseEventColumn("CallBackURLMidEvent", "${ET_COS_URL}/pseRespondToTribunal/midDetailsTable")
+            .caseEventColumn("PageLabel", "Select an Order or Request")
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .page("3")
+            .field(CaseData::getPseRespondentOrdReqTableMarkUp)
+            .readOnly()
+            .showCondition("pseRespondentRequestOrderTableLabel=\"dummy\"")
+            .caseEventColumn("CallBackURLMidEvent", "${ET_COS_URL}/pseRespondToTribunal/midValidateInput")
+            .caseEventColumn("PageLabel", "Your response")
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .field(CaseData::getPseRespondentRequestOrderTableLabel)
+            .readOnly()
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .field(CaseData::getPseRespondentOrdReqResponseText)
+            .optional()
+            .showSummary()
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .field(CaseData::getPseRespondentOrdReqHasSupportingMaterial)
+            .mandatory()
+            .showSummary()
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .field("pseRespondentOrdReqPage2TableLabel")
+            .readOnly()
+            .type("Label")
+            .label(PSE_RESPONDENT_SUPPORTING_MATERIAL_LABEL)
+            .showCondition("pseRespondentOrdReqHasSupportingMaterial=\"Yes\"")
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .field(CaseData::getPseRespondentOrdReqUploadDocument)
+            .showCondition("pseRespondentOrdReqHasSupportingMaterial=\"Yes\"")
+            .showSummary()
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .page("4")
+            .field("pseRespondentOrdReqCopyPartyIntro")
+            .readOnly()
+            .type("Label")
+            .label(PSE_RESPONDENT_COPY_PARTY_INTRO)
+            .caseEventColumn("PageLabel", "Copy this correspondence to the other party")
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .field(CaseData::getPseRespondentOrdReqCopyToOtherParty)
+            .mandatory()
+            .showSummary()
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .field(CaseData::getPseRespondentOrdReqCopyNoGiveDetails)
+            .mandatory()
+            .showCondition("pseRespondentOrdReqCopyToOtherParty=\"No\"")
+            .showSummary()
+            .caseEventColumn("RetainHiddenValue", "Yes")
             .caseEventColumn(PAGE_COLUMN_NUMBER, null)
             .done()
             .done();

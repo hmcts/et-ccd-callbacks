@@ -68,4 +68,14 @@ public class EnglandWalesSingleFieldEventsConfig extends SingleFieldEventsConfig
     protected int appealDocumentsDisplayOrder() {
         return 59;
     }
+
+    @Override
+    protected int pseRespondentRespondToTribunalDisplayOrder() {
+        return 60;
+    }
+
+    @Override
+    protected boolean pseRespondentRespondToTribunalUnavailableWarningShowsSummary() {
+        return false;
+    }
 }

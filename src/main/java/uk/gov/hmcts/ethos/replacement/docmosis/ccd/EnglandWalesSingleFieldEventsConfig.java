@@ -94,4 +94,9 @@ public class EnglandWalesSingleFieldEventsConfig extends SingleFieldEventsConfig
     protected String addressLabelsPageShowCondition() {
         return "correspondenceType.topLevel_Documents=\"EM-TRB-LET-ENG-00544\"";
     }
+
+    @Override
+    protected boolean includeEt1ReppedCreateCaseTriageErrorPage() {
+        return true;
+    }
 }

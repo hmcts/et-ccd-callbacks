@@ -534,6 +534,22 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API)
             .grant(Permission.D, EtUserRole.CLAIMANT_SOLICITOR);
 
+        et1ReppedCreateCaseFields(configBuilder.event("et1ReppedCreateCase")
+            .initialState(EtState.AWAITING_SUBMISSION_TO_HMCTS)
+            .name("Create draft claim")
+            .description("Create a new draft claim")
+            .displayOrder(54)
+            .significantEvent()
+            .ttlIncrement("365")
+            .aboutToSubmitCallbackUrl("${ET_COS_URL}/et1Repped/createCase/aboutToSubmit")
+            .submittedCallbackUrl("${ET_COS_URL}/et1Repped/createCase/submitted")
+            .endButtonLabel("Create draft claim"))
+            .grant(
+                Permission.CRUD,
+                EtUserRole.CASEWORKER_EMPLOYMENT_API,
+                EtUserRole.CASEWORKER_EMPLOYMENT_LEGALREP_SOLICITOR
+            );
+
         configBuilder.event("createDraftEt1")
             .forState(EtState.AWAITING_SUBMISSION_TO_HMCTS)
             .name("Download draft ET1 Form")
@@ -802,6 +818,8 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
 
     protected abstract String addressLabelsPageShowCondition();
 
+    protected abstract boolean includeEt1ReppedCreateCaseTriageErrorPage();
+
     protected Event.EventBuilder<T, EtUserRole, EtState> regionalCaseworkerEvent(
         Event.EventBuilder<T, EtUserRole, EtState> event
     ) {
@@ -930,6 +948,42 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .caseEventColumn(PAGE_COLUMN_NUMBER, null)
             .done()
             .done();
+    }
+
+    private Event.EventBuilder<T, EtUserRole, EtState> et1ReppedCreateCaseFields(
+        Event.EventBuilder<T, EtUserRole, EtState> event
+    ) {
+        var fields = event.fields()
+            .page("1")
+            .pageLabel("Claimant's work location")
+            .field("et1ReppedTriageLabel")
+            .readOnly()
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .field(CaseData::getEt1ReppedTriageAddress)
+            .caseEventColumn("PageLabel", null)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .field(CaseData::getEt1ReppedTriageYesNo)
+            .readOnly()
+            .showCondition("et1ReppedTriageAddress=\"dummy\"")
+            .caseEventColumn("CallBackURLMidEvent", "${ET_COS_URL}/et1Repped/createCase/validatePostcode")
+            .caseEventColumn("PageLabel", null)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done();
+
+        if (includeEt1ReppedCreateCaseTriageErrorPage()) {
+            fields.page("2")
+                .pageLabel("Service not available yet")
+                .field("et1ReppedTriageError")
+                .readOnly()
+                .caseEventColumn("PageShowCondition", "et1ReppedTriageYesNo=\"No\"")
+                .caseEventColumn("CallBackURLMidEvent", "${ET_COS_URL}/et1Repped/createCase/officeError")
+                .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+                .done();
+        }
+
+        return fields.done();
     }
 
     private Event.EventBuilder<T, EtUserRole, EtState> generateCorrespondenceFields(

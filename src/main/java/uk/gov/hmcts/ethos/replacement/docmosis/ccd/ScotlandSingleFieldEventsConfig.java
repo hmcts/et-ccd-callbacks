@@ -65,4 +65,9 @@ public class ScotlandSingleFieldEventsConfig extends SingleFieldEventsConfig<Sco
     protected String addressLabelsPageShowCondition() {
         return "correspondenceScotType.topLevel_Scot_Documents=\"EM-TRB-LET-ENG-00544\"";
     }
+
+    @Override
+    protected boolean includeEt1ReppedCreateCaseTriageErrorPage() {
+        return false;
+    }
 }

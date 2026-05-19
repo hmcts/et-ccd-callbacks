@@ -652,18 +652,6 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
         Event.EventBuilder<T, EtUserRole, EtState> event,
         Set<Permission> permissions
     ) {
-        return event.grant(
-            permissions,
-            EtUserRole.SOLICITOR_A,
-            EtUserRole.SOLICITOR_B,
-            EtUserRole.SOLICITOR_C,
-            EtUserRole.SOLICITOR_D,
-            EtUserRole.SOLICITOR_E,
-            EtUserRole.SOLICITOR_F,
-            EtUserRole.SOLICITOR_G,
-            EtUserRole.SOLICITOR_H,
-            EtUserRole.SOLICITOR_I,
-            EtUserRole.SOLICITOR_J
-        );
+        return event.grant(permissions, EtUserRole.respondentSolicitors());
     }
 }

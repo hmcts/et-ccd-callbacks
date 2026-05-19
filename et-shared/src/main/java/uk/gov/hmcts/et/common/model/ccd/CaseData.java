@@ -1510,6 +1510,10 @@ public class CaseData extends Et1CaseData {
     // Bundles Respondent
     @JsonProperty("bundlesRespondentPrepareDocNotesShow")
     private String bundlesRespondentPrepareDocNotesShow;
+    @JsonProperty("bundlesRespondentPrepareDocNotes1")
+    private String bundlesRespondentPrepareDocNotes1;
+    @JsonProperty("bundlesRespondentPrepareDocNotes2")
+    private String bundlesRespondentPrepareDocNotes2;
 
     @JsonProperty("bundlesRespondentAgreedDocWith")
     private String bundlesRespondentAgreedDocWith;
@@ -1539,6 +1543,8 @@ public class CaseData extends Et1CaseData {
     @JsonProperty("bundlesRespondentWhoseDocuments")
     private String bundlesRespondentWhoseDocuments;
 
+    @JsonProperty("bundlesRespondentUploadFileLabel")
+    private String bundlesRespondentUploadFileLabel;
     @JsonProperty("bundlesRespondentUploadFile")
     private UploadedDocumentType bundlesRespondentUploadFile;
     @JsonProperty("bundlesRespondentCollection")

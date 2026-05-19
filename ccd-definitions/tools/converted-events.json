@@ -1479,5 +1479,27 @@
       "CaseEventToFields": ["CaseEventToFields.json"],
       "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json"]
     }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "bundlesRespondentPrepareDoc",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-Bundles.json"],
+      "CaseEventToFields": ["CaseEventToFields-Bundles.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent-Bundles.json", "AuthorisationCaseEvent-ET1Repped.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "bundlesRespondentPrepareDoc",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-Bundles.json"],
+      "CaseEventToFields": ["CaseEventToFields-Bundles.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent-Bundles.json"]
+    }
   }
 ]

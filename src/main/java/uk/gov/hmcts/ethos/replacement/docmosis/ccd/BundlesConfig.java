@@ -7,6 +7,7 @@ import uk.gov.hmcts.ccd.sdk.api.Permission;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 
 import java.util.EnumSet;
+import java.util.Set;
 
 public abstract class BundlesConfig<T extends CaseData> implements CCDConfig<T, EtState, EtUserRole> {
 
@@ -14,21 +15,120 @@ public abstract class BundlesConfig<T extends CaseData> implements CCDConfig<T, 
     private final EtUserRole regionalJudgeRole;
     private final boolean grantClaimantSubmissionToApi;
     private final String removeHearingBundlesDescription;
+    private final String respondentPrepareDocShowCondition;
+    private final Set<Permission> respondentSolicitorPermissions;
 
     protected BundlesConfig(
         EtUserRole regionalCaseworkerRole,
         EtUserRole regionalJudgeRole,
         boolean grantClaimantSubmissionToApi,
-        String removeHearingBundlesDescription
+        String removeHearingBundlesDescription,
+        String respondentPrepareDocShowCondition,
+        Set<Permission> respondentSolicitorPermissions
     ) {
         this.regionalCaseworkerRole = regionalCaseworkerRole;
         this.regionalJudgeRole = regionalJudgeRole;
         this.grantClaimantSubmissionToApi = grantClaimantSubmissionToApi;
         this.removeHearingBundlesDescription = removeHearingBundlesDescription;
+        this.respondentPrepareDocShowCondition = respondentPrepareDocShowCondition;
+        this.respondentSolicitorPermissions = respondentSolicitorPermissions;
     }
 
     @Override
     public void configure(ConfigBuilder<T, EtState, EtUserRole> configBuilder) {
+        configBuilder.event("bundlesRespondentPrepareDoc")
+            .forAllStates()
+            .name("Upload documents for hearing")
+            .description("Upload documents for a hearing")
+            .displayOrder(1)
+            .showSummary()
+            .showCondition(respondentPrepareDocShowCondition)
+            .aboutToStartCallbackUrl("${ET_COS_URL}/bundlesRespondent/aboutToStart")
+            .aboutToSubmitCallbackUrl("${ET_COS_URL}/bundlesRespondent/aboutToSubmit")
+            .submittedCallbackUrl("${ET_COS_URL}/bundlesRespondent/submitted")
+            .fields()
+            .page("1")
+            .pageLabel("Prepare and submit documents for a hearing")
+            .field(CaseData::getBundlesRespondentPrepareDocNotesShow)
+            .optional()
+            .showCondition("bundlesRespondentPrepareDocNotes1=\"dummy\"")
+            .caseEventColumn("PageColumnNumber", null)
+            .done()
+            .field(CaseData::getBundlesRespondentPrepareDocNotes1)
+            .readOnly()
+            .caseEventColumn("PageLabel", null)
+            .caseEventColumn("PageColumnNumber", null)
+            .done()
+            .field(CaseData::getBundlesRespondentPrepareDocNotes2)
+            .readOnly()
+            .showCondition("bundlesRespondentPrepareDocNotesShow=\"Yes\"")
+            .caseEventColumn("PageLabel", null)
+            .caseEventColumn("PageColumnNumber", null)
+            .done()
+            .pageWithCallbackUrl("2", "${ET_COS_URL}/bundlesRespondent/midPopulateHearings")
+            .pageLabel("Have you agreed these documents with the other party?")
+            .field(CaseData::getBundlesRespondentAgreedDocWith)
+            .mandatory()
+            .showSummary()
+            .caseEventColumn("PageColumnNumber", null)
+            .done()
+            .field(CaseData::getBundlesRespondentAgreedDocWithBut)
+            .mandatory()
+            .showSummary()
+            .showCondition("bundlesRespondentAgreedDocWith=\"But\"")
+            .caseEventColumn("CallBackURLMidEvent", null)
+            .caseEventColumn("PageLabel", null)
+            .caseEventColumn("RetainHiddenValue", "No")
+            .caseEventColumn("PageColumnNumber", null)
+            .done()
+            .field(CaseData::getBundlesRespondentAgreedDocWithNo)
+            .mandatory()
+            .showSummary()
+            .showCondition("bundlesRespondentAgreedDocWith=\"No\"")
+            .caseEventColumn("CallBackURLMidEvent", null)
+            .caseEventColumn("PageLabel", null)
+            .caseEventColumn("RetainHiddenValue", "No")
+            .caseEventColumn("PageColumnNumber", null)
+            .done()
+            .page("3")
+            .pageLabel("About your hearing documents")
+            .field(CaseData::getBundlesRespondentSelectHearing)
+            .mandatory()
+            .showSummary()
+            .caseEventColumn("PageColumnNumber", null)
+            .done()
+            .field(CaseData::getBundlesRespondentWhoseDocuments)
+            .mandatory()
+            .showSummary()
+            .caseEventColumn("PageLabel", null)
+            .caseEventColumn("PageColumnNumber", null)
+            .done()
+            .field(CaseData::getBundlesRespondentWhatDocuments)
+            .mandatory()
+            .showSummary()
+            .caseEventColumn("PageLabel", null)
+            .caseEventColumn("PageColumnNumber", null)
+            .done()
+            .pageWithCallbackUrl("4", "${ET_COS_URL}/bundlesRespondent/midValidateUpload")
+            .pageLabel("Upload your file of documents")
+            .field(CaseData::getBundlesRespondentUploadFileLabel)
+            .readOnly()
+            .caseEventColumn("PageColumnNumber", null)
+            .done()
+            .field(CaseData::getBundlesRespondentUploadFile)
+            .mandatory()
+            .showSummary()
+            .caseEventColumn("CallBackURLMidEvent", null)
+            .caseEventColumn("DisplayContext", "COMPLEX")
+            .caseEventColumn("PageLabel", null)
+            .caseEventColumn("PageColumnNumber", null)
+            .done()
+            .done()
+            .grant(respondentSolicitorPermissions, EtUserRole.respondentSolicitors())
+            .grant(Permission.R, EtUserRole.ET_ACAS_API)
+            .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API)
+            .grant(Permission.D, EtUserRole.CLAIMANT_SOLICITOR);
+
         Event.EventBuilder<T, EtUserRole, EtState> submitClaimantBundles = configBuilder
             .event("SUBMIT_CLAIMANT_BUNDLES")
             .forAllStates()

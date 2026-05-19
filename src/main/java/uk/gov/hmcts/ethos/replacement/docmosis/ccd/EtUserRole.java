@@ -47,4 +47,19 @@ public enum EtUserRole implements HasRole {
     public String getCaseTypePermissions() {
         return caseTypePermissions;
     }
+
+    public static EtUserRole[] respondentSolicitors() {
+        return new EtUserRole[] {
+            SOLICITOR_A,
+            SOLICITOR_B,
+            SOLICITOR_C,
+            SOLICITOR_D,
+            SOLICITOR_E,
+            SOLICITOR_F,
+            SOLICITOR_G,
+            SOLICITOR_H,
+            SOLICITOR_I,
+            SOLICITOR_J
+        };
+    }
 }

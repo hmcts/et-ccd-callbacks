@@ -171,11 +171,15 @@ public class CreateUpdatesQueueProcessor {
             return;
         }
 
+        LocalDateTime processedAt = queueMessage.getRetryCount() + 1 >= MAX_RETRIES
+                ? LocalDateTime.now()
+                : null;
+
         createUpdatesQueueRepository.incrementRetryAndMarkFailureIfMax(
                 queueMessage.getMessageId(),
                 ex.getMessage(),
                 MAX_RETRIES,
-                LocalDateTime.now()
+                processedAt
         );
     }
 

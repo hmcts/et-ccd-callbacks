@@ -7,7 +7,7 @@ import uk.gov.hmcts.ccd.sdk.api.FieldCollection;
 import uk.gov.hmcts.ccd.sdk.api.Permission;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 
-public abstract class InitiateCaseConfig<T extends CaseData> implements CCDConfig<T, EtState, EtUserRole> {
+public abstract class CaseCreationConfig<T extends CaseData> implements CCDConfig<T, EtState, EtUserRole> {
 
     private static final String PAGE_COLUMN_NUMBER = "PageColumnNumber";
     private static final String PAGE_DISPLAY_ORDER = "PageDisplayOrder";
@@ -20,7 +20,7 @@ public abstract class InitiateCaseConfig<T extends CaseData> implements CCDConfi
     private final EtUserRole regionalJudgeRole;
     private final boolean includeAllocatedOffice;
 
-    protected InitiateCaseConfig(
+    protected CaseCreationConfig(
         EtUserRole regionalCaseworkerRole,
         EtUserRole regionalJudgeRole,
         boolean includeAllocatedOffice
@@ -32,7 +32,7 @@ public abstract class InitiateCaseConfig<T extends CaseData> implements CCDConfi
 
     @Override
     public void configure(ConfigBuilder<T, EtState, EtUserRole> configBuilder) {
-        initiateCaseFields(
+        createCaseFields(
             configBuilder.event("initiateCase")
                 .initialState(EtState.SUBMITTED)
                 .name("Create Case")
@@ -46,20 +46,74 @@ public abstract class InitiateCaseConfig<T extends CaseData> implements CCDConfi
                 .grant(Permission.R, EtUserRole.CASEWORKER_EMPLOYMENT_ETJUDGE)
                 .grant(Permission.R, EtUserRole.CASEWORKER_WA_TASK_CONFIGURATION)
                 .grant(Permission.CRU, regionalCaseworkerRole, regionalJudgeRole)
-                .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API)
+                .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API),
+            false,
+            includeAllocatedOffice,
+            false,
+            !includeAllocatedOffice,
+            Display.COMPLEX,
+            1
+        );
+
+        createCaseFields(
+            configBuilder.event("INITIATE_CASE_DRAFT")
+                .initialState(EtState.AWAITING_SUBMISSION_TO_HMCTS)
+                .name("Create Draft Case")
+                .description("Create a new draft case")
+                .displayOrder(3)
+                .significantEvent()
+                .ttlIncrement("365")
+                .grant(Permission.CRU, EtUserRole.CASEWORKER_WA_TASK_CONFIGURATION)
+                .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API, EtUserRole.CITIZEN),
+            true,
+            false,
+            true,
+            true,
+            Display.COMPLEX,
+            3
+        );
+
+        createCaseFields(
+            configBuilder.event("UPDATE_CASE_DRAFT")
+                .forState(EtState.AWAITING_SUBMISSION_TO_HMCTS)
+                .name("Update Draft Case")
+                .description("Maintain this state till case submission")
+                .displayOrder(4)
+                .caseEventColumn("PostConditionState", "*")
+                .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API, EtUserRole.CREATOR),
+            true,
+            false,
+            true,
+            true,
+            updateDraftTriageDisplay(),
+            1
         );
     }
 
-    private Event.EventBuilder<T, EtUserRole, EtState> initiateCaseFields(
-        Event.EventBuilder<T, EtUserRole, EtState> event
+    protected Display updateDraftTriageDisplay() {
+        return Display.OPTIONAL;
+    }
+
+    private Event.EventBuilder<T, EtUserRole, EtState> createCaseFields(
+        Event.EventBuilder<T, EtUserRole, EtState> event,
+        boolean draft,
+        boolean allocatedOffice,
+        boolean draftClaimFields,
+        boolean claimantWorkAddressQuestionPageCondition,
+        Display triageDisplay,
+        int triageFieldOrder
     ) {
         var fields = event.fields();
         field(fields, mandatory("receiptDate", 1, 1));
-        field(fields, optional("feeGroupReference", 1, 2, "managingOffice=\"dummy\""));
+        if (draft) {
+            field(fields, mandatory("feeGroupReference", 1, 2));
+        } else {
+            field(fields, optional("feeGroupReference", 1, 2, "managingOffice=\"dummy\""));
+        }
         field(fields, mandatory("managingOffice", 1, 3));
 
         int firstPageOffset = 0;
-        if (includeAllocatedOffice) {
+        if (allocatedOffice) {
             field(fields, mandatory("allocatedOffice", 1, 4));
             firstPageOffset = 1;
         }
@@ -71,6 +125,9 @@ public abstract class InitiateCaseConfig<T extends CaseData> implements CCDConfi
         field(fields, mandatory("caseType", 1, 8 + firstPageOffset, "feeGroupReference=\"dummy\"", "Yes"));
         field(fields, readonly("multipleReference", 1, 9 + firstPageOffset, "caseType=\"Multiple\""));
         field(fields, readonly("leadClaimant", 1, 10 + firstPageOffset, "caseType=\"Multiple\""));
+        if (draft) {
+            field(fields, optional("typesOfClaim", 1, 12));
+        }
 
         field(fields, mandatory("claimant_TypeOfClaimant", 2, 1));
         field(fields, mandatory("claimant_Company ", 2, 2, "claimant_TypeOfClaimant=\"Company\"", "Yes"));
@@ -79,17 +136,32 @@ public abstract class InitiateCaseConfig<T extends CaseData> implements CCDConfi
         field(fields, complex("respondentCollection", 3, 1)
             .midEvent("${ET_COS_URL}/midRespondentAddress"));
         field(fields, mandatory("claimantWorkAddressQuestion", 4, 1)
-            .pageShowCondition(includeAllocatedOffice ? null : "claimant_TypeOfClaimant=\"Individual\""));
+            .pageShowCondition(
+                claimantWorkAddressQuestionPageCondition ? "claimant_TypeOfClaimant=\"Individual\"" : null
+            ));
         field(fields, mandatory("claimantWorkAddressQRespondent", 4, 2, "claimantWorkAddressQuestion=\"Yes\"", "Yes"));
         field(fields, complex("claimantWorkAddress", 5, 1, "claimantWorkAddressQuestion=\"No\"")
             .pageShowCondition("claimant_TypeOfClaimant=\"Individual\" AND claimantWorkAddressQuestion=\"No\""));
         field(fields, complex("companyPremises", 6, 1)
             .pageShowCondition("claimant_TypeOfClaimant=\"Company\""));
         field(fields, complex("claimantOtherType", 7, 1));
+        if (draftClaimFields) {
+            field(fields, complex("newEmploymentType", 7, 2));
+            field(fields, complex("claimantRequests", 7, 3));
+        }
         field(fields, mandatory("claimantRepresentedQuestion", 8, 1));
         field(fields, complex("representativeClaimantType", 8, 2, "claimantRepresentedQuestion=\"Yes\""));
-        field(fields, complex("claimantHearingPreference", 9, 1)
-            .midEvent("${ET_COS_URL}/midEventHearingPreferences"));
+        if (draft) {
+            field(fields, complex("claimantTaskListChecks", 8, 3));
+            field(fields, optional("ClaimantPcqId", 9, 1));
+            field(
+                fields,
+                new FieldSpec("triageQuestions", triageDisplay, 10, triageFieldOrder, null, null, null, null)
+            );
+        } else {
+            field(fields, complex("claimantHearingPreference", 9, 1)
+                .midEvent("${ET_COS_URL}/midEventHearingPreferences"));
+        }
 
         return fields.done();
     }
@@ -104,6 +176,10 @@ public abstract class InitiateCaseConfig<T extends CaseData> implements CCDConfi
 
     private FieldSpec optional(String id, int page, int pageFieldOrder, String showCondition) {
         return optional(id, page, pageFieldOrder, showCondition, null);
+    }
+
+    private FieldSpec optional(String id, int page, int pageFieldOrder) {
+        return optional(id, page, pageFieldOrder, null, null);
     }
 
     private FieldSpec optional(String id, int page, int pageFieldOrder, String showCondition, String retainHidden) {
@@ -160,7 +236,7 @@ public abstract class InitiateCaseConfig<T extends CaseData> implements CCDConfi
         return field.done();
     }
 
-    private enum Display {
+    protected enum Display {
         MANDATORY,
         OPTIONAL,
         READONLY,

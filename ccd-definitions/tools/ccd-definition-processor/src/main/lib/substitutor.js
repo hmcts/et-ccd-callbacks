@@ -27,7 +27,7 @@ class Substitutor {
       )
       .forEach(environmentVariableName => {
         const environmentVariableValue = process.env[environmentVariableName];
-        if (environmentVariableValue) {
+        if (environmentVariableValue !== undefined) {
           value = value.replace(new RegExp('\\$\\{' + environmentVariableName + '\\}', 'g'), environmentVariableValue);
         }
       });

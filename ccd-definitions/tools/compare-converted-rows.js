@@ -14,6 +14,10 @@ const failures = [];
 
 for (const conversion of manifest) {
   for (const sheet of conversion.sheets || ['CaseEvent']) {
+    if ((conversion.skipRowCompareSheets || []).includes(sheet)) {
+      continue;
+    }
+
     const expected = selectedRows(legacyRoot, conversion, sheet);
     const actual = selectedRows(mergedRoot, conversion, sheet);
     if (stableJson(expected) !== stableJson(actual)) {

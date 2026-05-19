@@ -2655,5 +2655,31 @@
       "CaseEventToFields": ["CaseEventToFields-RetainAndDispose-nonprod.json", "CaseEventToFields.json"],
       "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json"]
     }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "reinstateClosedCase",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
+    "replaceInAllMatchingFilesSheets": ["CaseEvent"],
+    "skipRowCompareSheets": ["CaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-RetainAndDispose-nonprod.json", "CaseEvent-prod.json"],
+      "CaseEventToFields": ["CaseEventToFields.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "reinstateClosedCase",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
+    "replaceInAllMatchingFilesSheets": ["CaseEvent"],
+    "skipRowCompareSheets": ["CaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-RetainAndDispose-nonprod.json", "CaseEvent-prod.json"],
+      "CaseEventToFields": ["CaseEventToFields.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json"]
+    }
   }
 ]

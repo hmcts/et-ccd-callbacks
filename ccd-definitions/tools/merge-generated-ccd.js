@@ -27,6 +27,11 @@ function replaceConvertedRows(conversion, sheet) {
   }
 
   const sheetRoot = path.join(outputRoot, conversion.jurisdiction, 'json', sheet);
+  if ((conversion.replaceInAllMatchingFilesSheets || []).includes(sheet)) {
+    replaceConvertedRowsInEveryMatchingFile(conversion, sheet, sheetRoot, rows);
+    return;
+  }
+
   const files = sheetFiles(sheetRoot, conversion, sheet);
   const matches = rowMatcher(sheet, conversion);
   const remaining = new Map(rows.map(row => [rowKey(sheet, row), row]));
@@ -57,6 +62,16 @@ function replaceConvertedRows(conversion, sheet) {
     const target = defaultSheetFile(sheetRoot, sheet, conversion.eventId);
     fs.mkdirSync(path.dirname(target), { recursive: true });
     writeJson(target, [...remaining.values()]);
+  }
+}
+
+function replaceConvertedRowsInEveryMatchingFile(conversion, sheet, sheetRoot, rows) {
+  const matches = rowMatcher(sheet, conversion);
+  for (const file of sheetFiles(sheetRoot, conversion, sheet)) {
+    const existing = JSON.parse(fs.readFileSync(file, 'utf8'));
+    if (existing.some(matches)) {
+      writeJson(file, replaceRowsInPlace(sheet, existing, rows, matches));
+    }
   }
 }
 

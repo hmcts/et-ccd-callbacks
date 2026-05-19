@@ -106,6 +106,13 @@ def ccdDefinitionEnvVars = { String environmentName ->
         )
         variables.put('CCD_DEF_AAC_URL', "https://aac-et-cos-pr-${previewPr}.preview.platform.hmcts.net".toString())
     }
+    if (environmentName == 'prod') {
+        variables.put('ET_ENV_RETENTION_SIGNIFICANT_EVENT', '')
+        variables.put('ET_ENV_REINSTATE_CLOSED_CASE_TTL_INCREMENT', '')
+    } else {
+        variables.put('ET_ENV_RETENTION_SIGNIFICANT_EVENT', 'Yes')
+        variables.put('ET_ENV_REINSTATE_CLOSED_CASE_TTL_INCREMENT', '36524')
+    }
     variables
 }
 

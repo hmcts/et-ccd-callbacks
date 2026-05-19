@@ -109,9 +109,11 @@ def ccdDefinitionEnvVars = { String environmentName ->
     if (environmentName == 'prod') {
         variables.put('ET_ENV_RETENTION_SIGNIFICANT_EVENT', '')
         variables.put('ET_ENV_REINSTATE_CLOSED_CASE_TTL_INCREMENT', '')
+        variables.put('ET_ENV_DISPOSE_CASE_TTL_INCREMENT', '')
     } else {
         variables.put('ET_ENV_RETENTION_SIGNIFICANT_EVENT', 'Yes')
         variables.put('ET_ENV_REINSTATE_CLOSED_CASE_TTL_INCREMENT', '36524')
+        variables.put('ET_ENV_DISPOSE_CASE_TTL_INCREMENT', '365')
     }
     variables
 }

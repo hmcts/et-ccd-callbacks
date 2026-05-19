@@ -58,6 +58,9 @@ function rowMatcher(sheet, conversion) {
   if (sheet === 'CaseEvent') {
     return row => row.CaseTypeID === conversion.caseType && row.ID === conversion.eventId;
   }
+  if (sheet === 'EventToComplexTypes' || sheet === 'CaseEventToComplexTypes') {
+    return row => row.CaseEventID === conversion.eventId;
+  }
   return row => (row.CaseTypeID || row.CaseTypeId) === conversion.caseType
     && row.CaseEventID === conversion.eventId;
 }

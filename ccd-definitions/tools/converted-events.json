@@ -2681,5 +2681,42 @@
       "CaseEventToFields": ["CaseEventToFields.json"],
       "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json"]
     }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "disposeCase",
+    "sheets": ["CaseEvent", "CaseEventToFields", "EventToComplexTypes", "AuthorisationCaseEvent"],
+    "generatedSheets": {
+      "EventToComplexTypes": "CaseEventToComplexTypes"
+    },
+    "replaceInAllMatchingFilesSheets": ["CaseEvent", "EventToComplexTypes"],
+    "skipRowCompareSheets": ["CaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-RetainAndDispose-nonprod.json", "CaseEvent-prod.json"],
+      "CaseEventToFields": ["CaseEventToFields-RetainAndDispose-nonprod.json", "CaseEventToFields.json"],
+      "EventToComplexTypes": [
+        "EventToComplexType-RetainAndDispose-nonprod.json",
+        "EventToComplexType-RetainAndDispose.json"
+      ],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "disposeCase",
+    "sheets": ["CaseEvent", "CaseEventToFields", "EventToComplexTypes", "AuthorisationCaseEvent"],
+    "generatedSheets": {
+      "EventToComplexTypes": "CaseEventToComplexTypes"
+    },
+    "replaceInAllMatchingFilesSheets": ["CaseEvent"],
+    "skipRowCompareSheets": ["CaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-RetainAndDispose-nonprod.json", "CaseEvent-prod.json"],
+      "CaseEventToFields": ["CaseEventToFields-RetainAndDispose-nonprod.json", "CaseEventToFields.json"],
+      "EventToComplexTypes": ["EventToComplexTypes-RetainAndDispose-nonprod.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json"]
+    }
   }
 ]

@@ -76,7 +76,7 @@ function replaceConvertedRowsInEveryMatchingFile(conversion, sheet, sheetRoot, r
 }
 
 function generatedRows(conversion, sheet) {
-  const sheetRoot = path.join(generatedRoot, conversion.caseType, sheet);
+  const sheetRoot = path.join(generatedRoot, conversion.caseType, generatedSheetName(conversion, sheet));
   return jsonFiles(sheetRoot)
     .flatMap(file => JSON.parse(fs.readFileSync(file, 'utf8')))
     .filter(row => rowMatcher(sheet, conversion)(row))
@@ -143,7 +143,7 @@ function rowKey(sheet, row) {
   if (sheet === 'AuthorisationCaseEvent') {
     return [row.CaseTypeID || row.CaseTypeId, row.CaseEventID, row.UserRole].join('|');
   }
-  if (sheet === 'CaseEventToFields' || sheet === 'CaseEventToComplexTypes') {
+  if (sheet === 'CaseEventToFields' || sheet === 'CaseEventToComplexTypes' || sheet === 'EventToComplexTypes') {
     return [
       row.CaseTypeID,
       row.CaseEventID,
@@ -170,8 +170,15 @@ function rowMatcher(sheet, conversion) {
   if (sheet === 'CaseEvent') {
     return row => row.CaseTypeID === conversion.caseType && row.ID === conversion.eventId;
   }
+  if (sheet === 'EventToComplexTypes' || sheet === 'CaseEventToComplexTypes') {
+    return row => row.CaseEventID === conversion.eventId;
+  }
   return row => (row.CaseTypeID || row.CaseTypeId) === conversion.caseType
     && row.CaseEventID === conversion.eventId;
+}
+
+function generatedSheetName(conversion, sheet) {
+  return (conversion.generatedSheets && conversion.generatedSheets[sheet]) || sheet;
 }
 
 function defaultSheetFile(sheetRoot, sheet, eventId) {

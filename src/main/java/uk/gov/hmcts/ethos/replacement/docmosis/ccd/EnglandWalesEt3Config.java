@@ -10,6 +10,9 @@ public class EnglandWalesEt3Config extends Et3Config<EnglandWalesCaseData> {
             EtUserRole.CASEWORKER_EMPLOYMENT_ENGLANDWALES,
             EtUserRole.CASEWORKER_EMPLOYMENT_ETJUDGE_ENGLANDWALES,
             false,
+            false,
+            46,
+            null,
             false
         );
     }

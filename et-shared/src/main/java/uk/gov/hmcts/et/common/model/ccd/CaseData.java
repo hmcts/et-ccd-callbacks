@@ -1553,6 +1553,8 @@ public class CaseData extends Et1CaseData {
 
     @JsonProperty("submitEt3Respondent")
     private DynamicFixedListType submitEt3Respondent;
+    @JsonProperty("confirmEt3Submit")
+    private List<String> confirmEt3Submit;
     @JsonProperty("downloadDraftEt3Label")
     private String downloadDraftEt3Label;
 

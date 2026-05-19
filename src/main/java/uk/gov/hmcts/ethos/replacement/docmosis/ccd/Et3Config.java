@@ -8,6 +8,7 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 
 public abstract class Et3Config<T extends CaseData> implements CCDConfig<T, EtState, EtUserRole> {
 
+    private static final String PUBLISH = "Publish";
     private static final String PAGE_COLUMN_NUMBER = "PageColumnNumber";
     private static final String PAGE_LABEL = "PageLabel";
 
@@ -15,17 +16,26 @@ public abstract class Et3Config<T extends CaseData> implements CCDConfig<T, EtSt
     private final EtUserRole regionalJudgeRole;
     private final boolean grantSubmitToApi;
     private final boolean grantEt3NotificationToAcas;
+    private final int submitEt3DisplayOrder;
+    private final String submitEt3ShowCondition;
+    private final boolean includeSubmitEt3ReadonlyDocuments;
 
     protected Et3Config(
         EtUserRole regionalCaseworkerRole,
         EtUserRole regionalJudgeRole,
         boolean grantSubmitToApi,
-        boolean grantEt3NotificationToAcas
+        boolean grantEt3NotificationToAcas,
+        int submitEt3DisplayOrder,
+        String submitEt3ShowCondition,
+        boolean includeSubmitEt3ReadonlyDocuments
     ) {
         this.regionalCaseworkerRole = regionalCaseworkerRole;
         this.regionalJudgeRole = regionalJudgeRole;
         this.grantSubmitToApi = grantSubmitToApi;
         this.grantEt3NotificationToAcas = grantEt3NotificationToAcas;
+        this.submitEt3DisplayOrder = submitEt3DisplayOrder;
+        this.submitEt3ShowCondition = submitEt3ShowCondition;
+        this.includeSubmitEt3ReadonlyDocuments = includeSubmitEt3ReadonlyDocuments;
     }
 
     @Override
@@ -69,6 +79,37 @@ public abstract class Et3Config<T extends CaseData> implements CCDConfig<T, EtSt
 
         if (grantEt3NotificationToAcas) {
             et3Notification.grant(Permission.R, EtUserRole.ET_ACAS_API);
+        }
+
+        Event.EventBuilder<T, EtUserRole, EtState> submitEt3 = submitEt3Fields(
+            configBuilder.event("submitEt3")
+                .forAllStates()
+                .name("Submit ET3 Form")
+                .description("Submit ET3 Form")
+                .displayOrder(submitEt3DisplayOrder)
+                .showSummary()
+                .publishToCamunda()
+                .caseEventColumn("PreConditionState(s)", "Accepted")
+                .aboutToStartCallbackUrl("${ET_COS_URL}/et3Response/startSubmitEt3")
+                .aboutToSubmitCallbackUrl("${ET_COS_URL}/et3Response/aboutToSubmit")
+                .submittedCallbackUrl("${ET_COS_URL}/et3Response/processingComplete")
+                .endButtonLabel("Submit ET3 to Tribunal")
+        )
+            .grant(Permission.CRUD, EtUserRole.respondentSolicitors())
+            .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API)
+            .grant(Permission.D, EtUserRole.CLAIMANT_SOLICITOR)
+            .grant(
+                Permission.R,
+                EtUserRole.ET_ACAS_API,
+                EtUserRole.CASEWORKER_EMPLOYMENT,
+                regionalCaseworkerRole,
+                EtUserRole.CASEWORKER_EMPLOYMENT_ETJUDGE,
+                regionalJudgeRole
+            )
+            .grant(Permission.CRU, EtUserRole.CASEWORKER_WA_TASK_CONFIGURATION);
+
+        if (submitEt3ShowCondition != null) {
+            submitEt3.showCondition(submitEt3ShowCondition);
         }
     }
 
@@ -149,5 +190,61 @@ public abstract class Et3Config<T extends CaseData> implements CCDConfig<T, EtSt
             .caseEventColumn(PAGE_COLUMN_NUMBER, 1)
             .done()
             .done();
+    }
+
+    private Event.EventBuilder<T, EtUserRole, EtState> submitEt3Fields(
+        Event.EventBuilder<T, EtUserRole, EtState> event
+    ) {
+        var fields = event.fields()
+            .page("1")
+            .field(CaseData::getSubmitEt3Respondent)
+            .mandatory()
+            .showSummary()
+            .caseEventColumn("CallBackURLMidEvent", "${ET_COS_URL}/et3Response/reloadSubmitData")
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .caseEventColumn(PUBLISH, null)
+            .done()
+            .field(CaseData::getNextListedDate)
+            .optional()
+            .showCondition("submitEt3Respondent=\"dummy\"")
+            .caseEventColumn("ShowSummaryChangeOption", "N")
+            .caseEventColumn("PageFieldDisplayOrder", 2)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, 1)
+            .caseEventColumn(PUBLISH, "Y")
+            .done()
+            .page("2")
+            .field(CaseData::getConfirmEt3Submit)
+            .mandatory()
+            .showSummary()
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .caseEventColumn(PUBLISH, null)
+            .done();
+
+        if (includeSubmitEt3ReadonlyDocuments) {
+            fields
+                .field(CaseData::getEt3ResponseEmployerClaimDocument)
+                .readOnly()
+                .showSummary()
+                .showCondition("confirmEt3Submit CONTAINS \"dummy\"")
+                .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+                .caseEventColumn(PUBLISH, null)
+                .done()
+                .field(CaseData::getEt3ResponseContestClaimDocument)
+                .readOnly()
+                .showSummary()
+                .showCondition("confirmEt3Submit CONTAINS \"dummy\"")
+                .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+                .caseEventColumn(PUBLISH, null)
+                .done()
+                .field(CaseData::getEt3ResponseRespondentSupportDocument)
+                .readOnly()
+                .showSummary()
+                .showCondition("confirmEt3Submit CONTAINS \"dummy\"")
+                .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+                .caseEventColumn(PUBLISH, null)
+                .done();
+        }
+
+        return fields.done();
     }
 }

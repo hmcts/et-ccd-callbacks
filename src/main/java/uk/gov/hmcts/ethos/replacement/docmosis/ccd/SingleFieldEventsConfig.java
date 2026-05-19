@@ -304,6 +304,35 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API)
             .grant(Permission.CRU, EtUserRole.CLAIMANT_SOLICITOR);
 
+        claimantViewNotificationFields(
+            configBuilder.event("claimantViewNotification")
+                .forAllStates()
+                .name("View Notification")
+                .description("View Notification")
+                .displayOrder(59)
+                .aboutToStartCallbackUrl("${ET_COS_URL}/claimantViewNotification/aboutToStart")
+        )
+            .grant(Permission.CRU, EtUserRole.CLAIMANT_SOLICITOR)
+            .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API);
+
+        grantRespondentSolicitors(
+            pseRespondentViewNotificationFields(
+                configBuilder.event("pseRespondentViewNotification")
+                    .forAllStates()
+                    .name("Judgment, Order, Notification")
+                    .description("View a judgment, order or notification")
+                    .showCondition("caseType=\"dummy\"")
+                    .caseEventColumn("DisplayOrder", null)
+                    .aboutToStartCallbackUrl("${ET_COS_URL}/pseRespondentView/aboutToStart")
+                    .aboutToSubmitCallbackUrl("")
+                    .submittedCallbackUrl("")
+                    .endButtonLabel("Close and return to case details")
+            ),
+            Permission.CRUD
+        )
+            .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API)
+            .grant(Permission.D, EtUserRole.CLAIMANT_SOLICITOR);
+
         configBuilder.event("createDraftEt1")
             .forState(EtState.AWAITING_SUBMISSION_TO_HMCTS)
             .name("Download draft ET1 Form")
@@ -619,6 +648,56 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .caseEventColumn("PageColumnNumber", null)
             .done()
             .field(CaseData::getPseViewNotificationsLabel)
+            .readOnly()
+            .caseEventColumn("PageLabel", null)
+            .caseEventColumn("PageColumnNumber", null)
+            .done()
+            .done();
+    }
+
+    private Event.EventBuilder<T, EtUserRole, EtState> claimantViewNotificationFields(
+        Event.EventBuilder<T, EtUserRole, EtState> event
+    ) {
+        return event.fields()
+            .pageWithCallbackUrl("1", "${ET_COS_URL}/claimantViewNotification/midDetailsTable")
+            .pageLabel("View a judgment, order or notification")
+            .field(CaseData::getClaimantSelectNotification)
+            .mandatory()
+            .caseEventColumn("PageColumnNumber", null)
+            .done()
+            .page("2")
+            .pageLabel("View a judgment, order or notification")
+            .field(CaseData::getClaimantNotificationTableMarkdown)
+            .readOnly()
+            .showCondition("claimantNotificationTableMarkdownLabel=\"dummy\"")
+            .caseEventColumn("PageColumnNumber", null)
+            .done()
+            .field(CaseData::getClaimantNotificationTableMarkdownLabel)
+            .readOnly()
+            .caseEventColumn("PageLabel", null)
+            .caseEventColumn("PageColumnNumber", null)
+            .done()
+            .done();
+    }
+
+    private Event.EventBuilder<T, EtUserRole, EtState> pseRespondentViewNotificationFields(
+        Event.EventBuilder<T, EtUserRole, EtState> event
+    ) {
+        return event.fields()
+            .pageWithCallbackUrl("1", "${ET_COS_URL}/pseRespondentView/midDetailsTable")
+            .pageLabel("View a judgment, order or notification")
+            .field(CaseData::getPseRespondentSelectJudgmentOrderNotification)
+            .mandatory()
+            .caseEventColumn("PageColumnNumber", null)
+            .done()
+            .page("2")
+            .pageLabel("View a judgment, order or notification")
+            .field(CaseData::getPseRespondentOrdReqTableMarkUp)
+            .readOnly()
+            .showCondition("pseRespondentRequestOrderTableLabel=\"dummy\"")
+            .caseEventColumn("PageColumnNumber", null)
+            .done()
+            .field(CaseData::getPseRespondentRequestOrderTableLabel)
             .readOnly()
             .caseEventColumn("PageLabel", null)
             .caseEventColumn("PageColumnNumber", null)

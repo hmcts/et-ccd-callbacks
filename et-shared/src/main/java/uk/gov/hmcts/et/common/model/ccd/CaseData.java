@@ -1413,6 +1413,8 @@ public class CaseData extends Et1CaseData {
     private DynamicFixedListType pseRespondentSelectOrderOrRequest;
     @JsonProperty("pseRespondentOrdReqTableMarkUp")
     private String pseRespondentOrdReqTableMarkUp;
+    @JsonProperty("pseRespondentRequestOrderTableLabel")
+    private String pseRespondentRequestOrderTableLabel;
     @JsonProperty("pseRespondentOrdReqResponseText")
     private String pseRespondentOrdReqResponseText;
     @JsonProperty("pseRespondentOrdReqHasSupportingMaterial")
@@ -1890,6 +1892,8 @@ public class CaseData extends Et1CaseData {
     private DynamicFixedListType claimantSelectNotification;
     @JsonProperty("claimantNotificationTableMarkdown")
     private String claimantNotificationTableMarkdown;
+    @JsonProperty("claimantNotificationTableMarkdownLabel")
+    private String claimantNotificationTableMarkdownLabel;
     @JsonProperty("claimantNotificationResponseText")
     private String claimantNotificationResponseText;
     @JsonProperty("claimantNotificationSupportingMaterial")

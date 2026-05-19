@@ -10,7 +10,9 @@ public class ScotlandNotificationConfig extends NotificationConfig<ScotlandCaseD
             2,
             true,
             EtUserRole.CASEWORKER_EMPLOYMENT_SCOTLAND,
-            EtUserRole.CASEWORKER_EMPLOYMENT_ETJUDGE_SCOTLAND
+            EtUserRole.CASEWORKER_EMPLOYMENT_ETJUDGE_SCOTLAND,
+            true,
+            true
         );
     }
 }

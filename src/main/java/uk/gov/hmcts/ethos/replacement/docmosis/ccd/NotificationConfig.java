@@ -8,21 +8,32 @@ import uk.gov.hmcts.et.common.model.ccd.CaseData;
 
 public abstract class NotificationConfig<T extends CaseData> implements CCDConfig<T, EtState, EtUserRole> {
 
+    private static final String PAGE_FIELD_DISPLAY_ORDER = "PageFieldDisplayOrder";
+    private static final String PAGE_COLUMN_NUMBER = "PageColumnNumber";
+    private static final String RETAIN_HIDDEN_VALUE = "RetainHiddenValue";
+    private static final String PUBLISH = "Publish";
+
     private final int updateNotificationResponseHearingDatePage;
     private final boolean hideUpdateNotificationResponseCollection;
     private final EtUserRole regionalCaseworkerRole;
     private final EtUserRole regionalJudgeRole;
+    private final boolean sendNotificationInfoMidEvent;
+    private final boolean grantSendNotificationReadToCaseworker;
 
     protected NotificationConfig(
         int updateNotificationResponseHearingDatePage,
         boolean hideUpdateNotificationResponseCollection,
         EtUserRole regionalCaseworkerRole,
-        EtUserRole regionalJudgeRole
+        EtUserRole regionalJudgeRole,
+        boolean sendNotificationInfoMidEvent,
+        boolean grantSendNotificationReadToCaseworker
     ) {
         this.updateNotificationResponseHearingDatePage = updateNotificationResponseHearingDatePage;
         this.hideUpdateNotificationResponseCollection = hideUpdateNotificationResponseCollection;
         this.regionalCaseworkerRole = regionalCaseworkerRole;
         this.regionalJudgeRole = regionalJudgeRole;
+        this.sendNotificationInfoMidEvent = sendNotificationInfoMidEvent;
+        this.grantSendNotificationReadToCaseworker = grantSendNotificationReadToCaseworker;
     }
 
     @Override
@@ -35,6 +46,28 @@ public abstract class NotificationConfig<T extends CaseData> implements CCDConfi
             .showCondition("caseType=\"dummy\"")
             .blankCallbackUrls()
             .grant(Permission.CRUD, EtUserRole.CITIZEN);
+
+        Event.EventBuilder<T, EtUserRole, EtState> sendNotification = sendNotificationFields(
+            configBuilder.event("sendNotification")
+                .forAllStates()
+                .name("Send a notification")
+                .description("Send a notification")
+                .showSummary()
+                .showCondition("caseType=\"dummy\"")
+                .caseEventColumn("DisplayOrder", null)
+                .caseEventColumn(PUBLISH, "Y")
+                .aboutToStartCallbackUrl("${ET_COS_URL}/sendNotification/aboutToStart")
+                .aboutToSubmitCallbackUrl("${ET_COS_URL}/sendNotification/aboutToSubmit")
+                .submittedCallbackUrl("${ET_COS_URL}/sendNotification/submitted")
+        )
+            .grant(Permission.R, EtUserRole.ET_ACAS_API, EtUserRole.CASEWORKER_EMPLOYMENT_ETJUDGE)
+            .grant(Permission.CRU, regionalCaseworkerRole, regionalJudgeRole)
+            .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API)
+            .grant(Permission.R, EtUserRole.CASEWORKER_WA_TASK_CONFIGURATION);
+
+        if (grantSendNotificationReadToCaseworker) {
+            sendNotification.grant(Permission.R, EtUserRole.CASEWORKER_EMPLOYMENT);
+        }
 
         hiddenRespondentNotificationEvent(
             configBuilder,
@@ -110,6 +143,190 @@ public abstract class NotificationConfig<T extends CaseData> implements CCDConfi
             )
             .grant(Permission.CRU, regionalCaseworkerRole, regionalJudgeRole)
             .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API, EtUserRole.CASEWORKER_WA_TASK_CONFIGURATION);
+    }
+
+    private Event.EventBuilder<T, EtUserRole, EtState> sendNotificationFields(
+        Event.EventBuilder<T, EtUserRole, EtState> event
+    ) {
+        var sendNotificationInfo = event.fields()
+            .page("1")
+            .field("sendNotificationInfo")
+            .readOnly()
+            .caseEventColumn("PageLabel", "Send a notification")
+            .caseEventColumn(PAGE_FIELD_DISPLAY_ORDER, 1)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .caseEventColumn(PUBLISH, null);
+
+        if (sendNotificationInfoMidEvent) {
+            sendNotificationInfo.caseEventColumn(
+                "CallBackURLMidEvent",
+                "${ET_COS_URL}/sendNotification/midValidateInput"
+            );
+        }
+
+        return sendNotificationInfo
+            .done()
+            .field("sendNotificationLetter")
+            .mandatory()
+            .showSummary()
+            .caseEventColumn(PAGE_FIELD_DISPLAY_ORDER, 3)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .caseEventColumn(PUBLISH, null)
+            .done()
+            .field("sendNotificationUploadDocument")
+            .showCondition("sendNotificationLetter=\"Yes\"")
+            .showSummary()
+            .caseEventColumn("DisplayContext", "COMPLEX")
+            .caseEventColumn(RETAIN_HIDDEN_VALUE, "No")
+            .caseEventColumn(PAGE_FIELD_DISPLAY_ORDER, 4)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .caseEventColumn(PUBLISH, null)
+            .done()
+            .field("sendNotificationSubject")
+            .mandatory()
+            .showSummary()
+            .caseEventColumn(PAGE_FIELD_DISPLAY_ORDER, 5)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .caseEventColumn(PUBLISH, null)
+            .done()
+            .field("sendNotificationSelectHearing")
+            .mandatory()
+            .showCondition("sendNotificationSubject CONTAINS \"Hearing\"")
+            .showSummary()
+            .caseEventColumn(RETAIN_HIDDEN_VALUE, "No")
+            .caseEventColumn(PAGE_FIELD_DISPLAY_ORDER, 6)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .caseEventColumn(PUBLISH, null)
+            .done()
+            .field("sendNotificationCaseManagement")
+            .mandatory()
+            .showCondition("sendNotificationSubject CONTAINS \"Case management orders / requests\"")
+            .showSummary()
+            .caseEventColumn(RETAIN_HIDDEN_VALUE, "No")
+            .caseEventColumn(PAGE_FIELD_DISPLAY_ORDER, 7)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .caseEventColumn(PUBLISH, null)
+            .done()
+            .field("sendNotificationResponseTribunal")
+            .mandatory()
+            .showCondition(
+                "sendNotificationSubject CONTAINS \"Case management orders / requests\" "
+                    + "OR sendNotificationSubject CONTAINS \"Employer Contract Claim\""
+            )
+            .showSummary()
+            .caseEventColumn(RETAIN_HIDDEN_VALUE, "No")
+            .caseEventColumn(PAGE_FIELD_DISPLAY_ORDER, 8)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .caseEventColumn(PUBLISH, "N")
+            .done()
+            .field("sendNotificationWhoCaseOrder")
+            .mandatory()
+            .showCondition("sendNotificationSubject CONTAINS \"Case management orders / requests\" "
+                               + "AND sendNotificationCaseManagement=\"Case management order\"")
+            .showSummary()
+            .caseEventColumn(RETAIN_HIDDEN_VALUE, "No")
+            .caseEventColumn(PAGE_FIELD_DISPLAY_ORDER, 10)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .caseEventColumn(PUBLISH, null)
+            .done()
+            .field("sendNotificationFullName")
+            .mandatory()
+            .showCondition("sendNotificationSubject CONTAINS \"Case management orders / requests\" "
+                               + "AND sendNotificationCaseManagement!=\"\"")
+            .showSummary()
+            .caseEventColumn(RETAIN_HIDDEN_VALUE, "No")
+            .caseEventColumn(PAGE_FIELD_DISPLAY_ORDER, 11)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .caseEventColumn(PUBLISH, null)
+            .done()
+            .field("sendNotificationSelectParties")
+            .mandatory()
+            .showCondition("sendNotificationSubject CONTAINS \"Case management orders / requests\" "
+                               + "OR sendNotificationSubject CONTAINS \"Employer Contract Claim\" "
+                               + "AND sendNotificationResponseTribunal=\"Yes - view document for details\"")
+            .showSummary()
+            .caseEventColumn(RETAIN_HIDDEN_VALUE, "No")
+            .caseEventColumn(PAGE_FIELD_DISPLAY_ORDER, 9)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .caseEventColumn(PUBLISH, "N")
+            .done()
+            .field("sendNotificationTitle")
+            .mandatory()
+            .showSummary()
+            .caseEventColumn(PAGE_FIELD_DISPLAY_ORDER, 2)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .caseEventColumn(PUBLISH, null)
+            .done()
+            .field("sendNotificationWhoMadeJudgement")
+            .mandatory()
+            .showCondition(" sendNotificationSubject CONTAINS \"Judgment\"")
+            .showSummary()
+            .caseEventColumn(RETAIN_HIDDEN_VALUE, "No")
+            .caseEventColumn(PAGE_FIELD_DISPLAY_ORDER, 12)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .caseEventColumn(PUBLISH, null)
+            .done()
+            .field("sendNotificationFullName2")
+            .mandatory()
+            .showCondition("sendNotificationSubject CONTAINS \"Judgment\" AND sendNotificationWhoMadeJudgement!=\"\"")
+            .showSummary()
+            .caseEventColumn(RETAIN_HIDDEN_VALUE, "No")
+            .caseEventColumn(PAGE_FIELD_DISPLAY_ORDER, 13)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .caseEventColumn(PUBLISH, null)
+            .done()
+            .field("sendNotificationDecision")
+            .mandatory()
+            .showCondition("sendNotificationSubject CONTAINS \"Judgment\"")
+            .showSummary()
+            .caseEventColumn(RETAIN_HIDDEN_VALUE, "No")
+            .caseEventColumn(PAGE_FIELD_DISPLAY_ORDER, 14)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .caseEventColumn(PUBLISH, null)
+            .done()
+            .field("sendNotificationEccQuestion")
+            .mandatory()
+            .showCondition("sendNotificationSubject CONTAINS \"Employer Contract Claim\"")
+            .showSummary()
+            .caseEventColumn(RETAIN_HIDDEN_VALUE, "No")
+            .caseEventColumn(PAGE_FIELD_DISPLAY_ORDER, 16)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .caseEventColumn(PUBLISH, null)
+            .done()
+            .field("sendNotificationNotify")
+            .mandatory()
+            .showSummary()
+            .caseEventColumn(PAGE_FIELD_DISPLAY_ORDER, 18)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .caseEventColumn(PUBLISH, null)
+            .done()
+            .field("sendNotificationAdditionalInfo")
+            .optional()
+            .showSummary()
+            .caseEventColumn(PAGE_FIELD_DISPLAY_ORDER, 17)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .caseEventColumn(PUBLISH, null)
+            .done()
+            .field("sendNotificationDetails")
+            .mandatory()
+            .showCondition("sendNotificationDecision=\"Other\" AND sendNotificationSubject CONTAINS \"Judgment\"")
+            .showSummary()
+            .caseEventColumn(RETAIN_HIDDEN_VALUE, "No")
+            .caseEventColumn(PAGE_FIELD_DISPLAY_ORDER, 15)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .caseEventColumn(PUBLISH, null)
+            .done()
+            .field("sendNotificationRequestMadeBy")
+            .mandatory()
+            .showCondition("sendNotificationSubject CONTAINS \"Case management orders / requests\" "
+                               + "AND sendNotificationCaseManagement=\"Request\"")
+            .showSummary()
+            .caseEventColumn(RETAIN_HIDDEN_VALUE, "No")
+            .caseEventColumn(PAGE_FIELD_DISPLAY_ORDER, 11)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .caseEventColumn(PUBLISH, null)
+            .done()
+            .done();
     }
 
     private Event.EventBuilder<T, EtUserRole, EtState> hiddenRespondentNotificationEvent(

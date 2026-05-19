@@ -10,7 +10,9 @@ public class EnglandWalesNotificationConfig extends NotificationConfig<EnglandWa
             1,
             false,
             EtUserRole.CASEWORKER_EMPLOYMENT_ENGLANDWALES,
-            EtUserRole.CASEWORKER_EMPLOYMENT_ETJUDGE_ENGLANDWALES
+            EtUserRole.CASEWORKER_EMPLOYMENT_ETJUDGE_ENGLANDWALES,
+            false,
+            false
         );
     }
 }

@@ -1435,5 +1435,27 @@
       "CaseEvent": ["CaseEvent-DCF2.json"],
       "AuthorisationCaseEvent": ["AuthorisationCaseEvent-DCF2.json"]
     }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "fixCaseAPI",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent.json"],
+      "CaseEventToFields": ["CaseEventToFields.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "fixCaseAPI",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent.json"],
+      "CaseEventToFields": ["CaseEventToFields.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json"]
+    }
   }
 ]

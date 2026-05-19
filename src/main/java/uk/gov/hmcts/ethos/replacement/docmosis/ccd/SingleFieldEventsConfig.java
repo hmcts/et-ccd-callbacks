@@ -16,6 +16,7 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
     private static final String ACCEPTED_OR_REJECTED = "Accepted;Rejected";
     private static final String ACCEPT_REJECT_POST_CONDITION =
         "Accepted(preAcceptCase.caseAccepted=\"Yes\"):1;Rejected";
+    private static final String PAGE_COLUMN_NUMBER = "PageColumnNumber";
 
     private final EtUserRole regionalCaseworkerRole;
     private final EtUserRole regionalJudgeRole;
@@ -63,7 +64,7 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .field(CaseData::getPreAcceptCase)
             .mandatory()
             .showSummary()
-            .caseEventColumn("PageColumnNumber", 1)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, 1)
             .done()
             .done();
 
@@ -79,7 +80,7 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .field(CaseData::getTransferredCaseLink)
             .optional()
             .showSummary()
-            .caseEventColumn("PageColumnNumber", 1)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, 1)
             .done()
             .done()
             .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API);
@@ -96,7 +97,7 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .pageLabel("Retrieve ACAS Certificate")
             .field(CaseData::getAcasCertificate)
             .mandatory()
-            .caseEventColumn("PageColumnNumber", null)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
             .caseEventColumn("ShowSummaryChangeOption", "N")
             .done()
             .done();
@@ -114,7 +115,7 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .page("1")
             .field(CaseData::getBfActions)
             .showSummary()
-            .caseEventColumn("PageColumnNumber", 1)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, 1)
             .done()
             .done();
 
@@ -131,7 +132,7 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .field(CaseData::getBfActions)
             .optional()
             .showSummary()
-            .caseEventColumn("PageColumnNumber", 1)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, 1)
             .done()
             .done()
             .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API)
@@ -149,7 +150,7 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .page("1")
             .field(CaseData::getDocumentCollection)
             .showSummary()
-            .caseEventColumn("PageColumnNumber", 1)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, 1)
             .done()
             .done();
 
@@ -164,7 +165,7 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .page("1")
             .field(CaseData::getAddDocumentCollection)
             .showSummary()
-            .caseEventColumn("PageColumnNumber", 1)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, 1)
             .done()
             .done();
 
@@ -180,7 +181,7 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .page("SingleFormPageWithComplex")
             .pageLabel("Change Organisation Request")
             .field(CaseData::getChangeOrganisationRequestField)
-            .caseEventColumn("PageColumnNumber", null)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
             .caseEventColumn("ShowSummaryChangeOption", "N")
             .done()
             .done()
@@ -203,7 +204,7 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .fields()
             .page("1")
             .field(CaseData::getAddCaseNote)
-            .caseEventColumn("PageColumnNumber", null)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
             .done()
             .done()
             .grant(Permission.CRUD, regionalCaseworkerRole, regionalJudgeRole, EtUserRole.CASEWORKER_EMPLOYMENT_API)
@@ -222,7 +223,7 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .page("1")
             .field(CaseData::getDraftAndSignJudgement)
             .showSummary()
-            .caseEventColumn("PageColumnNumber", 1)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, 1)
             .done()
             .done()
             .grant(Permission.CRUD, regionalJudgeRole, EtUserRole.CASEWORKER_EMPLOYMENT_API)
@@ -244,9 +245,44 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .showSummary()
             .caseEventColumn("PageDisplayOrder", amendRespondentRepresentativeFieldDisplayOrder)
             .caseEventColumn("PageFieldDisplayOrder", amendRespondentRepresentativeFieldDisplayOrder)
-            .caseEventColumn("PageColumnNumber", 1)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, 1)
             .done()
             .done();
+
+        representativeContactFields(
+            configBuilder.event("amendClaimantRepresentativeContact")
+                .forAllStates()
+                .name("Amend contact details")
+                .description("Claimant - Amend Contact Details")
+                .displayOrder(62)
+                .showSummary()
+                .caseEventColumn("PreConditionState(s)", "Submitted;Vetted;Accepted;Rejected;")
+                .aboutToStartCallbackUrl("${ET_COS_URL}/et1Repped/aboutToStartAmendClaimantRepresentativeContact")
+                .aboutToSubmitCallbackUrl("${ET_COS_URL}/et1Repped/aboutToSubmitAmendClaimantRepresentativeContact"),
+            "${ET_COS_URL}/et1Repped/midEventAmendClaimantRepresentativeContact",
+            CaseData::getRepresentativePhoneNumber,
+            CaseData::getRepresentativeAddress,
+            false
+        )
+            .grant(Permission.CRUD, EtUserRole.CLAIMANT_SOLICITOR, EtUserRole.CASEWORKER_EMPLOYMENT_API);
+
+        representativeContactFields(
+            configBuilder.event("amendRespondentRepresentativeContact")
+                .forAllStates()
+                .name("Amend contact details")
+                .description("Amend contact details")
+                .displayOrder(53)
+                .showSummary()
+                .showCondition("caseType =\"dummy\"")
+                .caseEventColumn("PreConditionState(s)", "Accepted")
+                .aboutToSubmitCallbackUrl("${ET_COS_URL}/et3Response/aboutToSubmitAmendRepresentativeContact"),
+            "${ET_COS_URL}/et3Response/midEventAmendRepresentativeContact",
+            CaseData::getEt3ResponsePhone,
+            CaseData::getEt3ResponseAddress,
+            true
+        )
+            .grant(Permission.CRUD, EtUserRole.respondentSolicitors())
+            .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API);
 
         configBuilder.event("legalrepDocuments")
             .forAllStates()
@@ -263,11 +299,11 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .field(CaseData::getLegalRepDocumentsMarkdown)
             .optional()
             .showCondition("legalRepDocumentsMarkdownLabel=\"dummy\"")
-            .caseEventColumn("PageColumnNumber", null)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
             .done()
             .field(CaseData::getLegalRepDocumentsMarkdownLabel)
             .readOnly()
-            .caseEventColumn("PageColumnNumber", null)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
             .done()
             .done()
             .grant(Permission.R, EtUserRole.ET_ACAS_API)
@@ -348,7 +384,7 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .field(CaseData::getEt1DoNotSubmitDraftMessage)
             .readOnly()
             .caseEventColumn("PageFieldDisplayOrder", 2)
-            .caseEventColumn("PageColumnNumber", null)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
             .done()
             .done()
             .grant(Permission.CRU, EtUserRole.CLAIMANT_SOLICITOR)
@@ -372,12 +408,12 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .field(CaseData::getSubmitEt1Preamble)
             .readOnly()
             .caseEventColumn("Publish", null)
-            .caseEventColumn("PageColumnNumber", null)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
             .done()
             .field(CaseData::getSubmitEt1Confirmation)
             .mandatory()
             .caseEventColumn("Publish", null)
-            .caseEventColumn("PageColumnNumber", null)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
             .done()
             .done()
             .grant(Permission.CRU, EtUserRole.CLAIMANT_SOLICITOR)
@@ -414,11 +450,11 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
                 .page("1")
                 .field(CaseData::getDownloadDraftEt3Label)
                 .readOnly()
-                .caseEventColumn("PageColumnNumber", 1)
+                .caseEventColumn(PAGE_COLUMN_NUMBER, 1)
                 .done()
                 .field(CaseData::getSubmitEt3Respondent)
                 .mandatory()
-                .caseEventColumn("PageColumnNumber", 1)
+                .caseEventColumn(PAGE_COLUMN_NUMBER, 1)
                 .done()
                 .done(),
             Permission.CRU
@@ -439,12 +475,12 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .pageWithCallbackUrl("1", "${ET_COS_URL}/listingSingleCases")
             .field(CaseData::getPrintHearingDetails)
             .showSummary()
-            .caseEventColumn("PageColumnNumber", 1)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, 1)
             .done()
             .page("2")
             .field(CaseData::getPrintHearingCollection)
             .showSummary()
-            .caseEventColumn("PageColumnNumber", 1)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, 1)
             .done()
             .done();
 
@@ -474,7 +510,7 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .page("1")
             .field(CaseData::getDepositCollection)
             .showSummary()
-            .caseEventColumn("PageColumnNumber", 1)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, 1)
             .done()
             .done();
 
@@ -490,7 +526,7 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .page("1")
             .field(CaseData::getRestrictedReporting)
             .showSummary()
-            .caseEventColumn("PageColumnNumber", 1)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, 1)
             .done()
             .done();
 
@@ -507,7 +543,7 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .pageWithCallbackUrl("1", "${ET_COS_URL}/jurisdictionValidation")
             .field(CaseData::getJurCodesCollection)
             .showSummary()
-            .caseEventColumn("PageColumnNumber", 1)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, 1)
             .done()
             .done();
 
@@ -525,7 +561,7 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .pageWithCallbackUrl("1", "${ET_COS_URL}/judgmentValidation")
             .field(CaseData::getJudgementCollection)
             .showSummary()
-            .caseEventColumn("PageColumnNumber", 1)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, 1)
             .done()
             .done();
 
@@ -571,7 +607,7 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .page("1")
             .field(CaseData::getSelectNotificationDropdown)
             .mandatory()
-            .caseEventColumn("PageColumnNumber", null)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
             .done()
             .done()
             .grant(
@@ -628,7 +664,7 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .pageLabel(pageLabel)
             .field(field)
             .showSummary()
-            .caseEventColumn("PageColumnNumber", 1)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, 1)
             .done()
             .done()
             .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API)
@@ -645,12 +681,53 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .readOnly()
             .showCondition("pseViewNotificationsLabel=\"dummy\"")
             .caseEventColumn("RetainHiddenValue", "No")
-            .caseEventColumn("PageColumnNumber", null)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
             .done()
             .field(CaseData::getPseViewNotificationsLabel)
             .readOnly()
             .caseEventColumn("PageLabel", null)
-            .caseEventColumn("PageColumnNumber", null)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .done();
+    }
+
+    private Event.EventBuilder<T, EtUserRole, EtState> representativeContactFields(
+        Event.EventBuilder<T, EtUserRole, EtState> event,
+        String changeOptionCallbackUrl,
+        TypedPropertyGetter<T, ?> phoneField,
+        TypedPropertyGetter<T, ?> addressField,
+        boolean retainHiddenContactDetails
+    ) {
+        String retainHiddenValue = retainHiddenContactDetails ? "Yes" : null;
+
+        return event.fields()
+            .pageWithCallbackUrl("1", changeOptionCallbackUrl)
+            .field(CaseData::getRepresentativeContactChangeOption)
+            .optional()
+            .caseEventColumn("ShowSummaryChangeOption", "N")
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .page("2")
+            .field(phoneField)
+            .optional()
+            .showSummary()
+            .caseEventColumn("PageShowCondition", "representativeContactChangeOption=\"Amend contact details\"")
+            .caseEventColumn("retainHiddenValue", retainHiddenValue)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .field(addressField)
+            .optional()
+            .showSummary()
+            .caseEventColumn("retainHiddenValue", retainHiddenValue)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .page("3")
+            .field(CaseData::getMyHmctsAddressText)
+            .readOnly()
+            .showSummary()
+            .caseEventColumn("PageDisplayOrder", 2)
+            .caseEventColumn("PageShowCondition", "representativeContactChangeOption=\"Use MyHMCTS details\"")
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
             .done()
             .done();
     }
@@ -663,19 +740,19 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .pageLabel("View a judgment, order or notification")
             .field(CaseData::getClaimantSelectNotification)
             .mandatory()
-            .caseEventColumn("PageColumnNumber", null)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
             .done()
             .page("2")
             .pageLabel("View a judgment, order or notification")
             .field(CaseData::getClaimantNotificationTableMarkdown)
             .readOnly()
             .showCondition("claimantNotificationTableMarkdownLabel=\"dummy\"")
-            .caseEventColumn("PageColumnNumber", null)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
             .done()
             .field(CaseData::getClaimantNotificationTableMarkdownLabel)
             .readOnly()
             .caseEventColumn("PageLabel", null)
-            .caseEventColumn("PageColumnNumber", null)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
             .done()
             .done();
     }
@@ -688,19 +765,19 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .pageLabel("View a judgment, order or notification")
             .field(CaseData::getPseRespondentSelectJudgmentOrderNotification)
             .mandatory()
-            .caseEventColumn("PageColumnNumber", null)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
             .done()
             .page("2")
             .pageLabel("View a judgment, order or notification")
             .field(CaseData::getPseRespondentOrdReqTableMarkUp)
             .readOnly()
             .showCondition("pseRespondentRequestOrderTableLabel=\"dummy\"")
-            .caseEventColumn("PageColumnNumber", null)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
             .done()
             .field(CaseData::getPseRespondentRequestOrderTableLabel)
             .readOnly()
             .caseEventColumn("PageLabel", null)
-            .caseEventColumn("PageColumnNumber", null)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
             .done()
             .done();
     }
@@ -714,7 +791,7 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .field(CaseData::getHorizontalLine)
             .readOnly()
             .caseEventColumn("Publish", null)
-            .caseEventColumn("PageColumnNumber", null)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
             .done()
             .field(CaseData::getNextListedDate)
             .optional()
@@ -722,7 +799,7 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .caseEventColumn("ShowSummaryChangeOption", "N")
             .caseEventColumn("Publish", "Y")
             .caseEventColumn("PageLabel", null)
-            .caseEventColumn("PageColumnNumber", 1)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, 1)
             .done()
             .done();
     }

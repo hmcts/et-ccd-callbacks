@@ -2808,5 +2808,65 @@
       "EventToComplexTypes": ["EventToComplexTypes-WA.json", "EventToComplexTypes.json"],
       "AuthorisationCaseEvent": ["AuthorisationCaseEvent-WA.json", "AuthorisationCaseEvent.json"]
     }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales_Multiple",
+    "eventId": "amendMultipleAPI",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland_Multiple",
+    "eventId": "amendMultipleAPI",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales_Multiple",
+    "eventId": "updatePayloadMultiple",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland_Multiple",
+    "eventId": "updatePayloadMultiple",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales_Multiple",
+    "eventId": "resetMultipleState",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland_Multiple",
+    "eventId": "resetMultipleState",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales_Listings",
+    "eventId": "hearingDocumentation",
+    "sheets": ["CaseEvent"]
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland_Listings",
+    "eventId": "hearingDocumentation",
+    "sheets": ["CaseEvent"]
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales_Listings",
+    "eventId": "printCauseList",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland_Listings",
+    "eventId": "printCauseList",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
   }
 ]

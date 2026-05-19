@@ -1589,5 +1589,27 @@
       "CaseEventToFields": ["CaseEventToFields-WA.json", "CaseEventToFields-WA-hearingdate.json"],
       "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json"]
     }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "UPDATE_CASE_SUBMITTED",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent.json"],
+      "CaseEventToFields": ["CaseEventToFields.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "UPDATE_CASE_SUBMITTED",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent.json"],
+      "CaseEventToFields": ["CaseEventToFields.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json"]
+    }
   }
 ]

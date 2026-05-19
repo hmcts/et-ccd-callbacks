@@ -14,6 +14,7 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
     private static final String ACTIVE_CASE_STATES = "Submitted;Vetted;Accepted;Rejected;Closed";
     private static final String BF_ACTION_STATES = "Accepted;Rejected;Submitted;Vetted";
     private static final String ACCEPTED_OR_REJECTED = "Accepted;Rejected";
+    private static final String GENERATE_CORRESPONDENCE_STATES = "Accepted;Rejected;Submitted;Vetted;Closed";
     private static final String ACCEPT_REJECT_POST_CONDITION =
         "Accepted(preAcceptCase.caseAccepted=\"Yes\"):1;Rejected";
     private static final String PAGE_COLUMN_NUMBER = "PageColumnNumber";
@@ -200,6 +201,17 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .caseEventColumn(PAGE_COLUMN_NUMBER, 1)
             .done()
             .done();
+
+        regionalCaseworkerEvent(generateCorrespondenceFields(configBuilder.event("generateCorrespondence")
+            .forStates(EtState.ACCEPTED, EtState.REJECTED, EtState.SUBMITTED, EtState.VETTED, EtState.CLOSED)))
+            .name("Letters")
+            .description("Generate Letters")
+            .displayOrder(30)
+            .caseEventColumn("PreConditionState(s)", GENERATE_CORRESPONDENCE_STATES)
+            .publishToCamunda()
+            .aboutToStartCallbackUrl("${ET_COS_URL}/dynamicLetters")
+            .aboutToSubmitCallbackUrl("${ET_COS_URL}/generateDocument")
+            .submittedCallbackUrl("${ET_COS_URL}/generateDocumentConfirmation");
 
         regionalCaseworkerEvent(configBuilder.event("addDocument").forAllStates())
             .name("Add Document")
@@ -784,6 +796,12 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
 
     protected abstract boolean pseRespondentRespondToTribunalUnavailableWarningShowsSummary();
 
+    protected abstract String generateCorrespondenceTypeFieldId();
+
+    protected abstract String addressLabelsSelectionPageShowCondition();
+
+    protected abstract String addressLabelsPageShowCondition();
+
     protected Event.EventBuilder<T, EtUserRole, EtState> regionalCaseworkerEvent(
         Event.EventBuilder<T, EtUserRole, EtState> event
     ) {
@@ -910,6 +928,44 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .readOnly()
             .caseEventColumn("PageLabel", null)
             .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .done();
+    }
+
+    private Event.EventBuilder<T, EtUserRole, EtState> generateCorrespondenceFields(
+        Event.EventBuilder<T, EtUserRole, EtState> event
+    ) {
+        return event.fields()
+            .page("1")
+            .field(generateCorrespondenceTypeFieldId())
+            .mandatory()
+            .showSummary()
+            .caseEventColumn("CallBackURLMidEvent", "${ET_COS_URL}/midAddressLabels")
+            .caseEventColumn(PAGE_COLUMN_NUMBER, 1)
+            .caseEventColumn("Publish", null)
+            .done()
+            .page("2")
+            .field(CaseData::getAddressLabelsSelectionType)
+            .mandatory()
+            .showSummary()
+            .caseEventColumn("PageShowCondition", addressLabelsSelectionPageShowCondition())
+            .caseEventColumn("CallBackURLMidEvent", "${ET_COS_URL}/midAddressLabels")
+            .caseEventColumn(PAGE_COLUMN_NUMBER, 1)
+            .caseEventColumn("Publish", null)
+            .done()
+            .page("3")
+            .field(CaseData::getAddressLabelCollection)
+            .showSummary()
+            .caseEventColumn("PageShowCondition", addressLabelsPageShowCondition())
+            .caseEventColumn("CallBackURLMidEvent", "${ET_COS_URL}/midSelectedAddressLabels")
+            .caseEventColumn(PAGE_COLUMN_NUMBER, 1)
+            .done()
+            .page("4")
+            .field(CaseData::getAddressLabelsAttributesType)
+            .showSummary()
+            .caseEventColumn("PageShowCondition", addressLabelsPageShowCondition())
+            .caseEventColumn("CallBackURLMidEvent", "${ET_COS_URL}/midValidateAddressLabels")
+            .caseEventColumn(PAGE_COLUMN_NUMBER, 1)
             .done()
             .done();
     }

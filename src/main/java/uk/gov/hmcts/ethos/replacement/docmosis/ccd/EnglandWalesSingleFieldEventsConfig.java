@@ -78,4 +78,20 @@ public class EnglandWalesSingleFieldEventsConfig extends SingleFieldEventsConfig
     protected boolean pseRespondentRespondToTribunalUnavailableWarningShowsSummary() {
         return false;
     }
+
+    @Override
+    protected String generateCorrespondenceTypeFieldId() {
+        return "correspondenceType";
+    }
+
+    @Override
+    protected String addressLabelsSelectionPageShowCondition() {
+        return "correspondenceType.topLevel_Documents=\"EM-TRB-LET-ENG-00544\" "
+            + "AND correspondenceType.part_0_Documents=\"0.1\"";
+    }
+
+    @Override
+    protected String addressLabelsPageShowCondition() {
+        return "correspondenceType.topLevel_Documents=\"EM-TRB-LET-ENG-00544\"";
+    }
 }

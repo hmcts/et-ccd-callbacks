@@ -49,4 +49,20 @@ public class ScotlandSingleFieldEventsConfig extends SingleFieldEventsConfig<Sco
     protected boolean pseRespondentRespondToTribunalUnavailableWarningShowsSummary() {
         return true;
     }
+
+    @Override
+    protected String generateCorrespondenceTypeFieldId() {
+        return "correspondenceScotType";
+    }
+
+    @Override
+    protected String addressLabelsSelectionPageShowCondition() {
+        return "correspondenceScotType.topLevel_Scot_Documents=\"EM-TRB-LET-ENG-00544\" "
+            + "AND correspondenceScotType.part_0_Scot_Documents=\"0.1\"";
+    }
+
+    @Override
+    protected String addressLabelsPageShowCondition() {
+        return "correspondenceScotType.topLevel_Scot_Documents=\"EM-TRB-LET-ENG-00544\"";
+    }
 }

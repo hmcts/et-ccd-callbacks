@@ -4,4 +4,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ScotlandRule92Config extends Rule92Config<ScotlandCaseData> {
+
+    public ScotlandRule92Config() {
+        super(1, 2, false, true);
+    }
 }

@@ -1501,5 +1501,93 @@
       "CaseEventToFields": ["CaseEventToFields-Bundles.json"],
       "AuthorisationCaseEvent": ["AuthorisationCaseEvent-Bundles.json"]
     }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "SUBMIT_CLAIMANT_TSE",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-WA.json"],
+      "CaseEventToFields": ["CaseEventToFields-WA.json", "CaseEventToFields-WA-hearingdate.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json", "AuthorisationCaseEvent-WA.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "SUBMIT_CLAIMANT_TSE",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-WA.json"],
+      "CaseEventToFields": ["CaseEventToFields-WA.json", "CaseEventToFields-WA-hearingdate.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json"]
+    }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "SUBMIT_RESPONDENT_TSE",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-WA.json"],
+      "CaseEventToFields": ["CaseEventToFields-WA.json", "CaseEventToFields-WA-hearingdate.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json", "AuthorisationCaseEvent-WA.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "SUBMIT_RESPONDENT_TSE",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-WA.json"],
+      "CaseEventToFields": ["CaseEventToFields-WA.json", "CaseEventToFields-WA-hearingdate.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json"]
+    }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "CLAIMANT_TSE_RESPOND",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-WA.json"],
+      "CaseEventToFields": ["CaseEventToFields-WA.json", "CaseEventToFields-WA-hearingdate.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json", "AuthorisationCaseEvent-WA.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "CLAIMANT_TSE_RESPOND",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-WA.json"],
+      "CaseEventToFields": ["CaseEventToFields-WA.json", "CaseEventToFields-WA-hearingdate.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json"]
+    }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "RESPONDENT_TSE_RESPOND",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-WA.json"],
+      "CaseEventToFields": ["CaseEventToFields-WA.json", "CaseEventToFields-WA-hearingdate.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json", "AuthorisationCaseEvent-WA.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "RESPONDENT_TSE_RESPOND",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-WA.json"],
+      "CaseEventToFields": ["CaseEventToFields-WA.json", "CaseEventToFields-WA-hearingdate.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json"]
+    }
   }
 ]

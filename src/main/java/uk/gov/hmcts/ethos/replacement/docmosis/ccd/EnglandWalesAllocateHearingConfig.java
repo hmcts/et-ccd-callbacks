@@ -10,7 +10,8 @@ public class EnglandWalesAllocateHearingConfig extends AllocateHearingConfig<Eng
             EtUserRole.CASEWORKER_EMPLOYMENT_ENGLANDWALES,
             EtUserRole.CASEWORKER_EMPLOYMENT_ETJUDGE_ENGLANDWALES,
             false,
-            false
+            false,
+            "${ET_COS_URL}/hearingdetails/hearingMidEventValidation"
         );
     }
 }

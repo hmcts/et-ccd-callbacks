@@ -10,7 +10,8 @@ public class ScotlandAllocateHearingConfig extends AllocateHearingConfig<Scotlan
             EtUserRole.CASEWORKER_EMPLOYMENT_SCOTLAND,
             EtUserRole.CASEWORKER_EMPLOYMENT_ETJUDGE_SCOTLAND,
             true,
-            true
+            true,
+            null
         );
     }
 }

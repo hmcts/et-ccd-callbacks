@@ -1132,6 +1132,8 @@ public class CaseData extends Et1CaseData {
     private DynamicFixedListType suggestedHearingVenues;
     @JsonProperty("listedDateInPastWarning")
     private String listedDateInPastWarning;
+    @JsonProperty("listedDateInPastWarningLabel")
+    private String listedDateInPastWarningLabel;
     @JsonProperty("noticeOfChangeAnswers0")
     private NoticeOfChangeAnswers noticeOfChangeAnswers0;
     @JsonProperty("noticeOfChangeAnswers1")

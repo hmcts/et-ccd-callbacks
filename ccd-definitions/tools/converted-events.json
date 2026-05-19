@@ -2449,5 +2449,35 @@
       "CaseEventToFields": ["CaseEventToFields.json", "CaseEventToFields-WA.json"],
       "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json", "AuthorisationCaseEvent-ET1Repped.json"]
     }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "tseRespond",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-WA.json"],
+      "CaseEventToFields": [
+        "CaseEventToFields.json",
+        "CaseEventToFields-WA.json",
+        "CaseEventToFields-WA-hearingdate.json"
+      ],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "tseRespond",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-WA.json"],
+      "CaseEventToFields": [
+        "CaseEventToFields.json",
+        "CaseEventToFields-WA.json",
+        "CaseEventToFields-WA-hearingdate.json"
+      ],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json"]
+    }
   }
 ]

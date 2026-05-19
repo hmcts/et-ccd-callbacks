@@ -4,4 +4,8 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class ScotlandTseResponseConfig extends TseResponseConfig<ScotlandCaseData> {
+
+    public ScotlandTseResponseConfig() {
+        super(false, true);
+    }
 }

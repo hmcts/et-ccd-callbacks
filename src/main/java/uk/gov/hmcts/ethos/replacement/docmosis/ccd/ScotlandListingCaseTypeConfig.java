@@ -11,7 +11,8 @@ public class ScotlandListingCaseTypeConfig extends ListingCaseTypeConfig<Scotlan
             "Scotland - Reports (RET)",
             "Scotland - Hearings/Reports (RET)",
             EtUserRole.CASEWORKER_EMPLOYMENT_SCOTLAND,
-            EtUserRole.CASEWORKER_EMPLOYMENT_ETJUDGE_SCOTLAND
+            EtUserRole.CASEWORKER_EMPLOYMENT_ETJUDGE_SCOTLAND,
+            true
         );
     }
 }

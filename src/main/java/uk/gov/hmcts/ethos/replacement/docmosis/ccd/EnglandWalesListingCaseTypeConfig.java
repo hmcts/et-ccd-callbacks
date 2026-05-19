@@ -11,7 +11,8 @@ public class EnglandWalesListingCaseTypeConfig extends ListingCaseTypeConfig<Eng
             "Eng/Wales - Hearings/Reports",
             "England/Wales - Hearings/Reports",
             EtUserRole.CASEWORKER_EMPLOYMENT_ENGLANDWALES,
-            EtUserRole.CASEWORKER_EMPLOYMENT_ETJUDGE_ENGLANDWALES
+            EtUserRole.CASEWORKER_EMPLOYMENT_ETJUDGE_ENGLANDWALES,
+            false
         );
     }
 }

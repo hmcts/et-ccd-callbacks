@@ -4,7 +4,6 @@ import uk.gov.hmcts.ccd.sdk.api.DisplayContext;
 import uk.gov.hmcts.ccd.sdk.api.Event.EventBuilder;
 import uk.gov.hmcts.ccd.sdk.api.Field.FieldBuilder;
 import uk.gov.hmcts.ccd.sdk.api.FieldCollection.FieldCollectionBuilder;
-import uk.gov.hmcts.et.common.model.ccd.CaseData;
 
 record EventFieldSpec(
     String id,
@@ -93,12 +92,16 @@ record EventFieldSpec(
     }
 
     EventFieldSpec publishColumn() {
-        return new EventFieldSpec(id, context, page, pageDisplayOrder, pageFieldDisplayOrder, showCondition,
-            pageShowCondition, pageLabel, label, midEventCallbackUrl, showSummaryChangeOption, pageColumnNumber,
-            retainHiddenValue, "Y");
+        return publishColumn("Y");
     }
 
-    <T extends CaseData> FieldBuilder<?, EtState, T, EventBuilder<T, EtUserRole, EtState>> addTo(
+    EventFieldSpec publishColumn(String value) {
+        return new EventFieldSpec(id, context, page, pageDisplayOrder, pageFieldDisplayOrder, showCondition,
+            pageShowCondition, pageLabel, label, midEventCallbackUrl, showSummaryChangeOption, pageColumnNumber,
+            retainHiddenValue, value);
+    }
+
+    <T> FieldBuilder<?, EtState, T, EventBuilder<T, EtUserRole, EtState>> addTo(
         FieldCollectionBuilder<T, EtState, EventBuilder<T, EtUserRole, EtState>> fields
     ) {
         FieldBuilder<?, EtState, T, EventBuilder<T, EtUserRole, EtState>> field =
@@ -118,7 +121,7 @@ record EventFieldSpec(
         return field;
     }
 
-    private <T extends CaseData> void applyContext(
+    private <T> void applyContext(
         FieldBuilder<?, EtState, T, EventBuilder<T, EtUserRole, EtState>> field
     ) {
         switch (context) {
@@ -130,7 +133,7 @@ record EventFieldSpec(
         }
     }
 
-    private <T extends CaseData> void applyColumn(
+    private <T> void applyColumn(
         FieldBuilder<?, EtState, T, EventBuilder<T, EtUserRole, EtState>> field,
         String column,
         Object value

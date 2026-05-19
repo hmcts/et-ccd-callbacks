@@ -9,6 +9,7 @@ public class ScotlandEt3Config extends Et3Config<ScotlandCaseData> {
         super(
             EtUserRole.CASEWORKER_EMPLOYMENT_SCOTLAND,
             EtUserRole.CASEWORKER_EMPLOYMENT_ETJUDGE_SCOTLAND,
+            true,
             true
         );
     }

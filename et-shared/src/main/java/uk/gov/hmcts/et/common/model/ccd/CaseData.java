@@ -1001,14 +1001,26 @@ public class CaseData extends Et1CaseData {
     // ET3 Notification
     @JsonProperty("et3NotificationDocCollection")
     private List<DocumentTypeItem> et3NotificationDocCollection;
+    @JsonProperty("horizontalLine4")
+    private String horizontalLine4;
     @JsonProperty("et3OtherTypeDocumentName")
     private String et3OtherTypeDocumentName;
+    @JsonProperty("et3OtherTypeDocumentNameLabel")
+    private String et3OtherTypeDocumentNameLabel;
+    @JsonProperty("et3SelectAllThatApply")
+    private String et3SelectAllThatApply;
     @JsonProperty("et3NotificationDocRecipient")
     private List<String> et3NotificationDocRecipient;
     @JsonProperty("et3ClaimantAndRespondentAddresses")
     private String et3ClaimantAndRespondentAddresses;
+    @JsonProperty("et3EmailDocsToAcasTitle")
+    private String et3EmailDocsToAcasTitle;
     @JsonProperty("et3EmailLinkToAcas")
     private String et3EmailLinkToAcas;
+    @JsonProperty("et3EmailDocsToAcasLink")
+    private String et3EmailDocsToAcasLink;
+    @JsonProperty("et3EmailDocsToAcasInstructions")
+    private String et3EmailDocsToAcasInstructions;
 
     //Referral
     @JsonProperty("referralCollection")

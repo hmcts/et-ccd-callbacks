@@ -6,6 +6,11 @@ import org.springframework.stereotype.Component;
 public class ScotlandNotificationConfig extends NotificationConfig<ScotlandCaseData> {
 
     public ScotlandNotificationConfig() {
-        super(2, true);
+        super(
+            2,
+            true,
+            EtUserRole.CASEWORKER_EMPLOYMENT_SCOTLAND,
+            EtUserRole.CASEWORKER_EMPLOYMENT_ETJUDGE_SCOTLAND
+        );
     }
 }

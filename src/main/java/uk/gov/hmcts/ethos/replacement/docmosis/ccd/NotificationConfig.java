@@ -10,13 +10,19 @@ public abstract class NotificationConfig<T extends CaseData> implements CCDConfi
 
     private final int updateNotificationResponseHearingDatePage;
     private final boolean hideUpdateNotificationResponseCollection;
+    private final EtUserRole regionalCaseworkerRole;
+    private final EtUserRole regionalJudgeRole;
 
     protected NotificationConfig(
         int updateNotificationResponseHearingDatePage,
-        boolean hideUpdateNotificationResponseCollection
+        boolean hideUpdateNotificationResponseCollection,
+        EtUserRole regionalCaseworkerRole,
+        EtUserRole regionalJudgeRole
     ) {
         this.updateNotificationResponseHearingDatePage = updateNotificationResponseHearingDatePage;
         this.hideUpdateNotificationResponseCollection = hideUpdateNotificationResponseCollection;
+        this.regionalCaseworkerRole = regionalCaseworkerRole;
+        this.regionalJudgeRole = regionalJudgeRole;
     }
 
     @Override
@@ -82,6 +88,28 @@ public abstract class NotificationConfig<T extends CaseData> implements CCDConfi
         )
             .grant(Permission.CRU, EtUserRole.CITIZEN)
             .grant(Permission.R, EtUserRole.CASEWORKER_WA_TASK_CONFIGURATION);
+
+        respondNotificationFields(
+            configBuilder.event("respondNotification")
+                .forAllStates()
+                .name("Respond to a notification")
+                .description("Respond to a notification")
+                .showSummary()
+                .showCondition("caseType=\"dummy\"")
+                .publishToCamunda()
+                .caseEventColumn("DisplayOrder", null)
+                .aboutToStartCallbackUrl("${ET_COS_URL}/respondNotification/aboutToStart")
+                .aboutToSubmitCallbackUrl("${ET_COS_URL}/respondNotification/aboutToSubmit")
+                .submittedCallbackUrl("${ET_COS_URL}/respondNotification/submitted")
+        )
+            .grant(
+                Permission.R,
+                EtUserRole.ET_ACAS_API,
+                EtUserRole.CASEWORKER_EMPLOYMENT,
+                EtUserRole.CASEWORKER_EMPLOYMENT_ETJUDGE
+            )
+            .grant(Permission.CRU, regionalCaseworkerRole, regionalJudgeRole)
+            .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API, EtUserRole.CASEWORKER_WA_TASK_CONFIGURATION);
     }
 
     private Event.EventBuilder<T, EtUserRole, EtState> hiddenRespondentNotificationEvent(
@@ -117,6 +145,128 @@ public abstract class NotificationConfig<T extends CaseData> implements CCDConfi
             .caseEventColumn("PageFieldDisplayOrder", 2)
             .caseEventColumn("Publish", "Y")
             .caseEventColumn("PageColumnNumber", 1)
+            .done()
+            .done();
+    }
+
+    private Event.EventBuilder<T, EtUserRole, EtState> respondNotificationFields(
+        Event.EventBuilder<T, EtUserRole, EtState> event
+    ) {
+        return event.fields()
+            .page("1")
+            .field(CaseData::getSelectNotificationDropdown)
+            .mandatory()
+            .showSummary()
+            .caseEventColumn("PageFieldDisplayOrder", 2)
+            .caseEventColumn("PageColumnNumber", null)
+            .caseEventColumn("Publish", null)
+            .done()
+            .page("2")
+            .field(CaseData::getRespondNotificationTitle)
+            .mandatory()
+            .showSummary()
+            .caseEventColumn("PageLabel", "Respond to a notification")
+            .caseEventColumn("PageFieldDisplayOrder", 3)
+            .caseEventColumn("PageColumnNumber", null)
+            .caseEventColumn("Publish", null)
+            .done()
+            .field(CaseData::getRespondNotificationAdditionalInfo)
+            .optional()
+            .showSummary()
+            .caseEventColumn("PageFieldDisplayOrder", 4)
+            .caseEventColumn("PageColumnNumber", null)
+            .caseEventColumn("Publish", null)
+            .done()
+            .field(CaseData::getRespondNotificationUploadDocument)
+            .showSummary()
+            .caseEventColumn("PageFieldDisplayOrder", 5)
+            .caseEventColumn("PageColumnNumber", null)
+            .done()
+            .field(CaseData::getRespondNotificationResponseRequired)
+            .mandatory()
+            .showSummary()
+            .showCondition(" respondNotificationCmoOrRequest=\"Case management order\" "
+                               + "OR respondNotificationCmoOrRequest=\"Request\"")
+            .caseEventColumn("RetainHiddenValue", "Yes")
+            .caseEventColumn("PageFieldDisplayOrder", 8)
+            .caseEventColumn("PageColumnNumber", null)
+            .caseEventColumn("Publish", null)
+            .done()
+            .field(CaseData::getRespondNotificationWhoRespond)
+            .mandatory()
+            .showSummary()
+            .showCondition("respondNotificationResponseRequired=\"Yes\"")
+            .caseEventColumn("RetainHiddenValue", "Yes")
+            .caseEventColumn("PageFieldDisplayOrder", 9)
+            .caseEventColumn("PageColumnNumber", null)
+            .caseEventColumn("Publish", null)
+            .done()
+            .field(CaseData::getNotificationMarkdown)
+            .readOnly()
+            .showSummary()
+            .showCondition("notificationMarkdownLabel=\"dummy\"")
+            .caseEventColumn("RetainHiddenValue", "No")
+            .caseEventColumn("CallBackURLMidEvent", "${ET_COS_URL}/respondNotification/midValidateInput")
+            .caseEventColumn("PageLabel", "Respond to a Notification")
+            .caseEventColumn("PageFieldDisplayOrder", 1)
+            .caseEventColumn("PageColumnNumber", null)
+            .caseEventColumn("Publish", null)
+            .done()
+            .field("notificationMarkdownLabel")
+            .readOnly()
+            .caseEventColumn("PageFieldDisplayOrder", 2)
+            .caseEventColumn("PageColumnNumber", null)
+            .caseEventColumn("Publish", null)
+            .done()
+            .field(CaseData::getRespondNotificationPartyToNotify)
+            .mandatory()
+            .showSummary()
+            .caseEventColumn("PageFieldDisplayOrder", 21)
+            .caseEventColumn("PageColumnNumber", null)
+            .caseEventColumn("Publish", null)
+            .done()
+            .field(CaseData::getRespondNotificationCaseManagementMadeBy)
+            .mandatory()
+            .showSummary()
+            .showCondition(" respondNotificationCmoOrRequest=\"Case management order\"")
+            .caseEventColumn("RetainHiddenValue", "No")
+            .caseEventColumn("PageFieldDisplayOrder", 11)
+            .caseEventColumn("PageColumnNumber", null)
+            .caseEventColumn("Publish", null)
+            .done()
+            .field(CaseData::getRespondNotificationFullName)
+            .mandatory()
+            .showSummary()
+            .showCondition("respondNotificationCmoOrRequest=\"Case management order\" "
+                               + "OR respondNotificationCmoOrRequest=\"Request\"")
+            .caseEventColumn("RetainHiddenValue", "Yes")
+            .caseEventColumn("PageFieldDisplayOrder", 12)
+            .caseEventColumn("PageColumnNumber", null)
+            .caseEventColumn("Publish", null)
+            .done()
+            .field(CaseData::getRespondNotificationCmoOrRequest)
+            .mandatory()
+            .showSummary()
+            .caseEventColumn("PageFieldDisplayOrder", 6)
+            .caseEventColumn("PageColumnNumber", null)
+            .caseEventColumn("Publish", null)
+            .done()
+            .field(CaseData::getRespondNotificationRequestMadeBy)
+            .mandatory()
+            .showSummary()
+            .showCondition("respondNotificationCmoOrRequest=\"Request\"")
+            .caseEventColumn("RetainHiddenValue", "Yes")
+            .caseEventColumn("PageFieldDisplayOrder", 10)
+            .caseEventColumn("PageColumnNumber", null)
+            .caseEventColumn("Publish", null)
+            .done()
+            .field("respondNotificationDate")
+            .readOnly()
+            .showCondition(" respondNotificationCmoOrRequest=\"dummy\"")
+            .caseEventColumn("RetainHiddenValue", "Yes")
+            .caseEventColumn("PageFieldDisplayOrder", 22)
+            .caseEventColumn("PageColumnNumber", null)
+            .caseEventColumn("Publish", null)
             .done()
             .done();
     }

@@ -1281,8 +1281,12 @@ public class CaseData extends Et1CaseData {
     private String claimantTseTextBox13;
     @JsonProperty("claimantTseRule92AnsNoGiveDetails")
     private String claimantTseRule92AnsNoGiveDetails;
+    @JsonProperty("claimantTseAllApplicationsLabel")
+    private String claimantTseAllApplicationsLabel;
     @JsonProperty("claimantTseTableMarkUp")
     private String claimantTseTableMarkUp;
+    @JsonProperty("claimantTseTableLabel")
+    private String claimantTseTableLabel;
 
     //TSE Admin Record a Decision
     @JsonProperty("tseAdminSelectApplication")
@@ -1333,6 +1337,10 @@ public class CaseData extends Et1CaseData {
     private String tseResponseCopyNoGiveDetails;
     @JsonProperty("resTseTableMarkUp")
     private String resTseTableMarkUp;
+    @JsonProperty("resTseAllApplicationsLabel")
+    private String resTseAllApplicationsLabel;
+    @JsonProperty("resTseTableLabel")
+    private String resTseTableLabel;
     //  if Respondent is responding to Tribunal
     @JsonProperty("tseRespondingToTribunal")
     private String tseRespondingToTribunal;
@@ -1407,6 +1415,8 @@ public class CaseData extends Et1CaseData {
     private DynamicFixedListType tseViewApplicationSelect;
     @JsonProperty("tseApplicationSummaryAndResponsesMarkup")
     private String tseApplicationSummaryAndResponsesMarkup;
+    @JsonProperty("tseApplicationSummaryAndResponsesMarkupLabel")
+    private String tseApplicationSummaryAndResponsesMarkupLabel;
 
     // Provide Something Else to tribunal - Respondent - Respond to an order or request from the tribunal
     @JsonProperty("pseRespondentSelectOrderOrRequest")

@@ -6,6 +6,6 @@ import org.springframework.stereotype.Component;
 public class EnglandWalesRule92Config extends Rule92Config<EnglandWalesCaseData> {
 
     public EnglandWalesRule92Config() {
-        super(57, 58, true, false);
+        super(57, 58, true, false, 55, 56, true);
     }
 }

@@ -1526,6 +1526,13 @@ public class CaseData extends Et1CaseData {
     @JsonProperty("downloadDraftEt3Label")
     private String downloadDraftEt3Label;
 
+    @JsonProperty("deleteDraftCaseWarningLabel")
+    private String deleteDraftCaseWarningLabel;
+    @JsonProperty("deleteDraftCaseWarning1")
+    private String deleteDraftCaseWarning1;
+    @JsonProperty("deleteDraftCaseWarning2")
+    private String deleteDraftCaseWarning2;
+
     @JsonProperty("bundlesRespondentWhatDocuments")
     private String bundlesRespondentWhatDocuments;
 

@@ -2928,5 +2928,419 @@
     "caseType": "ET_Scotland_Listings",
     "eventId": "generateReport",
     "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales_Multiple",
+    "eventId": "extractNotifications",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales_Multiple",
+    "eventId": "createReferral",
+    "sheets": ["CaseEvent", "CaseEventToFields", "EventToComplexTypes", "AuthorisationCaseEvent"],
+    "generatedSheets": {
+      "EventToComplexTypes": "CaseEventToComplexTypes"
+    },
+    "files": {
+      "EventToComplexTypes": ["EventToComplexTypes-WA.json", "EventToComplexTypes.json"]
+    }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales_Multiple",
+    "eventId": "replyToReferral",
+    "sheets": ["CaseEvent", "CaseEventToFields", "EventToComplexTypes", "AuthorisationCaseEvent"],
+    "generatedSheets": {
+      "EventToComplexTypes": "CaseEventToComplexTypes"
+    },
+    "files": {
+      "EventToComplexTypes": ["EventToComplexTypes-WA.json", "EventToComplexTypes.json"]
+    }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales_Multiple",
+    "eventId": "closeReferral",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales_Multiple",
+    "eventId": "uploadDocument",
+    "sheets": ["CaseEvent", "CaseEventToFields", "EventToComplexTypes", "AuthorisationCaseEvent"],
+    "generatedSheets": {
+      "EventToComplexTypes": "CaseEventToComplexTypes"
+    },
+    "files": {
+      "EventToComplexTypes": ["EventToComplexTypes-DCF2.json", "EventToComplexTypes.json"]
+    }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales_Multiple",
+    "eventId": "sendNotification",
+    "sheets": ["CaseEvent", "CaseEventToFields", "EventToComplexTypes", "AuthorisationCaseEvent"],
+    "generatedSheets": {
+      "EventToComplexTypes": "CaseEventToComplexTypes"
+    },
+    "files": {
+      "EventToComplexTypes": ["EventToComplexTypes.json"]
+    }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales_Multiple",
+    "eventId": "updateReferral",
+    "sheets": ["CaseEvent", "CaseEventToFields", "EventToComplexTypes", "AuthorisationCaseEvent"],
+    "generatedSheets": {
+      "EventToComplexTypes": "CaseEventToComplexTypes"
+    },
+    "files": {
+      "EventToComplexTypes": ["EventToComplexTypes-WA.json", "EventToComplexTypes.json"]
+    }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales_Multiple",
+    "eventId": "addCaseNote",
+    "sheets": ["CaseEvent", "CaseEventToFields", "EventToComplexTypes", "AuthorisationCaseEvent"],
+    "generatedSheets": {
+      "EventToComplexTypes": "CaseEventToComplexTypes"
+    },
+    "files": {
+      "EventToComplexTypes": ["EventToComplexTypes-Multiples-nonprod.json", "EventToComplexTypes.json"]
+    }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales_Multiple",
+    "eventId": "documentSelect",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales_Multiple",
+    "eventId": "createDcf",
+    "sheets": ["CaseEvent", "CaseEventToFields", "EventToComplexTypes", "AuthorisationCaseEvent"],
+    "generatedSheets": {
+      "EventToComplexTypes": "CaseEventToComplexTypes"
+    },
+    "files": {
+      "EventToComplexTypes": ["EventToComplexTypes-DCF2.json"]
+    }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales_Multiple",
+    "eventId": "asyncStitchingComplete",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales_Multiple",
+    "eventId": "close",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales_Multiple",
+    "eventId": "createMultiple",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales_Multiple",
+    "eventId": "preAcceptMultiple",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales_Multiple",
+    "eventId": "amendMultipleDetails",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales_Multiple",
+    "eventId": "importFile",
+    "sheets": ["CaseEvent", "CaseEventToFields", "EventToComplexTypes", "AuthorisationCaseEvent"],
+    "generatedSheets": {
+      "EventToComplexTypes": "CaseEventToComplexTypes"
+    },
+    "files": {
+      "EventToComplexTypes": ["EventToComplexTypes.json"]
+    }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales_Multiple",
+    "eventId": "printSchedule",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales_Multiple",
+    "eventId": "batchUpdateCases",
+    "sheets": ["CaseEvent", "CaseEventToFields", "EventToComplexTypes", "AuthorisationCaseEvent"],
+    "generatedSheets": {
+      "EventToComplexTypes": "CaseEventToComplexTypes"
+    },
+    "files": {
+      "EventToComplexTypes": ["EventToComplexTypes.json"]
+    }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales_Multiple",
+    "eventId": "updateSubMultiple",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales_Multiple",
+    "eventId": "generateCorrespondence",
+    "sheets": ["CaseEvent", "CaseEventToFields", "EventToComplexTypes", "AuthorisationCaseEvent"],
+    "generatedSheets": {
+      "EventToComplexTypes": "CaseEventToComplexTypes"
+    },
+    "files": {
+      "EventToComplexTypes": ["EventToComplexTypes.json"]
+    }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales_Multiple",
+    "eventId": "multipleTransferSameCountry",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales_Multiple",
+    "eventId": "multipleTransferDifferentCountry",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales_Multiple",
+    "eventId": "fixMultipleTransferAPI",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales_Multiple",
+    "eventId": "bulkAddSingleCases",
+    "sheets": ["CaseEvent", "CaseEventToFields", "EventToComplexTypes", "AuthorisationCaseEvent"],
+    "generatedSheets": {
+      "EventToComplexTypes": "CaseEventToComplexTypes"
+    },
+    "files": {
+      "EventToComplexTypes": ["EventToComplexTypes.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland_Multiple",
+    "eventId": "createReferral",
+    "sheets": ["CaseEvent", "CaseEventToFields", "EventToComplexTypes", "AuthorisationCaseEvent"],
+    "generatedSheets": {
+      "EventToComplexTypes": "CaseEventToComplexTypes"
+    },
+    "files": {
+      "EventToComplexTypes": ["EventToComplexTypes-WA.json", "EventToComplexTypes.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland_Multiple",
+    "eventId": "sendNotification",
+    "sheets": ["CaseEvent", "CaseEventToFields", "EventToComplexTypes", "AuthorisationCaseEvent"],
+    "generatedSheets": {
+      "EventToComplexTypes": "CaseEventToComplexTypes"
+    },
+    "files": {
+      "EventToComplexTypes": ["EventToComplexTypes.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland_Multiple",
+    "eventId": "extractNotifications",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland_Multiple",
+    "eventId": "replyToReferral",
+    "sheets": ["CaseEvent", "CaseEventToFields", "EventToComplexTypes", "AuthorisationCaseEvent"],
+    "generatedSheets": {
+      "EventToComplexTypes": "CaseEventToComplexTypes"
+    },
+    "files": {
+      "EventToComplexTypes": ["EventToComplexTypes-WA.json", "EventToComplexTypes.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland_Multiple",
+    "eventId": "updateReferral",
+    "sheets": ["CaseEvent", "CaseEventToFields", "EventToComplexTypes", "AuthorisationCaseEvent"],
+    "generatedSheets": {
+      "EventToComplexTypes": "CaseEventToComplexTypes"
+    },
+    "files": {
+      "EventToComplexTypes": ["EventToComplexTypes-WA.json", "EventToComplexTypes.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland_Multiple",
+    "eventId": "closeReferral",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland_Multiple",
+    "eventId": "addCaseNote",
+    "sheets": ["CaseEvent", "CaseEventToFields", "EventToComplexTypes", "AuthorisationCaseEvent"],
+    "generatedSheets": {
+      "EventToComplexTypes": "CaseEventToComplexTypes"
+    },
+    "files": {
+      "EventToComplexTypes": ["EventToComplexTypes-Multiples-nonprod.json", "EventToComplexTypes.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland_Multiple",
+    "eventId": "documentSelect",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland_Multiple",
+    "eventId": "createDcf",
+    "sheets": ["CaseEvent", "CaseEventToFields", "EventToComplexTypes", "AuthorisationCaseEvent"],
+    "generatedSheets": {
+      "EventToComplexTypes": "CaseEventToComplexTypes"
+    },
+    "files": {
+      "EventToComplexTypes": ["EventToComplexTypes-DCF2.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland_Multiple",
+    "eventId": "asyncStitchingComplete",
+    "sheets": ["CaseEvent", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland_Multiple",
+    "eventId": "close",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland_Multiple",
+    "eventId": "createMultiple",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland_Multiple",
+    "eventId": "preAcceptMultiple",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland_Multiple",
+    "eventId": "amendMultipleDetails",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland_Multiple",
+    "eventId": "importFile",
+    "sheets": ["CaseEvent", "CaseEventToFields", "EventToComplexTypes", "AuthorisationCaseEvent"],
+    "generatedSheets": {
+      "EventToComplexTypes": "CaseEventToComplexTypes"
+    },
+    "files": {
+      "EventToComplexTypes": ["EventToComplexTypes.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland_Multiple",
+    "eventId": "printSchedule",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland_Multiple",
+    "eventId": "batchUpdateCases",
+    "sheets": ["CaseEvent", "CaseEventToFields", "EventToComplexTypes", "AuthorisationCaseEvent"],
+    "generatedSheets": {
+      "EventToComplexTypes": "CaseEventToComplexTypes"
+    },
+    "files": {
+      "EventToComplexTypes": ["EventToComplexTypes.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland_Multiple",
+    "eventId": "updateSubMultiple",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland_Multiple",
+    "eventId": "generateCorrespondence",
+    "sheets": ["CaseEvent", "CaseEventToFields", "EventToComplexTypes", "AuthorisationCaseEvent"],
+    "generatedSheets": {
+      "EventToComplexTypes": "CaseEventToComplexTypes"
+    },
+    "files": {
+      "EventToComplexTypes": ["EventToComplexTypes.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland_Multiple",
+    "eventId": "multipleTransferDifferentCountry",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland_Multiple",
+    "eventId": "fixMultipleTransferAPI",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"]
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland_Multiple",
+    "eventId": "bulkAddSingleCases",
+    "sheets": ["CaseEvent", "CaseEventToFields", "EventToComplexTypes", "AuthorisationCaseEvent"],
+    "generatedSheets": {
+      "EventToComplexTypes": "CaseEventToComplexTypes"
+    },
+    "files": {
+      "EventToComplexTypes": ["EventToComplexTypes.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland_Multiple",
+    "eventId": "uploadDocument",
+    "sheets": ["CaseEvent", "CaseEventToFields", "EventToComplexTypes", "AuthorisationCaseEvent"],
+    "generatedSheets": {
+      "EventToComplexTypes": "CaseEventToComplexTypes"
+    },
+    "files": {
+      "EventToComplexTypes": ["EventToComplexTypes-DCF2.json", "EventToComplexTypes.json"]
+    }
   }
 ]

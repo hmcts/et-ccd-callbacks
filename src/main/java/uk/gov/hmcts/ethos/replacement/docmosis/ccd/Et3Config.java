@@ -3,6 +3,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.ccd;
 import uk.gov.hmcts.ccd.sdk.api.CCDConfig;
 import uk.gov.hmcts.ccd.sdk.api.ConfigBuilder;
 import uk.gov.hmcts.ccd.sdk.api.Event;
+import uk.gov.hmcts.ccd.sdk.api.FieldCollection;
 import uk.gov.hmcts.ccd.sdk.api.Permission;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 
@@ -112,23 +113,19 @@ public abstract class Et3Config<T extends CaseData> implements CCDConfig<T, EtSt
             submitEt3.showCondition(submitEt3ShowCondition);
         }
 
-        et3ResponseDetailsFields(
-            configBuilder.event("et3ResponseDetails")
-                .forAllStates()
-                .name("ET3 - Response Details")
-                .description("ET3 - Response Details")
-                .displayOrder(submitEt3DisplayOrder - 1)
-                .showSummary()
-                .caseEventColumn("PreConditionState(s)", "Accepted")
-                .aboutToStartCallbackUrl("${ET_COS_URL}/et3Response/aboutToStart")
-                .aboutToSubmitCallbackUrl("${ET_COS_URL}/et3Response/submitSection")
-                .submittedCallbackUrl("${ET_COS_URL}/et3Response/sectionComplete")
-                .endButtonLabel("Save ET3 as draft")
-        )
-            .grant(Permission.CRUD, EtUserRole.respondentSolicitors())
-            .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API)
-            .grant(Permission.D, EtUserRole.CLAIMANT_SOLICITOR)
-            .grant(Permission.R, EtUserRole.ET_ACAS_API);
+        et3ResponseDetailsFields(et3ResponseEvent(
+            configBuilder,
+            "et3ResponseDetails",
+            "ET3 - Response Details",
+            submitEt3DisplayOrder - 1
+        ));
+
+        et3ResponseEmploymentDetailsFields(et3ResponseEvent(
+            configBuilder,
+            "et3ResponseEmploymentDetails",
+            "ET3 - Employment Details",
+            submitEt3DisplayOrder - 2
+        ));
     }
 
     private Event.EventBuilder<T, EtUserRole, EtState> et3Event(
@@ -141,6 +138,29 @@ public abstract class Et3Config<T extends CaseData> implements CCDConfig<T, EtSt
             .name(name)
             .description(name)
             .caseEventColumn("DisplayOrder", null);
+    }
+
+    private Event.EventBuilder<T, EtUserRole, EtState> et3ResponseEvent(
+        ConfigBuilder<T, EtState, EtUserRole> configBuilder,
+        String eventId,
+        String name,
+        int displayOrder
+    ) {
+        return configBuilder.event(eventId)
+            .forAllStates()
+            .name(name)
+            .description(name)
+            .displayOrder(displayOrder)
+            .showSummary()
+            .caseEventColumn("PreConditionState(s)", "Accepted")
+            .aboutToStartCallbackUrl("${ET_COS_URL}/et3Response/aboutToStart")
+            .aboutToSubmitCallbackUrl("${ET_COS_URL}/et3Response/submitSection")
+            .submittedCallbackUrl("${ET_COS_URL}/et3Response/sectionComplete")
+            .endButtonLabel("Save ET3 as draft")
+            .grant(Permission.CRUD, EtUserRole.respondentSolicitors())
+            .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API)
+            .grant(Permission.D, EtUserRole.CLAIMANT_SOLICITOR)
+            .grant(Permission.R, EtUserRole.ET_ACAS_API);
     }
 
     private Event.EventBuilder<T, EtUserRole, EtState> et3NotificationFields(
@@ -269,37 +289,7 @@ public abstract class Et3Config<T extends CaseData> implements CCDConfig<T, EtSt
     private Event.EventBuilder<T, EtUserRole, EtState> et3ResponseDetailsFields(
         Event.EventBuilder<T, EtUserRole, EtState> event
     ) {
-        return event.fields()
-            .page("1")
-            .pageLabel("ET3 - Response to Employment tribunal claim (ET1)")
-            .field(CaseData::getEt3ResponseShowInset)
-            .optional()
-            .showCondition("et3StartPagePreamble=\"dummy\"")
-            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
-            .done()
-            .field("et3StartPagePreamble")
-            .readOnly()
-            .caseEventColumn(PAGE_LABEL, null)
-            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
-            .done()
-            .field("et3StartPageInset")
-            .readOnly()
-            .showCondition("et3ResponseShowInset=\"Yes\"")
-            .caseEventColumn(PAGE_LABEL, null)
-            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
-            .done()
-            .field("et3StartPageMainBody")
-            .readOnly()
-            .caseEventColumn(PAGE_LABEL, null)
-            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
-            .done()
-            .page("2")
-            .field(CaseData::getEt3RepresentingRespondent)
-            .mandatory()
-            .showSummary()
-            .caseEventColumn("CallBackURLMidEvent", "${ET_COS_URL}/et3Response/validateRespondent")
-            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
-            .done()
+        return et3ResponseIntroFields(event)
             .page("3")
             .pageLabel("Do you agree with the details given by the claimant about early conciliation with Acas?")
             .field(CaseData::getEt3ResponseAcasAgree)
@@ -367,6 +357,193 @@ public abstract class Et3Config<T extends CaseData> implements CCDConfig<T, EtSt
             .caseEventColumn(PAGE_LABEL, null)
             .caseEventColumn(PAGE_COLUMN_NUMBER, null)
             .done()
+            .done();
+    }
+
+    private Event.EventBuilder<T, EtUserRole, EtState> et3ResponseEmploymentDetailsFields(
+        Event.EventBuilder<T, EtUserRole, EtState> event
+    ) {
+        return et3ResponseIntroFields(event)
+            .page("3")
+            .pageLabel("Respondent's workforce")
+            .field(CaseData::getEt3ResponseEmploymentCount)
+            .optional()
+            .showSummary()
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .field(CaseData::getEt3ResponseMultipleSites)
+            .optional()
+            .showSummary()
+            .caseEventColumn(PAGE_LABEL, null)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .field(CaseData::getEt3ResponseSiteEmploymentCount)
+            .optional()
+            .showSummary()
+            .caseEventColumn(PAGE_LABEL, null)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .page("4")
+            .pageLabel("Are the dates of employment given by the claimant correct?")
+            .field(CaseData::getEt3ResponseAreDatesCorrect)
+            .mandatory()
+            .showSummary()
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .page("5")
+            .pageLabel("What are the claimant's employment dates?")
+            .field(CaseData::getEt3ResponseEmploymentStartDate)
+            .optional()
+            .showSummary()
+            .caseEventColumn("PageShowCondition", "et3ResponseAreDatesCorrect=\"No\"")
+            .caseEventColumn("CallBackURLMidEvent", "${ET_COS_URL}/et3Response/midEmploymentDates")
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .field(CaseData::getEt3ResponseEmploymentEndDate)
+            .optional()
+            .showSummary()
+            .caseEventColumn(PAGE_LABEL, null)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .field(CaseData::getEt3ResponseEmploymentInformation)
+            .optional()
+            .showSummary()
+            .caseEventColumn(PAGE_LABEL, null)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .page("6")
+            .pageLabel("Is the claimant's employment with the respondent continuing?")
+            .field(CaseData::getEt3ResponseContinuingEmployment)
+            .mandatory()
+            .showSummary()
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .page("7")
+            .pageLabel("Is the claimant's description of their job or job title correct?")
+            .field(CaseData::getEt3ResponseIsJobTitleCorrect)
+            .mandatory()
+            .showSummary()
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .field(CaseData::getEt3ResponseCorrectJobTitle)
+            .optional()
+            .showCondition("et3ResponseIsJobTitleCorrect=\"No\"")
+            .showSummary()
+            .caseEventColumn("RetainHiddenValue", "Yes")
+            .caseEventColumn(PAGE_LABEL, null)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .page("8")
+            .pageLabel("Are the claimant's total weekly work hours correct?")
+            .field(CaseData::getEt3ResponseClaimantWeeklyHours)
+            .mandatory()
+            .showSummary()
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .field(CaseData::getEt3ResponseClaimantCorrectHours)
+            .optional()
+            .showCondition("et3ResponseClaimantWeeklyHours=\"No\"")
+            .showSummary()
+            .caseEventColumn("RetainHiddenValue", "Yes")
+            .caseEventColumn(PAGE_LABEL, null)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .page("9")
+            .pageLabel("Are the earnings details given by the claimant correct?")
+            .field(CaseData::getEt3ResponseEarningDetailsCorrect)
+            .mandatory()
+            .showSummary()
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .page("10")
+            .pageLabel("What are the claimant's correct pay details?")
+            .field("et3ResponsePayDetailsPreamble")
+            .readOnly()
+            .caseEventColumn("PageShowCondition", "et3ResponseEarningDetailsCorrect=\"No\"")
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .field(CaseData::getEt3ResponsePayFrequency)
+            .optional()
+            .showSummary()
+            .caseEventColumn(PAGE_LABEL, null)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .field(CaseData::getEt3ResponsePayBeforeTax)
+            .optional()
+            .showSummary()
+            .caseEventColumn(PAGE_LABEL, null)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .field(CaseData::getEt3ResponsePayTakehome)
+            .optional()
+            .showSummary()
+            .caseEventColumn(PAGE_LABEL, null)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .page("11")
+            .pageLabel("Is the information given by the claimant correct about their notice?")
+            .field(CaseData::getEt3ResponseIsNoticeCorrect)
+            .mandatory()
+            .showSummary()
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .field(CaseData::getEt3ResponseCorrectNoticeDetails)
+            .optional()
+            .showCondition("et3ResponseIsNoticeCorrect=\"No\"")
+            .showSummary()
+            .caseEventColumn(PAGE_LABEL, null)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .page("12")
+            .pageLabel("Are the details about pension and other benefits correct?")
+            .field(CaseData::getEt3ResponseIsPensionCorrect)
+            .mandatory()
+            .showSummary()
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .field(CaseData::getEt3ResponsePensionCorrectDetails)
+            .optional()
+            .showCondition("et3ResponseIsPensionCorrect=\"No\"")
+            .showSummary()
+            .caseEventColumn("RetainHiddenValue", "Yes")
+            .caseEventColumn(PAGE_LABEL, null)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .done();
+    }
+
+    private FieldCollection.FieldCollectionBuilder<T, EtState, Event.EventBuilder<T, EtUserRole, EtState>>
+        et3ResponseIntroFields(Event.EventBuilder<T, EtUserRole, EtState> event) {
+        return event.fields()
+            .page("1")
+            .pageLabel("ET3 - Response to Employment tribunal claim (ET1)")
+            .field(CaseData::getEt3ResponseShowInset)
+            .optional()
+            .showCondition("et3StartPagePreamble=\"dummy\"")
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .field("et3StartPagePreamble")
+            .readOnly()
+            .caseEventColumn(PAGE_LABEL, null)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .field("et3StartPageInset")
+            .readOnly()
+            .showCondition("et3ResponseShowInset=\"Yes\"")
+            .caseEventColumn(PAGE_LABEL, null)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .field("et3StartPageMainBody")
+            .readOnly()
+            .caseEventColumn(PAGE_LABEL, null)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .page("2")
+            .field(CaseData::getEt3RepresentingRespondent)
+            .mandatory()
+            .showSummary()
+            .caseEventColumn("CallBackURLMidEvent", "${ET_COS_URL}/et3Response/validateRespondent")
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
             .done();
     }
 }

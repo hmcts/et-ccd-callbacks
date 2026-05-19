@@ -23,6 +23,7 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
     private final int nocRequestDisplayOrder;
     private final String addCaseNoteDescription;
     private final int amendRespondentRepresentativeFieldDisplayOrder;
+    private final int amendRespondentDetailsFieldDisplayOrder;
     private final int legalRepDocumentsDisplayOrder;
     private final int downloadDraftEt3DisplayOrder;
     private final String viewAllNotificationsName;
@@ -34,6 +35,7 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
         int nocRequestDisplayOrder,
         String addCaseNoteDescription,
         int amendRespondentRepresentativeFieldDisplayOrder,
+        int amendRespondentDetailsFieldDisplayOrder,
         int legalRepDocumentsDisplayOrder,
         int downloadDraftEt3DisplayOrder,
         String viewAllNotificationsName,
@@ -44,6 +46,7 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
         this.nocRequestDisplayOrder = nocRequestDisplayOrder;
         this.addCaseNoteDescription = addCaseNoteDescription;
         this.amendRespondentRepresentativeFieldDisplayOrder = amendRespondentRepresentativeFieldDisplayOrder;
+        this.amendRespondentDetailsFieldDisplayOrder = amendRespondentDetailsFieldDisplayOrder;
         this.legalRepDocumentsDisplayOrder = legalRepDocumentsDisplayOrder;
         this.downloadDraftEt3DisplayOrder = downloadDraftEt3DisplayOrder;
         this.viewAllNotificationsName = viewAllNotificationsName;
@@ -99,6 +102,38 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .mandatory()
             .caseEventColumn(PAGE_COLUMN_NUMBER, null)
             .caseEventColumn("ShowSummaryChangeOption", "N")
+            .done()
+            .done();
+
+        regionalCaseworkerEvent(configBuilder.event("preAcceptanceCase").forAllStates())
+            .name("Accept/Reject Case")
+            .description("Accept/Reject Case")
+            .displayOrder(9)
+            .showCondition("caseType !=\"Multiple\" AND preAcceptCase.caseAccepted !=\"Yes\" "
+                               + "AND managingOffice !=\"Unassigned\"")
+            .caseEventColumn("PreConditionState(s)", "Accepted;Rejected;Vetted")
+            .caseEventColumn("PostConditionState", ACCEPT_REJECT_POST_CONDITION)
+            .publishToCamunda()
+            .aboutToSubmitCallbackUrl("${ET_COS_URL}/preAcceptanceCase/aboutToSubmit")
+            .grant(Permission.CRU, EtUserRole.CASEWORKER_WA_TASK_CONFIGURATION)
+            .fields()
+            .page("1")
+            .pageLabel("Pre-Acceptance")
+            .field(CaseData::getPreAcceptCase)
+            .mandatory()
+            .showSummary()
+            .caseEventColumn("CallBackURLMidEvent", "${ET_COS_URL}/postDefaultValues")
+            .caseEventColumn(PAGE_COLUMN_NUMBER, 1)
+            .caseEventColumn("Publish", null)
+            .done()
+            .field(CaseData::getNextListedDate)
+            .optional()
+            .showCondition("preAcceptCase=\"dummy\"")
+            .caseEventColumn("ShowSummaryChangeOption", "N")
+            .caseEventColumn("PageFieldDisplayOrder", 1)
+            .caseEventColumn("PageLabel", null)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, 1)
+            .caseEventColumn("Publish", "Y")
             .done()
             .done();
 
@@ -246,6 +281,33 @@ public abstract class SingleFieldEventsConfig<T extends CaseData> implements CCD
             .caseEventColumn("PageDisplayOrder", amendRespondentRepresentativeFieldDisplayOrder)
             .caseEventColumn("PageFieldDisplayOrder", amendRespondentRepresentativeFieldDisplayOrder)
             .caseEventColumn(PAGE_COLUMN_NUMBER, 1)
+            .done()
+            .done();
+
+        regionalCaseworkerEvent(configBuilder.event("amendRespondentDetails").forAllStates())
+            .name("Respondent Details")
+            .description("Amend Respondent Details")
+            .displayOrder(16)
+            .showCondition("managingOffice !=\"Unassigned\"")
+            .caseEventColumn("PreConditionState(s)", "Accepted;Closed;Rejected")
+            .publishToCamunda()
+            .aboutToSubmitCallbackUrl("${ET_COS_URL}/amendRespondentDetails")
+            .fields()
+            .page("1")
+            .field(CaseData::getRespondentCollection)
+            .showSummary()
+            .caseEventColumn("DisplayContext", "COMPLEX")
+            .caseEventColumn("PageDisplayOrder", amendRespondentDetailsFieldDisplayOrder)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, 1)
+            .done()
+            .field(CaseData::getNextListedDate)
+            .optional()
+            .showCondition("respondentCollection=\"dummy\"")
+            .caseEventColumn("ShowSummaryChangeOption", "N")
+            .caseEventColumn("PageDisplayOrder", 2)
+            .caseEventColumn("PageFieldDisplayOrder", 2)
+            .caseEventColumn(PAGE_COLUMN_NUMBER, 1)
+            .caseEventColumn("Publish", "Y")
             .done()
             .done();
 

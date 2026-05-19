@@ -1315,6 +1315,8 @@ public class CaseData extends Et1CaseData {
     private DynamicFixedListType tseAdminSelectApplication;
     @JsonProperty("tseAdminTableMarkUp")
     private String tseAdminTableMarkUp;
+    @JsonProperty("tseAdminTableLabel")
+    private String tseAdminTableLabel;
     @JsonProperty("tseAdminEnterNotificationTitle")
     private String tseAdminEnterNotificationTitle;
     @JsonProperty("tseAdminDecision")
@@ -1397,6 +1399,8 @@ public class CaseData extends Et1CaseData {
     //TSE Admin Respond to an application
     @JsonProperty("tseAdmReplyTableMarkUp")
     private String tseAdmReplyTableMarkUp;
+    @JsonProperty("tseAdmReplyTableLabel")
+    private String tseAdmReplyTableLabel;
     @JsonProperty("tseAdmReplyEnterResponseTitle")
     private String tseAdmReplyEnterResponseTitle;
     @JsonProperty("tseAdmReplyAdditionalInformation")

@@ -8,7 +8,10 @@ public class EnglandWalesTseAdminConfig extends TseAdminConfig<EnglandWalesCaseD
     public EnglandWalesTseAdminConfig() {
         super(
             EtUserRole.CASEWORKER_EMPLOYMENT_ENGLANDWALES,
-            EtUserRole.CASEWORKER_EMPLOYMENT_ETJUDGE_ENGLANDWALES
+            EtUserRole.CASEWORKER_EMPLOYMENT_ETJUDGE_ENGLANDWALES,
+            63,
+            61,
+            false
         );
     }
 }

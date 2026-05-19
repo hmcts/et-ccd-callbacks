@@ -2748,5 +2748,35 @@
       "EventToComplexTypes": ["EventToComplexTypes-ECC.json", "EventToComplexTypes-WA.json"],
       "AuthorisationCaseEvent": ["AuthorisationCaseEvent-WA.json", "AuthorisationCaseEvent.json"]
     }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "et1Vetting",
+    "sheets": ["CaseEvent", "CaseEventToFields", "EventToComplexTypes", "AuthorisationCaseEvent"],
+    "generatedSheets": {
+      "EventToComplexTypes": "CaseEventToComplexTypes"
+    },
+    "files": {
+      "CaseEvent": ["CaseEvent.json"],
+      "CaseEventToFields": ["CaseEventToFields.json"],
+      "EventToComplexTypes": ["EventToComplexTypes.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "et1Vetting",
+    "sheets": ["CaseEvent", "CaseEventToFields", "EventToComplexTypes", "AuthorisationCaseEvent"],
+    "generatedSheets": {
+      "EventToComplexTypes": "CaseEventToComplexTypes"
+    },
+    "files": {
+      "CaseEvent": ["CaseEvent.json"],
+      "CaseEventToFields": ["CaseEventToFields.json"],
+      "EventToComplexTypes": ["EventToComplexTypes.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json"]
+    }
   }
 ]

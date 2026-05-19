@@ -1098,6 +1098,8 @@ public class CaseData extends Et1CaseData {
     //Close Referral
     @JsonProperty("closeReferralHearingDetails")
     private String closeReferralHearingDetails;
+    @JsonProperty("closeReferralHearingDetailsLabel")
+    private String closeReferralHearingDetailsLabel;
     @JsonProperty("confirmCloseReferral")
     private List<String> confirmCloseReferral;
     @JsonProperty("closeReferralGeneralNotes")

@@ -1857,6 +1857,36 @@
   {
     "jurisdiction": "england-wales",
     "caseType": "ET_EnglandWales",
+    "eventId": "createReferral",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-WA.json"],
+      "CaseEventToFields": [
+        "CaseEventToFields-WA-hearingdate.json",
+        "CaseEventToFields-WA.json",
+        "CaseEventToFields.json"
+      ],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "createReferral",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-WA.json"],
+      "CaseEventToFields": [
+        "CaseEventToFields-WA-hearingdate.json",
+        "CaseEventToFields-WA.json",
+        "CaseEventToFields.json"
+      ],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json"]
+    }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
     "eventId": "preAcceptanceCase",
     "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
     "files": {

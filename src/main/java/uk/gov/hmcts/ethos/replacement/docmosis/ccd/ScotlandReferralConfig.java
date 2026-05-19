@@ -9,6 +9,10 @@ public class ScotlandReferralConfig extends ReferralConfig<ScotlandCaseData> {
         super(
             EtUserRole.CASEWORKER_EMPLOYMENT_SCOTLAND,
             EtUserRole.CASEWORKER_EMPLOYMENT_ETJUDGE_SCOTLAND,
+            46,
+            "Referral",
+            11,
+            4,
             49
         );
     }

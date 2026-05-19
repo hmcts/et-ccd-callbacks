@@ -1031,6 +1031,8 @@ public class CaseData extends Et1CaseData {
     private DynamicFixedListType selectReferral;
     @JsonProperty("replyToReferralDcfLink")
     private String replyToReferralDcfLink;
+    @JsonProperty("referralHearingDetailsLabel")
+    private String referralHearingDetailsLabel;
     //Referral Type
     @JsonProperty("referCaseTo")
     private String referCaseTo;

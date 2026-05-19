@@ -14,21 +14,47 @@ public abstract class ReferralConfig<T extends CaseData> implements CCDConfig<T,
 
     private final EtUserRole regionalCaseworkerRole;
     private final EtUserRole regionalJudgeRole;
+    private final int createReferralDisplayOrder;
+    private final String createReferralDescription;
+    private final int createReferralNextListedDateDisplayOrder;
+    private final int createReferralReferentEmailDisplayOrder;
     private final int closeReferralDisplayOrder;
 
     protected ReferralConfig(
         EtUserRole regionalCaseworkerRole,
         EtUserRole regionalJudgeRole,
+        int createReferralDisplayOrder,
+        String createReferralDescription,
+        int createReferralNextListedDateDisplayOrder,
+        int createReferralReferentEmailDisplayOrder,
         int closeReferralDisplayOrder
     ) {
         this.regionalCaseworkerRole = regionalCaseworkerRole;
         this.regionalJudgeRole = regionalJudgeRole;
+        this.createReferralDisplayOrder = createReferralDisplayOrder;
+        this.createReferralDescription = createReferralDescription;
+        this.createReferralNextListedDateDisplayOrder = createReferralNextListedDateDisplayOrder;
+        this.createReferralReferentEmailDisplayOrder = createReferralReferentEmailDisplayOrder;
         this.closeReferralDisplayOrder = closeReferralDisplayOrder;
     }
 
     @Override
     public void configure(ConfigBuilder<T, EtState, EtUserRole> configBuilder) {
-        closeReferralFields(
+        grantReferralAccess(createReferralFields(
+            configBuilder.event("createReferral")
+                .forAllStates()
+                .name("Create Referral")
+                .description(createReferralDescription)
+                .displayOrder(createReferralDisplayOrder)
+                .showSummary()
+                .showCondition("caseType =\"dummy\"")
+                .publishToCamunda()
+                .aboutToStartCallbackUrl("${ET_COS_URL}/createReferral/aboutToStart")
+                .aboutToSubmitCallbackUrl("${ET_COS_URL}/createReferral/aboutToSubmit")
+                .submittedCallbackUrl("${ET_COS_URL}/createReferral/completeCreateReferral")
+        ));
+
+        grantReferralAccess(closeReferralFields(
             configBuilder.event("closeReferral")
                 .forAllStates()
                 .name("Close Referral")
@@ -40,10 +66,109 @@ public abstract class ReferralConfig<T extends CaseData> implements CCDConfig<T,
                 .aboutToStartCallbackUrl("${ET_COS_URL}/closeReferral/aboutToStart")
                 .aboutToSubmitCallbackUrl("${ET_COS_URL}/closeReferral/aboutToSubmit")
                 .submittedCallbackUrl("${ET_COS_URL}/closeReferral/completeCloseReferral")
-        )
+        ));
+    }
+
+    private Event.EventBuilder<T, EtUserRole, EtState> grantReferralAccess(
+        Event.EventBuilder<T, EtUserRole, EtState> event
+    ) {
+        return event
             .grant(Permission.R, EtUserRole.CASEWORKER_EMPLOYMENT, EtUserRole.CASEWORKER_EMPLOYMENT_ETJUDGE)
             .grant(Permission.CRU, regionalCaseworkerRole, regionalJudgeRole)
             .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API);
+    }
+
+    private Event.EventBuilder<T, EtUserRole, EtState> createReferralFields(
+        Event.EventBuilder<T, EtUserRole, EtState> event
+    ) {
+        return event.fields()
+            .page("1")
+            .pageLabel("Refer to admin, legal officer or judge")
+            .field(CaseData::getReferralHearingDetails)
+            .readOnly()
+            .showSummary()
+            .showCondition("referralHearingDetailsLabel=\"dummy\"")
+            .caseEventColumn("CallBackURLMidEvent", "${ET_COS_URL}/createReferral/validateReferentEmail")
+            .caseEventColumn("PageFieldDisplayOrder", 1)
+            .caseEventColumn(PUBLISH, null)
+            .done()
+            .field(CaseData::getReferralHearingDetailsLabel)
+            .readOnly()
+            .caseEventColumn(PAGE_LABEL, null)
+            .caseEventColumn("PageFieldDisplayOrder", 2)
+            .caseEventColumn(PUBLISH, null)
+            .done()
+            .field(CaseData::getReferCaseTo)
+            .mandatory()
+            .showSummary()
+            .caseEventColumn(PAGE_LABEL, null)
+            .caseEventColumn("PageFieldDisplayOrder", 3)
+            .caseEventColumn(PUBLISH, null)
+            .done()
+            .field(CaseData::getReferentEmail)
+            .optional()
+            .showSummary()
+            .caseEventColumn(PAGE_LABEL, null)
+            .caseEventColumn("PageFieldDisplayOrder", createReferralReferentEmailDisplayOrder)
+            .caseEventColumn(PUBLISH, null)
+            .done()
+            .field(CaseData::getIsUrgent)
+            .mandatory()
+            .showSummary()
+            .caseEventColumn(PAGE_LABEL, null)
+            .caseEventColumn("PageFieldDisplayOrder", 5)
+            .caseEventColumn(PUBLISH, null)
+            .done()
+            .field(CaseData::getReferralSubject)
+            .mandatory()
+            .showSummary()
+            .caseEventColumn(PAGE_LABEL, null)
+            .caseEventColumn("PageFieldDisplayOrder", 6)
+            .caseEventColumn(PUBLISH, null)
+            .done()
+            .field(CaseData::getReferralSubjectSpecify)
+            .mandatory()
+            .showSummary()
+            .showCondition("referralSubject =\"Other\"")
+            .caseEventColumn(PAGE_LABEL, null)
+            .caseEventColumn("PageFieldDisplayOrder", 7)
+            .caseEventColumn("RetainHiddenValue", "Yes")
+            .caseEventColumn(PUBLISH, null)
+            .done()
+            .field(CaseData::getReferralDetails)
+            .mandatory()
+            .showSummary()
+            .caseEventColumn(PAGE_LABEL, null)
+            .caseEventColumn("PageFieldDisplayOrder", 8)
+            .caseEventColumn(PUBLISH, null)
+            .done()
+            .field(CaseData::getReferralDocument)
+            .showSummary()
+            .caseEventColumn(PAGE_LABEL, null)
+            .caseEventColumn("PageFieldDisplayOrder", 9)
+            .done()
+            .field(CaseData::getReferralInstruction)
+            .optional()
+            .showSummary()
+            .caseEventColumn(PAGE_LABEL, null)
+            .caseEventColumn("PageFieldDisplayOrder", 10)
+            .caseEventColumn(PUBLISH, null)
+            .done()
+            .field(CaseData::getReferralCollection)
+            .showCondition("referralHearingDetailsLabel=\"dummy\"")
+            .caseEventColumn(PAGE_LABEL, null)
+            .caseEventColumn("ShowSummaryChangeOption", "N")
+            .caseEventColumn("PageFieldDisplayOrder", 11)
+            .done()
+            .field(CaseData::getNextListedDate)
+            .optional()
+            .showCondition("referralHearingDetailsLabel=\"dummy\"")
+            .caseEventColumn(PAGE_LABEL, null)
+            .caseEventColumn("ShowSummaryChangeOption", "N")
+            .caseEventColumn("PageFieldDisplayOrder", createReferralNextListedDateDisplayOrder)
+            .caseEventColumn(PUBLISH, "Y")
+            .done()
+            .done();
     }
 
     private Event.EventBuilder<T, EtUserRole, EtState> closeReferralFields(

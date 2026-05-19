@@ -2177,5 +2177,27 @@
       "CaseEventToFields": ["CaseEventToFields-ET1Repped.json"],
       "AuthorisationCaseEvent": ["AuthorisationCaseEvent-ET1Repped.json"]
     }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "partyUnavailability",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-HMC-nonprod.json"],
+      "CaseEventToFields": ["CaseEventToFields-HMC-nonprod.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent-HMC-nonprod.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "partyUnavailability",
+    "sheets": ["CaseEvent", "CaseEventToFields", "AuthorisationCaseEvent"],
+    "files": {
+      "CaseEvent": ["CaseEvent-HMC-nonprod.json"],
+      "CaseEventToFields": ["CaseEventToFields-HMC-nonprod.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent-HMC-nonprod.json"]
+    }
   }
 ]

@@ -85,6 +85,22 @@ public abstract class AllocateHearingConfig<T extends CaseData> implements CCDCo
             )
         )
             .grant(Permission.CRU, EtUserRole.CASEWORKER_WA_TASK_CONFIGURATION);
+
+        regionalCaseworkerEvent(
+            partyUnavailabilityFields(
+                configBuilder.event("partyUnavailability")
+                    .forStateTransition(EnumSet.of(EtState.ACCEPTED, EtState.REJECTED), EtState.REJECTED)
+                    .name("Hearings: Unavailability dates")
+                    .description("party unavailability date ranges for hearing request")
+                    .showSummary()
+                    .caseEventColumn("DisplayOrder", null)
+                    .caseEventColumn("PostConditionState", POST_CONDITION_STATES)
+                    .caseEventColumn("EventEnablingCondition", "")
+                    .aboutToSubmitCallbackUrl("${ET_COS_URL}/hearingUnavailability/aboutToSubmit")
+                    .submittedCallbackUrl("${ET_COS_URL}/hearingUnavailability/submitted")
+            )
+        )
+            .grant(Permission.R, EtUserRole.ET_ACAS_API);
     }
 
     private Event.EventBuilder<T, EtUserRole, EtState> regionalCaseworkerEvent(
@@ -94,6 +110,36 @@ public abstract class AllocateHearingConfig<T extends CaseData> implements CCDCo
             .grant(Permission.R, EtUserRole.CASEWORKER_EMPLOYMENT, EtUserRole.CASEWORKER_EMPLOYMENT_ETJUDGE)
             .grant(Permission.CRU, regionalCaseworkerRole, regionalJudgeRole)
             .grant(Permission.CRUD, EtUserRole.CASEWORKER_EMPLOYMENT_API);
+    }
+
+    private Event.EventBuilder<T, EtUserRole, EtState> partyUnavailabilityFields(
+        Event.EventBuilder<T, EtUserRole, EtState> event
+    ) {
+        return event.fields()
+            .page("1")
+            .pageLabel("Party Selection")
+            .field(CaseData::getPartySelection)
+            .mandatory()
+            .showSummary()
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .page("2")
+            .pageLabel("Unavailability date ranges - Claimant")
+            .field(CaseData::getClaimantUnavailability)
+            .mandatory()
+            .showSummary()
+            .caseEventColumn("PageShowCondition", "partySelection CONTAINS \"claimant\"")
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .page("3")
+            .pageLabel("Unavailability date ranges - Respondent")
+            .field(CaseData::getRespondentUnavailability)
+            .mandatory()
+            .showSummary()
+            .caseEventColumn("PageShowCondition", "partySelection CONTAINS \"respondent\"")
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .done()
+            .done();
     }
 
     private Event.EventBuilder<T, EtUserRole, EtState> addAmendHearingFields(

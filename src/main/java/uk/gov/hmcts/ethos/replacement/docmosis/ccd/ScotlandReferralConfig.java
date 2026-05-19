@@ -16,6 +16,7 @@ public class ScotlandReferralConfig extends ReferralConfig<ScotlandCaseData> {
             47,
             null,
             true,
+            48,
             49
         );
     }

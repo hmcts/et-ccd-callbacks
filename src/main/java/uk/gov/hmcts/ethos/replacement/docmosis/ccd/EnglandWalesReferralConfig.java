@@ -16,6 +16,7 @@ public class EnglandWalesReferralConfig extends ReferralConfig<EnglandWalesCaseD
             49,
             1,
             false,
+            50,
             51
         );
     }

@@ -21,6 +21,7 @@ public abstract class ReferralConfig<T extends CaseData> implements CCDConfig<T,
     private final int updateReferralDisplayOrder;
     private final Object updateReferralSelectPageColumnNumber;
     private final boolean retainHiddenUpdateReferralSubjectSpecify;
+    private final int replyToReferralDisplayOrder;
     private final int closeReferralDisplayOrder;
 
     protected ReferralConfig(
@@ -33,6 +34,7 @@ public abstract class ReferralConfig<T extends CaseData> implements CCDConfig<T,
         int updateReferralDisplayOrder,
         Object updateReferralSelectPageColumnNumber,
         boolean retainHiddenUpdateReferralSubjectSpecify,
+        int replyToReferralDisplayOrder,
         int closeReferralDisplayOrder
     ) {
         this.regionalCaseworkerRole = regionalCaseworkerRole;
@@ -44,6 +46,7 @@ public abstract class ReferralConfig<T extends CaseData> implements CCDConfig<T,
         this.updateReferralDisplayOrder = updateReferralDisplayOrder;
         this.updateReferralSelectPageColumnNumber = updateReferralSelectPageColumnNumber;
         this.retainHiddenUpdateReferralSubjectSpecify = retainHiddenUpdateReferralSubjectSpecify;
+        this.replyToReferralDisplayOrder = replyToReferralDisplayOrder;
         this.closeReferralDisplayOrder = closeReferralDisplayOrder;
     }
 
@@ -74,6 +77,20 @@ public abstract class ReferralConfig<T extends CaseData> implements CCDConfig<T,
                 .publishToCamunda()
                 .aboutToStartCallbackUrl("${ET_COS_URL}/updateReferral/aboutToStart")
                 .aboutToSubmitCallbackUrl("${ET_COS_URL}/updateReferral/aboutToSubmit")
+        ));
+
+        grantReferralAccess(replyToReferralFields(
+            configBuilder.event("replyToReferral")
+                .forAllStates()
+                .name("Reply to Referral")
+                .description("Refer to admin, legal officer or judge")
+                .displayOrder(replyToReferralDisplayOrder)
+                .showSummary()
+                .showCondition("caseType =\"dummy\"")
+                .publishToCamunda()
+                .aboutToStartCallbackUrl("${ET_COS_URL}/replyReferral/aboutToStart")
+                .aboutToSubmitCallbackUrl("${ET_COS_URL}/replyReferral/aboutToSubmit")
+                .submittedCallbackUrl("${ET_COS_URL}/replyReferral/completeReplyToReferral")
         ));
 
         grantReferralAccess(closeReferralFields(
@@ -189,6 +206,115 @@ public abstract class ReferralConfig<T extends CaseData> implements CCDConfig<T,
             .caseEventColumn("ShowSummaryChangeOption", "N")
             .caseEventColumn("PageFieldDisplayOrder", createReferralNextListedDateDisplayOrder)
             .caseEventColumn(PUBLISH, "Y")
+            .done()
+            .done();
+    }
+
+    private Event.EventBuilder<T, EtUserRole, EtState> replyToReferralFields(
+        Event.EventBuilder<T, EtUserRole, EtState> event
+    ) {
+        return event.fields()
+            .page("1")
+            .pageLabel("Refer to admin, legal officer or judge")
+            .field(CaseData::getSelectReferral)
+            .mandatory()
+            .caseEventColumn("CallBackURLMidEvent", "${ET_COS_URL}/replyReferral/initHearingAndReferralDetails")
+            .caseEventColumn(PAGE_COLUMN_NUMBER, null)
+            .caseEventColumn(PUBLISH, null)
+            .done()
+            .field(CaseData::getIsJudge)
+            .readOnly()
+            .showCondition("selectReferral=\"dummy\"")
+            .caseEventColumn(PAGE_LABEL, null)
+            .caseEventColumn(PUBLISH, null)
+            .done()
+            .field(CaseData::getReferralCollection)
+            .showCondition("selectReferral=\"dummy\"")
+            .caseEventColumn(PAGE_LABEL, null)
+            .caseEventColumn("ShowSummaryChangeOption", "N")
+            .caseEventColumn("PageFieldDisplayOrder", 3)
+            .done()
+            .field(CaseData::getNextListedDate)
+            .optional()
+            .showCondition("selectReferral=\"dummy\"")
+            .caseEventColumn(PAGE_LABEL, null)
+            .caseEventColumn("ShowSummaryChangeOption", "N")
+            .caseEventColumn("PageFieldDisplayOrder", 3)
+            .caseEventColumn(PUBLISH, "Y")
+            .done()
+            .page("2")
+            .pageLabel("Refer to admin, legal officer or judge")
+            .field(CaseData::getReplyToReferralDcfLink)
+            .readOnly()
+            .showCondition("replyToReferralDcfLinkLabel=\"dummy\"")
+            .caseEventColumn("CallBackURLMidEvent", "${ET_COS_URL}/replyReferral/validateReplyToEmail")
+            .caseEventColumn(PUBLISH, null)
+            .done()
+            .field(CaseData::getReplyToReferralDcfLinkLabel)
+            .readOnly()
+            .caseEventColumn(PAGE_LABEL, null)
+            .caseEventColumn(PUBLISH, null)
+            .done()
+            .field(CaseData::getHearingAndReferralDetails)
+            .readOnly()
+            .showCondition("hearingAndReferralDetailsLabel=\"dummy\"")
+            .caseEventColumn(PAGE_LABEL, null)
+            .caseEventColumn(PUBLISH, null)
+            .done()
+            .field(CaseData::getHearingAndReferralDetailsLabel)
+            .readOnly()
+            .caseEventColumn(PAGE_LABEL, null)
+            .caseEventColumn(PUBLISH, null)
+            .done()
+            .field(CaseData::getDirectionTo)
+            .mandatory()
+            .showSummary()
+            .showCondition("isJudge=\"True\"")
+            .caseEventColumn(PAGE_LABEL, null)
+            .caseEventColumn(PUBLISH, null)
+            .done()
+            .field(CaseData::getReplyTo)
+            .mandatory()
+            .showSummary()
+            .showCondition("isJudge=\"False\"")
+            .caseEventColumn(PAGE_LABEL, null)
+            .caseEventColumn(PUBLISH, null)
+            .done()
+            .field(CaseData::getReplyToEmailAddress)
+            .optional()
+            .showSummary()
+            .caseEventColumn(PAGE_LABEL, null)
+            .caseEventColumn(PUBLISH, null)
+            .done()
+            .field(CaseData::getIsUrgentReply)
+            .mandatory()
+            .showSummary()
+            .caseEventColumn(PAGE_LABEL, null)
+            .caseEventColumn(PUBLISH, null)
+            .done()
+            .field(CaseData::getDirectionDetails)
+            .mandatory()
+            .showSummary()
+            .showCondition("isJudge=\"True\"")
+            .caseEventColumn(PAGE_LABEL, null)
+            .caseEventColumn(PUBLISH, null)
+            .done()
+            .field(CaseData::getReplyDetails)
+            .mandatory()
+            .showSummary()
+            .showCondition("isJudge=\"False\"")
+            .caseEventColumn(PAGE_LABEL, null)
+            .caseEventColumn(PUBLISH, null)
+            .done()
+            .field(CaseData::getReplyDocument)
+            .showSummary()
+            .caseEventColumn(PAGE_LABEL, null)
+            .done()
+            .field(CaseData::getReplyGeneralNotes)
+            .optional()
+            .showSummary()
+            .caseEventColumn(PAGE_LABEL, null)
+            .caseEventColumn(PUBLISH, null)
             .done()
             .done();
     }

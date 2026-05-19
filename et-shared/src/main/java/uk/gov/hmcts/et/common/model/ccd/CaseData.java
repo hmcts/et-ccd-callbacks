@@ -1078,6 +1078,10 @@ public class CaseData extends Et1CaseData {
     //Referral Reply
     @JsonProperty("hearingAndReferralDetails")
     private String hearingAndReferralDetails;
+    @JsonProperty("hearingAndReferralDetailsLabel")
+    private String hearingAndReferralDetailsLabel;
+    @JsonProperty("replyToReferralDcfLinkLabel")
+    private String replyToReferralDcfLinkLabel;
     @JsonProperty("directionTo")
     private String directionTo;
     @JsonProperty("replyToEmailAddress")

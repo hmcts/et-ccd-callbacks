@@ -15,6 +15,12 @@ public class EtICHearingListedAnswers {
     private String etICExtendDurationGiveDetails;
     @JsonProperty("etICOtherGiveDetails")
     private String etICOtherGiveDetails;
+    @JsonProperty("etICPostponeGiveDetails")
+    private String etICPostponeGiveDetails;
+    @JsonProperty("etICConvertPreliminaryGiveDetails")
+    private String etICConvertPreliminaryGiveDetails;
+    @JsonProperty("etICConvertF2fGiveDetails")
+    private String etICConvertF2fGiveDetails;
 
     @JsonProperty("etICIsHearingWithJudgeOrMembers")
     private String etICIsHearingWithJudgeOrMembers;
@@ -47,6 +53,10 @@ public class EtICHearingListedAnswers {
     @JsonProperty("etICMembersFinalHearingReasonOther")
     private String etICMembersFinalHearingReasonOther;
 
+    @JsonProperty("otherDirectionsLabel")
+    private String otherDirectionsLabel;
+    @JsonProperty("etICAnyOtherDirectionsDividerHrLabel3")
+    private String etICAnyOtherDirectionsDividerHrLabel3;
     @JsonProperty("etICHearingAnyOtherDirections")
     private String etICHearingAnyOtherDirections;
 

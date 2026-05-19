@@ -2778,5 +2778,35 @@
       "EventToComplexTypes": ["EventToComplexTypes.json"],
       "AuthorisationCaseEvent": ["AuthorisationCaseEvent.json"]
     }
+  },
+  {
+    "jurisdiction": "england-wales",
+    "caseType": "ET_EnglandWales",
+    "eventId": "initialConsideration",
+    "sheets": ["CaseEvent", "CaseEventToFields", "EventToComplexTypes", "AuthorisationCaseEvent"],
+    "generatedSheets": {
+      "EventToComplexTypes": "CaseEventToComplexTypes"
+    },
+    "files": {
+      "CaseEvent": ["CaseEvent-WA.json"],
+      "CaseEventToFields": ["CaseEventToFields-InitialConsideration.json"],
+      "EventToComplexTypes": ["EventToComplexTypes-WA.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent-WA.json", "AuthorisationCaseEvent.json"]
+    }
+  },
+  {
+    "jurisdiction": "scotland",
+    "caseType": "ET_Scotland",
+    "eventId": "initialConsideration",
+    "sheets": ["CaseEvent", "CaseEventToFields", "EventToComplexTypes", "AuthorisationCaseEvent"],
+    "generatedSheets": {
+      "EventToComplexTypes": "CaseEventToComplexTypes"
+    },
+    "files": {
+      "CaseEvent": ["CaseEvent-WA.json"],
+      "CaseEventToFields": ["CaseEventToFields-InitialConsideration.json"],
+      "EventToComplexTypes": ["EventToComplexTypes-WA.json", "EventToComplexTypes.json"],
+      "AuthorisationCaseEvent": ["AuthorisationCaseEvent-WA.json", "AuthorisationCaseEvent.json"]
+    }
   }
 ]

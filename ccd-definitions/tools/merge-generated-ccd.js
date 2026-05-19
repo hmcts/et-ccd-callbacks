@@ -151,6 +151,7 @@ function rowKey(sheet, row) {
       row.ListElementCode || '',
       row.PageID || '',
       row.PageFieldDisplayOrder || '',
+      row.FieldDisplayOrder || '',
       row.FieldShowCondition || ''
     ].join('|');
   }

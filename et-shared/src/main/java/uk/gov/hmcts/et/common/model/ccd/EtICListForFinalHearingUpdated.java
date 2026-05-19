@@ -21,6 +21,8 @@ public class EtICListForFinalHearingUpdated {
     private String etICLengthOfFinalHearing;
     @JsonProperty("finalHearingLengthNumTypeV2")
     private String finalHearingLengthNumType;
+    @JsonProperty("etICFinalHearingPanelComposition")
+    private String etICFinalHearingPanelComposition;
     @JsonProperty("etICFinalHearingIsEJSitAlone")
     private String etICFinalHearingIsEJSitAlone;
 
@@ -45,6 +47,8 @@ public class EtICListForFinalHearingUpdated {
     @JsonProperty("etICNoLFinalHearingIsEJSitAloneReasonsMembersOther")
     private String etICNoLFinalHearingIsEJSitAloneReasonsMembersOther;
 
+    @JsonProperty("etICFinalHearingPanelCompositionBottomDivider")
+    private String etICFinalHearingPanelCompositionBottomDivider;
     @JsonProperty("etICFinalHearingIsEJSitAloneFurtherDetails")
     private String etICFinalHearingIsEJSitAloneFurtherDetails;
 }

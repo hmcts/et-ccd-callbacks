@@ -10,7 +10,7 @@ record EventFieldSpec(
     String id,
     DisplayContext context,
     int page,
-    int pageDisplayOrder,
+    Integer pageDisplayOrder,
     int pageFieldDisplayOrder,
     String showCondition,
     String pageShowCondition,
@@ -70,6 +70,12 @@ record EventFieldSpec(
             publish);
     }
 
+    EventFieldSpec noPageDisplayOrder() {
+        return new EventFieldSpec(id, context, page, null, pageFieldDisplayOrder, showCondition, pageShowCondition,
+            pageLabel, label, midEventCallbackUrl, showSummaryChangeOption, pageColumnNumber, retainHiddenValue,
+            publish);
+    }
+
     EventFieldSpec pageColumn(int value) {
         return new EventFieldSpec(id, context, page, pageDisplayOrder, pageFieldDisplayOrder, showCondition,
             pageShowCondition, pageLabel, label, midEventCallbackUrl, showSummaryChangeOption, value,
@@ -77,9 +83,13 @@ record EventFieldSpec(
     }
 
     EventFieldSpec retainHidden() {
+        return retainHidden("Yes");
+    }
+
+    EventFieldSpec retainHidden(String value) {
         return new EventFieldSpec(id, context, page, pageDisplayOrder, pageFieldDisplayOrder, showCondition,
             pageShowCondition, pageLabel, label, midEventCallbackUrl, showSummaryChangeOption, pageColumnNumber,
-            "Yes", publish);
+            value, publish);
     }
 
     EventFieldSpec publishColumn() {
@@ -95,8 +105,8 @@ record EventFieldSpec(
             fields.page(String.valueOf(page)).field(id);
         applyContext(field);
         field.showCondition(showCondition)
-            .caseEventColumn("PageDisplayOrder", pageDisplayOrder)
             .caseEventColumn("PageFieldDisplayOrder", pageFieldDisplayOrder);
+        field.caseEventColumn("PageDisplayOrder", pageDisplayOrder);
         applyColumn(field, "PageShowCondition", pageShowCondition);
         applyColumn(field, "PageLabel", pageLabel);
         applyColumn(field, "Label", label);

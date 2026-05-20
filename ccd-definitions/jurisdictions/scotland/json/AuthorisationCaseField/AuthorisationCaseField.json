@@ -23187,7 +23187,7 @@
     "CaseTypeId": "ET_Scotland",
     "CaseFieldID": "SearchCriteria",
     "UserRole": "citizen",
-    "CRUD": "R"
+    "CRUD": "CRUD"
   },
   {
     "LiveFrom": "01/01/2017",

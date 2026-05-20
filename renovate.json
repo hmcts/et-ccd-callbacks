@@ -5,8 +5,7 @@
     "local>hmcts/.github//renovate/automerge-all"
   ],
   "ignoreDeps": [
-    "com.github.hmcts:et-common",
-    "com.github.hmcts:et-data-model"
+    "aac-manage-case-assignment"
   ],
   "automergeSchedule": ["before 12pm every weekday"]
 }

@@ -1931,4 +1931,8 @@ public class CaseData extends Et1CaseData {
     private String nocRemoveRepIsMoreThanOneFlag;
     @JsonProperty("nocRemoveRepOption")
     private String nocRemoveRepOption;
+    @JsonProperty("editOrDeleteCaseNote")
+    private String editOrDeleteCaseNote;
+    @JsonProperty("caseNoteList")
+    private DynamicFixedListType caseNoteList;
 }

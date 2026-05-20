@@ -72,7 +72,8 @@
     "EventEnablingCondition": "caseType=\"Dummy\"",
     "CallBackURLAboutToStartEvent": "",
     "CallBackURLAboutToSubmitEvent": "",
-    "CallBackURLSubmittedEvent": ""
+    "CallBackURLSubmittedEvent": "",
+    "Publish": "Y"
   },
   {
     "CaseTypeID": "ET_Scotland",

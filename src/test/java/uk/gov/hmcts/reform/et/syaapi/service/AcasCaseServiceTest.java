@@ -27,7 +27,7 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
 
@@ -84,7 +84,8 @@ class AcasCaseServiceTest {
 
     @Test
     void shouldLastModifiedCasesIdWhenCaseFoundThenCaseId() {
-        String requestDateTime = "2022-09-01T12:34:00";
+        LocalDateTime requestDateTime =
+            LocalDateTime.parse("2022-09-01T12:34:00", DateTimeFormatter.ISO_LOCAL_DATE_TIME);
 
         SearchResult englandWalesSearchResult = SearchResult.builder()
             .total(1)
@@ -115,7 +116,8 @@ class AcasCaseServiceTest {
 
     @Test
     void shouldLastModifiedCasesIdWhenNoCaseFoundThenEmpty() {
-        String requestDateTime = "2022-09-01T12:34:00";
+        LocalDateTime requestDateTime =
+            LocalDateTime.parse("2022-09-01T12:34:00", DateTimeFormatter.ISO_LOCAL_DATE_TIME);
 
         SearchResult englandWalesSearchResult = SearchResult.builder()
             .total(0)
@@ -143,7 +145,7 @@ class AcasCaseServiceTest {
             .isEmpty();
     }
 
-    private String generateCaseDataEsQueryWithDate(String requestDateTime) {
+    private String generateCaseDataEsQueryWithDate(LocalDateTime requestDateTime) {
         return """
             {
               "size": %d,
@@ -171,8 +173,7 @@ class AcasCaseServiceTest {
                 "reference"
               ]
             }
-            """.formatted(Constants.MAX_ES_SIZE,
-            LocalDateTime.parse(requestDateTime).atOffset(ZoneOffset.UTC).toInstant().toString());
+            """.formatted(Constants.MAX_ES_SIZE, requestDateTime.toString());
     }
 
     @Test

@@ -9129,15 +9129,6 @@
   },
   {
     "CaseTypeID": "ET_EnglandWales",
-    "CaseEventID": "addCaseNote",
-    "CaseFieldID": "addCaseNote",
-    "DisplayContext": "COMPLEX",
-    "PageID": 1,
-    "PageDisplayOrder": 1,
-    "PageFieldDisplayOrder": 1
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
     "CaseEventID": "generateNotificationSummary",
     "CaseFieldID": "selectNotificationDropdown",
     "DisplayContext": "MANDATORY",

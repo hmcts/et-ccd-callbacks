@@ -55,9 +55,7 @@ public interface UpdateCaseQueueRepository extends JpaRepository<UpdateCaseQueue
            + "m.retryCount = :retryCount, "
            + "m.lockedBy = NULL, "
            + "m.lockedUntil = NULL, "
-           + "m.processedAt = CASE "
-           + "WHEN :status = uk.gov.hmcts.ethos.replacement.docmosis.domain.messagequeue.QueueMessageStatus.FAILED "
-           + "THEN :processedAt ELSE NULL END "
+           + "m.processedAt = :processedAt "
            + "WHERE m.messageId = :messageId")
     void markAsFailed(@Param("messageId") String messageId,
                       @Param("errorMessage") String errorMessage,

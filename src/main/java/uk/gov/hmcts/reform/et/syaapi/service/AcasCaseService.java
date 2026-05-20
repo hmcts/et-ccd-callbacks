@@ -26,7 +26,6 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -67,14 +66,13 @@ public class AcasCaseService {
 
     /**
      * Given a datetime, this method will return a list of caseIds which have been modified since the datetime
-     * provided. The {@code requestDateTime} is treated as UTC regardless of the JVM's default timezone,
-     * ensuring consistent behaviour across environments and during BST/GMT transitions.
+     * provided.
      *
      * @param authorisation   used for IDAM authentication for the query
-     * @param requestDateTime used as the query parameter; must represent a UTC datetime
+     * @param requestDateTime used as the query parameter
      * @return a list of caseIds
      */
-    public List<Long> getLastModifiedCasesId(String authorisation, String requestDateTime) {
+    public List<Long> getLastModifiedCasesId(String authorisation, LocalDateTime requestDateTime) {
         String query = """
             {
               "size": %d,
@@ -102,8 +100,7 @@ public class AcasCaseService {
                 "reference"
               ]
             }
-            """.formatted(MAX_ES_SIZE,
-            LocalDateTime.parse(requestDateTime).atOffset(ZoneOffset.UTC).toInstant().toString());
+            """.formatted(MAX_ES_SIZE, requestDateTime.toString());
         return searchEnglandScotlandCases(authorisation, query)
             .stream()
             .map(CaseDetails::getId)

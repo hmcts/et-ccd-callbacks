@@ -75,7 +75,7 @@ et-sya:
   enabled: true
   nodejs:
     imagePullPolicy: Always
-    image: hmctsprod.azurecr.io/et/sya:pr-2408
+    image: hmctsprod.azurecr.io/et/sya:latest
     releaseNameOverride: ${SERVICE_NAME}-et-sya
     ingressHost: et-sya-${SERVICE_FQDN}
     devcpuRequests: 10m
@@ -94,7 +94,7 @@ et-sya:
           - launch-darkly-sdk-key
     environment:
       REDIS_HOST: et-session-storage-aat.redis.cache.windows.net
-      ET_SYA_API_HOST: https://${SERVICE_FQDN}
+      ET_SYA_API_HOST: https://et-sya-api-${SERVICE_FQDN}
       PCQ_ENABLED: true
 
 et-syr:

@@ -198,6 +198,8 @@ ccd:
       enabled: false
     printService:
       enabled: false
+    activityApi:
+      enabled: true
     elastic:
       enabled: true
     postgresql:
@@ -363,11 +365,28 @@ ccd:
         IDAM_SERVICE_KEY: ${API_GATEWAY_S2S_KEY}
         IDAM_OAUTH2_CLIENT_SECRET: ${API_GATEWAY_IDAM_SECRET}
         CORS_ORIGIN_WHITELIST: "*"
+        PROXY_CASE_ACTIVITY: http://${SERVICE_NAME}-ccd-case-activity-api
         PROXY_DOCUMENT_MANAGEMENT: http://dm-store-aat.service.core-compute-aat.internal
         PROXY_PRINT_SERVICE: http://ccd-case-print-service-${SERVICE_FQDN}
         ADDRESS_LOOKUP_TOKEN: ${ADDRESS_LOOKUP_TOKEN}
       ingressHost: gateway-${SERVICE_FQDN}
       ingressIP: ${INGRESS_IP}
+
+  ccd-case-activity-api:
+    nodejs:
+      keyVaults: []
+      environment:
+        REDIS_HOST: ${SERVICE_NAME}-ccd-case-activity-api-redis-master
+        REDIS_PORT: 6379
+        REDIS_PASSWORD: fake-password
+        REDIS_SSL_ENABLED: ""
+        CORS_ORIGIN_WHITELIST: "*"
+    redis:
+      enabled: true
+      architecture: standalone
+      auth:
+        enabled: true
+        password: "fake-password"
 
   ccd-user-profile-importer:
     users:

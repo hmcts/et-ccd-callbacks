@@ -10,6 +10,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.noc.NocRespondentMapper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.ClaimantRepresentativeUtils;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.RespondentRepresentativeUtils;
 
@@ -70,7 +71,10 @@ public class NocRemoveRepresentationService {
         // send email to unrepresented party, i.e. claimant
         nocRemoveRepresentationEmailService.sendEmailToUnrepresentedClaimant(caseDetails, orgName);
         // send email to other party, i.e. respondents
-        nocRemoveRepresentationEmailService.sendEmailToOtherPartyRespondent(caseDetails, List.of(), partyName);
+        List<String> respondentEmailAddresses = RespondentUtils
+                .resolveRespondentNotificationEmailAddresses(caseDetails);
+        nocRemoveRepresentationEmailService.sendEmailToOtherPartyRespondent(caseDetails, respondentEmailAddresses,
+                partyName);
     }
 
     /**

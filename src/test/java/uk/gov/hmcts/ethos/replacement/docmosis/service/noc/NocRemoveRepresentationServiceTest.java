@@ -15,6 +15,8 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -60,6 +62,8 @@ class NocRemoveRepresentationServiceTest {
     private static final String REP_CLAIMANT_NAME = "Legal Rep C";
     private static final String REP_CLAIMANT_EMAIL = "rep.c@test.com";
     private static final String CLAIMANT_NAME = "Chris Claimant";
+    private static final List<String> REP_EMAIL_LIST = new ArrayList<>(
+            Arrays.asList("rep.a1@test.com", "rep.a1@test.com", "rep.a2@test.com", "rep.b@test.com", "ruth@test.com"));
     private static final String RESPONDENT_1_ID = "84ac5b15-f28a-40fe-a5f4-c7127366fb41";
     private static final String RESPONDENT_1_NAME = "Rich Respondent";
     private static final String RESPONDENT_2_ID = "dc890d23-21f1-4290-bc4f-db9ec272badf";
@@ -120,9 +124,9 @@ class NocRemoveRepresentationServiceTest {
         // send email to other party
         verify(nocRemoveRepresentationEmailService, times(1))
             .sendEmailToOtherPartyRespondent(
-                caseDetails,
-                List.of(),
-                CLAIMANT_NAME
+                    caseDetails,
+                    REP_EMAIL_LIST,
+                    CLAIMANT_NAME
             );
     }
 

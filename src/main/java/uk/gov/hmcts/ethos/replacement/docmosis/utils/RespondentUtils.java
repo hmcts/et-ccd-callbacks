@@ -5,10 +5,14 @@ import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.UpdateRespondentRepresentativeRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
+import uk.gov.hmcts.ethos.replacement.docmosis.utils.noc.RespondentRepresentativeUtils;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -312,5 +316,84 @@ public final class RespondentUtils {
             return null;
         }
         return caseData.getRespondentCollection().get(index);
+    }
+
+    /**
+     * Resolves the notification email addresses for all valid respondents in the case.
+     * <p>
+     * For each valid respondent, the representative's email address is preferred when:
+     * <ul>
+     *     <li>a valid representative exists for the respondent, and</li>
+     *     <li>the representative email address is not blank.</li>
+     * </ul>
+     * Otherwise, the respondent's email address is used if available.
+     *
+     * <h3>Assumptions</h3>
+     * <ul>
+     *     <li>{@code caseDetails}, {@code caseData}, and related collections are expected to be non-null.</li>
+     *     <li>{@link #isValidRespondent(RespondentSumTypeItem)} guarantees that respondent data
+     *     is safe to access.</li>
+     *     <li>{@link #findRepresentativeByRespondentId(List, String)} returns the appropriate
+     *     representative for a respondent when one exists.</li>
+     *     <li>Email addresses are returned in the same order as respondents appear in the collection.</li>
+     * </ul>
+     *
+     * @param caseDetails the case details containing respondents and representatives
+     * @return a list of resolved notification email addresses for valid respondents;
+     *         returns an empty list when no valid respondent email addresses can be resolved
+     */
+    public static List<String> resolveRespondentNotificationEmailAddresses(CaseDetails caseDetails) {
+        List<String> respondentEmailAddresses = new ArrayList<>();
+        if (CollectionUtils.isEmpty(caseDetails.getCaseData().getRespondentCollection())) {
+            return respondentEmailAddresses;
+        }
+        for (RespondentSumTypeItem respondent : caseDetails.getCaseData().getRespondentCollection()) {
+            if (isValidRespondent(respondent)) {
+                RepresentedTypeRItem representative = findRepresentativeByRespondentId(
+                        caseDetails.getCaseData().getRepCollection(), respondent.getId());
+                if (ObjectUtils.isNotEmpty(representative)
+                        && StringUtils.isNotBlank(representative.getValue().getRepresentativeEmailAddress())) {
+                    respondentEmailAddresses.add(representative.getValue().getRepresentativeEmailAddress());
+                    continue;
+                }
+                if (StringUtils.isNotBlank(respondent.getValue().getRespondentEmail())) {
+                    respondentEmailAddresses.add(respondent.getValue().getRespondentEmail());
+                }
+            }
+        }
+        return respondentEmailAddresses;
+    }
+
+    /**
+     * Finds the first valid representative associated with the given respondent ID.
+     * <p>
+     * A representative is considered valid when it satisfies
+     * {@link RespondentRepresentativeUtils#isValidRepresentative(RepresentedTypeRItem)}.
+     *
+     * <h3>Assumptions</h3>
+     * <ul>
+     *     <li>The respondent ID uniquely identifies a representative within the collection.</li>
+     *     <li>{@code isValidRepresentative(...)} guarantees that the representative and its value
+     *     are safe to access.</li>
+     *     <li>The order of the representatives collection is significant, as the first matching
+     *     representative is returned.</li>
+     * </ul>
+     *
+     * @param representatives the list of representatives to search
+     * @param respondentId the respondent identifier used to match the representative
+     * @return the matching {@link RepresentedTypeRItem} if found; otherwise {@code null}
+     */
+    public static RepresentedTypeRItem findRepresentativeByRespondentId(
+            List<RepresentedTypeRItem> representatives,
+            String respondentId) {
+        if (CollectionUtils.isEmpty(representatives) || StringUtils.isBlank(respondentId)) {
+            return null;
+        }
+        return representatives.stream()
+                .filter(RespondentRepresentativeUtils::isValidRepresentative)
+                .filter(representative ->
+                        respondentId.equals(representative.getValue().getRespondentId()))
+                .findFirst()
+                .orElse(null);
     }
 }

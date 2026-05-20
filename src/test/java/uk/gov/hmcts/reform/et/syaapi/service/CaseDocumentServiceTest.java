@@ -7,9 +7,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
@@ -32,7 +34,6 @@ import java.io.IOException;
 import java.net.URI;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -70,7 +71,6 @@ class CaseDocumentServiceTest {
     private static final Integer MAX_API_CALL_ATTEMPTS = 4;
     private static final String MOCK_FILE_BODY = "Hello, World!";
     private static final UUID DOCUMENT_ID = UUID.randomUUID();
-    private static final Date TEST_DATE = new Date();
     private static final MockMultipartFile MOCK_FILE = new MockMultipartFile(
         "mock_file",
         DOCUMENT_NAME,
@@ -110,12 +110,6 @@ class CaseDocumentServiceTest {
         ".invalid|.xyz",
         MediaType.TEXT_PLAIN_VALUE,
         MOCK_FILE_BODY.getBytes()
-    );
-    private static final MockMultipartFile MOCK_FILE_CORRUPT = new MockMultipartFile(
-        "mock_file_corrupt",
-        DOCUMENT_NAME,
-        MediaType.IMAGE_GIF_VALUE,
-        (byte[]) null
     );
     private static final String RESPONSE_BODY = "{\"documents\":[{\"originalDocumentName\":";
     private static final String MOCK_RESPONSE_WITH_DOCUMENT = RESPONSE_BODY
@@ -238,7 +232,7 @@ class CaseDocumentServiceTest {
 
         mockServer.expect(ExpectedCount.max(MAX_API_CALL_ATTEMPTS), requestTo(DOCUMENT_API_URL))
             .andExpect(method(HttpMethod.POST))
-            .andRespond((response) -> {
+            .andRespond(response -> {
                 throw restClientException;
             });
 
@@ -519,5 +513,70 @@ class CaseDocumentServiceTest {
         assertEquals(createdDoc.getValue().getShortDescription(), documentTypeItem.getValue().getShortDescription());
         assertEquals(createdDoc.getValue().getDateOfCorrespondence(),
                      documentTypeItem.getValue().getDateOfCorrespondence());
+    }
+
+    @Test
+    void streamDocumentSuccess() {
+        byte[] content = "test document content".getBytes();
+        MockHttpServletResponse servletResponse = new MockHttpServletResponse();
+
+        mockServer.expect(ExpectedCount.once(), requestTo(DOCUMENT_API_URL_WITH_SLASH + DOCUMENT_ID + "/binary"))
+            .andExpect(method(HttpMethod.GET))
+            .andRespond(withStatus(HttpStatus.OK)
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(content));
+
+        caseDocumentService.streamDocument(MOCK_TOKEN, DOCUMENT_ID, servletResponse);
+
+        assertThat(servletResponse.getContentAsByteArray()).isEqualTo(content);
+        assertThat(servletResponse.getContentType()).isEqualTo(MediaType.APPLICATION_PDF_VALUE);
+    }
+
+    @Test
+    void streamDocumentForwardsContentLength() {
+        byte[] content = "test document content".getBytes();
+        MockHttpServletResponse servletResponse = new MockHttpServletResponse();
+        HttpHeaders responseHeaders = new HttpHeaders();
+        responseHeaders.setContentLength(content.length);
+
+        mockServer.expect(ExpectedCount.once(), requestTo(DOCUMENT_API_URL_WITH_SLASH + DOCUMENT_ID + "/binary"))
+            .andExpect(method(HttpMethod.GET))
+            .andRespond(withStatus(HttpStatus.OK)
+                .contentType(MediaType.APPLICATION_PDF)
+                .headers(responseHeaders)
+                .body(content));
+
+        caseDocumentService.streamDocument(MOCK_TOKEN, DOCUMENT_ID, servletResponse);
+
+        assertThat(servletResponse.getContentLength()).isEqualTo(content.length);
+    }
+
+    @Test
+    void streamDocumentResourceNotFound() {
+        MockHttpServletResponse servletResponse = new MockHttpServletResponse();
+
+        mockServer.expect(ExpectedCount.once(), requestTo(DOCUMENT_API_URL_WITH_SLASH + DOCUMENT_ID + "/binary"))
+            .andExpect(method(HttpMethod.GET))
+            .andRespond(withStatus(HttpStatus.NOT_FOUND));
+
+        ResourceNotFoundException resourceNotFoundException = assertThrows(
+            ResourceNotFoundException.class,
+            () -> caseDocumentService.streamDocument(MOCK_TOKEN, DOCUMENT_ID, servletResponse));
+
+        assertThat(resourceNotFoundException.getMessage())
+            .isEqualTo(String.format(RESOURCE_NOT_FOUND, DOCUMENT_ID, "404 Not Found: [no body]"));
+    }
+
+    @Test
+    void streamDocumentNonNotFoundHttpErrorIsRethrown() {
+        MockHttpServletResponse servletResponse = new MockHttpServletResponse();
+
+        mockServer.expect(ExpectedCount.once(), requestTo(DOCUMENT_API_URL_WITH_SLASH + DOCUMENT_ID + "/binary"))
+            .andExpect(method(HttpMethod.GET))
+            .andRespond(withStatus(HttpStatus.FORBIDDEN));
+
+        assertThrows(
+            HttpClientErrorException.class,
+            () -> caseDocumentService.streamDocument(MOCK_TOKEN, DOCUMENT_ID, servletResponse));
     }
 }

@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.et.syaapi.controllers;
 
+import jakarta.servlet.http.HttpServletResponse;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -20,6 +21,8 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -96,6 +99,38 @@ class DocumentControllerTest {
             .andExpect(status().isNotFound())
             .andExpect(jsonPath("$.code").value(404))
             .andExpect(jsonPath("$.message").value("Document not found"));
+    }
+
+    @Test
+    void streamDocumentBinaryContentSuccess() throws Exception {
+        byte[] content = "test document content".getBytes();
+        when(verifyTokenService.verifyTokenSignature(any())).thenReturn(true);
+        doAnswer(invocation -> {
+            HttpServletResponse servletResponse = invocation.getArgument(2);
+            servletResponse.setContentType(MediaType.APPLICATION_PDF_VALUE);
+            servletResponse.getOutputStream().write(content);
+            return null;
+        }).when(caseDocumentService).streamDocument(any(), any(), any(HttpServletResponse.class));
+
+        mockMvc.perform(get("/document/stream/" + DOCUMENT_ID)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, TEST_SERVICE_AUTH_TOKEN))
+            .andExpect(status().isOk())
+            .andExpect(content().bytes(content));
+    }
+
+    @Test
+    void streamDocumentBinaryContentResourceNotFound() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(any())).thenReturn(true);
+        doThrow(new ResourceNotFoundException(NOT_FOUND_MESSAGE, null))
+            .when(caseDocumentService).streamDocument(any(), any(), any(HttpServletResponse.class));
+
+        mockMvc.perform(get("/document/stream/" + DOCUMENT_ID)
+                .contentType(MediaType.APPLICATION_JSON)
+                .header(HttpHeaders.AUTHORIZATION, TEST_SERVICE_AUTH_TOKEN))
+            .andExpect(status().isNotFound())
+            .andExpect(jsonPath("$.code").value(404))
+            .andExpect(jsonPath("$.message").value(NOT_FOUND_MESSAGE));
     }
 
     private ResponseEntity<ByteArrayResource> getDocumentBinaryContent() {

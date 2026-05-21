@@ -127,7 +127,7 @@ The Helm configuration makes use of [charts-ccd](https://github.com/hmcts/chart-
 
 ### Data Setup
 
-Data for the PR environment is created using modern API-based scripts that are faster and more reliable than the previous UI-based approach.
+Data for the PR environment is created using modern setup scripts that are faster and more reliable than the previous UI-based approach.
 
 All jurisdictions (admin, england-wales, scotland) are now part of the unified workspace, eliminating the need for submodules.
 
@@ -136,13 +136,12 @@ All jurisdictions (admin, england-wales, scotland) are now part of the unified w
 || CCD roles         | `bin/preview/create-ccd-roles.sh`        | Create all ET roles via API               |
 || CCD configuration | `bin/preview/import-ccd-definitions.sh`  | Import all jurisdiction definitions via API |
 || ECM Admin case    | `bin/preview/create-admin-case.sh`       | Create ECM Admin cases via API            |
-|| Reference data    | `bin/preview/import-ref-data.sh`         | Import venue/staff reference data via API |
+|| Reference data    | `bin/preview/import-ref-data.sh`         | Copy venue/staff reference data into the PR ET COS database |
 
-### API Scripts Benefits
+### Setup Scripts Benefits
 
-- **Faster execution**: Direct API calls vs slow UI automation
+- **Faster execution**: Direct API and database setup vs slow UI automation
 - **More reliable**: Less prone to timeout and UI flakiness
 - **Better error handling**: Clear API responses vs DOM inspection
 - **Easier maintenance**: Simple script logic vs complex codeceptjs scenarios
 - **Modular setup**: Run individual setup steps as needed
-

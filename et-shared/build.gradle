@@ -39,7 +39,7 @@ dependencyManagement {
         dependency 'org.bouncycastle:bcprov-jdk15on:1.70'
         // CVE-2026-42198 - override above the Spring Boot BOM
         dependency 'org.postgresql:postgresql:42.7.11'
-        dependencySet(group: 'io.netty', version: '4.2.12.Final') {
+        dependencySet(group: 'io.netty', version: '4.2.13.Final') {
             entry 'netty-buffer'
             entry 'netty-codec'
             entry 'netty-codec-dns'
@@ -108,7 +108,7 @@ dependencies {
     api group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.1.2'
     api group: 'com.microsoft.azure', name: 'azure-servicebus', version: '3.6.7'
     api group: 'org.apache.poi', name: 'poi-ooxml', version: '5.4.1'
-    api group: 'org.elasticsearch', name: 'elasticsearch', version: '8.17.3'
+    api group: 'org.elasticsearch', name: 'elasticsearch', version: '9.2.4'
 
     implementation group: 'com.github.hmcts', name: 'core-case-data-store-client', version: '4.9.2'
     implementation group: 'uk.gov.dwp.regex', name: 'postcode-validation', version: '1.1.0'
@@ -171,7 +171,7 @@ configurations.configureEach {
     resolutionStrategy.eachDependency { details ->
         if (details.requested.group == "org.apache.tomcat.embed"
             && ["tomcat-embed-core", "tomcat-embed-websocket"].contains(details.requested.name)) {
-            details.useVersion("10.1.54")
+            details.useVersion("10.1.55")
         }
         // CVE-2020-29582 - Force Kotlin to 2.1.0+
         if (details.requested.group == "org.jetbrains.kotlin"
@@ -194,25 +194,25 @@ configurations.configureEach {
         'org.jetbrains.kotlin:kotlin-stdlib-jdk7:2.1.0',
         'org.jetbrains.kotlin:kotlin-stdlib-jdk8:2.1.0',
         'org.bouncycastle:bcprov-jdk15on:1.70',
-        'io.netty:netty-buffer:4.2.12.Final',
-        'io.netty:netty-codec:4.2.12.Final',
-        'io.netty:netty-codec-dns:4.2.12.Final',
-        'io.netty:netty-codec-http:4.2.12.Final',
-        'io.netty:netty-codec-http2:4.2.12.Final',
-        'io.netty:netty-codec-socks:4.2.12.Final',
-        'io.netty:netty-common:4.2.12.Final',
-        'io.netty:netty-handler:4.2.12.Final',
-        'io.netty:netty-handler-proxy:4.2.12.Final',
-        'io.netty:netty-resolver:4.2.12.Final',
-        'io.netty:netty-resolver-dns:4.2.12.Final',
-        'io.netty:netty-resolver-dns-classes-macos:4.2.12.Final',
-        'io.netty:netty-resolver-dns-native-macos:4.2.12.Final',
-        'io.netty:netty-transport:4.2.12.Final',
-        'io.netty:netty-transport-native-epoll:4.2.12.Final',
-        'io.netty:netty-transport-native-kqueue:4.2.12.Final',
-        'io.netty:netty-transport-native-unix-common:4.2.12.Final',
-        'io.netty:netty-transport-classes-epoll:4.2.12.Final',
-        'io.netty:netty-transport-classes-kqueue:4.2.12.Final',
+        'io.netty:netty-buffer:4.2.13.Final',
+        'io.netty:netty-codec:4.2.13.Final',
+        'io.netty:netty-codec-dns:4.2.13.Final',
+        'io.netty:netty-codec-http:4.2.13.Final',
+        'io.netty:netty-codec-http2:4.2.13.Final',
+        'io.netty:netty-codec-socks:4.2.13.Final',
+        'io.netty:netty-common:4.2.13.Final',
+        'io.netty:netty-handler:4.2.13.Final',
+        'io.netty:netty-handler-proxy:4.2.13.Final',
+        'io.netty:netty-resolver:4.2.13.Final',
+        'io.netty:netty-resolver-dns:4.2.13.Final',
+        'io.netty:netty-resolver-dns-classes-macos:4.2.13.Final',
+        'io.netty:netty-resolver-dns-native-macos:4.2.13.Final',
+        'io.netty:netty-transport:4.2.13.Final',
+        'io.netty:netty-transport-native-epoll:4.2.13.Final',
+        'io.netty:netty-transport-native-kqueue:4.2.13.Final',
+        'io.netty:netty-transport-native-unix-common:4.2.13.Final',
+        'io.netty:netty-transport-classes-epoll:4.2.13.Final',
+        'io.netty:netty-transport-classes-kqueue:4.2.13.Final',
         // CVE-2026-42198
         'org.postgresql:postgresql:42.7.11'
     )

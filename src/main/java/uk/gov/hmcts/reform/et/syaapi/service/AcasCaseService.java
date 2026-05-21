@@ -26,17 +26,19 @@ import uk.gov.hmcts.reform.idam.client.models.UserInfo;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Stream;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
+import static org.apache.commons.collections4.CollectionUtils.emptyIfNull;
 import static org.apache.commons.lang3.StringUtils.defaultIfEmpty;
+import static org.postgresql.shaded.com.ongres.scram.common.util.Preconditions.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPLOYMENT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.MAX_ES_SIZE;
-import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.ACAS_HIDDEN_DOCS;
+import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.ACAS_VISIBLE_DOCS;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.ENGLAND_CASE_TYPE;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.ET1_ATTACHMENT;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.ET3;
@@ -65,13 +67,14 @@ public class AcasCaseService {
 
     /**
      * Given a datetime, this method will return a list of caseIds which have been modified since the datetime
-     * provided.
+     * provided. The {@code requestDateTime} is treated as UTC regardless of the JVM's default timezone,
+     * ensuring consistent behaviour across environments and during BST/GMT transitions.
      *
      * @param authorisation   used for IDAM authentication for the query
-     * @param requestDateTime used as the query parameter
+     * @param requestDateTime used as the query parameter; must represent a UTC datetime
      * @return a list of caseIds
      */
-    public List<Long> getLastModifiedCasesId(String authorisation, LocalDateTime requestDateTime) {
+    public List<Long> getLastModifiedCasesId(String authorisation, String requestDateTime) {
         String query = """
             {
               "size": %d,
@@ -99,7 +102,8 @@ public class AcasCaseService {
                 "reference"
               ]
             }
-            """.formatted(MAX_ES_SIZE, requestDateTime.toString());
+            """.formatted(MAX_ES_SIZE,
+            LocalDateTime.parse(requestDateTime).atOffset(ZoneOffset.UTC).toInstant().toString());
         return searchEnglandScotlandCases(authorisation, query)
             .stream()
             .map(CaseDetails::getId)
@@ -150,7 +154,7 @@ public class AcasCaseService {
 
     private void addDocumentsToMap(String authorisation, List<CaseDocumentAcasResponse> documents,
                                    List<DocumentTypeItem> documentTypeItemList) {
-        documentTypeItemList.stream()
+        emptyIfNull(documentTypeItemList).stream()
             .filter(documentTypeItem -> !isDuplicatedDoc(documents, documentTypeItem))
             .forEach(documentTypeItem -> documents.add(caseDocumentAcasResponseBuilder(
                 documentTypeItem,
@@ -172,6 +176,11 @@ public class AcasCaseService {
 
     private List<DocumentTypeItem> getAllCaseDocuments(String authorisation, List<CaseDocumentAcasResponse> documents,
                                                        CaseData caseData) {
+
+        if (checkReceiptDateForAcas(caseData)) {
+            return new ArrayList<>();
+        }
+
         retrieveRespondentDocuments(authorisation, documents, caseData);
 
         List<DocumentTypeItem> documentTypeItemList = new ArrayList<>(getDocumentCollectionDocs(caseData));
@@ -185,13 +194,27 @@ public class AcasCaseService {
         return documentTypeItemList;
     }
 
+    /**
+     * ACAS should not receive documents for cases submitted before 1st April 2026. This is so that they can avoid
+     * having duplicate documents for older cases.
+     * @param caseData the case data
+     * @return true if the receipt date is before 1st April 2026 or if the receipt date is not provided or false if the
+     *     receipt date is on or after 1st April 2026.
+     */
+    private boolean checkReceiptDateForAcas(CaseData caseData) {
+        if (caseData.getReceiptDate() == null) {
+            return true;
+        }
+        return LocalDate.parse(caseData.getReceiptDate()).isBefore(LocalDate.of(2026, 4, 1));
+    }
+
     private static List<DocumentTypeItem> getDocumentCollectionDocs(CaseData caseData) {
         if (CollectionUtils.isEmpty(caseData.getDocumentCollection())) {
             return new ArrayList<>();
         }
 
         return caseData.getDocumentCollection().stream()
-            .filter(d -> !isNullOrEmpty(getDocumentType(d)) && !ACAS_HIDDEN_DOCS.contains(getDocumentType(d)))
+            .filter(d -> !isNullOrEmpty(getDocumentType(d)) && ACAS_VISIBLE_DOCS.contains(getDocumentType(d)))
             .toList();
     }
 
@@ -296,7 +319,7 @@ public class AcasCaseService {
 
     /**
      * Searches for cases in both England and Scotland case types based on the provided query. Note that this method
-     * is a synchronous operation that combines results from both case types to optimize performance.
+     * is a synchronous operation that combines results from both case types to optimise performance.
      * @param authorisation used for IDAM authentication for the query
      * @param query the query string to search for cases
      * @return a list of case details that match the query from both England and Scotland case types

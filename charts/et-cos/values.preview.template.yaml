@@ -30,7 +30,11 @@ java:
     SERVICE_AUTH_PROVIDER_URL: "http://rpe-service-auth-provider-aat.service.core-compute-aat.internal"
     CCD_GATEWAY_BASE_URL: "https://xui-${SERVICE_FQDN}"
     MICRO_SERVICE: "et_cos"
-    ET_COS_DB_CONN_OPTIONS: ?sslmode=require
+    ET_COS_DB_HOST: et-preview.postgres.database.azure.com
+    ET_COS_DB_PORT: 5432
+    ET_COS_DB_NAME: "pr-${CHANGE_ID}-et_cos"
+    ET_COS_DB_USER_NAME: hmcts
+    ET_COS_DB_CONN_OPTIONS: "?sslmode=require"
     CASE_DOCUMENT_AM_URL: http://ccd-case-document-am-api-aat.service.core-compute-aat.internal
     RD_PROFESSIONAL_API_URL: http://rd-professional-api-aat.service.core-compute-aat.internal
     SECURE_DOC_STORE_FEATURE: true
@@ -41,12 +45,6 @@ java:
     ET_SERVICEBUS_SCHEDULER_ENABLED: true
     AZURE_SERVICE_BUS_TOPIC_NAME: ${SERVICE_NAME}-asb-ccd-case-events
     AZURE_SERVICE_BUS_SUBSCRIPTION_NAME: ${SERVICE_NAME}-asb-ccd-case-events
-    PREVIEW_DATA_STORE_CASE_ID_SEQUENCE_BASE: "91${CHANGE_ID}000000000000"
-    PREVIEW_DATA_STORE_DB_HOST: et-preview.postgres.database.azure.com
-    PREVIEW_DATA_STORE_DB_PORT: 5432
-    PREVIEW_DATA_STORE_DB_NAME: "pr-${CHANGE_ID}-data-store"
-    PREVIEW_DATA_STORE_DB_USERNAME: hmcts
-    PREVIEW_DATA_STORE_DB_CONN_OPTIONS: "?sslmode=require"
   keyVaults:
     et-cos:
       secrets:
@@ -66,14 +64,6 @@ java:
           alias: ET1_SERVICE_OWNER_NOTIFICATION_EMAIL
         - name: et1-ecm-dts-core-team-slack-notification-email
           alias: ET1_ECM_DTS_CORE_TEAM_SLACK_NOTIFICATION_EMAIL
-        - name: et-cos-postgres-user-v15
-          alias: ET_COS_DB_USER_NAME
-        - name: et-cos-postgres-password-v15
-          alias: ET_COS_DB_PASSWORD
-        - name: et-cos-postgres-host-v15
-          alias: ET_COS_DB_HOST
-        - name: et-cos-postgres-port-v15
-          alias: ET_COS_DB_PORT
     et:
       secrets:
         - name: tornado-access-key
@@ -86,6 +76,8 @@ java:
           alias: app-insights-connection-string
         - name: et-preview-flexi-db-password
           alias: ET_PREVIEW_FLEXI_DB_PASSWORD
+        - name: et-preview-flexi-db-password
+          alias: ET_COS_DB_PASSWORD
   postgresql:
     enabled: false
 
@@ -206,6 +198,8 @@ ccd:
       enabled: false
     printService:
       enabled: false
+    activityApi:
+      enabled: true
     elastic:
       enabled: true
     postgresql:
@@ -370,11 +364,29 @@ ccd:
       environment:
         IDAM_SERVICE_KEY: ${API_GATEWAY_S2S_KEY}
         IDAM_OAUTH2_CLIENT_SECRET: ${API_GATEWAY_IDAM_SECRET}
+        CORS_ORIGIN_WHITELIST: "*"
+        PROXY_CASE_ACTIVITY: http://${SERVICE_NAME}-ccd-case-activity-api
         PROXY_DOCUMENT_MANAGEMENT: http://dm-store-aat.service.core-compute-aat.internal
         PROXY_PRINT_SERVICE: http://ccd-case-print-service-${SERVICE_FQDN}
         ADDRESS_LOOKUP_TOKEN: ${ADDRESS_LOOKUP_TOKEN}
       ingressHost: gateway-${SERVICE_FQDN}
       ingressIP: ${INGRESS_IP}
+
+  ccd-case-activity-api:
+    nodejs:
+      keyVaults: []
+      environment:
+        REDIS_HOST: ${SERVICE_NAME}-ccd-case-activity-api-redis-master
+        REDIS_PORT: 6379
+        REDIS_PASSWORD: fake-password
+        REDIS_SSL_ENABLED: ""
+        CORS_ORIGIN_WHITELIST: "*"
+    redis:
+      enabled: true
+      architecture: standalone
+      auth:
+        enabled: true
+        password: "fake-password"
 
   ccd-user-profile-importer:
     users:
@@ -384,32 +396,11 @@ ccd:
     nameOverride: ${SERVICE_NAME}-es
     clusterName: "es"
     replicas: 1
-    initResources:
-      limits:
-        cpu: "500m"
-        memory: "512Mi"
-      requests:
-        cpu: "25m"
-        memory: "512Mi"
-    minimumMasterNodes: 1
-    antiAffinity: "soft"
-    esJavaOpts: "-Xmx512m -Xms512m"
-    extraEnvs:
-      - name: discovery.type
-        value: single-node
-      - name: cluster.initial_master_nodes
-        value: ""
-      - name: action.auto_create_index
-        value: .security*,.watches,.triggered_watches,.watcher-history-*,.logstash_dead_letter,.ml*
-    persistence:
-      enabled: false
-    ingress:
-      enabled: false
-      className: traefik
+    clusterHealthCheckParams: "wait_for_status=yellow&timeout=1s"
 
   logstash:
-    image: "hmctsprod.azurecr.io/imported/logstash/logstash"
-    imageTag: "7.16.1"
+    image: "hmctsprod.azurecr.io/imported/elastic/logstash"
+    imageTag: "9.2.4"
     imagePullPolicy: "IfNotPresent"
     rbac:
       serviceAccountName: et
@@ -432,19 +423,29 @@ ccd:
           readOnly: true
           volumeAttributes:
             secretProviderClass: ${SERVICE_NAME}-java-et-cos
+      - name: vault-et
+        csi:
+          driver: "secrets-store.csi.k8s.io"
+          readOnly: true
+          volumeAttributes:
+            secretProviderClass: ${SERVICE_NAME}-java-et
     extraVolumeMounts: |
       - name: logstash-lib
         mountPath: /usr/share/logstash/ccd
       - name: vault-et-cos
         mountPath: /mnt/secrets/et-cos
         readOnly: true
+      - name: vault-et
+        mountPath: /mnt/secrets/et
+        readOnly: true
     logstashConfig:
       logstash.yml: |
-        http.host: 0.0.0.0
+        api.http.host: 0.0.0.0
         xpack.monitoring.enabled: false
         xpack.monitoring.elasticsearch.hosts: ["http://{{ .Release.Name }}-es-master:9200"]
         queue.type: persisted
         dead_letter_queue.enable: true
+        pipeline.ecs_compatibility: disabled
       pipelines.yml: |
         - pipeline.id: main
           path.config: "/usr/share/logstash/pipeline/{01_input,02_filter,03_output}.conf"
@@ -453,9 +454,9 @@ ccd:
       01_input.conf: |
         input  {
           jdbc {
-            jdbc_connection_string => "jdbc:postgresql://et-cos-postgres-v15-aat.postgres.database.azure.com:5432/et_cos?sslmode=require"
-            jdbc_user => "pgadmin"
-            jdbc_password_filepath => "/mnt/secrets/et-cos/ET_COS_DB_PASSWORD"
+            jdbc_connection_string => "jdbc:postgresql://et-preview.postgres.database.azure.com:5432/pr-${CHANGE_ID}-et_cos?sslmode=require"
+            jdbc_user => "hmcts"
+            jdbc_password_filepath => "/mnt/secrets/et/ET_COS_DB_PASSWORD"
             jdbc_validate_connection => true
             jdbc_driver_library => "/usr/share/logstash/ccd/postgresql.jar"
             jdbc_driver_class => "org.postgresql.Driver"
@@ -1187,7 +1188,7 @@ et-migration:
       IDAM_OIDC_URL: https://idam-web-public.aat.platform.hmcts.net
       OIDC_ISSUER: https://forgerock-am.service.core-compute-idam-aat.internal:8443/openam/oauth2/hmcts
       IDAM_S2S_URL: http://rpe-service-auth-provider-aat.service.core-compute-aat.internal
-      IDAM_CLIENT_REDIRECT_URI: https://et-msg-handler-aat.service.core-compute-aat.internal/oauth2redirect
+      IDAM_CLIENT_REDIRECT_URI: https://et-cos-${SERVICE_FQDN}/oauth2redirect
       MIGRATION_CASETYPE: ET_EnglandWales
       MIGRATION_QUERY_SIZE: 5
       ROOT_LOGGING_LEVEL: debug

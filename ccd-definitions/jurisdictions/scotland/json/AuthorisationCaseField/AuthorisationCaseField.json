@@ -23185,6 +23185,13 @@
   {
     "LiveFrom": "01/01/2017",
     "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "SearchCriteria",
+    "UserRole": "citizen",
+    "CRUD": "CRUD"
+  },
+  {
+    "LiveFrom": "01/01/2017",
+    "CaseTypeId": "ET_Scotland",
     "CaseFieldID": "caseNameHmctsInternal",
     "UserRole": "caseworker-employment-api",
     "CRUD": "CRUD"
@@ -23778,46 +23785,6 @@
     "CaseFieldID": "allocateHearingAdditionalJudge",
     "UserRole": "caseworker-employment-api",
     "CRUD": "CRUD"
-  },
-  {
-    "CaseTypeId": "ET_Scotland",
-    "CaseFieldID": "addCaseNote",
-    "AccessControl": [
-      {
-        "UserRoles": [
-          "caseworker-employment-scotland",
-          "caseworker-employment-etjudge-scotland",
-          "caseworker-employment-api"
-        ],
-        "CRUD": "CRUD"
-      },
-      {
-        "UserRoles": [
-          "caseworker-employment-etjudge"
-        ],
-        "CRUD": "R"
-      }
-    ]
-  },
-  {
-    "CaseTypeId": "ET_Scotland",
-    "CaseFieldID": "caseNotesCollection",
-    "AccessControl": [
-      {
-        "UserRoles": [
-          "caseworker-employment-scotland",
-          "caseworker-employment-etjudge-scotland",
-          "caseworker-employment-api"
-        ],
-        "CRUD": "CRUD"
-      },
-      {
-        "UserRoles": [
-          "caseworker-employment-etjudge"
-        ],
-        "CRUD": "R"
-      }
-    ]
   },
   {
     "CaseTypeId": "ET_Scotland",

@@ -4,7 +4,6 @@ import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,7 +19,6 @@ import uk.gov.hmcts.reform.et.syaapi.service.AdminUserService;
 import uk.gov.hmcts.reform.et.syaapi.service.CaseDocumentService;
 import uk.gov.hmcts.reform.et.syaapi.service.FeatureToggleService;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -55,8 +53,7 @@ public class AcasController {
     @RequiresAcasRole
     public ResponseEntity<Object> getLastModifiedCaseList(
         @RequestHeader(value = HttpHeaders.AUTHORIZATION) String userToken,
-        @RequestParam(name = "datetime")
-        @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime requestDateTime) {
+        @RequestParam(name = "datetime") String requestDateTime) {
         return ok(acasCaseService.getLastModifiedCasesId(userToken, requestDateTime));
     }
 

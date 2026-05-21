@@ -49,3 +49,21 @@ variable "aks_subscription_id" {}
 variable "businessArea" {
   default = "CFT"
 }
+
+variable "apim_suffix" {
+  default = ""
+}
+
+variable "et_ccd_callbacks_product_name" {
+  type    = string
+  default = "et-ccd-callbacks"
+}
+
+variable "et_ccd_callbacks_s2s_client_id" {
+  type    = string
+  default = "et_cos"
+}
+
+variable "acas_swagger_url" {
+  default = "https://raw.githubusercontent.com/hmcts/reform-api-docs/master/docs/specs/et-acas-api-nonprod.json"
+}

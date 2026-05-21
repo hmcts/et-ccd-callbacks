@@ -1,0 +1,28 @@
+[
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "disposeCase",
+    "Name": "Close Case",
+    "Description": "Close Case",
+    "DisplayOrder": 40,
+    "PreConditionState(s)": "Accepted;Rejected",
+    "PostConditionState": "Closed",
+    "CallBackURLAboutToStartEvent": "${ET_COS_URL}/aboutToStartDisposal",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "N",
+    "ShowSummary": "Y",
+    "Publish": "Y"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "ID": "reinstateClosedCase",
+    "Name": "Reinstate Case",
+    "Description": "Reinstate Case",
+    "DisplayOrder": 41,
+    "PreConditionState(s)": "Closed",
+    "PostConditionState": "Accepted(preAcceptCase.caseAccepted=\"Yes\" AND positionType!=\"Case closed\"):1;Rejected(preAcceptCase.caseAccepted=\"No\" AND positionType!=\"Case closed\"):2;Closed",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "N",
+    "ShowSummary": "N"
+  }
+]

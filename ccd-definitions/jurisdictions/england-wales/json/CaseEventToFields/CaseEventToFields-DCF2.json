@@ -1,0 +1,25 @@
+[
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseEventID": "createDcf",
+    "CaseFieldID": "uploadOrRemoveDcf",
+    "DisplayContext": "MANDATORY",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "ShowSummaryChangeOption": "N",
+    "PageColumnNumber": 1
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseEventID": "createDcf",
+    "CaseFieldID": "digitalCaseFile",
+    "DisplayContext": "COMPLEX",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 2,
+    "ShowSummaryChangeOption": "N",
+    "FieldShowCondition": "uploadOrRemoveDcf=\"Upload\"",
+    "PageColumnNumber": 1
+  }
+]

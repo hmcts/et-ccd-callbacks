@@ -80,6 +80,7 @@ public class CreateEcmSingleService {
         String originalCaseTypeId = createUpdatesMsg.getCaseTypeId();
         CaseData newEcmCaseData = generateNewCaseDataForCaseTransfer(oldSubmitEvent, originalCaseTypeId);
         newEcmCaseData.setReasonForCT(transferToEcmDataModel.getReasonForCT());
+        clearOfficeSpecificFields(newEcmCaseData);
         
         CaseDetails newEcmCaseDetails = new CaseDetails();
         newEcmCaseDetails.setCaseData(newEcmCaseData);
@@ -89,6 +90,15 @@ public class CreateEcmSingleService {
         newEcmCaseDetails.setCaseTypeId(caseTypeId);
         newEcmCaseDetails.setJurisdiction(createUpdatesMsg.getJurisdiction());
         return newEcmCaseDetails;
+    }
+
+    private void clearOfficeSpecificFields(CaseData caseData) {
+        caseData.setClerkResponsible(null);
+        caseData.setFileLocation(null);
+        caseData.setFileLocationGlasgow(null);
+        caseData.setFileLocationAberdeen(null);
+        caseData.setFileLocationDundee(null);
+        caseData.setFileLocationEdinburgh(null);
     }
 
     private CaseData generateNewCaseDataForCaseTransfer(SubmitEvent oldSubmitEvent, String caseTypeId) {

@@ -1,0 +1,20 @@
+[
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "tseApplicationStoredCollection",
+    "Label": " ",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "genericTseDetails",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  },
+  {
+    "CaseTypeID": "ET_Scotland",
+    "ID": "tseRespondentStoredCollection",
+    "Label": " ",
+    "FieldType": "Collection",
+    "FieldTypeParameter": "genericTseDetails",
+    "SecurityClassification": "Public",
+    "Searchable": "N"
+  }
+]

@@ -1,0 +1,29 @@
+[
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "Channel": "CaseWorker",
+    "TabID": "Bundles",
+    "TabLabel": "Hearing Documents",
+    "TabDisplayOrder": 17,
+    "TabShowCondition": "[STATE]!=\"AWAITING_SUBMISSION_TO_HMCTS\"",
+    "CaseFieldID": "bundlesRespondentCollection",
+    "TabFieldDisplayOrder": 1,
+    "DisplayContextParameter": "#TABLE(formattedSelectedHearing,uploadDateTime,uploadFile)"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "Channel": "CaseWorker",
+    "TabID": "Bundles",
+    "CaseFieldID": "bundlesClaimantCollection",
+    "TabFieldDisplayOrder": 2,
+    "DisplayContextParameter": "#TABLE(formattedSelectedHearing,uploadDateTime,uploadFile)"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "Channel": "CaseWorker",
+    "TabID": "Bundles",
+    "CaseFieldID": "removedHearingBundlesCollection",
+    "TabFieldDisplayOrder": 3,
+    "DisplayContextParameter": "#TABLE(bundleName,removedDateTime,removedReason)"
+  }
+]

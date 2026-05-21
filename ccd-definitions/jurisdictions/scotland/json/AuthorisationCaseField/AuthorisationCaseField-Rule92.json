@@ -1,0 +1,32 @@
+[
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "tseApplicationStoredCollection",
+    "UserRole": "et-acas-api",
+    "CRUD": "R"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "tseApplicationStoredCollection",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "tseApplicationStoredCollection",
+    "UserRole": "[CREATOR]",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "tseRespondentStoredCollection",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseFieldID": "tseRespondentStoredCollection",
+    "UserRole": "[DEFENDANT]",
+    "CRUD": "CRUD"
+  }
+]

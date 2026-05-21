@@ -2,8 +2,11 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.ObjectUtils;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
+import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.CaseNote;
@@ -13,11 +16,14 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
+import java.util.TimeZone;
 
 import static java.util.UUID.randomUUID;
 import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.EUROPE_LONDON;
 
 /**
  * Service for managing case notes in multiple data and case data.
@@ -64,6 +70,7 @@ public class CaseNotesService {
 
     private GenericTypeItem<CaseNote> getCaseNoteGenericTypeItem(String userToken, CaseNote caseNote) {
         DateFormat formatter = new SimpleDateFormat("dd MMM yyyy HH:mm", Locale.ENGLISH);
+        formatter.setTimeZone(TimeZone.getTimeZone(EUROPE_LONDON));
         caseNote.setDate(formatter.format(new Date()));
 
         try {
@@ -81,5 +88,89 @@ public class CaseNotesService {
         caseNoteListTypeItem.setId(String.valueOf(randomUUID()));
         caseNoteListTypeItem.setValue(caseNote);
         return caseNoteListTypeItem;
+    }
+
+    /**
+     * Populates the case note list for the given case data. If there are no case notes, an error message is returned
+     * indicating that there are no telephone notes to edit or delete.
+     * @param caseData the case data
+     * @return a list of error messages if there are no case notes, an empty list otherwise
+     */
+    public List<String> populateCaseNoteList(CaseData caseData) {
+        if (isEmpty(caseData.getCaseNotesCollection())) {
+            return List.of("There are no telephone notes to edit or delete");
+        }
+        clearOldValues(caseData);
+        List<DynamicValueType> caseNoteList = caseData.getCaseNotesCollection().stream()
+            .filter(ObjectUtils::isNotEmpty)
+            .map(caseNote -> DynamicValueType.create(caseNote.getId(), getCaseNoteLabel(caseNote)))
+            .toList();
+        caseData.setCaseNoteList(DynamicFixedListType.from(caseNoteList));
+        return new ArrayList<>();
+    }
+
+    private static String getCaseNoteLabel(GenericTypeItem<CaseNote> caseNote) {
+        return caseNote.getValue().getTitle() + " - " + caseNote.getValue().getDate() + " - "
+            + caseNote.getValue().getAuthor();
+    }
+
+    /**
+     * Populates the case note to be edited or deleted based on the selected option.
+     * @param caseData the case data
+     */
+    public void populateEditCaseNote(CaseData caseData) {
+        switch (caseData.getEditOrDeleteCaseNote()) {
+            case "Delete" -> {
+                // do nothing as the case note will be deleted in the 'about to submit' callback
+            }
+            case "Edit" -> {
+                if (isEmpty(caseData.getCaseNoteList())) {
+                    throw new IllegalArgumentException("Selected note cannot be null or empty");
+                }
+                String selectedCaseNoteId = caseData.getCaseNoteList().getSelectedCode();
+                caseData.getCaseNotesCollection().stream()
+                    .filter(caseNote -> caseNote.getId().equals(selectedCaseNoteId))
+                    .findFirst()
+                    .ifPresent(caseNote -> caseData.setAddCaseNote(caseNote.getValue()));
+            }
+            default -> throw new IllegalArgumentException(
+                "Invalid edit or delete case note option: " + caseData.getEditOrDeleteCaseNote());
+        }
+    }
+
+    /**
+     * Submits the case note update based on the selected option. If the option is "Delete", the selected case note
+     * will be removed from the collection. If the option is "Edit", the selected case note will be updated
+     * with the new title and note values.
+     * @param caseData the case data
+     */
+    public void submitCaseNoteUpdate(CaseData caseData) {
+        switch (caseData.getEditOrDeleteCaseNote()) {
+            case "Delete" -> {
+                caseData.setCaseNotesCollection(caseData.getCaseNotesCollection().stream()
+                    .filter(caseNote -> !caseNote.getId().equals(caseData.getCaseNoteList().getSelectedCode()))
+                    .toList());
+                clearOldValues(caseData);
+            }
+            case "Edit" -> {
+                String selectedCaseNoteId = caseData.getCaseNoteList().getSelectedCode();
+                caseData.getCaseNotesCollection().stream()
+                    .filter(caseNote -> caseNote.getId().equals(selectedCaseNoteId))
+                    .findFirst()
+                    .ifPresent(caseNote -> {
+                        caseNote.getValue().setTitle(caseData.getAddCaseNote().getTitle());
+                        caseNote.getValue().setNote(caseData.getAddCaseNote().getNote());
+                    });
+                clearOldValues(caseData);
+            }
+            default -> throw new IllegalArgumentException(
+                "Invalid edit or delete case note option: " + caseData.getEditOrDeleteCaseNote());
+        }
+    }
+
+    private static void clearOldValues(CaseData caseData) {
+        caseData.setCaseNoteList(null);
+        caseData.setAddCaseNote(null);
+        caseData.setEditOrDeleteCaseNote(null);
     }
 }

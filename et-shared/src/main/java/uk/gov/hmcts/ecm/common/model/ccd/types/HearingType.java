@@ -13,7 +13,7 @@ import java.util.List;
 @Data
 public class HearingType {
     public HearingType() {
-       hearingDateCollection = new ArrayList<>();
+        hearingDateCollection = new ArrayList<>();
     }
 
     @JsonProperty("Hearing_type")
@@ -62,4 +62,6 @@ public class HearingType {
     private String doesHearingNotesDocExist;
     @JsonProperty("removeHearingNotesDocument")
     private List<String> removeHearingNotesDocument;
+    @JsonProperty("hearingDates")
+    private String hearingDates;
 }

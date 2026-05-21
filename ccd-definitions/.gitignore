@@ -1,0 +1,71 @@
+# Node.js dependencies
+node_modules/
+package-lock.json
+
+# Yarn v3 gitignores
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+
+# Generated files
+jurisdictions/admin/xlsx/*.xlsx
+jurisdictions/england-wales/xlsx/*.xlsx
+jurisdictions/scotland/xlsx/*.xlsx
+
+# Symlinks (these are setup artifacts)
+jurisdictions/admin/definitions
+jurisdictions/england-wales/definitions
+jurisdictions/scotland/definitions
+jurisdictions/admin/bin
+jurisdictions/england-wales/bin
+jurisdictions/scotland/bin
+
+# Logs
+*.log
+yarn-debug.log*
+yarn-error.log*
+npm-debug.log*
+
+# Temporary files
+temp/
+*.tmp
+~$*.xlsx
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+
+# Build outputs
+build/
+dist/
+coverage/
+
+# Test artifacts
+tests/**/node_modules/
+tests/**/*.log
+tests/**/coverage/
+tests/**/dist/
+tests/**/temp/
+
+# Scripts and binary artifacts
+scripts/**/node_modules/
+scripts/**/*.log
+scripts/**/temp/
+
+# macOS and OS artifacts
+.DS_Store
+**/.DS_Store
+Thumbs.db
+
+# Individual package yarn.lock files (use workspace root only)
+jurisdictions/admin/yarn.lock
+jurisdictions/england-wales/yarn.lock
+jurisdictions/scotland/yarn.lock
+

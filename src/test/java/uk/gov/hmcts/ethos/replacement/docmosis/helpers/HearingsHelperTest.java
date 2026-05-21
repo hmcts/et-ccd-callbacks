@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
+import org.jetbrains.annotations.NotNull;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,17 +11,21 @@ import uk.gov.hmcts.et.common.model.bulk.types.DynamicFixedListType;
 import uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.DateListedTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingDetailTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.HearingTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DateListedType;
 import uk.gov.hmcts.et.common.model.ccd.types.HearingDetailType;
+import uk.gov.hmcts.et.common.model.ccd.types.HearingType;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
@@ -28,12 +33,15 @@ import java.util.UUID;
 import static java.time.ZoneOffset.UTC;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_HEARD;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_LISTED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.HEARING_STATUS_POSTPONED;
 import static uk.gov.hmcts.et.common.model.bulk.types.DynamicValueType.create;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HearingConstants.TWO_JUDGES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper.BREAK_TIME_VALIDATION_MESSAGE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper.HEARING_BREAK_FUTURE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper.HEARING_BREAK_RESUME_INVALID;
@@ -47,11 +55,11 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper.get
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper.hearingMidEventValidation;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper.hearingTimeValidation;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper.isDateInFuture;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper.setHearingDaysAndDates;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper.updatePostponedDate;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper.validateTwoJudges;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.HEARING_CREATION_DAY_ERROR;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.HEARING_CREATION_NUMBER_ERROR;
-import static uk.gov.hmcts.ethos.replacement.docmosis.reports.Constants.TWO_JUDGES;
 
 @Slf4j
 @ExtendWith(SpringExtension.class)
@@ -113,8 +121,70 @@ class HearingsHelperTest {
         caseData.getHearingCollection().getFirst().getValue()
                 .setHearingDateCollection(null);
 
-        assertEquals(0, hearingMidEventValidation(caseData).size());
+        assertEquals(0, HearingsHelper.hearingMidEventValidation(caseData).size());
 
+    }
+
+    @Test
+    void setEtInitialConsiderationListedHearingType_setsHearingTypeWhenEarliestListedHearingExists() {
+        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
+        DateListedType dateListedType = new DateListedType();
+        dateListedType.setListedDate(LocalDate.now().plusDays(12).toString() + "T10:00:00.000");
+
+        dateListedType.setHearingStatus("Listed");
+        dateListedTypeItem.setValue(dateListedType);
+
+        HearingType hearingType = new HearingType();
+        hearingType.setHearingType("Preliminary Hearing");
+        hearingType.setHearingDateCollection(List.of(dateListedTypeItem));
+        HearingTypeItem hearingTypeItem = new HearingTypeItem();
+        hearingTypeItem.setValue(hearingType);
+
+        caseData.setHearingCollection(List.of(hearingTypeItem));
+
+        HearingsHelper.setEtInitialConsiderationListedHearingType(caseData);
+
+        assertNotNull(caseData.getEtICHearingListedAnswers());
+        assertEquals("Preliminary Hearing",
+                caseData.getEtICHearingListedAnswers().getEtInitialConsiderationListedHearingType());
+    }
+
+    @Test
+    void setEtInitialConsiderationListedHearingType_doesNotSetHearingTypeWhenNoListedHearingsExist() {
+        caseData.setHearingCollection(new ArrayList<>());
+
+        HearingsHelper.setEtInitialConsiderationListedHearingType(caseData);
+
+        assertNull(caseData.getEtICHearingListedAnswers());
+    }
+
+    @Test
+    void setEtInitialConsiderationListedHearingType_createsEtICHearingListedAnswersIfNull() {
+        HearingTypeItem hearingTypeItem = new HearingTypeItem();
+        HearingType hearingType = getHearingType();
+        hearingTypeItem.setValue(hearingType);
+        caseData.setHearingCollection(List.of(hearingTypeItem));
+        caseData.setEtICHearingListedAnswers(null);
+
+        HearingsHelper.setEtInitialConsiderationListedHearingType(caseData);
+
+        assertNotNull(caseData.getEtICHearingListedAnswers());
+        assertEquals("Full Hearing",
+                caseData.getEtICHearingListedAnswers().getEtInitialConsiderationListedHearingType());
+    }
+
+    private static @NotNull HearingType getHearingType() {
+        DateListedType dateListedType = new DateListedType();
+        dateListedType.setListedDate("2030-08-01T10:00:00.000");
+        dateListedType.setHearingStatus("Listed");
+        DateListedTypeItem dateListedTypeItem = new DateListedTypeItem();
+        dateListedTypeItem.setValue(dateListedType);
+
+        HearingType hearingType = new HearingType();
+        hearingType.setHearingType("Full Hearing");
+        hearingType.setHearingDateCollection(List.of(new DateListedTypeItem()));
+        hearingType.setHearingDateCollection(List.of(dateListedTypeItem));
+        return hearingType;
     }
 
     @Test
@@ -304,6 +374,83 @@ class HearingsHelperTest {
         assertNull(actual);
     }
 
+    @Test
+    void returnsNullWhenHearingCollectionIsEmpty() {
+        assertNull(HearingsHelper.getEarliestListedHearingType(Collections.emptyList()));
+    }
+
+    @Test
+    void returnsNullWhenAllHearingsHaveNoFutureDates() {
+        DateListedTypeItem date = new DateListedTypeItem();
+        date.setValue(new uk.gov.hmcts.et.common.model.ccd.types.DateListedType());
+        date.getValue().setListedDate("2020-01-01T10:00:00.000"); // Past date
+        HearingType hearingType = new HearingType();
+        hearingType.setHearingDateCollection(List.of(date));
+        HearingTypeItem item = new HearingTypeItem();
+        item.setValue(hearingType);
+        assertNull(HearingsHelper.getEarliestListedHearingType(List.of(item)));
+    }
+
+    @Test
+    void returnsEarliestFutureHearingWhenMultipleHearingsWithFutureDates() {
+        DateListedTypeItem date1 = new DateListedTypeItem();
+        date1.setValue(new uk.gov.hmcts.et.common.model.ccd.types.DateListedType());
+        date1.getValue().setListedDate("2100-01-01T10:00:00.000");
+        date1.getValue().setHearingStatus("Listed");
+        HearingTypeItem item1 = new HearingTypeItem();
+        HearingType hearingType1 = new HearingType();
+        hearingType1.setHearingDateCollection(List.of(date1));
+        item1.setValue(hearingType1);
+
+        DateListedTypeItem date2 = new DateListedTypeItem();
+        date2.setValue(new uk.gov.hmcts.et.common.model.ccd.types.DateListedType());
+        date2.getValue().setListedDate("2099-12-31T10:00:00.000");
+        date2.getValue().setHearingStatus("Listed");
+        HearingTypeItem item2 = new HearingTypeItem();
+        HearingType hearingType2 = new HearingType();
+        hearingType2.setHearingDateCollection(List.of(date2));
+        item2.setValue(hearingType2);
+
+        HearingType result = HearingsHelper.getEarliestListedHearingType(List.of(item1, item2));
+        assertNotNull(result);
+        assertEquals("2099-12-31T10:00:00.000",
+                result.getHearingDateCollection().getFirst().getValue().getListedDate());
+    }
+
+    @Test
+    void ignoresHearingsWithNoValidFutureDates() {
+        HearingTypeItem item1 = new HearingTypeItem();
+        HearingType hearingType1 = new HearingType();
+        hearingType1.setHearingDateCollection(new ArrayList<>());
+        item1.setValue(hearingType1);
+
+        DateListedTypeItem date2 = new DateListedTypeItem();
+        date2.setValue(new uk.gov.hmcts.et.common.model.ccd.types.DateListedType());
+        date2.getValue().setListedDate("2099-12-31T10:00:00.000");
+        date2.getValue().setHearingStatus("Listed");
+        HearingTypeItem item2 = new HearingTypeItem();
+        HearingType hearingType2 = new HearingType();
+        hearingType2.setHearingDateCollection(List.of(date2));
+        item2.setValue(hearingType2);
+
+        HearingType result = HearingsHelper.getEarliestListedHearingType(List.of(item1, item2));
+        assertNotNull(result);
+        assertEquals("2099-12-31T10:00:00.000",
+                result.getHearingDateCollection().getFirst().getValue().getListedDate());
+    }
+
+    @Test
+    void returnsNullIfNoHearingsHaveListedStatus() {
+        DateListedTypeItem date = new DateListedTypeItem();
+        date.setValue(new uk.gov.hmcts.et.common.model.ccd.types.DateListedType());
+        date.getValue().setListedDate("2099-12-31T10:00:00.000");
+        HearingTypeItem item = new HearingTypeItem();
+        HearingType hearingType = new HearingType();
+        hearingType.setHearingDateCollection(List.of(date));
+        item.setValue(hearingType);
+        assertNull(HearingsHelper.getEarliestListedHearingType(List.of(item)));
+    }
+
     private void setListingDate(List<HearingTypeItem> hearingCollection, int hearingIndex, int dateIndex, String date) {
         hearingCollection.get(hearingIndex).getValue().getHearingDateCollection()
             .get(dateIndex).getValue().setListedDate(date);
@@ -482,6 +629,141 @@ class HearingsHelperTest {
     }
 
     @Test
+    void setHearingDaysAndDates_nullHearingCollection_doesNothing() {
+        caseData.setHearingCollection(null);
+        setHearingDaysAndDates(caseData);
+        assertNull(caseData.getHearingCollection());
+    }
+
+    @Test
+    void setHearingDaysAndDates_emptyHearingCollection_doesNothing() {
+        caseData.setHearingCollection(new ArrayList<>());
+        setHearingDaysAndDates(caseData);
+        assertTrue(caseData.getHearingCollection().isEmpty());
+    }
+
+    @Test
+    void setHearingDaysAndDates_nullDateCollection_skipsHearing() {
+        HearingType hearingType = new HearingType();
+        hearingType.setHearingDateCollection(null);
+        HearingTypeItem item = new HearingTypeItem();
+        item.setValue(hearingType);
+        caseData.setHearingCollection(List.of(item));
+
+        setHearingDaysAndDates(caseData);
+
+        assertNull(hearingType.getHearingDates());
+    }
+
+    @Test
+    void setHearingDaysAndDates_emptyDateCollection_skipsHearing() {
+        HearingType hearingType = new HearingType();
+        hearingType.setHearingDateCollection(new ArrayList<>());
+        HearingTypeItem item = new HearingTypeItem();
+        item.setValue(hearingType);
+        caseData.setHearingCollection(List.of(item));
+
+        setHearingDaysAndDates(caseData);
+
+        assertNull(hearingType.getHearingDates());
+    }
+
+    @Test
+    void setHearingDaysAndDates_singleListedDate_setsCountAndDate() {
+        HearingType hearingType = buildHearingWithDates(
+            hearingDate("2024-03-15T10:00:00.000", HEARING_STATUS_LISTED));
+        caseData.setHearingCollection(List.of(hearingTypeItem(hearingType)));
+
+        setHearingDaysAndDates(caseData);
+
+        assertEquals("15 Mar 2024", hearingType.getHearingDates());
+    }
+
+    @Test
+    void setHearingDaysAndDates_singleHeardDate_setsCountAndDate() {
+        HearingType hearingType = buildHearingWithDates(
+            hearingDate("2024-06-01T10:00:00.000", HEARING_STATUS_HEARD));
+        caseData.setHearingCollection(List.of(hearingTypeItem(hearingType)));
+
+        setHearingDaysAndDates(caseData);
+
+        assertEquals("1 Jun 2024", hearingType.getHearingDates());
+    }
+
+    @Test
+    void setHearingDaysAndDates_multipleDates_setsCountAndRange() {
+        HearingType hearingType = buildHearingWithDates(
+            hearingDate("2024-03-10T10:00:00.000", HEARING_STATUS_LISTED),
+            hearingDate("2024-03-01T10:00:00.000", HEARING_STATUS_LISTED),
+            hearingDate("2024-03-05T10:00:00.000", HEARING_STATUS_HEARD));
+        caseData.setHearingCollection(List.of(hearingTypeItem(hearingType)));
+
+        setHearingDaysAndDates(caseData);
+
+        assertEquals("1 Mar 2024 - 10 Mar 2024", hearingType.getHearingDates());
+    }
+
+    @Test
+    void setHearingDaysAndDates_noValidStatusDates_setsDashAndTbc() {
+        HearingType hearingType = buildHearingWithDates(
+            hearingDate("2024-03-01T10:00:00.000", HEARING_STATUS_POSTPONED));
+        caseData.setHearingCollection(List.of(hearingTypeItem(hearingType)));
+
+        setHearingDaysAndDates(caseData);
+
+        assertEquals("-", hearingType.getHearingDates());
+    }
+
+    @Test
+    void setHearingDaysAndDates_mixedStatuses_onlyCountsListedAndHeard() {
+        HearingType hearingType = buildHearingWithDates(
+            hearingDate("2024-03-01T10:00:00.000", HEARING_STATUS_LISTED),
+            hearingDate("2024-03-05T10:00:00.000", HEARING_STATUS_POSTPONED),
+            hearingDate("2024-03-10T10:00:00.000", HEARING_STATUS_HEARD));
+        caseData.setHearingCollection(List.of(hearingTypeItem(hearingType)));
+
+        setHearingDaysAndDates(caseData);
+
+        assertEquals("1 Mar 2024 - 10 Mar 2024", hearingType.getHearingDates());
+    }
+
+    @Test
+    void setHearingDaysAndDates_multipleHearings_processesBothIndependently() {
+        HearingType hearing1 = buildHearingWithDates(
+            hearingDate("2024-03-01T10:00:00.000", HEARING_STATUS_LISTED),
+            hearingDate("2024-03-02T10:00:00.000", HEARING_STATUS_LISTED));
+        HearingType hearing2 = buildHearingWithDates(
+            hearingDate("2024-06-10T10:00:00.000", HEARING_STATUS_POSTPONED));
+        caseData.setHearingCollection(List.of(hearingTypeItem(hearing1), hearingTypeItem(hearing2)));
+
+        setHearingDaysAndDates(caseData);
+
+        assertEquals("1 Mar 2024 - 2 Mar 2024", hearing1.getHearingDates());
+        assertEquals("-", hearing2.getHearingDates());
+    }
+
+    private static HearingType buildHearingWithDates(DateListedTypeItem... dates) {
+        HearingType hearingType = new HearingType();
+        hearingType.setHearingDateCollection(new ArrayList<>(List.of(dates)));
+        return hearingType;
+    }
+
+    private static HearingTypeItem hearingTypeItem(HearingType hearingType) {
+        HearingTypeItem item = new HearingTypeItem();
+        item.setValue(hearingType);
+        return item;
+    }
+
+    private static DateListedTypeItem hearingDate(String listedDate, String status) {
+        DateListedType dateListedType = new DateListedType();
+        dateListedType.setListedDate(listedDate);
+        dateListedType.setHearingStatus(status);
+        DateListedTypeItem item = new DateListedTypeItem();
+        item.setValue(dateListedType);
+        return item;
+    }
+
+    @Test
     void updatePostponedDate_whenStatusIsPostponedWithEmptyPostponedDate_setsNewDate() {
         DateListedType dateListedType = new DateListedType();
         dateListedType.setPostponedDate("");
@@ -493,4 +775,5 @@ class HearingsHelperTest {
         assertEquals(CLAIMANT, dateListedType.getPostponedBy());
         assertFalse(dateListedType.getPostponedDate().isBlank());
     }
+
 }

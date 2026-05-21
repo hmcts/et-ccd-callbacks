@@ -2,17 +2,21 @@ package uk.gov.hmcts.ethos.replacement.docmosis.helpers;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.EtICHearingListedAnswers;
 import uk.gov.hmcts.et.common.model.ccd.EtICListForFinalHearingUpdated;
 import uk.gov.hmcts.et.common.model.ccd.EtICListForPreliminaryHearingUpdated;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.InitialConsiderationConstants.ISSUE_RULE_27_NOTICE_AND_ORDER;
@@ -23,6 +27,123 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Constants.MONTH_ST
 
 class InitialConsiderationHelperTest {
     private CaseData caseData;
+
+    @Test
+    void getDocumentRequest_returnsExpectedJsonForEnglandWales() throws JsonProcessingException {
+        CaseData caseDataForEnglandWales = CaseDataBuilder.builder().build();
+        setCaseDataValues(caseDataForEnglandWales);
+        caseDataForEnglandWales.setEtICHearingNotListedListUpdated(
+                Collections.singletonList("List for preliminary hearing"));
+        caseDataForEnglandWales.setEtICHearingNotListedListForPrelimHearingUpdated(populatePreliminaryHearingUpdated());
+
+        String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseDataForEnglandWales, "key",
+                ENGLANDWALES_CASE_TYPE_ID);
+
+        assertNotNull(documentRequest);
+        assertTrue(documentRequest.contains("\"templateName\":\"EM-TRB-EGW-ENG-02203.docx\""));
+        assertTrue(documentRequest.contains("\"caseNumber\":\"6000001/2024\""));
+    }
+
+    @Test
+    void getDocumentRequest_returnsExpectedJsonForScotland() throws JsonProcessingException {
+        CaseData caseDataForScotland = CaseDataBuilder.builder().build();
+        setCaseDataValues(caseDataForScotland);
+        caseDataForScotland.setEtICHearingNotListedListUpdated(Collections.singletonList("List for final hearing"));
+        caseDataForScotland.setEtICHearingNotListedListForFinalHearingUpdated(populateFinalHearingUpdated());
+
+        String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseDataForScotland, "key",
+                SCOTLAND_CASE_TYPE_ID);
+
+        assertNotNull(documentRequest);
+        assertTrue(documentRequest.contains("\"templateName\":\"EM-TRB-SCO-ENG-02204.docx\""));
+        assertTrue(documentRequest.contains("\"caseNumber\":\"6000001/2024\""));
+    }
+
+    @Test
+    void getDocumentRequest_returnsEmptyJsonWhenCaseDataIsNull() throws JsonProcessingException {
+        CaseData caseDataEmpty = new CaseData();
+
+        String documentRequest = InitialConsiderationHelper.getDocumentRequest(caseDataEmpty, "key",
+                ENGLANDWALES_CASE_TYPE_ID);
+
+        assertNotNull(documentRequest);
+        assertTrue(documentRequest.contains("\"caseNumber\":null"));
+        assertTrue(documentRequest.contains("\"templateName\":\"EM-TRB-EGW-ENG-02203.docx\""));
+    }
+
+    @Test
+    void addToDocumentCollection_doesNotAddWhenDocumentIsNull() {
+        CaseData caseDataWithNullDoc = new CaseData();
+        caseDataWithNullDoc.setDocumentCollection(new ArrayList<>());
+
+        InitialConsiderationHelper.addToDocumentCollection(caseDataWithNullDoc);
+
+        assertTrue(caseDataWithNullDoc.getDocumentCollection().isEmpty());
+    }
+
+    @Test
+    void addToDocumentCollection_addsDocumentToCollection() {
+        CaseData caseDataWithDoc = new CaseData();
+        caseDataWithDoc.setEtInitialConsiderationDocument(Mockito.mock(
+                uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType.class));
+        caseDataWithDoc.setDocumentCollection(new ArrayList<>());
+
+        InitialConsiderationHelper.addToDocumentCollection(caseDataWithDoc);
+
+        assertEquals(1, caseDataWithDoc.getDocumentCollection().size());
+    }
+
+    @Test
+    void getSortedEJSitAloneReasons_returnsEmptyListWhenInputIsNull() {
+        List<String> result = InitialConsiderationHelper.getSortedEJSitAloneReasons(null);
+
+        assertNotNull(result);
+        assertTrue(result.isEmpty());
+    }
+
+    @Test
+    void getSortedEJSitAloneReasons_sortsReasonsAlphabeticallyWithOtherLast() {
+        List<String> reasons = List.of("Reason C", "Other", "Reason A");
+
+        List<String> result = InitialConsiderationHelper.getSortedEJSitAloneReasons(reasons);
+
+        assertEquals(List.of("Reason A", "Reason C", "Other"), result);
+    }
+
+    @Test
+    void updateHearingWithJudgeOrMembersDetails_returnsEmptyStringWhenAnswersAreNull() {
+        CaseData caseDataWithJudgeOrMembers = new CaseData();
+        caseDataWithJudgeOrMembers.setEtICHearingListedAnswers(null);
+
+        String result = InitialConsiderationHelper.updateHearingWithJudgeOrMembersDetails(
+                caseDataWithJudgeOrMembers);
+
+        assertEquals("", result);
+    }
+
+    @Test
+    void updateHearingWithJudgeOrMembersDetails_returnsDetailsForFinalHearingWithJsa() {
+        EtICHearingListedAnswers answers = new EtICHearingListedAnswers();
+        answers.setEtInitialConsiderationListedHearingType("Final Hearing");
+        answers.setEtICIsHearingWithJudgeOrMembers("JSA");
+        answers.setEtICIsFinalHearingWithJudgeOrMembersJsaReason(List.of("Reason A", "Other"));
+        answers.setEtICJsaFinalHearingReasonOther("Custom Reason");
+
+        CaseData caseDataWithFinalHearingJsa = new CaseData();
+        caseDataWithFinalHearingJsa.setEtICHearingListedAnswers(answers);
+
+        String result = InitialConsiderationHelper.updateHearingWithJudgeOrMembersDetails(
+                caseDataWithFinalHearingJsa);
+
+        String expected = """
+
+        - Reason A
+
+        - Other
+        Details: Custom Reason
+            """;
+        assertEquals(expected, result);
+    }
 
     @Test
     void getDocumentRequest_EW_preliminaryHearing() throws JsonProcessingException {
@@ -38,7 +159,8 @@ class InitialConsiderationHelperTest {
                 + "\"issuesJurisdiction\":\"No\",\"issuesJurCodesGiveDetails\":null,\"canProceed\":\"Yes\","
                 + "\"hearingAlreadyListed\":\"No\",\"hearingListed\":null,\"hearingPostpone\":null,"
                 + "\"hearingExtend\":null,\"hearingConvertFinal\":null,\"hearingConvertF2f\":null,"
-                + "\"hearingOther\":null,\"hearingWithJudgeOrMembers\":null,\"hearingWithJudgeOrMembersReason\":null,"
+                + "\"hearingOther\":null,\"hearingWithJudgeOrMembers\":null,\"hearingWithJudgeOrMembersReason\":[\"\"],"
+                + "\"hearingWithJsa\":null,\"hearingWithMembersLabel\":null,\"hearingWithMembers\":null,"
                 + "\"hearingWithJudgeOrMembersFurtherDetails\":null,\"otherDirections\":null,"
                 + "\"hearingNotListed\":[\"List for preliminary hearing\"],\"cvpHearingType\":null,"
                 + "\"cvpFinalDetails\":null,\"cvpPreliminaryDetails\":null,\"cvpPreliminaryYesNo\":null,"
@@ -52,7 +174,11 @@ class InitialConsiderationHelperTest {
                 + "\"etICHearingOrderBUCompliance\":null,"
                 + "\"etICFinalHearingLength\":null,"
                 + "\"etICFinalHearingLengthType\":null,\"etICFinalHearingIsEJSitAlone\":null,"
-                + "\"etICFinalHearingIsEJSitAloneReason\":null,"
+                + "\"etICFinalHearingIsEJSitAloneReasonYes\":null,\"etICFinalHearingIsEJSitAloneReasonYesOther\":null,"
+                + "\"etICFinalHearingIsEJSitAloneReasonNo\":null,\"etICFinalHearingIsEJSitAloneReasonNoOther\":null,"
+                + "\"etICNoLFinalHearingIsEJSitAloneReasonsJsa\":null,\"etICNoLFinalHearingIsEJSitAloneReasonsJsaOther"
+                + "\":null,\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":[null],"
+                + "\"etICNoLFinalHearingIsEJSitAloneReasonMembersOther\":null,"
                 + "\"etICFinalHearingIsEJSitAloneFurtherDetails\":null,"
                 + "\"udlSitAlone\":null,\"udlReasons\":null,\"udlDisputeOnFacts\":null,"
                 + "\"udlLittleOrNoAgreement\":null,\"udlIssueOfLawArising\":null,\"udlViewsOfParties\":null,"
@@ -87,7 +213,8 @@ class InitialConsiderationHelperTest {
                 + "\"issuesJurisdiction\":\"No\",\"issuesJurCodesGiveDetails\":null,\"canProceed\":\"Yes\","
                 + "\"hearingAlreadyListed\":\"No\",\"hearingListed\":null,\"hearingPostpone\":null,"
                 + "\"hearingExtend\":null,\"hearingConvertFinal\":null,\"hearingConvertF2f\":null,"
-                + "\"hearingOther\":null,\"hearingWithJudgeOrMembers\":null,\"hearingWithJudgeOrMembersReason\":null,"
+                + "\"hearingOther\":null,\"hearingWithJudgeOrMembers\":null,\"hearingWithJudgeOrMembersReason\":[\"\"],"
+                + "\"hearingWithJsa\":null,\"hearingWithMembersLabel\":null,\"hearingWithMembers\":null,"
                 + "\"hearingWithJudgeOrMembersFurtherDetails\":null,\"otherDirections\":null,"
                 + "\"hearingNotListed\":[\"List for final hearing\"],\"cvpHearingType\":null,"
                 + "\"cvpFinalDetails\":null,\"cvpPreliminaryDetails\":null,\"cvpPreliminaryYesNo\":null,"
@@ -101,8 +228,12 @@ class InitialConsiderationHelperTest {
                 + "\"etICHearingOrderBUCompliance\":null,"
                 + "\"etICFinalHearingLength\":\"1\","
                 + "\"etICFinalHearingLengthType\":\"Hours\",\"etICFinalHearingIsEJSitAlone\":\"JSA\","
-                + "\"etICFinalHearingIsEJSitAloneReason\":\"Members experience is likely to add significant value to "
-                + "the process of adjudication\","
+                + "\"etICFinalHearingIsEJSitAloneReasonYes\":[],\"etICFinalHearingIsEJSitAloneReasonYesOther\":null,"
+                + "\"etICFinalHearingIsEJSitAloneReasonNo\":[],\"etICFinalHearingIsEJSitAloneReasonNoOther\":null,"
+                + "\"etICNoLFinalHearingIsEJSitAloneReasonsJsa\":[\"Members experience is likely to add significant"
+                + " value to the process of adjudication\"],\"etICNoLFinalHearingIsEJSitAloneReasonsJsaOther\":null,"
+                + "\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":[null],"
+                + "\"etICNoLFinalHearingIsEJSitAloneReasonMembersOther\":null,"
                 + "\"etICFinalHearingIsEJSitAloneFurtherDetails\":null,"
                 + "\"udlSitAlone\":null,\"udlReasons\":null,\"udlDisputeOnFacts\":null,"
                 + "\"udlLittleOrNoAgreement\":null,\"udlIssueOfLawArising\":null,\"udlViewsOfParties\":null,"
@@ -121,6 +252,50 @@ class InitialConsiderationHelperTest {
                 + "\"icCompletedBy\":\"A User\",\"icDateCompleted\":\"20 Nov 2024\"}}";
 
         assertEquals(expected, documentRequest);
+    }
+
+    @Test
+    void getSortedEJSitAloneReasons_returnsSortedListWhenOtherIsPresent() {
+        List<String> reasons = List.of("Reason A", "Other", "Reason B");
+
+        List<String> result = InitialConsiderationHelper.getSortedEJSitAloneReasons(reasons);
+
+        assertEquals(List.of("Reason A", "Reason B", "Other"), result);
+    }
+
+    @Test
+    void getSortedEJSitAloneReasons_returnsSortedListWhenOtherIsAbsent() {
+        List<String> reasons = List.of("Reason C", "Reason A", "Reason B");
+
+        List<String> result = InitialConsiderationHelper.getSortedEJSitAloneReasons(reasons);
+
+        assertEquals(List.of("Reason A", "Reason B", "Reason C"), result);
+    }
+
+    @Test
+    void getSortedEJSitAloneReasons_returnsNullWhenInputIsEmpty() {
+        List<String> reasons = Collections.emptyList();
+
+        List<String> result = InitialConsiderationHelper.getSortedEJSitAloneReasons(reasons);
+
+        assertNotNull(result);
+        assertEquals(0, result.size());
+    }
+
+    @Test
+    void getSortedEJSitAloneReasons_returnsNullWhenInputIsNull() {
+        List<String> result = InitialConsiderationHelper.getSortedEJSitAloneReasons(null);
+        assertNotNull(result);
+        assertEquals(0, result.size());
+    }
+
+    @Test
+    void getSortedEJSitAloneReasons_handlesCaseInsensitivityForOther() {
+        List<String> reasons = List.of("Reason A", "other", "Reason B");
+
+        List<String> result = InitialConsiderationHelper.getSortedEJSitAloneReasons(reasons);
+
+        assertEquals(List.of("Reason A", "Reason B", "other"), result);
     }
 
     public void setCaseDataValues(CaseData caseData) {
@@ -164,7 +339,8 @@ class InitialConsiderationHelperTest {
                 + "\"issuesJurisdiction\":\"No\",\"issuesJurCodesGiveDetails\":null,\"canProceed\":\"Yes\","
                 + "\"hearingAlreadyListed\":\"No\",\"hearingListed\":null,\"hearingPostpone\":null,"
                 + "\"hearingExtend\":null,\"hearingConvertFinal\":null,\"hearingConvertF2f\":null,"
-                + "\"hearingOther\":null,\"hearingWithJudgeOrMembers\":null,\"hearingWithJudgeOrMembersReason\":null,"
+                + "\"hearingOther\":null,\"hearingWithJudgeOrMembers\":null,\"hearingWithJudgeOrMembersReason\":[\"\"],"
+                + "\"hearingWithJsa\":null,\"hearingWithMembersLabel\":null,\"hearingWithMembers\":null,"
                 + "\"hearingWithJudgeOrMembersFurtherDetails\":null,\"otherDirections\":null,"
                 + "\"hearingNotListed\":[\"List for final hearing\"],\"cvpHearingType\":null,"
                 + "\"cvpFinalDetails\":null,\"cvpPreliminaryDetails\":null,\"cvpPreliminaryYesNo\":null,"
@@ -177,8 +353,13 @@ class InitialConsiderationHelperTest {
                 + "\"etICHearingOrderBUCompliance\":null,"
                 + "\"etICFinalHearingLength\":\"1\","
                 + "\"etICFinalHearingLengthType\":\"Hours\",\"etICFinalHearingIsEJSitAlone\":\"JSA\","
-                + "\"etICFinalHearingIsEJSitAloneReason\":\"Members experience is likely to add significant "
-                + "value to the process of adjudication\",\"etICFinalHearingIsEJSitAloneFurtherDetails\":"
+                + "\"etICFinalHearingIsEJSitAloneReasonYes\":[],\"etICFinalHearingIsEJSitAloneReasonYesOther\":null,"
+                + "\"etICFinalHearingIsEJSitAloneReasonNo\":[],\"etICFinalHearingIsEJSitAloneReasonNoOther\":null,"
+                + "\"etICNoLFinalHearingIsEJSitAloneReasonsJsa\":[\"Members experience is likely to add significant "
+                + "value to the process of adjudication\"],\"etICNoLFinalHearingIsEJSitAloneReasonsJsaOther"
+                + "\":null,\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":[null],"
+                + "\"etICNoLFinalHearingIsEJSitAloneReasonMembersOther\":null,"
+                + "\"etICFinalHearingIsEJSitAloneFurtherDetails\":"
                 + "\"Test SC - EJ Sit Alone Further Details\","
                 + "\"udlSitAlone\":null,\"udlReasons\":null,\"udlDisputeOnFacts\":null,"
                 + "\"udlLittleOrNoAgreement\":null,\"udlIssueOfLawArising\":null,\"udlViewsOfParties\":null,"
@@ -216,7 +397,8 @@ class InitialConsiderationHelperTest {
                 + "\"issuesJurisdiction\":\"No\",\"issuesJurCodesGiveDetails\":null,\"canProceed\":\"Yes\","
                 + "\"hearingAlreadyListed\":\"No\",\"hearingListed\":null,\"hearingPostpone\":null,"
                 + "\"hearingExtend\":null,\"hearingConvertFinal\":null,\"hearingConvertF2f\":null,"
-                + "\"hearingOther\":null,\"hearingWithJudgeOrMembers\":null,\"hearingWithJudgeOrMembersReason\":null,"
+                + "\"hearingOther\":null,\"hearingWithJudgeOrMembers\":null,\"hearingWithJudgeOrMembersReason\":[\"\"],"
+                + "\"hearingWithJsa\":null,\"hearingWithMembersLabel\":null,\"hearingWithMembers\":null,"
                 + "\"hearingWithJudgeOrMembersFurtherDetails\":null,\"otherDirections\":null,"
                 + "\"hearingNotListed\":[\"List for preliminary hearing\"],\"cvpHearingType\":null,"
                 + "\"cvpFinalDetails\":null,\"cvpPreliminaryDetails\":null,\"cvpPreliminaryYesNo\":null,"
@@ -230,7 +412,13 @@ class InitialConsiderationHelperTest {
                 + "\"etICHearingOrderBUCompliance\":null,"
                 + "\"etICFinalHearingLength\":null,"
                 + "\"etICFinalHearingLengthType\":null,\"etICFinalHearingIsEJSitAlone\":null,"
-                + "\"etICFinalHearingIsEJSitAloneReason\":null,\"etICFinalHearingIsEJSitAloneFurtherDetails\":"
+                + "\"etICFinalHearingIsEJSitAloneReasonYes\":null,\"etICFinalHearingIsEJSitAloneReasonYesOther\":null,"
+                + "\"etICFinalHearingIsEJSitAloneReasonNo\":null,\"etICFinalHearingIsEJSitAloneReasonNoOther\":null,"
+                + "\"etICNoLFinalHearingIsEJSitAloneReasonsJsa\":null,"
+                + "\"etICNoLFinalHearingIsEJSitAloneReasonsJsaOther\":null,"
+                + "\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":[null],"
+                + "\"etICNoLFinalHearingIsEJSitAloneReasonMembersOther\":null,"
+                + "\"etICFinalHearingIsEJSitAloneFurtherDetails\":"
                 + "null,\"udlSitAlone\":null,\"udlReasons\":null,\"udlDisputeOnFacts\":null,"
                 + "\"udlLittleOrNoAgreement\":null,\"udlIssueOfLawArising\":null,\"udlViewsOfParties\":null,"
                 + "\"udlNoViewsExpressedByParties\":null,\"udlConcurrentProceedings\":null,\"udlOther\":null,"
@@ -261,7 +449,8 @@ class InitialConsiderationHelperTest {
                 + "\"issuesJurisdiction\":null,\"issuesJurCodesGiveDetails\":null,\"canProceed\":null,"
                 + "\"hearingAlreadyListed\":null,\"hearingListed\":null,\"hearingPostpone\":null,"
                 + "\"hearingExtend\":null,\"hearingConvertFinal\":null,\"hearingConvertF2f\":null,"
-                + "\"hearingOther\":null,\"hearingWithJudgeOrMembers\":null,\"hearingWithJudgeOrMembersReason\":null,"
+                + "\"hearingOther\":null,\"hearingWithJudgeOrMembers\":null,\"hearingWithJudgeOrMembersReason\":[\"\"],"
+                + "\"hearingWithJsa\":null,\"hearingWithMembersLabel\":null,\"hearingWithMembers\":null,"
                 + "\"hearingWithJudgeOrMembersFurtherDetails\":null,\"otherDirections\":null,"
                 + "\"hearingNotListed\":null,\"cvpHearingType\":null,\"cvpFinalDetails\":null,"
                 + "\"cvpPreliminaryDetails\":null,\"cvpPreliminaryYesNo\":null,\"preliminaryHearingType\":null,"
@@ -272,7 +461,13 @@ class InitialConsiderationHelperTest {
                 + "\"etICTypeOfVideoHearingOrder\":null,\"etICTypeOfF2fHearingOrder\":null,"
                 + "\"etICHearingOrderBUCompliance\":null,"
                 + "\"etICFinalHearingLength\":null,\"etICFinalHearingLengthType\":null,"
-                + "\"etICFinalHearingIsEJSitAlone\":null,\"etICFinalHearingIsEJSitAloneReason\":null,"
+                + "\"etICFinalHearingIsEJSitAlone\":null,\"etICFinalHearingIsEJSitAloneReasonYes\":null,"
+                + "\"etICFinalHearingIsEJSitAloneReasonYesOther\":null,\"etICFinalHearingIsEJSitAloneReasonNo\":null,"
+                + "\"etICFinalHearingIsEJSitAloneReasonNoOther\":null,"
+                + "\"etICNoLFinalHearingIsEJSitAloneReasonsJsa\":null,"
+                + "\"etICNoLFinalHearingIsEJSitAloneReasonsJsaOther\":null,"
+                + "\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":[null],"
+                + "\"etICNoLFinalHearingIsEJSitAloneReasonMembersOther\":null,"
                 + "\"etICFinalHearingIsEJSitAloneFurtherDetails\":null,\"udlSitAlone\":null,\"udlReasons\":null,"
                 + "\"udlDisputeOnFacts\":null,\"udlLittleOrNoAgreement\":null,\"udlIssueOfLawArising\":null,"
                 + "\"udlViewsOfParties\":null,\"udlNoViewsExpressedByParties\":null,\"udlConcurrentProceedings\":null,"
@@ -309,8 +504,9 @@ class InitialConsiderationHelperTest {
         finalHearingUpdated.setEtICLengthOfFinalHearing("1");
         finalHearingUpdated.setFinalHearingLengthNumType("Hours");
         finalHearingUpdated.setEtICFinalHearingIsEJSitAlone("JSA");
-        finalHearingUpdated.setEtICFinalHearingIsEJSitAloneReason("Members experience is likely to add significant "
-                + "value to the process of adjudication");
+        finalHearingUpdated.setEtICNoLFinalHearingIsEJSitAloneReasonsJsa(
+                List.of("Members experience is likely to add significant "
+                + "value to the process of adjudication"));
         return finalHearingUpdated;
     }
 
@@ -327,7 +523,8 @@ class InitialConsiderationHelperTest {
                 + "\"issuesJurisdiction\":\"No\",\"issuesJurCodesGiveDetails\":null,\"canProceed\":\"Yes\","
                 + "\"hearingAlreadyListed\":\"No\",\"hearingListed\":null,\"hearingPostpone\":null,"
                 + "\"hearingExtend\":null,\"hearingConvertFinal\":null,\"hearingConvertF2f\":null,"
-                + "\"hearingOther\":null,\"hearingWithJudgeOrMembers\":null,\"hearingWithJudgeOrMembersReason\":null,"
+                + "\"hearingOther\":null,\"hearingWithJudgeOrMembers\":null,\"hearingWithJudgeOrMembersReason\":[\"\"],"
+                + "\"hearingWithJsa\":null,\"hearingWithMembersLabel\":null,\"hearingWithMembers\":null,"
                 + "\"hearingWithJudgeOrMembersFurtherDetails\":null,\"otherDirections\":null,"
                 + "\"hearingNotListed\":null,\"cvpHearingType\":null,"
                 + "\"cvpFinalDetails\":null,\"cvpPreliminaryDetails\":null,\"cvpPreliminaryYesNo\":null,"
@@ -341,7 +538,11 @@ class InitialConsiderationHelperTest {
                 + "\"etICHearingOrderBUCompliance\":null,"
                 + "\"etICFinalHearingLength\":null,"
                 + "\"etICFinalHearingLengthType\":null,\"etICFinalHearingIsEJSitAlone\":null,"
-                + "\"etICFinalHearingIsEJSitAloneReason\":null,"
+                + "\"etICFinalHearingIsEJSitAloneReasonYes\":null,\"etICFinalHearingIsEJSitAloneReasonYesOther\":null,"
+                + "\"etICFinalHearingIsEJSitAloneReasonNo\":null,\"etICFinalHearingIsEJSitAloneReasonNoOther\":null,"
+                + "\"etICNoLFinalHearingIsEJSitAloneReasonsJsa\":null,\"etICNoLFinalHearingIsEJSitAloneReasonsJsaOther"
+                + "\":null,\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":[null],"
+                + "\"etICNoLFinalHearingIsEJSitAloneReasonMembersOther\":null,"
                 + "\"etICFinalHearingIsEJSitAloneFurtherDetails\":null,"
                 + "\"udlSitAlone\":null,\"udlReasons\":null,\"udlDisputeOnFacts\":null,"
                 + "\"udlLittleOrNoAgreement\":null,\"udlIssueOfLawArising\":null,\"udlViewsOfParties\":null,"
@@ -377,7 +578,8 @@ class InitialConsiderationHelperTest {
                 + "\"issuesJurisdiction\":\"No\",\"issuesJurCodesGiveDetails\":null,\"canProceed\":\"Yes\","
                 + "\"hearingAlreadyListed\":\"No\",\"hearingListed\":null,\"hearingPostpone\":null,"
                 + "\"hearingExtend\":null,\"hearingConvertFinal\":null,\"hearingConvertF2f\":null,"
-                + "\"hearingOther\":null,\"hearingWithJudgeOrMembers\":null,\"hearingWithJudgeOrMembersReason\":null,"
+                + "\"hearingOther\":null,\"hearingWithJudgeOrMembers\":null,\"hearingWithJudgeOrMembersReason\":[\"\"],"
+                + "\"hearingWithJsa\":null,\"hearingWithMembersLabel\":null,\"hearingWithMembers\":null,"
                 + "\"hearingWithJudgeOrMembersFurtherDetails\":null,\"otherDirections\":null,"
                 + "\"hearingNotListed\":null,\"cvpHearingType\":null,"
                 + "\"cvpFinalDetails\":null,\"cvpPreliminaryDetails\":null,\"cvpPreliminaryYesNo\":null,"
@@ -391,7 +593,12 @@ class InitialConsiderationHelperTest {
                 + "\"etICHearingOrderBUCompliance\":null,"
                 + "\"etICFinalHearingLength\":null,"
                 + "\"etICFinalHearingLengthType\":null,\"etICFinalHearingIsEJSitAlone\":null,"
-                + "\"etICFinalHearingIsEJSitAloneReason\":null,"
+                + "\"etICFinalHearingIsEJSitAloneReasonYes\":null,\"etICFinalHearingIsEJSitAloneReasonYesOther\":null,"
+                + "\"etICFinalHearingIsEJSitAloneReasonNo\":null,\"etICFinalHearingIsEJSitAloneReasonNoOther\":null,"
+                + "\"etICNoLFinalHearingIsEJSitAloneReasonsJsa\":null,"
+                + "\"etICNoLFinalHearingIsEJSitAloneReasonsJsaOther"
+                + "\":null,\"etICNoLFinalHearingIsEJSitAloneReasonsMembers\":[null],"
+                + "\"etICNoLFinalHearingIsEJSitAloneReasonMembersOther\":null,"
                 + "\"etICFinalHearingIsEJSitAloneFurtherDetails\":null,"
                 + "\"udlSitAlone\":null,\"udlReasons\":null,\"udlDisputeOnFacts\":null,"
                 + "\"udlLittleOrNoAgreement\":null,\"udlIssueOfLawArising\":null,\"udlViewsOfParties\":null,"
@@ -412,4 +619,97 @@ class InitialConsiderationHelperTest {
 
         assertEquals(expected, documentRequest);
     }
+
+    @Test
+    void updateHearingWithJudgeOrMembersDetails_returnsEmptyString_whenAnswersAreNull() {
+        CaseData caseDataWithJsaOrMembers = new CaseData();
+        caseDataWithJsaOrMembers.setEtICHearingListedAnswers(null);
+        String result = InitialConsiderationHelper.updateHearingWithJudgeOrMembersDetails(caseDataWithJsaOrMembers);
+
+        assertEquals("", result);
+    }
+
+    @Test
+    void updateHearingWithJudgeOrMembersDetails_returnsEmptyString_whenHearingTypeIsNull() {
+        EtICHearingListedAnswers answers = new EtICHearingListedAnswers();
+        CaseData caseDataWithEmptyHearing = new CaseData();
+        caseDataWithEmptyHearing.setEtICHearingListedAnswers(answers);
+        String result = InitialConsiderationHelper.updateHearingWithJudgeOrMembersDetails(caseDataWithEmptyHearing);
+
+        assertEquals("", result);
+    }
+
+    @Test
+    void updateHearingWithJudgeOrMembersDetails_returnsJsaDetails_whenPreliminaryHearingAndJsa() {
+        EtICHearingListedAnswers answers = new EtICHearingListedAnswers();
+        answers.setEtInitialConsiderationListedHearingType("Preliminary Hearing(CM)");
+        answers.setEtICIsHearingWithJudgeOrMembers("JSA");
+        answers.setEtICIsHearingWithJsa("Other");
+        answers.setEtICJsaCmPreliminaryHearingReasonOther("Custom Reason");
+
+        CaseData caseDataWithPhcm = new CaseData();
+        caseDataWithPhcm.setEtICHearingListedAnswers(answers);
+        String result = InitialConsiderationHelper.updateHearingWithJudgeOrMembersDetails(caseDataWithPhcm);
+
+        assertEquals("JSA - Custom Reason", result);
+    }
+
+    @Test
+    void updateHearingWithJudgeOrMembersDetails_returnsWithMembersDetails_whenPreliminaryHearingAndWithMembers() {
+        EtICHearingListedAnswers answers = new EtICHearingListedAnswers();
+        answers.setEtInitialConsiderationListedHearingType("Preliminary Hearing(CM)");
+        answers.setEtICIsHearingWithJudgeOrMembers("With members");
+        answers.setEtICIsHearingWithMembers("Reason A");
+
+        CaseData caseDataWithCmph = new CaseData();
+        caseDataWithCmph.setEtICHearingListedAnswers(answers);
+        String result = InitialConsiderationHelper.updateHearingWithJudgeOrMembersDetails(caseDataWithCmph);
+
+        assertEquals("With members - Reason A", result);
+    }
+
+    @Test
+    void updateHearingWithJudgeOrMembersDetails_returnsFinalHearingDetails_whenFinalHearingAndJsa() {
+        EtICHearingListedAnswers answers = new EtICHearingListedAnswers();
+        answers.setEtInitialConsiderationListedHearingType("Final Hearing");
+        answers.setEtICIsHearingWithJudgeOrMembers("JSA");
+        answers.setEtICIsFinalHearingWithJudgeOrMembersJsaReason(List.of("Reason B", "Other"));
+        answers.setEtICJsaFinalHearingReasonOther("Other Reason");
+
+        CaseData caseDataWithFinalHearing = new CaseData();
+        caseDataWithFinalHearing.setEtICHearingListedAnswers(answers);
+
+        String result = InitialConsiderationHelper.updateHearingWithJudgeOrMembersDetails(caseDataWithFinalHearing);
+
+        String expected = """
+        
+        - Reason B
+        
+        - Other
+        Details: Other Reason
+            """;
+        assertEquals(expected, result);
+    }
+
+    @Test
+    void updateHearingWithJudgeOrMembersDetails_returnsDefaultDetails_whenOtherHearingType() {
+        EtICHearingListedAnswers answers = new EtICHearingListedAnswers();
+        answers.setEtInitialConsiderationListedHearingType("Other Hearing");
+        answers.setEtICIsFinalHearingWithJudgeOrMembersJsaReason(List.of("Default Normal Reason", "Other"));
+        answers.setEtICIsHearingWithJsaReasonOther("Other Default Reason");
+        answers.setEtICIsHearingWithJudgeOrMembers("JSA");
+
+        CaseData caseDataWithOtherHearing = new CaseData();
+        caseDataWithOtherHearing.setEtICHearingListedAnswers(answers);
+        String result = InitialConsiderationHelper.updateHearingWithJudgeOrMembersDetails(caseDataWithOtherHearing);
+        String expected = """
+        
+        - Default Normal Reason
+        
+        - Other
+        Details: Other Default Reason
+            """;
+        assertEquals(expected, result);
+    }
+
 }

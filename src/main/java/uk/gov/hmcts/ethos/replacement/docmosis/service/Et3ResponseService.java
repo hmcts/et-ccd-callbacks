@@ -17,6 +17,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.DocumentTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationAddress;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
+import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.SolicitorRole;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
@@ -122,16 +123,18 @@ public class Et3ResponseService {
                 .filter(r -> respondentSelected.equals(r.getValue().getRespondentName().trim()))
                 .findFirst();
         if (respondent.isPresent()) {
-            respondent.get().getValue().setEt3Form(uploadedDocument);
-            respondent.get().getValue().setResponseReceived(YES);
-            respondent.get().getValue().setResponseReceivedDate(LocalDate.now().toString());
-            if (YES.equals(respondent.get().getValue().getExtensionRequested())
-                    && YES.equals(respondent.get().getValue().getExtensionGranted())) {
-                respondent.get().getValue().setExtensionResubmitted(YES);
+            RespondentSumType respondentSumType = respondent.get().getValue();
+            respondentSumType.setEt3Form(uploadedDocument);
+            respondentSumType.setResponseReceived(YES);
+            respondentSumType.setResponseReceivedDate(LocalDate.now().toString());
+            respondentSumType.setResponseStatus(null);
+            if (YES.equals(respondentSumType.getExtensionRequested())
+                    && YES.equals(respondentSumType.getExtensionGranted())) {
+                respondentSumType.setExtensionResubmitted(YES);
             }
             for (RespondentSumTypeItem respondentSumTypeItem : caseData.getRespondentCollection()) {
                 if (respondentSelected.equals(respondentSumTypeItem.getValue().getRespondentName())) {
-                    respondentSumTypeItem.setValue(respondent.get().getValue());
+                    respondentSumTypeItem.setValue(respondentSumType);
                 }
             }
         }

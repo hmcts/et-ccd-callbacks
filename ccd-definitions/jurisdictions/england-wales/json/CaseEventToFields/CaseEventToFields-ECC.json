@@ -1,0 +1,22 @@
+[
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseEventID": "UPDATE_NOTIFICATION_RESPONSE",
+    "CaseFieldID": "sendNotificationCollection",
+    "DisplayContext": "COMPLEX",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "PageColumnNumber": 1
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseEventID": "SUBMIT_STORED_PSE_RESPONSE",
+    "CaseFieldID": "sendNotificationCollection",
+    "DisplayContext": "COMPLEX",
+    "PageID": 1,
+    "PageDisplayOrder": 1,
+    "PageFieldDisplayOrder": 1,
+    "PageColumnNumber": 1
+  }
+]

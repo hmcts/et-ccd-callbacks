@@ -15,6 +15,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DocumentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
 import java.time.LocalDate;
@@ -33,6 +34,10 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ACCEPTED_STATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ET3_RESPONSE_STATUS_ACCEPTED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ET3_RESPONSE_STATUS_NOT_ACCEPTED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ET3_RESPONSE_STATUS_NOT_RECEIVED;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ET3_RESPONSE_STATUS_REJECTED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.ALL_RESPONDENTS_INCOMPLETE_SECTIONS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.ET3_RESPONSE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.ET3_RESPONSE_DETAILS;
@@ -40,6 +45,7 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.NO_RESPONDENTS_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.addEt3DataToRespondent;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.findRepresentativeFromCaseData;
+import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et3ResponseHelper.generateEventHyperlinks;
 
 class Et3ResponseHelperTest {
 
@@ -303,6 +309,51 @@ class Et3ResponseHelperTest {
         );
     }
 
+    @ParameterizedTest
+    @MethodSource("createDynamicListSelectionWithResponseStatus")
+    void createDynamicListSelection_responseReceivedYes_statusBased(String responseStatus, boolean shouldAllowSubmit) {
+        RespondentSumType respondentSumType = caseData.getRespondentCollection().getFirst().getValue();
+        respondentSumType.setResponseContinue(YES);
+        respondentSumType.setResponseReceived(YES);
+        respondentSumType.setResponseStatus(responseStatus);
+
+        List<String> errors = Et3ResponseHelper.createDynamicListSelection(caseData);
+
+        if (shouldAllowSubmit) {
+            assertThat(errors).isEmpty();
+            assertThat(caseData.getEt3RepresentingRespondent().getFirst().getValue().getDynamicList().getListItems(),
+                    hasSize(1));
+        } else {
+            assertThat(errors, hasSize(1));
+            assertThat(errors.getFirst()).isEqualTo("There are no respondents that require an ET3");
+        }
+    }
+
+    private static Stream<Arguments> createDynamicListSelectionWithResponseStatus() {
+        return Stream.of(
+            Arguments.of(null, false),
+            Arguments.of("", false),
+            Arguments.of(ET3_RESPONSE_STATUS_ACCEPTED, false),
+            Arguments.of(ET3_RESPONSE_STATUS_NOT_ACCEPTED, true),
+            Arguments.of(ET3_RESPONSE_STATUS_NOT_RECEIVED, true),
+            Arguments.of(ET3_RESPONSE_STATUS_REJECTED, true)
+        );
+    }
+
+    @Test
+    void et3SubmitRespondents_allSectionsCompleted_butResponseReceivedAccepted_returnsError() {
+        RespondentSumType respondentSumType = caseData.getRespondentCollection().getFirst().getValue();
+        respondentSumType.setPersonalDetailsSection(YES);
+        respondentSumType.setClaimDetailsSection(YES);
+        respondentSumType.setEmploymentDetailsSection(YES);
+        respondentSumType.setResponseReceived(YES);
+        respondentSumType.setResponseStatus(ET3_RESPONSE_STATUS_ACCEPTED);
+
+        List<String> errors = Et3ResponseHelper.et3SubmitRespondents(caseData);
+
+        assertThat(errors, hasSize(1));
+    }
+
     @Test
     void setEt3NotificationAcceptedDates() {
         RespondentSumTypeItem respondentSumTypeItemResponseNotAccepted = caseData.getRespondentCollection().getFirst();
@@ -341,5 +392,46 @@ class Et3ResponseHelperTest {
         RespondentSumTypeItem respondentSumTypeItemValueNull = caseData.getRespondentCollection().getFirst();
         respondentSumTypeItemValueNull.setValue(null);
         assertDoesNotThrow(() -> Et3ResponseHelper.setEt3NotificationAcceptedDates(caseData));
+    }
+
+    @Test
+    void generateEventHyperlinks_noRespondents_throws() {
+        caseData.setRespondentCollection(null);
+        IllegalArgumentException exception = assertThrows(IllegalArgumentException.class,
+                () -> generateEventHyperlinks(caseData, "1234123412341234"));
+        assertThat(exception.getMessage()).isEqualTo(NO_RESPONDENTS_FOUND);
+    }
+
+    @Test
+    void generateEventHyperlinks_noEligibleRespondents_excludesSubmitButton() {
+        String ccdId = "1234123412341234";
+        String expected = ET3ResponseConstants.SECTION_COMPLETE_BODY.formatted(ccdId, ccdId, ccdId, ccdId, "");
+
+        String actual = generateEventHyperlinks(caseData, ccdId);
+
+        assertThat(actual).isEqualTo(expected);
+    }
+
+    @Test
+    void generateEventHyperlinks_eligibleRespondent_includesSubmitButton() {
+        String ccdId = "1234123412341234";
+        RespondentSumType respondent = caseData.getRespondentCollection().getFirst().getValue();
+        respondent.setPersonalDetailsSection(YES);
+        respondent.setEmploymentDetailsSection(YES);
+        respondent.setClaimDetailsSection(YES);
+        respondent.setResponseContinue(YES);
+        respondent.setResponseReceived(NO);
+
+        String expected = ET3ResponseConstants.SECTION_COMPLETE_BODY.formatted(
+                ccdId,
+                ccdId,
+                ccdId,
+                ccdId,
+                ET3ResponseConstants.SUBMIT_ET3_BUTTON.formatted(ccdId)
+        );
+
+        String actual = generateEventHyperlinks(caseData, ccdId);
+
+        assertThat(actual).isEqualTo(expected);
     }
 }

@@ -1,0 +1,44 @@
+[
+  {
+    "CaseTypeID": "ET_Admin",
+    "CaseFieldID": "name",
+    "Label": "Name",
+    "DisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseFieldID": "caseReferenceNumber",
+    "Label": "Case reference number",
+    "DisplayOrder": 1
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseFieldID": "caseNumber",
+    "Label": "Case number",
+    "DisplayOrder": 2
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseFieldID": "claimantOrRespondentName",
+    "Label": "Claimant or respondent name",
+    "DisplayOrder": 3
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseFieldID": "depositDue",
+    "Label": "Deposit due",
+    "DisplayOrder": 4
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseFieldID": "depositAmount",
+    "Label": "Deposit Amount",
+    "DisplayOrder": 5
+  },
+  {
+    "CaseTypeID": "Pre_Hearing_Deposit",
+    "CaseFieldID": "status",
+    "Label": "Deposit state",
+    "DisplayOrder": 6
+  }
+]

@@ -33,13 +33,13 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.RANGE_HEARING_DATE_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_HEARING_DATE_TYPE;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HearingConstants.FULL_PANEL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HearingConstants.SIT_ALONE;
 
 class MemberDaysReportTest {
     private List<SubmitEvent> submitEvents;
     private ListingDetails listingDetails;
     private MemberDaysReport memberDaysReport;
-    private static final String SIT_ALONE_PANEL = "Sit Alone";
-    private static final String FULL_PANEL = "Full Panel";
 
     @BeforeEach
     void setUp() {
@@ -155,7 +155,7 @@ class MemberDaysReportTest {
         caseData2.setEcmCaseType(SINGLE_CASE_TYPE);
         HearingType hearingType2 = new HearingType();
         hearingType2.setHearingNumber("53");
-        hearingType2.setHearingSitAlone(SIT_ALONE_PANEL);
+        hearingType2.setHearingSitAlone(SIT_ALONE);
         hearingType2.setHearingVenue(new DynamicFixedListType("Aberdeen"));
         hearingType2.setHearingEstLengthNum("3");
         hearingType2.setHearingEstLengthNumType("hours");
@@ -287,7 +287,7 @@ class MemberDaysReportTest {
     @Test
     void shouldReturnZeroCasesWhenForNoHearingsWithFullPanelHearing() {
         submitEvents.forEach(s -> s.getCaseData().getHearingCollection()
-            .forEach(h -> h.getValue().setHearingSitAlone(SIT_ALONE_PANEL)));
+            .forEach(h -> h.getValue().setHearingSitAlone(SIT_ALONE)));
         String expectedReportDateType = "Range";
         MemberDaysReportData resultListingData = memberDaysReport.runReport(listingDetails, submitEvents);
         long actualFullPanelHearingsCount  = resultListingData.getReportDetails()

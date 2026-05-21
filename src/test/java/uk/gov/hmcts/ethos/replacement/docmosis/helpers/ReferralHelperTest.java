@@ -347,7 +347,7 @@ class ReferralHelperTest {
         caseData.setUpdateIsUrgent("Yes");
         caseData.setUpdateReferralInstruction("Instruction");
         caseData.setUpdateReferralSubjectSpecify("Subject Specify");
-        ReferralHelper.updateReferral(caseData, "FullName", "None");
+        ReferralHelper.updateReferral(caseData, "FullName", "None", true);
         ReferralType referral = caseData.getReferralCollection().getFirst().getValue();
         UpdateReferralType updateReferralType = referral.getUpdateReferralCollection().getFirst().getValue();
         assertEquals("Judge", updateReferralType.getUpdateReferCaseTo());

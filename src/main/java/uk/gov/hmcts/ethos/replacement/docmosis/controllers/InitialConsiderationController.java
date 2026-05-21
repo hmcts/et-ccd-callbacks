@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,6 +16,7 @@ import uk.gov.hmcts.et.common.model.ccd.CCDCallbackResponse;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
+import uk.gov.hmcts.ethos.replacement.docmosis.helpers.HearingsHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.InitialConsiderationHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
@@ -101,7 +101,7 @@ public class InitialConsiderationController {
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         initialConsiderationService.processIcDocumentCollections(caseData);
-        initialConsiderationService.clearHiddenValue(caseData);
+
         caseData.setIcCompletedBy(reportDataService.getUserFullName(userToken));
         caseData.setIcDateCompleted(LocalDate.now().format(DateTimeFormatter.ofPattern(MONTH_STRING_DATE_FORMAT)));
         DocumentInfo documentInfo = initialConsiderationService.generateDocument(caseData, userToken,
@@ -113,12 +113,9 @@ public class InitialConsiderationController {
             caseFlagsService.setPrivateHearingFlag(caseData);
         }
 
-        if (CollectionUtils.isNotEmpty(caseData.getEtICHearingNotListedList())) {
-            initialConsiderationService.clearIcHearingNotListedOldValues(caseData);
-        }
-
         setDocumentNumbers(caseData);
         caseManagementForCaseWorkerService.setNextListedDate(caseData);
+
         return getCallbackRespEntityNoErrors(caseData);
     }
 
@@ -139,26 +136,40 @@ public class InitialConsiderationController {
         }
 
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
+        initialConsiderationService.clearOldValues(caseData);
 
-        caseData.setEtInitialConsiderationRespondent(
-                initialConsiderationService.getRespondentName(caseData.getRespondentCollection()));
-        caseData.setEtInitialConsiderationHearing(
-            initialConsiderationService.getHearingDetails(caseData.getHearingCollection()));
-        caseData.setEtIcHearingPanelPreference(
-                initialConsiderationService.getClaimantHearingPanelPreference(caseData.getClaimantHearingPreference()));
-        String icRespondentHearingPanelPreference = initialConsiderationService.getIcRespondentHearingPanelPreference(
-                caseData.getRespondentCollection());
-        caseData.setIcRespondentHearingPanelPreference(icRespondentHearingPanelPreference);
+        // Sets the document links to the initial consideration support documents details such as ET1, ET3, ect
+        initialConsiderationService.initialiseInitialConsideration(ccdRequest.getCaseDetails());
 
+        // Sets the respondents details(respondent ET1 and ET3 names in a concatenated string format that forms
+        // an HTML table markup and renders as table in ExUI
+        caseData.setEtInitialConsiderationRespondent(initialConsiderationService.setRespondentDetails(caseData));
+
+        //If there is a hearing with future and earliest date, and it that hearing is of a listed status,
+        // set hearing details
+        HearingsHelper.setEtInitialConsiderationListedHearingType(caseData);
+
+        caseData.setEtInitialConsiderationHearing(initialConsiderationService.getHearingDetails(
+                    caseData.getHearingCollection(), ccdRequest.getCaseDetails().getCaseTypeId()));
+
+        //Parties' panel preference HTML table markup
+        caseData.setEtIcPartiesHearingPanelPreference(
+                initialConsiderationService.setPartiesHearingPanelPreferenceDetails(caseData));
+
+        //Parties' Hearing Format HTML table markup
+        caseData.setEtIcPartiesHearingFormat(initialConsiderationService.setPartiesHearingFormatDetails(
+                caseData, ccdRequest.getCaseDetails().getCaseTypeId()));
+
+        //Jurisdiction Codes section HTML table markup
         String caseTypeId = ccdRequest.getCaseDetails().getCaseTypeId();
-        caseData.setEtInitialConsiderationJurisdictionCodes(
-                initialConsiderationService.generateJurisdictionCodesHtml(
+        caseData.setEtInitialConsiderationJurisdictionCodes(initialConsiderationService.generateJurisdictionCodesHtml(
                         caseData.getJurCodesCollection(), caseTypeId));
-        initialConsiderationService.setIsHearingAlreadyListed(caseData, caseTypeId);
 
-        if (CollectionUtils.isNotEmpty(caseData.getEtICHearingNotListedList())) {
-            initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData, caseTypeId);
-        }
+        initialConsiderationService.mapOldIcHearingNotListedOptionsToNew(caseData, caseTypeId);
+
+        initialConsiderationService.setEt1VettingAndEt3ProcessingDetails(caseData, caseTypeId);
+
+        initialConsiderationService.setHearingRegionAndVenue(caseData);
 
         return getCallbackRespEntityNoErrors(caseData);
     }

@@ -82,9 +82,8 @@ public final class RolesConstants {
     public static final String ROLE_ASSIGNMENT_ADMIN_EMAIL = "role.assignment.admin@gmail.com";
     public static final String ET_CASEADMIN_EMAIL = "et.caseadmin@hmcts.net";
     public static final String WA_SYSTEM_USER_EMAIL = "wa-system-user@fake.hmcts.net";
-    public static final String ET_DEV_EMAIL = "et.dev@hmcts.net";
 
-    public static final String[] ECM_CASEWORKER_ROLES = {
+    static final String[] ECM_CASEWORKER_ROLES = {
             CASEWORKER_EMPLOYMENT.concat("-bristol"), CASEWORKER_EMPLOYMENT.concat("-leeds"),
             CASEWORKER_EMPLOYMENT.concat("-londoncentral"), CASEWORKER_EMPLOYMENT.concat("-londoneast"),
             CASEWORKER_EMPLOYMENT.concat("-londonsouth"), CASEWORKER_EMPLOYMENT.concat("-manchester"),
@@ -92,7 +91,7 @@ public final class RolesConstants {
             CASEWORKER_EMPLOYMENT.concat("-newcastle"), CASEWORKER_EMPLOYMENT.concat("-wales"),
             CASEWORKER_EMPLOYMENT.concat("-watford")
     };
-    public static final String[] ECM_JUDGE_ROLES = {
+    static final String[] ECM_JUDGE_ROLES = {
             CASEWORKER_EMPLOYMENT_ETJUDGE.concat("-bristol"), CASEWORKER_EMPLOYMENT_ETJUDGE.concat("-leeds"),
             CASEWORKER_EMPLOYMENT_ETJUDGE.concat("-londoncentral"), CASEWORKER_EMPLOYMENT_ETJUDGE.concat("-londoneast"),
             CASEWORKER_EMPLOYMENT_ETJUDGE.concat("-londonsouth"), CASEWORKER_EMPLOYMENT_ETJUDGE.concat("-manchester"),
@@ -102,11 +101,14 @@ public final class RolesConstants {
     };
 
     //Paths to definition files
-    public static final String ENGLANGWALES_CONFIG_FILE = "/definitions/xlsx/et-englandwales-ccd-config-cftlib.xlsx";
-    public static final String SCOTLAND_CONFIG_FILE = "/definitions/xlsx/et-scotland-ccd-config-cftlib.xlsx";
-    public static final String ADMIN_CONFIG_FILE = "/definitions/xlsx/et-admin-ccd-config-cftlib.xlsx";
+    public static final String ENGLANGWALES_CONFIG_FILE =
+            "./ccd-definitions/jurisdictions/england-wales/xlsx/et-englandwales-ccd-config-cftlib.xlsx";
+    public static final String SCOTLAND_CONFIG_FILE =
+            "./ccd-definitions/jurisdictions/scotland/xlsx/et-scotland-ccd-config-cftlib.xlsx";
+    public static final String ADMIN_CONFIG_FILE =
+            "./ccd-definitions/jurisdictions/admin/xlsx/et-admin-ccd-config-cftlib.xlsx";
 
-    public static final String[] CASEWORKER_ROLES = {CASEWORKER_ET_PCQEXTRACTOR, CASEWORKER_CAA,
+    static final String[] CASEWORKER_ROLES = {CASEWORKER_ET_PCQEXTRACTOR, CASEWORKER_CAA,
         CASEWORKER_EMPLOYMENT, CASEWORKER_EMPLOYMENT_API, CASEWORKER_EMPLOYMENT_ENGLANDWALES,
         CASEWORKER_EMPLOYMENT_SCOTLAND, CASEWORKER_EMPLOYMENT_ETJUDGE, CASEWORKER_EMPLOYMENT_ETJUDGE_ENGLANDWALES,
         CASEWORKER_EMPLOYMENT_ETJUDGE_SCOTLAND, CASEWORKER_EMPLOYMENT_LEGALREP_SOLICITOR, CITIZEN, ET_ACAS_API,

@@ -1,0 +1,81 @@
+[
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseEventID": "bundlesRespondentPrepareDoc",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[SOLICITORA]",
+          "[SOLICITORB]",
+          "[SOLICITORC]",
+          "[SOLICITORD]",
+          "[SOLICITORE]",
+          "[SOLICITORF]",
+          "[SOLICITORG]",
+          "[SOLICITORH]",
+          "[SOLICITORI]",
+          "[SOLICITORJ]",
+          "caseworker-employment-api"
+        ],
+        "CRUD": "CRUD"
+      },
+      {
+        "UserRoles": [
+          "[CLAIMANTSOLICITOR]"
+        ],
+        "CRUD": "D"
+      },
+      {
+        "UserRoles": [
+          "et-acas-api"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseEventID": "SUBMIT_CLAIMANT_BUNDLES",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "[CREATOR]",
+          "caseworker-employment-api"
+        ],
+        "CRUD": "CRUD"
+      }
+    ]
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseEventID": "removeHearingBundles",
+    "UserRole": "caseworker-employment-api",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseEventID": "removeHearingBundles",
+    "UserRole": "caseworker-employment-scotland",
+    "CRUD": "CRUD"
+  },
+  {
+    "CaseTypeId": "ET_Scotland",
+    "CaseEventID": "uploadHearingDocuments",
+    "AccessControl": [
+      {
+        "UserRoles": [
+          "caseworker-employment-scotland",
+          "caseworker-employment-etjudge-scotland",
+          "caseworker-employment-api"
+        ],
+        "CRUD": "CRUD"
+      },
+      {
+        "UserRoles": [
+          "caseworker-employment-etjudge"
+        ],
+        "CRUD": "R"
+      }
+    ]
+  }
+]

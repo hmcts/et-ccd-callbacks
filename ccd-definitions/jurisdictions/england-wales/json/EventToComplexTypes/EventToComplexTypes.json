@@ -1698,7 +1698,7 @@
     "ID": "CreateDraftCase",
     "CaseEventID": "INITIATE_CASE_DRAFT",
     "CaseFieldID": "claimantTaskListChecks",
-    "ListElementCode": "employmentAndRespondentCheck",
+    "ListElementCode": "groupClaimsCheck",
     "EventElementLabel": "Have you completed this section?",
     "FieldDisplayOrder": 2,
     "DisplayContext": "OPTIONAL"
@@ -1707,9 +1707,18 @@
     "ID": "CreateDraftCase",
     "CaseEventID": "INITIATE_CASE_DRAFT",
     "CaseFieldID": "claimantTaskListChecks",
-    "ListElementCode": "claimDetailsCheck",
+    "ListElementCode": "employmentAndRespondentCheck",
     "EventElementLabel": "Have you completed this section?",
     "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "CreateDraftCase",
+    "CaseEventID": "INITIATE_CASE_DRAFT",
+    "CaseFieldID": "claimantTaskListChecks",
+    "ListElementCode": "claimDetailsCheck",
+    "EventElementLabel": "Have you completed this section?",
+    "FieldDisplayOrder": 4,
     "DisplayContext": "OPTIONAL"
   },
   {
@@ -2712,7 +2721,7 @@
     "ID": "UpdateCase",
     "CaseEventID": "UPDATE_CASE_DRAFT",
     "CaseFieldID": "claimantTaskListChecks",
-    "ListElementCode": "employmentAndRespondentCheck",
+    "ListElementCode": "groupClaimsCheck",
     "EventElementLabel": "Have you completed this section?",
     "FieldDisplayOrder": 2,
     "DisplayContext": "OPTIONAL"
@@ -2721,9 +2730,18 @@
     "ID": "UpdateCase",
     "CaseEventID": "UPDATE_CASE_DRAFT",
     "CaseFieldID": "claimantTaskListChecks",
-    "ListElementCode": "claimDetailsCheck",
+    "ListElementCode": "employmentAndRespondentCheck",
     "EventElementLabel": "Have you completed this section?",
     "FieldDisplayOrder": 3,
+    "DisplayContext": "OPTIONAL"
+  },
+  {
+    "ID": "UpdateCase",
+    "CaseEventID": "UPDATE_CASE_DRAFT",
+    "CaseFieldID": "claimantTaskListChecks",
+    "ListElementCode": "claimDetailsCheck",
+    "EventElementLabel": "Have you completed this section?",
+    "FieldDisplayOrder": 4,
     "DisplayContext": "OPTIONAL"
   },
   {

@@ -18,6 +18,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.ClaimantWorkAddressType;
 import uk.gov.hmcts.et.common.model.ccd.types.CreateRespondentType;
 import uk.gov.hmcts.et.common.model.ccd.types.NewEmploymentType;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.et.common.model.ccd.types.multiples.AdditionalClaimant;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 
@@ -227,6 +228,7 @@ public final class Et1ReppedHelper {
      */
     public static void setEt1SubmitData(CaseData caseData) {
         addClaimantInformation(caseData);
+        addGroupClaimInformation(caseData);
         addRespondentInformation(caseData);
         addClaimDetails(caseData);
     }
@@ -517,6 +519,60 @@ public final class Et1ReppedHelper {
     }
 
     /**
+     * Maps and normalizes group-claim fields before ET1 submission.
+     *
+     * @param caseData the case data containing additional claimant information
+     */
+    private static void addGroupClaimInformation(CaseData caseData) {
+        List<GenericTypeItem<AdditionalClaimant>> additionalClaimants = addAdditionalClaimants(caseData);
+        if (CollectionUtils.isEmpty(additionalClaimants)) {
+            caseData.setAdditionalClaimants(null);
+            return;
+        }
+        caseData.setAdditionalClaimants(additionalClaimants);
+        caseData.setAddClaimantMethod(StringUtils.trimToNull(caseData.getAddClaimantMethod()));
+    }
+
+    /**
+     * Creates a mapped copy of the additional claimant collection.
+     *
+     * @param caseData the case data containing additional claimants
+     * @return a list of mapped additional claimant items, or an empty list when none exist
+     */
+    private static List<GenericTypeItem<AdditionalClaimant>> addAdditionalClaimants(CaseData caseData) {
+        if (CollectionUtils.isEmpty(caseData.getAdditionalClaimants())) {
+            return new ArrayList<>();
+        }
+        return caseData.getAdditionalClaimants().stream()
+                .map(Et1ReppedHelper::getAdditionalClaimantTypeItem)
+                .toList();
+    }
+
+    /**
+     * Copies an additional claimant item into a new generic item, preserving its id where present.
+     *
+     * @param additionalClaimantItem the claimant item to copy
+     * @return a new claimant item with copied values and a valid id
+     */
+    private static GenericTypeItem<AdditionalClaimant> getAdditionalClaimantTypeItem(
+            GenericTypeItem<AdditionalClaimant> additionalClaimantItem) {
+        AdditionalClaimant additionalClaimant = additionalClaimantItem.getValue();
+        AdditionalClaimant additionalClaimantCopy = AdditionalClaimant.builder()
+                .title(additionalClaimant.getTitle())
+                .firstName(additionalClaimant.getFirstName())
+                .lastName(additionalClaimant.getLastName())
+                .email(additionalClaimant.getEmail())
+                .dob(additionalClaimant.getDob())
+                .address(additionalClaimant.getAddress())
+                .build();
+
+        String itemId = isNullOrEmpty(additionalClaimantItem.getId())
+                ? String.valueOf(UUID.randomUUID())
+                : additionalClaimantItem.getId();
+        return GenericTypeItem.from(itemId, additionalClaimantCopy);
+    }
+
+    /**
      * Clears the ET1 Repped creation fields.
      * @param caseData the case data
      */
@@ -599,6 +655,8 @@ public final class Et1ReppedHelper {
         caseData.setTribunalRecommendationDetails(null);
         caseData.setLinkedCasesYesNo(null);
         caseData.setLinkedCasesDetails(null);
+        caseData.setAdditionalClaimants(null);
+        caseData.setAddClaimantMethod(null);
         caseData.setAddAdditionalRespondent(null);
     }
 

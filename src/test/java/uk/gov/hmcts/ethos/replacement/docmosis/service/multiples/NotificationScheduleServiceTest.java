@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 import uk.gov.hmcts.ecm.common.model.schedule.NotificationSchedulePayloadEvent;
@@ -22,7 +22,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_BULK_C
 
 @ExtendWith(SpringExtension.class)
 class NotificationScheduleServiceTest {
-    @MockBean
+    @MockitoBean
     SingleCasesReadingService singleCasesReadingService;
 
     private String userToken;

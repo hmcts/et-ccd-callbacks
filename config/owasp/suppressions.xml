@@ -6,6 +6,13 @@
         <packageUrl regex="true">^pkg:maven/com\.microsoft\.azure/adal4j@.*$</packageUrl>
         <cve>CVE-2021-42306</cve>
     </suppress>
+    <suppress>
+   <notes><![CDATA[
+   file name: azure-annotations-1.10.0.jar
+   ]]></notes>
+   <packageUrl regex="true">^pkg:maven/com\.microsoft\.azure/azure\-annotations@.*$</packageUrl>
+   <cpe>cpe:/a:microsoft:azure_sdk_for_java</cpe>
+    </suppress>
     <suppress until="2025-10-07Z">
         <cve>CVE-2023-36052</cve>
     </suppress>
@@ -70,5 +77,8 @@
     </suppress>
     <suppress>
        <cve>CVE-2026-23907</cve>
+    </suppress>
+    <suppress>
+       <cve>CVE-2026-33929</cve>
     </suppress>
 </suppressions>

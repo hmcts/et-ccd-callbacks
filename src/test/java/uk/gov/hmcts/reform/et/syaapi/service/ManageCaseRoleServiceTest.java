@@ -77,8 +77,10 @@ import static uk.gov.hmcts.reform.et.syaapi.enums.CaseEvent.REMOVE_OWN_REP_AS_RE
 import static uk.gov.hmcts.reform.et.syaapi.enums.CaseEvent.UPDATE_CASE_SUBMITTED;
 import static uk.gov.hmcts.reform.et.syaapi.enums.CaseEvent.UPDATE_ET3_FORM;
 import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.DUMMY_AUTHORISATION_TOKEN;
+import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.TEST_APPLICATION_NAME;
 import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.TEST_CASE_ID_LONG;
 import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.TEST_CASE_ID_STRING;
+import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.TEST_ETHOS_CASE_REFERENCE;
 import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.TEST_SERVICE_AUTH_TOKEN;
 import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.YES;
 
@@ -458,6 +460,38 @@ class ManageCaseRoleServiceTest {
                                                                      TEST_SERVICE_AUTH_TOKEN).getCaseTypeId())
             .isEqualTo(TestConstants.TEST_CASE_TYPE_ID_ENGLAND_WALES);
 
+    }
+
+    @Test
+    void theFindCaseForRoleModificationForClaimantSearch() throws IOException {
+        FindCaseForRoleModificationRequest findCaseForRoleModificationRequest =
+            FindCaseForRoleModificationRequest.builder()
+                .caseSubmissionReference(CASE_SUBMISSION_REFERENCE)
+                .ethosCaseReference(TEST_ETHOS_CASE_REFERENCE)
+                .claimantFirstNames(CLAIMANT_FIRST_NAMES)
+                .claimantLastName(CLAIMANT_LAST_NAME)
+                .applicationName(TEST_APPLICATION_NAME)
+                .build();
+        String elasticSearchQuery = ElasticSearchQueryBuilder.buildByFindCaseForRoleModificationRequestClaimant(
+            findCaseForRoleModificationRequest
+        );
+        when(adminUserService.getAdminUserToken()).thenReturn(TEST_SERVICE_AUTH_TOKEN);
+        when(authTokenGenerator.generate()).thenReturn(TEST_SERVICE_AUTH_TOKEN);
+        when(ccdApi.searchCases(TEST_SERVICE_AUTH_TOKEN,
+                                TEST_SERVICE_AUTH_TOKEN,
+                                TestConstants.TEST_CASE_TYPE_ID_ENGLAND_WALES,
+                                elasticSearchQuery))
+            .thenReturn(SearchResult.builder().cases(List.of(CaseDetails.builder()
+                .caseTypeId(TestConstants.TEST_CASE_TYPE_ID_ENGLAND_WALES)
+                .id(Long.parseLong(CASE_SUBMISSION_REFERENCE))
+                .state(TestConstants.TEST_CASE_STATE_ACCEPTED)
+                .build())).total(1).build());
+
+        CaseDetails actual = manageCaseRoleService.findCaseForRoleModification(findCaseForRoleModificationRequest,
+                                                                               TEST_SERVICE_AUTH_TOKEN);
+
+        assertThat(actual).isNotNull();
+        assertThat(actual.getId().toString()).isEqualTo(CASE_SUBMISSION_REFERENCE);
     }
 
     @Test
@@ -1277,5 +1311,101 @@ class ManageCaseRoleServiceTest {
         assertThat(response).isNotNull();
         assertThat(response.getStatus()).isEqualTo(CaseAssignmentResponse.AssignmentStatus.ASSIGNED);
         assertThat(response.getCaseDetails()).isNotNull();
+    }
+
+    @Test
+    void assignCreatorRoleShouldReturnAlreadyAssignedWhenCreatorAlreadyExists() {
+        ReflectionTestUtils.setField(
+            manageCaseRoleService,
+            CCD_API_URL_PARAMETER_NAME,
+            CCD_API_URL_PARAMETER_TEST_VALUE
+        );
+        ModifyCaseUserRolesRequest request = getModifyCaseUserRolesRequestValidCreator();
+        CaseDetails caseDetails = caseTestData.getCaseDetailsWithCaseData();
+
+        when(adminUserService.getAdminUserToken()).thenReturn(DUMMY_AUTHORISATION_TOKEN);
+        when(authTokenGenerator.generate()).thenReturn(TEST_SERVICE_AUTH_TOKEN);
+        when(ccdApi.getCase(DUMMY_AUTHORISATION_TOKEN, TEST_SERVICE_AUTH_TOKEN, CASE_ID)).thenReturn(caseDetails);
+        when(restTemplate.exchange(anyString(),
+                                   eq(HttpMethod.GET),
+                                   any(HttpEntity.class),
+                                   eq(CaseUserAssignmentData.class)))
+            .thenReturn(new ResponseEntity<>(
+                CaseUserAssignmentData.builder()
+                    .caseUserAssignments(List.of(CaseUserAssignment.builder()
+                        .userId(USER_ID)
+                        .caseRole(CASE_USER_ROLE_CREATOR)
+                        .build()))
+                    .build(),
+                HttpStatus.OK
+            ));
+
+        CaseAssignmentResponse response = manageCaseRoleService.assignCreatorRole(DUMMY_AUTHORISATION_TOKEN, request);
+
+        assertThat(response.getStatus()).isEqualTo(CaseAssignmentResponse.AssignmentStatus.ALREADY_ASSIGNED);
+        assertThat(response.getCaseDetails()).hasSize(1);
+    }
+
+    @Test
+    void assignCreatorRoleShouldAssignAndPersistClaimantData() throws IOException {
+        ReflectionTestUtils.setField(
+            manageCaseRoleService,
+            CCD_API_URL_PARAMETER_NAME,
+            CCD_API_URL_PARAMETER_TEST_VALUE
+        );
+        ModifyCaseUserRolesRequest request = getModifyCaseUserRolesRequestValidCreator();
+        CaseDetails caseDetails = caseTestData.getCaseDetailsWithCaseData();
+        StartEventResponse startEventResponse = StartEventResponse.builder()
+            .caseDetails(caseDetails)
+            .eventId(UPDATE_CASE_SUBMITTED.toString())
+            .token(DUMMY_AUTHORISATION_TOKEN)
+            .build();
+
+        when(adminUserService.getAdminUserToken()).thenReturn(DUMMY_AUTHORISATION_TOKEN);
+        when(authTokenGenerator.generate()).thenReturn(TEST_SERVICE_AUTH_TOKEN);
+        when(idamClient.getUserInfo(DUMMY_AUTHORISATION_TOKEN))
+            .thenReturn(UserInfo.builder().uid(USER_ID).sub("test@email.com").build());
+        when(ccdApi.getCase(DUMMY_AUTHORISATION_TOKEN, TEST_SERVICE_AUTH_TOKEN, CASE_ID)).thenReturn(caseDetails);
+        when(restTemplate.exchange(anyString(),
+                                   eq(HttpMethod.GET),
+                                   any(HttpEntity.class),
+                                   eq(CaseUserAssignmentData.class)))
+            .thenReturn(new ResponseEntity<>(
+                CaseUserAssignmentData.builder().caseUserAssignments(List.of()).build(),
+                HttpStatus.OK
+            ));
+        when(ccdApi.startEventForCaseWorker(
+            eq(DUMMY_AUTHORISATION_TOKEN),
+            eq(TEST_SERVICE_AUTH_TOKEN),
+            eq(USER_ID),
+            eq(EMPLOYMENT),
+            eq(caseDetails.getCaseTypeId()),
+            eq(CASE_ID),
+            eq(UPDATE_CASE_SUBMITTED.toString())
+        )).thenReturn(startEventResponse);
+        when(restTemplate.exchange(eq(CCD_API_URL_PARAMETER_TEST_VALUE + ManageCaseRoleConstants.CASE_USERS_API_URL),
+                                   eq(HttpMethod.POST),
+                                   any(HttpEntity.class),
+                                   eq(CaseAssignmentUserRolesResponse.class)))
+            .thenReturn(new ResponseEntity<>(HttpStatus.OK));
+        when(caseDetailsConverter.caseDataContent(eq(startEventResponse), any(CaseData.class))).thenReturn(null);
+        when(ccdApi.submitEventForCaseWorker(
+            eq(DUMMY_AUTHORISATION_TOKEN),
+            eq(TEST_SERVICE_AUTH_TOKEN),
+            eq(USER_ID),
+            eq(EMPLOYMENT),
+            eq(caseDetails.getCaseTypeId()),
+            eq(caseDetails.getId().toString()),
+            eq(true),
+            eq(null)
+        )).thenReturn(caseDetails);
+
+        CaseAssignmentResponse response = manageCaseRoleService.assignCreatorRole(DUMMY_AUTHORISATION_TOKEN, request);
+
+        assertThat(response.getStatus()).isEqualTo(CaseAssignmentResponse.AssignmentStatus.ASSIGNED);
+        assertThat(response.getCaseDetails()).hasSize(1);
+        CaseData updatedCaseData = EmployeeObjectMapper.convertCaseDataMapToCaseDataObject(caseDetails.getData());
+        assertThat(updatedCaseData.getClaimantId()).isEqualTo(USER_ID);
+        assertThat(updatedCaseData.getClaimantType().getClaimantEmailAddress()).isEqualTo("test@email.com");
     }
 }

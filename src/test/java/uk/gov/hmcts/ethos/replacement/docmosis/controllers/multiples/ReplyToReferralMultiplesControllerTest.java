@@ -5,8 +5,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.ecm.common.idam.models.UserDetails;
@@ -61,17 +61,17 @@ class ReplyToReferralMultiplesControllerTest extends BaseControllerTest {
     private static final String SUBMITTED_REFERRAL_URL = "/multiples/replyReferral/completeReplyToReferral";
     private static final String VALIDATE_EMAIL_URL = "/multiples/replyReferral/validateReplyToEmail";
 
-    @MockBean
+    @MockitoBean
     private UserIdamService userIdamService;
-    @MockBean
+    @MockitoBean
     private CaseLookupService caseLookupService;
-    @MockBean
+    @MockitoBean
     private ReferralService referralService;
-    @MockBean
+    @MockitoBean
     private DocumentManagementService documentManagementService;
-    @MockBean
+    @MockitoBean
     private EmailService emailService;
-    @MockBean
+    @MockitoBean
     private FeatureToggleService featureToggleService;
     @Autowired
     private MockMvc mockMvc;

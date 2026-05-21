@@ -3,6 +3,7 @@ package uk.gov.hmcts.reform.et.syaapi.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.ObjectUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -25,12 +26,16 @@ import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignmentData;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.ClaimantType;
 import uk.gov.hmcts.reform.authorisation.generators.AuthTokenGenerator;
 import uk.gov.hmcts.reform.ccd.client.CoreCaseDataApi;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDataContent;
 import uk.gov.hmcts.reform.ccd.client.model.CaseDetails;
+import uk.gov.hmcts.reform.ccd.client.model.SearchResult;
 import uk.gov.hmcts.reform.ccd.client.model.StartEventResponse;
 import uk.gov.hmcts.reform.et.syaapi.constants.ManageCaseRoleConstants;
+import uk.gov.hmcts.reform.et.syaapi.enums.CaseEvent;
+import uk.gov.hmcts.reform.et.syaapi.exception.CaseUserRoleNotFoundException;
 import uk.gov.hmcts.reform.et.syaapi.exception.ManageCaseRoleException;
 import uk.gov.hmcts.reform.et.syaapi.exception.ProfessionalUserException;
 import uk.gov.hmcts.reform.et.syaapi.helper.CaseDetailsConverter;
@@ -38,6 +43,7 @@ import uk.gov.hmcts.reform.et.syaapi.helper.EmployeeObjectMapper;
 import uk.gov.hmcts.reform.et.syaapi.models.CaseAssignmentResponse;
 import uk.gov.hmcts.reform.et.syaapi.models.FindCaseForRoleModificationRequest;
 import uk.gov.hmcts.reform.et.syaapi.search.ElasticSearchQueryBuilder;
+import uk.gov.hmcts.reform.et.syaapi.service.utils.ClaimantUtil;
 import uk.gov.hmcts.reform.et.syaapi.service.utils.DocumentUtil;
 import uk.gov.hmcts.reform.et.syaapi.service.utils.ManageCaseRoleServiceUtil;
 import uk.gov.hmcts.reform.et.syaapi.service.utils.RemoteServiceUtil;
@@ -49,11 +55,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import static uk.gov.hmcts.ecm.common.client.CcdClient.EXPERIMENTAL;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.EMPLOYMENT;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.ENGLAND_CASE_TYPE;
+import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.ET_SYA_FRONTEND;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.JURISDICTION_ID;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.NO;
 import static uk.gov.hmcts.reform.et.syaapi.constants.EtSyaConstants.SCOTLAND_CASE_TYPE;
@@ -115,36 +123,42 @@ public class ManageCaseRoleService {
      * Gets case with the user entered details, caseId, respondentName, claimantFirstNames and claimantSurname.
      * Returns null when case not found. It searches for the cases with administrator user to find if the case
      * exists with the given parameters. Also makes a security check if the user entered valid values.
-     * @param findCaseForRoleModificationRequest It has the values caseId, respondentName, claimantFirstNames and
-     *                                           claimantSurname values given by the respondent.
+     * @param request It has the values caseId, respondentName, claimantFirstNames and claimantSurname values
+     *                given by the respondent.
      * @return null if no case is found, CaseDetails if any case is found in both scotland and england wales case
      *              types.
      */
     public CaseDetails findCaseForRoleModification(
-        FindCaseForRoleModificationRequest findCaseForRoleModificationRequest,
+        FindCaseForRoleModificationRequest request,
         String authorisation) throws IOException {
-        log.info("Trying to receive case for role modification. Submission Reference: {}",
-                 findCaseForRoleModificationRequest.getCaseSubmissionReference());
+        log.info("Fetching case for role modification. Submission Reference: {}", request.getCaseSubmissionReference());
         String adminUserToken = adminUserService.getAdminUserToken();
-        String elasticSearchQuery = ElasticSearchQueryBuilder
-            .buildByFindCaseForRoleModificationRequest(findCaseForRoleModificationRequest);
-        CaseDetails englandCase = findCaseByCaseType(adminUserToken,
-                                                     ENGLAND_CASE_TYPE,
-                                                     elasticSearchQuery,
-                                                     authorisation);
-        if (ObjectUtils.isNotEmpty(englandCase)) {
-            return englandCase;
+
+        String elasticSearchQuery = ET_SYA_FRONTEND.equals(request.getApplicationName())
+            ? ElasticSearchQueryBuilder.buildByFindCaseForRoleModificationRequestClaimant(request)
+            : ElasticSearchQueryBuilder.buildByFindCaseForRoleModificationRequest(request);
+
+        if (ET_SYA_FRONTEND.equals(request.getApplicationName())) {
+            CaseDetails caseDetails = findCaseInSearchResults(adminUserToken, elasticSearchQuery, ENGLAND_CASE_TYPE);
+            if (caseDetails != null) {
+                return caseDetails;
+            }
+            return findCaseInSearchResults(adminUserToken, elasticSearchQuery, SCOTLAND_CASE_TYPE);
         }
 
-        CaseDetails scotlandCase = findCaseByCaseType(adminUserToken,
-                                                      SCOTLAND_CASE_TYPE,
-                                                      elasticSearchQuery,
-                                                      authorisation);
-        if (ObjectUtils.isNotEmpty(scotlandCase)) {
-            return scotlandCase;
+        CaseDetails caseDetails = findCaseByCaseType(adminUserToken, ENGLAND_CASE_TYPE,
+                                                     elasticSearchQuery, authorisation);
+        if (caseDetails != null) {
+            return caseDetails;
         }
-        log.info("Case not found for the parameters, submission reference: {}",
-                 findCaseForRoleModificationRequest.getCaseSubmissionReference());
+        return findCaseByCaseType(adminUserToken, SCOTLAND_CASE_TYPE, elasticSearchQuery, authorisation);
+    }
+
+    private CaseDetails findCaseInSearchResults(String adminUserToken, String query, String caseType) {
+        SearchResult searchResult = ccdApi.searchCases(adminUserToken, authTokenGenerator.generate(), caseType, query);
+        if (ObjectUtils.isNotEmpty(searchResult) && CollectionUtils.isNotEmpty(searchResult.getCases())) {
+            return searchResult.getCases().getFirst();
+        }
         return null;
     }
 
@@ -346,6 +360,137 @@ public class ManageCaseRoleService {
             .status(CaseAssignmentResponse.AssignmentStatus.ASSIGNED)
             .message("User successfully assigned to case")
             .build();
+    }
+
+    /**
+     * Assigns the creator role to a claimant for a case.
+     * It validates that the creator role is not already owned by another user, updates claimant data,
+     * then applies the CCD role assignment and persists the case changes.
+     * @param authorisation authorisation token of the requesting user
+     * @param modifyCaseUserRolesRequest request containing creator-role assignments
+     * @return CaseAssignmentResponse containing case details and assignment status
+     */
+    public CaseAssignmentResponse assignCreatorRole(String authorisation,
+                                                    ModifyCaseUserRolesRequest modifyCaseUserRolesRequest) {
+        ManageCaseRoleServiceUtil.checkModifyCaseUserRolesRequest(modifyCaseUserRolesRequest);
+
+        CaseAssignmentUserRolesRequest assignmentRequest =
+            ManageCaseRoleServiceUtil.generateCaseAssignmentUserRolesRequestByModifyCaseUserRolesRequest(
+                modifyCaseUserRolesRequest);
+
+        String adminToken = adminUserService.getAdminUserToken();
+        UserInfo adminUserInfo = idamClient.getUserInfo(adminToken);
+        List<CaseDetails> preparedCases = new ArrayList<>();
+        List<CaseDetails> updatedCases = new ArrayList<>();
+
+        try {
+            for (ModifyCaseUserRole roleRequest : modifyCaseUserRolesRequest.getModifyCaseUserRoles()) {
+                if (!CASE_USER_ROLE_CREATOR.equals(roleRequest.getCaseRole())) {
+                    continue;
+                }
+
+                CaseDetails caseDetails = ccdApi.getCase(adminToken, authTokenGenerator.generate(),
+                                                         roleRequest.getCaseDataId());
+                CaseUserAssignmentData assignments =
+                    fetchCaseUserAssignmentsByCaseId(caseDetails.getId().toString());
+
+                boolean alreadyAssigned = ClaimantUtil.validateClaimantAssignment(
+                    caseDetails,
+                    assignments,
+                    roleRequest.getUserId()
+                );
+
+                if (alreadyAssigned) {
+                    log.info("User already assigned as creator - skipping creator role assignment");
+                    preparedCases.add(caseDetails);
+                    return CaseAssignmentResponse.builder()
+                        .caseDetails(preparedCases)
+                        .status(CaseAssignmentResponse.AssignmentStatus.ALREADY_ASSIGNED)
+                        .message("User was already assigned to this case")
+                        .build();
+                }
+
+                StartEventResponse startEventResponse = ccdApi.startEventForCaseWorker(
+                    adminToken,
+                    authTokenGenerator.generate(),
+                    adminUserInfo.getUid(),
+                    EMPLOYMENT,
+                    caseDetails.getCaseTypeId(),
+                    roleRequest.getCaseDataId(),
+                    CaseEvent.UPDATE_CASE_SUBMITTED.toString()
+                );
+
+                caseDetails = startEventResponse.getCaseDetails();
+                assignClaimantToCase(roleRequest, caseDetails, idamClient.getUserInfo(authorisation));
+
+                try {
+                    restCallToModifyUserCaseRoles(assignmentRequest, HttpMethod.POST);
+                } catch (ProfessionalUserException e) {
+                    return CaseAssignmentResponse.builder()
+                        .status(CaseAssignmentResponse.AssignmentStatus.PROFESSIONAL_USER)
+                        .message(e.getMessage())
+                        .build();
+                } catch (RestClientResponseException | IOException e) {
+                    log.error("Error during creator role assignment: {}", e.getMessage());
+                    throw e;
+                }
+
+                submitUpdateForAssignment(adminToken, caseDetails, startEventResponse, updatedCases, assignmentRequest);
+                log.info("Creator role assignment successfully completed");
+            }
+        } catch (Exception e) {
+            throw new ManageCaseRoleException(e);
+        }
+
+        return CaseAssignmentResponse.builder()
+            .caseDetails(updatedCases)
+            .status(CaseAssignmentResponse.AssignmentStatus.ASSIGNED)
+            .message("User successfully assigned to case as creator")
+            .build();
+    }
+
+    private static void assignClaimantToCase(ModifyCaseUserRole roleRequest,
+                                             CaseDetails caseDetails,
+                                             UserInfo userInfo) {
+        Map<String, Object> existingCaseData = caseDetails.getData();
+        if (MapUtils.isEmpty(existingCaseData)) {
+            throw new CaseUserRoleNotFoundException(
+                String.format("Case details %s does not have case data", caseDetails.getId()));
+        }
+
+        CaseData caseData = EmployeeObjectMapper.convertCaseDataMapToCaseDataObject(existingCaseData);
+        caseData.setClaimantId(roleRequest.getUserId());
+        if (ObjectUtils.isEmpty(caseData.getClaimantType())) {
+            caseData.setClaimantType(new ClaimantType());
+        }
+        caseData.getClaimantType().setClaimantEmailAddress(userInfo.getSub());
+        caseDetails.setData(EmployeeObjectMapper.mapCaseDataToLinkedHashMap(caseData));
+    }
+
+    private void submitUpdateForAssignment(String authorisation,
+                                           CaseDetails caseDetails,
+                                           StartEventResponse startEventResponse,
+                                           List<CaseDetails> updatedCases,
+                                           CaseAssignmentUserRolesRequest assignmentRequest)
+        throws IOException {
+        try {
+            CaseDetails submittedCaseDetails = ccdApi.submitEventForCaseWorker(
+                authorisation,
+                authTokenGenerator.generate(),
+                idamClient.getUserInfo(authorisation).getUid(),
+                EMPLOYMENT,
+                caseDetails.getCaseTypeId(),
+                caseDetails.getId().toString(),
+                true,
+                caseDetailsConverter.caseDataContent(
+                    startEventResponse,
+                    EmployeeObjectMapper.convertCaseDataMapToCaseDataObject(caseDetails.getData()))
+            );
+            updatedCases.add(submittedCaseDetails);
+        } catch (Exception e) {
+            restCallToModifyUserCaseRoles(assignmentRequest, HttpMethod.DELETE);
+            throw new ManageCaseRoleException(e);
+        }
     }
 
     private void restCallToModifyUserCaseRoles(

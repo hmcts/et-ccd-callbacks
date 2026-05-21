@@ -6,7 +6,9 @@ import uk.gov.hmcts.reform.et.syaapi.models.FindCaseForRoleModificationRequest;
 import static org.assertj.core.api.Assertions.assertThat;
 import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.EXPECTED_QUERY_BY_ETHOS_CASE_REFERENCE;
 import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.EXPECTED_QUERY_BY_ROLE_MODIFICATION_REQUEST;
+import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.EXPECTED_QUERY_BY_ROLE_MODIFICATION_REQUEST_CLAIMANT;
 import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.EXPECTED_QUERY_BY_SUBMISSION_REFERENCE;
+import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.TEST_APPLICATION_NAME;
 import static uk.gov.hmcts.reform.et.syaapi.service.utils.TestConstants.TEST_ETHOS_CASE_REFERENCE;
 
 class ElasticSearchQueryBuilderTest {
@@ -28,6 +30,20 @@ class ElasticSearchQueryBuilderTest {
                 .build();
         assertThat(ElasticSearchQueryBuilder.buildByFindCaseForRoleModificationRequest(
             findCaseForRoleModificationRequest)).isEqualTo(EXPECTED_QUERY_BY_ROLE_MODIFICATION_REQUEST);
+    }
+
+    @Test
+    void theBuildByFindCaseForRoleModificationRequestClaimant() {
+        FindCaseForRoleModificationRequest findCaseForRoleModificationRequest =
+            FindCaseForRoleModificationRequest.builder()
+                .caseSubmissionReference(CASE_SUBMISSION_REFERENCE)
+                .ethosCaseReference(TEST_ETHOS_CASE_REFERENCE)
+                .claimantFirstNames(CLAIMANT_FIRST_NAMES)
+                .claimantLastName(CLAIMANT_LAST_NAME)
+                .applicationName(TEST_APPLICATION_NAME)
+                .build();
+        assertThat(ElasticSearchQueryBuilder.buildByFindCaseForRoleModificationRequestClaimant(
+            findCaseForRoleModificationRequest)).isEqualTo(EXPECTED_QUERY_BY_ROLE_MODIFICATION_REQUEST_CLAIMANT);
     }
 
     @Test

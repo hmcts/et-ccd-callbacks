@@ -1,4 +1,20 @@
 # ET COS FlexiDB
+locals {
+  db_base_config = [
+    {
+      "name" : "backslash_quote",
+      "value" : "on"
+    }
+  ]
+
+  db_config = var.env != "aat" ? local.db_base_config : concat(local.db_base_config, [
+    {
+      name  = "azure.extensions"
+      value = "postgres_fdw"
+    }
+  ])
+}
+
 module "postgres" {
   source = "git@github.com:hmcts/terraform-module-postgresql-flexible?ref=master"
   env    = var.env
@@ -18,6 +34,7 @@ module "postgres" {
   pgsql_version                  = "15"
   admin_user_object_id           = var.jenkins_AAD_objectId
   force_user_permissions_trigger = "2"
+  pgsql_server_configuration     = local.db_config
 }
 
 resource "azurerm_key_vault_secret" "et_cos_postgres_user_v15" {

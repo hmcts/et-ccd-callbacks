@@ -109,8 +109,10 @@ class DocumentGenerationServiceTest {
                 "a.docx", DOCUMENT_PDF, new ClaimCaseDocument()));
 
         assertThat(exception.getMessage()).isEqualTo(FAILED_TO_CONNECT_WITH_TORNADO);
-        assertThat(exception.getCause().getMessage()).isEqualTo("400 Bad Request: \"{\"succeeded\":false,"
-            + "\"shortMsg\":\"Unable to render - template does not exist [a.docx]\"}\"");
+        assertThat(exception.getCause().getMessage())
+            .isEqualTo("400 Bad Request on POST request for \"" + TORNADO_API_URL + "\": "
+                + "\"{\"succeeded\":false,"
+                + "\"shortMsg\":\"Unable to render - template does not exist [a.docx]\"}\"");
     }
 
     @Test
@@ -191,7 +193,9 @@ class DocumentGenerationServiceTest {
                 EM_TRB_HELLO_WORLD_DOCX, DOCUMENT_PDF, new ClaimCaseDocument()));
         assertThat(exception.getMessage()).isEqualTo(FAILED_TO_CONNECT_WITH_TORNADO);
         assertThat(exception.getCause()).isInstanceOf(HttpClientErrorException.UnsupportedMediaType.class);
-        assertThat(exception.getCause().getMessage()).isEqualTo("415 Unsupported Media Type: \"idontcare\"");
+        assertThat(exception.getCause().getMessage())
+            .isEqualTo("415 Unsupported Media Type on POST request for \"" + TORNADO_API_URL
+                + "\": \"idontcare\"");
     }
 
     @Test
@@ -209,8 +213,10 @@ class DocumentGenerationServiceTest {
                 "a.docx", DOCUMENT_PDF, new ClaimCaseDocument()));
 
         assertThat(exception.getMessage()).isEqualTo(FAILED_TO_CONNECT_WITH_TORNADO);
-        assertThat(exception.getCause().getMessage()).isEqualTo("400 Bad Request: \"{\"succeeded\":false,"
-            + "\"shortMsg\":\"Bad request for render:Invalid accessKey\"}\"");
+        assertThat(exception.getCause().getMessage())
+            .isEqualTo("400 Bad Request on POST request for \"" + TORNADO_API_URL + "\": "
+                + "\"{\"succeeded\":false,"
+                + "\"shortMsg\":\"Bad request for render:Invalid accessKey\"}\"");
     }
 
     private ClaimCaseDocument createClaimCase() {

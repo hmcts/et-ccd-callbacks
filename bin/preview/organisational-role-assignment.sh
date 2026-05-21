@@ -1,12 +1,13 @@
 #!/usr/bin/env bash
-## Usage: ./organisational-role-assignment.sh [username] [password] [role_classification] [role_name] [role_attributes] [microservice_name]
+## Usage: ./organisational-role-assignment.sh [username] [password] [role_classification] [role_name] [role_attributes] [role_category]
 ##
 ## Options:
 ##    - username: Email for user. Default to `ccd-import@fake.hmcts.net`.
 ##    - password: Password for user. Default to `London01`.
 ##    - role_classification: Role assignment classification. Default to `PUBLIC`.
 ##    - role_name: Name of the role for role-assignment. Default to `tribunal-caseworker`.
-##    - microservice_name: Name of the microservice to obtain S2S token. Default to `ccd_gw`.
+##    - role_attributes: JSON attributes for the role. Default to `{"jurisdiction":"EMPLOYMENT"}`.
+##    - role_category: Role category. Default to `LEGAL_OPERATIONS`.
 ##
 
 USERNAME=${1:-ccd-import@fake.hmcts.net}
@@ -14,6 +15,7 @@ PASSWORD=${2:-London01}
 ROLE_CLASSIFICATION="${3:-PUBLIC}"
 ROLE_NAME="${4:-"tribunal-caseworker"}"
 ROLE_ATTRIBUTES="${5:-'{"jurisdiction":"EMPLOYMENT"}'}"
+ROLE_CATEGORY="${6:-LEGAL_OPERATIONS}"
 
 # Get the directory of this script
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -50,9 +52,9 @@ curl --silent --show-error -X POST "${ROLE_ASSIGNMENT_URL}/am/role-assignments" 
             "roleName": "'"${ROLE_NAME}"'",
             "classification": "'"${ROLE_CLASSIFICATION}"'",
             "grantType": "STANDARD",
-            "roleCategory": "LEGAL_OPERATIONS",
+            "roleCategory": "'"${ROLE_CATEGORY}"'",
             "readOnly": false,
-            "attributes": '${ROLE_ATTRIBUTES}'
+            "attributes": '"${ROLE_ATTRIBUTES}"'
           }
         ]
       }'

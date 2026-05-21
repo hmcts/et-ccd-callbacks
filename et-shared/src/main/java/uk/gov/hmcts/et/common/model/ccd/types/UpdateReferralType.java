@@ -33,5 +33,6 @@ public class UpdateReferralType {
     private String updateReferredBy;
     @JsonProperty("updateReferralDate")
     private String updateReferralDate;
+    @JsonProperty("updateReferralDateTime")
+    private String updateReferralDateTime;
 }
-

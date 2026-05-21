@@ -9,8 +9,10 @@ import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDDocumentCatalog;
 import org.apache.pdfbox.pdmodel.PDResources;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
 import org.apache.pdfbox.pdmodel.interactive.form.PDField;
+import org.apache.pdfbox.pdmodel.interactive.form.PDTextField;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 import uk.gov.hmcts.ecm.common.exceptions.PdfServiceException;
@@ -32,6 +34,8 @@ import static uk.gov.hmcts.ecm.common.constants.PdfMapperConstants.HELVETICA_PDF
 import static uk.gov.hmcts.ecm.common.constants.PdfMapperConstants.PDF_TYPE_ET1;
 import static uk.gov.hmcts.ecm.common.constants.PdfMapperConstants.PDF_TYPE_ET3;
 import static uk.gov.hmcts.ecm.common.constants.PdfMapperConstants.TIMES_NEW_ROMAN_PDFBOX_CHARACTER_CODE;
+import static uk.gov.hmcts.ecm.common.service.pdf.PdfBoxUtil.enableTextWrapAndAutoSize;
+import static uk.gov.hmcts.ecm.common.service.pdf.PdfBoxUtil.sanitiseForPdf;
 import static uk.gov.hmcts.ecm.common.service.pdf.et3.ET3FormConstants.UNABLE_TO_MAP_RESPONDENT_TO_ET3_FORM;
 
 @Slf4j
@@ -45,9 +49,9 @@ public class PdfService {
      * Converts a {@link CaseData} class object into a pdf document
      * using template (ver. ET1_0224)
      *
-     * @param caseData  The data that is to be converted into pdf
+     * @param caseData  The data that is to be converted into PDF
      * @param pdfSource The source location of the PDF file to be used as the template
-     * @return A byte array that contains the pdf document.
+     * @return A byte array that contains the PDF document.
      */
     public byte[] convertCaseToPdf(CaseData caseData, String pdfSource, String pdfType, String clientType, String event)
             throws PdfServiceException {
@@ -61,12 +65,12 @@ public class PdfService {
     }
 
     /**
-     * Populates a pdf document with data stored in the case data parameter.
+     * Populates a PDF document with data stored in the case data parameter.
      *
-     * @param caseData  {@link CaseData} object with information in which to populate the pdf with
-     * @param pdfSource file name of the pdf template used to create the pdf
-     * @return a byte array of the generated pdf file.
-     * @throws IOException if there is an issue reading the pdf template
+     * @param caseData  {@link CaseData} object with information in which to populate the PDF with
+     * @param pdfSource file name of the PDF template used to create the PDF
+     * @return a byte array of the generated PDF file.
+     * @throws IOException if there is an issue reading the PDF template
      */
     public byte[] createPdf(CaseData caseData,
                             String pdfSource,
@@ -79,21 +83,21 @@ public class PdfService {
                 : cl.getResourceAsStream(pdfSource);
         if (!ObjectUtils.isEmpty(stream)) {
             try (PDDocument pdfDocument = Loader.loadPDF(
-                Objects.requireNonNull(stream))) {
-                Set<Map.Entry<String, Optional<String>>> pdfEntriesMap =
-                        buildPdfEntriesMap(caseData, pdfType, clientType, event);
+                Objects.requireNonNull(stream.readAllBytes()))) {
                 PDDocumentCatalog pdDocumentCatalog = pdfDocument.getDocumentCatalog();
                 PDAcroForm pdfForm = pdDocumentCatalog.getAcroForm();
                 PDResources defaultResources = pdfForm.getDefaultResources();
                 defaultResources.put(COSName.getPDFName(TIMES_NEW_ROMAN_PDFBOX_CHARACTER_CODE),
-                        PDType1Font.TIMES_ROMAN);
+                        new PDType1Font(Standard14Fonts.FontName.TIMES_ROMAN));
                 defaultResources.put(COSName.getPDFName(HELVETICA_PDFBOX_CHARACTER_CODE_1),
-                        PDType1Font.HELVETICA);
+                        new PDType1Font(Standard14Fonts.FontName.HELVETICA));
                 defaultResources.put(COSName.getPDFName(HELVETICA_PDFBOX_CHARACTER_CODE_2),
-                        PDType1Font.HELVETICA);
+                        new PDType1Font(Standard14Fonts.FontName.HELVETICA));
+                Set<Map.Entry<String, Optional<String>>> pdfEntriesMap =
+                        buildPdfEntriesMap(caseData, pdfType, clientType, event);
                 applyPdfEntries(pdfForm, pdfEntriesMap, caseData);
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-                pdfForm.setNeedAppearances(true);
+                pdfForm.flatten();
                 pdfDocument.save(byteArrayOutputStream);
                 return byteArrayOutputStream.toByteArray();
             } finally {
@@ -145,7 +149,11 @@ public class PdfService {
             if (entryValue.isPresent()) {
                 try {
                     PDField pdfField = pdfForm.getField(entryKey);
-                    pdfField.setValue(entryValue.get());
+                    String sanitisedValue = sanitiseForPdf(entryValue.get());
+                    if (pdfField instanceof PDTextField textField) {
+                        enableTextWrapAndAutoSize(textField, sanitisedValue);
+                    }
+                    pdfField.setValue(sanitisedValue);
                 } catch (Exception e) {
                     GenericServiceUtil.logException("Error while parsing PDF file for entry key \""
                                     + entryKey, caseData.getEthosCaseReference(), e.getMessage(),

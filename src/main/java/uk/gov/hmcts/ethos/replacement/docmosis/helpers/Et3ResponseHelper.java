@@ -12,6 +12,7 @@ import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.DynamicListType;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
+import uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -31,6 +32,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ET3_RESPONSE_STATUS_ACCEPTED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ET3_RESUBMIT_STATUSES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.SECTION_COMPLETE_BODY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.ET3DocumentHelper.isET3NotificationDocumentTypeResponseAccepted;
 
 /**
@@ -497,7 +499,7 @@ public final class Et3ResponseHelper {
         }
 
         List<RespondentSumTypeItem> validRespondents = caseData.getRespondentCollection().stream()
-                .filter(Et3ResponseHelper::checkRespondentSections)
+                .filter(Et3ResponseHelper::checkRespondentSectionsForEt3Submission)
                 .toList();
 
         if (CollectionUtils.isEmpty(validRespondents)) {
@@ -509,7 +511,7 @@ public final class Et3ResponseHelper {
         return new ArrayList<>();
     }
 
-    private static boolean checkRespondentSections(RespondentSumTypeItem respondentSumTypeItem) {
+    private static boolean checkRespondentSectionsForEt3Submission(RespondentSumTypeItem respondentSumTypeItem) {
         RespondentSumType respondent = respondentSumTypeItem.getValue();
         return YES.equals(respondent.getPersonalDetailsSection())
                 && YES.equals(respondent.getEmploymentDetailsSection())
@@ -579,5 +581,27 @@ public final class Et3ResponseHelper {
                 }
             }
         }
+    }
+
+    /**
+     * Generates a string containing event hyperlinks for a specific case and CCD ID,
+     * based on the respondents' ET3 submission status.
+     *
+     * @param caseData the data for the current case, including respondent information
+     * @param ccdId a unique identifier for the case in the CCD system
+     * @return a formatted string with event hyperlinks and a submit button link if applicable
+     * @throws IllegalArgumentException if the respondent collection in the case data is empty
+     */
+    public static String generateEventHyperlinks(CaseData caseData, String ccdId) {
+        if (CollectionUtils.isEmpty(caseData.getRespondentCollection())) {
+            throw new IllegalArgumentException(NO_RESPONDENTS_FOUND);
+        }
+
+        String submitButton = caseData.getRespondentCollection().stream()
+            .anyMatch(Et3ResponseHelper::checkRespondentSectionsForEt3Submission)
+            ? ET3ResponseConstants.SUBMIT_ET3_BUTTON.formatted(ccdId)
+            : "";
+
+        return SECTION_COMPLETE_BODY.formatted(ccdId, ccdId, ccdId, ccdId, submitButton);
     }
 }

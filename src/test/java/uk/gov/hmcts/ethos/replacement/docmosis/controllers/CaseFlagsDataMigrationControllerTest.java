@@ -2,6 +2,7 @@ package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -76,6 +77,44 @@ class CaseFlagsDataMigrationControllerTest {
                 .andExpect(jsonPath(JsonMapper.WARNINGS, nullValue()));
 
         verify(caseFlagsService).setupCaseFlags(any(CaseData.class));
+    }
+
+    @Test
+    void shouldAddCaseFlagGroupIdAndVisibilityForPreviouslyMigratedFlags() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+
+        mvc.perform(post(CASE_FLAGS_DATA_MIGRATION)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.claimantFlags.groupId").value("Claimant"))
+                .andExpect(jsonPath("$.data.claimantFlags.visibility").value("Internal"))
+                .andExpect(jsonPath("$.data.respondentFlags.groupId").value("Respondent 1"))
+                .andExpect(jsonPath("$.data.respondentFlags.visibility").value("Internal"));
+    }
+
+    @Test
+    void shouldNotOverwriteExistingCaseFlagGroupIdAndVisibility() throws Exception {
+        when(verifyTokenService.verifyTokenSignature(AUTH_TOKEN)).thenReturn(true);
+
+        ObjectNode caseData = (ObjectNode) requestContent.at("/case_details/case_data");
+        ObjectNode claimantFlags = (ObjectNode) caseData.get("claimantFlags");
+        claimantFlags.put("groupId", "existing-claimant-group");
+        claimantFlags.put("visibility", "Internal");
+        ObjectNode respondentFlags = (ObjectNode) caseData.get("respondentFlags");
+        respondentFlags.put("groupId", "existing-respondent-group");
+        respondentFlags.put("visibility", "Internal");
+
+        mvc.perform(post(CASE_FLAGS_DATA_MIGRATION)
+                        .content(requestContent.toString())
+                        .header(AUTHORIZATION, AUTH_TOKEN)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.data.claimantFlags.groupId").value("existing-claimant-group"))
+                .andExpect(jsonPath("$.data.claimantFlags.visibility").value("Internal"))
+                .andExpect(jsonPath("$.data.respondentFlags.groupId").value("existing-respondent-group"))
+                .andExpect(jsonPath("$.data.respondentFlags.visibility").value("Internal"));
     }
 
     @Test

@@ -24,6 +24,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1ReppedHelper;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseFlagsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.CaseManagementForCaseWorkerService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1ReppedService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.Et1SubmissionService;
@@ -52,6 +53,7 @@ public class Et1ReppedController {
     private final FeatureToggleService featureToggleService;
     private final Et1SubmissionService et1SubmissionService;
     private final NocRespondentRepresentativeService nocRespondentRepresentativeService;
+    private final CaseFlagsService caseFlagsService;
 
     /**
      * Callback to handle postcode validation for the ET1 Repped journey.
@@ -518,6 +520,13 @@ public class Et1ReppedController {
         et1SubmissionService.sendEt1ConfirmationMyHmcts(caseDetails, userToken);
         Et1ReppedHelper.clearEt1ReppedCreationFields(caseData);
         caseData = nocRespondentRepresentativeService.prepopulateOrgPolicyAndNoc(caseData);
+
+        boolean caseFlagsToggle = featureToggleService.isCaseFlagsEnabled();
+        log.info("Case flags feature flag is {}", caseFlagsToggle);
+        if (caseFlagsToggle && caseFlagsService.caseFlagsSetupRequired(caseData)) {
+            caseFlagsService.setupCaseFlags(caseData);
+            caseFlagsService.processNewlySetCaseFlags(caseData);
+        }
 
         return getCallbackRespEntityNoErrors(caseData);
     }

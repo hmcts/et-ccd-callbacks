@@ -54,7 +54,7 @@ class MyHmctsServiceTest {
 
     @Test
     @SneakyThrows
-    void theGetOrganisationAddress() {
+    void theGetUserOrganisationAddress() {
 
         UserDetails userDetails = new UserDetails();
         userDetails.setUid(TEST_USER_ID);
@@ -73,7 +73,7 @@ class MyHmctsServiceTest {
                                 .townCity(TEST_TOWN_CITY)
                                 .postCode(TEST_POST_CODE)
                                 .county(TEST_COUNTY).build())).build()));
-        OrganisationAddress organisationAddress = myHmctsService.getOrganisationAddress(DUMMY_USER_TOKEN);
+        OrganisationAddress organisationAddress = myHmctsService.getUserOrganisationAddress(DUMMY_USER_TOKEN);
         assertThat(organisationAddress.getAddressLine1()).isEqualTo(TEST_ADDRESS_LINE_1);
         assertThat(organisationAddress.getAddressLine2()).isEqualTo(TEST_ADDRESS_LINE_2);
         assertThat(organisationAddress.getAddressLine3()).isEqualTo(TEST_ADDRESS_LINE_3);
@@ -85,21 +85,21 @@ class MyHmctsServiceTest {
         when(organisationClient.retrieveOrganisationDetailsByUserId(DUMMY_USER_TOKEN, DUMMY_USER_TOKEN, TEST_USER_ID))
                 .thenReturn(null);
         GenericServiceException exceptionNullResponse = assertThrows(GenericServiceException.class,
-                () -> myHmctsService.getOrganisationAddress(DUMMY_USER_TOKEN));
+                () -> myHmctsService.getUserOrganisationAddress(DUMMY_USER_TOKEN));
         assertThat(exceptionNullResponse.getMessage()).isEqualTo(EXCEPTION_ORGANISATION_DETAILS_NOT_FOUND);
         // 3: When retrieving organisation details, we expect the organisation client to return a response with
         // empty response body.
         when(organisationClient.retrieveOrganisationDetailsByUserId(DUMMY_USER_TOKEN, DUMMY_USER_TOKEN, TEST_USER_ID))
                 .thenReturn(ResponseEntity.ok(null));
         GenericServiceException exceptionNullBody = assertThrows(GenericServiceException.class,
-                () -> myHmctsService.getOrganisationAddress(DUMMY_USER_TOKEN));
+                () -> myHmctsService.getUserOrganisationAddress(DUMMY_USER_TOKEN));
         assertThat(exceptionNullBody.getMessage()).isEqualTo(EXCEPTION_ORGANISATION_DETAILS_NOT_FOUND);
         // 3: When retrieving organisation details, we expect the organisation client to return a response with
         // empty contact information.
         when(organisationClient.retrieveOrganisationDetailsByUserId(DUMMY_USER_TOKEN, DUMMY_USER_TOKEN, TEST_USER_ID))
                 .thenReturn(ResponseEntity.ok(OrganisationsResponse.builder().build()));
         GenericServiceException exceptionEmptyContactInformation = assertThrows(GenericServiceException.class,
-                () -> myHmctsService.getOrganisationAddress(DUMMY_USER_TOKEN));
+                () -> myHmctsService.getUserOrganisationAddress(DUMMY_USER_TOKEN));
         assertThat(exceptionEmptyContactInformation.getMessage()).isEqualTo(EXCEPTION_ORGANISATION_DETAILS_NOT_FOUND);
         // 4: When retrieving organisation details, we expect the organisation client to return a response with
         // empty contact information list is empty.
@@ -107,7 +107,7 @@ class MyHmctsServiceTest {
                 .thenReturn(ResponseEntity.ok(
                         OrganisationsResponse.builder().contactInformation(new ArrayList<>()).build()));
         GenericServiceException exceptionEmptyOrganisationAddressList = assertThrows(GenericServiceException.class,
-                () -> myHmctsService.getOrganisationAddress(DUMMY_USER_TOKEN));
+                () -> myHmctsService.getUserOrganisationAddress(DUMMY_USER_TOKEN));
         assertThat(exceptionEmptyOrganisationAddressList.getMessage())
                 .isEqualTo(EXCEPTION_ORGANISATION_DETAILS_NOT_FOUND);
     }

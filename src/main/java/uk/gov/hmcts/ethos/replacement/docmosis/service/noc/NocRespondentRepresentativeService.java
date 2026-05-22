@@ -61,7 +61,7 @@ import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_ALLOCATED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.CASE_DETAILS_OR_CASE_DATA_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_REPRESENTATIVE_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_FAILED_TO_REMOVE_ORGANISATION_POLICIES;
@@ -870,13 +870,15 @@ public class NocRespondentRepresentativeService {
                     break;
                 }
                 try {
-                    nocService.grantRepresentativeAccess(adminUserService.getAdminUserToken(),
+                    String representativeIdamId = nocService.grantRepresentativeAccess(
+                            adminUserService.getAdminUserToken(),
                             representative.getValue().getRepresentativeEmailAddress(), caseDetails.getCaseId(),
                             representative.getValue().getRespondentOrganisation(), role);
                     RepresentedTypeRItem caseRepresentative = RespondentRepresentativeUtils.findRepresentativeById(
                             caseDetails.getCaseData(), representative.getId());
                     if (RespondentRepresentativeUtils.isValidRepresentative(caseRepresentative)) {
                         representative.getValue().setRole(role);
+                        representative.getValue().setIdamId(representativeIdamId);
                         caseDetails.getCaseData().getRepCollectionToAdd().add(caseRepresentative);
                     } else {
                         log.error(ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_REPRESENTATIVE_NOT_FOUND,
@@ -1056,6 +1058,7 @@ public class NocRespondentRepresentativeService {
         RespondentSumTypeItem respondent = caseData.getRespondentCollection().get(role.getIndex());
         RepresentedTypeR addedSolicitor = nocRespondentHelper.generateNewRepDetails(change, userDetails, respondent);
         addedSolicitor.setRole(role.getCaseRoleLabel());
+        auditEvent.ifPresent(event -> addedSolicitor.setIdamId(event.getUserId()));
         addedSolicitor.setRespondentId(respondent.getId());
         List<RepresentedTypeRItem> repCollection = getIfNull(caseData.getRepCollection(), new ArrayList<>());
         int repIndex = nocRespondentHelper.getIndexOfRep(respondent, repCollection);
@@ -1251,7 +1254,7 @@ public class NocRespondentRepresentativeService {
      */
     public void populateMyHmctsOrganisationAddress(String userToken, CaseData caseData)
             throws GenericServiceException {
-        OrganisationAddress organisationAddress = myHmctsService.getOrganisationAddress(userToken);
+        OrganisationAddress organisationAddress = myHmctsService.getUserOrganisationAddress(userToken);
         caseData.setEt3ResponseAddress(mapOrganisationAddressToAddress(organisationAddress));
         caseData.setMyHmctsAddressText(getOrganisationAddressAsText(organisationAddress));
     }
@@ -1270,7 +1273,7 @@ public class NocRespondentRepresentativeService {
     public void saveRespondentRepresentativeContactDetails(String userToken, CaseDetails caseDetails)
             throws GenericServiceException {
         CaseData caseData = caseDetails.getCaseData();
-        if (REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS.equals(
+        if (REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS.equals(
                 caseData.getRepresentativeContactChangeOption())) {
             populateMyHmctsOrganisationAddress(userToken, caseData);
         }

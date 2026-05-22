@@ -20,6 +20,8 @@ public final class HttpConstants {
     public static final String HTTP_MESSAGE_FIVE_ZERO_ONE = "Not Implemented";
     public static final String HTTP_MESSAGE_FIVE_ZERO_THREE = "Service Unavailable";
 
+    public static final String HTTP_HEADER_AUTHORIZATION = "Authorization";
+
     private HttpConstants() {
         // Access through static methods
     }

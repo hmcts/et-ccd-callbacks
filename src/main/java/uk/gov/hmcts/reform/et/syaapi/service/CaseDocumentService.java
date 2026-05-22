@@ -1,5 +1,6 @@
 package uk.gov.hmcts.reform.et.syaapi.service;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,6 +30,7 @@ import uk.gov.hmcts.reform.et.syaapi.config.interceptors.ResourceNotFoundExcepti
 import uk.gov.hmcts.reform.et.syaapi.models.CaseDocument;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -119,7 +121,7 @@ public class CaseDocumentService {
      * @param authToken  the caller's bearer token used to verify the caller
      * @param documentId the id of the document
      * @return the response entity which contains the binary stream
-     * @throws ResourceNotFoundException if the target API returns 404 response code
+     * @throws ResourceNotFoundException if the target API returns a 404 response code
      */
     public ResponseEntity<ByteArrayResource> downloadDocument(String authToken, UUID documentId) {
         log.info("Called downloadDocument");
@@ -152,7 +154,7 @@ public class CaseDocumentService {
      * @param authToken  the caller's bearer token used to verify the caller
      * @param documentId the id of the document
      * @return the response entity which contains the document details object
-     * @throws ResourceNotFoundException if the target API returns 404 response code
+     * @throws ResourceNotFoundException if the target API returns a 404 response code
      */
     public ResponseEntity<CaseDocument> getDocumentDetails(String authToken, UUID documentId) {
         HttpHeaders headers = new HttpHeaders();
@@ -276,18 +278,53 @@ public class CaseDocumentService {
         return body;
     }
 
+    /**
+     * Streams the binary content of the given document id from CDAM directly to the HTTP response.
+     * Headers including Content-Type and Content-Length are forwarded from the CDAM response.
+     *
+     * @param authToken  the caller's bearer token used to verify the caller
+     * @param documentId the id of the document
+     * @param response   the HTTP response to stream the document content to
+     * @throws ResourceNotFoundException if the target API returns a 404 response code
+     */
+    public void streamDocument(String authToken, UUID documentId, HttpServletResponse response) {
+        log.info("Called streamDocument");
+        HttpHeaders headers = new HttpHeaders();
+        headers.add(HttpHeaders.AUTHORIZATION, authToken);
+        headers.add(SERVICE_AUTHORIZATION, authTokenGenerator.generate());
+
+        try {
+            restTemplate.execute(
+                caseDocApiUrl + "/cases/documents/" + documentId + "/binary",
+                HttpMethod.GET,
+                request -> request.getHeaders().putAll(headers),
+                clientResponse -> {
+                    HttpHeaders responseHeaders = clientResponse.getHeaders();
+                    if (responseHeaders.getContentType() != null) {
+                        response.setContentType(responseHeaders.getContentType().toString());
+                    }
+                    if (responseHeaders.getContentLength() > 0) {
+                        response.setContentLengthLong(responseHeaders.getContentLength());
+                    }
+                    try (InputStream inputStream = clientResponse.getBody()) {
+                        inputStream.transferTo(response.getOutputStream());
+                    }
+                    return null;
+                }
+            );
+        } catch (HttpClientErrorException ex) {
+            if (NOT_FOUND.equals(ex.getStatusCode())) {
+                throw new ResourceNotFoundException(
+                    String.format(RESOURCE_NOT_FOUND, documentId, ex.getMessage()), ex);
+            }
+            throw ex;
+        }
+    }
+
     @Data
     private static final class DocumentUploadResponse {
         private List<CaseDocument> documents;
 
-        /**
-         * Accessor for revealing if the response has any documents.
-         *
-         * @return a boolean that is false if documents list is empty
-         */
-        public Boolean isEmpty() {
-            return documents.isEmpty();
-        }
     }
 
     /**

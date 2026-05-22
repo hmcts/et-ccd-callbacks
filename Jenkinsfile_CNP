@@ -35,7 +35,15 @@ def secrets = [
     secret('cos-system-user', 'ET_SYSTEM_USER'),
     secret('cos-system-user-password', 'ET_SYSTEM_USER_PASSWORD'),
     secret('et-staff-user-admin-user-name', 'ET_STAFF_USER_ADMIN_USER_NAME'),
-    secret('et-staff-user-admin-user-name-password', 'ET_STAFF_USER_ADMIN_USER_NAME_PASSWORD')
+    secret('et-staff-user-admin-user-name-password', 'ET_STAFF_USER_ADMIN_USER_NAME_PASSWORD'),
+    secret('et-legalrep-user-name', 'ET_LEGALREP_USER_NAME'),
+    secret('et-legalrep-password', 'ET_LEGALREP_PASSWORD'),
+    secret('et-resp-user-name','ET_REPSONDENT_USER_NAME'),
+    secret('et-resp-password','ET_REPSONDENT_PASSWORD'),
+    secret('et-wa-legal-ops-user-name', 'ET_LEGAL_OPS_USER_NAME'),
+    secret('et-wa-legal-ops-password', 'ET_LEGAL_OPS_PASSWORD'),
+    secret('et-judge-user-name-wa','ET_JUDGE_USER_NAME_WORKALLOCATION'),
+    secret('et-judge-user-password-wa','ET_JUDGE_USER_PASSWORD_WORKALLOCATION')
   ],
   'rpx-${env}': [
     // xuiwebapp IDAM client secret - required for obtaining user tokens with
@@ -115,7 +123,7 @@ withPipeline(type, product, component) {
   enablePerformanceTestStages(timeout: 10, perfTestEnvironments: ['preview','aat','perftest'])
   enableGatlingLoadTests([
     repo: 'https://github.com/hmcts/performance-testing.git',
-    branch: 'add-et-tests', 
+    branch: 'add-et-tests',
     simulation: 'et.simulations.EtCosApiBuildSimulation', 
     timeout: 10
   ])
@@ -149,8 +157,8 @@ withPipeline(type, product, component) {
     env.CCD_DATA_STORE_API_URL = "https://ccd-data-store-api-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
     env.TEST_URL_CITIZEN_UI = "https://et-sya-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net/"
     env.TEST_RESP_URL = "https://et-syr-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net/"
-    env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net/testing-support/accounts"
-    env.MANAGE_ORG_URL = "https://xui-mo-webapp-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+    env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net/"
+    env.MANAGE_ORG_URL = "https://xui-mo-webapp-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net/"
     env.TEST_MANAGE_CASE_URL = "https://xui-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net/"
     env.ET_CASE_API_URL = "https://et-sya-api-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net/cases/initiate-case/"
     env.ET_SUBMIT_DRAFT_CASE_URL = "https://et-sya-api-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net/cases/submit-case/"
@@ -208,8 +216,8 @@ withPipeline(type, product, component) {
 
       stage('Functional UI tests chromium') {
         try {
-          env.ET_COS_PREVIEW_ET_SYA_API = "https://et-sya-api-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
-          env.ET_COS_PREVIEW_CCD = "https://ccd-data-store-api-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net"
+          env.ET_COS_PREVIEW_ET_SYA_API = "https://et-sya-api-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net/"
+          env.ET_COS_PREVIEW_CCD = "https://ccd-data-store-api-et-cos-pr-${CHANGE_ID}.preview.platform.hmcts.net/"
           yarnBuilder.yarn('test:functional-chromium')
         } catch (Error) {
           unstable(message: "${STAGE_NAME} is unstable: " + Error.toString())
@@ -238,8 +246,8 @@ withPipeline(type, product, component) {
     env.CCD_DATA_STORE_API_URL = "http://ccd-data-store-api-aat.service.core-compute-aat.internal"
     env.TEST_URL_CITIZEN_UI = "https://et-sya.aat.platform.hmcts.net/"
     env.TEST_RESP_URL = "https://et-syr.aat.platform.hmcts.net/"
-    env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net/testing-support/accounts"
-    env.MANAGE_ORG_URL = "https://manage-org.aat.platform.hmcts.net"
+    env.IDAM_URL = "https://idam-api.aat.platform.hmcts.net/"
+    env.MANAGE_ORG_URL = "https://manage-org.aat.platform.hmcts.net/"
     env.TEST_MANAGE_CASE_URL = "https://manage-case.aat.platform.hmcts.net/"
     env.ET_CASE_API_URL = "http://et-sya-api-aat.service.core-compute-aat.internal/cases/initiate-case/"
     env.ET_SUBMIT_DRAFT_CASE_URL = "http://et-sya-api-aat.service.core-compute-aat.internal/cases/submit-case/"

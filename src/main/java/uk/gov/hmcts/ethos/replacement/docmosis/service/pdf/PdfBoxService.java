@@ -13,6 +13,7 @@ import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.font.Standard14Fonts;
 import org.apache.pdfbox.pdmodel.interactive.form.PDAcroForm;
 import org.apache.pdfbox.pdmodel.interactive.form.PDField;
+import org.apache.pdfbox.pdmodel.interactive.form.PDTextField;
 import org.springframework.stereotype.Service;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.DocumentInfo;
@@ -22,12 +23,12 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.TornadoService;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
-import java.nio.charset.CharsetEncoder;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
+import static uk.gov.hmcts.ecm.common.service.pdf.PdfBoxUtil.enableTextWrapAndAutoSize;
+import static uk.gov.hmcts.ecm.common.service.pdf.PdfBoxUtil.sanitiseForPdf;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.EMPTY_BYTE_ARRAY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.ET3_FORM_BYTE_ARRAY_CREATION_METHOD_NAME;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.PdfBoxServiceConstants.GENERATE_PDF_DOCUMENT_INFO_SERVICE_NAME;
@@ -65,12 +66,12 @@ public class PdfBoxService {
 
     /**
      * This method calls the ET3Mapper method to create the data to be passed through to dm store method
-     * and then checks whether  it can reach the service.
+     * and then checks whether it can reach the service.
      * @param caseData contains the data needed to generate the PDF
      * @param userToken contains the user authentication token
      * @param caseTypeId reference for which casetype the document is being uploaded to
      * @param documentName name of the document
-     * @param pdfTemplate location of the pdf template to be mapped with case data
+     * @param pdfTemplate location of the PDF template to be mapped with case data
      * @return DocumentInfo which contains the URL and markup of the uploaded document
      * @throws IOException if the call to Tornado has failed, an exception will be thrown. This could be due to
     timeout or maybe a bad gateway.
@@ -122,12 +123,12 @@ public class PdfBoxService {
     }
 
     /**
-     * Populates a pdf document with data stored in the case data parameter.
+     * Populates a PDF document with data stored in the case data parameter.
      *
-     * @param caseData  {@link CaseData} object with information in which to populate the pdf with
-     * @param pdfSource file name of the pdf template used to create the pdf
-     * @return a byte array of the generated pdf file.
-     * @throws IOException if there is an issue reading the pdf template
+     * @param caseData  {@link CaseData} object with information in which to populate the PDF with
+     * @param pdfSource file name of the PDF template used to create the PDF
+     * @return a byte array of the generated PDF file.
+     * @throws IOException if there is an issue reading the PDF template
      */
     public byte[] convertCaseToPdfAsByteArray(CaseData caseData, String pdfSource, String event) throws IOException {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
@@ -172,43 +173,16 @@ public class PdfBoxService {
                                     String entryKey) {
         try {
             PDField pdfField = pdfForm.getField(entryKey);
-            pdfField.setValue(sanitiseForPdf(entryValue.orElse(STRING_EMPTY)));
+            String sanitisedValue = sanitiseForPdf(entryValue.orElse(STRING_EMPTY));
+            if (pdfField instanceof PDTextField textField) {
+                enableTextWrapAndAutoSize(textField, sanitisedValue);
+            }
+            pdfField.setValue(sanitisedValue);
         } catch (Exception ex) {
             logException(String.format(PDF_SERVICE_EXCEPTION_FIRST_WORD_WHEN_UNABLE_TO_PUT_FIELD_TO_PDF_FILE, entryKey),
                     caseData.getEthosCaseReference(), ex.getMessage(),
                     PDF_SERVICE_CLASS_NAME, PUT_PDF_FIELD_METHOD_NAME);
         }
-    }
-
-    /**
-     * Strips invisible Unicode format characters that are not encodable in WinAnsiEncoding
-     * (e.g. zero-width spaces inserted by browsers or rich-text editors) to prevent
-     * PDFBox from failing when generating appearance streams during flattening.
-     */
-    private static String sanitiseForPdf(String value) {
-        if (value == null) {
-            return null;
-        }
-        // Strip invisible Unicode format characters (zero-width spaces, directional marks, BOM, etc.)
-        String sanitised = value.replaceAll("\\p{Cf}", "");
-        // Replace typographic Unicode space variants not in WinAnsiEncoding with a regular space
-        // e.g. figure space (U+2007), thin space (U+2009), em space (U+2003), narrow no-break space (U+202F)
-        sanitised = sanitised.replaceAll("[\\u2000-\\u200A\\u202F\\u205F\\u3000]", " ");
-        // Replace unsupported hyphen/dash variants with the nearest WinAnsiEncoding equivalent
-        // U+2010 hyphen, U+2011 non-breaking hyphen, U+2012 figure dash → regular hyphen-minus
-        // U+2015 horizontal bar, U+2E3A two-em dash, U+2E3B three-em dash → regular hyphen-minus
-        sanitised = sanitised.replaceAll("[\\u2010-\\u2012\\uFE58\\uFE63\\uFF0D]", "-");
-        sanitised = sanitised.replaceAll("[\\u2015\\u2E3A\\u2E3B]", "-");
-        // Replace mathematical minus sign (U+2212) with hyphen-minus
-        sanitised = sanitised.replace("−", "-");
-        // Final catch-all: strip any character still not encodable in Windows-1252 (WinAnsiEncoding).
-        // This covers symbols, emoji, CJK, Arabic, Cyrillic, and any future edge-case characters.
-        CharsetEncoder winAnsi = Charset.forName("windows-1252").newEncoder();
-        StringBuilder result = new StringBuilder(sanitised.length());
-        sanitised.codePoints()
-                .filter(cp -> cp < 0x10000 && winAnsi.canEncode((char) cp))
-                .forEach(result::appendCodePoint);
-        return result.toString();
     }
 
     private static void safeClose(InputStream is, CaseData caseData) {

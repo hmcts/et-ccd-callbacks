@@ -352,6 +352,10 @@ public class CaseData {
     private List<GenericTypeItem<CaseNote>> caseNotesCollection;
     @JsonProperty("addCaseNote")
     private CaseNote addCaseNote;
+    @JsonProperty("editOrDeleteCaseNote")
+    private String editOrDeleteCaseNote;
+    @JsonProperty("caseNoteDynamicList")
+    private DynamicFixedListType caseNoteDynamicList;
 
     @JsonProperty("TTL")
     private TTL ttl;

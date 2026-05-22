@@ -12,8 +12,8 @@
   {
     "CaseTypeID": "ET_EnglandWales",
     "CaseEventID": "nocRemoveRepClaimant",
-    "CaseFieldID": "nocRemoveRepClaimantSignLabel",
-    "DisplayContext": "READONLY",
+    "CaseFieldID": "nocRemoveRepOption",
+    "DisplayContext": "MANDATORY",
     "PageID": 2,
     "PageDisplayOrder": 2,
     "PageFieldDisplayOrder": 1,
@@ -22,21 +22,63 @@
   {
     "CaseTypeID": "ET_EnglandWales",
     "CaseEventID": "nocRemoveRepClaimant",
-    "CaseFieldID": "nocRemoveRepConfirmNoLonger",
+    "CaseFieldID": "nocRemoveRepRemoveLabelSelf",
+    "DisplayContext": "READONLY",
+    "PageID": 3,
+    "PageDisplayOrder": 3,
+    "PageFieldDisplayOrder": 1,
+    "PageShowCondition": "nocRemoveRepOption=\"yourself\"",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseEventID": "nocRemoveRepClaimant",
+    "CaseFieldID": "nocRemoveRepRemoveSelfConfirm",
     "DisplayContext": "MANDATORY",
-    "PageID": 2,
-    "PageDisplayOrder": 2,
+    "PageID": 3,
+    "PageDisplayOrder": 3,
     "PageFieldDisplayOrder": 2,
     "ShowSummaryChangeOption": "N"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
     "CaseEventID": "nocRemoveRepClaimant",
-    "CaseFieldID": "nocRemoveRepConfirmNotice",
+    "CaseFieldID": "nocRemoveRepRemoveLabelOrg",
+    "DisplayContext": "READONLY",
+    "PageID": 4,
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 1,
+    "PageShowCondition": "nocRemoveRepOption=\"your organisation\"",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseEventID": "nocRemoveRepClaimant",
+    "CaseFieldID": "nocRemoveRepRemoveOrgLabelClaimant",
+    "DisplayContext": "READONLY",
+    "PageID": 4,
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 2,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseEventID": "nocRemoveRepClaimant",
+    "CaseFieldID": "nocRemoveRepRemoveOrgConfirm1",
     "DisplayContext": "MANDATORY",
-    "PageID": 2,
-    "PageDisplayOrder": 2,
+    "PageID": 4,
+    "PageDisplayOrder": 4,
     "PageFieldDisplayOrder": 3,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseEventID": "nocRemoveRepClaimant",
+    "CaseFieldID": "nocRemoveRepRemoveOrgConfirm2",
+    "DisplayContext": "MANDATORY",
+    "PageID": 4,
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 4,
     "ShowSummaryChangeOption": "N"
   },
   {
@@ -52,49 +94,28 @@
   {
     "CaseTypeID": "ET_EnglandWales",
     "CaseEventID": "nocRemoveRepRespondent",
-    "CaseFieldID": "nocRemoveRepIsMoreThanOneFlag",
-    "DisplayContext": "READONLY",
-    "PageID": 2,
-    "PageDisplayOrder": 2,
-    "PageFieldDisplayOrder": 1,
-    "FieldShowCondition": "nocRemoveRepOptionLabel=\"dummy\"",
-    "PageShowCondition": "nocRemoveRepIsMoreThanOneFlag=\"Yes\"",
-    "ShowSummaryChangeOption": "N"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseEventID": "nocRemoveRepRespondent",
-    "CaseFieldID": "nocRemoveRepOptionLabel",
-    "DisplayContext": "READONLY",
-    "PageID": 2,
-    "PageDisplayOrder": 2,
-    "PageFieldDisplayOrder": 2,
-    "ShowSummaryChangeOption": "N"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseEventID": "nocRemoveRepRespondent",
     "CaseFieldID": "nocRemoveRepOption",
     "DisplayContext": "MANDATORY",
     "PageID": 2,
     "PageDisplayOrder": 2,
-    "PageFieldDisplayOrder": 3,
-    "ShowSummaryChangeOption": "N"
-  },
-  {
-    "CaseTypeID": "ET_EnglandWales",
-    "CaseEventID": "nocRemoveRepRespondent",
-    "CaseFieldID": "nocRemoveRepRespondentSignLabel",
-    "DisplayContext": "READONLY",
-    "PageID": 3,
-    "PageDisplayOrder": 3,
     "PageFieldDisplayOrder": 1,
     "ShowSummaryChangeOption": "N"
   },
   {
     "CaseTypeID": "ET_EnglandWales",
     "CaseEventID": "nocRemoveRepRespondent",
-    "CaseFieldID": "nocRemoveRepConfirmNoLonger",
+    "CaseFieldID": "nocRemoveRepRemoveLabelSelf",
+    "DisplayContext": "READONLY",
+    "PageID": 3,
+    "PageDisplayOrder": 3,
+    "PageFieldDisplayOrder": 1,
+    "PageShowCondition": "nocRemoveRepOption=\"yourself\"",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseEventID": "nocRemoveRepRespondent",
+    "CaseFieldID": "nocRemoveRepRemoveSelfConfirm",
     "DisplayContext": "MANDATORY",
     "PageID": 3,
     "PageDisplayOrder": 3,
@@ -104,11 +125,42 @@
   {
     "CaseTypeID": "ET_EnglandWales",
     "CaseEventID": "nocRemoveRepRespondent",
-    "CaseFieldID": "nocRemoveRepConfirmNotice",
+    "CaseFieldID": "nocRemoveRepRemoveLabelOrg",
+    "DisplayContext": "READONLY",
+    "PageID": 4,
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 1,
+    "PageShowCondition": "nocRemoveRepOption=\"your organisation\"",
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseEventID": "nocRemoveRepRespondent",
+    "CaseFieldID": "nocRemoveRepRemoveOrgLabelRespondent",
+    "DisplayContext": "READONLY",
+    "PageID": 4,
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 2,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseEventID": "nocRemoveRepRespondent",
+    "CaseFieldID": "nocRemoveRepRemoveOrgConfirm1",
     "DisplayContext": "MANDATORY",
-    "PageID": 3,
-    "PageDisplayOrder": 3,
+    "PageID": 4,
+    "PageDisplayOrder": 4,
     "PageFieldDisplayOrder": 3,
+    "ShowSummaryChangeOption": "N"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
+    "CaseEventID": "nocRemoveRepRespondent",
+    "CaseFieldID": "nocRemoveRepRemoveOrgConfirm2",
+    "DisplayContext": "MANDATORY",
+    "PageID": 4,
+    "PageDisplayOrder": 4,
+    "PageFieldDisplayOrder": 4,
     "ShowSummaryChangeOption": "N"
   }
 ]

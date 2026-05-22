@@ -1,15 +1,21 @@
 [
   {
-    "ID": "frl_NocRemove_ChooseYourselfOrWhole",
-    "ListElementCode": "Remove only me",
-    "ListElement": "Remove only me - You will no longer represent the client, but other representatives in your organisation will remain on the case.",
+    "ID": "frl_NocRemove_ChooseYourselfOrYourOrg",
+    "ListElementCode": "yourself",
+    "ListElement": "yourself - You will no longer represent the client but other representatives in your organisation will remain on the case",
     "DisplayOrder": 1
   },
   {
-    "ID": "frl_NocRemove_ChooseYourselfOrWhole",
-    "ListElementCode": "Remove the organisation",
-    "ListElement": "Remove the organisation - This will remove all representatives from your organisation. Your organisation will no longer represent the client.",
+    "ID": "frl_NocRemove_ChooseYourselfOrYourOrg",
+    "ListElementCode": "your organisation",
+    "ListElement": "your organisation - This will remove all representatives from your organisation. Your organisation will no longer represent the client.",
     "DisplayOrder": 2
+  },
+  {
+    "ID": "msl_NocRemove_ConfirmSelf",
+    "ListElementCode": "I confirm I'm removing myself from this case",
+    "ListElement": "I confirm I'm removing myself from this case",
+    "DisplayOrder": 1
   },
   {
     "ID": "msl_NocRemove_NoLonger",

@@ -57,7 +57,7 @@ public final class NocRespondentMapper {
             .filter(item -> item.getId() != null)
             .filter(item -> !respondentIdWithRep.contains(item.getId()))
             .filter(item -> !respondentIdToRevoke.contains(item.getId()))
-            .collect(Collectors.toList());
+            .toList();
     }
 
     private static Set<String> getRespondentIdsWithRepresentation(CaseData caseData) {
@@ -151,7 +151,7 @@ public final class NocRespondentMapper {
             .filter(Objects::nonNull)
             .map(RepresentedTypeR::getRespondentId)
             .filter(Objects::nonNull)
-            .collect(Collectors.toList());
+            .toList();
     }
 
     /**

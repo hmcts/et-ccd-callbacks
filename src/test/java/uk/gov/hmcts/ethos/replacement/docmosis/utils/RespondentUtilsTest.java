@@ -6,7 +6,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
+import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
+import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.et.common.model.ccd.types.UpdateRespondentRepresentativeRequest;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
@@ -28,6 +31,9 @@ final class RespondentUtilsTest {
     private static final String RESPONDENT_ID_2 = "dummy65_respondent43_id21";
     private static final String REPRESENTATIVE_ID_1 = "dummy12_representative34_id56";
     private static final String REPRESENTATIVE_ID_2 = "dummy65_representative43_id21";
+    private static final String REPRESENTATIVE_EMAIL_ADDRESS_1 = "representative1@hmcts.org";
+    private static final String RESPONDENT_EMAIL_ADDRESS_1 = "respondent1@hmcts.org";
+
     private static final String EXCEPTION_RESPONDENT_NOT_FOUND =
             "Respondent not found for case ID 1234567890123456.";
     private static final String EXCEPTION_RESPONDENT_ID_NOT_FOUND =
@@ -42,7 +48,7 @@ final class RespondentUtilsTest {
     private MockedStatic<RespondentUtils> respondentUtils;
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         respondentUtils = mockStatic(RespondentUtils.class);
     }
 
@@ -282,5 +288,59 @@ final class RespondentUtilsTest {
         // when index is valid should return respondent
         assertThat(RespondentUtils.getRespondentAtIndex(caseData, NumberUtils.INTEGER_ZERO)).isNotNull()
                 .isSameAs(respondent).isEqualTo(respondent);
+    }
+
+    @Test
+    void theResolveRespondentNotificationEmailAddresses() {
+        respondentUtils.close();
+        // when respondent collection is empty should return an empty list
+        List<RespondentSumTypeItem> respondents = new ArrayList<>();
+        CaseData caseData = new CaseData();
+        caseData.setRespondentCollection(respondents);
+        CaseDetails  caseDetails = new CaseDetails();
+        caseDetails.setCaseData(caseData);
+        assertThat(RespondentUtils.resolveRespondentNotificationEmailAddresses(caseDetails)).isEmpty();
+        // when respondent in the respondent collection is not valid should return an empty list
+        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
+        respondents.add(respondent);
+        assertThat(RespondentUtils.resolveRespondentNotificationEmailAddresses(caseDetails)).isEmpty();
+        // when representative not found matching with respondent should return an empty list
+        respondent.setId(RESPONDENT_ID_1);
+        respondent.setValue(RespondentSumType.builder().respondentName(RESPONDENT_NAME_1).build());
+        assertThat(RespondentUtils.resolveRespondentNotificationEmailAddresses(caseDetails)).isEmpty();
+        // when matching respondent does not have email address should return empty list
+        RepresentedTypeR representativeValue = RepresentedTypeR.builder().respondentId(RESPONDENT_ID_1).build();
+        RepresentedTypeRItem representative = RepresentedTypeRItem.builder().id(REPRESENTATIVE_ID_1)
+                .value(representativeValue).build();
+        caseData.setRepCollection(List.of(representative));
+        assertThat(RespondentUtils.resolveRespondentNotificationEmailAddresses(caseDetails)).isEmpty();
+        // when representative has email address should return a list of that email address
+        representativeValue.setRepresentativeEmailAddress(REPRESENTATIVE_EMAIL_ADDRESS_1);
+        assertThat(RespondentUtils.resolveRespondentNotificationEmailAddresses(caseDetails))
+                .isEqualTo(List.of(REPRESENTATIVE_EMAIL_ADDRESS_1));
+        // when representative id does not match with respondent id and respondent has email address should return
+        // respondent's email address in a list
+        representativeValue.setRespondentId(RESPONDENT_ID_2);
+        respondent.getValue().setRespondentEmail(RESPONDENT_EMAIL_ADDRESS_1);
+        assertThat(RespondentUtils.resolveRespondentNotificationEmailAddresses(caseDetails))
+                .isEqualTo(List.of(RESPONDENT_EMAIL_ADDRESS_1));
+    }
+
+    @Test
+    void theFindRepresentativeByRespondentId() {
+        respondentUtils.close();
+        // when representatives is empty should return null
+        assertThat(RespondentUtils.findRepresentativeByRespondentId(null, RESPONDENT_ID_1)).isNull();
+        // when representatives is not empty but respondent id is, should return null
+        RepresentedTypeRItem representative = RepresentedTypeRItem.builder().id(REPRESENTATIVE_ID_1)
+                .value(RepresentedTypeR.builder().respondentId(RESPONDENT_ID_1).build()).build();
+        List<RepresentedTypeRItem> representatives = new ArrayList<>();
+        representatives.add(representative);
+        assertThat(RespondentUtils.findRepresentativeByRespondentId(representatives, StringUtils.EMPTY)).isNull();
+        // when representatives does not have any representative representing the respondent id should return null
+        assertThat(RespondentUtils.findRepresentativeByRespondentId(representatives, RESPONDENT_ID_2)).isNull();
+        // when representatives has a representative representing the respondent id should return the representative
+        assertThat(RespondentUtils.findRepresentativeByRespondentId(representatives, RESPONDENT_ID_1))
+                .isEqualTo(representative);
     }
 }

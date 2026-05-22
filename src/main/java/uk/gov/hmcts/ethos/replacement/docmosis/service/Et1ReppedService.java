@@ -41,7 +41,7 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.ERROR_CASE_DATA_NOT_FOUND;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Et1ReppedHelper.setEt1Statuses;
 import static uk.gov.hmcts.ethos.replacement.docmosis.helpers.Helper.getFirstListItem;
 
@@ -262,7 +262,7 @@ public class Et1ReppedService {
      * @param caseData the {@link CaseData} object containing the representative and associated contact details.
      */
     public void setClaimantRepresentativeValues(String userToken, CaseData caseData) throws GenericServiceException {
-        if (REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS
+        if (REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS
                 .equals(caseData.getRepresentativeContactChangeOption())) {
             setMyHmctsOrganisationAddress(userToken, caseData);
         } else {
@@ -296,7 +296,7 @@ public class Et1ReppedService {
     public void setMyHmctsOrganisationAddress(String userToken, CaseData caseData)
             throws GenericServiceException {
         checkCaseData(caseData);
-        OrganisationAddress organisationAddress = myHmctsService.getOrganisationAddress(userToken);
+        OrganisationAddress organisationAddress = myHmctsService.getUserOrganisationAddress(userToken);
         caseData.getRepresentativeClaimantType().setRepresentativeAddress(
                 AddressUtils.mapOrganisationAddressToAddress(organisationAddress));
         caseData.setMyHmctsAddressText(AddressUtils.getOrganisationAddressAsText(organisationAddress));

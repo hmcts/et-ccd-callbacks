@@ -36,7 +36,7 @@ import java.util.List;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_CODE_FIVE_HUNDRED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_CODE_FIVE_ZERO_ONE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.HttpConstants.HTTP_CODE_FIVE_ZERO_THREE;
@@ -236,6 +236,7 @@ public class RespondentRepresentativeController {
                 for (RepresentedTypeRItem caseRepresentative : caseData.getRepCollection()) {
                     if (caseRepresentative.getId().equals(representative.getId())) {
                         caseRepresentative.getValue().setRole(representative.getValue().getRole());
+                        caseRepresentative.getValue().setIdamId(representative.getValue().getIdamId());
                     }
                 }
             }
@@ -292,7 +293,7 @@ public class RespondentRepresentativeController {
         CaseData caseData = ccdRequest.getCaseDetails().getCaseData();
         List<String> errors = new ArrayList<>();
         try {
-            if (REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS.equals(
+            if (REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS.equals(
                     caseData.getRepresentativeContactChangeOption())) {
                 nocRespondentRepresentativeService.populateMyHmctsOrganisationAddress(userToken, caseData);
             }

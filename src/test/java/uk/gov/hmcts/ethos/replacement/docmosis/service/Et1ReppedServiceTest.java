@@ -288,7 +288,7 @@ class Et1ReppedServiceTest {
                 .townCity(TEST_TOWN_CITY)
                 .build();
         caseData1.setRepresentativeAddress(AddressUtils.mapOrganisationAddressToAddress(organisationAddress));
-        when(myHmctsService.getOrganisationAddress(DUMMY_USER_TOKEN)).thenReturn(organisationAddress);
+        when(myHmctsService.getUserOrganisationAddress(DUMMY_USER_TOKEN)).thenReturn(organisationAddress);
         et1ReppedService.setClaimantRepresentativeValues(DUMMY_USER_TOKEN, caseData1);
         assertRepresentativeAddress(organisationAddress, caseData1);
         // 2: Sets the representative contact change option to use MyHMCTS details when claimant representative exists.

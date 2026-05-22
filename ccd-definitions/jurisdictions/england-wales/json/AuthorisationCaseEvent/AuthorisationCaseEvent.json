@@ -2360,7 +2360,7 @@
   },
   {
     "CaseTypeId": "ET_EnglandWales",
-    "CaseEventID": "amendRespondentRepresentativeContact",
+    "CaseEventID": "amendRepresentativeContact",
     "AccessControl": [
       {
         "UserRoles": [

@@ -57,6 +57,8 @@ public final class NOCConstants {
             "Unable to find organisation by user id for case %s.";
     public static final String EXCEPTION_USER_AND_SELECTED_ORGANISATIONS_NOT_MATCH =
             "User's organisation and selected organisation does not match, for case %s.";
+    public static final String EXCEPTION_CLAIMANT_REPRESENTATIVE_NOT_FOUND =
+            "Claimant representative not found.";
 
     public static final String ERROR_RESPONDENT_HAS_MULTIPLE_REPRESENTATIVES =
             "Respondent with name %s has more than one representative";

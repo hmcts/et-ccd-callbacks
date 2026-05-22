@@ -2385,7 +2385,7 @@
   },
   {
     "CaseTypeId": "ET_Scotland",
-    "CaseEventID": "amendRespondentRepresentativeContact",
+    "CaseEventID": "amendRepresentativeContact",
     "AccessControl": [
       {
         "UserRoles": [

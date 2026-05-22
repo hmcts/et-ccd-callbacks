@@ -13,6 +13,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.Organisation;
 import uk.gov.hmcts.et.common.model.ccd.types.OrganisationPolicy;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.ethos.replacement.docmosis.domain.ClaimantSolicitorRole;
+import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.ClaimantUtils;
 
 import java.util.List;
@@ -21,9 +22,12 @@ import java.util.UUID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.WARNING_CLAIMANT_EMAIL_NOT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.EXCEPTION_CLAIMANT_REPRESENTATIVE_NOT_FOUND;
 
 @Slf4j
 public final class ClaimantRepresentativeUtils {
+
+    private static final String CLASS_NAME = ClaimantRepresentativeUtils.class.getSimpleName();
 
     private ClaimantRepresentativeUtils() {
         // Utility classes should not have a public or default constructor.
@@ -317,5 +321,70 @@ public final class ClaimantRepresentativeUtils {
                     ClaimantSolicitorRole.CLAIMANTSOLICITOR.getCaseRoleLabel()
                     .equals(assignment.getCaseRole()));
         }
+    }
+
+    /**
+     * Updates the claimant representative contact details using the
+     * respondent ET3 response contact information stored in the case data.
+     * <p>
+     * This method updates the representative address and phone number
+     * from the corresponding ET3 response fields.
+     * <p>
+     * Assumptions:
+     * <ul>
+     *     <li>The provided case data contains a valid claimant representative.</li>
+     *     <li>The ET3 response address and phone number fields contain the latest
+     *     representative contact details.</li>
+     *     <li>The representative object within the case data is mutable.</li>
+     * </ul>
+     *
+     * @param caseData the case data containing representative and ET3 response details
+     * @param submissionReference the unique reference identifying the submission/case
+     * @throws GenericServiceException if the claimant representative details
+     *         are missing from the case data
+     */
+    public static void updateRepresentativeContactDetails(CaseData caseData, String submissionReference)
+            throws GenericServiceException {
+        final String methodName = "updateRepresentativeContactDetails";
+        if (ObjectUtils.isEmpty(caseData.getRepresentativeClaimantType())) {
+            throw new GenericServiceException(EXCEPTION_CLAIMANT_REPRESENTATIVE_NOT_FOUND,
+                    new Exception(EXCEPTION_CLAIMANT_REPRESENTATIVE_NOT_FOUND),
+                    EXCEPTION_CLAIMANT_REPRESENTATIVE_NOT_FOUND,
+                    submissionReference,
+                    CLASS_NAME,
+                    methodName);
+        }
+        RepresentedTypeC representative =  caseData.getRepresentativeClaimantType();
+        representative.setRepresentativeAddress(caseData.getEt3ResponseAddress());
+        representative.setRepresentativePhoneNumber(caseData.getEt3ResponsePhone());
+    }
+
+    /**
+     * Updates the ET3 response contact details using the claimant representative
+     * contact information stored in the case data.
+     * <p>
+     * This method copies the representative address and phone number from the
+     * claimant representative details into the ET3 response contact fields.
+     * <p>
+     * If no claimant representative details are present, the method exits
+     * without making any updates.
+     * <p>
+     * Assumptions:
+     * <ul>
+     *     <li>The claimant representative contains the latest contact details.</li>
+     *     <li>The ET3 response address and phone fields are mutable.</li>
+     *     <li>The representative object, when present, is valid.</li>
+     * </ul>
+     *
+     * @param caseData the case data containing claimant representative and
+     *                 ET3 response contact details
+     */
+    public static void updateET3ResponseContactDetails(CaseData caseData) {
+        if (ObjectUtils.isEmpty(caseData.getRepresentativeClaimantType())) {
+            return;
+        }
+        RepresentedTypeC representative =  caseData.getRepresentativeClaimantType();
+        caseData.setEt3ResponseAddress(representative.getRepresentativeAddress());
+        caseData.setEt3ResponsePhone(representative.getRepresentativePhoneNumber());
     }
 }

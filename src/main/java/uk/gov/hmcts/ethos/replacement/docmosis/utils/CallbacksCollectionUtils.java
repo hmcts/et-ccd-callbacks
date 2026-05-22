@@ -2,7 +2,11 @@ package uk.gov.hmcts.ethos.replacement.docmosis.utils;
 
 import org.apache.commons.collections4.CollectionUtils;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -43,5 +47,27 @@ public final class CallbacksCollectionUtils {
         }
         return collection1.stream().map(keyExtractor).collect(Collectors.toSet())
                 .equals(collection2.stream().map(keyExtractor).collect(Collectors.toSet()));
+    }
+
+    /**
+     * Merges two lists into a single list while removing duplicate values.
+     * <p>
+     * The order of elements is preserved based on their first occurrence.
+     *
+     * @param firstList the first list
+     * @param secondList the second list
+     * @return a merged list containing unique elements from both lists
+     */
+    public static List<String> mergeListsWithoutDuplicates(
+            List<String> firstList,
+            List<String> secondList) {
+        Set<String> mergedSet = new LinkedHashSet<>();
+        if (CollectionUtils.isNotEmpty(firstList)) {
+            mergedSet.addAll(firstList);
+        }
+        if (CollectionUtils.isNotEmpty(secondList)) {
+            mergedSet.addAll(secondList);
+        }
+        return new ArrayList<>(mergedSet);
     }
 }

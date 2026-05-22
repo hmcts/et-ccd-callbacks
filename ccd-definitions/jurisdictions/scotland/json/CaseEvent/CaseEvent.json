@@ -172,7 +172,9 @@
     "CallBackURLAboutToStartEvent": "${ET_COS_URL}/amendRepresentativeContact/aboutToStart",
     "SecurityClassification": "Public",
     "ShowEventNotes": "N",
-    "ShowSummary": "Y"
+    "ShowSummary": "Y",
+    "CallBackURLAboutToStartEvent": "${ET_COS_URL}/respondentRepresentative/amendContactDetailsAboutToStart",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/respondentRepresentative/amendContactDetailsAboutToSubmit"
   },
   {
     "CaseTypeID": "ET_Scotland",

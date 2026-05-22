@@ -58,7 +58,7 @@ public class MyHmctsService {
                     ERROR_ORGANISATION_DETAILS_NOT_FOUND,
                     StringUtils.EMPTY,
                     "MyHmctsService",
-                    "getOrganisationAddress - organisation details not found");
+                    "getUseOrganisationAddress - organisation details not found");
         }
         return response.getBody().getContactInformation().getFirst();
     }

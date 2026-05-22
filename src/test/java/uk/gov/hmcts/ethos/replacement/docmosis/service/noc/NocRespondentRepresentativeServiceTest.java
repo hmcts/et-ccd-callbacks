@@ -196,7 +196,7 @@ class NocRespondentRepresentativeServiceTest {
     private UserIdamService userIdamService;
     @MockitoBean
     private OrganisationService organisationService;
-    @MockBean
+    @MockitoBean
     private uk.gov.hmcts.ethos.replacement.docmosis.service.MyHmctsService myHmctsService;
 
     @InjectMocks

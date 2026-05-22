@@ -4892,7 +4892,7 @@
     "PageID": 1,
     "PageDisplayOrder": 1,
     "PageFieldDisplayOrder": 1,
-    "CallBackURLMidEvent": "${ET_COS_URL}/respondentRepresentative/amendContactDetailsMidEvent",
+    "CallBackURLMidEvent": "${ET_COS_URL}/amendRepresentativeContact/midEvent",
     "ShowSummaryChangeOption": "N"
   },
   {

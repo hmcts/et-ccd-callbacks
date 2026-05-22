@@ -229,8 +229,8 @@
     "DisplayOrder": 53,
     "PreConditionState(s)": "Accepted",
     "PostConditionState": "*",
-    "CallBackURLAboutToStartEvent": "${ET_COS_URL}/respondentRepresentative/amendContactDetailsAboutToStart",
-    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/respondentRepresentative/amendContactDetailsAboutToSubmit",
+    "CallBackURLAboutToStartEvent": "${ET_COS_URL}/amendRepresentativeContact/aboutToStart",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/amendRepresentativeContact/aboutToSubmit",
     "SecurityClassification": "Public",
     "ShowEventNotes": "N",
     "ShowSummary": "Y"

@@ -37,6 +37,7 @@ import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NocRespondentHelper;
 import uk.gov.hmcts.ethos.replacement.docmosis.helpers.NoticeOfChangeFieldPopulator;
 import uk.gov.hmcts.ethos.replacement.docmosis.rdprofessional.OrganisationClient;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.AdminUserService;
+import uk.gov.hmcts.ethos.replacement.docmosis.service.MyHmctsService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.OrganisationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils;
@@ -60,6 +61,7 @@ import static org.apache.commons.lang3.ObjectUtils.isEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NOT_ALLOCATED;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.GenericConstants.CASE_DETAILS_OR_CASE_DATA_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_FAILED_TO_ADD_ORGANISATION_POLICIES_REPRESENTATIVE_NOT_FOUND;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_FAILED_TO_REMOVE_ORGANISATION_POLICIES;
@@ -76,6 +78,8 @@ import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WAR
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_RETRIEVE_CASE_ASSIGNMENTS;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_RESPONDENT;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_REPRESENTATIVE_EMAIL_ADDRESS_NOT_FOUND;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils.getOrganisationAddressAsText;
+import static uk.gov.hmcts.ethos.replacement.docmosis.utils.AddressUtils.mapOrganisationAddressToAddress;
 
 @Service
 @RequiredArgsConstructor
@@ -94,6 +98,7 @@ public class NocRespondentRepresentativeService {
     private final NocService nocService;
     private final UserIdamService userIdamService;
     private final OrganisationService organisationService;
+    private final MyHmctsService myHmctsService;
 
     private static final String CLASS_NAME = NocRespondentRepresentativeService.class.getSimpleName();
 
@@ -1214,5 +1219,69 @@ public class NocRespondentRepresentativeService {
             log.warn(WARNING_FAILED_TO_RETRIEVE_CASE_ASSIGNMENTS, caseId, exception.getMessage());
             return Optional.empty();
         }
+    }
+
+    /**
+     * Pre-fills the amend contact details form with the respondent representative's current phone and address.
+     *
+     * <p>Finds the representative(s) for the authenticated user and copies their
+     * {@code representativePhoneNumber} and {@code representativeAddress} into the top-level
+     * {@code et3ResponsePhone} and {@code et3ResponseAddress} fields for display in the UI.
+     *
+     * @param userToken   the IDAM authentication token of the logged-in legal rep
+     * @param caseDetails the case details containing the representative collection
+     */
+    public void loadRespondentRepresentativeContactDetails(String userToken, CaseDetails caseDetails) {
+        List<RepresentedTypeRItem> representatives = findRepresentativesByToken(userToken, caseDetails);
+        if (CollectionUtils.isEmpty(representatives)) {
+            return;
+        }
+        RepresentedTypeR rep = representatives.getFirst().getValue();
+        caseDetails.getCaseData().setEt3ResponsePhone(rep.getRepresentativePhoneNumber());
+        caseDetails.getCaseData().setEt3ResponseAddress(rep.getRepresentativeAddress());
+    }
+
+    /**
+     * Fetches the MyHMCTS organisation address for the authenticated user and sets it on the case data
+     * so it can be displayed as a read-only field on the "Use MyHMCTS details" page.
+     *
+     * @param userToken the IDAM authentication token of the logged-in legal rep
+     * @param caseData  the case data to update with the organisation address text
+     * @throws GenericServiceException if the organisation address cannot be retrieved
+     */
+    public void populateMyHmctsOrganisationAddress(String userToken, CaseData caseData)
+            throws GenericServiceException {
+        OrganisationAddress organisationAddress = myHmctsService.getOrganisationAddress(userToken);
+        caseData.setEt3ResponseAddress(mapOrganisationAddressToAddress(organisationAddress));
+        caseData.setMyHmctsAddressText(getOrganisationAddressAsText(organisationAddress));
+    }
+
+    /**
+     * Saves the amended contact details (phone and address) back to all respondent representatives
+     * associated with the authenticated user.
+     *
+     * <p>If the user selected "Use MyHMCTS details", the organisation address is first fetched and
+     * applied to the case data before being persisted to the representative collection.
+     *
+     * @param userToken   the IDAM authentication token of the logged-in legal rep
+     * @param caseDetails the case details containing the representative collection and form values
+     * @throws GenericServiceException if the MyHMCTS organisation address cannot be retrieved
+     */
+    public void saveRespondentRepresentativeContactDetails(String userToken, CaseDetails caseDetails)
+            throws GenericServiceException {
+        CaseData caseData = caseDetails.getCaseData();
+        if (REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS.equals(
+                caseData.getRepresentativeContactChangeOption())) {
+            populateMyHmctsOrganisationAddress(userToken, caseData);
+        }
+        List<RepresentedTypeRItem> representatives = findRepresentativesByToken(userToken, caseDetails);
+        for (RepresentedTypeRItem item : representatives) {
+            if (ObjectUtils.isEmpty(item) || ObjectUtils.isEmpty(item.getValue())) {
+                continue;
+            }
+            item.getValue().setRepresentativePhoneNumber(caseData.getEt3ResponsePhone());
+            item.getValue().setRepresentativeAddress(caseData.getEt3ResponseAddress());
+        }
+        caseData.setMyHmctsAddressText(null);
     }
 }

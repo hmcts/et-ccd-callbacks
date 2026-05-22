@@ -223,14 +223,14 @@
   },
   {
     "CaseTypeID": "ET_EnglandWales",
-    "ID": "amendRespondentRepresentativeContact",
+    "ID": "amendRepresentativeContact",
     "Name": "Amend contact details",
     "Description": "Amend contact details",
     "DisplayOrder": 53,
     "PreConditionState(s)": "Accepted",
     "PostConditionState": "*",
-    "CallBackURLAboutToStartEvent": "${ET_COS_URL}/respondentRepresentative/amendContactDetailsAboutToStart",
-    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/respondentRepresentative/amendContactDetailsAboutToSubmit",
+    "CallBackURLAboutToStartEvent": "${ET_COS_URL}/amendRepresentativeContact/aboutToStart",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/amendRepresentativeContact/aboutToSubmit",
     "SecurityClassification": "Public",
     "ShowEventNotes": "N",
     "ShowSummary": "Y"

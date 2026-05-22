@@ -80,7 +80,7 @@ import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS;
 
 @ExtendWith(SpringExtension.class)
 @ContextConfiguration(classes = {CaseConverter.class, NoticeOfChangeFieldPopulator.class, ObjectMapper.class})
@@ -1030,7 +1030,8 @@ class NocRespondentRepresentativeServiceTest {
                 any(), any(), any());
         LoggerTestUtils.checkLog(Level.ERROR, LoggerTestUtils.INTEGER_TWO, EXPECTED_ERROR_UNABLE_TO_SET_ROLE);
         // when role successfully assigned should run setRepresentativesAccess without any error
-        doNothing().when(nocService).grantRepresentativeAccess(eq(ADMIN_USER_TOKEN), any(), any(), any(), any());
+        when(nocService.grantRepresentativeAccess(eq(ADMIN_USER_TOKEN), any(), any(), any(), any()))
+                .thenReturn(REPRESENTATIVE_ID_ONE);
         caseDetails.setCaseTypeId(CASE_TYPE_ID_ENGLAND_WALES);
         caseDetails.setJurisdiction(JURISDICTION_EMPLOYMENT);
         CCDRequest ccdRequest = new CCDRequest();
@@ -1746,7 +1747,7 @@ class NocRespondentRepresentativeServiceTest {
     void populateMyHmctsOrganisationAddress_setsAddressAndText() throws Exception {
         OrganisationAddress orgAddress = OrganisationAddress.builder()
                 .addressLine1("Org House").postCode("SW1A 1AA").build();
-        when(myHmctsService.getOrganisationAddress(USER_TOKEN)).thenReturn(orgAddress);
+        when(myHmctsService.getUserOrganisationAddress(USER_TOKEN)).thenReturn(orgAddress);
 
         nocRespondentRepresentativeService.populateMyHmctsOrganisationAddress(USER_TOKEN, caseData);
 
@@ -1757,10 +1758,10 @@ class NocRespondentRepresentativeServiceTest {
 
     @Test
     void populateMyHmctsOrganisationAddress_propagatesException() throws Exception {
-        when(myHmctsService.getOrganisationAddress(USER_TOKEN))
+        when(myHmctsService.getUserOrganisationAddress(USER_TOKEN))
                 .thenThrow(new GenericServiceException(EXCEPTION_DUMMY_MESSAGE,
                         new Exception(EXCEPTION_DUMMY_MESSAGE), EXCEPTION_DUMMY_MESSAGE,
-                        CASE_ID_1, "MyHmctsService", "getOrganisationAddress"));
+                        CASE_ID_1, "MyHmctsService", "getUserOrganisationAddress"));
 
         assertThrows(GenericServiceException.class,
                 () -> nocRespondentRepresentativeService.populateMyHmctsOrganisationAddress(USER_TOKEN, caseData));
@@ -1801,10 +1802,10 @@ class NocRespondentRepresentativeServiceTest {
 
     @Test
     void saveRespondentRepresentativeContactDetails_useMyHmcts_populatesFromOrg() throws Exception {
-        caseData.setRepresentativeContactChangeOption(REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS);
+        caseData.setRepresentativeContactChangeOption(REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS);
         OrganisationAddress orgAddress = OrganisationAddress.builder()
                 .addressLine1("Org Street").postCode("EC1A 1BB").build();
-        when(myHmctsService.getOrganisationAddress(USER_TOKEN)).thenReturn(orgAddress);
+        when(myHmctsService.getUserOrganisationAddress(USER_TOKEN)).thenReturn(orgAddress);
 
         RepresentedTypeRItem repItem = RepresentedTypeRItem.builder()
                 .id(REPRESENTATIVE_ID_ONE)

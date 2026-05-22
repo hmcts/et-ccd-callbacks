@@ -44,7 +44,7 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.ET3ResponseConstants.REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS;
 
 @ExtendWith(SpringExtension.class)
 @WebMvcTest({RespondentRepresentativeController.class, JsonMapper.class})
@@ -486,7 +486,7 @@ class RespondentRepresentativeControllerTest {
     void amendContactDetailsMidEvent_useMyHmcts_populatesAddress() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         ccdRequest.getCaseDetails().getCaseData()
-                .setRepresentativeContactChangeOption(REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS);
+                .setRepresentativeContactChangeOption(REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS);
         doNothing().when(nocRespondentRepresentativeService)
                 .populateMyHmctsOrganisationAddress(anyString(), any(CaseData.class));
         mockMvc.perform(post(URL_AMEND_CONTACT_DETAILS_MID_EVENT)
@@ -504,7 +504,7 @@ class RespondentRepresentativeControllerTest {
     void amendContactDetailsMidEvent_withException_returnsError() throws Exception {
         CCDRequest ccdRequest = CCDRequestBuilder.builder().build();
         ccdRequest.getCaseDetails().getCaseData()
-                .setRepresentativeContactChangeOption(REPRESENTATIVE_CONTACT_CHANGE_OPTION_USE_MYHMCTS_DETAILS);
+                .setRepresentativeContactChangeOption(REPRESENTATIVE_CONTACT_CHANGE_OPTION_MYHMCTS);
         doThrow(new GenericServiceException(DUMMY_EXCEPTION_MESSAGE, new Exception(DUMMY_EXCEPTION_MESSAGE),
                 DUMMY_EXCEPTION_MESSAGE, DUMMY_SUBMISSION_REFERENCE,
                 "NocRespondentRepresentativeService", "populateMyHmctsOrganisationAddress"))

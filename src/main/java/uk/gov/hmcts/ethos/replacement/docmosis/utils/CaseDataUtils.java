@@ -104,4 +104,32 @@ public final class CaseDataUtils {
         }
         validateCaseDetails(ccdRequest.getCaseDetails());
     }
+
+    /**
+     * Validates that the provided case data is present and not empty.
+     * <p>
+     * This method performs a basic validation check to ensure that
+     * the supplied {@link CaseData} object exists before further
+     * case processing is performed.
+     * <p>
+     * Assumptions:
+     * <ul>
+     *     <li>The submission reference uniquely identifies a case.</li>
+     *     <li>A valid workflow requires non-null case data.</li>
+     *     <li>Missing case data is considered a system/runtime error condition.</li>
+     * </ul>
+     *
+     * @param caseData the case data to validate
+     * @param submissionReference the unique reference identifying the submission/case
+     * @throws GenericRuntimeException if the case data is null or empty
+     */
+    public static void validateCaseData(CaseData caseData, String submissionReference) throws GenericServiceException {
+        String methodName = "validateCaseData";
+        if (ObjectUtils.isEmpty(caseData)) {
+            String exceptionMessage = String.format(EXCEPTION_CASE_DATA_NOT_FOUND, submissionReference);
+            throw new GenericServiceException(exceptionMessage,
+                    new Exception(exceptionMessage), exceptionMessage,
+                    exceptionMessage, CLASS_NAME, methodName);
+        }
+    }
 }

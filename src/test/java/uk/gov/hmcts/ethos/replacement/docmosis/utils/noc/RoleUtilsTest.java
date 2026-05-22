@@ -4,6 +4,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
 import org.junit.jupiter.api.Test;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
+import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
@@ -13,6 +14,8 @@ import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.et.common.model.ccd.types.RespondentSumType;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -21,6 +24,7 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 final class RoleUtilsTest {
 
     private static final String RESPONDENT_ID_1 = "Respondent Id One";
+    private static final String RESPONDENT_ID_2 = "Respondent Id Two";
     private static final String RESPONDENT_NAME_ONE = "Respondent Name One";
     private static final String RESPONDENT_NAME_TWO = "Respondent Name Two";
     private static final String RESPONDENT_NAME_THREE = "Respondent Name Three";
@@ -60,6 +64,8 @@ final class RoleUtilsTest {
     private static final String ROLE_CLAIMANT_SOLICITOR_LOWERCASE = "[claimantsolicitor]";
     private static final String ROLE_CLAIMANT_SOLICITOR_INVALID = "[CLAIMANTSOLICITORINVALID]";
     private static final String ROLE_INVALID = "[INVALIDROLE]";
+    private static final String REPRESENTATIVE_ID_1 = "Representative Id One";
+    private static final String REPRESENTATIVE_ID_2 = "Representative Id Two";
 
     private static final int INTEGER_THREE = 3;
     private static final int INTEGER_FOUR = 4;
@@ -518,5 +524,132 @@ final class RoleUtilsTest {
         // when answer has respondent name should return true
         noticeOfChangeAnswers = NoticeOfChangeAnswers.builder().respondentName(RESPONDENT_NAME_ONE).build();
         assertThat(RoleUtils.isValidNoticeOfChangeAnswers(noticeOfChangeAnswers)).isTrue();
+    }
+
+    @Test
+    void theFindFirstAssignmentsGroupedBySolicitorRole() {
+        // when case user assignment data is empty should return empty collection
+        assertThat(RoleUtils.findFirstAssignmentsGroupedBySolicitorRole(null)).isEmpty();
+        // when case user assignment list is empty should return empty collection
+        assertThat(RoleUtils.findFirstAssignmentsGroupedBySolicitorRole(Collections.emptyList())).isEmpty();
+        // when there is only one respondent case user assignment should return that assignment
+        CaseUserAssignment caseUserAssignmentSolicitorA1 = CaseUserAssignment.builder().caseRole(ROLE_SOLICITOR_A)
+                .userId(REPRESENTATIVE_ID_1).build();
+        List<CaseUserAssignment> caseUserAssignments = new ArrayList<>();
+        caseUserAssignments.add(caseUserAssignmentSolicitorA1);
+        assertThat(RoleUtils.findFirstAssignmentsGroupedBySolicitorRole(caseUserAssignments))
+                .isEqualTo(List.of(caseUserAssignmentSolicitorA1));
+        // when there are two respondent case user assignments, returns the first assignment
+        CaseUserAssignment caseUserAssignmentSolicitorA2 = CaseUserAssignment.builder().caseRole(ROLE_SOLICITOR_A)
+                .userId(REPRESENTATIVE_ID_2).build();
+        caseUserAssignments.add(caseUserAssignmentSolicitorA2);
+        assertThat(RoleUtils.findFirstAssignmentsGroupedBySolicitorRole(caseUserAssignments))
+                .isEqualTo(List.of(caseUserAssignmentSolicitorA2));
+        // when there are more assignments with different roles, should return the first assignments of those roles
+        CaseUserAssignment caseUserAssignmentSolicitorB1 = CaseUserAssignment.builder().caseRole(ROLE_SOLICITOR_B)
+                .userId(REPRESENTATIVE_ID_1).build();
+        caseUserAssignments.add(caseUserAssignmentSolicitorB1);
+        assertThat(RoleUtils.findFirstAssignmentsGroupedBySolicitorRole(caseUserAssignments))
+                .isEqualTo(List.of(caseUserAssignmentSolicitorA2, caseUserAssignmentSolicitorB1));
+        CaseUserAssignment caseUserAssignmentSolicitorB2 = CaseUserAssignment.builder().caseRole(ROLE_SOLICITOR_B)
+                .userId(REPRESENTATIVE_ID_2).build();
+        caseUserAssignments.add(caseUserAssignmentSolicitorB2);
+        assertThat(RoleUtils.findFirstAssignmentsGroupedBySolicitorRole(caseUserAssignments))
+                .isEqualTo(List.of(caseUserAssignmentSolicitorA2, caseUserAssignmentSolicitorB2));
+    }
+
+    @Test
+    void theGetCaseRolesForUser() {
+        // when case user assignments is empty should return an empty list
+        CaseData caseData = CaseDataBuilder.builder().build();
+        assertThat(RoleUtils.getCaseRolesForUser(caseData, null, REPRESENTATIVE_ID_1)).isEmpty();
+        // when representative id is empty should return an empty list
+        List<CaseUserAssignment> caseUserAssignments = List.of(CaseUserAssignment.builder().caseRole(ROLE_SOLICITOR_A)
+                .userId(REPRESENTATIVE_ID_1).build());
+        assertThat(RoleUtils.getCaseRolesForUser(caseData, caseUserAssignments, StringUtils.EMPTY)).isEmpty();
+        // when representative id not exists in the case user assignments should return an empty list
+        assertThat(RoleUtils.getCaseRolesForUser(caseData, caseUserAssignments, REPRESENTATIVE_ID_2)).isEmpty();
+        // when representative found should return role list
+        RepresentedTypeRItem representative = RepresentedTypeRItem.builder().build();
+        representative.setId(REPRESENTATIVE_ID_1);
+        caseData.setRepCollection(List.of(representative));
+        RepresentedTypeR representativeValue = RepresentedTypeR.builder().respondentId(RESPONDENT_ID_1)
+                .idamId(REPRESENTATIVE_ID_1).build();
+        representative.setValue(representativeValue);
+        RespondentSumType respondentValue = RespondentSumType.builder().respondentName(RESPONDENT_NAME_ONE).build();
+        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
+        respondent.setValue(respondentValue);
+        respondent.setId(RESPONDENT_ID_1);
+        caseData.setRespondentCollection(List.of(respondent));
+        assertThat(RoleUtils.getCaseRolesForUser(caseData, caseUserAssignments, REPRESENTATIVE_ID_1))
+                .isEqualTo(List.of(ROLE_SOLICITOR_A));
+    }
+
+    @Test
+    void theFindFirstCaseRolesByUserId() {
+        // when there is no case assignment found for the given user id should return an empty list
+        List<CaseUserAssignment> caseUserAssignments = List.of(CaseUserAssignment.builder().caseRole(ROLE_SOLICITOR_A)
+                .userId(REPRESENTATIVE_ID_1).build());
+        assertThat(RoleUtils.findFirstCaseRolesByUserId(caseUserAssignments, REPRESENTATIVE_ID_2)).isEmpty();
+        // when there are case assignments found for the given user id should return the latest case roles
+        assertThat(RoleUtils.findFirstCaseRolesByUserId(caseUserAssignments, REPRESENTATIVE_ID_1))
+                .isEqualTo(List.of(ROLE_SOLICITOR_A));
+    }
+
+    @Test
+    void theRemoveRolesWithoutMatchingRespondentRepresentative() {
+        // when case roles is empty should reset case roles
+        List<String> caseRoles = new ArrayList<>();
+        CaseData caseData = new  CaseData();
+        RoleUtils.removeRolesWithoutMatchingRespondentRepresentative(caseData, caseRoles, REPRESENTATIVE_ID_1);
+        assertThat(caseRoles).isEqualTo(Collections.emptyList());
+        // when respondent collection is empty should reset case roles
+        caseRoles.add(ROLE_SOLICITOR_A);
+        RoleUtils.removeRolesWithoutMatchingRespondentRepresentative(caseData, caseRoles, REPRESENTATIVE_ID_1);
+        assertThat(caseRoles).isEqualTo(Collections.emptyList());
+        // when representative collection is empty should reset case roles
+        RespondentSumType respondentValue = RespondentSumType.builder().respondentName(RESPONDENT_NAME_ONE).build();
+        RespondentSumTypeItem respondent = new RespondentSumTypeItem();
+        respondent.setValue(respondentValue);
+        respondent.setId(RESPONDENT_ID_1);
+        caseData.setRespondentCollection(List.of(respondent));
+        caseRoles.add(ROLE_SOLICITOR_A);
+        RoleUtils.removeRolesWithoutMatchingRespondentRepresentative(caseData, caseRoles, REPRESENTATIVE_ID_1);
+        assertThat(caseRoles).isEqualTo(Collections.emptyList());
+        // when role is not a valid respondent role should not change case roles
+        RepresentedTypeRItem representative = RepresentedTypeRItem.builder().build();
+        representative.setId(REPRESENTATIVE_ID_1);
+        caseData.setRepCollection(List.of(representative));
+        caseRoles.clear();
+        caseRoles.add(ROLE_INVALID);
+        RoleUtils.removeRolesWithoutMatchingRespondentRepresentative(caseData, caseRoles, REPRESENTATIVE_ID_1);
+        assertThat(caseRoles).isEqualTo(Collections.emptyList());
+        // when role index is greater than or equal to respondent collection size  should remove role
+        caseRoles.clear();
+        caseRoles.add(ROLE_SOLICITOR_B);
+        RoleUtils.removeRolesWithoutMatchingRespondentRepresentative(caseData, caseRoles, REPRESENTATIVE_ID_1);
+        assertThat(caseRoles).isEqualTo(Collections.emptyList());
+        // when representative is not a valid representative  should remove role
+        caseRoles.clear();
+        caseRoles.add(ROLE_SOLICITOR_A);
+        RoleUtils.removeRolesWithoutMatchingRespondentRepresentative(caseData, caseRoles, REPRESENTATIVE_ID_1);
+        assertThat(caseRoles).isEqualTo(Collections.emptyList());
+        // when representative idam id not equal to user id should remove role
+        RepresentedTypeR representativeValue = RepresentedTypeR.builder().respondentId(RESPONDENT_ID_2)
+                .idamId(REPRESENTATIVE_ID_1).build();
+        representative.setValue(representativeValue);
+        caseRoles.add(ROLE_SOLICITOR_A);
+        RoleUtils.removeRolesWithoutMatchingRespondentRepresentative(caseData, caseRoles, REPRESENTATIVE_ID_2);
+        assertThat(caseRoles).isEqualTo(Collections.emptyList());
+        // when representative respondent id not equal to respondent id of the selected role indexed respondent should
+        // remove role
+        caseRoles.add(ROLE_SOLICITOR_A);
+        RoleUtils.removeRolesWithoutMatchingRespondentRepresentative(caseData, caseRoles, REPRESENTATIVE_ID_1);
+        assertThat(caseRoles).isEqualTo(Collections.emptyList());
+        // when representative respondent id is equal to the selected role indexed respondent should not remove role
+        caseRoles.add(ROLE_SOLICITOR_A);
+        representativeValue.setRespondentId(RESPONDENT_ID_1);
+        RoleUtils.removeRolesWithoutMatchingRespondentRepresentative(caseData, caseRoles, REPRESENTATIVE_ID_1);
+        assertThat(caseRoles).isEqualTo(List.of(ROLE_SOLICITOR_A));
     }
 }

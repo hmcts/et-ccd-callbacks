@@ -169,10 +169,10 @@
     "PreConditionState(s)": "Accepted",
     "PostConditionState": "*",
     "SecurityClassification": "Public",
-    "EventEnablingCondition": "caseType =\"dummy\"",
     "ShowEventNotes": "N",
     "ShowSummary": "Y",
-    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/et3Response/aboutToSubmitAmendRepresentativeContact"
+    "CallBackURLAboutToStartEvent": "${ET_COS_URL}/respondentRepresentative/amendContactDetailsAboutToStart",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/respondentRepresentative/amendContactDetailsAboutToSubmit"
   },
   {
     "CaseTypeID": "ET_Scotland",

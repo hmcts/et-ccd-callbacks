@@ -987,17 +987,15 @@ public class NocRespondentRepresentativeService {
                 || CollectionUtils.isEmpty(caseUserAssignmentData.getCaseUserAssignments())) {
             return Collections.emptyList();
         }
-        List<CaseUserAssignment> representativeAssignments = RespondentRepresentativeUtils
-                .findCaseUserAssignmentsByRepresentativeIdamId(caseUserAssignmentData.getCaseUserAssignments(),
-                        userDetails.getUid());
         List<RepresentedTypeRItem> representatives = new ArrayList<>();
-        for (CaseUserAssignment caseUserAssignment : representativeAssignments) {
-            if (!RoleUtils.isRespondentRepresentativeRole(caseUserAssignment.getCaseRole())) {
+        for (CaseUserAssignment caseUserAssignment : caseUserAssignmentData.getCaseUserAssignments()) {
+            if (!RoleUtils.isRespondentRepresentativeRole(caseUserAssignment.getCaseRole())
+                    || !userDetails.getUid().equals(caseUserAssignment.getUserId())) {
                 continue;
             }
             RepresentedTypeRItem representative =
-                    RespondentRepresentativeUtils.findRepresentativeByRoleOrRespondentName(caseDetails.getCaseData(),
-                            caseUserAssignment.getCaseRole());
+                    RespondentRepresentativeUtils.findRepresentativeByRoleRespondentIdOrRespondentName(
+                            caseDetails.getCaseData(), caseUserAssignment.getCaseRole());
             if (ObjectUtils.isNotEmpty(representative)) {
                 representatives.add(representative);
             }

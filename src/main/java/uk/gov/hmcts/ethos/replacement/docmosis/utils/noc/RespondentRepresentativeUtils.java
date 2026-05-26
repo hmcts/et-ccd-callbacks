@@ -9,11 +9,9 @@ import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
 import uk.gov.hmcts.et.common.model.ccd.CaseUserAssignment;
 import uk.gov.hmcts.et.common.model.ccd.items.RepresentedTypeRItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
-import uk.gov.hmcts.et.common.model.ccd.types.NoticeOfChangeAnswers;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeR;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.RespondentUtils;
-import uk.gov.hmcts.reform.et.syaapi.service.utils.NoticeOfChangeUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -708,12 +706,21 @@ public final class RespondentRepresentativeUtils {
      * @return the matching {@link RepresentedTypeRItem}, or {@code null} if no representative
      *         can be found using either lookup strategy
      */
-    public static RepresentedTypeRItem findRepresentativeByRoleOrRespondentName(CaseData caseData, String role) {
+    public static RepresentedTypeRItem findRepresentativeByRoleRespondentIdOrRespondentName(CaseData caseData,
+                                                                                            String role) {
         RepresentedTypeRItem representative = findRepresentativeByRole(caseData, role);
         if (ObjectUtils.isNotEmpty(representative)) {
             return representative;
         }
-        String respondentName = findRespondentNameByRole(caseData, role);
+        RespondentSumTypeItem respondent = RoleUtils.findRespondentByRole(caseData, role);
+        if (ObjectUtils.isNotEmpty(respondent)) {
+            representative = RespondentRepresentativeUtils
+                    .findRepresentativeByRespondentId(caseData, respondent.getId());
+        }
+        if (ObjectUtils.isNotEmpty(representative)) {
+            return representative;
+        }
+        String respondentName = RoleUtils.findRespondentNameByRole(caseData, role);
         return findRepresentativeByRespondentName(caseData, respondentName);
     }
 
@@ -722,7 +729,7 @@ public final class RespondentRepresentativeUtils {
      * that the representative exists within the supplied list of representatives.
      *
      * <p>The method first attempts to locate a representative using
-     * {@link #findRepresentativeByRoleOrRespondentName(CaseData, String)}. If a representative
+     * {@link #findRepresentativeByRoleRespondentIdOrRespondentName(CaseData, String)}. If a representative
      * is found, it then checks whether a valid representative with the same identifier exists
      * in the provided {@code representatives} list.</p>
      *
@@ -750,7 +757,7 @@ public final class RespondentRepresentativeUtils {
      */
     public static RepresentedTypeRItem findRepresentativeInListByRoleOrRespondentName(
             CaseData caseData, String role, List<RepresentedTypeRItem> representatives) {
-        RepresentedTypeRItem tmpRepresentative = findRepresentativeByRoleOrRespondentName(caseData, role);
+        RepresentedTypeRItem tmpRepresentative = findRepresentativeByRoleRespondentIdOrRespondentName(caseData, role);
         if (tmpRepresentative != null && StringUtils.isNotBlank(tmpRepresentative.getId())) {
             for (RepresentedTypeRItem representative : representatives) {
                 if (!isValidRepresentative(representative)) {
@@ -793,36 +800,6 @@ public final class RespondentRepresentativeUtils {
     }
 
     /**
-     * Retrieves the respondent name associated with the specified role from the case data.
-     *
-     * <p>The method determines the index of the given role using
-     * {@link RoleUtils#findRoleIndexByRoleLabel(String)} and then retrieves the corresponding
-     * {@link NoticeOfChangeAnswers} from the {@link CaseData}. If a matching entry exists and
-     * contains a respondent name, that name is returned.</p>
-     *
-     * <p>If the role cannot be resolved to a valid index, or if the corresponding
-     * {@link NoticeOfChangeAnswers} object or respondent name is empty, the method returns {@code null}.</p>
-     *
-     * @param caseData the case data containing notice of change answers
-     * @param role the role label used to locate the respondent
-     * @return the respondent name associated with the given role, or {@code null} if the role is invalid
-     *         or no respondent name is available
-     */
-    public static String findRespondentNameByRole(CaseData caseData, String role) {
-        int roleIndex = RoleUtils.findRoleIndexByRoleLabel(role);
-        if (roleIndex == -1) {
-            return null;
-        }
-        NoticeOfChangeAnswers noticeOfChangeAnswers = NoticeOfChangeUtils
-                .getNoticeOfChangeAnswersAtIndex(caseData, roleIndex);
-        if (ObjectUtils.isEmpty(noticeOfChangeAnswers)
-                || ObjectUtils.isEmpty(noticeOfChangeAnswers.getRespondentName())) {
-            return null;
-        }
-        return noticeOfChangeAnswers.getRespondentName();
-    }
-
-    /**
      * Finds the first valid respondent representative in the case data whose name matches the
      * provided respondent name.
      *
@@ -846,6 +823,18 @@ public final class RespondentRepresentativeUtils {
         return caseData.getRepCollection().stream()
                 .filter(RespondentRepresentativeUtils::isValidRepresentative)
                 .filter(rep -> respondentName.equals(rep.getValue().getRespRepName()))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public static RepresentedTypeRItem findRepresentativeByRespondentId(CaseData caseData,
+                                                                          String respondentId) {
+        if (StringUtils.isBlank(respondentId)) {
+            return null;
+        }
+        return caseData.getRepCollection().stream()
+                .filter(RespondentRepresentativeUtils::isValidRepresentative)
+                .filter(rep -> respondentId.equals(rep.getValue().getRespondentId()))
                 .findFirst()
                 .orElse(null);
     }

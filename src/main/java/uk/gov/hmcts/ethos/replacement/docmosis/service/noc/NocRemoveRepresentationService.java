@@ -142,7 +142,6 @@ public class NocRemoveRepresentationService {
             String orgId = NocRespondentMapper.getFirstRepOrganisationId(currentRepList);
             return RespondentRepresentativeUtils.findRepresentativesByOrganisationId(caseData, orgId);
         }
-
         return currentRepList;
     }
 }

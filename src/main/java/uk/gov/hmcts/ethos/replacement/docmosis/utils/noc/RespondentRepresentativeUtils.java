@@ -960,15 +960,15 @@ public final class RespondentRepresentativeUtils {
      * </ul>
      *
      * @param caseUserAssignments the list of case user assignments to search
-     * @param representativeId the user ID of the representative whose assignments should be returned
+     * @param representativeIdamId the user ID of the representative whose assignments should be returned
      * @return a new list containing the case user assignments for the given representative ID;
      *         an empty list if no matching assignments are found
      */
-    public static List<CaseUserAssignment> findCaseUserAssignmentsByRepresentativeId(
-            List<CaseUserAssignment> caseUserAssignments, String representativeId) {
+    public static List<CaseUserAssignment> findCaseUserAssignmentsByRepresentativeIdamId(
+            List<CaseUserAssignment> caseUserAssignments, String representativeIdamId) {
         List<CaseUserAssignment> tmpCaseUserAssignments = new ArrayList<>();
         for (CaseUserAssignment caseUserAssignment : caseUserAssignments) {
-            if (representativeId.equals(caseUserAssignment.getUserId())) {
+            if (representativeIdamId.equals(caseUserAssignment.getUserId())) {
                 tmpCaseUserAssignments.add(caseUserAssignment);
             }
         }

@@ -445,7 +445,7 @@ public class NocRespondentRepresentativeService {
             return new ArrayList<>();
         }
         List<CaseUserAssignment> representativeRemainingAssignments = RespondentRepresentativeUtils
-                .findCaseUserAssignmentsByRepresentativeId(caseUserAssignments,
+                .findCaseUserAssignmentsByRepresentativeIdamId(caseUserAssignments,
                         accountIdByEmailResponse.getUserIdentifier());
         List<CaseUserAssignment> caseUserAssignmentsToRevoke = new ArrayList<>();
         // finds representative's other case assignments
@@ -987,10 +987,12 @@ public class NocRespondentRepresentativeService {
                 || CollectionUtils.isEmpty(caseUserAssignmentData.getCaseUserAssignments())) {
             return Collections.emptyList();
         }
+        List<CaseUserAssignment> representativeAssignments = RespondentRepresentativeUtils
+                .findCaseUserAssignmentsByRepresentativeIdamId(caseUserAssignmentData.getCaseUserAssignments(),
+                        userDetails.getUid());
         List<RepresentedTypeRItem> representatives = new ArrayList<>();
-        for (CaseUserAssignment caseUserAssignment : caseUserAssignmentData.getCaseUserAssignments()) {
-            if (!RoleUtils.isRespondentRepresentativeRole(caseUserAssignment.getCaseRole())
-                    || !userDetails.getUid().equals(caseUserAssignment.getUserId())) {
+        for (CaseUserAssignment caseUserAssignment : representativeAssignments) {
+            if (!RoleUtils.isRespondentRepresentativeRole(caseUserAssignment.getCaseRole())) {
                 continue;
             }
             RepresentedTypeRItem representative =

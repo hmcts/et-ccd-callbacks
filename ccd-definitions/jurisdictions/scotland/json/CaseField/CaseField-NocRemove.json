@@ -35,7 +35,7 @@
   {
     "CaseTypeID": "ET_Scotland",
     "ID": "nocRemoveRepClaimantSignLabel",
-    "Label": "You should tick to 'sign' when<br>Your organisation will no longer be representing claimant.<br>You have served notice of this change to your former client.",
+    "Label": "You should check the boxes to 'sign' when<br>Your organisation will no longer be representing claimant.<br>You have served notice of this change to your former client.",
     "FieldType": "Label",
     "SecurityClassification": "Public",
     "Searchable": "N"
@@ -43,7 +43,7 @@
   {
     "CaseTypeID": "ET_Scotland",
     "ID": "nocRemoveRepRespondentSignLabel",
-    "Label": "You should tick to 'sign' when<br>Your organisation will no longer be representing respondent.<br>You have served notice of this change to your former client.",
+    "Label": "You should check the boxes to 'sign' when<br>Your organisation will no longer be representing respondent.<br>You have served notice of this change to your former client.",
     "FieldType": "Label",
     "SecurityClassification": "Public",
     "Searchable": "N"

@@ -44,7 +44,7 @@
   {
     "CaseTypeID": "ET_EnglandWales",
     "ID": "nocRemoveRepRemoveOrgLabelClaimant",
-    "Label": "You should tick to 'sign' when<br>- Your organisation will no longer be representing the claimant.<br>- You have served notice of this change to your former client.",
+    "Label": "You should check the boxes to 'sign' when<br>- Your organisation will no longer be representing the claimant.<br>- You have served notice of this change to your former client.",
     "FieldType": "Label",
     "SecurityClassification": "Public",
     "Searchable": "N"
@@ -52,7 +52,7 @@
   {
     "CaseTypeID": "ET_EnglandWales",
     "ID": "nocRemoveRepRemoveOrgLabelRespondent",
-    "Label": "You should tick to 'sign' when<br>- Your organisation will no longer be representing the respondent.<br>- You have served notice of this change to your former client.",
+    "Label": "You should check the boxes to 'sign' when<br>- Your organisation will no longer be representing the respondent.<br>- You have served notice of this change to your former client.",
     "FieldType": "Label",
     "SecurityClassification": "Public",
     "Searchable": "N"

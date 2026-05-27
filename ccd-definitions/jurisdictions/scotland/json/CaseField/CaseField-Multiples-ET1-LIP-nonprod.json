@@ -1,6 +1,6 @@
 [
   {
-    "CaseTypeID": "ET_EnglandWales",
+    "CaseTypeID": "ET_Scotland",
     "ID": "additionalClaimants",
     "Label": "Additional claimants",
     "FieldType": "Collection",
@@ -9,7 +9,7 @@
     "Searchable": "N"
   },
   {
-    "CaseTypeID": "ET_EnglandWales",
+    "CaseTypeID": "ET_Scotland",
     "ID": "addClaimantMethod",
     "Label": "Add claimant method",
     "FieldType": "Text",

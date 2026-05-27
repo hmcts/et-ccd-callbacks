@@ -600,8 +600,6 @@ public final class Et1ReppedHelper {
         caseData.setLinkedCasesYesNo(null);
         caseData.setLinkedCasesDetails(null);
         caseData.setAdditionalClaimants(null);
-        caseData.setAddClaimantMethod(null);
-        caseData.setAddAdditionalRespondent(null);
     }
 
     /**

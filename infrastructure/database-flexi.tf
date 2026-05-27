@@ -10,7 +10,7 @@ locals {
   db_config = var.env != "aat" ? local.db_base_config : concat(local.db_base_config, [
     {
       name  = "azure.extensions"
-      value = "postgres_fdw"
+      value = "postgres_fdw,pgcrypto"
     }
   ])
 }

@@ -1,11 +1,11 @@
 package uk.gov.hmcts.et.common.model.hmc;
 
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.et.common.model.hmc.validator.EnumPattern;
 
 import java.time.LocalDate;
-import javax.validation.constraints.NotNull;
 
 @Data
 @NoArgsConstructor

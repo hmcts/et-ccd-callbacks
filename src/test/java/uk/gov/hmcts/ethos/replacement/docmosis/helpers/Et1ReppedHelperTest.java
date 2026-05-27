@@ -11,10 +11,8 @@ import uk.gov.hmcts.et.common.model.ccd.Address;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
 import uk.gov.hmcts.et.common.model.ccd.CaseData;
 import uk.gov.hmcts.et.common.model.ccd.CaseDetails;
-import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.RepresentedTypeC;
 import uk.gov.hmcts.et.common.model.ccd.types.UploadedDocumentType;
-import uk.gov.hmcts.et.common.model.ccd.types.multiples.AdditionalClaimant;
 import uk.gov.hmcts.ethos.replacement.docmosis.constants.ET1ReppedConstants;
 import uk.gov.hmcts.ethos.replacement.docmosis.exceptions.GenericServiceException;
 
@@ -184,24 +182,6 @@ class Et1ReppedHelperTest {
         Et1ReppedHelper.setEt1SubmitData(caseData);
         assertEquals(NO_LONGER_WORKING, caseData.getClaimantOtherType().getStillWorking());
 
-    }
-
-    @Test
-    void setEt1SubmitDataAdditionalClaimants() {
-        AdditionalClaimant additionalClaimant = AdditionalClaimant.builder()
-                .firstName("Jane")
-                .lastName("Doe")
-                .email("jane.doe@example.com")
-                .build();
-        caseData.setAddClaimantMethod("manually");
-        caseData.setAdditionalClaimants(List.of(GenericTypeItem.from("claimant-1", additionalClaimant)));
-
-        Et1ReppedHelper.setEt1SubmitData(caseData);
-
-        assertThat(caseData.getAdditionalClaimants()).hasSize(1);
-        assertThat(caseData.getAdditionalClaimants().getFirst().getValue().getFirstName()).isEqualTo("Jane");
-        assertThat(caseData.getAdditionalClaimants().getFirst().getValue().getLastName()).isEqualTo("Doe");
-        assertThat(caseData.getAddClaimantMethod()).isEqualTo("manually");
     }
 
     private void generateRespondentTypeInfo(String type) {

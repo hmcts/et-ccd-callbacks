@@ -1,84 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <suppressions xmlns="https://jeremylong.github.io/DependencyCheck/dependency-suppression.1.3.xsd">
-    <!--Below suppressed as library no longer getting updates. Needs to be removed once DB switchover from queue -->
-    <suppress until="2026-01-07Z">
-        <notes><![CDATA[file name: adal4j-1.6.7.jar]]></notes>
-        <packageUrl regex="true">^pkg:maven/com\.microsoft\.azure/adal4j@.*$</packageUrl>
-        <cve>CVE-2021-42306</cve>
-    </suppress>
+    <!-- Suppressing PDF Box as we're using the latest version, and no fix is available -->
     <suppress>
-   <notes><![CDATA[
-   file name: azure-annotations-1.10.0.jar
-   ]]></notes>
-   <packageUrl regex="true">^pkg:maven/com\.microsoft\.azure/azure\-annotations@.*$</packageUrl>
-   <cpe>cpe:/a:microsoft:azure_sdk_for_java</cpe>
+        <notes><![CDATA[
+    file name: pdfbox-3.0.7.jar and pdfbox-io-3.0.7.jar
+    ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.apache\.pdfbox/pdfbox(\-io)?@.*$</packageUrl>
+        <cpe>cpe:/a:apache:pdfbox</cpe>
     </suppress>
-    <suppress until="2025-10-07Z">
-        <cve>CVE-2023-36052</cve>
+    <!-- CVEs coming from CFTLib Usage and require common components to upgrade before we can remove the suppression -->
+    <suppress>
+        <notes><![CDATA[
+   file name: hibernate-validator-8.0.3.Final.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/org\.hibernate\.validator/hibernate\-validator@.*$</packageUrl>
+        <cve>CVE-2025-15104</cve>
     </suppress>
     <suppress>
         <notes><![CDATA[
-   file name: azure-client-authentication-1.7.14.jar
+   file name: angus-activation-2.0.3.jar
    ]]></notes>
-        <packageUrl regex="true">^pkg:maven/com\.microsoft\.azure/azure\-client\-authentication@.*$</packageUrl>
-        <cve>CVE-2024-35255</cve>
-    </suppress>
-    <suppress until="2025-10-07Z">
-        <cve>CVE-2024-43591</cve>
-    </suppress>
-    <suppress>
-        <notes><![CDATA[
-   file name: adal4j-1.6.7.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/com\.microsoft\.azure/adal4j@.*$</packageUrl>
-        <cpe>cpe:/a:microsoft:azure_active_directory</cpe>
-    </suppress>
-    <!-- Above to be removed when migrated to DB instead of SB queue -->
-    <suppress>
-        <notes><![CDATA[
-   file name: lucene-analyzers-common-8.11.1.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.apache\.lucene/lucene\-analyzers\-common@.*$</packageUrl>
-        <cpe>cpe:/a:apache:lucene</cpe>
-    </suppress>
-    <suppress>
-        <cve>CVE-2024-45772</cve>
-    </suppress>
-    <!-- Suppressing bcprov-jdk15on CVE while transitive deps still require jdk15on; no newer jdk15on artifact published -->
-    <suppress until="2026-06-30Z">
-        <notes><![CDATA[
-   file name: bcprov-jdk15on-1.70.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.bouncycastle/bcprov\-jdk15on@.*$</packageUrl>
-        <cve>CVE-2023-33202</cve>
-    </suppress>
-    <!-- Suppressing due to dependency on other services as we use CFTLib-->
-    <suppress>
-        <cve>CVE-2024-38820</cve>
-    </suppress>
-    <!-- Suppressing due to dependency on other services as we use CFTLib and the latest version 2.0.3 doesn't fix the issue-->
-    <suppress until="2026-02-20Z">
-        <notes><![CDATA[
-   file name: angus-activation-2.0.2.jar
-   ]]></notes>
-        <packageUrl regex="true">^pkg:maven/org\.eclipse\.angus\/angus\-activation@.*$</packageUrl>
+        <packageUrl regex="true">^pkg:maven/org\.eclipse\.angus/angus\-activation@.*$</packageUrl>
         <cpe>cpe:/a:eclipse:angus_mail</cpe>
-        <cve>CVE-2025-7962</cve>
-    </suppress>
-     <suppress>
-       <notes><![CDATA[
-       file name: angus-activation-2.0.2.jar
-       ]]></notes>
-       <packageUrl regex="true">^pkg:maven/org\.eclipse\.angus/angus\-activation@.*$</packageUrl>
-       <cve>CVE-2025-7962</cve>
     </suppress>
     <suppress>
-       <cve>CVE-2025-15104</cve>
+        <notes><![CDATA[
+   file name: commons-validator-1.10.1.jar
+   ]]></notes>
+        <packageUrl regex="true">^pkg:maven/commons\-validator/commons\-validator@.*$</packageUrl>
+        <cpe>cpe:/a:validator:validator</cpe>
     </suppress>
-    <suppress>
-       <cve>CVE-2026-23907</cve>
-    </suppress>
-    <suppress>
-       <cve>CVE-2026-33929</cve>
-    </suppress>
+    <!-- All other CVEs below -->
 </suppressions>

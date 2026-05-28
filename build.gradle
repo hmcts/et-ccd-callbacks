@@ -393,7 +393,7 @@ ext {
     log4JVersion = '2.25.4'
     pact_version = '4.3.10'
     reformLoggingVersion = '6.0.1'
-    serenity = '3.9.8'
+    serenity = '5.3.10'
     tomcatEmbedVersion = '10.1.55'
     jacksonVersion = '2.18.3'
 }
@@ -498,6 +498,8 @@ dependencies {
     implementation group: 'commons-beanutils', name: 'commons-beanutils', version: '1.11.0'
     implementation 'jakarta.annotation:jakarta.annotation-api:2.1.1'
     implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.13.4'
+    implementation 'com.google.guava:guava'
+    implementation group: 'joda-time', name: 'joda-time', version: '2.12.7'
 
     implementation group: 'com.github.hmcts', name: 'befta-fw', version: '9.2.6', {
         exclude group: 'org.apache.commons', module: 'commons-compress'

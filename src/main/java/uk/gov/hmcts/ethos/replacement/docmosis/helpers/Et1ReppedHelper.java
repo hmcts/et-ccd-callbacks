@@ -599,7 +599,7 @@ public final class Et1ReppedHelper {
         caseData.setTribunalRecommendationDetails(null);
         caseData.setLinkedCasesYesNo(null);
         caseData.setLinkedCasesDetails(null);
-        caseData.setAdditionalClaimants(null);
+        caseData.setAddAdditionalRespondent(null);
     }
 
     /**

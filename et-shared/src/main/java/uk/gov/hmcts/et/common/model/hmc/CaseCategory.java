@@ -1,14 +1,13 @@
 package uk.gov.hmcts.et.common.model.hmc;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import uk.gov.hmcts.et.common.model.hmc.validator.EnumPattern;
-
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
 
 @Builder
 @Data

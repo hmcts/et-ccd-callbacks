@@ -178,12 +178,16 @@ public final class TransferToEcmCaseDataHelper {
     }
 
     private static void copyScotlandData(uk.gov.hmcts.et.common.model.ccd.CaseData oldCaseData, CaseData caseData) {
-        caseData.setManagingOffice(oldCaseData.getManagingOffice().equals(UNASSIGNED_OFFICE)
-                                       ? TribunalOffice.GLASGOW.getOfficeName()
-                                       : oldCaseData.getManagingOffice());
-        caseData.setAllocatedOffice(oldCaseData.getAllocatedOffice().equals(UNASSIGNED_OFFICE)
-                                        ? TribunalOffice.GLASGOW.getOfficeName()
-                                        : oldCaseData.getAllocatedOffice());
+        String managingOffice = oldCaseData.getManagingOffice();
+        String allocatedOffice = oldCaseData.getAllocatedOffice();
+
+        caseData.setManagingOffice(UNASSIGNED_OFFICE.equals(managingOffice)
+                ? TribunalOffice.GLASGOW.getOfficeName()
+                : managingOffice);
+
+        caseData.setAllocatedOffice(UNASSIGNED_OFFICE.equals(allocatedOffice)
+                ? TribunalOffice.GLASGOW.getOfficeName()
+                : allocatedOffice);
 
         if (oldCaseData.getFileLocationAberdeen() != null) {
             caseData.setFileLocationAberdeen(oldCaseData.getFileLocationAberdeen().getSelectedCode());

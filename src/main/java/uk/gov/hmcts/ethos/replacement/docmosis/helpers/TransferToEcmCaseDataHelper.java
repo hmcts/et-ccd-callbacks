@@ -181,11 +181,11 @@ public final class TransferToEcmCaseDataHelper {
         String managingOffice = oldCaseData.getManagingOffice();
         String allocatedOffice = oldCaseData.getAllocatedOffice();
 
-        caseData.setManagingOffice(UNASSIGNED_OFFICE.equals(managingOffice)
+        caseData.setManagingOffice(managingOffice == null || UNASSIGNED_OFFICE.equals(managingOffice)
                 ? TribunalOffice.GLASGOW.getOfficeName()
                 : managingOffice);
 
-        caseData.setAllocatedOffice(UNASSIGNED_OFFICE.equals(allocatedOffice)
+        caseData.setAllocatedOffice(allocatedOffice == null || UNASSIGNED_OFFICE.equals(allocatedOffice)
                 ? TribunalOffice.GLASGOW.getOfficeName()
                 : allocatedOffice);
 

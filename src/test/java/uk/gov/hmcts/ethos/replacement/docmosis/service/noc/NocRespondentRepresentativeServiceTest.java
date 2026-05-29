@@ -2,7 +2,6 @@ package uk.gov.hmcts.ethos.replacement.docmosis.service.noc;
 
 import ch.qos.logback.classic.Level;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.nimbusds.oauth2.sdk.http.HTTPResponse;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.math.NumberUtils;
@@ -687,7 +686,7 @@ class NocRespondentRepresentativeServiceTest {
         // when case user assignment role is equal to the role in representative should revoke case user assignment
         tmpRepresentative.getValue().setRole(ROLE_SOLICITORA);
         when(ccdClient.revokeCaseAssignments(USER_TOKEN, caseUserAssignmentData)).thenReturn(
-                String.valueOf(HTTPResponse.SC_OK));
+                String.valueOf(HttpStatus.OK.value()));
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseId(CASE_ID_1);
         callbackRequest.setCaseDetails(caseDetails);

@@ -16,6 +16,7 @@ import static java.util.Optional.of;
 import static org.apache.commons.collections.CollectionUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
+import static uk.gov.hmcts.ecm.common.service.pdf.et3.ET3FormConstants.OFF_CAPITALISED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.STRING_COMMA_WITH_SPACE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.STRING_EMPTY;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.STRING_LINE_FEED;
@@ -186,7 +187,7 @@ public final class ET3FormUtil {
                 || isBlank(expectedValue)
                 || isEmpty(actualValue)
                 || !actualValue.contains(expectedValue)) {
-            pdfFields.put(fieldName, of(STRING_EMPTY));
+            pdfFields.put(fieldName, of(OFF_CAPITALISED));
         } else {
             pdfFields.put(fieldName, of(checkValue));
         }

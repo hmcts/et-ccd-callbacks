@@ -1,9 +1,11 @@
 package uk.gov.hmcts.et.common.model.ccd;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import uk.gov.hmcts.et.common.model.ccd.items.GenericTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.JurCodesTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.items.RespondentSumTypeItem;
 import uk.gov.hmcts.et.common.model.ccd.types.AdditionalCaseInfoType;
@@ -19,6 +21,7 @@ import uk.gov.hmcts.et.common.model.ccd.types.TTL;
 import uk.gov.hmcts.et.common.model.ccd.types.TaskListCheckType;
 import uk.gov.hmcts.et.common.model.ccd.types.TriageQuestions;
 import uk.gov.hmcts.et.common.model.ccd.types.citizenhub.HubLinksStatuses;
+import uk.gov.hmcts.et.common.model.ccd.types.multiples.AdditionalClaimant;
 import uk.gov.hmcts.et.common.model.generic.BaseCaseData;
 
 import java.util.List;
@@ -79,6 +82,11 @@ public class Et1CaseData extends BaseCaseData {
     private TriageQuestions triageQuestions;
     @JsonProperty("et1OnlineSubmission")
     private String et1OnlineSubmission;
+    @JsonProperty("additionalClaimants")
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private List<GenericTypeItem<AdditionalClaimant>> additionalClaimants;
+    @JsonProperty("addClaimantMethod")
+    private String addClaimantMethod;
     // Citizen hub
     @JsonProperty("hubLinksStatuses")
     private HubLinksStatuses hubLinksStatuses;

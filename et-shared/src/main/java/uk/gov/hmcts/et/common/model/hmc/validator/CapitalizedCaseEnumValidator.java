@@ -1,12 +1,12 @@
 package uk.gov.hmcts.et.common.model.hmc.validator;
 
+import jakarta.validation.ConstraintValidator;
+import jakarta.validation.ConstraintValidatorContext;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-import javax.validation.ConstraintValidator;
-import javax.validation.ConstraintValidatorContext;
 
 public class CapitalizedCaseEnumValidator implements ConstraintValidator<CapitalizedEnum, String> {
     private List<String> acceptedValues;

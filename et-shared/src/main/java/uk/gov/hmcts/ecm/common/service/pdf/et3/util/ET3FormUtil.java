@@ -215,7 +215,7 @@ public final class ET3FormUtil {
                 || isBlank(expectedValue)
                 || CollectionUtils.isEmpty(actualValue)
                 || !actualValue.contains(expectedValue)) {
-            pdfFields.put(fieldName, of(STRING_EMPTY));
+            pdfFields.put(fieldName, of(OFF_CAPITALISED));
         } else {
             pdfFields.put(fieldName, of(checkValue));
         }

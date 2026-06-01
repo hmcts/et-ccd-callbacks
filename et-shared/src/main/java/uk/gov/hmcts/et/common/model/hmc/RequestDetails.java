@@ -1,11 +1,10 @@
 package uk.gov.hmcts.et.common.model.hmc;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-
-import javax.validation.constraints.NotNull;
 
 @SuperBuilder
 @Data

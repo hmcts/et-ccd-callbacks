@@ -1,6 +1,8 @@
 package uk.gov.hmcts.et.common.model.hmc.hearing;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -12,8 +14,6 @@ import uk.gov.hmcts.et.common.model.hmc.RequestDetails;
 import uk.gov.hmcts.et.common.model.hmc.ValidationError;
 
 import java.util.List;
-import javax.validation.Valid;
-import javax.validation.constraints.NotNull;
 
 @Data
 @NoArgsConstructor

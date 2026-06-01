@@ -140,7 +140,7 @@ class NocNotificationServiceTest {
                     + "1234567890123456, NOC type: Removal";
     private static final String EXPECTED_WARNING_TRIBUNAL_EMAIL_NOT_FOUND_TO_NOTIFY_FOR_RESPONDENT_REP_UPDATE =
             "Tribunal email not found. Unable to notify organisation for respondent representative update. "
-                + "Case id: 1234567890123456,  NOC type: Removal";
+                + "Case id: 1234567890123456, NOC type: Removal";
     private static final String EXPECTED_WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_TRIBUNAL =
             "Failed to send email to tribunal, case id: " + CASE_ID + ", error: Dummy exception occurred while "
                     + "sending email to respondent";

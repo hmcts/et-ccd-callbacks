@@ -1,6 +1,22 @@
 [
   {
     "CaseTypeID": "ET_EnglandWales",
+    "ID": "addAmendClaimantRepresentative",
+    "Name": "Claimant Representative",
+    "Description": "Add or Amend a Claimant Representative",
+    "DisplayOrder": 14,
+    "PreConditionState(s)": "Accepted;Rejected;Closed",
+    "PostConditionState": "*",
+    "SecurityClassification": "Public",
+    "ShowEventNotes": "N",
+    "ShowSummary": "N",
+    "EventEnablingCondition": "managingOffice !=\"Unassigned\"",
+    "CallBackURLAboutToStartEvent": "",
+    "CallBackURLAboutToSubmitEvent": "${ET_COS_URL}/addAmendClaimantRepresentative/aboutToSubmit",
+    "CallBackURLSubmittedEvent": "${ET_COS_URL}/addAmendClaimantRepresentative/amendClaimantRepSubmitted"
+  },
+  {
+    "CaseTypeID": "ET_EnglandWales",
     "ID": "amendRespondentRepresentative",
     "Name": "Respondent Representative",
     "Description": "Add or Amend a Respondent Representative",

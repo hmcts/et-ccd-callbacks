@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_CHECK_REPRESENTATIVE_ACCOUNT_BY_EMAIL;
+import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.ERROR_UNABLE_TO_FIND_REPRESENTATIVE_ACCOUNT_BY_EMAIL;
 import static uk.gov.hmcts.ethos.replacement.docmosis.constants.NOCConstants.WARNING_REPRESENTATIVE_ACCOUNT_NOT_FOUND_BY_EMAIL;
 
 @Service
@@ -86,6 +87,36 @@ public class OrganisationService {
                 throw new GenericRuntimeException(e);
             }
         }
+
         return nocWarnings;
+    }
+
+    /**
+     * Finds an organisation account ID for the supplied email address.
+     * <p>
+     * This method calls the organisation service using an admin user token and a
+     * generated service authentication token. If the response contains a valid user
+     * identifier, the response body is returned. If the user cannot be found or the
+     * organisation service call fails, {@code null} is returned.
+     * </p>
+     *
+     * @param email the email address to search for
+     * @return the account ID response for the matching organisation user, or
+     *         {@code null} if no valid user identifier is found or the lookup fails
+     */
+    // TODO implement tests
+    public AccountIdByEmailResponse findAccountIdByEmail(String email) {
+        try {
+            ResponseEntity<AccountIdByEmailResponse> userResponse =
+                    organisationClient.getAccountIdByEmail(adminUserService.getAdminUserToken(),
+                            authTokenGenerator.generate(), email);
+            // checking if representative email address exists in organisation users
+            if (OrganisationUtils.hasUserIdentifier(userResponse)) {
+                return userResponse.getBody();
+            }
+        } catch (FeignException e) {
+            log.error(ERROR_UNABLE_TO_FIND_REPRESENTATIVE_ACCOUNT_BY_EMAIL, e.getMessage());
+        }
+        return null;
     }
 }

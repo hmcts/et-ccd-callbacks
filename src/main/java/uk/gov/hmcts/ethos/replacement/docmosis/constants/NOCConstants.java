@@ -102,6 +102,8 @@ public final class NOCConstants {
                     + "assign the case to them. To continue, please click Ignore and Continue.";
     public static final String ERROR_UNABLE_TO_CHECK_REPRESENTATIVE_ACCOUNT_BY_EMAIL =
             "Failed to check representative account by email. Exception is {}";
+    public static final String ERROR_UNABLE_TO_FIND_REPRESENTATIVE_ACCOUNT_BY_EMAIL =
+            "Failed to find representative account by email. Exception is {}";
     public static final String WARNING_MISSING_RESPONDENT_EMAIL_ADDRESS =
             "Missing respondent email address while sending Notice of Change (NoC) respondent representative removal "
                     + NOTIFICATION_FOR_CASE;

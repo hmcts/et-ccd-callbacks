@@ -109,7 +109,7 @@ class ET3FormUtilTest {
         assumeTrue(isNotBlank(fieldName));
         assertThat(pdfFields.get(fieldName)).contains(isBlank(checkValue) || isBlank(expectedValue)
                 || isEmpty(actualValue) || !actualValue.contains(expectedValue)
-                ? ET3FormConstants.STRING_EMPTY
+                ? ET3FormConstants.OFF_CAPITALISED
                 : checkValue);
     }
 

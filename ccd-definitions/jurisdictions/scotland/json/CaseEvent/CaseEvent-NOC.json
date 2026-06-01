@@ -1,6 +1,6 @@
 [
   {
-    "CaseTypeID": "ET_EnglandWales",
+    "CaseTypeID": "ET_Scotland",
     "ID": "amendRespondentRepresentative",
     "Name": "Respondent Representative",
     "Description": "Add or Amend a Respondent Representative",
@@ -16,7 +16,7 @@
     "ShowSummary": "N"
   },
   {
-    "CaseTypeID": "ET_EnglandWales",
+    "CaseTypeID": "ET_Scotland",
     "ID": "addAmendClaimantRepresentative",
     "Name": "Claimant Representative",
     "Description": "Add or Amend a Claimant Representative",

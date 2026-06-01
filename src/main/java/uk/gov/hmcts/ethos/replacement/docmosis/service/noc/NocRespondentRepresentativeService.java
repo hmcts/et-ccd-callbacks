@@ -1054,6 +1054,7 @@ public class NocRespondentRepresentativeService {
                     caseDetails.getCaseData(), representative, caseUserAssignment)) {
                 return true;
             }
+        }
     }
 
     /**

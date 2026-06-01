@@ -1040,14 +1040,15 @@ public class NocRespondentRepresentativeService {
         return representatives;
     }
 
-    private boolean checkRepresentativeAssignment(CaseDetails caseDetails,
+    public boolean checkRepresentativeAssignment(CaseDetails caseDetails,
                                                   RepresentedTypeRItem representative,
                                                   CaseUserAssignment caseUserAssignment) {
         if (RespondentRepresentativeUtils.isValidRepresentative(representative)) {
-            assert representative != null;
             return matchesRepresentativeIdamId(caseDetails.getCaseId(), representative, caseUserAssignment)
                     || RespondentRepresentativeUtils.isCaseUserAssignmentForRepresentativeByRespondentName(
-                    caseDetails.getCaseData(), representative, caseUserAssignment);
+                            caseDetails.getCaseData(), representative, caseUserAssignment)
+                    || RespondentRepresentativeUtils.isCaseUserAssignmentForRepresentativeByRespondentId(
+                            caseDetails.getCaseData(), representative, caseUserAssignment);
         }
         return false;
     }

@@ -893,6 +893,40 @@ public final class RespondentRepresentativeUtils {
     }
 
     /**
+     * Determines whether the given case user assignment relates to the supplied representative
+     * by matching the respondent ID associated with the representative against the respondent
+     * resolved from the assignment's case role.
+     *
+     * <p>The method returns {@code false} when the representative is invalid, the representative
+     * has no respondent ID, the case user assignment is empty, the case role is blank, the role
+     * cannot be mapped to a respondent index, or the resolved respondent does not match the
+     * representative's respondent ID.</p>
+     *
+     * @param caseData the case data containing respondent information
+     * @param representative the representative item whose respondent ID should be checked
+     * @param caseUserAssignment the case user assignment containing the case role to resolve
+     * @return {@code true} if the representative's respondent ID matches the respondent linked
+     *         to the assignment's case role; {@code false} otherwise
+     */
+    public static boolean isCaseUserAssignmentForRepresentativeByRespondentId(CaseData caseData,
+                                                                              RepresentedTypeRItem representative,
+                                                                              CaseUserAssignment caseUserAssignment) {
+        if (!isValidRepresentative(representative)
+                || StringUtils.isBlank(representative.getValue().getRespondentId())
+                || ObjectUtils.isEmpty(caseUserAssignment)
+                || StringUtils.isBlank(caseUserAssignment.getCaseRole())) {
+            return false;
+        }
+        int roleIndex = RoleUtils.findRoleIndexByRoleLabel(caseUserAssignment.getCaseRole());
+        if (roleIndex == -1) {
+            return false;
+        }
+        RespondentSumTypeItem respondent = RespondentUtils.getRespondentAtIndex(caseData, roleIndex);
+        return ObjectUtils.isNotEmpty(respondent)
+                && representative.getValue().getRespondentId().equals(respondent.getId());
+    }
+
+    /**
      * Finds the first valid respondent representative in the case data whose name matches the
      * provided respondent name.
      *

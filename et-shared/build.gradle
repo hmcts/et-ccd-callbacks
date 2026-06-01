@@ -105,8 +105,7 @@ publishing {
 }
 
 dependencies {
-    api group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '4.1.2'
-    api group: 'com.microsoft.azure', name: 'azure-servicebus', version: '3.6.7'
+    api group: 'com.github.hmcts', name: 'service-auth-provider-java-client', version: '5.3.4'
     api group: 'org.apache.poi', name: 'poi-ooxml', version: '5.4.1'
     api group: 'org.elasticsearch', name: 'elasticsearch', version: '9.2.4'
 
@@ -128,6 +127,7 @@ dependencies {
     implementation group: 'ch.qos.logback', name: 'logback-access', version: '1.5.32'
     implementation group: 'org.slf4j', name: 'slf4j-ext', version: '2.0.17'
 
+    implementation group: 'com.google.code.gson', name: 'gson', version: '2.13.1'
     implementation group: 'com.launchdarkly', name: 'launchdarkly-java-server-sdk', version: '7.13.4'
 
     implementation 'org.springframework:spring-web'
@@ -137,8 +137,8 @@ dependencies {
     implementation 'org.aspectj:aspectjweaver'
     implementation 'jakarta.annotation:jakarta.annotation-api'
 
-    implementation group: 'javax.validation', name: 'validation-api', version: '2.0.1.Final'
-    implementation group: 'org.hibernate.validator', name: 'hibernate-validator', version: '6.2.5.Final'
+    implementation group: 'jakarta.validation', name: 'jakarta.validation-api', version: '3.0.2'
+    implementation group: 'org.hibernate.validator', name: 'hibernate-validator', version: '8.0.3.Final'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-core', version: '2.18.3'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.18.3'
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.18.3'

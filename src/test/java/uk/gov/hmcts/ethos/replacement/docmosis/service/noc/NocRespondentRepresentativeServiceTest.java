@@ -354,7 +354,8 @@ class NocRespondentRepresentativeServiceTest {
         when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
         AccountIdByEmailResponse accountIdByEmailResponse = new AccountIdByEmailResponse();
         accountIdByEmailResponse.setUserIdentifier(USER_ID);
-        when(nocService.findUserByEmail(ADMIN_USER_TOKEN, USER_EMAIL, SUBMISSION_REFERENCE)).thenReturn(accountIdByEmailResponse);
+        when(nocService.findUserByEmail(ADMIN_USER_TOKEN, USER_EMAIL, SUBMISSION_REFERENCE))
+                .thenReturn(accountIdByEmailResponse);
         nocRespondentRepresentativeService.updateRespondentRepresentation(caseDetails);
 
         assertThat(caseData.getRepCollection().get(1).getValue().getRespondentOrganisation().getOrganisationID())
@@ -636,7 +637,8 @@ class NocRespondentRepresentativeServiceTest {
         // when nocCcdService.getCaseAssignments returns case assignments data without any case user assignments should
         // not revoke case user assignments
         CaseUserAssignmentData caseUserAssignmentData = CaseUserAssignmentData.builder().build();
-        when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, SUBMISSION_REFERENCE)).thenReturn(caseUserAssignmentData);
+        when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, SUBMISSION_REFERENCE))
+                .thenReturn(caseUserAssignmentData);
         assertThat(nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(callbackRequest,
                 USER_TOKEN, representativesToRemove)).isEmpty();
         verifyNocCcdServiceCaseAssignmentsCall(LoggerTestUtils.INTEGER_TWO);
@@ -644,7 +646,8 @@ class NocRespondentRepresentativeServiceTest {
         // assignments
         caseUserAssignmentData.setCaseUserAssignments(List.of(CaseUserAssignment.builder().caseRole(
                 ROLE_CLAIMANT_SOLICITOR).build()));
-        when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, SUBMISSION_REFERENCE)).thenReturn(caseUserAssignmentData);
+        when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, SUBMISSION_REFERENCE))
+                .thenReturn(caseUserAssignmentData);
         assertThat(nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(callbackRequest,
                 USER_TOKEN, representativesToRemove)).isEmpty();
         verifyNocCcdServiceCaseAssignmentsCall(LoggerTestUtils.INTEGER_THREE);
@@ -652,13 +655,15 @@ class NocRespondentRepresentativeServiceTest {
         // assignments
         caseUserAssignmentData.getCaseUserAssignments().getFirst().setCaseRole(ROLE_SOLICITORA);
         tmpRepresentative.setId(StringUtils.EMPTY);
-        when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, SUBMISSION_REFERENCE)).thenReturn(caseUserAssignmentData);
+        when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, SUBMISSION_REFERENCE))
+                .thenReturn(caseUserAssignmentData);
         assertThat(nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(callbackRequest,
                 USER_TOKEN, representativesToRemove)).isEmpty();
         verifyNocCcdServiceCaseAssignmentsCall(LoggerTestUtils.INTEGER_FOUR);
         // when representative is not able to removed should not revoke case user assignment
         tmpRepresentative.setId(REPRESENTATIVE_ID_ONE);
-        when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, SUBMISSION_REFERENCE)).thenReturn(caseUserAssignmentData);
+        when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, SUBMISSION_REFERENCE))
+                .thenReturn(caseUserAssignmentData);
         assertThat(nocRespondentRepresentativeService.revokeOldRespondentRepresentativeAccess(callbackRequest,
                 USER_TOKEN, representativesToRemove)).isEmpty();
         verifyNocCcdServiceCaseAssignmentsCall(LoggerTestUtils.INTEGER_FIVE);
@@ -735,16 +740,16 @@ class NocRespondentRepresentativeServiceTest {
         assertThat(nocRespondentRepresentativeService.findCaseAssignmentsToRevokeForRep(SUBMISSION_REFERENCE,
                 List.of(), representativeB, ROLE_SOLICITORB)).isEmpty();
         // when representative is empty should return empty list
-        assertThat(nocRespondentRepresentativeService.findCaseAssignmentsToRevokeForRep(SUBMISSION_REFERENCE, caseUserAssignments,
-                null, ROLE_SOLICITORB)).isEmpty();
+        assertThat(nocRespondentRepresentativeService.findCaseAssignmentsToRevokeForRep(SUBMISSION_REFERENCE,
+                caseUserAssignments, null, ROLE_SOLICITORB)).isEmpty();
         // when representative does not have value should return an empty list
-        assertThat(nocRespondentRepresentativeService.findCaseAssignmentsToRevokeForRep(SUBMISSION_REFERENCE, caseUserAssignments,
-                representativeB, ROLE_SOLICITORB)).isEmpty();
+        assertThat(nocRespondentRepresentativeService.findCaseAssignmentsToRevokeForRep(SUBMISSION_REFERENCE,
+                caseUserAssignments, representativeB, ROLE_SOLICITORB)).isEmpty();
         // when representative does not have email address should return an empty list
         RepresentedTypeR representativeBValue = RepresentedTypeR.builder().build();
         representativeB.setValue(representativeBValue);
-        assertThat(nocRespondentRepresentativeService.findCaseAssignmentsToRevokeForRep(SUBMISSION_REFERENCE, caseUserAssignments,
-                representativeB, ROLE_SOLICITORB)).isEmpty();
+        assertThat(nocRespondentRepresentativeService.findCaseAssignmentsToRevokeForRep(SUBMISSION_REFERENCE,
+                caseUserAssignments, representativeB, ROLE_SOLICITORB)).isEmpty();
         // when representativeB is removed and ROLE_SOLICITORB has remaining assignments should return those assignments
         representativeBValue.setRepresentativeEmailAddress(REPRESENTATIVE_EMAIL_1);
         when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
@@ -757,8 +762,9 @@ class NocRespondentRepresentativeServiceTest {
         caseUserAssignments.add(caseUserAssignmentSolicitorA2);
         caseUserAssignments.add(caseUserAssignmentSolicitorB1);
         caseUserAssignments.add(caseUserAssignmentSolicitorB2);
-        assertThat(nocRespondentRepresentativeService.findCaseAssignmentsToRevokeForRep(SUBMISSION_REFERENCE, caseUserAssignments,
-                representativeB, ROLE_SOLICITORB)).isNotEmpty().hasSize(LoggerTestUtils.INTEGER_THREE)
+        assertThat(nocRespondentRepresentativeService.findCaseAssignmentsToRevokeForRep(SUBMISSION_REFERENCE,
+                caseUserAssignments, representativeB, ROLE_SOLICITORB)).isNotEmpty()
+                .hasSize(LoggerTestUtils.INTEGER_THREE)
                 .containsExactlyInAnyOrder(caseUserAssignmentSolicitorA2, caseUserAssignmentSolicitorB1,
                         caseUserAssignmentSolicitorB2);
         // when there is only one assignment of ROLE_SOLICITORA should not return that assignment as it should not be
@@ -767,8 +773,9 @@ class NocRespondentRepresentativeServiceTest {
         caseUserAssignments.add(caseUserAssignmentSolicitorA2);
         caseUserAssignments.add(caseUserAssignmentSolicitorB1);
         caseUserAssignments.add(caseUserAssignmentSolicitorB2);
-        assertThat(nocRespondentRepresentativeService.findCaseAssignmentsToRevokeForRep(SUBMISSION_REFERENCE, caseUserAssignments,
-                representativeB, ROLE_SOLICITORB)).isNotEmpty().hasSize(LoggerTestUtils.INTEGER_TWO)
+        assertThat(nocRespondentRepresentativeService.findCaseAssignmentsToRevokeForRep(SUBMISSION_REFERENCE,
+                caseUserAssignments, representativeB, ROLE_SOLICITORB)).isNotEmpty()
+                .hasSize(LoggerTestUtils.INTEGER_TWO)
                 .containsExactlyInAnyOrder(caseUserAssignmentSolicitorB1, caseUserAssignmentSolicitorB2);
         // When representative A is removed and ROLE_SOLICITORA has remaining assignments should return those
         // assignments
@@ -783,8 +790,9 @@ class NocRespondentRepresentativeServiceTest {
         accountIdByEmailResponse2.setUserIdentifier(REPRESENTATIVE_ID_ONE);
         when(nocService.findUserByEmail(ADMIN_USER_TOKEN, REPRESENTATIVE_EMAIL_2, SUBMISSION_REFERENCE)).thenReturn(
                 accountIdByEmailResponse2);
-        assertThat(nocRespondentRepresentativeService.findCaseAssignmentsToRevokeForRep(SUBMISSION_REFERENCE, caseUserAssignments,
-                representativeA, ROLE_SOLICITORA)).isNotEmpty().hasSize(LoggerTestUtils.INTEGER_THREE)
+        assertThat(nocRespondentRepresentativeService.findCaseAssignmentsToRevokeForRep(SUBMISSION_REFERENCE,
+                caseUserAssignments, representativeA, ROLE_SOLICITORA)).isNotEmpty()
+                .hasSize(LoggerTestUtils.INTEGER_THREE)
                 .containsExactlyInAnyOrder(caseUserAssignmentSolicitorA1, caseUserAssignmentSolicitorA2,
                         caseUserAssignmentSolicitorB2);
         // when there is only one assignment of ROLE_SOLICITORB should not return that assignment as it should not be
@@ -793,9 +801,10 @@ class NocRespondentRepresentativeServiceTest {
         caseUserAssignments.add(caseUserAssignmentSolicitorA1);
         caseUserAssignments.add(caseUserAssignmentSolicitorA2);
         caseUserAssignments.add(caseUserAssignmentSolicitorB2);
-        assertThat(nocRespondentRepresentativeService.findCaseAssignmentsToRevokeForRep(SUBMISSION_REFERENCE, caseUserAssignments,
-                representativeA, ROLE_SOLICITORA)).isNotEmpty().hasSize(LoggerTestUtils.INTEGER_TWO)
-                .containsExactlyInAnyOrder(caseUserAssignmentSolicitorA1, caseUserAssignmentSolicitorA2);
+        assertThat(nocRespondentRepresentativeService.findCaseAssignmentsToRevokeForRep(SUBMISSION_REFERENCE,
+                caseUserAssignments, representativeA, ROLE_SOLICITORA)).isNotEmpty()
+                .hasSize(LoggerTestUtils.INTEGER_TWO).containsExactlyInAnyOrder(caseUserAssignmentSolicitorA1,
+                        caseUserAssignmentSolicitorA2);
         // when noc service throws exception should return empty list.
         caseUserAssignments.clear();
         caseUserAssignments.add(caseUserAssignmentSolicitorA1);
@@ -856,7 +865,8 @@ class NocRespondentRepresentativeServiceTest {
         CaseUserAssignmentData caseUserAssignmentData = new CaseUserAssignmentData();
         caseUserAssignmentData.setCaseUserAssignments(List.of(CaseUserAssignment.builder().caseRole(ROLE_SOLICITORA)
                 .build()));
-        when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, SUBMISSION_REFERENCE)).thenReturn(caseUserAssignmentData);
+        when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, SUBMISSION_REFERENCE))
+                .thenReturn(caseUserAssignmentData);
         oldCaseDetails.getCaseData().setNoticeOfChangeAnswers0(NoticeOfChangeAnswers.builder()
                 .respondentName(RESPONDENT_NAME_ONE).build());
         oldCaseDetails.getCaseData().setRespondentOrganisationPolicy0(OrganisationPolicy.builder().organisation(
@@ -880,8 +890,8 @@ class NocRespondentRepresentativeServiceTest {
         when(ccdClient.startEventForCase(ADMIN_USER_TOKEN, CASE_TYPE_ID_ENGLAND_WALES, JURISDICTION_EMPLOYMENT,
                 SUBMISSION_REFERENCE, EVENT_UPDATE_CASE_SUBMITTED)).thenReturn(ccdRequest);
         when(ccdClient.submitEventForCase(eq(ADMIN_USER_TOKEN), any(CaseData.class),
-                eq(CASE_TYPE_ID_ENGLAND_WALES), eq(JURISDICTION_EMPLOYMENT), any(CCDRequest.class), eq(SUBMISSION_REFERENCE)))
-                .thenReturn(new SubmitEvent());
+                eq(CASE_TYPE_ID_ENGLAND_WALES), eq(JURISDICTION_EMPLOYMENT), any(CCDRequest.class),
+                eq(SUBMISSION_REFERENCE))).thenReturn(new SubmitEvent());
         nocRespondentRepresentativeService.revokeOldRepresentatives(callbackRequest, USER_TOKEN);
         verify(nocNotificationService, times(LoggerTestUtils.INTEGER_THREE))
                 .sendRespondentRepresentationUpdateNotifications(any(CaseDetails.class), anyList(), anyString());
@@ -926,7 +936,8 @@ class NocRespondentRepresentativeServiceTest {
         assertThat(assignableRepresentatives.getFirst()).isEqualTo(representative);
         // when case user assignments doesn't have any assignment should return assignable representatives
         CaseUserAssignmentData caseUserAssignmentData = new CaseUserAssignmentData();
-        when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, SUBMISSION_REFERENCE)).thenReturn(caseUserAssignmentData);
+        when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, SUBMISSION_REFERENCE))
+                .thenReturn(caseUserAssignmentData);
         assignableRepresentatives = nocRespondentRepresentativeService.findRepresentativesToAssign(caseDetails,
                 representatives);
         assertThat(assignableRepresentatives).isNotEmpty().hasSize(LoggerTestUtils.INTEGER_ONE);
@@ -1136,7 +1147,8 @@ class NocRespondentRepresentativeServiceTest {
         // and repCollectionToAdd collections on CCD Request
         ccdRequest.getCaseDetails().setCaseData(new CaseData());
         doReturn(new SubmitEvent()).when(ccdClient).submitEventForCase(eq(ADMIN_USER_TOKEN), any(CaseData.class),
-                eq(CASE_TYPE_ID_ENGLAND_WALES), eq(JURISDICTION_EMPLOYMENT), any(CCDRequest.class), eq(SUBMISSION_REFERENCE));
+                eq(CASE_TYPE_ID_ENGLAND_WALES), eq(JURISDICTION_EMPLOYMENT), any(CCDRequest.class),
+                eq(SUBMISSION_REFERENCE));
         assertDoesNotThrow(() -> nocRespondentRepresentativeService.resetOrganisationPolicies(caseDetails));
         assertThat(ccdRequest.getCaseDetails().getCaseData().getRepCollectionToRemove()).isEqualTo(caseDetails
                 .getCaseData().getRepCollectionToRemove());
@@ -1269,13 +1281,14 @@ class NocRespondentRepresentativeServiceTest {
         when(userIdamService.getUserDetails(USER_TOKEN)).thenReturn(userDetails);
         assertThat(nocRespondentRepresentativeService.findRepresentativesByToken(USER_TOKEN, caseDetails)).isEmpty();
         // when there is no case user assignment data should return null
-        userDetails.setUid(REPRESENTATIVE_ID_ONE);
+        userDetails.setUid(REPRESENTATIVE_IDAM_ID_ONE);
         when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
         when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, SUBMISSION_REFERENCE)).thenReturn(null);
         assertThat(nocRespondentRepresentativeService.findRepresentativesByToken(USER_TOKEN, caseDetails)).isEmpty();
         // when case user assignment data not has any case user assignment should return null
         CaseUserAssignmentData caseUserAssignmentData = new CaseUserAssignmentData();
-        when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, SUBMISSION_REFERENCE)).thenReturn(caseUserAssignmentData);
+        when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, SUBMISSION_REFERENCE))
+                .thenReturn(caseUserAssignmentData);
         assertThat(nocRespondentRepresentativeService.findRepresentativesByToken(USER_TOKEN, caseDetails)).isEmpty();
         // when case user assignment role is not respondent solicitor should return null
         CaseUserAssignment caseUserAssignment = new CaseUserAssignment();
@@ -1284,13 +1297,14 @@ class NocRespondentRepresentativeServiceTest {
         assertThat(nocRespondentRepresentativeService.findRepresentativesByToken(USER_TOKEN, caseDetails)).isEmpty();
         // when case user assignment role user id is not same with representative user id should return null
         caseUserAssignment.setCaseRole(ROLE_SOLICITORA);
-        caseUserAssignment.setUserId(REPRESENTATIVE_ID_TWO);
+        caseUserAssignment.setUserId(REPRESENTATIVE_IDAM_ID_TWO);
         assertThat(nocRespondentRepresentativeService.findRepresentativesByToken(USER_TOKEN, caseDetails)).isEmpty();
         // when representative not found by role should return null
-        caseUserAssignment.setUserId(REPRESENTATIVE_ID_ONE);
+        caseUserAssignment.setUserId(REPRESENTATIVE_IDAM_ID_ONE);
         assertThat(nocRespondentRepresentativeService.findRepresentativesByToken(USER_TOKEN, caseDetails)).isEmpty();
         // when representative found by role should return that representative
         representative.getValue().setRole(ROLE_SOLICITORA);
+        representative.getValue().setIdamId(REPRESENTATIVE_IDAM_ID_ONE);
         caseUserAssignment.setCaseRole(ROLE_SOLICITORA);
         assertThat(nocRespondentRepresentativeService.findRepresentativesByToken(USER_TOKEN, caseDetails))
                 .isEqualTo(List.of(representative));
@@ -1576,8 +1590,10 @@ class NocRespondentRepresentativeServiceTest {
         verifyNoInteractions(ccdClient);
         // when there is respondent representative with same organisation with representative should revoke respondent
         // representatives and reset organisation policies
-        respondentRepresentative.setValue(RepresentedTypeR.builder().respondentOrganisation(Organisation.builder()
-                .organisationID(ORGANISATION_ID_ONE).build()).respRepName(RESPONDENT_NAME_ONE).build());
+        respondentRepresentative.setValue(RepresentedTypeR.builder().idamId(REPRESENTATIVE_IDAM_ID_ONE)
+                .respondentOrganisation(Organisation.builder().organisationID(ORGANISATION_ID_ONE).build())
+                .role(ROLE_SOLICITORA)
+                .respRepName(RESPONDENT_NAME_ONE).build());
         tmpCaseData.setRespondentOrganisationPolicy0(OrganisationPolicy.builder().organisation(Organisation.builder()
                 .organisationID(ORGANISATION_ID_ONE).build()).orgPolicyCaseAssignedRole(ROLE_SOLICITORA).build());
         tmpCaseData.setNoticeOfChangeAnswers0(NoticeOfChangeAnswers.builder().respondentName(RESPONDENT_NAME_ONE)
@@ -1587,8 +1603,9 @@ class NocRespondentRepresentativeServiceTest {
         when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
         CaseUserAssignmentData caseUserAssignmentData = CaseUserAssignmentData.builder().caseUserAssignments(
                 List.of(CaseUserAssignment.builder().caseId(SUBMISSION_REFERENCE).caseRole(ROLE_SOLICITORA)
-                        .organisationId(ORGANISATION_ID_ONE).build())).build();
-        when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, SUBMISSION_REFERENCE)).thenReturn(caseUserAssignmentData);
+                        .organisationId(ORGANISATION_ID_ONE).userId(REPRESENTATIVE_IDAM_ID_ONE).build())).build();
+        when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, SUBMISSION_REFERENCE))
+                .thenReturn(caseUserAssignmentData);
         doNothing().when(nocNotificationService).notifyRespondentOfRepresentativeUpdate(any(CaseDetails.class),
                 any(RespondentSumTypeItem.class));
         nocRespondentRepresentativeService.revokeRespondentRepresentativesWithSameOrganisationAsClaimant(caseDetails);
@@ -1706,6 +1723,7 @@ class NocRespondentRepresentativeServiceTest {
                         .role(ROLE_SOLICITORA)
                         .representativePhoneNumber("01234567890")
                         .representativeAddress(address)
+                        .idamId(REPRESENTATIVE_IDAM_ID_ONE)
                         .build())
                 .build();
         CaseDetails caseDetails = new CaseDetails();
@@ -1714,12 +1732,12 @@ class NocRespondentRepresentativeServiceTest {
         caseData.setRepCollection(List.of(repItem));
 
         UserDetails userDetails = new UserDetails();
-        userDetails.setUid(USER_ID);
+        userDetails.setUid(REPRESENTATIVE_IDAM_ID_ONE);
         when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
         when(userIdamService.getUserDetails(USER_TOKEN)).thenReturn(userDetails);
         CaseUserAssignmentData assignments = CaseUserAssignmentData.builder()
                 .caseUserAssignments(List.of(CaseUserAssignment.builder()
-                        .userId(USER_ID).caseRole(ROLE_SOLICITORA).build()))
+                        .userId(REPRESENTATIVE_IDAM_ID_ONE).caseRole(ROLE_SOLICITORA).build()))
                 .build();
         when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, SUBMISSION_REFERENCE)).thenReturn(assignments);
 
@@ -1777,7 +1795,8 @@ class NocRespondentRepresentativeServiceTest {
 
         RepresentedTypeRItem repItem = RepresentedTypeRItem.builder()
                 .id(REPRESENTATIVE_ID_ONE)
-                .value(RepresentedTypeR.builder().role(ROLE_SOLICITORA).representativePhoneNumber("old").build())
+                .value(RepresentedTypeR.builder().role(ROLE_SOLICITORA).idamId(REPRESENTATIVE_IDAM_ID_ONE)
+                        .representativePhoneNumber("old").build())
                 .build();
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseId(SUBMISSION_REFERENCE);
@@ -1785,12 +1804,12 @@ class NocRespondentRepresentativeServiceTest {
         caseData.setRepCollection(List.of(repItem));
 
         UserDetails userDetails = new UserDetails();
-        userDetails.setUid(USER_ID);
+        userDetails.setUid(REPRESENTATIVE_IDAM_ID_ONE);
         when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
         when(userIdamService.getUserDetails(USER_TOKEN)).thenReturn(userDetails);
         CaseUserAssignmentData assignments = CaseUserAssignmentData.builder()
                 .caseUserAssignments(List.of(CaseUserAssignment.builder()
-                        .userId(USER_ID).caseRole(ROLE_SOLICITORA).build()))
+                        .userId(REPRESENTATIVE_IDAM_ID_ONE).caseRole(ROLE_SOLICITORA).build()))
                 .build();
         when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, SUBMISSION_REFERENCE)).thenReturn(assignments);
 
@@ -1810,7 +1829,7 @@ class NocRespondentRepresentativeServiceTest {
 
         RepresentedTypeRItem repItem = RepresentedTypeRItem.builder()
                 .id(REPRESENTATIVE_ID_ONE)
-                .value(RepresentedTypeR.builder().role(ROLE_SOLICITORA).build())
+                .value(RepresentedTypeR.builder().role(ROLE_SOLICITORA).idamId(REPRESENTATIVE_IDAM_ID_ONE).build())
                 .build();
         CaseDetails caseDetails = new CaseDetails();
         caseDetails.setCaseId(SUBMISSION_REFERENCE);
@@ -1818,12 +1837,12 @@ class NocRespondentRepresentativeServiceTest {
         caseData.setRepCollection(List.of(repItem));
 
         UserDetails userDetails = new UserDetails();
-        userDetails.setUid(USER_ID);
+        userDetails.setUid(REPRESENTATIVE_IDAM_ID_ONE);
         when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
         when(userIdamService.getUserDetails(USER_TOKEN)).thenReturn(userDetails);
         CaseUserAssignmentData assignments = CaseUserAssignmentData.builder()
                 .caseUserAssignments(List.of(CaseUserAssignment.builder()
-                        .userId(USER_ID).caseRole(ROLE_SOLICITORA).build()))
+                        .userId(REPRESENTATIVE_IDAM_ID_ONE).caseRole(ROLE_SOLICITORA).build()))
                 .build();
         when(nocCcdService.retrieveCaseUserAssignments(ADMIN_USER_TOKEN, SUBMISSION_REFERENCE)).thenReturn(assignments);
 

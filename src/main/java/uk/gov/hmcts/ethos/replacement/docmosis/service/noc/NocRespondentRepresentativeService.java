@@ -1032,29 +1032,24 @@ public class NocRespondentRepresentativeService {
             if (userDetails.getUid().equals(caseUserAssignment.getUserId())) {
                 RepresentedTypeRItem representative = RespondentRepresentativeUtils.findRepresentativeByIdamIdOrRole(
                         caseDetails.getCaseData(), caseUserAssignment.getUserId(), caseUserAssignment.getCaseRole());
-                if (RespondentRepresentativeUtils.isValidRepresentative(representative)) {
-                    assert representative != null;
-                    if (matchesRepresentativeIdamId(caseDetails.getCaseId(), representative, caseUserAssignment)
-                            || RespondentRepresentativeUtils.isCaseUserAssignmentForRepresentativeByRespondentName(
-                                    caseDetails.getCaseData(), representative, caseUserAssignment)) {
-                        representatives.add(representative);
-                    }
+                if (checkRepresentativeAssignment(caseDetails, representative, caseUserAssignment)) {
+                    representatives.add(representative);
                 }
             }
         }
         return representatives;
     }
 
-    private boolean checkRepresentativeAssignment(RepresentedTypeRItem representative,
+    private boolean checkRepresentativeAssignment(CaseDetails caseDetails,
+                                                  RepresentedTypeRItem representative,
                                                   CaseUserAssignment caseUserAssignment) {
         if (RespondentRepresentativeUtils.isValidRepresentative(representative)) {
             assert representative != null;
-            if (matchesRepresentativeIdamId(caseDetails.getCaseId(), representative, caseUserAssignment)
+            return matchesRepresentativeIdamId(caseDetails.getCaseId(), representative, caseUserAssignment)
                     || RespondentRepresentativeUtils.isCaseUserAssignmentForRepresentativeByRespondentName(
-                    caseDetails.getCaseData(), representative, caseUserAssignment)) {
-                return true;
-            }
+                    caseDetails.getCaseData(), representative, caseUserAssignment);
         }
+        return false;
     }
 
     /**

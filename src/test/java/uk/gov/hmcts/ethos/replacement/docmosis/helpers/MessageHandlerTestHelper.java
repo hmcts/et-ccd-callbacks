@@ -14,6 +14,7 @@ import java.util.Arrays;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ENGLANDWALES_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.NO;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_BULK_CASE_TYPE_ID;
+import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_ID;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SINGLE_CASE_TYPE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.YES;
 
@@ -54,6 +55,14 @@ public final class MessageHandlerTestHelper {
         .officeCT(TribunalOffice.LONDON_EAST.getOfficeName())
         .ccdGatewayBaseUrl("ccdGatewayBaseUrl")
         .sourceEthosCaseReference("3600001/2021")
+        .build();
+
+    private static final TransferToEcmDataModel TRANSFER_TO_ECM_DATA_MODEL_SCOTLAND =
+        TransferToEcmDataModel.builder()
+        .positionTypeCT("Transferred")
+        .officeCT(TribunalOffice.GLASGOW.getOfficeName())
+        .ccdGatewayBaseUrl("ccdGatewayBaseUrl")
+        .sourceEthosCaseReference("6000001/2022")
         .build();
 
     private MessageHandlerTestHelper() {
@@ -154,6 +163,20 @@ public final class MessageHandlerTestHelper {
             .username(USERNAME)
             .confirmation(YES)
             .dataModelParent(TRANSFER_TO_ECM_DATA_MODEL_LONDON_EAST)
+            .build();
+    }
+
+    public static CreateUpdatesMsg transferToEcmMessageScotland() {
+        return CreateUpdatesMsg.builder()
+            .msgId("1")
+            .jurisdiction(JURISDICTION)
+            .caseTypeId(SCOTLAND_CASE_TYPE_ID)
+            .multipleRef(SINGLE_CASE_TYPE)
+            .ethosCaseRefCollection(Arrays.asList("6000001/2022"))
+            .totalCases("1")
+            .username(USERNAME)
+            .confirmation(YES)
+            .dataModelParent(TRANSFER_TO_ECM_DATA_MODEL_SCOTLAND)
             .build();
     }
 }

@@ -2,6 +2,11 @@ package uk.gov.hmcts.et.common.model.hmc;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -9,11 +14,6 @@ import lombok.NoArgsConstructor;
 import uk.gov.hmcts.et.common.model.hmc.validator.ListingReasonCodeEnum;
 
 import java.util.List;
-import javax.validation.Valid;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
 
 import static uk.gov.hmcts.et.common.model.hmc.ValidationError.AMEND_REASON_CODE_MAX_LENGTH;
 import static uk.gov.hmcts.et.common.model.hmc.ValidationError.FACILITIES_REQUIRED_MAX_LENGTH_MSG;

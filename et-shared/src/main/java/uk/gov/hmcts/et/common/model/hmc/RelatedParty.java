@@ -1,11 +1,10 @@
 package uk.gov.hmcts.et.common.model.hmc;
 
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.Size;
 
 @SuperBuilder
 @Data

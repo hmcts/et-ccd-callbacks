@@ -131,7 +131,7 @@ public final class NOCConstants {
                     + NOC_TYPE;
     public static final String WARNING_TRIBUNAL_EMAIL_NOT_FOUND_TO_NOTIFY_FOR_RESPONDENT_REP_UPDATE =
             "Tribunal email not found. Unable to notify organisation for respondent representative update. "
-                    + "Case id: {},  NOC type: {}";
+                    + "Case id: {}, " + NOC_TYPE;
     public static final String WARNING_FAILED_TO_SEND_NOC_NOTIFICATION_EMAIL_TRIBUNAL =
             "Failed to send email to tribunal, case id: {}, error: {}";
 

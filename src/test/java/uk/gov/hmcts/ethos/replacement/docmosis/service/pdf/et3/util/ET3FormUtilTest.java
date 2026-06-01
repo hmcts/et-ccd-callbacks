@@ -22,6 +22,7 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.junit.platform.commons.util.StringUtils.isBlank;
 import static org.junit.platform.commons.util.StringUtils.isNotBlank;
 import static org.springframework.util.CollectionUtils.isEmpty;
+import static uk.gov.hmcts.ecm.common.service.pdf.et3.ET3FormConstants.OFF_CAPITALISED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.NO_CAPITALISED;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.NO_LOWERCASE;
 import static uk.gov.hmcts.ethos.replacement.docmosis.service.pdf.et3.ET3FormConstants.STRING_COMMA_WITH_SPACE;
@@ -125,7 +126,7 @@ class ET3FormUtilTest {
                 pdfFields, fieldName, checkValue, expectedValue, actualValue);
         assumeTrue(isNotBlank(fieldName));
         assertThat(pdfFields.get(fieldName)).contains(isBlank(checkValue) || isBlank(expectedValue)
-                || isEmpty(actualValue) || !actualValue.contains(expectedValue) ? STRING_EMPTY : checkValue);
+                || isEmpty(actualValue) || !actualValue.contains(expectedValue) ? OFF_CAPITALISED : checkValue);
     }
 
     @ParameterizedTest

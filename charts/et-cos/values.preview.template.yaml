@@ -40,11 +40,11 @@ java:
     SECURE_DOC_STORE_FEATURE: true
     EM_CCD_ORCHESTRATOR_URL: http://em-ccd-orchestrator-{{ .Values.global.environment }}.service.core-compute-{{ .Values.global.environment }}.internal
     ACAS_BASE_URL: "https://api-dev-acas-01.azure-api.net/ECCLUAT"
-    CCD_SERVICEBUS_DESTINATION: ${SERVICE_NAME}-asb-ccd-case-events
+    CCD_SERVICEBUS_DESTINATION: ${SERVICE_NAME}-ccd-case-events
     SPRING_JMS_SERVICEBUS_ENABLED: true
     ET_SERVICEBUS_SCHEDULER_ENABLED: true
-    AZURE_SERVICE_BUS_TOPIC_NAME: ${SERVICE_NAME}-asb-ccd-case-events
-    AZURE_SERVICE_BUS_SUBSCRIPTION_NAME: ${SERVICE_NAME}-asb-ccd-case-events
+    AZURE_SERVICE_BUS_TOPIC_NAME: ${SERVICE_NAME}-ccd-case-events
+    AZURE_SERVICE_BUS_SUBSCRIPTION_NAME: ${SERVICE_NAME}-ccd-case-events
   keyVaults:
     et-cos:
       secrets:

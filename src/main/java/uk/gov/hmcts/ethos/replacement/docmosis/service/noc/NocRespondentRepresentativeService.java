@@ -668,6 +668,7 @@ public class NocRespondentRepresentativeService {
         }
 
         for (CaseUserAssignment caseUserAssignment : caseUserAssignmentsData.getCaseUserAssignments()) {
+            boolean caseUserAssignmentAdded = false;
             if (!RoleUtils.isRespondentRepresentativeRole(caseUserAssignment.getCaseRole())) {
                 continue;
             }
@@ -677,12 +678,13 @@ public class NocRespondentRepresentativeService {
             if (ObjectUtils.isNotEmpty(representedTypeRItem)) {
                 representativesCaseAssignments.getRevokedCaseUserAssignments().add(caseUserAssignment);
                 representativesCaseAssignments.getRepresentativesToRemove().add(representedTypeRItem);
-            } else {
-                RepresentedTypeRItem representative = RespondentRepresentativeUtils.findRepresentativeByIdamIdOrRole(
-                        caseDetails.getCaseData(), caseUserAssignment.getUserId(), caseUserAssignment.getCaseRole());
-                if (!checkRepresentativeAssignment(caseDetails, representative, caseUserAssignment)) {
-                    representativesCaseAssignments.getRevokedCaseUserAssignments().add(caseUserAssignment);
-                }
+                caseUserAssignmentAdded = true;
+            }
+            RepresentedTypeRItem representative = RespondentRepresentativeUtils.findRepresentativeByIdamIdOrRole(
+                    caseDetails.getCaseData(), caseUserAssignment.getUserId(), caseUserAssignment.getCaseRole());
+            if (!caseUserAssignmentAdded
+                    && !checkRepresentativeAssignment(caseDetails, representative, caseUserAssignment)) {
+                representativesCaseAssignments.getRevokedCaseUserAssignments().add(caseUserAssignment);
             }
         }
         try {

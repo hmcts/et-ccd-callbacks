@@ -1540,7 +1540,7 @@ class NocRespondentRepresentativeServiceTest {
                 .thenReturn(accountIdByEmailResponse);
         nocRespondentRepresentativeService.revokeRespondentRepresentatives(caseDetails, new  ArrayList<>());
         verifyNoInteractions(ccdClient);
-        // when representative not found but there is ccd automatically assignment should revoke case user assignment
+        // when representative not found but there is CCD automatically assignment should revoke case user assignment
         caseUserAssignment.setUserId(REPRESENTATIVE_IDAM_ID_TWO);
         nocRespondentRepresentativeService.revokeRespondentRepresentatives(caseDetails, new  ArrayList<>());
         verify(ccdClient, times(LoggerTestUtils.INTEGER_ONE)).revokeCaseAssignments(eq(ADMIN_USER_TOKEN),

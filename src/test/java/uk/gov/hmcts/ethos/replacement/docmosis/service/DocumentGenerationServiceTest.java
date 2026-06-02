@@ -292,4 +292,34 @@ class DocumentGenerationServiceTest {
         ObjectMapper mapper = new ObjectMapper();
         return mapper.readValue(json, CaseDetails.class);
     }
+
+    @Test
+    void setBfActionsSetsClaimServedDateWhenEmpty() {
+        CaseData caseData = new CaseData();
+        caseData.setClaimServedDate("");
+
+        documentGenerationService.setBfActions(caseData);
+
+        assertEquals(LocalDate.now().toString(), caseData.getClaimServedDate());
+    }
+
+    @Test
+    void setBfActionsDoesNotSetClaimServedDateWhenNotEmpty() {
+        CaseData caseData = new CaseData();
+        caseData.setClaimServedDate("2021-01-01");
+
+        documentGenerationService.setBfActions(caseData);
+
+        assertEquals("2021-01-01", caseData.getClaimServedDate());
+    }
+
+    @Test
+    void setBfActionsSetsClaimServedDateWhenNull() {
+        CaseData caseData = new CaseData();
+        caseData.setClaimServedDate(null);
+
+        documentGenerationService.setBfActions(caseData);
+
+        assertEquals(LocalDate.now().toString(), caseData.getClaimServedDate());
+    }
 }

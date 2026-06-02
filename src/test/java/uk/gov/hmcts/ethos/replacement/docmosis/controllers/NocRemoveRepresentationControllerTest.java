@@ -1,12 +1,13 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.controllers;
 
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpHeaders;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 import uk.gov.hmcts.et.common.model.ccd.CCDRequest;
@@ -14,9 +15,6 @@ import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRemoveRepresentati
 import uk.gov.hmcts.ethos.replacement.docmosis.utils.JsonMapper;
 import uk.gov.hmcts.ethos.utils.CCDRequestBuilder;
 import uk.gov.hmcts.ethos.utils.CaseDataBuilder;
-
-import java.io.IOException;
-import java.net.URISyntaxException;
 
 import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
@@ -37,7 +35,7 @@ class NocRemoveRepresentationControllerTest extends BaseControllerTest {
         "/nocRemoveRepresentation/respondent/aboutToSubmit";
     private CCDRequest ccdRequest;
 
-    @MockBean
+    @MockitoBean
     private NocRemoveRepresentationService nocRemoveRepresentationService;
     @Autowired
     private MockMvc mockMvc;
@@ -45,7 +43,8 @@ class NocRemoveRepresentationControllerTest extends BaseControllerTest {
     private JsonMapper jsonMapper;
 
     @BeforeEach
-    protected void setUp() throws IOException, URISyntaxException {
+    @SneakyThrows
+    void beforeEach() {
         ccdRequest = CCDRequestBuilder.builder()
             .withCaseData(CaseDataBuilder.builder()
                 .buildAsCaseDetails(ENGLANDWALES_CASE_TYPE_ID)

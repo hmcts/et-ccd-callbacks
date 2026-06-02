@@ -174,4 +174,48 @@ class CreateEcmSingleServiceTest {
         assertNull(sentCaseData.getFileLocationDundee());
         assertNull(sentCaseData.getFileLocationEdinburgh());
     }
+
+    @Test
+    @SuppressWarnings({"PMD.LawOfDemeter"})
+    void transferToEcmScotlandWithNullOffices_mapsToGlasgow() throws IOException {
+        ReflectionTestUtils.setField(createEcmSingleService, "ccdGatewayBaseUrl", "http://ccd-gateway");
+
+        CaseData caseData = new CaseData();
+        caseData.setEthosCaseReference("6000001/2022");
+
+        SubmitEvent submitEvent = new SubmitEvent();
+        submitEvent.setState(ACCEPTED_STATE);
+        submitEvent.setCaseData(caseData);
+
+        var returnedEcmCcdRequest = new uk.gov.hmcts.ecm.common.model.ccd.CCDRequest();
+        returnedEcmCcdRequest.setCaseDetails(new CaseDetails());
+        when(ccdClient.startEcmCaseCreationTransfer(eq(TEST_AUTH_TOKEN), any(CaseDetails.class)))
+            .thenReturn(returnedEcmCcdRequest);
+
+        var ecmCaseData = new uk.gov.hmcts.ecm.common.model.ccd.CaseData();
+        ecmCaseData.setEthosCaseReference("18860001/2022");
+        var ecmSubmitEvent = new uk.gov.hmcts.ecm.common.model.ccd.SubmitEvent();
+        ecmSubmitEvent.setCaseData(ecmCaseData);
+        when(ccdClient.submitEcmCaseCreation(eq(TEST_AUTH_TOKEN),
+            any(CaseDetails.class), any(uk.gov.hmcts.ecm.common.model.ccd.CCDRequest.class)))
+            .thenReturn(ecmSubmitEvent);
+
+        var ccdRequest = new CCDRequest();
+        var requestCaseDetails = new uk.gov.hmcts.et.common.model.ccd.CaseDetails();
+        requestCaseDetails.setCaseData(new uk.gov.hmcts.et.common.model.ccd.CaseData());
+        ccdRequest.setCaseDetails(requestCaseDetails);
+        when(ccdClient.startEventForCase(eq(TEST_AUTH_TOKEN), any(), any(), any())).thenReturn(ccdRequest);
+
+        createEcmSingleService.sendCreation(
+            submitEvent,
+            TEST_AUTH_TOKEN,
+            MessageHandlerTestHelper.transferToEcmMessageScotland()
+        );
+
+        ArgumentCaptor<CaseDetails> detailsCaptor = ArgumentCaptor.forClass(CaseDetails.class);
+        verify(ccdClient).submitEcmCaseCreation(eq(TEST_AUTH_TOKEN), detailsCaptor.capture(), any());
+        uk.gov.hmcts.ecm.common.model.ccd.CaseData sentCaseData = detailsCaptor.getValue().getCaseData();
+        assertEquals(TribunalOffice.GLASGOW.getOfficeName(), sentCaseData.getManagingOffice());
+        assertEquals(TribunalOffice.GLASGOW.getOfficeName(), sentCaseData.getAllocatedOffice());
+    }
 }

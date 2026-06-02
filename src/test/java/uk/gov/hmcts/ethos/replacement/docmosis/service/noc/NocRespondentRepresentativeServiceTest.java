@@ -1518,34 +1518,46 @@ class NocRespondentRepresentativeServiceTest {
         nocRespondentRepresentativeService.revokeRespondentRepresentatives(caseDetails, new  ArrayList<>());
         verifyNoInteractions(ccdClient);
         // when role in case user assignments is a claimant role should not revoke case user assignments
-        CaseUserAssignment caseUserAssignment = CaseUserAssignment.builder().caseRole(ROLE_CLAIMANT_SOLICITOR).build();
+        CaseUserAssignment caseUserAssignment = CaseUserAssignment.builder().caseRole(ROLE_CLAIMANT_SOLICITOR)
+                .userId(REPRESENTATIVE_IDAM_ID_ONE).build();
         caseUserAssignmentsData.setCaseUserAssignments(List.of(caseUserAssignment));
         nocRespondentRepresentativeService.revokeRespondentRepresentatives(caseDetails, new  ArrayList<>());
         verifyNoInteractions(ccdClient);
         // when representative not found should not revoke case user assignment
         caseUserAssignment.setCaseRole(ROLE_SOLICITORA);
         CaseData tmpCaseData = new CaseData();
-        RepresentedTypeR representedTypeR = RepresentedTypeR.builder().role(ROLE_SOLICITORA).build();
+        RepresentedTypeR representedTypeR = RepresentedTypeR.builder().role(ROLE_SOLICITORA)
+                .idamId(REPRESENTATIVE_IDAM_ID_ONE).representativeEmailAddress(REPRESENTATIVE_EMAIL_1).build();
         RepresentedTypeRItem representative = new  RepresentedTypeRItem();
         representative.setValue(representedTypeR);
         representative.setId(REPRESENTATIVE_ID_ONE);
         tmpCaseData.setRepCollection(List.of(representative));
         caseDetails.setCaseData(tmpCaseData);
+        when(adminUserService.getAdminUserToken()).thenReturn(ADMIN_USER_TOKEN);
+        AccountIdByEmailResponse accountIdByEmailResponse = new AccountIdByEmailResponse();
+        accountIdByEmailResponse.setUserIdentifier(REPRESENTATIVE_IDAM_ID_ONE);
+        when(nocService.findUserByEmail(ADMIN_USER_TOKEN, REPRESENTATIVE_EMAIL_1, SUBMISSION_REFERENCE))
+                .thenReturn(accountIdByEmailResponse);
         nocRespondentRepresentativeService.revokeRespondentRepresentatives(caseDetails, new  ArrayList<>());
         verifyNoInteractions(ccdClient);
+        // when representative not found but there is ccd automatically assignment should revoke case user assignment
+        caseUserAssignment.setUserId(REPRESENTATIVE_IDAM_ID_TWO);
+        nocRespondentRepresentativeService.revokeRespondentRepresentatives(caseDetails, new  ArrayList<>());
+        verify(ccdClient, times(LoggerTestUtils.INTEGER_ONE)).revokeCaseAssignments(eq(ADMIN_USER_TOKEN),
+                any(CaseUserAssignmentData.class));
         // when representative is found should revoke case user assignment
         when(ccdClient.revokeCaseAssignments(eq(ADMIN_USER_TOKEN), any(CaseUserAssignmentData.class)))
                 .thenReturn(StringUtils.EMPTY);
         assertThat(nocRespondentRepresentativeService.revokeRespondentRepresentatives(caseDetails,
                 List.of(representative)).getRepresentativesToRemove()).isNotEmpty().isEqualTo(List.of(representative));
-        verify(ccdClient, times(LoggerTestUtils.INTEGER_ONE)).revokeCaseAssignments(eq(ADMIN_USER_TOKEN),
+        verify(ccdClient, times(LoggerTestUtils.INTEGER_TWO)).revokeCaseAssignments(eq(ADMIN_USER_TOKEN),
                 any(CaseUserAssignmentData.class));
         // when representative is found but not able to revoke case user assignment should return empty list.
         when(ccdClient.revokeCaseAssignments(eq(ADMIN_USER_TOKEN), any(CaseUserAssignmentData.class)))
                 .thenThrow(new IOException(EXCEPTION_DUMMY_MESSAGE));
         assertThat(nocRespondentRepresentativeService.revokeRespondentRepresentatives(caseDetails,
                 List.of(representative)).getRepresentativesToRemove()).isNotEmpty().isEqualTo(List.of(representative));
-        verify(ccdClient, times(LoggerTestUtils.INTEGER_TWO)).revokeCaseAssignments(eq(ADMIN_USER_TOKEN),
+        verify(ccdClient, times(LoggerTestUtils.INTEGER_THREE)).revokeCaseAssignments(eq(ADMIN_USER_TOKEN),
                 any(CaseUserAssignmentData.class));
     }
 

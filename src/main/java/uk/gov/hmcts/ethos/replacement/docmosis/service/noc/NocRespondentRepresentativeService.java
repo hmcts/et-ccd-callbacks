@@ -677,6 +677,12 @@ public class NocRespondentRepresentativeService {
             if (ObjectUtils.isNotEmpty(representedTypeRItem)) {
                 representativesCaseAssignments.getRevokedCaseUserAssignments().add(caseUserAssignment);
                 representativesCaseAssignments.getRepresentativesToRemove().add(representedTypeRItem);
+            } else {
+                RepresentedTypeRItem representative = RespondentRepresentativeUtils.findRepresentativeByIdamIdOrRole(
+                        caseDetails.getCaseData(), caseUserAssignment.getUserId(), caseUserAssignment.getCaseRole());
+                if (!checkRepresentativeAssignment(caseDetails, representative, caseUserAssignment)) {
+                    representativesCaseAssignments.getRevokedCaseUserAssignments().add(caseUserAssignment);
+                }
             }
         }
         try {

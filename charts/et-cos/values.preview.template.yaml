@@ -874,7 +874,7 @@ ccd-message-publisher:
       DATA_STORE_DB_HOST: et-preview.postgres.database.azure.com
       DATA_STORE_DB_NAME: "pr-${CHANGE_ID}-et_cos"
       DATA_STORE_DB_USERNAME: hmcts
-      DATA_STORE_DB_OPTIONS: "?stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
+      DATA_STORE_DB_OPTIONS: "?currentSchema=ccd&stringtype=unspecified&reWriteBatchedInserts=true&sslmode=require"
       CCD_CASE_EVENTS_DESTINATION: ${SERVICE_NAME}-ccd-case-events
     secrets:
       SERVICE_BUS_CONNECTION_STRING:

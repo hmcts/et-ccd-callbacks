@@ -20,6 +20,10 @@ spring:
             non_contextual_creation: 'true'
   application:
     name: et-cos
+  servlet:
+    multipart:
+      max-file-size: 300MB
+      max-request-size: 300MB
   datasource:
     password: ${ET_COS_DB_PASSWORD:}
     url: jdbc:postgresql://${ET_COS_DB_HOST:localhost}:${ET_COS_DB_PORT:5432}/${ET_COS_DB_NAME:et_cos}${ET_COS_DB_CONN_OPTIONS:}

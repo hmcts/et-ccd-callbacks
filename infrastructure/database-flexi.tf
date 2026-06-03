@@ -28,7 +28,8 @@ module "postgres" {
   common_tags   = local.tags
   pgsql_databases = [
     {
-      name : "et_cos"
+      name : "et_cos",
+      schemas_for_reader_access = ["public", "ccd"]
     }
   ]
   pgsql_version                  = "15"

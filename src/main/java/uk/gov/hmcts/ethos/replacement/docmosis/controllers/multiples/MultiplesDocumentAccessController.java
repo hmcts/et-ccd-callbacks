@@ -10,6 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import uk.gov.hmcts.et.common.model.multiples.MultipleCallbackResponse;
@@ -63,7 +64,8 @@ public class MultiplesDocumentAccessController {
         @ApiResponse(responseCode = "500", description = "Internal Server Error")
     })
     public ResponseEntity<MultipleCallbackResponse> aboutToSubmit(
-            @RequestBody MultipleRequest ccdRequest) {
+            @RequestBody MultipleRequest ccdRequest,
+            @RequestHeader("Authorization") String userToken) {
 
         MultipleData multipleData = ccdRequest.getCaseDetails().getCaseData();
         multiplesDocumentAccessService.setMultipleDocumentsToCorrectTab(multipleData);

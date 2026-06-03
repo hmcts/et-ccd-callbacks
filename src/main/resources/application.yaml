@@ -7,6 +7,9 @@ management:
   endpoint:
     health:
       show-details: always
+  health:
+      elasticsearch:
+        enabled: false
 
 spring:
   jpa:
@@ -26,6 +29,15 @@ spring:
     username: ${ET_COS_DB_USER_NAME:et_cos}
   config:
     import: optional:configtree:/mnt/secrets/et-cos/,optional:configtree:/mnt/secrets/et/
+  jms:
+    servicebus:
+      enabled: true
+      connection-string: ${AZURE_SERVICE_BUS_CONNECTION_STRING:${AZURE_SERVICE_BUS_PREVIEW_CONNECTION_STRING:dummy}}
+      pricing-tier: standard
+      pool:
+        enabled: true
+  autoconfigure:
+    exclude: com.azure.spring.cloud.autoconfigure.implementation.context.AzureTokenCredentialAutoConfiguration
 
 server:
   port: '8081'
@@ -35,13 +47,19 @@ feign:
     enabled: 'true'
 
 tornado:
-  accessKey: ${TORNADO_ACCESS_KEY}
+  accessKey: ${TORNADO_ACCESS_KEY:dummy}
   url: ${TORNADO_URL:https://eu.dws3.docmosis.com/api/render}
 
 ccd:
   client:
     timeout: '60000'
   data-store-api-url: ${CCD_DATA_STORE_API_URL:http://ccd-data-store-api:4452}
+  servicebus:
+    destination: ${CCD_SERVICEBUS_DESTINATION:${AZURE_SERVICE_BUS_TOPIC_NAME:ccd-case-events-aat}}
+    scheduler-enabled: ${ET_SERVICEBUS_SCHEDULER_ENABLED:false}
+    batch-size: ${ET_SERVICEBUS_BATCH_SIZE:1000}
+    published-retention-days: ${ET_SERVICEBUS_PUBLISHED_RETENTION_DAYS:7}
+    schedule: ${ET_SERVICEBUS_SCHEDULE:*/30 * * * * *}
 
 core_case_data:
   api:
@@ -53,6 +71,9 @@ document_management:
   ccdCaseDocument:
     url: ${DOCUMENT_MANAGEMENT_URL:http://dm-store:8080}
   url: ${DOCUMENT_MANAGEMENT_URL:http://dm-store:8080}
+
+decentralisation:
+  legacy-json-service: true
 
 idam:
   s2s-auth:
@@ -98,7 +119,7 @@ springdoc:
   packagesToScan: uk.gov.hmcts.ethos.replacement.docmosis.controllers
   pathsToMatch: /**
 
-gov-notify-api-key: ${GOV_NOTIFY_API_KEY}
+gov-notify-api-key: ${GOV_NOTIFY_API_KEY:dummy}
 
 template:
   referral: ${REFERRAL_TEMPLATE_ID:f975c1cc-e102-472a-a6cb-84dffa0a6d42}
@@ -283,7 +304,7 @@ caching:
   adminUserService: ${CACHING_ADMIN_USER_SERVICE:21600000}
 
 notifications:
-  govNotifyApiKey: ${GOV_NOTIFY_API_KEY}
+  govNotifyApiKey: ${GOV_NOTIFY_API_KEY:dummy}
   citizenPortalLink: ${CITIZEN_PORTAL_LINK:${CITIZEN_CASE_DETAILS_URL:https://localhost:3001/citizen-hub/}}
   respondentPortalLink: ${RESPONDENT_PORTAL_LINK:http://localhost:3003/case-details/}
   exuiCaseDetailsLink: ${EXUI_CASE_DETAILS_URL:http://localhost:3455/cases/case-details/}

@@ -21,11 +21,6 @@ import uk.gov.hmcts.et.common.model.generic.GenericCallbackResponse;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.CcdCaseAssignment;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocNotificationService;
 import uk.gov.hmcts.ethos.replacement.docmosis.service.noc.NocRepresentativeService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.CcdCaseAssignment;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.NocNotificationService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.NocRepresentativeService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.UserIdamService;
-import uk.gov.hmcts.ethos.replacement.docmosis.service.VerifyTokenService;
 
 import java.io.IOException;
 
@@ -89,15 +84,6 @@ public class NoticeOfChangeController {
     public GenericCallbackResponse nocSubmitted(@RequestHeader("Authorization") String userToken,
                                                 @RequestBody CallbackRequest callbackRequest) {
         GenericCallbackResponse callbackResponse = new GenericCallbackResponse();
-    public CCDCallbackResponse nocSubmitted(
-            @RequestHeader("Authorization") String userToken,
-            @RequestBody CallbackRequest callbackRequest) {
-        if (!verifyTokenService.verifyTokenSignature(userToken)) {
-            log.error(INVALID_TOKEN, userToken);
-        }
-
-        CCDCallbackResponse callbackResponse = CCDCallbackResponse.builder().build();
-
         if (APPLY_NOC_DECISION.equals(callbackRequest.getEventId())) {
             CaseDetails caseDetails = callbackRequest.getCaseDetails();
             CaseData caseData = caseDetails.getCaseData();

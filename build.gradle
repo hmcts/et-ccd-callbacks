@@ -331,15 +331,15 @@ tasks.register('runAndPublishConsumerPactTests', Test) {
     classpath = sourceSets.contractTest.runtimeClasspath
 }
 
-rootProject.tasks.named("processContractTestResources") {
+tasks.named("processContractTestResources") {
     duplicatesStrategy = 'include'
 }
 
-rootProject.tasks.named("processFunctionalResources") {
+tasks.named("processFunctionalResources") {
     duplicatesStrategy = 'include'
 }
 
-rootProject.tasks.named("createManifestApplication") {
+tasks.named("createManifestApplication") {
     // bootWithCCD host manifest references the et-shared jar; ensure it exists.
     dependsOn(':et-shared:jar')
 }

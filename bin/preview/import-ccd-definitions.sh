@@ -16,6 +16,10 @@ REPO_ROOT="${SCRIPT_DIR}/../.."
 
 # Use preview-specific token utilities
 source "${SCRIPT_DIR}/utils/auth-utils.sh"
+source "${SCRIPT_DIR}/utils/definition-store-db-utils.sh"
+
+echo "⏳ Waiting for CCD definition-store schema..."
+wait_for_definition_store_schema
 
 echo "🔐 Getting authentication tokens..."
 echo "Retrieving IDAM user token"

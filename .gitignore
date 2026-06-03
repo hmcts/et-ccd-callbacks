@@ -59,6 +59,9 @@ yarn-error.log*
 ### VSCode ###
 .vscode/
 bin/
+!bin/
+!bin/preview/
+!bin/preview/import-ref-data.sh
 
 ### DevContainer ###
 .devcontainer/

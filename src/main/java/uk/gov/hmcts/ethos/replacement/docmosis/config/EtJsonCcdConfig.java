@@ -1,6 +1,5 @@
 package uk.gov.hmcts.ethos.replacement.docmosis.config;
 
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -24,7 +23,6 @@ import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_CASE_TYPE_
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.SCOTLAND_LISTING_CASE_TYPE_ID;
 
 @Configuration
-@ConditionalOnProperty(name = "et.ccd.decentralised", havingValue = "true")
 @ComponentScan("uk.gov.hmcts.ccd.sdk")
 public class EtJsonCcdConfig {
 

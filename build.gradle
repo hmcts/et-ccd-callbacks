@@ -420,7 +420,6 @@ ext {
     serenity = '5.3.10'
     tomcatEmbedVersion = '10.1.55'
     jacksonVersion = '2.18.3'
-    etCcdDecentralised = (System.getenv('ET_CCD_DECENTRALISED') ?: 'true').toBoolean()
 }
 
 ext["rest-assured.version"] = '5.1.0'
@@ -671,20 +670,17 @@ bootWithCCD {
     environment 'SPRING_PROFILES_ACTIVE', 'cftlib'
     environment 'ET_COS_SYSTEM_USER', System.getenv('ET_COS_SYSTEM_USER') ?: 'admin@hmcts.net'
     environment 'ET_COS_SYSTEM_USER_PASSWORD', System.getenv('ET_COS_SYSTEM_USER_PASSWORD') ?: 'Password'
-    environment 'ET_CCD_DECENTRALISED', etCcdDecentralised.toString()
     environment 'CFTLIB_IMPORT_CCD_DEFS_ON_BOOT', System.getenv('CFTLIB_IMPORT_CCD_DEFS_ON_BOOT') ?: 'true'
     // et-ccd-callbacks
     //environment 'SERVICEBUS_FAKE', 'true'*
     environment 'CFTLIB_EXTRA_COMPOSE_FILES', ''
-    if (etCcdDecentralised) {
-        environment 'CCD_DECENTRALISED_CASE-TYPE-SERVICE-URLS_ET_EnglandWales', 'https://localhost:8081'
-        environment 'CCD_DECENTRALISED_CASE-TYPE-SERVICE-URLS_ET_Scotland', 'https://localhost:8081'
-        environment 'CCD_DECENTRALISED_CASE-TYPE-SERVICE-URLS_ET_EnglandWales_Listings', 'https://localhost:8081'
-        environment 'CCD_DECENTRALISED_CASE-TYPE-SERVICE-URLS_ET_Scotland_Listings', 'https://localhost:8081'
-        environment 'CCD_DECENTRALISED_CASE-TYPE-SERVICE-URLS_ET_EnglandWales_Multiple', 'https://localhost:8081'
-        environment 'CCD_DECENTRALISED_CASE-TYPE-SERVICE-URLS_ET_Scotland_Multiple', 'https://localhost:8081'
-        environment 'CCD_DECENTRALISED_CASE-TYPE-SERVICE-URLS_ET_Admin', 'https://localhost:8081'
-    }
+    environment 'CCD_DECENTRALISED_CASE-TYPE-SERVICE-URLS_ET_EnglandWales', 'https://localhost:8081'
+    environment 'CCD_DECENTRALISED_CASE-TYPE-SERVICE-URLS_ET_Scotland', 'https://localhost:8081'
+    environment 'CCD_DECENTRALISED_CASE-TYPE-SERVICE-URLS_ET_EnglandWales_Listings', 'https://localhost:8081'
+    environment 'CCD_DECENTRALISED_CASE-TYPE-SERVICE-URLS_ET_Scotland_Listings', 'https://localhost:8081'
+    environment 'CCD_DECENTRALISED_CASE-TYPE-SERVICE-URLS_ET_EnglandWales_Multiple', 'https://localhost:8081'
+    environment 'CCD_DECENTRALISED_CASE-TYPE-SERVICE-URLS_ET_Scotland_Multiple', 'https://localhost:8081'
+    environment 'CCD_DECENTRALISED_CASE-TYPE-SERVICE-URLS_ET_Admin', 'https://localhost:8081'
 
 }
 

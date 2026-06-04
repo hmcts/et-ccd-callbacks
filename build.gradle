@@ -668,6 +668,7 @@ bootWithCCD {
     environment 'XUI_MANAGE_ORGANISATIONS_CASETYPES', 'ET_EnglandWales,ET_Scotland'
 
     environment 'SPRING_PROFILES_ACTIVE', 'cftlib'
+    environment 'ET_COS_URL', System.getenv('ET_COS_URL') ?: 'http://localhost:8081'
     environment 'ET_COS_SYSTEM_USER', System.getenv('ET_COS_SYSTEM_USER') ?: 'admin@hmcts.net'
     environment 'ET_COS_SYSTEM_USER_PASSWORD', System.getenv('ET_COS_SYSTEM_USER_PASSWORD') ?: 'Password'
     environment 'CFTLIB_IMPORT_CCD_DEFS_ON_BOOT', System.getenv('CFTLIB_IMPORT_CCD_DEFS_ON_BOOT') ?: 'true'
@@ -692,6 +693,7 @@ tasks.named('dumpCCDDefinitions') {
     environment 'SPRING_MAIN_LAZY_INITIALIZATION', 'true'
     environment 'CFTLIB_IMPORT_CCD_DEFS_ON_BOOT', System.getenv('CFTLIB_IMPORT_CCD_DEFS_ON_BOOT') ?: 'true'
     environment 'ET_COS_CFTLIB_DB_PASSWORD', System.getenv('ET_COS_CFTLIB_DB_PASSWORD') ?: 'postgres'
+    environment 'ET_COS_URL', System.getenv('ET_COS_URL') ?: 'http://localhost:8081'
     environment 'ET_COS_SYSTEM_USER', System.getenv('ET_COS_SYSTEM_USER') ?: 'admin@hmcts.net'
     environment 'ET_COS_SYSTEM_USER_PASSWORD', System.getenv('ET_COS_SYSTEM_USER_PASSWORD') ?: 'Password'
     environment 'CFTLIB_EXTRA_COMPOSE_FILES', ''

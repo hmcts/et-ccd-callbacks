@@ -25,7 +25,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-import static com.google.common.base.Strings.isNullOrEmpty;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ADDRESS_LABELS_TEMPLATE;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.ALL_AVAILABLE_ADDRESSES;
 import static uk.gov.hmcts.ecm.common.model.helper.Constants.CLAIMANT_ADDRESS;
@@ -193,16 +192,17 @@ public class DocumentGenerationService {
         BFActionTypeItem bfActionTypeItem = new BFActionTypeItem();
         bfActionTypeItem.setId(UUID.randomUUID().toString());
         bfActionTypeItem.setValue(bfActionType);
-        var claimServedDate = bfActionType.getDateEntered().substring(0, 10);
-        if (isNullOrEmpty(caseData.getClaimServedDate())) {
-            caseData.setClaimServedDate(claimServedDate);
-        }
+
         if (CollectionUtils.isEmpty(caseData.getBfActions())) {
             caseData.setBfActions(new ArrayList<>(Collections.singletonList(bfActionTypeItem)));
+            caseData.setClaimServedDate(bfActionType.getDateEntered());
         } else {
             List<BFActionTypeItem> tmp = caseData.getBfActions();
             tmp.add(bfActionTypeItem);
             caseData.setBfActions(tmp);
+            String dateEntered = caseData.getBfActions().get(0).getValue().getDateEntered().substring(0, 10);
+            LocalDate date = LocalDate.parse(dateEntered);
+            caseData.setClaimServedDate(String.valueOf(date));
         }
         caseData.setEt3DueDate(LocalDate.parse(caseData.getClaimServedDate())
             .plusDays(ET3_DUE_DATE_FROM_SERVING_DATE).toString());

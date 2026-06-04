@@ -138,7 +138,7 @@ class CallbackBindingSetupTest {
             applicationContext,
             OBJECT_MAPPER,
             handlerMapping,
-            new MockEnvironment().withProperty("decentralisation.local-callback-base-urls", LOCAL_CALLBACK_BASE_URL)
+            new MockEnvironment().withProperty("decentralisation.local-callback-base-url", LOCAL_CALLBACK_BASE_URL)
         );
     }
 

@@ -117,11 +117,11 @@ public class EtJsonCcdConfig {
         };
     }
 
-  /**
-   * If you someday wish to represent your case in Java instead of json, you can define case roles using enums.
-   * This is an inert placeholder.
-   */
-  public enum PlaceholderRole implements HasRole {
+    /**
+     * If you someday wish to represent your case in Java instead of json, you can define case roles using enums.
+     * This is an inert placeholder.
+     */
+    public enum PlaceholderRole implements HasRole {
         DUMMY_STATE;
 
         @Override

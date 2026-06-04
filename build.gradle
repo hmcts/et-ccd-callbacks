@@ -41,7 +41,7 @@ java {
 checkstyle {
     maxWarnings = 0
     toolVersion = '10.14.0'
-    getConfigDirectory().set(new File(rootDir, 'config/checkstyle'))
+    getConfigDirectory().set(new File(projectDir, 'config/checkstyle'))
 }
 
 def sonarExclusions =
